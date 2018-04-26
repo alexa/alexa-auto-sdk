@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/action_tap_to_talk"
+        android:icon="@drawable/ic_action_tap_to_talk"
+        android:title="@string/action_tap_to_talk"
+        app:showAsAction="always" />
+
+    <item android:id="@+id/action_drawer"
+        android:icon="@drawable/ic_menu"
+        android:title="Drawer"
+        app:showAsAction="always" />
+
+</menu>

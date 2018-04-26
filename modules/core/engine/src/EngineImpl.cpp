@@ -1,0 +1,366 @@
+/*
+ * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+#include <unordered_map>
+#include <forward_list>
+
+#include "AACE/Engine/Core/EngineImpl.h"
+#include "AACE/Engine/Core/EngineService.h"
+#include "AACE/Engine/Core/EngineMacros.h"
+
+// default Engine constructor
+std::shared_ptr<aace::core::Engine> aace::core::Engine::create() {
+    return aace::engine::core::EngineImpl::create();
+}
+
+namespace aace {
+namespace engine {
+namespace core {
+
+// String to identify log entries originating from this file.
+static const std::string TAG("aace.core.EngineImpl");
+
+std::shared_ptr<EngineImpl> EngineImpl::create() 
+{
+    try
+    {
+        auto engine = std::shared_ptr<EngineImpl>( new EngineImpl() );
+        
+        ThrowIfNull( engine, "createEngineFailed" );
+        ThrowIfNot( engine->initialize(), "initializeFailed" );
+
+        return engine;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"create").d("reason", ex.what()));
+        return nullptr;
+    }
+}
+
+EngineImpl::~EngineImpl()
+{
+    if( m_running && stop() == false ) {
+        AACE_ERROR(LX(TAG,"~EngineImpl").d("reason", "engineStopFailed"));
+    }
+}
+
+bool EngineImpl::initialize()
+{
+    try
+    {
+        ThrowIfNot( checkServices(), "checkServicesFailed" );
+
+        // iterate through registered engine services and call initialize() for each module
+        for( auto next : m_orderedServiceList ) {
+            ThrowIfNot( next->handleInitializeEngineEvent( shared_from_this() ), "initializeServiceFailed" );
+        }
+
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"initialize").d("reason", ex.what()));
+        return false;
+    }
+}
+
+bool EngineImpl::configure( std::shared_ptr<aace::core::config::EngineConfiguration> configuration ) {
+    return configure( { configuration } );
+}
+
+bool EngineImpl::configure( std::initializer_list<std::shared_ptr<aace::core::config::EngineConfiguration>> configurationList ) {
+    return configure( std::vector<std::shared_ptr<aace::core::config::EngineConfiguration>>( configurationList ) );
+}
+
+bool EngineImpl::configure( std::vector<std::shared_ptr<aace::core::config::EngineConfiguration>> configurationList )
+{
+    try
+    {
+        // get the configuration streams
+        std::vector<std::shared_ptr<std::istream>> configurationStreams;
+        
+        // iterate through configuration objects and get streams for sdk initialization
+        for( auto next : configurationList ) {
+            ThrowIfNull( next, "invalidConfiguration" );
+            configurationStreams.push_back( next->getStream() );
+        }
+
+        // iterate through registered engine services and call configure() for each module
+        for( auto nextService : m_orderedServiceList )
+        {
+            ThrowIfNot( nextService->handleConfigureEngineEvent( configurationStreams ), "configureServiceFailed" );
+            
+            for( auto nextStream : configurationStreams ) {
+                nextStream->clear();
+                nextStream->seekg( 0 );
+            }
+        }
+        
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"configure").d("reason", ex.what()));
+        return false;
+    }
+}
+
+bool EngineImpl::checkServices()
+{
+    try
+    {
+        std::unordered_map<std::string,std::shared_ptr<ServiceFactory>> registeredServiceFactoryMap;
+        std::vector<std::shared_ptr<ServiceFactory>> orderedServiceFactoryList;
+        std::forward_list<std::shared_ptr<ServiceFactory>> unresolvedDependencyList;
+
+        for( auto it = EngineServiceManager::registryBegin(); it != EngineServiceManager::registryEnd(); it++ )
+        {
+            bool success = true;
+            auto serviceFactory = it->second;
+            auto desc = serviceFactory->getDescription();
+        
+            for( auto next : desc.getDependencies() )
+            {
+                auto it = registeredServiceFactoryMap.find( next.getType() );
+            
+                if( it != registeredServiceFactoryMap.end() )
+                {
+                    auto serviceFactory = it->second;
+                    auto desc = serviceFactory->getDescription();
+                    auto v1 = desc.getVersion();
+                    auto v2 = next.getVersion();
+                    
+                    ThrowIf( v1 < v2, "invalidDependencyVersion" );
+                }
+                else
+                {
+                    success = false;
+                    break;
+                }
+            }
+            
+            if( success )
+            {
+                orderedServiceFactoryList.push_back( serviceFactory );
+                
+                // add the service to the registered service map so we can resolve dependencies
+                registeredServiceFactoryMap[desc.getType()] = serviceFactory;
+            }
+            else {
+                unresolvedDependencyList.push_front( serviceFactory );
+            }
+        }
+        
+        while( unresolvedDependencyList.empty() == false )
+        {
+            bool updated = false;
+            auto it = unresolvedDependencyList.begin();
+            auto prev = unresolvedDependencyList.before_begin();
+            
+            while( it != unresolvedDependencyList.end() )
+            {
+                bool success = true;
+                auto serviceFactory = *it;
+                auto desc = serviceFactory->getDescription();
+
+                for( auto next : desc.getDependencies() )
+                {
+                    auto it = registeredServiceFactoryMap.find( next.getType() );
+
+                    if( it != registeredServiceFactoryMap.end() )
+                    {
+                        auto serviceFactory = it->second;
+                        auto desc = serviceFactory->getDescription();
+                        auto v1 = desc.getVersion();
+                        auto v2 = next.getVersion();
+                        
+                        ThrowIf( v1 < v2, "invalidDependencyVersion" );
+                    }
+                    else
+                    {
+                        success = false;
+                        break;
+                    }
+                }
+                
+                if( success )
+                {
+                    orderedServiceFactoryList.push_back( serviceFactory );
+                
+                    // add the service to the registered service map so we can resolve dependencies
+                    registeredServiceFactoryMap[desc.getType()] = serviceFactory;
+
+                    // remove the item from the list
+                    it = unresolvedDependencyList.erase_after( prev );
+                    
+                    updated = true;
+                }
+                else {
+                    prev = it++;
+                }
+            }
+            
+            // fail if we were not able to resolve any of the remaining dependencies
+            ThrowIfNot( updated, "failedToResolveServiceDependencies" );
+        }
+        
+        // instantiate the engine service objects
+        for( auto next : orderedServiceFactoryList )
+        {
+            auto service = next->newInstance();
+            ThrowIfNull( service, "createNewServiceInstanceFailed" );
+            
+            m_orderedServiceList.push_back( service );
+            m_registeredServiceMap[service->getDescription().getType()] = service;
+        }
+        
+        // dump list of services to log
+        for( auto next : m_orderedServiceList ) {
+            auto desc = next->getDescription();
+            auto version = desc.getVersion();
+            AACE_INFO(LX(TAG,"EngineService").d("name",desc.getType()).d("version",version.toString()));
+        }
+        
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"checkServices").d("reason", ex.what()));
+        m_orderedServiceList.clear();
+        m_registeredServiceMap.clear();
+        return false;
+    }
+}
+
+bool EngineImpl::start()
+{
+    try
+    {
+        ThrowIf( m_running, "engineAlreadyRunning" );
+
+        // iterate through registered engine modules and call start() for each module
+        for( auto next : m_orderedServiceList ) {
+            ThrowIfNot( next->handleStartEngineEvent(), "startServiceFailed" );
+        }
+
+        // set the engine running flag to true
+        m_running = true;
+
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"start").d("reason", ex.what()));
+        return false;
+    }
+}
+
+bool EngineImpl::stop()
+{
+    try
+    {
+        ThrowIfNot( m_running, "engineNotRunning" );
+    
+        // iterate through registered engine modules and call stop() for each module
+        for( auto next : m_orderedServiceList ) {
+            ThrowIfNot( next->handleStopEngineEvent(), "stopServiceFailed" );
+        }
+
+        // set the engine running and configured flag to false - the engine must be reconfigured before starting again
+        m_running = false;
+
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"stop").d("reason", ex.what()));
+        return false;
+    }
+}
+
+std::shared_ptr<EngineService> EngineImpl::getService( const std::string& type ) {
+    auto it = m_registeredServiceMap.find( type );
+    return it != m_registeredServiceMap.end() ? it->second : nullptr;
+}
+
+std::shared_ptr<EngineService> EngineImpl::getServiceFromPropertyKey( const std::string& key )
+{
+    for( auto next : m_orderedServiceList )
+    {
+        std::string kcmp = next->getDescription().getType() + ".";
+
+        if( key.compare( 0, kcmp.length(), kcmp ) == 0 ) {
+            return next;
+        }
+    }
+    
+    return nullptr;
+}
+
+bool EngineImpl::setProperty( const std::string& key, const std::string& value )
+{
+    try
+    {
+        auto service = getServiceFromPropertyKey( key );
+        
+        if( service != nullptr ) {
+            return service->setProperty( key, value );
+        }
+    
+        // iterate through registered engine modules and call setProperty() for each module
+        for( auto next : m_orderedServiceList ) {
+            ReturnIf( next->setProperty( key, value ), true );
+        }
+
+        return false;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"setProperty").d("reason", ex.what()));
+        return false;
+    }
+}
+
+bool EngineImpl::registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface )
+{
+    try
+    {
+        // iterate through registered engine modules and call registerPlatformInterface() for each module
+        for( auto next : m_orderedServiceList ) {
+            ReturnIf( next->handleRegisterPlatformInterfaceEngineEvent( platformInterface ), true );
+        }
+
+        return false;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"registerPlatformInterface").d("reason", ex.what()));
+        return false;
+    }
+}
+
+bool EngineImpl::registerPlatformInterface( std::initializer_list<std::shared_ptr<aace::core::PlatformInterface>> platformInterfaceList )
+{
+    try
+    {
+        for( auto next : platformInterfaceList ) {
+            ThrowIfNot( registerPlatformInterface( next ), "registerPlatformInterfaceFailed" );
+        }
+        
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"registerPlatformInterface").d("reason", ex.what()));
+        return false;
+    }
+}
+
+} // aace::engine::core
+} // aace::engine
+} // aace
+

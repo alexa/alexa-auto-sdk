@@ -1,2 +1,95 @@
-Aac SDK
-Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved. 
+AAC SDK
+Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+
+***************************
+AAC SDK COMPONENTS
+***************************
+The following AAC SDK components are licensed under the Apache License, Version 2.0 (the "License"):
+
+builder
+modules/core
+modules/alexa
+modules/navigation
+platform/android
+samples/android
+tools/document
+
+You may not use this file except in compliance with the License. A copy of
+the License is located at
+
+    http://aws.amazon.com/apache2.0/
+
+or in the "license" file accompanying this file. This file is distributed on
+an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+or implied. See the License for the specific language governing permissions and
+limitations under the License.
+
+
+**********************
+THIRD PARTY COMPONENTS
+**********************
+SDK html documentation includes the following open source libraries:
+----------------------------------------
+jQuery JavaScript Library v1.7.1
+http://jquery.com/
+
+Copyright 2011, John Resig
+Dual licensed under the MIT or GPL Version 2 licenses.
+http://jquery.org/license
+----------------------------------------
+Sizzle CSS Selector Engine
+Copyright 2011, The Dojo Foundation
+Released under the MIT, BSD, and GPL Licenses.
+More information: http://sizzlejs.com/
+----------------------------------------
+jQuery UI 1.8.18
+
+Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
+Dual licensed under the MIT or GPL Version 2 licenses.
+http://jquery.org/license
+
+http://docs.jquery.com/UI
+----------------------------------------
+jQuery UI Widget 1.8.18
+
+Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
+Dual licensed under the MIT or GPL Version 2 licenses.
+http://jquery.org/license
+
+http://docs.jquery.com/UI/Widget
+----------------------------------------
+jQuery UI Mouse 1.8.18
+
+Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
+Dual licensed under the MIT or GPL Version 2 licenses.
+http://jquery.org/license
+
+http://docs.jquery.com/UI/Mouse
+----------------------------------------
+jQuery hashchange event - v1.3 - 7/21/2010
+http://benalman.com/projects/jquery-hashchange-plugin/
+
+Copyright (c) 2010 "Cowboy" Ben Alman
+Dual licensed under the MIT and GPL licenses.
+http://benalman.com/about/license/
+----------------------------------------
+PowerTip - v1.2.0 - 2013-04-03
+http://stevenbenner.github.com/jquery-powertip/
+Copyright (c) 2013 Steven Benner (http://stevenbenner.com/).
+Released under MIT license.
+https://raw.github.com/stevenbenner/jquery-powertip/master/LICENSE.txt
+----------------------------------------
+jQuery UI Touch Punch 0.2.3
+
+Copyright 2011-2014, Dave Furfero
+Dual licensed under the MIT or GPL Version 2 licenses.
+----------------------------------------
+SmartMenus jQuery Plugin - v1.0.0 - January 27, 2016
+http://www.smartmenus.org/
+
+Copyright Vasil Dinkov, Vadikom Web Ltd.
+http://vadikom.com
+
+Licensed MIT
+--------------------------------------------------------------------------------

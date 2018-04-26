@@ -1,0 +1,179 @@
+/*
+ * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+#include "AACE/Alexa/AlexaConfiguration.h"
+#include "AACE/Engine/Core/EngineMacros.h"
+
+#include <rapidjson/document.h>
+#include <rapidjson/prettywriter.h>
+#include <rapidjson/stringbuffer.h>
+
+namespace aace {
+namespace alexa {
+namespace config {
+
+// String to identify log entries originating from this file.
+static const std::string TAG("aace.alexa.config.AlexaConfiguationImpl");
+
+std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createAuthConfig( const std::string& clientId, const std::string& clientSecret, const std::string& refreshToken )
+{
+    rapidjson::Document document;
+
+    document.SetObject();
+
+    rapidjson::Value authDelegateElement;
+
+    authDelegateElement.SetObject();
+    authDelegateElement.AddMember( "clientId", rapidjson::Value().SetString( clientId.c_str(), clientId.length() ), document.GetAllocator() );
+    authDelegateElement.AddMember( "clientSecret", rapidjson::Value().SetString( clientSecret.c_str(), clientSecret.length() ), document.GetAllocator() );
+    authDelegateElement.AddMember( "refreshToken", rapidjson::Value().SetString( refreshToken.c_str(), refreshToken.length() ), document.GetAllocator() );
+    
+    document.AddMember( "authDelegate", authDelegateElement, document.GetAllocator() );
+
+    // create event string
+    rapidjson::StringBuffer buffer;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer( buffer );
+
+    document.Accept( writer );
+    
+    return aace::core::config::StreamConfiguration::create( std::make_shared<std::stringstream>( buffer.GetString() ) );
+}
+
+std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createAlertsConfig( const std::string& databaseFilePath )
+{
+    rapidjson::Document document;
+    
+    document.SetObject();
+
+    rapidjson::Value alertsCapabilityAgentElement;
+
+    alertsCapabilityAgentElement.SetObject();
+    alertsCapabilityAgentElement.AddMember( "databaseFilePath", rapidjson::Value().SetString( databaseFilePath.c_str(), databaseFilePath.length() ), document.GetAllocator() );
+    
+    document.AddMember( "alertsCapabilityAgent", alertsCapabilityAgentElement, document.GetAllocator() );
+
+    // create event string
+    rapidjson::StringBuffer buffer;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer( buffer );
+
+    document.Accept( writer );
+    
+    return aace::core::config::StreamConfiguration::create( std::make_shared<std::stringstream>( buffer.GetString() ) );
+}
+
+std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createNotificationsConfig( const std::string& databaseFilePath )
+{
+    rapidjson::Document document;
+    
+    document.SetObject();
+
+    rapidjson::Value notificationsElement;
+
+    notificationsElement.SetObject();
+    notificationsElement.AddMember( "databaseFilePath", rapidjson::Value().SetString( databaseFilePath.c_str(), databaseFilePath.length() ), document.GetAllocator() );
+    
+    document.AddMember( "notifications", notificationsElement, document.GetAllocator() );
+
+    // create event string
+    rapidjson::StringBuffer buffer;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer( buffer );
+
+    document.Accept( writer );
+    
+    return aace::core::config::StreamConfiguration::create( std::make_shared<std::stringstream>( buffer.GetString() ) );
+}
+
+std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createCertifiedSenderConfig( const std::string& databaseFilePath )
+{
+    rapidjson::Document document;
+    
+    document.SetObject();
+
+    rapidjson::Value certifiedSenderElement;
+
+    certifiedSenderElement.SetObject();
+    certifiedSenderElement.AddMember( "databaseFilePath", rapidjson::Value().SetString( databaseFilePath.c_str(), databaseFilePath.length() ), document.GetAllocator() );
+    
+    document.AddMember( "certifiedSender", certifiedSenderElement, document.GetAllocator() );
+
+    // create event string
+    rapidjson::StringBuffer buffer;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer( buffer );
+
+    document.Accept( writer );
+    
+    return aace::core::config::StreamConfiguration::create( std::make_shared<std::stringstream>( buffer.GetString() ) );
+}
+
+std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createSettingsConfig( const std::string& databaseFilePath, const std::string& locale )
+{
+    rapidjson::Document document;
+    
+    document.SetObject();
+
+    rapidjson::Value settingsElement;
+
+    settingsElement.SetObject();
+    settingsElement.AddMember( "databaseFilePath", rapidjson::Value().SetString( databaseFilePath.c_str(), databaseFilePath.length() ), document.GetAllocator() );
+    
+    rapidjson::Value defaultAVSClientSettingsElement;
+
+    defaultAVSClientSettingsElement.SetObject();
+    defaultAVSClientSettingsElement.AddMember( "locale", rapidjson::Value().SetString( locale.c_str(), locale.length() ), document.GetAllocator() );
+    
+    settingsElement.AddMember( "defaultAVSClientSettings", defaultAVSClientSettingsElement, document.GetAllocator() );
+    
+    document.AddMember( "settings", settingsElement, document.GetAllocator() );
+
+    // create event string
+    rapidjson::StringBuffer buffer;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer( buffer );
+
+    document.Accept( writer );
+    
+    return aace::core::config::StreamConfiguration::create( std::make_shared<std::stringstream>( buffer.GetString() ) );
+}
+
+std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createSystemConfig( uint32_t firmwareVersion )
+{
+    rapidjson::Document document;
+    
+    document.SetObject();
+
+    rapidjson::Value aaceAlexaElement;
+
+    aaceAlexaElement.SetObject();
+    
+    rapidjson::Value systemElement;
+
+    systemElement.SetObject();
+    systemElement.AddMember( "firmwareVersion", firmwareVersion, document.GetAllocator() );
+
+    aaceAlexaElement.AddMember( "system", systemElement, document.GetAllocator() );
+    
+    document.AddMember( "aace.alexa", aaceAlexaElement, document.GetAllocator() );
+
+    // create event string
+    rapidjson::StringBuffer buffer;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer( buffer );
+
+    document.Accept( writer );
+    
+    return aace::core::config::StreamConfiguration::create( std::make_shared<std::stringstream>( buffer.GetString() ) );
+}
+
+} // aace::alexa::config
+} // aace::alexa
+} // aace

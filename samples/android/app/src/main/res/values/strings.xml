@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Sample App</string>
+
+    <!-- actions -->
+    <string name="action_tap_to_talk">Tap to Talk</string>
+
+    <!-- drawer -->
+    <string name="error_switch">Error</string>
+    <string name="info_switch">Info</string>
+    <string name="warn_switch">Warn</string>
+    <string name="verbose_switch">Verbose</string>
+    <string name="log_switch_header">Filter Log</string>
+    <string name="log_switch_source">Source</string>
+    <string name="log_switch_level">Level</string>
+
+    <!-- display cards -->
+    <string name="down_arrow">Down Arrow</string>
+    <string name="up_arrow">Up Arrow</string>
+    <string name="current_weather_icon">Current Weather Icon</string>
+
+</resources>

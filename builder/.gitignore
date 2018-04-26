@@ -1,0 +1,13 @@
+bitbake
+extras
+
+android-toolchain/
+amazon-sources/
+
+build/
+build-legacy/
+build-cmake/
+
+deploy/
+
+.DS_Store

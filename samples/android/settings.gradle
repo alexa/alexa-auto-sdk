@@ -1,0 +1,5 @@
+include ':app', ':aace'
+def aaceProjectDir = new File(settingsDir, '../../platforms/android/aace')
+if (aaceProjectDir && aaceProjectDir.exists()) {
+    project(':aace').projectDir = aaceProjectDir
+}

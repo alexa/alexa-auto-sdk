@@ -18,6 +18,8 @@
 namespace aace {
 namespace alexa {
 
+AlexaClient::~AlexaClient() = default; // key function
+
 } // aace::alexa
 } // aac
 

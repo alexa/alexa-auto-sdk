@@ -32,10 +32,15 @@ protected:
 public:
     void renderTemplate( const std::string & payload ) override;
     void renderPlayerInfo( const std::string & payload ) override;
+    void clearTemplate() override;
+    void clearPlayerInfo() override;
 
 private:
     jmethodID m_javaMethod_renderTemplate_payload = nullptr;
     jmethodID m_javaMethod_renderPlayerInfo_payload = nullptr;
+    jmethodID m_javaMethod_clearTemplate = nullptr;
+    jmethodID m_javaMethod_clearPlayerInfo = nullptr;
+
 };
 
 #endif //AACE_ALEXA_TEMPLATE_RUNTIME_BINDER_H

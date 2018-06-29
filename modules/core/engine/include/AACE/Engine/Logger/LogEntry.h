@@ -70,7 +70,7 @@ LogEntry& LogEntry::d(const char* key, const ValueType& value) {
     return *this;
 }
 
-#ifdef AACE_EMIT_SENSITIVE_LOGS
+#ifdef AAC_EMIT_SENSITIVE_LOGS
 template <typename ValueType>
 LogEntry& LogEntry::sensitive(const char* key, const ValueType& value) {
     return d(key, value);

@@ -51,6 +51,30 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
     return aace::core::config::StreamConfiguration::create( std::make_shared<std::stringstream>( buffer.GetString() ) );
 }
 
+std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createDeviceInfoConfig( const std::string& deviceSerialNumber, const std::string& clientId, const std::string& productId )
+{
+    rapidjson::Document document;
+
+    document.SetObject();
+
+    rapidjson::Value authDelegateElement;
+
+    authDelegateElement.SetObject();
+    authDelegateElement.AddMember( "deviceSerialNumber", rapidjson::Value().SetString( deviceSerialNumber.c_str(), deviceSerialNumber.length() ), document.GetAllocator() );
+    authDelegateElement.AddMember( "clientId", rapidjson::Value().SetString( clientId.c_str(), clientId.length() ), document.GetAllocator() );
+    authDelegateElement.AddMember( "productId", rapidjson::Value().SetString( productId.c_str(), productId.length() ), document.GetAllocator() );
+    
+    document.AddMember( "deviceInfo", authDelegateElement, document.GetAllocator() );
+
+    // create event string
+    rapidjson::StringBuffer buffer;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer( buffer );
+
+    document.Accept( writer );
+    
+    return aace::core::config::StreamConfiguration::create( std::make_shared<std::stringstream>( buffer.GetString() ) );
+}
+
 std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createAlertsConfig( const std::string& databaseFilePath )
 {
     rapidjson::Document document;
@@ -116,6 +140,29 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
     
     return aace::core::config::StreamConfiguration::create( std::make_shared<std::stringstream>( buffer.GetString() ) );
 }
+    
+std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createCurlConfig( const std::string& certsPath )
+{
+    rapidjson::Document document;
+    
+    document.SetObject();
+    
+    rapidjson::Value libcurlUtilsElement;
+    
+    libcurlUtilsElement.SetObject();
+    libcurlUtilsElement.AddMember( "CURLOPT_CAPATH", rapidjson::Value().SetString( certsPath.c_str(), certsPath.length() ), document.GetAllocator());
+    
+    document.AddMember( "libcurlUtils", libcurlUtilsElement, document.GetAllocator() );
+    
+    // create event string
+    rapidjson::StringBuffer buffer;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer( buffer );
+    
+    document.Accept( writer );
+    
+    return aace::core::config::StreamConfiguration::create( std::make_shared<std::stringstream>( buffer.GetString() ) );
+    
+}
 
 std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createSettingsConfig( const std::string& databaseFilePath, const std::string& locale )
 {
@@ -164,6 +211,28 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
     aaceAlexaElement.AddMember( "system", systemElement, document.GetAllocator() );
     
     document.AddMember( "aace.alexa", aaceAlexaElement, document.GetAllocator() );
+
+    // create event string
+    rapidjson::StringBuffer buffer;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer( buffer );
+
+    document.Accept( writer );
+    
+    return aace::core::config::StreamConfiguration::create( std::make_shared<std::stringstream>( buffer.GetString() ) );
+}
+
+std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createMiscStorageConfig( const std::string& databaseFilePath )
+{
+    rapidjson::Document document;
+    
+    document.SetObject();
+
+    rapidjson::Value certifiedSenderElement;
+
+    certifiedSenderElement.SetObject();
+    certifiedSenderElement.AddMember( "databaseFilePath", rapidjson::Value().SetString( databaseFilePath.c_str(), databaseFilePath.length() ), document.GetAllocator() );
+    
+    document.AddMember( "miscDatabase", certifiedSenderElement, document.GetAllocator() );
 
     // create event string
     rapidjson::StringBuffer buffer;

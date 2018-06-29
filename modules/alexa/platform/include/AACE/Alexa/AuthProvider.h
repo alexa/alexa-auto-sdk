@@ -27,45 +27,54 @@ namespace aace {
 namespace alexa {
     
 /**
- * The @c AuthProvider class should be implemented by clients who handle their own authentication states
- * and manage their own access tokens.  i.e. mobile clients that authenticate with LWA and cannot
- * pass a refresh token to configure the Engine with.
+ * AuthProvider should be extended to manage access tokens for AVS authorization and report
+ * client authorization state to the Engine.
  */
 class AuthProvider : public aace::core::PlatformInterface {
 protected:
     AuthProvider() = default;
 
 public:
+    /**
+     * Describes the state of client authorization with AVS
+     * @sa @c aace::alexa::AuthProviderEngineInterface::AuthState
+     */
     using AuthState = aace::alexa::AuthProviderEngineInterface::AuthState;
+
+    /**
+     * Describes an error during an attempt to authorize with AVS
+     * @sa @c aace::alexa::AuthProviderEngineInterface::AuthError
+     */
     using AuthError = aace::alexa::AuthProviderEngineInterface::AuthError;
 
-    virtual ~AuthProvider() = default;
+    virtual ~AuthProvider();
     
     /**
-     * Called when the platform implementation should retrieve the an auth token
+     * Returns the token used by the platform implementation for authorization with AVS.
+     * The platform implementation should retrieve an auth token if it does not have one.
      *
-     * @return the auth token from the platform implementation of AuthProvider.
+     * @return The token used to authorize with AVS
      */
     virtual std::string getAuthToken() = 0;
     
     /**
-     * Called when the platform implementation should retrieve an authState
+     * Returns the AVS authorization state of the platform implementation
      *
-     * @return the auth state from the platform implementation of AuthProvider.
+     * @return The AVS authorization state
      */
     virtual AuthState getAuthState() = 0;
     
     /**
-     * Notify the Engine that the Auth State/Error has changed
+     * Notifies the Engine of a change in AVS authorization state in the platform implementation
      *
-     * @param [in] authState AuthState the authState of the platform implementation
-     * @param [in] authError AuthError the authError of the platform implementation
+     * @param [in] authState The new authorization state
+     * @param [in] authError The error state of the authorization attempt
      */
     void authStateChanged( AuthState authState, AuthError authError );
     
     /**
      * @internal
-     * Sets engine interface delegate.
+     * Sets the Engine interface delegate.
      *
      * Should *never* be called by the platform implementation.
      */

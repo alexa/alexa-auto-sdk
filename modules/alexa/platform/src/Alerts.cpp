@@ -21,6 +21,8 @@ namespace alexa {
 Alerts::Alerts( std::shared_ptr<aace::alexa::MediaPlayer> mediaPlayer, std::shared_ptr<aace::alexa::Speaker> speaker ) : aace::alexa::AudioChannel( mediaPlayer, speaker, aace::alexa::Speaker::Type::LOCAL ) {
 }
 
+Alerts::~Alerts() = default; // key function
+
 void Alerts::localStop() {
     if( m_alertsEngineInterface != nullptr ) {
         m_alertsEngineInterface->onLocalStop();

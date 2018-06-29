@@ -28,42 +28,46 @@ namespace aace {
 namespace network {
 
 /**
- * The @c NetworkInfoProvider should be extended by the platform implementation to handle network services.
+ * NetworkInfoProvider should be extended to report network connectivity events to the Engine.
  */
 class NetworkInfoProvider : public aace::core::PlatformInterface {
 protected:
     NetworkInfoProvider() = default;
 
 public:
+    /**
+     * Describes the status of network connectivity
+     * @sa @c aace::network::NetworkInfoProviderEngineInterface::NetworkStatus
+     */
     using NetworkStatus = aace::network::NetworkInfoProviderEngineInterface::NetworkStatus;
 
-    virtual ~NetworkInfoProvider() = default;
+    virtual ~NetworkInfoProvider();
 
     /**
-     * Called when the Engine needs the current network status.
+     * Returns the current network connectivity status on the platform
      *
-     * @return @c NetworkStatus of the current network.
+     * @return The connectivity status of the current network
      */
     virtual NetworkStatus getNetworkStatus() = 0;
 
     /**
-     * Called when the Engine needs the current signal strength of the network. (RSSI)
+     * Returns the current signal strength (RSSI) of the WiFi connection on the platform
      *
-     * @return @c int RSSI of the current network.
+     * @return The RSSI of the WiFi connection
      */
     virtual int getWifiSignalStrength() = 0;
 
     /**
-     * Tell the Engine that the Wi-Fi network status has changed
+     * Notifies the Engine of a WiFi network status change on the platform
      *
-     * @param [in] status The connection status of the Wi-Fi network.
-     * @param [in] wifiSignalStrength The RSSI of the Wi-Fi connection.
+     * @param [in] status The connection status of the WiFi network
+     * @param [in] wifiSignalStrength The RSSI of the WiFi connection
      */
     void networkStatusChanged( NetworkStatus status, int wifiSignalStrength );
 
     /**
      * @internal
-     * Sets engine interface delegate.
+     * Sets the Engine interface delegate.
      *
      * Should *never* be called by the platform implementation.
      */

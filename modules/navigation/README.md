@@ -2,33 +2,51 @@
 
 ### Overview
 
-The Navigation module includes a navigation platform interface to handle Alexa navigation events and directives. This means it depends on the [Alexa module](../alexa/README.md).
+The AAC Navigation API provides the features required by a platform implementation to interface with the navigation capabilities of Alexa.
 
 ### Handling Navigation
 
-The Engine provides callbacks for handling navigation directives from Alexa. The platform implementation must also inform the Engine of the status of navigation on the platform. This is optional and dependent on the platform implementation.
+It is the responsibility of the platform implementation to set a destination and stop navigation when notified to do so by the Engine. The platform implementation should choose how to handle these requests based on its navigation provider. 
 
-To implement a custom navigation handler for handling navigation events from Alexa, the `aace::navigation::Navigation` class should be extended:
+To implement a custom navigation handler for handling navigation requests from Alexa, the `aace::navigation::Navigation` class should be extended:
 
+```
     #include <AACE/Navigation/Navigation.h>
 
 
     class MyNavigation : public aace::navigation::Navigation {
 
       bool setDestination( const std::string &  payload ) override {
-        // handle the call from Alexa
+        // handle setting destination request from Alexa
       }
       ...etc...
 
-      // optional for future use
-      void platformNavigationStarted(...){
-        navigationStarted();// (future) tell the Engine that navigation has begun
+      bool cancelNavigation() override {
+        // handle cancel navigation request from Alexa
       }
       ..etc...
     };
 
     //engine config
     engine->registerPlatformInterface( std::make_shared<MyNavigation>());
+```
+
+Example setDestination JSON string payload:
+
+```
+{
+  "destination": {
+    "coordinate": {
+      "latitudeInDegrees": XXX.XXXXXXX,
+      "longitudeInDegrees": -XXX.XXXXXXX
+    },
+    "singleLineDisplayAddress": "Number StreetName City State Zipcode",
+    "multipleLineDisplayAddress": "Number StreetName \n City State Zipcode",
+    "name": "Place Name"
+  }
+}
+
+```
 
 ### Whitelisting
 

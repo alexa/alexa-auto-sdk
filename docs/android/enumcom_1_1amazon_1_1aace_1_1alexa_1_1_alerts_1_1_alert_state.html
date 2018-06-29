@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Automotive Core SDK (Android)
-   &#160;<span id="projectnumber">1.0.0-beta</span>
+   &#160;<span id="projectnumber">1.0.0</span>
    </div>
    <div id="projectbrief">Alexa Auto Core SDK for interacting with the Alexa Voice Service</div>
   </td>
@@ -95,7 +95,7 @@ Public Attributes</h2></td></tr>
 <tr class="separator:aa4bac67714cd5337498975309d7b8697"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>An enum class which captures the states an alert object can be in. </p>
+<div class="textblock"><p>Specifies the state of an alert </p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
 <a id="a808b9e372a43813f1cc465ca4cf2a558"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a808b9e372a43813f1cc465ca4cf2a558">&#9670;&nbsp;</a></span>READY</h2>
@@ -108,7 +108,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The alert is ready to start, and is waiting for channel focus. </p>
+<p>The alert is ready to activate and is waiting for channel focus. </p>
 
 </div>
 </div>
@@ -123,7 +123,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The alert has started. </p>
+<p>The alert is activated, and rendering is perceivable by the user. </p>
 
 </div>
 </div>
@@ -153,7 +153,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The alert has been snoozed. </p>
+<p>The alert is active but has been snoozed. </p>
 
 </div>
 </div>
@@ -168,7 +168,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The alert has completed on its own. </p>
+<p>The alert has completed on its own, without user interaction. </p>
 
 </div>
 </div>
@@ -183,7 +183,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The alert has been determined to have expired, and will not be rendered. </p>
+<p>The alert has expired and will not be rendered. </p>
 
 </div>
 </div>
@@ -237,7 +237,7 @@ Public Attributes</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Automotive Core SDK (Android) 1.0.0-beta - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Automotive Core SDK (Android) 1.0.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

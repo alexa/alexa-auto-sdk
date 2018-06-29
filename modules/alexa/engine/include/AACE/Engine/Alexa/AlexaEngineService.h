@@ -29,6 +29,9 @@
 
 #include <AVSCommon/Utils/UUIDGeneration/UUIDGeneration.h>
 #include <AVSCommon/Utils/Logger/Logger.h>
+#include <AVSCommon/Utils/DeviceInfo.h>
+#include <AVSCommon/Utils/LibcurlUtils/HttpPutInterface.h>
+#include <AVSCommon/Utils/AudioFormat.h>
 #include <AVSCommon/AVS/Attachment/AttachmentManager.h>
 #include <AVSCommon/AVS/DialogUXStateAggregator.h>
 #include <AVSCommon/AVS/ExceptionEncounteredSender.h>
@@ -36,23 +39,32 @@
 #include <AVSCommon/SDKInterfaces/Audio/NotificationsAudioFactoryInterface.h>
 #include <AVSCommon/SDKInterfaces/AuthObserverInterface.h>
 #include <AVSCommon/SDKInterfaces/ConnectionStatusObserverInterface.h>
+#include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
+#include <AVSCommon/SDKInterfaces/CapabilitiesObserverInterface.h>
 #include <AVSCommon/SDKInterfaces/DirectiveSequencerInterface.h>
 #include <AVSCommon/SDKInterfaces/DialogUXStateObserverInterface.h>
 #include <AVSCommon/SDKInterfaces/SpeakerInterface.h>
 #include <AVSCommon/SDKInterfaces/StateProviderInterface.h>
 #include <AVSCommon/SDKInterfaces/GlobalSettingsObserverInterface.h>
 #include <AVSCommon/SDKInterfaces/SoftwareInfoSenderObserverInterface.h>
+#include <AVSCommon/SDKInterfaces/AuthDelegateInterface.h>
+#include <AVSCommon/SDKInterfaces/Storage/MiscStorageInterface.h>
 #include <AVSCommon/Utils/Threading/Executor.h>
 #include <ADSL/MessageInterpreter.h>
-#include <AuthDelegate/AuthDelegate.h>
-#include <ACL/Transport/HTTP2MessageRouter.h>
+#include <ACL/Transport/PostConnectSynchronizerFactory.h>
+#include <ACL/Transport/TransportFactoryInterface.h>
 #include <ACL/AVSConnectionManager.h>
 #include <ContextManager/ContextManager.h>
 #include <AFML/FocusManager.h>
+#include <AFML/ActivityTrackerInterface.h>
+#include <AFML/AudioActivityTracker.h>
+#include <AFML/VisualActivityTracker.h>
 #include <System/EndpointHandler.h>
 #include <System/UserInactivityMonitor.h>
 #include <System/SoftwareInfoSender.h>
 #include <CertifiedSender/CertifiedSender.h>
+#include <CapabilitiesDelegate/CapabilitiesDelegate.h>
+
 #include <SpeakerManager/SpeakerManager.h>
 #include <Settings/Settings.h>
 #include <Settings/SQLiteSettingStorage.h>
@@ -79,10 +91,12 @@ namespace alexa {
 class AlexaEngineLocationStateProvider;
 class AlexaEngineSoftwareInfoSenderObserver;
 class AlexaEngineGlobalSettingsObserver;
+class AuthDelegateRouter;
 
 class AlexaEngineService :
     public aace::engine::core::EngineService,
     public alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface,
+    public alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesObserverInterface,
     public std::enable_shared_from_this<AlexaEngineService> {
 
 public:
@@ -93,7 +107,7 @@ private:
 
 public:
     virtual ~AlexaEngineService() = default;
-
+    
     // device sdk accessor methods
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> getDirectiveSequencer() {
         return m_directiveSequencer;
@@ -102,17 +116,33 @@ public:
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> getExceptionSender() {
         return m_exceptionSender;
     }
+
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> getCapabilitiesDelegate() {
+        return m_capabilitiesDelegate;
+    }
     
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> getContextManager() {
+        return m_contextManager;
+    }
+
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> getConnectionManager() {
+        return m_connectionManager;
+    }
+
     // alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface
-    void onAuthStateChange( State newState, Error error ) override;
+    void onAuthStateChange( AuthObserverInterface::State newState, AuthObserverInterface::Error error ) override;
+
+    // alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesObserverInterface
+    void onCapabilitiesStateChange(CapabilitiesObserverInterface::State newState, CapabilitiesObserverInterface::Error newError) override;
 
 protected:
-    // EngineService
     bool configure( const std::vector<std::shared_ptr<std::istream>>& configuration ) override;
     bool start() override;
     bool stop() override;
+    bool shutdown() override;
     bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) override;
     bool setProperty( const std::string& key, const std::string& value ) override;
+    std::string getProperty( const std::string& key ) override;
 
 private:
     /**
@@ -122,6 +152,15 @@ private:
      *   {
      *      "system": {
      *          "firmwareVersion": <FIRMWARE_VERSION>
+     *      }
+     *      "audioFormat": {
+     *          "encoding": "<ENCODIING>", // PCM, OPUS
+     *          "channels": <NUM_CHANNELS>, // 1, 2
+     *          "layout": "<LAYOUT>", // NON_INTERLEAVED, INTERLEAVED
+     *          "rate": <SAMPLE_RATE>, // 16000
+     *          "size": <SAMPLE_SIZE>, // 16
+     *          "endian": "<ENDIAN>", // LITTLE, BIG
+     *          "signed": <SIGNED> // bool
      *      }
      *   }
      * }
@@ -149,24 +188,24 @@ private:
     bool registerPlatformInterfaceType( std::shared_ptr<aace::alexa::PlaybackController> playbackController );
     bool registerPlatformInterfaceType( std::shared_ptr<aace::alexa::AuthProvider> authProvider );
 
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> createAuthDelegate();
     std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> createDialogStateAggregator();
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> createFocusManager();
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> createFocusManager( const std::vector<alexaClientSDK::afml::FocusManager::ChannelConfiguration>& channelConfigurations, std::shared_ptr<alexaClientSDK::afml::ActivityTrackerInterface> activityTracker = nullptr );
     std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentManager> createAttachmentManager();
-    std::shared_ptr<alexaClientSDK::acl::MessageRouterInterface> createMessageRouter( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate, std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentManager> attachmentManager );
+    std::shared_ptr<alexaClientSDK::acl::MessageRouterInterface> createMessageRouter( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate, std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentManager> attachmentManager, std::shared_ptr<alexaClientSDK::acl::TransportFactoryInterface> transportFactory );
     std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> createConnectionManager( std::shared_ptr<alexaClientSDK::acl::MessageRouterInterface> messageRouter );
-    std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> createCertifiedSender( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender, std::shared_ptr<alexaClientSDK::avsCommon::avs::AbstractConnection> connection, std::shared_ptr<alexaClientSDK::certifiedSender::MessageStorageInterface> storage );
+    std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> createCertifiedSender( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender, std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSConnectionManagerInterface> connection, std::shared_ptr<alexaClientSDK::certifiedSender::MessageStorageInterface> storage, std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager );
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> createExceptionEncounteredSender( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender );
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> createDirectiveSequencer( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender );
     std::shared_ptr<alexaClientSDK::adsl::MessageInterpreter> createMessageInterpreter( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionEncounteredSender, std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer, std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentManagerInterface> attachmentManager );
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> createContextManager();
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::AlertsAudioFactoryInterface> createAlertsAudioFactory();
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::NotificationsAudioFactoryInterface> createNotificationsAudioFactory();
+    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> createDataManager();
 
 private:
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> m_authDelegate;
     std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> m_dialogUXStateAggregator;
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> m_focusManager;
+    std::shared_ptr<alexaClientSDK::afml::AudioActivityTracker> m_audioActivityTracker;
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> m_audioFocusManager;
     std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentManager> m_attachmentManager;
     std::shared_ptr<alexaClientSDK::acl::MessageRouterInterface> m_messageRouter;
     std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> m_connectionManager;
@@ -183,20 +222,33 @@ private:
     std::shared_ptr<alexaClientSDK::capabilityAgents::settings::SQLiteSettingStorage> m_settingsStorage;
     std::shared_ptr<AlexaEngineGlobalSettingsObserver> m_globalSettingsObserver;
     std::shared_ptr<alexaClientSDK::capabilityAgents::settings::Settings> m_settings;
+    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> m_dataManager;
+    std::shared_ptr<alexaClientSDK::acl::PostConnectFactoryInterface> m_postConnectSynchronizerFactory;
+    std::shared_ptr<alexaClientSDK::acl::TransportFactoryInterface> m_transportFactory;
+    std::shared_ptr<alexaClientSDK::afml::VisualActivityTracker> m_visualActivityTracker;
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> m_visualFocusManager;
+    std::shared_ptr<AuthDelegateRouter> m_authDelegateRouter;
+    std::shared_ptr<alexaClientSDK::capabilitiesDelegate::CapabilitiesDelegate> m_capabilitiesDelegate;
 
     std::string m_endpoint = "https://avs-alexa-na.amazon.com";
+    std::string m_capabilitiesEndpoint = "https://api.amazonalexa.com";
     alexaClientSDK::avsCommon::sdkInterfaces::softwareInfo::FirmwareVersion m_firmwareVersion = 1;
+    alexaClientSDK::avsCommon::utils::AudioFormat m_audioFormat;
 
     bool m_configured = false;
-    bool m_connectOnStart = false;
+    AuthObserverInterface::State m_authState;
+
+    bool m_capabilitiesConfigured = false;
+    bool m_locationProviderConfigued = false;
 
     // engine implementation object references
     std::shared_ptr<aace::engine::alexa::AlexaClientEngineImpl> m_alexaClientEngineImpl;
     std::shared_ptr<aace::engine::alexa::SpeechRecognizerEngineImpl> m_speechRecognizerEngineImpl;
     std::shared_ptr<aace::engine::alexa::SpeechSynthesizerEngineImpl> m_speechSynthesizerEngineImpl;
+    std::shared_ptr<aace::engine::alexa::AudioPlayerEngineImpl> m_audioPlayerEngineImpl;
     std::shared_ptr<aace::engine::alexa::AlertsEngineImpl> m_alertsEngineImpl;
     std::shared_ptr<aace::engine::alexa::NotificationsEngineImpl> m_notificationsEngineImpl;
-    std::shared_ptr<aace::engine::alexa::AudioPlayerEngineImpl> m_audioPlayerEngineImpl;
+    std::shared_ptr<aace::engine::alexa::AuthProviderEngineImpl> m_authProviderEngineImpl;
     std::shared_ptr<aace::engine::alexa::PlaybackControllerEngineImpl> m_playbackControllerEngineImpl;
     std::shared_ptr<aace::engine::alexa::TemplateRuntimeEngineImpl> m_templateRuntimeEngineImpl;
 
@@ -208,25 +260,26 @@ private:
 
     // location service
     std::shared_ptr<AlexaEngineLocationStateProvider> m_locationStateProvider;
-
-    // requires shutdown list
-    std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::utils::RequiresShutdown>> m_requiresShutdownList;
 };
 
 //
 // AlexaEngineLocationStateProvider
 //
 
-class AlexaEngineLocationStateProvider : public alexaClientSDK::avsCommon::sdkInterfaces::StateProviderInterface {
+class AlexaEngineLocationStateProvider :
+    public alexaClientSDK::avsCommon::sdkInterfaces::StateProviderInterface,
+    public alexaClientSDK::avsCommon::utils::RequiresShutdown {
+
 private:
     AlexaEngineLocationStateProvider( std::shared_ptr<aace::location::LocationProvider> locationProvider, std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager );
 
 public:
     static std::shared_ptr<AlexaEngineLocationStateProvider> create( std::shared_ptr<aace::location::LocationProvider> locationProvider, std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager );
 
-    virtual ~AlexaEngineLocationStateProvider();
-
     void provideState( const alexaClientSDK::avsCommon::avs::NamespaceAndName& stateProviderName, const unsigned int stateRequestToken ) override;
+
+protected:
+    void doShutdown() override;
 
 private:
     void executeProvideState( const alexaClientSDK::avsCommon::avs::NamespaceAndName& stateProviderName, const unsigned int stateRequestToken );
@@ -253,6 +306,48 @@ public:
 class AlexaEngineGlobalSettingsObserver : public alexaClientSDK::avsCommon::sdkInterfaces::GlobalSettingsObserverInterface {
 public:
     void onSettingChanged( const std::unordered_map<std::string, std::string>& mapOfSettings ) override;
+};
+
+//
+// AuthDelegateRouter
+//
+
+class AuthDelegateRouter :
+    public alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface,
+    public alexaClientSDK::avsCommon::utils::RequiresShutdown {
+    
+public:
+    AuthDelegateRouter();
+
+    void setAuthDelegate( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate );
+
+    // alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface
+    void addAuthObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer ) override;
+    void removeAuthObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer ) override;
+    std::string getAuthToken() override;
+    
+protected:
+    void doShutdown() override;
+    
+private:
+    std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface>> m_observers;
+    
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> m_authDelegate;
+    
+    std::mutex m_mutex;
+};
+
+//
+// SystemSpeaker
+//
+
+class SystemSpeaker : public alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface {
+public:
+    bool setVolume( int8_t volume ) override;
+    bool adjustVolume( int8_t delta ) override;
+    bool setMute( bool mute ) override;
+    bool getSpeakerSettings( SpeakerSettings* settings ) override;
+    Type getSpeakerType() override;
 };
 
 } // aace::engine::alexa

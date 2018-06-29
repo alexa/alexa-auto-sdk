@@ -18,5 +18,7 @@
 namespace aace {
 namespace location {
 
+LocationProvider::~LocationProvider() = default; // key function
+
 } // aace::location
 } // aace

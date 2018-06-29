@@ -24,8 +24,42 @@ namespace alexa {
 static const std::string TAG("aace.alexa.SpeechSynthesizerEngineImpl");
 
 SpeechSynthesizerEngineImpl::SpeechSynthesizerEngineImpl( std::shared_ptr<aace::alexa::SpeechSynthesizer> speechSynthesizerPlatformInterface ) :
-    aace::engine::alexa::AudioChannelEngineImpl( speechSynthesizerPlatformInterface ),
-    alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG) {
+    AudioChannelEngineImpl( speechSynthesizerPlatformInterface, TAG ) {
+}
+
+bool SpeechSynthesizerEngineImpl::initialize(
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
+    std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentManagerInterface> attachmentManager,
+    std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender ) {
+    
+    try
+    {
+        ThrowIfNot( initializeAudioChannel( speakerManager ), "initializeAudioChannelFailed" );
+    
+        m_speechSynthesizerCapabilityAgent = alexaClientSDK::capabilityAgents::speechSynthesizer::SpeechSynthesizer::create( shared_from_this(), messageSender, focusManager, contextManager, exceptionSender, dialogUXStateAggregator );
+        ThrowIfNull( m_speechSynthesizerCapabilityAgent, "couldNotCreateCapabilityAgent" );
+        
+        // add dialog state observer
+        m_speechSynthesizerCapabilityAgent->addObserver( dialogUXStateAggregator );
+
+        // add capability agent to the directive sequencer
+        ThrowIfNot( directiveSequencer->addDirectiveHandler( m_speechSynthesizerCapabilityAgent ), "addDirectiveHandlerFailed" );
+
+        // register capability with delegate
+        ThrowIfNot( capabilitiesDelegate->registerCapability( m_speechSynthesizerCapabilityAgent ), "registerCapabilityFailed");
+
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"initialize").d("reason", ex.what()));
+        return false;
+    }
 }
 
 std::shared_ptr<SpeechSynthesizerEngineImpl> SpeechSynthesizerEngineImpl::create(
@@ -36,23 +70,15 @@ std::shared_ptr<SpeechSynthesizerEngineImpl> SpeechSynthesizerEngineImpl::create
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
     std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentManagerInterface> attachmentManager,
     std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender ) {
     
     try
     {
         std::shared_ptr<SpeechSynthesizerEngineImpl> speechSynthesizerEngineImpl = std::shared_ptr<SpeechSynthesizerEngineImpl>( new SpeechSynthesizerEngineImpl( speechSynthesizerPlatformInterface ) );
         
-        auto speechSynthesizerCapabilityAgent = alexaClientSDK::capabilityAgents::speechSynthesizer::SpeechSynthesizer::create( std::static_pointer_cast<MediaPlayerInterface>( speechSynthesizerEngineImpl ), messageSender, focusManager, contextManager, attachmentManager, exceptionSender, dialogUXStateAggregator );
-        ThrowIfNull( speechSynthesizerCapabilityAgent, "couldNotCreateCapabilityAgent" );
-        
-        // set the capability agent reference in the playback controller engine implementation
-        speechSynthesizerEngineImpl->m_speechSynthesizerCapabilityAgent = speechSynthesizerCapabilityAgent;
-        
-        // add dialog state observer
-        speechSynthesizerCapabilityAgent->addObserver( dialogUXStateAggregator );
-
-        // add capability agent to the directive sequencer
-        ThrowIfNot( directiveSequencer->addDirectiveHandler( speechSynthesizerCapabilityAgent ), "addDirectiveHandlerFailed" );
+        ThrowIfNot( speechSynthesizerEngineImpl->initialize( directiveSequencer, messageSender, focusManager, contextManager, attachmentManager, dialogUXStateAggregator, capabilitiesDelegate, speakerManager, exceptionSender ), "initializeSpeechSynthesizerEngineImplFailed" );
 
         return speechSynthesizerEngineImpl;
     }
@@ -62,11 +88,15 @@ std::shared_ptr<SpeechSynthesizerEngineImpl> SpeechSynthesizerEngineImpl::create
     }
 }
 
-void SpeechSynthesizerEngineImpl::doShutdown() {
+void SpeechSynthesizerEngineImpl::doShutdown()
+{
+    AudioChannelEngineImpl::doShutdown();
+
     if( m_speechSynthesizerCapabilityAgent != nullptr ) {
         m_speechSynthesizerCapabilityAgent->shutdown();
     }
 }
+
 
 } // aace::engine::alexa
 } // aace::engine

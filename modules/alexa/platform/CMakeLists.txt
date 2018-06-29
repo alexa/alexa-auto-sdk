@@ -28,14 +28,13 @@ add_library(AACEAlexaPlatform SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AudioChannel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AudioPlayer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/MediaPlayer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Speaker.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/PlaybackController.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/SpeechRecognizer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/SpeechSynthesizer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AuthProvider.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/TemplateRuntime.cpp
 )
-
-set_target_properties(AACEAlexaPlatform
-    PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
 
 target_include_directories(AACEAlexaPlatform
     PUBLIC
@@ -56,4 +55,5 @@ install(
 install(
     DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE
     DESTINATION include
+    FILES_MATCHING PATTERN "*.h"
 )

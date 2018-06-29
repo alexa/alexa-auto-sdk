@@ -24,7 +24,7 @@
 #include "aace/core/PlatformInterfaceBinder.h"
 
 class NetworkInfoProviderBinder : public PlatformInterfaceBinder, public aace::network::NetworkInfoProvider {
-private:
+public:
     NetworkInfoProviderBinder() = default;
 
 protected:

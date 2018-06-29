@@ -24,9 +24,46 @@ namespace alexa {
 static const std::string TAG("aace.alexa.AudioPlayerEngineImpl");
 
 AudioPlayerEngineImpl::AudioPlayerEngineImpl( std::shared_ptr<aace::alexa::AudioPlayer> audioPlayerPlatformInterface ) :
-    AudioChannelEngineImpl( audioPlayerPlatformInterface ),
-    alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
+    AudioChannelEngineImpl( audioPlayerPlatformInterface, TAG ),
     m_audioPlayerPlatformInterface( audioPlayerPlatformInterface ) {
+}
+
+bool AudioPlayerEngineImpl::initialize(
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+    std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> connectionManager,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
+    std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentManagerInterface> attachmentManager,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender ) {
+    
+    try
+    {
+        ThrowIfNot( initializeAudioChannel( speakerManager ), "initializeAudioChannelFailed" );
+    
+        // create the playback router instance
+        m_playbackRouter = std::shared_ptr<PlaybackRouterDelegate>( new PlaybackRouterDelegate() );
+        
+        // create the capability agent
+        m_audioPlayerCapabilityAgent = alexaClientSDK::capabilityAgents::audioPlayer::AudioPlayer::create( shared_from_this(), connectionManager, focusManager, contextManager, exceptionSender, m_playbackRouter );
+        ThrowIfNull( m_audioPlayerCapabilityAgent, "couldNotCreateCapabilityAgent" );
+        
+        // add audio observer
+        m_audioPlayerCapabilityAgent->addObserver( std::dynamic_pointer_cast<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface>( shared_from_this() ) );
+
+        // add capability agent to the directive sequencer
+        ThrowIfNot( directiveSequencer->addDirectiveHandler( m_audioPlayerCapabilityAgent ), "addDirectiveHandlerFailed" );
+
+        // register capability with delegate
+        ThrowIfNot( capabilitiesDelegate->registerCapability( m_audioPlayerCapabilityAgent ), "registerCapabilityFailed");
+
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"initialize").d("reason", ex.what()));
+        return false;
+    }
 }
 
 std::shared_ptr<AudioPlayerEngineImpl> AudioPlayerEngineImpl::create(
@@ -36,28 +73,15 @@ std::shared_ptr<AudioPlayerEngineImpl> AudioPlayerEngineImpl::create(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
     std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentManagerInterface> attachmentManager,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender ) {
     
     try
     {
-        auto audioPlayerEngineImpl = std::shared_ptr<AudioPlayerEngineImpl>( new AudioPlayerEngineImpl( audioPlayerPlatformInterface ) );
+        std::shared_ptr<AudioPlayerEngineImpl> audioPlayerEngineImpl = std::shared_ptr<AudioPlayerEngineImpl>( new AudioPlayerEngineImpl( audioPlayerPlatformInterface ) );
         
-        // create the playback router instance
-        audioPlayerEngineImpl->m_playbackRouter = std::shared_ptr<PlaybackRouterDelegate>( new PlaybackRouterDelegate() );
-        
-        // create the capability agent
-        auto audioPlayerCapabilityAgent = alexaClientSDK::capabilityAgents::audioPlayer::AudioPlayer::create( std::static_pointer_cast<MediaPlayerInterface>( audioPlayerEngineImpl ), connectionManager, focusManager, contextManager, attachmentManager, exceptionSender, audioPlayerEngineImpl->m_playbackRouter );
-        
-        ThrowIfNull( audioPlayerCapabilityAgent, "couldNotCreateCapabilityAgent" );
-        
-        // set the capability agent reference in the audio player engine implementation
-        audioPlayerEngineImpl->m_audioPlayerCapabilityAgent = audioPlayerCapabilityAgent;
-        
-        // add audio observer
-        audioPlayerCapabilityAgent->addObserver( audioPlayerEngineImpl );
-
-        // add capability agent to the directive sequencer
-        ThrowIfNot( directiveSequencer->addDirectiveHandler( audioPlayerCapabilityAgent ), "addDirectiveHandlerFailed" );
+        ThrowIfNot( audioPlayerEngineImpl->initialize( directiveSequencer, connectionManager, focusManager, contextManager, attachmentManager, capabilitiesDelegate, speakerManager, exceptionSender ), "initializeAudioPlayerEngineImplFailed" );
 
         return audioPlayerEngineImpl;
     }
@@ -69,9 +93,15 @@ std::shared_ptr<AudioPlayerEngineImpl> AudioPlayerEngineImpl::create(
 
 void AudioPlayerEngineImpl::doShutdown()
 {
+    AudioChannelEngineImpl::doShutdown();
+
     if( m_audioPlayerCapabilityAgent != nullptr ) {
+        m_audioPlayerCapabilityAgent->removeObserver( std::dynamic_pointer_cast<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface>( shared_from_this() ) );
         m_audioPlayerCapabilityAgent->shutdown();
     }
+    
+    // reset the playback router
+    m_playbackRouter.reset();
 }
 
 void AudioPlayerEngineImpl::setPlaybackRouter( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> router ) {

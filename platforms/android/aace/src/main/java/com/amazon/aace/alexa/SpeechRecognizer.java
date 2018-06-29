@@ -21,12 +21,39 @@ package com.amazon.aace.alexa;
 import com.amazon.aace.core.PlatformInterface;
 
 /**
- * The @c SpeechRecognizer class should be extended by the platform implementation to provide audio input data to the Engine/AVS.
+ * SpeechRecognizer should be extended to initiate voice interactions with Alexa and provide audio input to AVS.
+ * SpeechRecognizer provides interfaces for 
+ *
+ * @li Initiating a dialog interaction with Alexa
+ * via press-and-hold, press-and-release, and voice-initiated user actions
+ *
+ * @li Streaming audio input to the Engine
+ *
+ * @li Enabling and disabling the wake word engine
+ *
+ * @li Handling wake word and end of speech detection
+ *
+ * @note For observing Alexa dialog state transitions, see @c AlexaClient::dialogStateChanged().
  */
 abstract public class SpeechRecognizer extends PlatformInterface
 {
     private boolean m_initialWakewordDetectionEnabled = false;
 
+    /**
+     * SpeechRecognizer should be extended to initiate voice interactions with Alexa and provide audio input to AVS.
+     * SpeechRecognizer provides interfaces for 
+     *
+     * @li Initiating a dialog interaction with Alexa
+     * via press-and-hold, press-and-release, and voice-initiated user actions
+     *
+     * @li Streaming audio input to the Engine
+     *
+     * @li Enabling and disabling the wake word engine
+     *
+     * @li Handling wake word and end of speech detection
+     *
+     * @note For observing Alexa dialog state transitions, see @c AlexaClient::dialogStateChanged().
+     */
     public SpeechRecognizer( boolean wakewordDetectionEnabled ) {
         m_initialWakewordDetectionEnabled = wakewordDetectionEnabled;
     }
@@ -36,98 +63,123 @@ abstract public class SpeechRecognizer extends PlatformInterface
     }
 
     /**
-     * Called when the platform implementation should handle that a wakeword has been spoken.
+     * Notifies the platform implementation when a wake word is detected
      *
-     * @param [in] wakeword The wakeword that was detected.
-     * @return @c true if the @c SpeechRecognizer should continue recognizing audio invoked by the wakeword, or @c false if the wakeword invocation should be ignored.
+     * @param  wakeword The wake word that was detected
+     *
+     * @return @c true if the Engine should initiate a recognize event, @c false if the Engine should ignore the invocation
      */
     public boolean wakewordDetected( String wakeword ) {
-        return false;
+        return true;
     }
 
     /**
-     * Called when the platform implementation should handle that the end of speech has been reached.
+     * Notifies the platform implementation when end of 
+     * speech is detected for the current recognize event
      */
     public void endOfSpeechDetected() {
     }
 
     /**
-     * Called when audio input should start being streamed by the platform implementation. The @c write() method should be called whenever new audio samples are available.
-     * It is required that audio input continue to be streamed until the @c stopAudioInput() method is called.
+     * Notifies the platform implementation to start writing audio samples to the Engine via @c write(). The platform should continue writing audio samples until the Engine calls
+     * @c stopAudioInput().
+     *
+     * @return @c true if the platform handled the call successfully, else @c false
      */
     public boolean startAudioInput() {
         return false;
     }
 
     /**
-     * Called when audio input should stop being streamed by the platform implementation.
-     * e.g. after @c endOfSpeechDetected() or @c stopCapture() is called.
+     * Notifies the platform implementation to stop writing audio samples to the Engine
+     *
+     * @return @c true if the platform handled the call successfully, else @c false
      */
     public boolean stopAudioInput() {
         return false;
     }
 
     /**
-     * Initiate a Recognize Event from a press-and-hold action. The platform implementation must start streaming the audio samples provided by the @c write() method to the Engine, and should reflect the hold-to-talk behavior.
-     * Audio capture is terminated by calling @c stopCapture().
+     * Notifies the Engine of a speech recognition event initiated by a press-and-hold action on the 
+     * platform. The Engine will call @c startAudioInput() to notify the platform implementation when
+     * to start writing audio samples.
+     * The platform implementation should call @c stopCapture() to terminate speech recognition on release
+     * of the press-and-hold action.
      *
-     * @return @c true if the recognizer was successfully started.
+     * @return @c true if the Engine successfully initiated a recognize event, else @c false
      */
     public boolean holdToTalk() {
         return holdToTalk( getNativeObject() );
     }
 
     /**
-     * Initiate a Recognize Event from a tap-to-talk action. The platform implementation must start streaming the audio samples provided by the @c write() method to the Engine, and should reflect the tap-to-talk behavior.
-     * Audio capture is terminated by calling @c stopCapture().
+     * Notifies the Engine of a speech recognition event initiated by a press-and-release action on the 
+     * platform. The Engine will call @c startAudioInput() to notify the platform implementation when
+     * to start writing audio samples.
+     * The Engine will terminate the recognize event initiated by the press-and-release action
+     * when end of speech is detected.
      *
-     * @return @c true if the recognizer was successfully started.
+     * @return @c true if the Engine successfully started a recognize event, else @c false
      */
     public boolean tapToTalk() {
         return tapToTalk( getNativeObject() );
     }
 
     /**
-     * Notify the Engine to stop streaming audio and terminate the current Recognize Event.
+     * Notifies the Engine to terminate the current recognize event. The Engine will call @c stopAudioInput() to notify the platform implementation when to stop writing audio samples.
      *
-     * @return @c true if the recognizer was successfully stopped.
+     * @return @c true if the Engine successfully terminated the current recognize event, else @c false
      */
     public boolean stopCapture() {
         return stopCapture( getNativeObject() );
     }
 
     /**
-     * Write audio samples to be processed by the wakeword engine and/or streamed to AVS. Audio samples should be formatted as mono 16kHz LPCM encoded with 16 bits per sample, little-endian. Typically, samples are provided every 10 milliseconds in 160 sample chunks.
+     * Writes audio samples to the Engine for processing by the wake word engine or streaming to AVS.
+     * Audio samples should typically be streamed in 10ms, 320-byte chunks and should be encoded as
      *
-     * @param [in] data The data buffer to write.
-     * @param [in] size The number of short samples in the buffer.
-     * @return The number of short written, or zero if the stream has closed, or a negative error code if the stream is still open, but no data could be written.
+     * @li 16bit LPCM
+     *
+     * @li 16kHz sample rate
+     *
+     * @li Single channel
+     *
+     * @li Little endian byte order
+     *
+     * @param  data The audio sample buffer to write
+     *
+     * @param  size The number of samples in the buffer
+     *
+     * @return The number of samples successfully written to the Engine or a negative error code
+     * if data could not be written
      */
     public long write( byte[] data, long size ) {
         return write( getNativeObject(), data, 0, size );
     }
 
     /**
-     * Tell the Engine to enable wakeword detection.
+     * Notifies the Engine to enable the wake word engine. Wake word must be supported in the Engine to be enabled
+     * by this call.
      *
-     * @return @c true if wakeword detection was enabled, else @c false.
+     * @return @c true if the Engine successfully enabled wake word detection, else @c false
      */
     public boolean enableWakewordDetection() {
         return enableWakewordDetection( getNativeObject() );
     }
 
     /**
-     * Tell the Engine to disable wakeword detection.
+     * Notifies the Engine to disable the wake word engine
      *
-     * @return @c true if wakeword detection was disabled, else @c false.
+     * @return @c true if the Engine successfully disabled wakeword detection, else @c false
      */
     public boolean disableWakewordDetection() {
         return disableWakewordDetection( getNativeObject() );
     }
 
     /**
-     * Get the current @c wakewordDetectionEnabled state.
-     * @return @c true if wakeword detection is enabled, else @c false.
+     * Checks if wake word detection is enabled in the Engine
+     *
+     * @return @c true if wake word detection is enabled, else @c false
      */
     public boolean isWakewordDetectionEnabled() {
         return isWakewordDetectionEnabled( getNativeObject() );

@@ -43,8 +43,8 @@ protected:
 private:
     bool configure( std::shared_ptr<std::istream> configuration );
     
-    bool checkProperty( rapidjson::Value& root, const char* key, bool warnIfMissing = true );
-    std::string getProperty( rapidjson::Value& root, const char* key, const char* defaultValue = "", bool warnIfMissing = true );
+    bool checkVehicleConfigProperty( rapidjson::Value& root, const char* key, bool warnIfMissing = true );
+    std::string getVehicleConfigProperty( rapidjson::Value& root, const char* key, const char* defaultValue = "", bool warnIfMissing = true );
     
 private:
     std::unordered_map<std::string,std::string> m_vehiclePropertyMap;

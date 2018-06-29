@@ -1,5 +1,8 @@
 inherit image
 
+# Override with the meta-aac layer version
+PV = "${DISTRO_VERSION}"
+
 IMAGE_NAME_SUFFIX = ""
 
 # Workarounds

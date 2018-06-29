@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Automotive Core SDK (Android)
-   &#160;<span id="projectnumber">1.0.0-beta</span>
+   &#160;<span id="projectnumber">1.0.0</span>
    </div>
    <div id="projectbrief">Alexa Auto Core SDK for interacting with the Alexa Voice Service</div>
   </td>
@@ -75,6 +75,8 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a06238a5a9c050c847dc09cbdf65ad627"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a06238a5a9c050c847dc09cbdf65ad627">SpeechRecognizer</a> (boolean wakewordDetectionEnabled)</td></tr>
+<tr class="separator:a06238a5a9c050c847dc09cbdf65ad627"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a70707cd51dffbbeeeb5e90ec5cb36b18"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a70707cd51dffbbeeeb5e90ec5cb36b18">wakewordDetected</a> (String wakeword)</td></tr>
 <tr class="separator:a70707cd51dffbbeeeb5e90ec5cb36b18"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a59f998dabf28a7db3d87e2b9350a221b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a59f998dabf28a7db3d87e2b9350a221b">endOfSpeechDetected</a> ()</td></tr>
@@ -97,10 +99,59 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:af4c4e11876474aa362c4a9d628f3c1b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1bad3235340666f217920e23dab6f67d"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a1bad3235340666f217920e23dab6f67d">isWakewordDetectionEnabled</a> ()</td></tr>
 <tr class="separator:a1bad3235340666f217920e23dab6f67d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface.html">com.amazon.aace.core.PlatformInterface</a></td></tr>
+<tr class="memitem:ab262a5c3abc75647e55d68bee4dcc287 inherit pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface.html#ab262a5c3abc75647e55d68bee4dcc287">PlatformInterface</a> ()</td></tr>
+<tr class="separator:ab262a5c3abc75647e55d68bee4dcc287 inherit pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html">SpeechRecognizer</a></code> class should be extended by the platform implementation to provide audio input data to the Engine/AVS. </p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+<div class="textblock"><p><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html">SpeechRecognizer</a> should be extended to initiate voice interactions with Alexa and provide audio input to AVS. <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html">SpeechRecognizer</a> provides interfaces for</p>
+<ul>
+<li>Initiating a dialog interaction with Alexa via press-and-hold, press-and-release, and voice-initiated user actions</li>
+</ul>
+<ul>
+<li>Streaming audio input to the Engine</li>
+</ul>
+<ul>
+<li>Enabling and disabling the wake word engine</li>
+</ul>
+<ul>
+<li>Handling wake word and end of speech detection</li>
+</ul>
+<dl class="section note"><dt>Note</dt><dd>For observing Alexa dialog state transitions, see <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client.html#aa0c7e22aeb8007a30d02a0f89226886a">AlexaClient::dialogStateChanged()</a></code>. </dd></dl>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a06238a5a9c050c847dc09cbdf65ad627"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a06238a5a9c050c847dc09cbdf65ad627">&#9670;&nbsp;</a></span>SpeechRecognizer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">com.amazon.aace.alexa.SpeechRecognizer.SpeechRecognizer </td>
+          <td>(</td>
+          <td class="paramtype">boolean&#160;</td>
+          <td class="paramname"><em>wakewordDetectionEnabled</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html">SpeechRecognizer</a> should be extended to initiate voice interactions with Alexa and provide audio input to AVS. <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html">SpeechRecognizer</a> provides interfaces for</p>
+<ul>
+<li>Initiating a dialog interaction with Alexa via press-and-hold, press-and-release, and voice-initiated user actions</li>
+</ul>
+<ul>
+<li>Streaming audio input to the Engine</li>
+</ul>
+<ul>
+<li>Enabling and disabling the wake word engine</li>
+</ul>
+<ul>
+<li>Handling wake word and end of speech detection</li>
+</ul>
+<dl class="section note"><dt>Note</dt><dd>For observing Alexa dialog state transitions, see <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client.html#aa0c7e22aeb8007a30d02a0f89226886a">AlexaClient::dialogStateChanged()</a></code>. </dd></dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a id="a70707cd51dffbbeeeb5e90ec5cb36b18"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a70707cd51dffbbeeeb5e90ec5cb36b18">&#9670;&nbsp;</a></span>wakewordDetected()</h2>
 
@@ -116,14 +167,14 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Called when the platform implementation should handle that a wakeword has been spoken.</p>
+<p>Notifies the platform implementation when a wake word is detected</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">wakeword</td><td>The wakeword that was detected. </td></tr>
+    <tr><td class="paramname">wakeword</td><td>The wake word that was detected</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html">SpeechRecognizer</a></code> should continue recognizing audio invoked by the wakeword, or <code>false</code> if the wakeword invocation should be ignored. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the Engine should initiate a recognize event, <code>false</code> if the Engine should ignore the invocation </dd></dl>
 
 </div>
 </div>
@@ -141,7 +192,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Called when the platform implementation should handle that the end of speech has been reached. </p>
+<p>Notifies the platform implementation when end of speech is detected for the current recognize event </p>
 
 </div>
 </div>
@@ -159,7 +210,8 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Called when audio input should start being streamed by the platform implementation. The <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a549ae1f315f3b64818bba8d5ffa4c928">write()</a></code> method should be called whenever new audio samples are available. It is required that audio input continue to be streamed until the <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a1bea4e6b7ab396b34964c7f9be3cf042">stopAudioInput()</a></code> method is called. </p>
+<p>Notifies the platform implementation to start writing audio samples to the Engine via <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a549ae1f315f3b64818bba8d5ffa4c928">write()</a></code>. The platform should continue writing audio samples until the Engine calls <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a1bea4e6b7ab396b34964c7f9be3cf042">stopAudioInput()</a></code>.</p>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform handled the call successfully, else <code>false</code> </dd></dl>
 
 </div>
 </div>
@@ -177,7 +229,8 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Called when audio input should stop being streamed by the platform implementation. e.g. after <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a59f998dabf28a7db3d87e2b9350a221b">endOfSpeechDetected()</a></code> or <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a23e338856975e39ffb825dcf2a535192">stopCapture()</a></code> is called. </p>
+<p>Notifies the platform implementation to stop writing audio samples to the Engine</p>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform handled the call successfully, else <code>false</code> </dd></dl>
 
 </div>
 </div>
@@ -195,8 +248,8 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Initiate a Recognize Event from a press-and-hold action. The platform implementation must start streaming the audio samples provided by the <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a549ae1f315f3b64818bba8d5ffa4c928">write()</a></code> method to the Engine, and should reflect the hold-to-talk behavior. Audio capture is terminated by calling <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a23e338856975e39ffb825dcf2a535192">stopCapture()</a></code>.</p>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the recognizer was successfully started. </dd></dl>
+<p>Notifies the Engine of a speech recognition event initiated by a press-and-hold action on the platform. The Engine will call <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#aba3da69e8833ec5b855b4a0155d03f9d">startAudioInput()</a></code> to notify the platform implementation when to start writing audio samples. The platform implementation should call <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a23e338856975e39ffb825dcf2a535192">stopCapture()</a></code> to terminate speech recognition on release of the press-and-hold action.</p>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the Engine successfully initiated a recognize event, else <code>false</code> </dd></dl>
 
 </div>
 </div>
@@ -214,8 +267,8 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Initiate a Recognize Event from a tap-to-talk action. The platform implementation must start streaming the audio samples provided by the <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a549ae1f315f3b64818bba8d5ffa4c928">write()</a></code> method to the Engine, and should reflect the tap-to-talk behavior. Audio capture is terminated by calling <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a23e338856975e39ffb825dcf2a535192">stopCapture()</a></code>.</p>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the recognizer was successfully started. </dd></dl>
+<p>Notifies the Engine of a speech recognition event initiated by a press-and-release action on the platform. The Engine will call <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#aba3da69e8833ec5b855b4a0155d03f9d">startAudioInput()</a></code> to notify the platform implementation when to start writing audio samples. The Engine will terminate the recognize event initiated by the press-and-release action when end of speech is detected.</p>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the Engine successfully started a recognize event, else <code>false</code> </dd></dl>
 
 </div>
 </div>
@@ -233,8 +286,8 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Notify the Engine to stop streaming audio and terminate the current Recognize Event.</p>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the recognizer was successfully stopped. </dd></dl>
+<p>Notifies the Engine to terminate the current recognize event. The Engine will call <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a1bea4e6b7ab396b34964c7f9be3cf042">stopAudioInput()</a></code> to notify the platform implementation when to stop writing audio samples.</p>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the Engine successfully terminated the current recognize event, else <code>false</code> </dd></dl>
 
 </div>
 </div>
@@ -263,15 +316,27 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Write audio samples to be processed by the wakeword engine and/or streamed to AVS. Audio samples should be formatted as mono 16kHz LPCM encoded with 16 bits per sample, little-endian. Typically, samples are provided every 10 milliseconds in 160 sample chunks.</p>
+<p>Writes audio samples to the Engine for processing by the wake word engine or streaming to AVS. Audio samples should typically be streamed in 10ms, 320-byte chunks and should be encoded as</p>
+<ul>
+<li>16bit LPCM</li>
+</ul>
+<ul>
+<li>16kHz sample rate</li>
+</ul>
+<ul>
+<li>Single channel</li>
+</ul>
+<ul>
+<li>Little endian byte order</li>
+</ul>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The data buffer to write. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">size</td><td>The number of short samples in the buffer. </td></tr>
+    <tr><td class="paramname">data</td><td>The audio sample buffer to write</td></tr>
+    <tr><td class="paramname">size</td><td>The number of samples in the buffer</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The number of short written, or zero if the stream has closed, or a negative error code if the stream is still open, but no data could be written. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The number of samples successfully written to the Engine or a negative error code if data could not be written </dd></dl>
 
 </div>
 </div>
@@ -289,8 +354,8 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Tell the Engine to enable wakeword detection.</p>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if wakeword detection was enabled, else <code>false</code>. </dd></dl>
+<p>Notifies the Engine to enable the wake word engine. Wake word must be supported in the Engine to be enabled by this call.</p>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the Engine successfully enabled wake word detection, else <code>false</code> </dd></dl>
 
 </div>
 </div>
@@ -308,8 +373,8 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Tell the Engine to disable wakeword detection.</p>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if wakeword detection was disabled, else <code>false</code>. </dd></dl>
+<p>Notifies the Engine to disable the wake word engine</p>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the Engine successfully disabled wakeword detection, else <code>false</code> </dd></dl>
 
 </div>
 </div>
@@ -327,7 +392,8 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Get the current <code>wakewordDetectionEnabled</code> state. </p><dl class="section return"><dt>Returns</dt><dd><code>true</code> if wakeword detection is enabled, else <code>false</code>. </dd></dl>
+<p>Checks if wake word detection is enabled in the Engine</p>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if wake word detection is enabled, else <code>false</code> </dd></dl>
 
 </div>
 </div>
@@ -336,7 +402,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Automotive Core SDK (Android) 1.0.0-beta - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Automotive Core SDK (Android) 1.0.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

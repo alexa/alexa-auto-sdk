@@ -29,19 +29,19 @@ namespace aace {
 namespace location {
 
 /**
- * The @c LocationProvider class should be extended by the platform implementation to handle geolocation services.
+ * LocationProvider should be extended to report geolocation to the Engine.
  */
 class LocationProvider : public aace::core::PlatformInterface {
 protected:
     LocationProvider() = default;
 
 public:
-    virtual ~LocationProvider() = default;
+    virtual ~LocationProvider();
 
     /**
-     * Called when the Engine needs the current geolocation.
+     * Returns the current geolocation of the device
      *
-     * @return @c aace::location::Location of the platform implementation.
+     * @return The current location
      */
     virtual aace::location::Location getLocation() = 0;
 };

@@ -26,9 +26,6 @@ std::shared_ptr<AlexaClientEngineImpl> AlexaClientEngineImpl::create( std::share
     return std::shared_ptr<AlexaClientEngineImpl>( new AlexaClientEngineImpl( alexaClientPlatformInterface ) );
 }
 
-AlexaClientEngineImpl::~AlexaClientEngineImpl() {
-}
-
 // AuthObserverInterface
 void AlexaClientEngineImpl::onAuthStateChange( alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State state, alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error error ) {
     m_alexaClientPlatformInterface->authStateChanged( static_cast<aace::alexa::AlexaClient::AuthState>( state ), static_cast<aace::alexa::AlexaClient::AuthError>( error ) );

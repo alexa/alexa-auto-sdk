@@ -18,6 +18,8 @@
 namespace aace {
 namespace alexa {
 
+PlaybackController::~PlaybackController() = default; // key function
+
 void PlaybackController::playButtonPressed() {
     if( m_playbackControllerEngineInterface != nullptr ) {
         m_playbackControllerEngineInterface->onPlayButtonPressed();

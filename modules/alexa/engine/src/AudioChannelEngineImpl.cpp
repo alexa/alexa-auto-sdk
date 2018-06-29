@@ -28,224 +28,429 @@ static const std::string TAG("aace.alexa.AudioChannelEngineImpl");
 alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId AudioChannelEngineImpl::s_nextId =
     alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::ERROR;
 
-AudioChannelEngineImpl::AudioChannelEngineImpl( std::shared_ptr<aace::alexa::AudioChannel> audioChannelPlatformInterface ) :
+AudioChannelEngineImpl::AudioChannelEngineImpl( std::shared_ptr<aace::alexa::AudioChannel> audioChannelPlatformInterface, const std::string& name ) :
+    alexaClientSDK::avsCommon::utils::RequiresShutdown(name),
     m_audioChannelPlatformInterface( audioChannelPlatformInterface ),
     m_status( alexaClientSDK::avsCommon::avs::attachment::AttachmentReader::ReadStatus::OK ),
     m_stream( nullptr ),
     m_currentId( ERROR ),
     m_savedOffset( std::chrono::milliseconds( 0 ) ),
-    m_expectedEventState( EventState::NONE ),
-    m_eventState( EventState::NONE ) {
-    
-    m_mediaPlayerPlatformInterface = audioChannelPlatformInterface->getMediaPlayer();
-    m_speakerPlatformInterface = audioChannelPlatformInterface->getSpeaker();
+    m_pendingEventState( PendingEventState::NONE ),
+    m_currentMediaState( MediaState::STOPPED ) {
 }
 
-AudioChannelEngineImpl::~AudioChannelEngineImpl() {
-    m_executor.shutdown();
-}
-
-void AudioChannelEngineImpl::setEventState( EventState state ) {
-    m_eventState = state;
-    m_eventState_cv.notify_all();
-    m_expectedEventState = EventState::NONE;
-}
-
-bool AudioChannelEngineImpl::waitForEventState( const std::chrono::seconds duration ) {
-    return waitForEventState( m_expectedEventState, duration );
-}
-
-bool AudioChannelEngineImpl::waitForEventState( EventState state, const std::chrono::seconds duration )
+bool AudioChannelEngineImpl::initializeAudioChannel( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager )
 {
-    ReturnIf( state == EventState::NONE || state == m_eventState, true );
-    
-    std::unique_lock<std::mutex> lock( m_mutex );
-    
-    AACE_DEBUG(LX(TAG,"waitForEventState").d("state",state).d("expecting",m_expectedEventState));
-    
-    // reset the event state
-    m_eventState = EventState::NONE;
-    
-    return m_eventState_cv.wait_for( lock, duration, [this, state]()
+    try
     {
-        if( state != m_eventState ) {
-            AACE_ERROR(LX(TAG,"waitForEventState").d("reason","timeout").d("state",state).d("expecting",m_expectedEventState));
-            return false;
-        }
-        else {
-            return true;
-        }
-    });
+        m_speakerManager = speakerManager;
+    
+        m_mediaPlayerPlatformInterface = m_audioChannelPlatformInterface->getMediaPlayer();
+        ThrowIfNull( m_mediaPlayerPlatformInterface, "invalidMediaPlayerInterface" );
+
+        m_speakerPlatformInterface = m_audioChannelPlatformInterface->getSpeaker();
+        ThrowIfNull( m_speakerPlatformInterface, "invalidSpeakerInterface" );
+
+        // set the media player engine interface
+        m_mediaPlayerPlatformInterface->setEngineInterface( shared_from_this() );
+
+        // set the speaker engine interface
+        m_speakerPlatformInterface->setEngineInterface( shared_from_this() );
+
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"initialize").d("reason", ex.what()));
+        return false;
+    }
+}
+
+void AudioChannelEngineImpl::doShutdown()
+{
+    m_executor.shutdown();
+
+    // reset the media player engine interface
+    m_mediaPlayerPlatformInterface->setEngineInterface( nullptr );
+    
+    // reset the speaker engine interface
+    m_speakerPlatformInterface->setEngineInterface( nullptr );
+    
+    // reset the media observer reference
+    m_observer.reset();
+    
+    // reset speaker manager reference
+    m_speakerManager.reset();
+}
+
+void AudioChannelEngineImpl::sendPendingEvent()
+{
+    if( m_pendingEventState != PendingEventState::NONE ) {
+        sendEvent( m_pendingEventState );
+        m_pendingEventState = PendingEventState::NONE;
+    }
+}
+
+void AudioChannelEngineImpl::sendEvent( PendingEventState state )
+{
+    SourceId id = m_currentId;
+
+    if( state == PendingEventState::PLAYBACK_STARTED ) {
+        m_executor.submit([this,id] {
+            executePlaybackStarted( id );
+        });
+    }
+    else if( state == PendingEventState::PLAYBACK_RESUMED ) {
+        m_executor.submit([this,id] {
+            executePlaybackResumed( id );
+        });
+    }
+    else if( state == PendingEventState::PLAYBACK_STOPPED ) {
+        m_executor.submit([this,id] {
+            executePlaybackStopped( id );
+        });
+    }
+    else if( state == PendingEventState::PLAYBACK_PAUSED ) {
+        m_executor.submit([this,id] {
+            executePlaybackPaused( id );
+        });
+    }
+    else {
+        AACE_WARN(LX(TAG,"sendEvent").d("reason","unhandledEventState").d("state",state));
+    }
 }
 
 //
 // aace::engine::MediaPlayerEngineInterface
 //
 
-void AudioChannelEngineImpl::onPlaybackStarted()
+void AudioChannelEngineImpl::onMediaStateChanged( MediaState state )
 {
-    m_executor.submit([this] {
-        executePlaybackStarted();
+    auto id = m_currentId;
+    m_executor.submit([this,id,state] {
+        executeMediaStateChanged( id, state );
     });
 }
 
-void AudioChannelEngineImpl::executePlaybackStarted()
+void AudioChannelEngineImpl::executeMediaStateChanged( SourceId id, MediaState state )
 {
+    std::unique_lock<std::mutex> lock( m_mutex );
+
     try
     {
-        ThrowIf( m_expectedEventState != EventState::PLAYBACK_STARTED, "invalidExpectedState" );
-        
-        if( m_observer != nullptr ) {
-            m_observer->onPlaybackStarted( m_currentId );
-        }
+        AACE_VERBOSE(LX(TAG,"executeMediaStateChanged").d("currentState",m_currentMediaState).d("newState",state).d("pendingEvent",m_pendingEventState));
 
-        setEventState( EventState::PLAYBACK_STARTED );
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"executePlaybackStarted").d("reason", ex.what()).d("expectedState",m_expectedEventState));
-    }
-}
-
-void AudioChannelEngineImpl::onPlaybackFinished()
-{
-    m_executor.submit([this] {
-        executePlaybackFinished();
-    });
-}
-
-void AudioChannelEngineImpl::executePlaybackFinished()
-{
-    try
-    {
-        ThrowIf( m_expectedEventState != EventState::NONE, "invalidExpectedState" );
-        ThrowIf( m_currentId == ERROR, "invalidSource" );
-        
-        if( m_observer != nullptr ) {
-            m_observer->onPlaybackFinished( m_currentId );
-        }
-        
-        m_currentId = ERROR;
-        
-        setEventState( EventState::PLAYBACK_FINISHED );
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"executePlaybackFinished").d("reason", ex.what()).d("expectedState",m_expectedEventState));
-    }
-}
-
-void AudioChannelEngineImpl::onPlaybackPaused()
-{
-    m_executor.submit([this] {
-        executePlaybackPaused();
-    });
-}
-
-void AudioChannelEngineImpl::executePlaybackPaused()
-{
-    try
-    {
-        ThrowIf( m_expectedEventState != EventState::PLAYBACK_PAUSED, "invalidExpectedState" );
-        
-        if( m_observer != nullptr ) {
-            m_observer->onPlaybackPaused( m_currentId );
-        }
-
-        setEventState( EventState::PLAYBACK_PAUSED );
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"executePlaybackPaused").d("reason", ex.what()).d("expectedState",m_expectedEventState));
-    }
-}
-
-void AudioChannelEngineImpl::onPlaybackResumed()
-{
-    m_executor.submit([this] {
-        executePlaybackResumed();
-    });
-}
-
-void AudioChannelEngineImpl::executePlaybackResumed()
-{
-    try
-    {
-        ThrowIf( m_expectedEventState != EventState::PLAYBACK_RESUMED, "invalidExpectedState" );
-        
-        if( m_observer != nullptr ) {
-            m_observer->onPlaybackResumed( m_currentId );
-        }
-
-        setEventState( EventState::PLAYBACK_RESUMED );
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"executePlaybackResumed").d("reason", ex.what()).d("expectedState",m_expectedEventState));
-    }
-}
-
-void AudioChannelEngineImpl::onPlaybackStopped()
-{
-    m_executor.submit([this] {
-        executePlaybackStopped();
-    });
-}
-
-void AudioChannelEngineImpl::executePlaybackStopped()
-{
-    try
-    {
-        ThrowIf( m_expectedEventState != EventState::PLAYBACK_STOPPED, "invalidExpectedState" );
-
-        if( m_observer != nullptr ) {
-            m_observer->onPlaybackStopped( m_currentId );
+        // return if the current media state is the same as the new state
+        if( m_currentMediaState == state ) {
+            return;
         }
     
-        m_currentId = ERROR;
+        // handle media state switch to PLAYING
+        if( state == MediaState::PLAYING )
+        {
+            // if the current state is STOPPED then pending event should be set to either
+            // PLAYBACK_STARTED or PLAYBACK_RESUMED... otherwise the platform is attempting
+            // to change the media state at an unexpected time!
+            if( m_currentMediaState == MediaState::STOPPED  )
+            {
+                if( m_pendingEventState == PendingEventState::PLAYBACK_STARTED ) {
+                    executePlaybackStarted( id );
+                }
+                else if( m_pendingEventState == PendingEventState::PLAYBACK_RESUMED ) {
+                    executePlaybackResumed( id );
+                }
+                else {
+                    Throw( "unexpectedPendingEventState" );
+                }
+            }
+            
+            // if the current state is buffering then the platform is notifying us that
+            // playback has resumed after filling its media buffer.
+            else if( m_currentMediaState == MediaState::BUFFERING ) {
+                executeBufferRefilled( id );
+            }
+            
+            else {
+                Throw( "unexpectedMediaState" );
+            }
+        }
 
-        setEventState( EventState::PLAYBACK_STOPPED );
+        // handle media state switch to STOPPED
+        else if( state == MediaState::STOPPED )
+        {
+            // if the current state is PLAYING the pending event should be set to either
+            // PLAYBACK_STOPPED or PLAYBACK_PAUSED. If the pending state is NONE, then
+            // we assume that media state is indicating playback has finished.
+            if( m_currentMediaState == MediaState::PLAYING )
+            {
+                if( m_pendingEventState == PendingEventState::PLAYBACK_STOPPED ) {
+                    executePlaybackStopped( id );
+                }
+                else if( m_pendingEventState == PendingEventState::PLAYBACK_PAUSED ) {
+                    executePlaybackPaused( id );
+                }
+                else if( m_pendingEventState == PendingEventState::NONE ) {
+                    executePlaybackFinished( id );
+                }
+                else {
+                    Throw( "unexpectedPendingEventState" );
+                }
+            }
+            
+            // if the current media state is BUFFERING the pending event should be set to either
+            // PLAYBACK_STOPPED or PLAYBACK_PAUSED.
+            else if( m_currentMediaState == MediaState::BUFFERING )
+            {
+                if( m_pendingEventState == PendingEventState::PLAYBACK_STOPPED ) {
+                    executePlaybackStopped( id );
+                }
+                else if( m_pendingEventState == PendingEventState::PLAYBACK_PAUSED ) {
+                    executePlaybackPaused( id );
+                }
+                else {
+                    Throw( "unexpectedPendingEventState" );
+                }
+            }
+            
+            // if current state is anything else it is considered an error, since the platform
+            // is only allowed to transition to STOPPED if it currently PLAYING.
+            else {
+                Throw( "unexpectedMediaState" );
+            }
+        }
+        
+        // handle media state switch to BUFFERING
+        else if( state == MediaState::BUFFERING )
+        {
+            // if the pending event is PLAYBACK_STARTED then we ignore the media state change to BUFFERING
+            // since media is considering to be in a loading state until set to PLAYING
+            if( m_pendingEventState == PendingEventState::PLAYBACK_STARTED ) {
+                return;
+            }
+            
+            // if the pending evenis is PLAYBACK_RESUMED then send the resumed event to AVS before sending
+            // the buffer underrun event
+            else if( m_pendingEventState == PendingEventState::PLAYBACK_RESUMED ) {
+                executePlaybackResumed( id );
+                executeBufferUnderrun( id );
+            }
+            
+            // handle condition when there is no pending event
+            else if( m_pendingEventState == PendingEventState::NONE  )
+            {
+                // if the current state is PLAYING then send the buffer underrun event, otherwise
+                // we choose to ignore the BUFFERING state...
+                if( m_currentMediaState == MediaState::PLAYING ) {
+                    executeBufferUnderrun( id );
+                }
+                else {
+                    return;
+                }
+            }
+            else {
+                Throw( "unexpectedMediaStateForBuffering" );
+            }
+        }
+        
+        m_currentMediaState = state;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"executePlaybackStopped").d("reason", ex.what()).d("expectedState",m_expectedEventState));
+        AACE_ERROR(LX(TAG,"executeMediaStateChanged").d("reason", ex.what()).d("currentState",m_currentMediaState).d("newState",state).d("pendingEvent",m_pendingEventState));
     }
-
 }
 
-void AudioChannelEngineImpl::onPlaybackError( const MediaPlayerEngineInterface::ErrorType& type, const std::string& error )
+void AudioChannelEngineImpl::onMediaError( MediaError error, const std::string& description )
 {
-    m_executor.submit([this,type,error] {
-        executePlaybackError( type, error );
+    auto id = m_currentId;
+    m_executor.submit([this,id,error,description] {
+        executeMediaError( id, error, description );
     });
 }
 
-void AudioChannelEngineImpl::executePlaybackError( const MediaPlayerEngineInterface::ErrorType& type, const std::string& error )
+void AudioChannelEngineImpl::executeMediaError( SourceId id, MediaError error, const std::string& description )
 {
     try
     {
-        ThrowIf( m_currentId == ERROR, "invalidSource" );
+        ThrowIf( id == ERROR, "invalidSource" );
         
         if( m_observer != nullptr ) {
-            m_observer->onPlaybackError( m_currentId, static_cast<alexaClientSDK::avsCommon::utils::mediaPlayer::ErrorType>( type ), error );
+            m_observer->onPlaybackError( id, static_cast<alexaClientSDK::avsCommon::utils::mediaPlayer::ErrorType>( error ), description );
         }
         
         m_currentId = ERROR;
-        
-        setEventState( EventState::PLAYBACK_ERROR );
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"executePlaybackError").d("reason", ex.what()));
     }
+    
+    m_pendingEventState = PendingEventState::NONE;
+}
+
+void AudioChannelEngineImpl::executePlaybackStarted( SourceId id )
+{
+    try
+    {
+        ThrowIf( id == ERROR, "invalidSource" );
+        
+        if( m_observer != nullptr ) {
+            m_observer->onPlaybackStarted( id );
+        }
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"executePlaybackStarted").d("reason", ex.what()).d("expectedState",m_pendingEventState));
+    }
+    
+    m_pendingEventState = PendingEventState::NONE;
+}
+
+void AudioChannelEngineImpl::executePlaybackFinished( SourceId id )
+{
+    try
+    {
+        ThrowIf( id == ERROR, "invalidSource" );
+        
+        if( m_observer != nullptr ) {
+            m_observer->onPlaybackFinished( id );
+        }
+        
+        m_currentId = ERROR;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"executePlaybackFinished").d("reason", ex.what()).d("expectedState",m_pendingEventState));
+    }
+    
+    m_pendingEventState = PendingEventState::NONE;
+}
+
+void AudioChannelEngineImpl::executePlaybackPaused( SourceId id )
+{
+    try
+    {
+        ThrowIf( id == ERROR, "invalidSource" );
+        
+        // save the player offset
+        m_savedOffset = std::chrono::milliseconds( m_mediaPlayerPlatformInterface->getPosition() );
+
+        if( m_observer != nullptr ) {
+            m_observer->onPlaybackPaused( id );
+        }
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"executePlaybackPaused").d("reason", ex.what()).d("expectedState",m_pendingEventState));
+    }
+    
+    m_pendingEventState = PendingEventState::NONE;
+}
+
+void AudioChannelEngineImpl::executePlaybackResumed( SourceId id )
+{
+    try
+    {
+        ThrowIf( id == ERROR, "invalidSource" );
+        
+        if( m_observer != nullptr ) {
+            m_observer->onPlaybackResumed( id );
+        }
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"executePlaybackResumed").d("reason", ex.what()).d("expectedState",m_pendingEventState));
+    }
+    
+    m_pendingEventState = PendingEventState::NONE;
+}
+
+void AudioChannelEngineImpl::executePlaybackStopped( SourceId id )
+{
+    try
+    {
+        ThrowIf( id == ERROR, "invalidSource" );
+
+        // save the player offset
+        m_savedOffset = std::chrono::milliseconds( m_mediaPlayerPlatformInterface->getPosition() );
+
+        if( m_observer != nullptr ) {
+            m_observer->onPlaybackStopped( id );
+        }
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"executePlaybackStopped").d("reason", ex.what()).d("expectedState",m_pendingEventState));
+    }
+    
+    m_pendingEventState = PendingEventState::NONE;
+}
+
+void AudioChannelEngineImpl::executePlaybackError( SourceId id, MediaError error, const std::string& description )
+{
+    try
+    {
+        ThrowIf( id == ERROR, "invalidSource" );
+        
+        if( m_observer != nullptr ) {
+            m_observer->onPlaybackError( id, static_cast<alexaClientSDK::avsCommon::utils::mediaPlayer::ErrorType>( error ), description );
+        }
+        
+        m_currentId = ERROR;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"executePlaybackError").d("reason", ex.what()));
+    }
+    
+    m_pendingEventState = PendingEventState::NONE;
+}
+
+void AudioChannelEngineImpl::executeBufferUnderrun( SourceId id )
+{
+    try
+    {
+        ThrowIf( id == ERROR, "invalidSource" );
+        
+        if( m_observer != nullptr ) {
+            m_observer->onBufferUnderrun( id );
+        }
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"executeBufferUnderrun").d("reason", ex.what()));
+    }
+    
+    m_pendingEventState = PendingEventState::NONE;
+}
+
+void AudioChannelEngineImpl::executeBufferRefilled( SourceId id )
+{
+    try
+    {
+        ThrowIf( id == ERROR, "invalidSource" );
+        
+        if( m_observer != nullptr ) {
+            m_observer->onBufferRefilled( id );
+        }
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"executeBufferRefilled").d("reason", ex.what()));
+    }
+    
+    m_pendingEventState = PendingEventState::NONE;
 }
 
 ssize_t AudioChannelEngineImpl::read( char* data, const size_t size )
 {
     try
     {
-        if( m_attachmentReader != nullptr ) {
-            ssize_t count = m_attachmentReader->read( static_cast<void*>( data ), size, &m_status );
-            ThrowIf( count < 0, "readFailed" );
+        if( m_attachmentReader != nullptr )
+        {
+            ssize_t count = m_attachmentReader->read( static_cast<void*>( data ), size, &m_status, std::chrono::milliseconds(100) );
+            
+            if( m_status >= alexaClientSDK::avsCommon::avs::attachment::AttachmentReader::ReadStatus::CLOSED ) {
+                m_closed = true;
+            }
+            
             return count;
         }
         else if( m_stream != nullptr )
         {
-            ReturnIf( m_stream->eof(), 0 );
+            if( m_stream->eof() ) {
+                m_closed = true;
+                return 0;
+            }
         
             // read the data from the stream
             m_stream->read( data, size );
@@ -264,6 +469,7 @@ ssize_t AudioChannelEngineImpl::read( char* data, const size_t size )
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"read").d("reason", ex.what()));
+        m_closed = true;
         return 0;
     }
 }
@@ -272,30 +478,51 @@ bool AudioChannelEngineImpl::isRepeating() {
     return m_repeat;
 }
 
+bool AudioChannelEngineImpl::isClosed() {
+    return m_closed;
+}
+
 void AudioChannelEngineImpl::resetSource()
 {
     m_attachmentReader.reset();
     m_stream.reset();
     m_status = alexaClientSDK::avsCommon::avs::attachment::AttachmentReader::ReadStatus::OK;
     m_repeat = false;
+    m_closed = false;
     m_currentId = ERROR;
-    m_eventState = EventState::NONE;
-    m_expectedEventState = EventState::NONE;
+    m_pendingEventState = PendingEventState::NONE;
+    m_currentMediaState = MediaState::STOPPED;
     m_url.clear();
     m_savedOffset = std::chrono::milliseconds( 0 );
+}
+
+//
+// aace::engine::SpeakerEngineInterface
+//
+
+void AudioChannelEngineImpl::onLocalVolumeSet( int8_t volume )
+{
+    if( m_speakerManager != nullptr ) {
+        m_speakerManager->setVolume( getSpeakerType(), volume );
+    }
+}
+
+void AudioChannelEngineImpl::onLocalMuteSet( bool mute )
+{
+    if( m_speakerManager != nullptr ) {
+        m_speakerManager->setMute( getSpeakerType(), mute );
+    }
 }
 
 //
 // alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface
 //
 
-alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId AudioChannelEngineImpl::setSource( std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader> attachmentReader )
+alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId AudioChannelEngineImpl::setSource( std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader> attachmentReader, const alexaClientSDK::avsCommon::utils::AudioFormat* format )
 {
     try
     {
         AACE_DEBUG(LX(TAG,"setSource").d("type","attachment"));
-
-        ThrowIfNot( waitForEventState(), "waitForEventStateTimeout" );
 
         resetSource();
     
@@ -318,8 +545,6 @@ alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId Au
     {
         AACE_DEBUG(LX(TAG,"setSource").d("type","stream"));
 
-        ThrowIfNot( waitForEventState(), "waitForEventStateTimeout" );
-
         resetSource();
 
         ThrowIfNot( stream->good(), "invalidStream" );
@@ -331,7 +556,7 @@ alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId Au
         ThrowIfNot( m_mediaPlayerPlatformInterface->prepare(), "platformMediaPlayerPrepareFailed" );
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"setSource").d("reason", ex.what()).d("expectedState",m_expectedEventState));
+        AACE_ERROR(LX(TAG,"setSource").d("reason", ex.what()).d("expectedState",m_pendingEventState));
         resetSource();
     }
 
@@ -340,11 +565,11 @@ alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId Au
 
 alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId AudioChannelEngineImpl::setSource( const std::string& url, std::chrono::milliseconds offset )
 {
+    std::unique_lock<std::mutex> lock( m_mutex );
+
     try
     {
         AACE_DEBUG(LX(TAG,"setSource").d("type","url").sensitive("url", url));
-
-        ThrowIfNot( waitForEventState(), "waitForEventStateTimeout" );
 
         resetSource();
         
@@ -364,78 +589,120 @@ alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId Au
 
 bool AudioChannelEngineImpl::play( alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id )
 {
+    std::unique_lock<std::mutex> lock( m_mutex );
+
     try
     {
-        ThrowIf( m_expectedEventState != EventState::NONE, "invalidEventState" );
         ThrowIfNot( validateSource( id ), "invalidSource" );
 
+        // send the pending event
+        sendPendingEvent();
+
         ThrowIfNot( m_mediaPlayerPlatformInterface->play(), "platformMediaPlayerPlayFailed" );
-        
-        m_expectedEventState = EventState::PLAYBACK_STARTED;
+
+        // set the expected pending event state
+        m_pendingEventState = PendingEventState::PLAYBACK_STARTED;
+
+        // if the current media state is already playing then send up the pending event now
+        if( m_currentMediaState == MediaState::PLAYING ) {
+            sendPendingEvent();
+        }
         
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"play").d("reason", ex.what()).d("expectedState",m_expectedEventState));
+        AACE_ERROR(LX(TAG,"play").d("reason", ex.what()).d("expectedState",m_pendingEventState));
         return false;
     }
 }
 
 bool AudioChannelEngineImpl::stop( alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id )
 {
+    std::unique_lock<std::mutex> lock( m_mutex );
+
     try
     {
-        ThrowIf( m_expectedEventState != EventState::NONE, "invalidEventState" );
         ThrowIfNot( validateSource( id ), "invalidSource" );
-        
-        m_expectedEventState = EventState::PLAYBACK_STOPPED;
-        m_savedOffset = std::chrono::milliseconds( m_mediaPlayerPlatformInterface->getPosition() );
 
+        // send the pending event
+        sendPendingEvent();
+
+        // invoke the platform interface stop method
         ThrowIfNot( m_mediaPlayerPlatformInterface->stop(), "platformMediaPlayerStopFailed" );
         
+        // set the expected pending event state and media offset
+        m_pendingEventState = PendingEventState::PLAYBACK_STOPPED;
+
+        // if the current media state is already stopped then send up the pending event now
+        if( m_currentMediaState == MediaState::STOPPED ) {
+            sendPendingEvent();
+        }
+
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"stop").d("reason", ex.what()).d("expectedState",m_expectedEventState));
+        AACE_ERROR(LX(TAG,"stop").d("reason", ex.what()).d("expectedState",m_pendingEventState));
         return false;
     }
 }
 
 bool AudioChannelEngineImpl::pause( alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id )
 {
+    std::unique_lock<std::mutex> lock( m_mutex );
+
     try
     {
-        ThrowIf( m_expectedEventState != EventState::NONE, "invalidEventState" );
         ThrowIfNot( validateSource( id ), "invalidSource" );
-
-        m_expectedEventState = EventState::PLAYBACK_PAUSED;
-        m_savedOffset = std::chrono::milliseconds( m_mediaPlayerPlatformInterface->getPosition() );
-
+        ReturnIf( id == ERROR, true );
+        
+        // send the pending event
+        sendPendingEvent();
+        
+        // invoke the platform interface pause method
         ThrowIfNot( m_mediaPlayerPlatformInterface->pause(), "platformMediaPlayerPauseFailed" );
         
+        // set the expected pending event state and media offset
+        m_pendingEventState = PendingEventState::PLAYBACK_PAUSED;
+
+        // if the current media state is already stopped then send up the pending event now
+        if( m_currentMediaState == MediaState::STOPPED ) {
+            sendPendingEvent();
+        }
+
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"pause").d("reason", ex.what()).d("expectedState",m_expectedEventState));
+        AACE_ERROR(LX(TAG,"pause").d("reason", ex.what()).d("expectedState",m_pendingEventState));
         return false;
     }
 }
 
 bool AudioChannelEngineImpl::resume( alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id )
 {
+    std::unique_lock<std::mutex> lock( m_mutex );
+
     try
     {
-        ThrowIf( m_expectedEventState != EventState::NONE, "invalidEventState" );
         ThrowIfNot( validateSource( id ), "invalidSource" );
+        
+        // send the pending event
+        sendPendingEvent();
 
-        m_expectedEventState = EventState::PLAYBACK_RESUMED;
-
+        // invoke the platform interface resume method
         ThrowIfNot( m_mediaPlayerPlatformInterface->resume(), "platformMediaPlayerResumeFailed" );
         
+        // set the expected pending event state
+        m_pendingEventState = PendingEventState::PLAYBACK_RESUMED;
+
+        // if the current media state is already playing then send up the pending event now
+        if( m_currentMediaState == MediaState::PLAYING ) {
+            sendPendingEvent();
+        }
+
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"resume").d("reason", ex.what()).d("expectedState",m_expectedEventState));
+        AACE_ERROR(LX(TAG,"resume").d("reason", ex.what()).d("expectedState",m_pendingEventState));
         return false;
     }
 }
@@ -448,13 +715,17 @@ std::chrono::milliseconds AudioChannelEngineImpl::getOffset( alexaClientSDK::avs
         
         std::chrono::milliseconds offset = std::chrono::milliseconds( m_mediaPlayerPlatformInterface->getPosition() );
         ThrowIf( offset.count() < 0, "invalidMediaTime" );
-        
+
         return offset;
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"getOffset").d("reason", ex.what()));
         return std::chrono::milliseconds( 0 );
     }
+}
+
+uint64_t AudioChannelEngineImpl::getNumBytesBuffered() {
+    return 0;
 }
 
 void AudioChannelEngineImpl::setObserver(std::shared_ptr<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerObserverInterface> observer) {
@@ -490,11 +761,11 @@ bool AudioChannelEngineImpl::validateSource( alexaClientSDK::avsCommon::utils::m
 {
     try
     {
-        ThrowIf( m_currentId == ERROR || m_currentId != id, "invalidSource" )
+        ThrowIf( m_currentId != id, "invalidSource" )
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"validateSource").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG,"validateSource").d("reason", ex.what()).d("id",id).d("currentId",m_currentId));
         return false;
     }
 }

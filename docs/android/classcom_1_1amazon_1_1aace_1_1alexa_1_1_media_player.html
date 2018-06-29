@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Automotive Core SDK (Android)
-   &#160;<span id="projectnumber">1.0.0-beta</span>
+   &#160;<span id="projectnumber">1.0.0</span>
    </div>
    <div id="projectbrief">Alexa Auto Core SDK for interacting with the Alexa Voice Service</div>
   </td>
@@ -77,7 +77,9 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player_1_1_error_type.html">ErrorType</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player_1_1_media_error.html">MediaError</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player_1_1_media_state.html">MediaState</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -98,28 +100,29 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ad99af84f4bec2cbdb50dc9fdb563263d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0532126111b5c1f436a41d18da3cd634"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a0532126111b5c1f436a41d18da3cd634">setPosition</a> (long position)</td></tr>
 <tr class="separator:a0532126111b5c1f436a41d18da3cd634"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae45e936ed52ce845e0fa9a1c524a2eb1"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#ae45e936ed52ce845e0fa9a1c524a2eb1">isClosed</a> ()</td></tr>
+<tr class="separator:ae45e936ed52ce845e0fa9a1c524a2eb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a085331b570d02c16eb2160ed7c3f0cec"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a085331b570d02c16eb2160ed7c3f0cec">isRepeating</a> ()</td></tr>
 <tr class="separator:a085331b570d02c16eb2160ed7c3f0cec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface.html">com.amazon.aace.core.PlatformInterface</a></td></tr>
+<tr class="memitem:ab262a5c3abc75647e55d68bee4dcc287 inherit pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface.html#ab262a5c3abc75647e55d68bee4dcc287">PlatformInterface</a> ()</td></tr>
+<tr class="separator:ab262a5c3abc75647e55d68bee4dcc287 inherit pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a23036a05b260fea79f22c3a78911d2dd"><td class="memItemLeft" align="right" valign="top">final void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a23036a05b260fea79f22c3a78911d2dd">playbackStarted</a> ()</td></tr>
-<tr class="separator:a23036a05b260fea79f22c3a78911d2dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adf6cc005a2929ef7493194c25f1956df"><td class="memItemLeft" align="right" valign="top">final void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#adf6cc005a2929ef7493194c25f1956df">playbackFinished</a> ()</td></tr>
-<tr class="separator:adf6cc005a2929ef7493194c25f1956df"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a23bcb0b290cb355f58d40f34d1a220f8"><td class="memItemLeft" align="right" valign="top">final void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a23bcb0b290cb355f58d40f34d1a220f8">playbackPaused</a> ()</td></tr>
-<tr class="separator:a23bcb0b290cb355f58d40f34d1a220f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acb9e3c1afae283b219171a0fdf7ea213"><td class="memItemLeft" align="right" valign="top">final void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#acb9e3c1afae283b219171a0fdf7ea213">playbackResumed</a> ()</td></tr>
-<tr class="separator:acb9e3c1afae283b219171a0fdf7ea213"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae88291898f8942ceec3460c13cb910b6"><td class="memItemLeft" align="right" valign="top">final void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#ae88291898f8942ceec3460c13cb910b6">playbackStopped</a> ()</td></tr>
-<tr class="separator:ae88291898f8942ceec3460c13cb910b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a52789fb2321af2ea710c61048aee4bd8"><td class="memItemLeft" align="right" valign="top">final void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a52789fb2321af2ea710c61048aee4bd8">playbackError</a> (<a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player_1_1_error_type.html">ErrorType</a> type, String error)</td></tr>
-<tr class="separator:a52789fb2321af2ea710c61048aee4bd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af8a6743ae4321d175cdf79830cbcf222"><td class="memItemLeft" align="right" valign="top">final void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#af8a6743ae4321d175cdf79830cbcf222">mediaError</a> (<a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player_1_1_media_error.html">MediaError</a> type, String error)</td></tr>
+<tr class="separator:af8a6743ae4321d175cdf79830cbcf222"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f1ca70c91de1fa6aaf537dcc53ae24f"><td class="memItemLeft" align="right" valign="top">final void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a7f1ca70c91de1fa6aaf537dcc53ae24f">mediaStateChanged</a> (<a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player_1_1_media_state.html">MediaState</a> state)</td></tr>
+<tr class="separator:a7f1ca70c91de1fa6aaf537dcc53ae24f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a510670f7f4ba34244ee9a6f8d113b86c"><td class="memItemLeft" align="right" valign="top">final int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a510670f7f4ba34244ee9a6f8d113b86c">read</a> (byte[] buffer)</td></tr>
 <tr class="separator:a510670f7f4ba34244ee9a6f8d113b86c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e58a0b4e398ff359f818975b1f774ee"><td class="memItemLeft" align="right" valign="top">final int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a0e58a0b4e398ff359f818975b1f774ee">read</a> (byte[] data, int offset, int size)</td></tr>
+<tr class="separator:a0e58a0b4e398ff359f818975b1f774ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html">MediaPlayer</a></code> class is the base class for platform media players, and should be extended to handle them. </p>
+<div class="textblock"><p><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html">MediaPlayer</a> should be extended to play audio data provided by the Engine. <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html">MediaPlayer</a> is the interface for audio playback for an <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_channel.html">AudioChannel</a></code>. After returning <code>true</code> from a playback-controlling directive from the Engine (i.e. <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#aa3bfefa4c7deff700a3c2e8cadd151d1">play()</a></code>, <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a54a81bb5ac85126479d3d911e9397a9e">pause()</a></code>, <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a43d342c7bad79b089f65514614f981a2">stop()</a></code>, <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#aaa4e76e649f92fb84c7baf004ceb9334">resume()</a></code>), the platform implementation should notify the Engine when the platform media player changes playback state by calling <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a7f1ca70c91de1fa6aaf537dcc53ae24f">mediaStateChanged()</a></code> with the new <code><a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player_1_1_media_state.html">MediaState</a></code>. The Engine expects no call to <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a7f1ca70c91de1fa6aaf537dcc53ae24f">mediaStateChanged()</a></code> for a directive in which the platform returned <code>false</code>. The platform implementation may call <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#af8a6743ae4321d175cdf79830cbcf222">mediaError()</a></code> or <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a7f1ca70c91de1fa6aaf537dcc53ae24f">mediaStateChanged()</a></code> with <code><a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player_1_1_media_state.html#ace6f2c3cd1c03e4c4d206ac851ad87cc">MediaState.BUFFERING</a></code> at any time during a playback operation to notify the Engine of an error or buffer underrun, respectvely. When the media player resumes playback after a buffer underrun, the platform implementation should call <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a7f1ca70c91de1fa6aaf537dcc53ae24f">mediaStateChanged()</a></code> with <code><a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player_1_1_media_state.html#aac358232aa9837d312dbbe28ac4fcbc7">MediaState.PLAYING</a></code>.</p>
+<dl class="section note"><dt>Note</dt><dd>The <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html">MediaPlayer</a></code> platform implementation must be able to support the audio formats recommended by AVS: <a href="https://developer.amazon.com/docs/alexa-voice-service/recommended-media-support.html">https://developer.amazon.com/docs/alexa-voice-service/recommended-media-support.html</a></dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_channel.html">AudioChannel</a> </dd></dl>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a996e407a41f9720d45ea57590d0db8f5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a996e407a41f9720d45ea57590d0db8f5">&#9670;&nbsp;</a></span>prepare() <span class="overload">[1/2]</span></h2>
@@ -135,8 +138,8 @@ Protected Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Called when the platform implementation should prepare for audio playback. Audio data will be available to read at this point and can be cached locally for the platform media player.</p>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the call was handled successfully. </dd></dl>
+<p>Notifies the platform implementation to prepare for playback of an audio stream source. Audio data will be available to stream from the Engine via <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a510670f7f4ba34244ee9a6f8d113b86c">read()</a></code>. After returning <code>true</code>, the Engine will call <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#aa3bfefa4c7deff700a3c2e8cadd151d1">play()</a></code> to initiate audio playback.</p>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation successfully handled the call, else <code>false</code> </dd></dl>
 
 </div>
 </div>
@@ -155,14 +158,14 @@ Protected Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Called when the platform implementation should prepare to play back an audio stream URL.</p>
+<p>Notifies the platform implementation to prepare for playback of a URL audio source. After returning <code>true</code>, the Engine will call <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#aa3bfefa4c7deff700a3c2e8cadd151d1">play()</a></code> to initiate audio playback.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">url</td><td>Audio stream URL. </td></tr>
+    <tr><td class="paramname">url</td><td>The URL audio source to set in the platform media player</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the call was handled successfully. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation successfully handled the call, else <code>false</code> </dd></dl>
 
 </div>
 </div>
@@ -180,8 +183,8 @@ Protected Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Called when the platform implementation should start playing audio.</p>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the call was handled successfully. </dd></dl>
+<p>Notifies the platform implementation to start playback of the current audio source. After returning <code>true</code>, the platform implementation must call <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a7f1ca70c91de1fa6aaf537dcc53ae24f">mediaStateChanged()</a></code> with <code><a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player_1_1_media_state.html#aac358232aa9837d312dbbe28ac4fcbc7">MediaState.PLAYING</a></code> when the media player begins playing the audio or <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#af8a6743ae4321d175cdf79830cbcf222">mediaError()</a></code> if an error occurs.</p>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation successfully handled the call, else <code>false</code> </dd></dl>
 
 </div>
 </div>
@@ -199,8 +202,8 @@ Protected Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Called when the platform implementation should stop playing audio.</p>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the call was handled successfully, else <code>false</code>. </dd></dl>
+<p>Notifies the platform implementation to stop playback of the current audio source. After returning <code>true</code>, the platform implementation must call <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a7f1ca70c91de1fa6aaf537dcc53ae24f">mediaStateChanged()</a></code> with <code><a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player_1_1_media_state.html#afa3f10bdbab0bc0aef93de88791f6967">MediaState.STOPPED</a></code> when the media player stops playing the audio or <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#af8a6743ae4321d175cdf79830cbcf222">mediaError()</a></code> if an error occurs. A subsequent call to <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#aa3bfefa4c7deff700a3c2e8cadd151d1">play()</a></code> will be preceded by calls to <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a996e407a41f9720d45ea57590d0db8f5">prepare()</a></code> and <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a0532126111b5c1f436a41d18da3cd634">setPosition()</a></code>.</p>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation successfully handled the call, else <code>false</code> </dd></dl>
 
 </div>
 </div>
@@ -218,8 +221,8 @@ Protected Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Called when the platform implementation should pause the currently playing audio.</p>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the call was handled successfully. </dd></dl>
+<p>Notifies the platform implementation to pause playback of the current audio source. After returning <code>true</code>, the platform implementation must call <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a7f1ca70c91de1fa6aaf537dcc53ae24f">mediaStateChanged()</a></code> with <code><a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player_1_1_media_state.html#afa3f10bdbab0bc0aef93de88791f6967">MediaState.STOPPED</a></code> when the media player pauses the audio or <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#af8a6743ae4321d175cdf79830cbcf222">mediaError()</a></code> if an error occurs. A subsequent call to <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#aaa4e76e649f92fb84c7baf004ceb9334">resume()</a></code> will not be preceded by calls to <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a996e407a41f9720d45ea57590d0db8f5">prepare()</a></code> and <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a0532126111b5c1f436a41d18da3cd634">setPosition()</a></code>.</p>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation successfully handled the call, else <code>false</code> </dd></dl>
 
 </div>
 </div>
@@ -237,8 +240,8 @@ Protected Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Called when the platform implementation should resume playing currently paused audio.</p>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the call was handled successfully. </dd></dl>
+<p>Notifies the platform implementation to resume playback of the current audio source. After returning <code>true</code>, the platform implementation must call <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a7f1ca70c91de1fa6aaf537dcc53ae24f">mediaStateChanged()</a></code> with <code><a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player_1_1_media_state.html#aac358232aa9837d312dbbe28ac4fcbc7">MediaState.PLAYING</a></code> when the media player resumes the audio or <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#af8a6743ae4321d175cdf79830cbcf222">mediaError()</a></code> if an error occurs.</p>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation successfully handled the call, else <code>false</code> </dd></dl>
 
 </div>
 </div>
@@ -256,7 +259,8 @@ Protected Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Called when the Engine needs the media playback position (in milliseconds) of the current audio stream. Must return the current position. </p><dl class="section return"><dt>Returns</dt><dd>Playback position (in milliseconds) of the current audio stream. </dd></dl>
+<p>Returns the current playback position of the platform media player. If the audio source is not playing, the most recent position played should be returned.</p>
+<dl class="section return"><dt>Returns</dt><dd>The platform media player's playback position in milliseconds </dd></dl>
 
 </div>
 </div>
@@ -275,13 +279,32 @@ Protected Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Called when the Engine needs to set the media playback position (in milliseconds) of the current audio stream. Must set the media player to the position. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Notifies the platform implementation to set the playback position of the current audio source in the platform media player</p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">position</td><td>Position (in milliseconds) to set the current audio stream to.</td></tr>
+    <tr><td class="paramname">position</td><td>The playback position in milliseconds to set in the platform media player</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the call was handled successfully. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation successfully handled the call, else <code>false</code> </dd></dl>
+
+</div>
+</div>
+<a id="ae45e936ed52ce845e0fa9a1c524a2eb1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae45e936ed52ce845e0fa9a1c524a2eb1">&#9670;&nbsp;</a></span>isClosed()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boolean com.amazon.aace.alexa.MediaPlayer.isClosed </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the audio stream is closed and no more data is available to read. </dd></dl>
 
 </div>
 </div>
@@ -299,39 +322,13 @@ Protected Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Returns <code>true</code> if the current media source should repeat when it is finished playing. The <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html">MediaPlayer</a></code> is responsible for repeating the current audio if this call returns <code>true</code>. If <code>false</code> is returned, the <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html">MediaPlayer</a></code> should call <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#adf6cc005a2929ef7493194c25f1956df">playbackFinished()</a></code> when the current audio is done playing.</p>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the call was handled successfully. </dd></dl>
+<p>Checks if playback of the current audio source must be repeated when finished playing. If this call returns <code>true</code>, the platform implementation should repeat the current audio source. If <code>false</code> is returned, the platform implementation should call <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a7f1ca70c91de1fa6aaf537dcc53ae24f">mediaStateChanged()</a></code> with <code><a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player_1_1_media_state.html#afa3f10bdbab0bc0aef93de88791f6967">MediaState.STOPPED</a></code> when the audio is finished playing.</p>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform media player must repeat playback of the current audio source, else <code>false</code> </dd></dl>
 
 </div>
 </div>
-<a id="a23036a05b260fea79f22c3a78911d2dd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a23036a05b260fea79f22c3a78911d2dd">&#9670;&nbsp;</a></span>playbackStarted()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final void com.amazon.aace.alexa.MediaPlayer.playbackStarted </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Notify the Engine that the audio has started playing. Must be called when the platform implementation's <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html">MediaPlayer</a></code> starts playing. </p>
-
-</div>
-</div>
-<a id="adf6cc005a2929ef7493194c25f1956df"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adf6cc005a2929ef7493194c25f1956df">&#9670;&nbsp;</a></span>playbackFinished()</h2>
+<a id="af8a6743ae4321d175cdf79830cbcf222"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af8a6743ae4321d175cdf79830cbcf222">&#9670;&nbsp;</a></span>mediaError()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -340,113 +337,9 @@ Protected Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">final void com.amazon.aace.alexa.MediaPlayer.playbackFinished </td>
+          <td class="memname">final void com.amazon.aace.alexa.MediaPlayer.mediaError </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Notify the Engine that the audio has finished playing. Must be called when the platform implementation's <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html">MediaPlayer</a> has finished playing. </p>
-
-</div>
-</div>
-<a id="a23bcb0b290cb355f58d40f34d1a220f8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a23bcb0b290cb355f58d40f34d1a220f8">&#9670;&nbsp;</a></span>playbackPaused()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final void com.amazon.aace.alexa.MediaPlayer.playbackPaused </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Notify the Engine that audio playback has been paused. Must be called when the platform implementation's <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html">MediaPlayer</a> enters a paused state. </p>
-
-</div>
-</div>
-<a id="acb9e3c1afae283b219171a0fdf7ea213"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acb9e3c1afae283b219171a0fdf7ea213">&#9670;&nbsp;</a></span>playbackResumed()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final void com.amazon.aace.alexa.MediaPlayer.playbackResumed </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Notify the Engine that audio playback has resumed after being paused. Must be called when the platform implementation's <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html">MediaPlayer</a> resumes. </p>
-
-</div>
-</div>
-<a id="ae88291898f8942ceec3460c13cb910b6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae88291898f8942ceec3460c13cb910b6">&#9670;&nbsp;</a></span>playbackStopped()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final void com.amazon.aace.alexa.MediaPlayer.playbackStopped </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Notify the Engine that audio playback has stopped. Must be called when the platform implementation's <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html">MediaPlayer</a> enters a stopped state. </p>
-
-</div>
-</div>
-<a id="a52789fb2321af2ea710c61048aee4bd8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a52789fb2321af2ea710c61048aee4bd8">&#9670;&nbsp;</a></span>playbackError()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final void com.amazon.aace.alexa.MediaPlayer.playbackError </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player_1_1_error_type.html">ErrorType</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player_1_1_media_error.html">MediaError</a>&#160;</td>
           <td class="paramname"><em>type</em>, </td>
         </tr>
         <tr>
@@ -467,19 +360,54 @@ Protected Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Notify the Engine that an error occurred while playing the audio. Must be called if the platform implementation runs into a playback error. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Notifies the Engine of an error during audio playback</p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">type</td><td>The error type. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">error</td><td>The error description. </td></tr>
+    <tr><td class="paramname">error</td><td>The error encountered by the platform media player during playback</td></tr>
+    <tr><td class="paramname">description</td><td>A description of the error</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player_1_1_error_type.html">ErrorType</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player_1_1_media_error.html">MediaError</a> </dd></dl>
+
+</div>
+</div>
+<a id="a7f1ca70c91de1fa6aaf537dcc53ae24f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7f1ca70c91de1fa6aaf537dcc53ae24f">&#9670;&nbsp;</a></span>mediaStateChanged()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">final void com.amazon.aace.alexa.MediaPlayer.mediaStateChanged </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player_1_1_media_state.html">MediaState</a>&#160;</td>
+          <td class="paramname"><em>state</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Notifies the Engine of an audio playback state change in the platform implementation. Must be called when the platform media player transitions between stopped and playing states.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">state</td><td>The new playback state of the platform media player</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player_1_1_media_state.html">MediaState</a> </dd></dl>
 
 </div>
 </div>
 <a id="a510670f7f4ba34244ee9a6f8d113b86c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a510670f7f4ba34244ee9a6f8d113b86c">&#9670;&nbsp;</a></span>read()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a510670f7f4ba34244ee9a6f8d113b86c">&#9670;&nbsp;</a></span>read() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -501,15 +429,66 @@ Protected Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Read data from the audio stream for playback.</p>
+<p>Reads audio data from the Engine when available. Audio data will be available after a call to <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a996e407a41f9720d45ea57590d0db8f5">prepare()</a></code> and while <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#ae45e936ed52ce845e0fa9a1c524a2eb1">isClosed()</a></code> returns false.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The data buffer to read. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">size</td><td>The size of the data to read. </td></tr>
+    <tr><td class="paramname">data</td><td>The buffer where audio data should be copied</td></tr>
+    <tr><td class="paramname">size</td><td>The size of the buffer</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The number of bytes read, or zero if end of stream is reached, or -1 if an error occurred. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The number of bytes read, 0 if the end of stream is reached or data is not currently available, or -1 if an error occurred </dd></dl>
+
+</div>
+</div>
+<a id="a0e58a0b4e398ff359f818975b1f774ee"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0e58a0b4e398ff359f818975b1f774ee">&#9670;&nbsp;</a></span>read() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">final int com.amazon.aace.alexa.MediaPlayer.read </td>
+          <td>(</td>
+          <td class="paramtype">byte []&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>size</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Reads audio data from the Engine when available. Audio data will be available after a call to <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a996e407a41f9720d45ea57590d0db8f5">prepare()</a></code> and while <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#ae45e936ed52ce845e0fa9a1c524a2eb1">isClosed()</a></code> returns false.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">data</td><td>The buffer where audio data should be copied</td></tr>
+    <tr><td class="paramname">size</td><td>The size of the buffer</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The number of bytes read, 0 if the end of stream is reached or data is not currently available, or -1 if an error occurred </dd></dl>
 
 </div>
 </div>
@@ -518,7 +497,7 @@ Protected Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Automotive Core SDK (Android) 1.0.0-beta - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Automotive Core SDK (Android) 1.0.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

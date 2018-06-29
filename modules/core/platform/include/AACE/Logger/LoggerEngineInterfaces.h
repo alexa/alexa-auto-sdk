@@ -23,30 +23,39 @@
 namespace aace {
 namespace logger {
 
+/**
+ * LoggerEngineInterface
+ */
 class LoggerEngineInterface {
 public:
+
     /**
-     * Enum used to specify the severity assigned to a log message.
+     * Specifies the severity level of a log message
      */
     enum class Level {
+
         /**
-         * Most verbose log level. Only enabled for debug builds.
+         * Verbose log of an event, enabled only for debug builds
          */
         VERBOSE,
+
         /**
-         * Logs of normal operations, to be used in release builds.
+         * Log of a normal event. Used in release builds
          */
         INFO,
+
         /**
-         * Log of an event that may indicate a problem.
+         * Log of an event that may indicate a problem
          */
         WARN,
+
         /**
-         * Log of an event that indicates an error.
+         * Log of an event that indicates an error
          */
         ERROR,
+
         /**
-         * Log of an event that indicates an unrecoverable error.
+         * Log of an event that indicates an unrecoverable error
          */
         CRITICAL
     };

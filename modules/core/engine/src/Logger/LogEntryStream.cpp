@@ -22,7 +22,7 @@ namespace logger {
 LogEntryStream::LogEntryStream() : LogEntryBuffer{}, std::ostream{this} {
 }
 
-const char* LogEntryStream::LogEntryStream::c_str() const {
+const char* LogEntryStream::c_str() const {
     return LogEntryBuffer::c_str();
 }
 

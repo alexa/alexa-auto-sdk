@@ -1,148 +1,978 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent">
 
-    <!-- Product ID field -->
-    <EditText
-        android:id="@+id/product_id"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="2dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="16dp"
-        android:inputType="text" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="8dp"
-        android:text="Product ID"
-        android:textSize="16sp"
-        />
-
-    <!-- Product DSN field -->
-    <EditText
-        android:id="@+id/product_dsn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="2dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="16dp"
-        android:inputType="text" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="8dp"
-        android:text="Product DSN"
-        android:textSize="16sp"
-        />
-
-    <!-- Login with Amazon button -->
-    <ImageButton
-        android:id="@+id/action_login_with_amazon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="8dp"
-        android:layout_gravity="center"
-        android:background="@null"
-        android:src="@drawable/lwa_btn_src" />
-
-    <!-- Log out button -->
-    <include
-        layout="@layout/button_logout"
-        android:id="@+id/action_logout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="8dp" />
-
-    <!-- Container for log filter switch group -->
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="325dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="4dp"
-        android:background="@color/drawerSection" >
+        android:background="@color/drawerBackground"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp" >
 
-        <!-- Header -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/log_switch_header"
-            android:textColor="@color/drawerHeader"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:textSize="24sp" />
-
-        <!-- Source Header -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/log_switch_source"
-            android:textColor="@color/drawerHeader"
-            android:layout_marginEnd="24dp"
-            android:layout_marginStart="24dp"
-            android:textSize="20sp" />
-
-        <!-- Source switch group -->
+        <!-- Container for login -->
         <LinearLayout
-            android:id="@+id/container_source"
+            android:id="@+id/login"
+            android:visibility="visible"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:layout_marginStart="32dp"
-            android:layout_marginEnd="32dp" />
-
-        <!-- Level Header -->
-        <TextView
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/log_switch_level"
-            android:textColor="@color/drawerHeader"
-            android:layout_marginEnd="24dp"
-            android:layout_marginStart="24dp"
-            android:textSize="20sp" />
-
-        <!-- Level switch group -->
-        <LinearLayout
-            android:id="@+id/container_level"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
             android:orientation="vertical"
-            android:layout_marginStart="32dp"
-            android:layout_marginEnd="32dp" >
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="4dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:background="@color/drawerSection" >
 
+            <!-- Switch LWA modes -->
+            <ToggleButton
+                android:id="@+id/toggleLwaMode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textOff="@string/auth_lwa_cbl"
+                android:textOn="@string/auth_lwa_browser" />
+
+            <!-- Login with Amazon button -->
+            <ImageButton
+                android:id="@+id/loginButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp"
+                android:background="@null"
+                android:src="@drawable/lwa_btn_src" />
+        </LinearLayout>
+
+        <!-- Container for logout -->
+        <LinearLayout
+            android:id="@+id/logout"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:background="@color/drawerSection" >
+
+            <!-- Log out button -->
+            <TextView
+                android:id="@+id/logoutButton"
+                style="@style/button"
+                android:text="@string/auth_logout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp" />
+        </LinearLayout>
+
+        <!-- Config Info -->
+        <LinearLayout
+            android:id="@+id/configContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="4dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:background="@color/drawerSection" >
+
+            <!-- Header -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/config"
+                android:textColor="@color/drawerHeader"
+                android:textSize="18sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                android:orientation="vertical" >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/client_id"
+                    android:layout_gravity="start"
+                    android:textSize="12sp" />
+                <TextView
+                    android:id="@+id/clientId"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:textColor="@color/drawerTextStatus"
+                    android:layout_gravity="start"
+                    android:textSize="12sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/client_secret"
+                    android:layout_gravity="start"
+                    android:textSize="12sp" />
+                <TextView
+                    android:id="@+id/clientSecret"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:textColor="@color/drawerTextStatus"
+                    android:layout_gravity="start"
+                    android:textSize="12sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/product_id"
+                    android:layout_gravity="start"
+                    android:textSize="12sp" />
+                <TextView
+                    android:id="@+id/productId"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:textColor="@color/drawerTextStatus"
+                    android:layout_gravity="start"
+                    android:textSize="12sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/product_dsn"
+                    android:layout_gravity="start"
+                    android:textSize="12sp" />
+                <TextView
+                    android:id="@+id/productDsn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:textColor="@color/drawerTextStatus"
+                    android:layout_gravity="start"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Alexa client state -->
+        <LinearLayout
+            android:id="@+id/clientStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:background="@color/drawerSection" >
+
+            <!-- Header -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/client_state"
+                android:textColor="@color/drawerHeader"
+                android:textSize="18sp" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp">
+                <!-- State name-->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginEnd="8dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="@string/client_connection_status"
+                        android:layout_gravity="start"
+                        android:textSize="12sp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="@string/client_auth_state"
+                        android:layout_gravity="start"
+                        android:textSize="12sp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="@string/client_dialog_state"
+                        android:layout_gravity="start"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <!-- State status -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/connectionState"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:textColor="@color/drawerTextStatus"
+                        android:layout_gravity="end"
+                        android:textSize="12sp" />
+                    <TextView
+                        android:id="@+id/authState"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:textColor="@color/drawerTextStatus"
+                        android:layout_gravity="end"
+                        android:textSize="12sp" />
+                    <TextView
+                        android:id="@+id/dialogState"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:textColor="@color/drawerTextStatus"
+                        android:layout_gravity="end"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <!-- Wake Word -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/wakeWord"
+            android:orientation="vertical"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:background="@color/drawerSection" >
+            <!-- Header -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/wake_word"
+                android:textColor="@color/drawerHeader"
+                android:textSize="18sp" />
+            <TextView
+                android:id="@+id/wakeWordNotSupportedMessage"
+                android:visibility="visible"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="4dp"
+                android:text="@string/wake_word_not_supported"
+                android:layout_gravity="start"
+                android:textSize="12sp" />
+            <!-- Switch -->
+            <include
+                layout="@layout/drawer_switch"
+                android:visibility="gone"
+                android:id="@+id/toggleWakeWord"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal" />
+        </LinearLayout>
+
+        <!-- Container for log filters -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:background="@color/drawerSection" >
+
+            <!-- Header -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/log_filter"
+                android:textColor="@color/drawerHeader"
+                android:textSize="18sp" />
+
+            <!-- Source container -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="8dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:background="@color/drawerSubsection">
+
+                <!-- Source Header -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/log_switch_source"
+                    android:textColor="@color/drawerHeader"
+                    android:textSize="18sp" />
+
+                <!-- Source switch group -->
+                <LinearLayout
+                    android:id="@+id/sourceSwitchContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical" />
+            </LinearLayout>
+
+            <!-- Level container -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="8dp"
+                android:background="@color/drawerSubsection" >
+                <!-- Level Header -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/log_switch_level"
+                    android:textColor="@color/drawerHeader"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:textSize="18sp" />
+                <!-- Level selector -->
+                <Spinner
+                    android:id="@+id/levelSpinner"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="4dp" />
+            </LinearLayout>
+
+            <!-- Card switch -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="8dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:background="@color/drawerSubsection" >
+                <include
+                    layout="@layout/drawer_switch"
+                    android:id="@+id/toggleCards"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center|center_horizontal" />
+            </LinearLayout>
+
+            <!-- Template switch -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="8dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:background="@color/drawerSubsection" >
+                <include
+                    layout="@layout/drawer_switch"
+                    android:id="@+id/toggleTemplates"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center|center_horizontal" />
+            </LinearLayout>
+
+            <!-- Clear log button -->
+            <TextView
+                style="@style/button"
+                android:id="@+id/clearLogButton"
+                android:text="@string/log_clear"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp" />
+        </LinearLayout>
+
+        <!-- Alerts -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:background="@color/drawerSection" >
+
+            <!-- Header -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/alerts"
+                android:textColor="@color/drawerHeader"
+                android:textSize="18sp" />
+
+            <!-- Alert State -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp" >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_alignParentStart="true"
+                    android:text="@string/alerts_state"
+                    android:layout_gravity="start"
+                    android:textSize="12sp" />
+                <TextView
+                    android:id="@+id/alertState"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_gravity="end"
+                    android:textColor="@color/drawerTextStatus"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+
+            <!-- Stop alert button -->
+            <TextView
+                style="@style/button"
+                android:id="@+id/stopAlertButton"
+                android:text="@string/alerts_stop"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="4dp" />
+
+            <!-- Remove all alerts button -->
+            <TextView
+                style="@style/button"
+                android:id="@+id/removeAlertsButton"
+                android:text="@string/alerts_remove"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="8dp" />
+        </LinearLayout>
+
+        <!-- Notifications -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="4dp"
+            android:background="@color/drawerSection" >
+
+            <!-- Header -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/notifications"
+                android:textColor="@color/drawerHeader"
+                android:textSize="18sp" />
+
+            <!-- Indicator State -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp" >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_alignParentStart="true"
+                    android:text="@string/indicator_state"
+                    android:layout_gravity="start"
+                    android:textSize="12sp" />
+                <TextView
+                    android:id="@+id/indicatorState"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_gravity="end"
+                    android:textColor="@color/drawerTextStatus"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <!-- Network Info -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="4dp"
+            android:background="@color/drawerSection" >
+
+            <!-- Header -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/network_info"
+                android:textColor="@color/drawerHeader"
+                android:textSize="18sp" />
+
+            <!-- Network Status -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp" >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_alignParentStart="true"
+                    android:text="@string/network_status"
+                    android:layout_gravity="start"
+                    android:textSize="12sp" />
+                <TextView
+                    android:id="@+id/networkStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_gravity="end"
+                    android:textColor="@color/drawerTextStatus"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <!-- Location -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:background="@color/drawerSection" >
+
+            <!-- Header -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/location"
+                android:textColor="@color/drawerHeader"
+                android:layout_marginBottom="4dp"
+                android:textSize="18sp" />
+
+            <!-- Current location -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_gravity="start"
+                    android:text="@string/loc_current"
+                    android:textSize="12sp" />
+                <TextView
+                    android:id="@+id/latLong"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_gravity="end"
+                    android:textColor="@color/drawerTextStatus"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+
+            <!-- Switch -->
+            <include
+                layout="@layout/drawer_switch"
+                android:id="@+id/toggleMockLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal" />
+
+            <!-- Address entry -->
+            <LinearLayout
+                android:id="@+id/addressEntry"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="8dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:background="@color/drawerSubsection" >
+
+                <EditText
+                    android:id="@+id/addressText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:inputType="text" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/loc_address"
+                    android:textSize="12sp" />
+                <TextView
+                    style="@style/button"
+                    android:id="@+id/setAddressButton"
+                    android:text="@string/loc_set"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="4dp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Volume -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:background="@color/drawerSection" >
+
+            <!-- Header -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/volume"
+                android:textColor="@color/drawerHeader"
+                android:layout_marginBottom="8dp"
+                android:textSize="18sp" />
+
+            <!-- LOCAL -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="8dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:background="@color/drawerSubsection" >
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/volume_local"
+                    android:textSize="12sp" />
+                <SeekBar
+                    android:id="@+id/localVolume"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:progress="50"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp" />
+            </LinearLayout>
+
+            <!-- AVS-SYNCED -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="8dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:background="@color/drawerSubsection" >
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:text="@string/volume_synced"
+                    android:textSize="12sp" />
+                <SeekBar
+                    android:id="@+id/syncedVolume"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:progress="50"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp" />
+                <!-- Mute button -->
+                <TextView
+                    style="@style/button"
+                    android:id="@+id/muteSyncedSpeakersButton"
+                    android:text="@string/volume_mute"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="4dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Playback Controller -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:background="@color/drawerSection">
+
+            <!-- Header -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/playback_controller"
+                android:textColor="@color/drawerHeader"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginBottom="4dp"
+                android:textSize="18sp" />
+
+            <!-- Title -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="4dp" >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_alignParentStart="true"
+                    android:text="@string/playback_title"
+                    android:textSize="12sp" />
+                <TextView
+                    android:id="@+id/mediaTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_gravity="end"
+                    android:textAllCaps="true"
+                    android:singleLine="true"
+                    android:maxLength="25"
+                    android:ellipsize="end"
+                    android:textColor="@color/drawerTextStatus"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+
+            <!-- Artist -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="4dp" >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_alignParentStart="true"
+                    android:text="@string/playback_artist"
+                    android:textSize="12sp" />
+                <TextView
+                    android:id="@+id/mediaArtist"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_gravity="end"
+                    android:textAllCaps="true"
+                    android:singleLine="true"
+                    android:maxLength="25"
+                    android:ellipsize="end"
+                    android:textColor="@color/drawerTextStatus"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+
+            <!-- Provider -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="4dp" >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_alignParentStart="true"
+                    android:text="@string/playback_provider"
+                    android:textSize="12sp" />
+                <TextView
+                    android:id="@+id/mediaProvider"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_gravity="end"
+                    android:textAllCaps="true"
+                    android:singleLine="true"
+                    android:maxLength="25"
+                    android:ellipsize="end"
+                    android:textColor="@color/drawerTextStatus"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+
+            <!-- Controls -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="4dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:background="@color/playbackControllerBackground" >
+                <include
+                    layout="@layout/playback_controller"
+                    android:id="@+id/playbackController"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Phone Call Controller -->
+        <LinearLayout
+            android:id="@+id/phone_call_controller"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="8dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:background="@color/drawerSection" >
+
+            <!-- Header -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/phone_call_controller"
+                android:textColor="@color/drawerHeader"
+                android:layout_marginBottom="4dp"
+                android:textSize="18sp" />
+
+            <!-- Enable Phone Connection Switch -->
+            <include
+                layout="@layout/drawer_switch"
+                android:id="@+id/togglePhoneCallConnection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal" />
+
+            <!-- Call State Info -->
+            <RelativeLayout
+                android:id="@+id/callInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                android:layout_marginBottom="4dp"
+                android:visibility="gone">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginEnd="8dp" >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="4dp"
+                        android:text="@string/call_state_label"
+                        android:layout_gravity="start"
+                        android:textSize="12sp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:text="@string/callee_number"
+                        android:layout_gravity="start"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/callState"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
+                        android:layout_gravity="end"
+                        android:text="@string/call_state_idle"
+                        android:textColor="@color/drawerTextStatus"
+                        android:textSize="12sp" />
+                    <TextView
+                        android:id="@+id/calleeNumber"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:text="@string/callee_default_number"
+                        android:textColor="@color/drawerTextStatus"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </RelativeLayout>
+
+            <!-- Initiate Call Button -->
+            <TextView
+                style="@style/button"
+                android:text="@string/call_initiate"
+                android:id="@+id/initiateCall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone" />
+
+            <!-- Terminate Call Button -->
+            <TextView
+                style="@style/button"
+                android:text="@string/call_terminate"
+                android:id="@+id/terminateCall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone" />
         </LinearLayout>
 
     </LinearLayout>
 
-    <!-- Playback Controller -->
-    <include
-        layout="@layout/playback_controller"
-        android:id="@+id/playback_controller"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="8dp" />
-
-</LinearLayout>
+</ScrollView>

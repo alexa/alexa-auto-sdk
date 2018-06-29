@@ -16,8 +16,6 @@
 #ifndef AACE_ENGINE_LOGGER_LOGGER_ENGINE_SERVICE_H
 #define AACE_ENGINE_LOGGER_LOGGER_ENGINE_SERVICE_H
 
-#include <rapidjson/document.h>
-
 #include "AACE/Engine/Core/EngineService.h"
 #include "EngineLogger.h"
 #include "LoggerEngineImpl.h"
@@ -41,41 +39,6 @@ protected:
     bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) override;
 
 private:
-    /**
-     * @code{.json}
-     * {
-     *   "aace.logger":
-     *   {
-     *      "sinks": [
-     *          {
-     *              "id": "<SINK_ID>"
-     *              "type": "<SINK_TYPE>",
-     *              "config": {
-     *                  <CONFIG_DATA>
-     *              },
-     *              "rules": [
-     *                  {
-     *                      "level": "<LOG_LEVEL>",
-     *                      "source": "<SOURCE_FILTER>",
-     *                      "tag": "<TAG_FILTER>",
-     *                      "message": "<MESSAGE_FILTER>"
-     *                  }
-     *              ]
-     *          }
-     *      ],
-     *      "rules": [
-     *          {
-     *              "sink": "<SINK_ID>",
-     *              "level": "<LOG_LEVEL>",
-     *              "source": "<SOURCE_FILTER>",
-     *              "tag": "<TAG_FILTER>",
-     *              "message": "<MESSAGE_FILTER>"
-     *          }
-     *      ]
-     *   }
-     * }
-     * @endcode
-     */
     bool configure( std::shared_ptr<std::istream> configuration );
     
     std::shared_ptr<aace::engine::logger::sink::Sink> createSink( const rapidjson::Value& config );

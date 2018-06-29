@@ -19,7 +19,7 @@
 package com.amazon.aace.location;
 
 /**
- * The @c Location class holds a location, and provides accessor methods for its data.
+ * Represents a location object and provides accessor methods to its data
  */
 public class Location
 {
@@ -31,6 +31,9 @@ public class Location
     // used for undefined location values
     static final public double UNDEFINED = -1;
 
+    /**
+     * Represents a location object and provides accessor methods to its data
+     */
     public Location( double latitude, double longitude, double altitude, double accuracy ) {
         m_latitude = latitude;
         m_longitude = longitude;
@@ -38,45 +41,51 @@ public class Location
         m_accuracy = accuracy > 0 ? accuracy : 0;
     }
 
+    /**
+     * Represents a location object and provides accessor methods to its data
+     */
     public Location( double latitude, double longitude, double altitude ) {
         this( latitude, longitude, altitude, UNDEFINED );
     }
 
+    /**
+     * Represents a location object and provides accessor methods to its data
+     */
     public Location( double latitude, double longitude ) {
         this( latitude, longitude, UNDEFINED, UNDEFINED );
     }
 
     /**
-     * Location accessor method for latitude.
+     * Location accessor method for latitude
      *
-     * @return @c double Latitude for the location.
+     * @return The latitude for the location
      */
     public double getLatitude() {
         return m_latitude;
     }
 
     /**
-     * Location accessor method for longitude.
+     * Location accessor method for longitude
      *
-     * @return @c double Longitude for the location.
+     * @return The longitude for the location
      */
     public double getLongitude() {
         return m_longitude;
     }
 
     /**
-     * Location accessor method for altitude.
+     * Location accessor method for altitude
      *
-     * @return @c double Altitude for the location.
+     * @return The altitude for the location
      */
     public double getAltitude() {
         return m_altitude;
     }
 
     /**
-     * Location accessor method for Accuracy.
+     * Location accessor method for accuracy
      *
-     * @return @c double Accuracy for the location.
+     * @return The accuracy for the location
      */
     public double getAccuracy() {
         return m_accuracy;

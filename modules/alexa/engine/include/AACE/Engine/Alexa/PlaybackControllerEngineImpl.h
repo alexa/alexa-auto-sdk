@@ -17,6 +17,7 @@
 #define AACE_ENGINE_ALEXA_PLAYBACK_CONTROLLER_ENGINE_IMPL_H
 
 #include "AACE/Alexa/PlaybackController.h"
+#include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
 #include <PlaybackController/PlaybackController.h>
 #include <PlaybackController/PlaybackRouter.h>
 
@@ -24,15 +25,24 @@ namespace aace {
 namespace engine {
 namespace alexa {
 
-class PlaybackControllerEngineImpl : public aace::alexa::PlaybackControllerEngineInterface {
+class PlaybackControllerEngineImpl :
+    public aace::alexa::PlaybackControllerEngineInterface,
+    public alexaClientSDK::avsCommon::utils::RequiresShutdown {
+    
 private:
     PlaybackControllerEngineImpl( std::shared_ptr<aace::alexa::PlaybackController> playbackControllerPlatformInterface );
+
+    bool initialize(
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate );
 
 public:
     static std::shared_ptr<PlaybackControllerEngineImpl> create(
         std::shared_ptr<aace::alexa::PlaybackController> playbackControllerPlatformInterface,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager );
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate );
     
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> getPlaybackRouter();
 
@@ -42,6 +52,8 @@ protected:
     void onNextButtonPressed() override;
     void onPreviousButtonPressed() override;
  
+    void doShutdown() override;
+
 private:
     std::shared_ptr<alexaClientSDK::capabilityAgents::playbackController::PlaybackController> m_playbackControllerCapabilityAgent;
     std::shared_ptr<alexaClientSDK::capabilityAgents::playbackController::PlaybackRouter> m_playbackRouter;

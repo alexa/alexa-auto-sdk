@@ -47,8 +47,10 @@ public:
     bool registerPlatformInterface( std::initializer_list<std::shared_ptr<aace::core::PlatformInterface>> platformInterfaceList ) override;
     bool start() override;
     bool stop() override;
+    bool shutdown() override;
     bool setProperty( const std::string& key, const std::string& value ) override;
-    
+    std::string getProperty( const std::string& key ) override;
+
     // create the engine
     static std::shared_ptr<EngineImpl> create();
     
@@ -74,6 +76,8 @@ private:
 
     // engine flags
     bool m_running = false;
+    bool m_initialized = false;
+    bool m_configured = false;
 };
 
 } // aace::engine::core

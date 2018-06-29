@@ -19,10 +19,33 @@
 package com.amazon.aace.alexa;
 
 /**
- * The @c AudioPlayer class should be extended by the platform implementation to handle audio playback from AVS.
+ * AudioPlayer should be extended to handle audio output from the Engine.
+ * The AudioPlayer @c MediaPlayer and @c Speaker will receive directives from the Engine to handle audio playback.
+ *
+ * @note Audio playback control operations such as on-platform button presses must be routed through
+ * the @c PlaybackController.
+ *
+ * @sa AudioChannel
+ *
+ * @sa PlaybackController
+ *
+ * @sa TemplateRuntime::renderPlayerInfo()
  */
 public class AudioPlayer extends AudioChannel
 {
+    /**
+     * AudioPlayer should be extended to handle audio output from the Engine.
+     * The AudioPlayer @c MediaPlayer and @c Speaker will receive directives from the Engine to handle audio playback.
+     *
+     * @note Audio playback control operations such as on-platform button presses must be routed through
+     * the @c PlaybackController.
+     *
+     * @sa AudioChannel
+     *
+     * @sa PlaybackController
+     *
+     * @sa TemplateRuntime::renderPlayerInfo()
+     */
     public AudioPlayer( MediaPlayer mediaPlayer, Speaker speaker ) {
         super( mediaPlayer, speaker, Speaker.Type.AVS_SYNCED );
     }

@@ -29,30 +29,54 @@ namespace navigation {
 static const std::string TAG("aace.navigation.NavigationEngineImpl");
 
 NavigationEngineImpl::NavigationEngineImpl( std::shared_ptr<aace::navigation::Navigation> navigationPlatformInterface ) :
-            alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
-            m_navigationPlatformInterface( navigationPlatformInterface ) {
+    alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
+    m_navigationPlatformInterface( navigationPlatformInterface ) {
 }
 
-
-std::shared_ptr<NavigationEngineImpl> NavigationEngineImpl::create(
-    std::shared_ptr<aace::navigation::Navigation> navigationPlatformInterface,
+bool NavigationEngineImpl::initialize(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender ) {
     
     try
     {
-        std::shared_ptr<NavigationEngineImpl> navigationEngineImpl = std::shared_ptr<NavigationEngineImpl>( new NavigationEngineImpl( navigationPlatformInterface ) );
-        auto navigationCapabilityAgent = NavigationCapabilityAgent::create( exceptionSender );
-        ThrowIfNull( navigationCapabilityAgent, "couldNotCreateCapabilityAgent" );
+        m_navigationCapabilityAgent = NavigationCapabilityAgent::create( exceptionSender );
+        ThrowIfNull( m_navigationCapabilityAgent, "couldNotCreateCapabilityAgent" );
         
         // add navigation runtime observer
-        navigationCapabilityAgent->addObserver( navigationEngineImpl );
-        
-        // set the capability agent reference in the engine implementation
-        navigationEngineImpl->m_navigationCapabilityAgent = navigationCapabilityAgent;
+        m_navigationCapabilityAgent->addObserver( shared_from_this() );
 
         // add capability agent to the directive sequencer
-        ThrowIfNot( directiveSequencer->addDirectiveHandler( navigationCapabilityAgent ), "addDirectiveHandlerFailed" );
+        ThrowIfNot( directiveSequencer->addDirectiveHandler( m_navigationCapabilityAgent ), "addDirectiveHandlerFailed" );
+
+        // register capability with delegate
+        ThrowIfNot( capabilitiesDelegate->registerCapability( m_navigationCapabilityAgent ), "registerCapabilityFailed");
+        AACE_DEBUG(LX(TAG,"RegisterCapability").d("Navigation","successful")); 
+
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"initialize").d("reason", ex.what()));
+        return false;
+    }
+}
+
+std::shared_ptr<NavigationEngineImpl> NavigationEngineImpl::create(
+    std::shared_ptr<aace::navigation::Navigation> navigationPlatformInterface,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender ) {
+    
+    try
+    {
+        ThrowIfNull( navigationPlatformInterface, "couldNotCreateNavigationPlatformInterface" );
+        ThrowIfNull( capabilitiesDelegate, "couldNotCreateNavigationPlatformInterface" );
+        ThrowIfNull( directiveSequencer, "couldNotCreateNavigationPlatformInterface" );
+        ThrowIfNull( exceptionSender, "couldNotCreateNavigationPlatformInterface" );
+
+        std::shared_ptr<NavigationEngineImpl> navigationEngineImpl = std::shared_ptr<NavigationEngineImpl>( new NavigationEngineImpl( navigationPlatformInterface ) );
+
+        ThrowIfNot( navigationEngineImpl->initialize( directiveSequencer, capabilitiesDelegate, exceptionSender ), "initializeNavigationEngineImplFailed" );
 
         return navigationEngineImpl;
     }
@@ -62,15 +86,25 @@ std::shared_ptr<NavigationEngineImpl> NavigationEngineImpl::create(
     }
 }
 
-void NavigationEngineImpl::doShutdown() {
+void NavigationEngineImpl::doShutdown()
+{
     if( m_navigationCapabilityAgent != nullptr ) {
         m_navigationCapabilityAgent->shutdown();
     }
 }
 
 void NavigationEngineImpl::setDestination( const std::string& payload ) {
-    m_navigationPlatformInterface->setDestination( payload );
+    if( m_navigationPlatformInterface != nullptr ) {
+        m_navigationPlatformInterface->setDestination( payload );
+    }
 }
+
+void NavigationEngineImpl::cancelNavigation() {
+    if( m_navigationPlatformInterface != nullptr ) {
+        m_navigationPlatformInterface->cancelNavigation();
+    }
+}
+
 
 } // aace::engine::navigation
 } // aace::engine

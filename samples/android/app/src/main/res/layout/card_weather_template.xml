@@ -98,7 +98,7 @@
         android:id="@+id/currentWeatherIcon"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:contentDescription="@string/current_weather_icon"
+        android:contentDescription="@string/card_current_weather_icon"
         android:scaleType="centerInside"
         app:layout_constraintStart_toStartOf="@id/guidelineLeftMargin"
         app:layout_constraintEnd_toEndOf="@id/guidelineVertical1"
@@ -135,7 +135,7 @@
         app:layout_constraintTop_toTopOf="@+id/upArrow" />
 
     <TextView
-        android:id="@+id/highTemp"
+        android:id="@+id/highTempCurrent"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
@@ -148,7 +148,7 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <TextView
-        android:id="@+id/lowTemp"
+        android:id="@+id/lowTempCurrent"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -165,26 +165,26 @@
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginEnd="10dp"
-        android:contentDescription="@string/up_arrow"
+        android:contentDescription="@string/card_up_arrow"
         android:gravity="top"
         android:layout_gravity="top"
         android:src="@drawable/ic_up_arrow"
-        app:layout_constraintEnd_toStartOf="@id/highTemp"
-        app:layout_constraintTop_toTopOf="@id/highTemp"
-        app:layout_constraintBottom_toBottomOf="@id/highTemp" />
+        app:layout_constraintEnd_toStartOf="@id/highTempCurrent"
+        app:layout_constraintTop_toTopOf="@id/highTempCurrent"
+        app:layout_constraintBottom_toBottomOf="@id/highTempCurrent" />
 
     <ImageView
         android:id="@+id/downArrow"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginEnd="10dp"
-        android:contentDescription="@string/down_arrow"
+        android:contentDescription="@string/card_down_arrow"
         android:gravity="bottom"
         android:layout_gravity="bottom"
         android:src="@drawable/ic_down_arrow"
-        app:layout_constraintTop_toTopOf="@id/lowTemp"
-        app:layout_constraintBottom_toBottomOf="@id/lowTemp"
-        app:layout_constraintEnd_toStartOf="@id/lowTemp" />
+        app:layout_constraintTop_toTopOf="@id/lowTempCurrent"
+        app:layout_constraintBottom_toBottomOf="@id/lowTempCurrent"
+        app:layout_constraintEnd_toStartOf="@id/lowTempCurrent" />
 
     <include
         android:id="@+id/forecast4"

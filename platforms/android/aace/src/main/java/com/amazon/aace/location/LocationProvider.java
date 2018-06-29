@@ -21,13 +21,13 @@ package com.amazon.aace.location;
 import com.amazon.aace.core.PlatformInterface;
 
 /**
- * The @c LocationProvider class should be extended by the platform implementation to handle geolocation services.
+ * LocationProvider should be extended to report geolocation to the Engine.
  */
 abstract public class LocationProvider extends PlatformInterface {
     /**
-     * Called when the Engine needs the current geolocation.
+     * Returns the current geolocation of the device
      *
-     * @return @c aace::location::Location of the platform implementation.
+     * @return The current location
      */
     abstract public Location getLocation();
 }

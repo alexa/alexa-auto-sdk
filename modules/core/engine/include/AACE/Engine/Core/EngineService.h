@@ -54,6 +54,7 @@ protected:
     virtual bool stop();
     virtual bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface );
     virtual bool setProperty( const std::string& key, const std::string& value );
+    virtual std::string getProperty( const std::string& key );
 
     std::shared_ptr<aace::engine::core::EngineContext> getContext();
 

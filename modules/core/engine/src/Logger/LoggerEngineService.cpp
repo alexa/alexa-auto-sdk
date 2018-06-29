@@ -15,6 +15,7 @@
 
 #include <typeinfo>
 #include <algorithm>
+#include <iostream>
 
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
@@ -44,7 +45,7 @@ bool LoggerEngineService::configure( const std::vector<std::shared_ptr<std::istr
 {
     // attempt to configure each stream
     for( auto next : configuration ) {
-        ReturnIf( configure( next ), true );
+        configure( next );
     }
     
     return true;
@@ -91,13 +92,13 @@ bool LoggerEngineService::configure( std::shared_ptr<std::istream> configuration
             {
                 auto obj = rules[j].GetObject();
                 
-                if( obj.HasMember( "sink" ) && obj["sink"].IsString() )
+                if( obj.HasMember( "sink" ) && obj["sink"].IsString() && obj.HasMember( "rule" ) && obj["rule"].IsObject() )
                 {
                     auto sink = EngineLogger::getInstance()->getSink( obj["sink"].GetString() );
                     
                     if( sink != nullptr )
                     {
-                        auto rule = createRule( obj );
+                        auto rule = createRule( obj["rule"].GetObject() );
                         
                         if( rule != nullptr ) {
                             sink->addRule( rule );
@@ -136,7 +137,7 @@ std::shared_ptr<aace::engine::logger::sink::Sink> LoggerEngineService::createSin
         if( type == "aace.logger.sink.console" ) {
             sink = aace::engine::logger::sink::ConsoleSink::create( id );
         }
-        if( type == "aace.logger.sink.syslog" ) {
+        else if( type == "aace.logger.sink.syslog" ) {
             sink = aace::engine::logger::sink::SyslogSink::create( id );
         }
         else if( type == "aace.logger.sink.file" )

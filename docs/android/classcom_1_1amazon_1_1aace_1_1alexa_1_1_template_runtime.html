@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Automotive Core SDK (Android)
-   &#160;<span id="projectnumber">1.0.0-beta</span>
+   &#160;<span id="projectnumber">1.0.0</span>
    </div>
    <div id="projectbrief">Alexa Auto Core SDK for interacting with the Alexa Voice Service</div>
   </td>
@@ -75,14 +75,42 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:aa9a4bb3e06387e107da72c9da29bfe29"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_template_runtime.html#aa9a4bb3e06387e107da72c9da29bfe29">TemplateRuntime</a> ()</td></tr>
+<tr class="separator:aa9a4bb3e06387e107da72c9da29bfe29"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4c8189b23f28853714a99f3e0f1e8404"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_template_runtime.html#a4c8189b23f28853714a99f3e0f1e8404">renderTemplate</a> (String payload)</td></tr>
 <tr class="separator:a4c8189b23f28853714a99f3e0f1e8404"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a485b27cafa223d145a1808326446f13b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_template_runtime.html#a485b27cafa223d145a1808326446f13b">renderPlayerInfo</a> (String payload)</td></tr>
 <tr class="separator:a485b27cafa223d145a1808326446f13b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a298e0e13beabd319017ddd30e40dbdec"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_template_runtime.html#a298e0e13beabd319017ddd30e40dbdec">clearTemplate</a> ()</td></tr>
+<tr class="separator:a298e0e13beabd319017ddd30e40dbdec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8a8b02e8e2dd5ead01111aeba4f8a5da"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_template_runtime.html#a8a8b02e8e2dd5ead01111aeba4f8a5da">clearPlayerInfo</a> ()</td></tr>
+<tr class="separator:a8a8b02e8e2dd5ead01111aeba4f8a5da"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface.html">com.amazon.aace.core.PlatformInterface</a></td></tr>
+<tr class="memitem:ab262a5c3abc75647e55d68bee4dcc287 inherit pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface.html#ab262a5c3abc75647e55d68bee4dcc287">PlatformInterface</a> ()</td></tr>
+<tr class="separator:ab262a5c3abc75647e55d68bee4dcc287 inherit pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_template_runtime.html">TemplateRuntime</a></code> class should be extended by the platform implementation to handle GUI template data from AVS. </p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+<div class="textblock"><p><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_template_runtime.html">TemplateRuntime</a> should be extended to handle directives from the Engine for rendering visual metadata with display cards. Metadata is provided as structured JSON and should be parsed by the platform implementation for rendering cards that adhere to design guidelines for the platform device type. For screen-specific design guidance, see the AVS UX Design Overview: <a href="https://developer.amazon.com/docs/alexa-voice-service/ux-design-overview.html#displaycards">https://developer.amazon.com/docs/alexa-voice-service/ux-design-overview.html#displaycards</a> </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="aa9a4bb3e06387e107da72c9da29bfe29"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa9a4bb3e06387e107da72c9da29bfe29">&#9670;&nbsp;</a></span>TemplateRuntime()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">com.amazon.aace.alexa.TemplateRuntime.TemplateRuntime </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_template_runtime.html">TemplateRuntime</a> should be extended to handle directives from the Engine for rendering visual metadata with display cards. Metadata is provided as structured JSON and should be parsed by the platform implementation for rendering cards that adhere to design guidelines for the platform device type. For screen-specific design guidance, see the AVS UX Design Overview: <a href="https://developer.amazon.com/docs/alexa-voice-service/ux-design-overview.html#displaycards">https://developer.amazon.com/docs/alexa-voice-service/ux-design-overview.html#displaycards</a> </p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a id="a4c8189b23f28853714a99f3e0f1e8404"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4c8189b23f28853714a99f3e0f1e8404">&#9670;&nbsp;</a></span>renderTemplate()</h2>
 
@@ -98,14 +126,13 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Called when the platform implementation should handle a GUI template.</p>
+<p>Provides visual metadata associated with a user request to Alexa. The platform implementation should parse the template metadata and render a display card for the user. For supported templates and rendering guidelines, see <a href="https://alexa.design/DevDocRenderTemplate">https://alexa.design/DevDocRenderTemplate</a></p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">payload</td><td><code>JSON</code> data containing the template information to render. </td></tr>
+    <tr><td class="paramname">payload</td><td>Renderable template metadata in structured JSON format </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See also</dt><dd><a href="https://alexa.design/DevDocRenderTemplate">https://alexa.design/DevDocRenderTemplate</a> </dd></dl>
 
 </div>
 </div>
@@ -124,14 +151,52 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Called when the platform implementation should handle audio player renderable content.</p>
+<p>Provides visual metadata associated with a user request to Alexa for audio playback. The platform implementation should parse the player info metadata and render a display card for the user. For rendering guidelines, see <a href="https://amzn.to/DevDocTemplatePlayerInfo">https://amzn.to/DevDocTemplatePlayerInfo</a></p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">payload</td><td><code>JSON</code> data containing the player information to render. </td></tr>
+    <tr><td class="paramname">payload</td><td>Renderable player info metadata in structured JSON format</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See also</dt><dd><a href="https://amzn.to/DevDocTemplatePlayerInfo">https://amzn.to/DevDocTemplatePlayerInfo</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_playback_controller.html">PlaybackController</a></dd>
+<dd>
+<a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_player.html">AudioPlayer</a> </dd></dl>
+
+</div>
+</div>
+<a id="a298e0e13beabd319017ddd30e40dbdec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a298e0e13beabd319017ddd30e40dbdec">&#9670;&nbsp;</a></span>clearTemplate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void com.amazon.aace.alexa.TemplateRuntime.clearTemplate </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Notifies the platform implementation to dismiss the template display card </p>
+
+</div>
+</div>
+<a id="a8a8b02e8e2dd5ead01111aeba4f8a5da"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8a8b02e8e2dd5ead01111aeba4f8a5da">&#9670;&nbsp;</a></span>clearPlayerInfo()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void com.amazon.aace.alexa.TemplateRuntime.clearPlayerInfo </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Notifies the platform implementation to dismiss the player info display card </p>
 
 </div>
 </div>
@@ -140,7 +205,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Automotive Core SDK (Android) 1.0.0-beta - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Automotive Core SDK (Android) 1.0.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

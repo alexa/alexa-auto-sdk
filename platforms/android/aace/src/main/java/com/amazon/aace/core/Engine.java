@@ -21,8 +21,9 @@ package com.amazon.aace.core;
 import com.amazon.aace.core.config.EngineConfiguration;
 
 /**
- * The @c Engine must be instantiated by the platform implementation. Along with the platform interfaces, it is responsible for managing the interactions between the platform and AVS.
- * The platform implementation should *not* extend Engine. It is currently extended in the SDK.
+ * The Engine must be instantiated by the platform implementation. Along with the platform interfaces,
+ * it is responsible for managing the interactions between the platform and AVS.
+ * The platform implementation should *not* extend Engine; it is extended in the SDK.
  */
 public class Engine extends PlatformInterface
 {
@@ -45,20 +46,21 @@ public class Engine extends PlatformInterface
     }
 
     /**
-     * Sets the Engine configuration to a set of configuration objects.
+     * Sets the Engine configuration to a set of configuration objects
      *
-     * @sa [Configuring the Engine](index.html#configuring-the-engine)
-     * @param [in] configurationList Collection of @c aace::config::EngineConfiguration objects passed in as @c std::vector<aace::config::EngineConfiguration*>.
-     * @return @c true if successful, else @c false.
+     * @param  configurationList A collection of @c com.amazon.aace.core.config.EngineConfiguration objects as an      
+     * @c EngineConfiguration[]
+     * @return @c true if the Engine configuration was successful, else @c false
      */
     public boolean configure( EngineConfiguration[] configurationList ) {
         return configure( getNativeObject(), configurationList );
     }
 
     /**
-     * Starts the Engine and attempts to establish a connection to AVS.
+     * Starts the Engine and attempts to establish a connection to AVS
      *
-     * @return @c true if successful, else @c false.
+     * @return @c true if the Engine was started, else @c false
+     *
      * @sa stop()
      */
     public boolean start() {
@@ -66,9 +68,10 @@ public class Engine extends PlatformInterface
     }
 
     /**
-     * Stops the Engine and shuts down the connection to AVS.
+     * Stops the Engine and shuts down the connection to AVS
      *
-     * @return @c true if successful, else @c false.
+     * @return @c true if the Engine was stopped, else @c false
+     *
      * @sa start()
      */
     public boolean stop() {
@@ -79,8 +82,42 @@ public class Engine extends PlatformInterface
         return dispose( getNativeObject() );
     }
 
+    /**
+     * Registers a @c PlatformInterface instance with the Engine
+     * The platform implementation must register each interface required by the application.
+     *
+     * @param  platformInterface The @c PlatformInterface instance to register
+     *
+     * @return @c true if the @c PlatformInterface instance was registered, else @c false
+     *
+     * @sa com.amazon.aace.core.PlatformInterface
+     */
     public boolean registerPlatformInterface( PlatformInterface platformInterface ) {
         return registerPlatformInterface( getNativeObject(), platformInterface );
+    }
+
+    /**
+     * Sets a property value in the Engine
+     *
+     * @param  key The key used by the Engine to identify the property
+     *
+     * @param  value The property value to set in the Engine
+     *
+     * @return @c true if property value was set, else @c false
+     */
+    public boolean setProperty( String key, String value ) {
+        return setProperty( getNativeObject(), key, value );
+    }
+
+    /**
+     * Returns a property value from the Engine
+     *
+     * @param  key The key used by the Engine to identify the property
+     *
+     * @returns The property value as a string
+     */
+    public String getProperty( String key ) {
+        return getProperty( getNativeObject(), key );
     }
 
     public boolean setNativeEnv( String name, String value ) {
@@ -96,6 +133,8 @@ public class Engine extends PlatformInterface
     private native boolean stop( long nativeObject );
     private native boolean dispose( long nativeObject );
     private native boolean registerPlatformInterface( long nativeObject, PlatformInterface platformInterface );
+    private native boolean setProperty( long nativeObject, String key, String value );
+    private native String getProperty( long nativeObject, String key );
     private native boolean setNativeEnv( long nativeObj, String name, String value );
 }
 

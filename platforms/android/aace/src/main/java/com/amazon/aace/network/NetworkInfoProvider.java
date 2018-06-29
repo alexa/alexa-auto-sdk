@@ -21,12 +21,12 @@ package com.amazon.aace.network;
 import com.amazon.aace.core.*;
 
 /**
- * The @c NetworkInfoProvider should be extended by the platform implementation to handle network services.
+ * NetworkInfoProvider should be extended to report network connectivity events to the Engine.
  */
 abstract public class NetworkInfoProvider extends PlatformInterface
 {
     /**
-     * The enum NetworkStatus describes the state of network connectivity.
+     * Describes the status of network connectivity
      */
     public enum NetworkStatus
     {
@@ -71,32 +71,36 @@ abstract public class NetworkInfoProvider extends PlatformInterface
         }
     }
 
+    /**
+     * NetworkInfoProvider should be extended to report network connectivity events to the Engine.
+     */
     public NetworkInfoProvider() {
     }
 
     /**
-     * Called when the Engine needs the current network status.
+     * Returns the current network connectivity status on the platform
      *
-     * @return @c NetworkStatus of the current network.
+     * @return The connectivity status of the current network
      */
     public NetworkStatus getNetworkStatus() {
         return null;
     }
 
     /**
-     * Called when the Engine needs the current signal strength of the network. (RSSI)
+     * Returns the current signal strength (RSSI) of the WiFi connection on the platform
      *
-     * @return @c int RSSI of the current network.
+     * @return The RSSI of the WiFi connection
      */
     public int getWifiSignalStrength() {
         return 0;
     }
 
     /**
-     * Tell the Engine that the Wi-Fi network status has changed
+     * Notifies the Engine of a WiFi network status change on the platform
      *
-     * @param [in] status The connection status of the Wi-Fi network.
-     * @param [in] wifiSignalStrength The RSSI of the Wi-Fi connection.
+     * @param  status The connection status of the WiFi network
+     *
+     * @param  wifiSignalStrength The RSSI of the WiFi connection
      */
     public void networkStatusChanged( NetworkStatus status, int wifiSignalStrength ) {
         networkStatusChanged( getNativeObject(), status, wifiSignalStrength );

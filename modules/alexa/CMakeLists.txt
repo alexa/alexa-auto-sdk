@@ -2,7 +2,7 @@
 
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
-project(AACEAlexa VERSION 0.99.0 LANGUAGES CXX)
+project(AACEAlexa LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -22,10 +22,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "-DDEBUG -DAACE_DEBUG_LOG_ENABLED -Wall -g")
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
 # Alexa module is depends on Core module
-if(NOT TARGET AACECorePlatform)
-    if(NOT AAC_HOME)
-        message(FATAL_ERROR "AAC_HOME is not set!")
-    endif()
+if(AAC_HOME)
     include(${AAC_HOME}/share/cmake/AACECore.cmake)
 endif()
 

@@ -21,5 +21,7 @@ namespace alexa {
 Notifications::Notifications( std::shared_ptr<aace::alexa::MediaPlayer> mediaPlayer, std::shared_ptr<aace::alexa::Speaker> speaker ) : aace::alexa::AudioChannel( mediaPlayer, speaker, aace::alexa::Speaker::Type::LOCAL ) {
 }
 
+Notifications::~Notifications() = default; // key function
+
 } // aace::alexa
 } // aac

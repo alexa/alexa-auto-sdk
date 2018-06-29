@@ -28,99 +28,107 @@ namespace aace {
 namespace core {
 
 /**
- * The @c Engine must be instantiated by the platform implementation. Along with the platform interfaces,
+ * The Engine must be instantiated by the platform implementation. Along with the platform interfaces,
  * it is responsible for managing the interactions between the platform and AVS.
  *
- * The platform implementation should *not* extend Engine. It is currently extended in the SDK.
+ * The platform implementation should *not* extend Engine; it is extended in the SDK.
  */
 class Engine {
 public:
-    /**
-     * Creates a new instance of an Engine object.
-     */
+
     static std::shared_ptr<Engine> create();
 
-    /**
-     * Destructor.
-     * @internal
-     */
     virtual ~Engine() = default;
-
-     /**
-     * Sets the Engine configuration to a set of configuration objects.
+    
+    /**
+     * Sets the Engine configuration to a set of configuration objects
      *
-     * @sa [Configuring the Engine](index.html#configuring-the-engine)
-     * @param [in] configurationList Collection of @c aace::config::EngineConfiguration objects passed in as
-     * @c std::initializer_list<aace::config::EngineConfiguration*>.
-     * @return @c true if successful, else @c false.
+     * @param [in] configurationList A collection of @c aace::core::config::EngineConfiguration objects as an      
+     * @c std::initializer_list<aace::core::config::EngineConfiguration*>
+     * @return @c true if the Engine configuration was successful, else @c false
      */
     virtual bool configure( std::initializer_list<std::shared_ptr<aace::core::config::EngineConfiguration>> configurationList ) = 0;
     
     /**
-     * Sets the Engine configuration to a set of configuration objects.
+     * Sets the Engine configuration to a set of configuration objects
      *
-     * @sa [Configuring the Engine](index.html#configuring-the-engine)
-     * @param [in] configurationList Collection of @c aace::config::EngineConfiguration objects passed in as
-     * @c std::vector<aace::config::EngineConfiguration*>.
-     * @return @c true if successful, else @c false.
+     * @param [in] configurationList A collection of @c aace::core::config::EngineConfiguration objects as an
+     * @c std::vector<aace::core::config::EngineConfiguration*>
+     * @return @c true if the Engine configuration was successful, else @c false
      */
     virtual bool configure( std::vector<std::shared_ptr<aace::core::config::EngineConfiguration>> configurationList ) = 0;
     
     /**
-     * Sets the Engine configuration to a single configuration object.
+     * Sets the Engine configuration to a single configuration object
      *
-     * @sa [Configuring the Engine](index.html#configuring-the-engine)
-     * @param [in] configuration @c An aace::config::EngineConfiguration object.
-     * @return @c true if successful, else @c false.
+     * @param [in] configuration An @c aace::core::config::EngineConfiguration object
+     * @return @c true if the Engine configuration was successful, else @c false
      */
     virtual bool configure( std::shared_ptr<aace::core::config::EngineConfiguration> configuration ) = 0;
 
     /**
-     * Starts the Engine and attempts to establish a connection to AVS.
+     * Starts the Engine and attempts to establish a connection to AVS
      *
-     * @return @c true if successful, else @c false.
+     * @return @c true if the Engine was started, else @c false
+     *
      * @sa stop()
      */
     virtual bool start() = 0;
 
     /**
-     * Stops the Engine and shuts down the connection to AVS.
+     * Stops the Engine and shuts down the connection to AVS
      *
-     * @return @c true if successful, else @c false.
+     * @return @c true if the Engine was stopped, else @c false
+     *
      * @sa start()
      */
     virtual bool stop() = 0;
 
     /**
-     * Sets a property value in the Engine.
+     * Shuts down the Engine and releases all of its resources
      *
-     * @param [in] key @c The property key used by the Engine to identify the property.
-     * @param [in] value @c The value to set in the Engine.
-     * @return @c true if property value was set, else @c false.
+     * @return @c true if the Engine was shut down, else @c false
+     */
+    virtual bool shutdown() = 0;
+
+    /**
+     * Sets a property value in the Engine
+     *
+     * @param [in] key The key used by the Engine to identify the property
+     * @param [in] value The property value to set in the Engine
+     * @return @c true if property value was set, else @c false
      */
     virtual bool setProperty( const std::string& key, const std::string& value ) = 0;
     
     /**
-     * Register a @c PlatformInterface instance with the Engine.
+     * Returns a property value from the Engine
      *
-     * The platform implementation must register any interfaces necessary for the application.
+     * @param [in] key The key used by the Engine to identify the property
+     * @returns The property value as a string
+     */
+    virtual std::string getProperty( const std::string& key ) = 0;
+    
+    /**
+     * Registers a @c PlatformInterface instance with the Engine
+     *
+     * The platform implementation must register each interface required by the application.
+     * 
+     * @param [in] platformInterface The @c PlatformInterface instance to register
+     * @return @c true if the @c PlatformInterface instance was registered, else @c false
      *
      * @sa aace::core::PlatformInterface 
-     * 
-     * @param [in] platformInterface The @c PlatformInterface instance to register.
-     * @return @c true if successful, else @c false.
      */
     virtual bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) = 0;
 
     /**
-     * Register a list of @c PlatformInterface instances with the Engine.
+     * Registers a list of @c PlatformInterface instances with the Engine
      *
-     * The platform implementation must register any interfaces necessary for the application.
+     * The platform implementation must register each interface required by the application.
+     *      
+     * @param [in] platformInterfaceList The list of @c PlatformInterface instances to register
+     * @return @c true if all @c PlatformInterface instances were registered, else @c false
      *
      * @sa aace::core::PlatformInterface 
-     *      
-     * @param [in] platformInterfaceList The @c list of PlatformInterface instances to register.
-     * @return @c true if all interfaces were registered successfully, else @c false.
      * @sa registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface )
      */
     virtual bool registerPlatformInterface( std::initializer_list<std::shared_ptr<aace::core::PlatformInterface>> platformInterfaceList ) = 0;

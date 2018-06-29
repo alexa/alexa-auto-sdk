@@ -18,6 +18,8 @@
 namespace aace {
 namespace alexa {
     
+AuthProvider::~AuthProvider() = default; // key function
+
 void AuthProvider::authStateChanged( AuthState authState, AuthError authError ) {
     if( m_authProviderEngineInterface != nullptr ) {
         m_authProviderEngineInterface->onAuthStateChanged( authState, authError );

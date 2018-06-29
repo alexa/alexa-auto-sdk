@@ -25,11 +25,13 @@
 #include <AVSCommon/SDKInterfaces/Audio/NotificationsAudioFactoryInterface.h>
 #include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/DirectiveSequencerInterface.h>
+#include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
 #include <AVSCommon/SDKInterfaces/ExceptionEncounteredSenderInterface.h>
 #include <Notifications/NotificationsCapabilityAgent.h>
 #include <Notifications/NotificationRenderer.h>
 #include <Notifications/SQLiteNotificationsStorage.h>
 #include <ContextManager/ContextManager.h>
+#include <RegistrationManager/CustomerDataHandler.h>
 
 #include "AACE/Alexa/AlexaEngineInterfaces.h"
 #include "AACE/Alexa/Notifications.h"
@@ -41,22 +43,32 @@ namespace alexa {
 
 class NotificationsEngineImpl :
     public AudioChannelEngineImpl,
-    public alexaClientSDK::avsCommon::sdkInterfaces::NotificationsObserverInterface,
-    public alexaClientSDK::avsCommon::utils::RequiresShutdown {
+    public alexaClientSDK::avsCommon::sdkInterfaces::NotificationsObserverInterface {
 
 private:
     NotificationsEngineImpl( std::shared_ptr<aace::alexa::Notifications> notificationsPlatformInterface );
+
+    bool initialize(
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::NotificationsAudioFactoryInterface> notificationsAudioFactory,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
+        std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager );
 
 public:
     static std::shared_ptr<NotificationsEngineImpl> create(
         std::shared_ptr<aace::alexa::Notifications> notificationsPlatformInterface,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::NotificationsAudioFactoryInterface> notificationsAudioFactory );
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::NotificationsAudioFactoryInterface> notificationsAudioFactory,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
+        std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager );
 
     // NotificationObserverInterface
-    // void onNotificationRenderingFinished() override;
     void onSetIndicator(alexaClientSDK::avsCommon::avs::IndicatorState state) override;
 
 protected:
@@ -66,6 +78,7 @@ private:
     std::shared_ptr<aace::alexa::Notifications> m_notificationsPlatformInterface;
 
     std::shared_ptr<alexaClientSDK::capabilityAgents::notifications::NotificationsCapabilityAgent> m_notificationsCapabilityAgent;
+
 };
 
 } // aace::engine::alexa

@@ -25,40 +25,66 @@ namespace aace {
 namespace alexa {
 
 /**
- * The @c Notifications class should be extended by the platform implementation to handle Notifications from AVS and provide an indication whether notifications are available.
+ * Notifications should be extended to handle rendering indicators for notifications from AVS.
+ *
+ * The platform implementation is responsible for rendering visual cues for an active notification.
+ * The Notifications @c MediaPlayer will receive directives from the Engine
+ * for rendering audio indicators required by a change in @c Notifications::IndicatorState.
+ *
+ * @note This interface provides indicators that a notification was received, not the content of the notification.
+ *
+ * @sa AudioChannel
  */
 class Notifications : public AudioChannel {
 protected:
     Notifications( std::shared_ptr<aace::alexa::MediaPlayer> mediaPlayer, std::shared_ptr<aace::alexa::Speaker> speaker );
 
 public:
-    virtual ~Notifications() = default;
+    virtual ~Notifications();
+    
     /**
-     *  An enum class which captures the states a notifications object can be in.
+     * Specifies whether a notification indicator should be rendered on the platform
      */
     enum class IndicatorState {
+
       /**
-       *  The notifications indicator should be turned off
+       * The notification indicator should be turned off
        */
       OFF = 0,
+
       /**
-       *  The notifications indicator should be turned on
+       * The notification indicator should be turned on
        */
       ON = 1,
+
       /**
-       *  The notifications indicator state is unknown
+       * The notification indicator state is unknown.
        */
       UNKNOWN
     };
+    
     /**
-     *  Called when the notification indicator has changed state
+     * Notifies the platform implementation of whether a notification indicator should be rendered
      *
-     *
+     * @param [in] state The new notification indicator state
      */
-    virtual void setIndicator(IndicatorState state) = 0;
-private:
-
+    virtual void setIndicator( IndicatorState state ) = 0;
 };
+
+inline std::ostream& operator<<(std::ostream& stream, const Notifications::IndicatorState& state) {
+    switch (state) {
+        case Notifications::IndicatorState::OFF:
+            stream << "OFF";
+            break;
+        case Notifications::IndicatorState::ON:
+            stream << "ON";
+            break;
+        case Notifications::IndicatorState::UNKNOWN:
+            stream << "UNKNOWN";
+            break;
+    }
+    return stream;
+}
 
 } // aace::alexa
 } // aace

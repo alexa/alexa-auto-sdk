@@ -25,51 +25,65 @@ namespace aace {
 namespace alexa {
 
 /**
- * The @c Alerts class should be extended by the platform implementation to handle alerts from AVS.
+ * Alerts should be extended to handle alerts (e.g. timers, alarms, reminders) from AVS.
+ *
+ * The platform implementation is responsible for rendering visual cues for an active alert.
+ * The Alerts @c MediaPlayer will receive directives from the Engine to handle alerts audio playback.
+ *
+ * @sa AudioChannel
  */
 class Alerts : public AudioChannel {
 protected:
     Alerts( std::shared_ptr<aace::alexa::MediaPlayer> mediaPlayer, std::shared_ptr<aace::alexa::Speaker> speaker );
 
 public:
-    virtual ~Alerts() = default;
+    virtual ~Alerts();
 
     /**
-     * An enum class which captures the states an alert object can be in.
+     * Specifies the state of an alert
      */
     enum class AlertState {
+
         /**
-         * The alert is ready to start, and is waiting for channel focus.
+         * The alert is ready to activate and is waiting for channel focus.
          */
         READY,
+
         /**
-         * The alert has started.
+         * The alert is activated, and rendering is perceivable by the user.
          */
         STARTED,
+
         /**
          * The alert has stopped due to user or system intervention.
          */
         STOPPED,
+
         /**
-         * The alert has been snoozed.
+         * The alert is active but has been snoozed.
          */
         SNOOZED,
+
         /**
-         * The alert has completed on its own.
+         * The alert has completed on its own, without user interaction.
          */
         COMPLETED,
+
         /**
-         * The alert has been determined to have expired, and will not be rendered.
+         * The alert has expired and will not be rendered.
          */
         PAST_DUE,
+
         /**
          * The alert has entered the foreground.
          */
         FOCUS_ENTERED_FOREGROUND,
+
         /**
          * The alert has entered the background.
          */
         FOCUS_ENTERED_BACKGROUND,
+
         /**
          * The alert has encountered an error.
          */
@@ -77,31 +91,29 @@ public:
     };
 
     /**
-     * Called when the platform implementation should handle an alert state change.
+     * Notifies the platform implementation of an alert state change
      *
-     * @param [in] alertToken Opaque token that uniquely identifies the alert.
-     * @param [in] state New state of the alert.
-     * @param [in] reason Reason for the state change.
-     * @sa AlertState
+     * @param [in] alertToken The opaque token that uniquely identifies the alert
+     * @param [in] state The new alert state
+     * @param [in] reason The reason for the state change
      */
     virtual void alertStateChanged( const std::string& alertToken, AlertState state, const std::string& reason ) = 0;
 
     /**
-     * This function provides a way for application code to request this object stop any active alert as the result
-     * of a user action, such as pressing a physical 'stop' button on the device.
+     * Notifies the Engine of a platform request to stop any active alert, such as when a user presses a physical 'stop' button.
      */
     void localStop();
     
     /**
-     * A function that allows an application to clear all alerts from storage.  This may be useful for a scenario
-     * where a user logs out of a device, and another user will log in.  As the first user logs out, their pending
-     * alerts should not go off.
+     * Notifies the Engine of a platform request to clear the user's
+     * pending alerts from storage. This may be useful for a scenario in which a user's pending alerts should not go 
+     * off after he logs out of the application.
      */
     void removeAllAlerts();
 
     /**
      * @internal
-     * Sets engine interface delegate.
+     * Sets the Engine interface delegate.
      *
      * Should *never* be called by the platform implementation.
      */
@@ -110,6 +122,39 @@ public:
 private:
     std::shared_ptr<aace::alexa::AlertsEngineInterface> m_alertsEngineInterface;
 };
+
+inline std::ostream& operator<<(std::ostream& stream, const Alerts::AlertState& state) {
+    switch (state) {
+        case Alerts::AlertState::READY:
+            stream << "READY";
+            break;
+        case Alerts::AlertState::STARTED:
+            stream << "STARTED";
+            break;
+        case Alerts::AlertState::STOPPED:
+            stream << "STOPPED";
+            break;
+        case Alerts::AlertState::SNOOZED:
+            stream << "SNOOZED";
+            break;
+        case Alerts::AlertState::COMPLETED:
+            stream << "COMPLETED";
+            break;
+        case Alerts::AlertState::PAST_DUE:
+            stream << "PAST_DUE";
+            break;
+        case Alerts::AlertState::FOCUS_ENTERED_FOREGROUND:
+            stream << "FOCUS_ENTERED_FOREGROUND";
+            break;
+        case Alerts::AlertState::FOCUS_ENTERED_BACKGROUND:
+            stream << "FOCUS_ENTERED_BACKGROUND";
+            break;
+        case Alerts::AlertState::ERROR:
+            stream << "ERROR";
+            break;
+    }
+    return stream;
+}
 
 } // aace::alexa
 } // aace

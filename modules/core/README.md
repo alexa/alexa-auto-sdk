@@ -22,10 +22,10 @@ The class `aace::core::config::ConfigurationFile` creates an Engine configuratio
 
 ```
 {
-    "authDelegate": {
-        "clientId": "<CLIENTID>",
-        "clientSecret": "<CLIENTSECRET>",
-        "refreshToken": "<REFRESHTOKEN>"
+    "deviceInfo": {
+        "deviceSerialNumber": "<DEVICE_SERIAL_NUMBER>",
+        "clientId": "<CLIENT_ID>",
+        "productId": "<PRODUCT_ID>"
     },
     "certifiedSender": {
         "databaseFilePath": "<SQLITE_DATABASE_FILE_PATH>"
@@ -47,8 +47,6 @@ The JSON file can contain all of the configuration data for the Engine or option
 Another way to specify the configuration data is programmatically by using the configuration factory methods classes provided in the library. For example, you can configure the `alertsCapabilityAgent` settings by instantiating a configuration object with the following method:
 
     auto alertsConfig = aace::alexa::config::AlexaConfiguration::createAlertsConfig( "<SQLITE_DATABASE_FILE_PATH>" );
-
-The `<AAC_SDK_ROOT>/scripts/configure-aace.sh` script can be used to obtain values for the `authDelegate` object and to build the `JSON` data structures for the configuration file(s). File paths should be specified as absolute paths on the target device.
 
 After you have created your configuration object(s) you should call the Engine's `configure()` function, passing in the configuration object(s).
 
@@ -89,9 +87,9 @@ The default AAC platform implementation can be extended by overriding the variou
 
 ### Implementing LocationProvider
 
-The engine provides a callback for implementing location requests from AVS and other modules and a Location type definition. This is optional and dependent on the platform implementation.
+The Engine provides a callback for implementing location requests from AVS and other modules and a Location type definition. This is optional and dependent on the platform implementation.
 
-To implement a custom LocationService handler to provide location using the default engine LocationProvider class the `aace::location::LocationProvider` class should be extended:
+To implement a custom LocationService handler to provide location using the default Engine LocationProvider class the `aace::location::LocationProvider` class should be extended:
 
     #include <AACE/Location/LocationProvider.h>
 
@@ -111,9 +109,9 @@ To implement a custom LocationService handler to provide location using the defa
 
 ### Implementing NetworkInfoProvider
 
-The engine provides callbacks for implementing network information requests from AVS and to inform the engine of network changes. This is optional and dependent on the platform implementation.
+The Engine provides callbacks for implementing network information requests from AVS and to inform the Engine of network changes. This is optional and dependent on the platform implementation.
 
-To implement a custom NetworkInfoProvider handler to provide network info using the default engine NetworkInfoProvider class the `aace::network::NetworkInfoProvider` class should be extended:
+To implement a custom NetworkInfoProvider handler to provide network info using the default Engine NetworkInfoProvider class the `aace::network::NetworkInfoProvider` class should be extended:
 
     #include <AACE/Network/NetworkInfoProvider.h>
 

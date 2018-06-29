@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Automotive Core SDK (Android)
-   &#160;<span id="projectnumber">1.0.0-beta</span>
+   &#160;<span id="projectnumber">1.0.0</span>
    </div>
    <div id="projectbrief">Alexa Auto Core SDK for interacting with the Alexa Voice Service</div>
   </td>
@@ -75,12 +75,38 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:aba11518921821a782dee8b7e1c9ac50e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1navigation_1_1_navigation.html#aba11518921821a782dee8b7e1c9ac50e">Navigation</a> ()</td></tr>
+<tr class="separator:aba11518921821a782dee8b7e1c9ac50e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2024335dacfc051daf860328780f302b"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1navigation_1_1_navigation.html#a2024335dacfc051daf860328780f302b">setDestination</a> (String payload)</td></tr>
 <tr class="separator:a2024335dacfc051daf860328780f302b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab8bfcea62eb634ece636a1264b5b5a89"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1navigation_1_1_navigation.html#ab8bfcea62eb634ece636a1264b5b5a89">cancelNavigation</a> ()</td></tr>
+<tr class="separator:ab8bfcea62eb634ece636a1264b5b5a89"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface.html">com.amazon.aace.core.PlatformInterface</a></td></tr>
+<tr class="memitem:ab262a5c3abc75647e55d68bee4dcc287 inherit pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface.html#ab262a5c3abc75647e55d68bee4dcc287">PlatformInterface</a> ()</td></tr>
+<tr class="separator:ab262a5c3abc75647e55d68bee4dcc287 inherit pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>PRELIMINARY The <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1navigation_1_1_navigation.html">Navigation</a></code> class should be extended by the platform implementation to handle navigation directives and events from AVS. </p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+<div class="textblock"><p><a class="el" href="classcom_1_1amazon_1_1aace_1_1navigation_1_1_navigation.html">Navigation</a> should be extended to handle navigation directives from the Engine. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="aba11518921821a782dee8b7e1c9ac50e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aba11518921821a782dee8b7e1c9ac50e">&#9670;&nbsp;</a></span>Navigation()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">com.amazon.aace.navigation.Navigation.Navigation </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p><a class="el" href="classcom_1_1amazon_1_1aace_1_1navigation_1_1_navigation.html">Navigation</a> should be extended to handle navigation directives from the Engine. </p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a id="a2024335dacfc051daf860328780f302b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2024335dacfc051daf860328780f302b">&#9670;&nbsp;</a></span>setDestination()</h2>
 
@@ -96,13 +122,33 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Called when the platform implementation should handle a <code>setDestination</code> directive.</p>
+<p>Notifies the platform implementation to set the navigation destination</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">payload</td><td><code>JSON</code> data containing the destination information. <div class="fragment"><div class="line">)</div><div class="line">&quot;destination&quot;: {</div><div class="line">   &quot;coordinate&quot;: {</div><div class="line">       &quot;latitudeInDegrees&quot;: {{DOUBLE}},</div><div class="line">       &quot;longitudeInDegrees&quot;: {{DOUBLE}}</div><div class="line">   },</div><div class="line">   &quot;name&quot;: &quot;{{STRING}}&quot;,</div><div class="line">   &quot;singleLineDisplayAddress&quot;: &quot;{{STRING}}&quot;</div><div class="line">   &quot;multipleLineDisplayAddress&quot;: &quot;{{STRING}}&quot;,</div><div class="line">}</div></div><!-- fragment --> </td></tr>
+    <tr><td class="paramname">payload</td><td>JSON data containing the destination information</td></tr>
   </table>
   </dd>
 </dl>
+<div class="fragment"><div class="line">)</div><div class="line">&quot;destination&quot;: {</div><div class="line">   &quot;coordinate&quot;: {</div><div class="line">       &quot;latitudeInDegrees&quot;: {{DOUBLE}},</div><div class="line">       &quot;longitudeInDegrees&quot;: {{DOUBLE}}</div><div class="line">   },</div><div class="line">   &quot;name&quot;: &quot;{{STRING}}&quot;,</div><div class="line">   &quot;singleLineDisplayAddress&quot;: &quot;{{STRING}}&quot;</div><div class="line">   &quot;multipleLineDisplayAddress&quot;: &quot;{{STRING}}&quot;,</div><div class="line">}</div></div><!-- fragment --><dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation successfully handled the call, else <code>false</code> </dd></dl>
+
+</div>
+</div>
+<a id="ab8bfcea62eb634ece636a1264b5b5a89"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab8bfcea62eb634ece636a1264b5b5a89">&#9670;&nbsp;</a></span>cancelNavigation()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boolean com.amazon.aace.navigation.Navigation.cancelNavigation </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Notifies the platform implementation to cancel navigation</p>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation successfully handled the call, else <code>false</code> </dd></dl>
 
 </div>
 </div>
@@ -111,7 +157,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Automotive Core SDK (Android) 1.0.0-beta - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Automotive Core SDK (Android) 1.0.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

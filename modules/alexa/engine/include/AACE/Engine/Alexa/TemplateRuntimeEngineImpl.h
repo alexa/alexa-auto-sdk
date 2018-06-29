@@ -18,6 +18,8 @@
 
 #include <AVSCommon/SDKInterfaces/DirectiveSequencerInterface.h>
 #include <AVSCommon/SDKInterfaces/TemplateRuntimeObserverInterface.h>
+#include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
+#include <AVSCommon/AVS/DialogUXStateAggregator.h>
 #include <TemplateRuntime/TemplateRuntime.h>
 
 #include "AACE/Alexa/TemplateRuntime.h"
@@ -30,24 +32,38 @@ class AudioPlayerInterfaceDelegate;
 
 class TemplateRuntimeEngineImpl :
     public alexaClientSDK::avsCommon::sdkInterfaces::TemplateRuntimeObserverInterface,
-    public alexaClientSDK::avsCommon::utils::RequiresShutdown {
+    public alexaClientSDK::avsCommon::utils::RequiresShutdown,
+    public std::enable_shared_from_this<TemplateRuntimeEngineImpl> {
     
 private:
-    TemplateRuntimeEngineImpl( std::shared_ptr<aace::alexa::TemplateRuntime> templateRuntimePlatformInterface, std::shared_ptr<AudioPlayerInterfaceDelegate> audioPlayerInterfaceDelegate );
+    TemplateRuntimeEngineImpl( std::shared_ptr<aace::alexa::TemplateRuntime> templateRuntimePlatformInterface );
     
+    bool initialize(
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerInterface> audioPlayerInterface,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
+        std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender );
+
 public:
     static std::shared_ptr<TemplateRuntimeEngineImpl> create(
         std::shared_ptr<aace::alexa::TemplateRuntime> templateRuntimePlatformInterface,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerInterface> audioPlayerInterface,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
+        std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender );
     
     void setAudioPlayerInterface( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerInterface> audioPlayerInterface );
 
     // TemplateRuntimeObserverInterface
-    void renderTemplateCard( const std::string& jsonPayload ) override;
-    void renderPlayerInfoCard( const std::string& jsonPayload, alexaClientSDK::avsCommon::sdkInterfaces::TemplateRuntimeObserverInterface::AudioPlayerInfo audioPlayerInfo ) override;
-    
+    void renderTemplateCard( const std::string& jsonPayload, alexaClientSDK::avsCommon::avs::FocusState focusState ) override;
+    void clearTemplateCard() override;
+    void renderPlayerInfoCard( const std::string& jsonPayload, alexaClientSDK::avsCommon::sdkInterfaces::TemplateRuntimeObserverInterface::AudioPlayerInfo audioPlayerInfo, alexaClientSDK::avsCommon::avs::FocusState focusState ) override;
+    void clearPlayerInfoCard() override;
+
 protected:
     virtual void doShutdown() override;
 
@@ -61,7 +77,10 @@ private:
 // AudioPlayerInterfaceDelegate
 //
 
-class AudioPlayerInterfaceDelegate : public alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerInterface {
+class AudioPlayerInterfaceDelegate :
+    public alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerInterface,
+    public alexaClientSDK::avsCommon::utils::RequiresShutdown {
+    
 private:
     AudioPlayerInterfaceDelegate( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerInterface> audioPlayerInterface );
 
@@ -75,7 +94,9 @@ public:
     void removeObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface> observer ) override;
     std::chrono::milliseconds getAudioItemOffset() override;
 
-
+protected:
+    virtual void doShutdown() override;
+    
 private:
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerInterface> m_delegate;
     std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface>> m_observers;

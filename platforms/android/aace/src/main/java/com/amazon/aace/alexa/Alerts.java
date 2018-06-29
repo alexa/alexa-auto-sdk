@@ -19,22 +19,26 @@
 package com.amazon.aace.alexa;
 
 /**
- * The @c Alerts class should be extended by the platform implementation to handle alerts from AVS.
+ * Alerts should be extended to handle alerts (e.g. timers, alarms, reminders) from AVS.
+ * The platform implementation is responsible for rendering visual cues for an active alert.
+ * The Alerts @c MediaPlayer will receive directives from the Engine to handle alerts audio playback.
+ *
+ * @sa AudioChannel
  */
 public class Alerts extends AudioChannel
 {
     /**
-     * An enum class which captures the states an alert object can be in.
+     * Specifies the state of an alert
      */
     public enum AlertState
     {
         /**
-         * The alert is ready to start, and is waiting for channel focus.
+         * The alert is ready to activate and is waiting for channel focus.
          * @hideinitializer
          */
         READY("READY"),
         /**
-         * The alert has started.
+         * The alert is activated, and rendering is perceivable by the user.
          * @hideinitializer
          */
         STARTED("STARTED"),
@@ -44,17 +48,17 @@ public class Alerts extends AudioChannel
          */
         STOPPED("STOPPED"),
         /**
-         * The alert has been snoozed.
+         * The alert is active but has been snoozed.
          * @hideinitializer
          */
         SNOOZED("SNOOZED"),
         /**
-         * The alert has completed on its own.
+         * The alert has completed on its own, without user interaction.
          * @hideinitializer
          */
         COMPLETED("COMPLETED"),
         /**
-         * The alert has been determined to have expired, and will not be rendered.
+         * The alert has expired and will not be rendered.
          * @hideinitializer
          */
         PAST_DUE("PAST_DUE"),
@@ -94,21 +98,42 @@ public class Alerts extends AudioChannel
         }
     }
 
+    /**
+     * Alerts should be extended to handle alerts (e.g. timers, alarms, reminders) from AVS.
+     * The platform implementation is responsible for rendering visual cues for an active alert.
+     * The Alerts @c MediaPlayer will receive directives from the Engine to handle alerts audio playback.
+     *
+     * @sa AudioChannel
+     */
     public Alerts( MediaPlayer mediaPlayer, Speaker speaker ) {
         super( mediaPlayer, speaker , null );
     }
 
     /**
-     * Called when the platform implementation should handle an alert state change.
+     * Notifies the platform implementation of an alert state change
      *
-     * @param [in] alertToken Opaque token that uniquely identifies the alert.
-     * @param [in] state New state of the alert.
-     * @param [in] reason Reason for the state change.
-     * @sa AlertState
+     * @param  alertToken The opaque token that uniquely identifies the alert
+     *
+     * @param  state The new alert state
+     *
+     * @param  reason The reason for the state change
      */
-    public void alertStateChanged( String alertToken, AlertState state, String reason ) {
-    }
+    public void alertStateChanged( String alertToken, AlertState state, String reason ) {}
 
+    /**
+     * Notifies the Engine of a platform request to stop any active alert, such as when a user presses a physical 'stop' button.
+     */
+    public void localStop() { localStop( getNativeObject() ); }
+
+    /**
+     * Notifies the Engine of a platform request to clear the user's
+     * pending alerts from storage. This may be useful for a scenario in which a user's pending alerts should not go 
+     * off after he logs out of the application.
+     */
+    public void removeAllAlerts() { removeAllAlerts( getNativeObject() ); }
+
+    private native void localStop( long nativeObject );
+    private native void removeAllAlerts( long nativeObject );
 }
 
 // END OF FILE

@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Automotive Core SDK (Android)
-   &#160;<span id="projectnumber">1.0.0-beta</span>
+   &#160;<span id="projectnumber">1.0.0</span>
    </div>
    <div id="projectbrief">Alexa Auto Core SDK for interacting with the Alexa Voice Service</div>
   </td>
@@ -66,6 +66,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="enumcom_1_1amazon_1_1aace_1_1vehicle_1_1config_1_1_vehicle_configuration_1_1_vehicle_property_type-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -73,6 +74,11 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:aa545b283d5616723574d4f7e8457fe66"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enumcom_1_1amazon_1_1aace_1_1vehicle_1_1config_1_1_vehicle_configuration_1_1_vehicle_property_type.html#aa545b283d5616723574d4f7e8457fe66">VehiclePropertyType</a> (String name, String key)</td></tr>
+<tr class="separator:aa545b283d5616723574d4f7e8457fe66"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:ac47c1c6967b0b1226b477f6ae9dab54f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enumcom_1_1amazon_1_1aace_1_1vehicle_1_1config_1_1_vehicle_configuration_1_1_vehicle_property_type.html#ac47c1c6967b0b1226b477f6ae9dab54f">MAKE</a></td></tr>
@@ -95,8 +101,38 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a5a6dd9c71de1668f6bbe6b9cc4e5c400"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The enum <a class="el" href="enumcom_1_1amazon_1_1aace_1_1vehicle_1_1config_1_1_vehicle_configuration_1_1_vehicle_property_type.html">VehiclePropertyType</a> defines the different vehicle info values that can be set. </p>
-</div><h2 class="groupheader">Member Data Documentation</h2>
+<div class="textblock"><p>Specifies configurable vehicle properties </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="aa545b283d5616723574d4f7e8457fe66"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa545b283d5616723574d4f7e8457fe66">&#9670;&nbsp;</a></span>VehiclePropertyType()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">com.amazon.aace.vehicle.config.VehicleConfiguration.VehiclePropertyType.VehiclePropertyType </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>key</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Type used to identify a vehicle property type and value pair </p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
 <a id="ac47c1c6967b0b1226b477f6ae9dab54f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac47c1c6967b0b1226b477f6ae9dab54f">&#9670;&nbsp;</a></span>MAKE</h2>
 
@@ -108,7 +144,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Vehicle make. </p>
+<p>Vehicle make </p>
 
 </div>
 </div>
@@ -123,7 +159,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Vehicle model. </p>
+<p>Vehicle model </p>
 
 </div>
 </div>
@@ -138,7 +174,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Vehicle year. </p>
+<p>Vehicle year </p>
 
 </div>
 </div>
@@ -153,7 +189,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Vehicle trim. </p>
+<p>Vehicle trim package </p>
 
 </div>
 </div>
@@ -168,7 +204,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Vehicle geography. </p>
+<p>Vehicle country (ISO country code) </p>
 
 </div>
 </div>
@@ -183,7 +219,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Software version. </p>
+<p>Software version </p>
 
 </div>
 </div>
@@ -198,7 +234,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Software operating system. </p>
+<p>Operating system </p>
 
 </div>
 </div>
@@ -213,7 +249,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Hardware architecture. </p>
+<p>Hardware architecture </p>
 
 </div>
 </div>
@@ -228,7 +264,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Region language. </p>
+<p>Language </p>
 
 </div>
 </div>
@@ -237,7 +273,7 @@ Public Attributes</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Automotive Core SDK (Android) 1.0.0-beta - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Automotive Core SDK (Android) 1.0.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

@@ -41,11 +41,19 @@ std::shared_ptr<EngineLogger> EngineLogger::getInstance()
 EngineLogger::EngineLogger()
 {
     auto sink = aace::engine::logger::sink::ConsoleSink::create( "console" );
+
+#ifdef DEBUG
+    auto rule = aace::engine::logger::sink::Rule::create( Level::VERBOSE,
+        aace::engine::logger::sink::Rule::EMPTY,
+        aace::engine::logger::sink::Rule::EMPTY,
+        aace::engine::logger::sink::Rule::EMPTY );
+#else
     auto rule = aace::engine::logger::sink::Rule::create( Level::INFO,
         aace::engine::logger::sink::Rule::EMPTY,
         aace::engine::logger::sink::Rule::EMPTY,
         aace::engine::logger::sink::Rule::EMPTY );
-    
+#endif
+
     // add the default rule to the sink
     sink->addRule( rule, false );
 

@@ -1,5 +1,5 @@
 SUMMARY = "Alexa Automotive Core minimal target installation image with -dev packages"
-LICENSE = "CLOSED"
+LICENSE = "Apache-2.0"
 
 inherit aac-image
 
@@ -8,4 +8,5 @@ IMAGE_INSTALL += "\
     aac-module-core \
     aac-module-alexa \
     aac-module-navigation \
+    aac-module-phone-control \
     "

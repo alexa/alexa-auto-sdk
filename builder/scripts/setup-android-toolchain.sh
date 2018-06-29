@@ -1,24 +1,27 @@
 #!/bin/bash
 set -e
 
-#
-# ./setup-android-toolchains.sh <abi> <api-level>
-#
+THISDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source ${THISDIR}/common.sh
 
-THIS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BUILDER_HOME=${THIS_DIR}/..
-
-# External values
-: ${ANDROID_TOOLCHAIN:="${BUILDER_HOME}/android-toolchain"}
+# Default external values
 : ${NDK_PACKAGE:="android-ndk-r16b"}
+: ${NDK_SHA1SUM:="42aa43aae89a50d1c66c3f9fdecd676936da6128"}
 
 # Extra options
 ANDROID_ABI=${1}
 API_LEVEL=${2}
 
+#
+# Param checks
+#
+
+if [ -z ${ANDROID_TOOLCHAIN} ]; then
+	error "ANDROID_TOOLCHAIN is not set"
+fi
+
 if [ -z ${ANDROID_ABI} ] || [ -z ${API_LEVEL} ]; then
-	echo "Please specify ABI/API"
-	exit 1
+	error "Please specify ABI/API"
 fi
 
 # Android toolchain path
@@ -35,28 +38,25 @@ else
 	HOST="linux"
 fi
 
-install_ndk() {
-	echo "Installing NDK (${NDK_PACKAGE})..."
-	NDK_PACKAGE_FILE="${ANDROID_TOOLCHAIN}/${NDK_PACKAGE}-${HOST}-x86_64.zip"
-	if [ ! -e ${NDK_PACKAGE_FILE} ]; then
-		# Download Android NDK
-		wget https://dl.google.com/android/repository/${NDK_PACKAGE}-${HOST}-x86_64.zip -P ${ANDROID_TOOLCHAIN}
-	fi
-	mkdir -p ${ANDROID_NDK}/ndk-bundle
-	pushd ${ANDROID_NDK}/ndk-bundle
-	unzip -q ${NDK_PACKAGE_FILE}
-	popd
-}
+install() {
+	filename=${1}
+	checksum=${2}
+	dest=${3}
+	tmpdir=${ANDROID_TOOLCHAIN}
+	tmpfile=${tmpdir}/${filename}
 
-install_sdk_tools() {
-	echo "Installing SDK Tools..."
-	SDK_TOOLS_FILE="${ANDROID_TOOLCHAIN}/sdk-tools-${HOST}-3859397.zip"
-	if [ ! -e ${SDK_TOOLS_FILE} ]; then
-		wget https://dl.google.com/android/repository/sdk-tools-${HOST}-3859397.zip -P ${ANDROID_TOOLCHAIN}
+	if [ -e ${tmpfile} ] && [ ! "$(sha1sum ${tmpfile})" = "${checksum}" ]; then
+		warn "SHA1 checksum is wrong, re-download NDK package..."
+		rm ${tmpfile}
 	fi
-	mkdir -p ${ANDROID_SDK}
-	pushd ${ANDROID_SDK}
-	unzip -q ${SDK_TOOLS_FILE}
+	if [ ! -e ${dest} ]; then
+		note "Downloading file ${filename}"
+		wget https://dl.google.com/android/repository/${filename} -P ${tmpdir}
+		sha1sum ${tmpfile}
+	fi
+	mkdir -p ${dest}
+	pushd ${dest}
+	unzip -q ${tmpfile}
 	popd
 }
 
@@ -69,14 +69,13 @@ generate_toolchain() {
 			ARCH="arm"
 			;;
 		*)
-			echo "Unknown ABI: ${ANDROID_ABI}"
-			exit 1
+			error "Unknown ABI: ${ANDROID_ABI}"
 	esac
 
 	TOOLCHAIN="${ANDROID_NDK}/toolchains/${NDK_PACKAGE}/toolchain-${ANDROID_ABI}/android-${API_LEVEL}"
 
 	if [ ! -d ${TOOLCHAIN} ]; then
-		echo "Generating Standalone Toolchain..."
+		note "Generating Standalone Toolchain..."
 
 		${ANDROID_NDK}/ndk-bundle/${NDK_PACKAGE}/build/tools/make_standalone_toolchain.py \
 		--arch="${ARCH}" \
@@ -87,13 +86,15 @@ generate_toolchain() {
 	fi
 }
 
-echo "Checking Android toolchain installation (${ANDROID_ABI}/${API_LEVEL})..."
+note "Checking Android toolchain installation (${ANDROID_ABI}/${API_LEVEL})..."
 
 if [ ! -d ${ANDROID_NDK_HOME} ]; then
-	install_ndk
+	note "Installing NDK (${NDK_PACKAGE})..."
+	install ${NDK_PACKAGE}-${HOST}-x86_64.zip ${NDK_SHA1SUM} ${ANDROID_NDK}/ndk-bundle
 fi
 if [ ! -d ${ANDROID_SDK} ]; then
-	install_sdk_tools
+	note "Installing SDK Tools..."
+	install sdk-tools-${HOST}-3859397.zip "7eab0ada7ff28487e1b340cc3d866e70bcb4286e" ${ANDROID_SDK}
 fi
 
 generate_toolchain

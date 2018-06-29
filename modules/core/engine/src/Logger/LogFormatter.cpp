@@ -50,21 +50,7 @@ static const int MILLISECONDS_PER_SECOND = 1000;
 
 std::string LogFormatter::format( Level level, std::chrono::system_clock::time_point time, const char* threadMoniker, const char* text )
 {
-    bool dateTimeFailure = false;
-    bool millisecondFailure = false;
-    char dateTimeString[DATE_AND_TIME_STRING_SIZE];
-    auto timeAsTime_t = std::chrono::system_clock::to_time_t( time );
-    auto timeAsTmPtr = std::gmtime( &timeAsTime_t );
-    if (!timeAsTmPtr || 0 == strftime(dateTimeString, sizeof(dateTimeString), STRFTIME_FORMAT_STRING, timeAsTmPtr)) {
-        dateTimeFailure = true;
-    }
-    auto timeMillisPart = static_cast<int>(
-        std::chrono::duration_cast<std::chrono::milliseconds>(time.time_since_epoch()).count() %
-        MILLISECONDS_PER_SECOND);
-    char millisString[MILLIS_STRING_SIZE];
-    if (std::snprintf(millisString, sizeof(millisString), MILLIS_FORMAT_STRING, timeMillisPart) < 0) {
-        millisecondFailure = true;
-    }
+    std::stringstream stringToEmit;
 
     char levelCh;
     switch(level){
@@ -75,12 +61,34 @@ std::string LogFormatter::format( Level level, std::chrono::system_clock::time_p
         case Level::WARN: levelCh = 'W'; break;
         default: levelCh = '?'; break;
     }
-    std::stringstream stringToEmit;
-    stringToEmit << (dateTimeFailure ? "ERROR: strftime() failed.  Date and time not logged." : dateTimeString)
-                 << TIME_AND_MILLIS_SEPARATOR
-                 << (millisecondFailure ? "ERROR: snprintf() failed.  Milliseconds not logged." : millisString)
-                 << MILLIS_AND_THREAD_SEPARATOR << threadMoniker << THREAD_AND_LEVEL_SEPARATOR
-                 << levelCh << LEVEL_AND_TEXT_SEPARATOR << text;
+        
+    if( time.time_since_epoch().count() > 0 )
+    {
+        bool dateTimeFailure = false;
+        bool millisecondFailure = false;
+        char dateTimeString[DATE_AND_TIME_STRING_SIZE];
+        auto timeAsTime_t = std::chrono::system_clock::to_time_t( time );
+        auto timeAsTmPtr = std::gmtime( &timeAsTime_t );
+        if (!timeAsTmPtr || 0 == strftime(dateTimeString, sizeof(dateTimeString), STRFTIME_FORMAT_STRING, timeAsTmPtr)) {
+            dateTimeFailure = true;
+        }
+        auto timeMillisPart = static_cast<int>(
+            std::chrono::duration_cast<std::chrono::milliseconds>(time.time_since_epoch()).count() %
+            MILLISECONDS_PER_SECOND);
+        char millisString[MILLIS_STRING_SIZE];
+        if (std::snprintf(millisString, sizeof(millisString), MILLIS_FORMAT_STRING, timeMillisPart) < 0) {
+            millisecondFailure = true;
+        }
+
+        stringToEmit << (dateTimeFailure ? "ERROR: strftime() failed.  Date and time not logged." : dateTimeString)
+                     << TIME_AND_MILLIS_SEPARATOR
+                     << (millisecondFailure ? "ERROR: snprintf() failed.  Milliseconds not logged." : millisString)
+                     << MILLIS_AND_THREAD_SEPARATOR << threadMoniker << THREAD_AND_LEVEL_SEPARATOR
+                     << levelCh << LEVEL_AND_TEXT_SEPARATOR << text;
+    }
+    else {
+        stringToEmit << "[" << threadMoniker << THREAD_AND_LEVEL_SEPARATOR << levelCh << LEVEL_AND_TEXT_SEPARATOR << text;
+    }
     
     return stringToEmit.str();
 }

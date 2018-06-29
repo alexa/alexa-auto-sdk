@@ -19,23 +19,19 @@ import java.io.InputStream;
 
 /**
  * Configuration class used to provide configuration data from a stream. The contents
- * of the stream should be @c JSON data with values corresponding to the stream content provided
+ * of the stream should be JSON data with values corresponding to the stream content provided
  * by the other configuration objects.
- *
- * @sa [Configuring the Engine](index.html#configuring-the-engine)
  */
-public class StreamConfiguration extends EngineConfiguration
-{
-    private InputStream m_stream;
+public class StreamConfiguration extends EngineConfiguration {
+    private InputStream mStream;
 
     /**
      * Creates a new instance of @c StreamConfiguration by providing the input stream
-     * containing @c JSON data.
+     * containing JSON data
      *
-     * @sa [Configuring the Engine](index.html#configuring-the-engine)
-     * @param [in] stream Input stream.
+     * @param  stream The input stream
      */
-    static public StreamConfiguration create( InputStream is ) {
+    public static StreamConfiguration create( InputStream is ) {
         return new StreamConfiguration( is );
     }
 
@@ -43,11 +39,15 @@ public class StreamConfiguration extends EngineConfiguration
      * private constructor
      */
     private StreamConfiguration( InputStream is ) {
-        m_stream = is;
+        mStream = is;
     }
 
     @Override
+    /**
+     *
+     * @return A pointer to a @c InputStream object containing the JSON configuration data
+     */
     public InputStream getStream() {
-        return m_stream;
+        return mStream;
     }
 }

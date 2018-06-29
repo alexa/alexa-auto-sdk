@@ -25,6 +25,7 @@
 #include <AVSCommon/AVS/DialogUXStateAggregator.h>
 #include <AVSCommon/SDKInterfaces/AudioInputProcessorObserverInterface.h>
 #include <AVSCommon/SDKInterfaces/DirectiveSequencerInterface.h>
+#include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
 #include <AVSCommon/SDKInterfaces/ExceptionEncounteredSenderInterface.h>
 #include <AVSCommon/SDKInterfaces/FocusManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/KeyWordObserverInterface.h>
@@ -32,13 +33,8 @@
 #include <ContextManager/ContextManager.h>
 #include <KWD/AbstractKeywordDetector.h>
 
-#if defined WAKEWORD_PRYON
-#include <Pryon/PryonKeywordDetector.h>
-static const std::string PRYON_MODEL_NAME = "pryon";
-static const std::string PRYON_MANIFEST_PATH = "fox/pryon.manifest";
-#elif defined WAKEWORD_PRYONLITE
-#include <PryonLite/PryonLiteKeywordDetector.h>
-static const int32_t PRYON_LITE_THRESHOLD = 500;
+#if defined AMAZONLITE_WAKEWORD_SUPPORT
+#include <AmazonLite/PryonLiteKeywordDetector.h>
 #endif
 
 #include "AACE/Alexa/SpeechRecognizer.h"
@@ -55,22 +51,31 @@ class SpeechRecognizerEngineImpl :
     public std::enable_shared_from_this<SpeechRecognizerEngineImpl> {
 
 private:
-    SpeechRecognizerEngineImpl(
-        std::shared_ptr<aace::alexa::SpeechRecognizer> speechRecognizerPlatformInterface,
-        std::shared_ptr<alexaClientSDK::capabilityAgents::aip::AudioInputProcessor> audioInputProcessor,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer );
+    SpeechRecognizerEngineImpl( std::shared_ptr<aace::alexa::SpeechRecognizer> speechRecognizerPlatformInterface, const alexaClientSDK::avsCommon::utils::AudioFormat& audioFormat );
 
-public:
-    static std::shared_ptr<SpeechRecognizerEngineImpl> create(
-        std::shared_ptr<aace::alexa::SpeechRecognizer> speechRecognizerPlatformInterface,
+    bool initialize(
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
         std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::UserActivityNotifierInterface> userActivityNotifier );
-    
+
+public:
+    static std::shared_ptr<SpeechRecognizerEngineImpl> create(
+        std::shared_ptr<aace::alexa::SpeechRecognizer> speechRecognizerPlatformInterface,
+        const alexaClientSDK::avsCommon::utils::AudioFormat& audioFormat,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
+        std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::UserActivityNotifierInterface> userActivityNotifier );
+
     // SpeechRecognizerEngineInterface
     bool onHoldToTalk() override;
     bool onTapToTalk() override;
@@ -79,20 +84,22 @@ public:
     ssize_t write( const int16_t* data, const size_t size ) override;
 
     // keyword detection
-    bool isWakewordSupported();
     bool isWakewordEnabled();
-    
+    bool isWakewordSupported();
+
     bool enableWakewordDetection() override;
     bool disableWakewordDetection() override;
-    
+
     // AudioInputProcessorObserverInterface
     void onStateChanged( alexaClientSDK::avsCommon::sdkInterfaces::AudioInputProcessorObserverInterface::State state ) override;
 
     // KeyWordObserverInterface
-    void onKeyWordDetected( std::shared_ptr<alexaClientSDK::avsCommon::avs::AudioInputStream> stream,
+    void onKeyWordDetected(
+        std::shared_ptr<alexaClientSDK::avsCommon::avs::AudioInputStream> stream,
         std::string keyword,
-        alexaClientSDK::avsCommon::avs::AudioInputStream::Index beginIndex,
-        alexaClientSDK::avsCommon::avs::AudioInputStream::Index endIndex ) override;
+        alexaClientSDK::avsCommon::avs::AudioInputStream::Index beginIndex = UNSPECIFIED_INDEX,
+        alexaClientSDK::avsCommon::avs::AudioInputStream::Index endIndex = UNSPECIFIED_INDEX,
+        std::shared_ptr<const std::vector<char>> KWDMetadata = nullptr ) override;
 
 protected:
     virtual void doShutdown() override;
@@ -111,21 +118,21 @@ private:
 
 private:
     std::shared_ptr<aace::alexa::SpeechRecognizer> m_speechRecognizerPlatformInterface;
-    
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> m_directiveSequencer;
     std::shared_ptr<alexaClientSDK::capabilityAgents::aip::AudioInputProcessor> m_audioInputProcessor;
     
-    alexaClientSDK::avsCommon::utils::AudioFormat m_compatibleAudioFormat;
+    alexaClientSDK::avsCommon::utils::AudioFormat m_audioFormat;
     std::shared_ptr<alexaClientSDK::avsCommon::avs::AudioInputStream> m_audioInputStream;
     std::unique_ptr<alexaClientSDK::avsCommon::avs::AudioInputStream::Writer> m_audioInputWriter;
     
+    unsigned int m_wordSize;
+    
     std::shared_ptr<alexaClientSDK::kwd::AbstractKeywordDetector> m_wakewordDetector;
     
-    bool m_expectingAudio;
-    bool m_wakewordEnabled;
+    bool m_expectingAudio = false;
+    bool m_wakewordEnabled = false;
     
     // the aip state
-    alexaClientSDK::avsCommon::sdkInterfaces::AudioInputProcessorObserverInterface::State m_state;
+    AudioInputProcessorObserverInterface::State m_state;
     
     // mutex for blocking
     std::mutex m_expectingAudioMutex;

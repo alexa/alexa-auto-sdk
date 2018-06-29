@@ -48,7 +48,7 @@ bool VehicleEngineService::configure( const std::vector<std::shared_ptr<std::ist
     return true;
 }
 
-bool VehicleEngineService::checkProperty( rapidjson::Value& root, const char* key, bool warnIfMissing )
+bool VehicleEngineService::checkVehicleConfigProperty( rapidjson::Value& root, const char* key, bool warnIfMissing )
 {
     ReturnIf( root.HasMember( key ) && root[key].IsString(), true );
     
@@ -59,9 +59,9 @@ bool VehicleEngineService::checkProperty( rapidjson::Value& root, const char* ke
     return false;
 }
 
-std::string VehicleEngineService::getProperty( rapidjson::Value& root, const char* key, const char* defaultValue, bool warnIfMissing )
+std::string VehicleEngineService::getVehicleConfigProperty( rapidjson::Value& root, const char* key, const char* defaultValue, bool warnIfMissing )
 {
-    ReturnIfNot( checkProperty( root, key, warnIfMissing ), defaultValue );
+    ReturnIfNot( checkVehicleConfigProperty( root, key, warnIfMissing ), defaultValue );
 
     std::string value = root[key].GetString();
     
@@ -93,15 +93,15 @@ bool VehicleEngineService::configure( std::shared_ptr<std::istream> configuratio
         {
             rapidjson::Value info = vehicleConfigRoot["info"].GetObject();
             
-            m_vehiclePropertyMap["make"] = getProperty( info, "make" );
-            m_vehiclePropertyMap["model"] = getProperty( info, "model" );
-            m_vehiclePropertyMap["year"] = getProperty( info, "year" );
-            m_vehiclePropertyMap["trim"] = getProperty( info, "trim" );
-            m_vehiclePropertyMap["geography"] = getProperty( info, "geography" );
-            m_vehiclePropertyMap["version"] = getProperty( info, "version" );
-            m_vehiclePropertyMap["os"] = getProperty( info, "os" );
-            m_vehiclePropertyMap["arch"] = getProperty( info, "arch" );
-            m_vehiclePropertyMap["language"] = getProperty( info, "language" );
+            m_vehiclePropertyMap["make"] = getVehicleConfigProperty( info, "make" );
+            m_vehiclePropertyMap["model"] = getVehicleConfigProperty( info, "model" );
+            m_vehiclePropertyMap["year"] = getVehicleConfigProperty( info, "year" );
+            m_vehiclePropertyMap["trim"] = getVehicleConfigProperty( info, "trim" );
+            m_vehiclePropertyMap["geography"] = getVehicleConfigProperty( info, "geography" );
+            m_vehiclePropertyMap["version"] = getVehicleConfigProperty( info, "version" );
+            m_vehiclePropertyMap["os"] = getVehicleConfigProperty( info, "os" );
+            m_vehiclePropertyMap["arch"] = getVehicleConfigProperty( info, "arch" );
+            m_vehiclePropertyMap["language"] = getVehicleConfigProperty( info, "language" );
         }
 
         return true;

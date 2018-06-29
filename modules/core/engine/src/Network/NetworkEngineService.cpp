@@ -48,8 +48,14 @@ bool NetworkEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::
 {
     try
     {
-        ThrowIfNotNull( m_networkInfoProvider, "platformInterfaceAlreadyRegistered" );
-        m_networkInfoProvider = networkInfoProvider;
+        ThrowIfNotNull( m_networkInfoProviderEngineImpl, "platformInterfaceAlreadyRegistered" );
+        
+        // create the engine implementation
+        m_networkInfoProviderEngineImpl = NetworkInfoProviderEngineImpl::create();
+        ThrowIfNull( m_networkInfoProviderEngineImpl, "createNetworkInfoProviderEngineImplFailed" );
+
+        // set the network infor provider engine interface reference
+        networkInfoProvider->setEngineInterface( m_networkInfoProviderEngineImpl );
   
         return true;
     }

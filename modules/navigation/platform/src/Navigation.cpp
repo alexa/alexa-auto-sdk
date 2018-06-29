@@ -18,5 +18,7 @@
 namespace aace {
 namespace navigation {
 
+Navigation::~Navigation() = default; // key function
+
 } // aace::navigation
 } // aac

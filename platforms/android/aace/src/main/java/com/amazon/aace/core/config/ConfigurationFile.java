@@ -15,31 +15,31 @@
 
 package com.amazon.aace.core.config;
 
+import android.util.Log;
+
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 /**
  * Configuration class used to provide configuration data from a file. The contents
- * of the file should be @c JSON data with values corresponding to the stream content provided
+ * of the file should be JSON data with values corresponding to the content provided
  * by the other configuration objects.
- *
- * @sa [Configuring the Engine](index.html#configuring-the-engine)
  */
-public class ConfigurationFile
-{
+public class ConfigurationFile {
+
+    private static final String sTag = ConfigurationFile.class.getSimpleName();
+
     /**
-     * Creates a new instance of @c EngineConfiguration by providing the path to a configuration file
-     * containing @c JSON data.
+     * Creates a new instance of @c ConfigurationFile by providing the path to a configuration file
+     * containing JSON data.
      *
-     * @sa [Configuring the Engine](index.html#configuring-the-engine)
-     * @param [in] configFilePath Path to the configuration file.
+     * @param  configFilePath The path to the configuration file
      */
-    static public EngineConfiguration create( String configFilePath )
-    {
-        try
-        {
+    public static EngineConfiguration create( String configFilePath ) {
+        try {
             return StreamConfiguration.create( new FileInputStream( configFilePath ) );
-        }
-        catch( Throwable ex ) {
+        } catch ( FileNotFoundException e ) {
+            Log.e( sTag, e.getMessage() );
             return null;
         }
     }

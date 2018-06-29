@@ -19,11 +19,23 @@
 package com.amazon.aace.alexa;
 
 /**
- * The @c SpeechSynthesizer class must be extended by the platform implementation to handle playback of Alexa's synthesized speech audio data.
- * @sa MediaPlayer Speaker
+ * SpeechSynthesizer should be extended to handle Alexa speech output from the Engine.
+ * The SpeechSynthesizer @c MediaPlayer and @c Speaker will receive directives from the Engine to handle Alexa speech playback.
+ *
+ * @note For observing Alexa dialog state transitions, see @c AlexaClient::dialogStateChanged().
+ *
+ * @sa AudioChannel
  */
 public class SpeechSynthesizer extends AudioChannel
 {
+    /**
+     * SpeechSynthesizer should be extended to handle Alexa speech output from the Engine.
+     * The SpeechSynthesizer @c MediaPlayer and @c Speaker will receive directives from the Engine to handle Alexa speech playback.
+     *
+     * @note For observing Alexa dialog state transitions, see @c AlexaClient::dialogStateChanged().
+     *
+     * @sa AudioChannel
+     */
     public SpeechSynthesizer( MediaPlayer mediaPlayer, Speaker speaker ) {
         super( mediaPlayer, speaker, Speaker.Type.AVS_SYNCED );
     }

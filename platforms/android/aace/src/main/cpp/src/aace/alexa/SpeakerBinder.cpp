@@ -135,6 +135,15 @@ aace::alexa::Speaker::Type SpeakerBinder::convertType( jobject obj )
 
 extern "C" {
 
+    JNIEXPORT void JNICALL
+    Java_com_amazon_aace_alexa_Speaker_localVolumeSet( JNIEnv * env , jobject /* this */, jlong cptr, int8_t volume ) {
+        SPEAKER(cptr)->localVolumeSet( volume );
+    }
+
+    JNIEXPORT void JNICALL
+    Java_com_amazon_aace_alexa_Speaker_localMuteSet( JNIEnv * env , jobject /* this */, jlong cptr, bool mute ) {
+        SPEAKER(cptr)->localMuteSet( mute );
+    }
 }
 
 // END OF FILE

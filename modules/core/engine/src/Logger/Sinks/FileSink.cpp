@@ -64,8 +64,8 @@ std::shared_ptr<FileSink> FileSink::create( const std::string& id, const std::st
         sink->m_filename = sink->m_path + sink->m_prefix + ".log";
 
         // create the log file stream
-        sink->m_stream = std::ofstream( sink->m_filename, append ? std::ios::out : std::ios::out | std::ios::trunc );
-        ThrowIfNot( sink->m_stream.is_open(), "openStreamFailed");
+        sink->m_stream = std::make_shared<std::ofstream>( sink->m_filename, append ? std::ios::out : std::ios::out | std::ios::trunc );
+        ThrowIfNot( sink->m_stream->is_open(), "openStreamFailed");
         
         // enbale the sink
         sink->m_enabled = true;
@@ -87,12 +87,12 @@ void FileSink::log( Level level, std::chrono::system_clock::time_point time, con
             std::string log = aace::engine::logger::LogFormatter::format( level, time, threadMoniker, text );
             
             // check if the log file needs to be rotated
-            if( (long) m_stream.tellp() + log.length() + 1 > m_maxSize ) {
+            if( (long) m_stream->tellp() + log.length() + 1 > m_maxSize ) {
                 ThrowIfNot( rotateLog(), "rotateLogFailed" );
             }
             
             // log the event to file stream
-            m_stream << log << std::endl;
+            *m_stream << log << std::endl;
         }
         catch( std::exception& ex )
         {
@@ -107,7 +107,7 @@ void FileSink::log( Level level, std::chrono::system_clock::time_point time, con
 }
 
 void FileSink::flush() {
-    m_stream.flush();
+    m_stream->flush();
 }
 
 bool FileSink::rotateLog()
@@ -115,7 +115,7 @@ bool FileSink::rotateLog()
     try
     {
         // close the current log stream
-        m_stream.close();
+        m_stream->close();
 
         for( int j = m_maxFiles; j > 0; j-- )
         {
@@ -132,8 +132,8 @@ bool FileSink::rotateLog()
             }
         }
         
-        m_stream = std::ofstream( m_filename, std::ios::out | std::ios::trunc );
-        ThrowIfNot( m_stream.is_open(), "openStreamFailed" );
+        m_stream = std::make_shared<std::ofstream>( m_filename, std::ios::out | std::ios::trunc );
+        ThrowIfNot( m_stream->is_open(), "openStreamFailed" );
         
         return true;
     }

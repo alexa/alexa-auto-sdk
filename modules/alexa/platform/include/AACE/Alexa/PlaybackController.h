@@ -27,39 +27,53 @@ namespace aace {
 namespace alexa {
 
 /**
- * The @c PlaybackController class should be extended by the platform implementation to handle media controller
- * events occurring on the platform.
- */
+ * PlaybackController should be extended to handle playback control
+ * operations such as on-platform button presses for the @c AudioPlayer. The Engine will respond to PlaybackController 
+ * events with playback control directives on the @c AudioPlayer @c MediaPlayer.
+ *
+ * @note The TemplateRuntime::renderPlayerInfo() payload includes information about what
+ * playback control buttons should be enabled on screen with a player info display card.
+ *
+ * @sa AudioPlayer
+ */  
 class PlaybackController : public aace::core::PlatformInterface {
 protected:
     PlaybackController() = default;
 
 public:
-    virtual ~PlaybackController() = default;
+    virtual ~PlaybackController();
 
     /**
-     * Notify the Engine that the Play button has been pressed.
+     * Notifies the Engine of a platform request to begin audio playback, such as when a user presses
+     * a "play" button. The Engine will issue a playback directive to the @c AudioPlayer @c MediaPlayer to initiate
+     * playback on the platform.
      */
     void playButtonPressed();
 
     /**
-     * Notify the Engine that the Pause button has been pressed.
+     * Notifies the Engine of a platform request to pause audio playback, such as when a user presses
+     * a "pause" button. The Engine will issue a playback directive to the @c AudioPlayer @c MediaPlayer to stop
+     * playback on the platform.
      */
     void pauseButtonPressed();
 
     /**
-     * Notify the Engine that the Next button has been pressed.
+     * Notifies the Engine of a platform request to skip forward in the playback queue, such as when a user
+     * presses a "next" button. The Engine will issue playback directives to the @c AudioPlayer @c MediaPlayer
+     * to control playback on the platform.
      */
     void nextButtonPressed();
 
     /**
-     * Notify the Engine that the Previous button has been pressed.
+     * Notifies the Engine of a platform request to skip backward in the playback queue, such as when a user
+     * presses a "previous" button. The Engine will issue playback directives to the @c AudioPlayer @c MediaPlayer
+     * to control playback on the platform.
      */
     void previousButtonPressed();
 
     /**
      * @internal
-     * Sets engine interface delegate.
+     * Sets the Engine interface delegate.
      *
      * Should *never* be called by the platform implementation.
      */

@@ -18,12 +18,17 @@
 namespace aace {
 namespace logger {
  
+Logger::~Logger() = default; // key function
+
 bool Logger::logEvent( aace::logger::Logger::Level level, std::chrono::system_clock::time_point time, const std::string& source, const std::string& message ) {
     return false;
 }
  
-void Logger::log( Level level, const std::string &tag, const std::string &message ) {
-    m_loggerEngineInterface->log( level, tag, message );
+void Logger::log( Level level, const std::string &tag, const std::string &message )
+{
+    if( m_loggerEngineInterface != nullptr ) {
+        m_loggerEngineInterface->log( level, tag, message );
+    }
 }
     
 void Logger::setEngineInterface( std::shared_ptr<aace::logger::LoggerEngineInterface> loggerEngineInterface ) {

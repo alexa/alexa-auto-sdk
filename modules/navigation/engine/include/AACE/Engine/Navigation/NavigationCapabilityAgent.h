@@ -22,6 +22,9 @@
 #include <AVSCommon/AVS/CapabilityAgent.h>
 #include <AVSCommon/Utils/RequiresShutdown.h>
 #include <AVSCommon/Utils/Threading/Executor.h>
+#include <AVSCommon/SDKInterfaces/CapabilityConfigurationInterface.h>
+#include <AVSCommon/AVS/CapabilityConfiguration.h>
+
 
 #include "NavigationObserverInterface.h"
 
@@ -31,6 +34,7 @@ namespace navigation {
 
 class NavigationCapabilityAgent :
     public alexaClientSDK::avsCommon::avs::CapabilityAgent,
+    public alexaClientSDK::avsCommon::sdkInterfaces::CapabilityConfigurationInterface,
     public alexaClientSDK::avsCommon::utils::RequiresShutdown,
     public std::enable_shared_from_this<NavigationCapabilityAgent> {
     
@@ -66,6 +70,8 @@ public:
      * @param [in] observer The @c NavigationObserverInterface
      */
     void removeObserver( std::shared_ptr<NavigationObserverInterface> observer );
+
+    std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>> getCapabilityConfigurations() override;
 
 private:
     NavigationCapabilityAgent( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender );
@@ -109,6 +115,13 @@ private:
     void handleSetDestinationDirective(std::shared_ptr<DirectiveInfo> info);
 
     /**
+     * This function handles a @c SetDestination directive.
+     *
+     * @param [in] info The @c DirectiveInfo containing the @c AVSDirective and the @c DirectiveHandlerResultInterface.
+     */
+    void handleCancelNavigationDirective(std::shared_ptr<DirectiveInfo> info);
+
+    /**
      * This function handles any unknown directives received by the @c Navigation capability agent.
      *
      * @param [in] info The @c DirectiveInfo containing the @c AVSDirective and the @c DirectiveHandlerResultInterface.
@@ -125,6 +138,9 @@ private:
     /// A set of observers to be notified when a @c SetDestination directive is received
     std::unordered_set<std::shared_ptr<NavigationObserverInterface>> m_observers;
     /// @}
+
+    /// Set of capability configurations that will get published using the Capabilities API
+    std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>> m_capabilityConfigurations;
 
     /// This is the worker thread for the @c Navigation CA.
     alexaClientSDK::avsCommon::utils::threading::Executor m_executor;

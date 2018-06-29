@@ -28,9 +28,14 @@ EngineService::EngineService( const ServiceDescription& description ) : m_descri
 
 EngineService::~EngineService()
 {
-    if( m_running && stop() == false ) {
-        AACE_ERROR(LX(TAG,"~EngineService").d("reason", "serviceStopFailed"));
+    if( m_running ) {
+        AACE_WARN(LX(TAG,"~EngineService").m("EngineService was not stopped before being deleted").d("service",getDescription().getType()));
     }
+    else if( m_initialized ) {
+        AACE_WARN(LX(TAG,"~EngineService").m("EngineService was not shutdown before being deleted").d("service",getDescription().getType()));
+    }
+    
+    AACE_DEBUG(LX(TAG,"~EngineService").m(getDescription().getType()));
 }
 
 bool EngineService::handleInitializeEngineEvent( std::shared_ptr<aace::engine::core::EngineContext> context )
@@ -75,7 +80,10 @@ bool EngineService::handleShutdownEngineEvent()
 {
     try
     {
-        ThrowIfNot( m_initialized, "serviceNotInitialized" );
+        if( m_initialized == false ) {
+            AACE_WARN(LX(TAG,"handleShutdownEngineEvent").m("Attempting do shutdown service that is not initialized - doing nothing."));
+            return true;
+        }
 
         // if the service is running then stop it first
         if( isRunning() ) {
@@ -120,12 +128,16 @@ bool EngineService::handleStopEngineEvent()
     try
     {
         ThrowIfNot( m_initialized, "serviceNotInitialized" );
-        ThrowIfNot( m_running, "serviceNotRunning" );
+
+        if( m_running == false ) {
+            AACE_WARN(LX(TAG,"handleStopEngineEvent").m("Attempting do stop service that is not running - doing nothing."));
+            return true;
+        }
+
         ThrowIfNot( stop(), "stopServiceFailed" );
 
         // set the service running and initialized flags to false
         m_running = false;
-        m_initialized = false;
 
         return true;
     }
@@ -165,6 +177,10 @@ bool EngineService::stop() {
 
 bool EngineService::setProperty( const std::string& key, const std::string& value ) {
     return false;
+}
+
+std::string EngineService::getProperty( const std::string& key ) {
+    return std::string();
 }
 
 bool EngineService::registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) {

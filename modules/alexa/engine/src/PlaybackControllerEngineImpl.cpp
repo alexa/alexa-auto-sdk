@@ -23,35 +23,61 @@ namespace alexa {
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.PlaybackControllerEngineImpl");
 
-PlaybackControllerEngineImpl::PlaybackControllerEngineImpl( std::shared_ptr<aace::alexa::PlaybackController> playbackControllerPlatformInterface ) {
+PlaybackControllerEngineImpl::PlaybackControllerEngineImpl( std::shared_ptr<aace::alexa::PlaybackController> playbackControllerPlatformInterface ) : alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG) {
+}
+
+bool PlaybackControllerEngineImpl::initialize(
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate ) {
+    
+    try
+    {
+        m_playbackControllerCapabilityAgent = alexaClientSDK::capabilityAgents::playbackController::PlaybackController::create( contextManager, messageSender );
+        ThrowIfNull( m_playbackControllerCapabilityAgent, "couldNotCreateCapabilityAgent" );
+
+        m_playbackRouter = alexaClientSDK::capabilityAgents::playbackController::PlaybackRouter::create( m_playbackControllerCapabilityAgent );
+        ThrowIfNull( m_playbackRouter, "couldNotCreatePlaybackRouter" );
+
+        // register capability with delegate
+        ThrowIfNot( capabilitiesDelegate->registerCapability( m_playbackControllerCapabilityAgent ), "registerCapabilityFailed");
+
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"initialize").d("reason", ex.what()));
+        return false;
+    }
 }
 
 std::shared_ptr<PlaybackControllerEngineImpl> PlaybackControllerEngineImpl::create(
     std::shared_ptr<aace::alexa::PlaybackController> playbackControllerPlatformInterface,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager ) {
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate ) {
     
     try
     {
         std::shared_ptr<PlaybackControllerEngineImpl> playbackControllerEngineImpl = std::shared_ptr<PlaybackControllerEngineImpl>( new PlaybackControllerEngineImpl( playbackControllerPlatformInterface ) );
-        
-        auto playbackControllerCapabilityAgent = alexaClientSDK::capabilityAgents::playbackController::PlaybackController::create( contextManager, messageSender );
-        ThrowIfNull( playbackControllerCapabilityAgent, "couldNotCreateCapabilityAgent" );
 
-        auto playbackRouter = alexaClientSDK::capabilityAgents::playbackController::PlaybackRouter::create( playbackControllerCapabilityAgent );
-        ThrowIfNull( playbackRouter, "couldNotCreatePlaybackRouter" );
-        
-        // set the playback router reference
-        playbackControllerEngineImpl->m_playbackRouter = playbackRouter;
-        
-        // set the capability agent reference in the playback controller engine implementation
-        playbackControllerEngineImpl->m_playbackControllerCapabilityAgent = playbackControllerCapabilityAgent;
+        ThrowIfNot( playbackControllerEngineImpl->initialize( messageSender, contextManager, capabilitiesDelegate ), "initializePlaybackControllerEngineImplFailed" );
 
         return playbackControllerEngineImpl;
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"create").d("reason", ex.what()));
         return nullptr;
+    }
+}
+
+void PlaybackControllerEngineImpl::doShutdown()
+{
+    if( m_playbackRouter != nullptr ) {
+        m_playbackRouter->shutdown();
+    }
+
+    if( m_playbackControllerCapabilityAgent != nullptr ) {
+        m_playbackControllerCapabilityAgent->shutdown();
     }
 }
 

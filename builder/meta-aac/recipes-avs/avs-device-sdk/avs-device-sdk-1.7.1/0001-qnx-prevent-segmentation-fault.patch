@@ -1,0 +1,199 @@
+From 4073d7f9aa08b7133688f5b2f2c6b683caba86bf Mon Sep 17 00:00:00 2001
+From: Shotaro Uchida <shotaru@amazon.com>
+Date: Mon, 11 Jun 2018 12:34:11 -0700
+Subject: [PATCH] qnx: prevent segmentation fault
+
+Patches from Marco Visaya @visayamv
+---
+ AFML/include/AFML/FocusManager.h              | 20 +++++++++-----
+ AFML/src/FocusManager.cpp                     | 26 ++++++++++++-------
+ .../AVSCommon/Utils/Logger/ConsoleLogger.h    |  4 ++-
+ .../DefaultClient/src/DefaultClient.cpp       |  6 ++---
+ .../AIP/include/AIP/AudioInputProcessor.h     |  2 +-
+ Integration/test/AlertsIntegrationTest.cpp    |  2 +-
+ .../AudioInputProcessorIntegrationTest.cpp    |  2 +-
+ .../test/SpeechSynthesizerIntegrationTest.cpp |  2 +-
+ 8 files changed, 41 insertions(+), 23 deletions(-)
+
+diff --git a/AFML/include/AFML/FocusManager.h b/AFML/include/AFML/FocusManager.h
+index cac2aa2a..5577d879 100644
+--- a/AFML/include/AFML/FocusManager.h
++++ b/AFML/include/AFML/FocusManager.h
+@@ -84,12 +84,6 @@ public:
+         unsigned int priority;
+     };
+ 
+-    /// The default @c ChannelConfiguration for AVS audio channels.
+-    static const std::vector<FocusManager::ChannelConfiguration> DEFAULT_AUDIO_CHANNELS;
+-
+-    /// The default @c ChannelConfiguration for AVS visual channels.
+-    static const std::vector<FocusManager::ChannelConfiguration> DEFAULT_VISUAL_CHANNELS;
+-
+     /**
+      * This constructor creates Channels based on the provided configurations.
+      *
+@@ -119,6 +113,20 @@ public:
+     void removeObserver(
+         const std::shared_ptr<avsCommon::sdkInterfaces::FocusManagerObserverInterface>& observer) override;
+ 
++    /**
++     * Retrieves the default @c ChannelConfiguration for AVS audio channels.
++     *
++     * @return the default @c ChannelConfiguration for AVS audio channels.
++     */
++    static const std::vector<FocusManager::ChannelConfiguration> getDefaultAudioChannels();
++
++    /**
++     * Retrieves the default @c ChannelConfiguration for AVS visual channels.
++     *
++     * @return the default @c ChannelConfiguration for AVS visual channels.
++     */
++    static const std::vector<FocusManager::ChannelConfiguration> getDefaultVisualChannels();
++
+ private:
+     /**
+      * Functor so that we can compare Channel objects via shared_ptr.
+diff --git a/AFML/src/FocusManager.cpp b/AFML/src/FocusManager.cpp
+index 9428c51b..50ac43bd 100644
+--- a/AFML/src/FocusManager.cpp
++++ b/AFML/src/FocusManager.cpp
+@@ -33,15 +33,6 @@ static const std::string TAG("FocusManager");
+  */
+ #define LX(event) alexaClientSDK::avsCommon::utils::logger::LogEntry(TAG, event)
+ 
+-const std::vector<FocusManager::ChannelConfiguration> FocusManager::DEFAULT_AUDIO_CHANNELS = {
+-    {FocusManagerInterface::DIALOG_CHANNEL_NAME, FocusManagerInterface::DIALOG_CHANNEL_PRIORITY},
+-    {FocusManagerInterface::ALERTS_CHANNEL_NAME, FocusManagerInterface::ALERTS_CHANNEL_PRIORITY},
+-    {FocusManagerInterface::COMMUNICATIONS_CHANNEL_NAME, FocusManagerInterface::COMMUNICATIONS_CHANNEL_PRIORITY},
+-    {FocusManagerInterface::CONTENT_CHANNEL_NAME, FocusManagerInterface::CONTENT_CHANNEL_PRIORITY}};
+-
+-const std::vector<FocusManager::ChannelConfiguration> FocusManager::DEFAULT_VISUAL_CHANNELS = {
+-    {FocusManagerInterface::VISUAL_CHANNEL_NAME, FocusManagerInterface::VISUAL_CHANNEL_PRIORITY}};
+-
+ FocusManager::FocusManager(
+     const std::vector<ChannelConfiguration>& channelConfigurations,
+     std::shared_ptr<ActivityTrackerInterface> activityTrackerInterface) :
+@@ -264,5 +255,22 @@ void FocusManager::notifyActivityTracker() {
+     m_activityUpdates.clear();
+ }
+ 
++const std::vector<FocusManager::ChannelConfiguration> FocusManager::getDefaultAudioChannels() {
++    static const std::vector<FocusManager::ChannelConfiguration> defaultAudioChannels = {
++        {FocusManagerInterface::DIALOG_CHANNEL_NAME, FocusManagerInterface::DIALOG_CHANNEL_PRIORITY},
++        {FocusManagerInterface::ALERTS_CHANNEL_NAME, FocusManagerInterface::ALERTS_CHANNEL_PRIORITY},
++        {FocusManagerInterface::COMMUNICATIONS_CHANNEL_NAME, FocusManagerInterface::COMMUNICATIONS_CHANNEL_PRIORITY},
++        {FocusManagerInterface::CONTENT_CHANNEL_NAME, FocusManagerInterface::CONTENT_CHANNEL_PRIORITY}};
++
++    return defaultAudioChannels;
++}
++
++const std::vector<FocusManager::ChannelConfiguration> FocusManager::getDefaultVisualChannels() {
++    static const std::vector<FocusManager::ChannelConfiguration> defaultVisualChannels = {
++        {FocusManagerInterface::VISUAL_CHANNEL_NAME, FocusManagerInterface::VISUAL_CHANNEL_PRIORITY}};
++
++    return defaultVisualChannels;
++}
++
+ }  // namespace afml
+ }  // namespace alexaClientSDK
+diff --git a/AVSCommon/Utils/include/AVSCommon/Utils/Logger/ConsoleLogger.h b/AVSCommon/Utils/include/AVSCommon/Utils/Logger/ConsoleLogger.h
+index 202d8aca..485a65a6 100644
+--- a/AVSCommon/Utils/include/AVSCommon/Utils/Logger/ConsoleLogger.h
++++ b/AVSCommon/Utils/include/AVSCommon/Utils/Logger/ConsoleLogger.h
+@@ -16,6 +16,8 @@
+ #ifndef ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LOGGER_CONSOLELOGGER_H_
+ #define ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LOGGER_CONSOLELOGGER_H_
+ 
++#include <iostream>
++
+ #include "AVSCommon/Utils/Logger/Logger.h"
+ #include "AVSCommon/Utils/Logger/LoggerUtils.h"
+ #include "AVSCommon/Utils/Logger/LogStringFormatter.h"
+@@ -28,7 +30,7 @@ namespace logger {
+ /**
+  * A very simple (e.g. not asynchronous) @c Logger that logs to console.
+  */
+-class ConsoleLogger : public Logger {
++class ConsoleLogger : public Logger, public std::ios_base::Init {
+ public:
+     /**
+      * Return the one and only @c ConsoleLogger instance.
+diff --git a/ApplicationUtilities/DefaultClient/src/DefaultClient.cpp b/ApplicationUtilities/DefaultClient/src/DefaultClient.cpp
+index 9f089abe..7c193b3c 100644
+--- a/ApplicationUtilities/DefaultClient/src/DefaultClient.cpp
++++ b/ApplicationUtilities/DefaultClient/src/DefaultClient.cpp
+@@ -328,7 +328,7 @@ bool DefaultClient::initialize(
+      * Capability Agent will require the Focus Manager in order to request access to the Channel it wishes to play on.
+      */
+     m_audioFocusManager =
+-        std::make_shared<afml::FocusManager>(afml::FocusManager::DEFAULT_AUDIO_CHANNELS, m_audioActivityTracker);
++        std::make_shared<afml::FocusManager>(afml::FocusManager::getDefaultAudioChannels(), m_audioActivityTracker);
+ 
+     /*
+      * Creating the User Inactivity Monitor - This component is responsibly for updating AVS of user inactivity as
+@@ -541,8 +541,8 @@ bool DefaultClient::initialize(
+          * Capability Agent will require the Focus Manager in order to request access to the Channel it wishes to play
+          * on.
+          */
+-        m_visualFocusManager =
+-            std::make_shared<afml::FocusManager>(afml::FocusManager::DEFAULT_VISUAL_CHANNELS, m_visualActivityTracker);
++        m_visualFocusManager = std::make_shared<afml::FocusManager>(
++            afml::FocusManager::getDefaultVisualChannels(), m_visualActivityTracker);
+ 
+         /*
+          * Creating the TemplateRuntime Capability Agent - This component is the Capability Agent that implements the
+diff --git a/CapabilityAgents/AIP/include/AIP/AudioInputProcessor.h b/CapabilityAgents/AIP/include/AIP/AudioInputProcessor.h
+index 0deadd91..a482d92a 100644
+--- a/CapabilityAgents/AIP/include/AIP/AudioInputProcessor.h
++++ b/CapabilityAgents/AIP/include/AIP/AudioInputProcessor.h
+@@ -163,7 +163,7 @@ public:
+         avsCommon::avs::AudioInputStream::Index begin = INVALID_INDEX,
+         avsCommon::avs::AudioInputStream::Index keywordEnd = INVALID_INDEX,
+         std::string keyword = "",
+-        const ESPData& espData = ESPData::EMPTY_ESP_DATA,
++        const ESPData& espData = ESPData{},
+         std::shared_ptr<const std::vector<char>> KWDMetadata = nullptr);
+ 
+     /**
+diff --git a/Integration/test/AlertsIntegrationTest.cpp b/Integration/test/AlertsIntegrationTest.cpp
+index c97432da..b56a1958 100644
+--- a/Integration/test/AlertsIntegrationTest.cpp
++++ b/Integration/test/AlertsIntegrationTest.cpp
+@@ -263,7 +263,7 @@ protected:
+             m_context->getMessageRouter(), false, m_context->getConnectionStatusObserver(), m_messageInterpreter);
+         ASSERT_TRUE(m_avsConnectionManager);
+ 
+-        m_focusManager = std::make_shared<FocusManager>(FocusManager::DEFAULT_AUDIO_CHANNELS);
++        m_focusManager = std::make_shared<FocusManager>(FocusManager::getDefaultAudioChannels());
+         m_testContentClient = std::make_shared<TestClient>();
+         ASSERT_TRUE(m_focusManager->acquireChannel(
+             FocusManager::CONTENT_CHANNEL_NAME, m_testContentClient, CONTENT_ACTIVITY_ID));
+diff --git a/Integration/test/AudioInputProcessorIntegrationTest.cpp b/Integration/test/AudioInputProcessorIntegrationTest.cpp
+index 1ba99eac..0709c611 100644
+--- a/Integration/test/AudioInputProcessorIntegrationTest.cpp
++++ b/Integration/test/AudioInputProcessorIntegrationTest.cpp
+@@ -428,7 +428,7 @@ protected:
+ 
+         m_tapToTalkButton = std::make_shared<tapToTalkButton>();
+         m_holdToTalkButton = std::make_shared<holdToTalkButton>();
+-        m_focusManager = std::make_shared<FocusManager>(FocusManager::DEFAULT_AUDIO_CHANNELS);
++        m_focusManager = std::make_shared<FocusManager>(FocusManager::getDefaultAudioChannels());
+         m_dialogUXStateAggregator = std::make_shared<avsCommon::avs::DialogUXStateAggregator>();
+ 
+         m_stateProvider = std::make_shared<testStateProvider>(m_context->getContextManager());
+diff --git a/Integration/test/SpeechSynthesizerIntegrationTest.cpp b/Integration/test/SpeechSynthesizerIntegrationTest.cpp
+index 3833a075..bb30f43a 100644
+--- a/Integration/test/SpeechSynthesizerIntegrationTest.cpp
++++ b/Integration/test/SpeechSynthesizerIntegrationTest.cpp
+@@ -326,7 +326,7 @@ protected:
+ 
+         connect();
+ 
+-        m_focusManager = std::make_shared<FocusManager>(FocusManager::DEFAULT_AUDIO_CHANNELS);
++        m_focusManager = std::make_shared<FocusManager>(FocusManager::getDefaultAudioChannels());
+         m_testClient = std::make_shared<TestClient>();
+         ASSERT_TRUE(
+             m_focusManager->acquireChannel(FocusManager::ALERTS_CHANNEL_NAME, m_testClient, ALERTS_ACTIVITY_ID));
+-- 
+2.17.1
+

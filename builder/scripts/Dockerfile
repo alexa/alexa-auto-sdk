@@ -1,11 +1,9 @@
 FROM ubuntu:xenial
 
-RUN apt-get update && apt-get -y upgrade
-
-# OE-Core dependencies
-RUN apt-get install -y chrpath diffstat gawk texinfo doxygen graphviz \
+RUN apt-get update && apt-get install -y \
+    chrpath diffstat gawk texinfo doxygen graphviz \
     python python3 wget unzip build-essential cpio \
-    git-core
+    git-core libssl-dev
 
 # Locale settings
 RUN apt-get install -y locales
@@ -29,6 +27,7 @@ WORKDIR /home/builder
 RUN cd /home/builder \
     && git clone git://git.openembedded.org/openembedded-core -b rocko oe-core \
     && cd oe-core \
+    && git checkout 1b18cdf6b8bdb00ff5df165b9ac7bc2b10c87d57 \
     && git clone git://git.openembedded.org/bitbake -b 1.36
 
 ENV OE_CORE_PATH /home/builder/oe-core

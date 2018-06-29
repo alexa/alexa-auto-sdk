@@ -38,8 +38,6 @@ private:
 public:
     static std::shared_ptr<AlexaClientEngineImpl> create( std::shared_ptr<aace::alexa::AlexaClient> alexaClientPlatformInterface );
 
-    virtual ~AlexaClientEngineImpl();
-
     // AuthObserverInterface
     void onAuthStateChange( alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State state, alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error error ) override;
 

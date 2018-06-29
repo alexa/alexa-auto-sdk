@@ -48,7 +48,7 @@ private:
     bool m_append;
     
     std::string m_filename;
-    std::ofstream m_stream;
+    std::shared_ptr<std::ofstream> m_stream;
 };
 
 }  // aace::engine::logger::sink

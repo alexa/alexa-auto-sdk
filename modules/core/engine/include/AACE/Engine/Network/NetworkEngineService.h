@@ -32,6 +32,8 @@
 #include "AACE/Engine/Core/EngineService.h"
 #include "AACE/Network/NetworkInfoProvider.h"
 
+#include "NetworkInfoProviderEngineImpl.h"
+
 namespace aace {
 namespace engine {
 namespace network {
@@ -61,7 +63,8 @@ private:
     bool registerPlatformInterfaceType( std::shared_ptr<aace::network::NetworkInfoProvider> networkInfoProvider );
 
 private:
-    std::shared_ptr<aace::network::NetworkInfoProvider> m_networkInfoProvider;
+    std::shared_ptr<NetworkInfoProviderEngineImpl> m_networkInfoProviderEngineImpl;
+
 };
 
 } // aace::engine::network

@@ -24,30 +24,54 @@ namespace aace {
 namespace alexa {
 
 /**
- * The @c TemplateRuntime class should be extended by the platform implementation to handle GUI template data from AVS.
- */
+ * TemplateRuntime should be extended to handle directives from the Engine for 
+ * rendering visual metadata with display cards. 
+ *
+ * Metadata is provided as structured JSON and should be parsed by the platform implementation
+ * for rendering cards that adhere to design guidelines
+ * for the platform device type. For screen-specific design guidance, see the AVS UX Design Overview:
+ * https://developer.amazon.com/docs/alexa-voice-service/ux-design-overview.html#displaycards
+ */    
 class TemplateRuntime : public aace::core::PlatformInterface {
 protected:
     TemplateRuntime() = default;
 
 public:
-    virtual ~TemplateRuntime() = default;
+    virtual ~TemplateRuntime();
 
     /**
-     * Called when the platform implementation should handle a GUI template.
+     * Provides visual metadata associated with a user request to Alexa.
+     * The platform implementation should parse the template metadata and render
+     * a display card for the user.
      *
-     * @param [in] payload @c JSON data containing the template information to render.
-     * @see https://alexa.design/DevDocRenderTemplate
+     * For supported templates and rendering guidelines, see https://alexa.design/DevDocRenderTemplate
+     *
+     * @param [in] payload Renderable template metadata in structured JSON format
      */
     virtual void renderTemplate( const std::string& payload ) = 0;
+    
+    /**
+     * Notifies the platform implementation to dismiss the template display card
+     */
+    virtual void clearTemplate() = 0;
 
     /**
-     * Called when the platform implementation should handle audio player renderable content.
+     * Provides visual metadata associated with a user request to Alexa for audio playback. 
+     * The platform implementation should parse the player info metadata and render
+     * a display card for the user.
      *
-     * @param [in] payload @c JSON data containing the player information to render.
-     * @see https://amzn.to/DevDocTemplatePlayerInfo
+     * For rendering guidelines, see https://amzn.to/DevDocTemplatePlayerInfo
+     *
+     * @param [in] payload Renderable player info metadata in structured JSON format
+     * @sa PlaybackController
+     * @sa AudioPlayer
      */
     virtual void renderPlayerInfo( const std::string& payload ) = 0;
+    
+    /**
+     * Notifies the platform implementation to dismiss the player info display card
+     */
+    virtual void clearPlayerInfo() = 0;
 };
 
 } // aace::alexa

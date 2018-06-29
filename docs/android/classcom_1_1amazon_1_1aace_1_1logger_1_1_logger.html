@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Automotive Core SDK (Android)
-   &#160;<span id="projectnumber">1.0.0-beta</span>
+   &#160;<span id="projectnumber">1.0.0</span>
    </div>
    <div id="projectbrief">Alexa Auto Core SDK for interacting with the Alexa Voice Service</div>
   </td>
@@ -85,9 +85,12 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ae1a55b7d50d94b1872927e91f6490035"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aabf3af2fa06228a6ea43a9c0ae881921"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1logger_1_1_logger.html#aabf3af2fa06228a6ea43a9c0ae881921">log</a> (<a class="el" href="enumcom_1_1amazon_1_1aace_1_1logger_1_1_logger_1_1_level.html">Level</a> level, String tag, String message)</td></tr>
 <tr class="separator:aabf3af2fa06228a6ea43a9c0ae881921"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface.html">com.amazon.aace.core.PlatformInterface</a></td></tr>
+<tr class="memitem:ab262a5c3abc75647e55d68bee4dcc287 inherit pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface.html#ab262a5c3abc75647e55d68bee4dcc287">PlatformInterface</a> ()</td></tr>
+<tr class="separator:ab262a5c3abc75647e55d68bee4dcc287 inherit pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1logger_1_1_logger.html">Logger</a></code> should be extended by the platform implementation to handle logs coming from the SDK. </p>
+<div class="textblock"><p><a class="el" href="classcom_1_1amazon_1_1aace_1_1logger_1_1_logger.html">Logger</a> should be extended handle log events from the AAC SDK. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="ae1a55b7d50d94b1872927e91f6490035"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae1a55b7d50d94b1872927e91f6490035">&#9670;&nbsp;</a></span>logEvent()</h2>
@@ -126,17 +129,17 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Called when the platform implementation should handle a log event from the SDK logger.</p>
+<p>Notifies the platform implementation of a log event from the AAC SDK logger</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">level</td><td>The <code><a class="el" href="enumcom_1_1amazon_1_1aace_1_1logger_1_1_logger_1_1_level.html">aace::logger::Logger::Level</a></code> log level </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>Time of the logged message </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">source</td><td>The source of the log message </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">message</td><td>The log message</td></tr>
+    <tr><td class="paramname">level</td><td>The log level</td></tr>
+    <tr><td class="paramname">time</td><td>The timestamp of the logged message</td></tr>
+    <tr><td class="paramname">source</td><td>The source of the log message</td></tr>
+    <tr><td class="paramname">message</td><td>The log message</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if log event was handled by the platform. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation successfully handled the log event, else <code>false</code> </dd></dl>
 
 </div>
 </div>
@@ -171,12 +174,12 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Use the Engine's logger to log an event.</p>
+<p>Notifies the Engine to use the AAC SDK logger to log a message originating on the platform. The log event will be received by the platform with a call to <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1logger_1_1_logger.html#ae1a55b7d50d94b1872927e91f6490035">logEvent()</a></code> from the Engine.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">level</td><td>The <code><a class="el" href="enumcom_1_1amazon_1_1aace_1_1logger_1_1_logger_1_1_level.html">aace::logger::Logger::Level</a></code> log level </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">tag</td><td>The log tag </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">message</td><td>The log message </td></tr>
+    <tr><td class="paramname">level</td><td>The log level</td></tr>
+    <tr><td class="paramname">tag</td><td>The log tag</td></tr>
+    <tr><td class="paramname">message</td><td>The log message </td></tr>
   </table>
   </dd>
 </dl>
@@ -188,7 +191,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Automotive Core SDK (Android) 1.0.0-beta - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Automotive Core SDK (Android) 1.0.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

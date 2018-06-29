@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['warn',['WARN',['../enumcom_1_1amazon_1_1aace_1_1logger_1_1_logger_1_1_level.html#acba58823cfc4c53d5aa824d447c6299f',1,'com::amazon::aace::logger::Logger::Level']]],
-  ['write_5ftimedout',['WRITE_TIMEDOUT',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_connection_changed_reason.html#a00e8fa4aec24d97853ff838dac1d04c9',1,'com::amazon::aace::alexa::AlexaClient::ConnectionChangedReason']]]
+  ['verbose',['VERBOSE',['../enumcom_1_1amazon_1_1aace_1_1logger_1_1_logger_1_1_level.html#a704a568ee9d3f5deac0ae74a00c66072',1,'com::amazon::aace::logger::Logger::Level']]],
+  ['version',['VERSION',['../enumcom_1_1amazon_1_1aace_1_1vehicle_1_1config_1_1_vehicle_configuration_1_1_vehicle_property_type.html#a3e91ea0b1fa3b76c5823fa693a3327c1',1,'com::amazon::aace::vehicle::config::VehicleConfiguration::VehiclePropertyType']]]
 ];

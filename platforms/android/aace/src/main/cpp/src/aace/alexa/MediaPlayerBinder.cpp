@@ -29,13 +29,35 @@ void MediaPlayerBinder::initialize( JNIEnv* env )
     m_javaMethod_getPosition = env->GetMethodID( getJavaClass(), "getPosition", "()J" );
     m_javaMethod_setPosition_position = env->GetMethodID( getJavaClass(), "setPosition", "(J)Z" );
 
-    // ErrorType
-    jclass mediaErrorTypeEnumClass = env->FindClass( "com/amazon/aace/alexa/MediaPlayer$ErrorType" );
-    m_enum_ErrorType_MEDIA_ERROR_UNKNOWN = NativeLib::FindEnum( env, mediaErrorTypeEnumClass, "MEDIA_ERROR_UNKNOWN", "Lcom/amazon/aace/alexa/MediaPlayer$ErrorType;" );
-    m_enum_ErrorType_MEDIA_ERROR_INVALID_REQUEST = NativeLib::FindEnum( env, mediaErrorTypeEnumClass, "MEDIA_ERROR_INVALID_REQUEST", "Lcom/amazon/aace/alexa/MediaPlayer$ErrorType;" );
-    m_enum_ErrorType_MEDIA_ERROR_SERVICE_UNAVAILABLE = NativeLib::FindEnum( env, mediaErrorTypeEnumClass, "MEDIA_ERROR_SERVICE_UNAVAILABLE", "Lcom/amazon/aace/alexa/MediaPlayer$ErrorType;" );
-    m_enum_ErrorType_MEDIA_ERROR_INTERNAL_SERVER_ERROR = NativeLib::FindEnum( env, mediaErrorTypeEnumClass, "MEDIA_ERROR_INTERNAL_SERVER_ERROR", "Lcom/amazon/aace/alexa/MediaPlayer$ErrorType;" );
-    m_enum_ErrorType_MEDIA_ERROR_INTERNAL_DEVICE_ERROR = NativeLib::FindEnum( env, mediaErrorTypeEnumClass, "MEDIA_ERROR_INTERNAL_DEVICE_ERROR", "Lcom/amazon/aace/alexa/MediaPlayer$ErrorType;" );
+    // MediaError
+    jclass mediaErrorEnumClass = env->FindClass( "com/amazon/aace/alexa/MediaPlayer$MediaError" );
+    m_enum_MediaError_MEDIA_ERROR_UNKNOWN =
+            NativeLib::FindEnum( env, mediaErrorEnumClass, "MEDIA_ERROR_UNKNOWN",
+                                 "Lcom/amazon/aace/alexa/MediaPlayer$MediaError;" );
+    m_enum_MediaError_MEDIA_ERROR_INVALID_REQUEST =
+            NativeLib::FindEnum( env, mediaErrorEnumClass, "MEDIA_ERROR_INVALID_REQUEST",
+                                 "Lcom/amazon/aace/alexa/MediaPlayer$MediaError;" );
+    m_enum_MediaError_MEDIA_ERROR_SERVICE_UNAVAILABLE =
+            NativeLib::FindEnum( env, mediaErrorEnumClass, "MEDIA_ERROR_SERVICE_UNAVAILABLE",
+                                 "Lcom/amazon/aace/alexa/MediaPlayer$MediaError;" );
+    m_enum_MediaError_MEDIA_ERROR_INTERNAL_SERVER_ERROR =
+            NativeLib::FindEnum( env, mediaErrorEnumClass, "MEDIA_ERROR_INTERNAL_SERVER_ERROR",
+                                 "Lcom/amazon/aace/alexa/MediaPlayer$MediaError;" );
+    m_enum_MediaError_MEDIA_ERROR_INTERNAL_DEVICE_ERROR =
+            NativeLib::FindEnum( env, mediaErrorEnumClass, "MEDIA_ERROR_INTERNAL_DEVICE_ERROR",
+                                 "Lcom/amazon/aace/alexa/MediaPlayer$MediaError;" );
+
+    // MediaState
+    jclass mediaStateEnumClass = env->FindClass( "com/amazon/aace/alexa/MediaPlayer$MediaState" );
+    m_enum_MediaState_STOPPED =
+            NativeLib::FindEnum( env, mediaStateEnumClass, "STOPPED",
+                                 "Lcom/amazon/aace/alexa/MediaPlayer$MediaState;" );
+    m_enum_MediaState_PLAYING =
+            NativeLib::FindEnum( env, mediaStateEnumClass, "PLAYING",
+                                 "Lcom/amazon/aace/alexa/MediaPlayer$MediaState;" );
+    m_enum_MediaState_BUFFERING =
+            NativeLib::FindEnum( env, mediaStateEnumClass, "BUFFERING",
+                                 "Lcom/amazon/aace/alexa/MediaPlayer$MediaState;" );
 }
 
 bool MediaPlayerBinder::prepare()
@@ -153,42 +175,41 @@ bool MediaPlayerBinder::setPosition( int64_t position )
     return result;
 }
 
-jobject MediaPlayerBinder::convert( aace::alexa::MediaPlayer::ErrorType type )
+aace::alexa::MediaPlayer::MediaError MediaPlayerBinder::convertMediaError( JNIEnv* env, jobject obj )
 {
-    switch( type )
-    {
-        case aace::alexa::MediaPlayer::ErrorType::MEDIA_ERROR_UNKNOWN:
-            return m_enum_ErrorType_MEDIA_ERROR_UNKNOWN.get();
-        case aace::alexa::MediaPlayer::ErrorType::MEDIA_ERROR_INVALID_REQUEST:
-            return m_enum_ErrorType_MEDIA_ERROR_INVALID_REQUEST.get();
-        case aace::alexa::MediaPlayer::ErrorType::MEDIA_ERROR_SERVICE_UNAVAILABLE:
-            return m_enum_ErrorType_MEDIA_ERROR_SERVICE_UNAVAILABLE.get();
-        case aace::alexa::MediaPlayer::ErrorType::MEDIA_ERROR_INTERNAL_SERVER_ERROR:
-            return m_enum_ErrorType_MEDIA_ERROR_INTERNAL_SERVER_ERROR.get();
-        case aace::alexa::MediaPlayer::ErrorType::MEDIA_ERROR_INTERNAL_DEVICE_ERROR:
-            return m_enum_ErrorType_MEDIA_ERROR_INTERNAL_DEVICE_ERROR.get();
+    if( m_enum_MediaError_MEDIA_ERROR_UNKNOWN.isSameObject( env, obj ) ) {
+        return aace::alexa::MediaPlayer::MediaError::MEDIA_ERROR_UNKNOWN;
+    }
+    else if( m_enum_MediaError_MEDIA_ERROR_INVALID_REQUEST.isSameObject( env, obj ) ) {
+        return aace::alexa::MediaPlayer::MediaError::MEDIA_ERROR_INVALID_REQUEST;
+    }
+    else if( m_enum_MediaError_MEDIA_ERROR_SERVICE_UNAVAILABLE.isSameObject( env, obj ) ) {
+        return aace::alexa::MediaPlayer::MediaError::MEDIA_ERROR_SERVICE_UNAVAILABLE;
+    }
+    else if( m_enum_MediaError_MEDIA_ERROR_INTERNAL_SERVER_ERROR.isSameObject( env, obj ) ) {
+        return aace::alexa::MediaPlayer::MediaError::MEDIA_ERROR_INTERNAL_SERVER_ERROR;
+    }
+    else if( m_enum_MediaError_MEDIA_ERROR_INTERNAL_DEVICE_ERROR.isSameObject( env, obj ) ) {
+        return aace::alexa::MediaPlayer::MediaError::MEDIA_ERROR_INTERNAL_DEVICE_ERROR;
+    }
+    else {
+        return aace::alexa::MediaPlayer::MediaError::MEDIA_ERROR_UNKNOWN;
     }
 }
 
-aace::alexa::MediaPlayer::ErrorType MediaPlayerBinder::convertErrorType( JNIEnv* env, jobject obj )
+aace::alexa::MediaPlayer::MediaState MediaPlayerBinder::convertMediaState( JNIEnv* env, jobject obj )
 {
-    if( m_enum_ErrorType_MEDIA_ERROR_UNKNOWN.isSameObject( env, obj ) ) {
-        return aace::alexa::MediaPlayer::ErrorType::MEDIA_ERROR_UNKNOWN;
+    if( m_enum_MediaState_STOPPED.isSameObject( env, obj ) ) {
+        return aace::alexa::MediaPlayer::MediaState::STOPPED;
     }
-    else if( m_enum_ErrorType_MEDIA_ERROR_INVALID_REQUEST.isSameObject( env, obj ) ) {
-        return aace::alexa::MediaPlayer::ErrorType::MEDIA_ERROR_INVALID_REQUEST;
+    else if( m_enum_MediaState_PLAYING.isSameObject( env, obj ) ) {
+        return aace::alexa::MediaPlayer::MediaState::PLAYING;
     }
-    else if( m_enum_ErrorType_MEDIA_ERROR_SERVICE_UNAVAILABLE.isSameObject( env, obj ) ) {
-        return aace::alexa::MediaPlayer::ErrorType::MEDIA_ERROR_SERVICE_UNAVAILABLE;
-    }
-    else if( m_enum_ErrorType_MEDIA_ERROR_INTERNAL_SERVER_ERROR.isSameObject( env, obj ) ) {
-        return aace::alexa::MediaPlayer::ErrorType::MEDIA_ERROR_INTERNAL_SERVER_ERROR;
-    }
-    else if( m_enum_ErrorType_MEDIA_ERROR_INTERNAL_DEVICE_ERROR.isSameObject( env, obj ) ) {
-        return aace::alexa::MediaPlayer::ErrorType::MEDIA_ERROR_INTERNAL_DEVICE_ERROR;
+    else if( m_enum_MediaState_BUFFERING.isSameObject( env, obj ) ) {
+        return aace::alexa::MediaPlayer::MediaState::BUFFERING;
     }
     else {
-        return aace::alexa::MediaPlayer::ErrorType::MEDIA_ERROR_INTERNAL_DEVICE_ERROR; // anything for undefined?
+        return aace::alexa::MediaPlayer::MediaState::STOPPED;
     }
 }
 
@@ -198,43 +219,28 @@ aace::alexa::MediaPlayer::ErrorType MediaPlayerBinder::convertErrorType( JNIEnv*
 extern "C" {
 
 JNIEXPORT jboolean JNICALL
+Java_com_amazon_aace_alexa_MediaPlayer_isClosed( JNIEnv * env , jobject /* this */, jlong cptr ) {
+    return MEDIAPLAYER(cptr)->isClosed();
+}
+
+JNIEXPORT jboolean JNICALL
 Java_com_amazon_aace_alexa_MediaPlayer_isRepeating( JNIEnv * env , jobject /* this */, jlong cptr ) {
     return MEDIAPLAYER(cptr)->isRepeating();
 }
 
 JNIEXPORT void JNICALL
-Java_com_amazon_aace_alexa_MediaPlayer_playbackStarted( JNIEnv * env , jobject /* this */, jlong cptr ) {
-    MEDIAPLAYER(cptr)->playbackStarted();
+Java_com_amazon_aace_alexa_MediaPlayer_mediaError( JNIEnv * env , jobject /* this */, jlong cptr, jobject type, jstring error ) {
+    MEDIAPLAYER(cptr)->mediaError( MEDIAPLAYER(cptr)->convertMediaError( env, type ), NativeLib::convert( env, error ) );
 }
 
 JNIEXPORT void JNICALL
-Java_com_amazon_aace_alexa_MediaPlayer_playbackFinished( JNIEnv * env , jobject /* this */, jlong cptr ) {
-    MEDIAPLAYER(cptr)->playbackFinished();
-}
-
-JNIEXPORT void JNICALL
-Java_com_amazon_aace_alexa_MediaPlayer_playbackPaused( JNIEnv * env , jobject /* this */, jlong cptr ) {
-    MEDIAPLAYER(cptr)->playbackPaused();
-}
-
-JNIEXPORT void JNICALL
-Java_com_amazon_aace_alexa_MediaPlayer_playbackResumed( JNIEnv * env , jobject /* this */, jlong cptr ) {
-    MEDIAPLAYER(cptr)->playbackResumed();
-}
-
-JNIEXPORT void JNICALL
-Java_com_amazon_aace_alexa_MediaPlayer_playbackStopped( JNIEnv * env , jobject /* this */, jlong cptr ) {
-    MEDIAPLAYER(cptr)->playbackStopped();
-}
-
-JNIEXPORT void JNICALL
-Java_com_amazon_aace_alexa_MediaPlayer_playbackError( JNIEnv * env , jobject /* this */, jlong cptr, jobject type, jstring error ) {
-    MEDIAPLAYER(cptr)->playbackError( MEDIAPLAYER(cptr)->convertErrorType( env, type ), NativeLib::convert( env, error ) );
+Java_com_amazon_aace_alexa_MediaPlayer_mediaStateChanged( JNIEnv * env , jobject /* this */, jlong cptr, jobject state ) {
+    MEDIAPLAYER(cptr)->mediaStateChanged( MEDIAPLAYER(cptr)->convertMediaState( env, state ) );
 }
 
 JNIEXPORT jlong JNICALL
-Java_com_amazon_aace_alexa_MediaPlayer_read( JNIEnv * env , jobject /* this */, jlong cptr, jbyteArray data, jlong size ) {
-    jbyte *ptr = env->GetByteArrayElements( data, nullptr );
+Java_com_amazon_aace_alexa_MediaPlayer_read( JNIEnv * env , jobject /* this */, jlong cptr, jbyteArray data, jlong offset, jlong size ) {
+    jbyte *ptr = env->GetByteArrayElements( data + offset, nullptr );
     jlong count = MEDIAPLAYER(cptr)->read( (char *) ptr, size );
     env->ReleaseByteArrayElements( data, ptr, 0 );
     return count;

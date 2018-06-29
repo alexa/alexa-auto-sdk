@@ -124,6 +124,16 @@ aace::alexa::Alerts::AlertState AlertsBinder::convertAlertState( jobject obj )
 
 extern "C" {
 
+JNIEXPORT void JNICALL
+Java_com_amazon_aace_alexa_Alerts_localStop( JNIEnv * env , jobject /* this */, jlong cptr ) {
+    return ALERTS(cptr)->localStop();
+}
+
+JNIEXPORT void JNICALL
+Java_com_amazon_aace_alexa_Alerts_removeAllAlerts( JNIEnv * env , jobject /* this */, jlong cptr ) {
+    return ALERTS(cptr)->removeAllAlerts();
+}
+
 }
 
 // END OF FILE

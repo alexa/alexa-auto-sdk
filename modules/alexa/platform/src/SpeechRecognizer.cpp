@@ -21,6 +21,8 @@ namespace alexa {
 SpeechRecognizer::SpeechRecognizer( bool wakewordDetectionEnabled ) : m_wakewordDetectionEnabled( wakewordDetectionEnabled ) {
 }
 
+SpeechRecognizer::~SpeechRecognizer() = default; // key function
+
 bool SpeechRecognizer::holdToTalk() {
     return m_speechRecognizerEngineInterface != nullptr && m_speechRecognizerEngineInterface->onHoldToTalk();
 }

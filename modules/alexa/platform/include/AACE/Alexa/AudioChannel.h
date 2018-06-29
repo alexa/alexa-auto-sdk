@@ -26,7 +26,13 @@ namespace aace {
 namespace alexa {
 
 /**
- * The @c AudioChannel class is the base class for platform interfaces that can play audio.
+ * AudioChannel is the base class for platform interfaces that can play audio. Audio playback control for an AudioChannel
+ * is managed by a @c MediaPlayer, and volume and mute control is managed by a @c Speaker.
+ *
+ * @sa AudioPlayer
+ * @sa SpeechSynthesizer
+ * @sa Alerts
+ * @sa Notifications
  */
 class AudioChannel : public aace::core::PlatformInterface {
 protected:
@@ -36,17 +42,17 @@ public:
     virtual ~AudioChannel() = default;
 
     /**
-     * Returns the @c MediaPlayer instance associated with this @c AudioChannel interface.
+     * Returns the @c MediaPlayer instance associated with the AudioChannel
      */
     std::shared_ptr<aace::alexa::MediaPlayer> getMediaPlayer();
 
     /**
-     * Returns the @c Speaker instance associated with this @c AudioChannel interface.
+     * Returns the @c Speaker instance associated with the AudioChannel
      */
     std::shared_ptr<aace::alexa::Speaker> getSpeaker();
 
     /**
-     * Returns the Speaker @c aace::alexa::Speaker::Type associated with this @c AudioChannel interface.
+     * Returns the @c Speaker::Type associated with the AudioChannel
      */
     aace::alexa::Speaker::Type getSpeakerType();
 

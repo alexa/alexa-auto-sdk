@@ -31,9 +31,11 @@ protected:
 
 public:
     bool setDestination( const std::string & payload ) override;
+    bool cancelNavigation() override;
 
 private:
     jmethodID m_javaMethod_setDestination_payload = nullptr;
+    jmethodID m_javaMethod_cancelNavigation = nullptr;
 
 };
 

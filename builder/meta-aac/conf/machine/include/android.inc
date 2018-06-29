@@ -6,7 +6,7 @@ ANDROID_TOOLCHAIN ?= "${HOME}/android-toolchain"
 NDK_PACKAGE ?= "android-ndk-r16b"
 
 # API Level
-ANDROID_PLATFORM ?= "android-21"
+ANDROID_PLATFORM ?= "android-22"
 
 # Standalon Toolchain path
 TOOLCHAIN = "${ANDROID_TOOLCHAIN}/ndk/toolchains/${NDK_PACKAGE}/toolchain-${ANDROID_ABI}/${ANDROID_PLATFORM}"
@@ -15,6 +15,7 @@ TOOLCHAIN = "${ANDROID_TOOLCHAIN}/ndk/toolchains/${NDK_PACKAGE}/toolchain-${ANDR
 ANDROID_NDK_HOME = "${ANDROID_TOOLCHAIN}/ndk/ndk-bundle/${NDK_PACKAGE}"
 
 TCLIBC = "android"
+TCMODE = "external"
 
 TARGET_VENDOR = ""
 

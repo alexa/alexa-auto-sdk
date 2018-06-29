@@ -1,7 +1,7 @@
 # AACE Alexa Engine
 
 # Find AVS
-find_package(AVS 1.4.0)
+find_package(AVS 1.7.1)
 
 set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AlertsEngineImpl.h
@@ -39,9 +39,6 @@ add_library(AACEAlexaEngine SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AuthProviderEngineImpl.cpp
 )
 
-set_target_properties(AACEAlexaEngine
-    PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
-
 target_include_directories(AACEAlexaEngine
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -58,6 +55,28 @@ target_link_libraries(AACEAlexaEngine
         ${AVS_LIBRARIES}
 )
 
+if(AMAZONLITE_KEY_WORD_DETECTOR)
+    add_definitions(-DAMAZONLITE_WAKEWORD_SUPPORT)
+    find_path(AMAZONLITE_INCLUDE_DIR AmazonLite/PryonLiteKeywordDetector.h
+        CMAKE_FIND_ROOT_PATH_BOTH
+    )
+    find_library(AMAZONLITE_LIBRARY AMAZONLITE
+        CMAKE_FIND_ROOT_PATH_BOTH
+    )
+    find_library(AVS_KWD_PROVIDER_LIBRARY KeywordDetectorProvider
+        CMAKE_FIND_ROOT_PATH_BOTH
+    )
+    target_include_directories(AACEAlexaEngine
+        PRIVATE
+            ${AMAZONLITE_INCLUDE_DIR}
+    )
+    target_link_libraries(AACEAlexaEngine
+        PRIVATE
+            ${AVS_KWD_PROVIDER_LIBRARY}
+            ${AMAZONLITE_LIBRARY}
+    )
+endif()
+
 install(
     TARGETS AACEAlexaEngine
     DESTINATION lib
@@ -67,4 +86,5 @@ install(
 install(
     DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE
     DESTINATION include
+    FILES_MATCHING PATTERN "*.h"
 )

@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Automotive Core SDK (Android)
-   &#160;<span id="projectnumber">1.0.0-beta</span>
+   &#160;<span id="projectnumber">1.0.0</span>
    </div>
    <div id="projectbrief">Alexa Auto Core SDK for interacting with the Alexa Voice Service</div>
   </td>
@@ -77,9 +77,12 @@ $(function() {
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a612278e91d607bc6e478260331f9380f"><td class="memItemLeft" align="right" valign="top">abstract <a class="el" href="classcom_1_1amazon_1_1aace_1_1location_1_1_location.html">Location</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1location_1_1_location_provider.html#a612278e91d607bc6e478260331f9380f">getLocation</a> ()</td></tr>
 <tr class="separator:a612278e91d607bc6e478260331f9380f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface.html">com.amazon.aace.core.PlatformInterface</a></td></tr>
+<tr class="memitem:ab262a5c3abc75647e55d68bee4dcc287 inherit pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface.html#ab262a5c3abc75647e55d68bee4dcc287">PlatformInterface</a> ()</td></tr>
+<tr class="separator:ab262a5c3abc75647e55d68bee4dcc287 inherit pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1location_1_1_location_provider.html">LocationProvider</a></code> class should be extended by the platform implementation to handle geolocation services. </p>
+<div class="textblock"><p><a class="el" href="classcom_1_1amazon_1_1aace_1_1location_1_1_location_provider.html">LocationProvider</a> should be extended to report geolocation to the Engine. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a612278e91d607bc6e478260331f9380f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a612278e91d607bc6e478260331f9380f">&#9670;&nbsp;</a></span>getLocation()</h2>
@@ -103,8 +106,8 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Called when the Engine needs the current geolocation.</p>
-<dl class="section return"><dt>Returns</dt><dd><code><a class="el" href="classcom_1_1amazon_1_1aace_1_1location_1_1_location.html">aace::location::Location</a></code> of the platform implementation. </dd></dl>
+<p>Returns the current geolocation of the device</p>
+<dl class="section return"><dt>Returns</dt><dd>The current location </dd></dl>
 
 </div>
 </div>
@@ -113,7 +116,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Automotive Core SDK (Android) 1.0.0-beta - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Automotive Core SDK (Android) 1.0.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

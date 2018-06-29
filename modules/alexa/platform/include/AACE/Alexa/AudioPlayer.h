@@ -24,39 +24,91 @@ namespace aace {
 namespace alexa {
 
 /**
- * The @c AudioPlayer class should be extended by the platform implementation to handle audio playback from AVS.
+ * AudioPlayer should be extended to handle audio output from the Engine.
+ *
+ * The AudioPlayer @c MediaPlayer and @c Speaker will receive directives from the Engine to handle audio playback.
+ *
+ * @note Audio playback control operations such as on-platform button presses must be routed through
+ * the @c PlaybackController.
+ *
+ * @sa AudioChannel
+ * @sa PlaybackController
+ * @sa TemplateRuntime::renderPlayerInfo()
  */
 class AudioPlayer : public AudioChannel {
 protected:
     AudioPlayer( std::shared_ptr<aace::alexa::MediaPlayer> mediaPlayer, std::shared_ptr<aace::alexa::Speaker> speaker );
 
 public:
-    virtual ~AudioPlayer() = default;
+    virtual ~AudioPlayer();
 
-    /// Identifies the player state.
+    /**
+     * Specifies the state of audio playback activity
+     */
     enum class PlayerActivity {
-        /// Initial state, prior to acting on the first @c Play directive.
+
+        /**
+         * Audio playback has not yet begun.
+         */
         IDLE,
-        /// Indicates that audio is currently playing.
+
+        /**
+         * Audio is currently playing.
+         */
         PLAYING,
-        /// Indicates that audio playback was stopped due to an error or a directive which stops or replaces the current stream.
+
+        /**
+         * Audio playback is stopped, either from a stop directive or playback error.
+         */
         STOPPED,
-        /// Indicates that the audio stream has been paused.
+
+        /**
+         * Audio playback is paused.
+         */
         PAUSED,
-        /// Indicates that a buffer underrun has occurred and the stream is buffering.
+
+        /**
+         * Audio playback is stalled because a buffer underrun has occurred.
+         */
         BUFFER_UNDERRUN,
-        /// Indicates that playback has finished.
+
+        /**
+         * Audio playback is finished.
+         */
         FINISHED
     };
 
     /**
-     * Called when the platform implementation should handle AVS player activity state changes.
+     * Notifies the platform implementation of a change in audio playback state
      *
-     * @param [in] state The new player activity state.
-     * @sa PlayerActivity
+     * @param [in] state The new playback state
      */
     virtual void playerActivityChanged( PlayerActivity state ) {}
 };
+
+inline std::ostream& operator<<(std::ostream& stream, const AudioPlayer::PlayerActivity& state) {
+    switch (state) {
+        case AudioPlayer::PlayerActivity::IDLE:
+            stream << "IDLE";
+            break;
+        case AudioPlayer::PlayerActivity::PLAYING:
+            stream << "PLAYING";
+            break;
+        case AudioPlayer::PlayerActivity::STOPPED:
+            stream << "STOPPED";
+            break;
+        case AudioPlayer::PlayerActivity::PAUSED:
+            stream << "PAUSED";
+            break;
+        case AudioPlayer::PlayerActivity::BUFFER_UNDERRUN:
+            stream << "BUFFER_UNDERRUN";
+            break;
+        case AudioPlayer::PlayerActivity::FINISHED:
+            stream << "FINISHED";
+            break;
+    }
+    return stream;
+}
 
 } // aace::alexa
 } // aace

@@ -51,6 +51,10 @@ void EngineBinder::initialize( JNIEnv* env )
 
     m_javaClass_Navigation = NativeLib::FindClass( env, "com/amazon/aace/navigation/Navigation" );
 
+    m_javaClass_PhoneCallController = NativeLib::FindClass( env, "com/amazon/aace/phonecontrol/PhoneCallController" );
+
+    m_javaClass_NetworkInfoProvider = NativeLib::FindClass( env, "com/amazon/aace/network/NetworkInfoProvider" );
+
 }
 
 std::shared_ptr<LoggerBinder> EngineBinder::createLoggerBinder( JNIEnv* env, jobject platformInterface )
@@ -139,7 +143,7 @@ std::shared_ptr<SpeechRecognizerBinder> EngineBinder::createSpeechRecognizerBind
 {
     jclass platformInterfaceClass = env->GetObjectClass( platformInterface );
 
-    // get the speaker object from the platform interface
+    // get wake word enabled state from the platform interface
     jmethodID  javaMethod_getInitialWakewordDetectionEnabled = env->GetMethodID( platformInterfaceClass, "getInitialWakewordDetectionEnabled", "()Z" );
     jboolean wakewordEnabled = env->CallBooleanMethod( platformInterface, javaMethod_getInitialWakewordDetectionEnabled );
 
@@ -295,6 +299,44 @@ std::shared_ptr<NavigationBinder> EngineBinder::createNavigationBinder( JNIEnv* 
     return navigationBinder;
 }
 
+std::shared_ptr<PhoneCallControllerBinder> EngineBinder::createPhoneCallControllerBinder(JNIEnv *env, jobject platformInterface)
+{
+    // create the platform interface native binder
+    std::shared_ptr<PhoneCallControllerBinder> phoneCallControllerBinder = std::make_shared<PhoneCallControllerBinder>();
+
+    // register the platform interface with the engine
+    m_engine->registerPlatformInterface( phoneCallControllerBinder );
+
+    // bind the platform java interface to the native interface
+    jclass platformInterfaceClass = env->GetObjectClass( platformInterface );
+    jmethodID javaMethod_setNativeObject = env->GetMethodID( platformInterfaceClass, "setNativeObject", "(J)V" );
+
+    phoneCallControllerBinder->bind( env, platformInterface );
+
+    env->CallVoidMethod( platformInterface, javaMethod_setNativeObject, (jlong) phoneCallControllerBinder.get() );
+
+    return phoneCallControllerBinder;
+}
+
+std::shared_ptr<NetworkInfoProviderBinder> EngineBinder::createNetworkInfoProviderBinder( JNIEnv* env, jobject platformInterface )
+{
+    // create the platform interface native binder
+    std::shared_ptr<NetworkInfoProviderBinder> networkBinder = std::make_shared<NetworkInfoProviderBinder>();
+
+    // register the platform interface with the engine
+    m_engine->registerPlatformInterface( networkBinder );
+
+    // bind the platform java interface to the native interface
+    jclass platformInterfaceClass = env->GetObjectClass( platformInterface );
+    jmethodID javaMethod_setNativeObject = env->GetMethodID( platformInterfaceClass, "setNativeObject", "(J)V" );
+
+    networkBinder->bind( env, platformInterface );
+
+    env->CallVoidMethod( platformInterface, javaMethod_setNativeObject, (jlong) networkBinder.get() );
+
+    return networkBinder;
+}
+
 std::shared_ptr<PlaybackControllerBinder> EngineBinder::createPlaybackControllerBinder( JNIEnv* env, jobject platformInterface )
 {
     // create the platform interface native binder
@@ -382,6 +424,14 @@ bool EngineBinder::registerPlatformInterface( JNIEnv* env, jobject platformInter
     }
     else if( env->IsInstanceOf( platformInterface, m_javaClass_Navigation.get() ) ) {
         m_navigation = createNavigationBinder( env, platformInterface );
+        return true;
+    }
+    else if( env->IsInstanceOf( platformInterface, m_javaClass_PhoneCallController.get() ) ) {
+        m_phoneCallController = createPhoneCallControllerBinder( env, platformInterface );
+        return true;
+    }
+    else if( env->IsInstanceOf( platformInterface, m_javaClass_NetworkInfoProvider.get() ) ) {
+        m_networkInfo = createNetworkInfoProviderBinder( env, platformInterface );
         return true;
     }
 
@@ -489,6 +539,16 @@ Java_com_amazon_aace_core_Engine_dispose( JNIEnv * env , jobject /* this */, jlo
 JNIEXPORT jboolean JNICALL
 Java_com_amazon_aace_core_Engine_registerPlatformInterface( JNIEnv * env , jobject /* this */, jlong cptr, jobject platformInterface ) {
     return ENGINE(cptr)->registerPlatformInterface( env, platformInterface );
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_amazon_aace_core_Engine_setProperty( JNIEnv * env , jobject /* this */, jlong cptr, jstring key, jstring value ) {
+    return ENGINE(cptr)->getEngine()->setProperty( NativeLib::convert( env, key ), NativeLib::convert( env, value ) );
+}
+
+JNIEXPORT jstring JNICALL
+Java_com_amazon_aace_core_Engine_getProperty( JNIEnv * env , jobject /* this */, jlong cptr, jstring key ) {
+    return NativeLib::convert( env, ENGINE(cptr)->getEngine()->getProperty( NativeLib::convert( env, key ) ) );
 }
 
 JNIEXPORT jboolean JNICALL

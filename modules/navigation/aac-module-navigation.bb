@@ -1,9 +1,7 @@
 SUMMARY = "Alexa Automotive Core - Navigation Module"
-HOMEPAGE = "http://github.com/alexa"
-LICENSE = "CLOSED"
+LICENSE = "Apache-2.0"
+LIC_FILES_CHKSUM = "file://platform/include/AACE/Navigation/Navigation.h;beginline=2;endline=13;md5=e24dab4dc71d22b64c3479728f206e46"
 
 DEPENDS = "aac-module-core aac-module-alexa"
 
-PV = "0.99.0"
-
-inherit aac-module
+inherit aac-module devlibsonly

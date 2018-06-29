@@ -11,9 +11,6 @@ add_library(AACENavigationPlatform SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Navigation.cpp
 )
 
-set_target_properties(AACENavigationPlatform
-    PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
-
 target_include_directories(AACENavigationPlatform
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -33,4 +30,5 @@ install(
 install(
     DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE
     DESTINATION include
+    FILES_MATCHING PATTERN "*.h"
 )

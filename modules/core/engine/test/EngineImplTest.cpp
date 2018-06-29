@@ -51,8 +51,19 @@ public:
 
     std::shared_ptr<aace::core::Engine> m_engineImpl;
     std::shared_ptr<std::istream> m_sstream;
+    
+    /**
+     * Configure engine
+     */
+    void configureEngine() {
+        std::shared_ptr<MockEngineConfiguration> engineConfiguration = std::make_shared<MockEngineConfiguration>();
+        EXPECT_CALL(*engineConfiguration.get(), getStream()).Times(1).WillRepeatedly(testing::Return(m_sstream));
+        ASSERT_TRUE(m_engineImpl->configure(engineConfiguration)) << "Configure did not return True";
+    }
 
 };
+    
+
 
 /**
  * Test create() expecting a valid EngineImpl to be returned.
@@ -65,9 +76,7 @@ TEST_F(EngineImplTest, create) {
  * Test configure() with correct config file.
  */
 TEST_F(EngineImplTest, configure) {
-    std::shared_ptr<MockEngineConfiguration> engineConfiguration = std::make_shared<MockEngineConfiguration>();
-    EXPECT_CALL(*engineConfiguration.get(), getStream()).Times(1).WillRepeatedly(testing::Return(m_sstream));
-    EXPECT_TRUE(m_engineImpl->configure(engineConfiguration)) << "Configure did not return True";
+    configureEngine();
 }
 
 /**
@@ -81,9 +90,8 @@ TEST_F(EngineImplTest, configureNullPointer) {
  * Test configure() with correct config list.
  */
 TEST_F(EngineImplTest, configureList) {
-    std::shared_ptr<MockEngineConfiguration> engineConfiguration = std::make_shared<MockEngineConfiguration>();
-    EXPECT_CALL(*engineConfiguration.get(), getStream()).Times(1).WillRepeatedly(testing::Return(m_sstream));
-    EXPECT_TRUE(m_engineImpl->configure({engineConfiguration})) << "Configure did not return True";
+    //TODO: use list to configure engine
+    configureEngine();
 }
 
 /**
@@ -99,9 +107,7 @@ TEST_F(EngineImplTest, configureListEmpty) {
  * Test engine start().
  */
 TEST_F(EngineImplTest, engineStart) {
-    std::shared_ptr<MockEngineConfiguration> engineConfiguration = std::make_shared<MockEngineConfiguration>();
-    EXPECT_CALL(*engineConfiguration.get(), getStream()).Times(1).WillRepeatedly(testing::Return(m_sstream));
-    ASSERT_TRUE(m_engineImpl->configure(engineConfiguration)) << "Configure did not return True";
+    configureEngine();
     ASSERT_TRUE(m_engineImpl->start()) << "engine should be started successfully";
 }
 
@@ -109,13 +115,14 @@ TEST_F(EngineImplTest, engineStart) {
  * Test engine start before engine configure.
  */
 TEST_F(EngineImplTest, engineStartBeforeConfigure) {
-    ASSERT_TRUE(m_engineImpl->start()) << "engine should be started successfully";
+    ASSERT_FALSE(m_engineImpl->start()) << "engine should be congfigured before start";
 }
 
 /**
  * Test engine start twice without stopping the engine.
  */
 TEST_F(EngineImplTest, engineStartTwice) {
+    configureEngine();
     ASSERT_TRUE(m_engineImpl->start()) << "engine should be started successfully";
     ASSERT_FALSE(m_engineImpl->start()) << "engine started before stopping";
 
@@ -125,9 +132,7 @@ TEST_F(EngineImplTest, engineStartTwice) {
  * Test engine stop.
  */
 TEST_F(EngineImplTest, engineStop) {
-    std::shared_ptr<MockEngineConfiguration> engineConfiguration = std::make_shared<MockEngineConfiguration>();
-    EXPECT_CALL(*engineConfiguration.get(), getStream()).Times(1).WillRepeatedly(testing::Return(m_sstream));
-    ASSERT_TRUE(m_engineImpl->configure(engineConfiguration)) << "Configure did not return True";
+    configureEngine();
     ASSERT_TRUE(m_engineImpl->start()) << "engine should be started successfully";
     ASSERT_TRUE(m_engineImpl->stop()) << "engine did not stop successfully";
 }
@@ -136,16 +141,14 @@ TEST_F(EngineImplTest, engineStop) {
  * Test engine stop without start.
  */
 TEST_F(EngineImplTest, engineStopWithoutStart) {
-    ASSERT_FALSE(m_engineImpl->stop()) << "engine did not stop successfully";
+    ASSERT_TRUE(m_engineImpl->stop()) << "engine did not stop successfully";
 }
 
 /**
  * Test register platform interface with null pointer.
  */
 TEST_F(EngineImplTest, registerPlatformInterfaceNull) {
-    std::shared_ptr<MockEngineConfiguration> engineConfiguration = std::make_shared<MockEngineConfiguration>();
-    EXPECT_CALL(*engineConfiguration.get(), getStream()).Times(1).WillRepeatedly(testing::Return(m_sstream));
-    ASSERT_TRUE(m_engineImpl->configure(engineConfiguration)) << "Configure did not return True";
+    configureEngine();
     ASSERT_TRUE(m_engineImpl->start()) << "engine should be started successfully";
     ASSERT_FALSE(m_engineImpl->registerPlatformInterface(nullptr)) << "Platform Interface not registered";
 }

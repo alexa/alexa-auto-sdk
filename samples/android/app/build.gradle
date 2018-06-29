@@ -21,6 +21,7 @@ android {
 }
 
 dependencies {
+    compileProject()
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support:design:26.1.0'
@@ -30,7 +31,53 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation 'com.android.support:recyclerview-v7:26.1.0'
-    implementation project(':aace')
     implementation files('../login-with-amazon-sdk.jar')
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.7.1'
+    implementation 'com.google.android.exoplayer:exoplayer-dash:2.7.1'
+    implementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.7.1'
+    implementation 'com.google.android.exoplayer:exoplayer-hls:2.7.1'
+}
 
+preBuild {
+    doLast {
+        checkApiFileExists()
+    }
+}
+
+void compileProject() {
+    String libsPath = "app/src/main/libs/"
+    File debugAar = new File(libsPath + "aace-debug.aar")
+    File releaseAar = new File(libsPath + "aace-release.aar")
+    List<String> aarNames = new ArrayList<>()
+    String compileMsg, msg
+    if (debugAar.exists()) {
+        aarNames.add(debugAar.getName())
+    }
+    if (releaseAar.exists()) {
+        aarNames.add(releaseAar.getName())
+        dependencies.implementation(name: 'aace-release', ext: 'aar')
+        msg = "Attempting to build Project with the release aar file"
+    } else {
+        dependencies.implementation project(':aace')
+        msg = "The aace-release.aar was not found. Building SampleApp without the .aar file"
+    }
+
+    StringBuilder sb = new StringBuilder()
+    sb.append("Aar files found were: ").append(aarNames.toString())
+    String foundFilesMsg = generateWrappedMessage(sb.toString())
+    logger.lifecycle(foundFilesMsg)
+
+    compileMsg = generateWrappedMessage(msg)
+    logger.lifecycle(compileMsg)
+}
+
+void checkApiFileExists() {
+    String filename = "api_key.txt"
+    String apiKeyPath = String.format("./src/main/assets/%s", filename)
+    if (!file(apiKeyPath).exists()) {
+        String errMsg = String.format("The %s does not exist. Please create the file in %s", filename, apiKeyPath)
+        String fullErrMsg = project.generateWrappedMessage(errMsg)
+        project.logger.error(fullErrMsg)
+        throw new GradleException(fullErrMsg)
+    }
 }

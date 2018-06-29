@@ -20,7 +20,7 @@ JavaVM* g_javaVM = nullptr;
 
 std::string NativeLib::convert( JNIEnv *env, jstring jstr )
 {
-    if( env != nullptr )
+    if( env != nullptr && jstr != nullptr )
     {
         const char *cstr = env->GetStringUTFChars( jstr, nullptr );
         std::string result = std::string( cstr );
@@ -32,6 +32,17 @@ std::string NativeLib::convert( JNIEnv *env, jstring jstr )
     }
     else {
         return std::string();
+    }
+}
+
+jstring NativeLib::convert( JNIEnv *env, std::string str )
+{
+    if( env != nullptr )
+    {
+        return env->NewStringUTF( str.c_str() );
+    }
+    else {
+        return jstring();
     }
 }
 
@@ -70,8 +81,6 @@ ThreadContext::ThreadContext() : m_env( nullptr ), m_detatch( false )
 {
     if( g_javaVM != nullptr )
     {
-        g_javaVM->AttachCurrentThread( &m_env, nullptr );
-
         m_detatch = g_javaVM->GetEnv( (void**) &m_env, JNI_VERSION_1_6 ) == JNI_EDETACHED;
 
         if( m_detatch ) {

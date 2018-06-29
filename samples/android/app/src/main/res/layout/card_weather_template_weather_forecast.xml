@@ -31,19 +31,18 @@
 
     <TextView
         android:id="@+id/highTemp"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
         android:fontFamily="@font/amazon_ember_light"
+        android:gravity="end"
+        android:maxLines="1"
         android:textColor="@color/cardHighTemp"
         android:textSize="32sp"
-        android:gravity="end"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/divider"
-        app:layout_constraintTop_toBottomOf="@+id/day"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="1.0" />
+        app:layout_constraintEnd_toStartOf="@+id/divider"
+        app:layout_constraintTop_toBottomOf="@+id/day" />
 
     <View
         android:id="@+id/divider"
@@ -59,18 +58,17 @@
 
     <TextView
         android:id="@+id/lowTemp"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:fontFamily="@font/amazon_ember_light"
+        android:gravity="start"
+        android:maxLines="1"
         android:textColor="@color/cardLowTemp"
         android:textSize="32sp"
-        android:gravity="start"
-        app:layout_constraintStart_toEndOf="@+id/divider"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/day"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.0" />
+        app:layout_constraintStart_toEndOf="@+id/divider"
+        app:layout_constraintTop_toBottomOf="@+id/day" />
 
 </android.support.constraint.ConstraintLayout>

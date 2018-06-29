@@ -21,24 +21,32 @@
 namespace aace {
 namespace network {
 
+/**
+ * NetworkInfoProviderEngineInterface
+ */
 class NetworkInfoProviderEngineInterface {
 public:
+
     /**
-     * The enum NetworkStatus describes the state of network connectivity.
+     * Describes the status of network connectivity
      */
     enum class NetworkStatus {
+
         /**
          * The network is disconnected.
          */
         DISCONNECTED,
+
         /**
          * The network is disconnecting.
          */
         DISCONNECTING,
+
         /**
          * The network is connected.
          */
         CONNECTED,
+        
         /**
          * The network is connecting.
          */

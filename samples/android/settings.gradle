@@ -1,5 +1,10 @@
 include ':app', ':aace'
-def aaceProjectDir = new File(settingsDir, '../../platforms/android/aace')
-if (aaceProjectDir && aaceProjectDir.exists()) {
-    project(':aace').projectDir = aaceProjectDir
+
+String libsPath = "./app/src/main/libs/"
+File releaseAar = new File(libsPath + "aace-release.aar")
+if (!releaseAar.exists()) {
+    def aaceProjectDir = new File(settingsDir, '../../platforms/android/aace')
+    if (aaceProjectDir && aaceProjectDir.exists()) {
+        project(':aace').projectDir = aaceProjectDir
+    }
 }

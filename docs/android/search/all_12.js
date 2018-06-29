@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['wakeworddetected',['wakewordDetected',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a70707cd51dffbbeeeb5e90ec5cb36b18',1,'com::amazon::aace::alexa::SpeechRecognizer']]],
-  ['warn',['WARN',['../enumcom_1_1amazon_1_1aace_1_1logger_1_1_logger_1_1_level.html#acba58823cfc4c53d5aa824d447c6299f',1,'com::amazon::aace::logger::Logger::Level']]],
-  ['write',['write',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a549ae1f315f3b64818bba8d5ffa4c928',1,'com::amazon::aace::alexa::SpeechRecognizer']]],
-  ['write_5ftimedout',['WRITE_TIMEDOUT',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_connection_changed_reason.html#a00e8fa4aec24d97853ff838dac1d04c9',1,'com::amazon::aace::alexa::AlexaClient::ConnectionChangedReason']]]
+  ['vehicleconfiguration',['VehicleConfiguration',['../classcom_1_1amazon_1_1aace_1_1vehicle_1_1config_1_1_vehicle_configuration.html',1,'com::amazon::aace::vehicle::config']]],
+  ['vehiclepropertytype',['VehiclePropertyType',['../enumcom_1_1amazon_1_1aace_1_1vehicle_1_1config_1_1_vehicle_configuration_1_1_vehicle_property_type.html',1,'com.amazon.aace.vehicle.config.VehicleConfiguration.VehiclePropertyType'],['../enumcom_1_1amazon_1_1aace_1_1vehicle_1_1config_1_1_vehicle_configuration_1_1_vehicle_property_type.html#aa545b283d5616723574d4f7e8457fe66',1,'com.amazon.aace.vehicle.config.VehicleConfiguration.VehiclePropertyType.VehiclePropertyType()']]],
+  ['verbose',['VERBOSE',['../enumcom_1_1amazon_1_1aace_1_1logger_1_1_logger_1_1_level.html#a704a568ee9d3f5deac0ae74a00c66072',1,'com::amazon::aace::logger::Logger::Level']]],
+  ['version',['VERSION',['../enumcom_1_1amazon_1_1aace_1_1vehicle_1_1config_1_1_vehicle_configuration_1_1_vehicle_property_type.html#a3e91ea0b1fa3b76c5823fa693a3327c1',1,'com::amazon::aace::vehicle::config::VehicleConfiguration::VehiclePropertyType']]]
 ];

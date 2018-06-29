@@ -1,7 +1,0 @@
-{
-  "authDelegate": {
-    "clientId": "<YOUR DEVICE'S CLIENT ID", 
-    "clientSecret": "<YOUR DEVICE'S CLIENT SECRET>",
-    "refreshToken": "<OAUTH2 REFRESH TOKEN (get this by navigating to /opt/AAC/scripts/ and running configure-aace.sh)>"
-  }
-}

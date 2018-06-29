@@ -17,7 +17,7 @@
 #define AACE_ENGINE_NAVIGATION_NAVIGATION_ENGINE_IMPL_H
 
 #include <AVSCommon/SDKInterfaces/DirectiveSequencerInterface.h>
-
+#include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
 #include <AACE/Navigation/Navigation.h>
 
 #include "NavigationCapabilityAgent.h"
@@ -29,22 +29,30 @@ namespace navigation {
 
 class NavigationEngineImpl :
     public NavigationObserverInterface,
-    public alexaClientSDK::avsCommon::utils::RequiresShutdown {
+    public alexaClientSDK::avsCommon::utils::RequiresShutdown,
+    public std::enable_shared_from_this<NavigationEngineImpl> {
     
 private:
     NavigationEngineImpl( std::shared_ptr<aace::navigation::Navigation> navigationPlatformInterface );
+    
+    bool initialize(
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender );
     
 public:
     static std::shared_ptr<NavigationEngineImpl> create(
         std::shared_ptr<aace::navigation::Navigation> navigationPlatformInterface,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender );
 
     // NavigationObserverInterface
     void setDestination( const std::string& payload ) override;
+    void cancelNavigation() override;
     
 protected:
-    virtual void doShutdown() override;
+    void doShutdown() override;
 
 private:
     std::shared_ptr<aace::navigation::Navigation> m_navigationPlatformInterface;

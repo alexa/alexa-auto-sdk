@@ -2,7 +2,7 @@
 
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
-project(AACECore VERSION 0.99.0 LANGUAGES CXX)
+project(AACECore LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -18,6 +18,16 @@ endif()
 # Select flags.
 set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -Wall -O2")
 set(CMAKE_CXX_FLAGS_DEBUG "-DDEBUG -DAACE_DEBUG_LOG_ENABLED -Wall -g")
+
+if (AAC_EMIT_SENSITIVE_LOGS)
+    string(TOUPPER ${CMAKE_BUILD_TYPE} BUILD_TYPE_UPPER)
+    if (BUILD_TYPE_UPPER STREQUAL DEBUG)
+        message("WARNING: Logging of sensitive information enabled!")
+        add_definitions(-DAAC_EMIT_SENSITIVE_LOGS)
+    else()
+        message(FATAL_ERROR "FATAL_ERROR: AAC_EMIT_SENSITIVE_LOGS=ON in non-DEBUG build.")
+    endif()
+endif()
 
 if(AAC_ENABLE_TESTS)
     enable_testing()

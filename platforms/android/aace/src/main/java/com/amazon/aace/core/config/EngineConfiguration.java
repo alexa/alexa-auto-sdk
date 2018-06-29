@@ -18,40 +18,36 @@
 
 package com.amazon.aace.core.config;
 
+import android.util.Log;
+
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Abstract base class for providing @c JSON configuration data to the Engine.
+ * Base class for providing JSON configuration data to the Engine.
  */
-abstract public class EngineConfiguration
-{
+abstract public class EngineConfiguration {
+
+    private static final String sTag = EngineConfiguration.class.getSimpleName();
+
     /**
-     * @return Pointer to a @c std::istream object containing the @c JSON configuration data.
+     * @return Pointer to an @c InputStream object containing the @c JSON configuration data.
      */
     abstract public InputStream getStream();
 
     /**
-     * @return @c ByteArray of the @c std::istream object.
+     * @return @c ByteArray of the @c InputStream object.
      */
-    final public byte[] getBytes()
-    {
-        try
-        {
-            InputStream is = getStream();
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
+    final public byte[] getBytes() {
+        try ( InputStream is = getStream();
+              ByteArrayOutputStream os = new ByteArrayOutputStream()
+        ) {
             byte[] buffer = new byte[1024];
-            int len = 0;
-
-            while( (len = is.read(buffer)) > 0 ) {
-                os.write( buffer, 0, len );
-            }
-
+            int len;
+            while( ( len = is.read( buffer ) ) > 0 ) os.write( buffer, 0, len );
             return os.toByteArray();
-        }
-        catch( Throwable ex ) {
-            ex.printStackTrace();
-        }
+        } catch ( IOException e ) { Log.e( sTag, e.getMessage() ); }
 
         return new byte[0];
     }

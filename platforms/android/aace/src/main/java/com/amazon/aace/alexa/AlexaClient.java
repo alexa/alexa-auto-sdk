@@ -21,12 +21,12 @@ package com.amazon.aace.alexa;
 import com.amazon.aace.core.PlatformInterface;
 
 /**
- * The @c AlexaClient class should be extended by the platform implementation to handle standard AVS state changes in the application.
+ * AlexaClient should be extended to handle Alexa state changes on the platform.
  */
 public class AlexaClient extends PlatformInterface
 {
     /**
-     * The enum DialogState describes the state of the Alexa dialog interaction.
+     * Describes the state of Alexa dialog interaction
      */
     public enum DialogState
     {
@@ -41,7 +41,8 @@ public class AlexaClient extends PlatformInterface
          */
         LISTENING("LISTENING"),
         /**
-         * A customer request has been completed and no more input is accepted. In this state, Alexa is waiting for a response from AVS.
+         * A user request has completed, and no more user input is being accepted.
+         * Alexa is waiting for a response from AVS.
          * @hideinitializer
          */
         THINKING("THINKING"),
@@ -72,12 +73,12 @@ public class AlexaClient extends PlatformInterface
     }
 
     /**
-     * The enum AuthState describes the state of authorization.
+     * Describes the state of client authorization with AVS
      */
     public enum AuthState
     {
         /**
-         * Authorization not yet acquired.
+         * Authorization has not yet been acquired.
          * @hideinitializer
          */
         UNINITIALIZED("UNINITIALIZED"),
@@ -92,7 +93,7 @@ public class AlexaClient extends PlatformInterface
          */
         EXPIRED("EXPIRED"),
         /**
-         * Authorization failed in a manner that cannot be corrected by retrying.
+         * Authorization has failed in a manner that cannot be corrected by retrying.
          * @hideinitializer
          */
         UNRECOVERABLE_ERROR("UNRECOVERABLE_ERROR");
@@ -118,17 +119,17 @@ public class AlexaClient extends PlatformInterface
     }
 
     /**
-     * The enum AuthError encodes possible errors which may occur when changing authorization state.
+     * Describes an error during an attempt to authorize with AVS
      */
     public enum AuthError
     {
         /**
-         * No error.
+         * No error encountered
          * @hideinitializer
          */
         NO_ERROR("NO_ERROR"),
         /**
-         * An unknown body containing no error field has been encountered.
+         * An error was encountered, but no error description can be determined.
          * @hideinitializer
          */
         UNKNOWN_ERROR("UNKNOWN_ERROR"),
@@ -148,7 +149,7 @@ public class AlexaClient extends PlatformInterface
          */
         SERVER_ERROR("SERVER_ERROR"),
         /**
-         * The request is missing a required parameter, has an invalid value, or is otherwise improperly formed.
+         * The request is missing a required parameter, has an invalid value, or is otherwise malformed.
          * @hideinitializer
          */
         INVALID_REQUEST("INVALID_REQUEST"),
@@ -184,22 +185,22 @@ public class AlexaClient extends PlatformInterface
     }
 
     /**
-     * The enum ConnectionStatus describes the state of ACL connection.
+     * Describes the status of an AVS connection
      */
     public enum ConnectionStatus
     {
         /**
-         * ACL is not connected to AVS.
+         * Not connected to AVS
          * @hideinitializer
          */
         DISCONNECTED("DISCONNECTED"),
         /**
-         * ACL is attempting to establish a connection to AVS.
+         * Attempting to establish a connection to AVS
          * @hideinitializer
          */
         PENDING("PENDING"),
         /**
-         * ACL is connected to AVS.
+         * Connected to AVS
          * @hideinitializer
          */
         CONNECTED("CONNECTED");
@@ -225,27 +226,27 @@ public class AlexaClient extends PlatformInterface
     }
 
     /**
-     * The enum ConnectionChangedReason encodes the reasons for state changes or failures in the connection attempt to the public API.
+     * Describes the reason for a change in AVS connection status
      */
     public enum ConnectionChangedReason
     {
         /**
-         * The connection status changed due to the client interacting with the Connection public API.
+         * The connection status changed due to a client request.
          * @hideinitializer
          */
         ACL_CLIENT_REQUEST("ACL_CLIENT_REQUEST"),
         /**
-         * The connection attempt failed due to the Connection object being disabled.
+         * The connection attempt failed because connection was disabled.
          * @hideinitializer
          */
         ACL_DISABLED("ACL_DISABLED"),
         /**
-         * The connection attempt failed due to DNS resolution timeout.
+         * The connection attempt failed due to a DNS resolution timeout.
          * @hideinitializer
          */
         DNS_TIMEDOUT("DNS_TIMEDOUT"),
         /**
-         * The connection attempt failed due to timeout.
+         * The connection attempt failed due to a connection timeout.
          * @hideinitializer
          */
         CONNECTION_TIMEDOUT("CONNECTION_TIMEDOUT"),
@@ -255,7 +256,7 @@ public class AlexaClient extends PlatformInterface
          */
         CONNECTION_THROTTLED("CONNECTION_THROTTLED"),
         /**
-         * The access credentials provided to ACL were invalid.
+         * The provided access credentials were invalid.
          * @hideinitializer
          */
         INVALID_AUTH("INVALID_AUTH"),
@@ -280,7 +281,7 @@ public class AlexaClient extends PlatformInterface
          */
         FAILURE_PROTOCOL_ERROR("FAILURE_PROTOCOL_ERROR"),
         /**
-         * There was an internal error within ACL.
+         * There was an internal error.
          * @hideinitializer
          */
         INTERNAL_ERROR("INTERNAL_ERROR"),
@@ -321,30 +322,33 @@ public class AlexaClient extends PlatformInterface
     }
 
     /**
-     * Called when the platform implementation should handle AVS UX dialog state changes.
+     * Notifies the platform implementation of an Alexa dialog state change
      *
-     * @param [in] state The new dialog-specific AVS UX state.
-     * @sa DialogState
+     * @param  state The new Alexa dialog state
+     *
+     * @note It is the responsibility of the platform implementation to provide a familiar Alexa experience for the user.
+     * See the AVS UX Attention System guidelines for recommendations on communicating 
+     * Alexa attention states: https://developer.amazon.com/docs/alexa-voice-service/ux-design-attention.html#implement
      */
     public void dialogStateChanged( DialogState state ) {
     }
 
     /**
-     * Called when the platform implementation should handle AVS auth state changes.
+     * Notifies the platform implementation of an AVS authorization state change
      *
-     * @param [in] state The new auth state.
-     * @param [in] error The auth error if an error occurred.
-     * @sa AuthState AuthError
+     * @param  state The new authorization state
+     *
+     * @param  error The error state of the authorization attempt
      */
     public void authStateChanged( AuthState state, AuthError error ) {
     }
 
     /**
-     * Called when the platform implementation should handle AVS connection status changes.
+     * Notifies the platform implementation of an AVS connection status change
      *
-     * @param [in] status The new connection status.
-     * @param [in] reason The reason the status change occurred.
-     * @sa ConnectionStatus ConnectionChangedReason
+     * @param  status The new AVS connection status
+     *
+     * @param  reason The reason for the status change
      */
     public void connectionStatusChanged( ConnectionStatus status, ConnectionChangedReason reason ) {
     }

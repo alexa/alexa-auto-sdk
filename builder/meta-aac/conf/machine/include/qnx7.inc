@@ -1,4 +1,4 @@
-QNX_BASE = "${HOME}/qnx700"
+QNX_BASE ?= "${HOME}/qnx700"
 QNX_ARCH ?= "x86_64"
 
 export QNX_HOST = "${QNX_BASE}/host/linux/${BUILD_ARCH}"
@@ -6,6 +6,7 @@ export QNX_TARGET = "${QNX_BASE}/target/qnx7"
 export QNX_CONFIGURATION = "${HOME}/.qnx"
 
 TCLIBC = "qnx"
+TCMODE = "external"
 
 TARGET_OS = "nto-qnx7.0.0${ABIEXTENSION}"
 TARGET_VENDOR = "${@bb.utils.contains_any('TARGET_ARCH', 'arm aarch64', '-unknown', '-pc', d)}"

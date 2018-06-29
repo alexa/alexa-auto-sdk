@@ -2,7 +2,7 @@
 
 ### Overview
 
-The AAC Alexa API provides the features that are relevant to a platform implementation from the AVS Device SDK. For an Android project you should consider creating a class per interface you wish to handle. 
+The AAC Alexa API provides interfaces for standard AVS features. For an Android project you should consider creating a class per interface you wish to handle. 
 
 
 ### Handling Alexa State Changes
@@ -30,7 +30,7 @@ public class AlexaClientHandler extends AlexaClient
 
 ### Handling Authorization
 
-It is the respoonsibility of the platform implementation to provide an authorization method for establishing a connection to AVS. The AAC SDK provides an interface to handle this authorization.
+It is the respoonsibility of the platform implementation to provide an authorization method for establishing a connection to AVS. The AAC SDK provides an interface to handle authorization state changes and storing context.
 
 To implement the handler for authorization, the `AuthProvider` class should be extended:
 
@@ -45,8 +45,9 @@ public class AuthProviderHandler extends AuthProvider
 	@Override
 	public AuthState getAuthState() {
 		//return the current auth state
+	}
 	...
-		//notify the engine that a refresh token has been obtained
+		//notify the engine that a valid refresh token has been obtained
 		authStateChange( AuthProvider.AuthState.REFRESHED, AuthProvider.AuthError.NO_ERROR );
 	...
 ```
@@ -70,15 +71,29 @@ public class SpeechRecognizerHandler extends SpeechRecognizer
     }
     ...
     	// call the write audio method while reading audio input data 
-    	write( (byte[]) data, (int) size )
+    	write( (byte[]) data, (long) size )
     ...
 ...
 ```
 
-The initiation of a speech recognition event must be handled by the platform.
-The simplest way to invoke the speech recognizer is via its `holdToTalk()` and `tapToTalk()` methods.
+The initiation of a speech recognition event must be handled by the platform. The simplest way to invoke the speech recognizer is via its `holdToTalk()` and `tapToTalk()` methods.
 
-The class also provides various methods for detecting and handling wakeword invocation, if it is enabled.
+For wakeword implementations, the following methods should be extended in the handler class:
+
+```
+...
+    @Override
+    public void endOfSpeechDetected() {
+        // implement speech end detected after wakeword detected, and play correct audio cue
+    }
+    @Override
+    public boolean wakewordDetected( String wakeWord ) {
+        // implement wakeword detected, and play correct audio cue
+    }
+...
+```
+
+The interface also includes the methods `enableWakewordDetection()`, `disableWakewordDetection()`, and `isWakewordDetectionEnabled()`, for wakeword support.
 
 ### Handling Speech Output
 
@@ -147,6 +162,8 @@ public class AlertsHandler extends Alerts
 		//handle alert state change
 	}
 ```
+
+For local Alerts control, the methods `localStop`(stop current playing alert), and `removeAllAlerts`(remove all locally stored alerts) should be used.
 
 ### Handling Media and Volume
 
@@ -240,7 +257,7 @@ To implement a custom handler for Speaker, the `Speaker` class should be extende
 
 ```
 ...
-	private class AndroidMediaPlayerSpeaker extends Speaker
+	private class SpeakerHandler extends Speaker
 	{
 		...
 		@Override
@@ -266,6 +283,7 @@ To implement a custom handler for Speaker, the `Speaker` class should be extende
 			//return mute state
 		...
 ```
+
 ### Handling GUI Templates
 
 When template info is received from Alexa, it is the responsibility of the platform implementation to handle the rendering of any UI with the info that is received from Alexa. There are two template flavours: [Templates](https://alexa.design/DevDocRenderTemplate) and [PlayerInfo](https://amzn.to/DevDocTemplatePlayerInfo). You can view sample JSON payloads from these AVS documentation links as well.
@@ -287,11 +305,21 @@ public class TemplateRuntimeHandler extends TemplateRuntime
 	public void renderPlayerInfo( String payload )
 	{
 		//handle JSON string payload
+	...
+	@Override
+    public void clearTemplate() {
+        // Handle dismissing display card here
+    ...
+    @Override
+    public void clearPlayerInfo() {
+        // Handle clearing player info here
 ```
+
+
 
 ### Handling Playback Controller Events
 
-The Engine provides methods for notifying it of playback controller events. If the platform has playback control features, it must inform the Engine.
+The Engine provides methods for notifying it of playback controller events. If the platform implements playback control features, it must inform the Engine.
 
 To implement a custom handler for the playback controller, the `PlaybackController` class should be extended:
 
@@ -304,8 +332,6 @@ public class PlaybackControllerHandler extends PlaybackController
 		//notify the engine the previous button was pressed
 		super.previousButtonPressed();
 	...
-	public void playButtonHasBeenPressed()
-	{
 		//notify the engine the play button was pressed
 		playButtonPressed();
 	...

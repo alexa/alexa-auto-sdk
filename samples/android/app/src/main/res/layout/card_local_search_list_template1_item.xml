@@ -8,15 +8,12 @@
 
     <TextView
         android:id="@+id/index"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:fontFamily="@font/amazon_ember_regular"
-        android:textAlignment="textEnd"
         android:textColor="@color/cardMainTitle"
         android:textSize="28sp"
-        app:layout_constraintBottom_toTopOf="@+id/address"
-        app:layout_constraintEnd_toStartOf="@+id/guidelineVertical"
+        app:layout_constraintBottom_toBottomOf="@+id/name"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -24,59 +21,43 @@
         android:id="@+id/name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:ellipsize="end"
+        android:layout_marginStart="12dp"
         android:fontFamily="@font/amazon_ember_regular"
-        android:gravity="start"
         android:maxLines="1"
-        android:textAlignment="textStart"
+        android:ellipsize="end"
         android:textColor="@color/cardMainTitle"
         android:textSize="40sp"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintBottom_toTopOf="@+id/address"
         app:layout_constraintEnd_toStartOf="@+id/dist"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/guidelineVertical"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintStart_toEndOf="@+id/index"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/dist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
         android:fontFamily="@font/amazon_ember_regular"
-        android:gravity="start"
-        android:textAlignment="textStart"
         android:textColor="@color/cardMainTitle"
         android:textSize="28sp"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintBottom_toTopOf="@+id/address"
+        app:layout_constraintBottom_toBottomOf="@+id/name"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/name"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/address"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:ellipsize="end"
+        android:layout_marginStart="12dp"
         android:fontFamily="@font/amazon_ember_light"
-        android:gravity="start"
         android:maxLines="1"
+        android:ellipsize="end"
         android:textColor="@color/cardSubTitle"
         android:textSize="28sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/guidelineVertical"
-        app:layout_constraintTop_toBottomOf="@+id/name"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <android.support.constraint.Guideline
-        android:id="@+id/guidelineVertical"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.05" />
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/index"
+        app:layout_constraintTop_toBottomOf="@+id/name" />
 
 </android.support.constraint.ConstraintLayout>

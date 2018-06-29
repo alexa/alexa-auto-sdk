@@ -44,6 +44,15 @@ bool NavigationEngineService::stop() {
     return true;
 }
 
+bool NavigationEngineService::shutdown()
+{
+    if( m_navigationEngineImpl != nullptr ) {
+        m_navigationEngineImpl->shutdown();
+    }
+    
+    return true;
+}
+
 bool NavigationEngineService::registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface )
 {
     try
@@ -67,7 +76,7 @@ bool NavigationEngineService::registerPlatformInterfaceType( std::shared_ptr<aac
         auto alexaService = getContext()->getService<aace::engine::alexa::AlexaEngineService>();
         ThrowIfNull( alexaService, "alexaServiceNotFound" );
 
-        m_navigationEngineImpl = aace::engine::navigation::NavigationEngineImpl::create( navigation, alexaService->getDirectiveSequencer(), alexaService->getExceptionSender() );
+        m_navigationEngineImpl = aace::engine::navigation::NavigationEngineImpl::create( navigation, alexaService->getDirectiveSequencer(), alexaService->getCapabilitiesDelegate(), alexaService->getExceptionSender() );
         ThrowIfNull( m_navigationEngineImpl, "createNavigationEngineImplFailed" );
 
         return true;

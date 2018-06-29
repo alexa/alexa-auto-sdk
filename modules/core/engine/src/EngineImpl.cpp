@@ -19,6 +19,8 @@
 #include "AACE/Engine/Core/EngineImpl.h"
 #include "AACE/Engine/Core/EngineService.h"
 #include "AACE/Engine/Core/EngineMacros.h"
+#include "AACE/Engine/Core/EngineVersion.h"
+#include "AACE/Core/CoreProperties.h"
 
 // default Engine constructor
 std::shared_ptr<aace::core::Engine> aace::core::Engine::create() {
@@ -51,8 +53,9 @@ std::shared_ptr<EngineImpl> EngineImpl::create()
 
 EngineImpl::~EngineImpl()
 {
-    if( m_running && stop() == false ) {
-        AACE_ERROR(LX(TAG,"~EngineImpl").d("reason", "engineStopFailed"));
+    // shutdown the engine if initialized
+    if( m_initialized ) {
+        shutdown();
     }
 }
 
@@ -60,6 +63,9 @@ bool EngineImpl::initialize()
 {
     try
     {
+        AACE_INFO(LX(TAG,"initialize").d("engineVersion",aace::engine::core::version::getEngineVersion()));
+
+        ThrowIf( m_initialized, "engineAlreadyInitialized" );
         ThrowIfNot( checkServices(), "checkServicesFailed" );
 
         // iterate through registered engine services and call initialize() for each module
@@ -67,10 +73,55 @@ bool EngineImpl::initialize()
             ThrowIfNot( next->handleInitializeEngineEvent( shared_from_this() ), "initializeServiceFailed" );
         }
 
+        // set initialize flag
+        m_initialized = true;
+
         return true;
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"initialize").d("reason", ex.what()));
+        return false;
+    }
+}
+
+bool EngineImpl::shutdown()
+{
+    try
+    {
+        if( m_initialized == false ) {
+            AACE_WARN(LX(TAG,"shutdown").m("Attempting do shutdown engine that is not initialized - doing nothing."));
+            return true;
+        }
+        
+        // engine must be stopped before shutdown, but continue with shutdown if failed...
+        if( stop() == false ) {
+            AACE_ERROR(LX(TAG,"shutdown").d("reason","stopEngineFailed"));
+        }
+        
+        AACE_DEBUG(LX(TAG,"shutdown").m("EngineShutdown"));
+
+        // iterate through registered engine services and call shutdown() for each module
+        for( auto next : m_orderedServiceList )
+        {
+            AACE_DEBUG(LX(TAG,"shutdown").m(next->getDescription().getType()));
+
+            // if shutting down the service failed throw an error but continue with
+            // shutting down remaining services
+            if( next->handleShutdownEngineEvent() == false ) {
+                AACE_ERROR(LX(TAG,"shutdown").d("reason","shutdownServiceFailed").d("service",next->getDescription().getType()));
+            }
+        }
+        
+        // reset the engine state
+        m_orderedServiceList.clear();
+        m_registeredServiceMap.clear();
+        m_initialized = false;
+        m_configured = false;
+        
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"shutdown").d("reason", ex.what()));
         return false;
     }
 }
@@ -87,6 +138,12 @@ bool EngineImpl::configure( std::vector<std::shared_ptr<aace::core::config::Engi
 {
     try
     {
+        AACE_DEBUG(LX(TAG,"configure").m("EngineConfigure"));
+
+        ThrowIfNot( m_initialized, "engineNotInitialized" );
+        ThrowIf( m_running, "engineRunning" );
+        ThrowIf( m_configured, "engineAlreadyConfigured" );
+
         // get the configuration streams
         std::vector<std::shared_ptr<std::istream>> configurationStreams;
         
@@ -106,6 +163,8 @@ bool EngineImpl::configure( std::vector<std::shared_ptr<aace::core::config::Engi
                 nextStream->seekg( 0 );
             }
         }
+        
+        m_configured = true;
         
         return true;
     }
@@ -228,7 +287,7 @@ bool EngineImpl::checkServices()
         for( auto next : m_orderedServiceList ) {
             auto desc = next->getDescription();
             auto version = desc.getVersion();
-            AACE_INFO(LX(TAG,"EngineService").d("name",desc.getType()).d("version",version.toString()));
+            AACE_INFO(LX(TAG,"checkServices").m(desc.getType()).d("v",version.toString()));
         }
         
         return true;
@@ -245,8 +304,12 @@ bool EngineImpl::start()
 {
     try
     {
-        ThrowIf( m_running, "engineAlreadyRunning" );
+        AACE_DEBUG(LX(TAG,"start").m("EngineStart"));
 
+        ThrowIf( m_running, "engineAlreadyRunning" );
+        ThrowIfNot( m_initialized, "engineNotInitialized" );
+        ThrowIfNot( m_configured, "engineNotConfigured" );
+        
         // iterate through registered engine modules and call start() for each module
         for( auto next : m_orderedServiceList ) {
             ThrowIfNot( next->handleStartEngineEvent(), "startServiceFailed" );
@@ -267,7 +330,12 @@ bool EngineImpl::stop()
 {
     try
     {
-        ThrowIfNot( m_running, "engineNotRunning" );
+        AACE_DEBUG(LX(TAG,"stop").m("EngineStop"));
+
+        if( m_running == false ) {
+            AACE_WARN(LX(TAG,"stop").m("Attempting do stop engine that is not running - doing nothing."));
+            return true;
+        }
     
         // iterate through registered engine modules and call stop() for each module
         for( auto next : m_orderedServiceList ) {
@@ -313,6 +381,11 @@ bool EngineImpl::setProperty( const std::string& key, const std::string& value )
         if( service != nullptr ) {
             return service->setProperty( key, value );
         }
+        
+        // check core properties
+        if( key.compare( aace::core::property::VERSION ) == 0 ) {
+            Throw( "readOnlyProperty" );
+        }
     
         // iterate through registered engine modules and call setProperty() for each module
         for( auto next : m_orderedServiceList ) {
@@ -322,8 +395,39 @@ bool EngineImpl::setProperty( const std::string& key, const std::string& value )
         return false;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"setProperty").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG,"setProperty").d("reason", ex.what()).d("key",key).d("value",value));
         return false;
+    }
+}
+
+std::string EngineImpl::getProperty( const std::string& key )
+{
+    try
+    {
+        auto service = getServiceFromPropertyKey( key );
+        
+        if( service != nullptr ) {
+            return service->getProperty( key );
+        }
+    
+        // iterate through registered engine modules and call getProperty() for each module
+        std::string result;
+
+        for( auto next : m_orderedServiceList ) {
+            result = next->getProperty( key );
+            ReturnIfNot( result.empty(), result );
+        }
+
+        // core properties
+        if( key.compare( aace::core::property::VERSION ) == 0 ) {
+            return aace::engine::core::version::getEngineVersion().toString();
+        }
+
+        return result;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"getProperty").d("reason", ex.what()));
+        return std::string();
     }
 }
 

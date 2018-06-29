@@ -20,8 +20,10 @@
 
 #include <AVSCommon/Utils/MediaPlayer/MediaPlayerInterface.h>
 #include <AVSCommon/Utils/MediaPlayer/MediaPlayerObserverInterface.h>
-#include <AVSCommon/SDKInterfaces/SpeakerInterface.h>
 #include <AVSCommon/Utils/Threading/Executor.h>
+#include <AVSCommon/Utils/RequiresShutdown.h>
+#include <AVSCommon/SDKInterfaces/SpeakerInterface.h>
+#include <AVSCommon/SDKInterfaces/SpeakerManagerInterface.h>
 
 #include "AACE/Alexa/AlexaEngineInterfaces.h"
 #include "AACE/Alexa/AudioChannel.h"
@@ -34,32 +36,42 @@ namespace alexa {
 
 class AudioChannelEngineImpl :
     public aace::alexa::MediaPlayerEngineInterface,
+    public aace::alexa::SpeakerEngineInterface,
     public alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface,
     public alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface,
-    public std::enable_shared_from_this<AudioChannelEngineImpl> {
-    
-protected:
-    AudioChannelEngineImpl( std::shared_ptr<aace::alexa::AudioChannel> audioChannelPlatformInterface );
+    public alexaClientSDK::avsCommon::utils::RequiresShutdown,
+    public std::enable_shared_from_this<AudioChannelEngineImpl>  {
 
+protected:
+    AudioChannelEngineImpl( std::shared_ptr<aace::alexa::AudioChannel> audioChannelPlatformInterface, const std::string& name );
+
+    virtual bool initializeAudioChannel( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager );
+    
+    virtual void doShutdown() override;
+    
 public:
-    virtual ~AudioChannelEngineImpl();
+    virtual ~AudioChannelEngineImpl() = default;
 
     //
     // aace::engine::MediaPlayerEngineInterface
     //
-    void onPlaybackStarted() override;
-    void onPlaybackFinished() override;
-    void onPlaybackPaused() override;
-    void onPlaybackResumed() override;
-    void onPlaybackStopped() override;
-    void onPlaybackError( const MediaPlayerEngineInterface::ErrorType& type, const std::string& error ) override;
+    void onMediaStateChanged( MediaState state ) override;
+    void onMediaError( MediaError error, const std::string& description = "" ) override;
     ssize_t read( char* data, const size_t size ) override;
+    
     bool isRepeating() override;
+    bool isClosed() override;
+
+    //
+    // aace::engine::SpeakerEngineInterface
+    //
+    void onLocalVolumeSet( int8_t volume ) override;
+    void onLocalMuteSet( bool mute ) override;
 
     //
     // alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface
     //
-    alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId setSource( std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader> attachmentReader ) override;
+    alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId setSource( std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader> attachmentReader, const alexaClientSDK::avsCommon::utils::AudioFormat* format = nullptr ) override;
     alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId setSource( std::shared_ptr<std::istream> stream, bool repeat ) override;
     alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId setSource( const std::string& url, std::chrono::milliseconds offset ) override;
     bool play( alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id ) override;
@@ -67,6 +79,7 @@ public:
     bool pause( alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id ) override;
     bool resume( alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id ) override;
     std::chrono::milliseconds getOffset( alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id ) override;
+    uint64_t getNumBytesBuffered() override;
     void setObserver( std::shared_ptr<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerObserverInterface> observer ) override;
 
     //
@@ -90,28 +103,31 @@ protected:
     bool validateSource( alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id );
     
 private:
-    enum class EventState {
-        NONE, PLAYBACK_STARTED, PLAYBACK_FINISHED, PLAYBACK_PAUSED, PLAYBACK_RESUMED, PLAYBACK_STOPPED, PLAYBACK_ERROR
+    enum class PendingEventState {
+        NONE, PLAYBACK_STARTED, PLAYBACK_PAUSED, PLAYBACK_RESUMED, PLAYBACK_STOPPED
     };
     
+    using SourceId = alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId;
 
-    void setEventState( EventState state );
-    bool waitForEventState( const std::chrono::seconds duration = std::chrono::seconds( 3 ) );
-    bool waitForEventState( EventState state, const std::chrono::seconds duration = std::chrono::seconds( 3 ) );
-
+    void sendPendingEvent();
+    void sendEvent( PendingEventState state );
     void resetSource();
     
     //
     // MediaPlayerEngineInterface executor methods
     //
-    void executePlaybackStarted();
-    void executePlaybackFinished();
-    void executePlaybackPaused();
-    void executePlaybackResumed();
-    void executePlaybackStopped();
-    void executePlaybackError( const MediaPlayerEngineInterface::ErrorType& type, const std::string& error );
-    
-    friend std::ostream& operator<<(std::ostream& stream, const EventState& state);
+    void executeMediaStateChanged( SourceId id, MediaState state );
+    void executeMediaError( SourceId id, MediaError error, const std::string& description );
+    void executePlaybackStarted( SourceId id );
+    void executePlaybackFinished( SourceId id );
+    void executePlaybackPaused( SourceId id );
+    void executePlaybackResumed( SourceId id );
+    void executePlaybackStopped( SourceId id );
+    void executePlaybackError( SourceId id, MediaError error, const std::string& description );
+    void executeBufferUnderrun( SourceId id );
+    void executeBufferRefilled( SourceId id );
+
+    friend std::ostream& operator<<(std::ostream& stream, const PendingEventState& state);
 
 private:
     std::shared_ptr<aace::alexa::AudioChannel> m_audioChannelPlatformInterface;
@@ -120,17 +136,18 @@ private:
 
     std::shared_ptr<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerObserverInterface> m_observer;
     std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader> m_attachmentReader;
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> m_speakerManager;
     
     alexaClientSDK::avsCommon::avs::attachment::AttachmentReader::ReadStatus m_status;
     std::shared_ptr<std::istream> m_stream;
     alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId m_currentId;
     bool m_repeat;
+    bool m_closed;
     std::string m_url;
     std::chrono::milliseconds m_savedOffset;
     
-    std::condition_variable m_eventState_cv;
-    EventState m_expectedEventState;
-    EventState m_eventState;
+    PendingEventState m_pendingEventState;
+    MediaState m_currentMediaState;
 
     // executor used to send asynchronous events back to observer
     alexaClientSDK::avsCommon::utils::threading::Executor m_executor;
@@ -145,28 +162,22 @@ private:
     std::condition_variable m_trigger;    
 };
 
-inline std::ostream& operator<<(std::ostream& stream, const AudioChannelEngineImpl::EventState& state) {
+inline std::ostream& operator<<(std::ostream& stream, const AudioChannelEngineImpl::PendingEventState& state) {
     switch (state) {
-        case AudioChannelEngineImpl::EventState::NONE:
+        case AudioChannelEngineImpl::PendingEventState::NONE:
             stream << "NONE";
             break;
-        case AudioChannelEngineImpl::EventState::PLAYBACK_STARTED:
+        case AudioChannelEngineImpl::PendingEventState::PLAYBACK_STARTED:
             stream << "PLAYBACK_STARTED";
             break;
-        case AudioChannelEngineImpl::EventState::PLAYBACK_FINISHED:
-            stream << "PLAYBACK_FINISHED";
-            break;
-        case AudioChannelEngineImpl::EventState::PLAYBACK_PAUSED:
+        case AudioChannelEngineImpl::PendingEventState::PLAYBACK_PAUSED:
             stream << "PLAYBACK_PAUSED";
             break;
-        case AudioChannelEngineImpl::EventState::PLAYBACK_RESUMED:
+        case AudioChannelEngineImpl::PendingEventState::PLAYBACK_RESUMED:
             stream << "PLAYBACK_RESUMED";
             break;
-        case AudioChannelEngineImpl::EventState::PLAYBACK_STOPPED:
+        case AudioChannelEngineImpl::PendingEventState::PLAYBACK_STOPPED:
             stream << "PLAYBACK_STOPPED";
-            break;
-        case AudioChannelEngineImpl::EventState::PLAYBACK_ERROR:
-            stream << "PLAYBACK_ERROR";
             break;
     }
     return stream;

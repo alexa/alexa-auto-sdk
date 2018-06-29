@@ -21,37 +21,37 @@ package com.amazon.aace.logger;
 import com.amazon.aace.core.PlatformInterface;
 
 /**
- * The @c Logger should be extended by the platform implementation to handle logs coming from the SDK.
+ * Logger should be extended handle log events from the AAC SDK.
  */
 abstract public class Logger extends PlatformInterface
 {
     /**
-     * Enum used to specify the severity assigned to a log message.
+     * Specifies the severity level of a log message
      */
     public enum Level
     {
         /**
-         * Most verbose log level. Only enabled for debug builds.
+         * Verbose log of an event, enabled only for debug builds
          * @hideinitializer
          */
         VERBOSE("VERBOSE"),
         /**
-         * Logs of normal operations, to be used in release builds.
+         * Log of a normal event. Used in release builds
          * @hideinitializer
          */
         INFO("INFO"),
         /**
-         * Log of an event that may indicate a problem.
+         * Log of an event that may indicate a problem
          * @hideinitializer
          */
         WARN("WARN"),
         /**
-         * Log of an event that indicates an error.
+         * Log of an event that indicates an error
          * @hideinitializer
          */
         ERROR("ERROR"),
         /**
-         * Log of an event that indicates an unrecoverable error.
+         * Log of an event that indicates an unrecoverable error
          * @hideinitializer
          */
         CRITICAL("CRITICAL");
@@ -84,25 +84,31 @@ abstract public class Logger extends PlatformInterface
     }
 
     /**
-     * Called when the platform implementation should handle a log event from the SDK logger.
+     * Notifies the platform implementation of a log event from the AAC SDK logger
      *
-     * @param [in] level The @c aace::logger::Logger::Level log level
-     * @param [in] time Time of the logged message
-     * @param [in] source The source of the log message
-     * @param [in] message The log message
+     * @param  level The log level
      *
-     * @return @c true if log event was handled by the platform.
+     * @param  time The timestamp of the logged message
+     *
+     * @param  source The source of the log message
+     *
+     * @param  message The log message
+     *
+     * @return @c true if the platform implementation successfully handled the log event, else @c false
      */
     public boolean logEvent( Level level, long time, String source, String message ) {
         return false;
     }
 
     /**
-     * Use the Engine's logger to log an event.
+     * Notifies the Engine to use the AAC SDK logger to log a message originating on the platform.
+     * The log event will be received by the platform with a call to @c logEvent() from the Engine.
      *
-     * @param [in] level The @c aace::logger::Logger::Level log level
-     * @param [in] tag The log tag
-     * @param [in] message The log message
+     * @param  level The log level
+     *
+     * @param  tag The log tag
+     *
+     * @param  message The log message
      */
     public void log( Level level, String tag, String message ) {
         log( getNativeObject(), level, tag, message );

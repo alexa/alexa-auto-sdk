@@ -21,22 +21,26 @@ package com.amazon.aace.alexa;
 import com.amazon.aace.core.PlatformInterface;
 
 /**
- * The @c Speaker class is the base class for platform interfaces that have volume control.
+ * Speaker is the interface for volume and mute control for an @c AudioChannel.
+ * Volume and mute settings for the Speaker are independent of each other, 
+ * and the respective directives from the Engine should not affect the other setting in any way.
+ *
+ * @sa AudioChannel
  */
 abstract public class Speaker extends PlatformInterface
 {
     /**
-     * This enum provides the type of the @c Speaker class.
+     * Specifies the type of the Speaker
      */
     public enum Type
     {
         /**
-         * Speaker source that should be synced with AVS.
+         * The Speaker type that is controlled by AVS
          * @hideinitializer
          */
         AVS_SYNCED("AVS_SYNCED"),
         /**
-         * Speaker source that will not be synced with AVS.
+         * The Speaker type that is controlled locally by the platform
          * @hideinitializer
          */
         LOCAL("LOCAL");
@@ -61,52 +65,111 @@ abstract public class Speaker extends PlatformInterface
         }
     }
 
+    /**
+     * Speaker is the interface for volume and mute control for an @c AudioChannel.
+     * Volume and mute settings for the Speaker are independent of each other, 
+     * and the respective directives from the Engine should not affect the other setting in any way.
+     *
+     * @sa AudioChannel
+     */
     public Speaker() {
     }
 
     /**
-     * Called when the platform implementation should change the volume.
+     * Notifies the platform implementation to set the absolute volume of the Speaker. The
+     * @c volume value should be scaled to fit the needs of the platform.
      *
-     * @param [in] volume The absolute volume level scaled from 0 (min) to 100 (max).
-     * @return @c true if the call was handled successfully.
+     * @param  volume The absolute volume to set on the Speaker. @c volume is in the range [0,100]. 
+     *
+     * @return @c true if the platform implementation successfully handled the call, 
+     * else @c false
      */
     public boolean setVolume( byte volume ) {
         return false;
     }
 
     /**
-     * Called when the platform implementation should adjust the volume to a relative level.
+     * Notifies the platform implementation to make a relative adjustment to the volume setting of the Speaker. 
+     * The @c delta value is relative to the current volume setting and is positive to
+     * increase volume or negative to reduce volume.
+     * The volume @c delta value should be scaled to fit the needs of the platform.
      *
-     * @param [in] delta The relative volume adjustment. A positive or negative value used to increase or decrease volume in relation to the current volume setting.
-     * @return @c true if the call was handled successfully.
+     * @param  delta The volume adjustment to apply to the Speaker. @c delta is
+     * in the range [-100, 100].
+     *
+     * @return @c true if the platform implementation successfully handled the call, 
+     * else @c false
      */
     public boolean adjustVolume( byte delta ) {
         return false;
     }
 
     /**
-     * Called when the platform implementation should mute/unmute.
+     * Notifies the platform implementation to apply a mute setting to the Speaker
      *
-     * @param [in] mute @c true when the media player is muted, and @c false when unmuted.
-     * @return @c true if the call was handled successfully.
+     * @param  mute The mute setting to apply to the Speaker. @c true when the Speaker
+     * should be muted, @c false when unmuted
+     *
+     * @return @c true if the platform implementation successfully handled the call, 
+     * else @c false
      */
     public boolean setMute( boolean mute ) {
         return false;
     }
 
     /**
-     * Called when the Engine needs the platform's current volume.
+     * Returns the current volume setting of the Speaker platform implementation
+     *
+     * @return The current volume setting of the Speaker platform implementation. The volume returned
+     * must be scaled to the range [0,100].
      */
     public byte getVolume() {
         return 0;
     }
 
     /**
-     * Called when the Engine needs the platform's muting state.
+     * Returns the current mute setting of the Speaker platform implementation
+     *
+     * @return The current mute setting of the Speaker platform implementation.
+     * @c true when the Speaker is muted, else @c false
      */
     public boolean isMuted() {
         return false;
     }
+
+    /**
+     * Notifies the Engine of a volume change event
+     * originating on the platform, such as a user pressing a "volume up" or "volume down"
+     * button. If the Speaker is @c Type::AVS_SYNCED, the Engine will respond with a
+     * call to @c setVolume() on each AVS-synced Speaker.
+     *
+     * @param  volume The new volume setting of the Speaker. The @c volume reported
+     * must be scaled to the range [0,100].
+     *
+     * @sa Type
+     */
+    public void localVolumeSet( byte volume ) {
+        localVolumeSet( getNativeObject(), volume );
+    }
+
+    /**
+     * Notifies the Engine of a mute setting change event
+     * originating on the platform, such as a user pressing a "mute" button.
+     * If the Speaker is @c Type::AVS_SYNCED, the Engine will respond with a
+     * call to @c setMute() on each AVS-synced Speaker.
+     *
+     * @param  mute The new mute setting of the Speaker. @c true when the Speaker is muted,
+     * else @c false
+     *
+     * @sa Type
+     */
+    public void localMuteSet( boolean mute ) {
+        localMuteSet( getNativeObject(), mute );
+    }
+
+    private native void localVolumeSet( long nativeObject, byte volume );
+    private native void localMuteSet( long nativeObject, boolean mute );
+
 }
 
 // END OF FILE

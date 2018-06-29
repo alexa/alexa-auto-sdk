@@ -97,6 +97,7 @@ using ObjectRef = GlobalRef<jobject>;
 class NativeLib {
 public:
     static std::string convert( JNIEnv *env, jstring jstr );
+    static jstring convert( JNIEnv *env, std::string );
     static ObjectRef FindEnum( JNIEnv* env, jclass enumClass, const char* fieldName, const char* type );
     static ClassRef FindClass( JNIEnv* env, const char* className );
 };

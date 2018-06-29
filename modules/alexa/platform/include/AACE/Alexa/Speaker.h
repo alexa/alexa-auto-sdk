@@ -18,29 +18,39 @@
 
 #include <stdint.h>
 
+#include "AlexaEngineInterfaces.h"
+
 /** @file */
 
 namespace aace {
 namespace alexa {
 
 /**
- * The @c Speaker class is the base class for platform interfaces that have volume control.
- */
+ * Speaker is the interface for volume and mute control for an @c AudioChannel.
+ *
+ * Volume and mute settings for the Speaker are independent of each other, 
+ * and the respective directives from the Engine should not affect the other setting in any way.
+ *
+ * @sa AudioChannel
+ */  
 class Speaker {
 protected:
     Speaker() = default;
 
 public:
+
     /**
-     * This enum provides the type of the @c Speaker class.
+     * Specifies the type of the Speaker
      */
     enum class Type {
+
         /**
-         * Speaker source that should be synced with AVS.
+         * The Speaker type that is controlled by AVS
          */
         AVS_SYNCED,
+
         /**
-         * Speaker source that will not be synced with AVS.
+         * The Speaker type that is controlled locally by the platform
          */
         LOCAL
     };
@@ -48,44 +58,104 @@ public:
     virtual ~Speaker() = default;
 
     /**
-     * Called when the platform implementation should change the volume.
+     * Notifies the platform implementation to set the absolute volume of the Speaker. The
+     * @c volume value should be scaled to fit the needs of the platform.
      *
-     * @param [in] volume The absolute volume level scaled from 0 (min) to 100 (max).
-     * @return @c true if the call was handled successfully.
+     * @param [in] volume The absolute volume to set on the Speaker. @c volume
+     * is in the range [0,100]. 
+     * @return @c true if the platform implementation successfully handled the call, 
+     * else @c false
      */
     virtual bool setVolume( int8_t volume ) = 0;
 
     /**
-     * Called when the platform implementation should adjust the volume to
-     * a relative level.
+     * Notifies the platform implementation to make a relative adjustment to the volume setting of the Speaker. 
+     * The @c delta value is relative to the current volume setting and is positive to
+     * increase volume or negative to reduce volume.
+     * The volume @c delta value should be scaled to fit the needs of the platform.
      *
-     * @param [in] delta The relative volume adjustment. A positive or
-     * negative value used to increase or decrease volume in relation
-     * to the current volume setting.
-     * @return @c true if the call was handled successfully.
+     * @param [in] delta The volume adjustment to apply to the Speaker. @c delta is
+     * in the range [-100, 100].
+     * @return @c true if the platform implementation successfully handled the call, 
+     * else @c false
      */
     virtual bool adjustVolume( int8_t delta ) = 0;
 
     /**
-     * Called when the platform implementation should mute/unmute.
+     * Notifies the platform implementation to apply a mute setting to the Speaker
      *
-     * @param [in] mute @c true when the media player is muted, and @c false when unmuted.
-     * @return @c true if the call was handled successfully.
+     * @param [in] mute The mute setting to apply to the Speaker. @c true when the Speaker
+     * should be muted, @c false when unmuted
+     * @return @c true if the platform implementation successfully handled the call, 
+     * else @c false
      */
     virtual bool setMute( bool mute ) = 0;
 
     /**
-     * Called when the Engine needs the platform's current volume.
+     * Returns the current volume setting of the Speaker platform implementation
      *
+     * @return The current volume setting of the Speaker platform implementation. The volume returned
+     * must be scaled to the range [0,100].
      */
-    virtual int8_t getVolume() =  0;
+    virtual int8_t getVolume() = 0;
 
     /**
-     * Called when the Engine needs the platform's muting state.
+     * Returns the current mute setting of the Speaker platform implementation
      *
+     * @return The current mute setting of the Speaker platform implementation.
+     * @c true when the Speaker is muted, else @c false
      */
     virtual bool isMuted() = 0;
+    
+    /**
+     * Notifies the Engine of a volume change event
+     * originating on the platform, such as a user pressing a "volume up" or "volume down"
+     * button. If the Speaker is @c Type::AVS_SYNCED, the Engine will respond with a
+     * call to @c setVolume() on each AVS-synced Speaker.
+     *
+     * @param [in] volume The new volume setting of the Speaker. The @c volume reported
+     * must be scaled to the range [0,100].
+     *
+     * @sa Type  
+     */
+    void localVolumeSet( int8_t volume );
+    
+    /**
+     * Notifies the Engine of a mute setting change event
+     * originating on the platform, such as a user pressing a "mute" button.
+     * If the Speaker is @c Type::AVS_SYNCED, the Engine will respond with a
+     * call to @c setMute() on each AVS-synced Speaker.
+     *
+     * @param [in] mute The new mute setting of the Speaker. @c true when the Speaker is muted,
+     * else @c false
+     *
+     * @sa Type  
+     */
+    void localMuteSet( bool mute );
+
+    /**
+     * @internal
+     * Sets the Engine interface delegate.
+     *
+     * Should *never* be called by the platform implementation.
+     */
+    void setEngineInterface( std::shared_ptr<aace::alexa::SpeakerEngineInterface> speakerEngineInterface );
+
+private:
+    std::shared_ptr<aace::alexa::SpeakerEngineInterface> m_speakerEngineInterface;
 };
+
+inline std::ostream& operator<<(std::ostream& stream, const Speaker::Type& type) {
+    switch (type) {
+        case Speaker::Type::AVS_SYNCED:
+            stream << "AVS_SYNCED";
+            break;
+        case Speaker::Type::LOCAL:
+            stream << "LOCAL";
+            break;
+    }
+    return stream;
+}
 
 } // aace::alexa
 } // aace

@@ -18,7 +18,6 @@
 
 #include "AACE/Engine/Alexa/AlexaEngineService.h"
 #include "AACE/Navigation/Navigation.h"
-
 #include "NavigationEngineImpl.h"
 
 namespace aace {
@@ -38,6 +37,7 @@ public:
     bool configure( const std::vector<std::shared_ptr<std::istream>>& configuration ) override;
     bool start() override;
     bool stop() override;
+    bool shutdown() override;
     bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) override;
     
 private:

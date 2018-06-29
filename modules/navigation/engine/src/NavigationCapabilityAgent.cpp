@@ -33,6 +33,24 @@ static const std::string NAMESPACE{"Navigation"};
 /// The SetDestination directive signature.
 static const alexaClientSDK::avsCommon::avs::NamespaceAndName SET_DESTINATION{NAMESPACE, "SetDestination"};
 
+/// The CancelNavigation directive signature.
+static const alexaClientSDK::avsCommon::avs::NamespaceAndName CANCEL_NAVIGATION{NAMESPACE, "CancelNavigation"};
+
+/// Navigation capability constants
+/// Navigation interface type
+static const std::string NAVIGATION_CAPABILITY_INTERFACE_TYPE = "AlexaInterface";
+/// Navigation interface name
+static const std::string NAVIGATION_CAPABILITY_INTERFACE_NAME = "Navigation";
+/// Navigation interface version
+static const std::string NAVIGATION_CAPABILITY_INTERFACE_VERSION = "1.1";
+
+/**
+ * Creates the Navigation capability configuration.
+ *
+ * @return The Navigation capability configuration.
+ */
+static std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration> getNavigationCapabilityConfiguration();
+
 std::shared_ptr<NavigationCapabilityAgent> NavigationCapabilityAgent::create( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender )
 {
     try
@@ -62,6 +80,9 @@ void NavigationCapabilityAgent::preHandleDirective( std::shared_ptr<DirectiveInf
         if( info->directive->getName() == SET_DESTINATION.name ) {
             handleSetDestinationDirective( info );
         }
+        else if( info->directive->getName() == CANCEL_NAVIGATION.name ) {
+            handleCancelNavigationDirective( info );
+        }
         else {
             handleUnknownDirective( info );
         }
@@ -83,6 +104,7 @@ alexaClientSDK::avsCommon::avs::DirectiveHandlerConfiguration NavigationCapabili
 {
     alexaClientSDK::avsCommon::avs::DirectiveHandlerConfiguration configuration;
     configuration[SET_DESTINATION] = alexaClientSDK::avsCommon::avs::BlockingPolicy::HANDLE_IMMEDIATELY;
+    configuration[CANCEL_NAVIGATION] = alexaClientSDK::avsCommon::avs::BlockingPolicy::HANDLE_IMMEDIATELY;
     return configuration;
 }
 
@@ -123,6 +145,16 @@ void NavigationCapabilityAgent::removeObserver( std::shared_ptr<NavigationObserv
 NavigationCapabilityAgent::NavigationCapabilityAgent( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender ) :
     alexaClientSDK::avsCommon::avs::CapabilityAgent{NAMESPACE, exceptionSender},
     alexaClientSDK::avsCommon::utils::RequiresShutdown{"NavigationCapabilityAgent"} {
+    m_capabilityConfigurations.insert(getNavigationCapabilityConfiguration());
+}
+
+std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration> getNavigationCapabilityConfiguration() {
+    std::unordered_map<std::string, std::string> configMap;
+    configMap.insert({alexaClientSDK::avsCommon::avs::CAPABILITY_INTERFACE_TYPE_KEY, NAVIGATION_CAPABILITY_INTERFACE_TYPE});
+    configMap.insert({alexaClientSDK::avsCommon::avs::CAPABILITY_INTERFACE_NAME_KEY, NAVIGATION_CAPABILITY_INTERFACE_NAME});
+    configMap.insert({alexaClientSDK::avsCommon::avs::CAPABILITY_INTERFACE_VERSION_KEY, NAVIGATION_CAPABILITY_INTERFACE_VERSION});
+
+    return std::make_shared<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>(configMap);
 }
 
 void NavigationCapabilityAgent::doShutdown() {
@@ -170,6 +202,16 @@ void NavigationCapabilityAgent::handleSetDestinationDirective( std::shared_ptr<D
     });
 }
 
+void NavigationCapabilityAgent::handleCancelNavigationDirective( std::shared_ptr<DirectiveInfo> info )
+{
+    m_executor.submit([this, info]() {
+        for( auto observer : m_observers ) {
+            observer->cancelNavigation();
+        }
+        setHandlingCompleted( info );
+    });
+}
+
 void NavigationCapabilityAgent::handleUnknownDirective( std::shared_ptr<DirectiveInfo> info )
 {
     AACE_ERROR(LX(TAG,"handleDirectiveFailed")
@@ -183,6 +225,10 @@ void NavigationCapabilityAgent::handleUnknownDirective( std::shared_ptr<Directiv
 
         sendExceptionEncounteredAndReportFailed( info, exceptionMessage, alexaClientSDK::avsCommon::avs::ExceptionErrorType::UNEXPECTED_INFORMATION_RECEIVED );
     });
+}
+
+std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>> NavigationCapabilityAgent::getCapabilityConfigurations() {
+    return m_capabilityConfigurations;
 }
 
 } // aace::engine::navigation

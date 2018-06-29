@@ -21,6 +21,8 @@
 void NavigationBinder::initialize( JNIEnv* env )
 {
     m_javaMethod_setDestination_payload = env->GetMethodID( getJavaClass(), "setDestination", "(Ljava/lang/String;)Z" );
+    m_javaMethod_cancelNavigation = env->GetMethodID( getJavaClass(), "cancelNavigation", "()Z" );
+
 }
 
 bool NavigationBinder::setDestination( const std::string & payload )
@@ -36,6 +38,20 @@ bool NavigationBinder::setDestination( const std::string & payload )
 
             result = context.getEnv()->CallBooleanMethod( getJavaObject(), m_javaMethod_setDestination_payload, payloadStr );
             context.getEnv()->DeleteLocalRef( payloadStr );
+        }
+    }
+    return result;
+}
+
+bool NavigationBinder::cancelNavigation()
+{
+    bool result = false;
+    if( getJavaObject() != nullptr && m_javaMethod_cancelNavigation != nullptr )
+    {
+        ThreadContext context;
+
+        if( context.isValid() ) {
+            result = context.getEnv()->CallBooleanMethod( getJavaObject(), m_javaMethod_cancelNavigation );
         }
     }
     return result;

@@ -44,6 +44,10 @@
 
 #include "aace/navigation/NavigationBinder.h"
 
+#include "aace/phonecontrol/PhoneCallControllerBinder.h"
+
+#include "aace/network/NetworkInfoProviderBinder.h"
+
 class EngineBinder : public PlatformInterfaceBinder {
 public:
     EngineBinder();
@@ -73,9 +77,11 @@ private:
     std::shared_ptr<TemplateRuntimeBinder> createTemplateRuntimeBinder( JNIEnv* env, jobject platformInterface );
     std::shared_ptr<LocationProviderBinder> createLocationProviderBinder( JNIEnv* env, jobject platformInterface );
     std::shared_ptr<PlaybackControllerBinder> createPlaybackControllerBinder( JNIEnv* env, jobject platformInterface );
-
     std::shared_ptr<NavigationBinder> createNavigationBinder( JNIEnv* env, jobject platformInterface );
 
+    std::shared_ptr<NetworkInfoProviderBinder> createNetworkInfoProviderBinder( JNIEnv* env, jobject platformInterface );
+
+    std::shared_ptr<PhoneCallControllerBinder> createPhoneCallControllerBinder( JNIEnv* env, jobject platformInterface );
 
 private:
     std::shared_ptr<aace::core::Engine> m_engine;
@@ -86,10 +92,8 @@ private:
     std::shared_ptr<aace::alexa::AuthProvider> m_authProvider;
     std::shared_ptr<aace::alexa::AudioChannel> m_audioChannel;
     std::shared_ptr<aace::alexa::AudioPlayer> m_audioPlayer;
-    std::shared_ptr<aace::alexa::MediaPlayer> m_mediaPlayer;
     std::shared_ptr<aace::alexa::Notifications> m_notifications;
     std::shared_ptr<aace::alexa::PlaybackController> m_playbackController;
-    std::shared_ptr<aace::alexa::Speaker> m_speaker;
     std::shared_ptr<aace::alexa::SpeechRecognizer> m_speechRecognizer;
     std::shared_ptr<aace::alexa::SpeechSynthesizer> m_speechSynthesizer;
     std::shared_ptr<aace::alexa::TemplateRuntime> m_templateRuntime;
@@ -114,6 +118,14 @@ private:
     // com.amazon.navigation.*
     std::shared_ptr<aace::navigation::Navigation> m_navigation;
     ClassRef m_javaClass_Navigation;
+
+    // com.amazon.phonecontrol.*
+    std::shared_ptr<aace::phoneCallController::PhoneCallController> m_phoneCallController;
+    ClassRef m_javaClass_PhoneCallController;
+
+    // com.amazon.network.*
+    std::shared_ptr<aace::network::NetworkInfoProvider> m_networkInfo;
+    ClassRef m_javaClass_NetworkInfoProvider;
 };
 
 #endif //AACE_CORE_ENGINE_BINDER_H

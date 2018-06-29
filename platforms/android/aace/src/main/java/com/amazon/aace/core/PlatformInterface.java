@@ -19,10 +19,15 @@
 package com.amazon.aace.core;
 
 /**
- * The @c PlatformInterface class is the base class for all platform interfaces. It can be extended to create custom platform interfaces.
+ * PlatformInterface is the base class for all platform interfaces.
+ * It can be extended to create custom platform interfaces.
  */
 public class PlatformInterface
 {
+    /**
+     * PlatformInterface is the base class for all platform interfaces.
+     * It can be extended to create custom platform interfaces.
+     */
     public PlatformInterface() {
         super();
     }

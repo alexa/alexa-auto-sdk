@@ -19,27 +19,34 @@
 package com.amazon.aace.alexa;
 
 /**
- * The @c Notifications class should be extended by the platform implementation to handle Notifications from AVS and provide an indication whether notifications are available.
+ * Notifications should be extended to handle rendering indicators for notifications from AVS.
+ * The platform implementation is responsible for rendering visual cues for an active notification.
+ * The Notifications @c MediaPlayer will receive directives from the Engine
+ * for rendering audio indicators required by a change in @c Notifications::IndicatorState.
+ *
+ * @note This interface provides indicators that a notification was received, not the content of the notification.
+ *
+ * @sa AudioChannel
  */
 public class Notifications extends AudioChannel
 {
     /**
-     *  An enum class which captures the states a notifications object can be in.
+     * Specifies whether a notification indicator should be rendered on the platform
      */
     public enum IndicatorState
     {
         /**
-         *  The notifications indicator should be turned off
+         * The notification indicator should be turned off
          * @hideinitializer
          */
         OFF("OFF"),
         /**
-         *  The notifications indicator should be turned on
+         * The notification indicator should be turned on
          * @hideinitializer
          */
         ON("ON"),
         /**
-         *  The notifications indicator state is unknown
+         * The notification indicator state is unknown.
          * @hideinitializer
          */
         UNKNOWN("UNKNOWN");
@@ -64,12 +71,24 @@ public class Notifications extends AudioChannel
         }
     }
 
+    /**
+     * Notifications should be extended to handle rendering indicators for notifications from AVS.
+     * The platform implementation is responsible for rendering visual cues for an active notification.
+     * The Notifications @c MediaPlayer will receive directives from the Engine
+     * for rendering audio indicators required by a change in @c Notifications::IndicatorState.
+     *
+     * @note This interface provides indicators that a notification was received, not the content of the notification.
+     *
+     * @sa AudioChannel
+     */
     public Notifications( MediaPlayer mediaPlayer, Speaker speaker ) {
         super( mediaPlayer, speaker, null );
     }
 
     /**
-     *  Called when the notification indicator has changed state
+     * Notifies the platform implementation of whether a notification indicator should be rendered
+     *
+     * @param  state The new notification indicator state
      */
     public void setIndicator( IndicatorState state ) {
     }

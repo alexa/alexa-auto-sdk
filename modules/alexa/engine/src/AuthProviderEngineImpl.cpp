@@ -23,28 +23,32 @@ namespace alexa {
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.AuthProviderEngineImpl");
 
-std::shared_ptr<AuthProviderEngineImpl> AuthProviderEngineImpl::create() {
-    return std::shared_ptr<AuthProviderEngineImpl>( new AuthProviderEngineImpl() );
+std::shared_ptr<AuthProviderEngineImpl> AuthProviderEngineImpl::create( std::shared_ptr<aace::alexa::AuthProvider> authProvider ) {
+    return std::shared_ptr<AuthProviderEngineImpl>( new AuthProviderEngineImpl( authProvider ) );
 }
 
-AuthProviderEngineImpl::AuthProviderEngineImpl() : m_authState( AuthState::UNINITIALIZED ), m_authError( AuthError::NO_ERROR ) {
+AuthProviderEngineImpl::AuthProviderEngineImpl( std::shared_ptr<aace::alexa::AuthProvider> authProvider ) :
+    alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
+    m_authProviderPlatformInterface( authProvider ),
+    m_authState( AuthState::UNINITIALIZED ),
+    m_authError( AuthError::NO_ERROR ) {
 }
 
-void AuthProviderEngineImpl::setAuthProvider( std::shared_ptr<aace::alexa::AuthProvider> authProvider )
-{
-    if( m_authProvider != nullptr ) {
-        AACE_WARN(LX(TAG,"setAuthProvider").d("reason", "authProviderAlreadySet"));
-    }
-    
-    m_authProvider = authProvider;
+void AuthProviderEngineImpl::doShutdown() {
+    m_authProviderPlatformInterface->setEngineInterface( nullptr );
+    m_observers.clear();
+}
+
+AuthProviderEngineImpl::AuthState AuthProviderEngineImpl::getAuthState() {
+    return m_authProviderPlatformInterface != nullptr ? m_authProviderPlatformInterface->getAuthState() : AuthState::UNINITIALIZED;
 }
 
 std::string AuthProviderEngineImpl::getAuthToken()
 {
     try
     {
-        ThrowIfNull( m_authProvider, "nullAuthProvider" );
-        return m_authProvider->getAuthToken();
+        ThrowIfNull( m_authProviderPlatformInterface, "nullAuthProvider" );
+        return m_authProviderPlatformInterface->getAuthToken();
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"getAuthToken").d("reason", ex.what()));
@@ -69,12 +73,12 @@ void AuthProviderEngineImpl::removeAuthObserver( std::shared_ptr<alexaClientSDK:
 
 void AuthProviderEngineImpl::onAuthStateChanged( AuthState authState, AuthError authError )
 {
-    std::lock_guard<std::mutex> lock( m_mutex );
+    auto observerListCopy = m_observers;
     
     m_authState = authState;
     m_authError = authError;
     
-    for( const auto& observer : m_observers )
+    for( const auto& observer : observerListCopy )
     {
         observer->onAuthStateChange( static_cast<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State>( m_authState ),
                                      static_cast<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error>( m_authError ) );

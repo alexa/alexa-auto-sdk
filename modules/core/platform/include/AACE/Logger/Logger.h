@@ -28,33 +28,38 @@ namespace aace {
 namespace logger {
 
 /**
- * The @c Logger should be extended by the platform implementation to handle logs coming from the SDK.
+ * Logger should be extended handle log events from the AAC SDK.
  */
 class Logger : public aace::core::PlatformInterface {
 protected:
     Logger() = default;
 
 public:
-    virtual ~Logger() = default;
+    virtual ~Logger();
 
+    /**
+     * Specifies the severity level of a log message
+     * @sa @c aace::logger::LoggerEngineInterface::Level
+     */
     using Level = aace::logger::LoggerEngineInterface::Level;
 
     /**
-     * Called when the platform implementation should handle a log event from the SDK logger.
+     * Notifies the platform implementation of a log event from the AAC SDK logger
      *
-     * @param [in] level The @c aace::logger::Logger::Level log level
-     * @param [in] time Time of the logged message
+     * @param [in] level The log level
+     * @param [in] time The timestamp of the logged message
      * @param [in] source The source of the log message
      * @param [in] message The log message
      *
-     * @return @c true if log event was handled by the platform.
+     * @return @c true if the platform implementation successfully handled the log event, else @c false
      */
     virtual bool logEvent( aace::logger::Logger::Level level, std::chrono::system_clock::time_point time, const std::string& source, const std::string& message );
     
     /**
-     * Use the Engine's logger to log an event.
+     * Notifies the Engine to use the AAC SDK logger to log a message originating on the platform.
+     * The log event will be received by the platform with a call to @c logEvent() from the Engine.
      *
-     * @param [in] level The @c aace::logger::Logger::Level log level
+     * @param [in] level The log level
      * @param [in] tag The log tag
      * @param [in] message The log message
      */
@@ -62,7 +67,7 @@ public:
 
     /**
      * @internal
-     * Sets engine interface delegate.
+     * Sets the Engine interface delegate.
      *
      * Should *never* be called by the platform implementation.
      */

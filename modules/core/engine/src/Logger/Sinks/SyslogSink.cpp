@@ -17,6 +17,7 @@
 #include <syslog.h>
 
 #include "AACE/Engine/Logger/Sinks/SyslogSink.h"
+#include "AACE/Engine/Logger/LogFormatter.h"
 #include "AACE/Engine/Core/EngineMacros.h"
 
 namespace aace {
@@ -28,7 +29,7 @@ namespace sink {
 static const std::string TAG("aace.logger.sink.SyslogSink");
 
 SyslogSink::SyslogSink( const std::string& id ) : Sink( id ) {
-    openlog( id.c_str(), 0, LOG_USER );
+    openlog( nullptr, 0, LOG_USER );
     setlogmask( LOG_UPTO( LOG_DEBUG ) );
 }
 
@@ -66,8 +67,8 @@ void SyslogSink::log( Level level, std::chrono::system_clock::time_point time, c
             syslogLevel = LOG_CRIT;
             break;
     }
-
-    syslog( syslogLevel, "%s", text );
+    
+    syslog( syslogLevel, "%s", LogFormatter::format( level, std::chrono::system_clock::time_point(), threadMoniker, text ).c_str() );
 }
 
 } // aace::engine::logger::sink

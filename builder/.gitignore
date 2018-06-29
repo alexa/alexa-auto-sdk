@@ -5,8 +5,7 @@ android-toolchain/
 amazon-sources/
 
 build/
-build-legacy/
-build-cmake/
+cmake/
 
 deploy/
 

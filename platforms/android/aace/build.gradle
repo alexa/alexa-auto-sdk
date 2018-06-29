@@ -1,15 +1,18 @@
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
 apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion '26.0.2'
+    buildToolsVersion '27.0.3'
     defaultConfig {
         minSdkVersion 22
         targetSdkVersion 23
         versionCode 1
         versionName '1.0'
         ndk {
-            abiFilters 'armeabi-v7a'//, 'x86'
+            abiFilters = generateAbiFiltersDeploy()
         }
         externalNativeBuild {
             cmake {
@@ -17,6 +20,7 @@ android {
             }
         }
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -32,9 +36,80 @@ android {
             path 'CMakeLists.txt'
         }
     }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs 'native-dependencies/jni'
+        }
+    }
+}
+
+clean.doFirst {
+    delete 'native-dependencies'
 }
 
 clean.doLast {
     // Touch CMakeLists.txt file to force re-running CMake after gradle clean...
     file('CMakeLists.txt').setLastModified(new Date().getTime())
+}
+
+//visit abi directories in builder/deploy folder, extract abis, and add to abiFilters
+List<String> generateAbiFiltersDeploy() {
+    List<String> abiFilters = new ArrayList<>()
+    String builderDeployPath = "../../builder/deploy/"
+    File deployDir = new File(builderDeployPath)
+    File[] directories = deployDir.listFiles(new FileFilter() {
+        @Override
+        public boolean accept(File pathname) {
+            return pathname.isDirectory()
+        }
+    })
+    for (File dir : directories) {
+        String abi = extractAbiFromDirectory(dir)
+        if (abi != null) {
+            abiFilters.add(abi)
+        }
+    }
+    return abiFilters
+}
+
+String extractAbiFromDirectory(File dir) {
+    String[] filenames = dir.list()
+    for (String filename : filenames) {
+        String abi = extractAbiFromString(filename)
+        if (abi != null)
+            return abi
+    }
+    return null
+}
+
+String extractAbiFromString(String filename) {
+    Pattern pattern = Pattern.compile("aac-image-minimal-(armeabi-v7a|x86|x86_64|arm64-v8a)-android-[0-9]+\\.tar\\.gz")
+    Matcher matcher = pattern.matcher(filename)
+    if(matcher.find()) {
+        String abi = matcher.group(1)
+        String abiLogMsg = generateAbiLogMsg(abi, filename)
+        logger.lifecycle(abiLogMsg)
+        return abi
+    } else {
+        return null
+    }
+}
+
+String generateAbiLogMsg(String abi, String filename) {
+    StringBuilder sb = new StringBuilder()
+    String logMsg = String.format("Extracting the abi '%s' from '%s'", abi, filename)
+    String line = generateLine(logMsg.length())
+    sb.append(line).append(logMsg).append(line)
+    return sb.toString()
+}
+
+String generateLine(int length) {
+    StringBuilder sb = new StringBuilder()
+    sb.append('\n')
+    for (int x = 0; x < length; x++) {
+        sb.append("-")
+    }
+    sb.append('\n')
+    return sb.toString()
 }

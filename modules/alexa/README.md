@@ -2,7 +2,26 @@
 
 ### Overview
 
-The AAC Alexa API provides the features that are relevant to a platform implementation from the AVS Device SDK. The Engine handles some extra setup and steps to sequence events and directive handling. The platform developer can focus on just using the provided API to interact with AVS. This is done by registering platform interfaces via the Engine object.
+The AAC Alexa API provides interfaces for standard AVS features. The Engine handles some extra setup and steps to sequence events and directive handling. The platform developer can focus on just using the provided API to interact with AVS. This is done by registering platform interfaces via the Engine object.
+
+### AAC Sequence Diagrams<a id="sequencediagrams"> </a>
+
+You can read more about how the AAC flow works by checking out some sequence diagrams.
+
+* [Login/Logout Sequence Diagram](../../SEQUENCE_DIAGRAMS.md#loginlogout)
+* [Tap to Talk Sequence Diagram](../../SEQUENCE_DIAGRAMS.md#taptotalk)
+* [Wake Word Enabled Sequence Diagram](../../SEQUENCE_DIAGRAMS.md#wakewordenabled)
+
+### Request Wake Word Support for Alexa
+
+If you want to enable wake word support for your specific implementation of AAC, you need to make a request with your Alexa Automotive solution architect (SA).
+
+There are 3 steps to this process:
+1. Let your SA know you want to enable wake word support.
+2. Your SA processes your request with the appropriate Alexa teams.
+3. You'll receive a single zip file containing the necessary packages, instructions, and scripts.
+
+All that's left for you to do is create an "extras" directory under your "aac-sdk" directory for the packages and follow the instructions in the README file included in the package.
 
 ### Handling Alexa state changes
 
@@ -113,12 +132,12 @@ To implement a custom handler for Notifications the `aace::alexa::Notifications`
 using IndicatorState = aace::alexa::Notifications::IndicatorState;
 class MyNotificationsHandler : public aace::alexa::Notifications {
 	 MyNotificationsHandler(std::shared_ptr<aace::alexa::MediaPlayer> player, std::shared_ptr<aace::alexa::Speaker> speaker)
-	 
+
   public:
     void setIndicator( IndicatorState state ) override {
         // set your notifcations indicator!
     }
-   
+
 };
 ...
 
@@ -259,4 +278,3 @@ To implement a custom handler for the playback controller, the `aace::alexa::Pla
 
     // Configure the Engine
     engine->registerPlatformInterface( std::make_shared<MyPlaybackController>() );
-

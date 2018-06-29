@@ -25,33 +25,36 @@ namespace aace {
 namespace alexa {
 
 /**
- * The @c AlexaClient class should be extended by the platform implementation to handle standard AVS state changes in the
- * application.
+ * AlexaClient should be extended to handle Alexa state changes on the platform.
  */
 class AlexaClient : public aace::core::PlatformInterface {
 protected:
     AlexaClient() = default;
 
 public:
-    virtual ~AlexaClient() = default;
+    virtual ~AlexaClient();
 
     /**
-     * The enum DialogState describes the state of the Alexa dialog interaction.
+     * Describes the state of Alexa dialog interaction
      */
     enum class DialogState {
+
         /**
          * Alexa is idle and ready for an interaction.
          */
         IDLE,
+
         /**
          * Alexa is currently listening.
          */
         LISTENING,
+
         /**
-         * A customer request has been completed and no more input is accepted. In this state, Alexa is waiting for a
-         * response from AVS.
+         * A user request has completed, and no more user input is being accepted.
+         * Alexa is waiting for a response from AVS.
          */
         THINKING,
+
         /**
          * Alexa is responding to a request with speech.
          */
@@ -59,106 +62,119 @@ public:
     };
 
     /**
-     * Called when the platform implementation should handle AVS UX dialog state changes.
+     * Notifies the platform implementation of an Alexa dialog state change
      *
-     * @param [in] state The new dialog-specific AVS UX state.
-     * @sa DialogState
+     * @param [in] state The new Alexa dialog state
+     *
+     * @note It is the responsibility of the platform implementation to provide a familiar Alexa experience for the user.
+     * See the AVS UX Attention System guidelines for recommendations on communicating 
+     * Alexa attention states: https://developer.amazon.com/docs/alexa-voice-service/ux-design-attention.html#implement
      */
     virtual void dialogStateChanged( DialogState state ) {}
 
-    /**
-     * @sa aace::alexa::AuthProviderEngineInterface::AuthState
-     */
-    using AuthState = aace::alexa::AuthProviderEngineInterface::AuthState;
 
-    /**
-     * @sa aace::alexa::AuthProviderEngineInterface::AuthError
-     */
+    using AuthState = aace::alexa::AuthProviderEngineInterface::AuthState;
     using AuthError = aace::alexa::AuthProviderEngineInterface::AuthError;
 
     /**
-     * Called when the platform implementation should handle AVS auth state changes.
+     * Notifies the platform implementation of an AVS authorization state change
      *
-     * @param [in] state The new auth state.
-     * @param [in] error The auth error if an error occurred.
-     * @sa AuthState AuthError
+     * @param [in] state The new authorization state
+     * @param [in] error The error state of the authorization attempt
      */
     virtual void authStateChanged( AuthState state, AuthError error ) {}
 
     /**
-     * The enum ConnectionStatus describes the state of ACL connection.
+     * Describes the status of an AVS connection
      */
     enum class ConnectionStatus {
+
         /**
-         * ACL is not connected to AVS.
+         * Not connected to AVS
          */
         DISCONNECTED,
+
         /**
-         * ACL is attempting to establish a connection to AVS.
+         * Attempting to establish a connection to AVS
          */
         PENDING,
+
         /**
-         * ACL is connected to AVS.
+         * Connected to AVS
          */
         CONNECTED
     };
 
     /**
-     * The enum ConnectionChangedReason encodes the reasons for state changes or failures in the connection attempt to the public API.
+     * Describes the reason for a change in AVS connection status
      */
     enum class ConnectionChangedReason {
+
         /**
-         * The connection status changed due to the client interacting with the Connection public API.
+         * The connection status changed due to a client request.
          */
         ACL_CLIENT_REQUEST,
+
         /**
-         * The connection attempt failed due to the Connection object being disabled.
+         * The connection attempt failed because connection was disabled.
          */
         ACL_DISABLED,
+
         /**
-         * The connection attempt failed due to DNS resolution timeout.
+         * The connection attempt failed due to a DNS resolution timeout.
          */
         DNS_TIMEDOUT,
+
         /**
-         * The connection attempt failed due to timeout.
+         * The connection attempt failed due to a connection timeout.
          */
         CONNECTION_TIMEDOUT,
+
         /**
          * The connection attempt failed due to excessive load on the server.
          */
         CONNECTION_THROTTLED,
+
         /**
-         * The access credentials provided to ACL were invalid.
+         * The provided access credentials were invalid.
          */
         INVALID_AUTH,
+
         /**
          * There was a timeout sending a ping request.
          */
         PING_TIMEDOUT,
+
         /**
          * There was a timeout writing to AVS.
          */
         WRITE_TIMEDOUT,
+
         /**
          * There was a timeout reading from AVS.
          */
         READ_TIMEDOUT,
+
         /**
          * There was an underlying protocol error.
          */
         FAILURE_PROTOCOL_ERROR,
+
         /**
-         * There was an internal error within ACL.
+         * There was an internal error.
          */
         INTERNAL_ERROR,
+
         /**
          * There was an internal error on the server.
          */
         SERVER_INTERNAL_ERROR,
+
         /**
          * The server asked the client to reconnect.
          */
         SERVER_SIDE_DISCONNECT,
+
         /**
          * The server endpoint has changed.
          */
@@ -166,14 +182,94 @@ public:
     };
 
     /**
-     * Called when the platform implementation should handle AVS connection status changes.
+     * Notifies the platform implementation of an AVS connection status change
      *
-     * @param [in] status The new connection status.
-     * @param [in] reason The reason the status change occurred.
-     * @sa ConnectionStatus ConnectionChangedReason
+     * @param [in] status The new AVS connection status
+     * @param [in] reason The reason for the status change
      */
     virtual void connectionStatusChanged( ConnectionStatus status, ConnectionChangedReason reason ) {}
 };
+
+inline std::ostream& operator<<(std::ostream& stream, const AlexaClient::DialogState& state) {
+    switch (state) {
+        case AlexaClient::DialogState::IDLE:
+            stream << "IDLE";
+            break;
+        case AlexaClient::DialogState::LISTENING:
+            stream << "LISTENING";
+            break;
+        case AlexaClient::DialogState::THINKING:
+            stream << "THINKING";
+            break;
+        case AlexaClient::DialogState::SPEAKING:
+            stream << "SPEAKING";
+            break;
+    }
+    return stream;
+}
+
+inline std::ostream& operator<<(std::ostream& stream, const AlexaClient::ConnectionStatus& status) {
+    switch (status) {
+        case AlexaClient::ConnectionStatus::DISCONNECTED:
+            stream << "DISCONNECTED";
+            break;
+        case AlexaClient::ConnectionStatus::PENDING:
+            stream << "PENDING";
+            break;
+        case AlexaClient::ConnectionStatus::CONNECTED:
+            stream << "CONNECTED";
+            break;
+    }
+    return stream;
+}
+
+inline std::ostream& operator<<(std::ostream& stream, const AlexaClient::ConnectionChangedReason& reason) {
+    switch (reason) {
+        case AlexaClient::ConnectionChangedReason::ACL_CLIENT_REQUEST:
+            stream << "ACL_CLIENT_REQUEST";
+            break;
+        case AlexaClient::ConnectionChangedReason::ACL_DISABLED:
+            stream << "ACL_DISABLED";
+            break;
+        case AlexaClient::ConnectionChangedReason::DNS_TIMEDOUT:
+            stream << "DNS_TIMEDOUT";
+            break;
+        case AlexaClient::ConnectionChangedReason::CONNECTION_TIMEDOUT:
+            stream << "CONNECTION_TIMEDOUT";
+            break;
+        case AlexaClient::ConnectionChangedReason::CONNECTION_THROTTLED:
+            stream << "CONNECTION_THROTTLED";
+            break;
+        case AlexaClient::ConnectionChangedReason::INVALID_AUTH:
+            stream << "INVALID_AUTH";
+            break;
+        case AlexaClient::ConnectionChangedReason::PING_TIMEDOUT:
+            stream << "PING_TIMEDOUT";
+            break;
+        case AlexaClient::ConnectionChangedReason::WRITE_TIMEDOUT:
+            stream << "WRITE_TIMEDOUT";
+            break;
+        case AlexaClient::ConnectionChangedReason::READ_TIMEDOUT:
+            stream << "READ_TIMEDOUT";
+            break;
+        case AlexaClient::ConnectionChangedReason::FAILURE_PROTOCOL_ERROR:
+            stream << "FAILURE_PROTOCOL_ERROR";
+            break;
+        case AlexaClient::ConnectionChangedReason::INTERNAL_ERROR:
+            stream << "INTERNAL_ERROR";
+            break;
+        case AlexaClient::ConnectionChangedReason::SERVER_INTERNAL_ERROR:
+            stream << "SERVER_INTERNAL_ERROR";
+            break;
+        case AlexaClient::ConnectionChangedReason::SERVER_SIDE_DISCONNECT:
+            stream << "SERVER_SIDE_DISCONNECT";
+            break;
+        case AlexaClient::ConnectionChangedReason::SERVER_ENDPOINT_CHANGED:
+            stream << "SERVER_ENDPOINT_CHANGED";
+            break;
+    }
+    return stream;
+}
 
 } // aace::alexa
 } // aace

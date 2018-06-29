@@ -40,10 +40,8 @@ public:
     bool setPosition( int64_t position ) override;
 
 public:
-    aace::alexa::MediaPlayer::ErrorType convertErrorType( JNIEnv* env, jobject obj );
-
-private:
-    jobject convert( aace::alexa::MediaPlayer::ErrorType type );
+    aace::alexa::MediaPlayer::MediaError convertMediaError( JNIEnv* env, jobject obj );
+    aace::alexa::MediaPlayer::MediaState convertMediaState( JNIEnv* env, jobject obj );
 
 private:
     jmethodID m_javaMethod_prepare = nullptr;
@@ -55,12 +53,17 @@ private:
     jmethodID m_javaMethod_getPosition = nullptr;
     jmethodID m_javaMethod_setPosition_position = nullptr;
 
-    // ErrorType
-    ObjectRef m_enum_ErrorType_MEDIA_ERROR_UNKNOWN;
-    ObjectRef m_enum_ErrorType_MEDIA_ERROR_INVALID_REQUEST;
-    ObjectRef m_enum_ErrorType_MEDIA_ERROR_SERVICE_UNAVAILABLE;
-    ObjectRef m_enum_ErrorType_MEDIA_ERROR_INTERNAL_SERVER_ERROR;
-    ObjectRef m_enum_ErrorType_MEDIA_ERROR_INTERNAL_DEVICE_ERROR;
+    // MediaError
+    ObjectRef m_enum_MediaError_MEDIA_ERROR_UNKNOWN;
+    ObjectRef m_enum_MediaError_MEDIA_ERROR_INVALID_REQUEST;
+    ObjectRef m_enum_MediaError_MEDIA_ERROR_SERVICE_UNAVAILABLE;
+    ObjectRef m_enum_MediaError_MEDIA_ERROR_INTERNAL_SERVER_ERROR;
+    ObjectRef m_enum_MediaError_MEDIA_ERROR_INTERNAL_DEVICE_ERROR;
+
+    // MediaState
+    ObjectRef m_enum_MediaState_STOPPED;
+    ObjectRef m_enum_MediaState_PLAYING;
+    ObjectRef m_enum_MediaState_BUFFERING;
 };
 
 #endif //AACE_ALEXA_MEDIA_PLAYER_BINDER_H

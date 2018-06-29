@@ -21,36 +21,59 @@ package com.amazon.aace.alexa;
 import com.amazon.aace.core.PlatformInterface;
 
 /**
- * The @c PlaybackController class should be extended by the platform implementation to handle media controller events occurring on the platform.
+ * PlaybackController should be extended to handle playback control
+ * operations such as on-platform button presses for the @c AudioPlayer. The Engine will respond to PlaybackController 
+ * events with playback control directives on the @c AudioPlayer @c MediaPlayer.
+ *
+ * @note The TemplateRuntime::renderPlayerInfo() payload includes information about what
+ * playback control buttons should be enabled on screen with a player info display card.
+ *
+ * @sa AudioPlayer
  */
 abstract public class PlaybackController extends PlatformInterface
 {
+    /**
+     * PlaybackController should be extended to handle playback control
+     * operations such as on-platform button presses for the @c AudioPlayer. The Engine will respond to PlaybackController 
+     * events with playback control directives on the @c AudioPlayer @c MediaPlayer.
+     *
+     * @note The TemplateRuntime::renderPlayerInfo() payload includes information about what
+     * playback control buttons should be enabled on screen with a player info display card.
+     *
+     * @sa AudioPlayer
+     */
     public PlaybackController() {
     }
 
     /**
-     * Notify the Engine that the Play button has been pressed.
+     * Notifies the Engine of a platform request to begin audio playback, such as when a user presses
+     * a "play" button. The Engine will issue a playback directive to the @c AudioPlayer @c MediaPlayer to initiate
+     * playback on the platform.
      */
     public void playButtonPressed() {
         playButtonPressed( getNativeObject() );
     }
 
     /**
-     * Notify the Engine that the Pause button has been pressed.
+     * Notifies the Engine of a platform request to pause audio playback, such as when a user presses
+     * a "pause" button. The Engine will issue a playback directive to the @c AudioPlayer @c MediaPlayer to stop
+     * playback on the platform.
      */
     public void pauseButtonPressed() {
         pauseButtonPressed( getNativeObject() );
     }
 
     /**
-     * Notify the Engine that the Next button has been pressed.
+     * Notifies the Engine of a platform request to skip forward in the playback queue, such as when a user
+     * presses a "next" button. The Engine will issue playback directives to the @c AudioPlayer @c MediaPlayer to control playback on the platform.
      */
     public void nextButtonPressed() {
         nextButtonPressed( getNativeObject() );
     }
 
     /**
-     * Notify the Engine that the Previous button has been pressed.
+     * Notifies the Engine of a platform request to skip backward in the playback queue, such as when a user
+     * presses a "previous" button. The Engine will issue playback directives to the @c AudioPlayer @c MediaPlayer to control playback on the platform.
      */
     public void previousButtonPressed() {
         previousButtonPressed( getNativeObject() );

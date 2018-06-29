@@ -21,18 +21,21 @@ package com.amazon.aace.navigation;
 import com.amazon.aace.core.PlatformInterface;
 
 /**
- * PRELIMINARY
- * The @c Navigation class should be extended by the platform implementation to handle navigation directives and events from AVS.
+ * Navigation should be extended to handle navigation directives from the Engine.
  */
 abstract public class Navigation extends PlatformInterface
 {
+    /**
+     * Navigation should be extended to handle navigation directives from the Engine.
+     */
     public Navigation() {
     }
 
     /**
-     * Called when the platform implementation should handle a @c setDestination directive.
+     * Notifies the platform implementation to set the navigation destination
      *
-     * @param [in] payload @c JSON data containing the destination information.
+     * @param  payload JSON data containing the destination information
+     *
      * @code    {.json})
      * "destination": {
      *    "coordinate": {
@@ -44,10 +47,21 @@ abstract public class Navigation extends PlatformInterface
      *    "multipleLineDisplayAddress": "{{STRING}}",
      * }
      * @endcode
+     *
+     * @return @c true if the platform implementation successfully handled the call, 
+     * else @c false
      */
     public boolean setDestination( String payload ) {
         return false;
     }
+
+    /**
+     * Notifies the platform implementation to cancel navigation
+     *
+     * @return @c true if the platform implementation successfully handled the call, 
+     * else @c false
+     */
+    public boolean cancelNavigation() { return false; }
 
 }
 

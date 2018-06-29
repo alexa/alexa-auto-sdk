@@ -24,6 +24,7 @@ class NavigationObserverInterface {
 public:
     virtual ~NavigationObserverInterface() = default;
     virtual void setDestination( const std::string& payload ) = 0;
+    virtual void cancelNavigation() = 0;
 };
 
 } // aace::engine::navigation

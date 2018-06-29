@@ -1,21 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<font-family xmlns:android="http://schemas.android.com/apk/res/android">
+<font-family xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" >
     <font
         android:fontStyle="normal"
         android:fontWeight="400"
-        android:font="@font/amazon_ember_regular" />
+        android:font="@font/amazon_ember_regular"
+        app:fontStyle="normal"
+        app:fontWeight="400"
+        app:font="@font/amazon_ember_regular" />
     <font
         android:fontStyle="normal"
         android:fontWeight="700"
-        android:font="@font/amazon_ember_bold" />
+        android:font="@font/amazon_ember_bold"
+        app:fontStyle="normal"
+        app:fontWeight="700"
+        app:font="@font/amazon_ember_bold"/>
     <font
         android:fontStyle="normal"
         android:fontWeight="400"
-        android:font="@font/amazon_ember_light" />
+        android:font="@font/amazon_ember_light"
+        app:fontStyle="normal"
+        app:fontWeight="400"
+        app:font="@font/amazon_ember_light" />
 
     <font
         android:fontStyle="normal"
         android:fontWeight="300"
-        android:font="@font/amazon_ember_thin" />
+        android:font="@font/amazon_ember_thin"
+        app:fontStyle="normal"
+        app:fontWeight="300"
+        app:font="@font/amazon_ember_thin" />
 
 </font-family>

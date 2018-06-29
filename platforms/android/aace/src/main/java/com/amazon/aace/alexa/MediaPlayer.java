@@ -21,22 +21,34 @@ package com.amazon.aace.alexa;
 import com.amazon.aace.core.PlatformInterface;
 
 /**
- * The @c MediaPlayer class is the base class for platform media players, and should be extended to handle them.
+ * MediaPlayer should be extended to play audio data provided by the Engine.
+ * MediaPlayer is the interface for audio playback for an @c AudioChannel.
+ * After returning @c true from a playback-controlling directive from the Engine (i.e. @c play(), @c pause(), @c stop(), @c resume()), the platform implementation should notify the Engine when the platform
+ * media player changes playback state by calling @c mediaStateChanged() with the new @c MediaState. The Engine expects no call to @c mediaStateChanged() for a directive in which the platform
+ * returned @c false.
+ * The platform implementation may call @c mediaError() or @c mediaStateChanged() with @c MediaState.BUFFERING at any time during a playback operation to notify the Engine of an error or buffer underrun, respectvely.
+ * When the media player resumes playback after a buffer underrun, the platform implementation
+ * should call @c mediaStateChanged() with @c MediaState.PLAYING.
+ *
+ * @note The @c MediaPlayer platform implementation must be able to support the 
+ * audio formats recommended by AVS:
+ * https://developer.amazon.com/docs/alexa-voice-service/recommended-media-support.html
+ *
+ * @sa AudioChannel
  */
 abstract public class MediaPlayer extends PlatformInterface
 {
     /**
-     * Type used to identify an error that can occur during media operations.
+     * Describes an error during a media playback operation
      */
-    public enum ErrorType
-    {
+    public enum MediaError {
         /**
          * An unknown error occurred.
          * @hideinitializer
          */
         MEDIA_ERROR_UNKNOWN("MEDIA_ERROR_UNKNOWN"),
         /**
-         * The server recognized the request as being malformed (bad request, unauthorized, forbidden, not found, etc).
+         * The server recognized the request as malformed (e.g. bad request, unauthorized, forbidden, not found, etc).
          * @hideinitializer
          */
         MEDIA_ERROR_INVALID_REQUEST("MEDIA_ERROR_INVALID_REQUEST"),
@@ -46,7 +58,7 @@ abstract public class MediaPlayer extends PlatformInterface
          */
         MEDIA_ERROR_SERVICE_UNAVAILABLE("MEDIA_ERROR_SERVICE_UNAVAILABLE"),
         /**
-         * The server accepted the request, but was unable to process the request as expected.
+         * The server accepted the request but was unable to process it as expected.
          * @hideinitializer
          */
         MEDIA_ERROR_INTERNAL_SERVER_ERROR("MEDIA_ERROR_INTERNAL_SERVER_ERROR"),
@@ -64,7 +76,7 @@ abstract public class MediaPlayer extends PlatformInterface
         /**
          * @internal
          */
-        private ErrorType( String name ) {
+        private MediaError( String name ) {
             m_name = name;
         }
 
@@ -77,165 +89,215 @@ abstract public class MediaPlayer extends PlatformInterface
     }
 
     /**
-     * Called when the platform implementation should prepare for audio playback.
-     * Audio data will be available to read at this point and can be cached locally for the platform media player.
+     * Describes the playback state of the platform media player
+     */
+    public enum MediaState {
+        /**
+         * The media player is not currently playing. It may have paused, stopped, or finished.
+         * @hideinitializer
+         */
+        STOPPED("STOPPED"),
+        /**
+         * The media player is currently playing.
+         * @hideinitializer
+         */
+        PLAYING("PLAYING"),
+        /**
+         * The media player is currently buffering data.
+         * @hideinitializer
+         */
+        BUFFERING("BUFFERING");
+
+        /**
+         * @internal
+         */
+        private String m_name;
+
+        /**
+         * @internal
+         */
+        private MediaState( String name ) {
+            m_name = name;
+        }
+
+        /**
+         * @internal
+         */
+        public String toString() {
+            return m_name;
+        }
+    }
+
+    /**
+     * Notifies the platform implementation to prepare for playback of an audio stream source.
+     * Audio data will be available to stream from the Engine via @c read(). After returning @c true, the Engine will call
+     * @c play() to initiate audio playback.
      *
-     * @return @c true if the call was handled successfully.
+     * @return @c true if the platform implementation successfully handled the call, 
+     * else @c false
      */
     public boolean prepare() {
         return false;
     }
 
     /**
-     * Called when the platform implementation should prepare to play back an audio stream URL.
+     * Notifies the platform implementation to prepare for playback of a
+     * URL audio source. After returning @c true, the Engine will call @c play() to initiate audio playback.
      *
-     * @param [in] url Audio stream URL.
-     * @return @c true if the call was handled successfully.
+     * @param  url The URL audio source to set in the platform media player
+     *
+     * @return @c true if the platform implementation successfully handled the call, 
+     * else @c false
      */
     public boolean prepare( String url ) {
         return false;
     }
 
     /**
-     * Called when the platform implementation should start playing audio.
+     * Notifies the platform implementation to start playback of the current audio source. After returning @c true, the platform implementation must call @c mediaStateChanged() with @c MediaState.PLAYING when the media player begins playing the audio or @c mediaError() if an error occurs.
      *
-     * @return @c true if the call was handled successfully.
+     * @return @c true if the platform implementation successfully handled the call, 
+     * else @c false
      */
     public boolean play() {
         return false;
     }
 
     /**
-     * Called when the platform implementation should stop playing audio.
+     * Notifies the platform implementation to stop playback of the current audio source. After returning @c true, the platform implementation must call @c mediaStateChanged() with @c MediaState.STOPPED when the media player stops playing the audio or @c mediaError() if an error occurs.
+     * A subsequent call to @c play() will be preceded by calls to @c prepare() 
+     * and @c setPosition().
      *
-     * @return @c true if the call was handled successfully, else @c false.
+     * @return @c true if the platform implementation successfully handled the call, 
+     * else @c false
      */
     public boolean stop() {
         return false;
     }
 
     /**
-     * Called when the platform implementation should pause the currently playing audio.
+     * Notifies the platform implementation to pause playback of the current audio source. After returning @c true, the platform implementation must call @c mediaStateChanged() with @c MediaState.STOPPED when the media player pauses the audio or @c mediaError() if an error occurs.
+     * A subsequent call to @c resume() will not be preceded by calls to @c prepare() 
+     * and @c setPosition().
      *
-     * @return @c true if the call was handled successfully.
+     * @return @c true if the platform implementation successfully handled the call, 
+     * else @c false
      */
     public boolean pause() {
         return false;
     }
 
     /**
-     * Called when the platform implementation should resume playing currently paused audio.
+     * Notifies the platform implementation to resume playback of the current audio source. After returning @c true, the platform implementation must call @c mediaStateChanged() with @c MediaState.PLAYING when the media player resumes the audio or @c mediaError() if an error occurs.
      *
-     * @return @c true if the call was handled successfully.
+     * @return @c true if the platform implementation successfully handled the call, 
+     * else @c false
      */
     public boolean resume() {
         return false;
     }
 
     /**
-     * Called when the Engine needs the media playback position (in milliseconds) of the current audio stream.
-     * Must return the current position.
-     * @return Playback position (in milliseconds) of the current audio stream.
+     * Returns the current playback position of the platform media player.
+     * If the audio source is not playing, the most recent position played
+     * should be returned.
+     *
+     * @return The platform media player's playback position in milliseconds
      */
     public long getPosition() {
         return 0;
     }
 
     /**
-     * Called when the Engine needs to set the media playback position (in milliseconds) of the current audio stream.
-     * Must set the media player to the position.
-     * @param [in] position Position (in milliseconds) to set the current audio stream to.
+     * Notifies the platform implementation to set the playback position of the current audio source
+     * in the platform media player
      *
-     * @return @c true if the call was handled successfully.
+     * @param  position The playback position in milliseconds to set in the platform media player
+     *
+     * @return @c true if the platform implementation successfully handled the call, 
+     * else @c false
      */
     public boolean setPosition( long position ) {
         return false;
     }
 
     /**
-     * Returns @c true if the current media source should repeat when it is finished playing.
-     * The @c MediaPlayer is responsible for repeating the current audio if this call returns @c true. If @c false is returned, the @c MediaPlayer should call @c playbackFinished() when the current audio is done playing.
+     * @return @c true if the audio stream is closed and no more data is available to read.
+     */
+    public boolean isClosed() {
+        return isClosed( getNativeObject() );
+    }
+
+    /**
+     * Checks if playback of the current audio source must be repeated when finished playing.
+     * If this call returns @c true, the platform implementation should repeat the current audio source. If @c false is returned, the platform implementation should call @c mediaStateChanged() with @c MediaState.STOPPED when the
+     * audio is finished playing.
      *
-     * @return @c true if the call was handled successfully.
+     * @return @c true if the platform media player must repeat playback of the current audio source,
+     * else @c false
      */
     public boolean isRepeating() {
         return isRepeating( getNativeObject() );
     }
 
     /**
-     * Notify the Engine that the audio has started playing.
-     * Must be called when the platform implementation's @c MediaPlayer starts playing.
-     */
-    final protected void playbackStarted() {
-        playbackStarted( getNativeObject() );
-    }
-
-    /**
-     * Notify the Engine that the audio has finished playing.
-     * Must be called when the platform implementation's MediaPlayer has finished playing.
-     */
-    final protected void playbackFinished() {
-        playbackFinished( getNativeObject() );
-    }
-
-    /**
-     * Notify the Engine that audio playback has been paused.
-     * Must be called when the platform implementation's MediaPlayer enters a paused state.
-     */
-    final protected void playbackPaused() {
-        playbackPaused( getNativeObject() );
-    }
-
-    /**
-     * Notify the Engine that audio playback has resumed after being paused.
-     * Must be called when the platform implementation's MediaPlayer resumes.
-     */
-    final protected void playbackResumed() {
-        playbackResumed( getNativeObject() );
-    }
-
-    /**
-     * Notify the Engine that audio playback has stopped.
-     * Must be called when the platform implementation's MediaPlayer enters a stopped state.
-     */
-    final protected void playbackStopped() {
-        playbackStopped( getNativeObject() );
-    }
-
-    /**
-     * Notify the Engine that an error occurred while playing the audio.
-     * Must be called if the platform implementation runs into a playback error.
-     * @param [in] type The error type.
-     * @param [in] error The error description.
-     * @sa ErrorType
-     */
-    final protected void playbackError( ErrorType type, String error ) {
-        playbackError( getNativeObject(), type, error );
-    }
-
-    /**
-     * Read data from the audio stream for playback.
+     * Notifies the Engine of an error during audio playback
      *
-     * @param [in] data The data buffer to read.
-     * @param [in] size The size of the data to read.
-     * @return The number of bytes read, or zero if end of stream is reached, or -1 if an error occurred.
+     * @param  error The error encountered by the platform media player during playback
+     *
+     * @param  description A description of the error
+     *
+     * @sa MediaError
+     */
+    final protected void mediaError( MediaError type, String error ) {
+        mediaError( getNativeObject(), type, error);
+    }
+
+    /**
+     * Notifies the Engine of an audio playback state change in the platform implementation.
+     * Must be called when the platform media player transitions between stopped and playing states.
+     *
+     * @param  state The new playback state of the platform media player
+     *
+     * @sa MediaState
+     */
+    final protected void mediaStateChanged( MediaState state ) {
+        mediaStateChanged( getNativeObject(), state );
+    }
+
+    /**
+     * Reads audio data from the Engine when available. Audio data will be available after a call to @c prepare() and while @c isClosed() returns false.
+     *
+     * @param  data The buffer where audio data should be copied
+     *
+     * @param  size The size of the buffer
+     *
+     * @return The number of bytes read, 0 if the end of stream is reached or data is not currently available,
+     * or -1 if an error occurred
      */
     final protected int read( byte[] buffer ) {
         return read( getNativeObject(), buffer, 0, buffer.length );
     }
 
+    /**
+     * Reads audio data from the Engine when available. Audio data will be available after a call to @c prepare() and while @c isClosed() returns false.
+     *
+     * @param  data The buffer where audio data should be copied
+     *
+     * @param  size The size of the buffer
+     *
+     * @return The number of bytes read, 0 if the end of stream is reached or data is not currently available,
+     * or -1 if an error occurred
+     */
     final protected int read( byte[] data, int offset, int size ) {
         return read( getNativeObject(), data, offset, size );
     }
 
+    private native boolean isClosed( long nativeObject );
     private native boolean isRepeating( long nativeObject );
-    private native void playbackStarted( long nativeObject );
-    private native void playbackFinished( long nativeObject );
-    private native void playbackPaused( long nativeObject );
-    private native void playbackResumed( long nativeObject );
-    private native void playbackStopped( long nativeObject );
-    private native void playbackError( long nativeObject, ErrorType type, String error );
-    private native int read( long nativeObject, byte[] data, int offset, int size );
+    private native void mediaError( long nativeObject, MediaError type, String error );
+    private native void mediaStateChanged( long nativeObject, MediaState state );
+    private native int read( long nativeObject, byte[] data, long offset, long size );
 }
 
 // END OF FILE

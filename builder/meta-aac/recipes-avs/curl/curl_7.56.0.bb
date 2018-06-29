@@ -18,8 +18,18 @@ EXTRA_OECONF += "--with-nghttp2=${STAGING_DIR_HOST}${prefix}"
 
 # Use OpenSSL from Homebrew install
 EXTRA_OECONF_append_darwin = " --with-ssl=/usr/local/opt/openssl"
-
 # Use OpenSSL from our sysroot
 EXTRA_OECONF_append_android = " --with-ssl=${STAGING_DIR_HOST}${prefix}"
 
+# Use CA certs from AGL installation
 EXTRA_OECONF_append_m3ulcb = " --with-ca-bundle=/usr/lib/ssl/certs/ca-certificates.crt"
+
+do_configure_append() {
+	# Configure script will try to find SSL by default.
+	# Should be indicated as error if SSL couldn't be found.
+	ssl_enabled=$(grep "SSL_ENABLED" ${B}/config.status)
+	if [ ! "$ssl_enabled" = 'S["SSL_ENABLED"]="1"' ]; then
+		echo "SSL is not enabled!"
+		exit 1
+	fi
+}

@@ -16,7 +16,11 @@
 #ifndef AACE_ENGINE_ALEXA_AUTH_PROVIDER_ENGINE_IMPL_H
 #define AACE_ENGINE_ALEXA_AUTH_PROVIDER_ENGINE_IMPL_H
 
-#include <AuthDelegate/AuthDelegate.h>
+#include <unordered_set>
+
+//#include <AuthDelegate/AuthDelegate.h>
+#include <AVSCommon/SDKInterfaces/AuthDelegateInterface.h>
+#include <AVSCommon/Utils/RequiresShutdown.h>
 
 #include "AACE/Alexa/AlexaEngineInterfaces.h"
 #include "AACE/Alexa/AuthProvider.h"
@@ -27,15 +31,16 @@ namespace alexa {
     
 class AuthProviderEngineImpl :
     public aace::alexa::AuthProviderEngineInterface,
-    public alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface {
+    public alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface,
+    public alexaClientSDK::avsCommon::utils::RequiresShutdown {
 
 private:
-    AuthProviderEngineImpl();
+    AuthProviderEngineImpl( std::shared_ptr<aace::alexa::AuthProvider> authProvider );
     
 public:
-    static std::shared_ptr<AuthProviderEngineImpl> create();
-                                   
-    void setAuthProvider( std::shared_ptr<aace::alexa::AuthProvider> authProvider );
+    static std::shared_ptr<AuthProviderEngineImpl> create( std::shared_ptr<aace::alexa::AuthProvider> authProvider );
+    
+    AuthState getAuthState();
     
     // AuthProviderEngineInterface
     void onAuthStateChanged( AuthState authState, AuthError authError ) override;
@@ -45,9 +50,12 @@ public:
     void removeAuthObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer ) override;
     std::string getAuthToken() override;
     
+protected:
+    virtual void doShutdown() override;
+
 private:
     /// token provider, supplied by the client
-    std::shared_ptr<aace::alexa::AuthProvider> m_authProvider;
+    std::shared_ptr<aace::alexa::AuthProvider> m_authProviderPlatformInterface;
     
     /// holds a set of observers on the AuthProvider's state and error.
     std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface>> m_observers;

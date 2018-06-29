@@ -23,10 +23,58 @@ namespace alexa {
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.AlertsEngineImpl");
 
-AlertsEngineImpl::AlertsEngineImpl( std::shared_ptr<aace::alexa::Alerts> alertsPlatformInterface ) :
-    AudioChannelEngineImpl( alertsPlatformInterface ),
-    alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
-    m_alertsPlatformInterface( alertsPlatformInterface ) {
+AlertsEngineImpl::AlertsEngineImpl( std::shared_ptr<aace::alexa::Alerts> alertsPlatformInterface, std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> connectionManager ) :
+    AudioChannelEngineImpl( alertsPlatformInterface, TAG ),
+    m_alertsPlatformInterface( alertsPlatformInterface ),
+    m_connectionManager( connectionManager ) {
+}
+
+bool AlertsEngineImpl::initialize(
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+    std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> connectionManager,
+    std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedSender,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::AlertsAudioFactoryInterface> alertsAudioFactory,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
+    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager ) {
+
+    try
+    {
+        ThrowIfNot( initializeAudioChannel( speakerManager ), "initializeAudioChannelFailed" );
+
+        auto alertRenderer = alexaClientSDK::capabilityAgents::alerts::renderer::Renderer::create( std::static_pointer_cast<MediaPlayerInterface>( shared_from_this() ) );
+        ThrowIfNull( alertRenderer, "couldNotCreateAlertsRenderer" );
+
+        std::shared_ptr<alexaClientSDK::capabilityAgents::alerts::storage::SQLiteAlertStorage> alertStorage = alexaClientSDK::capabilityAgents::alerts::storage::SQLiteAlertStorage::create( alexaClientSDK::avsCommon::utils::configuration::ConfigurationNode::getRoot(), alertsAudioFactory );
+        ThrowIfNull( alertStorage, "couldNotCreateAlertsStorage" );
+
+        m_alertsCapabilityAgent = alexaClientSDK::capabilityAgents::alerts::AlertsCapabilityAgent::create( connectionManager, certifiedSender, focusManager, contextManager, exceptionSender, alertStorage, alertsAudioFactory, alertRenderer, dataManager );
+        ThrowIfNull( m_alertsCapabilityAgent, "couldNotCreateCapabilityAgent" );
+
+        // add the alert state changed observer
+        m_alertsCapabilityAgent->addObserver( std::dynamic_pointer_cast<alexaClientSDK::capabilityAgents::alerts::AlertObserverInterface>( shared_from_this() ) );
+
+        // add the capability agent to the connection manager
+        connectionManager->addConnectionStatusObserver( m_alertsCapabilityAgent );
+
+        // add capability agent to the directive sequencer
+        ThrowIfNot( directiveSequencer->addDirectiveHandler( m_alertsCapabilityAgent ), "addDirectiveHandlerFailed" );
+
+        // register capability with delegate
+        ThrowIfNot( capabilitiesDelegate->registerCapability( m_alertsCapabilityAgent ), "registerCapabilityFailed");
+
+        // set the platform's engine interface reference
+        m_alertsPlatformInterface->setEngineInterface( std::dynamic_pointer_cast<aace::alexa::AlertsEngineInterface>( shared_from_this() ) );
+
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"initialize").d("reason", ex.what()));
+        return false;
+    }
 }
 
 std::shared_ptr<AlertsEngineImpl> AlertsEngineImpl::create(
@@ -36,33 +84,17 @@ std::shared_ptr<AlertsEngineImpl> AlertsEngineImpl::create(
     std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::AlertsAudioFactoryInterface> alertsAudioFactory ) {
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::AlertsAudioFactoryInterface> alertsAudioFactory,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
+    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager ) {
 
     try
     {
-        std::shared_ptr<AlertsEngineImpl> alertsEngineImpl = std::shared_ptr<AlertsEngineImpl>( new AlertsEngineImpl( alertsPlatformInterface ) );
+        std::shared_ptr<AlertsEngineImpl> alertsEngineImpl = std::shared_ptr<AlertsEngineImpl>( new AlertsEngineImpl( alertsPlatformInterface, connectionManager ) );
 
-        auto alertRenderer = alexaClientSDK::capabilityAgents::alerts::renderer::Renderer::create( std::static_pointer_cast<MediaPlayerInterface>( alertsEngineImpl ) );
-        ThrowIfNull( alertRenderer, "couldNotCreateAlertsRenderer" );
-
-        auto alertStorage = std::make_shared<alexaClientSDK::capabilityAgents::alerts::storage::SQLiteAlertStorage>( alertsAudioFactory );
-        ThrowIfNull( alertStorage, "couldNotCreateAlertsStorage" );
-
-        auto alertsCapabilityAgent = alexaClientSDK::capabilityAgents::alerts::AlertsCapabilityAgent::create( connectionManager, certifiedSender, focusManager, contextManager, exceptionSender, alertStorage, alertsAudioFactory, alertRenderer );
-        ThrowIfNull( alertsCapabilityAgent, "couldNotCreateCapabilityAgent" );
-
-        // add the alert state changed observer
-        alertsCapabilityAgent->addObserver( alertsEngineImpl );
-
-        // add the capability agent to the connection manager
-        connectionManager->addConnectionStatusObserver( alertsCapabilityAgent );
-
-        // set the capability agent reference in the alerts engine implementation
-        alertsEngineImpl->m_alertsCapabilityAgent = alertsCapabilityAgent;
-
-        // add capability agent to the directive sequencer
-        ThrowIfNot( directiveSequencer->addDirectiveHandler( alertsCapabilityAgent ), "addDirectiveHandlerFailed" );
+        ThrowIfNot( alertsEngineImpl->initialize( directiveSequencer, connectionManager, certifiedSender, focusManager, contextManager, capabilitiesDelegate, exceptionSender, alertsAudioFactory, speakerManager, dataManager ), "initializeAlertsEngineImplFailed" );
 
         return alertsEngineImpl;
     }
@@ -72,24 +104,44 @@ std::shared_ptr<AlertsEngineImpl> AlertsEngineImpl::create(
     }
 }
 
-void AlertsEngineImpl::doShutdown() {
-    if( m_alertsCapabilityAgent != nullptr ) {
+void AlertsEngineImpl::doShutdown()
+{
+    AudioChannelEngineImpl::doShutdown();
+
+    if( m_alertsPlatformInterface != nullptr ) {
+        m_alertsPlatformInterface->setEngineInterface( nullptr );
+    }
+
+    if( m_alertsCapabilityAgent != nullptr )
+    {
+        m_connectionManager->removeConnectionStatusObserver( m_alertsCapabilityAgent );
+        
+        m_alertsCapabilityAgent->removeObserver( std::dynamic_pointer_cast<alexaClientSDK::capabilityAgents::alerts::AlertObserverInterface>( shared_from_this() ) );
         m_alertsCapabilityAgent->shutdown();
     }
 }
 
 // AlertsEngineInterface
-void AlertsEngineImpl::onLocalStop() {
-    m_alertsCapabilityAgent->onLocalStop();
+void AlertsEngineImpl::onLocalStop()
+{
+    if( m_alertsCapabilityAgent != nullptr ) {
+        m_alertsCapabilityAgent->onLocalStop();
+    }
 }
 
-void AlertsEngineImpl::removeAllAlerts() {
-    m_alertsCapabilityAgent->removeAllAlerts();
+void AlertsEngineImpl::removeAllAlerts()
+{
+    if( m_alertsCapabilityAgent != nullptr ) {
+        m_alertsCapabilityAgent->removeAllAlerts();
+    }
 }
 
 // AlertObserverInterface
-void AlertsEngineImpl::onAlertStateChange( const std::string& alertToken, alexaClientSDK::capabilityAgents::alerts::AlertObserverInterface::State state, const std::string& reason ) {
-    m_alertsPlatformInterface->alertStateChanged( alertToken, static_cast<aace::alexa::Alerts::AlertState>( state ), reason );
+void AlertsEngineImpl::onAlertStateChange( const std::string& alertToken, alexaClientSDK::capabilityAgents::alerts::AlertObserverInterface::State state, const std::string& reason )
+{
+    if( m_alertsPlatformInterface != nullptr ) {
+        m_alertsPlatformInterface->alertStateChanged( alertToken, static_cast<aace::alexa::Alerts::AlertState>( state ), reason );
+    }
 }
 
 } // aace::engine::alexa

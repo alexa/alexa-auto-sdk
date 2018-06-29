@@ -21,6 +21,8 @@
 void TemplateRuntimeBinder::initialize( JNIEnv* env ) {
     m_javaMethod_renderTemplate_payload = env->GetMethodID( getJavaClass(), "renderTemplate", "(Ljava/lang/String;)V" );
     m_javaMethod_renderPlayerInfo_payload = env->GetMethodID( getJavaClass(), "renderPlayerInfo", "(Ljava/lang/String;)V" );
+    m_javaMethod_clearTemplate = env->GetMethodID( getJavaClass(), "clearTemplate", "()V" );
+    m_javaMethod_clearPlayerInfo = env->GetMethodID( getJavaClass(), "clearPlayerInfo", "()V" );
 }
 
 void TemplateRuntimeBinder::renderTemplate( const std::string & payload )
@@ -51,6 +53,32 @@ void TemplateRuntimeBinder::renderPlayerInfo( const std::string & payload )
 
             context.getEnv()->CallVoidMethod( getJavaObject(), m_javaMethod_renderPlayerInfo_payload, payloadStr );
             context.getEnv()->DeleteLocalRef( payloadStr );
+        }
+    }
+}
+
+void TemplateRuntimeBinder::clearTemplate()
+{
+    if( getJavaObject() != nullptr && m_javaMethod_clearTemplate != nullptr )
+    {
+        ThreadContext context;
+
+        if( context.isValid() )
+        {
+            context.getEnv()->CallVoidMethod( getJavaObject(), m_javaMethod_clearTemplate );
+        }
+    }
+}
+
+void TemplateRuntimeBinder::clearPlayerInfo()
+{
+    if( getJavaObject() != nullptr && m_javaMethod_clearPlayerInfo != nullptr )
+    {
+        ThreadContext context;
+
+        if( context.isValid() )
+        {
+            context.getEnv()->CallVoidMethod( getJavaObject(), m_javaMethod_clearPlayerInfo );
         }
     }
 }

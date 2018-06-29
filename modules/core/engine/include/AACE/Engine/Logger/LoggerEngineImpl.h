@@ -37,8 +37,6 @@ private:
     LoggerEngineImpl( std::shared_ptr<aace::logger::Logger> platformLoggerInterface );
 
 public:
-    virtual ~LoggerEngineImpl() = default;
-    
     // LogEventObserver
     virtual bool onLogEvent( LogEventObserver::Level level, std::chrono::system_clock::time_point time, const char* source, const char* text ) override;
     

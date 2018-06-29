@@ -21,17 +21,18 @@ package com.amazon.aace.alexa;
 import com.amazon.aace.core.PlatformInterface;
 
 /**
- * The @c AuthProvider class should be implemented by clients who handle their own authentication states and manage their own access tokens.  i.e. mobile clients that authenticate with LWA and cannot pass a refresh token to configure the Engine with.
+ * AuthProvider should be extended to manage access tokens for AVS authorization and report
+ * client authorization state to the Engine.
  */
 abstract public class AuthProvider extends PlatformInterface
 {
     /**
-     * The enum AuthState describes the state of authorization.
+     * Describes the state of client authorization with AVS
      */
     public enum AuthState
     {
         /**
-         * Authorization not yet acquired.
+         * Authorization has not yet been acquired.
          * @hideinitializer
          */
         UNINITIALIZED("UNINITIALIZED"),
@@ -46,7 +47,7 @@ abstract public class AuthProvider extends PlatformInterface
          */
         EXPIRED("EXPIRED"),
         /**
-         * Authorization failed in a manner that cannot be corrected by retrying.
+         * Authorization has failed in a manner that cannot be corrected by retrying.
          * @hideinitializer
          */
         UNRECOVERABLE_ERROR("UNRECOVERABLE_ERROR");
@@ -72,17 +73,17 @@ abstract public class AuthProvider extends PlatformInterface
     }
 
     /**
-     * The enum AuthError encodes possible errors which may occur when changing authorization state.
+     * Describes an error during an attempt to authorize with AVS
      */
     public enum AuthError
     {
         /**
-         * No error.
+         * No error encountered
          * @hideinitializer
          */
         NO_ERROR("NO_ERROR"),
         /**
-         * An unknown body containing no error field has been encountered.
+         * An error was encountered, but no error description can be determined.
          * @hideinitializer
          */
         UNKNOWN_ERROR("UNKNOWN_ERROR"),
@@ -102,7 +103,7 @@ abstract public class AuthProvider extends PlatformInterface
          */
         SERVER_ERROR("SERVER_ERROR"),
         /**
-         * The request is missing a required parameter, has an invalid value, or is otherwise improperly formed.
+         * The request is missing a required parameter, has an invalid value, or is otherwise malformed.
          * @hideinitializer
          */
         INVALID_REQUEST("INVALID_REQUEST"),
@@ -137,22 +138,27 @@ abstract public class AuthProvider extends PlatformInterface
         }
     }
 
+    /**
+     * AuthProvider should be extended to manage access tokens for AVS authorization and report
+     * client authorization state to the Engine.
+     */
     public AuthProvider() {
     }
 
     /**
-     * Called when the platform implementation should retrieve the an auth token
+     * Returns the token used by the platform implementation for authorization with AVS.
+     * The platform implementation should retrieve an auth token if it does not have one.
      *
-     * @return the auth token from the platform implementation of AuthProvider.
+     * @return The token used to authorize with AVS
      */
     public String getAuthToken() {
         return null;
     }
 
     /**
-     * Called when the platform implementation should retrieve an authState
+     * Returns the AVS authorization state of the platform implementation
      *
-     * @return the auth state from the platform implementation of AuthProvider.
+     * @return The AVS authorization state
      */
     public AuthState getAuthState() {
         return null;

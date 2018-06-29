@@ -24,16 +24,20 @@ namespace aace {
 namespace alexa {
 
 /**
- * The @c SpeechSynthesizer class must be extended by the platform implementation to handle
- * playback of Alexa's synthesized speech audio data.
- * @sa MediaPlayer Speaker
+ * SpeechSynthesizer should be extended to handle Alexa speech output from the Engine.
+ *
+ * The SpeechSynthesizer @c MediaPlayer and @c Speaker will receive directives from the Engine to handle Alexa speech playback.
+ *
+ * @note For observing Alexa dialog state transitions, see @c AlexaClient::dialogStateChanged().
+ *
+ * @sa AudioChannel
  */
 class SpeechSynthesizer : public AudioChannel {
 protected:
     SpeechSynthesizer( std::shared_ptr<aace::alexa::MediaPlayer> mediaPlayer, std::shared_ptr<aace::alexa::Speaker> speaker );
 
 public:
-    virtual ~SpeechSynthesizer() = default;
+    virtual ~SpeechSynthesizer();
 };
 
 } // aace::alexa

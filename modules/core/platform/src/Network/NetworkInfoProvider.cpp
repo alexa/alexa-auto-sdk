@@ -18,8 +18,13 @@
 namespace aace {
 namespace network {
 
-void NetworkInfoProvider::networkStatusChanged( NetworkStatus status, int wifiSignalStrength ) {
-    m_networkInfoProviderEngineInterface->networkInfoChanged( static_cast<NetworkStatus>( status ), wifiSignalStrength );
+NetworkInfoProvider::~NetworkInfoProvider() = default; // key function
+
+void NetworkInfoProvider::networkStatusChanged( NetworkStatus status, int wifiSignalStrength )
+{
+    if( m_networkInfoProviderEngineInterface != nullptr ) {
+        m_networkInfoProviderEngineInterface->networkInfoChanged( static_cast<NetworkStatus>( status ), wifiSignalStrength );
+    }
 }
 
 void NetworkInfoProvider::setEngineInterface( std::shared_ptr<NetworkInfoProviderEngineInterface> networkInfoProviderEngineInterface ) {

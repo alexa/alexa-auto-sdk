@@ -38,8 +38,15 @@ void AuthProviderBinder::initialize( JNIEnv* env )
     m_enum_AuthError_UNAUTHORIZED_CLIENT = NativeLib::FindEnum( env, authErrorEnumClass, "UNAUTHORIZED_CLIENT", "Lcom/amazon/aace/alexa/AuthProvider$AuthError;" );
     m_enum_AuthError_SERVER_ERROR = NativeLib::FindEnum( env, authErrorEnumClass, "SERVER_ERROR", "Lcom/amazon/aace/alexa/AuthProvider$AuthError;" );
     m_enum_AuthError_INVALID_REQUEST = NativeLib::FindEnum( env, authErrorEnumClass, "INVALID_REQUEST", "Lcom/amazon/aace/alexa/AuthProvider$AuthError;" );
+    m_enum_AuthError_INVALID_VALUE = NativeLib::FindEnum( env, authErrorEnumClass, "INVALID_VALUE", "Lcom/amazon/aace/alexa/AuthProvider$AuthError;" );
     m_enum_AuthError_AUTHORIZATION_EXPIRED = NativeLib::FindEnum( env, authErrorEnumClass, "AUTHORIZATION_EXPIRED", "Lcom/amazon/aace/alexa/AuthProvider$AuthError;" );
     m_enum_AuthError_UNSUPPORTED_GRANT_TYPE = NativeLib::FindEnum( env, authErrorEnumClass, "UNSUPPORTED_GRANT_TYPE", "Lcom/amazon/aace/alexa/AuthProvider$AuthError;" );
+    m_enum_AuthError_INVALID_CODE_PAIR = NativeLib::FindEnum( env, authErrorEnumClass, "INVALID_CODE_PAIR", "Lcom/amazon/aace/alexa/AuthProvider$AuthError;" );
+    m_enum_AuthError_AUTHORIZATION_PENDING = NativeLib::FindEnum( env, authErrorEnumClass, "AUTHORIZATION_PENDING", "Lcom/amazon/aace/alexa/AuthProvider$AuthError;" );
+    m_enum_AuthError_SLOW_DOWN = NativeLib::FindEnum( env, authErrorEnumClass, "SLOW_DOWN", "Lcom/amazon/aace/alexa/AuthProvider$AuthError;" );
+    m_enum_AuthError_INTERNAL_ERROR = NativeLib::FindEnum( env, authErrorEnumClass, "INTERNAL_ERROR", "Lcom/amazon/aace/alexa/AuthProvider$AuthError;" );
+    m_enum_AuthError_INVALID_CBL_CLIENT_ID = NativeLib::FindEnum( env, authErrorEnumClass, "INVALID_CBL_CLIENT_ID", "Lcom/amazon/aace/alexa/AuthProvider$AuthError;" );
+
 }
 
 std::string AuthProviderBinder::getAuthToken()
@@ -128,10 +135,22 @@ jobject AuthProviderBinder::convert( aace::alexa::AuthProviderEngineInterface::A
             return m_enum_AuthError_SERVER_ERROR.get();
         case aace::alexa::AuthProviderEngineInterface::AuthError::INVALID_REQUEST:
             return m_enum_AuthError_INVALID_REQUEST.get();
+        case aace::alexa::AuthProviderEngineInterface::AuthError::INVALID_VALUE:
+            return m_enum_AuthError_INVALID_VALUE.get();
         case aace::alexa::AuthProviderEngineInterface::AuthError::AUTHORIZATION_EXPIRED:
             return m_enum_AuthError_AUTHORIZATION_EXPIRED.get();
         case aace::alexa::AuthProviderEngineInterface::AuthError::UNSUPPORTED_GRANT_TYPE:
             return m_enum_AuthError_UNSUPPORTED_GRANT_TYPE.get();
+        case aace::alexa::AuthProviderEngineInterface::AuthError::INVALID_CODE_PAIR:
+            return m_enum_AuthError_INVALID_CODE_PAIR.get();
+        case aace::alexa::AuthProviderEngineInterface::AuthError::AUTHORIZATION_PENDING:
+            return m_enum_AuthError_AUTHORIZATION_PENDING.get();
+        case aace::alexa::AuthProviderEngineInterface::AuthError::SLOW_DOWN:
+            return m_enum_AuthError_SLOW_DOWN.get();
+        case aace::alexa::AuthProviderEngineInterface::AuthError::INTERNAL_ERROR:
+            return m_enum_AuthError_INTERNAL_ERROR.get();
+        case aace::alexa::AuthProviderEngineInterface::AuthError::INVALID_CBL_CLIENT_ID:
+            return m_enum_AuthError_INVALID_CBL_CLIENT_ID.get();
     }
 }
 

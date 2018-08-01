@@ -81,7 +81,7 @@ bool EngineService::handleShutdownEngineEvent()
     try
     {
         if( m_initialized == false ) {
-            AACE_WARN(LX(TAG,"handleShutdownEngineEvent").m("Attempting do shutdown service that is not initialized - doing nothing."));
+            AACE_WARN(LX(TAG,"handleShutdownEngineEvent").m("Attempting to shutdown service that is not initialized - doing nothing."));
             return true;
         }
 
@@ -100,6 +100,21 @@ bool EngineService::handleShutdownEngineEvent()
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"handleShutdownEngineEvent").d("reason", ex.what()));
+        return false;
+    }
+}
+
+bool EngineService::handleSetupEngineEvent()
+{
+    try
+    {
+        ThrowIfNot( m_initialized, "serviceNotInitialized" );
+        ThrowIfNot( setup(), "setupServiceFailed" );
+
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"handleSetupEngineEvent").d("reason", ex.what()));
         return false;
     }
 }
@@ -130,7 +145,7 @@ bool EngineService::handleStopEngineEvent()
         ThrowIfNot( m_initialized, "serviceNotInitialized" );
 
         if( m_running == false ) {
-            AACE_WARN(LX(TAG,"handleStopEngineEvent").m("Attempting do stop service that is not running - doing nothing."));
+            AACE_WARN(LX(TAG,"handleStopEngineEvent").m("Attempting to stop service that is not running - doing nothing."));
             return true;
         }
 
@@ -164,6 +179,10 @@ bool EngineService::configure( const std::vector<std::shared_ptr<std::istream>>&
 }
 
 bool EngineService::shutdown() {
+    return true;
+}
+
+bool EngineService::setup() {
     return true;
 }
 

@@ -11,6 +11,7 @@ var searchData=
   ['setproperty',['setProperty',['../classaace_1_1core_1_1_engine.html#a65f89859ff67cfaa56051785543ceae2',1,'aace::core::Engine']]],
   ['setvolume',['setVolume',['../classaace_1_1alexa_1_1_speaker.html#a06f376ab6028d0578faf2fe4be06b52b',1,'aace::alexa::Speaker']]],
   ['shutdown',['shutdown',['../classaace_1_1core_1_1_engine.html#a8d127cbe960a7e4e86fb404289011901',1,'aace::core::Engine']]],
+  ['slow_5fdown',['SLOW_DOWN',['../classaace_1_1alexa_1_1_auth_provider_engine_interface.html#a006d3fd3bee07feafa325968054abc37a4a0a2ddc7446f94d38bcdd71e9bd4ee6',1,'aace::alexa::AuthProviderEngineInterface']]],
   ['snoozed',['SNOOZED',['../classaace_1_1alexa_1_1_alerts.html#a81cccb7e632cf26b7903d9c9c168fb22adbd414f9aaabb67e8430e9520f604a79',1,'aace::alexa::Alerts']]],
   ['speaker',['Speaker',['../classaace_1_1alexa_1_1_speaker.html',1,'aace::alexa']]],
   ['speaking',['SPEAKING',['../classaace_1_1alexa_1_1_alexa_client.html#a5f3b9fc09843bc68b5bb9f0ed6b8586eaddee564b336f5de690b746eb04e62114',1,'aace::alexa::AlexaClient']]],

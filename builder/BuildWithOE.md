@@ -31,7 +31,9 @@ $ export OE_CORE_PATH=$(pwd)
 The minimum requirements to run OpenEmbedded on an Ubuntu Linux host are as follows:
 
 ```
-$ apt-get install chrpath diffstat gawk texinfo
+$ apt-get install chrpath diffstat gawk texinfo \
+python python3 wget unzip build-essential cpio \
+git-core libssl-dev
 ```
 >**Note:** For Linux targets, you must install libssl-dev as well.
 
@@ -66,8 +68,6 @@ The following `options` are available:
 * `-c,--clean` option to clean build. If the OE recipe name is specified with `--package` option, the only specified recipe will be cleaned.
 * *(Android target only)* `--android-api <integer>` option to explicitly specify Android API level. Defaults to `22`.
 * *(QNX7 target only)* `--qnx7sdp-path <path>` option to specify QNX 7.0.0 SDP installation (in host). If you run Builder within Docker environment, host QNX SDP tools are always used. So make sure you have installed Linux tools within SDP even if your host is macOS.
-* `--package <recipe-name>` to specify OE recipe explicitly. Defaults to `aac-image-minimal`.
-* `--run-in-docker` option to run *Alexa Automotive Core Builder* inside the Docker environment. On macOS, this option will be enabled by default.
 
 The following build targets are available:
 

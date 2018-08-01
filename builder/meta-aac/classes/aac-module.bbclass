@@ -21,7 +21,8 @@ EXTRA_OECMAKE += "-DAAC_HOME=${STAGING_DIR_HOST}${prefix} \
                   -DCMAKE_BUILD_TYPE=${OECMAKE_BUILD_TYPE} \
                   -DAAC_EMIT_SENSITIVE_LOGS=${AAC_SENSITIVE_LOGS} \
                   -DAAC_LATENCY_LOGS=${AAC_LATENCY_LOGS} \
-                  -DAAC_ENABLE_TESTS=ON"
+                  -DAAC_ENABLE_TESTS=ON \
+                  -DAAC_VERSION=${PV}"
 
 do_install_append() {
 	mkdir -p ${D}${testbindir}/${PN}

@@ -13,9 +13,6 @@
  * permissions and limitations under the License.
  */
 
-// aace/core/PlatformInterface.java
-// This is an automatically generated file.
-
 package com.amazon.aace.core;
 
 /**
@@ -24,10 +21,6 @@ package com.amazon.aace.core;
  */
 public class PlatformInterface
 {
-    /**
-     * PlatformInterface is the base class for all platform interfaces.
-     * It can be extended to create custom platform interfaces.
-     */
     public PlatformInterface() {
         super();
     }

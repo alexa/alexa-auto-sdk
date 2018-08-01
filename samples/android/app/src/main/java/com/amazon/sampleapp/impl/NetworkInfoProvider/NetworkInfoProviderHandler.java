@@ -44,7 +44,7 @@ public class NetworkInfoProviderHandler extends NetworkInfoProvider {
     public NetworkInfoProviderHandler( Activity activity, LoggerHandler logger ) {
         mActivity = activity;
         mLogger = logger;
-        mStatus = NetworkStatus.DISCONNECTED;
+        mStatus = NetworkStatus.UNKNOWN;
         mNetworkStatusText = activity.findViewById( R.id.networkStatus );
 
         Context context = mActivity.getApplicationContext();
@@ -58,7 +58,9 @@ public class NetworkInfoProviderHandler extends NetworkInfoProvider {
     }
 
     @Override
-    public NetworkStatus getNetworkStatus() { return mStatus; }
+    public NetworkStatus getNetworkStatus() {
+        return mStatus;
+    }
 
     @Override
     public int getWifiSignalStrength() { return mWifiManager.getConnectionInfo().getRssi(); }
@@ -66,11 +68,13 @@ public class NetworkInfoProviderHandler extends NetworkInfoProvider {
     public class NetworkChangeReceiver extends BroadcastReceiver {
 
         @Override
-        public void onReceive( final Context context, final Intent intent ) {
+        public void onReceive( final Context context, final Intent intent )
+        {
             if ( mConnectivityManager != null ) {
                 NetworkInfo activeNetwork = mConnectivityManager.getActiveNetworkInfo();
                 if ( activeNetwork != null ) {
-                    switch ( activeNetwork.getState() ) {
+                    NetworkInfo.State state = activeNetwork.getState();
+                    switch ( state ) {
                         case CONNECTED:
                             mStatus = NetworkStatus.CONNECTED;
                             break;
@@ -81,13 +85,14 @@ public class NetworkInfoProviderHandler extends NetworkInfoProvider {
                             mStatus = NetworkStatus.DISCONNECTING;
                             break;
                         case DISCONNECTED:
+                        case SUSPENDED:
                             mStatus = NetworkStatus.DISCONNECTED;
                             break;
-                        default:
-                            mStatus = NetworkStatus.DISCONNECTED;
+                        case UNKNOWN:
+                            mStatus = NetworkStatus.UNKNOWN;
                             break;
                     }
-                } else mStatus = NetworkStatus.DISCONNECTED;
+                } else mStatus = NetworkStatus.UNKNOWN;
                 int rssi = mWifiManager.getConnectionInfo().getRssi();
 
                 mLogger.postInfo( sTag, String.format( "Network status changed. STATUS: %s, RSSI: %s",

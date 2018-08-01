@@ -106,7 +106,7 @@ init_cmake_file() {
 
 	cat > ${BUILD_DIR}/CMakeLists.txt <<EOF
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
-project(AACE)
+project(AAC VERSION ${SDK_BASE_VERSION})
 
 EOF
 

@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Automotive Core SDK (Android)
-   &#160;<span id="projectnumber">1.0.0</span>
+   &#160;<span id="projectnumber">1.0.1</span>
    </div>
    <div id="projectbrief">Alexa Auto Core SDK for interacting with the Alexa Voice Service</div>
   </td>
@@ -78,6 +78,10 @@ $(function() {
 : <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_auth_error.html#ab239854c195b04feb7b6e5548ad6d4ee">com.amazon.aace.alexa.AlexaClient.AuthError</a>
 , <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider_1_1_auth_error.html#a37dd844f07da9d1bbd756e0d1bdb51a0">com.amazon.aace.alexa.AuthProvider.AuthError</a>
 </li>
+<li>AUTHORIZATION_PENDING
+: <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_auth_error.html#a423bcf5d45f1bf81b84e08d8b113c654">com.amazon.aace.alexa.AlexaClient.AuthError</a>
+, <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider_1_1_auth_error.html#aafcfdbd2f90719857c1ea276bdab5540">com.amazon.aace.alexa.AuthProvider.AuthError</a>
+</li>
 <li>AVS_SYNCED
 : <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_speaker_1_1_type.html#abdc0286fe1b43bb42e5b43711f53f4e4">com.amazon.aace.alexa.Speaker.Type</a>
 </li>
@@ -85,6 +89,9 @@ $(function() {
 
 
 <h3><a id="index_b"></a>- b -</h3><ul>
+<li>BUFFER_UNDERRUN
+: <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_player_1_1_player_activity.html#a947333e7e18f62ecb6cf1387c34a12f3">com.amazon.aace.alexa.AudioPlayer.PlayerActivity</a>
+</li>
 <li>BUFFERING
 : <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player_1_1_media_state.html#ace6f2c3cd1c03e4c4d206ac851ad87cc">com.amazon.aace.alexa.MediaPlayer.MediaState</a>
 </li>
@@ -146,6 +153,9 @@ $(function() {
 <li>FAILURE_PROTOCOL_ERROR
 : <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_connection_changed_reason.html#acb096ffb04882dde59e47a2336823072">com.amazon.aace.alexa.AlexaClient.ConnectionChangedReason</a>
 </li>
+<li>FINISHED
+: <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_player_1_1_player_activity.html#a51053e7c19f8f4db8d438dc487d79c8d">com.amazon.aace.alexa.AudioPlayer.PlayerActivity</a>
+</li>
 <li>FOCUS_ENTERED_BACKGROUND
 : <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alerts_1_1_alert_state.html#a08664b1cbc2de62c1a869adad68b597d">com.amazon.aace.alexa.Alerts.AlertState</a>
 </li>
@@ -172,19 +182,34 @@ $(function() {
 <h3><a id="index_i"></a>- i -</h3><ul>
 <li>IDLE
 : <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_dialog_state.html#a67e1c3dea06939755563594ab58a94cf">com.amazon.aace.alexa.AlexaClient.DialogState</a>
+, <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_player_1_1_player_activity.html#ab67d81e3686ddb0543eb63e9847035e5">com.amazon.aace.alexa.AudioPlayer.PlayerActivity</a>
 </li>
 <li>INFO
 : <a class="el" href="enumcom_1_1amazon_1_1aace_1_1logger_1_1_logger_1_1_level.html#a7a263c82b708e691632845088197bce0">com.amazon.aace.logger.Logger.Level</a>
 </li>
 <li>INTERNAL_ERROR
-: <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_connection_changed_reason.html#a1b22429a7bd02c0b37b2300a69f7904d">com.amazon.aace.alexa.AlexaClient.ConnectionChangedReason</a>
+: <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_auth_error.html#a93164b476534d8d5222e6561abd19f64">com.amazon.aace.alexa.AlexaClient.AuthError</a>
+, <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_connection_changed_reason.html#a1b22429a7bd02c0b37b2300a69f7904d">com.amazon.aace.alexa.AlexaClient.ConnectionChangedReason</a>
+, <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider_1_1_auth_error.html#aa63e3e0b62ced63ab52ccd64774dfe16">com.amazon.aace.alexa.AuthProvider.AuthError</a>
 </li>
 <li>INVALID_AUTH
 : <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_connection_changed_reason.html#adda100720c508c85e79789231577dc53">com.amazon.aace.alexa.AlexaClient.ConnectionChangedReason</a>
 </li>
+<li>INVALID_CBL_CLIENT_ID
+: <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_auth_error.html#a1f3056441df8dcc989e111b0b96016e9">com.amazon.aace.alexa.AlexaClient.AuthError</a>
+, <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider_1_1_auth_error.html#a6e7c0fa9886bf86a5a33143ea4ec1e3d">com.amazon.aace.alexa.AuthProvider.AuthError</a>
+</li>
+<li>INVALID_CODE_PAIR
+: <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_auth_error.html#af4cbf7b7daf5c08c6fcfb6ee17571d34">com.amazon.aace.alexa.AlexaClient.AuthError</a>
+, <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider_1_1_auth_error.html#ac03243a2d29701c94db30e406942f5fb">com.amazon.aace.alexa.AuthProvider.AuthError</a>
+</li>
 <li>INVALID_REQUEST
 : <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_auth_error.html#ab6accdb3d0f7a66cf60cecdaf453bae8">com.amazon.aace.alexa.AlexaClient.AuthError</a>
 , <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider_1_1_auth_error.html#a2b45e1388e8814930d49fb51abe08a38">com.amazon.aace.alexa.AuthProvider.AuthError</a>
+</li>
+<li>INVALID_VALUE
+: <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_auth_error.html#ab45ae7cf9d114422efc8209f4f943c4d">com.amazon.aace.alexa.AlexaClient.AuthError</a>
+, <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider_1_1_auth_error.html#ac75e969852f0fb136ea74743f76baf85">com.amazon.aace.alexa.AuthProvider.AuthError</a>
 </li>
 </ul>
 
@@ -252,6 +277,9 @@ $(function() {
 <li>PAST_DUE
 : <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alerts_1_1_alert_state.html#a1fdf1b15b4d0d7d66f302d39226e1515">com.amazon.aace.alexa.Alerts.AlertState</a>
 </li>
+<li>PAUSED
+: <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_player_1_1_player_activity.html#a920ec3f1af331593ebbd401617c7c59f">com.amazon.aace.alexa.AudioPlayer.PlayerActivity</a>
+</li>
 <li>PENDING
 : <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_connection_status.html#a02bc9909272fb03ad50912fb14adad3a">com.amazon.aace.alexa.AlexaClient.ConnectionStatus</a>
 </li>
@@ -259,7 +287,8 @@ $(function() {
 : <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_connection_changed_reason.html#a21694df85e4806fb1312f0c1ef472f3d">com.amazon.aace.alexa.AlexaClient.ConnectionChangedReason</a>
 </li>
 <li>PLAYING
-: <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player_1_1_media_state.html#aac358232aa9837d312dbbe28ac4fcbc7">com.amazon.aace.alexa.MediaPlayer.MediaState</a>
+: <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_player_1_1_player_activity.html#aea6407431975166091c7d54683049231">com.amazon.aace.alexa.AudioPlayer.PlayerActivity</a>
+, <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player_1_1_media_state.html#aac358232aa9837d312dbbe28ac4fcbc7">com.amazon.aace.alexa.MediaPlayer.MediaState</a>
 </li>
 </ul>
 
@@ -292,6 +321,10 @@ $(function() {
 <li>SERVER_SIDE_DISCONNECT
 : <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_connection_changed_reason.html#ab91444ec409e9484d33a60f086d8e77f">com.amazon.aace.alexa.AlexaClient.ConnectionChangedReason</a>
 </li>
+<li>SLOW_DOWN
+: <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_auth_error.html#ad590a57461aa38c0c73f96a51870f7dc">com.amazon.aace.alexa.AlexaClient.AuthError</a>
+, <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider_1_1_auth_error.html#a84d4d348d7722a582dc6aa6d854ca66c">com.amazon.aace.alexa.AuthProvider.AuthError</a>
+</li>
 <li>SNOOZED
 : <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alerts_1_1_alert_state.html#a698f2a451a59c115400be9b1a2df164f">com.amazon.aace.alexa.Alerts.AlertState</a>
 </li>
@@ -303,6 +336,7 @@ $(function() {
 </li>
 <li>STOPPED
 : <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alerts_1_1_alert_state.html#a00ef2e9f819a785f05c3254fc032954f">com.amazon.aace.alexa.Alerts.AlertState</a>
+, <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_player_1_1_player_activity.html#a0bb54b0208ad695e194e484d0156b108">com.amazon.aace.alexa.AudioPlayer.PlayerActivity</a>
 , <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player_1_1_media_state.html#afa3f10bdbab0bc0aef93de88791f6967">com.amazon.aace.alexa.MediaPlayer.MediaState</a>
 </li>
 </ul>
@@ -329,6 +363,7 @@ $(function() {
 </li>
 <li>UNKNOWN
 : <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_notifications_1_1_indicator_state.html#a440225fb9b82619cf3336073764c4e80">com.amazon.aace.alexa.Notifications.IndicatorState</a>
+, <a class="el" href="enumcom_1_1amazon_1_1aace_1_1network_1_1_network_info_provider_1_1_network_status.html#a6b44a8379299aa098271ca9a9b21ca9e">com.amazon.aace.network.NetworkInfoProvider.NetworkStatus</a>
 </li>
 <li>UNKNOWN_ERROR
 : <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_auth_error.html#a110946e49f9624a3823d1457f5efe57b">com.amazon.aace.alexa.AlexaClient.AuthError</a>
@@ -375,7 +410,7 @@ $(function() {
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Automotive Core SDK (Android) 1.0.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Automotive Core SDK (Android) 1.0.1 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

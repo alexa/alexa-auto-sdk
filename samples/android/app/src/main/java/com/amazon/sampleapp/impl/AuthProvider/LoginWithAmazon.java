@@ -20,7 +20,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.amazon.sampleapp.R;
@@ -31,10 +30,16 @@ import java.util.Observer;
 
 class LoginWithAmazon implements Observer {
 
+    static final String CBL_LOGIN_METHOD_KEY = "CBL";
+    static final String LWA_LOGIN_METHOD_KEY = "LWA";
+
+    private static final String sTag = "LoginWithAmazon";
+
     private final LoginWithAmazonBrowser mLwaBrowser;
     private final LoginWithAmazonCBL mLwaCBL;
     private final SharedPreferences mPreferences;
     private final Activity mActivity;
+    private final LoggerHandler mLogger;
 
     private View mLoginView, mLogoutView;
 
@@ -42,6 +47,7 @@ class LoginWithAmazon implements Observer {
                             Activity activity,
                             AuthProviderHandler authProvider) {
         mActivity = activity;
+        mLogger = logger;
         mPreferences = activity.getSharedPreferences(
                 activity.getString( R.string.preference_file_key ), Context.MODE_PRIVATE );
         mLwaBrowser = new LoginWithAmazonBrowser( activity, mPreferences, logger, authProvider );
@@ -50,18 +56,22 @@ class LoginWithAmazon implements Observer {
         setupGUI();
     }
 
+    void onInitialize() {
+        String loginMethod = mPreferences.getString( mActivity.getString( R.string.preference_login_method ), "" );
+        if ( loginMethod.equals( CBL_LOGIN_METHOD_KEY ) ) mLwaCBL.onInitialize();
+        else if ( loginMethod.equals( LWA_LOGIN_METHOD_KEY ) ) mLwaBrowser.onInitialize();
+    }
+
     void onResume() {
-        // Refresh auth token with CBL if refreshToken stored in preferences, else with LWA browser
-        String refreshToken = mPreferences.getString( mActivity.getString( R.string.preference_refresh_token ), "" );
-        if ( !refreshToken.equals( "" ) ) mLwaCBL.onResume( refreshToken );
-        else mLwaBrowser.onResume();
+        String loginMethod = mPreferences.getString( mActivity.getString( R.string.preference_login_method ), "" );
+        if ( loginMethod.equals( LWA_LOGIN_METHOD_KEY ) ) mLwaBrowser.onResume();
     }
 
     private void logout() {
-        // Log out with CBL if refreshToken stored in preferences, else with LWA browser
-        String refreshToken = mPreferences.getString( mActivity.getString( R.string.preference_refresh_token ), "" );
-        if ( !refreshToken.equals( "" ) ) mLwaCBL.logout();
-        else mLwaBrowser.logout();
+        String loginMethod = mPreferences.getString( mActivity.getString( R.string.preference_login_method ), "" );
+        if ( loginMethod.equals( CBL_LOGIN_METHOD_KEY ) ) mLwaCBL.logout();
+        else if ( loginMethod.equals( LWA_LOGIN_METHOD_KEY ) ) mLwaBrowser.logout();
+        else mLogger.postError(sTag, "Logout Called, but no Login method saved in preferences" );
     }
 
     //
@@ -98,8 +108,12 @@ class LoginWithAmazon implements Observer {
                 // Use selected LWA method
                 boolean lwaWithBrowser =
                         ( ( ToggleButton ) mActivity.findViewById( R.id.toggleLwaMode ) ).isChecked();
-                if ( lwaWithBrowser ) mLwaBrowser.login();
-                else mLwaCBL.login();
+                // cancel pending cbl auth
+                mLwaCBL.cancelPendingAuthorization();
+                if ( lwaWithBrowser ) {
+                    mLwaBrowser.login();
+                } else mLwaCBL.login();
+
             }
         } );
 

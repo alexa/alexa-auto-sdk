@@ -74,9 +74,6 @@ ClassRef NativeLib::FindClass( JNIEnv* env, const char* className )
 // ThreadContext
 //
 
-// declare the static ThreadContextMap
-ThreadContext::ThreadContextMap ThreadContext::s_contextMap;
-
 ThreadContext::ThreadContext() : m_env( nullptr ), m_detatch( false )
 {
     if( g_javaVM != nullptr )
@@ -86,19 +83,6 @@ ThreadContext::ThreadContext() : m_env( nullptr ), m_detatch( false )
         if( m_detatch ) {
             g_javaVM->AttachCurrentThread( &m_env, nullptr );
         }
-
-        if( m_env != nullptr )
-        {
-            auto it = s_contextMap.find( m_env );
-
-            if( it != s_contextMap.end() ) {
-                s_contextMap[m_env] = s_contextMap[m_env] + 1;
-                m_detatch = true;
-            }
-            else if( m_detatch ) {
-                s_contextMap[m_env] = 1;
-            }
-        }
     }
 }
 
@@ -106,13 +90,7 @@ ThreadContext::~ThreadContext()
 {
     if( g_javaVM != nullptr && m_env != nullptr && m_detatch )
     {
-        int count = s_contextMap[m_env] - 1;
-
-        s_contextMap[m_env] = count;
-
-        if( count == 0 ) {
-            g_javaVM->DetachCurrentThread();
-        }
+        g_javaVM->DetachCurrentThread();
     }
 }
 

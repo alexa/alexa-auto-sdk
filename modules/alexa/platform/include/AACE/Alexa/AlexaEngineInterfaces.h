@@ -166,7 +166,6 @@ public:
  */
 class AuthProviderEngineInterface {
 public:
-
     /**
      * Describes the state of client authorization with AVS
      */
@@ -229,6 +228,11 @@ public:
         INVALID_REQUEST,
 
         /**
+         * One of the values in the request was invalid.
+         */
+        INVALID_VALUE,
+
+        /**
          * The authorization code is invalid, expired, revoked, or was issued to a different client.
          */
         AUTHORIZATION_EXPIRED,
@@ -236,7 +240,32 @@ public:
         /**
          * The client specified the wrong token type.
          */
-        UNSUPPORTED_GRANT_TYPE
+        UNSUPPORTED_GRANT_TYPE,
+        
+        /**
+         * Invalid code pair provided in Code-based linking token request.
+         */
+        INVALID_CODE_PAIR,
+        
+        /**
+         * Waiting for user to authorize the specified code pair.
+         */
+        AUTHORIZATION_PENDING,
+        
+        /**
+         * Client should slow down in the rate of requests polling for an access token.
+         */
+        SLOW_DOWN,
+        
+        /**
+         * Internal error in client code.
+         */
+        INTERNAL_ERROR,
+        
+        /**
+         * Client ID not valid for use with code based linking.
+         */
+        INVALID_CBL_CLIENT_ID
     };
 
     virtual void onAuthStateChanged( AuthState state, AuthError error ) = 0;
@@ -280,11 +309,29 @@ inline std::ostream& operator<<(std::ostream& stream, const AuthProviderEngineIn
         case AuthProviderEngineInterface::AuthError::INVALID_REQUEST:
             stream << "INVALID_REQUEST";
             break;
+        case AuthProviderEngineInterface::AuthError::INVALID_VALUE:
+            stream << "INVALID_VALUE";
+            break;
         case AuthProviderEngineInterface::AuthError::AUTHORIZATION_EXPIRED:
             stream << "AUTHORIZATION_EXPIRED";
             break;
         case AuthProviderEngineInterface::AuthError::UNSUPPORTED_GRANT_TYPE:
             stream << "UNSUPPORTED_GRANT_TYPE";
+            break;
+        case AuthProviderEngineInterface::AuthError::INVALID_CODE_PAIR:
+            stream << "INVALID_CODE_PAIR";
+            break;
+        case AuthProviderEngineInterface::AuthError::AUTHORIZATION_PENDING:
+            stream << "AUTHORIZATION_PENDING";
+            break;
+        case AuthProviderEngineInterface::AuthError::SLOW_DOWN:
+            stream << "SLOW_DOWN";
+            break;
+        case AuthProviderEngineInterface::AuthError::INTERNAL_ERROR:
+            stream << "INTERNAL_ERROR";
+            break;
+        case AuthProviderEngineInterface::AuthError::INVALID_CBL_CLIENT_ID:
+            stream << "INVALID_CBL_CLIENT_ID";
             break;
     }
     return stream;

@@ -41,8 +41,6 @@ public:
     virtual ~EngineService();
 
     bool isRunning();
-    bool isInitialized();
-    bool isConfigured();
 
     const ServiceDescription& getDescription();
 
@@ -50,6 +48,7 @@ protected:
     virtual bool initialize();
     virtual bool configure( const std::vector<std::shared_ptr<std::istream>>& configuration );
     virtual bool shutdown();
+    virtual bool setup();
     virtual bool start();
     virtual bool stop();
     virtual bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface );
@@ -62,6 +61,7 @@ private:
     bool handleInitializeEngineEvent( std::shared_ptr<aace::engine::core::EngineContext> context );
     bool handleConfigureEngineEvent( const std::vector<std::shared_ptr<std::istream>>& configuration );
     bool handleShutdownEngineEvent();
+    bool handleSetupEngineEvent();
     bool handleStartEngineEvent();
     bool handleStopEngineEvent();
     bool handleRegisterPlatformInterfaceEngineEvent( std::shared_ptr<aace::core::PlatformInterface> platformInterface );

@@ -13,16 +13,13 @@
  * permissions and limitations under the License.
  */
 
-// aace/alexa/SpeechRecognizer.java
-// This is an automatically generated file.
-
 package com.amazon.aace.alexa;
 
 import com.amazon.aace.core.PlatformInterface;
 
 /**
  * SpeechRecognizer should be extended to initiate voice interactions with Alexa and provide audio input to AVS.
- * SpeechRecognizer provides interfaces for 
+ * SpeechRecognizer provides interfaces for
  *
  * @li Initiating a dialog interaction with Alexa
  * via press-and-hold, press-and-release, and voice-initiated user actions
@@ -33,27 +30,12 @@ import com.amazon.aace.core.PlatformInterface;
  *
  * @li Handling wake word and end of speech detection
  *
- * @note For observing Alexa dialog state transitions, see @c AlexaClient::dialogStateChanged().
+ * @note For observing Alexa dialog state transitions, see @c AlexaClient.dialogStateChanged().
  */
 abstract public class SpeechRecognizer extends PlatformInterface
 {
     private boolean m_initialWakewordDetectionEnabled = false;
 
-    /**
-     * SpeechRecognizer should be extended to initiate voice interactions with Alexa and provide audio input to AVS.
-     * SpeechRecognizer provides interfaces for 
-     *
-     * @li Initiating a dialog interaction with Alexa
-     * via press-and-hold, press-and-release, and voice-initiated user actions
-     *
-     * @li Streaming audio input to the Engine
-     *
-     * @li Enabling and disabling the wake word engine
-     *
-     * @li Handling wake word and end of speech detection
-     *
-     * @note For observing Alexa dialog state transitions, see @c AlexaClient::dialogStateChanged().
-     */
     public SpeechRecognizer( boolean wakewordDetectionEnabled ) {
         m_initialWakewordDetectionEnabled = wakewordDetectionEnabled;
     }
@@ -74,7 +56,7 @@ abstract public class SpeechRecognizer extends PlatformInterface
     }
 
     /**
-     * Notifies the platform implementation when end of 
+     * Notifies the platform implementation when end of
      * speech is detected for the current recognize event
      */
     public void endOfSpeechDetected() {
@@ -100,7 +82,7 @@ abstract public class SpeechRecognizer extends PlatformInterface
     }
 
     /**
-     * Notifies the Engine of a speech recognition event initiated by a press-and-hold action on the 
+     * Notifies the Engine of a speech recognition event initiated by a press-and-hold action on the
      * platform. The Engine will call @c startAudioInput() to notify the platform implementation when
      * to start writing audio samples.
      * The platform implementation should call @c stopCapture() to terminate speech recognition on release
@@ -113,7 +95,7 @@ abstract public class SpeechRecognizer extends PlatformInterface
     }
 
     /**
-     * Notifies the Engine of a speech recognition event initiated by a press-and-release action on the 
+     * Notifies the Engine of a speech recognition event initiated by a press-and-release action on the
      * platform. The Engine will call @c startAudioInput() to notify the platform implementation when
      * to start writing audio samples.
      * The Engine will terminate the recognize event initiated by the press-and-release action

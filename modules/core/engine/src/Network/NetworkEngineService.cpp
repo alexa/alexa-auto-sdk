@@ -54,8 +54,11 @@ bool NetworkEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::
         m_networkInfoProviderEngineImpl = NetworkInfoProviderEngineImpl::create();
         ThrowIfNull( m_networkInfoProviderEngineImpl, "createNetworkInfoProviderEngineImplFailed" );
 
+        // save a reference to the newtork info provider
+        m_networkInfoProvider = networkInfoProvider;
+
         // set the network infor provider engine interface reference
-        networkInfoProvider->setEngineInterface( m_networkInfoProviderEngineImpl );
+        m_networkInfoProvider->setEngineInterface( m_networkInfoProviderEngineImpl );
   
         return true;
     }
@@ -63,6 +66,24 @@ bool NetworkEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::
         AACE_ERROR(LX(TAG,"registerPlatformInterfaceType<NetworkInfoProvider>").d("reason", ex.what()));
         return false;
     }
+}
+
+void NetworkEngineService::addObserver( std::shared_ptr<NetworkInfoObserver> observer )
+{
+    if( m_networkInfoProviderEngineImpl != nullptr ) {
+        m_networkInfoProviderEngineImpl->addObserver( observer );
+    }
+}
+
+void NetworkEngineService::removeObserver( std::shared_ptr<NetworkInfoObserver> observer )
+{
+    if( m_networkInfoProviderEngineImpl != nullptr ) {
+        m_networkInfoProviderEngineImpl->removeObserver( observer );
+    }
+}
+
+std::shared_ptr<aace::network::NetworkInfoProvider> NetworkEngineService::getNetworkInfoProvider() {
+    return m_networkInfoProvider;
 }
 
 } // aace::engine::network

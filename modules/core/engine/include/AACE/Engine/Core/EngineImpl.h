@@ -78,6 +78,7 @@ private:
     bool m_running = false;
     bool m_initialized = false;
     bool m_configured = false;
+    bool m_setup = false;
 };
 
 } // aace::engine::core

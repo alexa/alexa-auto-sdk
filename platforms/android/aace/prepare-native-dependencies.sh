@@ -29,7 +29,7 @@ if [ ! -e ${DEPLOY_DIR}/${IMAGE_NAME} ]; then
 	exit 1
 fi
 
-SYSROOT="${DEPLOY_DIR}/sysroot"
+SYSROOT="${DEPLOY_DIR}/sysroots/${ANDROID_ABI}"
 mkdir -p ${SYSROOT} && tar xf ${DEPLOY_DIR}/${IMAGE_NAME} -C ${SYSROOT}
 
 JNI_DEPLOY="${DEPLOY_DIR}/jni/${ANDROID_ABI}"

@@ -30,7 +30,7 @@ void PhoneCallController::callActivated( const std::string& callId ) {
     }
 }
 
-void PhoneCallController::callFailed( const std::string& callId, const std::string& error, const std::string& message = "" ) {
+void PhoneCallController::callFailed( const std::string& callId, const std::string& error, const std::string& message ) {
     if ( m_phoneCallControllerEngineInterface != nullptr ) {
         m_phoneCallControllerEngineInterface->onCallFailed( callId, error, message );
     }

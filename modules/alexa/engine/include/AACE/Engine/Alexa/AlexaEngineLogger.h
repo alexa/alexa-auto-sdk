@@ -17,6 +17,7 @@
 #define AACE_ENGINE_ALEXA_ALEXA_ENGINE_LOGGER_H
 
 #include <AVSCommon/Utils/Logger/Logger.h>
+#include <AVSCommon/Utils/RequiresShutdown.h>
 
 #include "AACE/Logger/Logger.h"
 
@@ -24,9 +25,15 @@ namespace aace {
 namespace engine {
 namespace alexa {
 
-class AlexaEngineLogger : public alexaClientSDK::avsCommon::utils::logger::Logger {
+class AlexaEngineLogger :
+    public alexaClientSDK::avsCommon::utils::logger::Logger,
+    public alexaClientSDK::avsCommon::utils::RequiresShutdown {
+    
 private:
     AlexaEngineLogger( alexaClientSDK::avsCommon::utils::logger::Level level );
+
+protected:
+    virtual void doShutdown() override;
 
 public:
     static std::shared_ptr<AlexaEngineLogger> create( alexaClientSDK::avsCommon::utils::logger::Level level );

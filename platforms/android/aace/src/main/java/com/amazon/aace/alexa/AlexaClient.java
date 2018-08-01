@@ -13,9 +13,6 @@
  * permissions and limitations under the License.
  */
 
-// aace/alexa/AlexaClient.java
-// This is an automatically generated file.
-
 package com.amazon.aace.alexa;
 
 import com.amazon.aace.core.PlatformInterface;
@@ -154,6 +151,11 @@ public class AlexaClient extends PlatformInterface
          */
         INVALID_REQUEST("INVALID_REQUEST"),
         /**
+         * One of the values in the request was invalid.
+         * @hideinitializer
+         */
+        INVALID_VALUE("INVALID_VALUE"),
+        /**
          * The authorization code is invalid, expired, revoked, or was issued to a different client.
          * @hideinitializer
          */
@@ -162,7 +164,32 @@ public class AlexaClient extends PlatformInterface
          * The client specified the wrong token type.
          * @hideinitializer
          */
-        UNSUPPORTED_GRANT_TYPE("UNSUPPORTED_GRANT_TYPE");
+        UNSUPPORTED_GRANT_TYPE("UNSUPPORTED_GRANT_TYPE"),
+        /**
+         * Invalid code pair provided in Code-based linking token request.
+         * @hideinitializer
+         */
+        INVALID_CODE_PAIR("INVALID_CODE_PAIR"),
+        /**
+         * Waiting for user to authorize the specified code pair.
+         * @hideinitializer
+         */
+        AUTHORIZATION_PENDING("AUTHORIZATION_PENDING"),
+        /**
+         * Client should slow down in the rate of requests polling for an access token.
+         * @hideinitializer
+         */
+        SLOW_DOWN("SLOW_DOWN"),
+        /**
+         * Internal error in client code.
+         * @hideinitializer
+         */
+        INTERNAL_ERROR("INTERNAL_ERROR"),
+        /**
+         * Client ID not valid for use with code based linking.
+         * @hideinitializer
+         */
+        INVALID_CBL_CLIENT_ID("INVALID_CBL_CLIENT_ID");
 
         /**
          * @internal
@@ -327,7 +354,7 @@ public class AlexaClient extends PlatformInterface
      * @param  state The new Alexa dialog state
      *
      * @note It is the responsibility of the platform implementation to provide a familiar Alexa experience for the user.
-     * See the AVS UX Attention System guidelines for recommendations on communicating 
+     * See the AVS UX Attention System guidelines for recommendations on communicating
      * Alexa attention states: https://developer.amazon.com/docs/alexa-voice-service/ux-design-attention.html#implement
      */
     public void dialogStateChanged( DialogState state ) {

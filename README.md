@@ -39,6 +39,8 @@ However, we recommend and support running a Docker environment with the followin
 * Memory: 16 Gb
 * Storage: 1 Gb+ available to use.
 
+
+
 ## Build the AAC SDK<a id="buildthesdk"></a>
 
 To build the AAC SDK you should read and understand the instructions in the [Builder README](./builder/README.md).
@@ -54,7 +56,7 @@ AAC SDK is supported on the following platforms:
 * Android x86
 * QNX ARM 64-bit
 
-> **Note**: For Android targets, AAC is available as a prebuilt library on GitHub. Read the instructions about accessing and using the library in the [samples/android/ directory](./samples/android/README.md).
+> **Note**: For Android targets, AAC is available as a prebuilt library on GitHub. Read the instructions about accessing and using the library in the [samples/android/ directory](./samples/android/README.md). 
 
 ## AAC SDK Architecture<a id="architecture"></a> Overview
 
@@ -104,30 +106,31 @@ The Android Sample App provides an example of how to use AAC. The [Android Sampl
 
 ## Release Notes and Known Issues<a id="relnotesknownissues"></a>
 
-### **v1.0.0**
+>Note: Feature enhancements, updates, and resolved issues from previous releases are available to view in [CHANGELOG.md](./CHANGELOG.md)
 
-* v1.0.0 released on 2018-06-29
-* Support for phone control APIs
-* Support for CancelNavigation() in the Navigation API
-* Support for Amazon Wake Word Engine (WWE)
+### v1.0.1 released on 2018-07-31:
 
-### **Enhancements**
+### Enhancements
 
-The following enhancements were added to the AAC SDK since the v1.0.0 Beta release.
+This release is for bug fixes only. There are no new features or enhancements.
 
-* AAC SDK now supports 2 Navigation directives.
-    * **`SetDestination`**
-    * **`CancelNavigation`**
-* For Phone Control we now support the Dial Directive with three events.
-    * **`CallActivated`**
-    * **`CallTerminated`**
-    * **`CallFailed`**
+### Resolved Issues
 
-### **Known Issues**
+Issues fixed in this release:
 
-The following are know issues in this release.
+* The Engine now reconnects to AVS when the `NetworkInfoProvider` updates the network status.
+* All shared memory objects are now freed when the Engine object is disposed.
+* We fixed a media playback state issue in the Engine that caused an unexpected pause and resume for a media stream that was already stopped.
+* We added AudioPlayer::playerActivityChanged to the Android APIs.
+* Updated the `AuthError` enumeration with additional error types.
+* Removed deprecated `createAuthConfig()` configuration method.
+* Fixed issue in the JNI where trying to create a UTF-8 string with invalid characters caused a crash, seen when sensitive logging is enabled.
+* Improved JNI thread handling.
+* Enabled capability registration for phone call control.
+* We fixed an issue where the Android platform build failed on the initial attempt when using clean code.
 
-* The Engine doesn't immediately reconnect to AVS when the **`NetworkInfoProvider`** updates network status.
-* Some shared memory objects are not freed when Engine object is disposed.
+### Known issues
 
-Sample App issues are documented in the [Sample App README](./samples/android/README.md).
+There are no known issues in this release.
+
+Sample App issues are documented in the [Sample App README](./samples/android/README.md#androidsampleapprelnote).

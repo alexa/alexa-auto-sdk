@@ -13,15 +13,12 @@
  * permissions and limitations under the License.
  */
 
-// aace/alexa/TemplateRuntime.java
-// This is an automatically generated file.
-
 package com.amazon.aace.alexa;
 
 import com.amazon.aace.core.PlatformInterface;
 
 /**
- * TemplateRuntime should be extended to handle directives from the Engine for 
+ * TemplateRuntime should be extended to handle directives from the Engine for
  * rendering visual metadata with display cards.
  * Metadata is provided as structured JSON and should be parsed by the platform implementation
  * for rendering cards that adhere to design guidelines
@@ -30,14 +27,6 @@ import com.amazon.aace.core.PlatformInterface;
  */
 abstract public class TemplateRuntime extends PlatformInterface
 {
-    /**
-     * TemplateRuntime should be extended to handle directives from the Engine for 
-     * rendering visual metadata with display cards.
-     * Metadata is provided as structured JSON and should be parsed by the platform implementation
-     * for rendering cards that adhere to design guidelines
-     * for the platform device type. For screen-specific design guidance, see the AVS UX Design Overview:
-     * https://developer.amazon.com/docs/alexa-voice-service/ux-design-overview.html#displaycards
-     */
     public TemplateRuntime() {
     }
 
@@ -52,7 +41,7 @@ abstract public class TemplateRuntime extends PlatformInterface
     public void renderTemplate( String payload ) {}
 
     /**
-     * Provides visual metadata associated with a user request to Alexa for audio playback. 
+     * Provides visual metadata associated with a user request to Alexa for audio playback.
      * The platform implementation should parse the player info metadata and render
      * a display card for the user.
      * For rendering guidelines, see https://amzn.to/DevDocTemplatePlayerInfo

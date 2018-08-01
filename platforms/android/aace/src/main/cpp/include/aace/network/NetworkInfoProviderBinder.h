@@ -45,6 +45,7 @@ private:
     jmethodID m_javaMethod_getWifiSignalStrength = nullptr;
 
     // NetworkStatus
+    ObjectRef m_enum_NetworkStatus_UNKNOWN;
     ObjectRef m_enum_NetworkStatus_DISCONNECTED;
     ObjectRef m_enum_NetworkStatus_DISCONNECTING;
     ObjectRef m_enum_NetworkStatus_CONNECTED;

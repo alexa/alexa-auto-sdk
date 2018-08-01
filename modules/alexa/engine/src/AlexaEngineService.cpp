@@ -66,7 +66,8 @@ REGISTER_SERVICE(AlexaEngineService)
 AlexaEngineService::AlexaEngineService( const aace::engine::core::ServiceDescription& description ) :
     aace::engine::core::EngineService( description ),
     m_configured( false ),
-    m_authState( alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State::UNINITIALIZED )
+    m_authState( AuthObserverInterface::State::UNINITIALIZED ),
+    m_networkStatus( NetworkInfoObserver::NetworkStatus::UNKNOWN )
 {
 #ifdef DEBUG
     m_logger = AlexaEngineLogger::create( alexaClientSDK::avsCommon::utils::logger::Level::DEBUG9 );
@@ -420,34 +421,53 @@ std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> AlexaE
     return std::make_shared<alexaClientSDK::registrationManager::CustomerDataManager>();
 }
 
+bool AlexaEngineService::setup()
+{
+    try
+    {
+        // if the location service can provide location info then create location state provider
+        auto locationService = getContext()->getService<aace::engine::location::LocationEngineService>();
+        ThrowIfNull( locationService, "locationServiceInvalid" );
+        
+        // get the location provider from the location service
+        auto locationProvider = locationService->getLocationProvider();
+
+        if( locationProvider != nullptr )
+        {
+            // create the alexa engine location state provider
+            m_locationStateProvider = AlexaEngineLocationStateProvider::create( locationProvider, m_contextManager );
+            ThrowIfNull( m_locationStateProvider, "createLocationStateProviderFailed" );
+
+            // add the location state to the context manager
+            m_contextManager->setStateProvider( LOCATION_STATE, m_locationStateProvider );
+        }
+        
+        // if a network service exists then add a listener for network status events
+        auto networkService = getContext()->getService<aace::engine::network::NetworkEngineService>();
+        ThrowIfNull( networkService, "networkServiceInvalid" );
+        
+        // observe network info provider changes
+        networkService->addObserver( shared_from_this() );
+        
+        // get the network provider from the network service
+        auto networkProvider = networkService->getNetworkInfoProvider();
+        
+        // get the initial network status from the network provider - if the network provider is not
+        // available then we always treat the network status as CONNECTED
+        m_networkStatus = networkProvider != nullptr ? networkProvider->getNetworkStatus() : NetworkStatus::CONNECTED;
+        
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"setup").d("reason", ex.what()));
+        return false;
+    }
+}
+
 bool AlexaEngineService::start()
 {
     try
     {
-        if( m_locationProviderConfigued == false )
-        {
-            // if the location service can provide location info then create location state provider
-            auto locationService = getContext()->getService<aace::engine::location::LocationEngineService>();
-            auto locationProvider = locationService != nullptr ? locationService->getProvider() : nullptr;
-
-            if( locationProvider != nullptr )
-            {
-                // create the alexa engine location state provider
-                m_locationStateProvider = AlexaEngineLocationStateProvider::create( locationProvider, m_contextManager );
-                ThrowIfNull( m_locationStateProvider, "createLocationStateProviderFailed" );
-
-                // add the location state to the context manager
-                m_contextManager->setStateProvider( LOCATION_STATE, m_locationStateProvider );
-            }
-        
-            m_locationProviderConfigued = true;
-        }
-        
-        // enabled speech recognizer wakeword if enabled by engine/platform implementations
-        if( m_speechRecognizerEngineImpl != nullptr && m_speechRecognizerEngineImpl->isWakewordEnabled() ) {
-            ThrowIfNot( m_speechRecognizerEngineImpl->enableWakewordDetection(), "enabledWakewordDetectionFailed" );
-        }
-    
         // get the current auth state from the platform interface
         m_authState = m_authProviderEngineImpl != nullptr ? static_cast<AuthObserverInterface::State>( m_authProviderEngineImpl->getAuthState() ) : AuthObserverInterface::State::UNINITIALIZED;
     
@@ -467,10 +487,6 @@ bool AlexaEngineService::stop()
 {
     try
     {
-        if( m_speechRecognizerEngineImpl != nullptr ) {
-            ThrowIfNot( m_speechRecognizerEngineImpl->disableWakewordDetection(), "disableWakewordDetectionFailed" );
-        }
-
         // disable the avs connection and wait for the disconnected state
         disconnect();
 
@@ -489,103 +505,129 @@ bool AlexaEngineService::shutdown()
         if( m_playbackControllerEngineImpl != nullptr ) {
             AACE_DEBUG(LX(TAG,"shutdown").m("PlaybackControllerEngineImpl"));
             m_playbackControllerEngineImpl->shutdown();
+            m_playbackControllerEngineImpl.reset();
         }
         
         if( m_speechRecognizerEngineImpl != nullptr ) {
             AACE_DEBUG(LX(TAG,"shutdown").m("SpeechRecognizerEngineImpl"));
             m_speechRecognizerEngineImpl->shutdown();
+            m_speechRecognizerEngineImpl.reset();
         }
 
         if( m_speechSynthesizerEngineImpl != nullptr ) {
             AACE_DEBUG(LX(TAG,"shutdown").m("SpeechSynthesizerEngineImpl"));
             m_speechSynthesizerEngineImpl->shutdown();
+            m_speechSynthesizerEngineImpl.reset();
         }
     
         if( m_audioPlayerEngineImpl != nullptr ) {
             AACE_DEBUG(LX(TAG,"shutdown").m("AudioPlayerEngineImpl"));
             m_audioPlayerEngineImpl->shutdown();
+            m_audioPlayerEngineImpl.reset();
         }
         
         if( m_notificationsEngineImpl != nullptr ) {
             AACE_DEBUG(LX(TAG,"shutdown").m("NotificationsEngineImpl"));
             m_notificationsEngineImpl->shutdown();
+            m_notificationsEngineImpl.reset();
         }
         
         if( m_alertsEngineImpl != nullptr ) {
             AACE_DEBUG(LX(TAG,"shutdown").m("AlertsEngineImpl"));
             m_alertsEngineImpl->shutdown();
+            m_alertsEngineImpl.reset();
         }
 
         if( m_templateRuntimeEngineImpl != nullptr ) {
             AACE_DEBUG(LX(TAG,"shutdown").m("TemplateRuntimeEngineImpl"));
             m_templateRuntimeEngineImpl->shutdown();
+            m_templateRuntimeEngineImpl.reset();
         }
         
         if( m_authProviderEngineImpl != nullptr ) {
             AACE_DEBUG(LX(TAG,"shutdown").m("AuthProviderEngineImpl"));
             m_authProviderEngineImpl->shutdown();
+            m_authProviderEngineImpl.reset();
         }
         
         if( m_authDelegateRouter != nullptr ) {
             AACE_DEBUG(LX(TAG,"shutdown").m("AuthDelegateRouter"));
             m_authDelegateRouter->shutdown();
+            m_authDelegateRouter.reset();
         }
         
         if( m_speakerManager != nullptr ) {
             AACE_DEBUG(LX(TAG,"shutdown").m("SpeakerManager"));
             m_speakerManager->shutdown();
+            m_speakerManager.reset();
         }
 
         if( m_directiveSequencer != nullptr ) {
             AACE_DEBUG(LX(TAG,"shutdown").m("DirectiveSequencer"));
             m_directiveSequencer->shutdown();
+            m_directiveSequencer.reset();
         }
 
         if( m_certifiedSender != nullptr ) {
             AACE_DEBUG(LX(TAG,"shutdown").m("CertifiedSender"));
             m_certifiedSender->shutdown();
+            m_certifiedSender.reset();
         }
 
         if( m_connectionManager != nullptr ) {
             AACE_DEBUG(LX(TAG,"shutdown").m("ConnectionManager"));
             m_connectionManager->shutdown();
+            m_connectionManager.reset();
         }
         
         if( m_messageRouter != nullptr ) {
             AACE_DEBUG(LX(TAG,"shutdown").m("MessageRouter"));
             m_messageRouter->shutdown();
+            m_messageRouter.reset();
         }
         
         if( m_softwareInfoSender != nullptr ) {
             AACE_DEBUG(LX(TAG,"shutdown").m("SoftwareInfoSender"));
             m_softwareInfoSender->shutdown();
+            m_softwareInfoSender.reset();
         }
         
         if( m_audioActivityTracker != nullptr ) {
             AACE_DEBUG(LX(TAG,"shutdown").m("AudioActivityTracker"));
             m_audioActivityTracker->shutdown();
+            m_audioActivityTracker.reset();
         }
         
         if( m_visualActivityTracker != nullptr ) {
             AACE_DEBUG(LX(TAG,"shutdown").m("VisualActivityTracker"));
             m_visualActivityTracker->shutdown();
+            m_visualActivityTracker.reset();
         }
         
         if( m_userActivityMonitor != nullptr ) {
             AACE_DEBUG(LX(TAG,"shutdown").m("UserActivityMonitor"));
             m_userActivityMonitor->shutdown();
+            m_userActivityMonitor.reset();
         }
         
         if( m_locationStateProvider != nullptr ) {
             AACE_DEBUG(LX(TAG,"shutdown").m("LocationStateProvider"));
             m_locationStateProvider->shutdown();
+            m_locationStateProvider.reset();
         }
         
         if( m_capabilitiesDelegate != nullptr ) {
             AACE_DEBUG(LX(TAG,"shutdown").m("CapabilitiesDelegate"));
             m_capabilitiesDelegate->shutdown();
+            m_capabilitiesDelegate.reset();
         }
-
+        
+        if( m_logger != nullptr ) {
+            AACE_DEBUG(LX(TAG,"shutdown").m("AlexaEngineLogger"));
+            m_logger->shutdown();
+            m_logger.reset();
+        }
+                
         // uninitialize the alexa client
         alexaClientSDK::avsCommon::avs::initialization::AlexaClientSDKInit::uninitialize();
 
@@ -690,18 +732,38 @@ bool AlexaEngineService::connect()
     {
         ThrowIfNot( m_configured, "alexaServiceNotConfigured" );
     
-        // if the capabilities have not been configured yet then publish the capabilities
-        // and wait for response before connecting...
-        if( m_capabilitiesConfigured == false ) {
-            m_capabilitiesDelegate->publishCapabilitiesAsyncWithRetries();
-        }
-        else
+        std::lock_guard<std::mutex> lock( m_connectionMutex );
+
+        // Only attempt to connect if: 1) we are not already in the process of an asynchronous connection attemtpt,
+        // 2) the network status is CONNECTED, and 3) the current auth state is REFRESHED
+        if( m_connecting == false && m_networkStatus == NetworkInfoObserver::NetworkStatus::CONNECTED && m_authState == AuthObserverInterface::State::REFRESHED )
         {
-            // enabled the avs connection
-            m_connectionManager->enable();
+            // if the capabilities have not been configured yet then publish the capabilities
+            // and wait for response before connecting...
+            if( m_capabilitiesConfigured == false ) {
+                m_connecting = true;
+                m_capabilitiesDelegate->publishCapabilitiesAsyncWithRetries();
+            }
+            else
+            {
+                // if we are already connected to avs then attempt reconnect
+                if( m_connectionManager->isConnected() ) {
+                    m_connectionManager->reconnect();
+                }
+                else
+                {
+                    // enabled the avs connection
+                    m_connectionManager->enable();
+                
+                    // send the default client settings
+                    m_settings->sendDefaultSettings();
+                }
+            }
             
-            // send the default client settings
-            m_settings->sendDefaultSettings();
+            // enabled speech recognizer wakeword if enabled by engine/platform implementations
+            if( m_speechRecognizerEngineImpl != nullptr && m_speechRecognizerEngineImpl->isWakewordEnabled() ) {
+                ThrowIfNot( m_speechRecognizerEngineImpl->enableWakewordDetection(), "enabledWakewordDetectionFailed" );
+            }
         }
 
         return true;
@@ -716,6 +778,12 @@ bool AlexaEngineService::disconnect()
 {
     try
     {
+        std::lock_guard<std::mutex> lock( m_connectionMutex );
+
+        if( m_speechRecognizerEngineImpl != nullptr ) {
+            ThrowIfNot( m_speechRecognizerEngineImpl->disableWakewordDetection(), "disableWakewordDetectionFailed" );
+        }
+
         ThrowIfNot( m_configured, "alexaServiceNotConfigured" );
         m_connectionManager->disable();
 
@@ -743,6 +811,9 @@ void AlexaEngineService::onCapabilitiesStateChange( CapabilitiesObserverInterfac
         // next connection attempt
         m_capabilitiesConfigured = true;
     }
+
+    // change the connecting state so engine can attempt reconnect
+    m_connecting = false;
 }
 
 void AlexaEngineService::onAuthStateChange( AuthObserverInterface::State newState, AuthObserverInterface::Error error )
@@ -755,21 +826,55 @@ void AlexaEngineService::onAuthStateChange( AuthObserverInterface::State newStat
 
         if( m_authState != newState )
         {
+            m_authState = newState;
+
             if( isRunning() )
             {
-                if( newState == AuthObserverInterface::State::REFRESHED ) {
+                if( m_authState == AuthObserverInterface::State::REFRESHED ) {
                     connect();
                 }
                 else {
                     disconnect();
                 }
             }
-        
-            m_authState = newState;
         }
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"onAuthStateChange").d("reason", ex.what()));
+    }
+}
+
+void AlexaEngineService::onNetworkInfoChanged( NetworkInfoObserver::NetworkStatus status, int wifiSignalStrength )
+{
+    try
+    {
+        AACE_INFO(LX(TAG,"onNetworkInfoChanged").d("status",status).d("wifiSignalStrength",wifiSignalStrength));
+
+        ThrowIfNot( m_configured, "alexaServiceNotConfigured" );
+
+        if( m_networkStatus != status )
+        {
+            auto previousNetworkStatus = m_networkStatus;
+
+            // save the new network status
+            m_networkStatus = status;
+
+            if( isRunning() )
+            {
+                // if we are transitioning from any state to CONNECTED then connect to avs
+                if( status == NetworkInfoObserver::NetworkStatus::CONNECTED ) {
+                    connect();
+                }
+                
+                // else if transitioning from CONNECTED to any other state disconnect the avs connection
+                else if( previousNetworkStatus == NetworkInfoObserver::NetworkStatus::CONNECTED ) {
+                    disconnect();
+                }
+            }
+        }
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"onNetworkInfoChanged").d("reason", ex.what()));
     }
 }
 

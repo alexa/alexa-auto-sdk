@@ -13,16 +13,13 @@
  * permissions and limitations under the License.
  */
 
-// aace/alexa/Speaker.java
-// This is an automatically generated file.
-
 package com.amazon.aace.alexa;
 
 import com.amazon.aace.core.PlatformInterface;
 
 /**
  * Speaker is the interface for volume and mute control for an @c AudioChannel.
- * Volume and mute settings for the Speaker are independent of each other, 
+ * Volume and mute settings for the Speaker are independent of each other,
  * and the respective directives from the Engine should not affect the other setting in any way.
  *
  * @sa AudioChannel
@@ -65,13 +62,6 @@ abstract public class Speaker extends PlatformInterface
         }
     }
 
-    /**
-     * Speaker is the interface for volume and mute control for an @c AudioChannel.
-     * Volume and mute settings for the Speaker are independent of each other, 
-     * and the respective directives from the Engine should not affect the other setting in any way.
-     *
-     * @sa AudioChannel
-     */
     public Speaker() {
     }
 
@@ -79,9 +69,9 @@ abstract public class Speaker extends PlatformInterface
      * Notifies the platform implementation to set the absolute volume of the Speaker. The
      * @c volume value should be scaled to fit the needs of the platform.
      *
-     * @param  volume The absolute volume to set on the Speaker. @c volume is in the range [0,100]. 
+     * @param  volume The absolute volume to set on the Speaker. @c volume is in the range [0,100].
      *
-     * @return @c true if the platform implementation successfully handled the call, 
+     * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
     public boolean setVolume( byte volume ) {
@@ -89,7 +79,7 @@ abstract public class Speaker extends PlatformInterface
     }
 
     /**
-     * Notifies the platform implementation to make a relative adjustment to the volume setting of the Speaker. 
+     * Notifies the platform implementation to make a relative adjustment to the volume setting of the Speaker.
      * The @c delta value is relative to the current volume setting and is positive to
      * increase volume or negative to reduce volume.
      * The volume @c delta value should be scaled to fit the needs of the platform.
@@ -97,7 +87,7 @@ abstract public class Speaker extends PlatformInterface
      * @param  delta The volume adjustment to apply to the Speaker. @c delta is
      * in the range [-100, 100].
      *
-     * @return @c true if the platform implementation successfully handled the call, 
+     * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
     public boolean adjustVolume( byte delta ) {
@@ -110,7 +100,7 @@ abstract public class Speaker extends PlatformInterface
      * @param  mute The mute setting to apply to the Speaker. @c true when the Speaker
      * should be muted, @c false when unmuted
      *
-     * @return @c true if the platform implementation successfully handled the call, 
+     * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
     public boolean setMute( boolean mute ) {
@@ -140,7 +130,7 @@ abstract public class Speaker extends PlatformInterface
     /**
      * Notifies the Engine of a volume change event
      * originating on the platform, such as a user pressing a "volume up" or "volume down"
-     * button. If the Speaker is @c Type::AVS_SYNCED, the Engine will respond with a
+     * button. If the Speaker is @c Type.AVS_SYNCED, the Engine will respond with a
      * call to @c setVolume() on each AVS-synced Speaker.
      *
      * @param  volume The new volume setting of the Speaker. The @c volume reported
@@ -155,7 +145,7 @@ abstract public class Speaker extends PlatformInterface
     /**
      * Notifies the Engine of a mute setting change event
      * originating on the platform, such as a user pressing a "mute" button.
-     * If the Speaker is @c Type::AVS_SYNCED, the Engine will respond with a
+     * If the Speaker is @c Type.AVS_SYNCED, the Engine will respond with a
      * call to @c setMute() on each AVS-synced Speaker.
      *
      * @param  mute The new mute setting of the Speaker. @c true when the Speaker is muted,

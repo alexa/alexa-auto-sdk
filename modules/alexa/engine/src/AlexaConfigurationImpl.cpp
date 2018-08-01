@@ -27,30 +27,6 @@ namespace config {
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.config.AlexaConfiguationImpl");
 
-std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createAuthConfig( const std::string& clientId, const std::string& clientSecret, const std::string& refreshToken )
-{
-    rapidjson::Document document;
-
-    document.SetObject();
-
-    rapidjson::Value authDelegateElement;
-
-    authDelegateElement.SetObject();
-    authDelegateElement.AddMember( "clientId", rapidjson::Value().SetString( clientId.c_str(), clientId.length() ), document.GetAllocator() );
-    authDelegateElement.AddMember( "clientSecret", rapidjson::Value().SetString( clientSecret.c_str(), clientSecret.length() ), document.GetAllocator() );
-    authDelegateElement.AddMember( "refreshToken", rapidjson::Value().SetString( refreshToken.c_str(), refreshToken.length() ), document.GetAllocator() );
-    
-    document.AddMember( "authDelegate", authDelegateElement, document.GetAllocator() );
-
-    // create event string
-    rapidjson::StringBuffer buffer;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer( buffer );
-
-    document.Accept( writer );
-    
-    return aace::core::config::StreamConfiguration::create( std::make_shared<std::stringstream>( buffer.GetString() ) );
-}
-
 std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createDeviceInfoConfig( const std::string& deviceSerialNumber, const std::string& clientId, const std::string& productId )
 {
     rapidjson::Document document;

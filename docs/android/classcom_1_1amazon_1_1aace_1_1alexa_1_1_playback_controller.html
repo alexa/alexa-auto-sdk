@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Automotive Core SDK (Android)
-   &#160;<span id="projectnumber">1.0.0</span>
+   &#160;<span id="projectnumber">1.0.1</span>
    </div>
    <div id="projectbrief">Alexa Auto Core SDK for interacting with the Alexa Voice Service</div>
   </td>
@@ -75,8 +75,6 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ad8aede57d3d20ad4dada7f4aeaed87fc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_playback_controller.html#ad8aede57d3d20ad4dada7f4aeaed87fc">PlaybackController</a> ()</td></tr>
-<tr class="separator:ad8aede57d3d20ad4dada7f4aeaed87fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adf6c0670d09f7028c6a94d229483e677"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_playback_controller.html#adf6c0670d09f7028c6a94d229483e677">playButtonPressed</a> ()</td></tr>
 <tr class="separator:adf6c0670d09f7028c6a94d229483e677"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a43923430d50524de95ec76ec677fb54a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_playback_controller.html#a43923430d50524de95ec76ec677fb54a">pauseButtonPressed</a> ()</td></tr>
@@ -85,36 +83,12 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aa54924ef1ba8b087f64dd8d742ec859b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a96ee8afcb279e2f0b0f49ff2fdcf6c63"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_playback_controller.html#a96ee8afcb279e2f0b0f49ff2fdcf6c63">previousButtonPressed</a> ()</td></tr>
 <tr class="separator:a96ee8afcb279e2f0b0f49ff2fdcf6c63"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface.html">com.amazon.aace.core.PlatformInterface</a></td></tr>
-<tr class="memitem:ab262a5c3abc75647e55d68bee4dcc287 inherit pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface.html#ab262a5c3abc75647e55d68bee4dcc287">PlatformInterface</a> ()</td></tr>
-<tr class="separator:ab262a5c3abc75647e55d68bee4dcc287 inherit pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_playback_controller.html">PlaybackController</a> should be extended to handle playback control operations such as on-platform button presses for the <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_player.html">AudioPlayer</a></code>. The Engine will respond to <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_playback_controller.html">PlaybackController</a> events with playback control directives on the <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_player.html">AudioPlayer</a></code> <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html">MediaPlayer</a></code>.</p>
-<dl class="section note"><dt>Note</dt><dd>The <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_template_runtime.html#a485b27cafa223d145a1808326446f13b">TemplateRuntime::renderPlayerInfo()</a> payload includes information about what playback control buttons should be enabled on screen with a player info display card.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>The <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_template_runtime.html#a485b27cafa223d145a1808326446f13b">TemplateRuntime.renderPlayerInfo()</a> payload includes information about what playback control buttons should be enabled on screen with a player info display card.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_player.html">AudioPlayer</a> </dd></dl>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="ad8aede57d3d20ad4dada7f4aeaed87fc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad8aede57d3d20ad4dada7f4aeaed87fc">&#9670;&nbsp;</a></span>PlaybackController()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">com.amazon.aace.alexa.PlaybackController.PlaybackController </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_playback_controller.html">PlaybackController</a> should be extended to handle playback control operations such as on-platform button presses for the <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_player.html">AudioPlayer</a></code>. The Engine will respond to <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_playback_controller.html">PlaybackController</a> events with playback control directives on the <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_player.html">AudioPlayer</a></code> <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html">MediaPlayer</a></code>.</p>
-<dl class="section note"><dt>Note</dt><dd>The <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_template_runtime.html#a485b27cafa223d145a1808326446f13b">TemplateRuntime::renderPlayerInfo()</a> payload includes information about what playback control buttons should be enabled on screen with a player info display card.</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_player.html">AudioPlayer</a> </dd></dl>
-
-</div>
-</div>
-<h2 class="groupheader">Member Function Documentation</h2>
+</div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="adf6c0670d09f7028c6a94d229483e677"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#adf6c0670d09f7028c6a94d229483e677">&#9670;&nbsp;</a></span>playButtonPressed()</h2>
 
@@ -192,7 +166,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Automotive Core SDK (Android) 1.0.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Automotive Core SDK (Android) 1.0.1 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

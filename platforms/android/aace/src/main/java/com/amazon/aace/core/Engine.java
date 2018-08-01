@@ -13,9 +13,6 @@
  * permissions and limitations under the License.
  */
 
-// aace/core/Engine.java
-// This is an automatically generated file.
-
 package com.amazon.aace.core;
 
 import com.amazon.aace.core.config.EngineConfiguration;
@@ -48,7 +45,7 @@ public class Engine extends PlatformInterface
     /**
      * Sets the Engine configuration to a set of configuration objects
      *
-     * @param  configurationList A collection of @c com.amazon.aace.core.config.EngineConfiguration objects as an      
+     * @param  configurationList A collection of @c com.amazon.aace.core.config.EngineConfiguration objects as an
      * @c EngineConfiguration[]
      * @return @c true if the Engine configuration was successful, else @c false
      */

@@ -36,7 +36,6 @@ public class PhoneCallControllerHandler extends PhoneCallController {
 
     private final Activity mActivity;
     private final LoggerHandler mLogger;
-    private RelativeLayout mCallInfoView;
     private TextView mInitiateCallButton, mTerminateCallButton;
     private TextView mCalleeNumberView, mCallStateView;
     private String mCallId, mCalleeNumber;
@@ -153,7 +152,6 @@ public class PhoneCallControllerHandler extends PhoneCallController {
                 }
         );
 
-        mCallInfoView = mActivity.findViewById( R.id.callInfo );
         mCalleeNumberView = mActivity.findViewById( R.id.calleeNumber );
         mCallStateView = mActivity.findViewById( R.id.callState );
         mInitiateCallButton =  mActivity.findViewById( R.id.initiateCall );
@@ -174,6 +172,7 @@ public class PhoneCallControllerHandler extends PhoneCallController {
             @Override
             public void run() {
                 mCalleeNumberView.setText( mCalleeNumber );
+                mCallStateView.setText( R.string.call_state_idle );
                 mInitiateCallButton.setVisibility( View.VISIBLE );
                 mTerminateCallButton.setVisibility( View.GONE );
             }
@@ -184,7 +183,6 @@ public class PhoneCallControllerHandler extends PhoneCallController {
         mActivity.runOnUiThread( new Runnable() {
             @Override
             public void run() {
-                mCallInfoView.setVisibility( View.VISIBLE );
                 mInitiateCallButton.setVisibility( View.VISIBLE );
                 mTerminateCallButton.setVisibility( View.GONE );
             }
@@ -195,10 +193,12 @@ public class PhoneCallControllerHandler extends PhoneCallController {
         mActivity.runOnUiThread( new Runnable() {
             @Override
             public void run() {
-                mCallInfoView.setVisibility( View.GONE );
                 mInitiateCallButton.setVisibility( View.GONE );
                 mTerminateCallButton.setVisibility( View.GONE );
-                mCallStateView.setText( R.string.call_state_idle );
+                if ( mCalleeNumber != null )
+                    mCallStateView.setText( R.string.call_state_idle );
+                else
+                    mCallStateView.setText( R.string.call_state_none );
             }
         });
     }
@@ -218,9 +218,11 @@ public class PhoneCallControllerHandler extends PhoneCallController {
         mActivity.runOnUiThread( new Runnable() {
             @Override
             public void run() {
-                mInitiateCallButton.setVisibility( View.VISIBLE );
+                mInitiateCallButton.setVisibility( View.GONE );
                 mTerminateCallButton.setVisibility( View.GONE );
-                mCallStateView.setText( R.string.call_state_idle );
+                mCallStateView.setText( R.string.call_state_none );
+                mCalleeNumber = null;
+                mCalleeNumberView.setText( R.string.callee_default_number );
             }
         });
     }

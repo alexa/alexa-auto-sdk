@@ -1,7 +1,7 @@
 var searchData=
 [
   ['callactivated',['callActivated',['../classaace_1_1phone_call_controller_1_1_phone_call_controller.html#a81b7d39516de1c3d4fa79410d37333d7',1,'aace::phoneCallController::PhoneCallController']]],
-  ['callfailed',['callFailed',['../classaace_1_1phone_call_controller_1_1_phone_call_controller.html#a2be7c3147d92ec5757fed65d000762b5',1,'aace::phoneCallController::PhoneCallController']]],
+  ['callfailed',['callFailed',['../classaace_1_1phone_call_controller_1_1_phone_call_controller.html#ad4f54f0e6df614bc7b85517952b4c5c4',1,'aace::phoneCallController::PhoneCallController']]],
   ['callterminated',['callTerminated',['../classaace_1_1phone_call_controller_1_1_phone_call_controller.html#ac20a01a4375fbb26928875e405cd2ff3',1,'aace::phoneCallController::PhoneCallController']]],
   ['cancelnavigation',['cancelNavigation',['../classaace_1_1navigation_1_1_navigation.html#afbda005d6f22d549b01b3700144f1d2a',1,'aace::navigation::Navigation']]],
   ['clearplayerinfo',['clearPlayerInfo',['../classaace_1_1alexa_1_1_template_runtime.html#a173cf6b23048bc7ee8436e931db3b5fc',1,'aace::alexa::TemplateRuntime']]],
@@ -20,7 +20,6 @@ var searchData=
   ['connectionstatuschanged',['connectionStatusChanged',['../classaace_1_1alexa_1_1_alexa_client.html#a70491bf5bb02e0fce4d8fcf2bc206261',1,'aace::alexa::AlexaClient']]],
   ['create',['create',['../classaace_1_1core_1_1config_1_1_stream_configuration.html#a7168bd10c4756eb4087609edb9a4d587',1,'aace::core::config::StreamConfiguration::create()'],['../classaace_1_1core_1_1config_1_1_configuration_file.html#ad96c069ff3ba56714d05a1df4110c817',1,'aace::core::config::ConfigurationFile::create()']]],
   ['createalertsconfig',['createAlertsConfig',['../classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#af7a3007198c8d8e47ce33edbf5c902a7',1,'aace::alexa::config::AlexaConfiguration']]],
-  ['createauthconfig',['createAuthConfig',['../classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#ad0561195dca3bdcfb5c15f779681b233',1,'aace::alexa::config::AlexaConfiguration']]],
   ['createcertifiedsenderconfig',['createCertifiedSenderConfig',['../classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a5d38a056525d20aad2114677d8d461ae',1,'aace::alexa::config::AlexaConfiguration']]],
   ['createconsolesinkconfig',['createConsoleSinkConfig',['../classaace_1_1logger_1_1config_1_1_logger_configuration.html#ae6aa1d5ddd52e173073d501861e6835a',1,'aace::logger::config::LoggerConfiguration']]],
   ['createcurlconfig',['createCurlConfig',['../classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a6c5cbbd9eeb05826fdb363ac2049fa0a',1,'aace::alexa::config::AlexaConfiguration']]],

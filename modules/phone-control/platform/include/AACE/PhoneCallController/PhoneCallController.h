@@ -27,7 +27,7 @@ namespace phoneCallController {
 
 /**
  * PhoneCallController should be extended to handle directives to initiate a phone call
- * on the platform calling device. It also provides interfaces for notifying the Engine 
+ * on a calling device (e.g. mobile phone). It also provides interfaces for notifying the Engine 
  * of the state of a call session and the state of platform connection to the calling device.
  *
  * The platform implementation is responsible for managing the lifecycle and user experience of a call session
@@ -40,7 +40,7 @@ protected:
 public: 
 
     /**
-     * Specifies the state of connection to the platform calling device
+     * Specifies the state of connection to a calling device.
      * @sa @c aace::phoneCallController::PhoneCallControllerEngineInterface::ConnectionState
      */
     using ConnectionState = aace::phoneCallController::PhoneCallControllerEngineInterface::ConnectionState;
@@ -86,12 +86,12 @@ public:
     virtual bool dial( const std::string& payload ) = 0;
     
     /**
-     * Notifies the Engine of a change in connection state of the platform calling device
+     * Notifies the Engine of a change in connection state of a calling device.
      */
     void connectionStateChanged( PhoneCallControllerEngineInterface::ConnectionState state );
 
     /**
-     * Notifies the Engine that a phone call was activated on the platform calling device.
+     * Notifies the Engine that a phone call was activated on a calling device.
      *
      * @c callActivated() should be called in response to a @c dial() directive in which the platform implementation returned @c true.
      * @c callId must match the @c callId from the @c dial() payload.
@@ -104,7 +104,7 @@ public:
     void callActivated( const std::string& callId );
 
     /**
-     * Notifies the Engine of an error in initiating or maintaining a call on the platform calling device
+     * Notifies the Engine of an error in initiating or maintaining a call on a calling device
      * 
      * @param [in] callId The unique identifier for the call
      * @param [in] error An error status code:
@@ -113,7 +113,7 @@ public:
      * @li 503: Error on the platform related to the cellular network
      * @param [in] message A description of the error
      */
-    void callFailed( const std::string& callId, const std::string& error, const std::string& message );
+    void callFailed( const std::string& callId, const std::string& error, const std::string& message = "" );
 
     /**
      * Notifies the Engine that an active call was terminated or an ongoing phone call setup was cancelled

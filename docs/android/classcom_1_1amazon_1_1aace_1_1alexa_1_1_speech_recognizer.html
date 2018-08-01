@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Automotive Core SDK (Android)
-   &#160;<span id="projectnumber">1.0.0</span>
+   &#160;<span id="projectnumber">1.0.1</span>
    </div>
    <div id="projectbrief">Alexa Auto Core SDK for interacting with the Alexa Voice Service</div>
   </td>
@@ -75,8 +75,6 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a06238a5a9c050c847dc09cbdf65ad627"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a06238a5a9c050c847dc09cbdf65ad627">SpeechRecognizer</a> (boolean wakewordDetectionEnabled)</td></tr>
-<tr class="separator:a06238a5a9c050c847dc09cbdf65ad627"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a70707cd51dffbbeeeb5e90ec5cb36b18"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a70707cd51dffbbeeeb5e90ec5cb36b18">wakewordDetected</a> (String wakeword)</td></tr>
 <tr class="separator:a70707cd51dffbbeeeb5e90ec5cb36b18"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a59f998dabf28a7db3d87e2b9350a221b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a59f998dabf28a7db3d87e2b9350a221b">endOfSpeechDetected</a> ()</td></tr>
@@ -99,9 +97,6 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:af4c4e11876474aa362c4a9d628f3c1b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1bad3235340666f217920e23dab6f67d"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a1bad3235340666f217920e23dab6f67d">isWakewordDetectionEnabled</a> ()</td></tr>
 <tr class="separator:a1bad3235340666f217920e23dab6f67d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface.html">com.amazon.aace.core.PlatformInterface</a></td></tr>
-<tr class="memitem:ab262a5c3abc75647e55d68bee4dcc287 inherit pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface.html#ab262a5c3abc75647e55d68bee4dcc287">PlatformInterface</a> ()</td></tr>
-<tr class="separator:ab262a5c3abc75647e55d68bee4dcc287 inherit pub_methods_classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html">SpeechRecognizer</a> should be extended to initiate voice interactions with Alexa and provide audio input to AVS. <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html">SpeechRecognizer</a> provides interfaces for</p>
@@ -117,41 +112,8 @@ Public Member Functions</h2></td></tr>
 <ul>
 <li>Handling wake word and end of speech detection</li>
 </ul>
-<dl class="section note"><dt>Note</dt><dd>For observing Alexa dialog state transitions, see <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client.html#aa0c7e22aeb8007a30d02a0f89226886a">AlexaClient::dialogStateChanged()</a></code>. </dd></dl>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a06238a5a9c050c847dc09cbdf65ad627"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a06238a5a9c050c847dc09cbdf65ad627">&#9670;&nbsp;</a></span>SpeechRecognizer()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">com.amazon.aace.alexa.SpeechRecognizer.SpeechRecognizer </td>
-          <td>(</td>
-          <td class="paramtype">boolean&#160;</td>
-          <td class="paramname"><em>wakewordDetectionEnabled</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html">SpeechRecognizer</a> should be extended to initiate voice interactions with Alexa and provide audio input to AVS. <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html">SpeechRecognizer</a> provides interfaces for</p>
-<ul>
-<li>Initiating a dialog interaction with Alexa via press-and-hold, press-and-release, and voice-initiated user actions</li>
-</ul>
-<ul>
-<li>Streaming audio input to the Engine</li>
-</ul>
-<ul>
-<li>Enabling and disabling the wake word engine</li>
-</ul>
-<ul>
-<li>Handling wake word and end of speech detection</li>
-</ul>
-<dl class="section note"><dt>Note</dt><dd>For observing Alexa dialog state transitions, see <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client.html#aa0c7e22aeb8007a30d02a0f89226886a">AlexaClient::dialogStateChanged()</a></code>. </dd></dl>
-
-</div>
-</div>
-<h2 class="groupheader">Member Function Documentation</h2>
+<dl class="section note"><dt>Note</dt><dd>For observing Alexa dialog state transitions, see <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client.html#aa0c7e22aeb8007a30d02a0f89226886a">AlexaClient.dialogStateChanged()</a></code>. </dd></dl>
+</div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a70707cd51dffbbeeeb5e90ec5cb36b18"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a70707cd51dffbbeeeb5e90ec5cb36b18">&#9670;&nbsp;</a></span>wakewordDetected()</h2>
 
@@ -402,7 +364,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Automotive Core SDK (Android) 1.0.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Automotive Core SDK (Android) 1.0.1 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

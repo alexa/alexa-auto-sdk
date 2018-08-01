@@ -82,8 +82,15 @@ Java_com_amazon_aace_phonecontrol_PhoneCallController_callTerminated( JNIEnv * e
 }
 
 JNIEXPORT void JNICALL
-Java_com_amazon_aace_phonecontrol_PhoneCallController_callFailed( JNIEnv * env , jobject /* this */, jlong cptr, jstring callId, jstring description, jstring message ) {
-    PHONECALLCONTROLLER(cptr)->callFailed( NativeLib::convert( env, callId ), NativeLib::convert( env, description ), NativeLib::convert( env, description ));
+Java_com_amazon_aace_phonecontrol_PhoneCallController_callFailed__JLjava_lang_String_2Ljava_lang_String_2
+        ( JNIEnv * env , jobject /* this */, jlong cptr, jstring callId, jstring error ) {
+    PHONECALLCONTROLLER(cptr)->callFailed(NativeLib::convert( env, callId ), NativeLib::convert( env, error ));
+}
+
+JNIEXPORT void JNICALL
+Java_com_amazon_aace_phonecontrol_PhoneCallController_callFailed__JLjava_lang_String_2Ljava_lang_String_2Ljava_lang_String_2
+        ( JNIEnv * env , jobject /* this */, jlong cptr, jstring callId, jstring error, jstring message ) {
+    PHONECALLCONTROLLER(cptr)->callFailed( NativeLib::convert( env, callId ), NativeLib::convert( env, error ), NativeLib::convert( env, message ));
 }
 
 JNIEXPORT void JNICALL

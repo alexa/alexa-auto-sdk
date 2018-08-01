@@ -13,9 +13,6 @@
  * permissions and limitations under the License.
  */
 
-// aace/alexa/AuthProvider.java
-// This is an automatically generated file.
-
 package com.amazon.aace.alexa;
 
 import com.amazon.aace.core.PlatformInterface;
@@ -108,6 +105,11 @@ abstract public class AuthProvider extends PlatformInterface
          */
         INVALID_REQUEST("INVALID_REQUEST"),
         /**
+         * One of the values in the request was invalid.
+         * @hideinitializer
+         */
+        INVALID_VALUE("INVALID_VALUE"),
+        /**
          * The authorization code is invalid, expired, revoked, or was issued to a different client.
          * @hideinitializer
          */
@@ -116,7 +118,32 @@ abstract public class AuthProvider extends PlatformInterface
          * The client specified the wrong token type.
          * @hideinitializer
          */
-        UNSUPPORTED_GRANT_TYPE("UNSUPPORTED_GRANT_TYPE");
+        UNSUPPORTED_GRANT_TYPE("UNSUPPORTED_GRANT_TYPE"),
+        /**
+         * Invalid code pair provided in Code-based linking token request.
+         * @hideinitializer
+         */
+        INVALID_CODE_PAIR("INVALID_CODE_PAIR"),
+        /**
+         * Waiting for user to authorize the specified code pair.
+         * @hideinitializer
+         */
+        AUTHORIZATION_PENDING("AUTHORIZATION_PENDING"),
+        /**
+         * Client should slow down in the rate of requests polling for an access token.
+         * @hideinitializer
+         */
+        SLOW_DOWN("SLOW_DOWN"),
+        /**
+         * Internal error in client code.
+         * @hideinitializer
+         */
+        INTERNAL_ERROR("INTERNAL_ERROR"),
+        /**
+         * Client ID not valid for use with code based linking.
+         * @hideinitializer
+         */
+        INVALID_CBL_CLIENT_ID("INVALID_CBL_CLIENT_ID");
 
         /**
          * @internal
@@ -138,10 +165,6 @@ abstract public class AuthProvider extends PlatformInterface
         }
     }
 
-    /**
-     * AuthProvider should be extended to manage access tokens for AVS authorization and report
-     * client authorization state to the Engine.
-     */
     public AuthProvider() {
     }
 
@@ -165,10 +188,11 @@ abstract public class AuthProvider extends PlatformInterface
     }
 
     /**
-     * Notify the Engine that the Auth State/Error has changed
+     * Notifies the Engine of a change in AVS authorization state in the platform implementation
      *
-     * @param [in] authState AuthState the authState of the platform implementation
-     * @param [in] authError AuthError the authError of the platform implementation
+     * @param  authState The new authorization state
+     *
+     * @param  authError The error state of the authorization attempt
      */
     public void authStateChange( AuthState authState, AuthError authError ) {
         authStateChange( getNativeObject(), authState, authError );

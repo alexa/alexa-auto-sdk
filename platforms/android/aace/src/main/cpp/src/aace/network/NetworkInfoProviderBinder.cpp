@@ -25,6 +25,7 @@ void NetworkInfoProviderBinder::initialize( JNIEnv* env )
 
     // NetworkStatus
     jclass networkStatusEnumClass = env->FindClass( "com/amazon/aace/network/NetworkInfoProvider$NetworkStatus" );
+    m_enum_NetworkStatus_UNKNOWN = NativeLib::FindEnum( env, networkStatusEnumClass, "UNKNOWN", "Lcom/amazon/aace/network/NetworkInfoProvider$NetworkStatus;" );
     m_enum_NetworkStatus_DISCONNECTED = NativeLib::FindEnum( env, networkStatusEnumClass, "DISCONNECTED", "Lcom/amazon/aace/network/NetworkInfoProvider$NetworkStatus;" );
     m_enum_NetworkStatus_DISCONNECTING = NativeLib::FindEnum( env, networkStatusEnumClass, "DISCONNECTING", "Lcom/amazon/aace/network/NetworkInfoProvider$NetworkStatus;" );
     m_enum_NetworkStatus_CONNECTED = NativeLib::FindEnum( env, networkStatusEnumClass, "CONNECTED", "Lcom/amazon/aace/network/NetworkInfoProvider$NetworkStatus;" );
@@ -64,8 +65,11 @@ int NetworkInfoProviderBinder::getWifiSignalStrength()
 
 jobject NetworkInfoProviderBinder::convert( aace::network::NetworkInfoProviderEngineInterface::NetworkStatus status )
 {
+
     switch( status )
     {
+        case aace::network::NetworkInfoProviderEngineInterface::NetworkStatus::UNKNOWN:
+            return m_enum_NetworkStatus_UNKNOWN.get();
         case aace::network::NetworkInfoProviderEngineInterface::NetworkStatus::DISCONNECTED:
             return m_enum_NetworkStatus_DISCONNECTED.get();
         case aace::network::NetworkInfoProviderEngineInterface::NetworkStatus::DISCONNECTING:
@@ -90,6 +94,9 @@ aace::network::NetworkInfoProviderEngineInterface::NetworkStatus NetworkInfoProv
     }
     else if( m_enum_NetworkStatus_CONNECTING.isSameObject( env, obj ) ) {
         return aace::network::NetworkInfoProviderEngineInterface::NetworkStatus::CONNECTING;
+    }
+    else if( m_enum_NetworkStatus_UNKNOWN.isSameObject( env, obj ) ) {
+        return aace::network::NetworkInfoProviderEngineInterface::NetworkStatus::UNKNOWN;
     }
     else {
         return aace::network::NetworkInfoProviderEngineInterface::NetworkStatus::CONNECTING;

@@ -20,7 +20,7 @@
 
 void LoggerBinder::initialize( JNIEnv* env )
 {
-    m_javaMethod_logEvent_level_time_module_message = env->GetMethodID( getJavaClass(), "logEvent", "(Lcom/amazon/aace/logger/Logger$Level;JLjava/lang/String;Ljava/lang/String;)Z" );
+    m_javaMethod_logEvent_level_time_module_message = env->GetMethodID( getJavaClass(), "logEvent", "(Lcom/amazon/aace/logger/Logger$Level;JLjava/lang/String;[B)Z" );
 
     // Level
     jclass levelEnumClass = env->FindClass( "com/amazon/aace/logger/Logger$Level" );
@@ -42,12 +42,13 @@ bool LoggerBinder::logEvent( aace::logger::Logger::Level level, std::chrono::sys
         if( context.isValid() )
         {
             jstring sourceStr = context.getEnv()->NewStringUTF( source.c_str() );
-            jstring messageStr = context.getEnv()->NewStringUTF( message.c_str() );
-
-            result = context.getEnv()->CallBooleanMethod( getJavaObject(), m_javaMethod_logEvent_level_time_module_message, convert( level ), std::chrono::duration_cast<std::chrono::milliseconds>( time.time_since_epoch() ).count(), sourceStr, messageStr );
+            jbyteArray messageArray = context.getEnv()->NewByteArray(message.size());
+            context.getEnv()->SetByteArrayRegion(messageArray, 0, message.size(), (const jbyte*)message.c_str());
+            
+            result = context.getEnv()->CallBooleanMethod( getJavaObject(), m_javaMethod_logEvent_level_time_module_message, convert( level ), std::chrono::duration_cast<std::chrono::milliseconds>( time.time_since_epoch() ).count(), sourceStr, messageArray );
 
             context.getEnv()->DeleteLocalRef( sourceStr );
-            context.getEnv()->DeleteLocalRef( messageStr );
+            context.getEnv()->DeleteLocalRef( messageArray );
         }
     }
     return result;

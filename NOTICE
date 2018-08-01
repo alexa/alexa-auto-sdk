@@ -11,6 +11,7 @@ builder
 modules/core
 modules/alexa
 modules/navigation
+modules/phone-control
 platform/android
 samples/android
 tools/document

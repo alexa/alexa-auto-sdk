@@ -13,9 +13,6 @@
  * permissions and limitations under the License.
  */
 
-// aace/core/config/EngineConfiguration.java
-// This is an automatically generated file.
-
 package com.amazon.aace.core.config;
 
 import android.util.Log;

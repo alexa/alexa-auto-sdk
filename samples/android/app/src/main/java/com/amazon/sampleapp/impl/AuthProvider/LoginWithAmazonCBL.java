@@ -31,7 +31,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Observable;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -43,6 +45,7 @@ import javax.net.ssl.HttpsURLConnection;
 class LoginWithAmazonCBL extends Observable {
 
     private static final String sTag = "CBL";
+
     private static final int sResponseOk = 200;
 
     // Refresh access token 2 minutes before it expires
@@ -51,24 +54,32 @@ class LoginWithAmazonCBL extends Observable {
     // Poll every 10 seconds when requesting device token
     private static final int sPollInterval = 10;
 
-    // Stop polling for device token within 30 seconds of its expiry time
-    private static final int sStopPollingDeviceTokenTime = 30;
+    // CBL auth endpoint URLs
+    private static final String sBaseEndpointUrl = "https://api.amazon.com/auth/O2/";
+    private static final String sAuthRequestUrl = LoginWithAmazonCBL.sBaseEndpointUrl + "create/codepair";
+    private static final String sTokenRequestUrl = LoginWithAmazonCBL.sBaseEndpointUrl + "token";
+    private static final String sTokenVerificationRequestUrl = LoginWithAmazonCBL.sBaseEndpointUrl + "tokeninfo?access_token=";
+    private static final String sProfileRequestUrl = "https://api.amazon.com/user/profile";
 
-    // CBL auth endpoint URL's
-    private static final String mBaseEndpointUrl = "https://api.amazon.com/auth/O2/";
-    private static final String mAuthRequestUrl = mBaseEndpointUrl + "create/codepair";
-    private static final String mTokenRequestUrl = mBaseEndpointUrl + "token";
+    //    To fetch User Profile data, set the sUserProfileEnabled to true
+    //    You will need additional parameters in your Security Profile for the profile scope request to succeed,
+    //    please see the README CBL section for more.
+    private static final boolean sUserProfileEnabled = false;
+    private static final String sScopeValue = sUserProfileEnabled ? "alexa:all+profile" : "alexa:all";
 
     private final SharedPreferences mPreferences;
     private final Activity mActivity;
     private final LoggerHandler mLogger;
     private final AuthProviderHandler mAuthProvider;
     private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
-    private Timer mRefreshTimer = new Timer();
     private String mClientId;
     private String mClientSecret;
     private String mProductID;
     private String mProductDSN;
+
+    private Timer mTimer = new Timer();
+    private TimerTask mAuthorizationTimerTask;
+    private TimerTask mRefreshTimerTask;
 
     LoginWithAmazonCBL( Activity activity,
                         SharedPreferences preferences,
@@ -100,17 +111,17 @@ class LoginWithAmazonCBL extends Observable {
             try {
                 if ( !mClientId.equals( "" ) ) {
                     final JSONObject scopeData = new JSONObject();
-                    final JSONObject scope = new JSONObject();
+                    final JSONObject data = new JSONObject();
                     final JSONObject productInstanceAttributes = new JSONObject();
 
                     productInstanceAttributes.put( "deviceSerialNumber", mProductDSN );
-                    scope.put( "productInstanceAttributes", productInstanceAttributes );
-                    scope.put( "productID", mProductID );
-                    scopeData.put( "alexa:all", scope );
+                    data.put( "productInstanceAttributes", productInstanceAttributes );
+                    data.put( "productID", mProductID );
+                    scopeData.put( "alexa:all", data );
 
                     final String urlParameters = "response_type=device_code"
                             + "&client_id=" + mClientId
-                            + "&scope=alexa:all"
+                            + "&scope=" + sScopeValue
                             + "&scope_data=" + scopeData.toString();
 
                     HttpsURLConnection con = null;
@@ -118,7 +129,7 @@ class LoginWithAmazonCBL extends Observable {
                     InputStream response = null;
 
                     try {
-                        URL obj = new URL( mAuthRequestUrl );
+                        URL obj = new URL( sAuthRequestUrl );
                         con = ( HttpsURLConnection ) obj.openConnection();
                         con.setRequestMethod( "POST" );
 
@@ -176,19 +187,18 @@ class LoginWithAmazonCBL extends Observable {
             final String userCode = response.getString( "user_code" );
             final String expirySeconds = response.getString( "expires_in" );
             final String urlParameters = "grant_type=device_code"
-                    +"&device_code=" + deviceCode
-                    +"&user_code=" + userCode;
+                    + "&device_code=" + deviceCode
+                    + "&user_code=" + userCode;
 
-            final Timer timer = new Timer();
-            timer.schedule( new TimerTask() {
-                int i = ( Integer.parseInt( expirySeconds ) - sStopPollingDeviceTokenTime ) / sPollInterval;
+            mTimer.schedule( mAuthorizationTimerTask = new TimerTask() {
+                int i = ( Integer.parseInt( expirySeconds ) ) / sPollInterval;
                 public void run() {
                     if ( i > 0 ) {
                         HttpsURLConnection con = null;
                         DataOutputStream os = null;
                         BufferedReader in = null;
                         try {
-                            URL obj = new URL( mTokenRequestUrl );
+                            URL obj = new URL( sTokenRequestUrl );
                             con = ( HttpsURLConnection ) obj.openConnection();
 
                             con.setRequestMethod( "POST" );
@@ -202,8 +212,7 @@ class LoginWithAmazonCBL extends Observable {
 
                             int responseCode = con.getResponseCode();
                             if ( responseCode == sResponseOk ) {
-                                timer.cancel();
-
+                                this.cancel();
                                 in = new BufferedReader(
                                         new InputStreamReader( con.getInputStream() ) );
                                 String inputLine;
@@ -221,6 +230,7 @@ class LoginWithAmazonCBL extends Observable {
                                 // Write refresh token to shared preferences
                                 SharedPreferences.Editor editor = mPreferences.edit();
                                 editor.putString( mActivity.getString( R.string.preference_refresh_token ), refreshToken );
+                                editor.putString( mActivity.getString( R.string.preference_login_method ), LoginWithAmazon.CBL_LOGIN_METHOD_KEY );
                                 editor.apply();
 
                                 // Refresh access token automatically before expiry
@@ -234,10 +244,15 @@ class LoginWithAmazonCBL extends Observable {
                                         AuthProvider.AuthError.NO_ERROR );
                                 setChanged();
                                 notifyObservers( "logged in" );
+
+                                // Fetch User Profile if profile scope was authorized
+                                if ( sScopeValue.contains( "profile" ) ) {
+                                    requestUserProfile( accessToken );
+                                }
                             }
 
                         } catch ( Exception e ) {
-                            timer.cancel();
+                            this.cancel();
                             mLogger.postError( sTag, e.getMessage() );
                             return;
                         } finally {
@@ -263,9 +278,7 @@ class LoginWithAmazonCBL extends Observable {
                         i--;
 
                     } else { // User didn't authorize with code before it expired
-
-                        timer.cancel();
-
+                        this.cancel();
                         // Prompt to attempt authorization again
                         String expiredMessage = "The code has expired. Retry to generate a new code.";
                         try {
@@ -274,16 +287,78 @@ class LoginWithAmazonCBL extends Observable {
                             renderJSON.put( "message", expiredMessage );
                             mLogger.postDisplayCard( renderJSON, LogRecyclerViewAdapter.CBL_CODE_EXPIRED );
                         } catch ( JSONException e ) {
-                            mLogger.postError( sTag, e.getMessage() );
+                            mLogger.postError( sTag, "JSON Error: " + e.getMessage() );
                             return;
                         }
                         mLogger.postWarn( sTag, expiredMessage );
                     }
                 }
             }, 0, sPollInterval * 1000 );
-
         } catch ( Exception e ) {
             mLogger.postError( sTag, "Error requesting device token. Error: " + e.getMessage() );
+        }
+    }
+
+    private void requestUserProfile( final String accessToken ) {
+        HttpsURLConnection urlConnection = null;
+        try {
+            // token authenticity verification
+            URL requestUrl = new URL( sTokenVerificationRequestUrl + URLEncoder.encode(accessToken, "UTF-8" ) );
+
+            urlConnection = ( HttpsURLConnection ) requestUrl.openConnection();
+            urlConnection.setRequestMethod( "GET" );
+            urlConnection.setRequestProperty( "Host", "api.amazon.com" );
+            urlConnection.setRequestProperty( "access_token", URLEncoder.encode( accessToken, "UTF-8" ) );
+
+            int responseCode = urlConnection.getResponseCode();
+
+            if( responseCode == HttpURLConnection.HTTP_OK ) {
+                JSONObject responseJSON = getResponseJSON( urlConnection.getInputStream() );
+                urlConnection.disconnect();
+                if ( responseJSON == null ) {
+                    mLogger.postError( sTag, "Error requesting Token Info. Error: Null JSON Response" );
+                } else {
+                    if (!mClientId.equals( responseJSON.getString("aud") ) ) {
+                        // the access token does not belong to us
+                        mLogger.postError( sTag, "Error requesting Token Info. Error: Invalid access token");
+                    } else {
+                        try {
+                            requestUrl = new URL(sProfileRequestUrl);
+                            urlConnection = (HttpsURLConnection) requestUrl.openConnection();
+                            urlConnection.setRequestMethod("GET");
+                            urlConnection.setRequestProperty("Host", "api.amazon.com");
+                            urlConnection.setRequestProperty("Authorization", "bearer " + accessToken);
+
+                            responseCode = urlConnection.getResponseCode();
+
+                            if (responseCode == HttpURLConnection.HTTP_OK) {
+                                try {
+                                    responseJSON = getResponseJSON(urlConnection.getInputStream());
+                                    if ( responseJSON == null ) {
+                                        mLogger.postError(sTag, "Error requesting User Profile. Error: null JSON Response");
+                                    } else {
+                                        mLogger.postInfo(sTag, String.format("USER PROFILE: Name: %s, Email: %s, User ID: %s",
+                                                responseJSON.getString("name"),
+                                                responseJSON.getString("email"),
+                                                responseJSON.getString("user_id")));
+                                    }
+
+                                } catch (Exception e) {
+                                    mLogger.postError(sTag, "Error requesting User Profile. Error: " + e.getMessage());
+                                }
+                            } else
+                                mLogger.postInfo(sTag, "User Profile request failed with code: " + responseCode);
+                            if (urlConnection != null) {
+                                urlConnection.disconnect();
+                            }
+                        } catch (Exception e) {
+                            mLogger.postError(sTag, "Error requesting Token Info. Error: " + e.getMessage());
+                        }
+                    }
+                }
+            } else mLogger.postInfo( sTag, "Token Info request failed with code: " + responseCode);
+        } catch( Exception e ) {
+            mLogger.postError( sTag, "Error while requesting User Profile. Error: " + e.getMessage() );
         }
     }
 
@@ -309,7 +384,7 @@ class LoginWithAmazonCBL extends Observable {
                     InputStream response = null;
 
                 try {
-                    URL obj = new URL( mTokenRequestUrl );
+                    URL obj = new URL( sTokenRequestUrl );
                     con = ( HttpsURLConnection ) obj.openConnection();
                     con.setRequestMethod( "POST" );
 
@@ -359,14 +434,21 @@ class LoginWithAmazonCBL extends Observable {
                                 + e.getMessage() );
                     }
 
-                } else  mLogger.postError( sTag, "Error refreshing auth token" );
+                } else {
+                    mAuthProvider.clearAuthToken();
+                    mAuthProvider.onAuthStateChanged( AuthProvider.AuthState.UNINITIALIZED,
+                            AuthProvider.AuthError.AUTHORIZATION_FAILED );
+                    mLogger.postError( sTag, "Error refreshing auth token" );
+                }
 
-            } else mLogger.postWarn( sTag, "Invalid client ID or client secret" );
+            } else mLogger.postWarn( sTag, String.format(
+                "Invalid Auth Parameters, clientID: %s, clientSecret: %s, refreshToken: %s",
+                    mClientId, mClientSecret, mRefreshToken ) );
         }
     }
 
     private void startRefreshTimer( Long delaySeconds, final String refreshToken ) {
-        mRefreshTimer.schedule( new TimerTask() {
+        mTimer.schedule( mRefreshTimerTask = new TimerTask() {
             public void run() { refreshAuthToken( refreshToken ); }
         }, delaySeconds * 1000 - sRefreshAccessTokenTime );
     }
@@ -374,9 +456,13 @@ class LoginWithAmazonCBL extends Observable {
     void logout() {
         mLogger.postInfo( sTag, "Attempting to un-authenticate" );
 
+        // stop refresh timer task
+        if ( mRefreshTimerTask != null ) mRefreshTimerTask.cancel();
+
         // Clear refresh token in preferences
         SharedPreferences.Editor editor = mPreferences.edit();
         editor.putString( mActivity.getString( R.string.preference_refresh_token ), "" );
+        editor.putString( mActivity.getString( R.string.preference_login_method ), "" );
         editor.apply();
 
         // Notify AuthProvider of unauthenticated state
@@ -389,7 +475,10 @@ class LoginWithAmazonCBL extends Observable {
         notifyObservers( "logged out" );
     }
 
-    void onResume( String refreshToken ) { refreshAuthToken( refreshToken ); }
+    void onInitialize() {
+        String refreshToken = mPreferences.getString( mActivity.getString( R.string.preference_refresh_token ), "" );
+        if ( !refreshToken.equals( "" ) ) refreshAuthToken( refreshToken );
+    }
 
     private JSONObject getResponseJSON( InputStream inStream ) {
         if ( inStream != null ) {
@@ -412,5 +501,11 @@ class LoginWithAmazonCBL extends Observable {
             }
         }
         return null;
+    }
+
+    void cancelPendingAuthorization() {
+        if ( mAuthorizationTimerTask != null ) {
+            mAuthorizationTimerTask.cancel();
+        }
     }
 }

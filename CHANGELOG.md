@@ -2,6 +2,31 @@
 
 ___
 
+### v1.0.1 released on 2018-07-31:
+
+### Enhancements
+
+This release is for bug fixes only. There are no new features or enhancements.
+
+### Resolved Issues
+
+Issues fixed in this release:
+
+* The Engine now reconnects to AVS when the `NetworkInfoProvider` updates the network status.
+* All shared memory objects are now freed when the Engine object is disposed.
+* We fixed a media playback state issue in the Engine that caused an unexpected pause and resume for a media stream that was already stopped.
+* We added AudioPlayer::playerActivityChanged to the Android APIs.
+* Updated the `AuthError` enumeration with additional error types.
+* Removed deprecated `createAuthConfig()` configuration method.
+* Fixed issue in the JNI where trying to create a UTF-8 string with invalid characters caused a crash, seen when sensitive logging is enabled.
+* Improved JNI thread handling.
+* Enabled capability registration for phone call control.
+* We fixed an issue where the Android platform build failed on the initial attempt when using clean code.
+
+### Known issues
+
+There are no known issues in this release.
+
 ### **v1.0.0**
 
 * v1.0.0 released on 2018-06-29

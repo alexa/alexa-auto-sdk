@@ -7,22 +7,13 @@ Please read through this document before submitting any issues or pull requests 
 
 ## Reporting Bugs/Feature Requests
 
-We welcome you to use the GitHub issue tracker to report bugs or suggest features.
-
-When filing an issue, please check [existing open](https://github.com/alexa/aac-sdk/issues), or [recently closed](https://github.com/alexa/aac-sdk/issues?utf8=%E2%9C%93&q=is%3Aissue%20is%3Aclosed%20), issues to make sure somebody else hasn't already reported the issue. Please try to include as much information as you can. The following information will ensure a quick response:
-
-* **Overview** - provide a brief overview of the issue.
-* **Steps to reproduce** - what you were doing when it happened, or (better) what to do (or where to look) to repeat the issue.
-* **Logs** - can you spot the issue in your logs?
-* **Related issues** - does a similar issue exist (open or closed)?
-* **OS and build** - tell us about your operating system and build.
-* **Hardware platform** - Are you using an ARM 32-bit, 64-bit or x86 processor?
+We are not using the GitHub issue tracker at this time. Read the section "[Reporting an issue](./NEED_HELP.md#reportinganissue)" in NEED_HELP for details about reporting issues.
 
 ## Contributing via Pull Requests
 At this time we are **not** accepting any pull requests.
 
 ## Code of Conduct
-This project has adopted the [Amazon Open Source Code of Conduct](https://aws.github.io/code-of-conduct). 
+This project has adopted the [Amazon Open Source Code of Conduct](https://aws.github.io/code-of-conduct).
 For more information see the [Code of Conduct FAQ](https://aws.github.io/code-of-conduct-faq) or contact opensource-codeofconduct@amazon.com with any additional questions or comments.
 
 

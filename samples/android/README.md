@@ -5,6 +5,8 @@
 The Android Sample App demonstrates a basic platform implementation of AAC SDK integration. It provides an example of creating and configuring an instance of the Engine, overriding the default implementation of each AAC Platform Interface, and registering those custom interface handlers with the Engine. It includes two example implementations of authorizing with AVS via Login with Amazon (LWA),
 detailed logs for interactions with the AAC SDK and developer convenience features for viewing those logs in the application, and UI elements relevant to each Platform Interface implementation. The purpose of the Android Sample App is to provide developers with useful example code to facilitate integration with the AAC SDK.
 
+Click [here](#androidsampleapprelnote) to read the release notes for this sample app.
+
 ### Setup
 
 #### Register a product
@@ -22,7 +24,7 @@ After registering for an Amazon developer account, you'll need to create an Alex
 9. Agree to the license terms in the Developer Portal and click **Finished**.
 
 #### Include AAC SDK dependencies
-If you have not already done so, you must build the Android specific binaries for the AAC SDK library project to link to. 
+If you have not already done so, you must build the Android specific binaries for the AAC SDK library project to link to.
 
 See the [Alexa Auto Core Builder](../../builder/README.md) instructions to build the AAC SDK binaries for your Android target.
 
@@ -60,15 +62,19 @@ Initiate various interactions with Alexa and explore the options menu features a
 - `[AAC]` refers to log messages from the AAC SDK.
 - `[CLI]` refers to log messages from the Sample App itself.
 
-> **NOTE**: 
+> **NOTE**:
 Some Alexa interactions will return data for rendering a [Display Card](https://alexa.design/dev-display-cards) for visual feedback. Card rendering in the Sample App is an example of parsing the payload of rendering calls to the TemplateRuntime Platform Interface. The Sample App implementation of these cards is not meant as a UI design guideline or requirement.
 
- ### Authorization with AVS in the Sample App
 
-To access the Alexa Voice Service (AVS) it is required that your product acquire [Login with Amazon (LWA)](https://developer.amazon.com/login-with-amazon) access tokens. The Android Sample App demonstrates two methods to acquire such tokens: 
-- **Code-Based Linking (CBL)**: The user is provided with a short alphanumeric code and a URL in which to enter the code on any web browser-enabled device. [Read more about CBL](https://developer.amazon.com/docs/alexa-voice-service/code-based-linking-other-platforms.html), if desired. The Sample App implementation of CBL requires no further setup.
+### Authorization with AVS in the Sample App
+
+To access the Alexa Voice Service (AVS) it is required that your product acquire [Login with Amazon (LWA)](https://developer.amazon.com/login-with-amazon) access tokens. The Android Sample App demonstrates two methods to acquire such tokens:
+
+- **Code-Based Linking (CBL)**: The user is provided with a short alphanumeric code and a URL in which to enter the code on any web browser-enabled device. [Read more about CBL](https://developer.amazon.com/docs/alexa-voice-service/code-based-linking-other-platforms.html), if desired. The Sample App implementation of CBL requires no further setup. It includes an example of optionally fetching user profile information, which requires you[ add your company privacy policy URL and a logo image to your security profile](#register-security-profile-with-login-with-amazon).
+
 - Using the **Login with Amazon SDK**: The Sample App implements a usage of the Login with Amazon SDK for Android that launches a web brower on the device and prompts the user to log in with their Amazon account. Using this method to authorize in the Sample App requires additional setup:
 	- [Add the LWA library to the project](#getting-the-lwa-library)
+	- [Register Security Profile with Login With Amazon](#register-security-profile-with-login-with-amazon)
 	- [Get an API Key](#generating-the-api-key)
 
 > **NOTE**: If you do not wish to use the LWA library method for authentication in the Sample App, no further reading is required for this section.
@@ -80,6 +86,11 @@ Download and expand the [Amazon Developer SDK for Android](https://developer.ama
 1. Navigate to the `Login With Amazon` folder
 2. Add library `login-with-amazon-sdk.jar` to the Android Studio project (In the `AAC_SDK_PATH/samples/android/` folder)
 3. Ensure the library is added as a dependency to the `app` module in the build.gradle. (If it is not automatically linked,  right-click and select **"Add As Library..."**)
+
+#### Register Security Profile with Login With Amazon
+
+In the [Amazon Developer portal](https://developer.amazon.com), go to **APPS & SERVICES > Login With Amazon**.
+Here you will be able to register the security profile you associated with your product. You will need to provide your company privacy policy URL and a logo image.
 
 #### Generating the API key
 
@@ -93,11 +104,11 @@ You will need an API key to get started. The API key is generated when you assoc
 		```
 		keytool -list -v -keystore ~/.android/debug.keystore
 		```
-		There is no password by default.	
+		There is no password by default.
 
 		If you are not using the default keystore, view more keystore instructions under [Determining an Android App Signature](https://alexa.design/dev-lwa-register#determining-an-android-app-signature).
 		If you do not see the MD5, you may need to temporarily switch Java version to 1.8.
-		You can check the java home version as follows: 
+		You can check the java home version as follows:
 
 		```
 		/usr/libexec/java_home -V
@@ -143,13 +154,20 @@ PreRequisite: Install LLDB package in Android Studio (LLDB component can be foun
 
 Note: If LLDB window isn't visible in debug tab, change the debug configuration to pick dual mode debugging (in place of default auto)
 
+## Android Sample App Release Notes<a id="androidsampleapprelnote"></a>
 
-### Known issues
-- Display card rendering is not adaptable to a variety of screen sizes.
-- When authenticated with CBL, if network connectivity is lost while refreshing the access token, the Sample App does not automatically attempt to refresh the token when connectivity is restored, and the GUI displays the "log in" button even though a refresh token is present. Restoring an authorized state requires either putting the app into the background and bringing it back to the foreground or following the log in steps again.
-- Particular sections of the Flash Briefing do not resume from a paused state properly. Attempting to play after pause in some cases may restart the media playback.
-- The Sample App does not implement managing audio focus, so other apps will not recognize its audio playback appropriately.
-- Alexa dialog playback may stop abruptly when switching between wifi and mobile data.
-- After saying 'stop' to stop music playback then saying 'flash briefing', the content of the flash briefing does not play and the stopped music resumes instead.
-- The PhoneCallController UI is limited and does not provide means to enter a phone number to initiate a call outside the scope of an Alexa interaction. When clicking "Initiate Call" to make a call from the stored number from the previous dial() payload, if a call with this identifier was already activated and terminated, the implementation does not generate a new call identifier when attempting to activate a new call to the same number.
-- The Sample App may not run on some emulators, such as Nexus 6 API 25 and ARM 64-bit.
+### Resolved Issues
+
+* The issue related to music playing after saying "stop" for music playback then saying "flash briefing" is fixed. The flash briefing response plays as expected.
+* The Login with Amazon browser implementation now refreshes the auth token after one hour.
+* Examples were added about how to fetch user profiles for LWA with browser and CBL. 
+
+### Known Issues
+
+* Display card rendering is not adaptable to a variety of screen sizes.
+* When authenticated with CBL, if network connectivity is lost while refreshing the access token, the Sample App does not automatically attempt to refresh the token when connectivity is restored, and the GUI incorrectly displays the "log in" button even though a refresh token is present. Restoring an authorized state requires either restarting the app or following the log in steps again with network connectivity.
+* Particular sections of the Flash Briefing do not resume from a paused state properly. Attempting to play after pause in some cases may restart the media playback.
+* The Sample App does not implement managing inter-app audio focus, so other apps will not recognize its audio playback appropriately.
+* Alexa dialog playback may stop abruptly when switching between wifi and mobile data.
+* The `PhoneCallController` UI is limited and does not provide a way to enter a phone number and generate a unique call identifier to initiate a call outside the scope of an Alexa interaction.
+* The Sample App may not run on some emulators, such as Nexus 6 API 25 and ARM 64-bit.

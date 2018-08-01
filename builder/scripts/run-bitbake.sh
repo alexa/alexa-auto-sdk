@@ -274,6 +274,9 @@ EOF
 			echo "AAC_LATENCY_LOGS = \"1\"" >> ${LOCAL_CONF}
 		fi
 	fi
+
+	# AAC version
+	echo "DISTRO_VERSION = \"${SDK_BASE_VERSION}\"" >> ${LOCAL_CONF}
 }
 
 execute_bitbake() {
@@ -297,6 +300,11 @@ execute_bitbake() {
 copy_images() {
 	mkdir -p ${DEPLOY_DIR}/${TARGET}
 	cp -P ${BUILD_DIR}/tmp*/deploy/images/${TARGET}/${PACKAGE}* ${DEPLOY_DIR}/${TARGET}
+	echo "SDK Version: ${SDK_VERSION}" > ${DEPLOY_DIR}/buildinfo.txt
+	if [ -d ${SDK_HOME}/.repo ]; then
+		echo "Repo Info:" >> ${DEPLOY_DIR}/buildinfo.txt
+		repo forall -c "echo \${REPO_PROJECT} =\> \${REPO_PATH}: \${REPO_LREV} >> ${DEPLOY_DIR}/buildinfo.txt"
+	fi
 }
 
 build() {
@@ -328,6 +336,8 @@ build() {
 	fi
 	execute_bitbake && copy_images
 }
+
+note "SDK Version: ${SDK_VERSION}"
 
 # Initialize local configs
 init_local_conf

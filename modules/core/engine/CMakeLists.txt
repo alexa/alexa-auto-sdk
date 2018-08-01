@@ -1,7 +1,5 @@
 # AACE Core Engine
 
-set(AACE_ENGINE_VERSION ${PROJECT_VERSION})
-
 configure_file (
     "${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Core/EngineVersion.h.in"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Core/EngineVersion.h"

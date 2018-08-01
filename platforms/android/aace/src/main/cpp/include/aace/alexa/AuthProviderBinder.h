@@ -58,8 +58,14 @@ private:
     ObjectRef m_enum_AuthError_UNAUTHORIZED_CLIENT;
     ObjectRef m_enum_AuthError_SERVER_ERROR;
     ObjectRef m_enum_AuthError_INVALID_REQUEST;
+    ObjectRef m_enum_AuthError_INVALID_VALUE;
     ObjectRef m_enum_AuthError_AUTHORIZATION_EXPIRED;
     ObjectRef m_enum_AuthError_UNSUPPORTED_GRANT_TYPE;
+    ObjectRef m_enum_AuthError_INVALID_CODE_PAIR;
+    ObjectRef m_enum_AuthError_AUTHORIZATION_PENDING;
+    ObjectRef m_enum_AuthError_SLOW_DOWN;
+    ObjectRef m_enum_AuthError_INTERNAL_ERROR;
+    ObjectRef m_enum_AuthError_INVALID_CBL_CLIENT_ID;
 };
 
 #endif //AACE_ALEXA_AUTH_PROVIDER_BINDER_H

@@ -40,7 +40,7 @@ class AudioChannelEngineImpl :
     public alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface,
     public alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface,
     public alexaClientSDK::avsCommon::utils::RequiresShutdown,
-    public std::enable_shared_from_this<AudioChannelEngineImpl>  {
+    public std::enable_shared_from_this<AudioChannelEngineImpl> {
 
 protected:
     AudioChannelEngineImpl( std::shared_ptr<aace::alexa::AudioChannel> audioChannelPlatformInterface, const std::string& name );
@@ -106,6 +106,10 @@ private:
     enum class PendingEventState {
         NONE, PLAYBACK_STARTED, PLAYBACK_PAUSED, PLAYBACK_RESUMED, PLAYBACK_STOPPED
     };
+
+    enum class MediaStateChangeInitiator {
+        NONE, PLAY, PAUSE, RESUME, STOP
+    };
     
     using SourceId = alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId;
 
@@ -148,6 +152,7 @@ private:
     
     PendingEventState m_pendingEventState;
     MediaState m_currentMediaState;
+    MediaStateChangeInitiator m_mediaStateChangeInitiator;
 
     // executor used to send asynchronous events back to observer
     alexaClientSDK::avsCommon::utils::threading::Executor m_executor;

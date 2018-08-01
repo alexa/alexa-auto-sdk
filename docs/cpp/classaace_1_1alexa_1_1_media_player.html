@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Automotive Core SDK
-   &#160;<span id="projectnumber">1.0.0</span>
+   &#160;<span id="projectnumber">1.0.1</span>
    </div>
    <div id="projectbrief">Alexa Auto Core SDK for interacting with the Alexa Voice Service</div>
   </td>
@@ -114,7 +114,7 @@ Public Member Functions</h2></td></tr>
 <div class="textblock"><p><a class="el" href="classaace_1_1alexa_1_1_media_player.html">MediaPlayer</a> should be extended to play audio data provided by the Engine. <a class="el" href="classaace_1_1alexa_1_1_media_player.html">MediaPlayer</a> is the interface for audio playback for an <code><a class="el" href="classaace_1_1alexa_1_1_audio_channel.html">AudioChannel</a></code>.</p>
 <p>After returning <code>true</code> from a playback-controlling directive from the Engine (i.e. <code><a class="el" href="classaace_1_1alexa_1_1_media_player.html#acd7b210f5bab4bd3a26e981da950232b">play()</a></code>, <code><a class="el" href="classaace_1_1alexa_1_1_media_player.html#ad4e5f2004d6cc905ff4a9c803b2ed6f9">pause()</a></code>, <code><a class="el" href="classaace_1_1alexa_1_1_media_player.html#aefb6004d189de290533ec4e9083c95ef">stop()</a></code>, <code><a class="el" href="classaace_1_1alexa_1_1_media_player.html#a834b03b41e8792cb97968524edf97c80">resume()</a></code>), the platform implementation should notify the Engine when the platform media player changes playback state by calling <code><a class="el" href="classaace_1_1alexa_1_1_media_player.html#ac2fe0773062dcef92e5277c120d6c0d4">mediaStateChanged()</a></code> with the new <code>MediaState</code>. The Engine expects no call to <code><a class="el" href="classaace_1_1alexa_1_1_media_player.html#ac2fe0773062dcef92e5277c120d6c0d4">mediaStateChanged()</a></code> for a directive in which the platform returned <code>false</code>.</p>
 <p>The platform implementation may call <code><a class="el" href="classaace_1_1alexa_1_1_media_player.html#a16c8ea0ca76ee9c3e4a6ff35504cf8a6">mediaError()</a></code> or <code><a class="el" href="classaace_1_1alexa_1_1_media_player.html#ac2fe0773062dcef92e5277c120d6c0d4">mediaStateChanged()</a></code> with <code><a class="el" href="classaace_1_1alexa_1_1_media_player_engine_interface.html#a85a574bb13b13453df66ff2cac6a4f86ac94a56bd8e7230ce6945166cd60798b3">MediaState.BUFFERING</a></code> at any time during a playback operation to notify the Engine of an error or buffer underrun, respectvely. When the media player resumes playback after a buffer underrun, the platform implementation should call <code><a class="el" href="classaace_1_1alexa_1_1_media_player.html#ac2fe0773062dcef92e5277c120d6c0d4">mediaStateChanged()</a></code> with <code><a class="el" href="classaace_1_1alexa_1_1_media_player_engine_interface.html#a85a574bb13b13453df66ff2cac6a4f86a50366a49630a416ab3ccaa004196027e">MediaState.PLAYING</a></code>.</p>
-<dl class="section note"><dt>Note</dt><dd>The <code><a class="el" href="classaace_1_1alexa_1_1_media_player.html">MediaPlayer</a></code> platform implementation must be able to support the audio formats recommended by AVS: <a href="https://developer.amazon.com/docs/alexa-voice-service/recommended-media-support.html">https://developer.amazon.com/docs/alexa-voice-service/recommended-media-support.html</a></dd></dl>
+<dl class="section note"><dt>Note</dt><dd>The <code><a class="el" href="classaace_1_1alexa_1_1_media_player.html">MediaPlayer</a></code> platform implementation should be able to support the audio formats recommended by AVS for a familiar Alexa experience: <a href="https://developer.amazon.com/docs/alexa-voice-service/recommended-media-support.html">https://developer.amazon.com/docs/alexa-voice-service/recommended-media-support.html</a></dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classaace_1_1alexa_1_1_audio_channel.html">AudioChannel</a> </dd></dl>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="aa173fb6a0acf0a0530307e5dddb9086f"></a>
@@ -521,7 +521,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Automotive Core SDK 1.0.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Automotive Core SDK 1.0.1 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

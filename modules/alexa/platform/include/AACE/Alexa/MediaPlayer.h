@@ -38,8 +38,8 @@ namespace alexa {
  * When the media player resumes playback after a buffer underrun, the platform implementation
  * should call @c mediaStateChanged() with @c MediaState.PLAYING.
  *
- * @note The @c MediaPlayer platform implementation must be able to support the 
- * audio formats recommended by AVS:
+ * @note The @c MediaPlayer platform implementation should be able to support the 
+ * audio formats recommended by AVS for a familiar Alexa experience:
  * https://developer.amazon.com/docs/alexa-voice-service/recommended-media-support.html
  *
  * @sa AudioChannel

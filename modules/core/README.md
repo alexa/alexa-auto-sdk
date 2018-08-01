@@ -56,7 +56,7 @@ After you have created your configuration object(s) you should call the Engine's
 
 OR
 
-    engine->configure( { authDelegateConfig, alertsConfig, ... } );
+    engine->configure( { deviceInfoConfig, alertsConfig, ... } );
 
 ### Registering Platform Interface Handlers
 

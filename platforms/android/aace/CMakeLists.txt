@@ -11,7 +11,7 @@ if (NOT ${PREP_RESULT} EQUAL 0)
     message(FATAL_ERROR "Script execution failed")
 endif()
 
-set(AAC_HOME ${CMAKE_CURRENT_SOURCE_DIR}/native-dependencies/sysroot/opt/AAC)
+set(AAC_HOME ${CMAKE_CURRENT_SOURCE_DIR}/native-dependencies/sysroots/${ANDROID_ABI}/opt/AAC)
 
 if(NOT EXISTS ${AAC_HOME})
     message(FATAL_ERROR "AAC build for ${ANDROID_ABI}/${ANDROID_PLATFORM} is not exists!")

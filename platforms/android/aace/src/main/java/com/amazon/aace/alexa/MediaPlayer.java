@@ -13,9 +13,6 @@
  * permissions and limitations under the License.
  */
 
-// aace/alexa/MediaPlayer.java
-// This is an automatically generated file.
-
 package com.amazon.aace.alexa;
 
 import com.amazon.aace.core.PlatformInterface;
@@ -30,8 +27,8 @@ import com.amazon.aace.core.PlatformInterface;
  * When the media player resumes playback after a buffer underrun, the platform implementation
  * should call @c mediaStateChanged() with @c MediaState.PLAYING.
  *
- * @note The @c MediaPlayer platform implementation must be able to support the 
- * audio formats recommended by AVS:
+ * @note The @c MediaPlayer platform implementation should be able to support the
+ * audio formats recommended by AVS for a familiar Alexa experience:
  * https://developer.amazon.com/docs/alexa-voice-service/recommended-media-support.html
  *
  * @sa AudioChannel
@@ -133,7 +130,7 @@ abstract public class MediaPlayer extends PlatformInterface
      * Audio data will be available to stream from the Engine via @c read(). After returning @c true, the Engine will call
      * @c play() to initiate audio playback.
      *
-     * @return @c true if the platform implementation successfully handled the call, 
+     * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
     public boolean prepare() {
@@ -146,7 +143,7 @@ abstract public class MediaPlayer extends PlatformInterface
      *
      * @param  url The URL audio source to set in the platform media player
      *
-     * @return @c true if the platform implementation successfully handled the call, 
+     * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
     public boolean prepare( String url ) {
@@ -156,7 +153,7 @@ abstract public class MediaPlayer extends PlatformInterface
     /**
      * Notifies the platform implementation to start playback of the current audio source. After returning @c true, the platform implementation must call @c mediaStateChanged() with @c MediaState.PLAYING when the media player begins playing the audio or @c mediaError() if an error occurs.
      *
-     * @return @c true if the platform implementation successfully handled the call, 
+     * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
     public boolean play() {
@@ -165,10 +162,10 @@ abstract public class MediaPlayer extends PlatformInterface
 
     /**
      * Notifies the platform implementation to stop playback of the current audio source. After returning @c true, the platform implementation must call @c mediaStateChanged() with @c MediaState.STOPPED when the media player stops playing the audio or @c mediaError() if an error occurs.
-     * A subsequent call to @c play() will be preceded by calls to @c prepare() 
+     * A subsequent call to @c play() will be preceded by calls to @c prepare()
      * and @c setPosition().
      *
-     * @return @c true if the platform implementation successfully handled the call, 
+     * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
     public boolean stop() {
@@ -177,10 +174,10 @@ abstract public class MediaPlayer extends PlatformInterface
 
     /**
      * Notifies the platform implementation to pause playback of the current audio source. After returning @c true, the platform implementation must call @c mediaStateChanged() with @c MediaState.STOPPED when the media player pauses the audio or @c mediaError() if an error occurs.
-     * A subsequent call to @c resume() will not be preceded by calls to @c prepare() 
+     * A subsequent call to @c resume() will not be preceded by calls to @c prepare()
      * and @c setPosition().
      *
-     * @return @c true if the platform implementation successfully handled the call, 
+     * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
     public boolean pause() {
@@ -190,7 +187,7 @@ abstract public class MediaPlayer extends PlatformInterface
     /**
      * Notifies the platform implementation to resume playback of the current audio source. After returning @c true, the platform implementation must call @c mediaStateChanged() with @c MediaState.PLAYING when the media player resumes the audio or @c mediaError() if an error occurs.
      *
-     * @return @c true if the platform implementation successfully handled the call, 
+     * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
     public boolean resume() {
@@ -214,7 +211,7 @@ abstract public class MediaPlayer extends PlatformInterface
      *
      * @param  position The playback position in milliseconds to set in the platform media player
      *
-     * @return @c true if the platform implementation successfully handled the call, 
+     * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
     public boolean setPosition( long position ) {

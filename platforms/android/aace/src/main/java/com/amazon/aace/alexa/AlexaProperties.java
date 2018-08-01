@@ -18,27 +18,32 @@ package com.amazon.aace.alexa;
 public class AlexaProperties {
 
     /**
-     * Property used to change the AVS endpoint with Engine::setProperty(). The value should be
-     * a valid AVS endpoint URL.
+     * This property is used with Engine.setProperty() to change the AVS endpoint. The value must be
+     * a valid AVS endpoint URL. See https://developer.amazon.com/docs/alexa-voice-service/api-overview.html#endpoints
+     * @hideinitializer
      */
     public static final String AVS_ENDPOINT = "aace.alexa.endpoint";
 
     /**
-     * Property used to return if the engine has wakeword support with Engine::getProperty().
-     * If wakeword is not supported in the engine, then attempts to enable wakeword detection in
+     * This read-only property is used with Engine.getProperty() to check if the Engine has wake word support.
+     * If wake word is not supported in the Engine, attempts to enable wake word detection by
      * the @c SpeechRecognizer will fail.
+     * @hideinitializer
      */
     public static final String WAKEWORD_SUPPORTED = "aace.alexa.wakewordSupported";
 
     /**
-     * Property used to change the firmware version that is reported to AVS when sending the
-     * SoftwareInfo event.
+     * This property is used with Engine.setProperty() to change the firmware version that is reported
+     * to AVS. The value must be a positive, signed 32-bit integer represented
+     * as a string.
+     * @hideinitializer
      */
     public static final String FIRMWARE_VERSION = "aace.alexa.system.firmwareVersion";
 
     /**
-     * Property used to change the current locale setting for AVS. The value should be a valid
-     * locale accepted by AVS.
+     * This property is used with Engine.setProperty() to change the current locale setting for AVS.
+     * The value should be a valid locale accepted by AVS: de-DE, en-AU, en-CA, en-GB, en-IN, en-US, fr-FR, ja-JP
+     * @hideinitializer
      */
     public static final String LOCALE = "aace.alexa.setting.locale";
 }

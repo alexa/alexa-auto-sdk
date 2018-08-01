@@ -13,9 +13,6 @@
  * permissions and limitations under the License.
  */
 
-// aace/navigation/Navigation.java
-// This is an automatically generated file.
-
 package com.amazon.aace.navigation;
 
 import com.amazon.aace.core.PlatformInterface;
@@ -25,9 +22,6 @@ import com.amazon.aace.core.PlatformInterface;
  */
 abstract public class Navigation extends PlatformInterface
 {
-    /**
-     * Navigation should be extended to handle navigation directives from the Engine.
-     */
     public Navigation() {
     }
 
@@ -48,7 +42,7 @@ abstract public class Navigation extends PlatformInterface
      * }
      * @endcode
      *
-     * @return @c true if the platform implementation successfully handled the call, 
+     * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
     public boolean setDestination( String payload ) {
@@ -58,7 +52,7 @@ abstract public class Navigation extends PlatformInterface
     /**
      * Notifies the platform implementation to cancel navigation
      *
-     * @return @c true if the platform implementation successfully handled the call, 
+     * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
     public boolean cancelNavigation() { return false; }

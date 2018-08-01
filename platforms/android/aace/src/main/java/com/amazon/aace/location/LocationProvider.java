@@ -13,9 +13,6 @@
  * permissions and limitations under the License.
  */
 
-// aace/location/LocationProvider.java
-// This is an automatically generated file.
-
 package com.amazon.aace.location;
 
 import com.amazon.aace.core.PlatformInterface;

@@ -18,7 +18,8 @@ package com.amazon.aace.core;
 public class CoreProperties {
 
     /**
-     * Property used to return the AACE SDK version with Engine::getProperty().
+     * This property is used with Engine.getProperty() to return the AAC SDK version.
+     * @hideinitializer
      */
     public static final String VERSION = "aace.core.version";
 

@@ -13,16 +13,13 @@
  * permissions and limitations under the License.
  */
 
-// aace/phone-control/PhoneCallController.java
-// This is an automatically generated file.
-
 package com.amazon.aace.phonecontrol;
 
 import com.amazon.aace.core.PlatformInterface;
 
 /**
  * PhoneCallController should be extended to handle directives to initiate a phone call
- * on the platform calling device. It also provides interfaces for notifying the Engine 
+ * on a calling device (e.g. mobile phone). It also provides interfaces for notifying the Engine
  * of the state of a call session and the state of platform connection to the calling device.
  * The platform implementation is responsible for managing the lifecycle and user experience of a call session
  * and connection to the calling device.
@@ -30,17 +27,17 @@ import com.amazon.aace.core.PlatformInterface;
 abstract public class PhoneCallController extends PlatformInterface
 {
     /**
-     * An enum class which captures the states an phone connection can be in
+     * Specifies the state of connection to the platform calling device
      */
     public enum ConnectionState
     {
         /**
-         * The phone is connected
+         * The platform is connected to a calling device
          * @hideinitializer
          */
         CONNECTED("CONNECTED"),
         /**
-         * The phone is disconnected
+         * The platform is not connected to a calling device
          * @hideinitializer
          */
         DISCONNECTED("DISCONNECTED");
@@ -93,7 +90,7 @@ abstract public class PhoneCallController extends PlatformInterface
      *   }
      * }
      * @endcode
-     * 
+     *
      *
      * @li callId (required): A unique identifier for the call
      *
@@ -111,7 +108,7 @@ abstract public class PhoneCallController extends PlatformInterface
      *
      * @li address.value (required): The address of the callee.
      *
-     * @return @c true if the platform implementation will initiate the call, 
+     * @return @c true if the platform implementation will initiate the call,
      * else @c false
      */
     public boolean dial( String payload ) {
@@ -119,7 +116,7 @@ abstract public class PhoneCallController extends PlatformInterface
     }
 
     /**
-     * Notifies the Engine that a phone call was activated on the platform calling device.
+     * Notifies the Engine that a phone call was activated on a calling device.
      * @c callActivated() should be called in response to a @c dial() directive in which the platform implementation returned @c true. @c callId must match the @c callId from the @c dial() payload.
      * When the platform implementation calls @c callActivated() for a call initiated outside of the scope of Alexa,
      * it is responsible for creating a UUID for this call session.
@@ -151,6 +148,23 @@ abstract public class PhoneCallController extends PlatformInterface
      * @li 500: Internal error on the platform unrelated to the cellular network
      *
      * @li 503: Error on the platform related to the cellular network
+     */
+    final protected void callFailed( String callId, String error ) {
+        callFailed( getNativeObject(), callId, error );
+    }
+
+    /**
+     * Notifies the Engine of an error in initiating or maintaining a call on a calling device
+     *
+     * @param  callId The unique identifier for the call
+     *
+     * @param  error An error status code:
+     *
+     * @li 4xx range: Validation failure for the input from the @c dial() directive
+     *
+     * @li 500: Internal error on the platform unrelated to the cellular network
+     *
+     * @li 503: Error on the platform related to the cellular network
      *
      * @param  message A description of the error
      */
@@ -159,7 +173,7 @@ abstract public class PhoneCallController extends PlatformInterface
     }
 
     /**
-     * Notifies the Engine of a change in connection state of the platform calling device
+     * Notifies the Engine of a change in connection state of a calling device.
      */
     public void connectionStateChanged( ConnectionState state ) {
         connectionStateChanged( getNativeObject(), state );
@@ -167,6 +181,7 @@ abstract public class PhoneCallController extends PlatformInterface
 
     private native void callActivated( long nativeObject, String callId );
     private native void callTerminated( long nativeObject, String callId );
+    private native void callFailed( long nativeObject, String callId, String error );
     private native void callFailed( long nativeObject, String callId, String error, String message );
     private native void connectionStateChanged( long nativeObject, ConnectionState state );
 

@@ -13,9 +13,6 @@
  * permissions and limitations under the License.
  */
 
-// aace/alexa/Alerts.java
-// This is an automatically generated file.
-
 package com.amazon.aace.alexa;
 
 /**
@@ -98,13 +95,6 @@ public class Alerts extends AudioChannel
         }
     }
 
-    /**
-     * Alerts should be extended to handle alerts (e.g. timers, alarms, reminders) from AVS.
-     * The platform implementation is responsible for rendering visual cues for an active alert.
-     * The Alerts @c MediaPlayer will receive directives from the Engine to handle alerts audio playback.
-     *
-     * @sa AudioChannel
-     */
     public Alerts( MediaPlayer mediaPlayer, Speaker speaker ) {
         super( mediaPlayer, speaker , null );
     }
@@ -127,7 +117,7 @@ public class Alerts extends AudioChannel
 
     /**
      * Notifies the Engine of a platform request to clear the user's
-     * pending alerts from storage. This may be useful for a scenario in which a user's pending alerts should not go 
+     * pending alerts from storage. This may be useful for a scenario in which a user's pending alerts should not go
      * off after he logs out of the application.
      */
     public void removeAllAlerts() { removeAllAlerts( getNativeObject() ); }

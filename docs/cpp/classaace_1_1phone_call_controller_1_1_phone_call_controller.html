@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Automotive Core SDK
-   &#160;<span id="projectnumber">1.0.0</span>
+   &#160;<span id="projectnumber">1.0.1</span>
    </div>
    <div id="projectbrief">Alexa Auto Core SDK for interacting with the Alexa Voice Service</div>
   </td>
@@ -87,13 +87,13 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ab5cee0d46796ffd2eaa6c78195b44eaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a81b7d39516de1c3d4fa79410d37333d7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1phone_call_controller_1_1_phone_call_controller.html#a81b7d39516de1c3d4fa79410d37333d7">callActivated</a> (const std::string &amp;callId)</td></tr>
 <tr class="separator:a81b7d39516de1c3d4fa79410d37333d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2be7c3147d92ec5757fed65d000762b5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1phone_call_controller_1_1_phone_call_controller.html#a2be7c3147d92ec5757fed65d000762b5">callFailed</a> (const std::string &amp;callId, const std::string &amp;error, const std::string &amp;message)</td></tr>
-<tr class="separator:a2be7c3147d92ec5757fed65d000762b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad4f54f0e6df614bc7b85517952b4c5c4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1phone_call_controller_1_1_phone_call_controller.html#ad4f54f0e6df614bc7b85517952b4c5c4">callFailed</a> (const std::string &amp;callId, const std::string &amp;error, const std::string &amp;message=&quot;&quot;)</td></tr>
+<tr class="separator:ad4f54f0e6df614bc7b85517952b4c5c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac20a01a4375fbb26928875e405cd2ff3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1phone_call_controller_1_1_phone_call_controller.html#ac20a01a4375fbb26928875e405cd2ff3">callTerminated</a> (const std::string &amp;callId)</td></tr>
 <tr class="separator:ac20a01a4375fbb26928875e405cd2ff3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p><a class="el" href="classaace_1_1phone_call_controller_1_1_phone_call_controller.html">PhoneCallController</a> should be extended to handle directives to initiate a phone call on the platform calling device. It also provides interfaces for notifying the Engine of the state of a call session and the state of platform connection to the calling device.</p>
+<div class="textblock"><p><a class="el" href="classaace_1_1phone_call_controller_1_1_phone_call_controller.html">PhoneCallController</a> should be extended to handle directives to initiate a phone call on a calling device (e.g. mobile phone). It also provides interfaces for notifying the Engine of the state of a call session and the state of platform connection to the calling device.</p>
 <p>The platform implementation is responsible for managing the lifecycle and user experience of a call session and connection to the calling device. </p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a05037f25d4285444a0ae111af231fe36"></a>
@@ -107,7 +107,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Specifies the state of connection to the platform calling device </p><dl class="section see"><dt>See also</dt><dd><code><a class="el" href="classaace_1_1phone_call_controller_1_1_phone_call_controller_engine_interface.html#a811798c0331570b684648f0cd71a82a8">aace::phoneCallController::PhoneCallControllerEngineInterface::ConnectionState</a></code> </dd></dl>
+<p>Specifies the state of connection to a calling device. </p><dl class="section see"><dt>See also</dt><dd><code><a class="el" href="classaace_1_1phone_call_controller_1_1_phone_call_controller_engine_interface.html#a811798c0331570b684648f0cd71a82a8">aace::phoneCallController::PhoneCallControllerEngineInterface::ConnectionState</a></code> </dd></dl>
 
 </div>
 </div>
@@ -171,7 +171,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Notifies the Engine of a change in connection state of the platform calling device </p>
+<p>Notifies the Engine of a change in connection state of a calling device. </p>
 
 </div>
 </div>
@@ -190,7 +190,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Notifies the Engine that a phone call was activated on the platform calling device.</p>
+<p>Notifies the Engine that a phone call was activated on a calling device.</p>
 <p><code><a class="el" href="classaace_1_1phone_call_controller_1_1_phone_call_controller.html#a81b7d39516de1c3d4fa79410d37333d7">callActivated()</a></code> should be called in response to a <code><a class="el" href="classaace_1_1phone_call_controller_1_1_phone_call_controller.html#a398192e0728d2e352483c6967419aba4">dial()</a></code> directive in which the platform implementation returned <code>true</code>. <code>callId</code> must match the <code>callId</code> from the <code><a class="el" href="classaace_1_1phone_call_controller_1_1_phone_call_controller.html#a398192e0728d2e352483c6967419aba4">dial()</a></code> payload.</p>
 <p>When the platform implementation calls <code><a class="el" href="classaace_1_1phone_call_controller_1_1_phone_call_controller.html#a81b7d39516de1c3d4fa79410d37333d7">callActivated()</a></code> for a call initiated outside of the scope of Alexa, it is responsible for creating a UUID for this call session.</p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -202,8 +202,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a2be7c3147d92ec5757fed65d000762b5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2be7c3147d92ec5757fed65d000762b5">&#9670;&nbsp;</a></span>callFailed()</h2>
+<a id="ad4f54f0e6df614bc7b85517952b4c5c4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad4f54f0e6df614bc7b85517952b4c5c4">&#9670;&nbsp;</a></span>callFailed()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -233,7 +233,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Notifies the Engine of an error in initiating or maintaining a call on the platform calling device</p>
+<p>Notifies the Engine of an error in initiating or maintaining a call on a calling device</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">callId</td><td>The unique identifier for the call </td></tr>
@@ -280,7 +280,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Automotive Core SDK 1.0.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Automotive Core SDK 1.0.1 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

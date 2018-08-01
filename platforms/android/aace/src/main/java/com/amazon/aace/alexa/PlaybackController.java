@@ -13,35 +13,22 @@
  * permissions and limitations under the License.
  */
 
-// aace/alexa/PlaybackController.java
-// This is an automatically generated file.
-
 package com.amazon.aace.alexa;
 
 import com.amazon.aace.core.PlatformInterface;
 
 /**
  * PlaybackController should be extended to handle playback control
- * operations such as on-platform button presses for the @c AudioPlayer. The Engine will respond to PlaybackController 
+ * operations such as on-platform button presses for the @c AudioPlayer. The Engine will respond to PlaybackController
  * events with playback control directives on the @c AudioPlayer @c MediaPlayer.
  *
- * @note The TemplateRuntime::renderPlayerInfo() payload includes information about what
+ * @note The TemplateRuntime.renderPlayerInfo() payload includes information about what
  * playback control buttons should be enabled on screen with a player info display card.
  *
  * @sa AudioPlayer
  */
 abstract public class PlaybackController extends PlatformInterface
 {
-    /**
-     * PlaybackController should be extended to handle playback control
-     * operations such as on-platform button presses for the @c AudioPlayer. The Engine will respond to PlaybackController 
-     * events with playback control directives on the @c AudioPlayer @c MediaPlayer.
-     *
-     * @note The TemplateRuntime::renderPlayerInfo() payload includes information about what
-     * playback control buttons should be enabled on screen with a player info display card.
-     *
-     * @sa AudioPlayer
-     */
     public PlaybackController() {
     }
 

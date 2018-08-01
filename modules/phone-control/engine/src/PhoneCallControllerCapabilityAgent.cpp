@@ -61,10 +61,14 @@ std::shared_ptr<PhoneCallControllerCapabilityAgent> PhoneCallControllerCapabilit
 }
     
 void PhoneCallControllerCapabilityAgent::handleDirectiveImmediately( std::shared_ptr<alexaClientSDK::avsCommon::avs::AVSDirective> directive ) {
-    preHandleDirective( std::make_shared<DirectiveInfo>( directive, nullptr ) );
+    // Do nothing here as directives are handled in the handle stage.
 }
     
 void PhoneCallControllerCapabilityAgent::preHandleDirective( std::shared_ptr<DirectiveInfo> info ) {
+    // Do nothing here as directives are handled in the handle stage.
+}
+    
+void PhoneCallControllerCapabilityAgent::handleDirective( std::shared_ptr<DirectiveInfo> info ) {
     try {
         ThrowIfNot( info && info->directive, "nullDirectiveInfo" );
         
@@ -76,12 +80,8 @@ void PhoneCallControllerCapabilityAgent::preHandleDirective( std::shared_ptr<Dir
         }
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"preHandleDirective").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG,"handleDirective").d("reason", ex.what()));
     }
-}
-    
-void PhoneCallControllerCapabilityAgent::handleDirective( std::shared_ptr<DirectiveInfo> info ) {
-    // Do nothing here as directives are handled in the preHandle stage.
 }
     
 void PhoneCallControllerCapabilityAgent::cancelDirective(std::shared_ptr<DirectiveInfo> info ) {
@@ -90,7 +90,7 @@ void PhoneCallControllerCapabilityAgent::cancelDirective(std::shared_ptr<Directi
 
 alexaClientSDK::avsCommon::avs::DirectiveHandlerConfiguration PhoneCallControllerCapabilityAgent::getConfiguration() const {
     alexaClientSDK::avsCommon::avs::DirectiveHandlerConfiguration configuration;
-    configuration[DIAL] = alexaClientSDK::avsCommon::avs::BlockingPolicy::HANDLE_IMMEDIATELY;
+    configuration[DIAL] = alexaClientSDK::avsCommon::avs::BlockingPolicy::NON_BLOCKING;
     return configuration;
 }
 
@@ -237,7 +237,7 @@ void PhoneCallControllerCapabilityAgent::callActivated( const std::string& callI
 }
     
 void PhoneCallControllerCapabilityAgent::callFailed( const std::string& callId, const std::string& error, const std::string& message ) {
-    m_executor.submit( [this, callId, error, &message] {
+    m_executor.submit( [this, callId, error, message] {
         executeCallFailed( callId, error, message );
     });
 }
@@ -316,13 +316,15 @@ void PhoneCallControllerCapabilityAgent::executeCallFailed( const std::string& c
         return;
     }
 
-    rapidjson::Document payload( rapidjson::kObjectType);
+    rapidjson::Document payload( rapidjson::kObjectType );
+    rapidjson::Document errorPayload( rapidjson::kObjectType );
     rapidjson::StringBuffer buffer;
     rapidjson::Writer<rapidjson::StringBuffer> writer( buffer );
-    
+
+    errorPayload.AddMember( "code", rapidjson::Value( error.c_str(), payload.GetAllocator() ), payload.GetAllocator() );
+    errorPayload.AddMember( "message", rapidjson::Value( message.c_str(), payload.GetAllocator() ), payload.GetAllocator() );
     payload.AddMember( "callId", rapidjson::Value( callId.c_str(), payload.GetAllocator() ), payload.GetAllocator() );
-    payload.AddMember( "error", rapidjson::Value( error.c_str(), payload.GetAllocator() ), payload.GetAllocator() );
-    payload.AddMember( "message", rapidjson::Value( message.c_str(), payload.GetAllocator() ), payload.GetAllocator() );
+    payload.AddMember( "error", errorPayload, payload.GetAllocator());
     ThrowIfNot( payload.Accept( writer ), "failedToWriteJsonDocument" );
 
     setCallState( callId, CallState::IDLE );

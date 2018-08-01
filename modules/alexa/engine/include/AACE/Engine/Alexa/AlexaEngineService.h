@@ -71,6 +71,8 @@
 
 #include "AACE/Engine/Core/EngineService.h"
 #include "AACE/Engine/Location/LocationEngineService.h"
+#include "AACE/Engine/Network/NetworkEngineService.h"
+#include "AACE/Engine/Network/NetworkInfoObserver.h"
 
 #include "AlexaEngineLogger.h"
 #include "AlexaEngineClientObserver.h"
@@ -97,10 +99,11 @@ class AlexaEngineService :
     public aace::engine::core::EngineService,
     public alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface,
     public alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesObserverInterface,
+    public aace::engine::network::NetworkInfoObserver,
     public std::enable_shared_from_this<AlexaEngineService> {
 
 public:
-    DESCRIBE("aace.alexa",VERSION("1.0"),DEPENDS(aace::engine::location::LocationEngineService))
+    DESCRIBE("aace.alexa",VERSION("1.0"),DEPENDS(aace::engine::location::LocationEngineService),DEPENDS(aace::engine::network::NetworkEngineService))
 
 private:
     AlexaEngineService( const aace::engine::core::ServiceDescription& description );
@@ -133,10 +136,14 @@ public:
     void onAuthStateChange( AuthObserverInterface::State newState, AuthObserverInterface::Error error ) override;
 
     // alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesObserverInterface
-    void onCapabilitiesStateChange(CapabilitiesObserverInterface::State newState, CapabilitiesObserverInterface::Error newError) override;
+    void onCapabilitiesStateChange( CapabilitiesObserverInterface::State newState, CapabilitiesObserverInterface::Error newError ) override;
+
+    // aace::engine::network::NetworkInfoObserver
+    void onNetworkInfoChanged( NetworkInfoObserver::NetworkStatus status, int wifiSignalStrength ) override;
 
 protected:
     bool configure( const std::vector<std::shared_ptr<std::istream>>& configuration ) override;
+    bool setup() override;
     bool start() override;
     bool stop() override;
     bool shutdown() override;
@@ -237,9 +244,12 @@ private:
 
     bool m_configured = false;
     AuthObserverInterface::State m_authState;
-
+    NetworkInfoObserver::NetworkStatus m_networkStatus;
+    
     bool m_capabilitiesConfigured = false;
-    bool m_locationProviderConfigued = false;
+    bool m_connecting = false;
+
+    std::mutex m_connectionMutex;
 
     // engine implementation object references
     std::shared_ptr<aace::engine::alexa::AlexaClientEngineImpl> m_alexaClientEngineImpl;

@@ -13,9 +13,6 @@
  * permissions and limitations under the License.
  */
 
-// aace/alexa/AudioChannel.java
-// This is an automatically generated file.
-
 package com.amazon.aace.alexa;
 
 import com.amazon.aace.core.PlatformInterface;
@@ -38,18 +35,6 @@ abstract public class AudioChannel extends PlatformInterface
     private Speaker m_speaker;
     private Speaker.Type m_type;
 
-    /**
-     * AudioChannel is the base class for platform interfaces that can play audio. Audio playback control for an AudioChannel
-     * is managed by a @c MediaPlayer, and volume and mute control is managed by a @c Speaker.
-     *
-     * @sa AudioPlayer
-     *
-     * @sa SpeechSynthesizer
-     *
-     * @sa Alerts
-     *
-     * @sa Notifications
-     */
     public AudioChannel( MediaPlayer mediaPlayer, Speaker speaker, Speaker.Type type ) {
         m_mediaPlayer = mediaPlayer;
         m_speaker = speaker;
@@ -70,6 +55,9 @@ abstract public class AudioChannel extends PlatformInterface
         return m_speaker;
     }
 
+    /**
+     * Returns the @c Speaker.Type associated with the AudioChannel
+     */
     public Speaker.Type getType() {
         return m_type;
     }

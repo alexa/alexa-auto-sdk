@@ -387,6 +387,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
         // Start the engine
         if ( !mEngine.start() ) throw new RuntimeException( "Could not start engine" );
+        mAuthProvider.onInitialize();
     }
 
     @Override
@@ -414,7 +415,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
         super.onDestroy();
     }
 
-    // For auth cycle
     @Override
     protected void onResume() {
         super.onResume();

@@ -15,6 +15,7 @@
 
 #include <AVSCommon/Utils/Logger/LoggerSinkManager.h>
 #include <AVSCommon/Utils/Logger/LoggerUtils.h>
+#include <AVSCommon/Utils/Logger/ConsoleLogger.h>
 
 #include "AACE/Engine/Alexa/AlexaEngineLogger.h"
 #include "AACE/Engine/Core/EngineMacros.h"
@@ -26,7 +27,10 @@ namespace alexa {
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.AlexaEngineLogger");
 
-AlexaEngineLogger::AlexaEngineLogger( alexaClientSDK::avsCommon::utils::logger::Level level ) : alexaClientSDK::avsCommon::utils::logger::Logger( level ) {
+AlexaEngineLogger::AlexaEngineLogger( alexaClientSDK::avsCommon::utils::logger::Level level ) :
+    alexaClientSDK::avsCommon::utils::logger::Logger( level ),
+    alexaClientSDK::avsCommon::utils::RequiresShutdown( TAG ) {
+    
     init( alexaClientSDK::avsCommon::utils::configuration::ConfigurationNode::getRoot()[TAG] );
 }
 
@@ -45,6 +49,10 @@ std::shared_ptr<AlexaEngineLogger> AlexaEngineLogger::create( alexaClientSDK::av
         AACE_ERROR(LX(TAG,"create").d("reason", ex.what()));
         return nullptr;
     }
+}
+
+void AlexaEngineLogger::doShutdown() {
+    alexaClientSDK::avsCommon::utils::logger::LoggerSinkManager::instance().initialize( alexaClientSDK::avsCommon::utils::logger::getConsoleLogger() );
 }
 
 void AlexaEngineLogger::emit( alexaClientSDK::avsCommon::utils::logger::Level level, std::chrono::system_clock::time_point time, const char *threadMoniker, const char *text ) {

@@ -2,11 +2,11 @@
 
 ### Overview
 
-The AAC Alexa API provides interfaces for standard AVS features. The Engine handles some extra setup and steps to sequence events and directive handling. The platform developer can focus on just using the provided API to interact with AVS. This is done by registering platform interfaces via the Engine object.
+The Alexa Auto SDK Alexa API provides interfaces for standard Alexa features. The Engine handles some extra setup and steps to sequence events and directive handling. The platform developer can focus on just using the provided API to interact with Alexa. This is done by registering platform interfaces via the Engine object.
 
-### AAC Sequence Diagrams<a id="sequencediagrams"> </a>
+### Alexa Auto Sequence Diagrams<a id="sequencediagrams"> </a>
 
-You can read more about how the AAC flow works by checking out some sequence diagrams.
+You can read more about how the Alexa Auto SDK flow works by checking out some sequence diagrams.
 
 * [Login/Logout Sequence Diagram](../../SEQUENCE_DIAGRAMS.md#loginlogout)
 * [Tap to Talk Sequence Diagram](../../SEQUENCE_DIAGRAMS.md#taptotalk)
@@ -14,9 +14,10 @@ You can read more about how the AAC flow works by checking out some sequence dia
 
 ### Request Wake Word Support for Alexa
 
-If you want to enable wake word support for your specific implementation of AAC, you need to make a request with your Alexa Automotive solution architect (SA).
+If you want to enable wake word support for your Alexa Auto integration, you need to make a request with your Alexa Auto Solution Architect (SA).
 
 There are 3 steps to this process:
+
 1. Let your SA know you want to enable wake word support.
 2. Your SA processes your request with the appropriate Alexa teams.
 3. You'll receive a single zip file containing the necessary packages, instructions, and scripts.
@@ -25,7 +26,7 @@ All that's left for you to do is create an "extras" directory under your "aac-sd
 
 ### Handling Alexa state changes
 
-The AAC SDK manages internal state information for Alexa and provides an interface for developers to handle state changes in their platform. To implement a custom handler for Alexa state changes, the `aace::alexa::AlexaClient` class should be extended:
+The Alexa Auto SDK manages internal state information for Alexa and provides an interface for developers to handle state changes in their platform. To implement a custom handler for Alexa state changes, the `aace::alexa::AlexaClient` class should be extended:
 
     #include <AACE/Alexa/AlexaClient.h>
     class MyAlexaClient : public aace::alexa::AlexaClient {

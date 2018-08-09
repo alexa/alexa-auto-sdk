@@ -2,8 +2,8 @@
 
 ### Overview
 
-The Android Sample App demonstrates a basic platform implementation of AAC SDK integration. It provides an example of creating and configuring an instance of the Engine, overriding the default implementation of each AAC Platform Interface, and registering those custom interface handlers with the Engine. It includes two example implementations of authorizing with AVS via Login with Amazon (LWA),
-detailed logs for interactions with the AAC SDK and developer convenience features for viewing those logs in the application, and UI elements relevant to each Platform Interface implementation. The purpose of the Android Sample App is to provide developers with useful example code to facilitate integration with the AAC SDK.
+The Android Sample App demonstrates a basic platform implementation of Alexa Auto SDK integration. It provides an example of creating and configuring an instance of the Engine, overriding the default implementation of each Alexa Auto Platform Interface, and registering those custom interface handlers with the Engine. It includes two example implementations of authorizing with AVS via Login with Amazon (LWA),
+detailed logs for interactions with the Alexa Auto SDK and developer convenience features for viewing those logs in the application, and UI elements relevant to each Platform Interface implementation. The purpose of the Android Sample App is to provide developers with useful example code to facilitate integration with the Alexa Auto SDK.
 
 Click [here](#androidsampleapprelnote) to read the release notes for this sample app.
 
@@ -23,29 +23,29 @@ After registering for an Amazon developer account, you'll need to create an Alex
 8. Make note of the **Client ID** and **Client Secret**.
 9. Agree to the license terms in the Developer Portal and click **Finished**.
 
-#### Include AAC SDK dependencies
-If you have not already done so, you must build the Android specific binaries for the AAC SDK library project to link to.
+#### Include Alexa Auto SDK dependencies
+If you have not already done so, you must build the Android specific binaries for the Alexa Auto SDK library project to link to.
 
-See the [Alexa Auto Core Builder](../../builder/README.md) instructions to build the AAC SDK binaries for your Android target.
+See the [Alexa Auto SDK Builder](../../builder/README.md) instructions to build the Alexa Auto SDK binaries for your Android target.
 
 #### Enabling device capabilities
 
-In order to use the certain AAC functionality, your product needs to be whitelisted by Amazon. Copy the product's **Amazon ID** from the Developer Console and follow the whitelisting directions on the [Need Help?](../../NEED_HELP.md) page.
+In order to use the certain Alexa Auto SDK functionality, your product needs to be whitelisted by Amazon. Copy the product's **Amazon ID** from the Developer Console and follow the whitelisting directions on the [Need Help?](../../NEED_HELP.md) page.
 
 #### Configure the project in Android Studio
 
 1. Launch [Android Studio](https://developer.android.com/studio/index.html) and select "Open an existing Android Studio project".
 2. Open the `${AAC_SDK_HOME}/samples/android` folder and click the **Open** button. (Tested with Android Studio version 3.x)
-3. [Include the AAC SDK dependencies](#include-AAC-SDK-dependencies) and select **Build > Refresh Linked C++ Projects** in Android Studio.
+3. [Include the Alexa Auto SDK dependencies](#include-Alexa-Auto-SDK-dependencies) and select **Build > Refresh Linked C++ Projects** in Android Studio.
 4. Read about [authorization with AVS in the Sample App](#authorization-with-avs-in-the-sample-app) and follow further setup instructions, if necessary.
 5. Populate the app_config.json file in the assets directory with the Client ID, Client Secret, and Product ID for your product. Product DSN may be any unique identifier. The contents of this file are required for configuring the Engine as well as authorizing with Code-Based Linking.
 
 ### Running the Sample App
 Use Android Studio to install and run the Sample App on your target device.
-> **NOTE**: The AAC SDK supports Android API level 22+.
+> **NOTE**: The Alexa Auto SDK supports Android API level 22+.
 
 ### Understanding the Sample App
-The Sample App provides an example of how to create and configure an instance of the Engine, extend the AAC SDK Platform Interfaces, and register the interface implementations with the Engine. The Platform Interface implementations are located in the `impl/` folder of the `com.amazon.sampleapp` directory with the `Handler` postfix. These classes extend the JNI wrapper classes, which mirror the AAC C++ API. You can read more about these interfaces in the following documentation:
+The Sample App provides an example of how to create and configure an instance of the Engine, extend the Alexa Auto SDK Platform Interfaces, and register the interface implementations with the Engine. The Platform Interface implementations are located in the `impl/` folder of the `com.amazon.sampleapp` directory with the `Handler` postfix. These classes extend the JNI wrapper classes, which mirror the Alexa Auto C++ API. You can read more about these interfaces in the following documentation:
 
 - [Core Module](../../platforms/android/CORE.md)
 - [Alexa Module](../../platforms/android/ALEXA.md)
@@ -56,10 +56,10 @@ The Sample App GUI consists of a menu bar and a log console. The expandable menu
 
 The microphone icon on the menu bar may be used to initiate a speech interaction with Alexa, either via tap-to-talk (press and release) or hold-to-talk (press and hold). You may also initiate an interaction with the Alexa wake word, and the Sample App provides a switch in the options menu to enable or disable wake word when supported.
 
-Initiate various interactions with Alexa and explore the options menu features and the log console to better understand the AAC SDK functionality. The logger implementation tags log messages in the following way:
+Initiate various interactions with Alexa and explore the options menu features and the log console to better understand the Alexa Auto SDK functionality. The logger implementation tags log messages in the following way:
 
 - `[AVS]` refers to log messages from the AVS Device SDK.
-- `[AAC]` refers to log messages from the AAC SDK.
+- `[AAC]` refers to log messages from the Alexa Auto SDK.
 - `[CLI]` refers to log messages from the Sample App itself.
 
 > **NOTE**:
@@ -133,7 +133,7 @@ Use Android Studio and hit the "Debug 'app'" button on toolbar. This will launch
 Debugging Java code is straight forward. Open the file and scroll to the method which you wish to debug. Click on to the vertical gray bar on the left of the source editor. This will set the breakpoint on the source line. Use Android Studio UI interface to navigate the stack trace, watch variables etc., when breakpoint is hit
 
 #### Debugging C++ code
-For debugging the AACE C++ library, which is part of the Android Studio sample project, debugging instructions are same as Java code. AACE Android platform library is compiled and linked by Android Studio so no special instructions are required. Similarly for more C++ projects in Android Studio, debugging is seamless.
+For debugging the Alexa Auto SDK C++ library, which is part of the Android Studio sample project, debugging instructions are same as Java code. The Alexa Auto Android SDK platform library is compiled and linked by Android Studio so no special instructions are required. Similarly for more C++ projects in Android Studio, debugging is seamless.
 
 For debugging all external libraries which are not built by Android Studio, follow these instructions (At present, All the modules except the platform/android and sample/android are built outside Android Studio)
 
@@ -160,7 +160,7 @@ Note: If LLDB window isn't visible in debug tab, change the debug configuration 
 
 * The issue related to music playing after saying "stop" for music playback then saying "flash briefing" is fixed. The flash briefing response plays as expected.
 * The Login with Amazon browser implementation now refreshes the auth token after one hour.
-* Examples were added about how to fetch user profiles for LWA with browser and CBL. 
+* Examples were added about how to fetch user profiles for LWA with browser and CBL.
 
 ### Known Issues
 

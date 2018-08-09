@@ -19,5 +19,5 @@ var searchData=
   ['authstatechange',['authStateChange',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider.html#aea8b68a706b77608c8ec32ba70cda15f',1,'com::amazon::aace::alexa::AuthProvider']]],
   ['authstatechanged',['authStateChanged',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client.html#aadf5e36e715105b0c182cab93d3bf427',1,'com::amazon::aace::alexa::AlexaClient']]],
   ['avs_5fsynced',['AVS_SYNCED',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_speaker_1_1_type.html#abdc0286fe1b43bb42e5b43711f53f4e4',1,'com::amazon::aace::alexa::Speaker::Type']]],
-  ['alexa_20auto_20core_20engine_20for_20android',['Alexa Auto Core Engine for Android',['../index.html',1,'']]]
+  ['alexa_20auto_20sdk_20for_20android',['Alexa Auto SDK for Android',['../index.html',1,'']]]
 ];

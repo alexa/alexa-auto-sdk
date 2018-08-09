@@ -2,11 +2,11 @@
 
 ### Overview
 
-The AAC Navigation API provides the features required by a platform implementation to interface with the navigation capabilities of Alexa.
+The Alexa Auto SDK Navigation API provides the features required by a platform implementation to interface with the navigation capabilities of Alexa.
 
 ### Handling Navigation
 
-It is the responsibility of the platform implementation to set a destination and stop navigation when notified to do so by the Engine. The platform implementation should choose how to handle these requests based on its navigation provider. 
+It is the responsibility of the platform implementation to set a destination and stop navigation when notified to do so by the Engine. The platform implementation should choose how to handle these requests based on its navigation provider.
 
 To implement a custom navigation handler for handling navigation requests from Alexa, the `Navigation` class should be extended:
 

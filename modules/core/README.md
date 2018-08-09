@@ -2,7 +2,7 @@
 
 ### Overview
 
-The module contains the Engine base classes and the abstract platform interfaces that can be utilized by the platform and/or other modules. It also provides an easy way to integrate AAC SDK into an application or a framework.This involves configuring and creating an instance of `aace::core::Engine`, overriding default platform implementation classes, and registering the custom interface handlers with the instantiated Engine.
+The module contains the Engine base classes and the abstract platform interfaces that can be utilized by the platform and/or other modules. It also provides an easy way to integrate the Alexa Auto SDK into an application or a framework. This involves configuring and creating an instance of `aace::core::Engine`, overriding default platform implementation classes, and registering the custom interface handlers with the instantiated Engine.
 
 ### Creating the Engine
 
@@ -83,11 +83,11 @@ After the Engine has been created and configured, and all of the platform interf
 
 ### Extending the Default Platform Implementation
 
-The default AAC platform implementation can be extended by overriding the various classes in the library that, when registered with the Engine, allow you to interact with Amazon services such as AVS.
+The default Alexa Auto SDK platform implementation can be extended by overriding the various classes in the library that, when registered with the Engine, allow you to interact with Amazon services.
 
 ### Implementing LocationProvider
 
-The Engine provides a callback for implementing location requests from AVS and other modules and a Location type definition. This is optional and dependent on the platform implementation.
+The Engine provides a callback for implementing location requests from Alexa and other modules and a Location type definition. This is optional and dependent on the platform implementation.
 
 To implement a custom LocationService handler to provide location using the default Engine LocationProvider class the `aace::location::LocationProvider` class should be extended:
 
@@ -109,7 +109,7 @@ To implement a custom LocationService handler to provide location using the defa
 
 ### Implementing NetworkInfoProvider
 
-The Engine provides callbacks for implementing network information requests from AVS and to inform the Engine of network changes. This is optional and dependent on the platform implementation.
+The Engine provides callbacks for implementing network information requests and informing the Engine of network changes. This is optional and dependent on the platform implementation.
 
 To implement a custom NetworkInfoProvider handler to provide network info using the default Engine NetworkInfoProvider class the `aace::network::NetworkInfoProvider` class should be extended:
 
@@ -158,4 +158,3 @@ To implement a custom log event handler for logging events from AVS using the de
 
     //engine config
     engine->registerPlatformInterface( std::make_shared<MyLogger>());
-

@@ -19,5 +19,5 @@ var searchData=
   ['authstate',['AuthState',['../classaace_1_1alexa_1_1_auth_provider_engine_interface.html#abe4ab37548dfaf7744afe9078e1792ec',1,'aace::alexa::AuthProviderEngineInterface::AuthState()'],['../classaace_1_1alexa_1_1_auth_provider.html#a703c765e6cb7c747a9fc6a12d81b7ef4',1,'aace::alexa::AuthProvider::AuthState()']]],
   ['authstatechanged',['authStateChanged',['../classaace_1_1alexa_1_1_alexa_client.html#a6b469f0511ffdea1083044f0fe9f421e',1,'aace::alexa::AlexaClient::authStateChanged()'],['../classaace_1_1alexa_1_1_auth_provider.html#a38e948a90a4e5ef46e2bdc34eb0b19cf',1,'aace::alexa::AuthProvider::authStateChanged()']]],
   ['avs_5fsynced',['AVS_SYNCED',['../classaace_1_1alexa_1_1_speaker.html#ae11df0cc137eb21d1c762303e0f7158eab7dadd69a14fa73e26ba543bbe4bdbeb',1,'aace::alexa::Speaker']]],
-  ['alexa_20auto_20core_20engine',['Alexa Auto Core Engine',['../index.html',1,'']]]
+  ['alexa_20auto_20sdk_20for_20c_2b_2b',['Alexa Auto SDK for C++',['../index.html',1,'']]]
 ];

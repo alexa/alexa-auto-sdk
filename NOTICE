@@ -1,20 +1,18 @@
-AAC SDK
+Alexa Auto SDK
 Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
-
-***************************
-AAC SDK COMPONENTS
-***************************
-The following AAC SDK components are licensed under the Apache License, Version 2.0 (the "License"):
+*************************
+ALEXA AUTO SDK COMPONENTS
+*************************
+The following Alexa Auto SDK components are licensed under the Apache License, Version 2.0 (the "License"):
 
 builder
-modules/core
 modules/alexa
+modules/core
 modules/navigation
 modules/phone-control
-platform/android
+platforms/android
 samples/android
-tools/document
 
 You may not use this file except in compliance with the License. A copy of
 the License is located at
@@ -25,7 +23,6 @@ or in the "license" file accompanying this file. This file is distributed on
 an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
 or implied. See the License for the specific language governing permissions and
 limitations under the License.
-
 
 **********************
 THIRD PARTY COMPONENTS
@@ -93,4 +90,4 @@ Copyright Vasil Dinkov, Vadikom Web Ltd.
 http://vadikom.com
 
 Licensed MIT
---------------------------------------------------------------------------------
+----------------------------------------

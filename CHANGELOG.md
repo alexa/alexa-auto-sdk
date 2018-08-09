@@ -2,6 +2,20 @@
 
 ___
 
+### v1.0.2 released on 2018-08-08:
+
+### Enhancements
+
+This release is only for documentation updates. There are no new features or enhancements.
+
+### Resolved Issues
+
+Only name change updates were made to the documentation. There are no resolved issues in this release.
+
+### Known Issues
+
+There are no known issues in this release.
+
 ### v1.0.1 released on 2018-07-31:
 
 ### Enhancements
@@ -12,7 +26,7 @@ This release is for bug fixes only. There are no new features or enhancements.
 
 Issues fixed in this release:
 
-* The Engine now reconnects to AVS when the `NetworkInfoProvider` updates the network status.
+* The Engine now reconnects to Alexa when the `NetworkInfoProvider` updates the network status.
 * All shared memory objects are now freed when the Engine object is disposed.
 * We fixed a media playback state issue in the Engine that caused an unexpected pause and resume for a media stream that was already stopped.
 * We added AudioPlayer::playerActivityChanged to the Android APIs.
@@ -23,7 +37,7 @@ Issues fixed in this release:
 * Enabled capability registration for phone call control.
 * We fixed an issue where the Android platform build failed on the initial attempt when using clean code.
 
-### Known issues
+### Known Issues
 
 There are no known issues in this release.
 
@@ -36,8 +50,8 @@ There are no known issues in this release.
 
 ### **Enhancements**
 
-The following enhancements were added to the AAC SDK since the v1.0.0 Beta release.
-* AAC SDK now supports 2 Navigation directives.
+The following enhancements were added to the Alexa Auto SDK since the v1.0.0 Beta release.
+* Alexa Auto SDK now supports 2 Navigation directives.
     * **`SetDestination`**
     * **`CancelNavigation`**
 * For Phone Control we now support the Dial Directive with three events.
@@ -48,6 +62,7 @@ The following enhancements were added to the AAC SDK since the v1.0.0 Beta relea
 ### **Known Issues**
 
 The following are know issues in this release.
+
 * The Engine doesn't immediately reconnect to AVS when the **`NetworkInfoProvider`** updates network status.
 * Some shared memory objects are not freed when Engine object is disposed.
 
@@ -59,20 +74,22 @@ Sample App issues are documented in the [Sample App README](./samples/android/RE
 
 ### **Enhancements**
 
-The following enhancements were added to the AAC SDK since the last Alpha release (binary).
+The following enhancements were added to the Alexa Auto SDK since the last Alpha release (binary).
 
- * `SetDestination()` API added to the Navigation module (see the [Modules](./README.md) sections in the "Alexa Automotive Core SDK" readme.)
+ * `SetDestination()` API added to the Navigation module (see the [Modules](./README.md) sections in the "Alexa Auto SDK" readme.)
  * Android Sample Application updated with a number of features such as rendering of Display Cards (Shopping List, Coffee Shops Nearby, etc), handling of the `SetDestination()` API, Notifications, LWA (Login with Amazon)
 
 ### **Known Issues**
 
 ***SDK:***
+
 * While the SDK does build against Android API22 and above and runs successfully on Android O devices, our current testing shows a native-code linking error when actually running on API22 devices.
 
 ***Android Sample App:***
+
 * M3U and PLS based stream URLs are not parsed before sent to the Android Mediaplayer. Affects live streams typically coming from TuneIn and IHeartRadio services
 * Media playback can take a long time to start sometimes for iHeartRadio and TuneIn
-* The Android AAC Sample App was developed on an Android tablet with 2048 x 1536 resolution screen size. It can run on smaller devices, but some of the display cards may not display correctly
+* The Android Alexa Auto SDK Sample App was developed on an Android tablet with 2048 x 1536 resolution screen size. It can run on smaller devices, but some of the display cards may not display correctly
 * During Playing Media in the Sample App we see the following messages (none of these will cause any issues):
   * E/AVS:JsonUtils:findNodeFailed:reason=missingDirectChild,child=streamFormat
   * E/AVS:JsonUtils:findNodeFailed:reason=missingDirectChild,child=progressReportDelayInMilliseconds

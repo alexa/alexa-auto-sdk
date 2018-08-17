@@ -78,7 +78,7 @@ To implement a custom handler for speech input, the `aace::alexa::SpeechRecogniz
 
 ### Handling speech output
 
-The speech synthesizer is responsible for handling Alexa's speech. The `SpeechSynthesizer` class extends the abstract `aace::alexa::AudioChannel` class. This is to separate each audio-capable class on the platform while allowing the nEgine to control their interactive behaviors. The platform implementation provides a reference to an instance of a *media player* and a *speaker*. (The term "speaker" is used here in the sense of an "output device") [**Read more about handling media and volume here**](#handling-media-and-volume).
+The speech synthesizer is responsible for handling Alexa's speech. The `SpeechSynthesizer` class extends the abstract `aace::alexa::AudioChannel` class. This is to separate each audio-capable class on the platform while allowing the Engine to control their interactive behaviors. The platform implementation provides a reference to an instance of a *media player* and a *speaker*. (The term "speaker" is used here in the sense of an "output device") [**Read more about handling media and volume here**](#handling-media-and-volume).
 
  To implement a custom handler for speech output the `aace::alexa::SpeechSynthesizer` class should be extended:
 

@@ -19,8 +19,7 @@ TCMODE = "external"
 
 TARGET_VENDOR = ""
 
-export SDKTARGETSYSROOT = "${TOOLCHAIN}/sysroot"
-export CROSS_SYSROOT = "${SDKTARGETSYSROOT}"
+TARGET_SYSROOT = "${TOOLCHAIN}/sysroot"
 
 # CMake
 # CMAKE_ANDROID_XXX options may be available in CMake 3.8 or later...
@@ -81,13 +80,16 @@ IMAGE_LINK_NAME = "${IMAGE_BASENAME}-${ANDROID_MACHINE}"
 
 def android_siteinfo_setfunc(archinfo, osinfo, targetinfo, d):
     osinfo['linux-android'] = "common-android"
+    targetinfo['x86_64-linux-android'] = "bit-64"
     return archinfo, osinfo, targetinfo
 
 SITEINFO_EXTRA_DATAFUNCS = "android_siteinfo_setfunc"
 
 def android_get_machine_dict(machdata, d):
     machdata["linux-android"] = {
-        "i686": (3,  0, 0, True, 32),
+        "x86_64": (62,  0, 0, True, 64),
+        "i686":   (3,   0, 0, True, 32),
+        "aarch64":(183, 0, 0, True, 64),
     }
     machdata["linux-androideabi"] = {
         "arm" : (40, 0, 0, True, 32),

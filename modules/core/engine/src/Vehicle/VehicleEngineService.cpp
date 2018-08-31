@@ -102,6 +102,7 @@ bool VehicleEngineService::configure( std::shared_ptr<std::istream> configuratio
             m_vehiclePropertyMap["os"] = getVehicleConfigProperty( info, "os" );
             m_vehiclePropertyMap["arch"] = getVehicleConfigProperty( info, "arch" );
             m_vehiclePropertyMap["language"] = getVehicleConfigProperty( info, "language" );
+            m_vehiclePropertyMap["microphone"] = getVehicleConfigProperty(info, "microphone" );
         }
 
         return true;

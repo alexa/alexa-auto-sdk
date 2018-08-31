@@ -3,9 +3,14 @@
 THISDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 export BUILDER_HOME=${THISDIR}
-export SDK_HOME=${BUILDER_HOME}/..
 
 source ${BUILDER_HOME}/scripts/common.sh
+source ${BUILDER_HOME}/scripts/agreement.sh
+
+# SDK Info
+export SDK_HOME=${BUILDER_HOME}/..
+export SDK_BASE_VERSION="$(bash -c "${BUILDER_HOME}/scripts/gen-version.sh -b")"
+export SDK_VERSION="$(bash -c "${BUILDER_HOME}/scripts/gen-version.sh")"
 
 #
 # Option
@@ -25,9 +30,11 @@ case ${COMMAND} in
 		usageExit
 		;;
 	"oe")
+		agreement_check
 		${BUILDER_HOME}/scripts/run-bitbake.sh $@
 		;;
 	"cmake")
+		agreement_check
 		${BUILDER_HOME}/scripts/run-cmake.sh $@
 		;;
 	"docker")

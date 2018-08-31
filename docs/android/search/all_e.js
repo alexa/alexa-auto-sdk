@@ -8,5 +8,6 @@ var searchData=
   ['removeallalerts',['removeAllAlerts',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_alerts.html#a71f9d8d63b53b90cb27f09d093741898',1,'com::amazon::aace::alexa::Alerts']]],
   ['renderplayerinfo',['renderPlayerInfo',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_template_runtime.html#a485b27cafa223d145a1808326446f13b',1,'com::amazon::aace::alexa::TemplateRuntime']]],
   ['rendertemplate',['renderTemplate',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_template_runtime.html#a4c8189b23f28853714a99f3e0f1e8404',1,'com::amazon::aace::alexa::TemplateRuntime']]],
+  ['repeat',['REPEAT',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_playback_controller_1_1_playback_toggle.html#a5b6191bde99908b57e7a49f42a9c44d6',1,'com::amazon::aace::alexa::PlaybackController::PlaybackToggle']]],
   ['resume',['resume',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#aaa4e76e649f92fb84c7baf004ceb9334',1,'com::amazon::aace::alexa::MediaPlayer']]]
 ];

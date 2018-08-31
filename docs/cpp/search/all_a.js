@@ -11,5 +11,7 @@ var searchData=
   ['mediaplayerengineinterface',['MediaPlayerEngineInterface',['../classaace_1_1alexa_1_1_media_player_engine_interface.html',1,'aace::alexa']]],
   ['mediastate',['MediaState',['../classaace_1_1alexa_1_1_media_player_engine_interface.html#a85a574bb13b13453df66ff2cac6a4f86',1,'aace::alexa::MediaPlayerEngineInterface::MediaState()'],['../classaace_1_1alexa_1_1_media_player.html#aa173fb6a0acf0a0530307e5dddb9086f',1,'aace::alexa::MediaPlayer::MediaState()']]],
   ['mediastatechanged',['mediaStateChanged',['../classaace_1_1alexa_1_1_media_player.html#ac2fe0773062dcef92e5277c120d6c0d4',1,'aace::alexa::MediaPlayer']]],
+  ['metric',['METRIC',['../classaace_1_1logger_1_1_logger_engine_interface.html#aa97c461bbc4f77638b45f7eb9271b786ad83e9b0c6b9339aaeb08d2a04ae9e34d',1,'aace::logger::LoggerEngineInterface']]],
+  ['microphone',['MICROPHONE',['../classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a6aa7ee80198586f3a51d0c0f8fb542cfa74a1ebda7fe4e2d30e665420bedde3bf',1,'aace::vehicle::config::VehicleConfiguration']]],
   ['model',['MODEL',['../classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a6aa7ee80198586f3a51d0c0f8fb542cfa7a03bac2692f8d17e2cda1b0721ffd0e',1,'aace::vehicle::config::VehicleConfiguration']]]
 ];

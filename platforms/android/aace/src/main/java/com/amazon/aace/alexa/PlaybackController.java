@@ -13,76 +13,155 @@
  * permissions and limitations under the License.
  */
 
-// aace/alexa/PlaybackController.java
-// This is an automatically generated file.
-
 package com.amazon.aace.alexa;
 
 import com.amazon.aace.core.PlatformInterface;
 
 /**
  * PlaybackController should be extended to handle playback control
- * operations such as on-platform button presses for the @c AudioPlayer. The Engine will respond to PlaybackController 
+ * operations such as on-platform button presses for the @c AudioPlayer. The Engine will respond to PlaybackController
  * events with playback control directives on the @c AudioPlayer @c MediaPlayer.
  *
- * @note The TemplateRuntime::renderPlayerInfo() payload includes information about what
+ * @note The TemplateRuntime.renderPlayerInfo() payload includes information about what
  * playback control buttons should be enabled on screen with a player info display card.
  *
  * @sa AudioPlayer
  */
 abstract public class PlaybackController extends PlatformInterface
 {
-    /**
-     * PlaybackController should be extended to handle playback control
-     * operations such as on-platform button presses for the @c AudioPlayer. The Engine will respond to PlaybackController 
-     * events with playback control directives on the @c AudioPlayer @c MediaPlayer.
-     *
-     * @note The TemplateRuntime::renderPlayerInfo() payload includes information about what
-     * playback control buttons should be enabled on screen with a player info display card.
-     *
-     * @sa AudioPlayer
-     */
     public PlaybackController() {
     }
 
     /**
-     * Notifies the Engine of a platform request to begin audio playback, such as when a user presses
-     * a "play" button. The Engine will issue a playback directive to the @c AudioPlayer @c MediaPlayer to initiate
-     * playback on the platform.
+     * Describes the playback controller button types
      */
-    public void playButtonPressed() {
-        playButtonPressed( getNativeObject() );
+    public enum PlaybackButton
+    {
+        /**
+         * 'Play' button.
+         * @hideinitializer
+         */
+        PLAY("PLAY"),
+        /**
+         * 'Pause' button.
+         * @hideinitializer
+         */
+        PAUSE("PAUSE"),
+        /**
+         * 'Next' button.
+         * @hideinitializer
+         */
+        NEXT("NEXT"),
+        /**
+         * 'Previous' button.
+         * @hideinitializer
+         */
+        PREVIOUS("PREVIOUS"),
+        /**
+         * 'Skip Forward' button.
+         * @hideinitializer
+         */
+        SKIP_FORWARD("SKIP_FORWARD"),
+        /**
+         * 'Skip Backward' button.
+         * @hideinitializer
+         */
+        SKIP_BACKWARD("SKIP_BACKWARD");
+
+        /**
+         * @internal
+         */
+        private String m_name;
+
+        /**
+         * @internal
+         */
+        private PlaybackButton( String name ) {
+            m_name = name;
+        }
+
+        /**
+         * @internal
+         */
+        public String toString() {
+            return m_name;
+        }
     }
 
     /**
-     * Notifies the Engine of a platform request to pause audio playback, such as when a user presses
-     * a "pause" button. The Engine will issue a playback directive to the @c AudioPlayer @c MediaPlayer to stop
-     * playback on the platform.
+     * Describes the playback controller toggle types
      */
-    public void pauseButtonPressed() {
-        pauseButtonPressed( getNativeObject() );
+    public enum PlaybackToggle
+    {
+        /**
+         * 'Shuffle' toggle.
+         * @hideinitializer
+         */
+        SHUFFLE("SHUFFLE"),
+        /**
+         * 'Loop' toggle.
+         * @hideinitializer
+         */
+        LOOP("LOOP"),
+        /**
+         * 'Repeat' toggle.
+         * @hideinitializer
+         */
+        REPEAT("REPEAT"),
+        /**
+         * 'Thumbs Up' toggle.
+         * @hideinitializer
+         */
+        THUMBS_UP("THUMBS_UP"),
+        /**
+         * 'Thumbs Down' toggle.
+         * @hideinitializer
+         */
+        THUMBS_DOWN("THUMBS_DOWN");
+
+        /**
+         * @internal
+         */
+        private String m_name;
+
+        /**
+         * @internal
+         */
+        private PlaybackToggle( String name ) {
+            m_name = name;
+        }
+
+        /**
+         * @internal
+         */
+        public String toString() {
+            return m_name;
+        }
     }
 
     /**
-     * Notifies the Engine of a platform request to skip forward in the playback queue, such as when a user
-     * presses a "next" button. The Engine will issue playback directives to the @c AudioPlayer @c MediaPlayer to control playback on the platform.
+     * Notifies the Engine of a platform button request (i.e. Play/Pause/Next/Previous/Skip Forward/Skip Backward).
+     * For certain playback types, the Engine will issue playback directives to the @c AudioPlayer @c MediaPlayer
+     * to control playback on the platform.
+     * @param  button The playback button type
      */
-    public void nextButtonPressed() {
-        nextButtonPressed( getNativeObject() );
+    public void buttonPressed(PlaybackButton button) {
+        buttonPressed( getNativeObject(), button );
     }
 
     /**
-     * Notifies the Engine of a platform request to skip backward in the playback queue, such as when a user
-     * presses a "previous" button. The Engine will issue playback directives to the @c AudioPlayer @c MediaPlayer to control playback on the platform.
+     * Notifies the Engine of a platform toggle request (i.e. Shuffle/Loop/Repeat/Thumbs Up/Thumbs Down).
+     * For certain playback types, the Engine will issue playback directives to the @c AudioPlayer @c MediaPlayer
+     * to control playback on the platform.
+     * @param  toggle The playback toggle type
+     * @param  action The playback toggle action
      */
-    public void previousButtonPressed() {
-        previousButtonPressed( getNativeObject() );
+    public void togglePressed(PlaybackToggle toggle, boolean action) {
+        togglePressed( getNativeObject(), toggle, action );
     }
 
-    private native void playButtonPressed( long nativeObject );
-    private native void pauseButtonPressed( long nativeObject );
-    private native void nextButtonPressed( long nativeObject );
-    private native void previousButtonPressed( long nativeObject );
+    private native void buttonPressed( long nativeObject, PlaybackButton button );
+    private native void togglePressed( long nativeObject, PlaybackToggle toggle, boolean action );
 }
 
 // END OF FILE

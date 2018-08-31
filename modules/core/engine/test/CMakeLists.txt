@@ -4,6 +4,7 @@ find_library(GMOCK_MAIN_LIBRARY NAMES gmock_main)
 
 set(UNIT_TEST_SRCS
     EngineImplTest.cpp
+    VehicleConfigurationImplTest.cpp
 )
 
 foreach(TEST_SRC ${UNIT_TEST_SRCS})

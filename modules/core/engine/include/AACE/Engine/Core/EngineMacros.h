@@ -44,12 +44,17 @@
 #define AACE_VERBOSE(entry)
 #endif // AACE_DEBUG_LOG_ENABLED
 
+#ifdef AAC_LATENCY_LOGS_ENABLED
+#define AACE_METRIC(entry) AACE_LOG(AACE_LOG_LEVEL::METRIC, entry)
+#else // AAC_LATENCY_LOGS_ENABLED
+#define AACE_METRIC(entry)
+#endif // AAC_LATENCY_LOGS_ENABLED
+
 #define AACE_INFO(entry) AACE_LOG(AACE_LOG_LEVEL::INFO, entry)
 #define AACE_WARN(entry) AACE_LOG(AACE_LOG_LEVEL::WARN, entry)
 #define AACE_ERROR(entry) AACE_LOG(AACE_LOG_LEVEL::ERROR, entry)
 #define AACE_CRITICAL(entry) AACE_LOG(AACE_LOG_LEVEL::CRITICAL, entry)
-
 // creates a log event for the aace logger
-#define LX(tag,event) aace::engine::logger::LogEntry(tag,event)
+#define LX(tag, event) aace::engine::logger::LogEntry(tag, event)
 
 #endif // AACE_ENGINE_CORE_ENGINE_EXCEPTIONS_H

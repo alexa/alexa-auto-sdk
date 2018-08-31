@@ -2,11 +2,11 @@
 
 ### Overview
 
-The AAC Phone Call Controller API provides the features required by a platform implementation to interface with the phone call controller capabilities of Alexa.
+The Alexa Auto SDK Phone Call Controller API provides the features required by a platform implementation to interface with the phone call controller capabilities of Alexa.
 
 ### Handling Phone Call Controller
 
-The Engine provides callbacks for handling phone call controller directives from Alexa. The platform implementation must also inform the Engine of the status of phone call controller on the platform. The platform implementation is responsible for managing the lifecycle and user experience of a call session and connection to a calling device.
+The Engine provides callbacks for handling phone call controller directives from Alexa. The platform implementation must also inform the Engine of the status of the phone call controller on the platform. The platform implementation is responsible for managing the lifecycle and user experience of a call session and connection to a calling device.
 
 To implement a custom phone call controller handler for handling phone call controller directives and events from Alexa, the `aace::phoneCallController::PhoneCallController` class should be extended:
 

@@ -44,6 +44,7 @@ private:
     // Level
     ObjectRef m_enum_Level_VERBOSE;
     ObjectRef m_enum_Level_INFO;
+    ObjectRef m_enum_Level_METRIC;
     ObjectRef m_enum_Level_WARN;
     ObjectRef m_enum_Level_ERROR;
     ObjectRef m_enum_Level_CRITICAL;

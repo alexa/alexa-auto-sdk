@@ -18,6 +18,8 @@
 
 /** @file */
 
+#include <iostream>
+
 namespace aace {
 namespace network {
 
@@ -33,20 +35,21 @@ public:
     enum class NetworkStatus {
 
         /**
+         * The network is unknown.
+         */
+        UNKNOWN,
+        /**
          * The network is disconnected.
          */
         DISCONNECTED,
-
         /**
          * The network is disconnecting.
          */
         DISCONNECTING,
-
         /**
          * The network is connected.
          */
         CONNECTED,
-        
         /**
          * The network is connecting.
          */
@@ -55,6 +58,27 @@ public:
 
     virtual void networkInfoChanged( NetworkStatus status, int wifiSignalStrength ) = 0;
 };
+
+inline std::ostream& operator<<(std::ostream& stream, const NetworkInfoProviderEngineInterface::NetworkStatus& status) {
+    switch (status) {
+        case NetworkInfoProviderEngineInterface::NetworkStatus::UNKNOWN:
+            stream << "UNKNOWN";
+            break;
+        case NetworkInfoProviderEngineInterface::NetworkStatus::DISCONNECTED:
+            stream << "DISCONNECTED";
+            break;
+        case NetworkInfoProviderEngineInterface::NetworkStatus::DISCONNECTING:
+            stream << "DISCONNECTING";
+            break;
+        case NetworkInfoProviderEngineInterface::NetworkStatus::CONNECTED:
+            stream << "CONNECTED";
+            break;
+        case NetworkInfoProviderEngineInterface::NetworkStatus::CONNECTING:
+            stream << "CONNECTING";
+            break;
+    }
+    return stream;
+}
 
 } // aace::network
 } // aace

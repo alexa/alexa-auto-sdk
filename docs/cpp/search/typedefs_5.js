@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['vehicleproperty',['VehicleProperty',['../classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ac9aae2e502cc7e09123991401e1bcb84',1,'aace::vehicle::config::VehicleConfiguration']]]
+  ['playbackbutton',['PlaybackButton',['../classaace_1_1alexa_1_1_playback_controller.html#a18c59eb4f33742d091a065d02c764762',1,'aace::alexa::PlaybackController']]],
+  ['playbacktoggle',['PlaybackToggle',['../classaace_1_1alexa_1_1_playback_controller.html#a15781abf2231c9b5de41444a27844a7d',1,'aace::alexa::PlaybackController']]]
 ];

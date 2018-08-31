@@ -47,12 +47,12 @@ public:
         /**
          * The Speaker type that is controlled by AVS
          */
-        AVS_SYNCED,
+        AVS_SPEAKER_VOLUME,
 
         /**
          * The Speaker type that is controlled locally by the platform
          */
-        LOCAL
+        AVS_ALERTS_VOLUME
     };
 
     virtual ~Speaker() = default;
@@ -110,7 +110,7 @@ public:
     /**
      * Notifies the Engine of a volume change event
      * originating on the platform, such as a user pressing a "volume up" or "volume down"
-     * button. If the Speaker is @c Type::AVS_SYNCED, the Engine will respond with a
+     * button. If the Speaker is @c Type::AVS_SPEAKER_VOLUME, the Engine will respond with a
      * call to @c setVolume() on each AVS-synced Speaker.
      *
      * @param [in] volume The new volume setting of the Speaker. The @c volume reported
@@ -123,7 +123,7 @@ public:
     /**
      * Notifies the Engine of a mute setting change event
      * originating on the platform, such as a user pressing a "mute" button.
-     * If the Speaker is @c Type::AVS_SYNCED, the Engine will respond with a
+     * If the Speaker is @c Type::AVS_SPEAKER_VOLUME, the Engine will respond with a
      * call to @c setMute() on each AVS-synced Speaker.
      *
      * @param [in] mute The new mute setting of the Speaker. @c true when the Speaker is muted,
@@ -147,11 +147,11 @@ private:
 
 inline std::ostream& operator<<(std::ostream& stream, const Speaker::Type& type) {
     switch (type) {
-        case Speaker::Type::AVS_SYNCED:
-            stream << "AVS_SYNCED";
+        case Speaker::Type::AVS_SPEAKER_VOLUME:
+            stream << "AVS_SPEAKER_VOLUME";
             break;
-        case Speaker::Type::LOCAL:
-            stream << "LOCAL";
+        case Speaker::Type::AVS_ALERTS_VOLUME:
+            stream << "AVS_ALERTS_VOLUME";
             break;
     }
     return stream;

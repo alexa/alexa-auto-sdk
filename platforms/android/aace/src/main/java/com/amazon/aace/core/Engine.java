@@ -13,11 +13,9 @@
  * permissions and limitations under the License.
  */
 
-// aace/core/Engine.java
-// This is an automatically generated file.
-
 package com.amazon.aace.core;
 
+import com.amazon.aace.communication.AlexaCommsModule;
 import com.amazon.aace.core.config.EngineConfiguration;
 
 /**
@@ -30,6 +28,11 @@ public class Engine extends PlatformInterface
     static {
         // Used to load the 'aace-lib' library on initialization
         System.loadLibrary( "aace-lib" );
+        if (AlexaCommsModule.isEnabled()) {
+            // AlexaCommsLib relies upon JNI OnLoad callback to initialize itself
+            // hence the explicit load of the lib here
+            System.loadLibrary("AlexaCommsLib");
+        }
     }
 
     /**
@@ -48,7 +51,7 @@ public class Engine extends PlatformInterface
     /**
      * Sets the Engine configuration to a set of configuration objects
      *
-     * @param  configurationList A collection of @c com.amazon.aace.core.config.EngineConfiguration objects as an      
+     * @param  configurationList A collection of @c com.amazon.aace.core.config.EngineConfiguration objects as an
      * @c EngineConfiguration[]
      * @return @c true if the Engine configuration was successful, else @c false
      */

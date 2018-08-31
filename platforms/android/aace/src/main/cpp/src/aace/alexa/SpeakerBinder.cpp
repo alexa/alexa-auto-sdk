@@ -28,8 +28,8 @@ void SpeakerBinder::initialize( JNIEnv* env )
 
     // Type
     jclass typeEnumClass = env->FindClass( "com/amazon/aace/alexa/Speaker$Type" );
-    m_enum_Type_AVS_SYNCED = NativeLib::FindEnum( env, typeEnumClass, "AVS_SYNCED", "Lcom/amazon/aace/alexa/Speaker$Type;" );
-    m_enum_Type_LOCAL = NativeLib::FindEnum( env, typeEnumClass, "LOCAL", "Lcom/amazon/aace/alexa/Speaker$Type;" );
+    m_enum_Type_AVS_SPEAKER = NativeLib::FindEnum( env, typeEnumClass, "AVS_SPEAKER", "Lcom/amazon/aace/alexa/Speaker$Type;" );
+    m_enum_Type_AVS_ALERTS = NativeLib::FindEnum( env, typeEnumClass, "AVS_ALERTS", "Lcom/amazon/aace/alexa/Speaker$Type;" );
 }
 
 bool SpeakerBinder::setVolume( int8_t volume )
@@ -106,10 +106,10 @@ jobject SpeakerBinder::convert( aace::alexa::Speaker::Type type )
 {
     switch( type )
     {
-        case aace::alexa::Speaker::Type::AVS_SYNCED:
-            return m_enum_Type_AVS_SYNCED.get();
-        case aace::alexa::Speaker::Type::LOCAL:
-            return m_enum_Type_LOCAL.get();
+        case aace::alexa::Speaker::Type::AVS_SPEAKER_VOLUME:
+            return m_enum_Type_AVS_SPEAKER.get();
+        case aace::alexa::Speaker::Type::AVS_ALERTS_VOLUME:
+            return m_enum_Type_AVS_ALERTS.get();
     }
 }
 

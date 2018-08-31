@@ -18,9 +18,9 @@
 #include <future>
 
 #include "MockAttachmentManager.h"
-#include "MockExceptionEncounteredSender.h"
-#include "MockDirectiveSequencer.h"
-#include "MockDirectiveHandlerResult.h"
+#include <AVSCommon/SDKInterfaces/test/MockExceptionEncounteredSender.h>
+#include <AVSCommon/SDKInterfaces/test/MockDirectiveSequencer.h>
+#include <AVSCommon/SDKInterfaces/test/MockDirectiveHandlerResult.h>
 
 #include "AACE/Engine/Navigation/NavigationCapabilityAgent.h"
 

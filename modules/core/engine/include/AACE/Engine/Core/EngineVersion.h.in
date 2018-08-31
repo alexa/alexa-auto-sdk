@@ -24,7 +24,7 @@ namespace core {
 namespace version {
 
 inline static aace::engine::core::Version getEngineVersion() {
-	return VERSION("@AACE_ENGINE_VERSION@");
+	return VERSION("@AAC_VERSION@");
 }
 
 } // aace::engine::core::version

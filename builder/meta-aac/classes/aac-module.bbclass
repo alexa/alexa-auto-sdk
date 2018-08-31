@@ -2,11 +2,14 @@ python () {
     if d.getVar('SRC_URI'):
         return
     d.setVar('SRC_URI', "file://.;subdir=src")
+    d.appendVar('SRC_URI', " " + d.getVar('AAC_PATCHES'))
     d.setVar('S', "${WORKDIR}/src")
     module_path = os.path.dirname(d.getVar('FILE'))
-    d.prependVar('FILESEXTRAPATHS', module_path)
+    d.prependVar('FILESEXTRAPATHS', module_path + ":")
     d.setVar('MODULE_PATH', module_path)
 }
+
+AAC_PATCHES ??= ""
 
 # Override with the meta-aac layer version
 PV = "${DISTRO_VERSION}"
@@ -20,8 +23,10 @@ FILES_${PN}-dev += "${datadir}/cmake"
 EXTRA_OECMAKE += "-DAAC_HOME=${STAGING_DIR_HOST}${prefix} \
                   -DCMAKE_BUILD_TYPE=${OECMAKE_BUILD_TYPE} \
                   -DAAC_EMIT_SENSITIVE_LOGS=${AAC_SENSITIVE_LOGS} \
-                  -DAAC_LATENCY_LOGS=${AAC_LATENCY_LOGS} \
-                  -DAAC_ENABLE_TESTS=ON"
+                  -DAAC_EMIT_LATENCY_LOGS=${AAC_LATENCY_LOGS} \
+                  -DAAC_ENABLE_TESTS=ON \
+                  -DAAC_VERSION=${PV} \
+                  -DSDK_VERSION=${SDK_VERSION}"
 
 do_install_append() {
 	mkdir -p ${D}${testbindir}/${PN}

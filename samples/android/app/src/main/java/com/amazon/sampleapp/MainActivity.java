@@ -39,7 +39,10 @@ import android.widget.Toast;
 import com.amazon.aace.alexa.AlexaClient;
 
 import com.amazon.aace.alexa.AlexaProperties;
+import com.amazon.aace.alexa.Speaker;
 import com.amazon.aace.alexa.config.AlexaConfiguration;
+import com.amazon.aace.communication.AlexaCommsModule;
+import com.amazon.aace.communication.config.AlexaCommsConfiguration;
 import com.amazon.aace.core.Engine;
 import com.amazon.aace.core.config.EngineConfiguration;
 
@@ -49,6 +52,8 @@ import com.amazon.sampleapp.impl.Alerts.AlertsHandler;
 import com.amazon.sampleapp.impl.AlexaClient.AlexaClientHandler;
 import com.amazon.sampleapp.impl.AudioPlayer.AudioPlayerHandler;
 import com.amazon.sampleapp.impl.AuthProvider.AuthProviderHandler;
+import com.amazon.sampleapp.impl.Communication.AlexaCommsHandler;
+import com.amazon.sampleapp.impl.Communication.AlexaCommsView;
 import com.amazon.sampleapp.impl.LocationProvider.LocationProviderHandler;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 import com.amazon.sampleapp.impl.MediaPlayer.MediaPlayerHandler;
@@ -85,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private AlexaClientHandler mAlexaClient;
     private AudioPlayerHandler mAudioPlayer;
     private AuthProviderHandler mAuthProvider;
+    private AlexaCommsHandler mAlexaCommsHandler;
     private NotificationsHandler mNotifications;
     private PhoneCallControllerHandler mPhoneCallController;
     private PlaybackControllerHandler mPlaybackController;
@@ -248,6 +254,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         String productId = mPreferences.getString( getString( R.string.preference_product_id ), "" );
 
         boolean configureSucceeded = mEngine.configure( new EngineConfiguration[]{
+                //AlexaConfiguration.createCurlConfig( certsDir.getPath(), "wlan0" ), Uncomment this line to specify the interface name to use by AVS.
                 AlexaConfiguration.createCurlConfig( certsDir.getPath() ),
                 AlexaConfiguration.createDeviceInfoConfig(  productDsn, clientId, productId ),
                 AlexaConfiguration.createMiscStorageConfig( appDataDir.getPath() + "/miscStorage.sqlite" ),
@@ -255,7 +262,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 AlexaConfiguration.createAlertsConfig( appDataDir.getPath() + "/alerts.sqlite" ),
                 AlexaConfiguration.createSettingsConfig( appDataDir.getPath() + "/settings.sqlite" ),
                 AlexaConfiguration.createNotificationsConfig( appDataDir.getPath() + "/notifications.sqlite" ),
-                LoggerConfiguration.createSyslogSinkConfig( "syslog", Logger.Level.VERBOSE )
+                LoggerConfiguration.createSyslogSinkConfig( "syslog", Logger.Level.VERBOSE ),
+                AlexaCommsConfiguration.createCommsConfig( certsDir.getPath() )
         });
         if ( !configureSucceeded ) throw new RuntimeException( "Engine configuration failed" );
 
@@ -310,7 +318,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
                         new MediaPlayerHandler(
                                 this,
                                 mLogger, "Audio Player",
-                                MediaPlayerHandler.SpeakerType.SYNCED,
+                                Speaker.Type.AVS_SPEAKER,
                                 mPlaybackController )
                 )
             )
@@ -323,7 +331,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
                                 this,
                                 mLogger,
                                 "Speech Synthesizer",
-                                MediaPlayerHandler.SpeakerType.SYNCED,
+                                Speaker.Type.AVS_SPEAKER,
                                 null )
                 )
             )
@@ -344,7 +352,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
                                 this,
                                 mLogger,
                                 "Alerts",
-                                MediaPlayerHandler.SpeakerType.LOCAL,
+                                Speaker.Type.AVS_ALERTS,
                                 null
                         )
                 )
@@ -378,15 +386,34 @@ public class MainActivity extends AppCompatActivity implements Observer {
                                 this,
                                 mLogger,
                                 "Notifications",
-                                MediaPlayerHandler.SpeakerType.LOCAL,
+                                Speaker.Type.AVS_ALERTS,
                                 null
                         )
                 )
             )
         ) throw new RuntimeException( "Could not register Notifications platform interface" );
 
+        // Alexa Comms Handler
+        if (AlexaCommsModule.isEnabled()) {
+            if (!mEngine.registerPlatformInterface(
+                    mAlexaCommsHandler = new AlexaCommsHandler(
+                        new MediaPlayerHandler(
+                                this,
+                                mLogger,
+                                "Communication",
+                                Speaker.Type.AVS_SPEAKER,
+                                null
+                        )
+                    )
+                )
+            ) throw new RuntimeException("Could not register AlexaCommsHandler platform interface");
+            AlexaCommsView commsView = findViewById(R.id.alexa_comms);
+            commsView.setupUI(mAlexaCommsHandler);
+        }
+
         // Start the engine
         if ( !mEngine.start() ) throw new RuntimeException( "Could not start engine" );
+        mAuthProvider.onInitialize();
     }
 
     @Override
@@ -414,7 +441,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
         super.onDestroy();
     }
 
-    // For auth cycle
     @Override
     protected void onResume() {
         super.onResume();

@@ -13,16 +13,13 @@
  * permissions and limitations under the License.
  */
 
-// aace/alexa/Notifications.java
-// This is an automatically generated file.
-
 package com.amazon.aace.alexa;
 
 /**
  * Notifications should be extended to handle rendering indicators for notifications from AVS.
  * The platform implementation is responsible for rendering visual cues for an active notification.
  * The Notifications @c MediaPlayer will receive directives from the Engine
- * for rendering audio indicators required by a change in @c Notifications::IndicatorState.
+ * for rendering audio indicators required by a change in @c Notifications.IndicatorState.
  *
  * @note This interface provides indicators that a notification was received, not the content of the notification.
  *
@@ -71,16 +68,6 @@ public class Notifications extends AudioChannel
         }
     }
 
-    /**
-     * Notifications should be extended to handle rendering indicators for notifications from AVS.
-     * The platform implementation is responsible for rendering visual cues for an active notification.
-     * The Notifications @c MediaPlayer will receive directives from the Engine
-     * for rendering audio indicators required by a change in @c Notifications::IndicatorState.
-     *
-     * @note This interface provides indicators that a notification was received, not the content of the notification.
-     *
-     * @sa AudioChannel
-     */
     public Notifications( MediaPlayer mediaPlayer, Speaker speaker ) {
         super( mediaPlayer, speaker, null );
     }

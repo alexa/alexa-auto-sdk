@@ -59,6 +59,7 @@ std::string LogFormatter::format( Level level, std::chrono::system_clock::time_p
         case Level::INFO: levelCh = 'I'; break;
         case Level::VERBOSE: levelCh = 'V'; break;
         case Level::WARN: levelCh = 'W'; break;
+        case Level::METRIC: levelCh = 'M'; break;
         default: levelCh = '?'; break;
     }
         

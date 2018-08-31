@@ -42,6 +42,10 @@
 #include "aace/alexa/PlaybackControllerBinder.h"
 #include "aace/alexa/NotificationsBinder.h"
 
+#ifdef INCLUDE_ALEXA_COMMS_MODULE
+#include "aace/communication/AlexaCommsBinder.h"
+#endif
+
 #include "aace/navigation/NavigationBinder.h"
 
 #include "aace/phonecontrol/PhoneCallControllerBinder.h"
@@ -82,6 +86,10 @@ private:
     std::shared_ptr<NetworkInfoProviderBinder> createNetworkInfoProviderBinder( JNIEnv* env, jobject platformInterface );
 
     std::shared_ptr<PhoneCallControllerBinder> createPhoneCallControllerBinder( JNIEnv* env, jobject platformInterface );
+
+#ifdef INCLUDE_ALEXA_COMMS_MODULE
+    std::shared_ptr<AlexaCommsBinder> createAlexaCommsBinder( JNIEnv* env, jobject platformInterface );
+#endif
 
 private:
     std::shared_ptr<aace::core::Engine> m_engine;
@@ -126,6 +134,12 @@ private:
     // com.amazon.network.*
     std::shared_ptr<aace::network::NetworkInfoProvider> m_networkInfo;
     ClassRef m_javaClass_NetworkInfoProvider;
+
+#ifdef INCLUDE_ALEXA_COMMS_MODULE
+    // com.amazon.communication.*
+    std::shared_ptr<aace::communication::AlexaComms> m_alexaComms;
+    ClassRef m_javaClass_AlexaComms;
+#endif // INCLUDE_ALEXA_COMMS_MODULE
 };
 
 #endif //AACE_CORE_ENGINE_BINDER_H

@@ -16,10 +16,10 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "MockContextManager.h"
-#include "MockExceptionEncounteredSender.h"
-#include "MockMessageSender.h"
-#include "MockDirectiveSequencer.h"
+#include <AVSCommon/SDKInterfaces/test/MockContextManager.h>
+#include <AVSCommon/SDKInterfaces/test/MockExceptionEncounteredSender.h>
+#include <AVSCommon/SDKInterfaces/test/MockMessageSender.h>
+#include <AVSCommon/SDKInterfaces/test/MockDirectiveSequencer.h>
 
 #include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
 
@@ -60,6 +60,7 @@ public:
 
         EXPECT_CALL(*m_mockDirectiveSequencer, addDirectiveHandler(testing::_)).WillOnce(testing::Return(true));
         EXPECT_CALL(*m_mockCapabilitiesDelegate, registerCapability(testing::_)).WillOnce(testing::Return(true));
+        EXPECT_CALL(*m_mockContextManager, setState(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(alexaClientSDK::avsCommon::sdkInterfaces::SetStateResult::SUCCESS));
         m_engineImpl = aace::engine::phoneCallController::PhoneCallControllerEngineImpl::create(
             m_mockPlatformInterface,
             m_mockCapabilitiesDelegate,

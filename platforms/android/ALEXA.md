@@ -2,12 +2,12 @@
 
 ### Overview
 
-The AAC Alexa API provides interfaces for standard AVS features. For an Android project you should consider creating a class per interface you wish to handle. 
+The Alexa Auto Alexa API provides interfaces for standard Alexa features. For an Android project you should consider creating a class per interface you wish to handle.
 
 
 ### Handling Alexa State Changes
 
-The AAC SDK manages internal state information for Alexa and provides an interface for developers to handle Alexa state changes in their platform. To implement a custom handler for Alexa state changes, the `AlexaClient` class should be extended:
+The Alexa Auto SDK manages internal state information for Alexa and provides an interface for developers to handle Alexa state changes in their platform. To implement a custom handler for Alexa state changes, the `AlexaClient` class should be extended:
 
 ```
 public class AlexaClientHandler extends AlexaClient
@@ -26,19 +26,19 @@ public class AlexaClientHandler extends AlexaClient
     }
 }
 ...
-```	
+```
 
 ### Handling Authorization
 
-It is the respoonsibility of the platform implementation to provide an authorization method for establishing a connection to AVS. The AAC SDK provides an interface to handle authorization state changes and storing context.
+It is the responsibility of the platform implementation to provide an authorization method for establishing a connection to AVS. The Alexa Auto SDK provides an interface to handle authorization state changes and storing context.
 
 To implement the handler for authorization, the `AuthProvider` class should be extended:
 
 ```
-public class AuthProviderHandler extends AuthProvider 
+public class AuthProviderHandler extends AuthProvider
 {
 	@Override
-	public String getAuthToken() 
+	public String getAuthToken()
 	{
     	//return the currently obtained auth refresh token
 	...
@@ -63,14 +63,14 @@ public class SpeechRecognizerHandler extends SpeechRecognizer
 {    
     @Override
     public boolean startAudioInput() {
-        // implement start recording 
+        // implement start recording
     }
     @Override
     public boolean stopAudioInput() {
-        // implement stop recording 
+        // implement stop recording
     }
     ...
-    	// call the write audio method while reading audio input data 
+    	// call the write audio method while reading audio input data
     	write( (byte[]) data, (long) size )
     ...
 ...
@@ -97,14 +97,14 @@ The interface also includes the methods `enableWakewordDetection()`, `disableWak
 
 ### Handling Speech Output
 
-The speech synthesizer is responsible for handling Alexa's speech. The `SpeechSynthesizer` class extends the abstract `AudioChannel` class. This is to separate each audio-capable class on the platform while allowing the engine to control their interactive behaviors. The platform implementation provides a reference to an instance of a *media player* and a *speaker*. (The term "speaker" is used here in the sense of "output device") [**Read more about handling media and volume here**](#handling-media-and-volume).
+The speech synthesizer is responsible for handling Alexa's speech. The `SpeechSynthesizer` class extends the abstract `AudioChannel` class. This is to separate each audio-capable class on the platform while allowing the Engine to control their interactive behaviors. The platform implementation provides a reference to an instance of a *media player* and a *speaker*. (The term "speaker" is used here in the sense of "output device") [**Read more about handling media and volume here**](#handling-media-and-volume).
 
  To implement a custom handler for speech output the `SpeechSynthesizer` class should be extended:
 
 ```
 public class SpeechSynthesizerHandler extends SpeechSynthesizer
 {
-	// passing in AndroidMediaPlayer 
+	// passing in AndroidMediaPlayer
 	public SpeechSynthesizerHandler( Context context, AndroidMediaPlayer mediaPlayer ) {
 		this( context, mediaPlayer, mediaPlayer.getSpeaker() );
     }
@@ -138,7 +138,7 @@ public class NotificationsHandler extends Notifications
 {
 	@Override
 	public void setIndicator( IndicatorState state )
-	{ 
+	{
 		// set your notifications indicator ON/OFF
 	...
 ```
@@ -163,7 +163,7 @@ public class AlertsHandler extends Alerts
 	}
 ```
 
-For local Alerts control, the methods `localStop`(stop current playing alert), and `removeAllAlerts`(remove all locally stored alerts) should be used.
+For local Alerts control, the methods `localStop` (stop current playing alert), and `removeAllAlerts` (remove all locally stored alerts) should be used.
 
 ### Handling Media and Volume
 
@@ -172,7 +172,7 @@ When audio data is received from Alexa it is the responsibility of the platform 
 To implement a custom handler for MediaPlayer the `MediaPlayer` class should be extended:
 
 ```
-//extending the AACE Media Player using the Android MediaPlayer
+//extending the Alexa Auto SDK Media Player using the Android MediaPlayer
 public class AndroidMediaPlayer extends com.amazon.aace.alexa.MediaPlayer implements android.media.MediaPlayer.OnCompletionListener, android.media.MediaPlayer.OnErrorListener
 {
 	...
@@ -231,7 +231,7 @@ public class AndroidMediaPlayer extends com.amazon.aace.alexa.MediaPlayer implem
 	@Override
     public void onCompletion( android.media.MediaPlayer mediaPlayer )
     {
-    	//handle media completing	
+    	//handle media completing
     	if( isRepeating() )
 		{
 			//handle repeating audio condition
@@ -241,15 +241,15 @@ public class AndroidMediaPlayer extends com.amazon.aace.alexa.MediaPlayer implem
 			playbackFinished();
 	...
 	@Override
-    public boolean onError( android.media.MediaPlayer mediaPlayer, int what, int extra ) 
+    public boolean onError( android.media.MediaPlayer mediaPlayer, int what, int extra )
     {
        	...
        	//inform engine of playback error
        	playbackError(...);
     }
-	
 
-``` 
+
+```
 
 The platform implementation's Speaker class will likely need a reference to the media player class. For an Android implementation, the Speaker can be subclassed in the MediaPlayer for example.
 
@@ -271,7 +271,7 @@ To implement a custom handler for Speaker, the `Speaker` class should be extende
 		...
 		@Override
 		public byte getVolume() {
-			//return the volume 
+			//return the volume
 		...
 		@Override
 		public boolean setMute( boolean mute )
@@ -286,7 +286,7 @@ To implement a custom handler for Speaker, the `Speaker` class should be extende
 
 ### Handling GUI Templates
 
-When template info is received from Alexa, it is the responsibility of the platform implementation to handle the rendering of any UI with the info that is received from Alexa. There are two template flavours: [Templates](https://alexa.design/DevDocRenderTemplate) and [PlayerInfo](https://amzn.to/DevDocTemplatePlayerInfo). You can view sample JSON payloads from these AVS documentation links as well.
+When template info is received from Alexa, it is the responsibility of the platform implementation to handle the rendering of any UI with the info that is received from Alexa. There are two template flavors: [Templates](https://alexa.design/DevDocRenderTemplate) and [PlayerInfo](https://amzn.to/DevDocTemplatePlayerInfo). You can view sample JSON payloads from these AVS documentation links as well.
 
 In case of lists, it is the responsibility of the platform to handle pagination. Alexa sends down the entire list as a JSON response and starts reading out the first five elements of the list. At the end of reading the first five elements it will prompt the user to see if they want to read the remaining elements from the list. If the user chooses to proceed with the remaining elements, Alexa sends down the entire list as a JSON response but starts reading from the sixth element onwards.
 
@@ -321,24 +321,105 @@ public class TemplateRuntimeHandler extends TemplateRuntime
 
 The Engine provides methods for notifying it of playback controller events. If the platform implements playback control features, it must inform the Engine.
 
+####PlayerInfo Only controls
+
+There are some playback controls, which are specific to the PlayerInfo template. This is for GUI implementations which use the PlayerInfo template as a reference for their GUI displays. The controls available, for a given service, come down with the playerInfo template. For toggles, the synced state is also provided by the PlayerInfo template.
+
+* Buttons
+	- Skip Forward ( service defined scrub forward )
+	- Skip Backward ( service defined scrub backward )
+* Toggles
+	- Shuffle ( toggle shuffle songs )
+	- Loop ( toggle playlist looping )
+	- Repeat ( toggle repeat current media once )
+	- Thumbs Up ( toggle thumbs up state )
+	- Thumbs Down ( toggle thumbs down state )
+
 To implement a custom handler for the playback controller, the `PlaybackController` class should be extended:
 
 ```
 public class PlaybackControllerHandler extends PlaybackController
 {
 	@Override
-    public void previousButtonPressed()
+    public void playButtonPressed()
     {
-		//notify the engine the previous button was pressed
-		super.previousButtonPressed();
-	...
 		//notify the engine the play button was pressed
-		playButtonPressed();
+		buttonPressed(PlaybackButton.PLAY);
 	...
 		//notify the engine the pause button was pressed
-		pauseButtonPressed();
+		buttonPressed(PlaybackButton.PAUSE);
 	...
-		//notify the engine the next button was pressed
-		nextButtonPressed();   
+	// after displaying controls given by PlayerInfo
+	public void skipForwardPressed()
+	{
+		//notify the engine that the skip forward button was pressed
+		buttonPressed(PlaybackButton.SKIP_FORWARD);
+	...
+
+	...
+		// toggle controls state is given by PlayerInfo
+		togglePressed(PlaybackButton.SHUFFLE, true); // should be called with opposing state from the PlayerInfo template
+
 ```
 
+## Alexa Engine Properties
+
+The Alexa module defines several constants that are used to get and set runtime properties in the Engine. To use these properties call the Engine's `getProperty()` and `setProperty()` methods.
+
+```
+// get the current locale setting from the Engine
+String locale = m_engine.getProperty( com.amazon.aace.alexa.AlexaProperties.LOCALE );
+
+// set the current locale setting in the Engine
+m_engine.setProperty( com.amazon.aace.alexa.AlexaProperties.LOCALE, "en-US" );
+```
+
+The following constants are defined in the Alexa module:
+
+<table>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>
+<code>com.amazon.aace.alexa.AlexaProperties.AVS_ENDPOINT</code>
+</td>
+<td>The value must be a valid AVS endpoint URL.
+</td>
+</tr>
+<tr>
+<td>
+<code>com.amazon.aace.alexa.AlexaProperties.WAKEWORD_SUPPORTED</code>
+</td>
+<td><p>Describes if wake word support is enabled. If wake word is not supported in the Engine, attempts to enable wake word detection by
+the <code>SpeechRecognizer</code> will fail.</p>
+<p><strong>Note</strong>: This is a read-only property.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>com.amazon.aace.alexa.AlexaProperties.FIRMWARE_VERSION</code>
+</td>
+<td>The firmware version that is reported to AVS. The value must be a positive, signed 32-bit integer represented as a string.
+</td>
+</tr>
+<tr>
+<td>
+<code>com.amazon.aace.alexa.AlexaProperties.LOCALE</code>
+</td>
+<td>The current locale setting for AVS. The value should be a valid locale accepted by AVS. Calling <code>Engine::getProperty()</code> with the <code>SUPPORTED_LOCALES</code> property provides the list of supported locales.
+</td>
+</tr>
+<tr>
+<td>
+<code>com.amazon.aace.alexa.AlexaProperties.SUPPORTED_LOCALES</code></li>
+</td>
+<td><p>AVS supported locales. The value is a comma-separated list, e.g. "de-DE,en-AU,..."</p>
+<p><strong>Note</strong>: This is a read-only property.</p>
+
+</td>
+</tr>
+</table>
+
+ See the API reference documentation for  [AlexaProperties](./aace/src/main/java/com/amazon/aace/alexa/AlexaProperties.java) for more information.

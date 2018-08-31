@@ -1,16 +1,8 @@
 python () {
     if not bb.data.inherits_class('native', d) and not bb.data.inherits_class('cross', d):
-        d.prependVar('PATH', "${AAC_HOSTTOOLS}:")
-        d.setVar('PKG_CONFIG', "${AAC_HOSTTOOLS}/pkg-config")
-        d.setVarFlag('PKG_CONFIG', "export", "1")
         d.delVar('PKG_CONFIG_PATH')
-        d.delVar('PKG_CONFIG_SYSROOT_DIR')
         d.delVar('PKG_CONFIG_SYSTEM_LIBRARY_PATH')
         d.delVar('PKG_CONFIG_SYSTEM_INCLUDE_PATH')
-        d.setVar('AAC_PKG_CONFIG_SYSROOT_DIR', "${STAGING_DIR_HOST}")
-        d.setVarFlag('AAC_PKG_CONFIG_SYSROOT_DIR', "export", "1")
-        d.setVar('AAC_PKG_CONFIG_PKG_CONFIG', "${STAGING_BINDIR_NATIVE}/pkg-config")
-        d.setVarFlag('AAC_PKG_CONFIG_PKG_CONFIG', "export", "1")
 }
 
 modify_find_root_path_mode() {

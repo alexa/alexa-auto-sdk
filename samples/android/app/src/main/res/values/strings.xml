@@ -23,6 +23,7 @@
     <string name="call_state_label">CALL STATE:</string>
     <string name="call_state_active">ACTIVE</string>
     <string name="call_state_idle">IDLE</string>
+    <string name="call_state_none">N/A</string>
 
     <!-- Config -->
     <string name="config">CONFIGURATION SETTINGS</string>
@@ -65,8 +66,8 @@
 
     <!-- Speaker Volume -->
     <string name="volume">VOLUME</string>
-    <string name="volume_synced">AVS-SYNCED ( AudioPlayer, SpeechSynthesizer )</string>
-    <string name="volume_local">LOCAL ( Alerts, Notifications )</string>
+    <string name="volume_speaker">SPEAKER ( AudioPlayer, SpeechSynthesizer )</string>
+    <string name="volume_alerts">ALERTS ( Alerts, Notifications )</string>
     <string name="volume_mute">MUTE</string>
     <string name="volume_unmute">UNMUTE</string>
 
@@ -96,5 +97,15 @@
     <string name="preference_product_id">Product ID Key</string>
     <string name="preference_product_dsn">Product DSN Key</string>
     <string name="preference_refresh_token">Refresh Token Key</string>
+    <string name="preference_login_method">Login Method Key</string>
 
+    <!-- Alexa Comms -->
+    <string name="alexa_comms_view_title">ALEXA COMMUNICATIONS</string>
+    <string name="alexa_comms_control_accept">Accept Call</string>
+    <string name="alexa_comms_control_stop">Stop Call</string>
+    <string name="alexa_comms_status_connecting">Connecting ...</string>
+    <string name="alexa_comms_status_connected">Call Connected</string>
+    <string name="alexa_comms_status_disconnected">Call Disconnected</string>
+    <string name="alexa_comms_status_inbound_ringing">Inbound Ringing</string>
+    <string name="alexa_comms_status_noactive_call">No Active Call</string>
 </resources>

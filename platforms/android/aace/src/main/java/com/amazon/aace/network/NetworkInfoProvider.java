@@ -13,9 +13,6 @@
  * permissions and limitations under the License.
  */
 
-// aace/network/NetworkInfoProvider.java
-// This is an automatically generated file.
-
 package com.amazon.aace.network;
 
 import com.amazon.aace.core.*;
@@ -30,6 +27,11 @@ abstract public class NetworkInfoProvider extends PlatformInterface
      */
     public enum NetworkStatus
     {
+        /**
+         * The network is unknown.
+         * @hideinitializer
+         */
+        UNKNOWN("UNKNOWN"),
         /**
          * The network is disconnected.
          * @hideinitializer
@@ -71,9 +73,6 @@ abstract public class NetworkInfoProvider extends PlatformInterface
         }
     }
 
-    /**
-     * NetworkInfoProvider should be extended to report network connectivity events to the Engine.
-     */
     public NetworkInfoProvider() {
     }
 

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Alexa Automotive Core SDK: aace::alexa::AuthProviderEngineInterface Class Reference</title>
+<title>Alexa Auto SDK: aace::alexa::AuthProviderEngineInterface Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,10 +22,9 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">Alexa Automotive Core SDK
-   &#160;<span id="projectnumber">1.0.0</span>
+   <div id="projectname">Alexa Auto SDK
+   &#160;<span id="projectnumber">1.1.0</span>
    </div>
-   <div id="projectbrief">Alexa Auto Core SDK for interacting with the Alexa Voice Service</div>
   </td>
  </tr>
  </tbody>
@@ -99,9 +98,21 @@ Public Types</h2></td></tr>
 <br />
 &#160;&#160;<a class="el" href="classaace_1_1alexa_1_1_auth_provider_engine_interface.html#a006d3fd3bee07feafa325968054abc37ab8c9d7ce4c399c56136475f36309020f">AuthError::INVALID_REQUEST</a>, 
 <br />
+&#160;&#160;<a class="el" href="classaace_1_1alexa_1_1_auth_provider_engine_interface.html#a006d3fd3bee07feafa325968054abc37ad8f24f388e990b9ccf8905b7993b99ae">AuthError::INVALID_VALUE</a>, 
+<br />
 &#160;&#160;<a class="el" href="classaace_1_1alexa_1_1_auth_provider_engine_interface.html#a006d3fd3bee07feafa325968054abc37ab5070f2cd4c592acd39c78b2023a56d3">AuthError::AUTHORIZATION_EXPIRED</a>, 
 <br />
-&#160;&#160;<a class="el" href="classaace_1_1alexa_1_1_auth_provider_engine_interface.html#a006d3fd3bee07feafa325968054abc37a58c1573951cde96d85d8fc7c0c850889">AuthError::UNSUPPORTED_GRANT_TYPE</a>
+&#160;&#160;<a class="el" href="classaace_1_1alexa_1_1_auth_provider_engine_interface.html#a006d3fd3bee07feafa325968054abc37a58c1573951cde96d85d8fc7c0c850889">AuthError::UNSUPPORTED_GRANT_TYPE</a>, 
+<br />
+&#160;&#160;<a class="el" href="classaace_1_1alexa_1_1_auth_provider_engine_interface.html#a006d3fd3bee07feafa325968054abc37a12c3d12888b38141abcbee72ee836587">AuthError::INVALID_CODE_PAIR</a>, 
+<br />
+&#160;&#160;<a class="el" href="classaace_1_1alexa_1_1_auth_provider_engine_interface.html#a006d3fd3bee07feafa325968054abc37a6b627cb5218d413b73e27bed70c35a3d">AuthError::AUTHORIZATION_PENDING</a>, 
+<br />
+&#160;&#160;<a class="el" href="classaace_1_1alexa_1_1_auth_provider_engine_interface.html#a006d3fd3bee07feafa325968054abc37a4a0a2ddc7446f94d38bcdd71e9bd4ee6">AuthError::SLOW_DOWN</a>, 
+<br />
+&#160;&#160;<a class="el" href="classaace_1_1alexa_1_1_auth_provider_engine_interface.html#a006d3fd3bee07feafa325968054abc37ae8c0c70879b5895c615677261d64a1ee">AuthError::INTERNAL_ERROR</a>, 
+<br />
+&#160;&#160;<a class="el" href="classaace_1_1alexa_1_1_auth_provider_engine_interface.html#a006d3fd3bee07feafa325968054abc37a4ef167bea8f7fa2a2cfd2934ea952ce3">AuthError::INVALID_CBL_CLIENT_ID</a>
 <br />
  }</td></tr>
 <tr class="separator:a006d3fd3bee07feafa325968054abc37"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -175,9 +186,21 @@ Public Types</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><a id="a006d3fd3bee07feafa325968054abc37ab8c9d7ce4c399c56136475f36309020f"></a>INVALID_REQUEST&#160;</td><td class="fielddoc"><p>The request is missing a required parameter, has an invalid value, or is otherwise malformed. </p>
 </td></tr>
+<tr><td class="fieldname"><a id="a006d3fd3bee07feafa325968054abc37ad8f24f388e990b9ccf8905b7993b99ae"></a>INVALID_VALUE&#160;</td><td class="fielddoc"><p>One of the values in the request was invalid. </p>
+</td></tr>
 <tr><td class="fieldname"><a id="a006d3fd3bee07feafa325968054abc37ab5070f2cd4c592acd39c78b2023a56d3"></a>AUTHORIZATION_EXPIRED&#160;</td><td class="fielddoc"><p>The authorization code is invalid, expired, revoked, or was issued to a different client. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="a006d3fd3bee07feafa325968054abc37a58c1573951cde96d85d8fc7c0c850889"></a>UNSUPPORTED_GRANT_TYPE&#160;</td><td class="fielddoc"><p>The client specified the wrong token type. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a006d3fd3bee07feafa325968054abc37a12c3d12888b38141abcbee72ee836587"></a>INVALID_CODE_PAIR&#160;</td><td class="fielddoc"><p>Invalid code pair provided in Code-based linking token request. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a006d3fd3bee07feafa325968054abc37a6b627cb5218d413b73e27bed70c35a3d"></a>AUTHORIZATION_PENDING&#160;</td><td class="fielddoc"><p>Waiting for user to authorize the specified code pair. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a006d3fd3bee07feafa325968054abc37a4a0a2ddc7446f94d38bcdd71e9bd4ee6"></a>SLOW_DOWN&#160;</td><td class="fielddoc"><p>Client should slow down in the rate of requests polling for an access token. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a006d3fd3bee07feafa325968054abc37ae8c0c70879b5895c615677261d64a1ee"></a>INTERNAL_ERROR&#160;</td><td class="fielddoc"><p>Internal error in client code. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a006d3fd3bee07feafa325968054abc37a4ef167bea8f7fa2a2cfd2934ea952ce3"></a>INVALID_CBL_CLIENT_ID&#160;</td><td class="fielddoc"><p>Client ID not valid for use with code based linking. </p>
 </td></tr>
 </table>
 
@@ -188,7 +211,7 @@ Public Types</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Automotive Core SDK 1.0.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 1.1.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

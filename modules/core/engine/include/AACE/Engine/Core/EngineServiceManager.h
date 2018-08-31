@@ -16,6 +16,8 @@
 #ifndef AACE_ENGINE_CORE_ENGINE_SERVICE_MANAGER_H
 #define AACE_ENGINE_CORE_ENGINE_SERVICE_MANAGER_H
 
+#include <functional>
+
 #include "EngineService.h"
 
 namespace aace {

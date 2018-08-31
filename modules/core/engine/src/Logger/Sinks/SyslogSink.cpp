@@ -66,6 +66,10 @@ void SyslogSink::log( Level level, std::chrono::system_clock::time_point time, c
         case Level::CRITICAL:
             syslogLevel = LOG_CRIT;
             break;
+            
+        case Level::METRIC:
+            syslogLevel = LOG_INFO;
+            break;
     }
     
     syslog( syslogLevel, "%s", LogFormatter::format( level, std::chrono::system_clock::time_point(), threadMoniker, text ).c_str() );

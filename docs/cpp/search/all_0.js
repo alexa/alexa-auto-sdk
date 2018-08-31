@@ -13,10 +13,12 @@ var searchData=
   ['autherror',['AuthError',['../classaace_1_1alexa_1_1_auth_provider_engine_interface.html#a006d3fd3bee07feafa325968054abc37',1,'aace::alexa::AuthProviderEngineInterface::AuthError()'],['../classaace_1_1alexa_1_1_auth_provider.html#a6f44b8c435407a4ff782fd931afc05ab',1,'aace::alexa::AuthProvider::AuthError()']]],
   ['authorization_5fexpired',['AUTHORIZATION_EXPIRED',['../classaace_1_1alexa_1_1_auth_provider_engine_interface.html#a006d3fd3bee07feafa325968054abc37ab5070f2cd4c592acd39c78b2023a56d3',1,'aace::alexa::AuthProviderEngineInterface']]],
   ['authorization_5ffailed',['AUTHORIZATION_FAILED',['../classaace_1_1alexa_1_1_auth_provider_engine_interface.html#a006d3fd3bee07feafa325968054abc37adce1442cd971edf5002db43b36fffa35',1,'aace::alexa::AuthProviderEngineInterface']]],
+  ['authorization_5fpending',['AUTHORIZATION_PENDING',['../classaace_1_1alexa_1_1_auth_provider_engine_interface.html#a006d3fd3bee07feafa325968054abc37a6b627cb5218d413b73e27bed70c35a3d',1,'aace::alexa::AuthProviderEngineInterface']]],
   ['authprovider',['AuthProvider',['../classaace_1_1alexa_1_1_auth_provider.html',1,'aace::alexa']]],
   ['authproviderengineinterface',['AuthProviderEngineInterface',['../classaace_1_1alexa_1_1_auth_provider_engine_interface.html',1,'aace::alexa']]],
   ['authstate',['AuthState',['../classaace_1_1alexa_1_1_auth_provider_engine_interface.html#abe4ab37548dfaf7744afe9078e1792ec',1,'aace::alexa::AuthProviderEngineInterface::AuthState()'],['../classaace_1_1alexa_1_1_auth_provider.html#a703c765e6cb7c747a9fc6a12d81b7ef4',1,'aace::alexa::AuthProvider::AuthState()']]],
   ['authstatechanged',['authStateChanged',['../classaace_1_1alexa_1_1_alexa_client.html#a6b469f0511ffdea1083044f0fe9f421e',1,'aace::alexa::AlexaClient::authStateChanged()'],['../classaace_1_1alexa_1_1_auth_provider.html#a38e948a90a4e5ef46e2bdc34eb0b19cf',1,'aace::alexa::AuthProvider::authStateChanged()']]],
-  ['avs_5fsynced',['AVS_SYNCED',['../classaace_1_1alexa_1_1_speaker.html#ae11df0cc137eb21d1c762303e0f7158eab7dadd69a14fa73e26ba543bbe4bdbeb',1,'aace::alexa::Speaker']]],
-  ['alexa_20auto_20core_20engine',['Alexa Auto Core Engine',['../index.html',1,'']]]
+  ['avs_5falerts_5fvolume',['AVS_ALERTS_VOLUME',['../classaace_1_1alexa_1_1_speaker.html#ae11df0cc137eb21d1c762303e0f7158eae7c3740e167227c69730501b5aaf0600',1,'aace::alexa::Speaker']]],
+  ['avs_5fspeaker_5fvolume',['AVS_SPEAKER_VOLUME',['../classaace_1_1alexa_1_1_speaker.html#ae11df0cc137eb21d1c762303e0f7158eaafb2a925f44a0b297bb16586a46dce7f',1,'aace::alexa::Speaker']]],
+  ['alexa_20auto_20sdk_20for_20c_2b_2b',['Alexa Auto SDK for C++',['../index.html',1,'']]]
 ];

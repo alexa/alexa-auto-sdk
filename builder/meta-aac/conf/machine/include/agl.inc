@@ -1,15 +1,20 @@
 TARGET_VENDOR = "-agl"
 
-AGL_VERSION ?= "4.0.2"
+AGL_SDK ?= "/opt/poky-agl/5.1.0"
 
-export SDKTARGETSYSROOT = "/opt/poky-agl/${AGL_VERSION}/sysroots/${TARGET_SYS}"
-OECORE_NATIVE_SYSROOT = "/opt/poky-agl/${AGL_VERSION}/sysroots/x86_64-aglsdk-linux"
+TARGET_SYSROOT = "${AGL_SDK}/sysroots/${TARGET_SYS}"
+OECORE_NATIVE_SYSROOT = "${AGL_SDK}/sysroots/x86_64-aglsdk-linux"
 
 # CMake
-OECMAKE_EXTRA_ROOT_PATH += "${SDKTARGETSYSROOT}"
+OECMAKE_EXTRA_ROOT_PATH += "${TARGET_SYSROOT}"
+# Newer version of LD linker has some strange behavior: -rpath will be
+# ignored to search indirect dependencies. Only -rpath-link seems to
+# be working.
+OECMAKE_C_LINK_FLAGS += "-Wl,-rpath-link,${STAGING_DIR_HOST}${libdir}"
+OECMAKE_CXX_LINK_FLAGS += "-Wl,-rpath-link,${STAGING_DIR_HOST}${libdir}"
 
 # Use external OE toolchain
-TOOLCHAIN_OPTIONS = " --sysroot=${SDKTARGETSYSROOT}"
+TOOLCHAIN_OPTIONS = " --sysroot=${TARGET_SYSROOT}"
 
 # Add toolchain path
 PATH_prepend = "${OECORE_NATIVE_SYSROOT}/usr/bin/${TARGET_SYS}:"

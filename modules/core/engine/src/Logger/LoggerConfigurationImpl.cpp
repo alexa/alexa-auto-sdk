@@ -56,6 +56,9 @@ std::shared_ptr<aace::core::config::EngineConfiguration> createSinkConfig( const
     std::string levelStr;
     
     switch( level ) {
+        case aace::logger::config::LoggerConfiguration::Level::METRIC:
+            levelStr = "METRIC";
+            break;
         case aace::logger::config::LoggerConfiguration::Level::CRITICAL:
             levelStr = "CRITICAL";
             break;
@@ -148,6 +151,9 @@ std::shared_ptr<aace::core::config::EngineConfiguration> LoggerConfiguration::cr
     std::string levelStr;
     
     switch( level ) {
+        case aace::logger::config::LoggerConfiguration::Level::METRIC:
+            levelStr = "METRIC";
+            break;
         case aace::logger::config::LoggerConfiguration::Level::CRITICAL:
             levelStr = "CRITICAL";
             break;

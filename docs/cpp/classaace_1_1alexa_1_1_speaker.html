@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Alexa Automotive Core SDK: aace::alexa::Speaker Class Reference</title>
+<title>Alexa Auto SDK: aace::alexa::Speaker Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,10 +22,9 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">Alexa Automotive Core SDK
-   &#160;<span id="projectnumber">1.0.0</span>
+   <div id="projectname">Alexa Auto SDK
+   &#160;<span id="projectnumber">1.1.0</span>
    </div>
-   <div id="projectbrief">Alexa Auto Core SDK for interacting with the Alexa Voice Service</div>
   </td>
  </tr>
  </tbody>
@@ -77,9 +76,9 @@ $(function() {
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
 <tr class="memitem:ae11df0cc137eb21d1c762303e0f7158e"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_speaker.html#ae11df0cc137eb21d1c762303e0f7158e">Type</a> { <br />
-&#160;&#160;<a class="el" href="classaace_1_1alexa_1_1_speaker.html#ae11df0cc137eb21d1c762303e0f7158eab7dadd69a14fa73e26ba543bbe4bdbeb">Type::AVS_SYNCED</a>, 
+&#160;&#160;<a class="el" href="classaace_1_1alexa_1_1_speaker.html#ae11df0cc137eb21d1c762303e0f7158eaafb2a925f44a0b297bb16586a46dce7f">Type::AVS_SPEAKER_VOLUME</a>, 
 <br />
-&#160;&#160;<a class="el" href="classaace_1_1alexa_1_1_speaker.html#ae11df0cc137eb21d1c762303e0f7158ea54b4c4075463b2e02cd69f5cd139b5b2">Type::LOCAL</a>
+&#160;&#160;<a class="el" href="classaace_1_1alexa_1_1_speaker.html#ae11df0cc137eb21d1c762303e0f7158eae7c3740e167227c69730501b5aaf0600">Type::AVS_ALERTS_VOLUME</a>
 <br />
  }</td></tr>
 <tr class="separator:ae11df0cc137eb21d1c762303e0f7158e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -127,9 +126,9 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Specifies the type of the <a class="el" href="classaace_1_1alexa_1_1_speaker.html">Speaker</a> </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ae11df0cc137eb21d1c762303e0f7158eab7dadd69a14fa73e26ba543bbe4bdbeb"></a>AVS_SYNCED&#160;</td><td class="fielddoc"><p>The <a class="el" href="classaace_1_1alexa_1_1_speaker.html">Speaker</a> type that is controlled by AVS </p>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ae11df0cc137eb21d1c762303e0f7158eaafb2a925f44a0b297bb16586a46dce7f"></a>AVS_SPEAKER_VOLUME&#160;</td><td class="fielddoc"><p>The <a class="el" href="classaace_1_1alexa_1_1_speaker.html">Speaker</a> type that is controlled by AVS </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ae11df0cc137eb21d1c762303e0f7158ea54b4c4075463b2e02cd69f5cd139b5b2"></a>LOCAL&#160;</td><td class="fielddoc"><p>The <a class="el" href="classaace_1_1alexa_1_1_speaker.html">Speaker</a> type that is controlled locally by the platform </p>
+<tr><td class="fieldname"><a id="ae11df0cc137eb21d1c762303e0f7158eae7c3740e167227c69730501b5aaf0600"></a>AVS_ALERTS_VOLUME&#160;</td><td class="fielddoc"><p>The <a class="el" href="classaace_1_1alexa_1_1_speaker.html">Speaker</a> type that is controlled locally by the platform </p>
 </td></tr>
 </table>
 
@@ -307,7 +306,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Notifies the Engine of a volume change event originating on the platform, such as a user pressing a "volume up" or "volume down" button. If the <a class="el" href="classaace_1_1alexa_1_1_speaker.html">Speaker</a> is <code><a class="el" href="classaace_1_1alexa_1_1_speaker.html#ae11df0cc137eb21d1c762303e0f7158eab7dadd69a14fa73e26ba543bbe4bdbeb">Type::AVS_SYNCED</a></code>, the Engine will respond with a call to <code><a class="el" href="classaace_1_1alexa_1_1_speaker.html#a06f376ab6028d0578faf2fe4be06b52b">setVolume()</a></code> on each AVS-synced <a class="el" href="classaace_1_1alexa_1_1_speaker.html">Speaker</a>.</p>
+<p>Notifies the Engine of a volume change event originating on the platform, such as a user pressing a "volume up" or "volume down" button. If the <a class="el" href="classaace_1_1alexa_1_1_speaker.html">Speaker</a> is <code><a class="el" href="classaace_1_1alexa_1_1_speaker.html#ae11df0cc137eb21d1c762303e0f7158eaafb2a925f44a0b297bb16586a46dce7f">Type::AVS_SPEAKER_VOLUME</a></code>, the Engine will respond with a call to <code><a class="el" href="classaace_1_1alexa_1_1_speaker.html#a06f376ab6028d0578faf2fe4be06b52b">setVolume()</a></code> on each AVS-synced <a class="el" href="classaace_1_1alexa_1_1_speaker.html">Speaker</a>.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">volume</td><td>The new volume setting of the <a class="el" href="classaace_1_1alexa_1_1_speaker.html">Speaker</a>. The <code>volume</code> reported must be scaled to the range [0,100].</td></tr>
@@ -333,7 +332,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Notifies the Engine of a mute setting change event originating on the platform, such as a user pressing a "mute" button. If the <a class="el" href="classaace_1_1alexa_1_1_speaker.html">Speaker</a> is <code><a class="el" href="classaace_1_1alexa_1_1_speaker.html#ae11df0cc137eb21d1c762303e0f7158eab7dadd69a14fa73e26ba543bbe4bdbeb">Type::AVS_SYNCED</a></code>, the Engine will respond with a call to <code><a class="el" href="classaace_1_1alexa_1_1_speaker.html#a10b28f30019cd594e369ade3f5cb4bb6">setMute()</a></code> on each AVS-synced <a class="el" href="classaace_1_1alexa_1_1_speaker.html">Speaker</a>.</p>
+<p>Notifies the Engine of a mute setting change event originating on the platform, such as a user pressing a "mute" button. If the <a class="el" href="classaace_1_1alexa_1_1_speaker.html">Speaker</a> is <code><a class="el" href="classaace_1_1alexa_1_1_speaker.html#ae11df0cc137eb21d1c762303e0f7158eaafb2a925f44a0b297bb16586a46dce7f">Type::AVS_SPEAKER_VOLUME</a></code>, the Engine will respond with a call to <code><a class="el" href="classaace_1_1alexa_1_1_speaker.html#a10b28f30019cd594e369ade3f5cb4bb6">setMute()</a></code> on each AVS-synced <a class="el" href="classaace_1_1alexa_1_1_speaker.html">Speaker</a>.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">mute</td><td>The new mute setting of the <a class="el" href="classaace_1_1alexa_1_1_speaker.html">Speaker</a>. <code>true</code> when the <a class="el" href="classaace_1_1alexa_1_1_speaker.html">Speaker</a> is muted, else <code>false</code> </td></tr>
@@ -349,7 +348,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Automotive Core SDK 1.0.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 1.1.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

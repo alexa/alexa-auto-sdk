@@ -101,6 +101,8 @@ std::shared_ptr<Rule> Rule::create( const std::string& level, const std::string&
     }
     else if( lvlUp.compare( "INFO" ) == 0 ) {
         lv = Level::INFO;
+    } else if( lvlUp.compare( "METRIC" ) == 0 ) {
+        lv = Level::METRIC;
     }
     else {
         lv = Level::VERBOSE;

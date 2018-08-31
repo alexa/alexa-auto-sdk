@@ -50,6 +50,7 @@
 #include <AVSCommon/SDKInterfaces/AuthDelegateInterface.h>
 #include <AVSCommon/SDKInterfaces/Storage/MiscStorageInterface.h>
 #include <AVSCommon/Utils/Threading/Executor.h>
+#include <InteractionModel/InteractionModelCapabilityAgent.h>
 #include <ADSL/MessageInterpreter.h>
 #include <ACL/Transport/PostConnectSynchronizerFactory.h>
 #include <ACL/Transport/TransportFactoryInterface.h>
@@ -64,6 +65,7 @@
 #include <System/SoftwareInfoSender.h>
 #include <CertifiedSender/CertifiedSender.h>
 #include <CapabilitiesDelegate/CapabilitiesDelegate.h>
+#include <RegistrationManager/RegistrationManager.h>
 
 #include <SpeakerManager/SpeakerManager.h>
 #include <Settings/Settings.h>
@@ -71,6 +73,8 @@
 
 #include "AACE/Engine/Core/EngineService.h"
 #include "AACE/Engine/Location/LocationEngineService.h"
+#include "AACE/Engine/Network/NetworkEngineService.h"
+#include "AACE/Engine/Network/NetworkInfoObserver.h"
 
 #include "AlexaEngineLogger.h"
 #include "AlexaEngineClientObserver.h"
@@ -97,10 +101,11 @@ class AlexaEngineService :
     public aace::engine::core::EngineService,
     public alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface,
     public alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesObserverInterface,
+    public aace::engine::network::NetworkInfoObserver,
     public std::enable_shared_from_this<AlexaEngineService> {
 
 public:
-    DESCRIBE("aace.alexa",VERSION("1.0"),DEPENDS(aace::engine::location::LocationEngineService))
+    DESCRIBE("aace.alexa",VERSION("1.0"),DEPENDS(aace::engine::location::LocationEngineService),DEPENDS(aace::engine::network::NetworkEngineService))
 
 private:
     AlexaEngineService( const aace::engine::core::ServiceDescription& description );
@@ -125,18 +130,38 @@ public:
         return m_contextManager;
     }
 
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> getConnectionManager() {
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> getMessageSender() {
         return m_connectionManager;
+    }
+
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSConnectionManagerInterface> getConnectionManager() {
+        return m_connectionManager;
+    }
+
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> getAudioFocusManager() {
+        return m_audioFocusManager;
+    }
+
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> getSpeakerManager() {
+        return m_speakerManager;
+    }
+
+    std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> getDialogUXStateAggregator() {
+        return m_dialogUXStateAggregator;
     }
 
     // alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface
     void onAuthStateChange( AuthObserverInterface::State newState, AuthObserverInterface::Error error ) override;
 
     // alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesObserverInterface
-    void onCapabilitiesStateChange(CapabilitiesObserverInterface::State newState, CapabilitiesObserverInterface::Error newError) override;
+    void onCapabilitiesStateChange( CapabilitiesObserverInterface::State newState, CapabilitiesObserverInterface::Error newError ) override;
+
+    // aace::engine::network::NetworkInfoObserver
+    void onNetworkInfoChanged( NetworkInfoObserver::NetworkStatus status, int wifiSignalStrength ) override;
 
 protected:
     bool configure( const std::vector<std::shared_ptr<std::istream>>& configuration ) override;
+    bool setup() override;
     bool start() override;
     bool stop() override;
     bool shutdown() override;
@@ -153,14 +178,10 @@ private:
      *      "system": {
      *          "firmwareVersion": <FIRMWARE_VERSION>
      *      }
-     *      "audioFormat": {
-     *          "encoding": "<ENCODIING>", // PCM, OPUS
-     *          "channels": <NUM_CHANNELS>, // 1, 2
-     *          "layout": "<LAYOUT>", // NON_INTERLEAVED, INTERLEAVED
-     *          "rate": <SAMPLE_RATE>, // 16000
-     *          "size": <SAMPLE_SIZE>, // 16
-     *          "endian": "<ENDIAN>", // LITTLE, BIG
-     *          "signed": <SIGNED> // bool
+     *      "speechRecognizer": {
+     *          "encoder": {
+     *              "name": "<ENCODER>" // OPUS
+     *          }
      *      }
      *   }
      * }
@@ -229,7 +250,8 @@ private:
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> m_visualFocusManager;
     std::shared_ptr<AuthDelegateRouter> m_authDelegateRouter;
     std::shared_ptr<alexaClientSDK::capabilitiesDelegate::CapabilitiesDelegate> m_capabilitiesDelegate;
-
+    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> m_customerDataManager;
+    std::shared_ptr<alexaClientSDK::capabilityAgents::interactionModel::InteractionModelCapabilityAgent> m_interactionModelCapabilityAgent;
     std::string m_endpoint = "https://avs-alexa-na.amazon.com";
     std::string m_capabilitiesEndpoint = "https://api.amazonalexa.com";
     alexaClientSDK::avsCommon::sdkInterfaces::softwareInfo::FirmwareVersion m_firmwareVersion = 1;
@@ -237,9 +259,15 @@ private:
 
     bool m_configured = false;
     AuthObserverInterface::State m_authState;
-
+    NetworkInfoObserver::NetworkStatus m_networkStatus;
+    
     bool m_capabilitiesConfigured = false;
-    bool m_locationProviderConfigued = false;
+    bool m_connecting = false;
+
+    std::mutex m_connectionMutex;
+
+    std::string m_encoderName;
+    bool m_encoderEnabled;
 
     // engine implementation object references
     std::shared_ptr<aace::engine::alexa::AlexaClientEngineImpl> m_alexaClientEngineImpl;
@@ -342,12 +370,21 @@ private:
 //
 
 class SystemSpeaker : public alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface {
+
 public:
+    SystemSpeaker() {
+        m_mute = false;
+        m_volume = 50;
+    }
     bool setVolume( int8_t volume ) override;
     bool adjustVolume( int8_t delta ) override;
     bool setMute( bool mute ) override;
     bool getSpeakerSettings( SpeakerSettings* settings ) override;
     Type getSpeakerType() override;
+
+private:
+    int8_t m_volume;
+    bool m_mute;
 };
 
 } // aace::engine::alexa

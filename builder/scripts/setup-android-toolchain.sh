@@ -65,8 +65,14 @@ generate_toolchain() {
 		x86)
 			ARCH="x86"
 			;;
+		x86_64)
+			ARCH="x86_64"
+			;;
 		armeabi-v7a)
 			ARCH="arm"
+			;;
+		arm64-v8a)
+			ARCH="arm64"
 			;;
 		*)
 			error "Unknown ABI: ${ANDROID_ABI}"

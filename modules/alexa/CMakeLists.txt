@@ -19,6 +19,12 @@ endif()
 set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -Wall -O2")
 set(CMAKE_CXX_FLAGS_DEBUG "-DDEBUG -DAACE_DEBUG_LOG_ENABLED -Wall -g")
 
+if (AAC_EMIT_LATENCY_LOGS)
+add_definitions(-DACSDK_LATENCY_LOG_ENABLED)
+add_definitions(-DACSDK_LOG_MODULE=avsCommon)
+add_definitions(-DAAC_LATENCY_LOGS_ENABLED)
+endif()
+
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
 # Alexa module is depends on Core module

@@ -20,27 +20,15 @@ namespace alexa {
 
 PlaybackController::~PlaybackController() = default; // key function
 
-void PlaybackController::playButtonPressed() {
+void PlaybackController::buttonPressed(PlaybackButton button) {
     if( m_playbackControllerEngineInterface != nullptr ) {
-        m_playbackControllerEngineInterface->onPlayButtonPressed();
+        m_playbackControllerEngineInterface->onButtonPressed(button);
     }
 }
 
-void PlaybackController::pauseButtonPressed() {
+void PlaybackController::togglePressed(PlaybackToggle toggle, bool action) {
     if( m_playbackControllerEngineInterface != nullptr ) {
-        m_playbackControllerEngineInterface->onPauseButtonPressed();
-    }
-}
-
-void PlaybackController::nextButtonPressed() {
-    if( m_playbackControllerEngineInterface != nullptr ) {
-        m_playbackControllerEngineInterface->onNextButtonPressed();
-    }
-}
-
-void PlaybackController::previousButtonPressed() {
-    if( m_playbackControllerEngineInterface != nullptr ) {
-        m_playbackControllerEngineInterface->onPreviousButtonPressed();
+        m_playbackControllerEngineInterface->onTogglePressed(toggle, action);
     }
 }
 

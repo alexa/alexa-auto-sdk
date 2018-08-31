@@ -1,0 +1,843 @@
+From 9055b8dd917d27533d5bf6f1bcc7845720a44783 Mon Sep 17 00:00:00 2001
+From: Shotaro Uchida <shotaru@amazon.com>
+Date: Tue, 28 Aug 2018 13:51:42 -0700
+Subject: [PATCH 1/3] SpeechEncoder: Introduce SpeechEncoder with OPUS support
+
+---
+ CMakeLists.txt                                |   1 +
+ SpeechEncoder/CMakeLists.txt                  |   9 +
+ .../OpusEncoderContext/CMakeLists.txt         |   6 +
+ .../SpeechEncoder/OpusEncoderContext.h        |  61 +++++
+ .../OpusEncoderContext/src/CMakeLists.txt     |  30 +++
+ .../src/OpusEncoderContext.cpp                | 208 ++++++++++++++++++
+ .../include/SpeechEncoder/SpeechEncoder.h     |  88 ++++++++
+ SpeechEncoder/src/CMakeLists.txt              |  18 ++
+ SpeechEncoder/src/SpeechEncoder.cpp           | 182 +++++++++++++++
+ SpeechEncoder/test/CMakeLists.txt             |   1 +
+ SpeechEncoder/test/SpeechEncoderTest.cpp      | 130 +++++++++++
+ 11 files changed, 734 insertions(+)
+ create mode 100644 SpeechEncoder/CMakeLists.txt
+ create mode 100644 SpeechEncoder/OpusEncoderContext/CMakeLists.txt
+ create mode 100644 SpeechEncoder/OpusEncoderContext/include/SpeechEncoder/OpusEncoderContext.h
+ create mode 100644 SpeechEncoder/OpusEncoderContext/src/CMakeLists.txt
+ create mode 100644 SpeechEncoder/OpusEncoderContext/src/OpusEncoderContext.cpp
+ create mode 100644 SpeechEncoder/include/SpeechEncoder/SpeechEncoder.h
+ create mode 100644 SpeechEncoder/src/CMakeLists.txt
+ create mode 100644 SpeechEncoder/src/SpeechEncoder.cpp
+ create mode 100644 SpeechEncoder/test/CMakeLists.txt
+ create mode 100644 SpeechEncoder/test/SpeechEncoderTest.cpp
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9f43edf6f..03947ae3a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -39,6 +39,7 @@ add_subdirectory("MediaPlayer")
+ add_subdirectory("ESP")
+ add_subdirectory("RegistrationManager")
+ add_subdirectory("SampleApp")
++add_subdirectory("SpeechEncoder")
+ add_subdirectory("Storage")
+ add_subdirectory("doc")
+ 
+diff --git a/SpeechEncoder/CMakeLists.txt b/SpeechEncoder/CMakeLists.txt
+new file mode 100644
+index 000000000..f7ff8fe31
+--- /dev/null
++++ b/SpeechEncoder/CMakeLists.txt
+@@ -0,0 +1,9 @@
++cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
++project(SpeechEncoder LANGUAGES CXX)
++
++add_subdirectory("src")
++add_subdirectory("test")
++
++if(OPUS)
++	add_subdirectory("OpusEncoderContext")
++endif()
+\ No newline at end of file
+diff --git a/SpeechEncoder/OpusEncoderContext/CMakeLists.txt b/SpeechEncoder/OpusEncoderContext/CMakeLists.txt
+new file mode 100644
+index 000000000..76287494b
+--- /dev/null
++++ b/SpeechEncoder/OpusEncoderContext/CMakeLists.txt
+@@ -0,0 +1,6 @@
++cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
++project(OpusEncoderContext LANGUAGES CXX)
++
++include(../../build/BuildDefaults.cmake)
++
++add_subdirectory("src")
+diff --git a/SpeechEncoder/OpusEncoderContext/include/SpeechEncoder/OpusEncoderContext.h b/SpeechEncoder/OpusEncoderContext/include/SpeechEncoder/OpusEncoderContext.h
+new file mode 100644
+index 000000000..136f134ad
+--- /dev/null
++++ b/SpeechEncoder/OpusEncoderContext/include/SpeechEncoder/OpusEncoderContext.h
+@@ -0,0 +1,61 @@
++/*
++ * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License").
++ * You may not use this file except in compliance with the License.
++ * A copy of the License is located at
++ *
++ *     http://aws.amazon.com/apache2.0/
++ *
++ * or in the "license" file accompanying this file. This file is distributed
++ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied. See the License for the specific language governing
++ * permissions and limitations under the License.
++ */
++
++#ifndef ALEXA_CLIENT_SDK_SPEECHENCODER_INCLUDE_SPEECHENCODER_OPUSSPEECHENCODER_H_
++#define ALEXA_CLIENT_SDK_SPEECHENCODER_INCLUDE_SPEECHENCODER_OPUSSPEECHENCODER_H_
++
++#include <memory>
++
++#include "SpeechEncoder/SpeechEncoder.h"
++
++#ifdef OPUS_H
++#define OPUS_ENCODER OpusEncoder
++#else
++#define OPUS_ENCODER void
++#endif
++
++namespace alexaClientSDK {
++namespace speechencoder {
++
++class OpusEncoderContext : public EncoderContext {
++public:
++    static std::shared_ptr<OpusEncoderContext> create();
++
++    ~OpusEncoderContext();
++
++    bool init(alexaClientSDK::avsCommon::utils::AudioFormat inputFormat) override;
++
++    size_t getInputFrameSize() override;
++    size_t getOutputFrameSize() override;
++    alexaClientSDK::avsCommon::utils::AudioFormat getAudioFormat() override;
++    std::string getAVSFormatName() override;
++
++    bool start() override;
++    ssize_t processSamples(void *samples, size_t nWords, uint8_t *buffer) override;
++    void close() override;
++
++private:
++    OpusEncoderContext();
++
++    OPUS_ENCODER *m_encoder;
++    alexaClientSDK::avsCommon::utils::AudioFormat m_outputFormat;
++    alexaClientSDK::avsCommon::utils::AudioFormat m_inputFormat;
++
++};
++
++} // alexaClientSDK::speechencoder
++} // alexaClientSDK
++
++#endif // ALEXA_CLIENT_SDK_SPEECHENCODER_INCLUDE_SPEECHENCODER_OPUSSPEECHENCODER_H_
+\ No newline at end of file
+diff --git a/SpeechEncoder/OpusEncoderContext/src/CMakeLists.txt b/SpeechEncoder/OpusEncoderContext/src/CMakeLists.txt
+new file mode 100644
+index 000000000..00b398505
+--- /dev/null
++++ b/SpeechEncoder/OpusEncoderContext/src/CMakeLists.txt
+@@ -0,0 +1,30 @@
++add_definitions("-DACSDK_LOG_MODULE=opusEncoderContext")
++
++add_library(OpusEncoderContext SHARED
++OpusEncoderContext.cpp)
++
++find_path(OPUS_INCLUDE_DIR opus)
++find_library(OPUS_LIBRARY opus)
++
++if(NOT OPUS_LIBRARY)
++	message(FATAL_ERROR "Cannot find libopus")
++endif()
++
++target_include_directories(OpusEncoderContext
++	PUBLIC
++		"${SpeechEncoder_SOURCE_DIR}/include"
++		"${OpusEncoderContext_SOURCE_DIR}/include"
++	PRIVATE
++		${OPUS_INCLUDE_DIR}
++)
++
++target_link_libraries(OpusEncoderContext
++	PUBLIC
++		SpeechEncoder
++		AVSCommon
++	PRIVATE
++		${OPUS_LIBRARY}
++)
++
++# install target
++asdk_install()
+\ No newline at end of file
+diff --git a/SpeechEncoder/OpusEncoderContext/src/OpusEncoderContext.cpp b/SpeechEncoder/OpusEncoderContext/src/OpusEncoderContext.cpp
+new file mode 100644
+index 000000000..e4f7e5bdd
+--- /dev/null
++++ b/SpeechEncoder/OpusEncoderContext/src/OpusEncoderContext.cpp
+@@ -0,0 +1,208 @@
++/*
++ * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License").
++ * You may not use this file except in compliance with the License.
++ * A copy of the License is located at
++ *
++ *     http://aws.amazon.com/apache2.0/
++ *
++ * or in the "license" file accompanying this file. This file is distributed
++ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied. See the License for the specific language governing
++ * permissions and limitations under the License.
++ */
++
++#include <iostream>
++#include <climits>
++
++#include <opus/opus.h>
++
++#include <AVSCommon/Utils/Logger/Logger.h>
++
++#include "SpeechEncoder/OpusEncoderContext.h"
++
++namespace alexaClientSDK {
++namespace speechencoder {
++
++using namespace avsCommon;
++using namespace avsCommon::avs;
++using namespace avsCommon::utils;
++
++static const std::string TAG("OpusEncoderContext");
++#define LX(event) alexaClientSDK::avsCommon::utils::logger::LogEntry(TAG, event)
++
++// AVS OPUS format: 16kHz, 32kbps CBR, 20ms
++static constexpr char AVS_FORMAT[] = "OPUS";
++static constexpr unsigned int SAMPLE_RATE = 16000;
++static constexpr unsigned int BIT_RATE = 32000;
++static constexpr unsigned int FRAME_LENGTH = 20;
++
++// PCM frame size
++static constexpr unsigned int FRAME_SIZE = (SAMPLE_RATE / 1000) * FRAME_LENGTH;
++// OPUS packet size (CBR)
++static constexpr unsigned int PACKET_SIZE = ((BIT_RATE / CHAR_BIT) / 1000) * FRAME_LENGTH;
++static constexpr unsigned int MAX_PACKET_SIZE = PACKET_SIZE * 2;
++
++inline uint16_t Reverse16(uint16_t value)
++{
++    return (((value & 0x00FF) << 8) |
++            ((value & 0xFF00) >> 8));
++}
++
++inline uint16_t LittleEndian16(uint16_t value)
++{
++#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
++    return value;
++#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
++    return Reverse16(value);
++#else
++#    error unsupported endianness
++#endif
++}
++
++inline uint16_t BigEndian16(uint16_t value)
++{
++#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
++    return Reverse16(value);
++#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
++    return value;
++#else
++#    error unsupported endianness
++#endif
++}
++
++std::shared_ptr<OpusEncoderContext> OpusEncoderContext::create()
++{
++    return std::shared_ptr<OpusEncoderContext>(new OpusEncoderContext());
++}
++
++OpusEncoderContext::OpusEncoderContext() {}
++
++OpusEncoderContext::~OpusEncoderContext() {}
++
++bool OpusEncoderContext::init(AudioFormat inputFormat)
++{
++    m_inputFormat = inputFormat;
++
++    if (inputFormat.sampleRateHz != SAMPLE_RATE) {
++        ACSDK_ERROR(LX("initFailed")
++            .d("reason", "Input sampling rate is invalid"));
++        return false;
++    }
++    if (inputFormat.encoding != AudioFormat::Encoding::LPCM) {
++        ACSDK_ERROR(LX("initFailed")
++            .d("reason", "Input audio format must be LPCM"));
++        return false;
++    }
++    if (inputFormat.numChannels == 2 && inputFormat.layout != AudioFormat::Layout::INTERLEAVED) {
++        // Error, only interleaved frames are supported for 2 channel
++        ACSDK_ERROR(LX("initFailed")
++            .d("reason", "Input audio format must be interleaved"));
++        return false;
++    }
++
++    m_outputFormat = {
++        .encoding = AudioFormat::Encoding::OPUS,
++        .endianness = AudioFormat::Endianness::LITTLE,
++        .sampleRateHz = inputFormat.sampleRateHz,
++        .sampleSizeInBits = 16,
++        .numChannels = inputFormat.numChannels,
++        .dataSigned = false,
++        .layout = AudioFormat::Layout::INTERLEAVED,
++    };
++
++    return true;
++}
++
++size_t OpusEncoderContext::getInputFrameSize()
++{
++    return FRAME_SIZE;
++}
++
++size_t OpusEncoderContext::getOutputFrameSize()
++{
++    return PACKET_SIZE;
++}
++
++AudioFormat OpusEncoderContext::getAudioFormat()
++{
++    return m_outputFormat;
++}
++
++std::string OpusEncoderContext::getAVSFormatName()
++{
++    return AVS_FORMAT;
++}
++
++bool OpusEncoderContext::start()
++{
++    int err;
++
++    m_encoder = opus_encoder_create(
++        m_inputFormat.sampleRateHz, m_inputFormat.numChannels,
++        OPUS_APPLICATION_VOIP, &err
++    );
++
++    if (err != OPUS_OK) {
++        ACSDK_ERROR(LX("startFailed")
++            .d("reason", "Failed to create OpusEncoder"));
++        goto exit_failure;
++    }
++
++    // Use 32k bit rate
++    err = opus_encoder_ctl(m_encoder, OPUS_SET_BITRATE(BIT_RATE));
++    if (err != OPUS_OK) {
++        ACSDK_ERROR(LX("startFailed")
++            .d("reason", "Failed to set bitrate to 32kbps"));
++        goto exit_failure;
++    }
++
++    // CBR Only
++    err = opus_encoder_ctl(m_encoder, OPUS_SET_VBR(0));
++    if (err != OPUS_OK) {
++        ACSDK_ERROR(LX("startFailed")
++            .d("reason", "Failed to set hard-CBR"));
++        goto exit_failure;
++    }
++
++    // 20ms framesize
++    err = opus_encoder_ctl(m_encoder, OPUS_SET_EXPERT_FRAME_DURATION(OPUS_FRAMESIZE_20_MS));
++    if (err != OPUS_OK) {
++        ACSDK_ERROR(LX("startFailed")
++            .d("reason", "Failed to set frame size to 20ms"));
++        goto exit_failure;
++    }
++
++    return true;
++
++exit_failure:
++    if (m_encoder) {
++         opus_encoder_destroy(m_encoder);
++    }
++    return false;
++}
++
++ssize_t OpusEncoderContext::processSamples(void *samples, size_t nWords, uint8_t *buffer)
++{
++    uint16_t *in = (uint16_t *) samples;
++    opus_int16 pcm[FRAME_SIZE];
++
++    for (unsigned int i = 0; i < nWords; i++) {
++        if (m_inputFormat.endianness == AudioFormat::Endianness::LITTLE) {
++            pcm[i] = LittleEndian16(in[i]);
++        } else {
++            pcm[i] = BigEndian16(in[i]);
++        }
++    }
++
++    return opus_encode(m_encoder, pcm, nWords, buffer, MAX_PACKET_SIZE);
++}
++
++void OpusEncoderContext::close()
++{
++    opus_encoder_destroy(m_encoder);
++}
++
++} // alexaClientSDK::speechencoder
++} // alexaClientSDK
+diff --git a/SpeechEncoder/include/SpeechEncoder/SpeechEncoder.h b/SpeechEncoder/include/SpeechEncoder/SpeechEncoder.h
+new file mode 100644
+index 000000000..ec4519ce5
+--- /dev/null
++++ b/SpeechEncoder/include/SpeechEncoder/SpeechEncoder.h
+@@ -0,0 +1,88 @@
++/*
++ * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License").
++ * You may not use this file except in compliance with the License.
++ * A copy of the License is located at
++ *
++ *     http://aws.amazon.com/apache2.0/
++ *
++ * or in the "license" file accompanying this file. This file is distributed
++ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied. See the License for the specific language governing
++ * permissions and limitations under the License.
++ */
++
++#ifndef ALEXA_CLIENT_SDK_SPEECHENCODER_INCLUDE_SPEECHENCODER_SPEECHENCODER_H_
++#define ALEXA_CLIENT_SDK_SPEECHENCODER_INCLUDE_SPEECHENCODER_SPEECHENCODER_H_
++
++#include <atomic>
++#include <memory>
++#include <thread>
++
++#include <AVSCommon/Utils/AudioFormat.h>
++#include <AVSCommon/AVS/AudioInputStream.h>
++#include <AVSCommon/Utils/Threading/Executor.h>
++
++namespace alexaClientSDK {
++namespace speechencoder {
++
++class EncoderContext {
++public:
++    virtual bool init(alexaClientSDK::avsCommon::utils::AudioFormat inputFormat) = 0;
++
++    virtual size_t getInputFrameSize() = 0;
++    virtual size_t getOutputFrameSize() = 0;
++    virtual alexaClientSDK::avsCommon::utils::AudioFormat getAudioFormat() = 0;
++    virtual std::string getAVSFormatName() = 0;
++
++    virtual bool start() = 0;
++    virtual ssize_t processSamples(void *samples, size_t nWords, uint8_t *buffer) = 0;
++    virtual void close() = 0;
++};
++
++class SpeechEncoder {
++public:
++    static const auto INVALID_INDEX = std::numeric_limits<avsCommon::avs::AudioInputStream::Index>::max();
++
++    static std::shared_ptr<SpeechEncoder> create(const std::shared_ptr<EncoderContext>& encoder);
++
++    ~SpeechEncoder();
++
++    bool startEncoding(
++        const std::shared_ptr<alexaClientSDK::avsCommon::avs::AudioInputStream>& inputStream,
++        alexaClientSDK::avsCommon::utils::AudioFormat inputFormat,
++        avsCommon::avs::AudioInputStream::Index begin,
++        avsCommon::avs::AudioInputStream::Reader::Reference reference);
++
++    void stopEncoding(bool stopImmediately = false);
++
++    std::shared_ptr<alexaClientSDK::avsCommon::avs::AudioInputStream> getEncodedStream();
++
++    std::shared_ptr<EncoderContext> getContext();
++
++private:
++    SpeechEncoder(const std::shared_ptr<EncoderContext>& encoder);
++
++    void encodeLoop(
++        avsCommon::avs::AudioInputStream::Index begin,
++        avsCommon::avs::AudioInputStream::Reader::Reference reference);
++
++    std::shared_ptr<EncoderContext> m_encoder;
++
++    alexaClientSDK::avsCommon::utils::AudioFormat m_inputAudioFormat;
++    std::shared_ptr<alexaClientSDK::avsCommon::avs::AudioInputStream> m_inputStream;
++    alexaClientSDK::avsCommon::utils::AudioFormat m_outputAudioFormat;
++    std::shared_ptr<alexaClientSDK::avsCommon::avs::AudioInputStream> m_encodedStream;
++
++    std::atomic<bool> m_isEncoding;
++    std::atomic<bool> m_stopRequested;
++    avsCommon::utils::threading::Executor m_executor;
++
++    size_t m_maxFrameSize;
++};
++
++} // alexaClientSDK::speechencoder
++} // alexaClientSDK
++
++#endif // ALEXA_CLIENT_SDK_SPEECHENCODER_INCLUDE_SPEECHENCODER_SPEECHENCODER_H_
+diff --git a/SpeechEncoder/src/CMakeLists.txt b/SpeechEncoder/src/CMakeLists.txt
+new file mode 100644
+index 000000000..b331d0389
+--- /dev/null
++++ b/SpeechEncoder/src/CMakeLists.txt
+@@ -0,0 +1,18 @@
++add_definitions("-DACSDK_LOG_MODULE=speechEncoder")
++
++add_library(SpeechEncoder SHARED
++	SpeechEncoder.cpp
++)
++
++target_include_directories(SpeechEncoder
++	PUBLIC
++		"${SpeechEncoder_SOURCE_DIR}/include"
++)
++
++target_link_libraries(SpeechEncoder
++	PUBLIC
++		AVSCommon
++)
++
++# install target
++asdk_install()
+\ No newline at end of file
+diff --git a/SpeechEncoder/src/SpeechEncoder.cpp b/SpeechEncoder/src/SpeechEncoder.cpp
+new file mode 100644
+index 000000000..b548cd089
+--- /dev/null
++++ b/SpeechEncoder/src/SpeechEncoder.cpp
+@@ -0,0 +1,182 @@
++/*
++ * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License").
++ * You may not use this file except in compliance with the License.
++ * A copy of the License is located at
++ *
++ *     http://aws.amazon.com/apache2.0/
++ *
++ * or in the "license" file accompanying this file. This file is distributed
++ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied. See the License for the specific language governing
++ * permissions and limitations under the License.
++ */
++
++#include <iostream>
++#include <climits>
++#include <fstream>
++
++#include <AVSCommon/Utils/Logger/Logger.h>
++
++#include "SpeechEncoder/SpeechEncoder.h"
++
++namespace alexaClientSDK {
++namespace speechencoder {
++
++using namespace avsCommon;
++using namespace avsCommon::avs;
++using namespace avsCommon::utils;
++
++static const std::string TAG("SpeechEncoder");
++#define LX(event) alexaClientSDK::avsCommon::utils::logger::LogEntry(TAG, event)
++
++#define MAX_READERS 10
++
++std::shared_ptr<SpeechEncoder> SpeechEncoder::create(const std::shared_ptr<EncoderContext>& encoder)
++{
++    return std::shared_ptr<SpeechEncoder>(new SpeechEncoder(encoder));
++}
++
++SpeechEncoder::SpeechEncoder(const std::shared_ptr<EncoderContext>& encoder) :
++    m_encoder{encoder},
++    m_isEncoding{false},
++    m_stopRequested{false} {}
++
++SpeechEncoder::~SpeechEncoder()
++{
++    m_executor.shutdown();
++}
++
++bool SpeechEncoder::startEncoding(
++    const std::shared_ptr<AudioInputStream>& inputStream,
++    AudioFormat inputFormat,
++    AudioInputStream::Index begin,
++    AudioInputStream::Reader::Reference reference)
++{
++    if (m_isEncoding) {
++        ACSDK_ERROR(LX("startEncodingFailed")
++            .d("reason", "Encoding in progress"));
++        return false;
++    }
++
++    if (!m_encoder->init(inputFormat)) {
++        ACSDK_ERROR(LX("startEncodingFailed")
++            .d("reason", "Encoder init failed"));
++        return false;
++    }
++
++    m_inputStream = inputStream;
++    m_inputAudioFormat = inputFormat;
++    m_maxFrameSize = m_encoder->getInputFrameSize();
++    m_outputAudioFormat = m_encoder->getAudioFormat();
++
++    unsigned int wordSize = m_outputAudioFormat.sampleSizeInBits / CHAR_BIT;
++
++    // Setup Writer for dest stream
++    size_t size = AudioInputStream::calculateBufferSize(m_encoder->getOutputFrameSize() * 20, wordSize, MAX_READERS);
++    auto buffer = std::make_shared<AudioInputStream::Buffer>(size);
++    m_encodedStream = AudioInputStream::create(buffer, wordSize, MAX_READERS);
++
++    ACSDK_INFO(LX("startEncoding").d("begin", begin));
++    m_isEncoding = true;
++    m_stopRequested = false;
++    m_executor.submit([this, begin, reference]() {
++        encodeLoop(begin, reference);
++    });
++
++    return true;
++}
++
++void SpeechEncoder::stopEncoding(bool stopImmediately)
++{
++    ACSDK_INFO(LX("stopEncoding").d("stopImmediately", stopImmediately));
++    if (stopImmediately) {
++        m_isEncoding = false;
++    } else {
++        // Stop after all frames are encoded
++        m_stopRequested = true;
++    }
++}
++
++std::shared_ptr<AudioInputStream> SpeechEncoder::getEncodedStream()
++{
++    return m_encodedStream;
++}
++
++std::shared_ptr<EncoderContext> SpeechEncoder::getContext()
++{
++    return m_encoder;
++}
++
++void SpeechEncoder::encodeLoop(AudioInputStream::Index begin, AudioInputStream::Reader::Reference reference)
++{
++    bool closed = false;
++    bool readsFull = true;  // TODO: configurable from context
++
++    std::shared_ptr<AudioInputStream::Reader> reader = m_inputStream->createReader(AudioInputStream::Reader::Policy::BLOCKING);
++    size_t wordSize = reader->getWordSize();
++
++    reader->seek(begin, reference);
++
++    size_t currentRead = 0;
++    uint8_t *readBuf = new uint8_t[m_maxFrameSize * wordSize];
++    uint8_t *writeBuf = new uint8_t[m_encoder->getOutputFrameSize()];
++
++    m_encoder->start();
++    std::shared_ptr<AudioInputStream::Writer> writer = m_encodedStream->createWriter(AudioInputStream::Writer::Policy::BLOCKING);
++    do {
++        auto r = reader->read(
++            readBuf + (currentRead * wordSize),
++            m_maxFrameSize - currentRead, std::chrono::milliseconds(10));
++        if (r > 0) {
++            currentRead += r;
++            if (readsFull && (currentRead < m_maxFrameSize)) {
++                continue;
++            }
++            auto nEncoded = m_encoder->processSamples(readBuf, currentRead, writeBuf);
++            if (nEncoded < 0) {
++                ACSDK_ERROR(LX("processSample")
++                    .d("reason", "Encode error")
++                    .d("err", nEncoded));
++                closed = true;
++            } else {
++                // May blocks here
++                writer->write(writeBuf, nEncoded / wordSize);
++            }
++            currentRead = 0;
++        } else {
++            switch (r) {
++            case AudioInputStream::Reader::Error::OVERRUN:
++            case AudioInputStream::Reader::Error::INVALID:
++                ACSDK_ERROR(LX("encodeLoop")
++                    .d("reason", "Reader error")
++                    .d("err", r));
++            case AudioInputStream::Reader::Error::CLOSED:
++                closed = true;
++                break;
++            case AudioInputStream::Reader::Error::WOULDBLOCK:
++            case AudioInputStream::Reader::Error::TIMEDOUT:
++                // Ignore
++                break;
++            }
++        }
++        if (m_stopRequested) {
++            // Reader will close after reads all data within buffer
++            reader->close(0, AudioInputStream::Reader::Reference::BEFORE_WRITER);
++            m_stopRequested = false;
++        }
++    } while (!closed && m_isEncoding);
++    writer->close();
++    m_encoder->close();
++
++    delete[] readBuf;
++    delete[] writeBuf;
++    reader->close();
++    reader.reset();
++
++    m_isEncoding = false;
++}
++
++} // alexaClientSDK::speechencoder
++} // alexaClientSDK
+diff --git a/SpeechEncoder/test/CMakeLists.txt b/SpeechEncoder/test/CMakeLists.txt
+new file mode 100644
+index 000000000..07fa61765
+--- /dev/null
++++ b/SpeechEncoder/test/CMakeLists.txt
+@@ -0,0 +1 @@
++discover_unit_tests("${SpeechEncoder_SOURCE_DIR}/include" SpeechEncoder)
+\ No newline at end of file
+diff --git a/SpeechEncoder/test/SpeechEncoderTest.cpp b/SpeechEncoder/test/SpeechEncoderTest.cpp
+new file mode 100644
+index 000000000..ffa1818e5
+--- /dev/null
++++ b/SpeechEncoder/test/SpeechEncoderTest.cpp
+@@ -0,0 +1,130 @@
++/*
++ * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License").
++ * You may not use this file except in compliance with the License.
++ * A copy of the License is located at
++ *
++ *     http://aws.amazon.com/apache2.0/
++ *
++ * or in the "license" file accompanying this file. This file is distributed
++ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied. See the License for the specific language governing
++ * permissions and limitations under the License.
++ */
++
++#include <chrono>
++#include <thread>
++
++#include <gtest/gtest.h>
++#include <gmock/gmock.h>
++
++#include <AVSCommon/Utils/AudioFormat.h>
++#include <AVSCommon/AVS/AudioInputStream.h>
++
++#include "SpeechEncoder/SpeechEncoder.h"
++
++namespace alexaClientSDK {
++namespace speechencoder {
++namespace test {
++
++using namespace avsCommon;
++using namespace avsCommon::avs;
++using namespace avsCommon::utils;
++
++static constexpr size_t FRAME_WORDSIZE = 2;
++static constexpr int NUM_AUDIO_WRITE = 100;
++
++static constexpr size_t MOCK_ENCODER_INPUT_FRAME_SIZE = 4;
++static constexpr size_t MOCK_ENCODER_OUTPUT_FRAME_SIZE = 4;
++static const AudioFormat MOCK_ENCODER_FORMAT = {
++    .encoding = AudioFormat::Encoding::LPCM,
++    .endianness = AudioFormat::Endianness::LITTLE,
++    .sampleRateHz = 16000,
++    .sampleSizeInBits = FRAME_WORDSIZE * CHAR_BIT,
++    .numChannels = 1,
++    .dataSigned = false,
++    .layout = AudioFormat::Layout::INTERLEAVED,
++};
++
++using ::testing::_;
++using ::testing::Return;
++
++/**
++ * A mock Keyword Detector that inherits from KeyWordDetector.
++ */
++class MockEncoderContext : public EncoderContext {
++public:
++    MOCK_METHOD1(init, bool(alexaClientSDK::avsCommon::utils::AudioFormat inputFormat));
++    MOCK_METHOD0(getInputFrameSize, size_t());
++    MOCK_METHOD0(getOutputFrameSize, size_t());
++    MOCK_METHOD0(getAudioFormat, AudioFormat());
++    MOCK_METHOD0(getAVSFormatName, std::string());
++
++    MOCK_METHOD0(start, bool());
++    MOCK_METHOD3(processSamples, ssize_t(void *samples, size_t nWords, uint8_t *buffer));
++    MOCK_METHOD0(close, void());
++};
++
++class SpeechEncoderTest : public ::testing::Test {
++protected:
++    std::shared_ptr<SpeechEncoder> m_encoder;
++    std::shared_ptr<MockEncoderContext> m_encoderCtx;
++
++    virtual void SetUp() {
++        m_encoderCtx = std::make_shared<MockEncoderContext>();
++        m_encoder = SpeechEncoder::create(m_encoderCtx);
++    }
++};
++
++TEST_F(SpeechEncoderTest, testStartEncoding) {
++    AudioFormat audioFormat = {
++        .encoding = AudioFormat::Encoding::LPCM,
++        .endianness = AudioFormat::Endianness::LITTLE,
++        .sampleRateHz = 16000,
++        .sampleSizeInBits = FRAME_WORDSIZE * CHAR_BIT,
++        .numChannels = 1,
++        .dataSigned = false,
++        .layout = AudioFormat::Layout::INTERLEAVED,
++    };
++    auto buffer = std::make_shared<AudioInputStream::Buffer>(4000);
++    std::shared_ptr<AudioInputStream> inputStream = AudioInputStream::create(buffer, FRAME_WORDSIZE, 1);
++    ASSERT_TRUE(inputStream);
++
++    EXPECT_CALL(*m_encoderCtx, init(_))
++        .Times(1).WillOnce(Return(true));
++    EXPECT_CALL(*m_encoderCtx, getInputFrameSize())
++        .WillRepeatedly(Return(MOCK_ENCODER_INPUT_FRAME_SIZE));
++    EXPECT_CALL(*m_encoderCtx, getAudioFormat())
++        .WillRepeatedly(Return(MOCK_ENCODER_FORMAT));
++    EXPECT_CALL(*m_encoderCtx, getOutputFrameSize())
++        .WillRepeatedly(Return(MOCK_ENCODER_OUTPUT_FRAME_SIZE));
++
++    // EncoderContext::start should be called once.
++    EXPECT_CALL(*m_encoderCtx, start())
++        .Times(1).WillOnce(Return(true));
++
++    // EncoderContext::close should be called once.
++    EXPECT_CALL(*m_encoderCtx, close())
++        .Times(1);
++
++    m_encoder->startEncoding(inputStream, audioFormat, 0, AudioInputStream::Reader::Reference::ABSOLUTE);
++
++    // EncoderContext::processSamples should be called with MOCK_ENCODER_INPUT_FRAME_SIZE size
++    EXPECT_CALL(*m_encoderCtx, processSamples(_,MOCK_ENCODER_INPUT_FRAME_SIZE,_))
++        .Times(NUM_AUDIO_WRITE / MOCK_ENCODER_INPUT_FRAME_SIZE)
++        .WillRepeatedly(Return(MOCK_ENCODER_OUTPUT_FRAME_SIZE));
++
++    std::shared_ptr<AudioInputStream::Writer> writer = inputStream->createWriter(AudioInputStream::Writer::Policy::BLOCKING);
++    uint8_t dummy[FRAME_WORDSIZE] = {0, 0};
++    for (int i = 0; i < NUM_AUDIO_WRITE; i++) {
++        writer->write(&dummy, 1);
++    }
++
++    // Let encoder thread to process...
++    std::this_thread::sleep_for(std::chrono::milliseconds(10));
++}
++
++}  // namespace test
++}  // namespace speechencoder
++}  // namespace alexaClientSDK
+\ No newline at end of file
+-- 
+2.18.0
+

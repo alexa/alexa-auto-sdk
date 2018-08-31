@@ -29,6 +29,12 @@ if (AAC_EMIT_SENSITIVE_LOGS)
     endif()
 endif()
 
+if (AAC_EMIT_LATENCY_LOGS)
+    add_definitions(-DACSDK_LATENCY_LOG_ENABLED)
+    add_definitions(-DACSDK_LOG_MODULE=avsCommon)
+    add_definitions(-DAAC_LATENCY_LOGS_ENABLED)
+endif()
+
 if(AAC_ENABLE_TESTS)
     enable_testing()
 endif()

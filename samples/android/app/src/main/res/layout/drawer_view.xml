@@ -687,10 +687,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_marginEnd="8dp"
-                    android:text="@string/volume_local"
+                    android:text="@string/volume_alerts"
                     android:textSize="12sp" />
                 <SeekBar
-                    android:id="@+id/localVolume"
+                    android:id="@+id/alertsVolume"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:progress="50"
@@ -712,10 +712,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_marginEnd="16dp"
-                    android:text="@string/volume_synced"
+                    android:text="@string/volume_speaker"
                     android:textSize="12sp" />
                 <SeekBar
-                    android:id="@+id/syncedVolume"
+                    android:id="@+id/speakerVolume"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:progress="50"
@@ -724,7 +724,7 @@
                 <!-- Mute button -->
                 <TextView
                     style="@style/button"
-                    android:id="@+id/muteSyncedSpeakersButton"
+                    android:id="@+id/muteSpeakerButton"
                     android:text="@string/volume_mute"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -898,8 +898,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="8dp"
-                android:layout_marginBottom="4dp"
-                android:visibility="gone">
+                android:layout_marginBottom="4dp">
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -934,7 +933,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="4dp"
                         android:layout_gravity="end"
-                        android:text="@string/call_state_idle"
+                        android:text="@string/call_state_none"
                         android:textColor="@color/drawerTextStatus"
                         android:textSize="12sp" />
                     <TextView
@@ -973,6 +972,18 @@
                 android:visibility="gone" />
         </LinearLayout>
 
+        <!-- Alexa Comms -->
+        <com.amazon.sampleapp.impl.Communication.AlexaCommsView
+            android:id="@+id/alexa_comms"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="8dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:background="@color/drawerSection">
+        </com.amazon.sampleapp.impl.Communication.AlexaCommsView>
     </LinearLayout>
 
 </ScrollView>

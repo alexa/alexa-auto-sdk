@@ -3,10 +3,10 @@ FROM ubuntu:xenial
 RUN apt-get update && apt-get install -y \
     chrpath diffstat gawk texinfo doxygen graphviz \
     python python3 wget unzip build-essential cpio \
-    git-core libssl-dev
+    git-core libssl-dev \
+    sudo locales
 
 # Locale settings
-RUN apt-get install -y locales
 RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
         echo 'LANG="en_US.UTF-8"'>/etc/default/locale && \
         dpkg-reconfigure --frontend=noninteractive locales && \
@@ -17,7 +17,6 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
 
 RUN useradd --uid 1000 --create-home builder
-RUN apt-get install -y sudo
 RUN echo "builder ALL=(ALL) NOPASSWD: ALL" | tee -a /etc/sudoers
 
 USER builder

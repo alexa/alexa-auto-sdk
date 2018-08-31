@@ -46,10 +46,9 @@ bool PhoneCallControllerEngineImpl::initialize (
         ThrowIfNot( directiveSequencer->addDirectiveHandler( m_phoneCallControllerCapabilityAgent ), "addDirectiveHandlerFailed" );
 
         m_phoneCallControllerPlatformInterface->setEngineInterface( std::dynamic_pointer_cast<aace::phoneCallController::PhoneCallControllerEngineInterface>( shared_from_this() ) );
-        
-        // Registry of PhoneCallController will be commented out until PublishCapability API supports this.
+
         // register capability with delegate
-        // ThrowIfNot( capabilitiesDelegate->registerCapability( m_phoneCallControllerCapabilityAgent ), "registerCapabilityFailed");
+        ThrowIfNot( capabilitiesDelegate->registerCapability( m_phoneCallControllerCapabilityAgent ), "registerCapabilityFailed");
 
         return true;
     }
@@ -68,12 +67,12 @@ std::shared_ptr<PhoneCallControllerEngineImpl> PhoneCallControllerEngineImpl::cr
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender ) {
 
     try {
-        ThrowIfNull( phoneCallControllerPlatformInterface, "couldNotCreatePhoneCallControllerEngineImpl" );
-        ThrowIfNull( capabilitiesDelegate, "couldNotCreatePhoneCallControllerEngineImpl" );
-        ThrowIfNull( contextManager, "couldNotCreatePhoneCallControllerEngineImpl" );
-        ThrowIfNull( directiveSequencer, "couldNotCreatePhoneCallControllerEngineImpl" );
-        ThrowIfNull( exceptionSender, "couldNotCreatePhoneCallControllerEngineImpl" );
-        ThrowIfNull( messageSender, "couldNotCreatePhoneCallControllerEngineImpl" );
+        ThrowIfNull( phoneCallControllerPlatformInterface, "nullPlatformInterface" );
+        ThrowIfNull( capabilitiesDelegate, "nullCapabilitiesDelegate" );
+        ThrowIfNull( contextManager, "nullContextManager" );
+        ThrowIfNull( directiveSequencer, "nullDirectiveSequencer" );
+        ThrowIfNull( exceptionSender, "nullExceptionSender" );
+        ThrowIfNull( messageSender, "nullMessageSender" );
 
         std::shared_ptr<PhoneCallControllerEngineImpl> phoneCallControllerEngineImpl = std::shared_ptr<PhoneCallControllerEngineImpl>( new PhoneCallControllerEngineImpl( phoneCallControllerPlatformInterface ) );
 
@@ -90,6 +89,11 @@ std::shared_ptr<PhoneCallControllerEngineImpl> PhoneCallControllerEngineImpl::cr
 void PhoneCallControllerEngineImpl::doShutdown() {
     if( m_phoneCallControllerCapabilityAgent != nullptr ) {
         m_phoneCallControllerCapabilityAgent->shutdown();
+        m_phoneCallControllerCapabilityAgent.reset();
+
+        if( m_phoneCallControllerPlatformInterface != nullptr ) {
+            m_phoneCallControllerPlatformInterface->setEngineInterface( nullptr );
+        }
     }
 }
 

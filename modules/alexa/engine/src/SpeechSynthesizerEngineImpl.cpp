@@ -40,6 +40,9 @@ bool SpeechSynthesizerEngineImpl::initialize(
     
     try
     {
+        ThrowIfNull( directiveSequencer, "invalidDirectiveSequencer" );
+        ThrowIfNull( capabilitiesDelegate, "invalidCapabilitiesDelegate" );
+
         ThrowIfNot( initializeAudioChannel( speakerManager ), "initializeAudioChannelFailed" );
     
         m_speechSynthesizerCapabilityAgent = alexaClientSDK::capabilityAgents::speechSynthesizer::SpeechSynthesizer::create( shared_from_this(), messageSender, focusManager, contextManager, exceptionSender, dialogUXStateAggregator );
@@ -73,10 +76,14 @@ std::shared_ptr<SpeechSynthesizerEngineImpl> SpeechSynthesizerEngineImpl::create
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender ) {
-    
-    try
+
+    std::shared_ptr<SpeechSynthesizerEngineImpl> speechSynthesizerEngineImpl = nullptr;
+
+    try 
     {
-        std::shared_ptr<SpeechSynthesizerEngineImpl> speechSynthesizerEngineImpl = std::shared_ptr<SpeechSynthesizerEngineImpl>( new SpeechSynthesizerEngineImpl( speechSynthesizerPlatformInterface ) );
+        ThrowIfNull( speechSynthesizerPlatformInterface, "invalidSpeechSynthesizerPlatformInterface" );
+
+        speechSynthesizerEngineImpl = std::shared_ptr<SpeechSynthesizerEngineImpl>( new SpeechSynthesizerEngineImpl( speechSynthesizerPlatformInterface ) );
         
         ThrowIfNot( speechSynthesizerEngineImpl->initialize( directiveSequencer, messageSender, focusManager, contextManager, attachmentManager, dialogUXStateAggregator, capabilitiesDelegate, speakerManager, exceptionSender ), "initializeSpeechSynthesizerEngineImplFailed" );
 
@@ -84,6 +91,9 @@ std::shared_ptr<SpeechSynthesizerEngineImpl> SpeechSynthesizerEngineImpl::create
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"create").d("reason", ex.what()));
+        if( speechSynthesizerEngineImpl != nullptr ) {
+            speechSynthesizerEngineImpl->shutdown();
+        }
         return nullptr;
     }
 }

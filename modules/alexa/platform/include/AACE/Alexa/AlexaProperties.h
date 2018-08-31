@@ -44,9 +44,16 @@ static const std::string FIRMWARE_VERSION = "aace.alexa.system.firmwareVersion";
 
 /**
  * This property is used with Engine::setProperty() to change the current locale setting for AVS.
- * The value should be a valid locale accepted by AVS: de-DE, en-AU, en-CA, en-GB, en-IN, en-US, fr-FR, ja-JP
+ * The value should be a valid locale accepted by AVS. Calling Engine::getProperty() with the
+ * SUPPORTED_LOCALES property provides the list of supported locales.
  */
 static const std::string LOCALE = "aace.alexa.setting.locale";
+
+/**
+ *  This read-only property is used with Engine::getProperty() to see all AVS supported locales. The return
+ *  value is a comma-separated list, e.g. "de-DE,en-AU,..."
+ */
+static const std::string SUPPORTED_LOCALES = "aace.alexa.supportedLocales";
 
 } // aace::alexa::property
 } // aace::alexa

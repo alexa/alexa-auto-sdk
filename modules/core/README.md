@@ -2,7 +2,7 @@
 
 ### Overview
 
-The module contains the Engine base classes and the abstract platform interfaces that can be utilized by the platform and/or other modules. It also provides an easy way to integrate AAC SDK into an application or a framework.This involves configuring and creating an instance of `aace::core::Engine`, overriding default platform implementation classes, and registering the custom interface handlers with the instantiated Engine.
+The module contains the Engine base classes and the abstract platform interfaces that can be utilized by the platform and/or other modules. It also provides an easy way to integrate the Alexa Auto SDK into an application or a framework. This involves configuring and creating an instance of `aace::core::Engine`, overriding default platform implementation classes, and registering the custom interface handlers with the instantiated Engine.
 
 ### Creating the Engine
 
@@ -46,17 +46,30 @@ The JSON file can contain all of the configuration data for the Engine or option
 
 Another way to specify the configuration data is programmatically by using the configuration factory methods classes provided in the library. For example, you can configure the `alertsCapabilityAgent` settings by instantiating a configuration object with the following method:
 
-    auto alertsConfig = aace::alexa::config::AlexaConfiguration::createAlertsConfig( "<SQLITE_DATABASE_FILE_PATH>" );
+    auto alertsConfig = aace::alexa::config::AlexaConfiguration::createAlertsConfig
+    ("<SQLITE_DATABASE_FILE_PATH>" );
 
 After you have created your configuration object(s) you should call the Engine's `configure()` function, passing in the configuration object(s).
-
-**NOTE:** The Engine's `configure()` method can only be called once and must be called before registering any platform interfaces or starting the Engine.
 
     engine->configure( config );
 
 OR
 
-    engine->configure( { authDelegateConfig, alertsConfig, ... } );
+    engine->configure( { deviceInfoConfig, alertsConfig, ... } );
+
+> **Note**: The Engine's `configure()` method can only be called once and must be called before registering any platform interfaces or starting the Engine.
+
+#### Update Locale Setting
+
+If the configuration database files have already been created, there are two ways to update the `locale` setting.
+
+You can delete the SQLite database files to force an update of all the configuration settings, or use the `setProperty()` method in the Engine Class.
+
+```
+engine->setProperty(aace::alexa::property::LOCALE,"<LOCALE_STRING>");
+```
+
+If the property value was updated, the method returns true. If the update failed, the method returns false.
 
 ### Registering Platform Interface Handlers
 
@@ -75,6 +88,35 @@ The Engine class provides two methods for registering platform interface handler
 
 Details about extending the default platform interfaces are covered later in this document. See the section [**Extending the Default Platform Implementation**](#extending-the-default-platform-implementation) for more information.
 
+### Vehicle Information Requirements
+
+The following JSON example lists all of the information that can be used to enhance the Alexa experience in the car. This information is required to pass the certification process.
+
+```
+{
+  "aace.vehicle":
+  {
+     "info": {
+         "make": "<MAKE>",
+         "model": "<MODEL>",
+         "year": "<YEAR>",
+         "trim": "<TRIM>",
+         "geography": "<GEOGRAPHY>",
+         "version": "<SOFTWARE_VERSION>",
+         "os": "<OPERATING_SYSTEM>",
+         "arch": "<HARDWARE_ARCH>",
+         "language": "<LANGUAGE>",
+         "microphone": "<MICROPHONE>"
+     }
+  }
+}
+```
+
+Read detailed information about the vehicle configuration class in the API reference documentation.
+
+* [Alexa Auto SDK for Android](../../docs/android/)
+* [Alexa Auto SDK for C++](../../docs/cpp/)
+
 ### Starting the Engine
 
 After the Engine has been created and configured, and all of the platform interfaces have been registered, the `Engine::start()` method must be called:
@@ -83,11 +125,11 @@ After the Engine has been created and configured, and all of the platform interf
 
 ### Extending the Default Platform Implementation
 
-The default AAC platform implementation can be extended by overriding the various classes in the library that, when registered with the Engine, allow you to interact with Amazon services such as AVS.
+The default Alexa Auto SDK platform implementation can be extended by overriding the various classes in the library that, when registered with the Engine, allow you to interact with Amazon services.
 
 ### Implementing LocationProvider
 
-The Engine provides a callback for implementing location requests from AVS and other modules and a Location type definition. This is optional and dependent on the platform implementation.
+The Engine provides a callback for implementing location requests from Alexa and other modules and a Location type definition. This is optional and dependent on the platform implementation.
 
 To implement a custom LocationService handler to provide location using the default Engine LocationProvider class the `aace::location::LocationProvider` class should be extended:
 
@@ -109,7 +151,9 @@ To implement a custom LocationService handler to provide location using the defa
 
 ### Implementing NetworkInfoProvider
 
-The Engine provides callbacks for implementing network information requests from AVS and to inform the Engine of network changes. This is optional and dependent on the platform implementation.
+The Engine provides callbacks for implementing network information requests and informing the Engine of network changes. This is dependent on the platform implementation.
+
+> **Important**! Connectivity monitoring is the responsibility of the platform. The Alexa Auto SDK doesn't monitor network connectivity.
 
 To implement a custom NetworkInfoProvider handler to provide network info using the default Engine NetworkInfoProvider class the `aace::network::NetworkInfoProvider` class should be extended:
 
@@ -159,3 +203,31 @@ To implement a custom log event handler for logging events from AVS using the de
     //engine config
     engine->registerPlatformInterface( std::make_shared<MyLogger>());
 
+## Core Engine Properties
+
+The Core module defines several constants that are used to get and set runtime properties in the Engine. To use these properties, include the <code>CoreProperties.h</code> header in your source code and call the Engine's <code>getProperty()</code> and <code>setProperty()</code> methods.
+
+    #include <AACE/Core/CoreProperties.h>
+
+    // get the SDK version number from the Engine
+    auto version = m_engine->getProperty( aace::core::property::VERSION );
+
+The following constants are defined in the Core module:
+
+<table>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+<tr>
+<td><code>aace::core::property::VERSION</code>
+</td>
+<td>The Alexa Auto SDK version.
+
+>**Note**: This is a read-only property.</td>
+
+</tr>
+</table>
+
+
+See the API reference documentation for [CoreProperties](./platform/include/AACE/Core/CoreProperties.h) for more information.

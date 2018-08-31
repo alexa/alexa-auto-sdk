@@ -1,13 +1,12 @@
 # AACE Core Engine
 
-set(AACE_ENGINE_VERSION ${PROJECT_VERSION})
-
 configure_file (
     "${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Core/EngineVersion.h.in"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Core/EngineVersion.h"
     @ONLY)
 
 set(HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Core/CoreMetrics.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Core/EngineMacros.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Core/EngineImpl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Core/EngineService.h

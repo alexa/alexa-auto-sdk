@@ -43,7 +43,9 @@ std::string getVehiclePropertyAttribute( VehiclePropertyType property )
         case VehiclePropertyType::OPERATING_SYSTEM: return "os";
         case VehiclePropertyType::HARDWARE_ARCH: return "arch";
         case VehiclePropertyType::LANGUAGE: return "language";
+        case VehiclePropertyType::MICROPHONE: return "microphone";
     }
+    return "";
 }
 
 std::shared_ptr<aace::core::config::EngineConfiguration> VehicleConfiguration::createVehicleInfoConfig( std::initializer_list<VehicleProperty> propertyList )

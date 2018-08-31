@@ -13,9 +13,6 @@
  * permissions and limitations under the License.
  */
 
-// aace/location/Location.java
-// This is an automatically generated file.
-
 package com.amazon.aace.location;
 
 /**
@@ -32,7 +29,12 @@ public class Location
     static final public double UNDEFINED = -1;
 
     /**
-     * Represents a location object and provides accessor methods to its data
+     * Most verbose constructor for a Location object
+     *
+     * @param  latitude A location latitude
+     * @param  longitude A location longitude
+     * @param  altitude A location altitude in meters
+     * @param  accuracy A location accuracy in meters
      */
     public Location( double latitude, double longitude, double altitude, double accuracy ) {
         m_latitude = latitude;
@@ -42,14 +44,21 @@ public class Location
     }
 
     /**
-     * Represents a location object and provides accessor methods to its data
+     * Less verbose constructor for a Location object
+     *
+     * @param  latitude A location latitude
+     * @param  longitude A location longitude
+     * @param  altitude A location altitude in meters
      */
     public Location( double latitude, double longitude, double altitude ) {
         this( latitude, longitude, altitude, UNDEFINED );
     }
 
     /**
-     * Represents a location object and provides accessor methods to its data
+     * Least verbose constructor for a Location object
+     *
+     * @param  latitude A location latitude
+     * @param  longitude A location longitude
      */
     public Location( double latitude, double longitude ) {
         this( latitude, longitude, UNDEFINED, UNDEFINED );

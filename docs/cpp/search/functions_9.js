@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['networkstatuschanged',['networkStatusChanged',['../classaace_1_1network_1_1_network_info_provider.html#a51201e3d5dc9f1ea8e6ef973373ed971',1,'aace::network::NetworkInfoProvider']]],
-  ['nextbuttonpressed',['nextButtonPressed',['../classaace_1_1alexa_1_1_playback_controller.html#ac3d3dcfc62eb322ac1e9d797fcf06c39',1,'aace::alexa::PlaybackController']]]
+  ['mediaerror',['mediaError',['../classaace_1_1alexa_1_1_media_player.html#a16c8ea0ca76ee9c3e4a6ff35504cf8a6',1,'aace::alexa::MediaPlayer']]],
+  ['mediastatechanged',['mediaStateChanged',['../classaace_1_1alexa_1_1_media_player.html#ac2fe0773062dcef92e5277c120d6c0d4',1,'aace::alexa::MediaPlayer']]]
 ];

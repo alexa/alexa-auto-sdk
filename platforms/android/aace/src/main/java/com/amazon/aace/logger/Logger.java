@@ -13,12 +13,11 @@
  * permissions and limitations under the License.
  */
 
-// aace/logger/Logger.java
-// This is an automatically generated file.
-
 package com.amazon.aace.logger;
 
 import com.amazon.aace.core.PlatformInterface;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * Logger should be extended handle log events from the AAC SDK.
@@ -40,6 +39,11 @@ abstract public class Logger extends PlatformInterface
          * @hideinitializer
          */
         INFO("INFO"),
+        /**
+         * Log of a metric, enabled only for builds with metrics enabled
+         * @hideinitializer
+         */
+        METRIC("METRIC"),
         /**
          * Log of an event that may indicate a problem
          * @hideinitializer
@@ -100,6 +104,10 @@ abstract public class Logger extends PlatformInterface
         return false;
     }
 
+    public boolean logEvent( Level level, long time, String source, byte[] message ) {
+        return logEvent(level, time, source, new String(message, StandardCharsets.UTF_8));
+    }
+
     /**
      * Notifies the Engine to use the AAC SDK logger to log a message originating on the platform.
      * The log event will be received by the platform with a call to @c logEvent() from the Engine.
@@ -116,5 +124,4 @@ abstract public class Logger extends PlatformInterface
 
     private native void log( long nativeObject, Level level, String tag, String message );
 }
-
 // END OF FILE

@@ -61,6 +61,6 @@ public class AuthProviderHandler extends AuthProvider {
 
     void clearAuthToken() { mAuthToken = ""; }
 
-    // Refresh auth token with LWA
     public void onResume() { if ( mLwa != null ) mLwa.onResume(); }
+    public void onInitialize() { if ( mLwa != null ) mLwa.onInitialize(); }
 }

@@ -20,6 +20,7 @@
 #include "AACE/Engine/Core/EngineService.h"
 #include "AACE/Engine/Core/EngineMacros.h"
 #include "AACE/Engine/Core/EngineVersion.h"
+#include "AACE/Engine/Core/CoreMetrics.h"
 #include "AACE/Core/CoreProperties.h"
 
 // default Engine constructor
@@ -70,12 +71,12 @@ bool EngineImpl::initialize()
 
         // iterate through registered engine services and call initialize() for each module
         for( auto next : m_orderedServiceList ) {
-            ThrowIfNot( next->handleInitializeEngineEvent( shared_from_this() ), "initializeServiceFailed" );
+            ThrowIfNot( next->handleInitializeEngineEvent( shared_from_this() ), "handleInitializeEngineEventFailed" );
         }
 
         // set initialize flag
         m_initialized = true;
-
+        
         return true;
     }
     catch( std::exception& ex ) {
@@ -89,7 +90,7 @@ bool EngineImpl::shutdown()
     try
     {
         if( m_initialized == false ) {
-            AACE_WARN(LX(TAG,"shutdown").m("Attempting do shutdown engine that is not initialized - doing nothing."));
+            AACE_WARN(LX(TAG,"shutdown").m("Attempting to shutdown engine that is not initialized - doing nothing."));
             return true;
         }
         
@@ -108,7 +109,7 @@ bool EngineImpl::shutdown()
             // if shutting down the service failed throw an error but continue with
             // shutting down remaining services
             if( next->handleShutdownEngineEvent() == false ) {
-                AACE_ERROR(LX(TAG,"shutdown").d("reason","shutdownServiceFailed").d("service",next->getDescription().getType()));
+                AACE_ERROR(LX(TAG,"shutdown").d("reason","handleShutdownEngineEventFailed").d("service",next->getDescription().getType()));
             }
         }
         
@@ -156,7 +157,7 @@ bool EngineImpl::configure( std::vector<std::shared_ptr<aace::core::config::Engi
         // iterate through registered engine services and call configure() for each module
         for( auto nextService : m_orderedServiceList )
         {
-            ThrowIfNot( nextService->handleConfigureEngineEvent( configurationStreams ), "configureServiceFailed" );
+            ThrowIfNot( nextService->handleConfigureEngineEvent( configurationStreams ), "handleConfigureEngineEventFailed" );
             
             for( auto nextStream : configurationStreams ) {
                 nextStream->clear();
@@ -305,22 +306,37 @@ bool EngineImpl::start()
     try
     {
         AACE_DEBUG(LX(TAG,"start").m("EngineStart"));
+        CORE_METRIC(LX(TAG,"start"), aace::engine::core::CoreMetrics::Location::ENGINE_START_BEGIN);
 
         ThrowIf( m_running, "engineAlreadyRunning" );
         ThrowIfNot( m_initialized, "engineNotInitialized" );
         ThrowIfNot( m_configured, "engineNotConfigured" );
         
-        // iterate through registered engine modules and call start() for each module
+        // setup is called for each service the first time the engine is started
+        if( m_setup == false )
+        {
+            // iterate through registered engine modules and call handleSetupEngineEvent() for each module
+            for( auto next : m_orderedServiceList ) {
+                ThrowIfNot( next->handleSetupEngineEvent(), "handleSetupEngineEventFailed" );
+            }
+            
+            // set the engine setup flag to true
+            m_setup = true;
+        }
+        
+        // iterate through registered engine modules and call handleStartEngineEvent() for each module
         for( auto next : m_orderedServiceList ) {
-            ThrowIfNot( next->handleStartEngineEvent(), "startServiceFailed" );
+            ThrowIfNot( next->handleStartEngineEvent(), "handleStartEngineEventFailed" );
         }
 
         // set the engine running flag to true
         m_running = true;
-
+        
+        CORE_METRIC(LX(TAG,"start"), aace::engine::core::CoreMetrics::Location::ENGINE_START_END);
         return true;
     }
     catch( std::exception& ex ) {
+        CORE_METRIC(LX(TAG,"start"), aace::engine::core::CoreMetrics::Location::ENGINE_START_EXCEPTION);
         AACE_ERROR(LX(TAG,"start").d("reason", ex.what()));
         return false;
     }
@@ -331,23 +347,26 @@ bool EngineImpl::stop()
     try
     {
         AACE_DEBUG(LX(TAG,"stop").m("EngineStop"));
+        CORE_METRIC(LX(TAG,"stop"), aace::engine::core::CoreMetrics::Location::ENGINE_STOP_BEGIN);
 
         if( m_running == false ) {
-            AACE_WARN(LX(TAG,"stop").m("Attempting do stop engine that is not running - doing nothing."));
+            AACE_WARN(LX(TAG,"stop").m("Attempting to stop engine that is not running - doing nothing."));
             return true;
         }
     
         // iterate through registered engine modules and call stop() for each module
         for( auto next : m_orderedServiceList ) {
-            ThrowIfNot( next->handleStopEngineEvent(), "stopServiceFailed" );
+            ThrowIfNot( next->handleStopEngineEvent(), "handleStopEngineEventFailed" );
         }
 
         // set the engine running and configured flag to false - the engine must be reconfigured before starting again
         m_running = false;
 
+        CORE_METRIC(LX(TAG,"stop"), aace::engine::core::CoreMetrics::Location::ENGINE_STOP_END);
         return true;
     }
     catch( std::exception& ex ) {
+        CORE_METRIC(LX(TAG,"stop"), aace::engine::core::CoreMetrics::Location::ENGINE_STOP_EXCEPTION);
         AACE_ERROR(LX(TAG,"stop").d("reason", ex.what()));
         return false;
     }

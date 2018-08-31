@@ -52,6 +52,7 @@ public class LoggerHandler extends Logger {
     /* Log colors */
     private static final int sColorVerbose = Color.parseColor( "#B3E5FC" ); // Light Blue
     private static final int sColorInfo = Color.parseColor( "#FFFFFF" ); // White
+    private static final int sColorMetric = Color.parseColor( "#73C54C" ); // Light Green
     private static final int sColorWarn = Color.parseColor( "#F57F17" ); // Orange
     private static final int sColorError = Color.parseColor( "#D50000" ); // Red
     private static final int sColorJsonTemplate = Color.parseColor( "#F9B702" ); // Gold
@@ -93,6 +94,9 @@ public class LoggerHandler extends Logger {
                     break;
                 case INFO:
                     color = sColorInfo;
+                    break;
+                case METRIC:
+                    color = sColorMetric;
                     break;
                 default:
                     color = sColorInfo;
@@ -193,7 +197,12 @@ public class LoggerHandler extends Logger {
         ArrayAdapter adapter = new ArrayAdapter( mActivity, android.R.layout.simple_spinner_item );
         adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
 
-        for ( Logger.Level level : Logger.Level.values() ) { adapter.add( level ); }
+        for ( Logger.Level level : Logger.Level.values() ) {
+            if ( level == Level.METRIC ) {
+                continue;
+            }
+            adapter.add( level );
+        }
 
         spinner.setAdapter( adapter );
         spinner.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {

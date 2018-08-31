@@ -9,14 +9,12 @@
 #    cp AutoCoreEngineSDK/cmake/FindAVS.cmake WakeWordEngines/cmake
 # 3. Update AVS_VERSION when upgrading to a new version
 
-set(AVS_VERSION 1.7.1)
+set(AVS_VERSION 1.9)
 
 find_path(AVS_COMMON_INCLUDE_DIR AVSCommon)
-find_path(RAPIDJSON_INCLUDE_DIR rapidjson/rapidjson.h)
 
 set(AVS_INCLUDE_DIRS
     ${AVS_COMMON_INCLUDE_DIR}
-    ${RAPIDJSON_INCLUDE_DIR}
 )
 
 find_library(AVS_ACL_LIBRARY ACL)
@@ -36,7 +34,9 @@ find_library(AVS_CONTEXT_MANAGER_LIBRARY ContextManager)
 find_library(AVS_DEFAULT_CLIENT_LIBRARY DefaultClient)
 find_library(AVS_ESP_LIBRARY ESP)
 find_library(AVS_EXTERNAL_MEDIA_PLAYER_LIBRARY ExternalMediaPlayer)
+find_library(AVS_INTERACTION_MODEL_LIBRARY InteractionModel)
 find_library(AVS_KWD_LIBRARY KWD)
+find_library(AVS_MRM_LIBRARY MRM)
 find_library(AVS_NOTIFICATIONS_LIBRARY Notifications)
 find_library(AVS_PLAYBACK_CONTROLLER_LIBRARY PlaybackController)
 find_library(AVS_PLAYLIST_PARSER_LIBRARY PlaylistParser)
@@ -44,6 +44,8 @@ find_library(AVS_REGISTRATION_MANAGER_LIBRARY RegistrationManager)
 find_library(AVS_SQLITE_STORAGE_LIBRARY SQLiteStorage)
 find_library(AVS_SETTINGS_LIBRARY Settings)
 find_library(AVS_SPEAKER_MANAGER_LIBRARY SpeakerManager)
+find_library(AVS_SPEECH_ENCODER_LIBRARY SpeechEncoder)
+find_library(AVS_OPUS_ENCODER_CONTEXT_LIBRARY OpusEncoderContext)
 find_library(AVS_SPEECH_SYNTHESIZER_LIBRARY SpeechSynthesizer)
 find_library(AVS_TEMPLATE_RUNTIME_LIBRARY TemplateRuntime)
 
@@ -65,7 +67,9 @@ set(AVS_LIBRARIES
     ${AVS_DEFAULT_CLIENT_LIBRARY}
     ${AVS_ESP_LIBRARY}
     ${AVS_EXTERNAL_MEDIA_PLAYER_LIBRARY}
+    ${AVS_INTERACTION_MODEL_LIBRARY}
     ${AVS_KWD_LIBRARY}
+    ${AVS_MRM_LIBRARY}
     ${AVS_NOTIFICATIONS_LIBRARY}
     ${AVS_PLAYBACK_CONTROLLER_LIBRARY}
     ${AVS_PLAYLIST_PARSER_LIBRARY}
@@ -73,6 +77,8 @@ set(AVS_LIBRARIES
     ${AVS_SQLITE_STORAGE_LIBRARY}
     ${AVS_SETTINGS_LIBRARY}
     ${AVS_SPEAKER_MANAGER_LIBRARY}
+    ${AVS_SPEECH_ENCODER_LIBRARY}
+    ${AVS_OPUS_ENCODER_CONTEXT_LIBRARY}
     ${AVS_SPEECH_SYNTHESIZER_LIBRARY}
     ${AVS_TEMPLATE_RUNTIME_LIBRARY}
 )

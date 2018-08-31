@@ -1,0 +1,208 @@
+From f64300e815cb90df96126ec98c1afad7b5d28c80 Mon Sep 17 00:00:00 2001
+From: Shotaro Uchida <shotaru@amazon.com>
+Date: Tue, 28 Aug 2018 13:51:58 -0700
+Subject: [PATCH 3/3] AIP: Initial SpeechEncoder support
+
+---
+ .../AIP/include/AIP/AudioInputProcessor.h     | 14 +++++-
+ .../AIP/src/AudioInputProcessor.cpp           | 46 ++++++++++++++++---
+ CapabilityAgents/AIP/src/CMakeLists.txt       |  4 +-
+ 3 files changed, 54 insertions(+), 10 deletions(-)
+
+diff --git a/CapabilityAgents/AIP/include/AIP/AudioInputProcessor.h b/CapabilityAgents/AIP/include/AIP/AudioInputProcessor.h
+index 5bd8c2a35..72ac7d597 100644
+--- a/CapabilityAgents/AIP/include/AIP/AudioInputProcessor.h
++++ b/CapabilityAgents/AIP/include/AIP/AudioInputProcessor.h
+@@ -39,6 +39,7 @@
+ #include <AVSCommon/Utils/RequiresShutdown.h>
+ #include <AVSCommon/Utils/Threading/Executor.h>
+ #include <AVSCommon/Utils/Timing/Timer.h>
++#include <SpeechEncoder/SpeechEncoder.h>
+ #include "AudioProvider.h"
+ #include "ESPData.h"
+ #include "Initiator.h"
+@@ -86,6 +87,8 @@ public:
+      * @param defaultAudioProvider A default @c avsCommon::AudioProvider to use for ExpectSpeech if the previous
+      *     provider is not readable (@c avsCommon::AudioProvider::alwaysReadable).  This parameter is optional and
+      *     defaults to an invalid @c avsCommon::AudioProvider.
++     * @param speechEncoder The Speech Encoder used to encode audio inputs. This parameter is optional and
++     *     defaults to nullptr, which disable the encoding feature.
+      * @return A @c std::shared_ptr to the new @c AudioInputProcessor instance.
+      */
+     static std::shared_ptr<AudioInputProcessor> create(
+@@ -96,7 +99,8 @@ public:
+         std::shared_ptr<avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
+         std::shared_ptr<avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionEncounteredSender,
+         std::shared_ptr<avsCommon::sdkInterfaces::UserInactivityMonitorInterface> userInactivityNotifier,
+-        AudioProvider defaultAudioProvider = AudioProvider::null());
++        AudioProvider defaultAudioProvider = AudioProvider::null(),
++        std::shared_ptr<speechencoder::SpeechEncoder> speechEncoder = nullptr);
+ 
+     /**
+      * Adds an observer to be notified of AudioInputProcessor state changes.
+@@ -241,6 +245,8 @@ private:
+      * @param defaultAudioProvider A default @c avsCommon::AudioProvider to use for ExpectSpeech if the previous
+      *     provider is not readable (@c AudioProvider::alwaysReadable).  This parameter is optional, and ignored if set
+      *     to @c AudioProvider::null().
++     * @param speechEncoder The Speech Encoder used to encode audio inputs. This parameter is optional and
++     *     will disable the encoding feature if set to nullptr.
+      *
+      * @note This constructor is private so that users are forced to use the @c create() factory function.  The primary
+      *     reason for this is to ensure that a @c std::shared_ptr to the instance exists, which is a requirement for
+@@ -253,7 +259,8 @@ private:
+         std::shared_ptr<avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
+         std::shared_ptr<avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionEncounteredSender,
+         std::shared_ptr<avsCommon::sdkInterfaces::UserInactivityMonitorInterface> userInactivityMonitor,
+-        AudioProvider defaultAudioProvider);
++        AudioProvider defaultAudioProvider,
++        std::shared_ptr<speechencoder::SpeechEncoder> speechEncoder);
+ 
+     /// @name RequiresShutdown Functions
+     /// @{
+@@ -493,6 +500,9 @@ private:
+     /// Timer which runs in the @c EXPECTING_SPEECH state.
+     avsCommon::utils::timing::Timer m_expectingSpeechTimer;
+ 
++    /// The Speech Encoder to encode input stream.
++    std::shared_ptr<speechencoder::SpeechEncoder> m_encoder;
++
+     /**
+      * @name Executor Thread Variables
+      *
+diff --git a/CapabilityAgents/AIP/src/AudioInputProcessor.cpp b/CapabilityAgents/AIP/src/AudioInputProcessor.cpp
+index 9cccefc08..819284158 100644
+--- a/CapabilityAgents/AIP/src/AudioInputProcessor.cpp
++++ b/CapabilityAgents/AIP/src/AudioInputProcessor.cpp
+@@ -24,6 +24,7 @@
+ #include <AVSCommon/Utils/Metrics.h>
+ #include <AVSCommon/Utils/UUIDGeneration/UUIDGeneration.h>
+ #include <AVSCommon/AVS/Attachment/AttachmentUtils.h>
++#include <SpeechEncoder/OpusEncoderContext.h>
+ 
+ #include "AIP/AudioInputProcessor.h"
+ 
+@@ -91,7 +92,8 @@ std::shared_ptr<AudioInputProcessor> AudioInputProcessor::create(
+     std::shared_ptr<avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
+     std::shared_ptr<avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionEncounteredSender,
+     std::shared_ptr<avsCommon::sdkInterfaces::UserInactivityMonitorInterface> userInactivityMonitor,
+-    AudioProvider defaultAudioProvider) {
++    AudioProvider defaultAudioProvider,
++    std::shared_ptr<speechencoder::SpeechEncoder> speechEncoder) {
+     if (!directiveSequencer) {
+         ACSDK_ERROR(LX("createFailed").d("reason", "nullDirectiveSequencer"));
+         return nullptr;
+@@ -122,7 +124,8 @@ std::shared_ptr<AudioInputProcessor> AudioInputProcessor::create(
+         focusManager,
+         exceptionEncounteredSender,
+         userInactivityMonitor,
+-        defaultAudioProvider));
++        defaultAudioProvider,
++        speechEncoder));
+ 
+     if (aip) {
+         contextManager->setStateProvider(RECOGNIZER_STATE, aip);
+@@ -270,7 +273,8 @@ AudioInputProcessor::AudioInputProcessor(
+     std::shared_ptr<avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
+     std::shared_ptr<avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionEncounteredSender,
+     std::shared_ptr<avsCommon::sdkInterfaces::UserInactivityMonitorInterface> userInactivityMonitor,
+-    AudioProvider defaultAudioProvider) :
++    AudioProvider defaultAudioProvider,
++    std::shared_ptr<speechencoder::SpeechEncoder> speechEncoder) :
+         CapabilityAgent{NAMESPACE, exceptionEncounteredSender},
+         RequiresShutdown{"AudioInputProcessor"},
+         m_directiveSequencer{directiveSequencer},
+@@ -278,6 +282,7 @@ AudioInputProcessor::AudioInputProcessor(
+         m_contextManager{contextManager},
+         m_focusManager{focusManager},
+         m_userInactivityMonitor{userInactivityMonitor},
++        m_encoder{speechEncoder},
+         m_defaultAudioProvider{defaultAudioProvider},
+         m_lastAudioProvider{AudioProvider::null()},
+         m_KWDMetadataReader{nullptr},
+@@ -307,6 +312,9 @@ void AudioInputProcessor::doShutdown() {
+     m_contextManager.reset();
+     m_focusManager.reset();
+     m_userInactivityMonitor.reset();
++    if (m_encoder) {
++        m_encoder.reset();
++    }
+     m_observers.clear();
+ }
+ 
+@@ -506,6 +514,13 @@ bool AudioInputProcessor::executeRecognize(
+             return false;
+     }
+ 
++    // Check if SpeechEncoder is available
++    const bool shouldBeEncoded = (m_encoder != nullptr);
++    // Set up format
++    if (shouldBeEncoded) {
++        avsEncodingFormat = m_encoder->getContext()->getAVSFormatName();
++    }
++
+     // Assemble the event payload.
+     std::ostringstream payload;
+     // clang-format off
+@@ -534,8 +549,19 @@ bool AudioInputProcessor::executeRecognize(
+         offset = begin;
+         reference = avsCommon::avs::attachment::InProcessAttachmentReader::SDSTypeReader::Reference::ABSOLUTE;
+     }
++
++    // Set up the speech encoder
++    if (shouldBeEncoded) {
++        if (!m_encoder->startEncoding(provider.stream, provider.format, offset, reference)) {
++            ACSDK_ERROR(LX("executeRecognizeFailed").d("reason", "Failed to start encoder"));
++            return false;
++        }
++        offset = 0;
++        reference = avsCommon::avs::attachment::InProcessAttachmentReader::SDSTypeReader::Reference::BEFORE_WRITER;
++    }
++
+     m_reader = avsCommon::avs::attachment::InProcessAttachmentReader::create(
+-        sds::ReaderPolicy::NONBLOCKING, provider.stream, offset, reference);
++        sds::ReaderPolicy::NONBLOCKING, shouldBeEncoded ? m_encoder->getEncodedStream() : provider.stream, offset, reference);
+     if (!m_reader) {
+         ACSDK_ERROR(LX("executeRecognizeFailed").d("reason", "Failed to create attachment reader"));
+         return false;
+@@ -711,10 +737,16 @@ bool AudioInputProcessor::executeStopCapture(bool stopImmediately, std::shared_p
+     // Create a lambda to do the StopCapture.
+     std::function<void()> stopCapture = [=] {
+         ACSDK_DEBUG(LX("stopCapture").d("stopImmediately", stopImmediately));
+-        if (stopImmediately) {
+-            m_reader->close(avsCommon::avs::attachment::AttachmentReader::ClosePoint::IMMEDIATELY);
++        if (m_encoder) {
++            // If SpeechEncoder is enabled, let it finish it so the stream will be closed automatically.
++            m_encoder->stopEncoding(stopImmediately);
+         } else {
+-            m_reader->close(avsCommon::avs::attachment::AttachmentReader::ClosePoint::AFTER_DRAINING_CURRENT_BUFFER);
++            // Otherwise close current reader manually.
++            if (stopImmediately) {
++                m_reader->close(avsCommon::avs::attachment::AttachmentReader::ClosePoint::IMMEDIATELY);
++            } else {
++                m_reader->close(avsCommon::avs::attachment::AttachmentReader::ClosePoint::AFTER_DRAINING_CURRENT_BUFFER);
++            }
+         }
+ 
+         m_reader.reset();
+diff --git a/CapabilityAgents/AIP/src/CMakeLists.txt b/CapabilityAgents/AIP/src/CMakeLists.txt
+index 3294e8c62..abd65b0e5 100644
+--- a/CapabilityAgents/AIP/src/CMakeLists.txt
++++ b/CapabilityAgents/AIP/src/CMakeLists.txt
+@@ -7,11 +7,13 @@ add_library(AIP SHARED
+ target_include_directories(AIP PUBLIC
+     "${AIP_SOURCE_DIR}/include"
+     "${AFML_SOURCE_DIR}/include"
++    "${OpusEncoderContext_SOURCE_DIR}/include"
+     "${AVSCommon_INCLUDE_DIRS}")
+ target_link_libraries(AIP
+     AVSCommon
+     ADSL
+-    AFML)
++    AFML
++    OpusEncoderContext)
+ 
+ # install target
+ asdk_install()
+-- 
+2.18.0
+

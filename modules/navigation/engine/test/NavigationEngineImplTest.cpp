@@ -17,8 +17,8 @@
 #include <gtest/gtest.h>
 
 #include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
-#include "MockExceptionEncounteredSender.h"
-#include "MockDirectiveSequencer.h"
+#include "AVSCommon/SDKInterfaces/test/MockExceptionEncounteredSender.h"
+#include "AVSCommon/SDKInterfaces/test/MockDirectiveSequencer.h"
 
 #include "AACE/Navigation/Navigation.h"
 #include "AACE/Engine/Navigation/NavigationEngineImpl.h"

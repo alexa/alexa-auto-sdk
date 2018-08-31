@@ -15,6 +15,8 @@
 
 #include <AVSCommon/Utils/Logger/LoggerSinkManager.h>
 #include <AVSCommon/Utils/Logger/LoggerUtils.h>
+#include <AVSCommon/Utils/Logger/ConsoleLogger.h>
+#include <AVSCommon/Utils/Metrics.h>
 
 #include "AACE/Engine/Alexa/AlexaEngineLogger.h"
 #include "AACE/Engine/Core/EngineMacros.h"
@@ -22,11 +24,14 @@
 namespace aace {
 namespace engine {
 namespace alexa {
-    
+
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.AlexaEngineLogger");
 
-AlexaEngineLogger::AlexaEngineLogger( alexaClientSDK::avsCommon::utils::logger::Level level ) : alexaClientSDK::avsCommon::utils::logger::Logger( level ) {
+AlexaEngineLogger::AlexaEngineLogger( alexaClientSDK::avsCommon::utils::logger::Level level ) :
+    alexaClientSDK::avsCommon::utils::logger::Logger( level ),
+    alexaClientSDK::avsCommon::utils::RequiresShutdown( TAG ) {
+    
     init( alexaClientSDK::avsCommon::utils::configuration::ConfigurationNode::getRoot()[TAG] );
 }
 
@@ -47,8 +52,18 @@ std::shared_ptr<AlexaEngineLogger> AlexaEngineLogger::create( alexaClientSDK::av
     }
 }
 
+void AlexaEngineLogger::doShutdown() {
+    alexaClientSDK::avsCommon::utils::logger::LoggerSinkManager::instance().initialize( alexaClientSDK::avsCommon::utils::logger::getConsoleLogger() );
+}
+
 void AlexaEngineLogger::emit( alexaClientSDK::avsCommon::utils::logger::Level level, std::chrono::system_clock::time_point time, const char *threadMoniker, const char *text ) {
-    AACE_LOGGER->log( "AVS", TAG, map( level ), time, threadMoniker, text );
+    aace::logger::Logger::Level aaceLevel = map( level );
+    if( aaceLevel == aace::logger::Logger::Level::CRITICAL ) {
+        if( strstr(text, alexaClientSDK::avsCommon::utils::METRICS_TAG.c_str()) != nullptr ) {
+            aaceLevel = aace::logger::Logger::Level::METRIC;
+        }
+    }
+    AACE_LOGGER->log( "AVS", TAG, aaceLevel, time, threadMoniker, text );
 }
 
 aace::logger::Logger::Level AlexaEngineLogger::map( alexaClientSDK::avsCommon::utils::logger::Level level )

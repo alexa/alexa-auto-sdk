@@ -24,12 +24,14 @@
 #include <AVSCommon/AVS/Attachment/AttachmentManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/Audio/AlertsAudioFactoryInterface.h>
 #include <AVSCommon/SDKInterfaces/CapabilityConfigurationInterface.h>
+#include <AVSCommon/SDKInterfaces/ConnectionStatusObserverInterface.h>
 #include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/DirectiveSequencerInterface.h>
 #include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
 #include <AVSCommon/SDKInterfaces/ExceptionEncounteredSenderInterface.h>
 #include <AVSCommon/SDKInterfaces/FocusManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/MessageSenderInterface.h>
+#include <AVSCommon/SDKInterfaces/SpeakerManagerInterface.h>
 #include <Alerts/AlertsCapabilityAgent.h>
 #include <Alerts/Storage/SQLiteAlertStorage.h>
 #include <ContextManager/ContextManager.h>
@@ -53,6 +55,7 @@ private:
 
     bool initialize(
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> connectionManager,
         std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
@@ -67,6 +70,7 @@ public:
     static std::shared_ptr<AlertsEngineImpl> create(
         std::shared_ptr<aace::alexa::Alerts> alertsPlatformInterface,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> connectionManager,
         std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,

@@ -8,7 +8,7 @@ source ${THISDIR}/common.sh
 #
 
 usageExit() {
-	echo "Usage: oe [options] [<bbrecipe-file>|<meta-layer>]"
+	echo "Usage: oe [options] [<bbrecipe-file>|<meta-layer>|<extra-conf-file>]"
 	echo ""
 	echo " -h,--help                  = Print usage information and exit."
 	echo ""
@@ -28,66 +28,71 @@ usageExit() {
 
 PARAMS="$@"
 POSITIONAL=()
+EXTRA_CONFS=()
 while [[ $# -gt 0 ]]; do
 	key="$1"
 	case $key in
 		-h|--help)
 		usageExit
-		shift # past argument
+		shift
 		;;
 		-t|--target)
 		TARGET="$2"
-		shift # past argument
-		shift # past value
+		shift
+		shift
 		;;
 		-b|--build-dir)
 		BUILD_DIR="$2"
-		shift # past argument
-		shift # past value
+		shift
+		shift
 		;;
 		-g|--debug)
 		DEBUG_BUILD="1"
-		shift # past argument
+		shift
 		;;
 		-c|--clean)
 		CLEAN="1"
-		shift # past argument
+		shift
 		;;
 		--android-api)
 		ANDROID_API_LEVEL="$2"
-		shift # past argument
-		shift # past value
+		shift
+		shift
 		;;
 		--qnx7sdp-path)
 		QNX_BASE="$2"
-		shift # past argument
-		shift # past value
+		shift
+		shift
 		;;
 		--package)
 		PACKAGE="$2"
-		shift # past argument
-		shift # past value
+		shift
+		shift
 		;;
 		--enable-sensitive-logs)
 		SENSITIVE_LOGS="1"
-		shift # past argument
+		shift
 		;;
 		--enable-latency-logs)
 		LATENCY_LOGS="1"
-		shift # past argument
+		shift
+		;;
+		-D*=*)
+		EXTRA_CONFS+=("${1:2}")
+		shift
 		;;
 		-*|--*)
 		echo "ERROR: Unknown option '$1'"
 		usageExit
 		shift
 		;;
-		*)    # unknown option
-		POSITIONAL+=("$1") # save it in an array for later
-		shift # past argument
+		*) # Any other additional arguments
+		POSITIONAL+=("$1")
+		shift
 		;;
 	esac
 done
-set -- "${POSITIONAL[@]}" # restore positional parameters
+set -- "${POSITIONAL[@]}"
 
 # Default values
 TARGET=${TARGET:-native}
@@ -114,7 +119,11 @@ if [ $(uname) = "Darwin" ]; then
 	if [[ ${TARGET} = *"native"* ]]; then
 		warn "\"native\" target will be built for Generic Linux"
 	fi
-	note "Using QNX 7.0.0 SDP installation path: ${QNX_BASE}"
+	if [[ ${TARGET} = *"qnx7"* ]]; then
+		note "Using QNX 7.0.0 SDP installation path: ${QNX_BASE}"
+		# Export into Docker script
+		export QNX_BASE
+	fi
 	note "Switching to Docker mode..."
 	echo ""
 	echo "*******************"
@@ -181,17 +190,23 @@ android_checks() {
 		androidx86)
 			ANDROID_ABI="x86"
 			;;
+		androidx86-64)
+			ANDROID_ABI="x86_64"
+			;;
 		androidarm)
 			ANDROID_ABI="armeabi-v7a"
 			;;
+		androidarm64)
+			ANDROID_ABI="arm64-v8a"
+			;;
+		*)
+			error "Unsupported Android target: ${TARGET}"
 	esac
 	# Export into Bitbake and setup script
 	export ANDROID_TOOLCHAIN
-	if [ ! -z ${ANDROID_ABI} ]; then
-		# Always run setup script
-		${BUILDER_HOME}/scripts/setup-android-toolchain.sh ${ANDROID_ABI} ${ANDROID_API_LEVEL} || \
-			error "Android toolchain setup failed"
-	fi
+	# Always run setup script
+	${BUILDER_HOME}/scripts/setup-android-toolchain.sh ${ANDROID_ABI} ${ANDROID_API_LEVEL} || \
+		error "Android toolchain setup failed"
 }
 
 #
@@ -210,6 +225,43 @@ qnx_checks() {
 # OE Initialization
 #
 
+EXTRA_BBFILES="${MODULES_PATH}/*/*.bb"
+EXTRA_BBLAYERS=""
+
+add_extra_bbfile() {
+	module=$(realpath ${1})
+	sub_module=${2}
+	if [[ -d ${module} ]]; then
+		if [[ $(basename ${module}) == "meta-"* && -e ${module}/conf/layer.conf ]]; then
+			note "Adding meta layer: ${module}"
+			EXTRA_BBLAYERS="${EXTRA_BBLAYERS} ${module}"
+		elif [[ ! ${sub_module} ]]; then
+			note "Search for sub modules: ${module}"
+			for sub_module in $(find ${module} -mindepth 1 -maxdepth 1 -type d) ; do
+				add_extra_bbfile ${sub_module} 1
+			done
+		elif [[ ${sub_module} && $(basename ${module}) == "modules" ]]; then
+			note "Adding modules: ${module}"
+			EXTRA_BBFILES="${EXTRA_BBFILES} ${module}/*/*.bb"
+		fi
+	elif [[ -e ${module} ]]; then
+		if [[ ${module} == *".bb" ]]; then
+			note "Adding BB file: ${module}"
+			EXTRA_BBFILES="${EXTRA_BBFILES} ${module}"
+		elif [[ ${module} == *".conf" ]]; then
+			note "Adding extra conf file: ${module}"
+			echo "# Extra Config: ${module}" >> ${LOCAL_CONF}
+			cat ${module} >> ${LOCAL_CONF}
+			echo "" >> ${LOCAL_CONF}
+			echo "#####" >> ${LOCAL_CONF}
+		else
+			warn "Unknown file: ${module}"
+		fi
+	else
+		warn "Unknown file/directory: ${module}"
+	fi
+}
+
 init_local_conf() {
 	mkdir -p ${BUILD_DIR}/conf
 
@@ -225,26 +277,17 @@ BBLAYERS = " \\
   "
 EOF
 
+	# Copy default local.conf
+	cp ${BUILDER_HOME}/meta-aac/conf/local.conf.sample ${LOCAL_CONF}
+
 	# Find extra bb files & layers
-	EXTRA_BBFILES="${MODULES_PATH}/*/*.bb"
-	EXTRA_BBLAYERS=""
 	for module in ${EXTRA_MODULES} ; do
-		module=$(realpath ${module})
-		if [[ ${module} == *".bb" && -e ${module} ]]; then
-			note "Adding BB file: ${module}"
-			EXTRA_BBFILES="${EXTRA_BBFILES} ${module}"
-		elif [[ -d ${module} && -e ${module}/conf/layer.conf ]]; then
-			note "Adding meta layer: ${module}"
-			EXTRA_BBLAYERS="${EXTRA_BBLAYERS} ${module}"
-		fi
+		add_extra_bbfile ${module}
 	done
 
 	# Register extra modules
 	echo "BBFILES += \"${EXTRA_BBFILES}\"" >> ${BBLAYER_CONF}
 	echo "BBLAYERS += \"${EXTRA_BBLAYERS}\"" >> ${BBLAYER_CONF}
-
-	# Copy default local.conf
-	cp ${BUILDER_HOME}/meta-aac/conf/local.conf.sample ${LOCAL_CONF}
 
 	if [ ! -z ${CODEBUILD_SRC_DIR} ]; then
 		# Cache points for AWS CodeBuild
@@ -269,11 +312,20 @@ EOF
 			note "Enable sensitive logs"
 			echo "AAC_SENSITIVE_LOGS = \"1\"" >> ${LOCAL_CONF}
 		fi
-		if [ ${LATENCY_LOGS} = "1" ]; then
-			note "Enable user perceived latency logs"
-			echo "AAC_LATENCY_LOGS = \"1\"" >> ${LOCAL_CONF}
-		fi
 	fi
+	if [ ${LATENCY_LOGS} = "1" ]; then
+		note "Enable user perceived latency logs"
+		echo "AAC_LATENCY_LOGS = \"1\"" >> ${LOCAL_CONF}
+	fi
+
+	# Extra properties from CLI
+	for extra_conf in "${EXTRA_CONFS[@]}"; do
+		echo "${extra_conf%=*} = \"${extra_conf#*=}\"" >> ${LOCAL_CONF}
+	done
+
+	# AAC version
+	echo "DISTRO_VERSION = \"${SDK_BASE_VERSION}\"" >> ${LOCAL_CONF}
+	echo "SDK_VERSION = \"${SDK_VERSION}\"" >> ${LOCAL_CONF}
 }
 
 execute_bitbake() {
@@ -297,6 +349,11 @@ execute_bitbake() {
 copy_images() {
 	mkdir -p ${DEPLOY_DIR}/${TARGET}
 	cp -P ${BUILD_DIR}/tmp*/deploy/images/${TARGET}/${PACKAGE}* ${DEPLOY_DIR}/${TARGET}
+	echo "SDK Version: ${SDK_VERSION}" > ${DEPLOY_DIR}/buildinfo.txt
+	if [ -d ${SDK_HOME}/.repo ] && [ $(command -v repo) ]; then
+		echo "Repo Info:" >> ${DEPLOY_DIR}/buildinfo.txt
+		repo forall -c "echo \${REPO_PROJECT} =\> \${REPO_PATH}: \${REPO_LREV} >> ${DEPLOY_DIR}/buildinfo.txt"
+	fi
 }
 
 build() {
@@ -328,6 +385,8 @@ build() {
 	fi
 	execute_bitbake && copy_images
 }
+
+note "SDK Version: ${SDK_VERSION}"
 
 # Initialize local configs
 init_local_conf

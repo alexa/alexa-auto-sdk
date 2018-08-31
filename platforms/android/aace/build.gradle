@@ -3,6 +3,9 @@ import java.util.regex.Pattern
 
 apply plugin: 'com.android.library'
 
+if (!project.hasProperty('INCLUDE_ALEXA_COMMS_MODULE'))
+    project.ext.INCLUDE_ALEXA_COMMS_MODULE = false;
+
 android {
     compileSdkVersion 26
     buildToolsVersion '27.0.3'
@@ -16,7 +19,8 @@ android {
         }
         externalNativeBuild {
             cmake {
-                arguments '-DANDROID_STL=c++_shared'
+                arguments '-DANDROID_STL=c++_shared',
+                          '-DINCLUDE_ALEXA_COMMS_MODULE=' + (project.INCLUDE_ALEXA_COMMS_MODULE ? "ON" : "OFF")
             }
         }
     }
@@ -40,6 +44,15 @@ android {
     sourceSets {
         main {
             jniLibs.srcDirs 'native-dependencies/jni'
+
+            java {
+                srcDirs = ['src/main/java']
+                if (project.INCLUDE_ALEXA_COMMS_MODULE) {
+                    srcDirs = ['src/main/java', 'src/main/javaWithComms']
+                } else {
+                    srcDirs = ['src/main/java', 'src/main/javaWithoutComms']
+                }
+            }
         }
     }
 }

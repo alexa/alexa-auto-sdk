@@ -33,6 +33,8 @@ bool PlaybackControllerEngineImpl::initialize(
     
     try
     {
+        ThrowIfNull( capabilitiesDelegate, "invalidCapabilitiesDelegate" );
+
         m_playbackControllerCapabilityAgent = alexaClientSDK::capabilityAgents::playbackController::PlaybackController::create( contextManager, messageSender );
         ThrowIfNull( m_playbackControllerCapabilityAgent, "couldNotCreateCapabilityAgent" );
 
@@ -55,10 +57,14 @@ std::shared_ptr<PlaybackControllerEngineImpl> PlaybackControllerEngineImpl::crea
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate ) {
-    
+
+    std::shared_ptr<PlaybackControllerEngineImpl> playbackControllerEngineImpl = nullptr;
+
     try
     {
-        std::shared_ptr<PlaybackControllerEngineImpl> playbackControllerEngineImpl = std::shared_ptr<PlaybackControllerEngineImpl>( new PlaybackControllerEngineImpl( playbackControllerPlatformInterface ) );
+        ThrowIfNull( playbackControllerPlatformInterface, "invalidPlaybackControllerPlatformInterface" );
+
+        playbackControllerEngineImpl = std::shared_ptr<PlaybackControllerEngineImpl>( new PlaybackControllerEngineImpl( playbackControllerPlatformInterface ) );
 
         ThrowIfNot( playbackControllerEngineImpl->initialize( messageSender, contextManager, capabilitiesDelegate ), "initializePlaybackControllerEngineImplFailed" );
 
@@ -66,6 +72,9 @@ std::shared_ptr<PlaybackControllerEngineImpl> PlaybackControllerEngineImpl::crea
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"create").d("reason", ex.what()));
+        if( playbackControllerEngineImpl != nullptr ) {
+            playbackControllerEngineImpl->shutdown();
+        }
         return nullptr;
     }
 }
@@ -85,20 +94,12 @@ std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterfac
     return m_playbackRouter;
 }
     
-void PlaybackControllerEngineImpl::onPlayButtonPressed() {
-    m_playbackRouter->playButtonPressed();
+void PlaybackControllerEngineImpl::onButtonPressed(PlaybackButton button) {
+    m_playbackRouter->buttonPressed(static_cast<alexaClientSDK::avsCommon::avs::PlaybackButton>( button ));
 }
 
-void PlaybackControllerEngineImpl::onPauseButtonPressed() {
-    m_playbackRouter->pauseButtonPressed();
-}
-
-void PlaybackControllerEngineImpl::onNextButtonPressed() {
-    m_playbackRouter->nextButtonPressed();
-}
-
-void PlaybackControllerEngineImpl::onPreviousButtonPressed() {
-    m_playbackRouter->previousButtonPressed();
+void PlaybackControllerEngineImpl::onTogglePressed(PlaybackToggle toggle, bool action) {
+    m_playbackRouter->togglePressed(static_cast<alexaClientSDK::avsCommon::avs::PlaybackToggle>( toggle ), action);
 }
     
 } // aace::engine::alexa

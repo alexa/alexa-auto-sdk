@@ -57,23 +57,23 @@ public class PlaybackControllerHandler extends PlaybackController {
     }
 
     public void previousButtonPressed() {
-        super.previousButtonPressed();
-        mLogger.postVerbose( sTag, "Calling previousButtonPressed()" );
+        buttonPressed(PlaybackButton.PREVIOUS);
+        mLogger.postVerbose( sTag, "Calling previousButtonPressed" );
     }
 
     public void playButtonPressed() {
-        super.playButtonPressed();
-        mLogger.postVerbose( sTag, "Calling playButtonPressed()" );
+        buttonPressed(PlaybackButton.PLAY);
+        mLogger.postVerbose( sTag, "Calling playButtonPressed" );
     }
 
     public void pauseButtonPressed() {
-        super.pauseButtonPressed();
-        mLogger.postVerbose( sTag, "Calling pauseButtonPressed()" );
+        buttonPressed(PlaybackButton.PAUSE);
+        mLogger.postVerbose( sTag, "Calling pauseButtonPressed" );
     }
 
     public void nextButtonPressed() {
-        super.nextButtonPressed();
-        mLogger.postVerbose( sTag, "Calling nextButtonPressed()" );
+        buttonPressed(PlaybackButton.NEXT);
+        mLogger.postVerbose( sTag, "Calling nextButtonPressed" );
     }
 
     public void setMediaPlayer( MediaPlayerHandler mediaPlayer ) { mMediaPlayer = mediaPlayer; }

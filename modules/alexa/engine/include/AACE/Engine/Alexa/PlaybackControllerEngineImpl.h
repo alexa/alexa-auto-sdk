@@ -47,10 +47,9 @@ public:
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> getPlaybackRouter();
 
 protected:
-    void onPlayButtonPressed() override;
-    void onPauseButtonPressed() override;
-    void onNextButtonPressed() override;
-    void onPreviousButtonPressed() override;
+    void onButtonPressed(PlaybackButton button) override;
+
+    void onTogglePressed(PlaybackToggle toggle, bool action) override;
  
     void doShutdown() override;
 

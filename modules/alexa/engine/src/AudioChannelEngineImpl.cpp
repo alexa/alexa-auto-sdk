@@ -16,6 +16,7 @@
 #include <AVSCommon/Utils/LibcurlUtils/HTTPContentFetcherFactory.h>
 
 #include "AACE/Engine/Alexa/AudioChannelEngineImpl.h"
+#include "AACE/Engine/Alexa/AlexaMetrics.h"
 #include "AACE/Engine/Core/EngineMacros.h"
 
 namespace aace {
@@ -35,14 +36,17 @@ AudioChannelEngineImpl::AudioChannelEngineImpl( std::shared_ptr<aace::alexa::Aud
     m_stream( nullptr ),
     m_currentId( ERROR ),
     m_savedOffset( std::chrono::milliseconds( 0 ) ),
+    m_name( name ),
     m_pendingEventState( PendingEventState::NONE ),
-    m_currentMediaState( MediaState::STOPPED ) {
+    m_currentMediaState( MediaState::STOPPED ),
+    m_mediaStateChangeInitiator( MediaStateChangeInitiator::NONE ) {
 }
 
 bool AudioChannelEngineImpl::initializeAudioChannel( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager )
 {
     try
     {
+        ThrowIfNull(speakerManager, "invalidSpeakerManager");
         m_speakerManager = speakerManager;
     
         m_mediaPlayerPlatformInterface = m_audioChannelPlatformInterface->getMediaPlayer();
@@ -70,11 +74,15 @@ void AudioChannelEngineImpl::doShutdown()
     m_executor.shutdown();
 
     // reset the media player engine interface
-    m_mediaPlayerPlatformInterface->setEngineInterface( nullptr );
-    
+    if( m_mediaPlayerPlatformInterface != nullptr ) {
+        m_mediaPlayerPlatformInterface->setEngineInterface(nullptr);
+    }
+
     // reset the speaker engine interface
-    m_speakerPlatformInterface->setEngineInterface( nullptr );
-    
+    if( m_speakerPlatformInterface != nullptr ) {
+        m_speakerPlatformInterface->setEngineInterface(nullptr);
+    }
+
     // reset the media observer reference
     m_observer.reset();
     
@@ -139,8 +147,8 @@ void AudioChannelEngineImpl::executeMediaStateChanged( SourceId id, MediaState s
     {
         AACE_VERBOSE(LX(TAG,"executeMediaStateChanged").d("currentState",m_currentMediaState).d("newState",state).d("pendingEvent",m_pendingEventState));
 
-        // return if the current media state is the same as the new state
-        if( m_currentMediaState == state ) {
+        // return if the current media state is the same as the new state and no pending event
+        if( m_currentMediaState == state && m_pendingEventState == PendingEventState::NONE ) {
             return;
         }
     
@@ -150,12 +158,14 @@ void AudioChannelEngineImpl::executeMediaStateChanged( SourceId id, MediaState s
             // if the current state is STOPPED then pending event should be set to either
             // PLAYBACK_STARTED or PLAYBACK_RESUMED... otherwise the platform is attempting
             // to change the media state at an unexpected time!
-            if( m_currentMediaState == MediaState::STOPPED  )
+            if( m_currentMediaState == MediaState::STOPPED )
             {
                 if( m_pendingEventState == PendingEventState::PLAYBACK_STARTED ) {
+                    m_mediaStateChangeInitiator = MediaStateChangeInitiator::PLAY;
                     executePlaybackStarted( id );
                 }
                 else if( m_pendingEventState == PendingEventState::PLAYBACK_RESUMED ) {
+                    m_mediaStateChangeInitiator = MediaStateChangeInitiator::RESUME;
                     executePlaybackResumed( id );
                 }
                 else {
@@ -183,12 +193,15 @@ void AudioChannelEngineImpl::executeMediaStateChanged( SourceId id, MediaState s
             if( m_currentMediaState == MediaState::PLAYING )
             {
                 if( m_pendingEventState == PendingEventState::PLAYBACK_STOPPED ) {
+                    m_mediaStateChangeInitiator = MediaStateChangeInitiator::STOP;
                     executePlaybackStopped( id );
                 }
                 else if( m_pendingEventState == PendingEventState::PLAYBACK_PAUSED ) {
+                    m_mediaStateChangeInitiator = MediaStateChangeInitiator::PAUSE;
                     executePlaybackPaused( id );
                 }
                 else if( m_pendingEventState == PendingEventState::NONE ) {
+                    m_mediaStateChangeInitiator = MediaStateChangeInitiator::NONE;
                     executePlaybackFinished( id );
                 }
                 else {
@@ -201,18 +214,33 @@ void AudioChannelEngineImpl::executeMediaStateChanged( SourceId id, MediaState s
             else if( m_currentMediaState == MediaState::BUFFERING )
             {
                 if( m_pendingEventState == PendingEventState::PLAYBACK_STOPPED ) {
+                    m_mediaStateChangeInitiator = MediaStateChangeInitiator::STOP;
                     executePlaybackStopped( id );
                 }
                 else if( m_pendingEventState == PendingEventState::PLAYBACK_PAUSED ) {
+                    m_mediaStateChangeInitiator = MediaStateChangeInitiator::PAUSE;
                     executePlaybackPaused( id );
                 }
                 else {
                     Throw( "unexpectedPendingEventState" );
                 }
             }
-            
+
+            // if the current media state is STOPPED the pending event should be set to PLAYBACK_STOPPED
+            // if we are transitioning from paused to stopped
+            else if( m_currentMediaState == MediaState::STOPPED )
+            {
+                if( m_pendingEventState == PendingEventState::PLAYBACK_STOPPED ) {
+                    m_mediaStateChangeInitiator = MediaStateChangeInitiator::STOP;
+                    executePlaybackStopped( id );
+                }
+                else {
+                    Throw( "unexpectedPendingEventState" );
+                }
+            }
+
             // if current state is anything else it is considered an error, since the platform
-            // is only allowed to transition to STOPPED if it currently PLAYING.
+            // is only allowed to transition to STOPPED if it currently PLAYING or STOPPED from pause().
             else {
                 Throw( "unexpectedMediaState" );
             }
@@ -227,7 +255,7 @@ void AudioChannelEngineImpl::executeMediaStateChanged( SourceId id, MediaState s
                 return;
             }
             
-            // if the pending evenis is PLAYBACK_RESUMED then send the resumed event to AVS before sending
+            // if the pending event is is PLAYBACK_RESUMED then send the resumed event to AVS before sending
             // the buffer underrun event
             else if( m_pendingEventState == PendingEventState::PLAYBACK_RESUMED ) {
                 executePlaybackResumed( id );
@@ -289,6 +317,7 @@ void AudioChannelEngineImpl::executePlaybackStarted( SourceId id )
 {
     try
     {
+        ALEXA_METRIC(LX(TAG, "executePlaybackStarted").d("channelName", m_name), aace::engine::alexa::AlexaMetrics::Location::PLAYBACK_STARTED);
         ThrowIf( id == ERROR, "invalidSource" );
         
         if( m_observer != nullptr ) {
@@ -345,6 +374,7 @@ void AudioChannelEngineImpl::executePlaybackResumed( SourceId id )
 {
     try
     {
+        ALEXA_METRIC(LX(TAG, "executePlaybackResumed").d("channelName", m_name), aace::engine::alexa::AlexaMetrics::Location::PLAYBACK_RESUMED);
         ThrowIf( id == ERROR, "invalidSource" );
         
         if( m_observer != nullptr ) {
@@ -492,6 +522,7 @@ void AudioChannelEngineImpl::resetSource()
     m_currentId = ERROR;
     m_pendingEventState = PendingEventState::NONE;
     m_currentMediaState = MediaState::STOPPED;
+    m_mediaStateChangeInitiator = MediaStateChangeInitiator::NONE;
     m_url.clear();
     m_savedOffset = std::chrono::milliseconds( 0 );
 }
@@ -595,18 +626,21 @@ bool AudioChannelEngineImpl::play( alexaClientSDK::avsCommon::utils::mediaPlayer
     {
         ThrowIfNot( validateSource( id ), "invalidSource" );
 
+        // return false if audio is already playing
+        ReturnIf( m_currentMediaState == MediaState::PLAYING || m_currentMediaState == MediaState::BUFFERING, false );
+
+        // return false if play() was already called but no callback has been made yet
+        ReturnIf( m_pendingEventState == PendingEventState::PLAYBACK_STARTED, false );
+
         // send the pending event
         sendPendingEvent();
 
+        //invoke the platform interface play method
+        ALEXA_METRIC(LX(TAG, "play").d("channelName", m_name), aace::engine::alexa::AlexaMetrics::Location::PLAYBACK_REQUEST_START);
         ThrowIfNot( m_mediaPlayerPlatformInterface->play(), "platformMediaPlayerPlayFailed" );
 
         // set the expected pending event state
         m_pendingEventState = PendingEventState::PLAYBACK_STARTED;
-
-        // if the current media state is already playing then send up the pending event now
-        if( m_currentMediaState == MediaState::PLAYING ) {
-            sendPendingEvent();
-        }
         
         return true;
     }
@@ -624,6 +658,9 @@ bool AudioChannelEngineImpl::stop( alexaClientSDK::avsCommon::utils::mediaPlayer
     {
         ThrowIfNot( validateSource( id ), "invalidSource" );
 
+        // return false if audio is already stopped
+        ReturnIf( m_mediaStateChangeInitiator == MediaStateChangeInitiator::STOP, false );
+
         // send the pending event
         sendPendingEvent();
 
@@ -632,11 +669,6 @@ bool AudioChannelEngineImpl::stop( alexaClientSDK::avsCommon::utils::mediaPlayer
         
         // set the expected pending event state and media offset
         m_pendingEventState = PendingEventState::PLAYBACK_STOPPED;
-
-        // if the current media state is already stopped then send up the pending event now
-        if( m_currentMediaState == MediaState::STOPPED ) {
-            sendPendingEvent();
-        }
 
         return true;
     }
@@ -654,7 +686,12 @@ bool AudioChannelEngineImpl::pause( alexaClientSDK::avsCommon::utils::mediaPlaye
     {
         ThrowIfNot( validateSource( id ), "invalidSource" );
         ReturnIf( id == ERROR, true );
-        
+
+        // return false if audio is not playing/starting/resuming
+        ReturnIf( m_currentMediaState == MediaState::STOPPED 
+                && m_pendingEventState != PendingEventState::PLAYBACK_STARTED 
+                && m_pendingEventState != PendingEventState::PLAYBACK_RESUMED, false );
+
         // send the pending event
         sendPendingEvent();
         
@@ -684,20 +721,25 @@ bool AudioChannelEngineImpl::resume( alexaClientSDK::avsCommon::utils::mediaPlay
     try
     {
         ThrowIfNot( validateSource( id ), "invalidSource" );
+
+        // return false if audio is not paused
+        ReturnIf( m_mediaStateChangeInitiator != MediaStateChangeInitiator::PAUSE, false );
+
+        // return false if audio is already playing
+        ReturnIf( m_currentMediaState == MediaState::PLAYING || m_currentMediaState == MediaState::BUFFERING, false );
+
+        // return false if resume() was already called but no callback has been made yet
+        ReturnIf( m_pendingEventState == PendingEventState::PLAYBACK_RESUMED, false );
         
         // send the pending event
         sendPendingEvent();
 
         // invoke the platform interface resume method
+        ALEXA_METRIC(LX(TAG, "resume").d("channelName", m_name), aace::engine::alexa::AlexaMetrics::Location::PLAYBACK_REQUEST_RESUME);
         ThrowIfNot( m_mediaPlayerPlatformInterface->resume(), "platformMediaPlayerResumeFailed" );
         
         // set the expected pending event state
         m_pendingEventState = PendingEventState::PLAYBACK_RESUMED;
-
-        // if the current media state is already playing then send up the pending event now
-        if( m_currentMediaState == MediaState::PLAYING ) {
-            sendPendingEvent();
-        }
 
         return true;
     }

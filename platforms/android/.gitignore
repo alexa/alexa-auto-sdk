@@ -35,6 +35,8 @@ captures/
 # IntelliJ
 *.iml
 .idea
+.project
+.settings
 
 # Keystore files
 # Uncomment the following line if you do not want to check your keystore files in.
@@ -62,3 +64,6 @@ fastlane/readme.md
 gradlew
 gradlew.bat
 gradle/
+
+# macOS
+.DS_Store

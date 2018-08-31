@@ -1,4 +1,21 @@
 var searchData=
 [
-  ['holdtotalk',['holdToTalk',['../classaace_1_1alexa_1_1_speech_recognizer.html#aa2859cbc2a49609ba8027f912d373692',1,'aace::alexa::SpeechRecognizer']]]
+  ['getaccuracy',['getAccuracy',['../classaace_1_1location_1_1_location.html#a1741ce546e33172d68825650d5499ce9',1,'aace::location::Location']]],
+  ['getaltitude',['getAltitude',['../classaace_1_1location_1_1_location.html#a6651d8181e4361df5777f1992cb063c0',1,'aace::location::Location']]],
+  ['getauthstate',['getAuthState',['../classaace_1_1alexa_1_1_auth_provider.html#a6d00a8dac76187fd4d7eebc3f13160fd',1,'aace::alexa::AuthProvider']]],
+  ['getauthtoken',['getAuthToken',['../classaace_1_1alexa_1_1_auth_provider.html#ac2600cbd59d19ce4f9e5d5134913376f',1,'aace::alexa::AuthProvider']]],
+  ['getlatitude',['getLatitude',['../classaace_1_1location_1_1_location.html#a2ff0516c0cb41fa318b75edd5e81f5e0',1,'aace::location::Location']]],
+  ['getlocation',['getLocation',['../classaace_1_1location_1_1_location_provider.html#a97f95a88be0b6cf84f3295a11eed5ba5',1,'aace::location::LocationProvider']]],
+  ['getlongitude',['getLongitude',['../classaace_1_1location_1_1_location.html#a64a93e6dd590bf066aa0790f32436c9d',1,'aace::location::Location']]],
+  ['getmediaplayer',['getMediaPlayer',['../classaace_1_1alexa_1_1_audio_channel.html#a6850227818b02b670e6beaa3dee00528',1,'aace::alexa::AudioChannel']]],
+  ['getnetworkstatus',['getNetworkStatus',['../classaace_1_1network_1_1_network_info_provider.html#ad7cf08c5dbaad707cc176e422258ee1d',1,'aace::network::NetworkInfoProvider']]],
+  ['getposition',['getPosition',['../classaace_1_1alexa_1_1_media_player.html#ada44f4e01630942d11eea612521924cf',1,'aace::alexa::MediaPlayer']]],
+  ['getproperty',['getProperty',['../classaace_1_1core_1_1_engine.html#abab5399f2030131a54f1ba93e4981508',1,'aace::core::Engine']]],
+  ['getspeaker',['getSpeaker',['../classaace_1_1alexa_1_1_audio_channel.html#a5ac3e6fb25db1e8af5dfb842ae1732a8',1,'aace::alexa::AudioChannel']]],
+  ['getspeakertype',['getSpeakerType',['../classaace_1_1alexa_1_1_audio_channel.html#a4b5807596680eb47671eaa5313da4e0d',1,'aace::alexa::AudioChannel']]],
+  ['getstream',['getStream',['../classaace_1_1core_1_1config_1_1_engine_configuration.html#ace6b90a16f1c8366e0beb15898c93e4e',1,'aace::core::config::EngineConfiguration::getStream()'],['../classaace_1_1core_1_1config_1_1_stream_configuration.html#a2a0af105fa9142f2190b749c91585d58',1,'aace::core::config::StreamConfiguration::getStream()'],['../classaace_1_1core_1_1config_1_1_configuration_file.html#a8ee151fa389256ca8e2df8626e76407e',1,'aace::core::config::ConfigurationFile::getStream()']]],
+  ['gettime',['getTime',['../classaace_1_1location_1_1_location.html#a20ba8e872b6b255d46dd5ea231cffb1a',1,'aace::location::Location']]],
+  ['gettimeasstring',['getTimeAsString',['../classaace_1_1location_1_1_location.html#aea77abc6aa7edc610312fde96cb77d7a',1,'aace::location::Location']]],
+  ['getvolume',['getVolume',['../classaace_1_1alexa_1_1_speaker.html#a9d58db586bde03037f749c4db5fb7e1a',1,'aace::alexa::Speaker']]],
+  ['getwifisignalstrength',['getWifiSignalStrength',['../classaace_1_1network_1_1_network_info_provider.html#a605775f8cfa22e10ca7a9144dc636a62',1,'aace::network::NetworkInfoProvider']]]
 ];

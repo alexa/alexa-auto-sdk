@@ -25,7 +25,7 @@ namespace core {
 
 class Version {
 public:
-    Version( uint8_t major = 0, uint8_t minor = 0, uint8_t revision = 0 );
+    Version( uint8_t major = 0, uint8_t minor = 0, uint8_t revision = 0, const std::string& tag = "" );
     Version( const std::string& str );
     Version( const Version& version );
     
@@ -40,6 +40,7 @@ private:
     uint8_t m_major;
     uint8_t m_minor;
     uint8_t m_revision;
+    std::string m_tag;
 };
 
 class ServiceDescription {

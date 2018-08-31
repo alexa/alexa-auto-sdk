@@ -32,11 +32,6 @@ public:
 private:
     JNIEnv* m_env;
     bool m_detatch;
-
-private:
-    using ThreadContextMap = std::unordered_map<JNIEnv*,int>;
-
-    static ThreadContextMap s_contextMap;
 };
 
 template <class T>

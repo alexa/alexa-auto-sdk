@@ -91,7 +91,13 @@ public class VehicleConfiguration {
          * Language
          * @hideinitializer
          */
-        LANGUAGE("LANGUAGE","language");
+        LANGUAGE("LANGUAGE","language"),
+
+        /**
+         * Microphone
+         * @hideinitializer
+         */
+        MICROPHONE("MICROPHONE","microphone");
 
         /**
          * @internal
@@ -156,8 +162,9 @@ public class VehicleConfiguration {
      *          "geography": "<GEOGRAPHY>",
      *          "version": "<SOFTWARE_VERSION>",
      *          "os": "<OPERATING_SYSTEM>",
-     *          "arch": "<HARDWARE_ARCH>"
-     *          "language": "<LANGUAGE>"
+     *          "arch": "<HARDWARE_ARCH>",
+     *          "language": "<LANGUAGE>",
+     *          "microphone": "<MICROPHONE>"
      *      }
      *   }
      * }

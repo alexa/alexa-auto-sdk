@@ -20,8 +20,21 @@ EXTRA_OECMAKE_append_darwin = " -DGSTREAMER_MEDIA_PLAYER=ON \
 
 FILES_${PN}-test += "${libdir}/libIntegration${SOLIBS}"
 
-# Use SQLite3 from our sysroot
-export PKG_CONFIG_LIBDIR="${STAGING_DIR_HOST}${libdir}/pkgconfig"
+# WakeWord: KITT.AI
+KITTAT_CMAKE_OPTIONS = "\
+  -DKITTAI_KEY_WORD_DETECTOR=ON \
+  -DKITTAI_KEY_WORD_DETECTOR_LIB_PATH=${STAGING_DIR_HOST}${libdir}/libsnowboy-detect.a \
+  -DKITTAI_KEY_WORD_DETECTOR_INCLUDE_DIR=${STAGING_DIR_HOST}${includedir} \
+"
+PACKAGECONFIG[kittai] = "${KITTAT_CMAKE_OPTIONS},,snowboy"
+
+# WakeWord: Sensory
+SENSORY_CMAKE_OPTIONS = "\
+  -DSENSORY_KEY_WORD_DETECTOR=ON \
+  -DSENSORY_KEY_WORD_DETECTOR_LIB_PATH=${STAGING_DIR_HOST}${libdir}/libsnsr.a \
+  -DSENSORY_KEY_WORD_DETECTOR_INCLUDE_DIR=${STAGING_DIR_HOST}${includedir} \
+"
+PACKAGECONFIG[sensory] = "${SENSORY_CMAKE_OPTIONS},,truly-handsfree"
 
 do_install_append() {
 	mkdir -p ${D}${testbindir}/${PN}
@@ -31,4 +44,7 @@ do_install_append() {
 	fi
 	mkdir -p ${D}${includedir}
 	cp -R ${S}/ThirdParty/rapidjson/rapidjson-1.1.0/include/* ${D}${includedir}
+	# Copy the Mock headers from AVS SDK
+	mkdir -p ${D}${includedir}/AVSCommon/SDKInterfaces/test
+	cp -R ${S}/AVSCommon/SDKInterfaces/test/AVSCommon/SDKInterfaces/* ${D}${includedir}/AVSCommon/SDKInterfaces/test
 }

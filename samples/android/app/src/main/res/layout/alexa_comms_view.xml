@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/alexacomms_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/alexa_comms_view_title"
+        android:textColor="@color/drawerHeader"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/alexacomms_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/alexa_comms_status_noactive_call" />
+
+    <LinearLayout
+        android:id="@+id/alexa_comms_commands_panel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <LinearLayout
+            android:id="@+id/alexa_comms_accept_stop_panel"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/alexa_comms_stop_btn"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@android:color/holo_red_dark"
+                android:enabled="false"
+                android:text="@string/alexa_comms_control_stop" />
+
+            <Button
+                android:id="@+id/alexa_comms_accept_btn"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@android:color/holo_green_dark"
+                android:enabled="false"
+                android:text="@string/alexa_comms_control_accept" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

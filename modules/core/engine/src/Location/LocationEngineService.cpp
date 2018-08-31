@@ -31,7 +31,7 @@ REGISTER_SERVICE(LocationEngineService)
 LocationEngineService::LocationEngineService( const aace::engine::core::ServiceDescription& description ) : aace::engine::core::EngineService( description ) {
 }
 
-std::shared_ptr<aace::location::LocationProvider> LocationEngineService::getProvider() {
+std::shared_ptr<aace::location::LocationProvider> LocationEngineService::getLocationProvider() {
     return m_locationProvider;
 }
 

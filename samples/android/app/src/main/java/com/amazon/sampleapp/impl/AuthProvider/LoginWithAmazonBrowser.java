@@ -28,7 +28,9 @@ import com.amazon.identity.auth.device.api.authorization.AuthorizeRequest;
 import com.amazon.identity.auth.device.api.authorization.AuthorizeResult;
 import com.amazon.identity.auth.device.api.authorization.Scope;
 import com.amazon.identity.auth.device.api.authorization.ScopeFactory;
+import com.amazon.identity.auth.device.api.authorization.User;
 import com.amazon.identity.auth.device.api.workflow.RequestContext;
+
 import com.amazon.sampleapp.R;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 
@@ -38,11 +40,25 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Observable;
+import java.util.Timer;
+import java.util.TimerTask;
 
 class LoginWithAmazonBrowser extends Observable {
 
     private static final String sTag = "LWA";
-    private static final Scope ALEXA_ALL_SCOPE = ScopeFactory.scopeNamed( "alexa:all" );
+
+    private static final String sAlexaAllScope = "alexa:all";
+    private static final String sProfileScope = "profile";
+
+    // To fetch User Profile data, set the sUserProfileEnabled to true
+    // You will need additional parameters in your Security Profile for the profile scope request to succeed,
+    // please see the README CBL section for more.
+    private static final boolean sUserProfileEnabled = false;
+
+    // Refresh access token 2 minutes before it expires
+    private static final int sRefreshAccessTokenTime = 120000;
+    // Access token expires after one hour
+    private static final int sAccessTokenExpirationTime = 3600000;
 
     private final SharedPreferences mPreferences;
     private final Activity mActivity;
@@ -52,6 +68,8 @@ class LoginWithAmazonBrowser extends Observable {
     private String mProductID;
     private String mProductDSN;
     private boolean mHasApiKey = false;
+    private Timer mTimer = new Timer();
+    private TimerTask mRefreshTimerTask;
 
     LoginWithAmazonBrowser( Activity activity,
                             SharedPreferences preferences,
@@ -84,7 +102,7 @@ class LoginWithAmazonBrowser extends Observable {
     private void setupLWA() {
         try {
             mRequestContext.registerListener( new AuthorizeListener() {
-                /* Authorization was completed successfully. */
+
                 @Override
                 public void onSuccess( AuthorizeResult result ) {
                     String accessToken = result.getAccessToken();
@@ -96,13 +114,22 @@ class LoginWithAmazonBrowser extends Observable {
                                 AuthProvider.AuthError.NO_ERROR );
                         setChanged();
                         notifyObservers( "logged in" );
-                    } else mLogger.postError( sTag, "AUTHORIZATION FAILED" );
+
+                        // show user profile info
+                        logUserProfile( result.getUser() );
+
+                        startRefreshTimer();
+
+                    } else mLogger.postError( sTag, "Authorization failed. Access token was not set." );
+
                 }
 
-                /* There was an error during the attempt to authorize the application. */
+                /* Inform the AuthProvider of auth failure  */
                 @Override
                 public void onError( AuthError ae ) {
-                    mLogger.postError( sTag, "%s: AUTHORIZATION FAILED. Error: "
+                    mAuthProvider.onAuthStateChanged( AuthProvider.AuthState.UNINITIALIZED,
+                            AuthProvider.AuthError.AUTHORIZATION_FAILED );
+                    mLogger.postError( sTag, "Authorization failed. Error: "
                             + ae.getMessage() );
                 }
 
@@ -116,9 +143,7 @@ class LoginWithAmazonBrowser extends Observable {
                 }
             });
 
-        } catch ( Throwable e ) {
-            mLogger.postError( sTag, e );
-        }
+        } catch ( Exception e ) { mLogger.postError( sTag, e ); }
     }
 
     void login() {
@@ -131,32 +156,47 @@ class LoginWithAmazonBrowser extends Observable {
                 scopeData.put( "productInstanceAttributes", productInstanceAttributes );
                 scopeData.put( "productID", mProductID );
 
-                AuthorizationManager.authorize( new AuthorizeRequest
-                        .Builder( mRequestContext )
-                        .addScopes( ScopeFactory.scopeNamed( "alexa:all", scopeData ) )
-                        .forGrantType( AuthorizeRequest.GrantType.ACCESS_TOKEN )
-                        .shouldReturnUserData( false )
-                        .build()
-                );
-
-                // Clear refresh token in preferences (used only for CBL)
+                // Save logged in method and access token
                 SharedPreferences.Editor editor = mPreferences.edit();
-                editor.putString( mActivity.getString( R.string.preference_refresh_token ), "" );
+                editor.putString( mActivity.getString( R.string.preference_login_method ), LoginWithAmazon.LWA_LOGIN_METHOD_KEY );
                 editor.apply();
 
-            } catch ( JSONException e ) {
-                mLogger.postError( sTag, e.getMessage() );
-            }
-        } else mLogger.postWarn( sTag,
-                "Cannot authenticate. assets/api_key.txt does not exist" );
+                if( sUserProfileEnabled ) {
+                    AuthorizationManager.authorize(new AuthorizeRequest
+                            .Builder(mRequestContext)
+                            .addScopes(ScopeFactory.scopeNamed(sAlexaAllScope, scopeData), ScopeFactory.scopeNamed(sProfileScope))
+                            .forGrantType(AuthorizeRequest.GrantType.ACCESS_TOKEN)
+                            .shouldReturnUserData(true)
+                            .build()
+                    );
+                } else {
+                    AuthorizationManager.authorize(new AuthorizeRequest
+                            .Builder(mRequestContext)
+                            .addScope(ScopeFactory.scopeNamed(sAlexaAllScope, scopeData))
+                            .forGrantType(AuthorizeRequest.GrantType.ACCESS_TOKEN)
+                            .shouldReturnUserData(true)
+                            .build()
+                    );
+
+                }
+            } catch ( Exception e ) { mLogger.postError( sTag, e.getMessage() ); }
+
+        } else mLogger.postWarn( sTag, "Cannot authenticate. assets/api_key.txt does not exist" );
     }
 
     void logout() {
+        mLogger.postInfo( sTag, "Attempting to de-authenticate" );
         AuthorizationManager.signOut( mActivity.getApplicationContext(),
                 new Listener<Void, AuthError>() {
             @Override
             public void onSuccess( Void aVoid ) {
-                mLogger.postInfo( sTag, "Attempting to de-authenticate" );
+                if ( mRefreshTimerTask != null ) mRefreshTimerTask.cancel();
+
+                // Save logged in method and access token
+                SharedPreferences.Editor editor = mPreferences.edit();
+                editor.putString( mActivity.getString( R.string.preference_login_method ), "" );
+                editor.apply();
+
                 mAuthProvider.clearAuthToken();
                 mAuthProvider.onAuthStateChanged( AuthProvider.AuthState.UNINITIALIZED,
                         AuthProvider.AuthError.NO_ERROR );
@@ -166,24 +206,27 @@ class LoginWithAmazonBrowser extends Observable {
 
             @Override
             public void onError( AuthError ae ) {
-                mLogger.postError( sTag, "Cannot log out. Error: " + ae.getMessage() );
+                mLogger.postError( sTag, "Unable to log out. Error: " + ae.getMessage() );
             }
         });
     }
 
-    void onResume() {
-        if ( mRequestContext != null ) {
-            mRequestContext.onResume();
-            if ( mHasApiKey ) {
-                Scope[] scopes = { ALEXA_ALL_SCOPE };
-                AuthorizationManager.getToken( mActivity, scopes, new TokenListener() );
-            }
+    void onInitialize() {
+        if ( mHasApiKey ) {
+            try {
+                AuthorizationManager.getToken( mActivity, new Scope[]{ ScopeFactory.scopeNamed( sAlexaAllScope ),
+                        ScopeFactory.scopeNamed( sProfileScope ) }, new TokenListener() );
+            } catch ( Exception e ) { mLogger.postError( sTag, e.getMessage() ); }
         }
+    }
+
+    void onResume() {
+        if ( mRequestContext != null ) mRequestContext.onResume();
     }
 
     private class TokenListener implements Listener<AuthorizeResult, AuthError> {
 
-        /* getToken completed successfully. */
+        /* will authorize if client already has access token from previous session */
         @Override
         public void onSuccess( AuthorizeResult result ) {
             String accessToken = result.getAccessToken();
@@ -195,12 +238,34 @@ class LoginWithAmazonBrowser extends Observable {
                         AuthProvider.AuthError.NO_ERROR );
                 setChanged();
                 notifyObservers( "logged in" );
+                startRefreshTimer();
             }
         }
 
         @Override
         public void onError( AuthError ae ) {
-            mLogger.postError( sTag, "AUTHORIZATION FAILED. Error: " + ae.getMessage() );
+            mAuthProvider.onAuthStateChanged( AuthProvider.AuthState.UNINITIALIZED,
+                    AuthProvider.AuthError.AUTHORIZATION_FAILED );
+            mLogger.postError( sTag, "Authorization failed. Error: " + ae.getMessage() );
         }
     }
+
+    private void startRefreshTimer() {
+        mTimer.schedule( mRefreshTimerTask = new TimerTask() {
+            public void run() {
+                if ( mHasApiKey ) {
+                    AuthorizationManager.getToken( mActivity, new Scope[]{ ScopeFactory.scopeNamed( sAlexaAllScope ),
+                            ScopeFactory.scopeNamed( sProfileScope ) }, new TokenListener() );
+                }
+            }
+        }, sAccessTokenExpirationTime - sRefreshAccessTokenTime );
+    }
+
+    private void logUserProfile( User user ) {
+        if ( user != null ) {
+            mLogger.postInfo( sTag, String.format( "User Profile: Name: %s, Email: %s, User ID: %s",
+                    user.getUserName(), user.getUserEmail(), user.getUserId() ) );
+        } else mLogger.postError( sTag, "Fetched user is null." );
+    }
+
 }

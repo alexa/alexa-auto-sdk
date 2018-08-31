@@ -8,5 +8,6 @@ var searchData=
   ['removeallalerts',['removeAllAlerts',['../classaace_1_1alexa_1_1_alerts.html#a48eea8459c5a5c42819fb4fcd155ff89',1,'aace::alexa::Alerts']]],
   ['renderplayerinfo',['renderPlayerInfo',['../classaace_1_1alexa_1_1_template_runtime.html#a71852ea84caa81de6cd633006c76ad51',1,'aace::alexa::TemplateRuntime']]],
   ['rendertemplate',['renderTemplate',['../classaace_1_1alexa_1_1_template_runtime.html#a8bac9d4c6a49d5f7e3ae64fbc477b325',1,'aace::alexa::TemplateRuntime']]],
+  ['repeat',['REPEAT',['../classaace_1_1alexa_1_1_playback_controller_engine_interface.html#a990f517d423450b712fcfd0488403e8ca5be68175be14dfaa080165456c2e9555',1,'aace::alexa::PlaybackControllerEngineInterface']]],
   ['resume',['resume',['../classaace_1_1alexa_1_1_media_player.html#a834b03b41e8792cb97968524edf97c80',1,'aace::alexa::MediaPlayer']]]
 ];

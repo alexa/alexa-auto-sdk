@@ -32,6 +32,7 @@
 #include <AVSCommon/SDKInterfaces/MessageSenderInterface.h>
 #include <ContextManager/ContextManager.h>
 #include <KWD/AbstractKeywordDetector.h>
+#include <SpeechEncoder/SpeechEncoder.h>
 
 #if defined AMAZONLITE_WAKEWORD_SUPPORT
 #include <AmazonLite/PryonLiteKeywordDetector.h>
@@ -61,7 +62,8 @@ private:
         std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::UserActivityNotifierInterface> userActivityNotifier );
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::UserInactivityMonitorInterface> userInactivityMonitor,
+        std::shared_ptr<alexaClientSDK::speechencoder::SpeechEncoder> speechEncoder );
 
 public:
     static std::shared_ptr<SpeechRecognizerEngineImpl> create(
@@ -74,7 +76,8 @@ public:
         std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::UserActivityNotifierInterface> userActivityNotifier );
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::UserInactivityMonitorInterface> userInactivityMonitor,
+        std::shared_ptr<alexaClientSDK::speechencoder::SpeechEncoder> speechEncoder = nullptr );
 
     // SpeechRecognizerEngineInterface
     bool onHoldToTalk() override;

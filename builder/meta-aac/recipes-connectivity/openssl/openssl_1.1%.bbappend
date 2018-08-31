@@ -11,11 +11,6 @@ do_configure_android() {
 	sed -i -e "s/-mandroid//" Configurations/10-main.conf
 	./Configure ${EXTRA_OECONF} \
 	  ${OPENSSL_TARGET} \
-	  -DARCH="${ANDROID_ABI}" \
-	  -DCROSS_COMPILE="${TARGET_PREFIX}" \
-	  -DMACHINE="${OPENSSL_MACHINE}" \
-	  -DRELEASE="2.6.37" \
-	  -DSYSTEM="android" \
 	  no-asm \
 	  no-comp \
 	  no-dso \
@@ -29,10 +24,14 @@ do_configure_android() {
 	  no-srp \
 	  no-ssl3 \
 	  no-weak-ssl-ciphers \
-	  --prefix=$prefix \
+	  --prefix=${prefix} \
 	  --openssldir=${libdir}/ssl-1.1 \
 	  --libdir=`basename ${libdir}` \
 	  -D_FORTIFY_SOURCE="2" -fstack-protector-strong
+}
+
+do_compile_prepend_android() {
+	export CROSS_SYSROOT="${TARGET_SYSROOT}"
 }
 
 do_install_android() {

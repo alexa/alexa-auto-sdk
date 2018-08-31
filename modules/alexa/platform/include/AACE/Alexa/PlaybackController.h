@@ -44,32 +44,31 @@ public:
     virtual ~PlaybackController();
 
     /**
-     * Notifies the Engine of a platform request to begin audio playback, such as when a user presses
-     * a "play" button. The Engine will issue a playback directive to the @c AudioPlayer @c MediaPlayer to initiate
-     * playback on the platform.
+     * Describes the playback button types
      */
-    void playButtonPressed();
+    using PlaybackButton = aace::alexa::PlaybackControllerEngineInterface::PlaybackButton;
 
     /**
-     * Notifies the Engine of a platform request to pause audio playback, such as when a user presses
-     * a "pause" button. The Engine will issue a playback directive to the @c AudioPlayer @c MediaPlayer to stop
-     * playback on the platform.
+     * Describes the playback toggle types
      */
-    void pauseButtonPressed();
+    using PlaybackToggle = aace::alexa::PlaybackControllerEngineInterface::PlaybackToggle;
 
     /**
-     * Notifies the Engine of a platform request to skip forward in the playback queue, such as when a user
-     * presses a "next" button. The Engine will issue playback directives to the @c AudioPlayer @c MediaPlayer
+     * Notifies the Engine of a platform button request (i.e. Play/Pause/Next/Previous/Skip Forward/Skip Backward)
+     * For certain playback types, the Engine will issue playback directives to the @c AudioPlayer @c MediaPlayer 
      * to control playback on the platform.
+     * @param [in] button The playback button type
      */
-    void nextButtonPressed();
+    void buttonPressed(PlaybackButton button);
 
     /**
-     * Notifies the Engine of a platform request to skip backward in the playback queue, such as when a user
-     * presses a "previous" button. The Engine will issue playback directives to the @c AudioPlayer @c MediaPlayer
+     * Notifies the Engine of a platform toggle request (i.e. Shuffle/Loop/Repeat/Thumbs Up/Thumbs Down) 
+     * For certain playback types, the Engine will issue playback directives to the @c AudioPlayer @c MediaPlayer 
      * to control playback on the platform.
+     * @param [in] toggle The playback toggle type
+     * @param [in] action The toggle action ( selected/deselected )
      */
-    void previousButtonPressed();
+    void togglePressed(PlaybackToggle toggle, bool action);
 
     /**
      * @internal

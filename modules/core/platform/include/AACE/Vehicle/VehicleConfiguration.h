@@ -80,7 +80,12 @@ public:
         /**
          * Language
          */
-        LANGUAGE
+        LANGUAGE,
+
+        /**
+         * Microphone
+         */
+        MICROPHONE
     };
     
     /**
@@ -105,8 +110,9 @@ public:
      *          "geography": "<GEOGRAPHY>",
      *          "version": "<SOFTWARE_VERSION>",
      *          "os": "<OPERATING_SYSTEM>",
-     *          "arch": "<HARDWARE_ARCH>"
-     *          "language": "<LANGUAGE>"
+     *          "arch": "<HARDWARE_ARCH>",
+     *          "language": "<LANGUAGE>",
+     *          "microphone": "<MICROPHONE>"
      *      }
      *   }
      * }

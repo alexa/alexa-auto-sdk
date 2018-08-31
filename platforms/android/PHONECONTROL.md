@@ -2,7 +2,7 @@
 
 ### Overview
 
-The AAC Phone Call Controller API provides the features required by a platform implementation to interface with the phone call controller capabilities of Alexa.
+The Alexa Auto Phone Call Controller API provides the features required by a platform implementation to interface with the phone call controller capabilities of Alexa.
 
 ### Handling PhoneCallController
 
@@ -25,7 +25,7 @@ public class PhoneCallControllerHandler extends PhoneCallController
 		if (SOME_ERROR_CASE){
 			callFailed( callId, error, message ); //inform the engine that the call failed
 	...
-	
+
 	...
 		//on some platform handler
 		connectionStatusChanged( ConnectionState.CONNECTED ); //phone call device is connected
@@ -50,7 +50,7 @@ public class PhoneCallControllerHandler extends PhoneCallController
 		String message = ... //platform error message
 		callFailed( callId, error, message );
 	...
-	
+
 ```
 
 Example Dial Directive JSON String payload:

@@ -1,0 +1,29 @@
+diff --git a/AVSCommon/Utils/include/AVSCommon/Utils/Stream/Streambuf.h b/AVSCommon/Utils/include/AVSCommon/Utils/Stream/Streambuf.h
+index 0bdcd4c7..e50fc175 100644
+--- a/AVSCommon/Utils/include/AVSCommon/Utils/Stream/Streambuf.h
++++ b/AVSCommon/Utils/include/AVSCommon/Utils/Stream/Streambuf.h
+@@ -45,7 +45,6 @@ public:
+ 
+ private:
+     int_type underflow() override;
+-    int_type uflow() override;
+     int_type pbackfail(int_type ch) override;
+     std::streamsize showmanyc() override;
+ 
+diff --git a/AVSCommon/Utils/src/Stream/Streambuf.cpp b/AVSCommon/Utils/src/Stream/Streambuf.cpp
+index 4dc47c63..fbc119bf 100644
+--- a/AVSCommon/Utils/src/Stream/Streambuf.cpp
++++ b/AVSCommon/Utils/src/Stream/Streambuf.cpp
+@@ -59,12 +59,6 @@ Streambuf::int_type Streambuf::underflow() {
+     return Streambuf::traits_type::to_int_type(*m_current);
+ }
+ 
+-Streambuf::int_type Streambuf::uflow() {
+-    ++m_current;
+-    setg(m_begin, m_current, m_end);
+-    return underflow();
+-}
+-
+ Streambuf::int_type Streambuf::pbackfail(int_type ch) {
+     if (m_current == m_begin || (ch != Streambuf::traits_type::eof() && ch != m_current[-1])) {
+         return Streambuf::traits_type::eof();

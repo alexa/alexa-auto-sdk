@@ -47,10 +47,6 @@ public class MediaPlayerHandler extends com.amazon.aace.alexa.MediaPlayer {
     private static final String sTag = "MediaPlayer";
     private static final String sFileName = "alexa_media"; // Note: not thread safe
 
-    // For volume controls
-    public enum SpeakerType { SYNCED, LOCAL }
-    private static List<SpeakerHandler> localSpeakers = new ArrayList<>();
-
     private final Activity mActivity;
     private final Context mContext;
     private final LoggerHandler mLogger;
@@ -63,7 +59,7 @@ public class MediaPlayerHandler extends com.amazon.aace.alexa.MediaPlayer {
     public MediaPlayerHandler( Activity activity,
                                LoggerHandler logger,
                                String name,
-                               @Nullable SpeakerType speakerType,
+                               @Nullable Speaker.Type speakerType,
                                @Nullable PlaybackControllerHandler controller ) {
         mActivity = activity;
         mContext = activity.getApplicationContext();
@@ -104,7 +100,7 @@ public class MediaPlayerHandler extends com.amazon.aace.alexa.MediaPlayer {
     public Speaker getSpeaker() { return mSpeaker; }
 
     //
-    // Handle playback directives from AAC engine
+    // Handle playback directives from Engine
     //
 
     @Override
@@ -163,7 +159,10 @@ public class MediaPlayerHandler extends com.amazon.aace.alexa.MediaPlayer {
     @Override
     public boolean stop() {
         mLogger.postVerbose( sTag, String.format( "(%s) Handling stop()", mName ) );
-        mPlayer.setPlayWhenReady( false );
+        if ( !mPlayer.getPlayWhenReady() ) {
+            // Player is already not playing. Notify Engine of stop
+            onPlaybackStopped();
+        } else mPlayer.setPlayWhenReady( false );
         return true;
     }
 
@@ -192,7 +191,7 @@ public class MediaPlayerHandler extends com.amazon.aace.alexa.MediaPlayer {
     public long getPosition() { return Math.abs( mPlayer.getCurrentPosition() ); }
 
     //
-    // Handle ExoPlayer state changes and notify AAC engine
+    // Handle ExoPlayer state changes and notify Engine
     //
 
     private void onPlaybackStarted () {
@@ -276,20 +275,19 @@ public class MediaPlayerHandler extends com.amazon.aace.alexa.MediaPlayer {
         private byte mVolume = 50;
         private boolean mIsMuted = false;
 
-        SpeakerHandler( @Nullable SpeakerType type ) {
+        SpeakerHandler( @Nullable Speaker.Type type ) {
             super();
-            if ( type != SpeakerType.SYNCED ) {
-                // Link all non synced speakers with the same UI control
-                localSpeakers.add( this );
-            } else {
+            if ( type == Speaker.Type.AVS_SPEAKER  ) {
                 // Link mute button to synced speakers only
-                mMuteButton = mActivity.findViewById( R.id.muteSyncedSpeakersButton );
+                mMuteButton = mActivity.findViewById( R.id.muteSpeakerButton );
             }
             setupUIVolumeControls( type );
         }
 
         @Override
         public boolean setVolume( byte volume ) {
+            if(mVolume == volume)
+                return true;
             mLogger.postInfo( sTag, String.format( "(%s) Handling setVolume(%s)", mName, volume ) );
             mVolume = volume;
             if ( mIsMuted ) {
@@ -340,11 +338,11 @@ public class MediaPlayerHandler extends com.amazon.aace.alexa.MediaPlayer {
             return mIsMuted;
         }
 
-        private void setupUIVolumeControls( @Nullable final SpeakerType type ) {
-            if ( type == SpeakerType.SYNCED ) {
-                mVolumeControl = mActivity.findViewById( R.id.syncedVolume );
+        private void setupUIVolumeControls( @Nullable final  Speaker.Type type ) {
+            if ( type == Speaker.Type.AVS_SPEAKER ) {
+                mVolumeControl = mActivity.findViewById( R.id.speakerVolume );
             } else {
-                mVolumeControl = mActivity.findViewById( R.id.localVolume );
+                mVolumeControl = mActivity.findViewById( R.id.alertsVolume );
             }
 
             updateUIVolume( mVolume );
@@ -360,11 +358,8 @@ public class MediaPlayerHandler extends com.amazon.aace.alexa.MediaPlayer {
                 @Override
                 public void onStopTrackingTouch( SeekBar seekBar ) {
                     int progress = seekBar.getProgress();
-                    if ( type != SpeakerType.SYNCED ) {
-                        // Update volume for all non-synced speakers from same UI control
-                        for ( Object speaker : localSpeakers ) {
-                            ( (SpeakerHandler) speaker ).setVolume( ( byte ) progress );
-                        }
+                    if ( type != Speaker.Type.AVS_SPEAKER ) {
+                        localVolumeSet( ( byte ) progress );
                     } else {
                         // Unmute before setting volume
                         if ( mIsMuted ) {

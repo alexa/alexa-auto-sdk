@@ -55,6 +55,9 @@ void EngineBinder::initialize( JNIEnv* env )
 
     m_javaClass_NetworkInfoProvider = NativeLib::FindClass( env, "com/amazon/aace/network/NetworkInfoProvider" );
 
+#ifdef INCLUDE_ALEXA_COMMS_MODULE
+    m_javaClass_AlexaComms = NativeLib::FindClass(env, "com/amazon/aace/communication/AlexaComms");
+#endif
 }
 
 std::shared_ptr<LoggerBinder> EngineBinder::createLoggerBinder( JNIEnv* env, jobject platformInterface )
@@ -299,6 +302,28 @@ std::shared_ptr<NavigationBinder> EngineBinder::createNavigationBinder( JNIEnv* 
     return navigationBinder;
 }
 
+#ifdef INCLUDE_ALEXA_COMMS_MODULE
+std::shared_ptr<AlexaCommsBinder> EngineBinder::createAlexaCommsBinder( JNIEnv* env, jobject platformInterface ) {
+    std::shared_ptr<MediaPlayerBinder> mediaPlayerBinder = createMediaPlayerBinder( env, platformInterface );
+    std::shared_ptr<SpeakerBinder> speakerBinder = createSpeakerBinder( env, platformInterface );
+
+    // create the platform interface native binder
+    std::shared_ptr<AlexaCommsBinder> alexaCommsBinder = std::make_shared<AlexaCommsBinder>( mediaPlayerBinder, speakerBinder );
+
+    // register the platform interface with the engine
+    m_engine->registerPlatformInterface( alexaCommsBinder );
+
+    // bind the platform java interface to the native interface
+    alexaCommsBinder->bind( env, platformInterface );
+
+    jclass platformInterfaceClass = env->GetObjectClass( platformInterface );
+    jmethodID javaMethod_setNativeObject = env->GetMethodID( platformInterfaceClass, "setNativeObject", "(J)V" );
+    env->CallVoidMethod( platformInterface, javaMethod_setNativeObject, (jlong) alexaCommsBinder.get() );
+
+    return alexaCommsBinder;
+}
+#endif //INCLUDE_ALEXA_COMMS_MODULE
+
 std::shared_ptr<PhoneCallControllerBinder> EngineBinder::createPhoneCallControllerBinder(JNIEnv *env, jobject platformInterface)
 {
     // create the platform interface native binder
@@ -434,6 +459,12 @@ bool EngineBinder::registerPlatformInterface( JNIEnv* env, jobject platformInter
         m_networkInfo = createNetworkInfoProviderBinder( env, platformInterface );
         return true;
     }
+#ifdef INCLUDE_ALEXA_COMMS_MODULE
+    else if( env->IsInstanceOf( platformInterface, m_javaClass_AlexaComms.get() ) ) {
+        m_alexaComms = createAlexaCommsBinder( env, platformInterface );
+        return true;
+    }
+#endif //INCLUDE_ALEXA_COMMS_MODULE
 
     return false;
 }

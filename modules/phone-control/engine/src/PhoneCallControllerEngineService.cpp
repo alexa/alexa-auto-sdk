@@ -45,6 +45,7 @@ bool PhoneCallControllerEngineService::stop() {
 bool PhoneCallControllerEngineService::shutdown() {
     if ( m_phoneCallControllerEngineImpl != nullptr ) {
         m_phoneCallControllerEngineImpl->shutdown();
+        m_phoneCallControllerEngineImpl.reset();
     } 
     return true;
 }
@@ -69,7 +70,7 @@ bool PhoneCallControllerEngineService::registerPlatformInterfaceType( std::share
         ThrowIfNull( alexaService, "alexaServiceNotFound" );
 
         m_phoneCallControllerEngineImpl = aace::engine::phoneCallController::PhoneCallControllerEngineImpl::create( phoneCallController, alexaService->getCapabilitiesDelegate(), alexaService->getContextManager(),
-                                    alexaService->getDirectiveSequencer(), alexaService->getExceptionSender(), alexaService->getConnectionManager() );
+                                    alexaService->getDirectiveSequencer(), alexaService->getExceptionSender(), alexaService->getMessageSender() );
         ThrowIfNull( m_phoneCallControllerEngineImpl, "createPhoneCallControllerEngineImplFailed" );
 
         return true;

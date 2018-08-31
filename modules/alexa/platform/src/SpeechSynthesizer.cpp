@@ -18,7 +18,7 @@
 namespace aace {
 namespace alexa {
 
-SpeechSynthesizer::SpeechSynthesizer( std::shared_ptr<aace::alexa::MediaPlayer> mediaPlayer, std::shared_ptr<aace::alexa::Speaker> speaker ) : aace::alexa::AudioChannel( mediaPlayer, speaker, aace::alexa::Speaker::Type::AVS_SYNCED ) {
+SpeechSynthesizer::SpeechSynthesizer( std::shared_ptr<aace::alexa::MediaPlayer> mediaPlayer, std::shared_ptr<aace::alexa::Speaker> speaker ) : aace::alexa::AudioChannel( mediaPlayer, speaker, aace::alexa::Speaker::Type::AVS_SPEAKER_VOLUME ) {
 }
 
 SpeechSynthesizer::~SpeechSynthesizer() = default; // key function

@@ -16,19 +16,6 @@
 #ifndef AACE_ENGINE_NETWORK_NETWORK_ENGINE_SERVICE_H
 #define AACE_ENGINE_NETWORK_NETWORK_ENGINE_SERVICE_H
 
-/*
-#include <fstream>
-#include <iostream>
-#include <string>
-#include <vector>
-#include <chrono>
-#include <condition_variable>
-#include <mutex>
-#include <typeindex>
-#include <typeinfo>
-#include <unordered_set>
-*/
-
 #include "AACE/Engine/Core/EngineService.h"
 #include "AACE/Network/NetworkInfoProvider.h"
 
@@ -47,6 +34,11 @@ private:
     
 public:
     virtual ~NetworkEngineService() = default;
+    
+    void addObserver( std::shared_ptr<NetworkInfoObserver> observer );
+    void removeObserver( std::shared_ptr<NetworkInfoObserver> observer );
+    
+    std::shared_ptr<aace::network::NetworkInfoProvider> getNetworkInfoProvider();
 
 protected:
     bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) override;
@@ -64,7 +56,7 @@ private:
 
 private:
     std::shared_ptr<NetworkInfoProviderEngineImpl> m_networkInfoProviderEngineImpl;
-
+    std::shared_ptr<aace::network::NetworkInfoProvider> m_networkInfoProvider;
 };
 
 } // aace::engine::network

@@ -33,17 +33,22 @@ public:
      * Specifies the severity level of a log message
      */
     enum class Level {
-
+        
         /**
          * Verbose log of an event, enabled only for debug builds
          */
         VERBOSE,
-
+        
         /**
          * Log of a normal event. Used in release builds
          */
         INFO,
-
+        
+        /**
+         * Log of a metric, enabled only for builds with metrics enabled
+         */
+        METRIC,
+        
         /**
          * Log of an event that may indicate a problem
          */

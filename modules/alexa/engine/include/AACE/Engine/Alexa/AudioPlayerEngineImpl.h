@@ -109,30 +109,18 @@ class PlaybackRouterDelegate : public alexaClientSDK::avsCommon::sdkInterfaces::
 public:
     virtual ~PlaybackRouterDelegate() = default;
     
-    void playButtonPressed() override {
+    void buttonPressed(alexaClientSDK::avsCommon::avs::PlaybackButton button) override {
         if( m_delegate != nullptr ) {
-            m_delegate->playButtonPressed();
+            m_delegate->buttonPressed(button);
         }
     }
-    
-    void pauseButtonPressed() override {
+
+    void togglePressed(alexaClientSDK::avsCommon::avs::PlaybackToggle toggle, bool action) override {
         if( m_delegate != nullptr ) {
-            m_delegate->pauseButtonPressed();
+            m_delegate->togglePressed(toggle, action);
         }
     }
-    
-    void nextButtonPressed() override {
-        if( m_delegate != nullptr ) {
-            m_delegate->nextButtonPressed();
-        }
-    }
-    
-    void previousButtonPressed() override {
-        if( m_delegate != nullptr ) {
-            m_delegate->previousButtonPressed();
-        }
-    }
-    
+
     void setHandler(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackHandlerInterface> handler) override {
         if( m_delegate != nullptr ) {
             m_delegate->setHandler(handler);

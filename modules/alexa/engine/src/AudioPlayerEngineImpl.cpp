@@ -40,6 +40,9 @@ bool AudioPlayerEngineImpl::initialize(
     
     try
     {
+        ThrowIfNull( directiveSequencer, "invalidDirectiveSequencer" );
+        ThrowIfNull( capabilitiesDelegate, "invalidCapabilitiesDelegate" );
+
         ThrowIfNot( initializeAudioChannel( speakerManager ), "initializeAudioChannelFailed" );
     
         // create the playback router instance
@@ -77,9 +80,13 @@ std::shared_ptr<AudioPlayerEngineImpl> AudioPlayerEngineImpl::create(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender ) {
     
+    std::shared_ptr<AudioPlayerEngineImpl> audioPlayerEngineImpl = nullptr;
+
     try
     {
-        std::shared_ptr<AudioPlayerEngineImpl> audioPlayerEngineImpl = std::shared_ptr<AudioPlayerEngineImpl>( new AudioPlayerEngineImpl( audioPlayerPlatformInterface ) );
+        ThrowIfNull( audioPlayerPlatformInterface, "invalidAlertsPlatformInterface" );
+
+        audioPlayerEngineImpl = std::shared_ptr<AudioPlayerEngineImpl>( new AudioPlayerEngineImpl( audioPlayerPlatformInterface ) );
         
         ThrowIfNot( audioPlayerEngineImpl->initialize( directiveSequencer, connectionManager, focusManager, contextManager, attachmentManager, capabilitiesDelegate, speakerManager, exceptionSender ), "initializeAudioPlayerEngineImplFailed" );
 
@@ -87,6 +94,9 @@ std::shared_ptr<AudioPlayerEngineImpl> AudioPlayerEngineImpl::create(
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"create").d("reason", ex.what()));
+        if( audioPlayerEngineImpl != nullptr ) {
+            audioPlayerEngineImpl->shutdown();
+        }
         return nullptr;
     }
 }
@@ -99,7 +109,7 @@ void AudioPlayerEngineImpl::doShutdown()
         m_audioPlayerCapabilityAgent->removeObserver( std::dynamic_pointer_cast<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface>( shared_from_this() ) );
         m_audioPlayerCapabilityAgent->shutdown();
     }
-    
+
     // reset the playback router
     m_playbackRouter.reset();
 }

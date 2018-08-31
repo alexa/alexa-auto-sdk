@@ -73,7 +73,7 @@ bool LoggerEngineService::configure( std::shared_ptr<std::istream> configuration
         {
             auto sinks = loggerConfigRoot["sinks"].GetArray();
             
-            for( int j = 0; j < sinks.Size(); j++ )
+            for( unsigned int j = 0; j < sinks.Size(); j++ )
             {
                 auto sink = createSink( sinks[j] );
                 
@@ -88,7 +88,7 @@ bool LoggerEngineService::configure( std::shared_ptr<std::istream> configuration
         {
             auto rules = loggerConfigRoot["rules"].GetArray();
 
-            for( int j = 0; j < rules.Size(); j++ )
+            for( unsigned int j = 0; j < rules.Size(); j++ )
             {
                 auto obj = rules[j].GetObject();
                 
@@ -167,7 +167,7 @@ std::shared_ptr<aace::engine::logger::sink::Sink> LoggerEngineService::createSin
         {
             auto rules = obj["rules"].GetArray();
         
-            for( int j = 0; j < rules.Size(); j++ )
+            for( unsigned int j = 0; j < rules.Size(); j++ )
             {
                 auto rule = createRule( rules[j] );
             

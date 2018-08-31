@@ -1,0 +1,25 @@
+From c189cd3c2b93a0366d630a162cedf6c7a65e33b3 Mon Sep 17 00:00:00 2001
+From: Shotaro Uchida <shotaru@amazon.com>
+Date: Fri, 17 Aug 2018 17:18:19 -0700
+Subject: [PATCH 2/3] AIP: Only 16kHz is supported for OPUS now
+
+---
+ CapabilityAgents/AIP/src/AudioInputProcessor.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CapabilityAgents/AIP/src/AudioInputProcessor.cpp b/CapabilityAgents/AIP/src/AudioInputProcessor.cpp
+index 74e407413..9cccefc08 100644
+--- a/CapabilityAgents/AIP/src/AudioInputProcessor.cpp
++++ b/CapabilityAgents/AIP/src/AudioInputProcessor.cpp
+@@ -429,7 +429,7 @@ bool AudioInputProcessor::executeRecognize(
+         return false;
+     }
+ 
+-    std::unordered_map<int, std::string> mapSampleRatesAVSEncoding = {{32000, "OPUS"}};
++    std::unordered_map<int, std::string> mapSampleRatesAVSEncoding = {{16000, "OPUS"}};
+     std::string avsEncodingFormat;
+     std::unordered_map<int, std::string>::iterator itSampleRateAVSEncoding;
+ 
+-- 
+2.18.0
+

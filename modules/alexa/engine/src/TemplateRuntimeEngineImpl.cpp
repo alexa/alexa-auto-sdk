@@ -38,6 +38,10 @@ bool TemplateRuntimeEngineImpl::initialize(
     
     try
     {
+        ThrowIfNull( directiveSequencer, "invalidDirectiveSequencer" );
+        ThrowIfNull( capabilitiesDelegate, "invalidCapabilitiesDelegate" );
+        ThrowIfNull( dialogUXStateAggregator, "invalidDialogUXStateAggregator" );
+
         m_audioPlayerInterfaceDelegate = AudioPlayerInterfaceDelegate::create( audioPlayerInterface );
         ThrowIfNull( m_audioPlayerInterfaceDelegate, "couldNotCreateAudioPlayerInterfaceDelegate" );
 
@@ -73,9 +77,13 @@ std::shared_ptr<TemplateRuntimeEngineImpl> TemplateRuntimeEngineImpl::create(
     std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender ) {
 
+    std::shared_ptr<TemplateRuntimeEngineImpl> templateRuntimeEngineImpl = nullptr;
+
     try
     {
-        std::shared_ptr<TemplateRuntimeEngineImpl> templateRuntimeEngineImpl = std::shared_ptr<TemplateRuntimeEngineImpl>( new TemplateRuntimeEngineImpl( templateRuntimePlatformInterface ) );
+        ThrowIfNull( templateRuntimePlatformInterface, "invalidTemplateRuntimePlatformInterface" );
+
+        templateRuntimeEngineImpl = std::shared_ptr<TemplateRuntimeEngineImpl>( new TemplateRuntimeEngineImpl( templateRuntimePlatformInterface ) );
         
         ThrowIfNot( templateRuntimeEngineImpl->initialize( directiveSequencer, audioPlayerInterface, focusManager, capabilitiesDelegate, dialogUXStateAggregator, exceptionSender ), "initializeTemplateRuntimeEngineImplFailed" );
 
@@ -83,6 +91,9 @@ std::shared_ptr<TemplateRuntimeEngineImpl> TemplateRuntimeEngineImpl::create(
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"create").d("reason", ex.what()));
+        if( templateRuntimeEngineImpl != nullptr ) {
+            templateRuntimeEngineImpl->shutdown();
+        }
         return nullptr;
     }
 }
@@ -129,7 +140,15 @@ AudioPlayerInterfaceDelegate::AudioPlayerInterfaceDelegate( std::shared_ptr<alex
 }
 
 std::shared_ptr<AudioPlayerInterfaceDelegate> AudioPlayerInterfaceDelegate::create( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerInterface> audioPlayerInterface ) {
-    return std::shared_ptr<AudioPlayerInterfaceDelegate>( new AudioPlayerInterfaceDelegate( audioPlayerInterface ) );
+    try
+    {
+        ThrowIfNull(audioPlayerInterface, "invalidAudioPlayerInterface");
+        return std::shared_ptr<AudioPlayerInterfaceDelegate>( new AudioPlayerInterfaceDelegate( audioPlayerInterface ) );
+    }
+    catch (std::exception &ex) {
+        AACE_ERROR(LX("AudioPlayerInterfaceDelegate", "create").d("reason", ex.what()));
+        return nullptr;
+    }
 }
 
 void AudioPlayerInterfaceDelegate::doShutdown()

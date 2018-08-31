@@ -1,17 +1,9 @@
 var searchData=
 [
-  ['setdestination',['setDestination',['../classcom_1_1amazon_1_1aace_1_1navigation_1_1_navigation.html#a2024335dacfc051daf860328780f302b',1,'com::amazon::aace::navigation::Navigation']]],
-  ['setindicator',['setIndicator',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_notifications.html#ab83e0f63cbd01de0c1fb2cf0b331b9cf',1,'com::amazon::aace::alexa::Notifications']]],
-  ['setmute',['setMute',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_speaker.html#a75ebfbf5a7f6ed9bd97b59602ed775e4',1,'com::amazon::aace::alexa::Speaker']]],
-  ['setposition',['setPosition',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a0532126111b5c1f436a41d18da3cd634',1,'com::amazon::aace::alexa::MediaPlayer']]],
-  ['setproperty',['setProperty',['../classcom_1_1amazon_1_1aace_1_1core_1_1_engine.html#a2739fa7b37aa1c292d5a55c6e0127189',1,'com::amazon::aace::core::Engine']]],
-  ['setvolume',['setVolume',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_speaker.html#a9ae57557d5c9009cdd8ba40f8397a9d3',1,'com::amazon::aace::alexa::Speaker']]],
-  ['speaker',['Speaker',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_speaker.html#a83f3a59ab6338a8313eb1eaac8a1f49d',1,'com::amazon::aace::alexa::Speaker']]],
-  ['speechrecognizer',['SpeechRecognizer',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a06238a5a9c050c847dc09cbdf65ad627',1,'com::amazon::aace::alexa::SpeechRecognizer']]],
-  ['speechsynthesizer',['SpeechSynthesizer',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_synthesizer.html#acb010a073a588058422eb689461fc731',1,'com::amazon::aace::alexa::SpeechSynthesizer']]],
-  ['start',['start',['../classcom_1_1amazon_1_1aace_1_1core_1_1_engine.html#a363681ccf0a37aa487dd32a0b1d3ce15',1,'com::amazon::aace::core::Engine']]],
-  ['startaudioinput',['startAudioInput',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#aba3da69e8833ec5b855b4a0155d03f9d',1,'com::amazon::aace::alexa::SpeechRecognizer']]],
-  ['stop',['stop',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a43d342c7bad79b089f65514614f981a2',1,'com.amazon.aace.alexa.MediaPlayer.stop()'],['../classcom_1_1amazon_1_1aace_1_1core_1_1_engine.html#af3f1799a40b40389cdb3c03a4b518c28',1,'com.amazon.aace.core.Engine.stop()']]],
-  ['stopaudioinput',['stopAudioInput',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a1bea4e6b7ab396b34964c7f9be3cf042',1,'com::amazon::aace::alexa::SpeechRecognizer']]],
-  ['stopcapture',['stopCapture',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a23e338856975e39ffb825dcf2a535192',1,'com::amazon::aace::alexa::SpeechRecognizer']]]
+  ['read',['read',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a510670f7f4ba34244ee9a6f8d113b86c',1,'com.amazon.aace.alexa.MediaPlayer.read(byte[] buffer)'],['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a0e58a0b4e398ff359f818975b1f774ee',1,'com.amazon.aace.alexa.MediaPlayer.read(byte[] data, int offset, int size)']]],
+  ['registerplatforminterface',['registerPlatformInterface',['../classcom_1_1amazon_1_1aace_1_1core_1_1_engine.html#ae4f3c98ac03db8b6f8aa0a33d88586b9',1,'com::amazon::aace::core::Engine']]],
+  ['removeallalerts',['removeAllAlerts',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_alerts.html#a71f9d8d63b53b90cb27f09d093741898',1,'com::amazon::aace::alexa::Alerts']]],
+  ['renderplayerinfo',['renderPlayerInfo',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_template_runtime.html#a485b27cafa223d145a1808326446f13b',1,'com::amazon::aace::alexa::TemplateRuntime']]],
+  ['rendertemplate',['renderTemplate',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_template_runtime.html#a4c8189b23f28853714a99f3e0f1e8404',1,'com::amazon::aace::alexa::TemplateRuntime']]],
+  ['resume',['resume',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#aaa4e76e649f92fb84c7baf004ceb9334',1,'com::amazon::aace::alexa::MediaPlayer']]]
 ];

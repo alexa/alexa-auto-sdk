@@ -29,26 +29,81 @@ package com.amazon.aace.alexa;
  *
  * @sa PlaybackController
  *
- * @sa TemplateRuntime::renderPlayerInfo()
+ * @sa TemplateRuntime.renderPlayerInfo()
  */
 public class AudioPlayer extends AudioChannel
 {
     /**
-     * AudioPlayer should be extended to handle audio output from the Engine.
-     * The AudioPlayer @c MediaPlayer and @c Speaker will receive directives from the Engine to handle audio playback.
-     *
-     * @note Audio playback control operations such as on-platform button presses must be routed through
-     * the @c PlaybackController.
-     *
-     * @sa AudioChannel
-     *
-     * @sa PlaybackController
-     *
-     * @sa TemplateRuntime::renderPlayerInfo()
+     * Specifies the state of audio playback activity
      */
-    public AudioPlayer( MediaPlayer mediaPlayer, Speaker speaker ) {
-        super( mediaPlayer, speaker, Speaker.Type.AVS_SYNCED );
+    public enum PlayerActivity
+    {
+        /**
+         * Audio playback has not yet begun.
+         * @hideinitializer
+         */
+        IDLE("IDLE"),
+
+        /**
+         * Audio is currently playing.
+         * @hideinitializer
+         */
+        PLAYING("PLAYING"),
+
+        /**
+         * Audio playback is stopped, either from a stop directive or playback error.
+         * @hideinitializer
+         */
+        STOPPED("STOPPED"),
+
+        /**
+         * Audio playback is paused.
+         * @hideinitializer
+         */
+        PAUSED("PAUSED"),
+
+        /**
+         * Audio playback is stalled because a buffer underrun has occurred.
+         * @hideinitializer
+         */
+        BUFFER_UNDERRUN("BUFFER_UNDERRUN"),
+
+        /**
+         * Audio playback is finished.
+         * @hideinitializer
+         */
+        FINISHED("FINISHED");
+
+        /**
+         * @internal
+         */
+        private String m_name;
+
+        /**
+         * @internal
+         */
+        private PlayerActivity( String name ) {
+            m_name = name;
+        }
+
+        /**
+         * @internal
+         */
+        public String toString() {
+            return m_name;
+        }
     }
+
+    public AudioPlayer( MediaPlayer mediaPlayer, Speaker speaker ) {
+        super( mediaPlayer, speaker, Speaker.Type.AVS_SPEAKER);
+    }
+
+    /**
+     * Notifies the platform implementation of a change in audio playback state
+     *
+     * @param  state The new playback state
+     */
+    public void playerActivityChanged( PlayerActivity state ) {}
 
 }
 

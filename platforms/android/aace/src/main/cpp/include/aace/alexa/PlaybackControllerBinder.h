@@ -25,6 +25,30 @@
 class PlaybackControllerBinder : public PlatformInterfaceBinder, public aace::alexa::PlaybackController {
 public:
     PlaybackControllerBinder() = default;
+    aace::alexa::PlaybackControllerEngineInterface::PlaybackButton convertPlaybackButton( JNIEnv* env, jobject obj );
+    aace::alexa::PlaybackControllerEngineInterface::PlaybackToggle convertPlaybackToggle( JNIEnv* env, jobject obj );
+
+protected:
+    void initialize( JNIEnv* env ) override;
+
+private:
+    jobject convert( aace::alexa::PlaybackControllerEngineInterface::PlaybackButton playbackButton );
+    jobject convert( aace::alexa::PlaybackControllerEngineInterface::PlaybackToggle playbackToggle );
+
+    // PlaybackButton
+    ObjectRef m_enum_PlaybackButton_PLAY;
+    ObjectRef m_enum_PlaybackButton_PAUSE;
+    ObjectRef m_enum_PlaybackButton_NEXT;
+    ObjectRef m_enum_PlaybackButton_PREVIOUS;
+    ObjectRef m_enum_PlaybackButton_SKIP_FORWARD;
+    ObjectRef m_enum_PlaybackButton_SKIP_BACKWARD;
+
+    // PlaybackToggle
+    ObjectRef m_enum_PlaybackToggle_SHUFFLE;
+    ObjectRef m_enum_PlaybackToggle_LOOP;
+    ObjectRef m_enum_PlaybackToggle_REPEAT;
+    ObjectRef m_enum_PlaybackToggle_THUMBS_UP;
+    ObjectRef m_enum_PlaybackToggle_THUMBS_DOWN;
 };
 
 #endif //AACE_ALEXA_PLAYBACK_CONTROLLER_BINDER_H

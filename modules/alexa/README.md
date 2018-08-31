@@ -2,11 +2,11 @@
 
 ### Overview
 
-The AAC Alexa API provides interfaces for standard AVS features. The Engine handles some extra setup and steps to sequence events and directive handling. The platform developer can focus on just using the provided API to interact with AVS. This is done by registering platform interfaces via the Engine object.
+The Alexa Auto SDK Alexa API provides interfaces for standard Alexa features. The Engine handles some extra setup and steps to sequence events and directive handling. The platform developer can focus on just using the provided API to interact with Alexa. This is done by registering platform interfaces via the Engine object.
 
-### AAC Sequence Diagrams<a id="sequencediagrams"> </a>
+### Sequence Diagrams for the Alexa Module in the Alexa Auto SDK<a id="sequencediagrams"> </a>
 
-You can read more about how the AAC flow works by checking out some sequence diagrams.
+You can read more about how the Alexa Auto SDK flow works by checking out some sequence diagrams.
 
 * [Login/Logout Sequence Diagram](../../SEQUENCE_DIAGRAMS.md#loginlogout)
 * [Tap to Talk Sequence Diagram](../../SEQUENCE_DIAGRAMS.md#taptotalk)
@@ -14,9 +14,10 @@ You can read more about how the AAC flow works by checking out some sequence dia
 
 ### Request Wake Word Support for Alexa
 
-If you want to enable wake word support for your specific implementation of AAC, you need to make a request with your Alexa Automotive solution architect (SA).
+If you want to enable wake word support for your Alexa Auto integration, you need to make a request with your Alexa Auto Solution Architect (SA).
 
 There are 3 steps to this process:
+
 1. Let your SA know you want to enable wake word support.
 2. Your SA processes your request with the appropriate Alexa teams.
 3. You'll receive a single zip file containing the necessary packages, instructions, and scripts.
@@ -25,7 +26,7 @@ All that's left for you to do is create an "extras" directory under your "aac-sd
 
 ### Handling Alexa state changes
 
-The AAC SDK manages internal state information for Alexa and provides an interface for developers to handle state changes in their platform. To implement a custom handler for Alexa state changes, the `aace::alexa::AlexaClient` class should be extended:
+The Alexa Auto SDK manages internal state information for Alexa and provides an interface for developers to handle state changes in their platform. To implement a custom handler for Alexa state changes, the `aace::alexa::AlexaClient` class should be extended:
 
     #include <AACE/Alexa/AlexaClient.h>
     class MyAlexaClient : public aace::alexa::AlexaClient {
@@ -48,6 +49,16 @@ The AAC SDK manages internal state information for Alexa and provides an interfa
 ### Handling speech input
 
 It is the responsibility of the platform implementation to supply audio data to the Engine so that Alexa can process voice input. Since the Engine does not know how audio is managed on a specific platform, the specific audio capture implementation is up to the platform developer. The default platform implementation provides methods for writing raw PCM data to the Engine's audio input processor, which includes handling wakeword recognition and end-of-speech detection.
+
+The audio input format should be encoded as:
+
+* 16bit Linear PCM
+
+* 16kHz sample rate
+
+* Single channel
+
+* Little endian byte order
 
 To implement a custom handler for speech input, the `aace::alexa::SpeechRecognizer` class should be extended:
 
@@ -169,6 +180,7 @@ To implement a custom handler for alerts, the `aace::alexa::Alerts` class should
     ...
 
     // Configure the Engine
+
     auto myAlertsMediaPlayer = std::make_shared<MyMediaPlayer>(...);
     auto myAlertsSpeaker = std::make_shared<MySpeaker>(...);
     auto myAlerts = std::make_shared<MyAlerts>(myAudioPlayerMediaPlayer, myAudioPlayerSpeaker);
@@ -236,6 +248,18 @@ To implement a custom handler for Speaker, the `aace::alexa::Speaker` class shou
           ...
     }
 
+#### Custom Volume Control for Alexa Devices
+
+You can use a custom volume control to support an Alexa device's native input volume range. By default, Alexa supports voice utterances that specify volume values between 0 and 10, but some devices may support a different range (i.e. 0 to 100). By whitelisting your Alexa devices volume range with Amazon for your target platform, you can specify input volume levels per your device's range. Your device's input volume range is then mapped appropriately to the Alexa volume range.
+
+Contact your Alexa Auto Solution Architect (SA) for help with whitelisting. Whitelisting requires the following parameters:
+
+* DeviceTypeID
+* Min:
+* Max:
+
+This does not impact the range used in the directives to the device.
+
 ### Handling GUI templates (display cards)
 
 When template info is received from Alexa, it is the responsibility of the platform implementation to handle the rendering of any UI with the info that is received from Alexa. There are two template types: [Templates](https://alexa.design/DevDocRenderTemplate) and [PlayerInfo](https://amzn.to/DevDocTemplatePlayerInfo).
@@ -263,6 +287,21 @@ To implement a custom handler for GUI templates, the `aace::alexa::TemplateRunti
 
 The Engine provides methods for notifying it of playback controller events. If the platform has playback control features, it must inform the Engine.
 
+####PlayerInfo Only controls
+
+The Template Runtime's Player Info template specifies some additional controls to be displayed. This is for GUI implementations which use the PlayerInfo template as a reference for their GUI displays. The controls available, for a given service, come down with the playerInfo template. For toggles, the synced state is also provided by the PlayerInfo template.
+
+* Buttons
+	- Skip Forward ( service defined scrub forward )
+	- Skip Backward ( service defined scrub backward )
+* Toggles
+	- Shuffle ( toggle shuffle songs )
+	- Loop ( toggle playlist looping )
+	- Repeat ( toggle repeat current media once )
+	- Thumbs Up ( toggle thumbs up state )
+	- Thumbs Down ( toggle thumbs down state )
+
+
 To implement a custom handler for the playback controller, the `aace::alexa::PlaybackController` class should be extended:
 
     #include <AACE/Alexa/PlaybackController.h>
@@ -270,11 +309,79 @@ To implement a custom handler for the playback controller, the `aace::alexa::Pla
       ...
 
       void platformPlayButtonPressed(){ //called by some platform event
-          playButtonPressed();
+          buttonPressed(PlaybackButton::PLAY);
           ...
+      void platformScrubFordGUIButtonPressed(){ //called by the platform on an avaiable GUI button event
+          buttonPressed(PlaybackButton::SKIP_FORWARD);
+          ...
+      void platformShuffleGUIButtonPressed(){ //called by the platform on an avaiable GUI toggle event
+          togglePressed(PlaybackToggle::SHUFFLE, true); //the action should send the value opposing the last playerinfo state for that toggle control
+          ...  
 
     };
     ...
 
     // Configure the Engine
     engine->registerPlatformInterface( std::make_shared<MyPlaybackController>() );
+
+## Alexa Engine Properties
+
+The Alexa module defines several constants that are used to get and set runtime properties in the Engine. To use these properties, include the `AlexaProperties.h` header in your source code and call the Engine's `getProperty()` and `setProperty()` methods.
+
+    #include <AACE/Alexa/AlexaProperties.h>
+
+    // get the current locale setting from the Engine
+    auto locale = m_engine->getProperty( aace::alexa::property::LOCALE );
+
+    // set the current locale setting in the Engine
+    m_engine->setProperty( aace::alexa::property::LOCALE, "en-US" );
+
+The following constants are defined in the Alexa module:
+
+<table>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>
+<code>aace::alexa::property::AVS_ENDPOINT</code>
+</td>
+<td>The value must be a valid AVS endpoint URL.
+</td>
+</tr>
+<tr>
+<td>
+<code>aace::alexa::property::WAKEWORD_SUPPORTED</code>
+</td>
+<td><p>Describes if wake word support is enabled. If wake word is not supported in the Engine, attempts to enable wake word detection by
+the <code>SpeechRecognizer</code> will fail.</p>
+<p><strong>Note</strong>: This is a read-only property.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>aace::alexa::property::FIRMWARE_VERSION</code>
+</td>
+<td>The firmware version that is reported to AVS. The value must be a positive, signed 32-bit integer represented as a string.
+</td>
+</tr>
+<tr>
+<td>
+<code>aace::alexa::property::LOCALE</code>
+</td>
+<td>The current locale setting for AVS. The value should be a valid locale accepted by AVS. Calling <code>Engine::getProperty()</code> with the <code>SUPPORTED_LOCALES</code> property provides the list of supported locales.
+</td>
+</tr>
+<tr>
+<td>
+<code>aace::alexa::property::SUPPORTED_LOCALES</code></li>
+</td>
+<td><p>AVS supported locales. The value is a comma-separated list, e.g. "de-DE,en-AU,..."</p>
+<p><strong>Note</strong>: This is a read-only property.</p>
+
+</td>
+</tr>
+</table>
+
+ See the API reference documentation for  [AlexaProperties](./platform/include/AACE/Alexa/AlexaProperties.h) for more information.

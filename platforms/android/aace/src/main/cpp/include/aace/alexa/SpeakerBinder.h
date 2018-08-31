@@ -52,8 +52,8 @@ private:
     jmethodID m_javaMethod_isMuted = nullptr;
 
     // Type
-    ObjectRef m_enum_Type_AVS_SYNCED;
-    ObjectRef m_enum_Type_LOCAL;
+    ObjectRef m_enum_Type_AVS_SPEAKER;
+    ObjectRef m_enum_Type_AVS_ALERTS;
 };
 
 #endif //AACE_ALEXA_SPEAKER_BINDER_H

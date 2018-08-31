@@ -1,7 +1,7 @@
 # AACE Alexa Engine
 
 # Find AVS
-find_package(AVS 1.7.1)
+find_package(AVS 1.9)
 
 set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AlertsEngineImpl.h
@@ -10,6 +10,7 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AlexaEngineService.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AlexaEngineLogger.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AlexaEngineClientObserver.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AlexaMetrics.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AudioChannelEngineImpl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AudioPlayerEngineImpl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/PlaybackControllerEngineImpl.h
@@ -88,3 +89,7 @@ install(
     DESTINATION include
     FILES_MATCHING PATTERN "*.h"
 )
+
+if(AAC_ENABLE_TESTS)
+    add_subdirectory(test)
+endif()

@@ -50,11 +50,6 @@ class LoginWithAmazonBrowser extends Observable {
     private static final String sAlexaAllScope = "alexa:all";
     private static final String sProfileScope = "profile";
 
-    // To fetch User Profile data, set the sUserProfileEnabled to true
-    // You will need additional parameters in your Security Profile for the profile scope request to succeed,
-    // please see the README CBL section for more.
-    private static final boolean sUserProfileEnabled = false;
-
     // Refresh access token 2 minutes before it expires
     private static final int sRefreshAccessTokenTime = 120000;
     // Access token expires after one hour
@@ -161,24 +156,14 @@ class LoginWithAmazonBrowser extends Observable {
                 editor.putString( mActivity.getString( R.string.preference_login_method ), LoginWithAmazon.LWA_LOGIN_METHOD_KEY );
                 editor.apply();
 
-                if( sUserProfileEnabled ) {
-                    AuthorizationManager.authorize(new AuthorizeRequest
-                            .Builder(mRequestContext)
-                            .addScopes(ScopeFactory.scopeNamed(sAlexaAllScope, scopeData), ScopeFactory.scopeNamed(sProfileScope))
-                            .forGrantType(AuthorizeRequest.GrantType.ACCESS_TOKEN)
-                            .shouldReturnUserData(true)
-                            .build()
-                    );
-                } else {
-                    AuthorizationManager.authorize(new AuthorizeRequest
-                            .Builder(mRequestContext)
-                            .addScope(ScopeFactory.scopeNamed(sAlexaAllScope, scopeData))
-                            .forGrantType(AuthorizeRequest.GrantType.ACCESS_TOKEN)
-                            .shouldReturnUserData(true)
-                            .build()
-                    );
+                AuthorizationManager.authorize( new AuthorizeRequest
+                        .Builder( mRequestContext )
+                        .addScopes( ScopeFactory.scopeNamed( sAlexaAllScope, scopeData ), ScopeFactory.scopeNamed( sProfileScope ) )
+                        .forGrantType( AuthorizeRequest.GrantType.ACCESS_TOKEN )
+                        .shouldReturnUserData( true )
+                        .build()
+                );
 
-                }
             } catch ( Exception e ) { mLogger.postError( sTag, e.getMessage() ); }
 
         } else mLogger.postWarn( sTag, "Cannot authenticate. assets/api_key.txt does not exist" );

@@ -1,6 +1,6 @@
 # Need Help?
 
-## Accessing APIs During Development (Whitelisting)
+## Accessing APIs During Development (Whitelisting)<a id="whitelisting"></a>
 
 The following functionality is only available after the device is whitelisted:
 
@@ -14,7 +14,7 @@ You will need to provide the Amazon ID of your development device or product on 
 2. Click **Manage** to the right of your device in its listing on the [My Products](https://developer.amazon.com/avs/home.html#/avs/home) page. Take note of your **Amazon ID** for your device.
 3. Contact your designated Amazon Solutions Architect or Partner Manager and provide them with the **Amazon ID**.
 
-## Reporting an Issue
+## Reporting an Issue<a id="reportinganissue"></a>
 
 Please reach out to the designated Amazon Solutions Architect or Partner Manager for your company, and include the following information:
 
@@ -23,6 +23,6 @@ Please reach out to the designated Amazon Solutions Architect or Partner Manager
 * **Logs** - include relevant logs
 * **Platform and environment** - provide details about your hardware platform, operating system, compiler, API level, etc.
 
-## Making Pull Requests
+## Making Pull Requests<a id="pullrequests"></a>
 
 We are **not** accepting pull requests or community contributed bug fixes at this time.

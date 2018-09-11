@@ -2,6 +2,22 @@
 
 ___
 
+## v1.1.1 released on 2018-09-10:
+
+### Enhancements
+
+This release is for bug fixes only. There are no new features or enhancements.
+
+### Resolved Issues
+
+Issues fixed in this release:
+
+* Update a dependency build recipe to skip the checksum verification to allow for document changes in the current tag.
+
+### Known Issues
+
+There are no known issues in this release.
+
 ## v1.1.0 released on 2018-08-31:
 
 ### Enhancements

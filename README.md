@@ -119,34 +119,19 @@ The Android Sample App provides an example of how to use the Alexa Auto SDK. The
 
 > **Note**: Feature enhancements, updates, and resolved issues from previous releases are available to view in [CHANGELOG.md](./CHANGELOG.md)
 
-### v1.1.0 Released on 2018-08-31:
+### v1.1.1 released on 2018-09-10:
 
-### Enhancements
+#### Enhancements
 
-* Added support for choosing one of multiple network adaptors before starting the engine.
+This release is for bug fixes only. There are no new features or enhancements.
 
-* Added support for latest Amazon Wakeword engine.
+#### Resolved Issues
 
-* Added custom volume control support for infotainment system's native input volume range. The range that comes down to the device will be 0 to 100.
+Issues fixed in this release:
 
-* Added support for encoding the utterance in OPUS format with the Amazon Wakeword Engine as well as PTT. Our builder pulls the libopus source code as a part of build process.
+* Update a dependency build recipe to skip the checksum verification to allow for document changes in the current tag.
 
-* Added Locale API to return the list of Alexa supported locales.
-
-* Updated Vehicle Information API to capture the microphone details.
-
-* Added support for routines, music alarms, timers and alarms volume management and deleting all timers and alarms.
-
-* Added support for TemplateRuntime Interface 1.1 which provides visual playback control for Alexa enabled products with TemplateRuntime Interface support. This includes upgrades to PlaybackController Interface 1.1 and TemplateRuntime Interface 1.1.
-    * > **Note**: The older button-press APIs (`playButtonPressed()` or `nextButtonPressed()`) have been deprecated in favor of the new generic `buttonPressed(PlaybackButtonType)`.
-
-* Updated the builder script to confirm compiance with open source component licenses.
-
-### Resolved Issues
-
-There are no resolved issues in this release.
-
-### Known Issues
+#### Known Issues
 
 There are no known issues in this release.
 

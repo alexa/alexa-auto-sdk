@@ -54,12 +54,22 @@ public class AlertsHandler extends Alerts {
     public void alertStateChanged( final String alertToken,
                                    final AlertState state,
                                    final String reason ) {
-        mLogger.postInfo( sTag, String.format( "Alert State Changed. STATE: %s, REASON: %s",
-                state, reason ) );
+        mLogger.postInfo( sTag, String.format( "Alert State Changed. STATE: %s, REASON: %s, TOKEN: %s",
+                state, reason, alertToken ) );
         mActivity.runOnUiThread( new Runnable() {
             @Override
             public void run() { mStateText.setText( state != null ? state.toString() : "" ); }
         });
+    }
+
+    @Override
+    public void alertCreated( String alertToken, String detailedInfo ) {
+        mLogger.postInfo(sTag, String.format( "Alert Created. TOKEN: %s, Detailed Info payload: %s", alertToken, detailedInfo ) );
+    }
+
+    @Override
+    public void alertDeleted( String alertToken ) {
+        mLogger.postInfo(sTag, String.format( "Alert Deleted. TOKEN: %s", alertToken ) );
     }
 
     private void onLocalStop() {

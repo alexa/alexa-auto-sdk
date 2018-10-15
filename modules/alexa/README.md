@@ -178,6 +178,21 @@ To implement a custom handler for alerts, the `aace::alexa::Alerts` class should
       //handle the alert state change
     }
     ...
+    void MyAlerts::alertCreated( const std::string& alertToken, const std::string& detailedInfo ) override {
+      //handle the alert detailed info when alert is created (optional)
+      /*
+		* JSON string detailedInfo :
+		* {	
+		*	 "time" : <String>
+		*	 "type" : <String>
+		*	 "label" : <String>	
+		* }
+		*/
+    }
+    void MyAlerts::alertDeleted( const std::string& alertToken ) override {
+      //handle the alert when alert is deleted (optional)
+    }
+
 
     // Configure the Engine
 

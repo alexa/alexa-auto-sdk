@@ -100,6 +100,29 @@ public:
     virtual void alertStateChanged( const std::string& alertToken, AlertState state, const std::string& reason ) = 0;
 
     /**
+     * Notifies the platform implementation of an alert created, with detailed alert info. 
+     *
+     * @param [in] alertToken The AVS token of the alert.
+     * @param [in] detailedInfo The alert info payload :
+     * {
+     *      "time" : <String>
+     *      "type" : <String>
+     *      "label" : <String>
+     * }
+     * time The time string ( Scheduled Time ISO_8601 ).
+     * type The type of the alert ( ALERT, REMINDER, TIMER ).
+     * label The label of the TIMER, description for REMINDER, or empty string for ALARM.
+     */
+    virtual void alertCreated( const std::string& alertToken, const std::string& detailedInfo ) = 0;
+
+    /**
+     * Notifies the platform implementation of an alert deleted, with the alertToken.
+     *
+     * @param [in] alertToken The AVS token of the alert.
+     */
+    virtual void alertDeleted( const std::string& alertToken ) = 0;
+
+    /**
      * Notifies the Engine of a platform request to stop any active alert, such as when a user presses a physical 'stop' button.
      */
     void localStop();

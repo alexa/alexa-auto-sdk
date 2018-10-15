@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">1.1.0</span>
+   &#160;<span id="projectnumber">1.2.0</span>
    </div>
   </td>
  </tr>
@@ -101,6 +101,10 @@ Public Types</h2></td></tr>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:afc6cb0b2755cf2d90d50b070dec0162e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_alerts.html#afc6cb0b2755cf2d90d50b070dec0162e">alertStateChanged</a> (const std::string &amp;alertToken, <a class="el" href="classaace_1_1alexa_1_1_alerts.html#a81cccb7e632cf26b7903d9c9c168fb22">AlertState</a> state, const std::string &amp;reason)=0</td></tr>
 <tr class="separator:afc6cb0b2755cf2d90d50b070dec0162e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25d28c1bff1fd629cee335f27160b3c7"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_alerts.html#a25d28c1bff1fd629cee335f27160b3c7">alertCreated</a> (const std::string &amp;alertToken, const std::string &amp;detailedInfo)=0</td></tr>
+<tr class="separator:a25d28c1bff1fd629cee335f27160b3c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aba0bb75596452b4853c545899fc11fc1"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_alerts.html#aba0bb75596452b4853c545899fc11fc1">alertDeleted</a> (const std::string &amp;alertToken)=0</td></tr>
+<tr class="separator:aba0bb75596452b4853c545899fc11fc1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0ad3204360a08a578af1af59013f64a8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_alerts.html#a0ad3204360a08a578af1af59013f64a8">localStop</a> ()</td></tr>
 <tr class="separator:a0ad3204360a08a578af1af59013f64a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a48eea8459c5a5c42819fb4fcd155ff89"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_alerts.html#a48eea8459c5a5c42819fb4fcd155ff89">removeAllAlerts</a> ()</td></tr>
@@ -213,6 +217,83 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a25d28c1bff1fd629cee335f27160b3c7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a25d28c1bff1fd629cee335f27160b3c7">&#9670;&nbsp;</a></span>alertCreated()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void aace::alexa::Alerts::alertCreated </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>alertToken</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>detailedInfo</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Notifies the platform implementation of an alert created, with detailed alert info.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">alertToken</td><td>The AVS token of the alert. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">detailedInfo</td><td>The alert info payload : { "time" : &lt;String&gt; "type" : &lt;String&gt; "label" : &lt;String&gt; } time The time string ( Scheduled Time ISO_8601 ). type The type of the alert ( ALERT, REMINDER, TIMER ). label The label of the TIMER, description for REMINDER, or empty string for ALARM. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aba0bb75596452b4853c545899fc11fc1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aba0bb75596452b4853c545899fc11fc1">&#9670;&nbsp;</a></span>alertDeleted()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void aace::alexa::Alerts::alertDeleted </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>alertToken</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Notifies the platform implementation of an alert deleted, with the alertToken.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">alertToken</td><td>The AVS token of the alert. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a0ad3204360a08a578af1af59013f64a8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0ad3204360a08a578af1af59013f64a8">&#9670;&nbsp;</a></span>localStop()</h2>
 
@@ -254,7 +335,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 1.1.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 1.2.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

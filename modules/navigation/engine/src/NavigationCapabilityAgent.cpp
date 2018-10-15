@@ -42,7 +42,7 @@ static const std::string NAVIGATION_CAPABILITY_INTERFACE_TYPE = "AlexaInterface"
 /// Navigation interface name
 static const std::string NAVIGATION_CAPABILITY_INTERFACE_NAME = "Navigation";
 /// Navigation interface version
-static const std::string NAVIGATION_CAPABILITY_INTERFACE_VERSION = "1.1";
+static const std::string NAVIGATION_CAPABILITY_INTERFACE_VERSION = "1.2";
 
 /**
  * Creates the Navigation capability configuration.

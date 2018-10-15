@@ -88,6 +88,10 @@ public:
     // AlertObserverInterface
     void onAlertStateChange( const std::string & alertToken, State state, const std::string & reason ) override;
 
+    void onAlertCreated( const std::string & alertToken, const std::string & detailedInfo ) override;
+
+    void onAlertDeleted( const std::string & alertToken ) override;
+
 protected:
     virtual void doShutdown() override;
 
@@ -104,4 +108,3 @@ private:
 } // aace
 
 #endif // AACE_ENGINE_ALEXA_ALERTS_ENGINE_IMPL_H
-

@@ -2,6 +2,24 @@
 
 ___
 
+
+## v1.2.0 released on 2018-10-15:
+
+### Enhancements
+
+* Additional information related to the presentation of alerts is now available. The extended interface now includes Alert token, type, rendering time, and label if applicable when an alert is set and notification when an alert is deleted.
+* In the Navigation platform interface, ```SetDestination``` now provides business hours and contact information for a returned location when available.
+
+### Resolved Issues
+
+* If a location is not available, the location state is set to unavailable. Previously it was treated as (0,0) which was a valid value for longitude and latitude.
+* Fixed an issue related to stopping an alert where there could be up to a 10 second delay before the alert completely stopped.
+* Fixed issue where the ```TemplateRuntime``` platform interface could not be registered before ```AudioPlayer```.
+
+### Known Issues
+
+There are no known issues in this release.
+
 ## v1.1.1 released on 2018-09-10:
 
 ### Enhancements

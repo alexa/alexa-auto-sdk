@@ -52,7 +52,7 @@ aace::location::Location LocationProviderBinder::getLocation()
         }
     }
 
-    return aace::location::Location( 0.0, 0.0 );
+    return aace::location::Location( aace::location::Location::UNDEFINED, aace::location::Location::UNDEFINED );
 }
 
 // JNI

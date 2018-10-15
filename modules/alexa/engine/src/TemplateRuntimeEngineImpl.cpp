@@ -140,15 +140,7 @@ AudioPlayerInterfaceDelegate::AudioPlayerInterfaceDelegate( std::shared_ptr<alex
 }
 
 std::shared_ptr<AudioPlayerInterfaceDelegate> AudioPlayerInterfaceDelegate::create( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerInterface> audioPlayerInterface ) {
-    try
-    {
-        ThrowIfNull(audioPlayerInterface, "invalidAudioPlayerInterface");
-        return std::shared_ptr<AudioPlayerInterfaceDelegate>( new AudioPlayerInterfaceDelegate( audioPlayerInterface ) );
-    }
-    catch (std::exception &ex) {
-        AACE_ERROR(LX("AudioPlayerInterfaceDelegate", "create").d("reason", ex.what()));
-        return nullptr;
-    }
+    return std::shared_ptr<AudioPlayerInterfaceDelegate>( new AudioPlayerInterfaceDelegate( audioPlayerInterface ) );
 }
 
 void AudioPlayerInterfaceDelegate::doShutdown()

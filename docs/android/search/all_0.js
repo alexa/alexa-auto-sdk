@@ -3,6 +3,8 @@ var searchData=
   ['acl_5fclient_5frequest',['ACL_CLIENT_REQUEST',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_connection_changed_reason.html#a27dd6905ea8b269e891cb7af615349af',1,'com::amazon::aace::alexa::AlexaClient::ConnectionChangedReason']]],
   ['acl_5fdisabled',['ACL_DISABLED',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_connection_changed_reason.html#ae296bd017d5b9aff977a96b358ed31da',1,'com::amazon::aace::alexa::AlexaClient::ConnectionChangedReason']]],
   ['adjustvolume',['adjustVolume',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_speaker.html#a6559aac790542b84e5309c6d8376882e',1,'com::amazon::aace::alexa::Speaker']]],
+  ['alertcreated',['alertCreated',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_alerts.html#aa3a5e2c9bf2adfb42f25b80a495cd234',1,'com::amazon::aace::alexa::Alerts']]],
+  ['alertdeleted',['alertDeleted',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_alerts.html#af768bdcfb00844d591dd38c6f340e4a7',1,'com::amazon::aace::alexa::Alerts']]],
   ['alerts',['Alerts',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_alerts.html',1,'com::amazon::aace::alexa']]],
   ['alertstate',['AlertState',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alerts_1_1_alert_state.html',1,'com::amazon::aace::alexa::Alerts']]],
   ['alertstatechanged',['alertStateChanged',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_alerts.html#aaec21170ff0f51d02a9f72f0d41b1ad6',1,'com::amazon::aace::alexa::Alerts']]],

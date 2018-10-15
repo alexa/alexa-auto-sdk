@@ -1105,46 +1105,50 @@ void AlexaEngineLocationStateProvider::executeProvideState( const alexaClientSDK
 
         aace::location::Location location = m_locationProvider->getLocation();
 
-        // build the context payload
-        rapidjson::Document document( rapidjson::kObjectType );
-
-        // add timestamp
-        std::string time = location.getTimeAsString();
-
-        document.AddMember( "timestamp", rapidjson::Value().SetString( time.c_str(), time.length(), document.GetAllocator() ), document.GetAllocator() );
-
-        // add location coordinate
-        rapidjson::Value coordinate( rapidjson::kObjectType );
-
-        coordinate.AddMember( "latitudeInDegrees", location.getLatitude(), document.GetAllocator() );
-        coordinate.AddMember( "longitudeInDegrees", location.getLongitude(), document.GetAllocator() );
-        coordinate.AddMember( "accuracyInMeters", location.getAccuracy() != aace::location::Location::UNDEFINED ? location.getAccuracy() : 0, document.GetAllocator() );
-
-        document.AddMember( "coordinate", coordinate, document.GetAllocator() );
-
-        if( location.getAltitude() != aace::location::Location::UNDEFINED )
+        if( location.isValid() )
         {
+            // build the context payload
+            rapidjson::Document document( rapidjson::kObjectType );
+
+            // add timestamp
+            std::string time = location.getTimeAsString();
+
+            document.AddMember( "timestamp", rapidjson::Value().SetString( time.c_str(), time.length(), document.GetAllocator() ), document.GetAllocator() );
+
+            // add location coordinate
+            rapidjson::Value coordinate( rapidjson::kObjectType );
+
+            coordinate.AddMember( "latitudeInDegrees", location.getLatitude(), document.GetAllocator() );
+            coordinate.AddMember( "longitudeInDegrees", location.getLongitude(), document.GetAllocator() );
+            coordinate.AddMember( "accuracyInMeters", location.getAccuracy() != aace::location::Location::UNDEFINED ? location.getAccuracy() : 0, document.GetAllocator() );
+
+            document.AddMember( "coordinate", coordinate, document.GetAllocator() );
+
             // add location altitude
-            rapidjson::Value altitude( rapidjson::kObjectType );
+            if( location.getAltitude() != aace::location::Location::UNDEFINED )
+            {
+                rapidjson::Value altitude( rapidjson::kObjectType );
 
-            altitude.SetObject();
-            altitude.AddMember( "altitudeInMeters", location.getAltitude(), document.GetAllocator() );
+                altitude.SetObject();
+                altitude.AddMember( "altitudeInMeters", location.getAltitude(), document.GetAllocator() );
+                altitude.AddMember( "accuracyInMeters", location.getAccuracy() != aace::location::Location::UNDEFINED ? location.getAccuracy() : 0, document.GetAllocator() );
 
-            if( location.getAccuracy() != aace::location::Location::UNDEFINED ) {
-                altitude.AddMember( "accuracyInMeters", location.getAccuracy(), document.GetAllocator() );
+                document.AddMember( "altitude", altitude, document.GetAllocator() );
             }
 
-            document.AddMember( "altitude", altitude, document.GetAllocator() );
+            // build the json state string
+            rapidjson::StringBuffer buffer;
+            rapidjson::Writer<rapidjson::StringBuffer> writer( buffer );
+
+            ThrowIfNot( document.Accept( writer ), "failedToWriteJsonDocument" );
+
+            // set the context location state
+            ThrowIf( m_contextManager->setState( LOCATION_STATE, buffer.GetString(), alexaClientSDK::avsCommon::avs::StateRefreshPolicy::ALWAYS, stateRequestToken ) != alexaClientSDK::avsCommon::sdkInterfaces::SetStateResult::SUCCESS, "contextManagerSetStateFailed" );
         }
-
-        // build the json state string
-        rapidjson::StringBuffer buffer;
-        rapidjson::Writer<rapidjson::StringBuffer> writer( buffer );
-
-        ThrowIfNot( document.Accept( writer ), "failedToWriteJsonDocument" );
-
-        // set the context location state
-        ThrowIf( m_contextManager->setState( LOCATION_STATE, buffer.GetString(), alexaClientSDK::avsCommon::avs::StateRefreshPolicy::ALWAYS, stateRequestToken ) != alexaClientSDK::avsCommon::sdkInterfaces::SetStateResult::SUCCESS, "contextManagerSetStateFailed" );
+        else
+        {
+            ThrowIf( m_contextManager->setState( LOCATION_STATE, "", alexaClientSDK::avsCommon::avs::StateRefreshPolicy::SOMETIMES, stateRequestToken ) != alexaClientSDK::avsCommon::sdkInterfaces::SetStateResult::SUCCESS, "contextManagerSetStateFailed" );
+        }
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG + ".AlexaEngineLocationStateProvider","executeProvideState").d("reason", ex.what()));

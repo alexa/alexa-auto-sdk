@@ -31,8 +31,11 @@ class Location;
  */
 class Location {
 public:
+    // used for undefined location values
+    static constexpr double UNDEFINED = std::numeric_limits<double>::min();
+
     /**
-     * Most verbose constructor for a Location object
+     * Location constructor
      *
      * @param [in] latitude A location latitude
      * @param [in] longitude A location longitude
@@ -40,26 +43,7 @@ public:
      * @param [in] accuracy A location accuracy in meters
      * @param [in] time The time of measurement. Default is time of construction
      */
-    Location( double latitude, double longitude, double altitude, double accuracy, std::chrono::system_clock::time_point time = std::chrono::system_clock::now() );
-
-    /**
-     * Less verbose constructor for a Location object
-     *
-     * @param [in] latitude A location latitude
-     * @param [in] longitude A location longitude
-     * @param [in] accuracy A location accuracy in meters
-     * @param [in] time The time of measurement. Default is time of construction
-     */
-    Location( double latitude, double longitude, double accuracy, std::chrono::system_clock::time_point time = std::chrono::system_clock::now() );
-
-    /**
-     * Least verbose constructor for a Location object
-     *
-     * @param [in] latitude A location latitude
-     * @param [in] longitude A location longitude
-     * @param [in] time The time of measurement. Default is time of construction
-     */
-    Location( double latitude, double longitude, std::chrono::system_clock::time_point time = std::chrono::system_clock::now() );
+    Location( double latitude, double longitude, double altitude = UNDEFINED, double accuracy = UNDEFINED, std::chrono::system_clock::time_point time = std::chrono::system_clock::now() );
 
     /**
      * Copy constructor for a Location object
@@ -116,9 +100,6 @@ public:
      * @return @c std::string The time of location measurement as a string
      */
     std::string getTimeAsString();
-
-    // used for undefined location values
-    static const double UNDEFINED;
 
 private:
     double m_latitude;

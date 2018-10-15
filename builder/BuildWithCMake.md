@@ -27,6 +27,8 @@ You also need to apply the series of patches for Alexa Auto SDK. Locate the dire
 0001-SpeechEncoder-Introduce-SpeechEncoder-with-OPUS-supp.patch
 0002-AIP-Only-16kHz-is-supported-for-OPUS-now.patch
 0003-AIP-Initial-SpeechEncoder-support.patch
+0004-Alerts-stop-delay-fix.patch
+0007-Alerts-Detailed-Info-Interface.patch
 ```
 
 We recommend to install AVS Device SDK with prefix `/opt/AAC` or any other arbitrary directory rather than default `/usr/local` so you can avoid contamination with system.

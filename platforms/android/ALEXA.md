@@ -161,6 +161,24 @@ public class AlertsHandler extends Alerts
 	public void alertStateChanged( String alertToken, AlertState state, String reason ) {
 		//handle alert state change
 	}
+	...
+	@Override
+	public void alertCreated( String alertToken, String detailedInfo ) {
+		//handle the alert detailed info when alert is created (optional)
+		/*
+		* JSON string detailedInfo :
+		* {	
+		*	 "time" : <String>
+		*	 "type" : <String>
+		*	 "label" : <String>	
+		* }
+		*/
+	}
+	...
+	@Override
+	public void alertDeleted( String alertToken ) {
+		//handle the alert when alert is deleted (optional)
+	}
 ```
 
 For local Alerts control, the methods `localStop` (stop current playing alert), and `removeAllAlerts` (remove all locally stored alerts) should be used.

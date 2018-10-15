@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">1.1.0</span>
+   &#160;<span id="projectnumber">1.2.0</span>
    </div>
   </td>
  </tr>
@@ -108,7 +108,24 @@ Public Member Functions</h2></td></tr>
 <p>Notifies the platform implementation to set the navigation destination</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">payload</td><td>JSON data containing the destination information <div class="fragment"><div class="line">)</div><div class="line">&quot;destination&quot;: {</div><div class="line">   &quot;coordinate&quot;: {</div><div class="line">       &quot;latitudeInDegrees&quot;: {{DOUBLE}},</div><div class="line">       &quot;longitudeInDegrees&quot;: {{DOUBLE}}</div><div class="line">   },</div><div class="line">   &quot;name&quot;: &quot;{{STRING}}&quot;,</div><div class="line">   &quot;singleLineDisplayAddress&quot;: &quot;{{STRING}}&quot;</div><div class="line">   &quot;multipleLineDisplayAddress&quot;: &quot;{{STRING}}&quot;,</div><div class="line">}</div></div><!-- fragment --></td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">payload</td><td>JSON data containing the destination information <div class="fragment"><div class="line">)</div><div class="line">&quot;destination&quot;: {</div><div class="line">   &quot;coordinate&quot;: {</div><div class="line">       &quot;latitudeInDegrees&quot;: {{DOUBLE}},</div><div class="line">       &quot;longitudeInDegrees&quot;: {{DOUBLE}}</div><div class="line">   },</div><div class="line">   &quot;name&quot;: &quot;{{STRING}}&quot;,</div><div class="line">   &quot;singleLineDisplayAddress&quot;: &quot;{{STRING}}&quot;</div><div class="line">   &quot;multipleLineDisplayAddress&quot;: &quot;{{STRING}}&quot;,</div><div class="line">},</div><div class="line">&quot;transportationMode&quot;: &quot;{{STRING}}&quot;,</div><div class="line">&quot;metadata&quot;: {</div><div class="line">   &quot;hoursOfOperation&quot;: [</div><div class="line">      {</div><div class="line">         &quot;dayOfWeek&quot;: &quot;{{STRING}}&quot;,</div><div class="line">         &quot;hours&quot;: [{</div><div class="line">            &quot;open&quot;: &quot;{{STRING}}&quot;</div><div class="line">            &quot;close&quot;: &quot;{{STRING}}&quot;</div><div class="line">         }],</div><div class="line">         &quot;status&quot;: &quot;{{STRING}}&quot;</div><div class="line">      },</div><div class="line">      {</div><div class="line">         &quot;dayOfWeek&quot;: &quot;{{STRING}}&quot;,</div><div class="line">         &quot;hours&quot;: [{</div><div class="line">            &quot;open&quot;: &quot;{{STRING}}&quot;</div><div class="line">            &quot;close&quot;: &quot;{{STRING}}&quot;</div><div class="line">         }],</div><div class="line">         &quot;status&quot;: &quot;{{STRING}}&quot;</div><div class="line">      },</div><div class="line">      ...</div><div class="line">      ...</div><div class="line">   ],</div><div class="line">   &quot;phoneNumber&quot;: &quot;{{STRING}}&quot;</div><div class="line">}</div></div><!-- fragment --> <ul>
+<li>destination (required) : Information needed to navigate to the destination </li>
+<li>destination.name (optional) : Name of the destination </li>
+<li>destination.singleLineDisplayAddress (optional) : Address of destination in single line </li>
+<li>destination.multipleLineDisplayAddress (optional) : Address of destination in multiple lines with new lines expressed with <br />
+ escape sequence </li>
+<li>coordinate (required) : Contains the geolocation information of the destination </li>
+<li>coordinate.latitudeInDegrees (required) : Latitude coordinate in degrees </li>
+<li>coordinate.longitudeInDegrees (required) : Longitute coordinate in degrees </li>
+<li>transportationMode (required) : Indicates the means to navigate to the destination (Values: BIKING, DRIVING, TRANSIT, WALKING) </li>
+<li>metadata (optional) : Extra information about the destination, requires phoneNumber or hoursOfOperation to be present </li>
+<li>metadata.hoursOfOperation (optional) : List of daily hours for the location </li>
+<li>hoursOfOperation.dayOfWeek (required) : Day of the week (Values: MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY) </li>
+<li>hoursOfOperation.status (required) : Indicates whether the location is open on this day or not (Values: OPEN_DURING_HOURS, OPEN_24_HOURS, CLOSED, UNKNOWN, HOLIDAY) </li>
+<li>hoursOfOperation.hours (required): Absent when status is UNKNOWN, OPEN_24_HOURS, CLOSED, hours are in ISO-8601 time with timezone format </li>
+<li>metadata.phoneNumber (optional) : The phone number of the location in E.164 format</li>
+</ul>
+</td></tr>
   </table>
   </dd>
 </dl>
@@ -148,7 +165,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 1.1.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 1.2.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

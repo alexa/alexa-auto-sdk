@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">1.1.0</span>
+   &#160;<span id="projectnumber">1.2.0</span>
    </div>
   </td>
  </tr>
@@ -82,6 +82,10 @@ Classes</h2></td></tr>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:aaec21170ff0f51d02a9f72f0d41b1ad6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_alerts.html#aaec21170ff0f51d02a9f72f0d41b1ad6">alertStateChanged</a> (String alertToken, <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alerts_1_1_alert_state.html">AlertState</a> state, String reason)</td></tr>
 <tr class="separator:aaec21170ff0f51d02a9f72f0d41b1ad6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa3a5e2c9bf2adfb42f25b80a495cd234"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_alerts.html#aa3a5e2c9bf2adfb42f25b80a495cd234">alertCreated</a> (String alertToken, String detailedInfo)</td></tr>
+<tr class="separator:aa3a5e2c9bf2adfb42f25b80a495cd234"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af768bdcfb00844d591dd38c6f340e4a7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_alerts.html#af768bdcfb00844d591dd38c6f340e4a7">alertDeleted</a> (String alertToken)</td></tr>
+<tr class="separator:af768bdcfb00844d591dd38c6f340e4a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a63b23b1c42de28e35aa943265f7e562d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_alerts.html#a63b23b1c42de28e35aa943265f7e562d">localStop</a> ()</td></tr>
 <tr class="separator:a63b23b1c42de28e35aa943265f7e562d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a71f9d8d63b53b90cb27f09d093741898"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_alerts.html#a71f9d8d63b53b90cb27f09d093741898">removeAllAlerts</a> ()</td></tr>
@@ -141,6 +145,67 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="aa3a5e2c9bf2adfb42f25b80a495cd234"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa3a5e2c9bf2adfb42f25b80a495cd234">&#9670;&nbsp;</a></span>alertCreated()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void com.amazon.aace.alexa.Alerts.alertCreated </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>alertToken</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>detailedInfo</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Notifies the platform implementation of an alert created, with detailed alert info.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">alertToken</td><td>The AVS token of the alert. </td></tr>
+    <tr><td class="paramname">detailedInfo</td><td>The alert info payload : { "time" : &lt;String&gt; "type" : &lt;String&gt; "label" : &lt;String&gt; } time The time string ( Scheduled Time ISO_8601 ). type The type of the alert ( ALERT, REMINDER, TIMER ). label The label of the TIMER, description for REMINDER, or empty string for ALARM. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="af768bdcfb00844d591dd38c6f340e4a7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af768bdcfb00844d591dd38c6f340e4a7">&#9670;&nbsp;</a></span>alertDeleted()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void com.amazon.aace.alexa.Alerts.alertDeleted </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>alertToken</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Notifies the platform implementation of an alert deleted, with alert token.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">alertToken</td><td>The AVS token of the alert. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a63b23b1c42de28e35aa943265f7e562d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a63b23b1c42de28e35aa943265f7e562d">&#9670;&nbsp;</a></span>localStop()</h2>
 
@@ -182,7 +247,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 1.1.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 1.2.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

@@ -3,6 +3,8 @@ var searchData=
   ['acl_5fclient_5frequest',['ACL_CLIENT_REQUEST',['../classaace_1_1alexa_1_1_alexa_client.html#a05af151f4b7fdd47b9ea56e504074e05a5cd351b726751149c0464e3d9c23dcf1',1,'aace::alexa::AlexaClient']]],
   ['acl_5fdisabled',['ACL_DISABLED',['../classaace_1_1alexa_1_1_alexa_client.html#a05af151f4b7fdd47b9ea56e504074e05aa81589ff9e0102b95f3eafce18463d1a',1,'aace::alexa::AlexaClient']]],
   ['adjustvolume',['adjustVolume',['../classaace_1_1alexa_1_1_speaker.html#af20358ba06b312efdfe61fe0afbd4f40',1,'aace::alexa::Speaker']]],
+  ['alertcreated',['alertCreated',['../classaace_1_1alexa_1_1_alerts.html#a25d28c1bff1fd629cee335f27160b3c7',1,'aace::alexa::Alerts']]],
+  ['alertdeleted',['alertDeleted',['../classaace_1_1alexa_1_1_alerts.html#aba0bb75596452b4853c545899fc11fc1',1,'aace::alexa::Alerts']]],
   ['alerts',['Alerts',['../classaace_1_1alexa_1_1_alerts.html',1,'aace::alexa']]],
   ['alertstate',['AlertState',['../classaace_1_1alexa_1_1_alerts.html#a81cccb7e632cf26b7903d9c9c168fb22',1,'aace::alexa::Alerts']]],
   ['alertstatechanged',['alertStateChanged',['../classaace_1_1alexa_1_1_alerts.html#afc6cb0b2755cf2d90d50b070dec0162e',1,'aace::alexa::Alerts']]],

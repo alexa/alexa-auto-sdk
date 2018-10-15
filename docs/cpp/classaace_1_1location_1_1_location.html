@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">1.1.0</span>
+   &#160;<span id="projectnumber">1.2.0</span>
    </div>
   </td>
  </tr>
@@ -74,12 +74,8 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a56104088f2829b62ff00b0c728ff8a90"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1location_1_1_location.html#a56104088f2829b62ff00b0c728ff8a90">Location</a> (double latitude, double longitude, double altitude, double accuracy, std::chrono::system_clock::time_point time=std::chrono::system_clock::now())</td></tr>
-<tr class="separator:a56104088f2829b62ff00b0c728ff8a90"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adbec6c082c24315d328ec09a84c8b5b7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1location_1_1_location.html#adbec6c082c24315d328ec09a84c8b5b7">Location</a> (double latitude, double longitude, double accuracy, std::chrono::system_clock::time_point time=std::chrono::system_clock::now())</td></tr>
-<tr class="separator:adbec6c082c24315d328ec09a84c8b5b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a13f41eaa6f0c80cbbed5a2d0bfcb2617"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1location_1_1_location.html#a13f41eaa6f0c80cbbed5a2d0bfcb2617">Location</a> (double latitude, double longitude, std::chrono::system_clock::time_point time=std::chrono::system_clock::now())</td></tr>
-<tr class="separator:a13f41eaa6f0c80cbbed5a2d0bfcb2617"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2fee1df1854e9ae0f8a279ef0fe4bae9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1location_1_1_location.html#a2fee1df1854e9ae0f8a279ef0fe4bae9">Location</a> (double latitude, double longitude, double altitude=UNDEFINED, double accuracy=UNDEFINED, std::chrono::system_clock::time_point time=std::chrono::system_clock::now())</td></tr>
+<tr class="separator:a2fee1df1854e9ae0f8a279ef0fe4bae9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a579c0255247a086d5715044b9f783beb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1location_1_1_location.html#a579c0255247a086d5715044b9f783beb">Location</a> (const <a class="el" href="classaace_1_1location_1_1_location.html">Location</a> &amp;location)</td></tr>
 <tr class="separator:a579c0255247a086d5715044b9f783beb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2dd9abb6c2c005ca822c29d14fefada4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1location_1_1_location.html#a2dd9abb6c2c005ca822c29d14fefada4">isValid</a> ()</td></tr>
@@ -100,8 +96,8 @@ Public Member Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Represents a location object and provides accessor methods to its data </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a56104088f2829b62ff00b0c728ff8a90"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a56104088f2829b62ff00b0c728ff8a90">&#9670;&nbsp;</a></span>Location() <span class="overload">[1/4]</span></h2>
+<a id="a2fee1df1854e9ae0f8a279ef0fe4bae9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2fee1df1854e9ae0f8a279ef0fe4bae9">&#9670;&nbsp;</a></span>Location() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -122,13 +118,13 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>altitude</em>, </td>
+          <td class="paramname"><em>altitude</em> = <code>UNDEFINED</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>accuracy</em>, </td>
+          <td class="paramname"><em>accuracy</em> = <code>UNDEFINED</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -143,7 +139,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Most verbose constructor for a <a class="el" href="classaace_1_1location_1_1_location.html">Location</a> object</p>
+<p><a class="el" href="classaace_1_1location_1_1_location.html">Location</a> constructor</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">latitude</td><td>A location latitude </td></tr>
@@ -157,101 +153,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="adbec6c082c24315d328ec09a84c8b5b7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adbec6c082c24315d328ec09a84c8b5b7">&#9670;&nbsp;</a></span>Location() <span class="overload">[2/4]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">aace::location::Location::Location </td>
-          <td>(</td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>latitude</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>longitude</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>accuracy</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::chrono::system_clock::time_point&#160;</td>
-          <td class="paramname"><em>time</em> = <code>std::chrono::system_clock::now()</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Less verbose constructor for a <a class="el" href="classaace_1_1location_1_1_location.html">Location</a> object</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">latitude</td><td>A location latitude </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">longitude</td><td>A location longitude </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">accuracy</td><td>A location accuracy in meters </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>The time of measurement. Default is time of construction </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a13f41eaa6f0c80cbbed5a2d0bfcb2617"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a13f41eaa6f0c80cbbed5a2d0bfcb2617">&#9670;&nbsp;</a></span>Location() <span class="overload">[3/4]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">aace::location::Location::Location </td>
-          <td>(</td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>latitude</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>longitude</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::chrono::system_clock::time_point&#160;</td>
-          <td class="paramname"><em>time</em> = <code>std::chrono::system_clock::now()</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Least verbose constructor for a <a class="el" href="classaace_1_1location_1_1_location.html">Location</a> object</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">latitude</td><td>A location latitude </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">longitude</td><td>A location longitude </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>The time of measurement. Default is time of construction </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
 <a id="a579c0255247a086d5715044b9f783beb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a579c0255247a086d5715044b9f783beb">&#9670;&nbsp;</a></span>Location() <span class="overload">[4/4]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a579c0255247a086d5715044b9f783beb">&#9670;&nbsp;</a></span>Location() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -414,7 +317,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 1.1.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 1.2.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

@@ -20,22 +20,19 @@
 namespace aace {
 namespace location {
 
-const double Location::UNDEFINED = std::numeric_limits<double>::min();
-
-Location::Location( double latitude, double longitude, double altitude, double accuracy, std::chrono::system_clock::time_point time ) : m_latitude( latitude ), m_longitude( longitude ), m_altitude( altitude ), m_accuracy( accuracy ), m_time( time ) {
-}
-
-Location::Location( double latitude, double longitude, double accuracy, std::chrono::system_clock::time_point time ) : m_latitude( latitude ), m_longitude( longitude ), m_altitude( UNDEFINED ), m_accuracy( accuracy ), m_time( time ) {
-}
-
-Location::Location( double latitude, double longitude, std::chrono::system_clock::time_point time ) : m_latitude( latitude ), m_longitude( longitude ), m_altitude( UNDEFINED ), m_accuracy( UNDEFINED ), m_time( time ) {
+Location::Location( double latitude, double longitude, double altitude, double accuracy, std::chrono::system_clock::time_point time ) {
+    m_latitude = (latitude >= -90 && latitude <= 90) ? latitude : UNDEFINED;
+    m_longitude = (longitude >= -180 && longitude <= 180) ? longitude : UNDEFINED;
+    m_altitude = altitude >= 0 ? altitude : UNDEFINED;
+    m_accuracy = accuracy >=0 ? accuracy : UNDEFINED;
+    m_time = time;
 }
 
 Location::Location( const Location& location ) {
     m_latitude = location.m_latitude;
     m_longitude = location.m_longitude;
-    m_altitude = location.m_altitude;
     m_accuracy = location.m_accuracy;
+    m_altitude = location.m_altitude;
     m_time = location.m_time;
 }
 
@@ -44,19 +41,19 @@ bool Location::isValid() {
 }
 
 double Location::getLatitude() {
-    return m_latitude != UNDEFINED ? m_latitude : 0;
+    return m_latitude;
 }
 
 double Location::getLongitude() {
-    return m_longitude != UNDEFINED ? m_longitude : 0;
+    return m_longitude;
 }
 
 double Location::getAltitude() {
-    return m_altitude != UNDEFINED ? m_altitude : 0;
+    return m_altitude;
 }
 
 double Location::getAccuracy() {
-    return m_accuracy != UNDEFINED ? m_accuracy : 0;
+    return m_accuracy;
 }
 
 std::chrono::system_clock::time_point Location::getTime() {

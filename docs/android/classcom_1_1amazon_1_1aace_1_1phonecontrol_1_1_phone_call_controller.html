@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">1.1.0</span>
+   &#160;<span id="projectnumber">1.3.0</span>
    </div>
   </td>
  </tr>
@@ -76,29 +76,58 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_call_error.html">CallError</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_calling_device_configuration_property.html">CallingDeviceConfigurationProperty</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_call_state.html">CallState</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_connection_state.html">ConnectionState</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_d_t_m_f_error.html">DTMFError</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a01d791710c2d299ca213b7723b593b0d"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a01d791710c2d299ca213b7723b593b0d">dial</a> (String payload)</td></tr>
 <tr class="separator:a01d791710c2d299ca213b7723b593b0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab5e3c7dea09051cefaf2c5c4785f9454"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#ab5e3c7dea09051cefaf2c5c4785f9454">connectionStateChanged</a> (<a class="el" href="enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_connection_state.html">ConnectionState</a> state)</td></tr>
-<tr class="separator:ab5e3c7dea09051cefaf2c5c4785f9454"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2efb96253241a29f2cf840a43ba8c180"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a2efb96253241a29f2cf840a43ba8c180">redial</a> (String payload)</td></tr>
+<tr class="separator:a2efb96253241a29f2cf840a43ba8c180"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a96fcb25d9e32de9524becbec82a79ed7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a96fcb25d9e32de9524becbec82a79ed7">answer</a> (String payload)</td></tr>
+<tr class="separator:a96fcb25d9e32de9524becbec82a79ed7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6b16e1f163c1ba5732cca98e507f0220"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a6b16e1f163c1ba5732cca98e507f0220">stop</a> (String payload)</td></tr>
+<tr class="separator:a6b16e1f163c1ba5732cca98e507f0220"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a84929af8429fa585444691eb965da31a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a84929af8429fa585444691eb965da31a">sendDTMF</a> (String payload)</td></tr>
+<tr class="separator:a84929af8429fa585444691eb965da31a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:acb788db528f09c6ee7ca6aeaa62f7d00"><td class="memItemLeft" align="right" valign="top">final void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#acb788db528f09c6ee7ca6aeaa62f7d00">callActivated</a> (String callId)</td></tr>
-<tr class="separator:acb788db528f09c6ee7ca6aeaa62f7d00"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a04af0cd43743f34f867624e8dba5931a"><td class="memItemLeft" align="right" valign="top">final void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a04af0cd43743f34f867624e8dba5931a">callTerminated</a> (String callId)</td></tr>
-<tr class="separator:a04af0cd43743f34f867624e8dba5931a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4d8ab01ed2de2ec5a4a2089255e5dcb7"><td class="memItemLeft" align="right" valign="top">final void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a4d8ab01ed2de2ec5a4a2089255e5dcb7">callFailed</a> (String callId, String error)</td></tr>
-<tr class="separator:a4d8ab01ed2de2ec5a4a2089255e5dcb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2e3c2d4a8d5eff99a09ab72498083d98"><td class="memItemLeft" align="right" valign="top">final void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a2e3c2d4a8d5eff99a09ab72498083d98">callFailed</a> (String callId, String error, String message)</td></tr>
-<tr class="separator:a2e3c2d4a8d5eff99a09ab72498083d98"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a941fcb1da744bc9d254bc1657942aba5"><td class="memItemLeft" align="right" valign="top">final void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a941fcb1da744bc9d254bc1657942aba5">connectionStateChanged</a> (<a class="el" href="enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_connection_state.html">ConnectionState</a> state)</td></tr>
+<tr class="separator:a941fcb1da744bc9d254bc1657942aba5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a297a3c5a3bf26b7c54dcb8a00ce835e8"><td class="memItemLeft" align="right" valign="top">final void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a297a3c5a3bf26b7c54dcb8a00ce835e8">callStateChanged</a> (<a class="el" href="enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_call_state.html">CallState</a> state, String callId)</td></tr>
+<tr class="separator:a297a3c5a3bf26b7c54dcb8a00ce835e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afb4c67b88d5e9aa8c389597cb25d1822"><td class="memItemLeft" align="right" valign="top">final void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#afb4c67b88d5e9aa8c389597cb25d1822">callStateChanged</a> (<a class="el" href="enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_call_state.html">CallState</a> state, String callId, String callerId)</td></tr>
+<tr class="separator:afb4c67b88d5e9aa8c389597cb25d1822"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3c41db407c07df25c744d6d4ed5ed470"><td class="memItemLeft" align="right" valign="top">final void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a3c41db407c07df25c744d6d4ed5ed470">callFailed</a> (String callId, <a class="el" href="enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_call_error.html">CallError</a> code)</td></tr>
+<tr class="separator:a3c41db407c07df25c744d6d4ed5ed470"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab5c9f2d6a6b3d5ed1993d8a1f44142ee"><td class="memItemLeft" align="right" valign="top">final void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#ab5c9f2d6a6b3d5ed1993d8a1f44142ee">callFailed</a> (String callId, <a class="el" href="enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_call_error.html">CallError</a> code, String message)</td></tr>
+<tr class="separator:ab5c9f2d6a6b3d5ed1993d8a1f44142ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad8af283538524392cee3d2647eb78a6e"><td class="memItemLeft" align="right" valign="top">final void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#ad8af283538524392cee3d2647eb78a6e">callerIdReceived</a> (String callId, String callerId)</td></tr>
+<tr class="separator:ad8af283538524392cee3d2647eb78a6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abbef49449a17271bc67e885054c50416"><td class="memItemLeft" align="right" valign="top">final void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#abbef49449a17271bc67e885054c50416">sendDTMFSucceeded</a> (String callId)</td></tr>
+<tr class="separator:abbef49449a17271bc67e885054c50416"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa339310c1f1f0c29b99308677572a47"><td class="memItemLeft" align="right" valign="top">final void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#aaa339310c1f1f0c29b99308677572a47">sendDTMFFailed</a> (String callId, <a class="el" href="enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_d_t_m_f_error.html">DTMFError</a> code)</td></tr>
+<tr class="separator:aaa339310c1f1f0c29b99308677572a47"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6deac75764abd61feefcff05756ed367"><td class="memItemLeft" align="right" valign="top">final void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a6deac75764abd61feefcff05756ed367">sendDTMFFailed</a> (String callId, <a class="el" href="enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_d_t_m_f_error.html">DTMFError</a> code, String message)</td></tr>
+<tr class="separator:a6deac75764abd61feefcff05756ed367"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad7d3413ded20b937afc728931005c122"><td class="memItemLeft" align="right" valign="top">final void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#ad7d3413ded20b937afc728931005c122">deviceConfigurationUpdated</a> (HashMap&lt; <a class="el" href="enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_calling_device_configuration_property.html">CallingDeviceConfigurationProperty</a>, Boolean &gt; configurationMap)</td></tr>
+<tr class="separator:ad7d3413ded20b937afc728931005c122"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2998eb274f0bdbc50cc89f2a3d12cd13"><td class="memItemLeft" align="right" valign="top">final String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a2998eb274f0bdbc50cc89f2a3d12cd13">createCallId</a> ()</td></tr>
+<tr class="separator:a2998eb274f0bdbc50cc89f2a3d12cd13"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html">PhoneCallController</a> should be extended to handle directives to initiate a phone call on a calling device (e.g. mobile phone). It also provides interfaces for notifying the Engine of the state of a call session and the state of platform connection to the calling device. The platform implementation is responsible for managing the lifecycle and user experience of a call session and connection to the calling device. </p>
+<div class="textblock"><p><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html">PhoneCallController</a> should be extended to allow a user to use Alexa to interact with a calling device such as a connected mobile phone. It provides interfaces for controlling inbound and outbound calls and for notifying the Engine of the state of a call session and the state of platform connection to a calling device.</p>
+<p>The platform implementation is responsible for managing the lifecycle and user experience of a call session and connection to the calling device. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a01d791710c2d299ca213b7723b593b0d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a01d791710c2d299ca213b7723b593b0d">&#9670;&nbsp;</a></span>dial()</h2>
@@ -115,43 +144,144 @@ Protected Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Notifies the platform implementation to initiate an outgoing phone call to a destination address</p>
+<p>Notifies the platform implementation to initiate an outgoing phone call to the destination address</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">payload</td><td>Details of the outgoing call in structured JSON format. See the following payload structure and the description of each field:</td></tr>
-  </table>
-  </dd>
-</dl>
-<div class="fragment"><div class="line">)</div><div class="line"> {</div><div class="line">    &quot;callId&quot;: &quot;{{STRING}}&quot;,</div><div class="line">    &quot;callee&quot;: {</div><div class="line">      &quot;details&quot;: &quot;{{STRING}}&quot;,</div><div class="line">      &quot;defaultAddress&quot;: {</div><div class="line">        &quot;protocol&quot;: &quot;{{STRING}}&quot;,</div><div class="line">        &quot;format&quot;: &quot;{{STRING}}&quot;,</div><div class="line">        &quot;value&quot;: &quot;{{STRING}}&quot;</div><div class="line">      },</div><div class="line">      &quot;alternativeAddresses&quot;: [{</div><div class="line">        &quot;protocol&quot;: &quot;{{STRING}}&quot;,</div><div class="line">        &quot;format&quot;: &quot;{{STRING}}&quot;,</div><div class="line">        &quot;value&quot;: {{STRING}}</div><div class="line">      }]</div><div class="line">    }</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><ul>
-<li>callId (required): A unique identifier for the call</li>
-</ul>
-<ul>
-<li>callee (required): The destination of the outgoing call</li>
-</ul>
-<ul>
-<li>callee.details (optional): Descriptive information about the callee</li>
-</ul>
-<ul>
-<li>callee.defaultAddress (required): The default address to use for calling the callee</li>
-</ul>
-<ul>
-<li>callee.alternativeAddresses (optional): An array of alternate addresses for the existing callee</li>
-</ul>
-<ul>
-<li>address.protocol (required): The protocol for this address of the callee (e.g. PSTN, SIP, H323, etc.)</li>
-</ul>
-<ul>
-<li>address.format (optional): The format for this address of the callee (e.g. E.164, E.163, E.123, DIN5008, etc.)</li>
-</ul>
-<ul>
+    <tr><td class="paramname">payload</td><td>Details of the dial request in structured JSON format. See the following payload structure and the description of each field: <div class="fragment"><div class="line"> {</div><div class="line">    &quot;callId&quot;: &quot;{{STRING}}&quot;,</div><div class="line">    &quot;callee&quot;: {</div><div class="line">      &quot;details&quot;: &quot;{{STRING}}&quot;,</div><div class="line">      &quot;defaultContactAddress&quot;: {</div><div class="line">        &quot;protocol&quot;: &quot;{{STRING}}&quot;,</div><div class="line">        &quot;format&quot;: &quot;{{STRING}}&quot;,</div><div class="line">        &quot;value&quot;: &quot;{{STRING}}&quot;</div><div class="line">      },</div><div class="line">      &quot;alternativeContactAddresses&quot;: [{</div><div class="line">        &quot;protocol&quot;: &quot;{{STRING}}&quot;,</div><div class="line">        &quot;format&quot;: &quot;{{STRING}}&quot;,</div><div class="line">        &quot;value&quot;: {{STRING}}</div><div class="line">      }]</div><div class="line">    },</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --> <ul>
+<li>callId (required): A unique identifier for the call </li>
+<li>callee (required): The destination of the outgoing call </li>
+<li>callee.details (optional): Descriptive information about the callee </li>
+<li>callee.defaultContactAddress (required): The default address to use for calling the callee </li>
+<li>callee.alternativeContactAddresses (optional): An array of alternate addresses for the callee </li>
+<li>address.protocol (required): The protocol for this address of the callee. One of PSTN, SIP, H.323 </li>
+<li>address.format (optional): The format for this address of the callee. One of E.164, E.163, E.123, MICROSOFT, DIN5008, RAW </li>
 <li>address.value (required): The address of the callee.</li>
 </ul>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation will initiate the call, else <code>false</code> </dd></dl>
+</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation successfully handled the call </dd></dl>
 
 </div>
 </div>
-<a id="acb788db528f09c6ee7ca6aeaa62f7d00"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acb788db528f09c6ee7ca6aeaa62f7d00">&#9670;&nbsp;</a></span>callActivated()</h2>
+<a id="a2efb96253241a29f2cf840a43ba8c180"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2efb96253241a29f2cf840a43ba8c180">&#9670;&nbsp;</a></span>redial()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boolean com.amazon.aace.phonecontrol.PhoneCallController.redial </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>payload</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Notifies the platform implementation to redial the last called phone number.</p>
+<p>After returning <code>true</code>, if no stored number is available to be redialed, <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a3c41db407c07df25c744d6d4ed5ed470">PhoneCallController::callFailed</a></code> with <code><a class="el" href="enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_call_error.html#a65e4bf416fa94982beeae4217b8ce0bd">CallError::NO_NUMBER_FOR_REDIAL</a></code> should be called.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">payload</td><td>Details of the redial request in structured JSON format. See the following payload structure and the description of each field: <div class="fragment"><div class="line">{</div><div class="line">  &quot;callId&quot;: &quot;{{STRING}}&quot;</div><div class="line">}</div></div><!-- fragment --> <ul>
+<li>callId (required): A unique identifier for the call</li>
+</ul>
+</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation successfully handled the call </dd></dl>
+
+</div>
+</div>
+<a id="a96fcb25d9e32de9524becbec82a79ed7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a96fcb25d9e32de9524becbec82a79ed7">&#9670;&nbsp;</a></span>answer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void com.amazon.aace.phonecontrol.PhoneCallController.answer </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>payload</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Notifies the platform implementation to answer an inbound call</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">payload</td><td>Details of the answer request in structured JSON format. See the following payload structure and the description of each field: <div class="fragment"><div class="line">{</div><div class="line">  &quot;callId&quot;: &quot;{{STRING}}&quot;,</div><div class="line">}</div></div><!-- fragment --> <ul>
+<li>callId (required): The unique identifier for the call to answer </li>
+</ul>
+</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a6b16e1f163c1ba5732cca98e507f0220"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6b16e1f163c1ba5732cca98e507f0220">&#9670;&nbsp;</a></span>stop()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void com.amazon.aace.phonecontrol.PhoneCallController.stop </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>payload</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Notifies the platform implementation to end an ongoing call or stop inbound or outbound call setup</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">payload</td><td>Details of the stop request in structured JSON format. See the following payload structure and the description of each field: <div class="fragment"><div class="line">{</div><div class="line">  &quot;callId&quot;: &quot;{{STRING}}&quot;</div><div class="line">}</div></div><!-- fragment --> <ul>
+<li>callId (required): The unique identifier for the call to be stopped </li>
+</ul>
+</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a84929af8429fa585444691eb965da31a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a84929af8429fa585444691eb965da31a">&#9670;&nbsp;</a></span>sendDTMF()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void com.amazon.aace.phonecontrol.PhoneCallController.sendDTMF </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>payload</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Notifies the platform implementation to send a DTMF signal to the calling device</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">payload</td><td>Details of the DTMF request in structured JSON format. See the following payload structure and the description of each field: <div class="fragment"><div class="line">{</div><div class="line">  &quot;callId&quot;: &quot;{{STRING}}&quot;,</div><div class="line">  &quot;signal&quot;: &quot;{{STRING}}&quot;</div><div class="line">}</div></div><!-- fragment --> <ul>
+<li>callId (required): The unique identifier for the call </li>
+<li>signal (required): The DTMF string to be sent to the calling device associated with the callId </li>
+</ul>
+</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a941fcb1da744bc9d254bc1657942aba5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a941fcb1da744bc9d254bc1657942aba5">&#9670;&nbsp;</a></span>connectionStateChanged()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -160,10 +290,10 @@ Protected Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">final void com.amazon.aace.phonecontrol.PhoneCallController.callActivated </td>
+          <td class="memname">final void com.amazon.aace.phonecontrol.PhoneCallController.connectionStateChanged </td>
           <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>callId</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_connection_state.html">ConnectionState</a>&#160;</td>
+          <td class="paramname"><em>state</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -173,18 +303,18 @@ Protected Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Notifies the Engine that a phone call was activated on a calling device. <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#acb788db528f09c6ee7ca6aeaa62f7d00">callActivated()</a></code> should be called in response to a <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a01d791710c2d299ca213b7723b593b0d">dial()</a></code> directive in which the platform implementation returned <code>true</code>. <code>callId</code> must match the <code>callId</code> from the <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a01d791710c2d299ca213b7723b593b0d">dial()</a></code> payload. When the platform implementation calls <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#acb788db528f09c6ee7ca6aeaa62f7d00">callActivated()</a></code> for a call initiated outside of the scope of Alexa, it is responsible for creating a UUID for this call session.</p>
+<p>Notifies the Engine of a change in connection to a calling device</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">callId</td><td>The unique identifier for the call </td></tr>
+    <tr><td class="paramname">state</td><td>The state of connection to a calling device </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="a04af0cd43743f34f867624e8dba5931a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a04af0cd43743f34f867624e8dba5931a">&#9670;&nbsp;</a></span>callTerminated()</h2>
+<a id="a297a3c5a3bf26b7c54dcb8a00ce835e8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a297a3c5a3bf26b7c54dcb8a00ce835e8">&#9670;&nbsp;</a></span>callStateChanged() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -193,49 +323,16 @@ Protected Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">final void com.amazon.aace.phonecontrol.PhoneCallController.callTerminated </td>
+          <td class="memname">final void com.amazon.aace.phonecontrol.PhoneCallController.callStateChanged </td>
           <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>callId</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Notifies the Engine that an active call was terminated or an ongoing phone call setup was cancelled</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">callId</td><td>The unique identifier for the call </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a4d8ab01ed2de2ec5a4a2089255e5dcb7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4d8ab01ed2de2ec5a4a2089255e5dcb7">&#9670;&nbsp;</a></span>callFailed() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final void com.amazon.aace.phonecontrol.PhoneCallController.callFailed </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>callId</em>, </td>
+          <td class="paramtype"><a class="el" href="enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_call_state.html">CallState</a>&#160;</td>
+          <td class="paramname"><em>state</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>error</em>&#160;</td>
+          <td class="paramname"><em>callId</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -249,28 +346,70 @@ Protected Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Notifies the Engine of an error in initiating or maintaining a call on the platform calling device</p>
+<p>Notifies the Engine of a change in the state of an ongoing call</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">callId</td><td>The unique identifier for the call</td></tr>
-    <tr><td class="paramname">error</td><td>An error status code:</td></tr>
+    <tr><td class="paramname">state</td><td>The state of the call </td></tr>
+    <tr><td class="paramname">callId</td><td>The unique identifier associated with the call </td></tr>
   </table>
   </dd>
 </dl>
-<ul>
-<li>4xx range: Validation failure for the input from the <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a01d791710c2d299ca213b7723b593b0d">dial()</a></code> directive</li>
-</ul>
-<ul>
-<li>500: Internal error on the platform unrelated to the cellular network</li>
-</ul>
-<ul>
-<li>503: Error on the platform related to the cellular network </li>
-</ul>
 
 </div>
 </div>
-<a id="a2e3c2d4a8d5eff99a09ab72498083d98"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2e3c2d4a8d5eff99a09ab72498083d98">&#9670;&nbsp;</a></span>callFailed() <span class="overload">[2/2]</span></h2>
+<a id="afb4c67b88d5e9aa8c389597cb25d1822"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afb4c67b88d5e9aa8c389597cb25d1822">&#9670;&nbsp;</a></span>callStateChanged() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">final void com.amazon.aace.phonecontrol.PhoneCallController.callStateChanged </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_call_state.html">CallState</a>&#160;</td>
+          <td class="paramname"><em>state</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>callId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>callerId</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Notifies the Engine of a change in the state of an ongoing call</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">state</td><td>The state of the call </td></tr>
+    <tr><td class="paramname">callId</td><td>The unique identifier associated with the call </td></tr>
+    <tr><td class="paramname">callerId</td><td>The identifier for a contact. May be included for <code><a class="el" href="enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_call_state.html#ac64f764a5a9ab1ec83cc35eace0f6af2">CallState::CALL_RECEIVED</a></code> </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a3c41db407c07df25c744d6d4ed5ed470"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3c41db407c07df25c744d6d4ed5ed470">&#9670;&nbsp;</a></span>callFailed() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -287,8 +426,52 @@ Protected Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_call_error.html">CallError</a>&#160;</td>
+          <td class="paramname"><em>code</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Notifies the Engine of an error related to a call</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">callId</td><td>The unique identifier for the call associated with the error </td></tr>
+    <tr><td class="paramname">code</td><td>The error type </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ab5c9f2d6a6b3d5ed1993d8a1f44142ee"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab5c9f2d6a6b3d5ed1993d8a1f44142ee">&#9670;&nbsp;</a></span>callFailed() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">final void com.amazon.aace.phonecontrol.PhoneCallController.callFailed </td>
+          <td>(</td>
           <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>error</em>, </td>
+          <td class="paramname"><em>callId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_call_error.html">CallError</a>&#160;</td>
+          <td class="paramname"><em>code</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -308,25 +491,11 @@ Protected Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Notifies the Engine of an error in initiating or maintaining a call on a calling device</p>
+<p>Notifies the Engine of an error related to a call</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">callId</td><td>The unique identifier for the call</td></tr>
-    <tr><td class="paramname">error</td><td>An error status code:</td></tr>
-  </table>
-  </dd>
-</dl>
-<ul>
-<li>4xx range: Validation failure for the input from the <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a01d791710c2d299ca213b7723b593b0d">dial()</a></code> directive</li>
-</ul>
-<ul>
-<li>500: Internal error on the platform unrelated to the cellular network</li>
-</ul>
-<ul>
-<li>503: Error on the platform related to the cellular network</li>
-</ul>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
+    <tr><td class="paramname">callId</td><td>The unique identifier for the call associated with the error </td></tr>
+    <tr><td class="paramname">code</td><td>The error type </td></tr>
     <tr><td class="paramname">message</td><td>A description of the error </td></tr>
   </table>
   </dd>
@@ -334,22 +503,238 @@ Protected Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ab5e3c7dea09051cefaf2c5c4785f9454"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab5e3c7dea09051cefaf2c5c4785f9454">&#9670;&nbsp;</a></span>connectionStateChanged()</h2>
+<a id="ad8af283538524392cee3d2647eb78a6e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad8af283538524392cee3d2647eb78a6e">&#9670;&nbsp;</a></span>callerIdReceived()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void com.amazon.aace.phonecontrol.PhoneCallController.connectionStateChanged </td>
+          <td class="memname">final void com.amazon.aace.phonecontrol.PhoneCallController.callerIdReceived </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_connection_state.html">ConnectionState</a>&#160;</td>
-          <td class="paramname"><em>state</em></td><td>)</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>callId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>callerId</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Notifies the Engine that a caller id was received for an inbound call</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">callId</td><td>The unique identifier for the call associated with the callId </td></tr>
+    <tr><td class="paramname">callerId</td><td>The caller's identifier or phone number </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="abbef49449a17271bc67e885054c50416"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abbef49449a17271bc67e885054c50416">&#9670;&nbsp;</a></span>sendDTMFSucceeded()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">final void com.amazon.aace.phonecontrol.PhoneCallController.sendDTMFSucceeded </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>callId</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
-<p>Notifies the Engine of a change in connection state of a calling device. </p>
+<p>Notifies the Engine that sending the DTMF signal succeeded.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">callId</td><td>The unique identifier for the associated call</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a84929af8429fa585444691eb965da31a">PhoneCallController::sendDTMF</a> </dd></dl>
+
+</div>
+</div>
+<a id="aaa339310c1f1f0c29b99308677572a47"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaa339310c1f1f0c29b99308677572a47">&#9670;&nbsp;</a></span>sendDTMFFailed() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">final void com.amazon.aace.phonecontrol.PhoneCallController.sendDTMFFailed </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>callId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_d_t_m_f_error.html">DTMFError</a>&#160;</td>
+          <td class="paramname"><em>code</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Notifies the Engine that the DTMF signal could not be delivered to the remote party</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">callId</td><td>The unique identifier for the associated call </td></tr>
+    <tr><td class="paramname">code</td><td>The error type</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a84929af8429fa585444691eb965da31a">PhoneCallController::sendDTMF</a> </dd></dl>
+
+</div>
+</div>
+<a id="a6deac75764abd61feefcff05756ed367"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6deac75764abd61feefcff05756ed367">&#9670;&nbsp;</a></span>sendDTMFFailed() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">final void com.amazon.aace.phonecontrol.PhoneCallController.sendDTMFFailed </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>callId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_d_t_m_f_error.html">DTMFError</a>&#160;</td>
+          <td class="paramname"><em>code</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>message</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Notifies the Engine that the DTMF signal could not be delivered to the remote party</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">callId</td><td>The unique identifier for the associated call </td></tr>
+    <tr><td class="paramname">code</td><td>The error type </td></tr>
+    <tr><td class="paramname">message</td><td>A description of the error</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a84929af8429fa585444691eb965da31a">PhoneCallController::sendDTMF</a> </dd></dl>
+
+</div>
+</div>
+<a id="ad7d3413ded20b937afc728931005c122"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad7d3413ded20b937afc728931005c122">&#9670;&nbsp;</a></span>deviceConfigurationUpdated()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">final void com.amazon.aace.phonecontrol.PhoneCallController.deviceConfigurationUpdated </td>
+          <td>(</td>
+          <td class="paramtype">HashMap&lt; <a class="el" href="enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_calling_device_configuration_property.html">CallingDeviceConfigurationProperty</a>, Boolean &gt;&#160;</td>
+          <td class="paramname"><em>configurationMap</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Notifies the Engine of the calling feature configuration of the connected calling device. The configuration data may change if, for example, the connection mechanism to the calling device changes. The provided configuration will override the default or previous configuration.</p>
+<p>See <code><a class="el" href="enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_calling_device_configuration_property.html">PhoneCallController::CallingDeviceConfigurationProperty</a></code> for a description of each configurable feature</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">configurationMap</td><td>A map of configuration properties to the boolean state of the properties </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a2998eb274f0bdbc50cc89f2a3d12cd13"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2998eb274f0bdbc50cc89f2a3d12cd13">&#9670;&nbsp;</a></span>createCallId()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">final String com.amazon.aace.phonecontrol.PhoneCallController.createCallId </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Generates a unique identifier for a call </p>
 
 </div>
 </div>
@@ -358,7 +743,7 @@ Protected Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 1.1.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 1.3.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

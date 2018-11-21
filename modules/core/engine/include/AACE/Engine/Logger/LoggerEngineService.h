@@ -19,12 +19,17 @@
 #include "AACE/Engine/Core/EngineService.h"
 #include "EngineLogger.h"
 #include "LoggerEngineImpl.h"
+#include "LoggerServiceInterface.h"
 
 namespace aace {
 namespace engine {
 namespace logger {
 
-class LoggerEngineService : public aace::engine::core::EngineService {
+class LoggerEngineService :
+    public aace::engine::core::EngineService,
+    public LoggerServiceInterface,
+    public std::enable_shared_from_this<LoggerEngineService> {
+
 public:
     DESCRIBE("aace.logger",VERSION("1.0"))
 
@@ -33,6 +38,9 @@ private:
 
 public:
     virtual ~LoggerEngineService() = default;
+
+    // LoggerServiceInterface
+    bool addSink( std::shared_ptr<aace::engine::logger::sink::Sink> sink ) override;
 
 protected:
     bool configure( const std::vector<std::shared_ptr<std::istream>>& configuration ) override;

@@ -62,6 +62,8 @@ public:
         std::shared_ptr<aace::alexa::Speaker> speaker ) : Alerts(mediaPlayer,speaker) {
     }
     MOCK_METHOD3( alertStateChanged, void(const std::string& alertToken,aace::alexa::Alerts::AlertState state, const std::string& reason) );
+    MOCK_METHOD2( alertCreated, void(const std::string& alertToken, const std::string& detailedInfo) );
+    MOCK_METHOD1( alertDeleted, void(const std::string& alertToken) );
 };
 
 // clang-format off

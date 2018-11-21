@@ -35,9 +35,9 @@ class VehicleConfigurationImplTest : public ::testing::Test
 };
 
 /**
- * Test create() expecting a valid VehicleConfigurationImplTest to be returned.
+ * Test createVehicleInfoConfig() expecting a valid VehicleConfigurationImplTest to be returned.
  */
-TEST_F(VehicleConfigurationImplTest, create) {
+TEST_F(VehicleConfigurationImplTest, createVehicleInfoConfig) {
     using VehiclePropertyType = aace::vehicle::config::VehicleConfiguration::VehiclePropertyType;
     std::shared_ptr<aace::core::config::EngineConfiguration> testConfiguration, expectedConfiguration;
     const std::string &temp = "{\n"
@@ -52,7 +52,8 @@ TEST_F(VehicleConfigurationImplTest, create) {
         "            \"os\": \"darwin\",\n"
         "            \"arch\": \"x86_64\",\n"
         "            \"language\": \"en_US\",\n"
-        "            \"microphone\": \"SingleArray\"\n"
+        "            \"microphone\": \"SingleArray\",\n"
+        "            \"countries\": \"US,GB,IE,CA,DE,AT,IN,JP,AU,NZ,FR\"\n"
         "        }\n"
         "    }\n"
         "}";
@@ -68,8 +69,31 @@ TEST_F(VehicleConfigurationImplTest, create) {
             {VehiclePropertyType::OPERATING_SYSTEM, "darwin"},
             {VehiclePropertyType::HARDWARE_ARCH, "x86_64"},
             {VehiclePropertyType::LANGUAGE, "en_US"},
-            {VehiclePropertyType::MICROPHONE, "SingleArray"}
+            {VehiclePropertyType::MICROPHONE, "SingleArray"},
+            {VehiclePropertyType::COUNTRY_LIST, "US,GB,IE,CA,DE,AT,IN,JP,AU,NZ,FR"}
         });
+    
+    //Convert to ostringstream for comparing the istream
+    std::ostringstream expectedString, actualString;
+    expectedString << expectedConfiguration->getStream()->rdbuf();
+    actualString << testConfiguration->getStream()->rdbuf();
+    EXPECT_EQ(0, expectedString.str().compare(actualString.str())) << "Error in the Configuration String";
+}
+
+/**
+ * Test createVehicleInfoConfig() expecting a valid VehicleConfigurationImplTest to be returned.
+ */
+TEST_F(VehicleConfigurationImplTest, createOperatingCountryConfig) {
+    std::shared_ptr<aace::core::config::EngineConfiguration> testConfiguration, expectedConfiguration;
+    const std::string &temp =
+        "{\n"
+        "    \"aace.vehicle\": {\n"
+        "        \"operatingCountry\": \"US\"\n"
+        "    }\n"
+        "}";
+
+    expectedConfiguration = aace::core::config::StreamConfiguration::create(std::make_shared<std::stringstream>(temp));
+    testConfiguration = aace::vehicle::config::VehicleConfiguration::createOperatingCountryConfig( "US" );
     
     //Convert to ostringstream for comparing the istream
     std::ostringstream expectedString, actualString;
@@ -81,7 +105,7 @@ TEST_F(VehicleConfigurationImplTest, create) {
 /**
  * Test create() expecting a valid VehicleConfigurationImplTest to be returned.
  */
-TEST_F(VehicleConfigurationImplTest, createWithEmptyValueString) {
+TEST_F(VehicleConfigurationImplTest, createVehicleInfoConfigWithEmptyValueString) {
     using VehiclePropertyType = aace::vehicle::config::VehicleConfiguration::VehiclePropertyType;
     std::shared_ptr<aace::core::config::EngineConfiguration> testConfiguration, expectedConfiguration;
     const std::string &temp = "{\n"
@@ -96,7 +120,8 @@ TEST_F(VehicleConfigurationImplTest, createWithEmptyValueString) {
         "            \"os\": \"\",\n"
         "            \"arch\": \"x86_64\",\n"
         "            \"language\": \"en_US\",\n"
-        "            \"microphone\": \"SingleArray\"\n"
+        "            \"microphone\": \"SingleArray\",\n"
+        "            \"countries\": \"US,GB,IE,CA,DE,AT,IN,JP,AU,NZ,FR\"\n"
         "        }\n"
         "    }\n"
         "}";
@@ -112,7 +137,8 @@ TEST_F(VehicleConfigurationImplTest, createWithEmptyValueString) {
             {VehiclePropertyType::OPERATING_SYSTEM, ""},
             {VehiclePropertyType::HARDWARE_ARCH, "x86_64"},
             {VehiclePropertyType::LANGUAGE, "en_US"},
-            {VehiclePropertyType::MICROPHONE, "SingleArray"}
+            {VehiclePropertyType::MICROPHONE, "SingleArray"},
+            {VehiclePropertyType::COUNTRY_LIST, "US,GB,IE,CA,DE,AT,IN,JP,AU,NZ,FR"}
         });
     
     //Convert to ostringstream for comparing the istream
@@ -125,7 +151,7 @@ TEST_F(VehicleConfigurationImplTest, createWithEmptyValueString) {
 /**
  * Test create() expecting a valid VehicleConfigurationImplTest to be returned.
  */
-TEST_F(VehicleConfigurationImplTest, createWithPossibleCharsinValueString) {
+TEST_F(VehicleConfigurationImplTest, createVehicleInfoConfigWithPossibleCharsinValueString) {
     using VehiclePropertyType = aace::vehicle::config::VehicleConfiguration::VehiclePropertyType;
     std::shared_ptr<aace::core::config::EngineConfiguration> testConfiguration, expectedConfiguration;
     const std::string &temp = "{\n"
@@ -140,7 +166,8 @@ TEST_F(VehicleConfigurationImplTest, createWithPossibleCharsinValueString) {
                               "            \"os\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
                               "            \"arch\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
                               "            \"language\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
-                              "            \"microphone\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\"\n"
+                              "            \"microphone\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
+                              "            \"countries\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\"\n"
                               "        }\n"
                               "    }\n"
                               "}";
@@ -156,7 +183,8 @@ TEST_F(VehicleConfigurationImplTest, createWithPossibleCharsinValueString) {
             {VehiclePropertyType::OPERATING_SYSTEM, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
             {VehiclePropertyType::HARDWARE_ARCH, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
             {VehiclePropertyType::LANGUAGE, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
-            {VehiclePropertyType::MICROPHONE, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"}
+            {VehiclePropertyType::MICROPHONE, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
+            {VehiclePropertyType::COUNTRY_LIST, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"}
         });
     
     //Convert to ostringstream for comparing the istream

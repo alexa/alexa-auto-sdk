@@ -13,8 +13,6 @@
  * permissions and limitations under the License.
  */
 
-#include <AVSCommon/Utils/LibcurlUtils/HTTPContentFetcherFactory.h>
-
 #include "AACE/Engine/Alexa/AudioChannelEngineImpl.h"
 #include "AACE/Engine/Alexa/AlexaMetrics.h"
 #include "AACE/Engine/Core/EngineMacros.h"
@@ -54,6 +52,9 @@ bool AudioChannelEngineImpl::initializeAudioChannel( std::shared_ptr<alexaClient
 
         m_speakerPlatformInterface = m_audioChannelPlatformInterface->getSpeaker();
         ThrowIfNull( m_speakerPlatformInterface, "invalidSpeakerInterface" );
+
+        // add the speaker impl to the speaker manager
+        m_speakerManager->addSpeaker( shared_from_this() );
 
         // set the media player engine interface
         m_mediaPlayerPlatformInterface->setEngineInterface( shared_from_this() );
@@ -145,7 +146,7 @@ void AudioChannelEngineImpl::executeMediaStateChanged( SourceId id, MediaState s
 
     try
     {
-        AACE_VERBOSE(LX(TAG,"executeMediaStateChanged").d("currentState",m_currentMediaState).d("newState",state).d("pendingEvent",m_pendingEventState));
+        AACE_VERBOSE(LX(TAG,"executeMediaStateChanged").d("currentState",m_currentMediaState).d("newState",state).d("pendingEvent",m_pendingEventState).d("id",id));
 
         // return if the current media state is the same as the new state and no pending event
         if( m_currentMediaState == state && m_pendingEventState == PendingEventState::NONE ) {
@@ -163,10 +164,12 @@ void AudioChannelEngineImpl::executeMediaStateChanged( SourceId id, MediaState s
                 if( m_pendingEventState == PendingEventState::PLAYBACK_STARTED ) {
                     m_mediaStateChangeInitiator = MediaStateChangeInitiator::PLAY;
                     executePlaybackStarted( id );
+                    m_pendingEventState = PendingEventState::NONE;
                 }
                 else if( m_pendingEventState == PendingEventState::PLAYBACK_RESUMED ) {
                     m_mediaStateChangeInitiator = MediaStateChangeInitiator::RESUME;
                     executePlaybackResumed( id );
+                    m_pendingEventState = PendingEventState::NONE;
                 }
                 else {
                     Throw( "unexpectedPendingEventState" );
@@ -195,14 +198,17 @@ void AudioChannelEngineImpl::executeMediaStateChanged( SourceId id, MediaState s
                 if( m_pendingEventState == PendingEventState::PLAYBACK_STOPPED ) {
                     m_mediaStateChangeInitiator = MediaStateChangeInitiator::STOP;
                     executePlaybackStopped( id );
+                    m_pendingEventState = PendingEventState::NONE;
                 }
                 else if( m_pendingEventState == PendingEventState::PLAYBACK_PAUSED ) {
                     m_mediaStateChangeInitiator = MediaStateChangeInitiator::PAUSE;
                     executePlaybackPaused( id );
+                    m_pendingEventState = PendingEventState::NONE;
                 }
                 else if( m_pendingEventState == PendingEventState::NONE ) {
                     m_mediaStateChangeInitiator = MediaStateChangeInitiator::NONE;
                     executePlaybackFinished( id );
+                    m_pendingEventState = PendingEventState::NONE;
                 }
                 else {
                     Throw( "unexpectedPendingEventState" );
@@ -216,10 +222,12 @@ void AudioChannelEngineImpl::executeMediaStateChanged( SourceId id, MediaState s
                 if( m_pendingEventState == PendingEventState::PLAYBACK_STOPPED ) {
                     m_mediaStateChangeInitiator = MediaStateChangeInitiator::STOP;
                     executePlaybackStopped( id );
+                    m_pendingEventState = PendingEventState::NONE;
                 }
                 else if( m_pendingEventState == PendingEventState::PLAYBACK_PAUSED ) {
                     m_mediaStateChangeInitiator = MediaStateChangeInitiator::PAUSE;
                     executePlaybackPaused( id );
+                    m_pendingEventState = PendingEventState::NONE;
                 }
                 else {
                     Throw( "unexpectedPendingEventState" );
@@ -233,6 +241,7 @@ void AudioChannelEngineImpl::executeMediaStateChanged( SourceId id, MediaState s
                 if( m_pendingEventState == PendingEventState::PLAYBACK_STOPPED ) {
                     m_mediaStateChangeInitiator = MediaStateChangeInitiator::STOP;
                     executePlaybackStopped( id );
+                    m_pendingEventState = PendingEventState::NONE;
                 }
                 else {
                     Throw( "unexpectedPendingEventState" );
@@ -260,6 +269,7 @@ void AudioChannelEngineImpl::executeMediaStateChanged( SourceId id, MediaState s
             else if( m_pendingEventState == PendingEventState::PLAYBACK_RESUMED ) {
                 executePlaybackResumed( id );
                 executeBufferUnderrun( id );
+                m_pendingEventState = PendingEventState::NONE;
             }
             
             // handle condition when there is no pending event
@@ -292,6 +302,7 @@ void AudioChannelEngineImpl::onMediaError( MediaError error, const std::string& 
     m_executor.submit([this,id,error,description] {
         executeMediaError( id, error, description );
     });
+    m_pendingEventState = PendingEventState::NONE;
 }
 
 void AudioChannelEngineImpl::executeMediaError( SourceId id, MediaError error, const std::string& description )
@@ -307,10 +318,8 @@ void AudioChannelEngineImpl::executeMediaError( SourceId id, MediaError error, c
         m_currentId = ERROR;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"executePlaybackError").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG,"executeMediaError").d("reason", ex.what()));
     }
-    
-    m_pendingEventState = PendingEventState::NONE;
 }
 
 void AudioChannelEngineImpl::executePlaybackStarted( SourceId id )
@@ -327,8 +336,6 @@ void AudioChannelEngineImpl::executePlaybackStarted( SourceId id )
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"executePlaybackStarted").d("reason", ex.what()).d("expectedState",m_pendingEventState));
     }
-    
-    m_pendingEventState = PendingEventState::NONE;
 }
 
 void AudioChannelEngineImpl::executePlaybackFinished( SourceId id )
@@ -346,8 +353,6 @@ void AudioChannelEngineImpl::executePlaybackFinished( SourceId id )
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"executePlaybackFinished").d("reason", ex.what()).d("expectedState",m_pendingEventState));
     }
-    
-    m_pendingEventState = PendingEventState::NONE;
 }
 
 void AudioChannelEngineImpl::executePlaybackPaused( SourceId id )
@@ -366,8 +371,6 @@ void AudioChannelEngineImpl::executePlaybackPaused( SourceId id )
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"executePlaybackPaused").d("reason", ex.what()).d("expectedState",m_pendingEventState));
     }
-    
-    m_pendingEventState = PendingEventState::NONE;
 }
 
 void AudioChannelEngineImpl::executePlaybackResumed( SourceId id )
@@ -384,8 +387,6 @@ void AudioChannelEngineImpl::executePlaybackResumed( SourceId id )
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"executePlaybackResumed").d("reason", ex.what()).d("expectedState",m_pendingEventState));
     }
-    
-    m_pendingEventState = PendingEventState::NONE;
 }
 
 void AudioChannelEngineImpl::executePlaybackStopped( SourceId id )
@@ -404,8 +405,6 @@ void AudioChannelEngineImpl::executePlaybackStopped( SourceId id )
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"executePlaybackStopped").d("reason", ex.what()).d("expectedState",m_pendingEventState));
     }
-    
-    m_pendingEventState = PendingEventState::NONE;
 }
 
 void AudioChannelEngineImpl::executePlaybackError( SourceId id, MediaError error, const std::string& description )
@@ -423,8 +422,6 @@ void AudioChannelEngineImpl::executePlaybackError( SourceId id, MediaError error
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"executePlaybackError").d("reason", ex.what()));
     }
-    
-    m_pendingEventState = PendingEventState::NONE;
 }
 
 void AudioChannelEngineImpl::executeBufferUnderrun( SourceId id )
@@ -440,8 +437,6 @@ void AudioChannelEngineImpl::executeBufferUnderrun( SourceId id )
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"executeBufferUnderrun").d("reason", ex.what()));
     }
-    
-    m_pendingEventState = PendingEventState::NONE;
 }
 
 void AudioChannelEngineImpl::executeBufferRefilled( SourceId id )
@@ -457,8 +452,6 @@ void AudioChannelEngineImpl::executeBufferRefilled( SourceId id )
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"executeBufferRefilled").d("reason", ex.what()));
     }
-    
-    m_pendingEventState = PendingEventState::NONE;
 }
 
 ssize_t AudioChannelEngineImpl::read( char* data, const size_t size )
@@ -624,6 +617,8 @@ bool AudioChannelEngineImpl::play( alexaClientSDK::avsCommon::utils::mediaPlayer
 
     try
     {
+        AACE_VERBOSE(LX(TAG,"play").d("id",id));
+
         ThrowIfNot( validateSource( id ), "invalidSource" );
 
         // return false if audio is already playing
@@ -656,6 +651,8 @@ bool AudioChannelEngineImpl::stop( alexaClientSDK::avsCommon::utils::mediaPlayer
 
     try
     {
+        AACE_VERBOSE(LX(TAG,"stop").d("id",id));
+
         ThrowIfNot( validateSource( id ), "invalidSource" );
 
         // return false if audio is already stopped
@@ -684,6 +681,8 @@ bool AudioChannelEngineImpl::pause( alexaClientSDK::avsCommon::utils::mediaPlaye
 
     try
     {
+        AACE_VERBOSE(LX(TAG,"pause").d("id",id));
+
         ThrowIfNot( validateSource( id ), "invalidSource" );
         ReturnIf( id == ERROR, true );
 
@@ -720,6 +719,8 @@ bool AudioChannelEngineImpl::resume( alexaClientSDK::avsCommon::utils::mediaPlay
 
     try
     {
+        AACE_VERBOSE(LX(TAG,"resume").d("id",id));
+
         ThrowIfNot( validateSource( id ), "invalidSource" );
 
         // return false if audio is not paused

@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <limits>
 
 /** @file */
 
@@ -128,27 +129,71 @@ inline std::ostream& operator<<(std::ostream& stream, const MediaPlayerEngineInt
     return stream;
 }
 
+/**
+ * SpeakerEngineInterface
+ */
 class SpeakerEngineInterface {
 public:
-
     virtual void onLocalVolumeSet( int8_t volume ) = 0;
     virtual void onLocalMuteSet( bool mute ) = 0;
 };
 
+/**
+ * SpeechRecognizerEngineInterface
+ */
 class SpeechRecognizerEngineInterface {
 public:
+    /**
+     * Describes type of event that initiated the speech request.
+     */
+    enum class Initiator {
+    
+        /**
+         * Hold-to-talk speech initiator type.
+         */
+        HOLD_TO_TALK,
+        /**
+         * Tap-to-talk speech initiator type.
+         */
+        TAP_TO_TALK,
+        /**
+         * Wakeword speech initiator type.
+         */
+        WAKEWORD
+    };
+    
+    /*
+     * Defines an unspecified value for the speech recognizer's audio index.
+     */
+    static constexpr uint64_t UNSPECIFIED_INDEX = std::numeric_limits<uint64_t>::max();
 
-    virtual bool onHoldToTalk() = 0;
-    virtual bool onTapToTalk() = 0;
+    virtual bool onStartCapture( Initiator initiator, uint64_t keywordBegin, uint64_t keywordEnd, const std::string& keyword ) = 0;
     virtual bool onStopCapture() = 0;
     virtual ssize_t write( const int16_t* data, const size_t size ) = 0;
     virtual bool enableWakewordDetection() = 0;
     virtual bool disableWakewordDetection() = 0;
 };
 
+inline std::ostream& operator<<(std::ostream& stream, const SpeechRecognizerEngineInterface::Initiator& initiator) {
+    switch (initiator) {
+        case SpeechRecognizerEngineInterface::Initiator::HOLD_TO_TALK:
+            stream << "HOLD_TO_TALK";
+            break;
+        case SpeechRecognizerEngineInterface::Initiator::TAP_TO_TALK:
+            stream << "TAP_TO_TALK";
+            break;
+        case SpeechRecognizerEngineInterface::Initiator::WAKEWORD:
+            stream << "WAKEWORD";
+            break;
+    }
+    return stream;
+}
+
+/**
+ * AlertsEngineInterface
+ */
 class AlertsEngineInterface {
 public:
-
     virtual void onLocalStop() = 0;
     virtual void removeAllAlerts() = 0;
 };
@@ -394,6 +439,53 @@ inline std::ostream& operator<<(std::ostream& stream, const AuthProviderEngineIn
     return stream;
 }
  
+/**
+ * ExternalMediaAdapterEngineInterface
+ */
+class ExternalMediaAdapterEngineInterface {
+public:
+    /**
+     * Describes a discovered external media player app
+     */
+    class DiscoveredPlayerInfo {
+    public:
+        /// The opaque token that uniquely identifies the local external player app
+        std::string localPlayerId;
+        /// The only spiVersion that currently exists is "1.0"
+        std::string spiVersion;
+        /** Validation methods :
+         *  1. "SIGNING_CERTIFICATE"
+         *  2. "GENERATED_CERTIFICATE"
+         *  3. "NONE"
+         */
+        std::string validationMethod;
+        /** Validation data :
+         *  1. Device platform issued app signing certificate. A list of certificates may be attached.
+         *  2. In some cases validation is performed locally. The certificate is trasmitted as validationData during discovery to announce the activated app's identity in order to allow app activation to be revoked.
+         *  3. empty
+         */
+        std::vector<std::string> validationData;
+    };
+    
+    virtual void onReportDiscoveredPlayers( const std::vector<DiscoveredPlayerInfo>& discoveredPlayers ) = 0;
+    virtual void onRequestToken( const std::string& localPlayerId ) = 0;
+    virtual void onLoginComplete( const std::string& localPlayerId ) = 0;
+    virtual void onLogoutComplete( const std::string& localPlayerId ) = 0;
+    virtual void onPlayerEvent( const std::string& localPlayerId, const std::string& eventName ) = 0;
+    virtual void onPlayerError( const std::string& localPlayerId, const std::string& errorName, long code, const std::string& description, bool fatal ) = 0;
+    virtual void onSetFocus( const std::string& playerId ) = 0;
+    virtual void onRemoveDiscoveredPlayer( const std::string& localPlayerId ) = 0;
+};
+
+/**
+ * LocalMediaSourceEngineInterface
+ */
+class LocalMediaSourceEngineInterface {
+public:
+    virtual void onPlayerEvent( const std::string& eventName ) = 0;
+    virtual void onPlayerError( const std::string& errorName, long code, const std::string& description, bool fatal ) = 0;
+    virtual void onSetFocus() = 0;
+};
 
 } // aace::alexa
 } // aace

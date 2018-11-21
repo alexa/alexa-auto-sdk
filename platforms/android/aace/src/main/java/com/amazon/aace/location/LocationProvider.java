@@ -27,6 +27,16 @@ abstract public class LocationProvider extends PlatformInterface {
      * @return The current location
      */
     abstract public Location getLocation();
+
+    /**
+     * Returns the ISO country code for the current geolocation of the device. If no country can
+     * be determined, this method should return an empty string.
+     *
+     * @return The current country
+     */
+    public String getCountry() {
+        return "";
+    }
 }
 
 // END OF FILE

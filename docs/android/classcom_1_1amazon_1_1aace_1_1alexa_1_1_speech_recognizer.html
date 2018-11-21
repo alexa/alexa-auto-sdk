@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">1.1.0</span>
+   &#160;<span id="projectnumber">1.3.0</span>
    </div>
   </td>
  </tr>
@@ -65,6 +65,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -72,6 +73,11 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer_1_1_initiator.html">Initiator</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a70707cd51dffbbeeeb5e90ec5cb36b18"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a70707cd51dffbbeeeb5e90ec5cb36b18">wakewordDetected</a> (String wakeword)</td></tr>
@@ -86,6 +92,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a91fc1719a69b386b7eeaff2dfa57b6f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af27a23f6989b8a9fcee97d1decd70291"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#af27a23f6989b8a9fcee97d1decd70291">tapToTalk</a> ()</td></tr>
 <tr class="separator:af27a23f6989b8a9fcee97d1decd70291"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a876bef552796f113a8901bee934f1189"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a876bef552796f113a8901bee934f1189">startCapture</a> (<a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer_1_1_initiator.html">Initiator</a> initiator, long keywordBegin, long keywordEnd, String keyword)</td></tr>
+<tr class="separator:a876bef552796f113a8901bee934f1189"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a23e338856975e39ffb825dcf2a535192"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a23e338856975e39ffb825dcf2a535192">stopCapture</a> ()</td></tr>
 <tr class="separator:a23e338856975e39ffb825dcf2a535192"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a549ae1f315f3b64818bba8d5ffa4c928"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a549ae1f315f3b64818bba8d5ffa4c928">write</a> (byte[] data, long size)</td></tr>
@@ -233,6 +241,57 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a876bef552796f113a8901bee934f1189"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a876bef552796f113a8901bee934f1189">&#9670;&nbsp;</a></span>startCapture()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boolean com.amazon.aace.alexa.SpeechRecognizer.startCapture </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer_1_1_initiator.html">Initiator</a>&#160;</td>
+          <td class="paramname"><em>initiator</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">long&#160;</td>
+          <td class="paramname"><em>keywordBegin</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">long&#160;</td>
+          <td class="paramname"><em>keywordEnd</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>keyword</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Notifies the Engine of a speech recognition event. The Engine will call <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#aba3da69e8833ec5b855b4a0155d03f9d">startAudioInput()</a></code> to notify the platform implementation when to start writing audio samples. If the initator type is <code>HOLD_TO_TALK</code>, then the platform implementation should call <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a23e338856975e39ffb825dcf2a535192">stopCapture()</a></code> to terminate speech recognition on release of the press-and-hold action. Otherwise, the Engine will terminate the recognize event when end of speech is detected.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">initiator</td><td>The <code><a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer_1_1_initiator.html">Initiator</a></code> type for the speech recognition event </td></tr>
+    <tr><td class="paramname">keywordBegin</td><td>The sample index where the keyword begins. This is required when the initator type is <code>WAKEWORD</code>, otherwise should be set to <code>UNSPECIFIED_INDEX</code>. </td></tr>
+    <tr><td class="paramname">keywordEnd</td><td>The sample index where the keyword ends. This is required when the initator type is <code>WAKEWORD</code>, otherwise should be set to <code>UNSPECIFIED_INDEX</code>. </td></tr>
+    <tr><td class="paramname">keyword</td><td>The keyword being recognized, e.g. "alexa". This is required when the initator type is <code>WAKEWORD</code>, otherwise should be set to null. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the Engine successfully started a recognize event, else <code>false</code> </dd></dl>
+
+</div>
+</div>
 <a id="a23e338856975e39ffb825dcf2a535192"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a23e338856975e39ffb825dcf2a535192">&#9670;&nbsp;</a></span>stopCapture()</h2>
 
@@ -363,7 +422,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 1.1.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 1.3.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

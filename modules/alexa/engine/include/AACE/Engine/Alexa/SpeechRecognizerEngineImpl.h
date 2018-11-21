@@ -80,8 +80,7 @@ public:
         std::shared_ptr<alexaClientSDK::speechencoder::SpeechEncoder> speechEncoder = nullptr );
 
     // SpeechRecognizerEngineInterface
-    bool onHoldToTalk() override;
-    bool onTapToTalk() override;
+    bool onStartCapture( Initiator initiator, uint64_t keywordBegin, uint64_t keywordEnd, const std::string& keyword ) override;
     bool onStopCapture() override;
 
     ssize_t write( const int16_t* data, const size_t size ) override;
@@ -100,8 +99,8 @@ public:
     void onKeyWordDetected(
         std::shared_ptr<alexaClientSDK::avsCommon::avs::AudioInputStream> stream,
         std::string keyword,
-        alexaClientSDK::avsCommon::avs::AudioInputStream::Index beginIndex = UNSPECIFIED_INDEX,
-        alexaClientSDK::avsCommon::avs::AudioInputStream::Index endIndex = UNSPECIFIED_INDEX,
+        alexaClientSDK::avsCommon::avs::AudioInputStream::Index beginIndex = KeyWordObserverInterface::UNSPECIFIED_INDEX,
+        alexaClientSDK::avsCommon::avs::AudioInputStream::Index endIndex = KeyWordObserverInterface::UNSPECIFIED_INDEX,
         std::shared_ptr<const std::vector<char>> KWDMetadata = nullptr ) override;
 
 protected:

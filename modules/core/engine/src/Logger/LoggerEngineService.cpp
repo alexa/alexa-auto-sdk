@@ -41,12 +41,20 @@ REGISTER_SERVICE(LoggerEngineService);
 LoggerEngineService::LoggerEngineService( const aace::engine::core::ServiceDescription& description ) : aace::engine::core::EngineService( description ) {
 }
 
+// LoggerServiceInterface
+bool LoggerEngineService::addSink( std::shared_ptr<aace::engine::logger::sink::Sink> sink ) {
+    return EngineLogger::getInstance()->addSink( sink );
+}
+
 bool LoggerEngineService::configure( const std::vector<std::shared_ptr<std::istream>>& configuration )
 {
     // attempt to configure each stream
     for( auto next : configuration ) {
         configure( next );
     }
+    
+    // register the AlexaComponentInterface
+    ThrowIfNot( registerServiceInterface<LoggerServiceInterface>( shared_from_this() ), "registerLoggerServiceInterfaceFailed" );
     
     return true;
 }
@@ -129,7 +137,7 @@ std::shared_ptr<aace::engine::logger::sink::Sink> LoggerEngineService::createSin
         std::string type = obj["type"].GetString();
         
         // convert the type to lower case
-        std::transform( type.begin(), type.end(), type.begin(), [](unsigned char c) -> unsigned char { return std::tolower(c); } );
+        std::transform( type.begin(), type.end(), type.begin(), [](unsigned char c) -> unsigned char { return static_cast<unsigned char>(std::tolower(c)); } );
         
         // create the new sink
         std::shared_ptr<aace::engine::logger::sink::Sink> sink = nullptr;

@@ -61,16 +61,34 @@ bool PhoneCallControllerEngineService::registerPlatformInterface( std::shared_pt
     }
 }
 
-bool PhoneCallControllerEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::phoneCallController::PhoneCallController> phoneCallController ) {
-    try {
+bool PhoneCallControllerEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::phoneCallController::PhoneCallController> phoneCallController )
+{
+    try
+    {
         ThrowIfNotNull( m_phoneCallControllerEngineImpl, "platformInterfaceAlreadyRegistered" );
 
-        // create the playback controller engine implementation
-        auto alexaService = getContext()->getService<aace::engine::alexa::AlexaEngineService>();
-        ThrowIfNull( alexaService, "alexaServiceNotFound" );
+        auto alexaComponents = getContext()->getServiceInterface<aace::engine::alexa::AlexaComponentInterface>( "aace.alexa" );
+        ThrowIfNull( alexaComponents, "invalidAlexaComponentInterface" );
 
-        m_phoneCallControllerEngineImpl = aace::engine::phoneCallController::PhoneCallControllerEngineImpl::create( phoneCallController, alexaService->getCapabilitiesDelegate(), alexaService->getContextManager(),
-                                    alexaService->getDirectiveSequencer(), alexaService->getExceptionSender(), alexaService->getMessageSender() );
+        auto directiveSequencer = alexaComponents->getDirectiveSequencer();
+        ThrowIfNull( directiveSequencer, "directiveSequencerInvalid" );
+
+        auto capabilitiesDelegate = alexaComponents->getCapabilitiesDelegate();
+        ThrowIfNull( capabilitiesDelegate, "capabilitiesDelegateInvalid" );
+
+        auto exceptionSender = alexaComponents->getExceptionEncounteredSender();
+        ThrowIfNull( exceptionSender, "exceptionSenderInvalid" );
+
+        auto messageSender = alexaComponents->getMessageSender();
+        ThrowIfNull( messageSender, "messageSenderInvalid" );
+
+        auto contextManager = alexaComponents->getContextManager();
+        ThrowIfNull( contextManager, "contextManagerInvalid" );
+
+        auto focusManager = alexaComponents->getAudioFocusManager();
+        ThrowIfNull( focusManager, "focusManagerInvalid" );
+
+        m_phoneCallControllerEngineImpl = aace::engine::phoneCallController::PhoneCallControllerEngineImpl::create( phoneCallController, capabilitiesDelegate, contextManager, directiveSequencer, exceptionSender, messageSender, focusManager );
         ThrowIfNull( m_phoneCallControllerEngineImpl, "createPhoneCallControllerEngineImplFailed" );
 
         return true;

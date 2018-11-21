@@ -17,7 +17,9 @@ package com.amazon.sampleapp.impl.TemplateRuntime;
 
 import android.support.annotation.Nullable;
 
+import com.amazon.aace.alexa.ExternalMediaAdapter;
 import com.amazon.aace.alexa.TemplateRuntime;
+import com.amazon.sampleapp.impl.ExternalMediaPlayer.MACCPlayer;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 import com.amazon.sampleapp.impl.PlaybackController.PlaybackControllerHandler;
 import com.amazon.sampleapp.logView.LogRecyclerViewAdapter;
@@ -78,9 +80,14 @@ public class TemplateRuntimeHandler extends TemplateRuntime {
         try {
             JSONObject playerInfo = new JSONObject( payload );
             String audioItemId = playerInfo.getString( "audioItemId" );
+            JSONObject content = playerInfo.getJSONObject( "content" );
+            JSONObject audioProvider = content.getJSONObject( "provider" );
+            String providerName = audioProvider.getString( "name" );
 
             // Update playback controller buttons and player info labels
             if ( mPlaybackController != null ) {
+                //reset visual state
+                mPlaybackController.hidePlayerInfoControls();
                 JSONArray controls = playerInfo.getJSONArray("controls" );
                 for ( int j = 0; j < controls.length(); j++ ) {
                     JSONObject control = controls.getJSONObject( j );
@@ -88,10 +95,14 @@ public class TemplateRuntimeHandler extends TemplateRuntime {
                         final boolean enabled = control.getBoolean( "enabled" );
                         final String name = control.getString( "name" );
                         mPlaybackController.updateControlButton( name, enabled );
+                    } else if ( control.getString( "type" ).equals( "TOGGLE" ) ) {
+                        final boolean selected = control.getBoolean( "selected" );
+                        final boolean enabled = control.getBoolean( "enabled" );
+                        final String name = control.getString( "name" );
+                        mPlaybackController.updateControlToggle( name, enabled, selected );
                     }
                 }
 
-                JSONObject content = playerInfo.getJSONObject( "content" );
                 String title = content.has( "title" ) ? content.getString( "title" ) : "";
                 String artist = content.has( "titleSubtext1" ) ? content.getString( "titleSubtext1" ) : "";
                 JSONObject provider = content.getJSONObject( "provider" );
@@ -107,9 +118,10 @@ public class TemplateRuntimeHandler extends TemplateRuntime {
                 mLogger.postJSONTemplate( sTag, playerInfo.toString( 4 ) );
 
                 // Log card
-                JSONObject content = playerInfo.getJSONObject( "content" );
                 mLogger.postDisplayCard( content, LogRecyclerViewAdapter.RENDER_PLAYER_INFO );
 
+            } else {
+                mLogger.postJSONTemplate( sTag, playerInfo.toString( 4 ) );
             }
         } catch ( JSONException e ) {
             mLogger.postError( sTag, e.getMessage() );
@@ -124,8 +136,10 @@ public class TemplateRuntimeHandler extends TemplateRuntime {
 
     @Override
     public void clearPlayerInfo() {
-        // Handle clearing player info here
         mLogger.postInfo( sTag, "handle clearPlayerInfo()" );
-        if ( mPlaybackController != null ) mPlaybackController.setPlayerInfo( "", "", "" );
+        if ( mPlaybackController != null && !mPlaybackController.getProvider().equals(MACCPlayer.SPOTIFY_PROVIDER_NAME) ) {
+            mPlaybackController.setPlayerInfo("", "", "");
+            mPlaybackController.hidePlayerInfoControls();
+        }
     }
 }

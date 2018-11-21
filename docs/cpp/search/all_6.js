@@ -5,6 +5,7 @@ var searchData=
   ['getaltitude',['getAltitude',['../classaace_1_1location_1_1_location.html#a6651d8181e4361df5777f1992cb063c0',1,'aace::location::Location']]],
   ['getauthstate',['getAuthState',['../classaace_1_1alexa_1_1_auth_provider.html#a6d00a8dac76187fd4d7eebc3f13160fd',1,'aace::alexa::AuthProvider']]],
   ['getauthtoken',['getAuthToken',['../classaace_1_1alexa_1_1_auth_provider.html#ac2600cbd59d19ce4f9e5d5134913376f',1,'aace::alexa::AuthProvider']]],
+  ['getcountry',['getCountry',['../classaace_1_1location_1_1_location_provider.html#aea9910732c32ee028b109ff24bd61ef8',1,'aace::location::LocationProvider']]],
   ['getlatitude',['getLatitude',['../classaace_1_1location_1_1_location.html#a2ff0516c0cb41fa318b75edd5e81f5e0',1,'aace::location::Location']]],
   ['getlocation',['getLocation',['../classaace_1_1location_1_1_location_provider.html#a97f95a88be0b6cf84f3295a11eed5ba5',1,'aace::location::LocationProvider']]],
   ['getlongitude',['getLongitude',['../classaace_1_1location_1_1_location.html#a64a93e6dd590bf066aa0790f32436c9d',1,'aace::location::Location']]],

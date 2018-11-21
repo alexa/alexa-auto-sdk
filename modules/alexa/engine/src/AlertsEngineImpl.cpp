@@ -157,7 +157,20 @@ void AlertsEngineImpl::onAlertStateChange( const std::string& alertToken, alexaC
     }
 }
 
+void AlertsEngineImpl::onAlertCreated( const std::string & alertToken, const std::string & detailedInfo ) {
+    AACE_DEBUG(LX(TAG,"onAlertCreated").d("alertToken:", alertToken).sensitive("detailedInfo:", detailedInfo));
+    if( m_alertsPlatformInterface != nullptr ) {
+        m_alertsPlatformInterface->alertCreated( alertToken, detailedInfo );
+    }
+}
+
+void AlertsEngineImpl::onAlertDeleted( const std::string & alertToken ) {
+    AACE_DEBUG(LX(TAG,"onAlertDeleted").d("alertToken:", alertToken));
+    if( m_alertsPlatformInterface != nullptr ) {
+        m_alertsPlatformInterface->alertDeleted( alertToken );
+    }
+}
+
 } // aace::engine::alexa
 } // aace::engine
 } // aace
-

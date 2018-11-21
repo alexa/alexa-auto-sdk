@@ -25,6 +25,11 @@ void AlertsBinder::initialize( JNIEnv* env )
 {
     m_javaMethod_alertStateChanged_alertToken_state_reason = env->GetMethodID( getJavaClass(), "alertStateChanged", "(Ljava/lang/String;Lcom/amazon/aace/alexa/Alerts$AlertState;Ljava/lang/String;)V" );
 
+    m_javaMethod_alertCreated_alertToken_detailedInfo = env->GetMethodID( getJavaClass(), "alertCreated", "(Ljava/lang/String;Ljava/lang/String;)V" );
+
+    m_javaMethod_alertDeleted_alertToken = env->GetMethodID( getJavaClass(), "alertDeleted", "(Ljava/lang/String;)V" );
+
+
     // AlertState
     jclass alertStateEnumClass = env->FindClass( "com/amazon/aace/alexa/Alerts$AlertState" );
     m_enum_AlertState_READY = NativeLib::FindEnum( env, alertStateEnumClass, "READY", "Lcom/amazon/aace/alexa/Alerts$AlertState;" );
@@ -55,6 +60,41 @@ void AlertsBinder::alertStateChanged( const std::string & alertToken, aace::alex
         }
     }
 }
+
+void AlertsBinder::alertCreated( const std::string & alertToken, const std::string & detailedInfo )
+{
+    if( getJavaObject() != nullptr && m_javaMethod_alertCreated_alertToken_detailedInfo != nullptr )
+    {
+        ThreadContext context;
+
+        if( context.isValid() )
+        {
+            jstring alertTokenStr = context.getEnv()->NewStringUTF( alertToken.c_str() );
+            jstring detailedInfoStr = context.getEnv()->NewStringUTF( detailedInfo.c_str() );
+
+            context.getEnv()->CallVoidMethod( getJavaObject(), m_javaMethod_alertCreated_alertToken_detailedInfo, alertTokenStr, detailedInfoStr );
+            context.getEnv()->DeleteLocalRef( alertTokenStr );
+            context.getEnv()->DeleteLocalRef( detailedInfoStr );
+        }
+    }
+}
+
+void AlertsBinder::alertDeleted( const std::string & alertToken )
+{
+    if( getJavaObject() != nullptr && m_javaMethod_alertDeleted_alertToken != nullptr )
+    {
+        ThreadContext context;
+
+        if( context.isValid() )
+        {
+            jstring alertTokenStr = context.getEnv()->NewStringUTF( alertToken.c_str() );
+
+            context.getEnv()->CallVoidMethod( getJavaObject(), m_javaMethod_alertDeleted_alertToken, alertTokenStr );
+            context.getEnv()->DeleteLocalRef( alertTokenStr );
+        }
+    }
+}
+
 
 jobject AlertsBinder::convert( aace::alexa::Alerts::AlertState state )
 {

@@ -19,9 +19,12 @@
 #include "aace/communication/AlexaCommsBinder.h"
 
 AlexaCommsBinder::AlexaCommsBinder(
-    std::shared_ptr<aace::alexa::MediaPlayer> mediaPlayer,
-    std::shared_ptr<aace::alexa::Speaker> speaker)
-    :   aace::communication::AlexaComms(mediaPlayer, speaker) {
+    std::shared_ptr<aace::alexa::MediaPlayer> ringtoneMediaPlayer,
+    std::shared_ptr<aace::alexa::Speaker> ringtoneSpeaker,
+    std::shared_ptr<aace::alexa::MediaPlayer> callAudioMediaPlayer,
+    std::shared_ptr<aace::alexa::Speaker> callAudioSpeaker)
+    :   aace::communication::AlexaComms(
+            ringtoneMediaPlayer, ringtoneSpeaker, callAudioMediaPlayer, callAudioSpeaker) {
 
 }
 
@@ -80,6 +83,19 @@ Java_com_amazon_aace_communication_AlexaComms_acceptCall( JNIEnv * env , jobject
 JNIEXPORT void JNICALL
 Java_com_amazon_aace_communication_AlexaComms_stopCall( JNIEnv * env , jobject /* this */, jlong cptr ) {
     ALEXACOMMS(cptr)->stopCall();
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_amazon_aace_communication_AlexaComms_writeMicrophoneAudioData(
+        JNIEnv * env , jobject /* this */, jlong cptr,
+        jbyteArray data, jlong offset, jlong size) {
+    jbyte *ptr = env->GetByteArrayElements( data, nullptr );
+
+    jint count = ALEXACOMMS(cptr)->writeMicrophoneAudioData( (int16_t *) &ptr[offset], size / 2 );
+
+    env->ReleaseByteArrayElements( data, ptr, JNI_ABORT );
+
+    return count * 2;
 }
 
 }

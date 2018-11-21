@@ -7,7 +7,10 @@ DEPENDS = "curl nghttp2 googletest sqlite3"
 
 SRC_URI = "https://github.com/alexa/avs-device-sdk/archive/v${PV}.tar.gz"
 
-inherit cmake devlibsonly unittests
+# Skip checksum verification
+BB_STRICT_CHECKSUM = "0"
+
+inherit pkgconfig cmake devlibsonly unittests
 
 EXTRA_OECMAKE += "-DCMAKE_BUILD_TYPE=${OECMAKE_BUILD_TYPE} \
                   -DACSDK_EMIT_SENSITIVE_LOGS=${AAC_SENSITIVE_LOGS} \

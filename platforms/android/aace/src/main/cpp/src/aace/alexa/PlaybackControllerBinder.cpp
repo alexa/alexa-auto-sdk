@@ -59,6 +59,9 @@ aace::alexa::PlaybackControllerEngineInterface::PlaybackButton PlaybackControlle
     else if( m_enum_PlaybackButton_SKIP_BACKWARD.isSameObject( env, obj ) ) {
         return aace::alexa::PlaybackControllerEngineInterface::PlaybackButton::SKIP_BACKWARD;
     }
+    else {
+        return aace::alexa::PlaybackControllerEngineInterface::PlaybackButton::PLAY; // anything for undefined?
+    }
 }
 
 aace::alexa::PlaybackControllerEngineInterface::PlaybackToggle PlaybackControllerBinder::convertPlaybackToggle( JNIEnv* env, jobject obj )
@@ -77,6 +80,9 @@ aace::alexa::PlaybackControllerEngineInterface::PlaybackToggle PlaybackControlle
     }
     else if( m_enum_PlaybackToggle_THUMBS_DOWN.isSameObject( env, obj ) ) {
         return aace::alexa::PlaybackControllerEngineInterface::PlaybackToggle::THUMBS_DOWN;
+    }
+    else {
+        return aace::alexa::PlaybackControllerEngineInterface::PlaybackToggle::SHUFFLE; // anything for undefined?
     }
 }
 

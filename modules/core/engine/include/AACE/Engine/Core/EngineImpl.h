@@ -58,7 +58,7 @@ protected:
     bool registerPlatformInterfaceType( std::shared_ptr<aace::logger::Logger> logger );
     
     // EngineContext
-    std::shared_ptr<EngineService> getService( const std::string& type ) override;
+    std::shared_ptr<EngineServiceContext> getService( const std::string& type ) override;
 
 private:
     // engine impl references

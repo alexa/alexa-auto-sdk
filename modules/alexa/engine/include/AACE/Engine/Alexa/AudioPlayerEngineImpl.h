@@ -56,7 +56,8 @@ private:
         std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentManagerInterface> attachmentManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender);
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter );
 
 public:
     static std::shared_ptr<AudioPlayerEngineImpl> create(
@@ -68,9 +69,8 @@ public:
         std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentManagerInterface> attachmentManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender );
-    
-    void setPlaybackRouter( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> router );
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter );
     
     //
     // AudioPlayerInterface
@@ -98,47 +98,6 @@ protected:
 private:
     std::shared_ptr<aace::alexa::AudioPlayer> m_audioPlayerPlatformInterface = nullptr;
     std::shared_ptr<alexaClientSDK::capabilityAgents::audioPlayer::AudioPlayer> m_audioPlayerCapabilityAgent;
-    std::shared_ptr<PlaybackRouterDelegate> m_playbackRouter;
-};
-
-//
-// PlaybackRouterDelegate
-//
-
-class PlaybackRouterDelegate : public alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface {
-public:
-    virtual ~PlaybackRouterDelegate() = default;
-    
-    void buttonPressed(alexaClientSDK::avsCommon::avs::PlaybackButton button) override {
-        if( m_delegate != nullptr ) {
-            m_delegate->buttonPressed(button);
-        }
-    }
-
-    void togglePressed(alexaClientSDK::avsCommon::avs::PlaybackToggle toggle, bool action) override {
-        if( m_delegate != nullptr ) {
-            m_delegate->togglePressed(toggle, action);
-        }
-    }
-
-    void setHandler(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackHandlerInterface> handler) override {
-        if( m_delegate != nullptr ) {
-            m_delegate->setHandler(handler);
-        }
-    }
-    
-    void switchToDefaultHandler() override {
-        if( m_delegate != nullptr ) {
-            m_delegate->switchToDefaultHandler();
-        }
-    }
-    
-    void setDelegate( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> delegate ) {
-        m_delegate = delegate;
-    }
-
-private:
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> m_delegate;
 };
 
 } // aace::engine::alexa

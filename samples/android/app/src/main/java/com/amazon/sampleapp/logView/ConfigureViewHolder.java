@@ -21,7 +21,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.amazon.sampleapp.MainActivity;
 import com.amazon.sampleapp.R;
 
 import org.json.JSONArray;
@@ -224,19 +223,6 @@ class ConfigureViewHolder {
 
                 if ( template.has( "destination" ) ) {
                     JSONObject dest = template.getJSONObject( "destination" );
-                    if ( dest.has( "coordinate" ) ) {
-                        JSONObject coord = dest.getJSONObject( "coordinate" );
-                        double lat = Double.parseDouble( coord.getString( "latitudeInDegrees" ) );
-                        double lng = Double.parseDouble( coord.getString( "longitudeInDegrees" ) );
-                        String imageURL = "https://maps.google.com/maps/api/staticmap?"
-                                + "center=" + lat + "," + lng
-                                + "&zoom=15"
-                                + "&size=640x400"
-                                + "&scale=2"
-                                + "&markers=color:red%7C" + lat + "," + lng
-                                + "&sensor=false";
-                        new DownloadImageTask( vh.getMapContainer() ).execute( imageURL );
-                    }
 
                     String name = dest.has( "name" ) ? dest.getString( "name" ) : "";
                     vh.getName().setText( name );
@@ -244,6 +230,13 @@ class ConfigureViewHolder {
                     String address = dest.has( "singleLineDisplayAddress" )
                             ? dest.getString( "singleLineDisplayAddress" ) : "";
                     vh.getAddress().setText( address );
+
+                    if ( dest.has( "coordinate" ) ) {
+                        JSONObject coord = dest.getJSONObject( "coordinate" );
+                        double lat = Double.parseDouble( coord.getString( "latitudeInDegrees" ) );
+                        double lng = Double.parseDouble( coord.getString( "longitudeInDegrees" ) );
+                        vh.setPlace( lat,lng );
+                    }
                 }
             }
         } catch ( JSONException e ) { Log.e( sTag, e.getMessage() ); }

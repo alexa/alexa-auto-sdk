@@ -47,13 +47,13 @@ public class AlexaCommsConfiguration {
             commsElement.put("sipCertificateFilePath", sipCertificateFile.getAbsolutePath());
 
             JSONObject inputDeviceSettingsElement = new JSONObject();
-            inputDeviceSettingsElement.put("driverName", "default");
-            inputDeviceSettingsElement.put("deviceName", "default");
+            inputDeviceSettingsElement.put("driverName", "audioproxy");
+            inputDeviceSettingsElement.put("deviceName", "audioproxy");
             commsElement.put("inputDevice", inputDeviceSettingsElement);
 
             JSONObject outputDeviceSettingsElement = new JSONObject();
-            outputDeviceSettingsElement.put("driverName", "default");
-            outputDeviceSettingsElement.put("deviceName", "default");
+            outputDeviceSettingsElement.put("driverName", "audioproxy");
+            outputDeviceSettingsElement.put("deviceName", "audioproxy");
             commsElement.put("outputDevice", outputDeviceSettingsElement);
 
             String configStr = config.toString();

@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import com.amazon.aace.network.NetworkInfoProvider;
 import com.amazon.sampleapp.R;
+import com.amazon.sampleapp.impl.AuthProvider.AuthProviderHandler;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 
 public class NetworkInfoProviderHandler extends NetworkInfoProvider {
@@ -40,6 +41,7 @@ public class NetworkInfoProviderHandler extends NetworkInfoProvider {
     private final NetworkChangeReceiver mReceiver;
     private final TextView mNetworkStatusText;
     private NetworkStatus mStatus;
+    private AuthProviderHandler mAuthProvider;
 
     public NetworkInfoProviderHandler( Activity activity, LoggerHandler logger ) {
         mActivity = activity;
@@ -55,6 +57,13 @@ public class NetworkInfoProviderHandler extends NetworkInfoProvider {
 
         mWifiManager = ( WifiManager ) context.getSystemService( Context.WIFI_SERVICE );
         mConnectivityManager = ( ConnectivityManager ) context.getSystemService( Context.CONNECTIVITY_SERVICE );
+
+        updateNetworkStatus();
+
+    }
+
+    public void setAuthProvider(AuthProviderHandler authProvider) {
+        mAuthProvider = authProvider;
     }
 
     @Override
@@ -71,34 +80,19 @@ public class NetworkInfoProviderHandler extends NetworkInfoProvider {
         public void onReceive( final Context context, final Intent intent )
         {
             if ( mConnectivityManager != null ) {
-                NetworkInfo activeNetwork = mConnectivityManager.getActiveNetworkInfo();
-                if ( activeNetwork != null ) {
-                    NetworkInfo.State state = activeNetwork.getState();
-                    switch ( state ) {
-                        case CONNECTED:
-                            mStatus = NetworkStatus.CONNECTED;
-                            break;
-                        case CONNECTING:
-                            mStatus = NetworkStatus.CONNECTING;
-                            break;
-                        case DISCONNECTING:
-                            mStatus = NetworkStatus.DISCONNECTING;
-                            break;
-                        case DISCONNECTED:
-                        case SUSPENDED:
-                            mStatus = NetworkStatus.DISCONNECTED;
-                            break;
-                        case UNKNOWN:
-                            mStatus = NetworkStatus.UNKNOWN;
-                            break;
-                    }
-                } else mStatus = NetworkStatus.UNKNOWN;
+                updateNetworkStatus();
                 int rssi = mWifiManager.getConnectionInfo().getRssi();
 
                 mLogger.postInfo( sTag, String.format( "Network status changed. STATUS: %s, RSSI: %s",
                         mStatus, rssi ) );
                 updateGUI( mStatus );
                 networkStatusChanged( mStatus, rssi );
+
+                // Notify AuthProvider to login if we aren't logged on yet
+                if (mStatus == NetworkStatus.CONNECTED && mAuthProvider != null) {
+                    mLogger.postInfo( sTag, String.format( "Calling auth provider to reinitialize if needed" ));
+                    mAuthProvider.onInitialize();
+                }
             }
         }
     }
@@ -112,5 +106,31 @@ public class NetworkInfoProviderHandler extends NetworkInfoProvider {
                 mNetworkStatusText.setText( status != null ? status.toString() : "" );
             }
         } );
+    }
+    private void updateNetworkStatus() {
+        NetworkInfo activeNetwork = mConnectivityManager.getActiveNetworkInfo();
+        if ( activeNetwork != null ) {
+            NetworkInfo.State state = activeNetwork.getState();
+            switch ( state ) {
+                case CONNECTED:
+                    mStatus = NetworkStatus.CONNECTED;
+                    break;
+                case CONNECTING:
+                    mStatus = NetworkStatus.CONNECTING;
+                    break;
+                case DISCONNECTING:
+                    mStatus = NetworkStatus.DISCONNECTING;
+                    break;
+                case DISCONNECTED:
+                case SUSPENDED:
+                    mStatus = NetworkStatus.DISCONNECTED;
+                    break;
+                case UNKNOWN:
+                    mStatus = NetworkStatus.UNKNOWN;
+                    break;
+            }
+        } else {
+            mStatus = NetworkStatus.UNKNOWN;
+        }
     }
 }

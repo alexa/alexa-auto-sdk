@@ -40,7 +40,7 @@
         android:id="@+id/name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/amazon_ember_regular"
+        android:fontFamily="sans-serif"
         android:lines="1"
         android:ellipsize="end"
         android:textColor="@color/cardMainTitle"
@@ -56,7 +56,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:ellipsize="end"
-        android:fontFamily="@font/amazon_ember_light"
+        android:fontFamily="sans-serif-light"
         android:lines="1"
         android:textColor="@color/cardSubTitle"
         android:textSize="32sp"
@@ -65,10 +65,15 @@
         app:layout_constraintStart_toStartOf="@id/guidelineLeftMargin"
         app:layout_constraintTop_toBottomOf="@+id/name" />
 
-    <ImageView
+    <com.google.android.gms.maps.MapView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:map="http://schemas.android.com/apk/res-auto"
+        android:name="com.google.android.gms.maps.MapFragment"
         android:id="@+id/mapContainer"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        map:cameraZoom="13"
+        map:mapType="normal"
+        map:liteMode="true"
         android:layout_marginTop="8dp"
         android:scaleType="centerInside"
         app:layout_constraintBottom_toTopOf="@+id/guidelineBottomMargin"
@@ -76,6 +81,6 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@id/guidelineLeftMargin"
         app:layout_constraintTop_toBottomOf="@+id/address"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.0"/>
 
 </android.support.constraint.ConstraintLayout>

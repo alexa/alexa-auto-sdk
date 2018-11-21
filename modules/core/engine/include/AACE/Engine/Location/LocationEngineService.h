@@ -33,8 +33,6 @@ private:
 public:
     virtual ~LocationEngineService() = default;
     
-    std::shared_ptr<aace::location::LocationProvider> getLocationProvider();
-
 protected:
     bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) override;
     

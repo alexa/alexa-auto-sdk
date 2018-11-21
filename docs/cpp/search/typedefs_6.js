@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['vehicleproperty',['VehicleProperty',['../classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ac9aae2e502cc7e09123991401e1bcb84',1,'aace::vehicle::config::VehicleConfiguration']]]
+  ['networkstatus',['NetworkStatus',['../classaace_1_1network_1_1_network_info_provider.html#a7559331245cff527a1acb4423ca4dfd3',1,'aace::network::NetworkInfoProvider']]]
 ];

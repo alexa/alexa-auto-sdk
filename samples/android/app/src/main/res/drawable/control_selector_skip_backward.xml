@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+    <item android:state_enabled="false"
+        android:drawable="@drawable/ic_control_30sec_back_disabled" />
+    <item android:state_pressed="true"
+        android:drawable="@drawable/ic_control_30sec_back_enabled" />
+    <item android:state_focused="true"
+        android:drawable="@drawable/ic_control_30sec_back_enabled" />
+    <item android:drawable="@drawable/ic_control_30sec_back_default" />
+</selector>

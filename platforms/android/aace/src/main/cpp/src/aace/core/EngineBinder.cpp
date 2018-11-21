@@ -41,6 +41,8 @@ void EngineBinder::initialize( JNIEnv* env )
     m_javaClass_AlexaClient = NativeLib::FindClass( env, "com/amazon/aace/alexa/AlexaClient" );
     m_javaClass_AudioPlayer = NativeLib::FindClass( env, "com/amazon/aace/alexa/AudioPlayer" );
     m_javaClass_AuthProvider = NativeLib::FindClass( env, "com/amazon/aace/alexa/AuthProvider" );
+    m_javaClass_ExternalMediaAdapter = NativeLib::FindClass( env, "com/amazon/aace/alexa/ExternalMediaAdapter" );
+    m_javaClass_LocalMediaSource = NativeLib::FindClass( env, "com/amazon/aace/alexa/LocalMediaSource" );
     m_javaClass_Notifications = NativeLib::FindClass( env, "com/amazon/aace/alexa/Notifications" );
     m_javaClass_PlaybackController = NativeLib::FindClass( env, "com/amazon/aace/alexa/PlaybackController" );
     m_javaClass_SpeechRecognizer = NativeLib::FindClass( env, "com/amazon/aace/alexa/SpeechRecognizer" );
@@ -53,10 +55,18 @@ void EngineBinder::initialize( JNIEnv* env )
 
     m_javaClass_PhoneCallController = NativeLib::FindClass( env, "com/amazon/aace/phonecontrol/PhoneCallController" );
 
+    m_javaClass_ContactUploader = NativeLib::FindClass( env, "com/amazon/aace/contactuploader/ContactUploader" );
+
+    m_javaClass_MetricsUploader = NativeLib::FindClass( env, "com/amazon/aace/metrics/MetricsUploader" );
+
     m_javaClass_NetworkInfoProvider = NativeLib::FindClass( env, "com/amazon/aace/network/NetworkInfoProvider" );
 
 #ifdef INCLUDE_ALEXA_COMMS_MODULE
     m_javaClass_AlexaComms = NativeLib::FindClass(env, "com/amazon/aace/communication/AlexaComms");
+#endif
+
+#ifdef INCLUDE_LOCAL_VOICE_CONTROL_MODULE
+    m_javaClass_ClimateControlInterface = NativeLib::FindClass( env, "com/amazon/aace/carControl/ClimateControlInterface" );
 #endif
 }
 
@@ -98,12 +108,15 @@ std::shared_ptr<AlexaClientBinder> EngineBinder::createAlexaClientBinder( JNIEnv
     return alexaClientBinder;
 }
 
-std::shared_ptr<MediaPlayerBinder> EngineBinder::createMediaPlayerBinder( JNIEnv* env, jobject platformInterface )
+std::shared_ptr<MediaPlayerBinder> EngineBinder::createMediaPlayerBinder(
+    JNIEnv* env,
+    jobject platformInterface,
+    const std::string mediaPlayerGetMethodName)
 {
     jclass platformInterfaceClass = env->GetObjectClass( platformInterface );
 
     // get the media player from the platform interface
-    jmethodID  javaMethod_getMediaPlayer = env->GetMethodID( platformInterfaceClass, "getMediaPlayer", "()Lcom/amazon/aace/alexa/MediaPlayer;" );
+    jmethodID  javaMethod_getMediaPlayer = env->GetMethodID( platformInterfaceClass, mediaPlayerGetMethodName.c_str(), "()Lcom/amazon/aace/alexa/MediaPlayer;" );
     jobject mediaPlayerObj = env->CallObjectMethod( platformInterface, javaMethod_getMediaPlayer );
 
     // create the media player native binder
@@ -120,12 +133,15 @@ std::shared_ptr<MediaPlayerBinder> EngineBinder::createMediaPlayerBinder( JNIEnv
     return mediaPlayerBinder;
 }
 
-std::shared_ptr<SpeakerBinder> EngineBinder::createSpeakerBinder( JNIEnv* env, jobject platformInterface )
+std::shared_ptr<SpeakerBinder> EngineBinder::createSpeakerBinder(
+    JNIEnv* env,
+    jobject platformInterface,
+    const std::string speakerGetMethodName)
 {
     jclass platformInterfaceClass = env->GetObjectClass( platformInterface );
 
     // get the speaker object from the platform interface
-    jmethodID  javaMethod_getSpeaker = env->GetMethodID( platformInterfaceClass, "getSpeaker", "()Lcom/amazon/aace/alexa/Speaker;" );
+    jmethodID  javaMethod_getSpeaker = env->GetMethodID( platformInterfaceClass, speakerGetMethodName.c_str(), "()Lcom/amazon/aace/alexa/Speaker;" );
     jobject speakerObj = env->CallObjectMethod( platformInterface, javaMethod_getSpeaker );
 
     // create the speaker native binder
@@ -304,11 +320,19 @@ std::shared_ptr<NavigationBinder> EngineBinder::createNavigationBinder( JNIEnv* 
 
 #ifdef INCLUDE_ALEXA_COMMS_MODULE
 std::shared_ptr<AlexaCommsBinder> EngineBinder::createAlexaCommsBinder( JNIEnv* env, jobject platformInterface ) {
-    std::shared_ptr<MediaPlayerBinder> mediaPlayerBinder = createMediaPlayerBinder( env, platformInterface );
-    std::shared_ptr<SpeakerBinder> speakerBinder = createSpeakerBinder( env, platformInterface );
+    std::shared_ptr<MediaPlayerBinder> ringtoneMediaPlayerBinder = createMediaPlayerBinder(
+            env, platformInterface, "getRingtoneMediaPlayer");
+    std::shared_ptr<SpeakerBinder> ringtoneSpeakerBinder = createSpeakerBinder(
+            env, platformInterface, "getRingtoneSpeaker");
+
+    std::shared_ptr<MediaPlayerBinder> callAudioMediaPlayerBinder = createMediaPlayerBinder(
+            env, platformInterface, "getCallAudioMediaPlayer");
+    std::shared_ptr<SpeakerBinder> callAudioSpeakerBinder = createSpeakerBinder(
+            env, platformInterface, "getCallAudioSpeaker");
 
     // create the platform interface native binder
-    std::shared_ptr<AlexaCommsBinder> alexaCommsBinder = std::make_shared<AlexaCommsBinder>( mediaPlayerBinder, speakerBinder );
+    std::shared_ptr<AlexaCommsBinder> alexaCommsBinder = std::make_shared<AlexaCommsBinder>(
+            ringtoneMediaPlayerBinder, ringtoneSpeakerBinder, callAudioMediaPlayerBinder, callAudioSpeakerBinder);
 
     // register the platform interface with the engine
     m_engine->registerPlatformInterface( alexaCommsBinder );
@@ -341,6 +365,44 @@ std::shared_ptr<PhoneCallControllerBinder> EngineBinder::createPhoneCallControll
     env->CallVoidMethod( platformInterface, javaMethod_setNativeObject, (jlong) phoneCallControllerBinder.get() );
 
     return phoneCallControllerBinder;
+}
+
+std::shared_ptr<ContactUploaderBinder> EngineBinder::createContactUploaderBinder(JNIEnv *env, jobject platformInterface)
+{
+    // create the platform interface native binder
+    std::shared_ptr<ContactUploaderBinder> contactUploaderBinder = std::make_shared<ContactUploaderBinder>();
+
+    // register the platform interface with the engine
+    m_engine->registerPlatformInterface( contactUploaderBinder );
+
+    // bind the platform java interface to the native interface
+    jclass platformInterfaceClass = env->GetObjectClass( platformInterface );
+    jmethodID javaMethod_setNativeObject = env->GetMethodID( platformInterfaceClass, "setNativeObject", "(J)V" );
+
+    contactUploaderBinder->bind( env, platformInterface );
+
+    env->CallVoidMethod( platformInterface, javaMethod_setNativeObject, (jlong) contactUploaderBinder.get() );
+
+    return contactUploaderBinder;
+}
+
+std::shared_ptr<MetricsUploaderBinder> EngineBinder::createMetricsUploaderBinder(JNIEnv *env, jobject platformInterface)
+{
+    // create the platform interface native binder
+    std::shared_ptr<MetricsUploaderBinder> metricsUploaderBinder = std::make_shared<MetricsUploaderBinder>();
+
+    // register the platform interface with the engine
+    m_engine->registerPlatformInterface( metricsUploaderBinder );
+
+    // bind the platform java interface to the native interface
+    jclass platformInterfaceClass = env->GetObjectClass( platformInterface );
+    jmethodID javaMethod_setNativeObject = env->GetMethodID( platformInterfaceClass, "setNativeObject", "(J)V" );
+
+    metricsUploaderBinder->bind( env, platformInterface );
+
+    env->CallVoidMethod( platformInterface, javaMethod_setNativeObject, (jlong) metricsUploaderBinder.get() );
+
+    return metricsUploaderBinder;
 }
 
 std::shared_ptr<NetworkInfoProviderBinder> EngineBinder::createNetworkInfoProviderBinder( JNIEnv* env, jobject platformInterface )
@@ -401,6 +463,104 @@ std::shared_ptr<NotificationsBinder> EngineBinder::createNotificationsBinder( JN
     return notificationsBinder;
 }
 
+#ifdef INCLUDE_LOCAL_VOICE_CONTROL_MODULE
+std::shared_ptr<ClimateControlInterfaceBinder> EngineBinder::createClimateControlInterfaceBinder( JNIEnv* env, jobject platformInterface )
+{
+    jmethodID javaMethod;
+    
+    jclass platformInterfaceClass = env->GetObjectClass( platformInterface );
+
+    // create the platform interface native binder
+    std::shared_ptr<ClimateControlInterfaceBinder> climateControlInterfaceBinder = std::make_shared<ClimateControlInterfaceBinder>();
+
+    // register the platform interface with the engine
+    m_engine->registerPlatformInterface( climateControlInterfaceBinder );
+
+    // bind the platform java interface to the native interface
+    jmethodID javaMethod_setNativeObject = env->GetMethodID( platformInterfaceClass, "setNativeObject", "(J)V" );
+
+    climateControlInterfaceBinder->bind( env, platformInterface );
+
+    env->CallVoidMethod( platformInterface, javaMethod_setNativeObject, (jlong) climateControlInterfaceBinder.get() );
+
+    return climateControlInterfaceBinder;
+}
+#endif //INCLUDE_LOCAL_VOICE_CONTROL_MODULE
+
+std::shared_ptr<ExternalMediaAdapterBinder> EngineBinder::createExternalMediaAdapterBinder( JNIEnv* env, jobject platformInterface )
+{
+    std::shared_ptr<SpeakerBinder> speakerBinder = createSpeakerBinder( env, platformInterface );
+    std::shared_ptr<ExternalMediaAdapterBinder> externalMediaAdapterBinder = std::make_shared<ExternalMediaAdapterBinder>( speakerBinder );
+
+
+    // register the platform interface with the engine
+    m_engine->registerPlatformInterface( externalMediaAdapterBinder );
+
+    // bind the platform java interface to the native interface
+    jclass platformInterfaceClass = env->GetObjectClass( platformInterface );
+    jmethodID javaMethod_setNativeObject = env->GetMethodID( platformInterfaceClass, "setNativeObject", "(J)V" );
+
+    externalMediaAdapterBinder->bind( env, platformInterface );
+
+    env->CallVoidMethod( platformInterface, javaMethod_setNativeObject, (jlong) externalMediaAdapterBinder.get() );
+
+    return externalMediaAdapterBinder;
+}
+
+std::shared_ptr<LocalMediaSourceBinder> EngineBinder::createLocalMediaSourceBinder( JNIEnv* env, jobject platformInterface )
+{
+
+    jclass platformInterfaceClass = env->GetObjectClass( platformInterface );
+    jmethodID  javaMethod_getLocalMediaSource = env->GetMethodID( platformInterfaceClass, "getSource", "()Lcom/amazon/aace/alexa/LocalMediaSource$Source;" );
+    jobject source = env->CallObjectMethod( platformInterface, javaMethod_getLocalMediaSource );
+    aace::alexa::LocalMediaSource::Source sourceEnum = aace::alexa::LocalMediaSource::Source::BLUETOOTH;
+
+    jclass sourceEnumClass = env->FindClass( "com/amazon/aace/alexa/LocalMediaSource$Source" );
+    ObjectRef enum_Source_BLUETOOTH = NativeLib::FindEnum( env, sourceEnumClass, "BLUETOOTH", "Lcom/amazon/aace/alexa/LocalMediaSource$Source;" );
+    ObjectRef enum_Source_USB = NativeLib::FindEnum( env, sourceEnumClass, "USB", "Lcom/amazon/aace/alexa/LocalMediaSource$Source;" );
+    ObjectRef enum_Source_FM_RADIO = NativeLib::FindEnum( env, sourceEnumClass, "FM_RADIO", "Lcom/amazon/aace/alexa/LocalMediaSource$Source;" );
+    ObjectRef enum_Source_AM_RADIO = NativeLib::FindEnum( env, sourceEnumClass, "AM_RADIO", "Lcom/amazon/aace/alexa/LocalMediaSource$Source;" );
+    ObjectRef enum_Source_SATELLITE_RADIO = NativeLib::FindEnum( env, sourceEnumClass, "SATELLITE_RADIO", "Lcom/amazon/aace/alexa/LocalMediaSource$Source;" );
+    ObjectRef enum_Source_LINE_IN = NativeLib::FindEnum( env, sourceEnumClass, "LINE_IN", "Lcom/amazon/aace/alexa/LocalMediaSource$Source;" );
+    ObjectRef enum_Source_COMPACT_DISC = NativeLib::FindEnum( env, sourceEnumClass, "COMPACT_DISC", "Lcom/amazon/aace/alexa/LocalMediaSource$Source;" );
+
+    if( enum_Source_BLUETOOTH.isSameObject( env, source ) ) {
+        sourceEnum = aace::alexa::LocalMediaSource::Source::BLUETOOTH;
+    }
+    else if( enum_Source_USB.isSameObject( env, source ) ) {
+        sourceEnum = aace::alexa::LocalMediaSource::Source::USB;
+    }
+    else if( enum_Source_FM_RADIO.isSameObject( env, source ) ) {
+        sourceEnum = aace::alexa::LocalMediaSource::Source::FM_RADIO;
+    }
+    else if( enum_Source_AM_RADIO.isSameObject( env, source ) ) {
+        sourceEnum = aace::alexa::LocalMediaSource::Source::AM_RADIO;
+    }
+    else if( enum_Source_SATELLITE_RADIO.isSameObject( env, source ) ) {
+        sourceEnum = aace::alexa::LocalMediaSource::Source::SATELLITE_RADIO;
+    }
+    else if( enum_Source_LINE_IN.isSameObject( env, source ) ) {
+        sourceEnum = aace::alexa::LocalMediaSource::Source::LINE_IN;
+    }
+    else if( enum_Source_COMPACT_DISC.isSameObject( env, source ) ) {
+        sourceEnum = aace::alexa::LocalMediaSource::Source::COMPACT_DISC;
+    }
+
+    std::shared_ptr<SpeakerBinder> speakerBinder = createSpeakerBinder( env, platformInterface );
+    std::shared_ptr<LocalMediaSourceBinder> localMediaSourceBinder = std::make_shared<LocalMediaSourceBinder>( sourceEnum, speakerBinder );
+
+    // register the platform interface with the engine
+    m_engine->registerPlatformInterface( localMediaSourceBinder );
+
+    jmethodID javaMethod_setNativeObject = env->GetMethodID( platformInterfaceClass, "setNativeObject", "(J)V" );
+
+    localMediaSourceBinder->bind( env, platformInterface );
+
+    env->CallVoidMethod( platformInterface, javaMethod_setNativeObject, (jlong) localMediaSourceBinder.get() );
+
+    return localMediaSourceBinder;
+}
+
 bool EngineBinder::registerPlatformInterface( JNIEnv* env, jobject platformInterface )
 {
     if( env->IsInstanceOf( platformInterface, m_javaClass_AlexaClient.get() ) ) {
@@ -455,8 +615,24 @@ bool EngineBinder::registerPlatformInterface( JNIEnv* env, jobject platformInter
         m_phoneCallController = createPhoneCallControllerBinder( env, platformInterface );
         return true;
     }
+    else if( env->IsInstanceOf( platformInterface, m_javaClass_ContactUploader.get() ) ) {
+        m_contactUploader = createContactUploaderBinder(env, platformInterface);
+        return true;
+    }
+    else if( env->IsInstanceOf( platformInterface, m_javaClass_MetricsUploader.get() ) ) {
+        m_metricsUploader = createMetricsUploaderBinder(env, platformInterface);
+        return true;
+    }
     else if( env->IsInstanceOf( platformInterface, m_javaClass_NetworkInfoProvider.get() ) ) {
         m_networkInfo = createNetworkInfoProviderBinder( env, platformInterface );
+        return true;
+    }
+    else if( env->IsInstanceOf( platformInterface, m_javaClass_ExternalMediaAdapter.get() ) ) {
+        m_externalMediaAdapter = createExternalMediaAdapterBinder( env, platformInterface );
+        return true;
+    }
+    else if( env->IsInstanceOf( platformInterface, m_javaClass_LocalMediaSource.get() ) ) {
+        m_localMediaSource = createLocalMediaSourceBinder( env, platformInterface );
         return true;
     }
 #ifdef INCLUDE_ALEXA_COMMS_MODULE
@@ -465,6 +641,13 @@ bool EngineBinder::registerPlatformInterface( JNIEnv* env, jobject platformInter
         return true;
     }
 #endif //INCLUDE_ALEXA_COMMS_MODULE
+#ifdef INCLUDE_LOCAL_VOICE_CONTROL_MODULE
+
+    else if( env->IsInstanceOf( platformInterface, m_javaClass_ClimateControlInterface.get() ) ) {
+        m_climateControl = createClimateControlInterfaceBinder( env, platformInterface );
+        return true;
+    }
+#endif //INCLUDE_LOCAL_VOICE_CONTROL_MODULE
 
     return false;
 }

@@ -860,7 +860,6 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginEnd="8dp" />
             </LinearLayout>
-
         </LinearLayout>
 
         <!-- Phone Call Controller -->
@@ -892,24 +891,37 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center|center_horizontal" />
 
-            <!-- Call State Info -->
+            <!--Configure Device Features Button-->
+            <TextView
+                style="@style/button"
+                android:text="@string/configure_device"
+                android:id="@+id/deviceConfiguration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Phone Call Controller State Info -->
             <RelativeLayout
                 android:id="@+id/callInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="8dp"
                 android:layout_marginBottom="4dp">
+
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:layout_alignParentStart="true"
-                    android:layout_marginEnd="8dp" >
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="4dp" >
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
-                        android:layout_marginBottom="4dp"
                         android:text="@string/call_state_label"
                         android:layout_gravity="start"
                         android:textSize="12sp" />
@@ -917,7 +929,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
-                        android:text="@string/callee_number"
+                        android:text="@string/current_number"
+                        android:layout_gravity="start"
+                        android:textSize="12sp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:text="@string/last_called_number"
                         android:layout_gravity="start"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -926,51 +945,262 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:layout_marginBottom="4dp" >
+
                     <TextView
-                        android:id="@+id/callState"
+                        android:id="@+id/currentCallState"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp"
                         android:layout_gravity="end"
-                        android:text="@string/call_state_none"
                         android:textColor="@color/drawerTextStatus"
                         android:textSize="12sp" />
                     <TextView
-                        android:id="@+id/calleeNumber"
+                        android:id="@+id/currentCallNumber"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="end"
-                        android:text="@string/callee_default_number"
+                        android:textColor="@color/drawerTextStatus"
+                        android:textSize="12sp" />
+                    <TextView
+                        android:id="@+id/lastCalledNumber"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
                         android:textColor="@color/drawerTextStatus"
                         android:textSize="12sp" />
                 </LinearLayout>
             </RelativeLayout>
 
-            <!-- Initiate Call Button -->
-            <TextView
-                style="@style/button"
-                android:text="@string/call_initiate"
-                android:id="@+id/initiateCall"
+            <!-- Local Calling Device -->
+            <LinearLayout
+                android:id="@+id/localCallingDevice"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="8dp"
+                android:orientation="vertical"
                 android:layout_marginBottom="8dp"
-                android:visibility="gone" />
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:background="@color/drawerSubsection" >
 
-            <!-- Terminate Call Button -->
-            <TextView
-                style="@style/button"
-                android:text="@string/call_terminate"
-                android:id="@+id/terminateCall"
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/local_calling_device"
+                    android:textSize="12sp" />
+                <EditText
+                    android:id="@+id/localCallingNumber"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:inputType="phone" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/calling_number"
+                    android:textSize="12sp" />
+                <TextView
+                    style="@style/button"
+                    android:id="@+id/localInitiate"
+                    android:text="@string/call_initiate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp" />
+                <TextView
+                    style="@style/button"
+                    android:id="@+id/localEnd"
+                    android:text="@string/call_end"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone"
+                    android:layout_marginBottom="8dp" />
+
+                <LinearLayout
+                    android:id="@+id/localAnswerDecline"
+                    android:layout_width="match_parent"
+                    android:layout_height="58dp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/button"
+                        android:text="@string/call_answer"
+                        android:id="@+id/localAnswer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_weight="1"
+                        android:layout_marginBottom="8dp" />
+                    <TextView
+                        style="@style/button"
+                        android:text="@string/call_decline"
+                        android:id="@+id/localDecline"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_weight="1"
+                        android:layout_marginBottom="8dp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Remote Party Device -->
+            <LinearLayout
+                android:id="@+id/remotePartyDevice"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="8dp"
+                android:orientation="vertical"
                 android:layout_marginBottom="8dp"
-                android:visibility="gone" />
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:background="@color/drawerSubsection" >
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/remote_device"
+                    android:textSize="12sp" />
+                <TextView
+                    style="@style/button"
+                    android:id="@+id/remoteInitiate"
+                    android:text="@string/call_initiate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp" />
+                <TextView
+                    style="@style/button"
+                    android:id="@+id/remoteEnd"
+                    android:text="@string/call_end"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone"
+                    android:layout_marginBottom="8dp" />
+
+
+                <LinearLayout
+                    android:id="@+id/remoteAnswerDecline"
+                    android:layout_width="match_parent"
+                    android:layout_height="58dp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/button"
+                        android:text="@string/call_answer"
+                        android:id="@+id/remoteAnswer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_weight="1"
+                        android:layout_marginBottom="8dp" />
+
+                    <TextView
+                        style="@style/button"
+                        android:text="@string/call_decline"
+                        android:id="@+id/remoteDecline"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_weight="1"
+                        android:layout_marginBottom="8dp" />
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
+
+    <!-- Contact Uploader -->
+    <LinearLayout
+        android:id="@+id/phone_contact_uploader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="8dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:background="@color/drawerSection">
+
+        <!-- Header -->
+        <TextView
+            android:id="@+id/phone_contact_uploader_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/contact_uploader"
+            android:textColor="@color/drawerHeader"
+            android:layout_marginBottom="4dp"
+            android:textSize="18sp" />
+        <include
+            layout="@layout/drawer_switch"
+            android:id="@+id/togglePhoneConnection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|center_horizontal" />
+
+        <!-- Upload/Abort/Remove Button -->
+        <TextView
+            style="@style/button"
+            android:text="@string/upload_contacts"
+            android:id="@+id/upload_cancel_or_remove_contacts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone" />
+
+        <!-- Upload/Abort/Remove in-Progress widget -->
+        <ProgressBar
+            android:id="@+id/contact_upload_progress_cyclic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:visibility="gone" />
+
+        <!-- TextView to show user granted access to phone contacts -->
+        <TextView
+            android:id="@+id/access_to_contacts_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_phone_is_connected"
+            android:textColor="@color/drawerHeader"
+            android:layout_marginBottom="4dp"
+            android:textSize="12sp" />
+
+        <!-- Upload/Abort/Remove success or failure text -->
+        <TextView
+            android:id="@+id/status_of_contact_ingestion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/drawerHeader"
+            android:layout_marginBottom="4dp"
+            android:textSize="12sp"
+            android:visibility="gone"/>
+
+    </LinearLayout>
 
         <!-- Alexa Comms -->
         <com.amazon.sampleapp.impl.Communication.AlexaCommsView

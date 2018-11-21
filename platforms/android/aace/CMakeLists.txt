@@ -18,13 +18,22 @@ if(NOT EXISTS ${AAC_HOME})
 endif()
 
 option(INCLUDE_ALEXA_COMMS_MODULE "Should include Alexa Communications module in AAC SDK" OFF)
+option(INCLUDE_LOCAL_VOICE_CONTROL_MODULE "Should include Local Voice Control module in AAC SDK" OFF)
 
 include(${AAC_HOME}/share/cmake/AACECore.cmake)
 include(${AAC_HOME}/share/cmake/AACEAlexa.cmake)
 include(${AAC_HOME}/share/cmake/AACENavigation.cmake)
 include(${AAC_HOME}/share/cmake/AACEPhoneControl.cmake)
+include(${AAC_HOME}/share/cmake/AACEContactUploader.cmake)
+
 if (INCLUDE_ALEXA_COMMS_MODULE)
     include(${AAC_HOME}/share/cmake/AACECommunication.cmake)
+endif()
+
+if (INCLUDE_LOCAL_VOICE_CONTROL_MODULE)
+    include(${AAC_HOME}/share/cmake/AACELocalVoiceControl.cmake)
+    include(${AAC_HOME}/share/cmake/AACELocalSkillService.cmake)
+    include(${AAC_HOME}/share/cmake/AACECarControl.cmake)
 endif()
 
 set(aace_lib_src
@@ -39,13 +48,17 @@ set(aace_lib_src
     src/main/cpp/src/aace/alexa/SpeechRecognizerBinder.cpp
     src/main/cpp/src/aace/alexa/SpeechSynthesizerBinder.cpp
     src/main/cpp/src/aace/alexa/TemplateRuntimeBinder.cpp
+    src/main/cpp/src/aace/alexa/ExternalMediaAdapterBinder.cpp
+    src/main/cpp/src/aace/alexa/LocalMediaSourceBinder.cpp
     src/main/cpp/src/aace/core/EngineBinder.cpp
     src/main/cpp/src/aace/core/PlatformInterfaceBinder.cpp
     src/main/cpp/src/aace/location/LocationProviderBinder.cpp
     src/main/cpp/src/aace/logger/LoggerBinder.cpp
     src/main/cpp/src/aace/navigation/NavigationBinder.cpp
     src/main/cpp/src/aace/phonecontrol/PhoneCallControllerBinder.cpp
+    src/main/cpp/src/aace/contactuploader/ContactUploaderBinder.cpp
     src/main/cpp/src/aace/network/NetworkInfoProviderBinder.cpp
+    src/main/cpp/src/aace/metrics/MetricsUploaderBinder.cpp
     src/main/cpp/src/NativeLib.cpp
 )
 
@@ -54,6 +67,7 @@ find_library(log-lib log)
 
 set(aace_lib_dependencies
     AACEPhoneControlPlatform AACEPhoneControlEngine
+    AACEContactUploaderPlatform AACEContactUploaderEngine
     AACENavigationPlatform AACENavigationEngine
     AACEAlexaPlatform AACEAlexaEngine
     AACECorePlatform AACECoreEngine
@@ -70,12 +84,30 @@ if (INCLUDE_ALEXA_COMMS_MODULE)
     )
 endif()
 
+if (INCLUDE_LOCAL_VOICE_CONTROL_MODULE)
+    list(APPEND aace_lib_src
+        src/main/cpp/src/aace/carControl/ClimateControlInterfaceBinder.cpp
+    )
+    list(APPEND aace_lib_dependencies
+         AACELocalVoiceControlEngine
+         AACELocalSkillServicePlatform AACELocalSkillServiceEngine
+         AACECarControlPlatform AACECarControlEngine
+    )
+endif()
+
 add_library(aace-lib SHARED ${aace_lib_src})
 
 if (INCLUDE_ALEXA_COMMS_MODULE)
     target_compile_definitions(aace-lib
         PRIVATE
             -DINCLUDE_ALEXA_COMMS_MODULE
+    )
+endif()
+
+if (INCLUDE_LOCAL_VOICE_CONTROL_MODULE)
+    target_compile_definitions(aace-lib
+        PRIVATE
+            -DINCLUDE_LOCAL_VOICE_CONTROL_MODULE
     )
 endif()
 

@@ -33,14 +33,12 @@ bool PhoneCallControllerEngineImpl::initialize (
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender ) {
-    
-    try {
-        m_phoneCallControllerCapabilityAgent = PhoneCallControllerCapabilityAgent::create( contextManager, exceptionSender, messageSender );
-        ThrowIfNull( m_phoneCallControllerCapabilityAgent, "couldNotCreateCapabilityAgent" );
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager ) {
 
-        // add phoneCallController runtime observer
-        m_phoneCallControllerCapabilityAgent->addObserver( shared_from_this() );
+    try {
+        m_phoneCallControllerCapabilityAgent = PhoneCallControllerCapabilityAgent::create( shared_from_this(), contextManager, exceptionSender, messageSender, focusManager );
+        ThrowIfNull( m_phoneCallControllerCapabilityAgent, "couldNotCreateCapabilityAgent" );
 
         // add capability agent to the directive sequencer 
         ThrowIfNot( directiveSequencer->addDirectiveHandler( m_phoneCallControllerCapabilityAgent ), "addDirectiveHandlerFailed" );
@@ -64,7 +62,8 @@ std::shared_ptr<PhoneCallControllerEngineImpl> PhoneCallControllerEngineImpl::cr
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender ) {
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager ) {
 
     try {
         ThrowIfNull( phoneCallControllerPlatformInterface, "nullPlatformInterface" );
@@ -73,10 +72,11 @@ std::shared_ptr<PhoneCallControllerEngineImpl> PhoneCallControllerEngineImpl::cr
         ThrowIfNull( directiveSequencer, "nullDirectiveSequencer" );
         ThrowIfNull( exceptionSender, "nullExceptionSender" );
         ThrowIfNull( messageSender, "nullMessageSender" );
+        ThrowIfNull( focusManager, "nullFocusManager" );
 
         std::shared_ptr<PhoneCallControllerEngineImpl> phoneCallControllerEngineImpl = std::shared_ptr<PhoneCallControllerEngineImpl>( new PhoneCallControllerEngineImpl( phoneCallControllerPlatformInterface ) );
 
-        ThrowIfNot( phoneCallControllerEngineImpl->initialize( capabilitiesDelegate, contextManager, directiveSequencer, exceptionSender, messageSender ), "initializePhoneCallControllerEngineImplFailed" );
+        ThrowIfNot( phoneCallControllerEngineImpl->initialize( capabilitiesDelegate, contextManager, directiveSequencer, exceptionSender, messageSender, focusManager ), "initializePhoneCallControllerEngineImplFailed" );
 
         return phoneCallControllerEngineImpl;
     }
@@ -102,21 +102,47 @@ void PhoneCallControllerEngineImpl::onConnectionStateChanged( ConnectionState st
         m_phoneCallControllerCapabilityAgent->connectionStateChanged( state );
     } 
 }
-void PhoneCallControllerEngineImpl::onCallActivated( const std::string& callId ) {
+
+void PhoneCallControllerEngineImpl::onCallStateChanged ( CallState state, const std::string& callId, const std::string& callerId ) {
     if( m_phoneCallControllerCapabilityAgent != nullptr ) {
-        m_phoneCallControllerCapabilityAgent->callActivated( callId );
+        m_phoneCallControllerCapabilityAgent->callStateChanged( state, callId, callerId );
+    } 
+}
+
+void PhoneCallControllerEngineImpl::onCallFailed( const std::string& callId, CallError code, const std::string& message ) {
+    if( m_phoneCallControllerCapabilityAgent != nullptr ) {
+        m_phoneCallControllerCapabilityAgent->callFailed( callId, code, message );
     }
 }
-void PhoneCallControllerEngineImpl::onCallFailed( const std::string& callId, const std::string& error, const std::string& message ) {
+
+void PhoneCallControllerEngineImpl::onCallerIdReceived( const std::string& callId, const std::string& callerId ) {
     if( m_phoneCallControllerCapabilityAgent != nullptr ) {
-        m_phoneCallControllerCapabilityAgent->callFailed( callId, error, message );
+        m_phoneCallControllerCapabilityAgent->callerIdReceived( callId, callerId );
     }
 }
-    
-void PhoneCallControllerEngineImpl::onCallTerminated( const std::string& callId ) {
+
+void PhoneCallControllerEngineImpl::onSendDTMFSucceeded( const std::string& callId) {
     if( m_phoneCallControllerCapabilityAgent != nullptr ) {
-        m_phoneCallControllerCapabilityAgent->callTerminated( callId );
+        m_phoneCallControllerCapabilityAgent->sendDTMFSucceeded( callId );
     }
+}
+
+void PhoneCallControllerEngineImpl::onSendDTMFFailed( const std::string& callId, DTMFError code, const std::string& message ) {
+    if( m_phoneCallControllerCapabilityAgent != nullptr ) {
+        m_phoneCallControllerCapabilityAgent->sendDTMFFailed( callId, code, message );
+    }
+}
+
+void PhoneCallControllerEngineImpl::onDeviceConfigurationUpdated( std::unordered_map<PhoneCallControllerEngineInterface::CallingDeviceConfigurationProperty, bool> configurationMap ) {
+    if( m_phoneCallControllerCapabilityAgent != nullptr ) {
+        m_phoneCallControllerCapabilityAgent->deviceConfigurationUpdated( configurationMap );
+    }
+}
+std::string PhoneCallControllerEngineImpl::onCreateCallId() {
+    if( m_phoneCallControllerCapabilityAgent != nullptr ) {
+        return m_phoneCallControllerCapabilityAgent->createCallId();
+    }
+    return "";
 }
 
 bool PhoneCallControllerEngineImpl::dial( const std::string& payload ) {
@@ -124,6 +150,34 @@ bool PhoneCallControllerEngineImpl::dial( const std::string& payload ) {
         return m_phoneCallControllerPlatformInterface->dial( payload );
     }
     return false;
+}
+
+bool PhoneCallControllerEngineImpl::redial( const std::string& payload ) {
+    if( m_phoneCallControllerPlatformInterface != nullptr ) {
+        return m_phoneCallControllerPlatformInterface->redial( payload );
+    }
+    return false;
+}
+
+void PhoneCallControllerEngineImpl::answer( const std::string& payload ) {
+    if( m_phoneCallControllerPlatformInterface != nullptr ) {
+        m_phoneCallControllerPlatformInterface->answer( payload );
+    }
+}
+
+void PhoneCallControllerEngineImpl::stop( const std::string& payload ) {
+    if( m_phoneCallControllerPlatformInterface != nullptr ) {
+        m_phoneCallControllerPlatformInterface->stop( payload );
+    }
+}
+
+void PhoneCallControllerEngineImpl::playRingtone( const std::string& payload ) {
+}
+
+void PhoneCallControllerEngineImpl::sendDTMF( const std::string& payload ) {
+    if( m_phoneCallControllerPlatformInterface != nullptr ) {
+        m_phoneCallControllerPlatformInterface->sendDTMF( payload );
+    }
 }
 
 } // aace::engine::phoneCallController

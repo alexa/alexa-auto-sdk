@@ -72,11 +72,20 @@ bool NavigationEngineService::registerPlatformInterfaceType( std::shared_ptr<aac
     {
         ThrowIfNotNull( m_navigationEngineImpl, "platformInterfaceAlreadyRegistered" );
 
-        // create the playback controller engine implementation
-        auto alexaService = getContext()->getService<aace::engine::alexa::AlexaEngineService>();
-        ThrowIfNull( alexaService, "alexaServiceNotFound" );
+        // create the navigation engine implementation
+        auto alexaComponents = getContext()->getServiceInterface<aace::engine::alexa::AlexaComponentInterface>( "aace.alexa" );
+        ThrowIfNull( alexaComponents, "invalidAlexaComponentInterface" );
+        
+        auto directiveSequencer = alexaComponents->getDirectiveSequencer();
+        ThrowIfNull( directiveSequencer, "directiveSequencerInvalid" );
 
-        m_navigationEngineImpl = aace::engine::navigation::NavigationEngineImpl::create( navigation, alexaService->getDirectiveSequencer(), alexaService->getCapabilitiesDelegate(), alexaService->getExceptionSender() );
+        auto capabilitiesDelegate = alexaComponents->getCapabilitiesDelegate();
+        ThrowIfNull( capabilitiesDelegate, "capabilitiesDelegateInvalid" );
+
+        auto exceptionSender = alexaComponents->getExceptionEncounteredSender();
+        ThrowIfNull( exceptionSender, "exceptionSenderInvalid" );
+
+        m_navigationEngineImpl = aace::engine::navigation::NavigationEngineImpl::create( navigation, directiveSequencer, capabilitiesDelegate, exceptionSender );
         ThrowIfNull( m_navigationEngineImpl, "createNavigationEngineImplFailed" );
 
         return true;

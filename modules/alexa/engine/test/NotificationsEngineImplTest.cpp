@@ -117,6 +117,7 @@ public:
         EXPECT_CALL(*m_mockContextManager, setStateProvider(testing::_, testing::_));
         EXPECT_CALL(*m_mockContextManager,setState(testing::_, testing::_,testing::_,testing::_)).Times(testing::Exactly(1));
         EXPECT_CALL(*m_mockNotificationPlatformInterface, setIndicator(aace::alexa::Notifications::IndicatorState::OFF));
+        EXPECT_CALL(*m_mockSpeakerManager, addSpeaker(testing::_));
         m_notificationEngineImpl = aace::engine::alexa::NotificationsEngineImpl::create(
             m_mockNotificationPlatformInterface, m_mockDirectiveSequencer,m_mockContextManager, 
             m_mockCapabilitiesDelegate, m_mockExceptionSender, m_mockNotificationsAudioFactory,
@@ -198,7 +199,8 @@ TEST_F(NotificationsEngineImplTest, createWithDirectiveSequencerAsNull) {
  */
 TEST_F(NotificationsEngineImplTest, createWithContextManagerAsNull) {
     std::shared_ptr<aace::engine::alexa::NotificationsEngineImpl> notificationEngineImplTemp;
-    
+
+    EXPECT_CALL(*m_mockSpeakerManager, addSpeaker(testing::_));
     notificationEngineImplTemp = aace::engine::alexa::NotificationsEngineImpl::create(
         m_mockNotificationPlatformInterface, m_mockDirectiveSequencer, nullptr,
         m_mockCapabilitiesDelegate, m_mockExceptionSender, m_mockNotificationsAudioFactory,
@@ -224,7 +226,8 @@ TEST_F(NotificationsEngineImplTest, createWithCapabilitiesDelegateAsNull) {
  */
 TEST_F(NotificationsEngineImplTest, createWithExceptionSenderAsNull) {
     std::shared_ptr<aace::engine::alexa::NotificationsEngineImpl> notificationEngineImplTemp;
-    
+
+    EXPECT_CALL(*m_mockSpeakerManager, addSpeaker(testing::_));
     notificationEngineImplTemp = aace::engine::alexa::NotificationsEngineImpl::create(
         m_mockNotificationPlatformInterface, m_mockDirectiveSequencer, m_mockContextManager,
         m_mockCapabilitiesDelegate, nullptr, m_mockNotificationsAudioFactory,
@@ -237,7 +240,8 @@ TEST_F(NotificationsEngineImplTest, createWithExceptionSenderAsNull) {
  */
 TEST_F(NotificationsEngineImplTest, createWithNotificationsAudioFactoryAsNull) {
     std::shared_ptr<aace::engine::alexa::NotificationsEngineImpl> notificationEngineImplTemp;
-    
+
+    EXPECT_CALL(*m_mockSpeakerManager, addSpeaker(testing::_));
     notificationEngineImplTemp = aace::engine::alexa::NotificationsEngineImpl::create(
         m_mockNotificationPlatformInterface, m_mockDirectiveSequencer, m_mockContextManager,
         m_mockCapabilitiesDelegate, m_mockExceptionSender, nullptr,
@@ -263,7 +267,8 @@ TEST_F(NotificationsEngineImplTest, createWithSpeakerManagerAsNull) {
  */
 TEST_F(NotificationsEngineImplTest, createWithcustomerDataManagerAsNull) {
     std::shared_ptr<aace::engine::alexa::NotificationsEngineImpl> notificationEngineImplTemp;
-    
+
+    EXPECT_CALL(*m_mockSpeakerManager, addSpeaker(testing::_));
     notificationEngineImplTemp = aace::engine::alexa::NotificationsEngineImpl::create(
         m_mockNotificationPlatformInterface, m_mockDirectiveSequencer, m_mockContextManager,
         m_mockCapabilitiesDelegate, m_mockExceptionSender, m_mockNotificationsAudioFactory,

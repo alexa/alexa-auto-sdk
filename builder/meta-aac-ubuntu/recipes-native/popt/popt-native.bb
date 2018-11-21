@@ -1,0 +1,1 @@
+inherit native hostnativepackage

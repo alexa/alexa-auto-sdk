@@ -111,6 +111,29 @@ public class Alerts extends AudioChannel
     public void alertStateChanged( String alertToken, AlertState state, String reason ) {}
 
     /**
+     * Notifies the platform implementation of an alert created, with detailed alert info.
+     *
+     * @param alertToken The AVS token of the alert.
+     * @param detailedInfo The alert info payload :
+     * {
+     *      "time" : <String>
+     *      "type" : <String>
+     *      "label" : <String>
+     * }
+     * time The time string ( Scheduled Time ISO_8601 ).
+     * type The type of the alert ( ALERT, REMINDER, TIMER ).
+     * label The label of the TIMER, description for REMINDER, or empty string for ALARM.
+     */
+    public void alertCreated( String alertToken, String detailedInfo ) {}
+
+    /**
+     * Notifies the platform implementation of an alert deleted, with alert token.
+     *
+     * @param alertToken The AVS token of the alert.
+     */
+    public void alertDeleted( String alertToken ) {}
+
+    /**
      * Notifies the Engine of a platform request to stop any active alert, such as when a user presses a physical 'stop' button.
      */
     public void localStop() { localStop( getNativeObject() ); }

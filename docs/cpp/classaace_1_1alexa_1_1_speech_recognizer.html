@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">1.1.0</span>
+   &#160;<span id="projectnumber">1.3.0</span>
    </div>
   </td>
  </tr>
@@ -65,6 +65,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classaace_1_1alexa_1_1_speech_recognizer-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -72,12 +73,19 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a0cb2f19f83b36509b8db7aa5ac5b1233"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#a0cb2f19f83b36509b8db7aa5ac5b1233">Initiator</a> = <a class="el" href="classaace_1_1alexa_1_1_speech_recognizer_engine_interface.html#a32b21eebeb377059d5548e7297c0846b">SpeechRecognizerEngineInterface::Initiator</a></td></tr>
+<tr class="separator:a0cb2f19f83b36509b8db7aa5ac5b1233"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:aa2859cbc2a49609ba8027f912d373692"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#aa2859cbc2a49609ba8027f912d373692">holdToTalk</a> ()</td></tr>
 <tr class="separator:aa2859cbc2a49609ba8027f912d373692"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a43cf5fc0d4a1386949d5a5d4e00d804c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#a43cf5fc0d4a1386949d5a5d4e00d804c">tapToTalk</a> ()</td></tr>
 <tr class="separator:a43cf5fc0d4a1386949d5a5d4e00d804c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab2d1df9942a32ff6eb829211a1ebffba"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#ab2d1df9942a32ff6eb829211a1ebffba">startCapture</a> (<a class="el" href="classaace_1_1alexa_1_1_speech_recognizer_engine_interface.html#a32b21eebeb377059d5548e7297c0846b">Initiator</a> initiator, uint64_t keywordBegin=UNSPECIFIED_INDEX, uint64_t keywordEnd=UNSPECIFIED_INDEX, const std::string &amp;keyword=&quot;&quot;)</td></tr>
+<tr class="separator:ab2d1df9942a32ff6eb829211a1ebffba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afbbd237e855308ed0d440c7f3d469a69"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#afbbd237e855308ed0d440c7f3d469a69">stopCapture</a> ()</td></tr>
 <tr class="separator:afbbd237e855308ed0d440c7f3d469a69"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeb12098569630da4863cc5458e346dd9"><td class="memItemLeft" align="right" valign="top">ssize_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#aeb12098569630da4863cc5458e346dd9">write</a> (const int16_t *data, const size_t size)</td></tr>
@@ -106,7 +114,23 @@ Public Member Functions</h2></td></tr>
 <li>Handling wake word and end of speech detection</li>
 </ul>
 <dl class="section note"><dt>Note</dt><dd>For observing Alexa dialog state transitions, see <code><a class="el" href="classaace_1_1alexa_1_1_alexa_client.html#a0c91642e76d6501af40ef878f12d7bf4">AlexaClient::dialogStateChanged()</a></code>. </dd></dl>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a id="a0cb2f19f83b36509b8db7aa5ac5b1233"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0cb2f19f83b36509b8db7aa5ac5b1233">&#9670;&nbsp;</a></span>Initiator</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="classaace_1_1alexa_1_1_speech_recognizer_engine_interface.html#a32b21eebeb377059d5548e7297c0846b">aace::alexa::SpeechRecognizer::Initiator</a> =  <a class="el" href="classaace_1_1alexa_1_1_speech_recognizer_engine_interface.html#a32b21eebeb377059d5548e7297c0846b">SpeechRecognizerEngineInterface::Initiator</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Describes type of event that initiated the speech request </p><dl class="section see"><dt>See also</dt><dd><code><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer_engine_interface.html#a32b21eebeb377059d5548e7297c0846b">aace::alexa::SpeechRecognizerEngineInterface::Initiator</a></code> </dd></dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a id="aa2859cbc2a49609ba8027f912d373692"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa2859cbc2a49609ba8027f912d373692">&#9670;&nbsp;</a></span>holdToTalk()</h2>
 
@@ -143,6 +167,58 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Notifies the Engine of a speech recognition event initiated by a press-and-release action on the platform. The Engine will call <code><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#a0a075e7b0fa1934dda8b517c251480b9">startAudioInput()</a></code> to notify the platform implementation when to start writing audio samples.</p>
 <p>The Engine will terminate the recognize event initiated by the press-and-release action when end of speech is detected.</p>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the Engine successfully started a recognize event, else <code>false</code> </dd></dl>
+
+</div>
+</div>
+<a id="ab2d1df9942a32ff6eb829211a1ebffba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab2d1df9942a32ff6eb829211a1ebffba">&#9670;&nbsp;</a></span>startCapture()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool aace::alexa::SpeechRecognizer::startCapture </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer_engine_interface.html#a32b21eebeb377059d5548e7297c0846b">Initiator</a>&#160;</td>
+          <td class="paramname"><em>initiator</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint64_t&#160;</td>
+          <td class="paramname"><em>keywordBegin</em> = <code>UNSPECIFIED_INDEX</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint64_t&#160;</td>
+          <td class="paramname"><em>keywordEnd</em> = <code>UNSPECIFIED_INDEX</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>keyword</em> = <code>&quot;&quot;</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Notifies the Engine of a speech recognition event. The Engine will call <code><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#a0a075e7b0fa1934dda8b517c251480b9">startAudioInput()</a></code> to notify the platform implementation when to start writing audio samples.</p>
+<p>If the initator type is <code>HOLD_TO_TALK</code>, then the platform implementation should call <code><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#afbbd237e855308ed0d440c7f3d469a69">stopCapture()</a></code> to terminate speech recognition on release of the press-and-hold action. Otherwise, the Engine will terminate the recognize event when end of speech is detected.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">initiator</td><td>The <code>Initiator</code> type for the speech recognition event </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">keywordBegin</td><td>The sample index where the keyword begins. This is required when the initator type is <code>WAKEWORD</code>, otherwise should be set to <code>SpeechRecognizer::UNSPECIFIED_INDEX</code>. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">keywordEnd</td><td>The sample index where the keyword ends. This is required when the initator type is <code>WAKEWORD</code>, otherwise should be set to <code>SpeechRecognizer::UNSPECIFIED_INDEX</code>. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">keyword</td><td>The keyword being recognized, e.g. "alexa". This is required when the initator type is <code>WAKEWORD</code>, otherwise should be set to an empty string. </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if the Engine successfully started a recognize event, else <code>false</code> </dd></dl>
 
 </div>
@@ -385,7 +461,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 1.1.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 1.3.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

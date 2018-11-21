@@ -32,6 +32,9 @@ namespace aace {
 namespace engine {
 namespace core {
 
+// default user agent constant
+static const std::string USER_AGENT_NAME = "AlexaAutoSDK";
+
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.core.EngineImpl");
 
@@ -372,9 +375,9 @@ bool EngineImpl::stop()
     }
 }
 
-std::shared_ptr<EngineService> EngineImpl::getService( const std::string& type ) {
+std::shared_ptr<EngineServiceContext> EngineImpl::getService( const std::string& type ) {
     auto it = m_registeredServiceMap.find( type );
-    return it != m_registeredServiceMap.end() ? it->second : nullptr;
+    return it != m_registeredServiceMap.end() ? std::make_shared<EngineServiceContext>( it->second ) : nullptr;
 }
 
 std::shared_ptr<EngineService> EngineImpl::getServiceFromPropertyKey( const std::string& key )
@@ -397,20 +400,25 @@ bool EngineImpl::setProperty( const std::string& key, const std::string& value )
     {
         auto service = getServiceFromPropertyKey( key );
         
+        // if the property starts with a service id then delegate the setProperty() call to
+        // the specified service implementation
         if( service != nullptr ) {
             return service->setProperty( key, value );
         }
         
         // check core properties
-        if( key.compare( aace::core::property::VERSION ) == 0 ) {
+        else if( key.compare( aace::core::property::VERSION ) == 0 ) {
             Throw( "readOnlyProperty" );
         }
-    
+        
         // iterate through registered engine modules and call setProperty() for each module
-        for( auto next : m_orderedServiceList ) {
-            ReturnIf( next->setProperty( key, value ), true );
+        else
+        {
+            for( auto next : m_orderedServiceList ) {
+                ReturnIf( next->setProperty( key, value ), true );
+            }
         }
-
+        
         return false;
     }
     catch( std::exception& ex ) {
@@ -425,24 +433,29 @@ std::string EngineImpl::getProperty( const std::string& key )
     {
         auto service = getServiceFromPropertyKey( key );
         
+        // if the property starts with a service id then delegate the getProperty() call to
+        // the specified service implementation
         if( service != nullptr ) {
             return service->getProperty( key );
         }
     
-        // iterate through registered engine modules and call getProperty() for each module
-        std::string result;
-
-        for( auto next : m_orderedServiceList ) {
-            result = next->getProperty( key );
-            ReturnIfNot( result.empty(), result );
-        }
-
         // core properties
-        if( key.compare( aace::core::property::VERSION ) == 0 ) {
+        else if( key.compare( aace::core::property::VERSION ) == 0 ) {
             return aace::engine::core::version::getEngineVersion().toString();
         }
+        
+        // iterate through registered engine modules and call getProperty() for each module
+        else
+        {
+            std::string result;
 
-        return result;
+            for( auto next : m_orderedServiceList ) {
+                result = next->getProperty( key );
+                ReturnIfNot( result.empty(), result );
+            }
+
+            return result;
+        }
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"getProperty").d("reason", ex.what()));

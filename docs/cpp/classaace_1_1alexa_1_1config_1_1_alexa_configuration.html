@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">1.1.0</span>
+   &#160;<span id="projectnumber">1.3.0</span>
    </div>
   </td>
  </tr>
@@ -65,6 +65,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="classaace_1_1alexa_1_1config_1_1_alexa_configuration-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -72,6 +73,20 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:abf68ff89209ddbd51fbd9fa7abe21b41"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#abf68ff89209ddbd51fbd9fa7abe21b41">TemplateRuntimeTimeoutType</a> { <br />
+&#160;&#160;<a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#abf68ff89209ddbd51fbd9fa7abe21b41ad084961d221fc1d7a551f5d52a5b4029">TemplateRuntimeTimeoutType::DISPLAY_CARD_TTS_FINISHED_TIMEOUT</a>, 
+<br />
+&#160;&#160;<a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#abf68ff89209ddbd51fbd9fa7abe21b41a75f689a91ec0aafe83528281324ecf25">TemplateRuntimeTimeoutType::DISPLAY_CARD_AUDIO_PLAYBACK_FINISHED_TIMEOUT</a>, 
+<br />
+&#160;&#160;<a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#abf68ff89209ddbd51fbd9fa7abe21b41a519cca93dd1076dbeb68337fd2bc33e7">TemplateRuntimeTimeoutType::DISPLAY_CARD_AUDIO_PLAYBACK_STOPPED_PAUSED_TIMEOUT</a>
+<br />
+ }</td></tr>
+<tr class="separator:abf68ff89209ddbd51fbd9fa7abe21b41"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a27fcf72e4bbe6b90e7d86f14c09c577c"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a27fcf72e4bbe6b90e7d86f14c09c577c">TemplateRuntimeTimeout</a> = std::pair&lt; <a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#abf68ff89209ddbd51fbd9fa7abe21b41">TemplateRuntimeTimeoutType</a>, std::chrono::milliseconds &gt;</td></tr>
+<tr class="separator:a27fcf72e4bbe6b90e7d86f14c09c577c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a6d122fd791d0e9a5bb54b940c84ffd98"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; <a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a6d122fd791d0e9a5bb54b940c84ffd98">createDeviceInfoConfig</a> (const std::string &amp;deviceSerialNumber, const std::string &amp;clientId, const std::string &amp;productId)</td></tr>
@@ -92,10 +107,62 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:a1a918b6c9d057360a64ace0ba68df93a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aacb872514a75a1fdc3d54d17b64a2ec6"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; <a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#aacb872514a75a1fdc3d54d17b64a2ec6">createSpeechRecognizerConfig</a> (const std::string &amp;encoderName)</td></tr>
 <tr class="separator:aacb872514a75a1fdc3d54d17b64a2ec6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9988d9ebfde9e2c74a7f814de7ab8189"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; <a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a9988d9ebfde9e2c74a7f814de7ab8189">createTemplateRuntimeTimeoutConfig</a> (std::initializer_list&lt; <a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a27fcf72e4bbe6b90e7d86f14c09c577c">TemplateRuntimeTimeout</a> &gt; timeoutList)</td></tr>
+<tr class="separator:a9988d9ebfde9e2c74a7f814de7ab8189"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4753ff7cfd440ba505e0508c2c77c07a"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; <a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a4753ff7cfd440ba505e0508c2c77c07a">createExternalMediaPlayerConfig</a> (const std::string &amp;agent)</td></tr>
+<tr class="separator:a4753ff7cfd440ba505e0508c2c77c07a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A factory interface for creating Alexa configuration objects </p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a id="a27fcf72e4bbe6b90e7d86f14c09c577c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a27fcf72e4bbe6b90e7d86f14c09c577c">&#9670;&nbsp;</a></span>TemplateRuntimeTimeout</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a27fcf72e4bbe6b90e7d86f14c09c577c">aace::alexa::config::AlexaConfiguration::TemplateRuntimeTimeout</a> =  std::pair&lt;<a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#abf68ff89209ddbd51fbd9fa7abe21b41">TemplateRuntimeTimeoutType</a>, std::chrono::milliseconds&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Identifies a Template Runtime configuration with a type and value pair </p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Enumeration Documentation</h2>
+<a id="abf68ff89209ddbd51fbd9fa7abe21b41"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abf68ff89209ddbd51fbd9fa7abe21b41">&#9670;&nbsp;</a></span>TemplateRuntimeTimeoutType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#abf68ff89209ddbd51fbd9fa7abe21b41">aace::alexa::config::AlexaConfiguration::TemplateRuntimeTimeoutType</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>enum specifying the configurable <a class="el" href="classaace_1_1alexa_1_1_template_runtime.html">TemplateRuntime</a> timeout. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="abf68ff89209ddbd51fbd9fa7abe21b41ad084961d221fc1d7a551f5d52a5b4029"></a>DISPLAY_CARD_TTS_FINISHED_TIMEOUT&#160;</td><td class="fielddoc"><p>Display Card timeout in ms when Alexa completes TTS </p>
+</td></tr>
+<tr><td class="fieldname"><a id="abf68ff89209ddbd51fbd9fa7abe21b41a75f689a91ec0aafe83528281324ecf25"></a>DISPLAY_CARD_AUDIO_PLAYBACK_FINISHED_TIMEOUT&#160;</td><td class="fielddoc"><p>Display Card timeout in ms when AudioPlayback Completes. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="abf68ff89209ddbd51fbd9fa7abe21b41a519cca93dd1076dbeb68337fd2bc33e7"></a>DISPLAY_CARD_AUDIO_PLAYBACK_STOPPED_PAUSED_TIMEOUT&#160;</td><td class="fielddoc"><p>Display Card timeout in ms when AudioPlayback Stopped or Paused. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a id="a6d122fd791d0e9a5bb54b940c84ffd98"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6d122fd791d0e9a5bb54b940c84ffd98">&#9670;&nbsp;</a></span>createDeviceInfoConfig()</h2>
 
@@ -438,12 +505,82 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a9988d9ebfde9e2c74a7f814de7ab8189"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9988d9ebfde9e2c74a7f814de7ab8189">&#9670;&nbsp;</a></span>createTemplateRuntimeTimeoutConfig()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static std::shared_ptr&lt;<a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a>&gt; aace::alexa::config::AlexaConfiguration::createTemplateRuntimeTimeoutConfig </td>
+          <td>(</td>
+          <td class="paramtype">std::initializer_list&lt; <a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a27fcf72e4bbe6b90e7d86f14c09c577c">TemplateRuntimeTimeout</a> &gt;&#160;</td>
+          <td class="paramname"><em>timeoutList</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Factory method used to programmatically generate template runtime configuration data. This is an optional configuration. Following are the accepted keys and their description.</p><ul>
+<li>displayCardTTSFinishedTimeout If present, specifies the values in milli seconds to control the timeout of display card at the end of Alexa TTS.</li>
+<li>displayCardAudioPlaybackFinishedTimeout If present, specifies the values in milli seconds to control the timeout of display card at the FINISHED state of AudioPlayback.</li>
+<li>displayCardAudioPlaybackStoppedPausedTimeout If present, specifies the values in milli seconds to control the timeout of display card at STOP or PAUSE state of AudioPlayback. The data generated by this method is equivalent to providing the following JSON values in a configuration:</li>
+</ul>
+<div class="fragment"><div class="line">{</div><div class="line">  &quot;templateRuntimeCapabilityAgent&quot;: {</div><div class="line">     &quot;displayCardTTSFinishedTimeout&quot;: &lt;TIMEOUT_IN_MS&gt;,</div><div class="line">     &quot;displayCardAudioPlaybackFinishedTimeout&quot;: &lt;TIMEOUT_IN_MS&gt;,</div><div class="line">     &quot;displayCardAudioPlaybackStoppedPausedTimeout&quot;: &lt;TIMEOUT_IN_MS&gt;</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">timeoutList</td><td>A list of <code>TemplateRuntimeTimeout</code> type and value pairs </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a4753ff7cfd440ba505e0508c2c77c07a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4753ff7cfd440ba505e0508c2c77c07a">&#9670;&nbsp;</a></span>createExternalMediaPlayerConfig()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static std::shared_ptr&lt;<a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a>&gt; aace::alexa::config::AlexaConfiguration::createExternalMediaPlayerConfig </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>agent</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Factory method used to programmatically generate external media player configuration data. The data generated by this method is equivalent to providing the following JSON values in a configuration file:</p>
+<div class="fragment"><div class="line">{</div><div class="line">  &quot;aace.alexa&quot;: {</div><div class="line">     &quot;externalMediaPlayer&quot;: {</div><div class="line">         &quot;agent&quot;: &quot;&lt;agent&gt;&quot;</div><div class="line">     }</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">agent</td><td>The external media player agent </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <html>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 1.1.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 1.3.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

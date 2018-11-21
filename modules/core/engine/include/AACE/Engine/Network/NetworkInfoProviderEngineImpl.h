@@ -20,22 +20,28 @@
 #include <mutex>
 #include <memory>
 
+#include "AACE/Engine/Network/NetworkObservableInterface.h"
 #include "AACE/Network/NetworkEngineInterfaces.h"
+
 #include "NetworkInfoObserver.h"
 
 namespace aace {
 namespace engine {
 namespace network {
 
-class NetworkInfoProviderEngineImpl : public aace::network::NetworkInfoProviderEngineInterface {
+class NetworkInfoProviderEngineImpl :
+    public aace::network::NetworkInfoProviderEngineInterface,
+    public NetworkObservableInterface {
+
 private:
     NetworkInfoProviderEngineImpl() = default;
 
 public:
     static std::shared_ptr<NetworkInfoProviderEngineImpl> create();
 
-    void addObserver( std::shared_ptr<NetworkInfoObserver> observer );
-    void removeObserver( std::shared_ptr<NetworkInfoObserver> observer );
+    // aace::engine::network::NetworkObservableInterface
+    void addObserver( std::shared_ptr<NetworkInfoObserver> observer ) override;
+    void removeObserver( std::shared_ptr<NetworkInfoObserver> observer ) override;
 
     // NetworkInfoProviderEngineInterface
     virtual void networkInfoChanged( NetworkStatus status, int wifiSignalStrength ) override;

@@ -256,6 +256,72 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
     return aace::core::config::StreamConfiguration::create( std::make_shared<std::stringstream>( buffer.GetString() ) );
 }
 
+// TemplateRuntimeTimeoutType alias
+using TemplateRuntimeTimeoutType = aace::alexa::config::AlexaConfiguration::TemplateRuntimeTimeoutType;
+
+std::string getTemplateRuntimeTimeoutAttribute(TemplateRuntimeTimeoutType timeout)
+{
+    switch( timeout )
+    {
+    case TemplateRuntimeTimeoutType::DISPLAY_CARD_TTS_FINISHED_TIMEOUT:
+        return "displayCardTTSFinishedTimeout";
+    case TemplateRuntimeTimeoutType::DISPLAY_CARD_AUDIO_PLAYBACK_FINISHED_TIMEOUT:
+        return "displayCardAudioPlaybackFinishedTimeout";
+    case TemplateRuntimeTimeoutType::DISPLAY_CARD_AUDIO_PLAYBACK_STOPPED_PAUSED_TIMEOUT:
+        return "displayCardAudioPlaybackStoppedPausedTimeout";
+    }
+    return "";
+}
+
+std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createTemplateRuntimeTimeoutConfig( std::initializer_list<TemplateRuntimeTimeout> timeoutList )
+{
+    rapidjson::Document document;
+
+    document.SetObject();
+
+    rapidjson::Value templateRuntimeCapabilityAgentElement;
+
+    templateRuntimeCapabilityAgentElement.SetObject();
+
+    for( auto next : timeoutList ) {
+        std::string name = getTemplateRuntimeTimeoutAttribute(next.first);
+        templateRuntimeCapabilityAgentElement.AddMember(rapidjson::Value().SetString(name.c_str(), name.length(), document.GetAllocator()), rapidjson::Value().SetInt(next.second.count()), document.GetAllocator());
+    }
+
+    document.AddMember("templateRuntimeCapabilityAgent", templateRuntimeCapabilityAgentElement, document.GetAllocator());
+
+    // create event string
+    rapidjson::StringBuffer buffer;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+
+    document.Accept(writer);
+
+    return aace::core::config::StreamConfiguration::create(std::make_shared<std::stringstream>(buffer.GetString()));
+}
+
+std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createExternalMediaPlayerConfig( const std::string& agent )
+{
+    rapidjson::Document document;
+
+    document.SetObject();
+
+    rapidjson::Value aaceAlexaElement( rapidjson::kObjectType );
+    rapidjson::Value externalMediaPlayerElement( rapidjson::kObjectType );
+
+    externalMediaPlayerElement.AddMember( "agent", rapidjson::Value().SetString( agent.c_str(), agent.length() ), document.GetAllocator() );
+    aaceAlexaElement.AddMember( "externalMediaPlayer", externalMediaPlayerElement, document.GetAllocator() );
+    
+    document.AddMember( "aace.alexa", aaceAlexaElement, document.GetAllocator() );
+
+    // create event string
+    rapidjson::StringBuffer buffer;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer( buffer );
+
+    document.Accept( writer );
+
+    return aace::core::config::StreamConfiguration::create( std::make_shared<std::stringstream>( buffer.GetString() ) );
+}
+
 } // aace::alexa::config
 } // aace::alexa
 } // aace

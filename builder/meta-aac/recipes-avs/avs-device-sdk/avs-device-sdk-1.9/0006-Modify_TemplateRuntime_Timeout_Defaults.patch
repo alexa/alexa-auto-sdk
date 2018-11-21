@@ -1,0 +1,33 @@
+From f955dc6e37dd85df82bf40a02f866308b34e05e0 Mon Sep 17 00:00:00 2001
+From: Raghavendra Bilamkar <bilamkar@amazon.com>
+Date: Wed, 3 Oct 2018 10:40:18 -0700
+
+Modify TemplateRuntime defaults.
+
+---
+ CapabilityAgents/TemplateRuntime/src/TemplateRuntime.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/CapabilityAgents/TemplateRuntime/src/TemplateRuntime.cpp b/CapabilityAgents/TemplateRuntime/src/TemplateRuntime.cpp
+index 19443195..fe099c4d 100644
+--- a/CapabilityAgents/TemplateRuntime/src/TemplateRuntime.cpp
++++ b/CapabilityAgents/TemplateRuntime/src/TemplateRuntime.cpp
+@@ -86,13 +86,13 @@ static const std::string AUDIO_ITEM_ID_TAG{"audioItemId"};
+ static const size_t MAXIMUM_QUEUE_SIZE{100};
+ 
+ /// Default timeout for clearing the RenderTemplate display card when SpeechSynthesizer is in FINISHED state.
+-static const std::chrono::milliseconds DEFAULT_TTS_FINISHED_TIMEOUT_MS{2000};
++static const std::chrono::milliseconds DEFAULT_TTS_FINISHED_TIMEOUT_MS{8000};
+ 
+ /// Default timeout for clearing the RenderPlayerInfo display card when AudioPlayer is in FINISHED state.
+ static const std::chrono::milliseconds DEFAULT_AUDIO_FINISHED_TIMEOUT_MS{2000};
+ 
+ /// Default timeout for clearing the RenderPlayerInfo display card when AudioPlayer is in STOPPED/PAUSED state.
+-static const std::chrono::milliseconds DEFAULT_AUDIO_STOPPED_PAUSED_TIMEOUT_MS{60000};
++static const std::chrono::milliseconds DEFAULT_AUDIO_STOPPED_PAUSED_TIMEOUT_MS{1800000};
+ 
+ /**
+  * Creates the TemplateRuntime capability configuration.
+-- 
+2.14.3 (Apple Git-98)
+

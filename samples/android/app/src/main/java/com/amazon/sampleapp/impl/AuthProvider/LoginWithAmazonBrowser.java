@@ -50,6 +50,11 @@ class LoginWithAmazonBrowser extends Observable {
     private static final String sAlexaAllScope = "alexa:all";
     private static final String sProfileScope = "profile";
 
+    // To fetch User Profile data, set the sUserProfileEnabled to true
+    // You will need additional parameters in your Security Profile for the profile scope request to succeed,
+    // please see the README CBL section for more.
+    private static final boolean sUserProfileEnabled = false;
+
     // Refresh access token 2 minutes before it expires
     private static final int sRefreshAccessTokenTime = 120000;
     // Access token expires after one hour
@@ -111,7 +116,9 @@ class LoginWithAmazonBrowser extends Observable {
                         notifyObservers( "logged in" );
 
                         // show user profile info
-                        logUserProfile( result.getUser() );
+                        if ( sUserProfileEnabled ) {
+                            logUserProfile(result.getUser());
+                        }
 
                         startRefreshTimer();
 
@@ -156,14 +163,23 @@ class LoginWithAmazonBrowser extends Observable {
                 editor.putString( mActivity.getString( R.string.preference_login_method ), LoginWithAmazon.LWA_LOGIN_METHOD_KEY );
                 editor.apply();
 
-                AuthorizationManager.authorize( new AuthorizeRequest
-                        .Builder( mRequestContext )
-                        .addScopes( ScopeFactory.scopeNamed( sAlexaAllScope, scopeData ), ScopeFactory.scopeNamed( sProfileScope ) )
-                        .forGrantType( AuthorizeRequest.GrantType.ACCESS_TOKEN )
-                        .shouldReturnUserData( true )
-                        .build()
-                );
-
+                if ( sUserProfileEnabled ) {
+                    AuthorizationManager.authorize( new AuthorizeRequest
+                            .Builder( mRequestContext )
+                            .addScopes( ScopeFactory.scopeNamed( sAlexaAllScope, scopeData ), ScopeFactory.scopeNamed( sProfileScope ) )
+                            .forGrantType( AuthorizeRequest.GrantType.ACCESS_TOKEN )
+                            .shouldReturnUserData( true )
+                            .build()
+                    );
+                } else {
+                    AuthorizationManager.authorize(new AuthorizeRequest
+                            .Builder( mRequestContext )
+                            .addScope( ScopeFactory.scopeNamed( sAlexaAllScope, scopeData ) )
+                            .forGrantType( AuthorizeRequest.GrantType.ACCESS_TOKEN )
+                            .shouldReturnUserData( false )
+                            .build()
+                    );
+                }
             } catch ( Exception e ) { mLogger.postError( sTag, e.getMessage() ); }
 
         } else mLogger.postWarn( sTag, "Cannot authenticate. assets/api_key.txt does not exist" );
@@ -199,8 +215,13 @@ class LoginWithAmazonBrowser extends Observable {
     void onInitialize() {
         if ( mHasApiKey ) {
             try {
-                AuthorizationManager.getToken( mActivity, new Scope[]{ ScopeFactory.scopeNamed( sAlexaAllScope ),
-                        ScopeFactory.scopeNamed( sProfileScope ) }, new TokenListener() );
+                if ( sUserProfileEnabled ) {
+                    AuthorizationManager.getToken(mActivity, new Scope[]{ScopeFactory.scopeNamed(sAlexaAllScope),
+                            ScopeFactory.scopeNamed(sProfileScope)}, new TokenListener());
+                } else {
+                    AuthorizationManager.getToken(mActivity, new Scope[]{ScopeFactory.scopeNamed(sAlexaAllScope)},
+                            new TokenListener());
+                }
             } catch ( Exception e ) { mLogger.postError( sTag, e.getMessage() ); }
         }
     }
@@ -239,8 +260,13 @@ class LoginWithAmazonBrowser extends Observable {
         mTimer.schedule( mRefreshTimerTask = new TimerTask() {
             public void run() {
                 if ( mHasApiKey ) {
-                    AuthorizationManager.getToken( mActivity, new Scope[]{ ScopeFactory.scopeNamed( sAlexaAllScope ),
-                            ScopeFactory.scopeNamed( sProfileScope ) }, new TokenListener() );
+                    if ( sUserProfileEnabled ) {
+                        AuthorizationManager.getToken(mActivity, new Scope[]{ScopeFactory.scopeNamed(sAlexaAllScope),
+                                ScopeFactory.scopeNamed(sProfileScope)}, new TokenListener());
+                    } else {
+                        AuthorizationManager.getToken(mActivity, new Scope[]{ScopeFactory.scopeNamed(sAlexaAllScope)},
+                                new TokenListener());
+                    }
                 }
             }
         }, sAccessTokenExpirationTime - sRefreshAccessTokenTime );

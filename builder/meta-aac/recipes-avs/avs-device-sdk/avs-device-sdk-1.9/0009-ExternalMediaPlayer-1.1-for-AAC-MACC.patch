@@ -1,0 +1,1822 @@
+From cea1bb3f82c9148a21d415cae501ea00c691d81d Mon Sep 17 00:00:00 2001
+From: Mark Wharton <mark@jynx.com>
+Date: Tue, 13 Nov 2018 16:21:48 -0800
+Subject: [PATCH] ExternalMediaPlayer 1.1 for AAC/MACC
+
+---
+ .../AVS/ExternalMediaPlayer/AdapterUtils.h    |  25 +-
+ .../ExternalMediaAdapterConstants.h           |   6 +
+ .../src/ExternalMediaPlayer/AdapterUtils.cpp  |  15 +-
+ .../ExternalMediaAdapterHandlerInterface.h    | 125 ++++
+ .../ExternalMediaAdapterInterface.h           |  36 +
+ .../ExternalMediaPlayerInterface.h            |  24 +-
+ CMakeLists.txt                                |   4 +
+ .../ExternalMediaPlayer/ExternalMediaPlayer.h | 109 +++
+ .../src/ExternalMediaPlayer.cpp               | 638 +++++++++++++++++-
+ .../test/ExternalMediaPlayerTest.cpp          | 218 +++++-
+ 10 files changed, 1161 insertions(+), 39 deletions(-)
+ create mode 100644 AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaAdapterHandlerInterface.h
+
+diff --git a/AVSCommon/AVS/include/AVSCommon/AVS/ExternalMediaPlayer/AdapterUtils.h b/AVSCommon/AVS/include/AVSCommon/AVS/ExternalMediaPlayer/AdapterUtils.h
+index cd5672e..8b7c62c 100644
+--- a/AVSCommon/AVS/include/AVSCommon/AVS/ExternalMediaPlayer/AdapterUtils.h
++++ b/AVSCommon/AVS/include/AVSCommon/AVS/ExternalMediaPlayer/AdapterUtils.h
+@@ -33,7 +33,7 @@ namespace externalMediaPlayer {
+ /// Enumeration class for events sent by adapters to AVS.
+ enum class AdapterEvent {
+     /// ChangeReport event sent after adapter's initialization succeeds/fails.
+-    CHANGE_REPORT,
++    CHANGE_REPORT, // Note: not in ExternalMediaPlayer 1.1
+ 
+     /// Event to request token from third party.
+     REQUEST_TOKEN,
+@@ -48,7 +48,19 @@ enum class AdapterEvent {
+     PLAYER_EVENT,
+ 
+     /// PlayerErrorEvent to report all errors from the adapters.
+-    PLAYER_ERROR_EVENT
++    PLAYER_ERROR_EVENT, // Note: rename PLAYER_ERROR in ExternalMediaPlayer 1.1
++
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    /// PlayerError event to report all errors from the adapters.
++    PLAYER_ERROR,
++
++    /// ReportDiscoveredPlayers event notifies the cloud of discovered players to be authorized.
++    REPORT_DISCOVERED_PLAYERS,
++
++    /// AuthorizationComplete event notifies the cloud of players which were authorized (and de-authorized).
++    AUTHORIZATION_COMPLETE
++
++#endif
+ };
+ 
+ /// Table with the retry times on subsequent retries for session management (token fetch/changeReport send).
+@@ -58,12 +70,17 @@ extern const std::vector<int> SESSION_RETRY_TABLE;
+ extern avsCommon::utils::RetryTimer SESSION_RETRY_TIMER;
+ 
+ // The NamespaceAndName for events sent from the adapter to AVS.
+-extern const avsCommon::avs::NamespaceAndName CHANGE_REPORT;
++extern const avsCommon::avs::NamespaceAndName CHANGE_REPORT; // Note: not in ExternalMediaPlayer 1.1
+ extern const avsCommon::avs::NamespaceAndName REQUEST_TOKEN;
+ extern const avsCommon::avs::NamespaceAndName LOGIN;
+ extern const avsCommon::avs::NamespaceAndName LOGOUT;
+ extern const avsCommon::avs::NamespaceAndName PLAYER_EVENT;
+-extern const avsCommon::avs::NamespaceAndName PLAYER_ERROR_EVENT;
++extern const avsCommon::avs::NamespaceAndName PLAYER_ERROR_EVENT; // Note: rename PLAYER_ERROR in ExternalMediaPlayer 1.1
++#ifdef EXTERNALMEDIAPLAYER_1_1
++extern const avsCommon::avs::NamespaceAndName PLAYER_ERROR; // Note: rename PLAYER_ERROR in ExternalMediaPlayer 1.1
++extern const avsCommon::avs::NamespaceAndName REPORT_DISCOVERED_PLAYERS;
++extern const avsCommon::avs::NamespaceAndName AUTHORIZATION_COMPLETE;
++#endif
+ 
+ /**
+  * Method to iterate over a vector of supported operation in playback state and convert to JSON.
+diff --git a/AVSCommon/AVS/include/AVSCommon/AVS/ExternalMediaPlayer/ExternalMediaAdapterConstants.h b/AVSCommon/AVS/include/AVSCommon/AVS/ExternalMediaPlayer/ExternalMediaAdapterConstants.h
+index e5a4ee0..e84e737 100644
+--- a/AVSCommon/AVS/include/AVSCommon/AVS/ExternalMediaPlayer/ExternalMediaAdapterConstants.h
++++ b/AVSCommon/AVS/include/AVSCommon/AVS/ExternalMediaPlayer/ExternalMediaAdapterConstants.h
+@@ -31,6 +31,12 @@ const char USERNAME[] = "username";
+ const char IS_GUEST[] = "isGuest";
+ const char LAUNCHED[] = "launched";
+ const char ACTIVE[] = "active";
++#ifdef EXTERNALMEDIAPLAYER_1_1
++const char SPI_VERSION[] = "spiVersion";
++const char PLAYER_COOKIE[] = "playerCookie";
++const char SKILL_TOKEN[] = "skillToken";
++const char PLAYBACK_SESSION_ID[] = "playbackSessionId";
++#endif
+ 
+ // The key values used in the context payload from External Media Player to AVS.
+ const char STATE[] = "state";
+diff --git a/AVSCommon/AVS/src/ExternalMediaPlayer/AdapterUtils.cpp b/AVSCommon/AVS/src/ExternalMediaPlayer/AdapterUtils.cpp
+index 169dda8..8eca67a 100644
+--- a/AVSCommon/AVS/src/ExternalMediaPlayer/AdapterUtils.cpp
++++ b/AVSCommon/AVS/src/ExternalMediaPlayer/AdapterUtils.cpp
+@@ -45,12 +45,17 @@ const std::vector<int> SESSION_RETRY_TABLE = {
+ 
+ avsCommon::utils::RetryTimer SESSION_RETRY_TIMER(SESSION_RETRY_TABLE);
+ 
+-const NamespaceAndName CHANGE_REPORT("Alexa", "ChangeReport");
++const NamespaceAndName CHANGE_REPORT("Alexa", "ChangeReport"); // Note: not in ExternalMediaPlayer 1.1
+ const NamespaceAndName REQUEST_TOKEN("ExternalMediaPlayer", "RequestToken");
+ const NamespaceAndName LOGIN("ExternalMediaPlayer", "Login");
+ const NamespaceAndName LOGOUT("ExternalMediaPlayer", "Logout");
+ const NamespaceAndName PLAYER_EVENT("ExternalMediaPlayer", "PlayerEvent");
+-const NamespaceAndName PLAYER_ERROR_EVENT("ExternalMediaPlayer", "PlayerError");
++const NamespaceAndName PLAYER_ERROR_EVENT("ExternalMediaPlayer", "PlayerError"); // Note: rename PLAYER_ERROR in ExternalMediaPlayer 1.1
++#ifdef EXTERNALMEDIAPLAYER_1_1
++const NamespaceAndName PLAYER_ERROR("ExternalMediaPlayer", "PlayerError"); // Note: rename PLAYER_ERROR in ExternalMediaPlayer 1.1
++const NamespaceAndName REPORT_DISCOVERED_PLAYERS("ExternalMediaPlayer", "ReportDiscoveredPlayers");
++const NamespaceAndName AUTHORIZATION_COMPLETE("ExternalMediaPlayer", "AuthorizationComplete");
++#endif
+ 
+ /// The default state of a player.
+ const char DEFAULT_STATE[] = "IDLE";
+@@ -128,6 +133,12 @@ rapidjson::Value buildSessionState(
+     playerJson.AddMember(IS_GUEST, sessionState.isGuest, allocator);
+     playerJson.AddMember(LAUNCHED, sessionState.launched, allocator);
+     playerJson.AddMember(ACTIVE, sessionState.active, allocator);
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    playerJson.AddMember(SPI_VERSION, sessionState.spiVersion, allocator);
++    playerJson.AddMember(PLAYER_COOKIE, sessionState.playerCookie, allocator);
++    playerJson.AddMember(SKILL_TOKEN, sessionState.skillToken, allocator);
++    playerJson.AddMember(PLAYBACK_SESSION_ID, sessionState.playbackSessionId, allocator);
++#endif
+ 
+     return playerJson;
+ }
+diff --git a/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaAdapterHandlerInterface.h b/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaAdapterHandlerInterface.h
+new file mode 100644
+index 0000000..d48fc1e
+--- /dev/null
++++ b/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaAdapterHandlerInterface.h
+@@ -0,0 +1,125 @@
++/*
++ * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License").
++ * You may not use this file except in compliance with the License.
++ * A copy of the License is located at
++ *
++ *     http://aws.amazon.com/apache2.0/
++ *
++ * or in the "license" file accompanying this file. This file is distributed
++ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied. See the License for the specific language governing
++ * permissions and limitations under the License.
++ */
++
++#ifndef ALEXA_CLIENT_SDK_AVSCOMMON_SDKINTERFACES_INCLUDE_AVSCOMMON_SDKINTERFACES_EXTERNALMEDIAADAPTERHANDLERINTERFACE_H_
++#define ALEXA_CLIENT_SDK_AVSCOMMON_SDKINTERFACES_INCLUDE_AVSCOMMON_SDKINTERFACES_EXTERNALMEDIAADAPTERHANDLERINTERFACE_H_
++
++#include <chrono>
++#include <string>
++
++#include "AVSCommon/SDKInterfaces/ExternalMediaAdapterInterface.h"
++
++namespace alexaClientSDK {
++namespace avsCommon {
++namespace sdkInterfaces {
++
++/**
++ * The ExternalMediaAdapterHandlerInterface class provides generic ExternalMediaPlayer 1.1 Interface support
++ * for extending functionality to custom handlers for managing multi player adapters as required by MACC.
++ * Note: This interface may eventually be replaced with integrated support for multi player adapters.
++ */
++class ExternalMediaAdapterHandlerInterface {
++public:
++    /**
++     * Destructor
++     */
++    virtual ~ExternalMediaAdapterHandlerInterface() = default;
++
++    /**
++     * Method to handle the ExternalMediaPlayer AuthorizeDiscoveredPlayers directive.
++     *
++     * @param payload The AuthorizeDiscoveredPlayers directive payload.
++     *
++     * @note With multiple adapter handlers, playerId can belong to another adapter handler.
++     */
++    virtual void authorizeDiscoveredPlayers(const std::string& payload) = 0;
++
++    /**
++     * Method to handle the ExternalMediaPlayer Login directive.
++     *
++     * @param payload The Login directive payload.
++     *
++     * @note With multiple adapter handlers, playerId can belong to another adapter handler.
++     */
++    virtual void login(const std::string& payload) = 0;
++
++    /**
++     * Method to handle the ExternalMediaPlayer Logout directive.
++     *
++     * @param payload The Logout directive payload.
++     *
++     * @note With multiple adapter handlers, playerId can belong to another adapter handler.
++     */
++    virtual void logout(const std::string& payload) = 0;
++
++    /**
++     * Method to handle the ExternalMediaPlayer Play directive.
++     *
++     * @param payload The Play directive payload.
++     *
++     * @note With multiple adapter handlers, playerId can belong to another adapter handler.
++     */
++    virtual void play(const std::string& payload) = 0;
++
++    /**
++     * Method to handle the Alexa.PlaybackController Play/Pause/Next/Previous/StartOver/Rewind/FastForward directives.
++     *
++     * @param payload The Play/Pause/Next/Previous/StartOver/Rewind/FastForward directive payload.
++     * @param requestType The external media player request type.
++     *
++     * @note With multiple adapter handlers, playerId can belong to another adapter handler.
++     */
++    virtual void playControl(const std::string& payload, alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::RequestType requestType) = 0;
++
++    /**
++     * Method to handle the Alexa.PlaybackController Play/Pause/Next/Previous/StartOver/Rewind/FastForward directives for a designated player (i.e. the player in focus).
++     *
++     * @param payload The Play/Pause/Next/Previous/StartOver/Rewind/FastForward directive payload.
++     * @param requestType The external media player request type.
++     *
++     * @note Handles PlaybackHandlerInterface onTogglePressed() and onButtonPressed() notifications for the player in focus.
++     * @note With multiple adapter handlers, playerId can belong to another adapter handler.
++     */
++    virtual void playControlForPlayer(const std::string& playerId, alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::RequestType requestType) = 0;
++
++    /**
++     * Method to handle the Alexa.SeekController SetSeekPosition directive.
++     *
++     * @param payload The SetSeekPosition directive payload.
++     *
++     * @note With multiple adapter handlers, playerId can belong to another adapter handler.
++     */
++    virtual void seek(const std::string& payload) = 0;
++
++    /**
++     * Method to handle the Alexa.SeekController AdjustSeekPosition directive.
++     *
++     * @param payload The AdjustSeekPosition directive payload.
++     *
++     * @note With multiple adapter handlers, playerId can belong to another adapter handler.
++     */
++    virtual void adjustSeek(const std::string& payload) = 0;
++
++    /**
++     * Method to get adapter state for each of the handled players.
++     */
++    virtual std::vector<avsCommon::sdkInterfaces::externalMediaPlayer::AdapterState> getAdapterStates() = 0;
++};
++
++}  // namespace sdkInterfaces
++}  // namespace avsCommon
++}  // namespace alexaClientSDK
++
++#endif  // ALEXA_CLIENT_SDK_AVSCOMMON_SDKINTERFACES_INCLUDE_AVSCOMMON_SDKINTERFACES_EXTERNALMEDIAADAPTERHANDLERINTERFACE_H_
+diff --git a/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaAdapterInterface.h b/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaAdapterInterface.h
+index b3e279d..94db2bd 100644
+--- a/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaAdapterInterface.h
++++ b/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaAdapterInterface.h
+@@ -267,6 +267,21 @@ struct AdapterSessionState {
+      */
+     bool active;
+ 
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    /// The service provider interface (SPI) version.
++    std::string spiVersion;
++
++    /// The playerCookie to select version-specific content or actions.
++    std::string playerCookie;
++
++    /// An opaque token for the domain or skill that is presently associated with this player.
++    std::string skillToken;
++
++    /// A universally unique identifier (UUID) generated to the RFC 4122 specification.
++    std::string playbackSessionId;
++
++#endif
++
+     /**
+      * The accessToken used to login a user. The access token may also be used as a bearer token if the adapter
+      * makes an authenticated Web API to the music provider.
+@@ -425,6 +440,26 @@ public:
+      */
+     virtual void handleLogout() = 0;
+ 
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    /**
++     * Method to allow a user to initiate play from a third party music service provider based on a play context.
++     *
++     * @param playContextToken Play context {Track/playlist/album/artist/station/podcast} identifier.
++     * @param index The index of the media item in the container, if the container is indexable.
++     * @param offset The offset position within media item, in milliseconds.
++     * @param skillToken An opaque token for the domain or skill that is presently associated with this player.
++     * @param playbackSessionId A universally unique identifier (UUID) generated to the RFC 4122 specification.
++     * @param navigation Communicates desired visual display behavior for the app associated with playback.
++     * @param preload If true, this Play directive is intended to preload the identified content only but not begin playback.
++     */
++    virtual void handlePlay(std::string& playContextToken,
++                            int64_t index,
++                            std::chrono::milliseconds offset,
++                            std::string& skillToken,
++                            std::string& playbackSessionId,
++                            std::string& navigation, // DEFAULT, NONE, FOREGROUND
++                            bool preload) = 0;
++#else
+     /**
+      * Method to allow a user to initiate play from a third party music service provider based on a play context.
+      *
+@@ -433,6 +468,7 @@ public:
+      * @param offset The offset position within media item, in milliseconds.
+      */
+     virtual void handlePlay(std::string& playContextToken, int64_t index, std::chrono::milliseconds offset) = 0;
++#endif
+ 
+     /**
+      * Method to initiate the different types of play control like PLAY/PAUSE/RESUME/NEXT/...
+diff --git a/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaPlayerInterface.h b/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaPlayerInterface.h
+index 4b67622..fe9c174 100644
+--- a/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaPlayerInterface.h
++++ b/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaPlayerInterface.h
+@@ -16,6 +16,9 @@
+ #ifndef ALEXA_CLIENT_SDK_AVSCOMMON_SDKINTERFACES_INCLUDE_AVSCOMMON_SDKINTERFACES_EXTERNALMEDIAPLAYERINTERFACE_H_
+ #define ALEXA_CLIENT_SDK_AVSCOMMON_SDKINTERFACES_INCLUDE_AVSCOMMON_SDKINTERFACES_EXTERNALMEDIAPLAYERINTERFACE_H_
+ 
++#ifdef EXTERNALMEDIAPLAYER_1_1
++#include <AVSCommon/AVS/PlayerActivity.h>
++#endif
+ #include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
+ #include <AVSCommon/SDKInterfaces/FocusManagerInterface.h>
+ #include <AVSCommon/SDKInterfaces/MessageSenderInterface.h>
+@@ -30,7 +33,8 @@ namespace sdkInterfaces {
+ 
+ /**
+  * This class provides an interface to the @c ExternalMediaPlayer.
+- * Currently it provides an interface for adapters to set the player in focus when they acquire focus.
++ * Currently it provides an interface for adapters to set the current activity
++ * and set the player in focus when they acquire focus.
+  */
+ class ExternalMediaPlayerInterface {
+ public:
+@@ -39,6 +43,24 @@ public:
+      */
+     virtual ~ExternalMediaPlayerInterface() = default;
+ 
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    /**
++     * Method to set the current activity for the player in focus.
++     *
++     * @param currentActivity The current activity of the player.
++     */
++    virtual void setCurrentActivity(const avsCommon::avs::PlayerActivity currentActivity) = 0;
++
++    /**
++     * Method to set the player in focus after an adapter has acquired the channel.
++     *
++     * @param playerInFocus The business name of the adapter that has currently acquired focus.
++     * @param focusAcquire If @c true, acquire the channel and manage the focus state.
++     * If @c false release the channel when the player is the player in focus.
++     */
++    virtual void setPlayerInFocus(const std::string& playerInFocus, bool focusAcquire) = 0;
++#endif
++
+     /**
+      * Method to set the player in focus after an adapter has acquired the channel.
+      *
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 5b990ff..d22e481 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -6,6 +6,10 @@ set(PROJECT_BRIEF "A cross-platform, modular SDK for interacting with the Alexa
+ if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/CapabilityAgents/ExternalMediaPlayer/src/ExternalMediaPlayerAdapters")
+     set(HAS_EXTERNAL_MEDIA_PLAYER_ADAPTERS ON)
+ endif()
++option(EXTERNALMEDIAPLAYER_1_1 "Build ExternalMediaPlayer 1.1" ON)
++if(EXTERNALMEDIAPLAYER_1_1)
++    add_definitions(-DEXTERNALMEDIAPLAYER_1_1)
++endif()
+ 
+ include(build/BuildDefaults.cmake)
+ include(tools/Testing.cmake)
+diff --git a/CapabilityAgents/ExternalMediaPlayer/include/ExternalMediaPlayer/ExternalMediaPlayer.h b/CapabilityAgents/ExternalMediaPlayer/include/ExternalMediaPlayer/ExternalMediaPlayer.h
+index 61d7c52..6aad0e0 100644
+--- a/CapabilityAgents/ExternalMediaPlayer/include/ExternalMediaPlayer/ExternalMediaPlayer.h
++++ b/CapabilityAgents/ExternalMediaPlayer/include/ExternalMediaPlayer/ExternalMediaPlayer.h
+@@ -20,6 +20,12 @@
+ #include <memory>
+ #include <string>
+ 
++#ifdef EXTERNALMEDIAPLAYER_1_1
++#include <AVSCommon/AVS/CapabilityConfiguration.h>
++#include <AVSCommon/AVS/PlayerActivity.h>
++#include <AVSCommon/SDKInterfaces/CapabilityConfigurationInterface.h>
++#include <AVSCommon/SDKInterfaces/ExternalMediaAdapterHandlerInterface.h>
++#endif
+ #include <AVSCommon/AVS/CapabilityAgent.h>
+ #include <AVSCommon/AVS/DirectiveHandlerConfiguration.h>
+ #include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
+@@ -39,6 +45,23 @@ namespace alexaClientSDK {
+ namespace capabilityAgents {
+ namespace externalMediaPlayer {
+ 
++#ifdef EXTERNALMEDIAPLAYER_1_1
++/// Enum to identify the initiator type of a stop.
++enum class HaltInitiator {
++    /// The system is not halted.
++    NONE,
++
++    /// Voice initiated Pause request from AVS/Pause from Spotify Connect.
++    EXTERNAL_PAUSE,
++
++    /// Pause was initiated when focus changed from FOREGROUND to BACKGROUND.
++    FOCUS_CHANGE_PAUSE,
++
++    /// Stop initiated when focus changed from FOREGROUND/BACKGROUND to NONE.
++    FOCUS_CHANGE_STOP
++};
++#endif
++
+ /**
+  * This class implements the @c ExternalMediaPlayer capability agent. This agent is responsible for handling
+  * music service providers which manage their PLAY queue.
+@@ -48,6 +71,9 @@ namespace externalMediaPlayer {
+ class ExternalMediaPlayer
+         : public avsCommon::avs::CapabilityAgent
+         , public avsCommon::utils::RequiresShutdown
++#ifdef EXTERNALMEDIAPLAYER_1_1
++        , public avsCommon::sdkInterfaces::CapabilityConfigurationInterface
++#endif
+         , public avsCommon::sdkInterfaces::ExternalMediaPlayerInterface
+         , public avsCommon::sdkInterfaces::PlaybackHandlerInterface
+         , public std::enable_shared_from_this<ExternalMediaPlayer> {
+@@ -101,6 +127,23 @@ public:
+         std::shared_ptr<avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
+         std::shared_ptr<avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter);
+ 
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    std::unordered_set<std::shared_ptr<avsCommon::avs::CapabilityConfiguration>> getCapabilityConfigurations() override;
++
++    void addAdapterHandler(std::shared_ptr<avsCommon::sdkInterfaces::ExternalMediaAdapterHandlerInterface> adapterHandler);
++    void removeAdapterHandler(std::shared_ptr<avsCommon::sdkInterfaces::ExternalMediaAdapterHandlerInterface> adapterHandler);
++#endif
++
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    void executeOnFocusChanged(avsCommon::avs::FocusState newFocus);
++
++    void onFocusChanged(avsCommon::avs::FocusState newFocus) override;
++
++    void onContextAvailable(const std::string& jsonContext) override;
++
++    void onContextFailure(const avsCommon::sdkInterfaces::ContextRequestError error) override;
++#endif
++
+     /// @name StateProviderInterface Functions
+     /// @{
+     void provideState(const avsCommon::avs::NamespaceAndName& stateProviderName, unsigned int stateRequestToken)
+@@ -126,6 +169,12 @@ public:
+ 
+     /// @name Overridden ExternalMediaPlayerInterface methods.
+     /// @{
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    virtual void setCurrentActivity(const avsCommon::avs::PlayerActivity currentActivity) override;
++
++    virtual void setPlayerInFocus(const std::string& playerInFocus, bool focusAcquire) override;
++#endif
++
+     virtual void setPlayerInFocus(const std::string& playerInFocus) override;
+     /// @}
+ 
+@@ -148,12 +197,20 @@ private:
+     /**
+      * This method returns the ExternalMediaPlayer session state registered in the ExternalMediaPlayer namespace.
+      */
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    std::string provideSessionState(std::vector<avsCommon::sdkInterfaces::externalMediaPlayer::AdapterState> adapterStates);
++#else
+     std::string provideSessionState();
++#endif
+ 
+     /**
+      * This method returns the Playback state registered in the Alexa.PlaybackStateReporter state.
+      */
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    std::string providePlaybackState(std::vector<avsCommon::sdkInterfaces::externalMediaPlayer::AdapterState> adapterStates);
++#else
+     std::string providePlaybackState();
++#endif
+ 
+     /**
+      * This function deserializes a @c Directive's payload into a @c rapidjson::Document.
+@@ -196,6 +253,15 @@ private:
+         std::shared_ptr<avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
+         std::shared_ptr<avsCommon::sdkInterfaces::ContextManagerInterface> contextManager);
+ 
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    /**
++     * Set the appropriate halt initiator for the request.
++     *
++     * @param The type of the request.
++     */
++    void setHaltInitiatorRequestHelper(avsCommon::sdkInterfaces::externalMediaPlayer::RequestType request);
++#endif
++
+     /**
+      * Send the handling completed notification and clean up the resources the specified @c DirectiveInfo.
+      *
+@@ -252,6 +318,19 @@ private:
+         std::shared_ptr<DirectiveInfo> info,
+         rapidjson::Document* document);
+ 
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    /**
++     * Handler for AuthorizeDiscoveredPlayers directive.
++     *
++     * @param info The DirectiveInfo to be processed.
++     * @param The type of the request. Will be NONE for the
++     *        handleAuthorizeDiscoveredPlayers case.
++     */
++    void handleAuthorizeDiscoveredPlayers(
++        std::shared_ptr<DirectiveInfo> info,
++        avsCommon::sdkInterfaces::externalMediaPlayer::RequestType request);
++#endif
++
+     /**
+      * Handler for login directive.
+      *
+@@ -328,6 +407,36 @@ private:
+     /// The id of the player which currently has focus.
+     std::string m_playerInFocus;
+ 
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    /// Set of capability configurations that will get published using the Capabilities API
++    std::unordered_set<std::shared_ptr<avsCommon::avs::CapabilityConfiguration>> m_capabilityConfigurations;
++
++    std::unordered_set<std::shared_ptr<avsCommon::sdkInterfaces::ExternalMediaAdapterHandlerInterface>> m_adapterHandlers;
++#endif
++
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    /// The @c FocusManager used to manage usage of the channel.
++    std::shared_ptr<avsCommon::sdkInterfaces::FocusManagerInterface> m_focusManager;
++
++    /// The current focus state of the @c AudioPlayer on the content channel.
++    avsCommon::avs::FocusState m_focus;
++
++    /// bool to identify if acquire of focus is currently in progress.
++    bool m_focusAcquireInProgress;
++
++    /// Enum to identify the type and source of the halt request.
++    HaltInitiator m_haltInitiator;
++
++    /// The current state of the @c ExternalMediaPlayer.
++    avsCommon::avs::PlayerActivity m_currentActivity;
++
++    /// Protects writes to @c m_currentActivity and waiting on @c m_currentActivityConditionVariable.
++    std::mutex m_currentActivityMutex;
++
++    /// Provides notifications of changes to @c m_currentActivity.
++    std::condition_variable m_currentActivityConditionVariable;
++#endif
++
+     /**
+      * @c Executor which queues up operations from asynchronous API calls.
+      *
+diff --git a/CapabilityAgents/ExternalMediaPlayer/src/ExternalMediaPlayer.cpp b/CapabilityAgents/ExternalMediaPlayer/src/ExternalMediaPlayer.cpp
+index 51651ad..18a8616 100644
+--- a/CapabilityAgents/ExternalMediaPlayer/src/ExternalMediaPlayer.cpp
++++ b/CapabilityAgents/ExternalMediaPlayer/src/ExternalMediaPlayer.cpp
+@@ -65,10 +65,67 @@ static const std::string PLAYLISTCONTROLLER_NAMESPACE = "Alexa.PlaylistControlle
+ static const std::string SEEKCONTROLLER_NAMESPACE = "Alexa.SeekController";
+ static const std::string FAVORITESCONTROLLER_NAMESPACE = "Alexa.FavoritesController";
+ 
++#ifdef EXTERNALMEDIAPLAYER_1_1
++// Capability constants
++/// The AlexaInterface constant type.
++static const std::string ALEXA_INTERFACE_TYPE = "AlexaInterface";
++
++/// externalMediaPlayer capability constants
++/// externalMediaPlayer interface type
++static const std::string EXTERNALMEDIAPLAYER_CAPABILITY_INTERFACE_TYPE = ALEXA_INTERFACE_TYPE;
++/// externalMediaPlayer interface name
++static const std::string EXTERNALMEDIAPLAYER_CAPABILITY_INTERFACE_NAME = "ExternalMediaPlayer";
++/// externalMediaPlayer interface version
++static const std::string EXTERNALMEDIAPLAYER_CAPABILITY_INTERFACE_VERSION = "1.1";
++
++/// Alexa.PlaybackStateReporter name.
++static const std::string PLAYBACKSTATEREPORTER_CAPABILITY_INTERFACE_NAME = PLAYBACKSTATEREPORTER_STATE_NAMESPACE;
++/// Alexa.PlaybackStateReporter version.
++static const std::string PLAYBACKSTATEREPORTER_CAPABILITY_INTERFACE_VERSION = "1.0";
++
++/// Alexa.PlaybackController name.
++static const std::string PLAYBACKCONTROLLER_CAPABILITY_INTERFACE_NAME = PLAYBACKCONTROLLER_NAMESPACE;
++/// Alexa.PlaybackController version.
++static const std::string PLAYBACKCONTROLLER_CAPABILITY_INTERFACE_VERSION = "1.0";
++
++/// Alexa.PlaylistController name.
++static const std::string PLAYLISTCONTROLLER_CAPABILITY_INTERFACE_NAME = PLAYLISTCONTROLLER_NAMESPACE;
++/// Alexa.PlaylistController version.
++static const std::string PLAYLISTCONTROLLER_CAPABILITY_INTERFACE_VERSION = "1.0";
++
++/// Alexa.SeekController name.
++static const std::string SEEKCONTROLLER_CAPABILITY_INTERFACE_NAME = SEEKCONTROLLER_NAMESPACE;
++/// Alexa.SeekController version.
++static const std::string SEEKCONTROLLER_CAPABILITY_INTERFACE_VERSION = "1.0";
++
++/// Alexa.FavoritesController name.
++static const std::string FAVORITESCONTROLLER_CAPABILITY_INTERFACE_NAME = FAVORITESCONTROLLER_NAMESPACE;
++/// Alexa.FavoritesController version.
++static const std::string FAVORITESCONTROLLER_CAPABILITY_INTERFACE_VERSION = "1.0";
++#endif
++
++#ifdef EXTERNALMEDIAPLAYER_1_1
++/// The name of the @c FocusManager channel used by @c ExternalMediaPlayer and
++/// its Adapters.
++static const std::string CHANNEL_NAME = avsCommon::sdkInterfaces::FocusManagerInterface::CONTENT_CHANNEL_NAME;
++
++/**
++ * The activityId string used with @c FocusManager by @c ExternalMediaPlayer.
++ * (as per spec for AVS for monitoring channel activity.)
++ */
++static const std::string FOCUS_MANAGER_ACTIVITY_ID = "ExternalMediaPlayer";
++
++/// The duration to wait for a state change in @c onFocusChanged before failing.
++static const std::chrono::seconds TIMEOUT{2};
++#endif
++
+ // The @c External media player play directive signature.
+ static const NamespaceAndName PLAY_DIRECTIVE{EXTERNALMEDIAPLAYER_NAMESPACE, "Play"};
+ static const NamespaceAndName LOGIN_DIRECTIVE{EXTERNALMEDIAPLAYER_NAMESPACE, "Login"};
+ static const NamespaceAndName LOGOUT_DIRECTIVE{EXTERNALMEDIAPLAYER_NAMESPACE, "Logout"};
++#ifdef EXTERNALMEDIAPLAYER_1_1
++static const NamespaceAndName AUTHORIZEDISCOVEREDPLAYERS_DIRECTIVE{EXTERNALMEDIAPLAYER_NAMESPACE, "AuthorizeDiscoveredPlayers"};
++#endif
+ 
+ // The @c Transport control directive signatures.
+ static const NamespaceAndName RESUME_DIRECTIVE{PLAYBACKCONTROLLER_NAMESPACE, "Play"};
+@@ -110,9 +167,21 @@ static const int64_t MAX_PAST_OFFSET = -86400000;
+ /// The max relative time in the past that we can  seek to in milliseconds(+12 hours in ms).
+ static const int64_t MAX_FUTURE_OFFSET = 86400000;
+ 
++#ifdef EXTERNALMEDIAPLAYER_1_1
++/**
++ * Creates the ExternalMediaPlayer capability configuration.
++ *
++ * @return The ExternalMediaPlayer capability configuration.
++ */
++static std::shared_ptr<avsCommon::avs::CapabilityConfiguration> getExternalMediaPlayerCapabilityConfiguration();
++#endif
++
+ /// The @c m_directiveToHandlerMap Map of the directives to their handlers.
+ std::unordered_map<NamespaceAndName, std::pair<RequestType, ExternalMediaPlayer::DirectiveHandler>>
+     ExternalMediaPlayer::m_directiveToHandlerMap = {
++#ifdef EXTERNALMEDIAPLAYER_1_1
++        {AUTHORIZEDISCOVEREDPLAYERS_DIRECTIVE, std::make_pair(RequestType::NONE, &ExternalMediaPlayer::handleAuthorizeDiscoveredPlayers)},
++#endif
+         {LOGIN_DIRECTIVE, std::make_pair(RequestType::LOGIN, &ExternalMediaPlayer::handleLogin)},
+         {LOGOUT_DIRECTIVE, std::make_pair(RequestType::LOGOUT, &ExternalMediaPlayer::handleLogout)},
+         {PLAY_DIRECTIVE, std::make_pair(RequestType::PLAY, &ExternalMediaPlayer::handlePlay)},
+@@ -135,7 +204,12 @@ std::unordered_map<NamespaceAndName, std::pair<RequestType, ExternalMediaPlayer:
+         {SEEK_DIRECTIVE, std::make_pair(RequestType::SEEK, &ExternalMediaPlayer::handleSeek)},
+         {ADJUSTSEEK_DIRECTIVE, std::make_pair(RequestType::ADJUST_SEEK, &ExternalMediaPlayer::handleAdjustSeek)}};
+ 
++#ifdef EXTERNALMEDIAPLAYER_1_1
++static DirectiveHandlerConfiguration g_configuration = {{AUTHORIZEDISCOVEREDPLAYERS_DIRECTIVE, BlockingPolicy::NON_BLOCKING},
++                                                        {PLAY_DIRECTIVE, BlockingPolicy::NON_BLOCKING},
++#else
+ static DirectiveHandlerConfiguration g_configuration = {{PLAY_DIRECTIVE, BlockingPolicy::NON_BLOCKING},
++#endif
+                                                         {LOGIN_DIRECTIVE, BlockingPolicy::NON_BLOCKING},
+                                                         {LOGOUT_DIRECTIVE, BlockingPolicy::NON_BLOCKING},
+                                                         {RESUME_DIRECTIVE, BlockingPolicy::NON_BLOCKING},
+@@ -156,18 +230,45 @@ static DirectiveHandlerConfiguration g_configuration = {{PLAY_DIRECTIVE, Blockin
+                                                         {UNFAVORITE_DIRECTIVE, BlockingPolicy::NON_BLOCKING}};
+ 
+ static std::unordered_map<PlaybackButton, RequestType> g_buttonToRequestType = {
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    // Important Note: This changes default AVS Device SDK behavior.
++    {PlaybackButton::PLAY, RequestType::RESUME},
++    {PlaybackButton::PAUSE, RequestType::PAUSE},
++#else
+     {PlaybackButton::PLAY, RequestType::PAUSE_RESUME_TOGGLE},
+     {PlaybackButton::PAUSE, RequestType::PAUSE_RESUME_TOGGLE},
++#endif
+     {PlaybackButton::NEXT, RequestType::NEXT},
+     {PlaybackButton::PREVIOUS, RequestType::PREVIOUS}};
+ 
+ static std::unordered_map<PlaybackToggle, std::pair<RequestType, RequestType>> g_toggleToRequestType = {
+     {PlaybackToggle::SHUFFLE, std::make_pair(RequestType::ENABLE_SHUFFLE, RequestType::DISABLE_SHUFFLE)},
+     {PlaybackToggle::LOOP, std::make_pair(RequestType::ENABLE_REPEAT, RequestType::DISABLE_REPEAT)},
+-    {PlaybackToggle::REPEAT, std::make_pair(RequestType::ENABLE_REPEAT_ONE, RequestType::DISABLE_REPEAT_ONE)},
++    {PlaybackToggle::REPEAT, std::make_pair(RequestType::ENABLE_REPEAT_ONE, RequestType::DISABLE_REPEAT)},
+     {PlaybackToggle::THUMBS_UP, std::make_pair(RequestType::FAVORITE, RequestType::DESELECT_FAVORITE)},
+     {PlaybackToggle::THUMBS_DOWN, std::make_pair(RequestType::UNFAVORITE, RequestType::DESELECT_UNFAVORITE)}};
+ 
++#ifdef EXTERNALMEDIAPLAYER_1_1
++/**
++ * Generate a @c CapabilityConfiguration object.
++ *
++ * @param type The Capability interface type.
++ * @param interface The Capability interface name.
++ * @param version The Capability interface verison.
++ */
++static std::shared_ptr<CapabilityConfiguration> generateCapabilityConfiguration(
++    const std::string& type,
++    const std::string& interface,
++    const std::string& version) {
++    std::unordered_map<std::string, std::string> configMap;
++    configMap.insert({CAPABILITY_INTERFACE_TYPE_KEY, type});
++    configMap.insert({CAPABILITY_INTERFACE_NAME_KEY, interface});
++    configMap.insert({CAPABILITY_INTERFACE_VERSION_KEY, version});
++
++    return std::make_shared<CapabilityConfiguration>(configMap);
++}
++#endif
++
+ std::shared_ptr<ExternalMediaPlayer> ExternalMediaPlayer::create(
+     const AdapterMediaPlayerMap& mediaPlayers,
+     const AdapterSpeakerMap& speakers,
+@@ -213,6 +314,10 @@ std::shared_ptr<ExternalMediaPlayer> ExternalMediaPlayer::create(
+     externalMediaPlayer->createAdapters(
+         mediaPlayers, speakers, adapterCreationMap, messageSender, focusManager, contextManager);
+ 
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    externalMediaPlayer->m_focusManager = focusManager;
++#endif
++
+     return externalMediaPlayer;
+ }
+ 
+@@ -225,9 +330,271 @@ ExternalMediaPlayer::ExternalMediaPlayer(
+         RequiresShutdown{"ExternalMediaPlayer"},
+         m_speakerManager{speakerManager},
+         m_contextManager{contextManager},
++#ifdef EXTERNALMEDIAPLAYER_1_1
++        m_playbackRouter{playbackRouter},
++        m_focus{FocusState::NONE},
++        m_focusAcquireInProgress{false},
++        m_haltInitiator{HaltInitiator::NONE},
++        m_currentActivity{avsCommon::avs::PlayerActivity::IDLE} {
++#else
+         m_playbackRouter{playbackRouter} {
++#endif
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    // Register all supported capabilities.
++    m_capabilityConfigurations.insert(getExternalMediaPlayerCapabilityConfiguration());
++
++    m_capabilityConfigurations.insert(generateCapabilityConfiguration(
++        ALEXA_INTERFACE_TYPE,
++        PLAYBACKSTATEREPORTER_CAPABILITY_INTERFACE_NAME,
++        PLAYBACKSTATEREPORTER_CAPABILITY_INTERFACE_VERSION));
++
++    m_capabilityConfigurations.insert(generateCapabilityConfiguration(
++        ALEXA_INTERFACE_TYPE,
++        PLAYBACKCONTROLLER_CAPABILITY_INTERFACE_NAME,
++        PLAYBACKCONTROLLER_CAPABILITY_INTERFACE_VERSION));
++
++    m_capabilityConfigurations.insert(generateCapabilityConfiguration(
++        ALEXA_INTERFACE_TYPE,
++        PLAYLISTCONTROLLER_CAPABILITY_INTERFACE_NAME,
++        PLAYLISTCONTROLLER_CAPABILITY_INTERFACE_VERSION));
++
++    m_capabilityConfigurations.insert(generateCapabilityConfiguration(
++        ALEXA_INTERFACE_TYPE, SEEKCONTROLLER_CAPABILITY_INTERFACE_NAME, SEEKCONTROLLER_CAPABILITY_INTERFACE_VERSION));
++
++    m_capabilityConfigurations.insert(generateCapabilityConfiguration(
++        ALEXA_INTERFACE_TYPE,
++        FAVORITESCONTROLLER_CAPABILITY_INTERFACE_NAME,
++        FAVORITESCONTROLLER_CAPABILITY_INTERFACE_VERSION));
++#endif
+ }
+ 
++#ifdef EXTERNALMEDIAPLAYER_1_1
++std::shared_ptr<CapabilityConfiguration> getExternalMediaPlayerCapabilityConfiguration() {
++    return generateCapabilityConfiguration(
++        EXTERNALMEDIAPLAYER_CAPABILITY_INTERFACE_TYPE,
++        EXTERNALMEDIAPLAYER_CAPABILITY_INTERFACE_NAME,
++        EXTERNALMEDIAPLAYER_CAPABILITY_INTERFACE_VERSION);
++}
++
++std::unordered_set<std::shared_ptr<avsCommon::avs::CapabilityConfiguration>> ExternalMediaPlayer::getCapabilityConfigurations() {
++    return m_capabilityConfigurations;
++}
++
++void ExternalMediaPlayer::addAdapterHandler(
++    std::shared_ptr<avsCommon::sdkInterfaces::ExternalMediaAdapterHandlerInterface> adapterHandler) {
++    ACSDK_DEBUG5(LX("addAdapterHandler"));
++    if (!adapterHandler) {
++        ACSDK_ERROR(LX("addAdapterHandler").m("Adapter handler is null."));
++        return;
++    }
++    m_executor.submit([this, adapterHandler]() {
++        ACSDK_DEBUG5(LX("addAdapterHandlerInExecutor"));
++        if (!m_adapterHandlers.insert(adapterHandler).second) {
++            ACSDK_ERROR(LX("addAdapterHandlerInExecutor").m("Duplicate adapter handler."));
++        }
++    });
++}
++
++void ExternalMediaPlayer::removeAdapterHandler(
++    std::shared_ptr<avsCommon::sdkInterfaces::ExternalMediaAdapterHandlerInterface> adapterHandler) {
++    ACSDK_DEBUG5(LX("removeAdapterHandler"));
++    if (!adapterHandler) {
++        ACSDK_ERROR(LX("removeAdapterHandler").m("Adapter handler is null."));
++        return;
++    }
++    m_executor.submit([this, adapterHandler]() {
++        ACSDK_DEBUG5(LX("removeAdapterHandlerInExecutor"));
++        if (m_adapterHandlers.erase(adapterHandler) == 0) {
++            ACSDK_WARN(LX("removeAdapterHandlerInExecutor").m("Nonexistent adapter handler."));
++        }
++    });
++}
++#endif
++
++#ifdef EXTERNALMEDIAPLAYER_1_1
++void ExternalMediaPlayer::executeOnFocusChanged(avsCommon::avs::FocusState newFocus) {
++    ACSDK_DEBUG1(
++        LX("executeOnFocusChanged").d("from", m_focus).d("to", newFocus).d("m_currentActivity", m_currentActivity));
++    if (m_focus == newFocus) {
++        m_focusAcquireInProgress = false;
++        return;
++    }
++    m_focus = newFocus;
++    m_focusAcquireInProgress = false;
++
++    if (!m_playerInFocus.empty()) {
++        auto adapterIt = m_adapters.find(m_playerInFocus);
++
++        if (m_adapters.end() == adapterIt) {
++            switch (newFocus) {
++                case FocusState::FOREGROUND: {
++                    /*
++                     * If the system is currently in a pause initiated from AVS, on focus change
++                     * to FOREGROUND do not try to resume. This happens when a user calls
++                     * "Alexa, pause" while Spotify is PLAYING. This moves the adapter to
++                     * BACKGROUND focus. AVS then sends a PAUSE request and after calling the
++                     * ESDK pause when the adapter switches to FOREGROUND focus we do not want
++                     * the adapter to start PLAYING.
++                     */
++                    if (m_haltInitiator == HaltInitiator::EXTERNAL_PAUSE) {
++                        return;
++                    }
++
++                    switch (m_currentActivity) {
++                        case PlayerActivity::IDLE:
++                        case PlayerActivity::STOPPED:
++                        case PlayerActivity::FINISHED:
++                            return;
++                        case PlayerActivity::PAUSED: {
++                            // A focus change to foreground when paused means we should resume the current song.
++                            ACSDK_DEBUG1(LX("executeOnFocusChanged").d("action", "resumeExternalMediaPlayer"));
++                            setCurrentActivity(avsCommon::avs::PlayerActivity::PLAYING);
++                            // At this point a request to play another artist on Spotify may have already
++                            // been processed (or is being processed) and we do not want to send resume here.
++                            if (m_haltInitiator != HaltInitiator::NONE) {
++                                for (auto adapterHandler : m_adapterHandlers) {
++                                    adapterHandler->playControlForPlayer(m_playerInFocus, RequestType::RESUME);
++                                }
++                            }
++                        }
++                            return;
++                        case PlayerActivity::PLAYING:
++                        case PlayerActivity::BUFFER_UNDERRUN:
++                            // We should already have foreground focus in these states; break out to the warning below.
++                            break;
++                    }
++                    break;
++                }
++                case FocusState::BACKGROUND:
++                    switch (m_currentActivity) {
++                        case PlayerActivity::STOPPED:
++                        // We can also end up here with an empty queue if we've asked MediaPlayer to play, but playback
++                        // hasn't started yet, so we fall through to call @c pause() here as well.
++                        case PlayerActivity::FINISHED:
++                        case PlayerActivity::IDLE:
++                        // Note: can be in FINISHED or IDLE while waiting for MediaPlayer to start playing, so we fall
++                        // through to call @c pause() here as well.
++                        case PlayerActivity::PAUSED:
++                        // Note: can be in PAUSED while we're trying to resume, in which case we still want to pause, so we
++                        // fall through to call @c pause() here as well.
++                        case PlayerActivity::PLAYING:
++                        case PlayerActivity::BUFFER_UNDERRUN: {
++                            // If we get pushed into the background while playing or buffering, pause the current song.
++                            ACSDK_DEBUG1(LX("executeOnFocusChanged").d("action", "pauseExternalMediaPlayer"));
++                            if (m_haltInitiator != HaltInitiator::EXTERNAL_PAUSE) {
++                                m_haltInitiator = HaltInitiator::FOCUS_CHANGE_PAUSE;
++                            }
++                            setCurrentActivity(avsCommon::avs::PlayerActivity::PAUSED);
++                            for (auto adapterHandler : m_adapterHandlers) {
++                                adapterHandler->playControlForPlayer(m_playerInFocus, RequestType::PAUSE);
++                            }
++                        }
++                            return;
++                    }
++                    break;
++                case FocusState::NONE:
++                    switch (m_currentActivity) {
++                        case PlayerActivity::IDLE:
++                        case PlayerActivity::STOPPED:
++                        case PlayerActivity::FINISHED:
++                            // Nothing to more to do if we're already not playing; we got here because the act of stopping
++                            // caused the channel to be released, which in turn caused this callback.
++                            return;
++                        case PlayerActivity::PLAYING:
++                        case PlayerActivity::PAUSED:
++                        case PlayerActivity::BUFFER_UNDERRUN:
++                            // If the focus change came in while we were in a 'playing' state, we need to stop because we are
++                            // yielding the channel.
++                            ACSDK_DEBUG1(LX("executeOnFocusChanged").d("action", "stopExternalMediaPlayer"));
++                            m_haltInitiator = HaltInitiator::FOCUS_CHANGE_STOP;
++                            setCurrentActivity(avsCommon::avs::PlayerActivity::STOPPED);
++                            for (auto adapterHandler : m_adapterHandlers) {
++                                adapterHandler->playControlForPlayer(m_playerInFocus, RequestType::STOP);
++                            }
++                            return;
++                    }
++                    break;
++            }
++        }
++    }
++    ACSDK_WARN(LX("unexpectedExecuteOnFocusChanged").d("newFocus", newFocus).d("m_currentActivity", m_currentActivity));
++}
++
++void ExternalMediaPlayer::onFocusChanged(FocusState newFocus) {
++    ACSDK_DEBUG(LX("onFocusChanged").d("newFocus", newFocus));
++    m_executor.submit([this, newFocus] { executeOnFocusChanged(newFocus); });
++
++    switch (newFocus) {
++        case FocusState::FOREGROUND:
++            // Could wait for playback to actually start, but there's no real benefit to waiting, and long delays in
++            // buffering could result in timeouts, so returning immediately for this case.
++            return;
++        case FocusState::BACKGROUND: {
++            // Ideally expecting to see a transition to PAUSED, but in terms of user-observable changes, a move to any
++            // of PAUSED/STOPPED/FINISHED will indicate that it's safe for another channel to move to the foreground.
++            auto predicate = [this] {
++                switch (m_currentActivity) {
++                    case PlayerActivity::IDLE:
++                    case PlayerActivity::PAUSED:
++                    case PlayerActivity::STOPPED:
++                    case PlayerActivity::FINISHED:
++                        return true;
++                    case PlayerActivity::PLAYING:
++                    case PlayerActivity::BUFFER_UNDERRUN:
++                        return false;
++                }
++                ACSDK_ERROR(LX("onFocusChangedFailed")
++                                .d("reason", "unexpectedActivity")
++                                .d("m_currentActivity", m_currentActivity));
++                return false;
++            };
++            std::unique_lock<std::mutex> lock(m_currentActivityMutex);
++            if (!m_currentActivityConditionVariable.wait_for(lock, TIMEOUT, predicate)) {
++                ACSDK_ERROR(
++                    LX("onFocusChangedTimedOut").d("newFocus", newFocus).d("m_currentActivity", m_currentActivity));
++            }
++        }
++            return;
++        case FocusState::NONE: {
++            // Need to wait for STOPPED or FINISHED, indicating that we have completely ended playback.
++            auto predicate = [this] {
++                switch (m_currentActivity) {
++                    case PlayerActivity::IDLE:
++                    case PlayerActivity::STOPPED:
++                    case PlayerActivity::FINISHED:
++                        return true;
++                    case PlayerActivity::PLAYING:
++                    case PlayerActivity::PAUSED:
++                    case PlayerActivity::BUFFER_UNDERRUN:
++                        return false;
++                }
++                ACSDK_ERROR(LX("onFocusChangedFailed")
++                                .d("reason", "unexpectedActivity")
++                                .d("m_currentActivity", m_currentActivity));
++                return false;
++            };
++            std::unique_lock<std::mutex> lock(m_currentActivityMutex);
++            if (!m_currentActivityConditionVariable.wait_for(lock, TIMEOUT, predicate)) {
++                ACSDK_ERROR(LX("onFocusChangedFailed")
++                                .d("reason", "activityChangeTimedOut")
++                                .d("newFocus", newFocus)
++                                .d("m_currentActivity", m_currentActivity));
++            }
++        }
++            return;
++    }
++    ACSDK_ERROR(LX("onFocusChangedFailed").d("reason", "unexpectedFocusState").d("newFocus", newFocus));
++}
++
++void ExternalMediaPlayer::onContextAvailable(const std::string&) {
++    // default no-op
++}
++
++void ExternalMediaPlayer::onContextFailure(const avsCommon::sdkInterfaces::ContextRequestError) {
++    // default no-op
++}
++#endif
++
+ void ExternalMediaPlayer::provideState(
+     const avsCommon::avs::NamespaceAndName& stateProviderName,
+     unsigned int stateRequestToken) {
+@@ -301,6 +668,12 @@ std::shared_ptr<ExternalMediaAdapterInterface> ExternalMediaPlayer::preprocessDi
+         return nullptr;
+     }
+ 
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    if (m_adapters.empty()) { // use handlers when there are no adapters
++        return nullptr;
++    }
++#endif
++
+     auto adapterIt = m_adapters.find(playerId);
+     if (adapterIt == m_adapters.end()) {
+         ACSDK_ERROR(LX("preprocessDirectiveFailed").d("reason", "noAdapterForPlayerId").d(PLAYER_ID, playerId));
+@@ -318,11 +691,36 @@ std::shared_ptr<ExternalMediaAdapterInterface> ExternalMediaPlayer::preprocessDi
+     return adapter;
+ }
+ 
++#ifdef EXTERNALMEDIAPLAYER_1_1
++void ExternalMediaPlayer::handleAuthorizeDiscoveredPlayers(std::shared_ptr<DirectiveInfo> info, RequestType request) {
++    rapidjson::Document payload;
++
++    if (!parseDirectivePayload(info, &payload)) {
++        return;
++    }
++
++    m_executor.submit([this, info]() {
++        for (auto adapterHandler : m_adapterHandlers) {
++            adapterHandler->authorizeDiscoveredPlayers(info->directive->getPayload());
++        }
++        setHandlingCompleted(info);
++    });
++}
++#endif
++
+ void ExternalMediaPlayer::handleLogin(std::shared_ptr<DirectiveInfo> info, RequestType request) {
+     rapidjson::Document payload;
+ 
+     auto adapter = preprocessDirective(info, &payload);
+     if (!adapter) {
++#ifdef EXTERNALMEDIAPLAYER_1_1
++        m_executor.submit([this, info]() {
++            for (auto adapterHandler : m_adapterHandlers) {
++                adapterHandler->login(info->directive->getPayload());
++            }
++            setHandlingCompleted(info);
++        });
++#endif
+         return;
+     }
+ 
+@@ -361,6 +759,14 @@ void ExternalMediaPlayer::handleLogout(std::shared_ptr<DirectiveInfo> info, Requ
+ 
+     auto adapter = preprocessDirective(info, &payload);
+     if (!adapter) {
++#ifdef EXTERNALMEDIAPLAYER_1_1
++        m_executor.submit([this, info]() {
++            for (auto adapterHandler : m_adapterHandlers) {
++                adapterHandler->logout(info->directive->getPayload());
++            }
++            setHandlingCompleted(info);
++        });
++#endif
+         return;
+     }
+ 
+@@ -373,6 +779,15 @@ void ExternalMediaPlayer::handlePlay(std::shared_ptr<DirectiveInfo> info, Reques
+ 
+     auto adapter = preprocessDirective(info, &payload);
+     if (!adapter) {
++#ifdef EXTERNALMEDIAPLAYER_1_1
++        setHaltInitiatorRequestHelper(request);
++        m_executor.submit([this, info]() {
++            for (auto adapterHandler : m_adapterHandlers) {
++                adapterHandler->play(info->directive->getPayload());
++            }
++            setHandlingCompleted(info);
++        });
++#endif
+         return;
+     }
+ 
+@@ -393,8 +808,41 @@ void ExternalMediaPlayer::handlePlay(std::shared_ptr<DirectiveInfo> info, Reques
+         index = 0;
+     }
+ 
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    std::string skillToken;
++    if (!jsonUtils::retrieveValue(payload, "skillToken", &skillToken)) {
++        ACSDK_ERROR(LX("handleDirectiveFailed").d("reason", "nullSkillToken"));
++        sendExceptionEncounteredAndReportFailed(info, "missing skillToken in Play directive");
++        return;
++    }
++
++    std::string playbackSessionId;
++    if (!jsonUtils::retrieveValue(payload, "playbackSessionId", &playbackSessionId)) {
++        ACSDK_ERROR(LX("handleDirectiveFailed").d("reason", "nullPlaybackSessionId"));
++        sendExceptionEncounteredAndReportFailed(info, "missing playbackSessionId in Play directive");
++        return;
++    }
++
++    std::string navigation;
++    if (!jsonUtils::retrieveValue(payload, "navigation", &navigation)) {
++        ACSDK_ERROR(LX("handleDirectiveFailed").d("reason", "nullNavigation"));
++        sendExceptionEncounteredAndReportFailed(info, "missing navigation in Play directive");
++        return;
++    }
++
++    bool preload;
++    if (!jsonUtils::retrieveValue(payload, "preload", &preload)) {
++        ACSDK_ERROR(LX("handleDirectiveFailed").d("reason", "nullPreload"));
++        sendExceptionEncounteredAndReportFailed(info, "missing preload in Play directive");
++        return;
++    }
++
++    setHandlingCompleted(info);
++    adapter->handlePlay(playbackContextToken, index, std::chrono::milliseconds(offset), skillToken, playbackSessionId, navigation, preload);
++#else
+     setHandlingCompleted(info);
+     adapter->handlePlay(playbackContextToken, index, std::chrono::milliseconds(offset));
++#endif
+ }
+ 
+ void ExternalMediaPlayer::handleSeek(std::shared_ptr<DirectiveInfo> info, RequestType request) {
+@@ -402,6 +850,14 @@ void ExternalMediaPlayer::handleSeek(std::shared_ptr<DirectiveInfo> info, Reques
+ 
+     auto adapter = preprocessDirective(info, &payload);
+     if (!adapter) {
++#ifdef EXTERNALMEDIAPLAYER_1_1
++        m_executor.submit([this, info]() {
++            for (auto adapterHandler : m_adapterHandlers) {
++                adapterHandler->seek(info->directive->getPayload());
++            }
++            setHandlingCompleted(info);
++        });
++#endif
+         return;
+     }
+ 
+@@ -421,6 +877,14 @@ void ExternalMediaPlayer::handleAdjustSeek(std::shared_ptr<DirectiveInfo> info,
+ 
+     auto adapter = preprocessDirective(info, &payload);
+     if (!adapter) {
++#ifdef EXTERNALMEDIAPLAYER_1_1
++        m_executor.submit([this, info]() {
++            for (auto adapterHandler : m_adapterHandlers) {
++                adapterHandler->adjustSeek(info->directive->getPayload());
++            }
++            setHandlingCompleted(info);
++        });
++#endif
+         return;
+     }
+ 
+@@ -448,6 +912,15 @@ void ExternalMediaPlayer::handlePlayControl(std::shared_ptr<DirectiveInfo> info,
+ 
+     auto adapter = preprocessDirective(info, &payload);
+     if (!adapter) {
++#ifdef EXTERNALMEDIAPLAYER_1_1
++        setHaltInitiatorRequestHelper(request);
++        m_executor.submit([this, info, request]() {
++            for (auto adapterHandler : m_adapterHandlers) {
++                adapterHandler->playControl(info->directive->getPayload(),request);
++            }
++            setHandlingCompleted(info);
++        });
++#endif
+         return;
+     }
+ 
+@@ -466,6 +939,38 @@ DirectiveHandlerConfiguration ExternalMediaPlayer::getConfiguration() const {
+     return g_configuration;
+ }
+ 
++#ifdef EXTERNALMEDIAPLAYER_1_1
++
++void ExternalMediaPlayer::setCurrentActivity(const avsCommon::avs::PlayerActivity currentActivity) {
++    ACSDK_DEBUG9(LX("setCurrentActivity").d("from", m_currentActivity).d("to", currentActivity));
++    {
++        std::lock_guard<std::mutex> lock(m_currentActivityMutex);
++        m_currentActivity = currentActivity;
++    }
++    m_currentActivityConditionVariable.notify_all();
++}
++
++void ExternalMediaPlayer::setPlayerInFocus(const std::string& playerInFocus, bool focusAcquire) {
++    ACSDK_DEBUG9(LX("setPlayerInFocus").d("playerInFocus", playerInFocus).d("focusAcquire", focusAcquire ? "true" : "false"));
++    if (focusAcquire) {
++        m_playerInFocus = playerInFocus;
++        m_playbackRouter->setHandler(shared_from_this());
++        // Acquire the channel and have this ExternalMediaPlayer manage the focus state.
++        if (m_focus == FocusState::NONE && m_focusAcquireInProgress != true) {
++            m_currentActivity = avsCommon::avs::PlayerActivity::IDLE;
++            m_haltInitiator = HaltInitiator::NONE;
++            m_focusAcquireInProgress = true;
++            m_focusManager->acquireChannel(CHANNEL_NAME, shared_from_this(), FOCUS_MANAGER_ACTIVITY_ID);
++        }
++    }
++    else if (playerInFocus.compare(m_playerInFocus) == 0 && m_focus != avsCommon::avs::FocusState::NONE) {
++        // We only release the channel when the player is the player in focus.
++        m_focusManager->releaseChannel(CHANNEL_NAME, shared_from_this());
++    }
++}
++
++#endif
++
+ void ExternalMediaPlayer::setPlayerInFocus(const std::string& playerInFocus) {
+     ACSDK_DEBUG9(LX("setPlayerInFocus").d("playerInFocus", playerInFocus));
+     m_playerInFocus = playerInFocus;
+@@ -473,19 +978,28 @@ void ExternalMediaPlayer::setPlayerInFocus(const std::string& playerInFocus) {
+ }
+ 
+ void ExternalMediaPlayer::onButtonPressed(PlaybackButton button) {
++    auto buttonIt = g_buttonToRequestType.find(button);
++
++    if (g_buttonToRequestType.end() == buttonIt) {
++        ACSDK_ERROR(LX("ButtonToRequestTypeNotFound").d("button", button));
++        return;
++    }
++
+     if (!m_playerInFocus.empty()) {
+         auto adapterIt = m_adapters.find(m_playerInFocus);
+ 
+         if (m_adapters.end() == adapterIt) {
++#ifdef EXTERNALMEDIAPLAYER_1_1
++            setHaltInitiatorRequestHelper(buttonIt->second);
++            m_executor.submit([this, buttonIt]() {
++                for (auto adapterHandler : m_adapterHandlers) {
++                    adapterHandler->playControlForPlayer(m_playerInFocus, buttonIt->second);
++                }
++            });
++#else
+             // Should never reach here as playerInFocus is always set based on a contract with AVS.
+             ACSDK_ERROR(LX("AdapterNotFound").d("player", m_playerInFocus));
+-            return;
+-        }
+-
+-        auto buttonIt = g_buttonToRequestType.find(button);
+-
+-        if (g_buttonToRequestType.end() == buttonIt) {
+-            ACSDK_ERROR(LX("ButtonToRequestTypeNotFound").d("button", button));
++#endif
+             return;
+         }
+ 
+@@ -494,37 +1008,48 @@ void ExternalMediaPlayer::onButtonPressed(PlaybackButton button) {
+ }
+ 
+ void ExternalMediaPlayer::onTogglePressed(PlaybackToggle toggle, bool action) {
++    auto toggleIt = g_toggleToRequestType.find(toggle);
++
++    if (g_toggleToRequestType.end() == toggleIt) {
++        ACSDK_ERROR(LX("ToggleToRequestTypeNotFound").d("toggle", toggle));
++        return;
++    }
++
++    // toggleStates map is <SELECTED,DESELECTED>
++    auto toggleStates = toggleIt->second;
++
+     if (!m_playerInFocus.empty()) {
+         auto adapterIt = m_adapters.find(m_playerInFocus);
+ 
+         if (m_adapters.end() == adapterIt) {
++#ifdef EXTERNALMEDIAPLAYER_1_1
++            m_executor.submit([this, action, toggleStates]() {
++                for (auto adapterHandler : m_adapterHandlers) {
++                    if (action) {
++                        adapterHandler->playControlForPlayer(m_playerInFocus, toggleStates.first);
++                    }
++                    else {
++                        adapterHandler->playControlForPlayer(m_playerInFocus, toggleStates.second);
++                    }
++                }
++            });
++#else
+             // Should never reach here as playerInFocus is always set based on a contract with AVS.
+             ACSDK_ERROR(LX("AdapterNotFound").d("player", m_playerInFocus));
++#endif
+             return;
+         }
+ 
+-        auto toggleIt = g_toggleToRequestType.find(toggle);
+-
+-        if (g_toggleToRequestType.end() == toggleIt) {
+-            ACSDK_ERROR(LX("ToggleToRequestTypeNotFound").d("toggle", toggle));
+-            return;
+-        }
+-
+-        auto adapter = adapterIt->second;
+-
+-        // toggleStates map is <SELECTED,DESELECTED>
+-        auto toggleStates = toggleIt->second;
+-
+-        if (action) {
+-            adapter->handlePlayControl(toggleStates.first);
+-        } else {
+-            adapterIt->second->handlePlayControl(toggleStates.second);
+-        }
++        adapterIt->second->handlePlayControl(action ? toggleStates.first : toggleStates.second);
+     }
+ }
+ 
+ void ExternalMediaPlayer::doShutdown() {
+     m_executor.shutdown();
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    m_adapterHandlers.clear();
++    m_focusManager.reset();
++#endif
+     // Reset the EMP from being a state provider. If not there would be calls from the adapter to provide context
+     // which will try to add tasks to the executor thread.
+     m_contextManager->setStateProvider(SESSION_STATE, nullptr);
+@@ -552,6 +1077,29 @@ void ExternalMediaPlayer::removeDirective(std::shared_ptr<DirectiveInfo> info) {
+     }
+ }
+ 
++#ifdef EXTERNALMEDIAPLAYER_1_1
++void ExternalMediaPlayer::setHaltInitiatorRequestHelper(RequestType request) {
++    switch (request) {
++        case RequestType::PAUSE:
++            m_haltInitiator = HaltInitiator::EXTERNAL_PAUSE;
++            break;
++        case RequestType::PAUSE_RESUME_TOGGLE:
++            if (m_currentActivity == avsCommon::avs::PlayerActivity::PLAYING ||
++                    (m_currentActivity == avsCommon::avs::PlayerActivity::PAUSED &&
++                    m_haltInitiator == HaltInitiator::FOCUS_CHANGE_PAUSE)) {
++                m_haltInitiator = HaltInitiator::EXTERNAL_PAUSE;
++            }
++            break;
++        case RequestType::PLAY:
++        case RequestType::RESUME:
++            m_haltInitiator = HaltInitiator::NONE;
++            break;
++        default:
++            break;
++    }
++}
++#endif
++
+ void ExternalMediaPlayer::setHandlingCompleted(std::shared_ptr<DirectiveInfo> info) {
+     if (info && info->result) {
+         info->result->setCompleted();
+@@ -582,10 +1130,28 @@ void ExternalMediaPlayer::executeProvideState(
+     ACSDK_DEBUG(LX("executeProvideState").d("sendToken", sendToken).d("stateRequestToken", stateRequestToken));
+     std::string state;
+ 
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    std::vector<avsCommon::sdkInterfaces::externalMediaPlayer::AdapterState> adapterStates;
++    if (m_adapters.empty()) { // use handlers when there are no adapters
++        for (auto adapterHandler : m_adapterHandlers) {
++            auto handlerAdapterStates = adapterHandler->getAdapterStates();
++            adapterStates.insert(adapterStates.end(), handlerAdapterStates.begin(), handlerAdapterStates.end());
++        }
++    }
++#endif
++
+     if (stateProviderName == SESSION_STATE) {
++#ifdef EXTERNALMEDIAPLAYER_1_1
++        state = provideSessionState(adapterStates);
++#else
+         state = provideSessionState();
++#endif
+     } else if (stateProviderName == PLAYBACK_STATE) {
++#ifdef EXTERNALMEDIAPLAYER_1_1
++        state = providePlaybackState(adapterStates);
++#else
+         state = providePlaybackState();
++#endif
+     } else {
+         ACSDK_ERROR(LX("executeProvideState").d("reason", "unknownStateProviderName"));
+         return;
+@@ -603,7 +1169,11 @@ void ExternalMediaPlayer::executeProvideState(
+     }
+ }
+ 
++#ifdef EXTERNALMEDIAPLAYER_1_1
++std::string ExternalMediaPlayer::provideSessionState(std::vector<avsCommon::sdkInterfaces::externalMediaPlayer::AdapterState> adapterStates) {
++#else
+ std::string ExternalMediaPlayer::provideSessionState() {
++#endif
+     rapidjson::Document state(rapidjson::kObjectType);
+     rapidjson::Document::AllocatorType& stateAlloc = state.GetAllocator();
+ 
+@@ -619,6 +1189,13 @@ std::string ExternalMediaPlayer::provideSessionState() {
+         players.PushBack(playerJson, stateAlloc);
+     }
+ 
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    for (auto adapterState : adapterStates) {
++        rapidjson::Value playerJson = buildSessionState(adapterState.sessionState, stateAlloc);
++        players.PushBack(playerJson, stateAlloc);
++    }
++#endif
++
+     state.AddMember(rapidjson::StringRef(PLAYERS), players, stateAlloc);
+ 
+     rapidjson::StringBuffer buffer;
+@@ -631,7 +1208,11 @@ std::string ExternalMediaPlayer::provideSessionState() {
+     return buffer.GetString();
+ }
+ 
++#ifdef EXTERNALMEDIAPLAYER_1_1
++std::string ExternalMediaPlayer::providePlaybackState(std::vector<avsCommon::sdkInterfaces::externalMediaPlayer::AdapterState> adapterStates) {
++#else
+ std::string ExternalMediaPlayer::providePlaybackState() {
++#endif
+     rapidjson::Document state(rapidjson::kObjectType);
+     rapidjson::Document::AllocatorType& stateAlloc = state.GetAllocator();
+ 
+@@ -650,6 +1231,13 @@ std::string ExternalMediaPlayer::providePlaybackState() {
+         players.PushBack(playerJson, stateAlloc);
+     }
+ 
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    for (auto adapterState : adapterStates) {
++        rapidjson::Value playerJson = buildPlaybackState(adapterState.playbackState, stateAlloc);
++        players.PushBack(playerJson, stateAlloc);
++    }
++#endif
++
+     state.AddMember(PLAYERS, players, stateAlloc);
+ 
+     rapidjson::StringBuffer buffer;
+diff --git a/CapabilityAgents/ExternalMediaPlayer/test/ExternalMediaPlayerTest.cpp b/CapabilityAgents/ExternalMediaPlayer/test/ExternalMediaPlayerTest.cpp
+index c124c20..e464c4f 100644
+--- a/CapabilityAgents/ExternalMediaPlayer/test/ExternalMediaPlayerTest.cpp
++++ b/CapabilityAgents/ExternalMediaPlayer/test/ExternalMediaPlayerTest.cpp
+@@ -90,6 +90,9 @@ static const std::string FAVORITESCONTROLLER_NAMESPACE = "Alexa.FavoritesControl
+ static const NamespaceAndName PLAY_DIRECTIVE{EXTERNALMEDIAPLAYER_NAMESPACE, "Play"};
+ static const NamespaceAndName LOGIN_DIRECTIVE{EXTERNALMEDIAPLAYER_NAMESPACE, "Login"};
+ static const NamespaceAndName LOGOUT_DIRECTIVE{EXTERNALMEDIAPLAYER_NAMESPACE, "Logout"};
++#ifdef EXTERNALMEDIAPLAYER_1_1
++static const NamespaceAndName AUTHORIZEDISCOVEREDPLAYERS_DIRECTIVE{EXTERNALMEDIAPLAYER_NAMESPACE, "AuthorizeDiscoveredPlayers"};
++#endif
+ 
+ // The @c Transport control directive signatures.
+ static const NamespaceAndName RESUME_DIRECTIVE{PLAYBACKCONTROLLER_NAMESPACE, "Play"};
+@@ -130,7 +133,15 @@ static const std::string IDLE_SESSION_STATE =
+             "\"username\":\"\","
+             "\"isGuest\":false,"
+             "\"launched\":false,"
+-           "\"active\":false}"
++            "\"active\":false"
++#ifdef EXTERNALMEDIAPLAYER_1_1
++            ","
++            "\"spiVersion\":\"\","
++            "\"playerCookie\":\"\","
++            "\"skillToken\":\"\","
++            "\"playbackSessionId\":\"\""
++#endif
++        "}"
+     "]}";
+ 
+ static const std::string IDLE_PLAYBACK_STATE =
+@@ -232,7 +243,12 @@ public:
+             bool forceLogin,
+             std::chrono::milliseconds tokenRefreshInterval));
+     MOCK_METHOD0(handleLogout, void());
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    MOCK_METHOD7(handlePlay, void(std::string& playContextToken, int64_t index, std::chrono::milliseconds offset,
++        std::string& skillToken, std::string& playbackSessionId, std::string& navigation, bool preload));
++#else
+     MOCK_METHOD3(handlePlay, void(std::string& playContextToken, int64_t index, std::chrono::milliseconds offset));
++#endif
+     MOCK_METHOD1(handlePlayControl, void(RequestType requestType));
+     MOCK_METHOD1(handleSeek, void(std::chrono::milliseconds offset));
+     MOCK_METHOD1(handleAdjustSeek, void(std::chrono::milliseconds deltaOffset));
+@@ -266,6 +282,53 @@ MockExternalMediaPlayerAdapter::getInstance(
+     return MockExternalMediaPlayerAdapter::m_currentActiveMediaPlayerAdapter;
+ }
+ 
++#ifdef EXTERNALMEDIAPLAYER_1_1
++/**
++ * Method to create AuthorizeDiscoveredPlayers payload.
++ *
++ * @return A string representation of the payload.
++ */
++static std::string createAuthorizeDiscoveredPlayersPayload() {
++    // clang-format off
++    // {
++    //     "directive": {
++    //         "header": {
++    //             "namespace": "ExternalMediaPlayer",
++    //             "name": "AuthorizeDiscoveredPlayers"
++    //         },
++    //         "payload": {
++    //             "players" : [
++    //                 {
++    //                     "localPlayerId": "{{STRING}}",
++    //                     "authorized": {{BOOLEAN}},
++    //                     "metadata": {
++    //                         "playerId": "{{STRING}}",
++    //                         "skillToken": "{{STRING}}"
++    //                     }
++    //                 }
++    //             ]
++    //         }
++    //     }
++    // }
++    const std::string AUTHORIZEDISCOVEREDPLAYERS_PAYLOAD_TEST =
++        "{"
++            "\"players\" : ["
++                "{"
++                    "\"localPlayerId\": \"Spotify:ESDK\","
++                    "\"authorized\": true,"
++                    "\"metadata\": {"
++                        "\"playerId\": \"Spotify\","
++                        "\"skillToken\": \"YYY\""
++                    "}"
++                "}"
++            "]"
++        "}";
++    // clang-format on
++
++    return AUTHORIZEDISCOVEREDPLAYERS_PAYLOAD_TEST;
++}
++#endif
++
+ /**
+  * Method to create payload with parse error.
+  *
+@@ -279,7 +342,15 @@ static std::string createPlayPayloadWithParseError(
+     const std::string& playContext,
+     int index,
+     int64_t offsetInMilliseconds,
+-    const std::string& playerId) {
++    const std::string& playerId
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    ,
++    const std::string& skillToken,
++    const std::string& playbackSessionId,
++    const std::string& navigation, // DEFAULT, NONE, FOREGROUND
++    bool preload
++#endif
++    ) {
+     // clang-format off
+     const std::string PLAY_PAYLOAD_TEST =
+         "{"
+@@ -287,6 +358,13 @@ static std::string createPlayPayloadWithParseError(
+             "\"offsetInMilliseconds\":" + std::to_string(offsetInMilliseconds) + "\","
+             "\"playerId\":\"" + playerId + "\","
+             "\"index\":\"" + std::to_string(index) + "\","
++#ifdef EXTERNALMEDIAPLAYER_1_1
++//             ","
++            "\"skillToken\":\"" + skillToken + "\","
++            "\"playbackSessionId\":\"" + playbackSessionId + "\","
++            "\"navigation\":\"" + navigation + "\"," // DEFAULT, NONE, FOREGROUND
++            "\"preload\":" + (preload ? "true" : "false") + ""
++#endif
+         "}";
+     // clang-format on
+ 
+@@ -323,7 +401,15 @@ static std::string createPlayPayload(
+     const std::string& playContext,
+     int index,
+     int64_t offsetInMilliseconds,
+-    const std::string& playerId) {
++    const std::string& playerId
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    ,
++    const std::string& skillToken,
++    const std::string& playbackSessionId,
++    const std::string& navigation, // DEFAULT, NONE, FOREGROUND
++    bool preload
++#endif
++    ) {
+     // clang-format off
+     const std::string PLAY_PAYLOAD_TEST =
+         "{"
+@@ -331,6 +417,13 @@ static std::string createPlayPayload(
+             "\"offsetInMilliseconds\":\"" + std::to_string(offsetInMilliseconds) + "\","
+             "\"playerId\":\"" + playerId + "\","
+             "\"index\":\"" + std::to_string(index) + "\""
++#ifdef EXTERNALMEDIAPLAYER_1_1
++            ","
++            "\"skillToken\":\"" + skillToken + "\","
++            "\"playbackSessionId\":\"" + playbackSessionId + "\","
++            "\"navigation\":\"" + navigation + "\"," // DEFAULT, NONE, FOREGROUND
++            "\"preload\":" + (preload ? "true" : "false") + ""
++#endif
+         "}";
+     // clang-format on
+ 
+@@ -345,13 +438,28 @@ static std::string createPlayPayload(
+  * @param playerId The business name of the player.
+  * @return A string representation of the payload.
+  */
+-static std::string createPlayPayloadNoContext(int index, int64_t offsetInMilliseconds, const std::string& playerId) {
++static std::string createPlayPayloadNoContext(int index, int64_t offsetInMilliseconds, const std::string& playerId
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    ,
++    const std::string& skillToken,
++    const std::string& playbackSessionId,
++    const std::string& navigation, // DEFAULT, NONE, FOREGROUND
++    bool preload
++#endif
++) {
+     // clang-format off
+     const std::string PLAY_PAYLOAD_TEST =
+         "{"
+             "\"offsetInMilliseconds\":\"" + std::to_string(offsetInMilliseconds) + "\","
+             "\"playerId\":\"" + playerId + "\","
+             "\"index\":\"" + std::to_string(index) + "\""
++#ifdef EXTERNALMEDIAPLAYER_1_1
++            ","
++            "\"skillToken\":\"" + skillToken + "\","
++            "\"playbackSessionId\":\"" + playbackSessionId + "\","
++            "\"navigation\":\"" + navigation + "\"," // DEFAULT, NONE, FOREGROUND
++            "\"preload\":" + (preload ? "true" : "false") + ""
++#endif
+         "}";
+     // clang-format on
+ 
+@@ -369,13 +477,28 @@ static std::string createPlayPayloadNoContext(int index, int64_t offsetInMillise
+ static std::string createPlayPayloadNoPlayerId(
+     const std::string& playContext,
+     int index,
+-    int64_t offsetInMilliseconds) {
++    int64_t offsetInMilliseconds
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    ,
++    const std::string& skillToken,
++    const std::string& playbackSessionId,
++    const std::string& navigation, // DEFAULT, NONE, FOREGROUND
++    bool preload
++#endif
++    ) {
+     // clang-format off
+     const std::string PLAY_PAYLOAD_TEST =
+         "{"
+             "\"playbackContextToken\":\"" + playContext + "\","
+             "\"offsetInMilliseconds\":\"" + std::to_string(offsetInMilliseconds) + "\","
+             "\"index\":\"" + std::to_string(index) + "\""
++#ifdef EXTERNALMEDIAPLAYER_1_1
++            ","
++            "\"skillToken\":\"" + skillToken + "\","
++            "\"playbackSessionId\":\"" + playbackSessionId + "\","
++            "\"navigation\":\"" + navigation + "\"," // DEFAULT, NONE, FOREGROUND
++            "\"preload\":" + (preload ? "true" : "false") + ""
++#endif
+         "}";
+ 
+     // clang-format on
+@@ -394,13 +517,28 @@ static std::string createPlayPayloadNoPlayerId(
+ static std::string createPlayPayloadNoIndex(
+     const std::string& playContext,
+     int64_t offsetInMilliseconds,
+-    const std::string& playerId) {
++    const std::string& playerId
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    ,
++    const std::string& skillToken,
++    const std::string& playbackSessionId,
++    const std::string& navigation, // DEFAULT, NONE, FOREGROUND
++    bool preload
++#endif
++    ) {
+     // clang-format off
+     const std::string PLAY_PAYLOAD_TEST =
+         "{"
+             "\"playbackContextToken\":\"" + playContext + "\","
+             "\"offsetInMilliseconds\":" + std::to_string(offsetInMilliseconds) + ","
+             "\"playerId\":\"" + playerId + "\""
++#ifdef EXTERNALMEDIAPLAYER_1_1
++            ","
++            "\"skillToken\":\"" + skillToken + "\","
++            "\"playbackSessionId\":\"" + playbackSessionId + "\","
++            "\"navigation\":\"" + navigation + "\"," // DEFAULT, NONE, FOREGROUND
++            "\"preload\":" + (preload ? "true" : "false") + ""
++#endif
+         "}";
+ 
+     // clang-format on
+@@ -416,13 +554,28 @@ static std::string createPlayPayloadNoIndex(
+  * @param playerId The business name of the player.
+  * @return A string representation of the payload.
+  */
+-static std::string createPlayPayloadNoOffset(const std::string& playContext, int index, const std::string& playerId) {
++static std::string createPlayPayloadNoOffset(const std::string& playContext, int index, const std::string& playerId
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    ,
++    const std::string& skillToken,
++    const std::string& playbackSessionId,
++    const std::string& navigation, // DEFAULT, NONE, FOREGROUND
++    bool preload
++#endif
++) {
+     // clang-format off
+     const std::string PLAY_PAYLOAD_TEST =
+         "{"
+             "\"playbackContextToken\":\"" + playContext + "\","
+             "\"playerId\":\"" + playerId + "\","
+             "\"index\":\"" + std::to_string(index) + "\""
++#ifdef EXTERNALMEDIAPLAYER_1_1
++            ","
++            "\"skillToken\":\"" + skillToken + "\","
++            "\"playbackSessionId\":\"" + playbackSessionId + "\","
++            "\"navigation\":\"" + navigation + "\"," // DEFAULT, NONE, FOREGROUND
++            "\"preload\":" + (preload ? "true" : "false") + ""
++#endif
+         "}";
+ 
+     // clang-format on
+@@ -742,6 +895,9 @@ TEST_F(ExternalMediaPlayerTest, testCreateWithAdapterCreationFailures) {
+ TEST_F(ExternalMediaPlayerTest, testGetConfiguration) {
+     auto configuration = m_externalMediaPlayer->getConfiguration();
+     ASSERT_EQ(configuration[PLAY_DIRECTIVE], BlockingPolicy::NON_BLOCKING);
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    ASSERT_EQ(configuration[AUTHORIZEDISCOVEREDPLAYERS_DIRECTIVE], BlockingPolicy::NON_BLOCKING);
++#endif
+     ASSERT_EQ(configuration[LOGIN_DIRECTIVE], BlockingPolicy::NON_BLOCKING);
+     ASSERT_EQ(configuration[LOGOUT_DIRECTIVE], BlockingPolicy::NON_BLOCKING);
+     ASSERT_EQ(configuration[RESUME_DIRECTIVE], BlockingPolicy::NON_BLOCKING);
+@@ -815,7 +971,11 @@ TEST_F(ExternalMediaPlayerTest, testPlayParserError) {
+         PLAY_DIRECTIVE.nameSpace, PLAY_DIRECTIVE.name, MESSAGE_ID_TEST, DIALOG_REQUEST_ID_TEST);
+ 
+     std::shared_ptr<AVSDirective> directive = AVSDirective::create(
++#ifdef EXTERNALMEDIAPLAYER_1_1
++        "", avsMessageHeader, createPlayPayloadWithParseError("XXX", 0, 0, "Spotify", "YYY", "ZZZ", "DEFAULT", false), m_attachmentManager, "");
++#else
+         "", avsMessageHeader, createPlayPayloadWithParseError("XXX", 0, 0, "Spotify"), m_attachmentManager, "");
++#endif
+ 
+     EXPECT_CALL(*(m_mockExceptionSender.get()), sendExceptionEncountered(_, _, _));
+     EXPECT_CALL(*m_mockDirectiveHandlerResult, setFailed(_));
+@@ -832,7 +992,11 @@ TEST_F(ExternalMediaPlayerTest, testPlayNoAdapter) {
+         PLAY_DIRECTIVE.nameSpace, PLAY_DIRECTIVE.name, MESSAGE_ID_TEST, DIALOG_REQUEST_ID_TEST);
+ 
+     std::shared_ptr<AVSDirective> directive =
++#ifdef EXTERNALMEDIAPLAYER_1_1
++        AVSDirective::create("", avsMessageHeader, createPlayPayload("XXX", 0, 0, "Spotify", "YYY", "ZZZ", "DEFAULT", false), m_attachmentManager, "");
++#else
+         AVSDirective::create("", avsMessageHeader, createPlayPayload("XXX", 0, 0, "Spotify"), m_attachmentManager, "");
++#endif
+ 
+     EXPECT_CALL(*(m_mockExceptionSender.get()), sendExceptionEncountered(_, _, _));
+     EXPECT_CALL(*m_mockDirectiveHandlerResult, setFailed(_));
+@@ -849,7 +1013,11 @@ TEST_F(ExternalMediaPlayerTest, testPlayNoPlayContext) {
+         PLAY_DIRECTIVE.nameSpace, PLAY_DIRECTIVE.name, MESSAGE_ID_TEST, DIALOG_REQUEST_ID_TEST);
+ 
+     std::shared_ptr<AVSDirective> directive = AVSDirective::create(
++#ifdef EXTERNALMEDIAPLAYER_1_1
++        "", avsMessageHeader, createPlayPayloadNoContext(0, 0, MSP_NAME1, "YYY", "ZZZ", "DEFAULT", false), m_attachmentManager, "");
++#else
+         "", avsMessageHeader, createPlayPayloadNoContext(0, 0, MSP_NAME1), m_attachmentManager, "");
++#endif
+ 
+     EXPECT_CALL(*(m_mockExceptionSender.get()), sendExceptionEncountered(_, _, _));
+     EXPECT_CALL(*m_mockDirectiveHandlerResult, setFailed(_));
+@@ -866,7 +1034,11 @@ TEST_F(ExternalMediaPlayerTest, testPlayNoPlayerId) {
+         PLAY_DIRECTIVE.nameSpace, PLAY_DIRECTIVE.name, MESSAGE_ID_TEST, DIALOG_REQUEST_ID_TEST);
+ 
+     std::shared_ptr<AVSDirective> directive =
++#ifdef EXTERNALMEDIAPLAYER_1_1
++        AVSDirective::create("", avsMessageHeader, createPlayPayloadNoPlayerId("XXX", 0, 0, "YYY", "ZZZ", "DEFAULT", false), m_attachmentManager, "");
++#else
+         AVSDirective::create("", avsMessageHeader, createPlayPayloadNoPlayerId("XXX", 0, 0), m_attachmentManager, "");
++#endif
+ 
+     EXPECT_CALL(*(m_mockExceptionSender.get()), sendExceptionEncountered(_, _, _));
+     EXPECT_CALL(*m_mockDirectiveHandlerResult, setFailed(_));
+@@ -883,9 +1055,17 @@ TEST_F(ExternalMediaPlayerTest, testPlayNoOffset) {
+         PLAY_DIRECTIVE.nameSpace, PLAY_DIRECTIVE.name, MESSAGE_ID_TEST, DIALOG_REQUEST_ID_TEST);
+ 
+     std::shared_ptr<AVSDirective> directive = AVSDirective::create(
++#ifdef EXTERNALMEDIAPLAYER_1_1
++        "", avsMessageHeader, createPlayPayloadNoOffset("XXX", 0, MSP_NAME1, "YYY", "ZZZ", "DEFAULT", false), m_attachmentManager, "");
++#else
+         "", avsMessageHeader, createPlayPayloadNoOffset("XXX", 0, MSP_NAME1), m_attachmentManager, "");
++#endif
+ 
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    EXPECT_CALL(*(MockExternalMediaPlayerAdapter::m_currentActiveMediaPlayerAdapter), handlePlay(_, _, _, _, _, _, _));
++#else
+     EXPECT_CALL(*(MockExternalMediaPlayerAdapter::m_currentActiveMediaPlayerAdapter), handlePlay(_, _, _));
++#endif
+     EXPECT_CALL(*m_mockDirectiveHandlerResult, setCompleted());
+ 
+     m_externalMediaPlayer->CapabilityAgent::preHandleDirective(directive, std::move(m_mockDirectiveHandlerResult));
+@@ -900,15 +1080,39 @@ TEST_F(ExternalMediaPlayerTest, testPlayNoIndex) {
+         PLAY_DIRECTIVE.nameSpace, PLAY_DIRECTIVE.name, MESSAGE_ID_TEST, DIALOG_REQUEST_ID_TEST);
+ 
+     std::shared_ptr<AVSDirective> directive = AVSDirective::create(
++#ifdef EXTERNALMEDIAPLAYER_1_1
++        "", avsMessageHeader, createPlayPayloadNoIndex("XXX", 0, MSP_NAME1, "YYY", "ZZZ", "DEFAULT", false), m_attachmentManager, "");
++#else
+         "", avsMessageHeader, createPlayPayloadNoIndex("XXX", 0, MSP_NAME1), m_attachmentManager, "");
++#endif
+ 
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    EXPECT_CALL(*(MockExternalMediaPlayerAdapter::m_currentActiveMediaPlayerAdapter), handlePlay(_, _, _, _, _, _, _));
++#else
+     EXPECT_CALL(*(MockExternalMediaPlayerAdapter::m_currentActiveMediaPlayerAdapter), handlePlay(_, _, _));
++#endif
+     EXPECT_CALL(*m_mockDirectiveHandlerResult, setCompleted());
+ 
+     m_externalMediaPlayer->CapabilityAgent::preHandleDirective(directive, std::move(m_mockDirectiveHandlerResult));
+     m_externalMediaPlayer->CapabilityAgent::handleDirective(MESSAGE_ID_TEST);
+ }
+ 
++#ifdef EXTERNALMEDIAPLAYER_1_1
++/**
++ * Test successful AuthorizeDiscoveredPlayers.
++ */
++TEST_F(ExternalMediaPlayerTest, testAuthorizeDiscoveredPlayers) {
++    auto avsMessageHeader = std::make_shared<AVSMessageHeader>(
++        AUTHORIZEDISCOVEREDPLAYERS_DIRECTIVE.nameSpace, AUTHORIZEDISCOVEREDPLAYERS_DIRECTIVE.name, MESSAGE_ID_TEST, DIALOG_REQUEST_ID_TEST);
++
++    std::shared_ptr<AVSDirective> directive =
++        AVSDirective::create("", avsMessageHeader, createAuthorizeDiscoveredPlayersPayload(), m_attachmentManager, "");
++
++    m_externalMediaPlayer->CapabilityAgent::preHandleDirective(directive, std::move(m_mockDirectiveHandlerResult));
++    m_externalMediaPlayer->CapabilityAgent::handleDirective(MESSAGE_ID_TEST);
++}
++#endif
++
+ /**
+  * Test successful logout.
+  */
+-- 
+2.18.0
+

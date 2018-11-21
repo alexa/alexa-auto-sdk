@@ -240,8 +240,8 @@ Java_com_amazon_aace_alexa_MediaPlayer_mediaStateChanged( JNIEnv * env , jobject
 
 JNIEXPORT jlong JNICALL
 Java_com_amazon_aace_alexa_MediaPlayer_read( JNIEnv * env , jobject /* this */, jlong cptr, jbyteArray data, jlong offset, jlong size ) {
-    jbyte *ptr = env->GetByteArrayElements( data + offset, nullptr );
-    jlong count = MEDIAPLAYER(cptr)->read( (char *) ptr, size );
+    jbyte *ptr = env->GetByteArrayElements( data, nullptr );
+    jlong count = MEDIAPLAYER(cptr)->read( (char *) ptr + offset, size );
     env->ReleaseByteArrayElements( data, ptr, 0 );
     return count;
 }

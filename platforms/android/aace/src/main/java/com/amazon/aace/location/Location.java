@@ -26,7 +26,7 @@ public class Location
     private double m_accuracy;
 
     // used for undefined location values
-    static final public double UNDEFINED = -1;
+    static final public double UNDEFINED = Double.MIN_VALUE;
 
     /**
      * Most verbose constructor for a Location object

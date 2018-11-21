@@ -20,6 +20,7 @@
 #include <AVSCommon/SDKInterfaces/test/MockExceptionEncounteredSender.h>
 #include <AVSCommon/SDKInterfaces/test/MockMessageSender.h>
 #include <AVSCommon/SDKInterfaces/test/MockDirectiveSequencer.h>
+#include <AVSCommon/SDKInterfaces/test/MockFocusManager.h>
 
 #include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
 
@@ -42,10 +43,19 @@ public:
 class MockPhoneCallControllerPlatformInterface : public aace::phoneCallController::PhoneCallController {
 public:
     MOCK_METHOD1( dial, bool(const std::string& payload) );
+    MOCK_METHOD1( redial, bool(const std::string& payload) );
+    MOCK_METHOD1( stop, void(const std::string& payload) );
+    MOCK_METHOD1( answer, void(const std::string& payload) );
+    MOCK_METHOD1( playRingtone, void(const std::string& payload) );
+    MOCK_METHOD1( sendDTMF, void(const std::string& payload) );
     MOCK_METHOD1( connectionStateChanged, void(aace::phoneCallController::PhoneCallControllerEngineInterface::ConnectionState state) );
-    MOCK_METHOD1( callActivated, void(const std::string& callId) );
-    MOCK_METHOD3( callFailed, void(const std::string& callId, const std::string& error, const std::string& message) );
-    MOCK_METHOD1( callTerminated, void(const std::string& callId) );
+    MOCK_METHOD3( callStateChanged, void(aace::phoneCallController::PhoneCallControllerEngineInterface::ConnectionState state, const std::string& callId, const std::string& callerId) );
+    MOCK_METHOD3( callFailed, void(const std::string& callId, aace::phoneCallController::PhoneCallControllerEngineInterface::CallError code, const std::string& message) );
+    MOCK_METHOD2( callerIdReceived, void(const std::string& callId, const std::string& callerId) );
+    MOCK_METHOD1( sendDTMFSucceeded, void(const std::string& callId) );
+    MOCK_METHOD3( sendDTMFFailed, void(const std::string& callId, aace::phoneCallController::PhoneCallControllerEngineInterface::DTMFError code, const std::string& message) );
+    MOCK_METHOD1( deviceConfigurationUpdated, void(std::unordered_map<aace::phoneCallController::PhoneCallControllerEngineInterface::CallingDeviceConfigurationProperty, bool> configurationMap) );
+    MOCK_METHOD0( createCallId, void() );
 };
 
 class PhoneCallControllerEngineImplTest : public ::testing::Test {
@@ -57,6 +67,7 @@ public:
         m_mockDirectiveSequencer = std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockDirectiveSequencer>>();
         m_mockExceptionSender = std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockExceptionEncounteredSender>>();
         m_mockMessageSender = std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockMessageSender>>();
+        m_mockFocusManager = std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockFocusManager>>();
 
         EXPECT_CALL(*m_mockDirectiveSequencer, addDirectiveHandler(testing::_)).WillOnce(testing::Return(true));
         EXPECT_CALL(*m_mockCapabilitiesDelegate, registerCapability(testing::_)).WillOnce(testing::Return(true));
@@ -67,7 +78,8 @@ public:
             m_mockContextManager,
             m_mockDirectiveSequencer,
             m_mockExceptionSender,
-            m_mockMessageSender
+            m_mockMessageSender,
+            m_mockFocusManager
         );
     }
     void TearDown() override {
@@ -81,6 +93,7 @@ public:
     std::shared_ptr<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockDirectiveSequencer>> m_mockDirectiveSequencer;
     std::shared_ptr<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockExceptionEncounteredSender>> m_mockExceptionSender;
     std::shared_ptr<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockMessageSender>> m_mockMessageSender;
+    std::shared_ptr<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockFocusManager>> m_mockFocusManager;
 };
 
 TEST_F( PhoneCallControllerEngineImplTest, create ) {
@@ -90,42 +103,42 @@ TEST_F( PhoneCallControllerEngineImplTest, create ) {
 TEST_F( PhoneCallControllerEngineImplTest, createWithNullPlatform ) {
     std::shared_ptr<aace::engine::phoneCallController::PhoneCallControllerEngineImpl> engineImpl; 
     engineImpl = aace::engine::phoneCallController::PhoneCallControllerEngineImpl::create(
-        nullptr, m_mockCapabilitiesDelegate, m_mockContextManager, m_mockDirectiveSequencer, m_mockExceptionSender, m_mockMessageSender );
+        nullptr, m_mockCapabilitiesDelegate, m_mockContextManager, m_mockDirectiveSequencer, m_mockExceptionSender, m_mockMessageSender, m_mockFocusManager );
     EXPECT_EQ(nullptr, engineImpl);
 }
 
 TEST_F( PhoneCallControllerEngineImplTest, createWithNullCapabilitiesDelegate ) {
     std::shared_ptr<aace::engine::phoneCallController::PhoneCallControllerEngineImpl> engineImpl;
     engineImpl = aace::engine::phoneCallController::PhoneCallControllerEngineImpl::create(
-        m_mockPlatformInterface, nullptr, m_mockContextManager, m_mockDirectiveSequencer, m_mockExceptionSender, m_mockMessageSender );
+        m_mockPlatformInterface, nullptr, m_mockContextManager, m_mockDirectiveSequencer, m_mockExceptionSender, m_mockMessageSender, m_mockFocusManager );
     EXPECT_EQ(nullptr, engineImpl);
 }
 
 TEST_F( PhoneCallControllerEngineImplTest, createWithNullContextManager ) {
     std::shared_ptr<aace::engine::phoneCallController::PhoneCallControllerEngineImpl> engineImpl;
     engineImpl = aace::engine::phoneCallController::PhoneCallControllerEngineImpl::create(
-        m_mockPlatformInterface, m_mockCapabilitiesDelegate, nullptr, m_mockDirectiveSequencer, m_mockExceptionSender, m_mockMessageSender );
+        m_mockPlatformInterface, m_mockCapabilitiesDelegate, nullptr, m_mockDirectiveSequencer, m_mockExceptionSender, m_mockMessageSender, m_mockFocusManager );
     EXPECT_EQ(nullptr, engineImpl);
 }
 
 TEST_F( PhoneCallControllerEngineImplTest, createWithNullDirectiveSequencer ) {
     std::shared_ptr<aace::engine::phoneCallController::PhoneCallControllerEngineImpl> engineImpl;
     engineImpl = aace::engine::phoneCallController::PhoneCallControllerEngineImpl::create(
-        m_mockPlatformInterface, m_mockCapabilitiesDelegate, m_mockContextManager, nullptr, m_mockExceptionSender, m_mockMessageSender );
+        m_mockPlatformInterface, m_mockCapabilitiesDelegate, m_mockContextManager, nullptr, m_mockExceptionSender, m_mockMessageSender, m_mockFocusManager );
     EXPECT_EQ(nullptr, engineImpl);
 }
 
 TEST_F( PhoneCallControllerEngineImplTest, createWithNullExceptionSender ) {
     std::shared_ptr<aace::engine::phoneCallController::PhoneCallControllerEngineImpl> engineImpl;
     engineImpl = aace::engine::phoneCallController::PhoneCallControllerEngineImpl::create(
-        m_mockPlatformInterface, m_mockCapabilitiesDelegate, m_mockContextManager, m_mockDirectiveSequencer, nullptr, m_mockMessageSender );
+        m_mockPlatformInterface, m_mockCapabilitiesDelegate, m_mockContextManager, m_mockDirectiveSequencer, nullptr, m_mockMessageSender, m_mockFocusManager );
     EXPECT_EQ(nullptr, engineImpl);
 }
 
 TEST_F( PhoneCallControllerEngineImplTest, createWithNullMessageSender ) {
     std::shared_ptr<aace::engine::phoneCallController::PhoneCallControllerEngineImpl> engineImpl;
     engineImpl = aace::engine::phoneCallController::PhoneCallControllerEngineImpl::create(
-        m_mockPlatformInterface, m_mockCapabilitiesDelegate, m_mockContextManager, m_mockDirectiveSequencer, m_mockExceptionSender, nullptr );
+        m_mockPlatformInterface, m_mockCapabilitiesDelegate, m_mockContextManager, m_mockDirectiveSequencer, m_mockExceptionSender, nullptr, m_mockFocusManager );
     EXPECT_EQ(nullptr, engineImpl);
 }
 

@@ -9,4 +9,5 @@ IMAGE_INSTALL += "\
     aac-module-alexa \
     aac-module-navigation \
     aac-module-phone-control \
+    aac-module-contact-uploader \
     "

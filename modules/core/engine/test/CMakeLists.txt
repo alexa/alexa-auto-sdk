@@ -7,11 +7,13 @@ set(UNIT_TEST_SRCS
     VehicleConfigurationImplTest.cpp
 )
 
+set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 foreach(TEST_SRC ${UNIT_TEST_SRCS})
     get_filename_component(TEST_NAME ${TEST_SRC} NAME_WE)
     add_executable(${TEST_NAME} ${TEST_SRC})
     target_link_libraries(${TEST_NAME} AACECoreEngine
-        GTest::GTest GTest::Main ${GMOCK_LIBRARY} ${GMOCK_MAIN_LIBRARY})
+        GTest::GTest GTest::Main ${GMOCK_LIBRARY} ${GMOCK_MAIN_LIBRARY}
+        ${SQLITE3_LIBRARIES})
     add_test(NAME ${TEST_NAME}
-        COMMAND ${TEST_NAME})
+        COMMAND ${CMAKE_COMMAND} -E env GTEST_OUTPUT=xml:${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TEST_NAME}.xml ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TEST_NAME})
 endforeach()

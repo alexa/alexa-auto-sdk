@@ -9,7 +9,7 @@ SRC_URI[sha256sum] = "66562e26c2a8112eb3d15e8521290352cbb5a8295271583840cb9a9f22
 
 inherit cmake
 
-FILES_${PN}_remove = "${datadir}/${BPN}"
+FILES_${PN} += "${datadir}/${BPN}"
 
 # Use OpenSSL from Homebrew install
 EXTRA_OECMAKE_append_darwin = " -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl"

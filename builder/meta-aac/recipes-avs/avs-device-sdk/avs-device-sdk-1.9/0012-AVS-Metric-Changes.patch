@@ -1,0 +1,664 @@
+ AVSCommon/CMakeLists.txt                           |   2 +
+ AVSCommon/Utils/include/AVSCommon/Utils/Metrics.h  |  38 +++++-
+ .../include/AVSCommon/Utils/Metrics/MetricEvent.h  | 136 +++++++++++++++++++++
+ .../include/AVSCommon/Utils/Metrics/UPLService.h   | 127 +++++++++++++++++++
+ AVSCommon/Utils/src/Metrics.cpp                    |  10 ++
+ AVSCommon/Utils/src/Metrics/MetricEvent.cpp        |  78 ++++++++++++
+ AVSCommon/Utils/src/Metrics/UPLService.cpp         | 131 ++++++++++++++++++++
+ CapabilityAgents/AIP/src/AudioInputProcessor.cpp   |  10 ++
+ .../SpeechSynthesizer/src/SpeechSynthesizer.cpp    |  10 ++
+ 9 files changed, 541 insertions(+), 1 deletion(-)
+
+diff --git a/AVSCommon/CMakeLists.txt b/AVSCommon/CMakeLists.txt
+index 0e3b453..951bb47 100644
+--- a/AVSCommon/CMakeLists.txt
++++ b/AVSCommon/CMakeLists.txt
+@@ -58,6 +58,8 @@ add_library(AVSCommon SHARED
+     Utils/src/Logger/LogStringFormatter.cpp
+     Utils/src/Logger/ModuleLogger.cpp
+     Utils/src/Logger/ThreadMoniker.cpp
++    Utils/src/Metrics/MetricEvent.cpp
++    Utils/src/Metrics/UPLService.cpp
+     Utils/src/MacAddressString.cpp
+     Utils/src/Metrics.cpp
+     Utils/src/Network/InternetConnectionMonitor.cpp
+diff --git a/AVSCommon/Utils/include/AVSCommon/Utils/Metrics.h b/AVSCommon/Utils/include/AVSCommon/Utils/Metrics.h
+index f2586e9..b535f61 100644
+--- a/AVSCommon/Utils/include/AVSCommon/Utils/Metrics.h
++++ b/AVSCommon/Utils/include/AVSCommon/Utils/Metrics.h
+@@ -47,7 +47,22 @@ public:
+         AIP_SEND,
+ 
+         // Used when issuing an extra metric log for missing Ids
+-        BUILDING_MESSAGE
++        BUILDING_MESSAGE,
++
++        // Dispatch Directive
++        DISPATCH_DIRECTIVE,
++
++        // Parse Complete
++        PARSE_COMPLETE,
++
++        // Stop Capture
++        STOP_CAPTURE,
++
++        // First Bye of Json
++        FIRST_BYTE_OF_JSON,
++        
++        // Playback Started
++        PLAYBACK_STARTED
+     };
+ 
+     /**
+@@ -132,6 +147,19 @@ private:
+         ACSDK_METRIC_WITH_ENTRY(logEntry);                                     \
+     } while (false)
+ 
++/**
++ * Send a Metric log line.
++ *
++ * @param TAG The name of the source of the log entry
++ * @param msg The text (or builder of the text) for the log entry.
++ */
++#define ACSDK_METRIC_SEND(TAG, msg)                                            \
++    do {                                                                       \
++        alexaClientSDK::avsCommon::utils::logger::LogEntry logEntry(           \
++            TAG, __func__ + alexaClientSDK::avsCommon::utils::METRICS_TAG);    \
++        logEntry.d("Message", msg);                                            \
++        ACSDK_METRIC_WITH_ENTRY(logEntry);                                     \
++    } while (false)
+ #else  // ACSDK_LATENCY_LOG_ENABLED
+ 
+ /**
+@@ -154,6 +182,14 @@ private:
+  */
+ #define ACSDK_METRIC_MSG(TAG, msg, location)
+ 
++/**
++ * Compile out a Metric log line.
++ *
++ * @param TAG The name of the source of the log entry
++ * @param msg The text (or builder of the text) for the log entry.
++ */
++#define ACSDK_METRIC_SEND(TAG, msg)
++
+ #endif  // ACSDK_LATENCY_LOG_ENABLED
+ 
+ #endif  // ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_METRICS_H_
+diff --git a/AVSCommon/Utils/include/AVSCommon/Utils/Metrics/MetricEvent.h b/AVSCommon/Utils/include/AVSCommon/Utils/Metrics/MetricEvent.h
+new file mode 100644
+index 0000000..baebc38
+--- /dev/null
++++ b/AVSCommon/Utils/include/AVSCommon/Utils/Metrics/MetricEvent.h
+@@ -0,0 +1,136 @@
++/*
++ * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License").
++ * You may not use this file except in compliance with the License.
++ * A copy of the License is located at
++ *
++ *     http://aws.amazon.com/apache2.0/
++ *
++ * or in the "license" file accompanying this file. This file is distributed
++ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied. See the License for the specific language governing
++ * permissions and limitations under the License.
++ */
++
++#ifndef ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_METRICS_METRICEVENT_H_
++#define ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_METRICS_METRICEVENT_H_
++
++#include <string>
++#include <unordered_map>
++
++#include <AVSCommon/Utils/Logger/Logger.h>
++
++namespace alexaClientSDK {
++namespace avsCommon {
++namespace utils {
++namespace metrics {
++
++class MetricEvent {
++public:
++    /**
++     * An enum class to represent the metric types: One of CT (counter), TI (timer), DV (discrete value)
++     */
++    enum class MetricDataType {
++        TI,
++        DV,
++        CT
++    };
++    
++    /**
++     * An enum class to represent upload priority: One of HI (high) or NR (normal). Default is NR.
++     */
++    enum class MetricPriority {
++        NR,
++        HI
++    };
++
++    /**
++     * Constructor.
++     *
++     * @param program The name that indicates where the event came from / who reported.
++     * @param source The name that provides additional contextual information about how the event happened.
++     */
++    MetricEvent(const std::string& program, const std::string& source);
++    
++    /**
++     * Constructor.
++     *
++     * @param program The name that indicates where the event came from / who reported.
++     * @param source The name that provides additional contextual information about how the event happened.
++     */
++    MetricEvent(const std::string& program, const std::string& source, MetricPriority priority);
++
++    /**
++     * Add timer data to the metric event.
++     *
++     * @param name The name describing the datapoint being captured.
++     * @param value The time in milliseconds.
++     */
++    void addTimer(const std::string& name, long value);
++    
++    /**
++     * Add string data to the metric event. 
++     *
++     * @param name The name describing the datapoint being captured.
++     * @param value The string that represents the value.
++     */
++    void addString(const std::string& name, const std::string& value);
++    
++    /**
++     * Add counter data to the metric event. 
++     *
++     * @param name The name describing the datapoint being captured.
++     * @param value The number that represents frequency or count.
++     */
++    void addCounter(const std::string& name, int value);
++    
++    /**
++     * Print the metric event data via logger in a standardized metric format.
++     */
++    void record();
++
++private:
++    /**
++     * Convert MetricPriority enum to String representation. 
++     *
++     * @param priority The enum to convert.
++     */
++    static std::string priorityToString(MetricPriority priority);
++    
++    /**
++     * Convert MetricDataType enum to String representation. 
++     *
++     * @param priority The enum to convert.
++     */
++    static std::string dataTypeToString(MetricDataType dataPoint);
++    
++    /**
++     * Helper method to append data to the string log that is being built. 
++     *
++     * @param name The name describing the datapoint being captured.
++     * @param value The string that represents the value.
++     * @param type The type of metric (timer, counter, string).
++     * @param sampleCount The frequency or count of the datapoint.
++     */
++    void addDataToLog(std::string name, std::string value, MetricDataType type, std::string sampleCount);
++
++    /// Name that indicates where the event came from / who reported.
++    std::string m_program;
++
++    /// Name that provides additional contextual information about how the event happened.
++    std::string m_source;
++
++    /// A string that follows a standard format to capture metric datapoints.
++    std::string m_metricLog;
++
++    /// Priority of the metric (High or Normal).
++    MetricPriority m_priority;
++};
++
++}  // namespace metrics
++}  // namespace utils
++}  // namespace avsCommon
++}  // namespace alexaClientSDK
++
++#endif  // ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_METRICS_METRICEVENT_H_
+\ No newline at end of file
+diff --git a/AVSCommon/Utils/include/AVSCommon/Utils/Metrics/UPLService.h b/AVSCommon/Utils/include/AVSCommon/Utils/Metrics/UPLService.h
+new file mode 100644
+index 0000000..fdd4b45
+--- /dev/null
++++ b/AVSCommon/Utils/include/AVSCommon/Utils/Metrics/UPLService.h
+@@ -0,0 +1,127 @@
++/*
++ * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License").
++ * You may not use this file except in compliance with the License.
++ * A copy of the License is located at
++ *
++ *     http://aws.amazon.com/apache2.0/
++ *
++ * or in the "license" file accompanying this file. This file is distributed
++ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied. See the License for the specific language governing
++ * permissions and limitations under the License.
++ */
++
++#ifndef ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_METRICS_UPLSERVICE_H_
++#define ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_METRICS_UPLSERVICE_H_
++
++#include "AVSCommon/Utils/Metrics/MetricEvent.h"
++
++#include <string>
++#include <unordered_map>
++
++namespace alexaClientSDK {
++namespace avsCommon {
++namespace utils {
++namespace metrics {
++
++class UPLService {
++public:
++    /**
++     * Return the one and only @c UPLService instance.
++     *
++     * @return The one and only @c UPLService instance.
++     */
++    static std::shared_ptr<UPLService> getInstance();
++
++    /**
++     * Destructor.
++     */
++    virtual ~UPLService() = default;
++    
++    /**
++     * An enum class to represent the state of the Dialogue Request received from AVS.
++     */
++    enum class DialogueState {
++        NONE,
++        STOP_CAPTURE,
++        FIRST_BYTE_JSON_RECEIVED,
++        PLAYBACK_STARTED
++    };
++
++    /**
++     * A struct to define how to calculate hash for the DialogueState enum.
++     */
++    struct DialogueStateHash {
++        std::size_t operator()(DialogueState e) const {
++            return static_cast<std::size_t>(e);
++        }
++    };
++
++    /**
++     * Reset states by clearing previously saved information from m_stateToTimeMap and m_currentMetric.
++     */
++    void resetStates();
++
++    /**
++     * Save the current time in milliseconds paired with the current state 
++     *
++     * @param currentState The current state that AVS is in processing the directive.
++     * @param dialogId The dialog id of the directive being processed
++     */
++    void saveStateTime(const DialogueState currentState, const std::string& dialogId);
++
++    /**
++     * Save the current time in milliseconds paired with the current state 
++     *
++     * @param isOnline Boolean to determine if metric came from local AHE or online AVS.
++     * @param dialogId The dialog id of the directive being processed
++     */
++    void setIsUplOnline(bool isOnline, const std::string& dialogId);
++
++private:
++    /**
++     * Constructor.
++     */
++    UPLService();
++
++    /**
++     * Record the user perceived latency based on the STOP_CAPTURE and PLAYBACK_STARTED state information.
++     */
++    void recordUPL();
++    
++    /**
++     * Manage the current state that AVS is in processing the directive. 
++     *
++     * @param currentState The current state that AVS is in processing the directive.
++     * @param dialogId The dialog id of the directive being processed
++     */
++    void manageStates(const DialogueState currentState, const std::string& dialogId);
++
++    /**
++     * Get current time in milliseconds.
++     *
++     * @return The time in milliseconds.
++     */
++    const long getCurrentTimeInMs();
++
++    /// Dialog id of current directive being processed by AVS.
++    std::string m_dialogId;
++
++    /// Current state that AVS is in processing the directive.
++    DialogueState m_currentState;
++
++    /// Map of DialogueState and the time it occurred in milliseconds. Used to calculate UPL.
++    std::unordered_map<DialogueState, long, DialogueStateHash> m_stateToTimeMap;
++
++    /// Boolean that defines if UPL measured is from local AHE or online AVS.
++    bool m_isOnline;
++};
++
++}  // namespace metrics
++}  // namespace utils
++}  // namespace avsCommon
++}  // namespace alexaClientSDK
++
++#endif  // ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_METRICS_UPLSERVICE_H_
+\ No newline at end of file
+diff --git a/AVSCommon/Utils/src/Metrics.cpp b/AVSCommon/Utils/src/Metrics.cpp
+index bf66d9a..c3192b1 100644
+--- a/AVSCommon/Utils/src/Metrics.cpp
++++ b/AVSCommon/Utils/src/Metrics.cpp
+@@ -36,6 +36,16 @@ const std::string Metrics::locationToString(Metrics::Location location) {
+             return "AIP Send";
+         case BUILDING_MESSAGE:
+             return "Building Message";
++        case DISPATCH_DIRECTIVE:
++            return "Dispatch Directive";
++        case PARSE_COMPLETE:
++            return "Parse Complete";
++        case STOP_CAPTURE:
++            return "Stop Capture";
++        case FIRST_BYTE_OF_JSON:
++            return "First Byte Of Json";
++        case PLAYBACK_STARTED:
++            return "Playback Started";
+     }
+ 
+     // UNREACHABLE
+diff --git a/AVSCommon/Utils/src/Metrics/MetricEvent.cpp b/AVSCommon/Utils/src/Metrics/MetricEvent.cpp
+new file mode 100644
+index 0000000..4e70cb2
+--- /dev/null
++++ b/AVSCommon/Utils/src/Metrics/MetricEvent.cpp
+@@ -0,0 +1,78 @@
++#include <AVSCommon/Utils/Logger/LogEntry.h>
++#include "AVSCommon/Utils/Metrics/MetricEvent.h"
++#include "AVSCommon/Utils/Metrics.h"
++
++namespace alexaClientSDK {
++namespace avsCommon {
++namespace utils {
++namespace metrics {
++
++static const std::string TAG("MetricEvent");
++
++/// Default number of samples for metric.
++const std::string METRIC_NUM_SAMPLES_DEFAULT = "1";
++
++MetricEvent::MetricEvent(const std::string& program, const std::string& source) : 
++        MetricEvent(program, source, MetricPriority::NR) {
++}
++
++MetricEvent::MetricEvent(
++        const std::string& program, 
++        const std::string& source, 
++        MetricPriority priority ) :
++            m_program{program},
++            m_source(source),
++            m_metricLog{""},
++            m_priority{priority} {
++    m_metricLog.append(m_program).append(":").append(m_source);
++}
++
++void MetricEvent::addTimer(const std::string& name, long value) {
++    addDataToLog(name, std::to_string(value), MetricDataType::TI, METRIC_NUM_SAMPLES_DEFAULT);    
++}
++
++void MetricEvent::addString(const std::string& name, const std::string& value) {
++    addDataToLog(name, value, MetricDataType::DV, METRIC_NUM_SAMPLES_DEFAULT);
++}
++
++void MetricEvent::addCounter(const std::string& name, int value) {
++    addDataToLog(name, std::to_string(value), MetricDataType::CT, METRIC_NUM_SAMPLES_DEFAULT);
++}
++
++void MetricEvent::record() {
++    std::string priorityStr = priorityToString(m_priority);
++    m_metricLog.append(":").append(priorityStr);
++    ACSDK_METRIC_SEND(TAG, m_metricLog);
++}
++
++void MetricEvent::addDataToLog(std::string name, std::string value, MetricDataType type, std::string sampleCount) {
++    m_metricLog.append(":").append(name).append("=").append(value).append(";");
++    m_metricLog.append(dataTypeToString(type)).append(";").append(sampleCount).append(",");
++}
++
++std::string MetricEvent::priorityToString(MetricPriority priority) {
++    switch (priority) {
++        case MetricPriority::NR:
++            return "NR";
++        case MetricPriority::HI:
++            return "HI";
++    }
++    return "";
++}
++
++std::string MetricEvent::dataTypeToString(MetricDataType type) {
++    switch (type) {
++        case MetricDataType::TI:
++            return "TI";
++        case MetricDataType::DV:
++            return "DV";
++        case MetricDataType::CT:
++            return "CT";
++    }
++    return "";
++}
++
++}  // namespace metrics
++}  // namespace utils
++}  // namespace avsCommon
++}  // namespace alexaClientSDK
+\ No newline at end of file
+diff --git a/AVSCommon/Utils/src/Metrics/UPLService.cpp b/AVSCommon/Utils/src/Metrics/UPLService.cpp
+new file mode 100644
+index 0000000..d01ffaf
+--- /dev/null
++++ b/AVSCommon/Utils/src/Metrics/UPLService.cpp
+@@ -0,0 +1,131 @@
++#include <chrono>
++
++#include <AVSCommon/Utils/Logger/Logger.h>
++#include "AVSCommon/Utils/Metrics/UPLService.h"
++
++namespace alexaClientSDK {
++namespace avsCommon {
++namespace utils {
++namespace metrics {
++
++static const std::string PROGRAM_NAME = "AVS_Speech";
++static const std::string DELIMITER = "_";
++static const std::string OFFLINE_NAME = "Offline";
++static const std::string SOURCE_NAME = "VoiceRequest";
++static const std::string USER_PERCEIVED_LATENCY_AUDIO_NAME = "UserPerceivedLatency.Audio";
++static const std::string DIALOG_ID_NAME = "dialogId";
++
++static const std::string TAG("UPLService");
++
++/**
++ * Create a LogEntry using this file's TAG and the specified event string.
++ *
++ * @param The event string for this @c LogEntry.
++ */
++#define LX(event) alexaClientSDK::avsCommon::utils::logger::LogEntry(TAG, event)
++
++std::shared_ptr<UPLService> UPLService::getInstance() {
++    static std::shared_ptr<UPLService> s_instance(new UPLService());
++    return s_instance;
++}
++
++UPLService::UPLService() :
++        m_dialogId{""},
++        m_currentState{DialogueState::NONE},
++        m_isOnline(true){
++}
++
++void UPLService::resetStates() {
++    m_dialogId = "";
++    m_isOnline = true;
++    m_currentState = DialogueState::NONE;
++    m_stateToTimeMap.clear();
++}
++
++void UPLService::saveStateTime(const DialogueState currentState, const std::string& dialogId) {
++    //Set dialogId if empty
++    if (m_dialogId.empty()) {
++        m_dialogId = dialogId;
++    }
++
++    //If dialogId doesn't match the current dialogId, then clear existing states
++    if (m_dialogId.compare(dialogId) != 0) {
++        resetStates();
++        m_dialogId = dialogId;
++    }
++
++    //Save current state with current time
++    long curTime = getCurrentTimeInMs();
++    m_stateToTimeMap.insert({currentState, curTime});
++
++    //Manage state logic based on currentState
++    manageStates(currentState, dialogId);
++}
++
++void UPLService::manageStates(const DialogueState currentState, const std::string& dialogId) {
++    //Set current state
++    m_currentState = currentState;
++
++    //If current state is the final state (Playback Started), record UPL and reset
++    if(m_currentState ==  DialogueState::PLAYBACK_STARTED) {
++        recordUPL();
++        resetStates();
++    }
++}
++
++void UPLService::recordUPL() {
++    //If dialogId is not set, return
++    if(m_dialogId.empty()) {
++        ACSDK_ERROR(LX("DialogId is empty when trying to upload UPL metric").d("connection online", m_isOnline));
++        return;
++    }
++
++    //If Stop Capture or Playback Started were not captured, return
++    if(m_stateToTimeMap.find(DialogueState::STOP_CAPTURE) == m_stateToTimeMap.end() || 
++        m_stateToTimeMap.find(DialogueState::PLAYBACK_STARTED) == m_stateToTimeMap.end()) {
++            ACSDK_ERROR(LX("StopCapture and PlaybackStarted states weren't stored when trying to upload UPL metric:").d("dialogRequestId", m_dialogId).d("connection online", m_isOnline));
++            return;
++    }
++
++    //If current state is not Playback Started, return
++    if(m_currentState != DialogueState::PLAYBACK_STARTED) {
++        ACSDK_DEBUG(LX("Current state is not PlaybackStarted:").d("dialogRequestId", m_dialogId).d("connection online", m_isOnline));
++        return;
++    }
++
++    long stopCaptureTime = m_stateToTimeMap.at(DialogueState::STOP_CAPTURE);
++    long playbackStartedTime = m_stateToTimeMap.at(DialogueState::PLAYBACK_STARTED);
++    long userPerceivedLatency = playbackStartedTime - stopCaptureTime;
++
++    //If UPL is valid, then create a MetricEvent, add the calculated UPL and record it
++    if(userPerceivedLatency > 0) {
++        std::string programName = m_isOnline ? PROGRAM_NAME : PROGRAM_NAME + DELIMITER + OFFLINE_NAME;
++        std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricEvent> currentMetric = 
++            std::shared_ptr<MetricEvent>(new MetricEvent(programName, SOURCE_NAME));
++        currentMetric->addTimer(USER_PERCEIVED_LATENCY_AUDIO_NAME, userPerceivedLatency);
++        currentMetric->addString(DIALOG_ID_NAME, m_dialogId);
++        currentMetric->record();
++    } else {
++        ACSDK_ERROR(LX("UserPerceivedLatency value was not valid (less than 0) when trying to upload UPL metric:").d("dialogRequestId", m_dialogId).d("connection online", m_isOnline));
++    }
++}
++
++void UPLService::setIsUplOnline(bool isOnline, const std::string& dialogId) {
++    if(m_dialogId == dialogId) {
++        m_isOnline = isOnline;
++        ACSDK_DEBUG(LX("Setting UPL Metric to online or offline:").d("dialogRequestId", dialogId).d("connection online", isOnline));
++    }
++}
++
++const long UPLService::getCurrentTimeInMs() {
++    auto now = std::chrono::system_clock::now();
++    auto now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(now);
++    auto value = now_ms.time_since_epoch();
++    long duration = value.count();
++    return duration;
++}
++
++}  // namespace metrics
++}  // namespace utils
++}  // namespace avsCommon
++}  // namespace alexaClientSDK
+\ No newline at end of file
+diff --git a/CapabilityAgents/AIP/src/AudioInputProcessor.cpp b/CapabilityAgents/AIP/src/AudioInputProcessor.cpp
+index 8192841..247c29b 100644
+--- a/CapabilityAgents/AIP/src/AudioInputProcessor.cpp
++++ b/CapabilityAgents/AIP/src/AudioInputProcessor.cpp
+@@ -22,6 +22,7 @@
+ #include <AVSCommon/Utils/Logger/Logger.h>
+ #include <AVSCommon/Utils/Memory/Memory.h>
+ #include <AVSCommon/Utils/Metrics.h>
++#include <AVSCommon/Utils/Metrics/UPLService.h>
+ #include <AVSCommon/Utils/UUIDGeneration/UUIDGeneration.h>
+ #include <AVSCommon/AVS/Attachment/AttachmentUtils.h>
+ #include <SpeechEncoder/OpusEncoderContext.h>
+@@ -703,6 +704,15 @@ bool AudioInputProcessor::executeStopCapture(bool stopImmediately, std::shared_p
+         ACSDK_DEBUG(LX("stopCaptureIgnored").d("reason", "isCancelled"));
+         return true;
+     }
++
++    if (info && info->directive) {
++        ACSDK_METRIC_IDS(TAG, info->directive->getName(), info->directive->getMessageId(),
++            info->directive->getDialogRequestId(), Metrics::Location::STOP_CAPTURE);
++
++        metrics::UPLService::getInstance()->saveStateTime(metrics::UPLService::DialogueState::STOP_CAPTURE,
++            info->directive->getDialogRequestId());
++    }
++
+     if (m_state != ObserverInterface::State::RECOGNIZING) {
+         static const char* errorMessage = "StopCapture only allowed in RECOGNIZING state.";
+         auto returnValue = false;
+diff --git a/CapabilityAgents/SpeechSynthesizer/src/SpeechSynthesizer.cpp b/CapabilityAgents/SpeechSynthesizer/src/SpeechSynthesizer.cpp
+index 14d6418..6fece91 100644
+--- a/CapabilityAgents/SpeechSynthesizer/src/SpeechSynthesizer.cpp
++++ b/CapabilityAgents/SpeechSynthesizer/src/SpeechSynthesizer.cpp
+@@ -20,6 +20,7 @@
+ #include <AVSCommon/AVS/CapabilityConfiguration.h>
+ #include <AVSCommon/Utils/Logger/Logger.h>
+ #include <AVSCommon/Utils/Metrics.h>
++#include <AVSCommon/Utils/Metrics/UPLService.h>
+ 
+ #include "SpeechSynthesizer/SpeechSynthesizer.h"
+ 
+@@ -608,6 +609,15 @@ void SpeechSynthesizer::executePlaybackStarted() {
+         ACSDK_ERROR(LX("executePlaybackStartedIgnored").d("reason", "nullptrDirectiveInfo"));
+         return;
+     }
++
++    if (m_currentInfo->directive) {
++        ACSDK_METRIC_IDS(TAG, m_currentInfo->directive->getName(), m_currentInfo->directive->getMessageId(),
++            m_currentInfo->directive->getDialogRequestId(), Metrics::Location::PLAYBACK_STARTED);
++    
++        metrics::UPLService::getInstance()->saveStateTime(metrics::UPLService::DialogueState::PLAYBACK_STARTED,
++            m_currentInfo->directive->getDialogRequestId());
++    }
++
+     {
+         std::lock_guard<std::mutex> lock(m_mutex);
+         setCurrentStateLocked(SpeechSynthesizerObserverInterface::SpeechSynthesizerState::PLAYING);

@@ -9,6 +9,7 @@ The following Alexa Auto SDK components are licensed under the Apache License, V
 builder
 modules/alexa
 modules/core
+modules/contact-uploader
 modules/navigation
 modules/phone-control
 platforms/android

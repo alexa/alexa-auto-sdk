@@ -29,7 +29,7 @@ set(UNIT_TEST_SRCS
     AlexaEngineClientObserverTest.cpp
 )
 
-
+set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 foreach(TEST_SRC ${UNIT_TEST_SRCS})
     get_filename_component(TEST_NAME ${TEST_SRC} NAME_WE)
     add_executable(${TEST_NAME} ${TEST_SRC})
@@ -45,7 +45,7 @@ foreach(TEST_SRC ${UNIT_TEST_SRCS})
         ${AVSCONNECTIONMANAGER_LIBRARY} ${CERTIFIEDSENDER}
     )
     add_test(NAME ${TEST_NAME}
-        COMMAND ${TEST_NAME})
+        COMMAND ${CMAKE_COMMAND} -E env GTEST_OUTPUT=xml:${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TEST_NAME}.xml ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TEST_NAME})
 endforeach()
 
 install(

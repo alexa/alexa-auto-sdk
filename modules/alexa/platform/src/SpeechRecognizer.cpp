@@ -24,11 +24,15 @@ SpeechRecognizer::SpeechRecognizer( bool wakewordDetectionEnabled ) : m_wakeword
 SpeechRecognizer::~SpeechRecognizer() = default; // key function
 
 bool SpeechRecognizer::holdToTalk() {
-    return m_speechRecognizerEngineInterface != nullptr && m_speechRecognizerEngineInterface->onHoldToTalk();
+    return startCapture( Initiator::HOLD_TO_TALK );
 }
 
 bool SpeechRecognizer::tapToTalk() {
-    return m_speechRecognizerEngineInterface != nullptr && m_speechRecognizerEngineInterface->onTapToTalk();
+    return startCapture( Initiator::TAP_TO_TALK );
+}
+
+bool SpeechRecognizer::startCapture( Initiator initiator, uint64_t keywordBegin, uint64_t keywordEnd, const std::string& keyword ) {
+    return m_speechRecognizerEngineInterface != nullptr && m_speechRecognizerEngineInterface->onStartCapture( initiator, keywordBegin, keywordEnd, keyword );
 }
 
 bool SpeechRecognizer::stopCapture() {

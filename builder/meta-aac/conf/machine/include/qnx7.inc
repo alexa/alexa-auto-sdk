@@ -35,6 +35,10 @@ TARGET_CFLAGS = ""
 TARGET_CXXFLAGS = " -Y_cxx"
 TARGET_LDFLAGS = ""
 
+# pkg-config
+export AAC_PKG_CONFIG_SYSROOT_DIR = "${QNX_TARGET}"
+export AAC_PKG_CONFIG_LIBDIR = "${AAC_HOSTTOOLS}/qnx7-pkgconfig/${QNX_ARCH}"
+
 # Workaround
 MODIFYTOS = "0"
 

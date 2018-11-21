@@ -1,0 +1,12 @@
+bob,marley,bob,amazon,phonenumber,+11111111111,home
+bob,kelly,bob,amazon,phonenumber,+11111111112,work
+bob,delan,bob,amazon,phonenumber,+11111111113,
+kelly,jo,jo,amazon,phonenumber,+11111111114,
+mark,hu,mark,amazon,phonenumber,+11111111115,home
+mark,jo,mark,amazon,phonenumber,+11111111116,work
+mark,bob,mark,amazon,phonenumber,+11111111117,
+punit,roy,punit,,phonenumber,+11111111118,home
+punit,bose,punit,,phonenumber,+11111111119,home
+punit,roy,punit,amazon,phonenumber,+11111111110,work
+jon,dev,jon,,phonenumber,+11111111111,home
+jon,dev,jon,amazon,phonenumber,+11111111112,work

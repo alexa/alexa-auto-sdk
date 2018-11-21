@@ -20,5 +20,9 @@ namespace location {
 
 LocationProvider::~LocationProvider() = default; // key function
 
+std::string LocationProvider::getCountry() {
+    return "";
+}
+
 } // aace::location
 } // aace

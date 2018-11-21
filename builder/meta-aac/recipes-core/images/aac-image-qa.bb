@@ -9,6 +9,7 @@ IMAGE_INSTALL += "\
     aac-module-alexa \
     aac-module-navigation \
     aac-module-phone-control \
+    aac-module-contact-uploader \
     avs-device-sdk-test \
     aac-module-core-test \
     aac-integration \

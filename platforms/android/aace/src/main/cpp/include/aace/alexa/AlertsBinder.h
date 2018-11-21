@@ -32,6 +32,10 @@ protected:
 public:
     void alertStateChanged( const std::string & alertToken, aace::alexa::Alerts::AlertState state, const std::string & reason ) override;
 
+    void alertCreated( const std::string & alertToken, const std::string & detailedInfo ) override;
+
+    void alertDeleted( const std::string & alertToken ) override;
+
     /*
 public: // these need to be accessible
     aace::alexa::Alerts::AlertState convertAlertState( jobject obj );
@@ -42,6 +46,8 @@ private:
 
 private:
     jmethodID m_javaMethod_alertStateChanged_alertToken_state_reason = nullptr;
+    jmethodID m_javaMethod_alertCreated_alertToken_detailedInfo = nullptr;
+    jmethodID m_javaMethod_alertDeleted_alertToken = nullptr;
 
     // AlertState
     ObjectRef m_enum_AlertState_READY;

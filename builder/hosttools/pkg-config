@@ -1,0 +1,44 @@
+#!/bin/bash
+
+THISDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+contains() {
+	[[ $2 =~ (^|[[:space:]])$1($|[[:space:]]) ]] && echo 1 || echo 0
+}
+
+PARAMS="$@"
+PKG_NAMES=()
+while [[ $# -gt 0 ]]; do
+	key="$1"
+	case $key in
+		--atleast-version)
+		shift; shift
+		;;
+		-*|--*)
+		shift
+		;;
+		*) # Any other additional arguments
+		PKG_NAMES+=("$1")
+		shift
+		;;
+	esac
+done
+set -- "${POSITIONAL[@]}"
+
+# Don't use PKG_CONFIG_PATH
+export PKG_CONFIG_PATH=""
+
+if [ ${#PKG_NAMES[@]} == 1 ]; then
+	pkgname="${PKG_NAMES[0]}"
+	regex="(.*[^><])(>=|=|<=)(.*)"
+	if [[ ${pkgname} =~ ${regex} ]]; then
+		pkgname="${BASH_REMATCH[1]}"
+	fi
+	if [ $(contains ${pkgname} "${AAC_PKG_CONFIG_PROVIDED}") == 1 ]; then
+		# Use system package
+		export PKG_CONFIG_SYSROOT_DIR="${AAC_PKG_COFIG_SYSROOT_DIR}"
+		export PKG_CONFIG_LIBDIR="${AAC_PKG_CONFIG_LIBDIR}"
+	fi
+fi
+
+${AAC_PKG_CONFIG} ${PARAMS}

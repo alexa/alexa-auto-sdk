@@ -27,6 +27,7 @@
 #include <AVSCommon/SDKInterfaces/test/MockDirectiveSequencer.h>
 #include <AVSCommon/SDKInterfaces/test/MockExceptionEncounteredSender.h>
 #include <AVSCommon/SDKInterfaces/test/MockFocusManager.h>
+#include <AVSCommon/SDKInterfaces/test/MockPlaybackRouter.h>
 #include "include/MockSpeakerManager.h"
 #include "include/MockAttachmentManager.h"
 #include "include/MockCapabilitiesDelegateInterface.h"
@@ -118,7 +119,6 @@ public:
             std::unordered_set<std::shared_ptr<avsCommon::sdkInterfaces::ConnectionStatusObserverInterface>>(),
             std::unordered_set<std::shared_ptr<avsCommon::sdkInterfaces::MessageObserverInterface>>());
      
-        
         m_mockDirectiveSequencer = std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockDirectiveSequencer>>();
         m_mockFocusManager = std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockFocusManager>>();
         m_mockContextManager = std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockContextManager>>();
@@ -126,14 +126,16 @@ public:
         m_mockCapabilitiesDelegate = std::make_shared<testing::StrictMock<aace::test::unit::MockCapabilitiesDelegateInterface>>();
         m_mockSpeakerManager = std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockSpeakerManager>>();
         m_mockExceptionSender = std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockExceptionEncounteredSender>>();
+        m_mockPlaybackRouter = std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockPlaybackRouter>>();
 
         EXPECT_CALL(*m_mockDirectiveSequencer, addDirectiveHandler(testing::_)).WillOnce(testing::Return(true));
         EXPECT_CALL(*m_mockCapabilitiesDelegate, registerCapability(testing::_)).WillOnce(testing::Return(true));
         EXPECT_CALL(*m_mockContextManager, setStateProvider(testing::_, testing::_));
+        EXPECT_CALL(*m_mockSpeakerManager, addSpeaker(testing::_));
         m_audioPlayerEngineImpl = aace::engine::alexa::AudioPlayerEngineImpl::create(
             m_mockAudioPlayerPlatformInterface, m_mockDirectiveSequencer, m_mockConnectionManager,
             m_mockFocusManager, m_mockContextManager, m_mockAttachmentManager, m_mockCapabilitiesDelegate, m_mockSpeakerManager,
-            m_mockExceptionSender);
+            m_mockExceptionSender, m_mockPlaybackRouter );
         if (DEBUG) {
             std::cout << "Exit " << __PRETTY_FUNCTION__ << std::endl;
         }
@@ -184,6 +186,8 @@ public:
     std::shared_ptr<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockSpeakerManager>> m_mockSpeakerManager;
     std::shared_ptr<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockExceptionEncounteredSender>> m_mockExceptionSender;
     std::shared_ptr<MockMessageRouter> m_mockMessageRouter;
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> m_mockPlaybackRouter;
+
 
 };
 
@@ -203,7 +207,7 @@ TEST_F(AudioPlayerEngineImplTest, createWithPlayerInterfaceAsNull) {
     audioPlayerEngineImplTemp = aace::engine::alexa::AudioPlayerEngineImpl::create(
         nullptr, m_mockDirectiveSequencer, m_mockConnectionManager,
         m_mockFocusManager, m_mockContextManager, m_mockAttachmentManager, m_mockCapabilitiesDelegate, m_mockSpeakerManager,
-        m_mockExceptionSender);
+        m_mockExceptionSender, m_mockPlaybackRouter );
     EXPECT_EQ(nullptr, audioPlayerEngineImplTemp) << "AudioPlayerEngineImpl pointer to be null";
 }
 
@@ -216,7 +220,7 @@ TEST_F(AudioPlayerEngineImplTest, createWithDirectiveSequencerAsNull) {
     audioPlayerEngineImplTemp = aace::engine::alexa::AudioPlayerEngineImpl::create(
         m_mockAudioPlayerPlatformInterface, nullptr, m_mockConnectionManager,
         m_mockFocusManager, m_mockContextManager, m_mockAttachmentManager, m_mockCapabilitiesDelegate, m_mockSpeakerManager,
-        m_mockExceptionSender);
+        m_mockExceptionSender, m_mockPlaybackRouter );
     EXPECT_EQ(nullptr, audioPlayerEngineImplTemp) << "AudioPlayerEngineImpl pointer to be null";
 }
 
@@ -226,10 +230,11 @@ TEST_F(AudioPlayerEngineImplTest, createWithDirectiveSequencerAsNull) {
 TEST_F(AudioPlayerEngineImplTest, createWithConnectionManagerNull){
     std::shared_ptr<aace::engine::alexa::AudioPlayerEngineImpl> audioPlayerEngineImplTemp;
 
+    EXPECT_CALL(*m_mockSpeakerManager, addSpeaker(testing::_));
     audioPlayerEngineImplTemp = aace::engine::alexa::AudioPlayerEngineImpl::create(
         m_mockAudioPlayerPlatformInterface, m_mockDirectiveSequencer, nullptr,
         m_mockFocusManager, m_mockContextManager, m_mockAttachmentManager, m_mockCapabilitiesDelegate, m_mockSpeakerManager,
-        m_mockExceptionSender);
+        m_mockExceptionSender, m_mockPlaybackRouter );
     EXPECT_EQ(nullptr, audioPlayerEngineImplTemp) << "AudioPlayerEngineImpl pointer to be null";
 }
 
@@ -239,10 +244,11 @@ TEST_F(AudioPlayerEngineImplTest, createWithConnectionManagerNull){
 TEST_F(AudioPlayerEngineImplTest, createWithFocusManagerAsNull) {
     std::shared_ptr<aace::engine::alexa::AudioPlayerEngineImpl> audioPlayerEngineImplTemp;
 
+    EXPECT_CALL(*m_mockSpeakerManager, addSpeaker(testing::_));
     audioPlayerEngineImplTemp = aace::engine::alexa::AudioPlayerEngineImpl::create(
         m_mockAudioPlayerPlatformInterface, m_mockDirectiveSequencer, m_mockConnectionManager,
         nullptr, m_mockContextManager, m_mockAttachmentManager, m_mockCapabilitiesDelegate, m_mockSpeakerManager,
-        m_mockExceptionSender);
+        m_mockExceptionSender, m_mockPlaybackRouter );
     EXPECT_EQ(nullptr, audioPlayerEngineImplTemp) << "AudioPlayerEngineImpl pointer to be null";
 }
 
@@ -252,10 +258,11 @@ TEST_F(AudioPlayerEngineImplTest, createWithFocusManagerAsNull) {
 TEST_F(AudioPlayerEngineImplTest, createWithContextManagerAsNull) {
     std::shared_ptr<aace::engine::alexa::AudioPlayerEngineImpl> audioPlayerEngineImplTemp;
 
+    EXPECT_CALL(*m_mockSpeakerManager, addSpeaker(testing::_));
     audioPlayerEngineImplTemp = aace::engine::alexa::AudioPlayerEngineImpl::create(
         m_mockAudioPlayerPlatformInterface, m_mockDirectiveSequencer, m_mockConnectionManager,
         m_mockFocusManager, nullptr, m_mockAttachmentManager, m_mockCapabilitiesDelegate, m_mockSpeakerManager,
-        m_mockExceptionSender);
+        m_mockExceptionSender, m_mockPlaybackRouter );
     EXPECT_EQ(nullptr, audioPlayerEngineImplTemp) << "AudioPlayerEngineImpl pointer to be null";
 }
 
@@ -268,10 +275,11 @@ TEST_F(AudioPlayerEngineImplTest, createWithAttachmentManagerAsNull) {
     EXPECT_CALL(*m_mockDirectiveSequencer, addDirectiveHandler(testing::_)).WillOnce(testing::Return(true));
     EXPECT_CALL(*m_mockCapabilitiesDelegate, registerCapability(testing::_)).WillOnce(testing::Return(true));
     EXPECT_CALL(*m_mockContextManager, setStateProvider(testing::_, testing::_));
+    EXPECT_CALL(*m_mockSpeakerManager, addSpeaker(testing::_));
     audioPlayerEngineImplTemp = aace::engine::alexa::AudioPlayerEngineImpl::create(
         m_mockAudioPlayerPlatformInterface, m_mockDirectiveSequencer, m_mockConnectionManager,
         m_mockFocusManager, m_mockContextManager, nullptr, m_mockCapabilitiesDelegate, m_mockSpeakerManager,
-        m_mockExceptionSender);
+        m_mockExceptionSender, m_mockPlaybackRouter );
     EXPECT_NE(nullptr, audioPlayerEngineImplTemp) << "AudioPlayerEngineImpl pointer to be null";
     if (audioPlayerEngineImplTemp) {
         EXPECT_CALL(*m_mockContextManager, setStateProvider(testing::_, testing::_));
@@ -288,7 +296,7 @@ TEST_F(AudioPlayerEngineImplTest, createWithCapabilitiesDelegateAsNull) {
     audioPlayerEngineImplTemp = aace::engine::alexa::AudioPlayerEngineImpl::create(
         m_mockAudioPlayerPlatformInterface, m_mockDirectiveSequencer, m_mockConnectionManager,
         m_mockFocusManager, m_mockContextManager, m_mockAttachmentManager, nullptr, m_mockSpeakerManager,
-        m_mockExceptionSender);
+        m_mockExceptionSender, m_mockPlaybackRouter );
     EXPECT_EQ(nullptr, audioPlayerEngineImplTemp) << "AudioPlayerEngineImpl pointer to be null";
 }
 
@@ -301,19 +309,35 @@ TEST_F(AudioPlayerEngineImplTest, createWithSpeakerManagerAsNull) {
     audioPlayerEngineImplTemp = aace::engine::alexa::AudioPlayerEngineImpl::create(
         m_mockAudioPlayerPlatformInterface, m_mockDirectiveSequencer, m_mockConnectionManager,
         m_mockFocusManager, m_mockContextManager, m_mockAttachmentManager, m_mockCapabilitiesDelegate, nullptr,
-        m_mockExceptionSender);
+        m_mockExceptionSender, m_mockPlaybackRouter );
     EXPECT_EQ(nullptr, audioPlayerEngineImplTemp) << "AudioPlayerEngineImpl pointer to be null";
 }
+
 /**
  * Test create() with null parameters
  */
 TEST_F(AudioPlayerEngineImplTest, createWithExceptionSenderAsNull) {
     std::shared_ptr<aace::engine::alexa::AudioPlayerEngineImpl> audioPlayerEngineImplTemp;
 
+    EXPECT_CALL(*m_mockSpeakerManager, addSpeaker(testing::_));
     audioPlayerEngineImplTemp = aace::engine::alexa::AudioPlayerEngineImpl::create(
         m_mockAudioPlayerPlatformInterface, m_mockDirectiveSequencer, m_mockConnectionManager,
         m_mockFocusManager, m_mockContextManager, m_mockAttachmentManager, m_mockCapabilitiesDelegate, m_mockSpeakerManager,
-        nullptr);
+        nullptr, m_mockPlaybackRouter );
+    EXPECT_EQ(nullptr, audioPlayerEngineImplTemp) << "AudioPlayerEngineImpl pointer to be null";
+}
+
+/**
+ * Test create() with null parameters
+ */
+    TEST_F(AudioPlayerEngineImplTest, createWithPlayBackRouterAsNull) {
+    std::shared_ptr<aace::engine::alexa::AudioPlayerEngineImpl> audioPlayerEngineImplTemp;
+
+    EXPECT_CALL(*m_mockSpeakerManager, addSpeaker(testing::_));
+    audioPlayerEngineImplTemp = aace::engine::alexa::AudioPlayerEngineImpl::create(
+        m_mockAudioPlayerPlatformInterface, m_mockDirectiveSequencer, m_mockConnectionManager,
+        m_mockFocusManager, m_mockContextManager, m_mockAttachmentManager, m_mockCapabilitiesDelegate, m_mockSpeakerManager,
+        m_mockExceptionSender, nullptr );
     EXPECT_EQ(nullptr, audioPlayerEngineImplTemp) << "AudioPlayerEngineImpl pointer to be null";
 }
 

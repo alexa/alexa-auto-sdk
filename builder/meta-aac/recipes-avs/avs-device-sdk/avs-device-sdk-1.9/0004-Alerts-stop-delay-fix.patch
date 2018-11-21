@@ -1,0 +1,100 @@
+commit b0c9db2861b5abc82a12338eb4e006c180ec567c
+Author: Madi Juby <madelynj@amazon.com>
+Date:   Thu Sep 27 18:18:50 2018 -0700
+
+    Fix 10 second delay stopping an active alert
+
+diff --git a/CapabilityAgents/Alerts/include/Alerts/Renderer/Renderer.h b/CapabilityAgents/Alerts/include/Alerts/Renderer/Renderer.h
+index 47f6913..49ce9c6 100644
+--- a/CapabilityAgents/Alerts/include/Alerts/Renderer/Renderer.h
++++ b/CapabilityAgents/Alerts/include/Alerts/Renderer/Renderer.h
+@@ -23,6 +23,8 @@
+ #include <AVSCommon/Utils/MediaPlayer/MediaPlayerInterface.h>
+ #include <AVSCommon/Utils/MediaPlayer/MediaPlayerObserverInterface.h>
+ 
++#include <condition_variable>
++#include <mutex>
+ #include <string>
+ #include <vector>
+ 
+@@ -264,9 +266,16 @@ private:
+     /// A pointer to a stream factory to use as the default audio to use when the audio assets aren't available.
+     std::function<std::unique_ptr<std::istream>()> m_defaultAudioFactory;
+ 
+-    /// A flag to capture if the renderer has been asked to stop by its owner.
++    /// A flag to capture if the renderer has been asked to stop by its owner. @c m_waitMutex must be locked when
++    /// modifying this variable.
+     bool m_isStopping;
+ 
++    /// The condition variable used to wait for @c stop() or @c m_loopPause timeouts.
++    std::condition_variable m_waitCondition;
++
++    /// The mutex for @c m_waitCondition.
++    std::mutex m_waitMutex;
++
+     /// The id associated with the media that our MediaPlayer is currently handling.
+     SourceId m_currentSourceId;
+ 
+diff --git a/CapabilityAgents/Alerts/src/Renderer/Renderer.cpp b/CapabilityAgents/Alerts/src/Renderer/Renderer.cpp
+index 30d9d3e..2ff0aa4 100644
+--- a/CapabilityAgents/Alerts/src/Renderer/Renderer.cpp
++++ b/CapabilityAgents/Alerts/src/Renderer/Renderer.cpp
+@@ -88,6 +88,10 @@ void Renderer::start(
+ }
+ 
+ void Renderer::stop() {
++    std::lock_guard<std::mutex> lock(m_waitMutex);
++    m_isStopping = true;
++    m_waitCondition.notify_all();
++
+     m_executor.submit([this]() { executeStop(); });
+ }
+ 
+@@ -180,7 +184,9 @@ bool Renderer::shouldPause() {
+ }
+ void Renderer::pause() {
+     ACSDK_DEBUG9(LX("pause"));
+-    std::this_thread::sleep_for(m_loopPause);
++    std::unique_lock<std::mutex> lock(m_waitMutex);
++    // Wait for stop() or m_loopPause to elapse.
++    m_waitCondition.wait_for(lock, m_loopPause, [this]() { return m_isStopping; });
+ }
+ 
+ void Renderer::play() {
+@@ -223,7 +229,10 @@ void Renderer::executeStart(
+             .d("m_urls.size", m_urls.size())
+             .d("m_remainingLoopCount", m_remainingLoopCount)
+             .d("m_loopPause (ms)", std::chrono::duration_cast<std::chrono::milliseconds>(m_loopPause).count()));
++
++    std::unique_lock<std::mutex> lock(m_waitMutex);
+     m_isStopping = false;
++    lock.unlock();
+ 
+     m_numberOfStreamsRenderedThisLoop = 0;
+ 
+@@ -232,9 +241,7 @@ void Renderer::executeStart(
+ 
+ void Renderer::executeStop() {
+     ACSDK_DEBUG1(LX("executeStop"));
+-    if (m_mediaPlayer->stop(m_currentSourceId)) {
+-        m_isStopping = true;
+-    } else {
++    if (!m_mediaPlayer->stop(m_currentSourceId)) {
+         std::string errorMessage = "mediaPlayer stop request failed.";
+         ACSDK_ERROR(LX("executeStopFailed").d("SourceId", m_currentSourceId).m(errorMessage));
+         notifyObserver(RendererObserverInterface::State::ERROR, errorMessage);
+@@ -279,8 +286,13 @@ void Renderer::executeOnPlaybackFinished(SourceId sourceId) {
+     RendererObserverInterface::State finalState = RendererObserverInterface::State::STOPPED;
+ 
+     ++m_numberOfStreamsRenderedThisLoop;
++    auto isStopping = false;
++    {
++        std::lock_guard<std::mutex> lock(m_waitMutex);
++        isStopping = m_isStopping;
++    }
+ 
+-    if (!m_isStopping && shouldRenderNext()) {
++    if (!isStopping && shouldRenderNext()) {
+         if (renderNextAudioAsset()) {
+             return;
+         }

@@ -54,7 +54,7 @@ public class AuthProviderHandler extends AuthProvider
 
 ### Handling Speech Input
 
-It is the responsibility of the platform implementation to supply audio data to the Engine so that Alexa can process voice input. Since the Engine does not know how audio is managed on a specific platform, the specific audio capture implementation is up to the platform developer. The default platform implementation provides methods for writing raw PCM data to the Engine's audio input processor, which includes handling wakeword recognition and end-of-speech detection.
+It is the responsibility of the platform implementation to supply audio data to the Engine so that Alexa can process voice input. Since the Engine does not know how audio is managed on a specific platform, the specific audio capture implementation is up to the platform developer. The default platform implementation provides methods for writing raw PCM data to the Engine's audio input processor, which includes handling wake word recognition and end-of-speech detection.
 
 To implement a custom handler for speech input, the `SpeechRecognizer` class should be extended:
 
@@ -78,17 +78,17 @@ public class SpeechRecognizerHandler extends SpeechRecognizer
 
 The initiation of a speech recognition event must be handled by the platform. The simplest way to invoke the speech recognizer is via its `holdToTalk()` and `tapToTalk()` methods.
 
-For wakeword implementations, the following methods should be extended in the handler class:
+For wake word implementations, the following methods should be extended in the handler class:
 
 ```
 ...
     @Override
     public void endOfSpeechDetected() {
-        // implement speech end detected after wakeword detected, and play correct audio cue
+        // implement speech end detected after wake word detected, and play correct audio cue
     }
     @Override
     public boolean wakewordDetected( String wakeWord ) {
-        // implement wakeword detected, and play correct audio cue
+        // implement wake word detected, and play correct audio cue
     }
 ...
 ```
@@ -160,6 +160,24 @@ public class AlertsHandler extends Alerts
 	@Override
 	public void alertStateChanged( String alertToken, AlertState state, String reason ) {
 		//handle alert state change
+	}
+	...
+	@Override
+	public void alertCreated( String alertToken, String detailedInfo ) {
+		//handle the alert detailed info when alert is created (optional)
+		/*
+		* JSON string detailedInfo :
+		* {
+		*	 "time" : <String>
+		*	 "type" : <String>
+		*	 "label" : <String>
+		* }
+		*/
+	}
+	...
+	@Override
+	public void alertDeleted( String alertToken ) {
+		//handle the alert when alert is deleted (optional)
 	}
 ```
 
@@ -315,13 +333,11 @@ public class TemplateRuntimeHandler extends TemplateRuntime
         // Handle clearing player info here
 ```
 
-
-
 ### Handling Playback Controller Events
 
 The Engine provides methods for notifying it of playback controller events. If the platform implements playback control features, it must inform the Engine.
 
-####PlayerInfo Only controls
+#### PlayerInfo Only controls
 
 There are some playback controls, which are specific to the PlayerInfo template. This is for GUI implementations which use the PlayerInfo template as a reference for their GUI displays. The controls available, for a given service, come down with the playerInfo template. For toggles, the synced state is also provided by the PlayerInfo template.
 
@@ -361,6 +377,287 @@ public class PlaybackControllerHandler extends PlaybackController
 		togglePressed(PlaybackButton.SHUFFLE, true); // should be called with opposing state from the PlayerInfo template
 
 ```
+
+### Handling External Media Adapter with MACCAndroidClient  
+
+The External Media Adapter interface allows the platform to declare and integrate with an external media source. In our MACC Player example, we handle the registration of the MACC Client callbacks for discovery and authorization.
+
+After registering the platform we make a delayed call to `runDiscovery()`. This initializes and tells the MACC client to discover all MACC applications available on the device.
+
+```
+public void runDiscovery() {
+	mHandler.postDelayed(new Runnable() {
+		@Override
+		public void run() {
+		    mClient.initAndRunDiscovery();
+		}
+	}, 100);
+```    
+
+In our MACCAndroidClientCallback method `onPlayerDiscovered` we call reportDiscoveredPlayers with the discovered players array populated according to the object spec. This will notify the cloud of the discovered players.
+
+```
+@Override
+        public void onPlayerDiscovered(List<DiscoveredPlayer> list) {
+        	DiscoveredPlayerInfo[] discoveredPlayers = new DiscoveredPlayerInfo[list.size()];
+        		//populate
+        	...
+        	//call to interface
+        	reportDiscoveredPlayers(discoveredPlayers);
+```
+
+The cloud will confirm the players by sending calling the authorize method. Here we submit the authorized playlist back to the MACCClient.
+
+```
+@Override
+    public boolean authorize(AuthorizedPlayerInfo[] authorizedPlayers) {
+    	...
+    	mClient.onAuthorizedPlayers(mAuthorizedPlayers);
+```
+
+Once the discovery, and authorization has been done, the MACCClient callback will report a `PlayerEvent` with at least `SessionsStarted` (this only happens once during lifecycle). Depending on the state of the MACC external app, we will start playing or not. We can also show the current media information if the external media app is logged in and playing on a separate device for example. Two interface methods should be called whenever the MACC client calls this player event. `playerEvent` will inform the cloud of the player event to stay in sync.
+
+The `playerId` will be static and will be associated with one MACC application.
+
+You can optionally update the playback controller interface from this to allow for GUI playback control. The example is shown in our sample app.
+
+```
+	@Override
+	public void onPlayerEvent(String playerId, Set<PlayerEvents> playerEvents, String skillToken, UUID playbackSessionId) {
+        ...
+        playerEvent(playerId, event.getName());
+```
+
+Next the `getState`method will be called. This method is used by various state providers to maintain correct state during start up, and after every play request. We construct the ExternalMediaPlayerState object, using the data taken from the MACCClient (associated via `localPlayerId`) and return the state information.
+
+```
+@Override
+    public ExternalMediaAdapter.ExternalMediaAdapterState getState(String localPlayerId) {
+    	ExternalMediaPlayerState state = mClient.getState(localPlayerId);
+    	...
+    	MediaAppMetaData metaData = state.getMediaAppPlaybackState().getMediaAppMetaData();
+    	...
+    	ExternalMediaAdapter.ExternalMediaAdapterState stateToReturn = new ExternalMediaAdapterState();
+        stateToReturn.playbackState = new PlaybackState();
+        stateToReturn.sessionState = new SessionState();
+        ...
+        return stateToReturn;
+```
+
+The following table describes the possible values for ExternalMediaAdapterState, and additional details.
+
+| State        | Type           | Notes  |
+| ------------- |:-------------:| -----:|
+| **PlaybackState**      |
+| state      | String        |   "IDLE/STOPPED/PLAYING" required |
+| supportedOperations | SupportedOperations[] | (see SupportedOperation) required |
+| trackOffset      | long  |   optional |
+| shuffleEnabled      | boolean       |   required |
+| repeatEnabled      | boolean       |   required |
+| favorites      | Favorites  | {FAVORITED/UNFAVORITED/NOT_RATE} optional |
+| type      | String  |   "ExternalMediaPlayerMusicItem" required |
+| playbackSource      | String       |   If available else use local player name. optional|
+| playbackSourceId      | String  |   empty |
+| trackName      | String   |   If available else use local player name. optional|
+| trackId      | String    |   empty |
+| trackNumber      | String   |  optional |
+| artistName      | String    |  optional |
+| artistId      | String   |   empty |
+| albumName      | String |   optional |
+| albumId      | String |   empty |
+| tinyURL      | String |   optional |
+| smallURL      | String |   optional |
+| mediumURL      | String |   optional |
+| largeURL      | String |   optional |
+| coverId      | String  |   empty |
+| mediaProvider      | String  |   optional |
+| mediaType      | MediaType |   {TRACK, PODCAST, STATION, AD, SAMPLE, OTHER} required |
+| duration      | long  |   optional |
+| **SessionsState** |
+| endpointId      | String  |   empty |
+| loggedIn      | boolean  |   empty |
+| userName      | String  |   empty |
+| isGuest      | boolean  |   empty |
+| launched      | boolean  |   True if MediaController was successfully connected and MediaControllerCompat.Callback.onSessionDestroyed has not been invoked. |
+| active      | boolean  |   Media session state. required  |
+| accessToken      | String  |   empty |
+| tokenRefreshInterval      | long  |   empty |
+| playerCookie      | String  |   A player may declare arbitrary information for itself. optional |
+| spiVersion      | String  |   "1.0" required  |
+
+
+When an Alexa voice request (i.e. "Play Spotify") occurs, the `play` method will be invoked. In our example, we `setFocus`, and send the play directive info to the MACC client. `setFocus` will ensure that the external media player will take priority for playing audio, and responding to playback control events.
+
+```
+@Override
+    public boolean play(String localPlayerId, String playContextToken, long index, long offset, boolean preload, Navigation navigation) {
+        setFocus(localPlayerId);
+        mClient.handleDirective(new PlayDirective(localPlayerId, playContextToken, index, offset, preload, navigation.toString()));
+        return true;
+```   
+
+Whether through voice or GUI event, the `playControl` method will be called with the relevant playControlType. As in play, we set the focus, and then pass the directive to the MACC Client.
+
+```
+@Override
+    public boolean playControl(String localPlayerId, PlayControlType playControlType) {
+        setFocus(localPlayerId);
+        mClient.handleDirective(new PlayControlDirective(localPlayerId, playControlType.toString()));
+        ...
+```
+
+The seek method will be called when AVS invokes seeking for the external media source currently in focus. The adjustSeek method will be similar.
+
+```
+	@Override
+	public boolean seek( long offset ) {
+	    public boolean seek(String localPlayerId, long offset) {
+        setFocus(localPlayerId);
+        mClient.handleDirective(new SeekDirective(localPlayerId, (int) offset));
+        ...
+```
+
+The External Media Adapter handler should also create its own Speaker implementation. It should handle adjusting volume, and setting mute for the source. It does not need to specify a type.
+
+```
+private static class MACCSpeaker extends Speaker {
+	...
+	MACCSpeaker() {
+        super();
+    }
+    ...
+    @Override
+    public boolean setVolume( byte volume ) {
+    	// set MACC app volume
+    	...
+```
+
+
+### Handling Local Media Sources
+
+The `LocalMediaSource` interface allows the platform to register a local media sources of a specific type (i.e. BLUETOOTH, USB, LINE\_IN, SATELLITE\_RADIO). Doing so will allow playback for these sources via Alexa ( "Alexa play the CD player"), or via the playback controller.
+
+`CDLocalMediaSource.Source.COMPACT_DISC`
+ is an example of the CD type that must be passed to the LocalMediaSource constructor which will handle a CD local media source. The handler methods below will use CD player as an example.
+
+```
+	public CDLocalMediaSource (Context context, LoggerHandler logger, Source cd ) {
+	    super(cd, new CDSpeaker());
+	    ...
+```    
+
+After construction, the authorize method will be called on startup. This value will be returned `true` if the AVS cloud accepts the local media source for your device type.
+
+```
+	@Override
+	public boolean authorize( boolean authorized ) {
+  		...
+  		return m_authorized = authorized;
+```
+
+The play method is called when AVS invokes play for the local media source. The implementation depends on the local media source, however setFocus() should always be called. **NOTE: Currently Local Media Source will NOT receive play on voice invocation (this may change)**
+
+```
+ 	@Override
+	public boolean play( String payload ) {
+        if ( m_authorized ) {
+   			setFocus();
+   			// handle the play for CD player
+        	return true;
+        } else return false;    
+```
+
+The playControl method is called when AVS invokes a play control for the local media source. The implementation depends on the local media source, however setFocus() should always be called. **NOTE: Currently Local Media Source will receive a PLAY type play control on voice invocation (this may change)**
+
+```
+ 	@Override
+	public boolean playControl( PlayControlType controlType ) {
+        if ( m_authorized ) {
+   			setFocus();
+   			// handle the control type appropriately for CD player
+        	return true;
+        } else return false;    
+```
+
+The seek method will be called when AVS invokes seeking for the local media source currently in focus. The adjustSeek method will be similar.
+
+```
+	@Override
+	public boolean seek( long offset ) {
+	    if ( m_authorized ) {
+	    	// handle seeking CD player
+```
+
+The getState method is called in order synchronize the state information with the cloud. All relevant information should be added to the state object and returned. The fields that will be required vary by source.
+
+```
+	@Override
+	public LocalMediaSourceState getState() {
+	    LocalMediaSourceState stateToReturn = new LocalMediaSourceState();
+	    stateToReturn.playbackState = new PlaybackState();
+	    stateToReturn.sessionState = new SessionState();
+	    stateToReturn.playbackState.albumName = "mock albumName";
+	    ....
+	    return stateToReturn;
+```
+
+The following table describes the possible values for LocalMediaSourceState, and additional details.
+
+| State        | Type           | Notes  |
+| ------------- |:-------------:| -----:|
+| **PlaybackState**      |
+| state      | String        |   "IDLE/STOPPED/PLAYING" required |
+| supportedOperations | SupportedOperations[] | (see SupportedOperation) required |
+| trackOffset      | long  |   optional |
+| shuffleEnabled      | boolean       |   optional |
+| repeatEnabled      | boolean       |   optional |
+| favorites      | Favorites  |   {FAVORITED/UNFAVORITED/NOT_RATED} optional  |
+| type      | String  |   "ExternalMediaPlayerMusicItem" required |
+| playbackSource      | String       |   If available else use local player name. optional|
+| playbackSourceId      | String  |   empty |
+| trackName      | String   |   If available else use local player name. optional |
+| trackId      | String    |   empty |
+| trackNumber      | String   |  optional |
+| artistName      | String    |  optional |
+| artistId      | String   |   empty |
+| albumName      | String |   optional |
+| albumId      | String |   empty |
+| tinyURL      | String |   optional |
+| smallURL      | String |   optional |
+| mediumURL      | String |   optional |
+| largeURL      | String |   optional |
+| coverId      | String  |   empty |
+| mediaProvider      | String  |   optional |
+| mediaType      | MediaType |   {TRACK, PODCAST, STATION, AD, SAMPLE, OTHER} optional |
+| duration      | long  |   optional |
+| **SessionsState** |
+| endpointId      | String  |   empty |
+| loggedIn      | boolean  |   empty |
+| userName      | String  |   empty |
+| isGuest      | boolean  |   empty |
+| launched      | boolean  |   empty |
+| active      | boolean  |   empty |
+| accessToken      | String  |   empty |
+| tokenRefreshInterval      | long  |   empty |
+| playerCookie      | String  |   A player may declare arbitrary information for itself. optional |
+| spiVersion      | String  |   "1.0" required  |
+
+
+The Local Media Source handler should also create its own Speaker implementation. It should handle adjusting volume, and setting mute for the source. It does not need to specify a type.
+
+```
+private static class CDSpeaker extends Speaker {
+	...
+	CDSpeaker() {
+        super();
+    }
+    ...
+    @Override
+    public boolean setVolume( byte volume ) {
+    	// set CD player volume
+    	...
+```
+
 
 ## Alexa Engine Properties
 

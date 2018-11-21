@@ -278,6 +278,77 @@ TEST_F(AlexaConfigurationImplTest, createMiscStorageConfigBestCase) {
     EXPECT_EQ(0, expectedString.str().compare(actualString.str())) << "Error in the Configuration String";
 }
 
+/**
+ * Test createTemplateRuntimeConfig() for best case
+ */
+TEST_F(AlexaConfigurationImplTest, createTemplateRuntimeConfigBestCase)
+{
+    using TemplateRuntimeTimeoutType = alexa::config::AlexaConfiguration::TemplateRuntimeTimeoutType;
+    std::shared_ptr<aace::core::config::EngineConfiguration> testConfiguration, expectedConfiguration;
+    const std::string &temp = "{\n"
+                              "    \"templateRuntimeCapabilityAgent\": {\n"
+                              "        \"displayCardTTSFinishedTimeout\": 1234509876,\n"
+                              "        \"displayCardAudioPlaybackFinishedTimeout\": 1234567890,\n"
+                              "        \"displayCardAudioPlaybackStoppedPausedTimeout\": 987654321\n"
+                              "    }\n"
+                              "}";
+    expectedConfiguration = aace::core::config::StreamConfiguration::create(std::make_shared<std::stringstream>(temp));
+    testConfiguration = alexa::config::AlexaConfiguration::createTemplateRuntimeTimeoutConfig({
+        { TemplateRuntimeTimeoutType::DISPLAY_CARD_TTS_FINISHED_TIMEOUT, std::chrono::milliseconds( 1234509876 ) },
+        { TemplateRuntimeTimeoutType::DISPLAY_CARD_AUDIO_PLAYBACK_FINISHED_TIMEOUT, std::chrono::milliseconds( 1234567890 ) },
+        { TemplateRuntimeTimeoutType::DISPLAY_CARD_AUDIO_PLAYBACK_STOPPED_PAUSED_TIMEOUT, std::chrono::milliseconds( 987654321 ) }
+    });
+
+    //Convert to ostringstream for comparing the istream
+    std::ostringstream expectedString, actualString;
+    expectedString << expectedConfiguration->getStream()->rdbuf();
+    actualString << testConfiguration->getStream()->rdbuf();
+    EXPECT_EQ(0, expectedString.str().compare(actualString.str())) << "Error in the Configuration String";
+}
+
+/**
+ * Test createTemplateRuntimeConfig() for best case
+ */
+TEST_F(AlexaConfigurationImplTest, createTemplateRuntimeConfigWithOneKeyBestCase)
+{
+    using TemplateRuntimeTimeoutType = alexa::config::AlexaConfiguration::TemplateRuntimeTimeoutType;
+    std::shared_ptr<aace::core::config::EngineConfiguration> testConfiguration, expectedConfiguration;
+    const std::string &temp = "{\n"
+                              "    \"templateRuntimeCapabilityAgent\": {\n"
+                              "        \"displayCardTTSFinishedTimeout\": 1234509876\n"
+                              "    }\n"
+                              "}";
+    expectedConfiguration = aace::core::config::StreamConfiguration::create(std::make_shared<std::stringstream>(temp));
+    testConfiguration = alexa::config::AlexaConfiguration::createTemplateRuntimeTimeoutConfig({
+        { TemplateRuntimeTimeoutType::DISPLAY_CARD_TTS_FINISHED_TIMEOUT, std::chrono::milliseconds( 1234509876 ) }
+    });
+
+    //Convert to ostringstream for comparing the istream
+    std::ostringstream expectedString, actualString;
+    expectedString << expectedConfiguration->getStream()->rdbuf();
+    actualString << testConfiguration->getStream()->rdbuf();
+    EXPECT_EQ(0, expectedString.str().compare(actualString.str())) << "Error in the Configuration String";
+}
+
+/**
+ * Test createTemplateRuntimeConfig() for best case
+ */
+TEST_F(AlexaConfigurationImplTest, createTemplateRuntimeConfigWithNoKeys)
+{
+    std::shared_ptr<aace::core::config::EngineConfiguration> testConfiguration, expectedConfiguration;
+    const std::string &temp = "{\n"
+                              "    \"templateRuntimeCapabilityAgent\": {}\n"
+                              "}";
+    expectedConfiguration = aace::core::config::StreamConfiguration::create(std::make_shared<std::stringstream>(temp));
+    testConfiguration = alexa::config::AlexaConfiguration::createTemplateRuntimeTimeoutConfig({/*Empty List*/});
+
+    //Convert to ostringstream for comparing the istream
+    std::ostringstream expectedString, actualString;
+    expectedString << expectedConfiguration->getStream()->rdbuf();
+    actualString << testConfiguration->getStream()->rdbuf();
+    EXPECT_EQ(0, expectedString.str().compare(actualString.str())) << "Error in the Configuration String";
+}
+
 }  // namespace unit
 }  // namespace test
 }  // namespace aace

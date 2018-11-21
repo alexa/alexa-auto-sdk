@@ -23,6 +23,8 @@ include(${AAC_HOME}/share/cmake/AACECore.cmake)
 include(${AAC_HOME}/share/cmake/AACEAlexa.cmake)
 include(${AAC_HOME}/share/cmake/AACENavigation.cmake)
 include(${AAC_HOME}/share/cmake/AACEPhoneControl.cmake)
+include(${AAC_HOME}/share/cmake/AACEContactUploader.cmake)
+
 if (INCLUDE_ALEXA_COMMS_MODULE)
     include(${AAC_HOME}/share/cmake/AACECommunication.cmake)
 endif()
@@ -39,12 +41,15 @@ set(aace_lib_src
     src/main/cpp/src/aace/alexa/SpeechRecognizerBinder.cpp
     src/main/cpp/src/aace/alexa/SpeechSynthesizerBinder.cpp
     src/main/cpp/src/aace/alexa/TemplateRuntimeBinder.cpp
+    src/main/cpp/src/aace/alexa/ExternalMediaAdapterBinder.cpp
+    src/main/cpp/src/aace/alexa/LocalMediaSourceBinder.cpp
     src/main/cpp/src/aace/core/EngineBinder.cpp
     src/main/cpp/src/aace/core/PlatformInterfaceBinder.cpp
     src/main/cpp/src/aace/location/LocationProviderBinder.cpp
     src/main/cpp/src/aace/logger/LoggerBinder.cpp
     src/main/cpp/src/aace/navigation/NavigationBinder.cpp
     src/main/cpp/src/aace/phonecontrol/PhoneCallControllerBinder.cpp
+    src/main/cpp/src/aace/contactuploader/ContactUploaderBinder.cpp
     src/main/cpp/src/aace/network/NetworkInfoProviderBinder.cpp
     src/main/cpp/src/NativeLib.cpp
 )
@@ -54,6 +59,7 @@ find_library(log-lib log)
 
 set(aace_lib_dependencies
     AACEPhoneControlPlatform AACEPhoneControlEngine
+    AACEContactUploaderPlatform AACEContactUploaderEngine
     AACENavigationPlatform AACENavigationEngine
     AACEAlexaPlatform AACEAlexaEngine
     AACECorePlatform AACECoreEngine

@@ -18,12 +18,12 @@ package com.amazon.sampleapp.impl.Communication;
 import com.amazon.aace.alexa.MediaPlayer;
 import com.amazon.aace.alexa.Speaker;
 import com.amazon.aace.communication.AlexaComms;
-import com.amazon.sampleapp.impl.MediaPlayer.MediaPlayerHandler;
+import com.amazon.sampleapp.impl.Common.AudioInputManager;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class AlexaCommsHandler extends AlexaComms {
+public class AlexaCommsHandler extends AlexaComms implements AudioInputManager.AudioInputConsumer {
     /**
      * Observer for receiving call Alexa comms state change notifications
      */
@@ -32,16 +32,17 @@ public class AlexaCommsHandler extends AlexaComms {
     }
 
     private AlexaCommsState mCommsState = new AlexaCommsState();
+    private AudioInputManager mAudioInputManager;
     private Set<AlexaCommsObserver> mCommsObservers;
 
-    public AlexaCommsHandler(MediaPlayer mediaPlayer,
-                             Speaker speaker) {
-        super( mediaPlayer, speaker );
+    public AlexaCommsHandler(AudioInputManager audioInputManager,
+                             MediaPlayer ringtoneMediaPlayer,
+                             Speaker ringtoneSspeaker,
+                             MediaPlayer callAudioMediaPlayer,
+                             Speaker callAudioSpeaker) {
+        super(ringtoneMediaPlayer, ringtoneSspeaker, callAudioMediaPlayer, callAudioSpeaker);
+        mAudioInputManager = audioInputManager;
         mCommsObservers = new HashSet<AlexaCommsObserver>();
-    }
-
-    public AlexaCommsHandler(MediaPlayerHandler mediaPlayer) {
-        this(mediaPlayer, mediaPlayer.getSpeaker());
     }
 
     public void addObserver(AlexaCommsObserver observer) {
@@ -55,7 +56,22 @@ public class AlexaCommsHandler extends AlexaComms {
     @Override
     protected void callStateChanged(CallState state) {
         mCommsState.m_currentCallState = state;
+        if (mCommsState.getCurrentCallState() == CallState.CALL_CONNECTED) {
+            mAudioInputManager.startAudioInput(this);
+        } else {
+            mAudioInputManager.stopAudioInput(this);
+        }
         notifyCurrentStateToObservers();
+    }
+
+    @Override
+    public String getAudioInputConsumerName() {
+        return "AlexaComms";
+    }
+
+    @Override
+    public void onAudioInputAvailable(byte[] buffer, int size) {
+        writeMicrophoneAudioData(buffer, size);
     }
 
     private void notifyCurrentStateToObservers() {

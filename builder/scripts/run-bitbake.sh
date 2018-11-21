@@ -23,6 +23,10 @@ usageExit() {
 	echo " --enable-sensitive-logs    = Enable sensitive logs only when building with debugging options."
 	echo " --enable-latency-logs      = Enable user perceived latency logs only when building with debugging options."
 	echo ""
+	echo "Additional options:"
+	echo "--force-docker              = Force builds to happen inside an ubuntu docker container."
+	echo "--no-tty                    = Runs docker commands without TTY to support CI tools such as Jenkins."
+	echo ""
 	exit 1
 }
 
@@ -77,6 +81,14 @@ while [[ $# -gt 0 ]]; do
 		LATENCY_LOGS="1"
 		shift
 		;;
+		--force-docker)
+		FORCE_DOCKER="1"
+		shift
+		;;
+		--no-tty)
+		NO_TTY="1"
+		shift
+		;;
 		-D*=*)
 		EXTRA_CONFS+=("${1:2}")
 		shift
@@ -114,8 +126,10 @@ EXTRA_MODULES=$@
 # Param Checks
 #
 
-if [ $(uname) = "Darwin" ]; then
-	note "Builder only runs within Docker with macOS host"
+if [ $(uname) = "Darwin" ] || ([ ! -f /.dockerenv ] && [ "${FORCE_DOCKER}" = "1" ]); then
+        if [ $(uname) = "Darwin" ]; then
+        	note "Builder only runs within Docker with macOS host"
+	fi
 	if [[ ${TARGET} = *"native"* ]]; then
 		warn "\"native\" target will be built for Generic Linux"
 	fi
@@ -130,8 +144,11 @@ if [ $(uname) = "Darwin" ]; then
 	echo "*** Docker Mode ***"
 	echo "*******************"
 	echo ""
-	${THISDIR}/run-docker.sh "aac/builder/build.sh oe" ${PARAMS}
+	NO_TTY=${NO_TTY} ${THISDIR}/run-docker.sh "aac/builder/build.sh oe" ${PARAMS}
 	exit 0
+elif [[ $(uname -a) == *"Ubuntu"* ]]; then
+	note "Ubuntu host is detected, optimizing for Ubuntu machine"
+	HOST_SUPPORT_LAYER="${BUILDER_HOME}/meta-aac-ubuntu"
 fi
 
 # Parse into array
@@ -149,6 +166,9 @@ BUILD_DIR=$(realpath ${BUILD_DIR})
 DEPLOY_DIR="${BUILDER_HOME}/deploy"
 mkdir -p ${DEPLOY_DIR} && rm -rf ${DEPLOY_DIR}/*
 
+# Download repository
+DL_DIR="${BUILDER_HOME}/downloads"
+
 #
 # Docker Overrides
 #
@@ -156,8 +176,12 @@ mkdir -p ${DEPLOY_DIR} && rm -rf ${DEPLOY_DIR}/*
 if [ -f /.dockerenv ] && [ -z ${CODEBUILD_SRC_DIR} ]; then
 	# Assuming we are running inside the Docker
 	DOCKER_WORKDIR="/workdir"
+	# We know the Docker image is Ubuntu based
+	HOST_SUPPORT_LAYER="${BUILDER_HOME}/meta-aac-ubuntu"
 	# Override build directory
 	BUILD_DIR="${DOCKER_WORKDIR}/build"
+	# Override download directory
+	DL_DIR="${DOCKER_WORKDIR}/downloads"
 	# Override QNX SDP path
 	QNX_BASE="${HOME}/qnx700"
 	# Override extra modules path
@@ -262,6 +286,20 @@ add_extra_bbfile() {
 	fi
 }
 
+clean_lockfile() {
+	if [ -e ${BUILD_DIR}/bitbake.lock ]; then
+		warn "A build already appears to be in progress, or else a previous build was interrupted."
+		read -p "Do you want to proceed? (y/n): " -n 1 -r
+		echo
+		if [[ $REPLY =~ ^[Yy]$ ]]; then
+			note "Removing ${BUILD_DIR}/bitbake.lock..."
+			rm -rf ${BUILD_DIR}/bitbake.lock
+		else
+			exit 0
+		fi
+	fi
+}
+
 init_local_conf() {
 	mkdir -p ${BUILD_DIR}/conf
 
@@ -272,6 +310,7 @@ init_local_conf() {
 LCONF_VERSION = "7"
 BBPATH = "\${TOPDIR}"
 BBLAYERS = " \\
+  ${HOST_SUPPORT_LAYER} \\
   ${OE_CORE_PATH}/meta \\
   ${BUILDER_HOME}/meta-aac \\
   "
@@ -293,6 +332,8 @@ EOF
 		# Cache points for AWS CodeBuild
 		echo "DL_DIR = \"/root/downloads\"" >> ${LOCAL_CONF}
 		echo "SSTATE_DIR = \"/root/sstate-cache\"" >> ${LOCAL_CONF}
+	else
+		echo "DL_DIR = \"${DL_DIR}\"" >> ${LOCAL_CONF}
 	fi
 
 	# Export white list for ECS
@@ -387,6 +428,8 @@ build() {
 }
 
 note "SDK Version: ${SDK_VERSION}"
+
+clean_lockfile
 
 # Initialize local configs
 init_local_conf

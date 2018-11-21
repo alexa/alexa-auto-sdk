@@ -19,6 +19,8 @@
 #include <unordered_map>
 
 #include "AACE/Engine/Core/EngineService.h"
+#include "AACE/Engine/Vehicle/VehiclePropertyInterface.h"
+
 #include "AACE/Vehicle/VehicleConfiguration.h"
 
 #include <rapidjson/document.h>
@@ -27,9 +29,24 @@ namespace aace {
 namespace engine {
 namespace vehicle {
 
-class VehicleEngineService : public aace::engine::core::EngineService {
+struct EnumHash
+{
+    template <typename T>
+    std::size_t operator()(T t) const {
+        return static_cast<std::size_t>(t);
+    }
+};
+
+class VehicleEngineService :
+    public aace::engine::core::EngineService,
+    public VehiclePropertyInterface,
+    public std::enable_shared_from_this<VehicleEngineService> {
+    
 public:
     DESCRIBE("aace.vehicle",VERSION("1.0"))
+
+public:
+    using VehiclePropertyType = aace::vehicle::config::VehicleConfiguration::VehiclePropertyType;
 
 private:
     VehicleEngineService( const aace::engine::core::ServiceDescription& description );
@@ -37,9 +54,15 @@ private:
 public:
     virtual ~VehicleEngineService() = default;
     
-protected:
-    bool configure( const std::vector<std::shared_ptr<std::istream>>& configuration ) override;
+    // VehiclePropertyInterface
+    std::string getVehicleProperty( VehiclePropertyType type ) override;
     
+protected:
+    bool initialize() override;
+    bool configure( const std::vector<std::shared_ptr<std::istream>>& configuration ) override;
+    bool setProperty( const std::string& key, const std::string& value ) override;
+    std::string getProperty( const std::string& key ) override;
+
 private:
     bool configure( std::shared_ptr<std::istream> configuration );
     
@@ -47,7 +70,8 @@ private:
     std::string getVehicleConfigProperty( rapidjson::Value& root, const char* key, const char* defaultValue = "", bool warnIfMissing = true );
     
 private:
-    std::unordered_map<std::string,std::string> m_vehiclePropertyMap;
+    std::unordered_map<VehiclePropertyType,std::string,EnumHash> m_vehiclePropertyMap;
+    std::string m_operatingCountry;
 };
 
 } // aace::engine::vehicle

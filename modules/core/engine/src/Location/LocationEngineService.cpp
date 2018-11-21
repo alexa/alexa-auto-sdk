@@ -31,10 +31,6 @@ REGISTER_SERVICE(LocationEngineService)
 LocationEngineService::LocationEngineService( const aace::engine::core::ServiceDescription& description ) : aace::engine::core::EngineService( description ) {
 }
 
-std::shared_ptr<aace::location::LocationProvider> LocationEngineService::getLocationProvider() {
-    return m_locationProvider;
-}
-
 bool LocationEngineService::registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface )
 {
     try
@@ -54,6 +50,7 @@ bool LocationEngineService::registerPlatformInterfaceType( std::shared_ptr<aace:
     {
         ThrowIfNotNull( m_locationProvider, "platformInterfaceAlreadyRegistered" );
         m_locationProvider = locationProvider;
+        registerServiceInterface<aace::location::LocationProvider>( m_locationProvider );
   
         return true;
     }

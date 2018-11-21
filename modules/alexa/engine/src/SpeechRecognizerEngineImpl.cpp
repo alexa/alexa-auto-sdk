@@ -171,54 +171,45 @@ bool SpeechRecognizerEngineImpl::waitForExpectingAudioState( bool state, const s
 }
 
 // SpeechRecognizer
-bool SpeechRecognizerEngineImpl::onHoldToTalk()
+bool SpeechRecognizerEngineImpl::onStartCapture( Initiator initiator, uint64_t keywordBegin, uint64_t keywordEnd, const std::string& keyword )
 {
     try
     {
         ThrowIf( m_state == alexaClientSDK::avsCommon::sdkInterfaces::AudioInputProcessorObserverInterface::State::RECOGNIZING, "alreadyRecognizing" );
-
+        
+        // initialize the audio input stream if it does not exist
         if( m_audioInputWriter == nullptr ) {
             ThrowIfNot( initializeAudioInputStream(), "initializeAudioInputStreamFailed" );
         }
+
+        // create a new audio provider for the specified initiator type
+        std::shared_ptr<alexaClientSDK::capabilityAgents::aip::AudioProvider> audioProvider;
+
+        switch( initiator )
+        {
+            case Initiator::HOLD_TO_TALK:
+                audioProvider = std::make_shared<alexaClientSDK::capabilityAgents::aip::AudioProvider>( m_audioInputStream, m_audioFormat, alexaClientSDK::capabilityAgents::aip::ASRProfile::CLOSE_TALK, false, true, false );
+                break;
+                
+            case Initiator::TAP_TO_TALK:
+                audioProvider = std::make_shared<alexaClientSDK::capabilityAgents::aip::AudioProvider>( m_audioInputStream, m_audioFormat, alexaClientSDK::capabilityAgents::aip::ASRProfile::NEAR_FIELD, true, true, true );
+                break;
         
-        // Creating hold-to-talk audio provider
-        //bool holdAlwaysReadable = false;
-        //bool holdCanOverride = true;
-        //bool holdCanBeOverridden = false;
-        auto audioProvider = std::make_shared<alexaClientSDK::capabilityAgents::aip::AudioProvider>( m_audioInputStream, m_audioFormat, alexaClientSDK::capabilityAgents::aip::ASRProfile::CLOSE_TALK, false, true, false );
-        
-        ThrowIfNot( startCapture( audioProvider, alexaClientSDK::capabilityAgents::aip::Initiator::PRESS_AND_HOLD ), "startCaptureFailed" );
+            case Initiator::WAKEWORD:
+                ThrowIf( keywordBegin == SpeechRecognizerEngineInterface::UNSPECIFIED_INDEX, "invalidKeywordBeginIndex" );
+                ThrowIf( keywordEnd == SpeechRecognizerEngineInterface::UNSPECIFIED_INDEX, "invalidKeywordEndIndex" );
+                ThrowIf( keyword.empty(), "invalidKeyword" );
+                audioProvider = std::make_shared<alexaClientSDK::capabilityAgents::aip::AudioProvider>( m_audioInputStream, m_audioFormat, alexaClientSDK::capabilityAgents::aip::ASRProfile::NEAR_FIELD, true, false, true );
+                break;
+        }
+
+        // start the recognize event
+        ThrowIfNot( startCapture( audioProvider, static_cast<alexaClientSDK::capabilityAgents::aip::Initiator>( initiator ), keywordBegin, keywordEnd, keyword ), "startCaptureFailed" );
     
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"onHoldToTalk").d("reason", ex.what()));
-        return false;
-    }
-}
-
-bool SpeechRecognizerEngineImpl::onTapToTalk()
-{
-    try
-    {
-        ThrowIf( m_state == alexaClientSDK::avsCommon::sdkInterfaces::AudioInputProcessorObserverInterface::State::RECOGNIZING, "alreadyRecognizing" );
-    
-        if( m_audioInputWriter == nullptr ) {
-            ThrowIfNot( initializeAudioInputStream(), "initializeAudioInputStreamFailed" );
-        }
-        
-        // Creating hold-to-talk audio provider
-        //bool holdAlwaysReadable = false;
-        //bool holdCanOverride = true;
-        //bool holdCanBeOverridden = false;
-        auto audioProvider = std::make_shared<alexaClientSDK::capabilityAgents::aip::AudioProvider>( m_audioInputStream, m_audioFormat, alexaClientSDK::capabilityAgents::aip::ASRProfile::NEAR_FIELD, true, true, true );
-        
-        ThrowIfNot( startCapture( audioProvider, alexaClientSDK::capabilityAgents::aip::Initiator::TAP ), "startCaptureFailed" );
-        
-        return true;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"onTapToTalk").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG,"onStartCapture").d("reason", ex.what()));
         return false;
     }
 }
@@ -256,19 +247,8 @@ ssize_t SpeechRecognizerEngineImpl::write( const int16_t* data, const size_t siz
 
 void SpeechRecognizerEngineImpl::onKeyWordDetected( std::shared_ptr<alexaClientSDK::avsCommon::avs::AudioInputStream> stream, std::string keyword, alexaClientSDK::avsCommon::avs::AudioInputStream::Index beginIndex, alexaClientSDK::avsCommon::avs::AudioInputStream::Index endIndex, std::shared_ptr<const std::vector<char>> KWDMetadata )
 {
-    if( m_state == AudioInputProcessorObserverInterface::State::IDLE && m_speechRecognizerPlatformInterface->wakewordDetected( keyword ) )
-    {
-        //bool wakeAlwaysReadable = true;
-        //bool wakeCanOverride = false;
-        //bool wakeCanBeOverridden = true;
-        auto audioProvider = std::make_shared<alexaClientSDK::capabilityAgents::aip::AudioProvider>( m_audioInputStream, m_audioFormat, alexaClientSDK::capabilityAgents::aip::ASRProfile::NEAR_FIELD, true, false, true );
-    
-        if( endIndex != alexaClientSDK::avsCommon::sdkInterfaces::KeyWordObserverInterface::UNSPECIFIED_INDEX && beginIndex == alexaClientSDK::avsCommon::sdkInterfaces::KeyWordObserverInterface::UNSPECIFIED_INDEX ) {
-            startCapture( audioProvider, alexaClientSDK::capabilityAgents::aip::Initiator::TAP, endIndex );
-        }
-        else if( endIndex != alexaClientSDK::avsCommon::sdkInterfaces::KeyWordObserverInterface::UNSPECIFIED_INDEX && beginIndex != alexaClientSDK::avsCommon::sdkInterfaces::KeyWordObserverInterface::UNSPECIFIED_INDEX ) {
-            startCapture( audioProvider, alexaClientSDK::capabilityAgents::aip::Initiator::WAKEWORD, beginIndex, endIndex, keyword );
-        }
+    if( m_state == AudioInputProcessorObserverInterface::State::IDLE && m_speechRecognizerPlatformInterface->wakewordDetected( keyword ) ) {
+        onStartCapture( Initiator::WAKEWORD, beginIndex, endIndex, keyword );
     }
 }
 

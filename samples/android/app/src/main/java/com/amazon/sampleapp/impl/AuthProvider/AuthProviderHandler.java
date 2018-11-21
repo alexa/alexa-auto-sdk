@@ -16,9 +16,11 @@
 package com.amazon.sampleapp.impl.AuthProvider;
 
 import android.app.Activity;
+import android.content.Context;
 
 import com.amazon.aace.alexa.AuthProvider;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
+import com.amazon.sampleapp.impl.NetworkInfoProvider.NetworkInfoProviderHandler;
 
 public class AuthProviderHandler extends AuthProvider {
 
@@ -29,11 +31,11 @@ public class AuthProviderHandler extends AuthProvider {
     private AuthState mAuthState = AuthState.UNINITIALIZED;
     private String mAuthToken = "";
 
-    public AuthProviderHandler( Activity activity, LoggerHandler logger ) {
+    public AuthProviderHandler( Activity activity, LoggerHandler logger, NetworkInfoProviderHandler networkInfoProviderHandler ) {
         mLogger = logger;
 
         // Authenticate with LWA
-        mLwa = new LoginWithAmazon( mLogger, activity, this );
+        mLwa = new LoginWithAmazon( mLogger, activity, this, networkInfoProviderHandler );
     }
 
     @Override

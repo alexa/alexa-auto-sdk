@@ -1,79 +1,143 @@
-## Phone Call Controller API
+# Phone Call Controller API
 
-### Overview
+## Overview
 
-The Alexa Auto Phone Call Controller API provides the features required by a platform implementation to interface with the phone call controller capabilities of Alexa.
+The Alexa Auto SDK Phone Call Controller API provides the features required by a platform implementation to use the phone call control capabilities of Alexa, independent of the connection mechanism to the calling device. Registering a Phone Call Controller allows the end user to use Alexa to interact with new or ongoing calls, and provide Alexa with the state of the calling device on the platform. The platform implementation is responsible for managing the lifecycle of the call session, including the end user experience.
 
-### Handling PhoneCallController
+### Sequence Diagrams
 
-It is the responsibility of the platform implementation to handle dial requests from Alexa. The platform implementation must also inform the Engine of calling events, and the status of the connected calling device on the platform. The platform implementation is responsible for managing the lifecycle and user experience of a call session and connection to a calling device.
+The following sequence diagrams provide and overview of how inbound and outbound phone call control is handled.
 
-To implement a custom phone control handler for handling phone control events from Alexa, the `PhoneCallController` class should be extended:
+#### Inbound Calling
+
+This diagram provides an overview of inbound phone call control using voice.
+
+![Inbound Calling](../../modules/phone-control/assets/aac-pcc-inbound-call.png)
+
+#### Outbound Calling
+
+This diagram provides an overview of outbound phone call control using voice.
+
+![Outbound Calling](../../modules/phone-control//assets/aac-pcc-outbound-call.png)
+
+## Using PhoneCallController
+
+To implement a custom phone control handler, the `PhoneCallController` class should be extended:
 
 ```
 public class PhoneCallControllerHandler extends PhoneCallController
 {
+	// The user asked Alexa to make an outbound call.
 	@Override
 	public boolean dial( String payload )
 	{
-		...
-		//handle making the call, and keep reference to callId
-		...
-		callActivated(callId); //inform the engine the call is now active
-		...
+		// Initiate an outbound call.
+		return true;
+	}
 
-		if (SOME_ERROR_CASE){
-			callFailed( callId, error, message ); //inform the engine that the call failed
+	// The user asked Alexa to redial a call.
+	@Override
+	public boolean redial( String payload )
+	{
+		// Initiate an outbound call.
+		// It is the platform's responsibility to maintain the last dialed number.
+		return true;
+	}
+
+	// The user asked Alexa to answer the inbound call.
+	@Override
+	public void answer( String payload )
+	{
+		// Answer the inbound call.
+	}
+
+	// The user asked Alexa to hang up a call, cancel a call setup, or decline an incoming call.
+	@Override
+	public void stop( String payload ) {
+		// Stop the call.
+	}
+
+	// The user asked Alexa to press the keypad.
+	@Override
+	public void sendDTMF( String payload ) {
+		// Send a DTMF signal.
+	}
+
+	// Return quickly, as handling in dial, redial, answer, stop, and sendDTMF should not block the caller.
+
+	// Alexa acts on the most recently used callId.
+
+	// Connection to a calling device is established or broken.
+	ConnectionState state = .. // CONNECTED, DISCONNECTED
+	connectionStatusChanged( state );
 	...
 
-	...
-		//on some platform handler
-		connectionStatusChanged( ConnectionState.CONNECTED ); //phone call device is connected
-	...
-
-	...
-		// on receiving a dial call or initiating a call outside the scope of Alexa
-		String callId = ... // unique identifier given from dial, or UUID generated from the platform for calls outside of Alexa
-		callActivated( callId );
+	// Setting up an outgoing call.
+	String callId = ... // The identifier for the call.
+	callStateChanged( State.DIALING, callId );
 	...
 
-	...
-		// on an active call was ended or an ongoing phone call setup was cancelled
-		String callId = ... // unique identifier for call session
-		callTerminated( callId );
-	...
-
-	...
-		// on error handling for initiating or maintaining a call on the platform calling device
-		String callId = ... // unique identifier for call session
-		String error = ... // platform error code, ex. 4xx, 500, 503
-		String message = ... //platform error message
-		callFailed( callId, error, message );
+	// Outgoing call setup is complete, and outbound ringing has started.
+	String callId = ... // The identifier for the call.
+	callStateChanged( CallState.OUTBOUND_RINGING, callId );
 	...
 
-```
+	// The call is answered and in progress.
+	String callId = ... // The identifier for the call.
+	callStateChanged( CallState.ACTIVE, callId );
+	...
 
-Example Dial Directive JSON String payload:
+	// The active call ended, the outbound call setup was cancelled, or the inbound call was declined.
+	String callId = ... // The identifier for the call.
+	callStateChanged( CallState.IDLE, callId );
+	...
 
-```
-{
-  "callId": "{{STRING}}",
-  "callee": {
-    "details" : "{{STRING}}"
-    "defaultAddress" : {
-      "protocol" : "{{STRING}}",
-      "format" : "{{STRING}}",
-      "value" : "{{STRING}}"
-    }
-    "alternativeAddresses" : [{
-      "protocol" : "{{STRING}}",
-      "format" : "{{STRING}}",
-      "value" : "{{STRING}}"
-    }]
-  }
+	// An inbound call alert was received.
+	String callId = ... // The identifier for the call.
+	callStateChanged( CallState.CALL_RECEIVED, callId );
+	...
+
+	// The inbound call is ringing.
+	String callId = ... // The identifier for the call.
+	callStateChanged( CallState.INBOUNDING_RINGING, callId );
+	...
+
+	// Generate an identifier for a call initiated outside of the scope of Alexa.
+	String callId = createCallId();
+	...
+
+	// A feature of the calling device changed.
+	HashMap<CallingDeviceConfigurationProperty, Boolean> deviceConfiguration = new HashMap<>();
+	deviceConfiguration.put( CallingDeviceConfigurationProperty.DTMF_SUPPORTED, true ); // update the configuration
+	deviceConfigurationUpdated( deviceConfiguration );
+	...
+
+	// An error occurred during an active call or call setup.
+	String callId = ... // The identifier for the call.
+	CallError code = ... // error type
+	String message = ... // error description
+	callFailed( callId, code, message );
+	...
+
+	// The DTMF signal was delivered.
+	String callId = ... // The identifier for the call.
+	sendDTMFSucceeded( callId );
+	...
+
+	// Sending the DTMF signal failed.
+	String callId = ... // The identifier for the call.
+	DTMFError code = ... // error type
+	String message = ... // error description
+	sendDTMFFailed( callId, code, message );
+	...
+
+	// Register a phone call controller handler with the Engine.
+	PhoneCallController phoneCallController = new PhoneCallControllerHandler();
+	engine.registerPlatformInterface( phoneCallController );
 }
+
 ```
 
-### Whitelisting
+## Whitelisting
 
 Please see the [Need Help?](../../NEED_HELP.md) page for how to whitelist your device for using PhoneCallController APIs.

@@ -39,6 +39,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Pattern;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -66,6 +67,9 @@ class LoginWithAmazonCBL extends Observable {
     //    please see the README CBL section for more.
     private static final boolean sUserProfileEnabled = false;
     private static final String sScopeValue = sUserProfileEnabled ? "alexa:all+profile" : "alexa:all";
+
+    // default client id regexpr <>
+    private static String sDefaultRegExpr = "^<[^>]*>$";
 
     private final SharedPreferences mPreferences;
     private final Activity mActivity;
@@ -109,7 +113,7 @@ class LoginWithAmazonCBL extends Observable {
         @Override
         public void run() {
             try {
-                if ( !mClientId.equals( "" ) ) {
+                if ( !Pattern.matches( sDefaultRegExpr, mClientId ) ) {
                     final JSONObject scopeData = new JSONObject();
                     final JSONObject data = new JSONObject();
                     final JSONObject productInstanceAttributes = new JSONObject();
@@ -175,7 +179,7 @@ class LoginWithAmazonCBL extends Observable {
 
                     } else mLogger.postError( sTag, "Error requesting device authorization" );
 
-                } else mLogger.postWarn( sTag, "Cannot authenticate. Invalid client ID" );
+                } else mLogger.postWarn( sTag, "Cannot authenticate. Please review the configuration file in the app's assets directory." );
 
             } catch ( Exception e ) { mLogger.postError( sTag, e.getMessage() ); }
         }

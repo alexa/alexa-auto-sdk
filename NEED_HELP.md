@@ -4,9 +4,8 @@
 
 The following functionality is only available after the device is whitelisted:
 
-1. Navigation
-2. Amazon Music and other music service providers
-3. Phone Call Control
+* Amazon Music and other music service providers
+* Phone Call Control
 
 You will need to provide the Amazon ID of your development device or product on the [AVS Developer Portal](https://developer.amazon.com/avs/home.html#/avs/home).
 
@@ -16,12 +15,18 @@ You will need to provide the Amazon ID of your development device or product on 
 
 ## Reporting an Issue<a id="reportinganissue"></a>
 
-Please reach out to the designated Amazon Solutions Architect or Partner Manager for your company, and include the following information:
+### Existing Alexa Auto SDK Customers
+
+Please reach out to the designated Amazon Solution Architect (SA) or Partner Manager for your company, and include the following information:
 
 * **Overview** - provide a brief overview of the issue
 * **Steps to reproduce** - provide details of how to reproduce the issue
 * **Logs** - include relevant logs
 * **Platform and environment** - provide details about your hardware platform, operating system, compiler, API level, etc.
+
+### New Alexa Auto SDK Customers
+
+Please fill out the form "Request more information" at the bottom of the [Alexa Auto Software Development Kit (SDK)](https://developer.amazon.com/alexa-voice-service/alexa-auto-sdk) page. Once you have submitted your request, someone from Amazon will contact you.
 
 ## Making Pull Requests<a id="pullrequests"></a>
 

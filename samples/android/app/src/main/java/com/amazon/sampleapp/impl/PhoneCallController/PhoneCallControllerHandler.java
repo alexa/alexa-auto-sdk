@@ -16,8 +16,11 @@
 package com.amazon.sampleapp.impl.PhoneCallController;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.view.View;
-import android.widget.RelativeLayout;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.support.v7.widget.SwitchCompat;
 import android.widget.CompoundButton;
@@ -29,27 +32,53 @@ import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class PhoneCallControllerHandler extends PhoneCallController {
 
     private static final String sTag = "PhoneCallController";
-    private static final String sConnectionError = "503";
+
+    private static final long sDialingToRingingDelay = 2;
 
     private final Activity mActivity;
     private final LoggerHandler mLogger;
-    private TextView mInitiateCallButton, mTerminateCallButton;
-    private TextView mCalleeNumberView, mCallStateView;
-    private String mCallId, mCalleeNumber;
+    private TextView mDeviceConfigurationButton;
+    private TextView mCurrentCallNumberView, mCallStateView, mLastCalledNumberView;
+    private EditText mCallingNumberText;
+    private LinearLayout mLocalAnswerDecline, mRemoteAnswerDecline;
+    private TextView mLocalInitiateButton, mLocalEndButton, mLocalAnswerButton, mLocalDeclineButton;
+    private TextView mRemoteInitiateButton, mRemoteEndButton, mRemoteAnswerButton, mRemoteDeclineButton;
+    private String mCallId, mCurrentCallNumber, mLastCalledNumber;
     private boolean mCallActivated = false;
-    private ConnectionState mConnectionState = ConnectionState.DISCONNECTED;
+    private boolean mLocalCallStarted = false;
+    private boolean mRemoteCallStarted = false;
+    private CallState mCallState;
+    private ConnectionState mConnectionState;
+    private HashMap<CallingDeviceConfigurationProperty, Boolean> mDeviceConfiguration;
+
+    private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
+    private Timer mTimer = new Timer();
 
     public PhoneCallControllerHandler( Activity activity, LoggerHandler logger ) {
         mActivity = activity;
         mLogger = logger;
+        mCallId = "";
+        mConnectionState = ConnectionState.DISCONNECTED;
         setupGUI();
+        updateGUI();
+
+        mDeviceConfiguration = new HashMap<>();
+        mDeviceConfiguration.put(CallingDeviceConfigurationProperty.DTMF_SUPPORTED, false);
     }
 
     @Override
     public boolean dial( String payload ) {
+        // Handling should not block the caller
         String callId = "";
         String calleeNumber = "";
 
@@ -61,60 +90,250 @@ public class PhoneCallControllerHandler extends PhoneCallController {
         } catch ( JSONException e ) {
             mLogger.postError( sTag, "Error parsing dial directive payload: "
                     + e.getMessage() );
-        }
-
-        if ( mCallActivated ) {
-            mLogger.postInfo( sTag, "Received dial(), Call State is already active" );
             return false;
         }
 
         mCallId = callId;
-        mCalleeNumber = calleeNumber;
+        mCurrentCallNumber = calleeNumber;
+        mCallState = CallState.DIALING;
+        callStateChanged( CallState.DIALING, callId );
 
-        if ( mConnectionState == ConnectionState.DISCONNECTED ) {
-            mLogger.postInfo( sTag, "Received dial(), ConnectionState: DISCONNECTED" );
+        startDialingCallTimer( sDialingToRingingDelay );
+        mLocalCallStarted = true;
+        updateGUI();
+        return true;
+    }
+
+    @Override
+    public boolean redial( String payload ) {
+        // Handling should not block the caller
+        String callId = "";
+        try {
+            JSONObject obj = new JSONObject( payload );
+            mLogger.postJSONTemplate( sTag, obj.toString( 4 ) );
+            callId = obj.getString( "callId" );
+        } catch ( JSONException e) {
+            mLogger.postError( sTag, "Error parsing redial directive payload: "
+                    + e.getMessage() );
             return false;
-        } else {
-            updateViewOnDial();
+        }
+
+        if ( mLastCalledNumber == null || mLastCalledNumber.equals( "" ) ) {
+            callFailed( callId, CallError.NO_NUMBER_FOR_REDIAL );
             return true;
         }
+
+        mCallId = callId;
+        mCurrentCallNumber = mLastCalledNumber;
+        mCallState = CallState.DIALING;
+        callStateChanged( CallState.DIALING, callId );
+
+        startDialingCallTimer( sDialingToRingingDelay );
+        mLocalCallStarted = true;
+        updateGUI();
+        return true;
+    }
+
+    @Override
+    public void answer( String payload ) {
+        // Handling should not block the caller
+        String callId = "";
+        try {
+            JSONObject obj = new JSONObject( payload );
+            mLogger.postJSONTemplate( sTag, obj.toString( 4 ) );
+            callId = obj.getString( "callId" );
+        } catch ( JSONException e) {
+            mLogger.postError( sTag, "Error parsing answer directive payload: "
+                    + e.getMessage() );
+            return;
+        }
+
+        if( !mCallId.equals( callId ) ) {
+            callFailed( callId, CallError.OTHER, "Call ID does not match" );
+        }
+        handleAnswerCall();
+    }
+
+    @Override
+    public void stop( String payload ) {
+        // Handling should not block the caller
+        String callId = "";
+        try {
+            JSONObject obj = new JSONObject( payload );
+            mLogger.postJSONTemplate( sTag, obj.toString( 4 ) );
+            callId = obj.getString( "callId" );
+        } catch ( JSONException e) {
+            mLogger.postError( sTag, "Error parsing stop directive payload: "
+                    + e.getMessage() );
+            return;
+        }
+
+        if( !mCallId.equals( callId ) ) {
+            callFailed( callId, CallError.OTHER, "Call ID does not match" );
+        }
+        if( mCallState == CallState.INBOUND_RINGING || mCallState == CallState.CALL_RECEIVED ) {
+            handleDeclineCall();
+        } else {
+            handleEndCall();
+        }
+    }
+
+    @Override
+    public void sendDTMF( String payload ) {
+        // Handling should not block the caller
+        String callId = "";
+        try {
+            JSONObject obj = new JSONObject( payload );
+            mLogger.postJSONTemplate( sTag, obj.toString( 4 ) );
+            callId = obj.getString( "callId" );
+        } catch ( JSONException e) {
+            mLogger.postError( sTag, "Error parsing stop directive payload: "
+                    + e.getMessage() );
+            return;
+        }
+
+        if( !mCallId.equals( callId ) ) {
+            callFailed( callId, CallError.OTHER, "Call ID does not match" );
+        }
+        sendDTMFSucceeded( callId );
+    }
+
+    private void startDialingCallTimer( Long delaySeconds ) {
+        mTimer.schedule( new TimerTask() {
+            public void run() { handleInitiateCall(); }
+        }, delaySeconds * 1000 );
+    }
+
+    private class InitiateCallTask implements Runnable {
+        @Override
+        public void run() {
+            if ( mCallId.equals( "" ) ) {
+                mCallId = createCallId();
+            }
+            mCallState = CallState.OUTBOUND_RINGING;
+            callStateChanged( CallState.OUTBOUND_RINGING, mCallId);
+            updateGUI();
+        }
+    };
+
+    private void handleInitiateCall() {
+        mLocalCallStarted = true;
+        mExecutor.submit( new InitiateCallTask() );
+    }
+
+    private void startCallReceivedTimer( Long delaySeconds ) {
+        mTimer.schedule( new TimerTask() {
+            public void run() { handleCallReceived(); }
+        }, delaySeconds * 1000 );
+
+    }
+
+    private void handleCallReceived() {
+        mExecutor.submit( new CallReceivedTask() );
+
+    }
+
+    private class CallReceivedTask implements Runnable {
+        @Override
+        public void run() {
+            mCallState = CallState.INBOUND_RINGING;
+            callStateChanged( mCallState, mCallId );
+            updateGUI();
+        }
+    };
+
+    private void handleRemoteInitiateCall() {
+        mRemoteCallStarted = true;
+        String callId = createCallId();
+        mCallId = callId;
+        mCallState = CallState.CALL_RECEIVED;
+        callStateChanged( mCallState, callId );
+        startCallReceivedTimer( (long)2 );
+        updateGUI();
+    }
+
+    private void handleAnswerCall() {
+        mCallActivated = true;
+        mCallState = CallState.ACTIVE;
+        callStateChanged( CallState.ACTIVE, mCallId );
+        updateGUI();
+    }
+
+    private void handleRemoteAnswerCall() {
+        mCallActivated = true;
+        mCallState = CallState.ACTIVE;
+        callStateChanged( CallState.ACTIVE, mCallId );
+        updateGUI();
+    }
+
+    private void handleDeclineCall() {
+        mRemoteCallStarted = false;
+        mLocalCallStarted = false;
+        mCallState = CallState.IDLE;
+        callStateChanged( CallState.IDLE, mCallId );
+        mCurrentCallNumber = "";
+        mCallId = "";
+        updateGUI();
+    }
+
+    private void handleRemoteDeclineCall() {
+        mLastCalledNumber = mCurrentCallNumber;
+        mRemoteCallStarted = false;
+        mLocalCallStarted = false;
+        mCallState = CallState.IDLE;
+        callStateChanged( CallState.IDLE, mCallId );
+        mCurrentCallNumber = "";
+        mCallId = "";
+        updateGUI();
+    }
+
+    private void handleEndCall() {
+        if ( mLocalCallStarted ) {
+            mLastCalledNumber = mCurrentCallNumber;
+        }
+        mRemoteCallStarted = false;
+        mLocalCallStarted = false;
+        mCallActivated = false;
+        mCallState = CallState.IDLE;
+        mLastCalledNumber = mCurrentCallNumber;
+        callStateChanged( CallState.IDLE, mCallId );
+        mCurrentCallNumber = "";
+        mCallId = "";
+        updateGUI();
+    }
+
+    private void handleRemoteEndCall() {
+        if ( mLocalCallStarted ) {
+            mLastCalledNumber = mCurrentCallNumber;
+        }
+        mRemoteCallStarted = false;
+        mLocalCallStarted = false;
+        mCallActivated = false;
+        mCallState = CallState.IDLE;
+        mLastCalledNumber = mCurrentCallNumber;
+        callStateChanged( CallState.IDLE, mCallId );
+        mCurrentCallNumber = "";
+        mCallId = "";
+        updateGUI();
     }
 
     private void togglePhoneConnectionState( boolean enable ) {
         if ( enable ) {
             mConnectionState = ConnectionState.CONNECTED;
             mLogger.postInfo( sTag, "ConnectionState: CONNECTED" );
-            connectionStateChanged( ConnectionState.CONNECTED );
-            updateViewOnConnected();
+            connectionStateChanged( mConnectionState );
         } else {
             mConnectionState = ConnectionState.DISCONNECTED;
             mLogger.postInfo( sTag, "ConnectionState: DISCONNECTED" );
-            connectionStateChanged( ConnectionState.DISCONNECTED );
-            updateViewOnDisconnected();
+            connectionStateChanged( mConnectionState );
 
-            // Notify the Engine if phone disconnects during active call
-            if ( mCallActivated ) {
-                mCallActivated = false;
+            // Notify the Engine if phone disconnects during call
+            if ( mLocalCallStarted || mRemoteCallStarted ) {
                 mLogger.postInfo( sTag, "Call Failed, ConnectionState: DISCONNECTED" );
-                callFailed( mCallId, sConnectionError, "Connection lost" );
+                callFailed( mCallId, CallError.OTHER, "Connection lost" );
+                handleEndCall();
             }
         }
-    }
-
-    private void onCallInitiated() {
-        mCallActivated = true;
-        mLogger.postInfo( sTag, String.format( "Call Initiated. CALL ID: %s, NUMBER: %s",
-                mCallId, mCalleeNumber ) );
-        callActivated( mCallId );
-        updateViewOnCallInitiated();
-    }
-
-    private void onCallTerminated() {
-        mCallActivated = false;
-        mLogger.postInfo( sTag, String.format( "Call Terminated. CALL ID: %s, NUMBER: %s",
-                mCallId, mCalleeNumber ) );
-        callTerminated( mCallId );
-        updateViewOnCallTerminated();
     }
 
     private String getCalleeDefaultAddressValue( JSONObject payload ) {
@@ -122,7 +341,7 @@ public class PhoneCallControllerHandler extends PhoneCallController {
         try {
             JSONObject callee = payload.getJSONObject( "callee" );
             if ( callee != null ) {
-                JSONObject defaultAddress = callee.getJSONObject( "defaultAddress" );
+                JSONObject defaultAddress = callee.getJSONObject( "defaultContactAddress" );
                 if ( defaultAddress != null ) {
                     return defaultAddress.getString( "value" );
                 }
@@ -132,6 +351,74 @@ public class PhoneCallControllerHandler extends PhoneCallController {
                     + e.getMessage() );
         }
         return address;
+    }
+
+    private void onDeviceConfigurationUpdated() {
+        AlertDialog.Builder builder = new AlertDialog.Builder( mActivity );
+        builder.setTitle("Device Configurations");
+
+        CallingDeviceConfigurationProperty[] configurations = CallingDeviceConfigurationProperty.values();
+        final String[] configurationNames = new String[configurations.length];
+        boolean[] configurationValues = new boolean[configurations.length];
+
+        for ( int i = 0; i < configurations.length; i++ ) {
+            configurationNames[i] = configurations[i].name();
+        }
+        Arrays.sort( configurationNames );
+
+        for ( int i = 0; i < configurations.length; i++ ) {
+            configurationValues[i] = mDeviceConfiguration.get( CallingDeviceConfigurationProperty.valueOf( configurationNames[i] ) );
+        }
+
+        builder.setMultiChoiceItems( configurationNames, configurationValues, new DialogInterface.OnMultiChoiceClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i, boolean b) {
+                mDeviceConfiguration.put( CallingDeviceConfigurationProperty.valueOf( configurationNames[i] ),  b);
+            }
+        });
+
+        builder.setPositiveButton("Update", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                deviceConfigurationUpdated( mDeviceConfiguration );
+            }
+        });
+        builder.setNegativeButton("Cancel", null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void onLocalInitiate() {
+        mCurrentCallNumber = mCallingNumberText.getText().toString();
+        handleInitiateCall();
+    }
+
+    private void onLocalEnd() {
+        handleEndCall();
+    }
+
+    private void onLocalAnswer() {
+        handleAnswerCall();
+
+    }
+    private void onLocalDecline() {
+        handleDeclineCall();
+    }
+
+    private void onRemoteInitiate() {
+        handleRemoteInitiateCall();
+    }
+
+    private void onRemoteEnd() {
+        handleRemoteEndCall();
+    }
+
+    private void onRemoteAnswer() {
+        handleRemoteAnswerCall();
+    }
+
+    private void onRemoteDecline() {
+        handleRemoteDeclineCall();
     }
 
     /* For Updating GUI */
@@ -146,83 +433,110 @@ public class PhoneCallControllerHandler extends PhoneCallController {
         phoneCallConnectionSwitch.setOnCheckedChangeListener(
                 new CompoundButton.OnCheckedChangeListener() {
                     @Override
-                    public void onCheckedChanged( CompoundButton buttonView, boolean isChecked ) {
-                        togglePhoneConnectionState( isChecked );
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        togglePhoneConnectionState(isChecked);
                     }
                 }
         );
 
-        mCalleeNumberView = mActivity.findViewById( R.id.calleeNumber );
-        mCallStateView = mActivity.findViewById( R.id.callState );
-        mInitiateCallButton =  mActivity.findViewById( R.id.initiateCall );
-        mTerminateCallButton = mActivity.findViewById( R.id.terminateCall );
+        mDeviceConfigurationButton = mActivity.findViewById( R.id.deviceConfiguration );
+        mCurrentCallNumberView = mActivity.findViewById( R.id.currentCallNumber );
+        mCallStateView = mActivity.findViewById( R.id.currentCallState );
+        mLastCalledNumberView = mActivity.findViewById( R.id.lastCalledNumber );
+        mCallingNumberText = mActivity.findViewById( R.id.localCallingNumber );
+        mLocalInitiateButton = mActivity.findViewById( R.id.localInitiate );
+        mLocalEndButton = mActivity.findViewById( R.id.localEnd );
+        mLocalAnswerDecline = mActivity.findViewById( R.id.localAnswerDecline);
+        mLocalAnswerButton = mActivity.findViewById( R.id.localAnswer );
+        mLocalDeclineButton = mActivity.findViewById( R.id.localDecline );
+        mRemoteInitiateButton = mActivity.findViewById( R.id.remoteInitiate );
+        mRemoteEndButton = mActivity.findViewById( R.id.remoteEnd );
+        mRemoteAnswerDecline = mActivity.findViewById( R.id.remoteAnswerDecline );
+        mRemoteAnswerButton = mActivity.findViewById( R.id.remoteAnswer );
+        mRemoteDeclineButton = mActivity.findViewById( R.id.remoteDecline );
 
-        mInitiateCallButton.setOnClickListener( new View.OnClickListener() {
+        mDeviceConfigurationButton.setOnClickListener( new View.OnClickListener() {
             @Override
-            public void onClick( View v ) { onCallInitiated(); }
+            public void onClick( View v ) { onDeviceConfigurationUpdated(); }
         });
-        mTerminateCallButton.setOnClickListener( new View.OnClickListener() {
+        mLocalInitiateButton.setOnClickListener( new View.OnClickListener() {
             @Override
-            public void onClick( View v ) { onCallTerminated(); }
+            public void onClick( View v ) { onLocalInitiate(); }
         });
-    }
-
-    private void updateViewOnDial () {
-        mActivity.runOnUiThread( new Runnable() {
+        mLocalEndButton.setOnClickListener( new View.OnClickListener() {
             @Override
-            public void run() {
-                mCalleeNumberView.setText( mCalleeNumber );
-                mCallStateView.setText( R.string.call_state_idle );
-                mInitiateCallButton.setVisibility( View.VISIBLE );
-                mTerminateCallButton.setVisibility( View.GONE );
-            }
+            public void onClick( View v ) { onLocalEnd(); }
         });
-    }
-
-    private void updateViewOnConnected() {
-        mActivity.runOnUiThread( new Runnable() {
+        mLocalAnswerButton.setOnClickListener( new View.OnClickListener() {
             @Override
-            public void run() {
-                mInitiateCallButton.setVisibility( View.VISIBLE );
-                mTerminateCallButton.setVisibility( View.GONE );
-            }
+            public void onClick( View v ) { onLocalAnswer(); }
         });
-    }
-
-    private void updateViewOnDisconnected() {
-        mActivity.runOnUiThread( new Runnable() {
+        mLocalDeclineButton.setOnClickListener( new View.OnClickListener() {
             @Override
-            public void run() {
-                mInitiateCallButton.setVisibility( View.GONE );
-                mTerminateCallButton.setVisibility( View.GONE );
-                if ( mCalleeNumber != null )
-                    mCallStateView.setText( R.string.call_state_idle );
-                else
-                    mCallStateView.setText( R.string.call_state_none );
-            }
+            public void onClick( View v ) { onLocalDecline(); }
         });
-    }
-
-    private void updateViewOnCallInitiated() {
-        mActivity.runOnUiThread( new Runnable() {
+        mRemoteInitiateButton.setOnClickListener( new View.OnClickListener() {
             @Override
-            public void run() {
-                mInitiateCallButton.setVisibility( View.GONE );
-                mTerminateCallButton.setVisibility( View.VISIBLE );
-                mCallStateView.setText( R.string.call_state_active );
-            }
+            public void onClick( View v ) { onRemoteInitiate(); }
+        });
+        mRemoteEndButton.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick( View v ) { onRemoteEnd(); }
+        });
+        mRemoteAnswerButton.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick( View v ) { onRemoteAnswer(); }
+        });
+        mRemoteDeclineButton.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick( View v ) { onRemoteDecline(); }
         });
     }
 
-    private void updateViewOnCallTerminated() {
+    private void updateGUI() {
         mActivity.runOnUiThread( new Runnable() {
             @Override
             public void run() {
-                mInitiateCallButton.setVisibility( View.GONE );
-                mTerminateCallButton.setVisibility( View.GONE );
-                mCallStateView.setText( R.string.call_state_none );
-                mCalleeNumber = null;
-                mCalleeNumberView.setText( R.string.callee_default_number );
+                if ( mCallState == null || mCallState == CallState.IDLE) {
+                    mCallStateView.setText( "" );
+                } else {
+                    mCallStateView.setText( mCallState.toString() );
+                }
+                mCurrentCallNumberView.setText( mCurrentCallNumber );
+                mLastCalledNumberView.setText( mLastCalledNumber );
+
+                if ( mCallActivated ) {
+                    mLocalInitiateButton.setVisibility( View.GONE );
+                    mLocalEndButton.setVisibility( View.VISIBLE );
+                    mRemoteInitiateButton.setVisibility( View.GONE );
+                    mRemoteEndButton.setVisibility( View.VISIBLE );
+                    mLocalAnswerDecline.setVisibility( View.GONE );
+                    mRemoteAnswerDecline.setVisibility( View.GONE );
+                }
+                else if ( !mLocalCallStarted && !mRemoteCallStarted ) {
+                    mLocalInitiateButton.setVisibility( View.VISIBLE );
+                    mLocalEndButton.setVisibility( View.GONE );
+                    mRemoteInitiateButton.setVisibility( View.VISIBLE );
+                    mRemoteEndButton.setVisibility( View.GONE );
+                    mLocalAnswerDecline.setVisibility( View.GONE );
+                    mRemoteAnswerDecline.setVisibility( View.GONE );
+                }
+                else if ( mLocalCallStarted && !mRemoteCallStarted ) {
+                    mLocalInitiateButton.setVisibility( View.GONE );
+                    mLocalEndButton.setVisibility( View.VISIBLE );
+                    mRemoteInitiateButton.setVisibility( View.GONE );
+                    mRemoteEndButton.setVisibility( View.GONE );
+                    mLocalAnswerDecline.setVisibility( View.GONE );
+                    mRemoteAnswerDecline.setVisibility( View.VISIBLE );
+                }
+                else if ( !mLocalCallStarted && mRemoteCallStarted ) {
+                    mLocalInitiateButton.setVisibility( View.GONE );
+                    mLocalEndButton.setVisibility( View.GONE );
+                    mRemoteInitiateButton.setVisibility( View.GONE );
+                    mRemoteEndButton.setVisibility( View.VISIBLE );
+                    mLocalAnswerDecline.setVisibility( View.VISIBLE );
+                    mRemoteAnswerDecline.setVisibility( View.GONE );
+                }
             }
         });
     }

@@ -68,6 +68,12 @@ public class LocationProviderHandler extends LocationProvider {
         return mLocation;
     }
 
+    @Override
+    public String getCountry(){
+        // Get device country from a platform specific method/service. As an example "US" is set here by default.
+        return "US";
+    }
+
     private void enableMockLocation( boolean enable ) {
         mMockLocationEnabled = enable;
         if ( enable ) {
@@ -117,10 +123,8 @@ public class LocationProviderHandler extends LocationProvider {
                 }
             }
             if ( mLocation == null ) {
-                mLocation = new Location( 37.369, -122.036 );
-                mLogger.postInfo( sTag,
-                        String.format( "No location provider found. Defaulting to: (%s, %s)",
-                            mLocation.getLatitude(), mLocation.getLongitude() ) );
+                mLogger.postVerbose( sTag,
+                    "No location provider found. Geolocation context will not be sent. Defaulting to AVS cloud. ");
             }
             setGUILocation( mLocation );
         }
@@ -180,8 +184,12 @@ public class LocationProviderHandler extends LocationProvider {
         mActivity.runOnUiThread( new Runnable() {
             @Override
             public void run() {
-                mLatLongText.setText( String.format( "( %.3f, %.3f )",
-                        loc.getLatitude(), loc.getLongitude() ) );
+                if ( mLocation != null ) {
+                    mLatLongText.setText(String.format("( %.3f, %.3f )",
+                            loc.getLatitude(), loc.getLongitude()));
+                } else {
+                    mLatLongText.setText( "Not Available." );
+                }
             }
         });
     }

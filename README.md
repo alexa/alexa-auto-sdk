@@ -19,18 +19,20 @@ The following components are included with the Alexa Auto SDK:
 
 * [Builder](./builder/README.md): This directory contains the scripts that allow developers to build modules for a variety of hardware targets.
 
-* [Modules](./modules): This directory contains the Alexa Auto SDK interfaces and source code.
+* Modules: This directory contains the Alexa Auto SDK interfaces and source code in the following modules:
+     * [Alexa](./modules/alexa/README.md)
+     * [Core](./modules/core/README.md)
+     * [Navigation](./modules/navigation/README.md)
+     * [Phone Control](./modules/phone-control/README.md)
+     * [Contact Uploader](./modules/contact-uploader/README.md)
 
 * [Android Sample App](./samples/android/README.md): This directory contains the Android sample application that uses the Alexa Auto SDK to demonstrate end-to-end functionality.
+> **Important!** You need an [Amazon Developer Account](https://developer.amazon.com/home.html) to use the Alexa Auto SDK. Read the [Sample App](./samples/android/README.md) documentation for more details.
 
-    * > **Important!** You need an [Amazon Developer Account](https://developer.amazon.com/home.html) to use the Alexa Auto SDK. Read the [Sample App](./samples/android/README.md) documentation for more details.
+Alexa Auto SDK API Reference documentation is available for Android and C++. Access the Alexa Auto SDK API reference documentation from the links below.
 
-Alexa Auto SDK API Reference documentation is available for Android and C++. Go to the appropriate directory and open the **`index.html`** file with a web browser.
-
-Access the Alexa Auto SDK API reference documentation from the links below.
-
-* [Alexa Auto SDK for Android](./docs/android/)
-* [Alexa Auto SDK for C++](./docs/cpp/)
+* [Alexa Auto SDK for Android](https://alexa.github.io/aac-sdk/docs/android/)
+* [Alexa Auto SDK for C++](https://alexa.github.io/aac-sdk/docs/cpp/)
 
 ## General Build Requirements<a id="generalbuildreqs"></a>
 
@@ -43,35 +45,59 @@ However, we recommend and support running a Docker environment with the followin
 * Memory: 16 Gb
 * Storage: 1 Gb+ available to use.
 
+### Build Dependencies and License Information
+
+During the build time, the following dependencies are fetched and built for the target platform by [Alexa Auto SDK Builder](./builder/README.md). Please refer to each of the individual entities for the particular licenses.
+
+* [AVS Device SDK v1.9](https://github.com/alexa/avs-device-sdk/)
+  * [cURL 7.58.0](https://curl.haxx.se/)
+  * [ngHTTP2 1.31.1](https://github.com/nghttp2/nghttp2)
+  * [SQLite3 3.20.0](https://www.sqlite.org/)
+  * *Android target only* [OpenSSL 1.1.0h](https://www.openssl.org/)
+* [Google Test v1.8.0](https://github.com/google/googletest)
+* [libopus 1.2.1](https://opus-codec.org/)
+* [OpenEmbedded-Core Rocko](https://www.openembedded.org/wiki/OpenEmbedded-Core)
+* [BitBake](https://www.yoctoproject.org/software-overview/)
+* *Android target only* [Android Toolchain](https://www.android.com/)
+  * [NDK r16b](https://developer.android.com/ndk/)
+  * [SDK Tools 26.0.1](https://developer.android.com/studio/releases/sdk-tools)
+
+> **Note**: that *OpenEmbedded-Core* will fetch and build additional components for preparing the dedicated toolchain for your environment (Such as *GNU Binutils*). Please refer to the [Yocto project](https://www.yoctoproject.org/software-overview/) to understand how it works.
+
+
 ## Vehicle Configuration Information<a id="vehicleconfigurationdatarequirements"></a>
 
 The Vehicle Configuration class provides an interface for vehicle information to be supplied to the SDK. This information is required to pass the certification process.
 
 Read detailed information about the vehicle configuration class in the API reference documentation.
 
-* [Alexa Auto SDK for Android](./docs/android/)
-* [Alexa Auto SDK for C++](./docs/cpp/)
+* [Alexa Auto SDK for Android](https://alexa.github.io/aac-sdk/docs/android/)
+* [Alexa Auto SDK for C++](https://alexa.github.io/aac-sdk/docs/cpp/)
 
 ## Build the Alexa Auto SDK<a id="buildthesdk"></a>
 
 To build the Alexa Auto SDK you should read and understand the instructions in the [Builder README](./builder/README.md).
 
-The recommended and tested Linux hosts are **Ubuntu 16.04 LTS** or **macOS Sierra**.
+The recommended and tested host operating systems are **Ubuntu 16.04 LTS** or **macOS Sierra**.
 
 ### Supported Target Platforms
 
 Alexa Auto SDK is supported on the following platforms:
 
-* Android ARM 32-bit
-* Android ARM 64-bit (using 32-bit build)
-* Android x86
-* QNX ARM 64-bit
+* Android 5.1 Lollypop API Level 22 or higher.
+    * ARM 32-bit
+    * ARM 64-bit
+    * x86
+    * x86 64-bit
+* QNX 7.0
+    * ARM 64-bit
+    * x86 64-bit
 
 > **Note**: For Android targets, Alexa Auto SDK is available as a prebuilt library on GitHub. Read the instructions about accessing and using the library in the [samples/android/ directory](./samples/android/README.md).
 
 ## Alexa Auto SDK Architecture<a id="architecture"></a> Overview
 
-The Alexa Auto SDK is designed to allow flexibility in the integration of Alexa as a part of the Auto in-cabin experience. The Alexa Auto SDK Engine provides runtime support for Alexa and other services and allows the application to integrate with platform specific functionality. Platform specific behavior in Alexa Auto is abstracted into interfaces called "Platform Interfaces." These interfaces should be extended in the application and registered with the Engine.
+The Alexa Auto SDK is designed to allow flexibility in the integration of Alexa as a part of the automotive in-cabin experience. The Alexa Auto SDK Engine provides runtime support for Alexa and other services and allows the application to integrate with platform specific functionality. Platform specific behavior in Alexa Auto is abstracted into interfaces called "Platform Interfaces." These interfaces should be extended in the application and registered with the Engine.
 
 The Platform Interfaces are documented in their respective module's API documentation.
 
@@ -119,35 +145,28 @@ The Android Sample App provides an example of how to use the Alexa Auto SDK. The
 
 > **Note**: Feature enhancements, updates, and resolved issues from previous releases are available to view in [CHANGELOG.md](./CHANGELOG.md)
 
-### v1.1.0 Released on 2018-08-31:
+### v1.3.0 released on 2018-11-20:
 
-### Enhancements
+#### Enhancements
 
-* Added support for choosing one of multiple network adaptors before starting the engine.
+Alexa Auto SDK now includes the following features and enhancements:
 
-* Added support for latest Amazon Wakeword engine.
+* Android 8 and ARM v8a platform support.
+* Making calls to contacts from a locally paired mobile phone as long as the Alexa Auto SDK has a valid auth token. Read more about [Contact Uploader API](./modules/contact-uploader/README.md).
+* Redial, answer, terminate and decline calls using voice. End users can also send dual-tone multi-frequency (DTMF) via voice to interact with Interactive Voice Responders (IVRs). Read more here [Phone Call Controller](./modules/phone-control/README.md).
+* Switching to local media sources, generic controls and deep linking into 3rd party media applications compatible with the Amazon Media App Command and Control (MACC) specification using the External Media Player Interface 1.1. This allows customers to switch between  a CD player, AM/ FM player  and auxiliary input that is MACC compliant. Read more here [Handling External Media Adapter with MACCAndroidClient](./platforms/android/ALEXA.md#handlingexternalmediaadapterwithmaccandroidclient).  
+* Enhancement for 3rd party wake word engine to enable cloud based verification.
+* Provides a way to override Template Runtime display card timeout values for RenderTemplate and RenderPlayerInfo by updating the [templateRuntimeCapabilityAgent Engine configuration](https://alexa.github.io/aac-sdk/modules/core/#configuring-the-engine) values.
 
-* Added custom volume control support for infotainment system's native input volume range. The range that comes down to the device will be 0 to 100.
+#### Resolved Issues
 
-* Added support for encoding the utterance in OPUS format with the Amazon Wakeword Engine as well as PTT. Our builder pulls the libopus source code as a part of build process.
+No resolved issues.
 
-* Added Locale API to return the list of Alexa supported locales.
+#### Known Issues
 
-* Updated Vehicle Information API to capture the microphone details.
-
-* Added support for routines, music alarms, timers and alarms volume management and deleting all timers and alarms.
-
-* Added support for TemplateRuntime Interface 1.1 which provides visual playback control for Alexa enabled products with TemplateRuntime Interface support. This includes upgrades to PlaybackController Interface 1.1 and TemplateRuntime Interface 1.1.
-    * > **Note**: The older button-press APIs (`playButtonPressed()` or `nextButtonPressed()`) have been deprecated in favor of the new generic `buttonPressed(PlaybackButtonType)`.
-
-* Updated the builder script to confirm compiance with open source component licenses.
-
-### Resolved Issues
-
-There are no resolved issues in this release.
-
-### Known Issues
-
-There are no known issues in this release.
+* The Alexa Auto SDK does not re-discover Media Apps Command and Control (MACC) compliant apps if they are unresponsive after being idle for a long period  (around 30 minutes).
+* The Alexa Auto SDK Engine becomes unresponsive if it receives PLAY directive during shutdown. However since shutdown is triggered when car ignition is turned off, there is not direct customer impact expected.
+* When a timer sounds during an Alexa to Alexa call, uttering "stop" ends the call not the timer.
+* Multiple automotive devices using the same account at the same time, can access contacts from phones paired across those devices.
 
 Sample App issues are documented in the [Sample App README](./samples/android/README.md#androidsampleapprelnote).

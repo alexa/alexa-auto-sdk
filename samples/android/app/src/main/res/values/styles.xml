@@ -19,4 +19,5 @@
         <item name="android:textColor">@color/drawerButtonText</item>
         <item name="android:background">@drawable/btn_drawer_selector</item>
     </style>
+
 </resources>

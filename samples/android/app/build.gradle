@@ -7,7 +7,7 @@ android {
         minSdkVersion 22
         targetSdkVersion 23
         versionCode 1
-        versionName "1.0"
+        versionName "1.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -21,7 +21,8 @@ android {
 }
 
 dependencies {
-    compileProject()
+    compileProjectAace()
+    compileProjectMacc()
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support:design:26.1.0'
@@ -36,6 +37,7 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer-dash:2.7.1'
     implementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.7.1'
     implementation 'com.google.android.exoplayer:exoplayer-hls:2.7.1'
+    implementation 'com.google.android.gms:play-services-maps:16.0.0'
 }
 
 preBuild {
@@ -44,7 +46,7 @@ preBuild {
     }
 }
 
-void compileProject() {
+void compileProjectAace() {
     String libsPath = "app/src/main/libs/"
     File debugAar = new File(libsPath + "aace-debug.aar")
     File releaseAar = new File(libsPath + "aace-release.aar")
@@ -56,14 +58,41 @@ void compileProject() {
     if (releaseAar.exists()) {
         aarNames.add(releaseAar.getName())
         dependencies.implementation(name: 'aace-release', ext: 'aar')
-        msg = "Attempting to build Project with the release aar file"
+        msg = "Attempting to build SampleApp with the aace-release.aar file"
     } else {
         dependencies.implementation project(':aace')
         msg = "The aace-release.aar was not found. Building SampleApp without the .aar file"
     }
 
     StringBuilder sb = new StringBuilder()
-    sb.append("Aar files found were: ").append(aarNames.toString())
+    sb.append("The aace .aar files found were: ").append(aarNames.toString())
+    String foundFilesMsg = generateWrappedMessage(sb.toString())
+    logger.lifecycle(foundFilesMsg)
+
+    compileMsg = generateWrappedMessage(msg)
+    logger.lifecycle(compileMsg)
+}
+
+void compileProjectMacc() {
+    String libsPath = "app/src/main/libs/"
+    File debugAar = new File(libsPath + "maccandroid-debug.aar")
+    File releaseAar = new File(libsPath + "maccandroid-release.aar")
+    List<String> aarNames = new ArrayList<>()
+    String compileMsg, msg
+    if (debugAar.exists()) {
+        aarNames.add(debugAar.getName())
+    }
+    if (releaseAar.exists()) {
+        aarNames.add(releaseAar.getName())
+        dependencies.implementation(name: 'maccandroid-release', ext: 'aar')
+        msg = "Attempting to build SampleApp with the maccandroid-release.aar file"
+    } else {
+        dependencies.implementation project(':maccandroid')
+        msg = "The maccandroid-release.aar was not found. Building SampleApp without the .aar file"
+    }
+
+    StringBuilder sb = new StringBuilder()
+    sb.append("The maccandroid .aar files found were: ").append(aarNames.toString())
     String foundFilesMsg = generateWrappedMessage(sb.toString())
     logger.lifecycle(foundFilesMsg)
 

@@ -1,7 +1,11 @@
 var searchData=
 [
-  ['speaker',['Speaker',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_speaker.html',1,'com::amazon::aace::alexa']]],
-  ['speechrecognizer',['SpeechRecognizer',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html',1,'com::amazon::aace::alexa']]],
-  ['speechsynthesizer',['SpeechSynthesizer',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_synthesizer.html',1,'com::amazon::aace::alexa']]],
-  ['streamconfiguration',['StreamConfiguration',['../classcom_1_1amazon_1_1aace_1_1core_1_1config_1_1_stream_configuration.html',1,'com::amazon::aace::core::config']]]
+  ['phonecallcontroller',['PhoneCallController',['../classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html',1,'com::amazon::aace::phonecontrol']]],
+  ['platforminterface',['PlatformInterface',['../classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface.html',1,'com::amazon::aace::core']]],
+  ['playbackbutton',['PlaybackButton',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_playback_controller_1_1_playback_button.html',1,'com::amazon::aace::alexa::PlaybackController']]],
+  ['playbackcontroller',['PlaybackController',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_playback_controller.html',1,'com::amazon::aace::alexa']]],
+  ['playbackstate',['PlaybackState',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter_1_1_playback_state.html',1,'com.amazon.aace.alexa.ExternalMediaAdapter.PlaybackState'],['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source_1_1_playback_state.html',1,'com.amazon.aace.alexa.LocalMediaSource.PlaybackState']]],
+  ['playbacktoggle',['PlaybackToggle',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_playback_controller_1_1_playback_toggle.html',1,'com::amazon::aace::alexa::PlaybackController']]],
+  ['playcontroltype',['PlayControlType',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter_1_1_play_control_type.html',1,'com.amazon.aace.alexa.ExternalMediaAdapter.PlayControlType'],['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source_1_1_play_control_type.html',1,'com.amazon.aace.alexa.LocalMediaSource.PlayControlType']]],
+  ['playeractivity',['PlayerActivity',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_player_1_1_player_activity.html',1,'com::amazon::aace::alexa::AudioPlayer']]]
 ];

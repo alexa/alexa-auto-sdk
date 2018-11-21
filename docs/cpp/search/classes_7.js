@@ -1,7 +1,9 @@
 var searchData=
 [
-  ['speaker',['Speaker',['../classaace_1_1alexa_1_1_speaker.html',1,'aace::alexa']]],
-  ['speechrecognizer',['SpeechRecognizer',['../classaace_1_1alexa_1_1_speech_recognizer.html',1,'aace::alexa']]],
-  ['speechsynthesizer',['SpeechSynthesizer',['../classaace_1_1alexa_1_1_speech_synthesizer.html',1,'aace::alexa']]],
-  ['streamconfiguration',['StreamConfiguration',['../classaace_1_1core_1_1config_1_1_stream_configuration.html',1,'aace::core::config']]]
+  ['phonecallcontroller',['PhoneCallController',['../classaace_1_1phone_call_controller_1_1_phone_call_controller.html',1,'aace::phoneCallController']]],
+  ['phonecallcontrollerengineinterface',['PhoneCallControllerEngineInterface',['../classaace_1_1phone_call_controller_1_1_phone_call_controller_engine_interface.html',1,'aace::phoneCallController']]],
+  ['platforminterface',['PlatformInterface',['../classaace_1_1core_1_1_platform_interface.html',1,'aace::core']]],
+  ['playbackcontroller',['PlaybackController',['../classaace_1_1alexa_1_1_playback_controller.html',1,'aace::alexa']]],
+  ['playbackcontrollerengineinterface',['PlaybackControllerEngineInterface',['../classaace_1_1alexa_1_1_playback_controller_engine_interface.html',1,'aace::alexa']]],
+  ['playbackstate',['PlaybackState',['../classaace_1_1alexa_1_1_external_media_adapter_1_1_playback_state.html',1,'aace::alexa::ExternalMediaAdapter']]]
 ];

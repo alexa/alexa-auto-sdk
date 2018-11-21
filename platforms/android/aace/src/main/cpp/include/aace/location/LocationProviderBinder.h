@@ -31,11 +31,14 @@ protected:
 
 public:
     aace::location::Location getLocation() override;
+    std::string getCountry() override;
 
 private:
     ClassRef m_javaClass_Location;
 
     jmethodID m_javaMethod_getLocation = nullptr;
+    jmethodID m_javaMethod_getCountry = nullptr;
+
     jmethodID m_javaMethod_getLatitude = nullptr;
     jmethodID m_javaMethod_getLongitude = nullptr;
     jmethodID m_javaMethod_getAltitude = nullptr;

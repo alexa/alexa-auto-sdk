@@ -14,7 +14,11 @@
  */
 
 #include "AACE/Engine/Vehicle/VehicleEngineService.h"
+#include "AACE/Engine/Vehicle/VehiclePropertyInterface.h"
+#include "AACE/Engine/Storage/LocalStorageInterface.h"
 #include "AACE/Engine/Core/EngineMacros.h"
+
+#include "AACE/Vehicle/VehicleProperties.h"
 
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
@@ -27,22 +31,42 @@ namespace vehicle {
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.vehicle.VehicleEngineService");
 
+// name of the table used for the local storage database
+static const std::string VEHICLE_SERVICE_LOCAL_STORAGE_TABLE = "aace.vehicle";
+
 // register the service
 REGISTER_SERVICE(VehicleEngineService)
 
 VehicleEngineService::VehicleEngineService( const aace::engine::core::ServiceDescription& description ) : aace::engine::core::EngineService( description ) {
 }
 
+std::string VehicleEngineService::getVehicleProperty( VehiclePropertyType type ) {
+    auto it = m_vehiclePropertyMap.find( type );
+    return it != m_vehiclePropertyMap.end() ? it->second : "";
+}
+
+bool VehicleEngineService::initialize() {
+    ThrowIfNot( registerServiceInterface<VehiclePropertyInterface>( shared_from_this() ), "registerVehiclePropertyInterfaceFailed" );
+    return true;
+}
+
 bool VehicleEngineService::configure( const std::vector<std::shared_ptr<std::istream>>& configuration )
 {
     // attempt to configure each stream
     for( auto next : configuration ) {
-        ReturnIf( configure( next ), true );
+        configure( next );
     }
     
     // warn if the vehicle property map has not been configured
     if( m_vehiclePropertyMap.empty() ) {
         AACE_WARN(LX(TAG,"configure").m("vehicleInfoNotConfigured"));
+    }
+    
+    // get the operating country from the settings
+    auto localStorage = getContext()->getServiceInterface<aace::engine::storage::LocalStorageInterface>( "aace.storage" );
+    
+    if( localStorage != nullptr && localStorage->containsKey( VEHICLE_SERVICE_LOCAL_STORAGE_TABLE, "operatingCountry" ) ) {
+        m_operatingCountry = localStorage->get( VEHICLE_SERVICE_LOCAL_STORAGE_TABLE, "operatingCountry", m_operatingCountry );
     }
     
     return true;
@@ -93,16 +117,21 @@ bool VehicleEngineService::configure( std::shared_ptr<std::istream> configuratio
         {
             rapidjson::Value info = vehicleConfigRoot["info"].GetObject();
             
-            m_vehiclePropertyMap["make"] = getVehicleConfigProperty( info, "make" );
-            m_vehiclePropertyMap["model"] = getVehicleConfigProperty( info, "model" );
-            m_vehiclePropertyMap["year"] = getVehicleConfigProperty( info, "year" );
-            m_vehiclePropertyMap["trim"] = getVehicleConfigProperty( info, "trim" );
-            m_vehiclePropertyMap["geography"] = getVehicleConfigProperty( info, "geography" );
-            m_vehiclePropertyMap["version"] = getVehicleConfigProperty( info, "version" );
-            m_vehiclePropertyMap["os"] = getVehicleConfigProperty( info, "os" );
-            m_vehiclePropertyMap["arch"] = getVehicleConfigProperty( info, "arch" );
-            m_vehiclePropertyMap["language"] = getVehicleConfigProperty( info, "language" );
-            m_vehiclePropertyMap["microphone"] = getVehicleConfigProperty(info, "microphone" );
+            m_vehiclePropertyMap[VehiclePropertyType::MAKE] = getVehicleConfigProperty( info, "make" );
+            m_vehiclePropertyMap[VehiclePropertyType::MODEL] = getVehicleConfigProperty( info, "model" );
+            m_vehiclePropertyMap[VehiclePropertyType::YEAR] = getVehicleConfigProperty( info, "year" );
+            m_vehiclePropertyMap[VehiclePropertyType::TRIM] = getVehicleConfigProperty( info, "trim" );
+            m_vehiclePropertyMap[VehiclePropertyType::GEOGRAPHY] = getVehicleConfigProperty( info, "geography" );
+            m_vehiclePropertyMap[VehiclePropertyType::VERSION] = getVehicleConfigProperty( info, "version" );
+            m_vehiclePropertyMap[VehiclePropertyType::OPERATING_SYSTEM] = getVehicleConfigProperty( info, "os" );
+            m_vehiclePropertyMap[VehiclePropertyType::HARDWARE_ARCH] = getVehicleConfigProperty( info, "arch" );
+            m_vehiclePropertyMap[VehiclePropertyType::LANGUAGE] = getVehicleConfigProperty( info, "language" );
+            m_vehiclePropertyMap[VehiclePropertyType::MICROPHONE] = getVehicleConfigProperty(info, "microphone" );
+            m_vehiclePropertyMap[VehiclePropertyType::COUNTRY_LIST] = getVehicleConfigProperty(info, "countries" );
+        }
+        
+        if( vehicleConfigRoot.HasMember( "operatingCountry" ) && vehicleConfigRoot["operatingCountry"].IsString() ) {
+            m_operatingCountry = vehicleConfigRoot["operatingCountry"].GetString();
         }
 
         return true;
@@ -111,6 +140,46 @@ bool VehicleEngineService::configure( std::shared_ptr<std::istream> configuratio
         AACE_WARN(LX(TAG,"configure").d("reason", ex.what()));
         return false;
     }
+}
+
+bool VehicleEngineService::setProperty( const std::string& key, const std::string& value )
+{
+    try
+    {
+        if( key.compare( aace::vehicle::property::OPERATING_COUNTRY ) == 0 )
+        {
+            auto localStorage = getContext()->getServiceInterface<aace::engine::storage::LocalStorageInterface>( "aace.storage" );
+
+            ThrowIfNull( localStorage, "localStorageInterfaceInvalid" );
+            ThrowIfNot( localStorage->put( VEHICLE_SERVICE_LOCAL_STORAGE_TABLE, "operatingCountry", value ), "setLocalStorageFailed" );
+            
+            m_operatingCountry = value;
+        }
+        else {
+            return false;
+        }
+        
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"setProperty").d("reason", ex.what()).d("key",key).d("value",value));
+        return false;
+    }
+}
+
+std::string VehicleEngineService::getProperty( const std::string& key )
+{
+    try
+    {    
+        if( key.compare( aace::vehicle::property::OPERATING_COUNTRY ) == 0 ) {
+            return m_operatingCountry;
+        }
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"getProperty").d("reason", ex.what()).d("key",key));
+    }
+    
+    return std::string();
 }
 
 } // aace::engine::vehicle

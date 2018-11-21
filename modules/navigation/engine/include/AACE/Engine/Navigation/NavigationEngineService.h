@@ -33,7 +33,7 @@ private:
 public:
     virtual ~NavigationEngineService() = default;
 
-    // EngineService
+protected:
     bool configure( const std::vector<std::shared_ptr<std::istream>>& configuration ) override;
     bool start() override;
     bool stop() override;

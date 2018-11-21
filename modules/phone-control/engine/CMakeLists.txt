@@ -8,7 +8,7 @@ find_library(AVS_AVS_COMMON_LIBRARY AVSCommon)
 set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/PhoneCallController/PhoneCallControllerEngineService.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/PhoneCallController/PhoneCallControllerCapabilityAgent.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/PhoneCallController/PhoneCallControllerObserverInterface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/PhoneCallController/PhoneCallControllerInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/PhoneCallController/PhoneCallControllerEngineImpl.h
 )
 

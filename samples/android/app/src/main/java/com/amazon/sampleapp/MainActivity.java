@@ -20,11 +20,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
-
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -35,28 +34,35 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.amazon.aace.alexa.AlexaClient;
-
 import com.amazon.aace.alexa.AlexaProperties;
+import com.amazon.aace.alexa.LocalMediaSource;
 import com.amazon.aace.alexa.Speaker;
 import com.amazon.aace.alexa.config.AlexaConfiguration;
-import com.amazon.aace.communication.AlexaCommsModule;
 import com.amazon.aace.communication.config.AlexaCommsConfiguration;
+import com.amazon.aace.core.CoreProperties;
 import com.amazon.aace.core.Engine;
 import com.amazon.aace.core.config.EngineConfiguration;
-
 import com.amazon.aace.logger.Logger;
 import com.amazon.aace.logger.config.LoggerConfiguration;
+import com.amazon.aace.modules.ExtraModules;
+import com.amazon.aace.storage.config.StorageConfiguration;
+import com.amazon.aace.vehicle.config.VehicleConfiguration;
 import com.amazon.sampleapp.impl.Alerts.AlertsHandler;
 import com.amazon.sampleapp.impl.AlexaClient.AlexaClientHandler;
 import com.amazon.sampleapp.impl.AudioPlayer.AudioPlayerHandler;
 import com.amazon.sampleapp.impl.AuthProvider.AuthProviderHandler;
+import com.amazon.sampleapp.impl.Common.AudioInputManager;
 import com.amazon.sampleapp.impl.Communication.AlexaCommsHandler;
 import com.amazon.sampleapp.impl.Communication.AlexaCommsView;
+import com.amazon.sampleapp.impl.ContactIngestion.ContactUploader.ContactUploaderHandler;
+import com.amazon.sampleapp.impl.ExternalMediaPlayer.MACCPlayer;
+import com.amazon.sampleapp.impl.LocalMediaSource.CDLocalMediaSource;
 import com.amazon.sampleapp.impl.LocationProvider.LocationProviderHandler;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 import com.amazon.sampleapp.impl.MediaPlayer.MediaPlayerHandler;
+import com.amazon.sampleapp.impl.MediaPlayer.RawAudioMediaPlayerHandler;
+import com.amazon.sampleapp.impl.Navigation.NavigationHandler;
 import com.amazon.sampleapp.impl.NetworkInfoProvider.NetworkInfoProviderHandler;
 import com.amazon.sampleapp.impl.Notifications.NotificationsHandler;
 import com.amazon.sampleapp.impl.PhoneCallController.PhoneCallControllerHandler;
@@ -64,19 +70,12 @@ import com.amazon.sampleapp.impl.PlaybackController.PlaybackControllerHandler;
 import com.amazon.sampleapp.impl.SpeechRecognizer.SpeechRecognizerHandler;
 import com.amazon.sampleapp.impl.SpeechSynthesizer.SpeechSynthesizerHandler;
 import com.amazon.sampleapp.impl.TemplateRuntime.TemplateRuntimeHandler;
-import com.amazon.sampleapp.impl.Navigation.NavigationHandler;
-
 import com.amazon.sampleapp.logView.LogEntry;
 import com.amazon.sampleapp.logView.LogRecyclerViewAdapter;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
@@ -84,6 +83,9 @@ import java.util.Observer;
 public class MainActivity extends AppCompatActivity implements Observer {
 
     /* AACE Platform Interface Handlers */
+
+    // Common
+    private AudioInputManager mAudioInputManager;
 
     // Alexa
     private AlertsHandler mAlerts;
@@ -93,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private AlexaCommsHandler mAlexaCommsHandler;
     private NotificationsHandler mNotifications;
     private PhoneCallControllerHandler mPhoneCallController;
+    private ContactUploaderHandler mContactUploader;
     private PlaybackControllerHandler mPlaybackController;
     private SpeechRecognizerHandler mSpeechRecognizer;
     private SpeechSynthesizerHandler mSpeechSynthesizer;
@@ -132,6 +135,9 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private static final int sPermissionRequestCode = 0;
     private static final String[] sRequiredPermissions = { Manifest.permission.RECORD_AUDIO,
             Manifest.permission.ACCESS_COARSE_LOCATION };
+    private MACCPlayer mMACCPlayer;
+
+    private CDLocalMediaSource mCDLocalMediaSource;
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
@@ -253,6 +259,14 @@ public class MainActivity extends AppCompatActivity implements Observer {
         String clientId = mPreferences.getString( getString( R.string.preference_client_id ), "" );
         String productId = mPreferences.getString( getString( R.string.preference_product_id ), "" );
 
+        AlexaConfiguration.TemplateRuntimeTimeout [] timeoutList = new AlexaConfiguration.TemplateRuntimeTimeout[ ]{
+                new AlexaConfiguration.TemplateRuntimeTimeout ( AlexaConfiguration.TemplateRuntimeTimeoutType.DISPLAY_CARD_TTS_FINISHED_TIMEOUT, 8000 ),
+                new AlexaConfiguration.TemplateRuntimeTimeout ( AlexaConfiguration.TemplateRuntimeTimeoutType.DISPLAY_CARD_AUDIO_PLAYBACK_FINISHED_TIMEOUT, 8000),
+                new AlexaConfiguration.TemplateRuntimeTimeout ( AlexaConfiguration.TemplateRuntimeTimeoutType.DISPLAY_CARD_AUDIO_PLAYBACK_STOPPED_PAUSED_TIMEOUT, 1800000)
+        };
+
+
+
         boolean configureSucceeded = mEngine.configure( new EngineConfiguration[]{
                 //AlexaConfiguration.createCurlConfig( certsDir.getPath(), "wlan0" ), Uncomment this line to specify the interface name to use by AVS.
                 AlexaConfiguration.createCurlConfig( certsDir.getPath() ),
@@ -262,18 +276,37 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 AlexaConfiguration.createAlertsConfig( appDataDir.getPath() + "/alerts.sqlite" ),
                 AlexaConfiguration.createSettingsConfig( appDataDir.getPath() + "/settings.sqlite" ),
                 AlexaConfiguration.createNotificationsConfig( appDataDir.getPath() + "/notifications.sqlite" ),
+                StorageConfiguration.createLocalStorageConfig( appDataDir.getPath() + "/localStorage.sqlite" ),
                 LoggerConfiguration.createSyslogSinkConfig( "syslog", Logger.Level.VERBOSE ),
-                AlexaCommsConfiguration.createCommsConfig( certsDir.getPath() )
+                AlexaCommsConfiguration.createCommsConfig( certsDir.getPath() ),
+                //AlexaConfiguration.createTemplateRuntimeTimeoutConfig( timeoutList )
+                // Example Vehicle Config
+                VehicleConfiguration.createVehicleInfoConfig( new VehicleConfiguration.VehicleProperty[]{
+                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.MAKE, "Amazon"),
+                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.MODEL, "AmazonCarOne"),
+                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.TRIM, "Advance"),
+                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.YEAR, "2025"),
+                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.GEOGRAPHY, "US"),
+                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.VERSION, String.format(
+                            "Vehicle Software Version 1.0 (Auto SDK Version %s)", mEngine.getProperty( CoreProperties.VERSION ) ) ),
+                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.OPERATING_SYSTEM, "Android 8.1 Oreo API Level 26"),
+                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.HARDWARE_ARCH, "Armv8a"),
+                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.LANGUAGE, "en-US"),
+                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.MICROPHONE, "Single, roof mounted"),
+                        // If this list is left blank, it will be fetched by the engine using amazon default endpoint
+                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.COUNTRY_LIST, "US,GB,IE,CA,DE,AT,IN,JP,AU,NZ,FR")
+                })
         });
         if ( !configureSucceeded ) throw new RuntimeException( "Engine configuration failed" );
 
         // Create the platform implementation handlers and register them with the engine
-
         // Logger
         if ( !mEngine.registerPlatformInterface(
                 mLogger = new LoggerHandler(this, ( LogRecyclerViewAdapter ) mRecyclerAdapter )
             )
         ) throw new RuntimeException( "Could not register Logger platform interface" );
+
+        mAudioInputManager = new AudioInputManager(mLogger);
 
         // LocationProvider
         if ( !mEngine.registerPlatformInterface(
@@ -304,6 +337,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 mEngine.getProperty( AlexaProperties.WAKEWORD_SUPPORTED ).equals( "true" );
         if ( !mEngine.registerPlatformInterface(
                 mSpeechRecognizer = new SpeechRecognizerHandler(
+                        mAudioInputManager,
                         this,
                         mLogger,
                         wakeWordSupported,
@@ -323,6 +357,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 )
             )
         ) throw new RuntimeException( "Could not register AudioPlayer platform interface" );
+
 
         // SpeechSynthesizer
         if ( !mEngine.registerPlatformInterface(
@@ -359,23 +394,25 @@ public class MainActivity extends AppCompatActivity implements Observer {
             )
         ) throw new RuntimeException( "Could not register Alerts platform interface" );
 
+        // NetworkInfoProvider
+        if ( !mEngine.registerPlatformInterface(
+                mNetworkInfoProvider = new NetworkInfoProviderHandler( this, mLogger )
+            )
+        ) throw new RuntimeException( "Could not register NetworkInfoProvider platform interface" );
+
         // AuthProvider
         if ( !mEngine.registerPlatformInterface(
-                mAuthProvider = new AuthProviderHandler( this, mLogger )
+                mAuthProvider = new AuthProviderHandler( this, mLogger, mNetworkInfoProvider )
             )
         ) throw new RuntimeException( "Could not register AuthProvider platform interface" );
+
+        mNetworkInfoProvider.setAuthProvider(mAuthProvider);
 
         // Navigation
         if ( !mEngine.registerPlatformInterface(
                 mNavigation = new NavigationHandler( mLogger )
             )
         ) throw new RuntimeException( "Could not register Navigation platform interface" );
-
-        // NetworkInfoProvider
-        if ( !mEngine.registerPlatformInterface(
-                mNetworkInfoProvider = new NetworkInfoProviderHandler( this, mLogger )
-            )
-        ) throw new RuntimeException( "Could not register NetworkInfoProvider platform interface" );
 
         // Notifications
         if ( !mEngine.registerPlatformInterface(
@@ -393,17 +430,35 @@ public class MainActivity extends AppCompatActivity implements Observer {
             )
         ) throw new RuntimeException( "Could not register Notifications platform interface" );
 
+        // Contact-Uploader
+        if (!mEngine.registerPlatformInterface(
+            mContactUploader = new ContactUploaderHandler(this, mLogger)
+            )
+        ) throw new RuntimeException("Could not register ContactUploader platform interface");
+
+        ExtraModules extraModules = new ExtraModules(getApplicationContext());
         // Alexa Comms Handler
-        if (AlexaCommsModule.isEnabled()) {
+        if (extraModules.isAlexaCommsEnabled()) {
+            MediaPlayerHandler ringtoneMediaPlayerHandler = new MediaPlayerHandler(
+                    this,
+                    mLogger,
+                    "CommunicationRingtone",
+                    Speaker.Type.AVS_SPEAKER,
+                    null);
+            // Call audio player is required to play PCM 16 raw data @ 16 KHZ.
+            // RawAudioMediaPlayerHandler can play from such a data stream.
+            RawAudioMediaPlayerHandler callAudioMediaPlayerHandler = new RawAudioMediaPlayerHandler(
+                    this,
+                    mLogger,
+                    "CommunicationCallAudio",
+                    Speaker.Type.AVS_SPEAKER);
             if (!mEngine.registerPlatformInterface(
                     mAlexaCommsHandler = new AlexaCommsHandler(
-                        new MediaPlayerHandler(
-                                this,
-                                mLogger,
-                                "Communication",
-                                Speaker.Type.AVS_SPEAKER,
-                                null
-                        )
+                            mAudioInputManager,
+                            ringtoneMediaPlayerHandler,
+                            ringtoneMediaPlayerHandler.getSpeaker(),
+                            callAudioMediaPlayerHandler,
+                            callAudioMediaPlayerHandler.getSpeaker()
                     )
                 )
             ) throw new RuntimeException("Could not register AlexaCommsHandler platform interface");
@@ -411,9 +466,26 @@ public class MainActivity extends AppCompatActivity implements Observer {
             commsView.setupUI(mAlexaCommsHandler);
         }
 
+        mMACCPlayer = new MACCPlayer(this,  mPlaybackController);
+        if ( !mEngine.registerPlatformInterface( mMACCPlayer ) )  {
+            Log.i("MACC", "registered not fine");
+            throw new RuntimeException( "Could not register Notifications platform interface" );
+        } else {
+            Log.i("MACC", "registered fine");
+        }
+        mMACCPlayer.runDiscovery();
+
+        // Mock CD platform handler
+        if ( !mEngine.registerPlatformInterface(
+                mCDLocalMediaSource = new CDLocalMediaSource(this, mLogger, CDLocalMediaSource.Source.COMPACT_DISC )
+        ) ) throw new RuntimeException( "Could not register Mock CD player Local Media Source platform interface" );
+
         // Start the engine
         if ( !mEngine.start() ) throw new RuntimeException( "Could not start engine" );
+        //log whether LocationProvider gave a supported country
+        mLogger.postInfo( "Country Supported: ",  mEngine.getProperty( AlexaProperties.COUNTRY_SUPPORTED ));
         mAuthProvider.onInitialize();
+        mContactUploader.onInitialize();
     }
 
     @Override

@@ -1,0 +1,193 @@
+diff --git a/CapabilityAgents/Alerts/include/Alerts/AlertObserverInterface.h b/CapabilityAgents/Alerts/include/Alerts/AlertObserverInterface.h
+index 3eb418f7..c89c38c7 100644
+--- a/CapabilityAgents/Alerts/include/Alerts/AlertObserverInterface.h
++++ b/CapabilityAgents/Alerts/include/Alerts/AlertObserverInterface.h
+@@ -65,6 +65,29 @@ public:
+      */
+     virtual void onAlertStateChange(const std::string& alertToken, State state, const std::string& reason = "") = 0;
+ 
++    /**
++     * A callback function to notify an object that an alert has been created with additional information about the alert.
++     *
++     * @param alertToken The AVS token of the alert.
++     * @param detailedInfo The JSON payload of detailed alert info :
++     * {
++     *      "time" : <String>
++     *      "type" : <String>
++     *      "label" : <String>
++     * }
++     * time The time string ( Scheduled Time ISO_8601 ).
++     * type The type of the alert ( ALERT, REMINDER, TIMER ).
++     * label The label of the TIMER, description for REMINDER, or empty string for ALARM.
++     */
++    virtual void onAlertCreated(const std::string& alertToken, const std::string& detailedInfo) {};
++
++    /**
++     * A callback function to notify an object that an alert has been deleted.
++     *
++     * alertToken The AVS token of the alert.
++     */
++    virtual void onAlertDeleted(const std::string& alertToken) {};
++
+     /**
+      * Convert a @c State to a @c std::string.
+      *
+diff --git a/CapabilityAgents/Alerts/include/Alerts/AlertsCapabilityAgent.h b/CapabilityAgents/Alerts/include/Alerts/AlertsCapabilityAgent.h
+index ba34afaf..c83f3c5e 100644
+--- a/CapabilityAgents/Alerts/include/Alerts/AlertsCapabilityAgent.h
++++ b/CapabilityAgents/Alerts/include/Alerts/AlertsCapabilityAgent.h
+@@ -269,6 +269,32 @@ private:
+         AlertObserverInterface::State state,
+         const std::string& reason);
+ 
++    /**
++     * A callback function to notify an object that an alert has been created with additional information about the alert.
++     *
++     * @param alertToken The AVS token of the alert.
++     * @param detailedInfo The JSON payload of detailed alert info :
++     * {
++     *      "time" : <String>
++     *      "type" : <String>
++     *      "label" : <String>
++     * }
++     * time The time string ( Scheduled Time ISO_8601 ).
++     * type The type of the alert ( ALERT, REMINDER, TIMER ).
++     * label The label of the TIMER, description for REMINDER, or empty string for ALARM.
++     */
++    void executeOnAlertCreated(
++        const std::string& alertToken,
++        const std::string& jsonPayload);
++
++    /**
++     * A handler function which will be called by our internal executor when an alert is deleted.
++     *
++     * alertToken The AVS token of the alert.
++     */
++    void executeOnAlertDeleted(
++        const std::string& alertToken);
++
+     /**
+      * A handler function which will be called by our internal executor to add an alert observer.
+      *
+@@ -295,6 +321,21 @@ private:
+         AlertObserverInterface::State state,
+         const std::string& reason = "");
+ 
++    /**
++     * A handler function which will be called by our internal executor to notify the observer of detailed alert info.
++     *
++     * @param alertToken The alert token. See AlertObserverInterface for more.
++     * @param jsonInfo The detailed JSON info. See AlertObserverInterface for more.
++     */
++    void executeNotifyAlertCreatedObservers(const std::string& alertToken, const std::string& jsonInfo);
++
++    /**
++     * A handler function which will be called by our internal executor to notify the observer of an alert deleted.
++     *
++     * @param alertToken The alert token. See AlertObserverInterface for more.
++     */
++    void executeNotifyAlertDeletedObservers(const std::string& alertToken);
++
+     /**
+      * A handler function which will be called by our internal executor to remove all alerts currently being managed.
+      */
+diff --git a/CapabilityAgents/Alerts/src/AlertsCapabilityAgent.cpp b/CapabilityAgents/Alerts/src/AlertsCapabilityAgent.cpp
+index f667adf1..a6e17928 100644
+--- a/CapabilityAgents/Alerts/src/AlertsCapabilityAgent.cpp
++++ b/CapabilityAgents/Alerts/src/AlertsCapabilityAgent.cpp
+@@ -59,6 +59,9 @@ static const std::string ALERTS_CAPABILITY_INTERFACE_VERSION = "1.3";
+ /// The value for Type which we need for json parsing.
+ static const std::string KEY_TYPE = "type";
+ 
++/// The value for Label which we need for json parsing.
++static const std::string KEY_LABEL = "label";
++
+ // ==== Directives ===
+ 
+ /// The value of the SetAlert Directive.
+@@ -451,6 +454,27 @@ bool AlertsCapabilityAgent::handleSetAlert(
+ 
+     updateContextManager();
+ 
++    Document document( rapidjson::kObjectType );;
++    document.AddMember("time", parsedAlert->getScheduledTime_ISO_8601(), document.GetAllocator());
++    document.AddMember("type", parsedAlert->getTypeName(), document.GetAllocator());
++    std::string label;
++    if (!retrieveValue(payload, KEY_LABEL, &label)) {
++        document.AddMember("label", "", document.GetAllocator());
++    } else {
++        document.AddMember("label", label, document.GetAllocator());
++    }
++    // build the json state string
++    rapidjson::StringBuffer buffer;
++    rapidjson::Writer<rapidjson::StringBuffer> writer( buffer );
++
++    if (!document.Accept( writer )) {
++        ACSDK_ERROR(LX("failedToWriteJsonDocument").m("Alert DetailedInfo not sent"));
++    } else {
++        std::string payload = buffer.GetString();
++        std::string token = parsedAlert->getToken();
++        m_executor.submit([this, token, payload]() { executeOnAlertCreated( token, payload); });
++    }
++
+     return true;
+ }
+ 
+@@ -470,6 +494,9 @@ bool AlertsCapabilityAgent::handleDeleteAlert(
+ 
+     updateContextManager();
+ 
++    std::string token = *alertToken;
++    m_executor.submit([this, token]() { executeOnAlertDeleted(token); });
++
+     return true;
+ }
+ 
+@@ -499,6 +526,8 @@ bool AlertsCapabilityAgent::handleDeleteAlerts(
+         if (!convertToValue(tokenArray[i], &token)) {
+             ACSDK_WARN(LX("handleDeleteAlertsFailed").d("reason", "invalid token in payload"));
+             continue;
++        } else {
++            m_executor.submit([this, token]() { executeOnAlertDeleted(token); });
+         }
+         alertTokens.push_back(token);
+     }
+@@ -829,6 +858,14 @@ void AlertsCapabilityAgent::executeOnAlertStateChange(
+     m_executor.submit([this, alertToken, state, reason]() { executeNotifyObservers(alertToken, state, reason); });
+ }
+ 
++void AlertsCapabilityAgent::executeOnAlertCreated(const std::string& alertToken, const std::string& payload){
++    m_executor.submit([this, alertToken, payload]() { executeNotifyAlertCreatedObservers(alertToken, payload); });
++}
++
++void AlertsCapabilityAgent::executeOnAlertDeleted(const std::string& alertToken){
++    m_executor.submit([this, alertToken]() { executeNotifyAlertDeletedObservers(alertToken); });
++}
++
+ void AlertsCapabilityAgent::executeAddObserver(std::shared_ptr<AlertObserverInterface> observer) {
+     ACSDK_DEBUG1(LX("executeAddObserver").d("observer", observer.get()));
+     m_observers.insert(observer);
+@@ -849,6 +886,23 @@ void AlertsCapabilityAgent::executeNotifyObservers(
+     }
+ }
+ 
++void AlertsCapabilityAgent::executeNotifyAlertCreatedObservers(
++    const std::string& alertToken,
++    const std::string& payload) {
++        ACSDK_DEBUG1(LX("executeNotifyAlertCreatedObservers").d("alertToken", alertToken).sensitive("payload", payload));
++    for (auto observer : m_observers) {
++        observer->onAlertCreated(alertToken, payload);
++    }
++}
++
++void AlertsCapabilityAgent::executeNotifyAlertDeletedObservers(
++    const std::string& alertToken) {
++        ACSDK_DEBUG1(LX("executeNotifyAlertDeletedObservers").d("alertToken", alertToken));
++    for (auto observer : m_observers) {
++        observer->onAlertDeleted(alertToken);
++    }
++}
++
+ void AlertsCapabilityAgent::executeRemoveAllAlerts() {
+     ACSDK_DEBUG1(LX("executeRemoveAllAlerts"));
+     m_alertScheduler.clearData();

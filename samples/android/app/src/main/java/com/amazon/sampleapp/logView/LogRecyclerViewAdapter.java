@@ -16,6 +16,8 @@
 package com.amazon.sampleapp.logView;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -23,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.amazon.aace.logger.Logger;
+import com.amazon.maccandroid.Log;
 import com.amazon.sampleapp.R;
 
 import org.json.JSONException;
@@ -45,6 +48,10 @@ public class LogRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     private Set<String> mFilteredSources;
     private boolean mHideCards;
     private boolean mHideJsonTemplates;
+    private boolean mHideMapView;
+    private static final String GoogleMapsAPIkey = "com.google.android.geo.API_KEY";
+
+    private static final String sTag = "LogRecyclerViewAdapter";
 
     public static final int TEXT_LOG = 0, BODY_TEMPLATE1 = 1, BODY_TEMPLATE2 = 2, LIST_TEMPLATE1 = 3,
             WEATHER_TEMPLATE = 4, SET_DESTINATION_TEMPLATE = 5, LOCAL_SEARCH_LIST_TEMPLATE1 = 6,
@@ -59,6 +66,23 @@ public class LogRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         mFilteredSources = new HashSet<>();
         mHideCards = false;
         mHideJsonTemplates = false;
+        mHideMapView = false;
+
+        final PackageManager pm = mContext.getPackageManager();
+        // check for API key before trying to load map
+        try {
+            final ApplicationInfo info = pm.getApplicationInfo(mContext.getPackageName(),
+                    PackageManager.GET_META_DATA);
+            if (info.metaData != null) {
+                final String value = String.valueOf(info.metaData.get(GoogleMapsAPIkey));
+                if ( value.isEmpty() ) {
+                    mHideMapView = true;
+                    Log.i(sTag, "No Google maps API key in AndroidManifest.xml");
+                }
+            }
+        } catch (final PackageManager.NameNotFoundException e) {
+            Log.i(sTag, e.toString());
+        }
     }
 
     // Return the size of your dataset (invoked by the layout manager)
@@ -121,7 +145,7 @@ public class LogRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                 view = inflater.inflate( R.layout.log_card_container, viewGroup, false );
                 cardContainer = view.findViewById( R.id.container );
                 inflater.inflate( R.layout.card_set_destination_template, cardContainer, true );
-                viewHolder = new ViewHolderSetDestinationTemplate( view );
+                viewHolder = new ViewHolderSetDestinationTemplate( view, mHideMapView );
                 break;
             case LOCAL_SEARCH_LIST_TEMPLATE1:
                 view = inflater.inflate( R.layout.log_card_container, viewGroup, false );

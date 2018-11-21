@@ -18,28 +18,52 @@
 namespace aace {
 namespace phoneCallController {
 
-void PhoneCallController::connectionStateChanged( PhoneCallControllerEngineInterface::ConnectionState state ) {
+void PhoneCallController::connectionStateChanged( ConnectionState state ) {
     if ( m_phoneCallControllerEngineInterface != nullptr ) {
         m_phoneCallControllerEngineInterface->onConnectionStateChanged( state );
     }
 }
 
-void PhoneCallController::callActivated( const std::string& callId ) {
+void PhoneCallController::callStateChanged( CallState state, const std::string& callId, const std::string& callerId ) {
     if ( m_phoneCallControllerEngineInterface != nullptr ) {
-        m_phoneCallControllerEngineInterface->onCallActivated( callId );
+        m_phoneCallControllerEngineInterface->onCallStateChanged( state, callId, callerId );
     }
 }
 
-void PhoneCallController::callFailed( const std::string& callId, const std::string& error, const std::string& message ) {
+void PhoneCallController::callFailed( const std::string& callId, CallError code, const std::string& message ) {
     if ( m_phoneCallControllerEngineInterface != nullptr ) {
-        m_phoneCallControllerEngineInterface->onCallFailed( callId, error, message );
+        m_phoneCallControllerEngineInterface->onCallFailed( callId, code, message );
     }
 }
-    
-void PhoneCallController::callTerminated( const std::string& callId ) {
+
+void PhoneCallController::callerIdReceived( const std::string& callId, const std::string& callerId ) {
     if ( m_phoneCallControllerEngineInterface != nullptr ) {
-        m_phoneCallControllerEngineInterface->onCallTerminated( callId );
+        m_phoneCallControllerEngineInterface->onCallerIdReceived( callId, callerId );
     }
+}
+
+void PhoneCallController::sendDTMFSucceeded( const std::string& callId ) {
+    if ( m_phoneCallControllerEngineInterface != nullptr ) {
+        m_phoneCallControllerEngineInterface->onSendDTMFSucceeded( callId );
+    }
+}
+void PhoneCallController::sendDTMFFailed( const std::string& callId, DTMFError code, const std::string& message ) {
+    if ( m_phoneCallControllerEngineInterface != nullptr ) {
+        m_phoneCallControllerEngineInterface->onSendDTMFFailed( callId, code, message );
+    }
+}
+
+void PhoneCallController::deviceConfigurationUpdated( std::unordered_map<CallingDeviceConfigurationProperty, bool> configurationMap ) {
+    if ( m_phoneCallControllerEngineInterface != nullptr ) {
+        m_phoneCallControllerEngineInterface->onDeviceConfigurationUpdated( configurationMap );
+    }
+}
+
+std::string PhoneCallController::createCallId() {
+    if( m_phoneCallControllerEngineInterface != nullptr ) {
+         return m_phoneCallControllerEngineInterface->onCreateCallId();
+    }
+    return "";
 }
 
 void PhoneCallController::setEngineInterface ( std::shared_ptr<PhoneCallControllerEngineInterface>  phoneCallControllerEngineInterface ) {

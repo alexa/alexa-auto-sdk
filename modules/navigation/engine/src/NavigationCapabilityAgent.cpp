@@ -42,7 +42,7 @@ static const std::string NAVIGATION_CAPABILITY_INTERFACE_TYPE = "AlexaInterface"
 /// Navigation interface name
 static const std::string NAVIGATION_CAPABILITY_INTERFACE_NAME = "Navigation";
 /// Navigation interface version
-static const std::string NAVIGATION_CAPABILITY_INTERFACE_VERSION = "1.1";
+static const std::string NAVIGATION_CAPABILITY_INTERFACE_VERSION = "1.2";
 
 /**
  * Creates the Navigation capability configuration.
@@ -132,7 +132,7 @@ void NavigationCapabilityAgent::removeObserver( std::shared_ptr<NavigationObserv
         ThrowIfNull(observer,"observerIsNull");
 
         m_executor.submit([this, observer]() {
-            if(!m_observers.insert( observer ).second) {
+            if(!m_observers.erase( observer )) {
                 AACE_ERROR(LX(TAG,"removeObserverInExecutor").m("observerNotInList"));
             }
         });

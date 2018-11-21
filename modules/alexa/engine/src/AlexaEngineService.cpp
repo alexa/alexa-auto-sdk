@@ -29,16 +29,23 @@
 #include <AVSCommon/Utils/LibcurlUtils/HttpPut.h>
 #include <SQLiteStorage/SQLiteMiscStorage.h>
 #include <SpeechEncoder/OpusEncoderContext.h>
+#include <AVSCommon/SDKInterfaces/HTTPContentFetcherInterface.h>
+#include <AVSCommon/Utils/LibcurlUtils/HTTPContentFetcherFactory.h>
+#include <Settings/SQLiteSettingStorage.h>
 
-#include "rapidjson/document.h"
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
+#include <rapidjson/document.h>
+#include <rapidjson/prettywriter.h>
+#include <rapidjson/stringbuffer.h>
 #include <rapidjson/error/en.h>
 #include <rapidjson/istreamwrapper.h>
 
 #include "AACE/Engine/Alexa/AlexaEngineService.h"
 #include "AACE/Engine/Core/EngineMacros.h"
+#include "AACE/Engine/Vehicle/VehiclePropertyInterface.h"
+#include "AACE/Engine/Network/NetworkObservableInterface.h"
+#include "AACE/Core/CoreProperties.h"
 #include "AACE/Alexa/AlexaProperties.h"
+#include "AACE/Vehicle/VehicleProperties.h"
 
 namespace aace {
 namespace engine {
@@ -46,6 +53,9 @@ namespace alexa {
 
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.AlexaEngineService");
+
+// name of the table used for the local storage database
+static const std::string ALEXA_SERVICE_LOCAL_STORAGE_TABLE = "aace.alexa";
 
 // state provider constants
 static const alexaClientSDK::avsCommon::avs::NamespaceAndName LOCATION_STATE{ "Geolocation", "GeolocationState" };
@@ -63,7 +73,7 @@ static const std::vector<alexaClientSDK::afml::FocusManager::ChannelConfiguratio
 };
 
 // locales supported by AVS, https://developer.amazon.com/docs/alexa-voice-service/settings.html
-static const std::string SUPPORTED_LOCALES = "de-DE,en-AU,en-CA,en-GB,en-IN,en-US,fr-FR,ja-JP";
+static const std::string SUPPORTED_LOCALES = "de-DE,en-AU,en-CA,en-GB,en-IN,en-US,es-ES,fr-FR,it-IT,ja-JP";
 
 // register the service
 REGISTER_SERVICE(AlexaEngineService)
@@ -94,6 +104,9 @@ bool AlexaEngineService::configure( const std::vector<std::shared_ptr<std::istre
         m_audioFormat.encoding = alexaClientSDK::avsCommon::utils::AudioFormat::Encoding::LPCM;
         m_audioFormat.layout = alexaClientSDK::avsCommon::utils::AudioFormat::Layout::INTERLEAVED;
     
+        // default external media player agent
+        m_externalMediaPlayerAgent = "RUHAV8PRLD";
+    
         // attempt to configure each stream as "aace.alexa" configuration data
         for( auto next : configuration ) {
             configure( next );
@@ -104,22 +117,45 @@ bool AlexaEngineService::configure( const std::vector<std::shared_ptr<std::istre
 
         auto config = alexaClientSDK::avsCommon::utils::configuration::ConfigurationNode::getRoot();
         
-        m_authDelegateRouter = std::make_shared<AuthDelegateRouter>();
-        ThrowIfNull( m_authDelegateRouter, "createAuthDelegateRouterFailed" );
-        m_authDelegateRouter->addAuthObserver( shared_from_this() );
+        // get the local storage instance
+        m_localStorage = getContext()->getServiceInterface<aace::engine::storage::LocalStorageInterface>( "aace.storage" );
+        ThrowIfNull( m_localStorage, "invalidLocalStorage" )
 
-        // Capabilities
-        m_capabilitiesDelegate = alexaClientSDK::capabilitiesDelegate::CapabilitiesDelegate::create( m_authDelegateRouter, alexaClientSDK::storage::sqliteStorage::SQLiteMiscStorage::create( config ), alexaClientSDK::avsCommon::utils::libcurlUtils::HttpPut::create(), m_customerDataManager, config, alexaClientSDK::avsCommon::utils::DeviceInfo::create( config ) );
+        // register the AlexaComponentInterface
+        ThrowIfNot( registerServiceInterface<AlexaComponentInterface>( shared_from_this() ), "registerAlexaComponentInterfaceFailed" );
+
+        // create the authdelegate using the factory method if provided, otherwise create
+        // an AuthDelegateRouter to support the AuthProvider platform interface...
+        m_authDelegate = newFactoryInstance<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface>( []() {
+            return std::make_shared<AuthDelegateRouter>();
+        });
+        ThrowIfNull( m_authDelegate, "crateAuthDelegateFailed" );
+        m_authDelegate->addAuthObserver( shared_from_this() );
+        
+        // create the customer data manager
+        m_customerDataManager = std::make_shared<alexaClientSDK::registrationManager::CustomerDataManager>();
+
+        // create message storage
+        std::shared_ptr<alexaClientSDK::storage::sqliteStorage::SQLiteMiscStorage> miscStorage = alexaClientSDK::storage::sqliteStorage::SQLiteMiscStorage::create( config );
+        ThrowIfNull( miscStorage, "createMiscStorageFailed" );
+        
+        // create device info
+        m_deviceInfo = alexaClientSDK::avsCommon::utils::DeviceInfo::create( config );
+        ThrowIfNull( m_deviceInfo, "createDeviceInfoFailed" );
+        
+        // create capabilities delegate
+        m_capabilitiesDelegate = alexaClientSDK::capabilitiesDelegate::CapabilitiesDelegate::create( m_authDelegate, miscStorage, alexaClientSDK::avsCommon::utils::libcurlUtils::HttpPut::create(), m_customerDataManager, config, m_deviceInfo );
         ThrowIfNull( m_capabilitiesDelegate, "createCapabilitiesDelegateFailed");
+        
         m_capabilitiesDelegate->addCapabilitiesObserver( shared_from_this() );
 
-        m_contextManager = createContextManager();
+        m_contextManager = alexaClientSDK::contextManager::ContextManager::create();
         ThrowIfNull( m_contextManager, "createContextManagerFailed" );
 
         m_clientObserver = AlexaEngineClientObserver::create();
-        m_authDelegateRouter->addAuthObserver( m_clientObserver );
+        m_authDelegate->addAuthObserver( m_clientObserver );
 
-        m_dialogUXStateAggregator = createDialogStateAggregator();
+        m_dialogUXStateAggregator = std::make_shared<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator>();
         ThrowIfNull( m_dialogUXStateAggregator, "createDialogStateAggregatorFailed" );
 
         m_audioActivityTracker = alexaClientSDK::afml::AudioActivityTracker::create( m_contextManager );
@@ -128,10 +164,13 @@ bool AlexaEngineService::configure( const std::vector<std::shared_ptr<std::istre
         // register capability with delegate
         ThrowIfNot( m_capabilitiesDelegate->registerCapability( m_audioActivityTracker ), "registerCapabilityFailed");
 
-        m_audioFocusManager = createFocusManager( DEFAULT_AUDIO_CHANNELS, m_audioActivityTracker );
+        m_audioFocusManager = std::make_shared<alexaClientSDK::afml::FocusManager>( DEFAULT_AUDIO_CHANNELS, m_audioActivityTracker );
         ThrowIfNull( m_audioFocusManager, "createAudioFocusManagerFailed" );
 
-        m_attachmentManager = createAttachmentManager();
+        m_visualFocusManager = std::make_shared<alexaClientSDK::afml::FocusManager>( DEFAULT_VISUAL_CHANNELS, m_visualActivityTracker );
+        ThrowIfNull( m_visualFocusManager, "createVisualFocusManagerFailed" );
+
+        m_attachmentManager = std::make_shared<alexaClientSDK::avsCommon::avs::attachment::AttachmentManager>( alexaClientSDK::avsCommon::avs::attachment::AttachmentManager::AttachmentType::IN_PROCESS );
         ThrowIfNull( m_attachmentManager, "createAttachmentManagerFailed" );
 
         m_visualActivityTracker = alexaClientSDK::afml::VisualActivityTracker::create( m_contextManager );
@@ -140,38 +179,41 @@ bool AlexaEngineService::configure( const std::vector<std::shared_ptr<std::istre
         // register capability with delegate
         ThrowIfNot( m_capabilitiesDelegate->registerCapability( m_visualActivityTracker ), "registerCapabilityFailed");
         
-        m_visualFocusManager = std::make_shared<alexaClientSDK::afml::FocusManager>( DEFAULT_VISUAL_CHANNELS, m_visualActivityTracker );
-        ThrowIfNull( m_visualFocusManager, "createVisualFocusManagerFailed" );
-
         m_postConnectSynchronizerFactory = alexaClientSDK::acl::PostConnectSynchronizerFactory::create( m_contextManager );
         ThrowIfNull( m_postConnectSynchronizerFactory, "createPostConnectSynchronizerFactoryFailed" );
 
         m_transportFactory = std::make_shared<alexaClientSDK::acl::HTTP2TransportFactory>( m_postConnectSynchronizerFactory );
         ThrowIfNull( m_transportFactory, "createTransportFactoryFailed" );
 
-        m_messageRouter = createMessageRouter( m_authDelegateRouter, m_attachmentManager, m_transportFactory );
+        // create the message router using the factory method if provided, otherwise create
+        // the default device sdk message router...
+        m_messageRouter = newFactoryInstance<alexaClientSDK::acl::MessageRouterInterface>( [this]() {
+            return std::make_shared<alexaClientSDK::acl::MessageRouter>( m_authDelegate, m_attachmentManager, m_transportFactory );
+        });
         ThrowIfNull( m_messageRouter, "crateMessageRouterFailed" );
 
-        m_connectionManager = createConnectionManager( m_messageRouter );
+        m_connectionManager = alexaClientSDK::acl::AVSConnectionManager::create( m_messageRouter, false );
         ThrowIfNull( m_connectionManager, "createConnectionManagerFailed" );
-
+        
         m_connectionManager->addConnectionStatusObserver( m_clientObserver );
         m_connectionManager->addConnectionStatusObserver( m_dialogUXStateAggregator );
         m_connectionManager->addMessageObserver( m_dialogUXStateAggregator );
 
-        m_dataManager = createDataManager();
+        m_dataManager = std::make_shared<alexaClientSDK::registrationManager::CustomerDataManager>();
         ThrowIfNull( m_dataManager, "createDataManagerFailed" );
 
-        m_certifiedSender = createCertifiedSender( m_connectionManager, m_connectionManager, alexaClientSDK::certifiedSender::SQLiteMessageStorage::create( config ), m_dataManager );
+        std::shared_ptr<alexaClientSDK::certifiedSender::SQLiteMessageStorage> messageStorage = alexaClientSDK::certifiedSender::SQLiteMessageStorage::create( config );
+        ThrowIfNull( messageStorage, "createMessageStorageFailed" );
+        m_certifiedSender = alexaClientSDK::certifiedSender::CertifiedSender::create( m_connectionManager, m_connectionManager, messageStorage, m_dataManager );
         ThrowIfNull( m_certifiedSender, "createCertifiedSenderFailed" );
 
-        m_exceptionSender = createExceptionEncounteredSender( m_connectionManager );
+        m_exceptionSender = alexaClientSDK::avsCommon::avs::ExceptionEncounteredSender::create( m_connectionManager );
         ThrowIfNull( m_exceptionSender, "createExceptionEncounteredSenderFailed" );
 
-        m_directiveSequencer = createDirectiveSequencer( m_exceptionSender );
+        m_directiveSequencer = alexaClientSDK::adsl::DirectiveSequencer::create( m_exceptionSender );
         ThrowIfNull( m_directiveSequencer, "createDirectiveSequencerFailed" );
 
-        m_messageInterpreter = createMessageInterpreter( m_exceptionSender, m_directiveSequencer, m_attachmentManager );
+        m_messageInterpreter = std::make_shared<alexaClientSDK::adsl::MessageInterpreter>( m_exceptionSender, m_directiveSequencer, m_attachmentManager );
         ThrowIfNull( m_directiveSequencer, "createMessageInterpreterFailed" );
 
         // add the message interpreter as an observer of the connection manager
@@ -190,21 +232,23 @@ bool AlexaEngineService::configure( const std::vector<std::shared_ptr<std::istre
         m_softwareInfoSender = alexaClientSDK::capabilityAgents::system::SoftwareInfoSender::create( m_firmwareVersion, true, m_softwareInfoSenderObserver, m_connectionManager, m_connectionManager, m_exceptionSender );
 
         // Settings
-        m_settingsStorage = alexaClientSDK::capabilityAgents::settings::SQLiteSettingStorage::create( config );
         m_globalSettingsObserver = std::make_shared<AlexaEngineGlobalSettingsObserver>();
 
         std::shared_ptr<alexaClientSDK::capabilityAgents::settings::SettingsUpdatedEventSender> settingsUpdatedEventSender = alexaClientSDK::capabilityAgents::settings::SettingsUpdatedEventSender::create( m_certifiedSender );
         ThrowIfNull( settingsUpdatedEventSender, "createSettingsUpdatedEventSenderFailed" );
 
-        m_settings = alexaClientSDK::capabilityAgents::settings::Settings::create( m_settingsStorage, { settingsUpdatedEventSender, m_globalSettingsObserver }, m_dataManager );
+        std::shared_ptr<alexaClientSDK::capabilityAgents::settings::SQLiteSettingStorage> settingsStorage = alexaClientSDK::capabilityAgents::settings::SQLiteSettingStorage::create( config );
+        ThrowIfNull( settingsStorage, "createSettingsStorageFailed" );
+        m_settings = alexaClientSDK::capabilityAgents::settings::Settings::create( settingsStorage, { settingsUpdatedEventSender, m_globalSettingsObserver }, m_dataManager );
         ThrowIfNull( m_settings, "createSettingsFailed" );
 
         // register capability with delegate
         ThrowIfNot( m_capabilitiesDelegate->registerCapability( m_settings ), "registerCapabilityFailed");
 
-        // register speaker manager with dummy speaker, since can't create SpeakerManager without a speaker 
-        m_speakerManager = alexaClientSDK::capabilityAgents::speakerManager::SpeakerManager::create( { std::make_shared<SystemSpeaker>() }, m_contextManager, m_connectionManager, m_exceptionSender );
+        // register speaker manager with empty speaker list. Speakers are added by platform.
+        m_speakerManager = alexaClientSDK::capabilityAgents::speakerManager::SpeakerManager::create( {}, m_contextManager, m_connectionManager, m_exceptionSender );
         ThrowIfNull( m_speakerManager, "createSpeakerManagerFailed" );
+        registerServiceInterface<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface>( m_speakerManager );
         
         // add capability agent to the directive sequencer
         ThrowIfNot( m_directiveSequencer->addDirectiveHandler( m_speakerManager ), "addDirectiveHandlerFailed" );
@@ -221,6 +265,10 @@ bool AlexaEngineService::configure( const std::vector<std::shared_ptr<std::istre
 
         // register capability with delegate
         ThrowIfNot( m_capabilitiesDelegate->registerCapability( m_interactionModelCapabilityAgent ), "registerCapabilityFailed");
+
+        // create the playback router delegate
+        m_playbackRouterDelegate = std::shared_ptr<PlaybackRouterDelegate>( new PlaybackRouterDelegate() );
+        ThrowIfNull( m_playbackRouterDelegate, "couldNotCreatePlaybackRouterDelegate" );
 
         // set the requires shutdown list
         m_configured = true;
@@ -288,6 +336,16 @@ bool AlexaEngineService::configure( std::shared_ptr<std::istream> configuration 
                     AACE_ERROR(LX(TAG,"configure").d("reason",ex.what()));
                 }
             }
+            
+            if( alexaConfigRoot.HasMember( "externalMediaPlayer" ) && alexaConfigRoot["externalMediaPlayer"].IsObject() )
+            {
+                auto externalMediaPlayer = alexaConfigRoot["externalMediaPlayer"].GetObject();
+            
+                if( externalMediaPlayer.HasMember( "agent" ) && externalMediaPlayer["agent"].IsString() ) {
+                    m_externalMediaPlayerAgent = externalMediaPlayer["agent"].GetString();
+                }
+            }
+            
             handled = true;
         }
 
@@ -304,72 +362,12 @@ bool AlexaEngineService::configure( std::shared_ptr<std::istream> configuration 
     }
 }
 
-//
-// Devices SDK Factory methods
-//
-
-std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> AlexaEngineService::createDialogStateAggregator() {
-    return std::make_shared<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator>();
-}
-
-std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> AlexaEngineService::createFocusManager( const std::vector<alexaClientSDK::afml::FocusManager::ChannelConfiguration>& channelConfigurations, std::shared_ptr<alexaClientSDK::afml::ActivityTrackerInterface> activityTracker ) {
-    return std::make_shared<alexaClientSDK::afml::FocusManager>( channelConfigurations, activityTracker );
-}
-
-std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentManager> AlexaEngineService::createAttachmentManager() {
-    return std::make_shared<alexaClientSDK::avsCommon::avs::attachment::AttachmentManager>( alexaClientSDK::avsCommon::avs::attachment::AttachmentManager::AttachmentType::IN_PROCESS );
-}
-
-std::shared_ptr<alexaClientSDK::acl::MessageRouterInterface> AlexaEngineService::createMessageRouter( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate, std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentManager> attachmentManager, std::shared_ptr<alexaClientSDK::acl::TransportFactoryInterface> transportFactory ) {
-    return std::make_shared<alexaClientSDK::acl::MessageRouter>( authDelegate, attachmentManager, transportFactory );
-}
-
-std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> AlexaEngineService::createConnectionManager( std::shared_ptr<alexaClientSDK::acl::MessageRouterInterface> messageRouter ) {
-    return alexaClientSDK::acl::AVSConnectionManager::create( messageRouter, false );
-}
-
-std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> AlexaEngineService::createCertifiedSender( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender, std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSConnectionManagerInterface> connection, std::shared_ptr<alexaClientSDK::certifiedSender::MessageStorageInterface> storage, std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager ) {
-    return alexaClientSDK::certifiedSender::CertifiedSender::create( messageSender, connection, storage, dataManager );
-}
-
-std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> AlexaEngineService::createExceptionEncounteredSender( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender ) {
-    return alexaClientSDK::avsCommon::avs::ExceptionEncounteredSender::create( messageSender );
-}
-
-std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> AlexaEngineService::createDirectiveSequencer( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender ) {
-    return alexaClientSDK::adsl::DirectiveSequencer::create( exceptionSender );
-}
-
-std::shared_ptr<alexaClientSDK::adsl::MessageInterpreter> AlexaEngineService::createMessageInterpreter( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionEncounteredSender, std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer, std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentManagerInterface> attachmentManager ) {
-    return std::make_shared<alexaClientSDK::adsl::MessageInterpreter>( exceptionEncounteredSender, directiveSequencer, attachmentManager);
-}
-
-std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> AlexaEngineService::createContextManager() {
-    return alexaClientSDK::contextManager::ContextManager::create();
-}
-
-std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::AlertsAudioFactoryInterface> AlexaEngineService::createAlertsAudioFactory() {
-    return std::make_shared<alexaClientSDK::applicationUtilities::resources::audio::AlertsAudioFactory>();
-}
-
-std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::NotificationsAudioFactoryInterface> AlexaEngineService::createNotificationsAudioFactory() {
-    return std::make_shared<alexaClientSDK::applicationUtilities::resources::audio::NotificationsAudioFactory>();
-}
-
-std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> AlexaEngineService::createDataManager() {
-    return std::make_shared<alexaClientSDK::registrationManager::CustomerDataManager>();
-}
-
 bool AlexaEngineService::setup()
 {
     try
     {
-        // if the location service can provide location info then create location state provider
-        auto locationService = getContext()->getService<aace::engine::location::LocationEngineService>();
-        ThrowIfNull( locationService, "locationServiceInvalid" );
-        
-        // get the location provider from the location service
-        auto locationProvider = locationService->getLocationProvider();
+        // get the location provider interface from the location service
+        auto locationProvider = getContext()->getServiceInterface<aace::location::LocationProvider>( "aace.location" );
 
         if( locationProvider != nullptr )
         {
@@ -381,15 +379,16 @@ bool AlexaEngineService::setup()
             m_contextManager->setStateProvider( LOCATION_STATE, m_locationStateProvider );
         }
         
-        // if a network service exists then add a listener for network status events
-        auto networkService = getContext()->getService<aace::engine::network::NetworkEngineService>();
-        ThrowIfNull( networkService, "networkServiceInvalid" );
+        // get the network observable interface from the network service
+        auto networkObservableInterface = getContext()->getServiceInterface<aace::engine::network::NetworkObservableInterface>( "aace.network" );
         
         // observe network info provider changes
-        networkService->addObserver( shared_from_this() );
+        if( networkObservableInterface != nullptr ) {
+            networkObservableInterface->addObserver( shared_from_this() );
+        }
         
         // get the network provider from the network service
-        auto networkProvider = networkService->getNetworkInfoProvider();
+        auto networkProvider = getContext()->getServiceInterface<aace::network::NetworkInfoProvider>( "aace.network" );
         
         // get the initial network status from the network provider - if the network provider is not
         // available then we always treat the network status as CONNECTED
@@ -489,10 +488,10 @@ bool AlexaEngineService::shutdown()
             m_authProviderEngineImpl.reset();
         }
         
-        if( m_authDelegateRouter != nullptr ) {
-            AACE_DEBUG(LX(TAG,"shutdown").m("AuthDelegateRouter"));
-            m_authDelegateRouter->shutdown();
-            m_authDelegateRouter.reset();
+        if( m_externalMediaPlayerEngineImpl != nullptr ) {
+            AACE_DEBUG(LX(TAG,"shutdown").m("ExternalMediaPlayerEngineImpl"));
+            m_externalMediaPlayerEngineImpl->shutdown();
+            m_externalMediaPlayerEngineImpl .reset();
         }
         
         if( m_speakerManager != nullptr ) {
@@ -567,10 +566,17 @@ bool AlexaEngineService::shutdown()
             m_logger.reset();
         }
 
+        if( m_authDelegate != nullptr ) {
+            m_authDelegate.reset();
+        }
+        
         if( m_interactionModelCapabilityAgent != nullptr ) {
             m_interactionModelCapabilityAgent.reset();
         }
-                
+
+        // shutdown the executer
+        m_executor.shutdown();
+        
         // uninitialize the alexa client
         alexaClientSDK::avsCommon::avs::initialization::AlexaClientSDKInit::uninitialize();
 
@@ -690,20 +696,23 @@ bool AlexaEngineService::connect()
             // if the capabilities have not been configured yet then publish the capabilities
             // and wait for response before connecting...
             if( m_capabilitiesConfigured == false ) {
+                AACE_DEBUG(LX(TAG, "Publishing capabilities"));
                 m_connecting = true;
+
+                // hotfix for multiple account login in same session use case
+                m_capabilitiesDelegate->setCapabilitiesPublishOverride( true );
+
                 m_capabilitiesDelegate->publishCapabilitiesAsyncWithRetries();
             }
             else
             {
-                // if we are already connected to avs then attempt reconnect
-                if( m_connectionManager->isConnected() ) {
-                    m_connectionManager->reconnect();
-                }
-                else
-                {
+                // if avs connection has not been enabled, connect
+                if (!m_connectionManager->isEnabled()) {
                     // enabled the avs connection
+                    AACE_DEBUG(LX(TAG, "Enabling connection"));
                     m_connectionManager->enable();
                 
+                    AACE_DEBUG(LX(TAG, "Sending default settings"));
                     // send the default client settings
                     m_settings->sendDefaultSettings();
                 }
@@ -783,6 +792,9 @@ void AlexaEngineService::onAuthStateChange( AuthObserverInterface::State newStat
                     connect();
                 }
                 else {
+                    if ( m_authState == AuthObserverInterface::State::UNINITIALIZED ) {
+                        m_capabilitiesConfigured = false;
+                    } 
                     disconnect();
                 }
             }
@@ -841,6 +853,8 @@ bool AlexaEngineService::registerPlatformInterface( std::shared_ptr<aace::core::
         ReturnIf( registerPlatformInterfaceType<aace::alexa::Notifications>( platformInterface ), true );
         ReturnIf( registerPlatformInterfaceType<aace::alexa::PlaybackController>( platformInterface ), true );
         ReturnIf( registerPlatformInterfaceType<aace::alexa::AuthProvider>( platformInterface ), true );
+        ReturnIf( registerPlatformInterfaceType<aace::alexa::ExternalMediaAdapter>( platformInterface ), true );
+        ReturnIf( registerPlatformInterfaceType<aace::alexa::LocalMediaSource>( platformInterface ), true );
 
         return false;
     }
@@ -863,7 +877,7 @@ bool AlexaEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::al
         // add observers
         m_connectionManager->addConnectionStatusObserver( m_alexaClientEngineImpl );
         m_dialogUXStateAggregator->addObserver( m_alexaClientEngineImpl );
-        m_authDelegateRouter->addAuthObserver( m_alexaClientEngineImpl );
+        m_authDelegate->addAuthObserver( m_alexaClientEngineImpl );
 
         return true;
     }
@@ -916,9 +930,6 @@ bool AlexaEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::al
         m_speechSynthesizerEngineImpl = aace::engine::alexa::SpeechSynthesizerEngineImpl::create( speechSynthesizer, m_directiveSequencer, m_connectionManager, m_audioFocusManager, m_contextManager, m_attachmentManager, m_dialogUXStateAggregator, m_capabilitiesDelegate, m_speakerManager, m_exceptionSender );
         ThrowIfNull( m_speechSynthesizerEngineImpl, "createSpeechSynthesizerEngineImplFailed" );
 
-        // add the speaker impl to the speaker manager
-        m_speakerManager->addSpeaker( m_speechSynthesizerEngineImpl );
-
         // add engine interface to shutdown list
         //m_requiresShutdownList.insert( m_speechSynthesizerEngineImpl );
 
@@ -955,7 +966,7 @@ bool AlexaEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::al
         ThrowIfNotNull( m_audioPlayerEngineImpl, "platformInterfaceAlreadyRegistered" );
 
         // create the audio player engine implementation
-        m_audioPlayerEngineImpl = aace::engine::alexa::AudioPlayerEngineImpl::create( audioPlayer, m_directiveSequencer, m_connectionManager, m_audioFocusManager, m_contextManager, m_attachmentManager, m_capabilitiesDelegate, m_speakerManager, m_exceptionSender );
+        m_audioPlayerEngineImpl = aace::engine::alexa::AudioPlayerEngineImpl::create( audioPlayer, m_directiveSequencer, m_connectionManager, m_audioFocusManager, m_contextManager, m_attachmentManager, m_capabilitiesDelegate, m_speakerManager, m_exceptionSender, m_playbackRouterDelegate );
         ThrowIfNull( m_audioPlayerEngineImpl, "createAudioPlayerEngineImplFailed" );
 
         // if a template interface has been registered it needs to know about the
@@ -963,14 +974,6 @@ bool AlexaEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::al
         if( m_templateRuntimeEngineImpl != nullptr ) {
             m_templateRuntimeEngineImpl->setAudioPlayerInterface( m_audioPlayerEngineImpl );
         }
-
-        // if a playback controller interface has already been registered then we set the audio player's router
-        if( m_playbackControllerEngineImpl != nullptr ) {
-            m_audioPlayerEngineImpl->setPlaybackRouter( m_playbackControllerEngineImpl->getPlaybackRouter() );
-        }
-
-        // add the speaker impl to the speaker manager
-        m_speakerManager->addSpeaker( m_audioPlayerEngineImpl );
 
         return true;
     }
@@ -987,11 +990,8 @@ bool AlexaEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::al
         ThrowIfNotNull( m_alertsEngineImpl, "platformInterfaceAlreadyRegistered" );
 
         // create the alerts engine implementation
-        m_alertsEngineImpl = aace::engine::alexa::AlertsEngineImpl::create( alerts, m_directiveSequencer, m_connectionManager, m_connectionManager, m_certifiedSender, m_audioFocusManager, m_contextManager, m_capabilitiesDelegate, m_exceptionSender, createAlertsAudioFactory(), m_speakerManager, m_dataManager );
+        m_alertsEngineImpl = aace::engine::alexa::AlertsEngineImpl::create( alerts, m_directiveSequencer, m_connectionManager, m_connectionManager, m_certifiedSender, m_audioFocusManager, m_contextManager, m_capabilitiesDelegate, m_exceptionSender, std::make_shared<alexaClientSDK::applicationUtilities::resources::audio::AlertsAudioFactory>(), m_speakerManager, m_dataManager );
         ThrowIfNull( m_alertsEngineImpl, "createAlertsEngineImplFailed" );
-
-        // add the speaker impl to the speaker manager
-        m_speakerManager->addSpeaker( m_alertsEngineImpl );
 
         return true;
     }
@@ -1008,11 +1008,8 @@ bool AlexaEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::al
         ThrowIfNotNull( m_notificationsEngineImpl, "platformInterfaceAlreadyRegistered" );
 
         // create the notifications engine implementation
-        m_notificationsEngineImpl = aace::engine::alexa::NotificationsEngineImpl::create( notifications, m_directiveSequencer, m_contextManager, m_capabilitiesDelegate, m_exceptionSender, createNotificationsAudioFactory(), m_speakerManager, m_dataManager );
+        m_notificationsEngineImpl = aace::engine::alexa::NotificationsEngineImpl::create( notifications, m_directiveSequencer, m_contextManager, m_capabilitiesDelegate, m_exceptionSender, std::make_shared<alexaClientSDK::applicationUtilities::resources::audio::NotificationsAudioFactory>(), m_speakerManager, m_dataManager );
         ThrowIfNull( m_notificationsEngineImpl, "createNotificationsEngineImplFailed" );
-
-        // add the speaker impl to the speaker manager
-        m_speakerManager->addSpeaker( m_notificationsEngineImpl );
 
         return true;
     }
@@ -1035,10 +1032,8 @@ bool AlexaEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::al
         // set the playback controller engine interface reference
         playbackController->setEngineInterface( m_playbackControllerEngineImpl );
 
-        // if an audio player interface has already been registered then we set its playback router
-        if( m_audioPlayerEngineImpl != nullptr ) {
-            m_audioPlayerEngineImpl->setPlaybackRouter( m_playbackControllerEngineImpl->getPlaybackRouter() );
-        }
+        // register playback router with the playback router delegate
+        m_playbackRouterDelegate->setDelegate( m_playbackControllerEngineImpl->getPlaybackRouter() );
 
         return true;
     }
@@ -1053,12 +1048,17 @@ bool AlexaEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::al
     try
     {
         ThrowIfNotNull( m_authProviderEngineImpl, "platformInterfaceAlreadyRegistered" );
-    
+        ThrowIfNull( m_authDelegate, "authDelegateInvalid" );
+
+        // cast the auth delegate to an AuthDelegateRouter
+        auto authDelegateRouter = std::dynamic_pointer_cast<AuthDelegateRouter>( m_authDelegate );
+        ThrowIfNull( authDelegateRouter, "authDelegateRouterInvalid" );
+
         m_authProviderEngineImpl = aace::engine::alexa::AuthProviderEngineImpl::create( authProvider );
         ThrowIfNull( m_authProviderEngineImpl, "createAuthProviderEngineImplFailed" );
 
         // set the auth delegate router's auth delegate to the new auth provider impl
-        m_authDelegateRouter->setAuthDelegate( m_authProviderEngineImpl );
+        authDelegateRouter->setAuthDelegate( m_authProviderEngineImpl );
 
         // set the auth provider engine interface reference
         authProvider->setEngineInterface( m_authProviderEngineImpl );
@@ -1069,6 +1069,127 @@ bool AlexaEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::al
         AACE_ERROR(LX(TAG,"registerPlatformInterfaceType<AuthProvider>").d("reason", ex.what()));
         return false;
     }
+}
+
+bool AlexaEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::alexa::ExternalMediaAdapter> externalMediaAdapter )
+{
+    try
+    {
+        // create the external media player impl if needed
+        ThrowIfNot( createExternalMediaPlayerImpl(), "invalidExternalMediaPlayerImpl" );
+        
+        // register the platform media adapter
+        ThrowIfNot( m_externalMediaPlayerEngineImpl->registerPlatformMediaAdapter( externalMediaAdapter ), "registerPlatformMediaAdapterFailed" );
+    
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"registerPlatformInterfaceType<ExternalMediaPlayer>").d("reason", ex.what()));
+        return false;
+    }
+}
+
+bool AlexaEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::alexa::LocalMediaSource> localMediaSource )
+{
+    try
+    {
+        // create the external media player impl if needed
+        ThrowIfNot( createExternalMediaPlayerImpl(), "invalidExternalMediaPlayerImpl" );
+        
+        // register the platform media adapter
+        ThrowIfNot( m_externalMediaPlayerEngineImpl->registerPlatformMediaAdapter( localMediaSource ), "registerPlatformMediaAdapterFailed" );
+    
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"registerPlatformInterfaceType<LocalMediaSourceAdapter>").d("reason", ex.what()));
+        return false;
+    }
+}
+
+bool AlexaEngineService::createExternalMediaPlayerImpl()
+{
+    try
+    {
+        ReturnIf( m_externalMediaPlayerEngineImpl != nullptr, true );
+    
+        // create the external media player impl if is null
+        m_externalMediaPlayerEngineImpl = aace::engine::alexa::ExternalMediaPlayerEngineImpl::create( m_externalMediaPlayerAgent, m_directiveSequencer, m_capabilitiesDelegate, m_speakerManager, m_connectionManager, m_audioFocusManager, m_contextManager, m_exceptionSender, m_playbackRouterDelegate );
+        ThrowIfNull( m_externalMediaPlayerEngineImpl, "createExternalMediaPlayerEngineImplFailed" );
+
+        // external media player impl needs to observer connection manager connections status
+        m_connectionManager->addConnectionStatusObserver( m_externalMediaPlayerEngineImpl );
+    
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"createExternalMediaPlayerImpl").d("reason", ex.what()));
+        return false;
+    }
+}
+
+//
+// AlexaComponentInterface
+//
+
+std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> AlexaEngineService::getAuthDelegate() {
+    return m_authDelegate;
+}
+
+std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> AlexaEngineService::getCapabilitiesDelegate() {
+    return m_capabilitiesDelegate;
+}
+
+std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> AlexaEngineService::getContextManager() {
+    return m_contextManager;
+}
+
+std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> AlexaEngineService::getDialogUXStateAggregator() {
+    return m_dialogUXStateAggregator;
+}
+
+std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> AlexaEngineService::getAudioFocusManager() {
+    return m_audioFocusManager;
+}
+
+std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> AlexaEngineService::getVisualFocusManager() {
+    return m_visualFocusManager;
+}
+
+std::shared_ptr<alexaClientSDK::acl::MessageRouterInterface> AlexaEngineService::getMessageRouter() {
+    return m_messageRouter;
+}
+
+std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> AlexaEngineService::getMessageSender() {
+    return m_connectionManager;
+}
+
+std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSConnectionManagerInterface> AlexaEngineService::getConnectionManager() {
+    return m_connectionManager;
+}
+
+std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> AlexaEngineService::getExceptionEncounteredSender() {
+    return m_exceptionSender;
+}
+
+std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> AlexaEngineService::getDirectiveSequencer() {
+    return m_directiveSequencer;
+}
+
+std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> AlexaEngineService::getSpeakerManager() {
+    return m_speakerManager;
+}
+
+std::shared_ptr<alexaClientSDK::adsl::MessageInterpreter> AlexaEngineService::getMessageInterpreter() {
+    return m_messageInterpreter;
+}
+
+std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentManager> AlexaEngineService::getAttachmentManager() {
+    return m_attachmentManager;
+}
+
+std::shared_ptr<alexaClientSDK::acl::TransportFactoryInterface> AlexaEngineService::getTransportFactory() {
+    return m_transportFactory;
 }
 
 //
@@ -1105,46 +1226,50 @@ void AlexaEngineLocationStateProvider::executeProvideState( const alexaClientSDK
 
         aace::location::Location location = m_locationProvider->getLocation();
 
-        // build the context payload
-        rapidjson::Document document( rapidjson::kObjectType );
-
-        // add timestamp
-        std::string time = location.getTimeAsString();
-
-        document.AddMember( "timestamp", rapidjson::Value().SetString( time.c_str(), time.length(), document.GetAllocator() ), document.GetAllocator() );
-
-        // add location coordinate
-        rapidjson::Value coordinate( rapidjson::kObjectType );
-
-        coordinate.AddMember( "latitudeInDegrees", location.getLatitude(), document.GetAllocator() );
-        coordinate.AddMember( "longitudeInDegrees", location.getLongitude(), document.GetAllocator() );
-        coordinate.AddMember( "accuracyInMeters", location.getAccuracy() != aace::location::Location::UNDEFINED ? location.getAccuracy() : 0, document.GetAllocator() );
-
-        document.AddMember( "coordinate", coordinate, document.GetAllocator() );
-
-        if( location.getAltitude() != aace::location::Location::UNDEFINED )
+        if( location.isValid() )
         {
+            // build the context payload
+            rapidjson::Document document( rapidjson::kObjectType );
+
+            // add timestamp
+            std::string time = location.getTimeAsString();
+
+            document.AddMember( "timestamp", rapidjson::Value().SetString( time.c_str(), time.length(), document.GetAllocator() ), document.GetAllocator() );
+
+            // add location coordinate
+            rapidjson::Value coordinate( rapidjson::kObjectType );
+
+            coordinate.AddMember( "latitudeInDegrees", location.getLatitude(), document.GetAllocator() );
+            coordinate.AddMember( "longitudeInDegrees", location.getLongitude(), document.GetAllocator() );
+            coordinate.AddMember( "accuracyInMeters", location.getAccuracy() != aace::location::Location::UNDEFINED ? location.getAccuracy() : 0, document.GetAllocator() );
+
+            document.AddMember( "coordinate", coordinate, document.GetAllocator() );
+
             // add location altitude
-            rapidjson::Value altitude( rapidjson::kObjectType );
+            if( location.getAltitude() != aace::location::Location::UNDEFINED )
+            {
+                rapidjson::Value altitude( rapidjson::kObjectType );
 
-            altitude.SetObject();
-            altitude.AddMember( "altitudeInMeters", location.getAltitude(), document.GetAllocator() );
+                altitude.SetObject();
+                altitude.AddMember( "altitudeInMeters", location.getAltitude(), document.GetAllocator() );
+                altitude.AddMember( "accuracyInMeters", location.getAccuracy() != aace::location::Location::UNDEFINED ? location.getAccuracy() : 0, document.GetAllocator() );
 
-            if( location.getAccuracy() != aace::location::Location::UNDEFINED ) {
-                altitude.AddMember( "accuracyInMeters", location.getAccuracy(), document.GetAllocator() );
+                document.AddMember( "altitude", altitude, document.GetAllocator() );
             }
 
-            document.AddMember( "altitude", altitude, document.GetAllocator() );
+            // build the json state string
+            rapidjson::StringBuffer buffer;
+            rapidjson::Writer<rapidjson::StringBuffer> writer( buffer );
+
+            ThrowIfNot( document.Accept( writer ), "failedToWriteJsonDocument" );
+
+            // set the context location state
+            ThrowIf( m_contextManager->setState( LOCATION_STATE, buffer.GetString(), alexaClientSDK::avsCommon::avs::StateRefreshPolicy::ALWAYS, stateRequestToken ) != alexaClientSDK::avsCommon::sdkInterfaces::SetStateResult::SUCCESS, "contextManagerSetStateFailed" );
         }
-
-        // build the json state string
-        rapidjson::StringBuffer buffer;
-        rapidjson::Writer<rapidjson::StringBuffer> writer( buffer );
-
-        ThrowIfNot( document.Accept( writer ), "failedToWriteJsonDocument" );
-
-        // set the context location state
-        ThrowIf( m_contextManager->setState( LOCATION_STATE, buffer.GetString(), alexaClientSDK::avsCommon::avs::StateRefreshPolicy::ALWAYS, stateRequestToken ) != alexaClientSDK::avsCommon::sdkInterfaces::SetStateResult::SUCCESS, "contextManagerSetStateFailed" );
+        else
+        {
+            ThrowIf( m_contextManager->setState( LOCATION_STATE, "", alexaClientSDK::avsCommon::avs::StateRefreshPolicy::SOMETIMES, stateRequestToken ) != alexaClientSDK::avsCommon::sdkInterfaces::SetStateResult::SUCCESS, "contextManagerSetStateFailed" );
+        }
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG + ".AlexaEngineLocationStateProvider","executeProvideState").d("reason", ex.what()));
@@ -1173,12 +1298,6 @@ void AlexaEngineGlobalSettingsObserver::onSettingChanged( const std::unordered_m
 //
 // AuthDelegateRouter
 //
-
-AuthDelegateRouter::AuthDelegateRouter() : alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG + ".AuthDelegateRouter") {
-}
-
-void AuthDelegateRouter::doShutdown() {
-}
 
 void AuthDelegateRouter::setAuthDelegate( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate )
 {
@@ -1234,32 +1353,48 @@ std::string AuthDelegateRouter::getAuthToken()
 }
 
 //
-// SystemSpeaker
+// PlaybackRouterDelegate
 //
 
-bool SystemSpeaker::setVolume( int8_t volume ) {
-    m_volume = volume;
-    return true;
+void PlaybackRouterDelegate::buttonPressed( alexaClientSDK::avsCommon::avs::PlaybackButton button ) {
+    if( m_delegate != nullptr ) {
+        m_delegate->buttonPressed( button );
+    }
 }
 
-bool SystemSpeaker::adjustVolume( int8_t delta ) {
-    m_volume += delta;
-    return true;
+void PlaybackRouterDelegate::togglePressed( alexaClientSDK::avsCommon::avs::PlaybackToggle toggle, bool action ) {
+    if( m_delegate != nullptr ) {
+        m_delegate->togglePressed( toggle, action );
+    }
 }
 
-bool SystemSpeaker::setMute( bool mute ) {
-    m_mute = mute;
-    return true;
+void PlaybackRouterDelegate::setHandler( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackHandlerInterface> handler )
+{
+    if( m_delegate != nullptr ) {
+        m_delegate->setHandler( handler );
+    }
+    else {
+        m_handler = handler;
+    }
 }
+
+void PlaybackRouterDelegate::switchToDefaultHandler() {
+    if( m_delegate != nullptr ) {
+        m_delegate->switchToDefaultHandler();
+    }
+    else {
+        m_handler.reset();
+    }
+}
+
+void PlaybackRouterDelegate::setDelegate( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> delegate )
+{
+    m_delegate = delegate;
     
-bool SystemSpeaker::getSpeakerSettings( SpeakerSettings* settings ) {
-    settings->volume = m_volume;
-    settings->mute = m_mute;
-    return true;
-}
-
-SystemSpeaker::Type SystemSpeaker::getSpeakerType() {
-    return SystemSpeaker::Type::AVS_ALERTS_VOLUME;
+    if( m_delegate != nullptr && m_handler != nullptr ) {
+        m_delegate->setHandler( m_handler );
+        m_handler.reset();
+    }
 }
 
 } // aace::engine::alexa

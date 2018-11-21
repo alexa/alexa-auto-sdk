@@ -3,9 +3,9 @@ extras
 
 android-toolchain/
 amazon-sources/
+downloads/
 
 build/
-cmake/
 
 deploy/
 

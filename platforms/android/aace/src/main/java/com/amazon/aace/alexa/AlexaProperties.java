@@ -54,4 +54,11 @@ public class AlexaProperties {
      * @hideinitializer
      */
     public static final String SUPPORTED_LOCALES = "aace.alexa.supportedLocales";
+
+    /**
+     *
+     * This read-only property is used with Engine.getProperty() to check if the vehicle's country is supported.
+     * @hideinitializer
+     */
+    public static final String COUNTRY_SUPPORTED = "aace.alexa.countrySupported";
 }

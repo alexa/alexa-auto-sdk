@@ -13,6 +13,8 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Network/NetworkInfoProvider.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Network/NetworkEngineInterfaces.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Vehicle/VehicleConfiguration.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Vehicle/VehicleProperties.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Storage/StorageConfiguration.h
 )
 
 source_group("Header Files" FILES ${HEADERS})

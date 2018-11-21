@@ -1,0 +1,724 @@
+From 3a9b528d8a23e1b5086d9bf84e1a21b06f9f4859 Mon Sep 17 00:00:00 2001
+From: Raghavendra Bilamkar <bilamkar@amazon.com>
+Date: Sat, 20 Oct 2018 15:30:46 -0700
+Subject: [PATCH] AVS Changes for HTTP Get and Delete Support
+
+---
+ AVSCommon/CMakeLists.txt                           |   2 +
+ .../Utils/LibcurlUtils/CurlEasyHandleWrapper.h     |   4 +-
+ .../AVSCommon/Utils/LibcurlUtils/HttpDelete.h      |  83 ++++++++++
+ .../Utils/LibcurlUtils/HttpDeleteInterface.h       |  53 +++++++
+ .../include/AVSCommon/Utils/LibcurlUtils/HttpGet.h |  83 ++++++++++
+ .../Utils/LibcurlUtils/HttpGetInterface.h          |  53 +++++++
+ .../src/LibcurlUtils/CurlEasyHandleWrapper.cpp     |   3 +
+ AVSCommon/Utils/src/LibcurlUtils/HttpDelete.cpp    | 174 +++++++++++++++++++++
+ AVSCommon/Utils/src/LibcurlUtils/HttpGet.cpp       | 174 +++++++++++++++++++++
+ 9 files changed, 628 insertions(+), 1 deletion(-)
+ create mode 100644 AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpDelete.h
+ create mode 100644 AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpDeleteInterface.h
+ create mode 100644 AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpGet.h
+ create mode 100644 AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpGetInterface.h
+ create mode 100644 AVSCommon/Utils/src/LibcurlUtils/HttpDelete.cpp
+ create mode 100644 AVSCommon/Utils/src/LibcurlUtils/HttpGet.cpp
+
+diff --git a/AVSCommon/CMakeLists.txt b/AVSCommon/CMakeLists.txt
+index 734800c..0e3b453 100644
+--- a/AVSCommon/CMakeLists.txt
++++ b/AVSCommon/CMakeLists.txt
+@@ -42,6 +42,8 @@ add_library(AVSCommon SHARED
+     Utils/src/LibcurlUtils/HTTPContentFetcherFactory.cpp
+     Utils/src/LibcurlUtils/HttpPost.cpp
+     Utils/src/LibcurlUtils/HttpPut.cpp
++    Utils/src/LibcurlUtils/HttpGet.cpp
++    Utils/src/LibcurlUtils/HttpDelete.cpp
+     Utils/src/LibcurlUtils/HTTPResponse.cpp
+     Utils/src/LibcurlUtils/LibCurlHttpContentFetcher.cpp
+     Utils/src/LibcurlUtils/LibcurlUtils.cpp
+diff --git a/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/CurlEasyHandleWrapper.h b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/CurlEasyHandleWrapper.h
+index 0187c82..448eb87 100644
+--- a/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/CurlEasyHandleWrapper.h
++++ b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/CurlEasyHandleWrapper.h
+@@ -64,7 +64,9 @@ public:
+         /// HTTP POST
+         kPOST,
+         /// HTTP PUT
+-        kPUT
++        kPUT,
++        /// HTTP DELETE
++        kDELETE
+     };
+ 
+     /**
+diff --git a/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpDelete.h b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpDelete.h
+new file mode 100644
+index 0000000..0bfbaa1
+--- /dev/null
++++ b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpDelete.h
+@@ -0,0 +1,83 @@
++/*
++ * Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License").
++ * You may not use this file except in compliance with the License.
++ * A copy of the License is located at
++ *
++ *     http://aws.amazon.com/apache2.0/
++ *
++ * or in the "license" file accompanying this file. This file is distributed
++ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied. See the License for the specific language governing
++ * permissions and limitations under the License.
++ */
++
++#ifndef ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LIBCURLUTILS_HTTPDELETE_H_
++#define ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LIBCURLUTILS_HTTPDELETE_H_
++
++#include <memory>
++#include <mutex>
++#include <string>
++
++#include <curl/curl.h>
++
++#include "AVSCommon/Utils/LibcurlUtils/CurlEasyHandleWrapper.h"
++#include "HttpDeleteInterface.h"
++
++namespace alexaClientSDK {
++namespace avsCommon {
++namespace utils {
++namespace libcurlUtils {
++
++/// LIBCURL based implementation of HttpDeleteInterface.
++class HttpDelete : public HttpDeleteInterface {
++public:
++    /**
++     * Create a new HttpDelete instance, passing ownership of the new instance on to the caller.
++     *
++     * @return Returns an std::unique_ptr to the new HttpDelete instance, or @c nullptr of the operation failed.
++     */
++    static std::unique_ptr<HttpDelete> create();
++
++    /**
++     * HttpDelete destructor
++     */
++    ~HttpDelete() = default;
++
++    /**
++     * Deleted copy constructor.
++     *
++     * @param rhs The 'right hand side' to not copy.
++     */
++    HttpDelete(const HttpDelete& rhs) = delete;
++
++    /**
++     * Deleted assignment operator.
++     *
++     * @param rhs The 'right hand side' to not copy.
++     * @return The object assigned to.
++     */
++    HttpDelete& operator=(const HttpDelete& rhs) = delete;
++
++    HTTPResponse doDelete(const std::string& url, const std::vector<std::string>& headers) override;
++
++private:
++    /**
++     * Default HttpDelete constructor.
++     */
++    HttpDelete() = default;
++
++    /// Mutex to serialize access to @c m_curl.
++    std::mutex m_mutex;
++
++    /// CURL handle with which to make requests
++    CurlEasyHandleWrapper m_curl;
++};
++
++}  // namespace libcurlUtils
++}  // namespace utils
++}  // namespace avsCommon
++}  // namespace alexaClientSDK
++
++#endif  // ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LIBCURLUTILS_HTTPDELETE_H_
+diff --git a/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpDeleteInterface.h b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpDeleteInterface.h
+new file mode 100644
+index 0000000..1a948d8
+--- /dev/null
++++ b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpDeleteInterface.h
+@@ -0,0 +1,53 @@
++/*
++ * Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License").
++ * You may not use this file except in compliance with the License.
++ * A copy of the License is located at
++ *
++ *     http://aws.amazon.com/apache2.0/
++ *
++ * or in the "license" file accompanying this file. This file is distributed
++ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied. See the License for the specific language governing
++ * permissions and limitations under the License.
++ */
++
++#ifndef ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LIBCURLUTILS_HTTPDELETEINTERFACE_H_
++#define ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LIBCURLUTILS_HTTPDELETEINTERFACE_H_
++
++#include <string>
++#include <vector>
++
++#include <AVSCommon/Utils/LibcurlUtils/HTTPResponse.h>
++
++namespace alexaClientSDK {
++namespace avsCommon {
++namespace utils {
++namespace libcurlUtils {
++
++/// Minimal interface for making HTTP DELETE requests.
++class HttpDeleteInterface {
++public:
++    /// Virtual destructor to assure proper cleanup of derived types.
++    virtual ~HttpDeleteInterface() = default;
++
++    /**
++     * Perform an HTTP DELETE request returning the response body as a string. This method blocks for the duration
++     * of the request.
++     *
++     * @param url The URL to send the DELETE to.
++     * @param headers vector of strings to add in the header.
++     * @return An object describing the response to the DELETE request.
++     */
++    virtual HTTPResponse doDelete(
++        const std::string& url,
++        const std::vector<std::string>& headers) = 0;
++};
++
++}  // namespace libcurlUtils
++}  // namespace utils
++}  // namespace avsCommon
++}  // namespace alexaClientSDK
++
++#endif  // ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LIBCURLUTILS_HTTPDELETEINTERFACE_H_
+diff --git a/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpGet.h b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpGet.h
+new file mode 100644
+index 0000000..5068502
+--- /dev/null
++++ b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpGet.h
+@@ -0,0 +1,83 @@
++/*
++ * Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License").
++ * You may not use this file except in compliance with the License.
++ * A copy of the License is located at
++ *
++ *     http://aws.amazon.com/apache2.0/
++ *
++ * or in the "license" file accompanying this file. This file is distributed
++ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied. See the License for the specific language governing
++ * permissions and limitations under the License.
++ */
++
++#ifndef ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LIBCURLUTILS_HTTPGET_H_
++#define ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LIBCURLUTILS_HTTPGET_H_
++
++#include <memory>
++#include <mutex>
++#include <string>
++
++#include <curl/curl.h>
++
++#include "AVSCommon/Utils/LibcurlUtils/CurlEasyHandleWrapper.h"
++#include "HttpGetInterface.h"
++
++namespace alexaClientSDK {
++namespace avsCommon {
++namespace utils {
++namespace libcurlUtils {
++
++/// LIBCURL based implementation of HttpGetInterface.
++class HttpGet : public HttpGetInterface {
++public:
++    /**
++     * Create a new HttpGet instance, passing ownership of the new instance on to the caller.
++     *
++     * @return Returns an std::unique_ptr to the new HttpGet instance, or @c nullptr of the operation failed.
++     */
++    static std::unique_ptr<HttpGet> create();
++
++    /**
++     * HttpGet destructor
++     */
++    ~HttpGet() = default;
++
++    /**
++     * Deleted copy constructor.
++     *
++     * @param rhs The 'right hand side' to not copy.
++     */
++    HttpGet(const HttpGet& rhs) = delete;
++
++    /**
++     * Deleted assignment operator.
++     *
++     * @param rhs The 'right hand side' to not copy.
++     * @return The object assigned to.
++     */
++    HttpGet& operator=(const HttpGet& rhs) = delete;
++
++    HTTPResponse doGet(const std::string& url, const std::vector<std::string>& headers) override;
++
++private:
++    /**
++     * Default HttpGet constructor.
++     */
++    HttpGet() = default;
++
++    /// Mutex to serialize access to @c m_curl.
++    std::mutex m_mutex;
++
++    /// CURL handle with which to make requests
++    CurlEasyHandleWrapper m_curl;
++};
++
++}  // namespace libcurlUtils
++}  // namespace utils
++}  // namespace avsCommon
++}  // namespace alexaClientSDK
++
++#endif  // ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LIBCURLUTILS_HTTPGET_H_
+diff --git a/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpGetInterface.h b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpGetInterface.h
+new file mode 100644
+index 0000000..770b206
+--- /dev/null
++++ b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpGetInterface.h
+@@ -0,0 +1,53 @@
++/*
++ * Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License").
++ * You may not use this file except in compliance with the License.
++ * A copy of the License is located at
++ *
++ *     http://aws.amazon.com/apache2.0/
++ *
++ * or in the "license" file accompanying this file. This file is distributed
++ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied. See the License for the specific language governing
++ * permissions and limitations under the License.
++ */
++
++#ifndef ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LIBCURLUTILS_HTTPGETINTERFACE_H_
++#define ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LIBCURLUTILS_HTTPGETINTERFACE_H_
++
++#include <string>
++#include <vector>
++
++#include <AVSCommon/Utils/LibcurlUtils/HTTPResponse.h>
++
++namespace alexaClientSDK {
++namespace avsCommon {
++namespace utils {
++namespace libcurlUtils {
++
++/// Minimal interface for making HTTP GET requests.
++class HttpGetInterface {
++public:
++    /// Virtual destructor to assure proper cleanup of derived types.
++    virtual ~HttpGetInterface() = default;
++
++    /**
++     * Perform an HTTP Get request returning the response body as a string. This method blocks for the duration
++     * of the request.
++     *
++     * @param url The URL to send the GET to.
++     * @param headers vector of strings to add in the header.
++     * @return An object describing the response to the GET request.
++     */
++    virtual HTTPResponse doGet(
++        const std::string& url,
++        const std::vector<std::string>& headers) = 0;
++};
++
++}  // namespace libcurlUtils
++}  // namespace utils
++}  // namespace avsCommon
++}  // namespace alexaClientSDK
++
++#endif  // ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LIBCURLUTILS_HTTPGETINTERFACE_H_
+diff --git a/AVSCommon/Utils/src/LibcurlUtils/CurlEasyHandleWrapper.cpp b/AVSCommon/Utils/src/LibcurlUtils/CurlEasyHandleWrapper.cpp
+index bd3500f..cc57a6c 100644
+--- a/AVSCommon/Utils/src/LibcurlUtils/CurlEasyHandleWrapper.cpp
++++ b/AVSCommon/Utils/src/LibcurlUtils/CurlEasyHandleWrapper.cpp
+@@ -152,6 +152,9 @@ bool CurlEasyHandleWrapper::setTransferType(TransferType type) {
+         case TransferType::kPUT:
+             ret = setopt(CURLOPT_UPLOAD, 1L);
+             break;
++        case TransferType::kDELETE:
++            ret = setopt(CURLOPT_CUSTOMREQUEST, "DELETE");
++            break;
+     }
+     return ret;
+ }
+diff --git a/AVSCommon/Utils/src/LibcurlUtils/HttpDelete.cpp b/AVSCommon/Utils/src/LibcurlUtils/HttpDelete.cpp
+new file mode 100644
+index 0000000..6cbec7b
+--- /dev/null
++++ b/AVSCommon/Utils/src/LibcurlUtils/HttpDelete.cpp
+@@ -0,0 +1,174 @@
++/*
++ * Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License").
++ * You may not use this file except in compliance with the License.
++ * A copy of the License is located at
++ *
++ *     http://aws.amazon.com/apache2.0/
++ *
++ * or in the "license" file accompanying this file. This file is distributed
++ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied. See the License for the specific language governing
++ * permissions and limitations under the License.
++ */
++
++#include <cstdlib>
++#include <cstring>
++#include <vector>
++
++#include <AVSCommon/Utils/LibcurlUtils/CallbackData.h>
++#include <AVSCommon/Utils/LibcurlUtils/HttpResponseCodes.h>
++#include <AVSCommon/Utils/LibcurlUtils/HttpDelete.h>
++#include <AVSCommon/Utils/Logger/Logger.h>
++
++namespace alexaClientSDK {
++namespace avsCommon {
++namespace utils {
++namespace libcurlUtils {
++
++using namespace alexaClientSDK::avsCommon::utils;
++
++/// String to identify log entries originating from this file.
++static const std::string TAG("HttpDelete");
++
++/**
++ * Create a LogEntry using this file's TAG and the specified event string.
++ *
++ * @param The event string for this @c LogEntry.
++ */
++#define LX(event) alexaClientSDK::avsCommon::utils::logger::LogEntry(TAG, event)
++
++/**
++ * Write callback function used for CURLOPT_WRITEFUNCTION option in libcurl
++ */
++static size_t writeCallback(char* dataBuffer, size_t blockSize, size_t numBlocks, void* dataStream);
++
++#ifdef ACSDK_EMIT_SENSITIVE_LOGS
++/**
++ * Debug callback function used for CURLOPT_DEBUGFUNCTION option in libcurl
++ */
++static int debugCallback(CURL* handle, curl_infotype infoType, char* dataBuffer, size_t blockSize, void* dataStream);
++#endif
++
++std::unique_ptr<HttpDelete> HttpDelete::create() {
++    std::unique_ptr<HttpDelete> httpDelete(new HttpDelete());
++    if (httpDelete->m_curl.isValid()) {
++        return httpDelete;
++    }
++    return nullptr;
++}
++
++HTTPResponse HttpDelete::doDelete(const std::string& url, const std::vector<std::string>& headers ) {
++    std::lock_guard<std::mutex> lock(m_mutex);
++    const std::string errorEvent = "doDeleteFailed";
++    const std::string errorReasonKey = "reason";
++    HTTPResponse httpResponse;
++
++    if (!m_curl.reset()) {
++        ACSDK_ERROR(LX(errorEvent).d(errorReasonKey, "unableToResetCurlHandle"));
++        return httpResponse;
++    }
++
++    if (!m_curl.setURL(url)) {
++        ACSDK_ERROR(LX(errorEvent).d(errorReasonKey, "unableToSetUrl"));
++        return httpResponse;
++    }
++
++    if (!m_curl.setTransferType(CurlEasyHandleWrapper::TransferType::kDELETE)) {
++        ACSDK_ERROR(LX(errorEvent).d(errorReasonKey, "unableToSetHttpRequestType"));
++        return httpResponse;
++    }
++
++    for (auto header : headers) {
++        if (!m_curl.addHTTPHeader(header)) {
++            ACSDK_ERROR(LX(errorEvent).d(errorReasonKey, "unableToAddHttpHeader"));
++            return httpResponse;
++        }
++    }
++
++    CallbackData responseData;
++    if (!m_curl.setWriteCallback(writeCallback, &responseData)) {
++        ACSDK_ERROR(LX(errorEvent).d(errorReasonKey, "unableToSetWriteCallback"));
++        return httpResponse;
++    }
++
++#ifdef ACSDK_EMIT_SENSITIVE_LOGS
++    CallbackData debugData;
++    if (!m_curl.setDebugCallback(debugCallback, &debugData)) {
++        ACSDK_INFO(LX("doDeleteWarning").d(errorReasonKey, "unableToSetDebugCallback"));
++    }
++#endif
++
++    CURLcode curlResult = m_curl.perform();
++    if (curlResult != CURLE_OK) {
++        ACSDK_ERROR(
++            LX(errorEvent).d(errorReasonKey, "curlFailedWithCode: " + std::string(curl_easy_strerror(curlResult))));
++        return httpResponse;
++    }
++
++    size_t responseSize = responseData.getSize();
++    if (responseSize > 0) {
++        std::vector<char> responseBody(responseSize + 1, 0);
++        responseData.getData(responseBody.data(), responseSize);
++        httpResponse.body = std::string(responseBody.data());
++    } else {
++        httpResponse.body = "";
++    }
++    httpResponse.code = m_curl.getHTTPResponseCode();
++
++    return httpResponse;
++}
++
++size_t writeCallback(char* dataBuffer, size_t blockSize, size_t numBlocks, void* dataStream) {
++    if (!dataStream) {
++        ACSDK_ERROR(LX("writeCallbackFailed").d("reason", "nullDataStream"));
++        return 0;
++    }
++
++    size_t realSize = blockSize * numBlocks;
++    CallbackData* callbackData = reinterpret_cast<CallbackData*>(dataStream);
++
++    return callbackData->appendData(dataBuffer, realSize);
++}
++
++#ifdef ACSDK_EMIT_SENSITIVE_LOGS
++int debugCallback(CURL* handle, curl_infotype infoType, char* dataBuffer, size_t blockSize, void* dataStream) {
++    std::string sectionHeader;
++    switch (infoType) {
++        case CURLINFO_TEXT:
++            sectionHeader = "Information";
++            break;
++        case CURLINFO_HEADER_OUT:
++            sectionHeader = "RequestHeader";
++            break;
++        case CURLINFO_DATA_OUT:
++            sectionHeader = "RequestBody";
++            break;
++        case CURLINFO_SSL_DATA_OUT:
++            sectionHeader = "RequestSSLData";
++            break;
++        case CURLINFO_HEADER_IN:
++            sectionHeader = "ResponseHeader";
++            break;
++        case CURLINFO_DATA_IN:
++            sectionHeader = "ResponseBody";
++            break;
++        case CURLINFO_SSL_DATA_IN:
++            sectionHeader = "ResponseSSLData";
++            break;
++        default:
++            return 0;
++    }
++
++    sectionHeader = sectionHeader + "(" + std::to_string(blockSize) + " " + (blockSize == 1 ? "byte" : "bytes") + ")";
++    ACSDK_DEBUG9(LX("httpDeleteData").d(sectionHeader, dataBuffer));
++
++    return 0;
++}
++#endif
++
++}  // namespace libcurlUtils
++}  // namespace utils
++}  // namespace avsCommon
++}  // namespace alexaClientSDK
+diff --git a/AVSCommon/Utils/src/LibcurlUtils/HttpGet.cpp b/AVSCommon/Utils/src/LibcurlUtils/HttpGet.cpp
+new file mode 100644
+index 0000000..f081dd4
+--- /dev/null
++++ b/AVSCommon/Utils/src/LibcurlUtils/HttpGet.cpp
+@@ -0,0 +1,174 @@
++/*
++ * Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License").
++ * You may not use this file except in compliance with the License.
++ * A copy of the License is located at
++ *
++ *     http://aws.amazon.com/apache2.0/
++ *
++ * or in the "license" file accompanying this file. This file is distributed
++ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied. See the License for the specific language governing
++ * permissions and limitations under the License.
++ */
++
++#include <cstdlib>
++#include <cstring>
++#include <vector>
++
++#include <AVSCommon/Utils/LibcurlUtils/CallbackData.h>
++#include <AVSCommon/Utils/LibcurlUtils/HttpResponseCodes.h>
++#include <AVSCommon/Utils/LibcurlUtils/HttpGet.h>
++#include <AVSCommon/Utils/Logger/Logger.h>
++
++namespace alexaClientSDK {
++namespace avsCommon {
++namespace utils {
++namespace libcurlUtils {
++
++using namespace alexaClientSDK::avsCommon::utils;
++
++/// String to identify log entries originating from this file.
++static const std::string TAG("HttpGet");
++
++/**
++ * Create a LogEntry using this file's TAG and the specified event string.
++ *
++ * @param The event string for this @c LogEntry.
++ */
++#define LX(event) alexaClientSDK::avsCommon::utils::logger::LogEntry(TAG, event)
++
++/**
++ * Write callback function used for CURLOPT_WRITEFUNCTION option in libcurl
++ */
++static size_t writeCallback(char* dataBuffer, size_t blockSize, size_t numBlocks, void* dataStream);
++
++#ifdef ACSDK_EMIT_SENSITIVE_LOGS
++/**
++ * Debug callback function used for CURLOPT_DEBUGFUNCTION option in libcurl
++ */
++static int debugCallback(CURL* handle, curl_infotype infoType, char* dataBuffer, size_t blockSize, void* dataStream);
++#endif
++
++std::unique_ptr<HttpGet> HttpGet::create() {
++    std::unique_ptr<HttpGet> httpGet(new HttpGet());
++    if (httpGet->m_curl.isValid()) {
++        return httpGet;
++    }
++    return nullptr;
++}
++
++HTTPResponse HttpGet::doGet(const std::string& url, const std::vector<std::string>& headers ) {
++    std::lock_guard<std::mutex> lock(m_mutex);
++    const std::string errorEvent = "doGetFailed";
++    const std::string errorReasonKey = "reason";
++    HTTPResponse httpResponse;
++
++    if (!m_curl.reset()) {
++        ACSDK_ERROR(LX(errorEvent).d(errorReasonKey, "unableToResetCurlHandle"));
++        return httpResponse;
++    }
++
++    if (!m_curl.setURL(url)) {
++        ACSDK_ERROR(LX(errorEvent).d(errorReasonKey, "unableToSetUrl"));
++        return httpResponse;
++    }
++
++    if (!m_curl.setTransferType(CurlEasyHandleWrapper::TransferType::kGET)) {
++        ACSDK_ERROR(LX(errorEvent).d(errorReasonKey, "unableToSetHttpRequestType"));
++        return httpResponse;
++    }
++
++    for (auto header : headers) {
++        if (!m_curl.addHTTPHeader(header)) {
++            ACSDK_ERROR(LX(errorEvent).d(errorReasonKey, "unableToAddHttpHeader"));
++            return httpResponse;
++        }
++    }
++
++    CallbackData responseData;
++    if (!m_curl.setWriteCallback(writeCallback, &responseData)) {
++        ACSDK_ERROR(LX(errorEvent).d(errorReasonKey, "unableToSetWriteCallback"));
++        return httpResponse;
++    }
++
++#ifdef ACSDK_EMIT_SENSITIVE_LOGS
++    CallbackData debugData;
++    if (!m_curl.setDebugCallback(debugCallback, &debugData)) {
++        ACSDK_INFO(LX("doGetWarning").d(errorReasonKey, "unableToSetDebugCallback"));
++    }
++#endif
++
++    CURLcode curlResult = m_curl.perform();
++    if (curlResult != CURLE_OK) {
++        ACSDK_ERROR(
++            LX(errorEvent).d(errorReasonKey, "curlFailedWithCode: " + std::string(curl_easy_strerror(curlResult))));
++        return httpResponse;
++    }
++
++    size_t responseSize = responseData.getSize();
++    if (responseSize > 0) {
++        std::vector<char> responseBody(responseSize + 1, 0);
++        responseData.getData(responseBody.data(), responseSize);
++        httpResponse.body = std::string(responseBody.data());
++    } else {
++        httpResponse.body = "";
++    }
++    httpResponse.code = m_curl.getHTTPResponseCode();
++
++    return httpResponse;
++}
++
++size_t writeCallback(char* dataBuffer, size_t blockSize, size_t numBlocks, void* dataStream) {
++    if (!dataStream) {
++        ACSDK_ERROR(LX("writeCallbackFailed").d("reason", "nullDataStream"));
++        return 0;
++    }
++
++    size_t realSize = blockSize * numBlocks;
++    CallbackData* callbackData = reinterpret_cast<CallbackData*>(dataStream);
++
++    return callbackData->appendData(dataBuffer, realSize);
++}
++
++#ifdef ACSDK_EMIT_SENSITIVE_LOGS
++int debugCallback(CURL* handle, curl_infotype infoType, char* dataBuffer, size_t blockSize, void* dataStream) {
++    std::string sectionHeader;
++    switch (infoType) {
++        case CURLINFO_TEXT:
++            sectionHeader = "Information";
++            break;
++        case CURLINFO_HEADER_OUT:
++            sectionHeader = "RequestHeader";
++            break;
++        case CURLINFO_DATA_OUT:
++            sectionHeader = "RequestBody";
++            break;
++        case CURLINFO_SSL_DATA_OUT:
++            sectionHeader = "RequestSSLData";
++            break;
++        case CURLINFO_HEADER_IN:
++            sectionHeader = "ResponseHeader";
++            break;
++        case CURLINFO_DATA_IN:
++            sectionHeader = "ResponseBody";
++            break;
++        case CURLINFO_SSL_DATA_IN:
++            sectionHeader = "ResponseSSLData";
++            break;
++        default:
++            return 0;
++    }
++
++    sectionHeader = sectionHeader + "(" + std::to_string(blockSize) + " " + (blockSize == 1 ? "byte" : "bytes") + ")";
++    ACSDK_DEBUG9(LX("httpGetData").d(sectionHeader, dataBuffer));
++
++    return 0;
++}
++#endif
++
++}  // namespace libcurlUtils
++}  // namespace utils
++}  // namespace avsCommon
++}  // namespace alexaClientSDK
+-- 
+2.14.3 (Apple Git-98)
+

@@ -2,6 +2,63 @@
 
 ___
 
+## v1.3.0 released on 2018-11-20:
+
+### Enhancements
+
+Alexa Auto SDK now includes the following features and enhancements:
+
+* Android 8 and ARM v8a platform support.
+* Making calls to contacts from a locally paired mobile phone as long as the Alexa Auto SDK has a valid auth token. Read more about [Contact Uploader API](./modules/contact-uploader/README.md).
+* Redial, answer, terminate and decline calls using voice. End users can also send dual-tone multi-frequency (DTMF) via voice to interact with Interactive Voice Responders (IVRs). Read more here [Phone Call Controller](./modules/phone-control/README.md).
+* Switching to local media sources, generic controls and deep linking into 3rd party media applications compatible with the Amazon Media App Command and Control (MACC) specification using the External Media Player Interface 1.1. This allows customers to switch between  a CD player, AM/ FM player  and auxiliary input that is MACC compliant. Read more here [Handling External Media Adapter with MACCAndroidClient](./platforms/android/ALEXA.md#handlingexternalmediaadapterwithmaccandroidclient).  
+* Enhancement for 3rd party wake word engine to enable cloud based verification.
+* Provides a way to override Template Runtime display card timeout values for RenderTemplate and RenderPlayerInfo by updating the [templateRuntimeCapabilityAgent Engine configuration](https://alexa.github.io/aac-sdk/modules/core/#configuring-the-engine) values.
+
+### Resolved Issues
+
+No resolved issues.
+
+### Known Issues
+
+* The Alexa Auto SDK does not re-discover Media Apps Command and Control (MACC) compliant apps if they are unresponsive after being idle for a long period  (around 30 minutes).
+* The Alexa Auto SDK Engine becomes unresponsive if it receives PLAY directive during shutdown. However since shutdown is triggered when car ignition is turned off, there is not direct customer impact expected.
+* When a timer sounds during an Alexa to Alexa call, uttering "stop" ends the call not the timer.
+* Multiple automotive devices using the same account at the same time, can access contacts from phones paired across those devices.
+
+## v1.2.0 released on 2018-10-15:
+
+### Enhancements
+
+* Additional information related to the presentation of alerts is now available. The extended interface now includes Alert token, type, rendering time, and label if applicable when an alert is set and notification when an alert is deleted.
+* In the Navigation platform interface, ```SetDestination``` now provides business hours and contact information for a returned location when available.
+
+### Resolved Issues
+
+* If a location is not available, the location state is set to ```unavailable```. Previously it was treated as ```(0,0)``` which was a valid value for longitude and latitude.
+* Fixed an issue related to stopping an alert where there could be up to a 10 second delay before the alert completely stopped.
+* Fixed issue where the ```TemplateRuntime``` platform interface could not be registered before ```AudioPlayer```.
+
+### Known Issues
+
+There are no known issues in this release.
+
+## v1.1.1 released on 2018-09-10:
+
+### Enhancements
+
+This release is for bug fixes only. There are no new features or enhancements.
+
+### Resolved Issues
+
+Issues fixed in this release:
+
+* Update a dependency build recipe to skip the checksum verification to allow for document changes in the current tag.
+
+### Known Issues
+
+There are no known issues in this release.
+
 ## v1.1.0 released on 2018-08-31:
 
 ### Enhancements

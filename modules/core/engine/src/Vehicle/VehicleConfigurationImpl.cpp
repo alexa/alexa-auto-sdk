@@ -25,7 +25,7 @@ namespace vehicle {
 namespace config {
 
 // String to identify log entries originating from this file.
-static const std::string TAG("aace.alexa.config.AlexaConfiguationImpl");
+static const std::string TAG("aace.vehicle.config.VehicleConfiguationImpl");
 
 // VehicleProperty alias
 using VehiclePropertyType = aace::vehicle::config::VehicleConfiguration::VehiclePropertyType;
@@ -44,7 +44,9 @@ std::string getVehiclePropertyAttribute( VehiclePropertyType property )
         case VehiclePropertyType::HARDWARE_ARCH: return "arch";
         case VehiclePropertyType::LANGUAGE: return "language";
         case VehiclePropertyType::MICROPHONE: return "microphone";
+        case VehiclePropertyType::COUNTRY_LIST: return "countries";
     }
+    
     return "";
 }
 
@@ -74,6 +76,27 @@ std::shared_ptr<aace::core::config::EngineConfiguration> VehicleConfiguration::c
 
     document.Accept( writer );
     
+    return aace::core::config::StreamConfiguration::create( std::make_shared<std::stringstream>( buffer.GetString() ) );
+}
+
+std::shared_ptr<aace::core::config::EngineConfiguration> VehicleConfiguration::createOperatingCountryConfig( const std::string &operatingCountry )
+{
+    rapidjson::Document document;
+
+    document.SetObject();
+
+    rapidjson::Value aaceVehicleNode( rapidjson::kObjectType );
+
+    aaceVehicleNode.AddMember( "operatingCountry", rapidjson::Value().SetString( operatingCountry.c_str(), operatingCountry.length() ), document.GetAllocator() );
+
+    document.AddMember( "aace.vehicle", aaceVehicleNode, document.GetAllocator() );
+
+    // create event string
+    rapidjson::StringBuffer buffer;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer( buffer );
+
+    document.Accept( writer );
+
     return aace::core::config::StreamConfiguration::create( std::make_shared<std::stringstream>( buffer.GetString() ) );
 }
 

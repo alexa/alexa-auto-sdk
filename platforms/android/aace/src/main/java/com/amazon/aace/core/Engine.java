@@ -15,7 +15,6 @@
 
 package com.amazon.aace.core;
 
-import com.amazon.aace.communication.AlexaCommsModule;
 import com.amazon.aace.core.config.EngineConfiguration;
 
 /**
@@ -28,11 +27,6 @@ public class Engine extends PlatformInterface
     static {
         // Used to load the 'aace-lib' library on initialization
         System.loadLibrary( "aace-lib" );
-        if (AlexaCommsModule.isEnabled()) {
-            // AlexaCommsLib relies upon JNI OnLoad callback to initialize itself
-            // hence the explicit load of the lib here
-            System.loadLibrary("AlexaCommsLib");
-        }
     }
 
     /**

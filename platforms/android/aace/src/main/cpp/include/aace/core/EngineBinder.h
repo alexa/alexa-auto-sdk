@@ -41,6 +41,8 @@
 #include "aace/alexa/AlertsBinder.h"
 #include "aace/alexa/PlaybackControllerBinder.h"
 #include "aace/alexa/NotificationsBinder.h"
+#include "aace/alexa/ExternalMediaAdapterBinder.h"
+#include "aace/alexa/LocalMediaSourceBinder.h"
 
 #ifdef INCLUDE_ALEXA_COMMS_MODULE
 #include "aace/communication/AlexaCommsBinder.h"
@@ -49,6 +51,8 @@
 #include "aace/navigation/NavigationBinder.h"
 
 #include "aace/phonecontrol/PhoneCallControllerBinder.h"
+
+#include "aace/contactuploader/ContactUploaderBinder.h"
 
 #include "aace/network/NetworkInfoProviderBinder.h"
 
@@ -71,8 +75,16 @@ private:
 
     std::shared_ptr<AlexaClientBinder> createAlexaClientBinder( JNIEnv* env, jobject platformInterface );
     std::shared_ptr<AuthProviderBinder> createAuthProviderBinder( JNIEnv* env, jobject platformInterface );
-    std::shared_ptr<MediaPlayerBinder> createMediaPlayerBinder( JNIEnv* env, jobject platformInterface );
-    std::shared_ptr<SpeakerBinder> createSpeakerBinder( JNIEnv* env, jobject platformInterface );
+    std::shared_ptr<MediaPlayerBinder> createMediaPlayerBinder(
+        JNIEnv* env,
+        jobject platformInterface,
+        const std::string mediaPlayerGetMethodName = "getMediaPlayer");
+    std::shared_ptr<SpeakerBinder> createSpeakerBinder(
+        JNIEnv* env,
+        jobject platformInterface,
+        const std::string speakerGetMethodName = "getSpeaker");
+    std::shared_ptr<ExternalMediaAdapterBinder> createExternalMediaAdapterBinder( JNIEnv* env, jobject platformInterface );
+    std::shared_ptr<LocalMediaSourceBinder> createLocalMediaSourceBinder( JNIEnv* env, jobject platformInterface );
     std::shared_ptr<SpeechRecognizerBinder> createSpeechRecognizerBinder( JNIEnv* env, jobject platformInterface );
     std::shared_ptr<SpeechSynthesizerBinder> createSpeechSynthesizerBinder( JNIEnv* env, jobject platformInterface );
     std::shared_ptr<AudioPlayerBinder> createAudioPlayerBinder( JNIEnv* env, jobject platformInterface );
@@ -87,6 +99,8 @@ private:
 
     std::shared_ptr<PhoneCallControllerBinder> createPhoneCallControllerBinder( JNIEnv* env, jobject platformInterface );
 
+    std::shared_ptr<ContactUploaderBinder> createContactUploaderBinder( JNIEnv* env, jobject platformInterface );
+
 #ifdef INCLUDE_ALEXA_COMMS_MODULE
     std::shared_ptr<AlexaCommsBinder> createAlexaCommsBinder( JNIEnv* env, jobject platformInterface );
 #endif
@@ -100,6 +114,8 @@ private:
     std::shared_ptr<aace::alexa::AuthProvider> m_authProvider;
     std::shared_ptr<aace::alexa::AudioChannel> m_audioChannel;
     std::shared_ptr<aace::alexa::AudioPlayer> m_audioPlayer;
+    std::shared_ptr<aace::alexa::ExternalMediaAdapter> m_externalMediaAdapter;
+    std::shared_ptr<aace::alexa::LocalMediaSource> m_localMediaSource;
     std::shared_ptr<aace::alexa::Notifications> m_notifications;
     std::shared_ptr<aace::alexa::PlaybackController> m_playbackController;
     std::shared_ptr<aace::alexa::SpeechRecognizer> m_speechRecognizer;
@@ -109,6 +125,8 @@ private:
     ClassRef m_javaClass_AlexaClient;
     ClassRef m_javaClass_AudioPlayer;
     ClassRef m_javaClass_AuthProvider;
+    ClassRef m_javaClass_ExternalMediaAdapter;
+    ClassRef m_javaClass_LocalMediaSource;
     ClassRef m_javaClass_Notifications;
     ClassRef m_javaClass_PlaybackController;
     ClassRef m_javaClass_SpeechRecognizer;
@@ -131,6 +149,10 @@ private:
     std::shared_ptr<aace::phoneCallController::PhoneCallController> m_phoneCallController;
     ClassRef m_javaClass_PhoneCallController;
 
+    // com.amazon.contactuploader.*
+    std::shared_ptr<aace::contactUploader::ContactUploader> m_contactUploader;
+    ClassRef m_javaClass_ContactUploader;
+
     // com.amazon.network.*
     std::shared_ptr<aace::network::NetworkInfoProvider> m_networkInfo;
     ClassRef m_javaClass_NetworkInfoProvider;
@@ -140,6 +162,7 @@ private:
     std::shared_ptr<aace::communication::AlexaComms> m_alexaComms;
     ClassRef m_javaClass_AlexaComms;
 #endif // INCLUDE_ALEXA_COMMS_MODULE
+
 };
 
 #endif //AACE_CORE_ENGINE_BINDER_H

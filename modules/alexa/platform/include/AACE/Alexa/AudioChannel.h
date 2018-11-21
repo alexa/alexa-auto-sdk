@@ -35,10 +35,9 @@ namespace alexa {
  * @sa Notifications
  */
 class AudioChannel : public aace::core::PlatformInterface {
-protected:
+public:
     AudioChannel( std::shared_ptr<aace::alexa::MediaPlayer> mediaPlayer, std::shared_ptr<aace::alexa::Speaker> speaker, aace::alexa::Speaker::Type speakerType );
 
-public:
     virtual ~AudioChannel() = default;
 
     /**

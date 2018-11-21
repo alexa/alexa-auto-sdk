@@ -44,6 +44,17 @@ public:
     virtual ~SpeechRecognizer();
 
     /**
+     * Describes type of event that initiated the speech request
+     * @sa @c aace::alexa::SpeechRecognizerEngineInterface::Initiator
+     */
+    using Initiator = SpeechRecognizerEngineInterface::Initiator;
+
+    /*
+     * Defines an unspecified value for the speech recognizers audio index.
+     */
+    static constexpr uint64_t UNSPECIFIED_INDEX = SpeechRecognizerEngineInterface::UNSPECIFIED_INDEX;
+
+    /**
      * Notifies the Engine of a speech recognition event initiated by a press-and-hold action on the 
      * platform. The Engine will call @c startAudioInput() to notify the platform implementation when
      * to start writing audio samples.
@@ -66,6 +77,25 @@ public:
      * @return @c true if the Engine successfully started a recognize event, else @c false
      */
     bool tapToTalk();
+
+    /**
+     * Notifies the Engine of a speech recognition event. The Engine will call @c startAudioInput() to notify 
+     * the platform implementation when to start writing audio samples.
+     *
+     * If the initator type is @c HOLD_TO_TALK, then the platform implementation should call @c stopCapture() 
+     * to terminate speech recognition on release of the press-and-hold action. Otherwise, the Engine will 
+     * terminate the recognize event when end of speech is detected.
+     *
+     * @param [in] initiator The @c Initiator type for the speech recognition event
+     * @param [in] keywordBegin The sample index where the keyword begins. This is required when the
+     * initator type is @c WAKEWORD, otherwise should be set to @c SpeechRecognizer::UNSPECIFIED_INDEX.
+     * @param [in] keywordEnd The sample index where the keyword ends. This is required when the
+     * initator type is @c WAKEWORD, otherwise should be set to @c SpeechRecognizer::UNSPECIFIED_INDEX.
+     * @param [in] keyword The keyword being recognized, e.g. "alexa". This is required when the
+     * initator type is @c WAKEWORD, otherwise should be set to an empty string.
+     * @return @c true if the Engine successfully started a recognize event, else @c false
+     */
+    bool startCapture( Initiator initiator, uint64_t keywordBegin = UNSPECIFIED_INDEX, uint64_t keywordEnd = UNSPECIFIED_INDEX, const std::string& keyword = "" );
 
     /**
      * Notifies the Engine to terminate the current recognize event. The Engine will call @c stopAudioInput()

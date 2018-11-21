@@ -32,11 +32,11 @@ This diagram includes the actual names and syntax for the methods and functions 
 
 ### Tap to Talk Flow Summary
 
-![numberone](./assets/number-1.png) &ensp; The driver pushes the voice button in the car. This specific human action puts Alexa into a listening state. There should be a visual indication to the driver that Alexa is now ready for audio input.  
+1. The driver pushes the voice button in the car. This specific human action puts Alexa into a listening state. There should be a visual indication to the driver that Alexa is now ready for audio input.  
 
-![numbertwo](./assets/number-2.png) &ensp; The car's microphone is now actively receiving voice input and preparing an audio buffer to send to the Alexa Auto SDK Engine. The Alexa Auto SDK Engine audio input function loops until a directive is returned indicating that the audio input has finished.  
+1. The car's microphone is now actively receiving voice input and preparing an audio buffer to send to the Alexa Auto SDK Engine. The Alexa Auto SDK Engine audio input function loops until a directive is returned indicating that the audio input has finished.  
 
-![numberthree](./assets/number-3.png) &ensp; A visual indication should be displayed on the head unit screen indicating that Alexa is in a thinking state. In this state, Alexa is processing the input buffer and creating an appropriate response type. In this example Alexa is creating an audio out file that is sent to the cars head unit to play.  
+1. A visual indication should be displayed on the head unit screen indicating that Alexa is in a thinking state. In this state, Alexa is processing the input buffer and creating an appropriate response type. In this example Alexa is creating an audio out file that is sent to the cars head unit to play.  
 
 ## Wake Word Enabled Sequence Diagram<a id="wakewordenabled"></a>
 
@@ -50,6 +50,10 @@ This diagram includes the actual names and syntax for the methods and functions 
 
 ### Wake Word Enabled Flow Summary
 
-![numberone](./assets/number-1.png) &ensp; Alexa recognizes the wake word and starts building an audio data buffer until the audio request is complete.  
+1. ```startAudioInput()``` is called when wake word detection is enabled. This occurs when the Engine is started if wake word is enabled by default, or when ```enabledWakewordDetection()``` is explicitly called by the application. When this happens, the application must start sending audio samples from the microphone to the Engine.
 
-![numbertwo](./assets/number-2.png) &ensp; Once the audio request is complete, a thinking state voice chrome should be displayed.  
+1. Audio is processed locally by the wake word engine until the wake word is detected. Once the wake word is detected, the Engine notifies the application that the dialog state has changed to "listening" and initiates a Recognize event with Alexa.
+
+1. While in the listening state, audio data is sent to Alexa until the end of speech is detected. Once the end of speech is detected, Alexa sends a ```StopCapture``` directive to the Engine and the dialog state is changed to "thinking." Alexa then respond with additional directives in response to the speech request.
+
+1. The application should continue to send audio to the Engine until ```stopAudioInput()``` is received. When wake word is enabled, this happens when the Engine is stopped, or when ```disableWakewordDetection()``` is explicitly called by the application.

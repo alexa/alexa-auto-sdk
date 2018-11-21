@@ -1,0 +1,76 @@
+From eb86c086fb9c223f9b06b2cca081ad2abfdafc64 Mon Sep 17 00:00:00 2001
+From: Brook Nichols <broonich@amazon.com>
+Date: Wed, 14 Nov 2018 21:58:18 +0000
+Subject: [PATCH] hotfix to override publish capabilities check
+
+---
+ .../CapabilitiesDelegate/CapabilitiesDelegate.h   |  6 ++++++
+ CapabilitiesDelegate/src/CapabilitiesDelegate.cpp | 15 ++++++++++++++-
+ 2 files changed, 20 insertions(+), 1 deletion(-)
+
+diff --git a/CapabilitiesDelegate/include/CapabilitiesDelegate/CapabilitiesDelegate.h b/CapabilitiesDelegate/include/CapabilitiesDelegate/CapabilitiesDelegate.h
+index 2e04830..a9481a0 100644
+--- a/CapabilitiesDelegate/include/CapabilitiesDelegate/CapabilitiesDelegate.h
++++ b/CapabilitiesDelegate/include/CapabilitiesDelegate/CapabilitiesDelegate.h
+@@ -99,6 +99,9 @@ public:
+     void clearData() override;
+     /// @}
+ 
++    // publish capabilities again in case of new client login to same device
++    void setCapabilitiesPublishOverride( bool overriden ); 
++
+ private:
+     /**
+      * CapabilitiesDelegate constructor.
+@@ -283,6 +286,9 @@ private:
+     /// To indicate if CapabilitiesDelegate is being shutdown
+     bool m_isCapabilitiesDelegateShutdown;
+ 
++    /// To indicate if CapabilitiesDelegate should publish anyway ( in case of same capabilities with new user account )
++    bool m_capabilitiesDelegatePublishOverride;
++
+     /// Used to let CapabilitiesDelegate know that it no longer needs to wait to publish.
+     std::condition_variable m_publishWaitDone;
+ 
+diff --git a/CapabilitiesDelegate/src/CapabilitiesDelegate.cpp b/CapabilitiesDelegate/src/CapabilitiesDelegate.cpp
+index 4848204..0eea67a 100644
+--- a/CapabilitiesDelegate/src/CapabilitiesDelegate.cpp
++++ b/CapabilitiesDelegate/src/CapabilitiesDelegate.cpp
+@@ -379,7 +379,8 @@ CapabilitiesDelegate::CapabilitiesDelegate(
+         m_httpPut{httpPut},
+         m_deviceInfo{deviceInfo},
+         m_currentAuthState{AuthObserverInterface::State::UNINITIALIZED},
+-        m_isCapabilitiesDelegateShutdown{false} {
++        m_isCapabilitiesDelegateShutdown{false},
++        m_capabilitiesDelegatePublishOverride{false} {
+ }
+ 
+ void CapabilitiesDelegate::doShutdown() {
+@@ -1040,6 +1041,11 @@ void CapabilitiesDelegate::getPreviouslySentCapabilitiesPublishData() {
+ bool CapabilitiesDelegate::isCapabilitiesPublishDataDifferent() {
+     getPreviouslySentCapabilitiesPublishData();
+ 
++    // explicitly set overidden
++    if ( m_capabilitiesDelegatePublishOverride ) {
++        return true;
++    }
++
+     if ((!m_previousDeviceInfo) || (*m_previousDeviceInfo != *m_deviceInfo)) {
+         return true;
+     }
+@@ -1157,5 +1163,12 @@ bool CapabilitiesDelegate::saveCapabilitiesPublishData() {
+     return true;
+ }
+ 
++void CapabilitiesDelegate::setCapabilitiesPublishOverride( bool overriden ) {
++    ACSDK_DEBUG0(LX("setCapabilitiesPublishOverride")
++                   .m("overriding capabilities publish"));
++    if (overriden) m_capabilitiesState = CapabilitiesObserverInterface::State::UNINITIALIZED;
++    m_capabilitiesDelegatePublishOverride = overriden;
++}
++
+ }  // namespace capabilitiesDelegate
+ }  // namespace alexaClientSDK
+-- 
+2.17.0
+

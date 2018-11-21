@@ -26,6 +26,8 @@ class SpeechRecognizerBinder : public PlatformInterfaceBinder, public aace::alex
 public:
     SpeechRecognizerBinder( bool wakewordDetectionEnabled );
 
+    aace::alexa::SpeechRecognizer::Initiator convertInitiator( JNIEnv* env, jobject obj );
+
 protected:
     void initialize( JNIEnv* env ) override;
 
@@ -40,6 +42,11 @@ private:
     jmethodID m_javaMethod_endOfSpeechDetected = nullptr;
     jmethodID m_javaMethod_startAudioInput = nullptr;
     jmethodID m_javaMethod_stopAudioInput = nullptr;
+
+    // Initiator
+    ObjectRef m_enum_Initiator_HOLD_TO_TALK;
+    ObjectRef m_enum_Initiator_TAP_TO_TALK;
+    ObjectRef m_enum_Initiator_WAKEWORD;
 };
 
 #endif //AACE_ALEXA_SPEECH_RECOGNIZER_BINDER_H

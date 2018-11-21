@@ -178,6 +178,21 @@ To implement a custom handler for alerts, the `aace::alexa::Alerts` class should
       //handle the alert state change
     }
     ...
+    void MyAlerts::alertCreated( const std::string& alertToken, const std::string& detailedInfo ) override {
+      //handle the alert detailed info when alert is created (optional)
+      /*
+		* JSON string detailedInfo :
+		* {	
+		*	 "time" : <String>
+		*	 "type" : <String>
+		*	 "label" : <String>	
+		* }
+		*/
+    }
+    void MyAlerts::alertDeleted( const std::string& alertToken ) override {
+      //handle the alert when alert is deleted (optional)
+    }
+
 
     // Configure the Engine
 
@@ -323,6 +338,97 @@ To implement a custom handler for the playback controller, the `aace::alexa::Pla
 
     // Configure the Engine
     engine->registerPlatformInterface( std::make_shared<MyPlaybackController>() );
+    
+### Handling Local Media Sources 
+
+The Local Media Source allows the platform to declare and use local media sources such as radio, bluetooth, compact disc, or line in.
+Each local media source should be registered using the corresponding local Media source type. This will allow AVS to excercise playback control over that source type. The cloud will authorize a registered Local Media Source, and if successful that source will be controllable via Alexa voice interaction. Currently, the interactions are sent to the `playControl` method. Below is an example of a CD player local media source implementation. 
+
+```
+	#include <AACE/Alexa/LocalMediaSource.h>
+    class MyCDLocalMediaSource : public aace::alexa:: LocalMediaSource {	
+    public:
+		MyCDLocalMediaSource( LocalMedidaSource::Source source, std::shared_ptr<MyCDSpeaker> speaker){
+	 		m_source = source;
+			m_speaker = speaker;
+		}; 
+		...
+		  
+		bool authorize( boolean authorized ) override {
+			// if true, CD playersource was authorized by cloud
+			m_authorized = authorized; // save auth state
+		...
+		bool play( std::string payload ) override {
+		// currently not used. may be used in future to handle play initiation
+		...
+      		
+  		bool playControl( PlayControlType controlType ) override {
+  			if ( m_authorized ) {
+				setFocus();
+				// handle the control type appropriately for CD player
+				return true;
+		...
+		bool seek( long offset ) override {
+			if ( m_authorized ) {
+				// handle seeking CD player
+		...
+		LocalMediaSourceState getState() override {
+			LocalMediaSourceState stateToReturn = std::make_shared<LocalMediaSourceState>();
+			stateToReturn.playbackState.albumName = "mock albumName";
+			... // fill in all required state information (see below)
+			return stateToReturn;
+ 
+// Configure the Engine
+	auto myCDSpeaker = std::make_shared<MyCDSpeaker>(...);
+    engine->registerPlatformInterface( std::make_shared<MyLocalMediaSource>(LocalMedidaSource::Source::COMPACT_DISC, myCDSpeaker) );
+```
+
+The platform implementation should create it's own speaker, and can be used to listen to volume control directives. It need not specify an AVS Speaker type. 
+
+The following table describes the possible values for `LocalMediaSourceState`, and additional details. 
+
+| State        | Type           | Notes  |
+| ------------- |:-------------:| -----:|
+| **PlaybackState**      | 
+| state      | String        |   "IDLE/STOPPED/PLAYING" required |
+| supportedOperations | SupportedOperations[] | (see SupportedOperation) required |
+| trackOffset      | long  |   optional |
+| shuffleEnabled      | boolean       |   optional |
+| repeatEnabled      | boolean       |   optional |
+| favorites      | Favorites  |   {FAVORITED/UNFAVORITED/NOT_RATED} optional  |
+| type      | String  |   "ExternalMediaPlayerMusicItem" required |
+| playbackSource      | String       |   If available else use local player name. optional|
+| playbackSourceId      | String  |   empty |
+| trackName      | String   |   If available else use local player name. optional |
+| trackId      | String    |   empty |
+| trackNumber      | String   |  optional |
+| artistName      | String    |  optional |
+| artistId      | String   |   empty |
+| albumName      | String |   optional |
+| albumId      | String |   empty |
+| tinyURL      | String |   optional |
+| smallURL      | String |   optional |
+| mediumURL      | String |   optional |
+| largeURL      | String |   optional |
+| coverId      | String  |   empty |
+| mediaProvider      | String  |   optional |
+| mediaType      | MediaType |   {TRACK, PODCAST, STATION, AD, SAMPLE, OTHER} optional |
+| duration      | long  |   optional |
+| **SessionsState** | 
+| endpointId      | String  |   empty |
+| loggedIn      | boolean  |   empty |
+| userName      | String  |   empty |
+| isGuest      | boolean  |   empty |
+| launched      | boolean  |   empty |
+| active      | boolean  |   empty |
+| accessToken      | String  |   empty |
+| tokenRefreshInterval      | long  |   empty |
+| playerCookie      | String  |   A player may declare arbitrary information for itself. optional |
+| spiVersion      | String  |   "1.0" required  |
+
+### Using External Media Adapter to handle external media apps
+
+The External Media Adapter allows the platform to declare and use external media application sources such as Spotify. Each External media adapter should be registered and implemented along with it's associated external client. On startup, discovery must be run in order to validate each external media application. This will allow AVS to excercise playback control over that source type. Currently this feature is only officially supported on the Android platform. 
 
 ## Alexa Engine Properties
 

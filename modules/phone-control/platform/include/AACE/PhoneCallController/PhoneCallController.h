@@ -17,6 +17,8 @@
 #define AACE_PHONECALLCONTROLLER_PHONECALLCONTROLLER_H
 
 #include <string>
+#include <unordered_map>
+
 #include "AACE/Core/PlatformInterface.h"
 #include "PhoneCallControllerEngineInterfaces.h"
 
@@ -26,9 +28,10 @@ namespace aace {
 namespace phoneCallController {
 
 /**
- * PhoneCallController should be extended to handle directives to initiate a phone call
- * on a calling device (e.g. mobile phone). It also provides interfaces for notifying the Engine 
- * of the state of a call session and the state of platform connection to the calling device.
+ * PhoneCallController should be extended to allow a user to use Alexa to interact with a calling device 
+ * such as a connected mobile phone. It provides interfaces for controlling inbound and outbound calls
+ * and for notifying the Engine of the state of a call session and the state of platform connection 
+ * to a calling device.
  *
  * The platform implementation is responsible for managing the lifecycle and user experience of a call session
  * and connection to the calling device.
@@ -37,90 +40,205 @@ class PhoneCallController : public aace::core::PlatformInterface {
 protected:
     PhoneCallController() = default;
 
-public: 
+public:
 
     /**
-     * Specifies the state of connection to a calling device.
-     * @sa @c aace::phoneCallController::PhoneCallControllerEngineInterface::ConnectionState
+     * Describes the state of connection to a calling device
      */
     using ConnectionState = aace::phoneCallController::PhoneCallControllerEngineInterface::ConnectionState;
+
+    /**
+     * Describes the state of a call
+     */
+    using CallState = aace::phoneCallController::PhoneCallControllerEngineInterface::CallState;
+
+    /**
+     * Describes a configuration property of a connected calling device
+     */
+    using CallingDeviceConfigurationProperty = aace::phoneCallController::PhoneCallControllerEngineInterface::CallingDeviceConfigurationProperty;
+
+    /**
+     * Describes an error for a failed call
+     */
+    using CallError = aace::phoneCallController::PhoneCallControllerEngineInterface::CallError;
+
+    /** 
+     * Describes an error preventing a DTMF signal from being delivered
+     */
+    using DTMFError = aace::phoneCallController::PhoneCallControllerEngineInterface::DTMFError;
 
     virtual ~PhoneCallController();
 
     /**
-     * Notifies the platform implementation to initiate an outgoing phone call to a destination address
+     * Notifies the platform implementation to initiate an outgoing phone call
+     * to the destination address
      * 
-     * @param [in] payload Details of the outgoing call in structured JSON format. See the following
+     * @param [in] payload Details of the dial request in structured JSON format. See the following
      * payload structure and the description of each field:
-     * @code{.json})
+     * @code{.json}
      *  {
      *     "callId": "{{STRING}}",
      *     "callee": {
      *       "details": "{{STRING}}",
-     *       "defaultAddress": {
+     *       "defaultContactAddress": {
      *         "protocol": "{{STRING}}",
      *         "format": "{{STRING}}",
      *         "value": "{{STRING}}"
      *       },
-     *       "alternativeAddresses": [{
+     *       "alternativeContactAddresses": [{
      *         "protocol": "{{STRING}}",
      *         "format": "{{STRING}}",
      *         "value": {{STRING}}
      *       }]
-     *     }
+     *     },
      *   }
      * }
      * @endcode 
      * @li callId (required): A unique identifier for the call
      * @li callee (required): The destination of the outgoing call
      * @li callee.details (optional): Descriptive information about the callee
-     * @li callee.defaultAddress (required): The default address to use for calling the callee
-     * @li callee.alternativeAddresses (optional): An array of alternate addresses for the existing callee
-     * @li address.protocol (required): The protocol for this address of the callee (e.g. PSTN, SIP, H323, etc.)
-     * @li address.format (optional): The format for this address of the callee (e.g. E.164, E.163, E.123, DIN5008, etc.)
+     * @li callee.defaultContactAddress (required): The default address to use for calling the callee
+     * @li callee.alternativeContactAddresses (optional): An array of alternate addresses for the callee
+     * @li address.protocol (required): The protocol for this address of the callee. One of PSTN, SIP, H.323
+     * @li address.format (optional): The format for this address of the callee. One of E.164, E.163, E.123, MICROSOFT, DIN5008, RAW
      * @li address.value (required): The address of the callee.
      *
-     * @return @c true if the platform implementation will initiate the call, 
-     * else @c false
+     * @return @c true if the platform implementation successfully handled the call
      */ 
     virtual bool dial( const std::string& payload ) = 0;
-    
-    /**
-     * Notifies the Engine of a change in connection state of a calling device.
-     */
-    void connectionStateChanged( PhoneCallControllerEngineInterface::ConnectionState state );
 
     /**
-     * Notifies the Engine that a phone call was activated on a calling device.
-     *
-     * @c callActivated() should be called in response to a @c dial() directive in which the platform implementation returned @c true.
-     * @c callId must match the @c callId from the @c dial() payload.
-     *
-     * When the platform implementation calls @c callActivated() for a call initiated outside of the scope of Alexa,
-     * it is responsible for creating a UUID for this call session.
-     *
-     * @param [in] callId The unique identifier for the call
-     */
-    void callActivated( const std::string& callId );
-
-    /**
-     * Notifies the Engine of an error in initiating or maintaining a call on a calling device
+     * Notifies the platform implementation to redial the last called phone number.
      * 
-     * @param [in] callId The unique identifier for the call
-     * @param [in] error An error status code:
-     * @li 4xx range: Validation failure for the input from the @c dial() directive
-     * @li 500: Internal error on the platform unrelated to the cellular network
-     * @li 503: Error on the platform related to the cellular network
+     * After returning @c true, if no stored number is available to be redialed, @c PhoneCallController::callFailed with 
+     * @c CallError::NO_NUMBER_FOR_REDIAL should be called.
+     * 
+     * @param [in] payload Details of the redial request in structured JSON format. See the following
+     * payload structure and the description of each field:
+     * @code{.json}
+     * {
+     *   "callId": "{{STRING}}"
+     * }
+     * @endcode 
+     * @li callId (required): A unique identifier for the call
+     *
+     * @return @c true if the platform implementation successfully handled the call
+     */ 
+    virtual bool redial( const std::string& payload ) = 0;
+
+    /**
+     * Notifies the platform implementation to answer an inbound call
+     * 
+     * @param [in] payload Details of the answer request in structured JSON format. See the following
+     * payload structure and the description of each field:
+     * @code{.json}
+     * {
+     *   "callId": "{{STRING}}",
+     * }
+     * @endcode 
+     * @li callId (required): The unique identifier for the call to answer
+     */  
+    virtual void answer( const std::string& payload ) = 0;
+
+    /**
+     * Notifies the platform implementation to end an ongoing call or stop inbound or outbound call setup
+     * 
+     * @param [in] payload Details of the stop request in structured JSON format. See the following
+     * payload structure and the description of each field:
+     * @code{.json}
+     * {
+     *   "callId": "{{STRING}}"
+     * }
+     * @endcode 
+     * @li callId (required): The unique identifier for the call to be stopped
+     */
+    virtual void stop( const std::string& payload ) = 0;
+
+    /**
+     * Notifies the platform implementation to send a DTMF signal to the calling device
+     * 
+     * @param [in] payload Details of the DTMF request in structured JSON format. See the following
+     * payload structure and the description of each field:
+     * @code{.json}
+     * {
+     *   "callId": "{{STRING}}",
+     *   "signal": "{{STRING}}"
+     * }
+     * @endcode 
+     * @li callId (required): The unique identifier for the call
+     * @li signal (required): The DTMF string to be sent to the calling device associated with the callId
+     */ 
+    virtual void sendDTMF( const std::string& payload ) = 0;
+
+    /**
+     * Notifies the Engine of a change in connection to a calling device
+     * 
+     * @param [in] state The state of connection to a calling device
+     */
+    void connectionStateChanged( ConnectionState state );
+
+    /**
+     * Notifies the Engine of a change in the state of an ongoing call
+     * 
+     * @param [in] state The state of the call
+     * @param [in] callId The unique identifier associated with the call
+     * @param [in] callerId The identifier for a contact. May be included for @c CallState::CALL_RECEIVED
+     */
+    void callStateChanged( CallState state, const std::string& callId, const std::string& callerId = "" );
+
+    /**
+     * Notifies the Engine of an error related to a call
+     * 
+     * @param [in] callId The unique identifier for the call associated with the error
+     * @param [in] code The error type
      * @param [in] message A description of the error
      */
-    void callFailed( const std::string& callId, const std::string& error, const std::string& message = "" );
+    void callFailed( const std::string& callId, CallError code, const std::string& message = "" );
 
     /**
-     * Notifies the Engine that an active call was terminated or an ongoing phone call setup was cancelled
+     * Notifies the Engine that a caller id was received for an inbound call
      * 
-     * @param [in] callId The unique identifier for the call
+     * @param [in] callId The unique identifier for the call associated with the callId
+     * @param [in] callerId The caller's identifier or phone number
      */
-    void callTerminated( const std::string& callId );
+    void callerIdReceived( const std::string& callId, const std::string& callerId );
+
+    /** 
+     * Notifies the Engine that sending the DTMF signal succeeded.
+     * 
+     * @param [in] callId The unique identifier for the associated call
+     * 
+     * @sa PhoneCallController::sendDTMF
+     */
+    void sendDTMFSucceeded( const std::string& callId );
+
+    /** 
+     * Notifies the Engine that the DTMF signal could not be delivered to the remote party
+     * 
+     * @param [in] callId The unique identifier for the associated call
+     * @param [in] code The error type
+     * @param [in] message A description of the error
+     * 
+     * @sa PhoneCallController::sendDTMF
+     */
+    void sendDTMFFailed( const std::string& callId, DTMFError code, const std::string& message = "" );
+
+    /**
+     * Notifies the Engine of the calling feature configuration of the connected calling device.
+     * The configuration data may change if, for example, the connection mechanism to the calling device changes.
+     * The provided configuration will override the default or previous configuration.
+     * 
+     * See @c PhoneCallController::CallingDeviceConfigurationProperty for a 
+     * description of each configurable feature
+     * 
+     * @param [in] configurationMap A map of configuration properties to the boolean state of the properties
+     */
+    void deviceConfigurationUpdated( std::unordered_map<CallingDeviceConfigurationProperty, bool> configurationMap );
+
+    /**
+     * Generates a unique identifier for a call
+     */
+    std::string createCallId();
 
     /**
      * @internal

@@ -31,4 +31,9 @@ RUN cd /home/builder \
 
 ENV OE_CORE_PATH /home/builder/oe-core
 
+# Additional packages
+RUN sudo apt-get update && sudo apt-get install -y quilt \
+    libsqlite3-dev libarchive-dev python3-dev \
+    libdb-dev libpopt-dev
+
 CMD "/bin/bash"

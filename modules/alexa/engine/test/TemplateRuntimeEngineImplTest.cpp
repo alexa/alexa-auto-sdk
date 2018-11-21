@@ -147,14 +147,14 @@ public:
 };
 
 /**
- * Test create() with valid parameters
+ * Validate SetUp create method
  */
 TEST_F( TemplateRuntimeEngineImplTest, create ) {
-    EXPECT_NE(nullptr, m_templateRuntimeEngineImpl) << "AlexaLogger pointer is null";
+    EXPECT_NE(nullptr, m_templateRuntimeEngineImpl) << "templateRuntimeEngineImpl pointer is null";
 }
 
 /**
- * Test create() with nullptr parameters
+ * Test create() with nullptr TemplateRuntimePlatformInterface
  */
 TEST_F(TemplateRuntimeEngineImplTest, createWithTemplateRuntimePlatformAsNull) {
     std::shared_ptr<aace::engine::alexa::TemplateRuntimeEngineImpl> templateRuntimeEngineImplTemp;
@@ -167,7 +167,7 @@ TEST_F(TemplateRuntimeEngineImplTest, createWithTemplateRuntimePlatformAsNull) {
 }
 
 /**
- * Test create() with nullptr parameters
+ * Test create() with nullptr DirectiveSequencer
  */
 TEST_F(TemplateRuntimeEngineImplTest, createWithDirectiveSequencerAsNull) {
     std::shared_ptr<aace::engine::alexa::TemplateRuntimeEngineImpl> templateRuntimeEngineImplTemp;
@@ -180,19 +180,23 @@ TEST_F(TemplateRuntimeEngineImplTest, createWithDirectiveSequencerAsNull) {
 }
 
 /**
- * Test create() with nullptr parameters
+ * Test create() with nullptr AudioPlayerInterface
+ * Should succeed with no call to addObserver for AudioPlayerInterface
  */
 TEST_F(TemplateRuntimeEngineImplTest, createWithAudioPlayerAsNull) {
     std::shared_ptr<aace::engine::alexa::TemplateRuntimeEngineImpl> templateRuntimeEngineImplTemp;
+    EXPECT_CALL(*m_mockDirectiveSequencer, addDirectiveHandler(testing::_)).WillOnce(testing::Return(true));
+    EXPECT_CALL(*m_mockCapabilitiesDelegate, registerCapability(testing::_)).WillOnce(testing::Return(true));
 
     templateRuntimeEngineImplTemp = aace::engine::alexa::TemplateRuntimeEngineImpl::create(
         m_mockTemplateRuntimePlatformInterface, m_mockDirectiveSequencer, nullptr,
         m_mockFocusManager, m_mockCapabilitiesDelegate, m_mockDialogUXStateAggregator,
         m_mockExceptionSender);
-    EXPECT_EQ(nullptr, templateRuntimeEngineImplTemp) << "templateRuntimeEngineImpl pointer should be null";
+    EXPECT_NE(nullptr, templateRuntimeEngineImplTemp) << "templateRuntimeEngineImpl pointer should not be null in case of null audioplayer interface";
 }
+
 /**
- * Test create() with nullptr parameters
+ * Test create() with nullptr FocusManager
  */
 TEST_F(TemplateRuntimeEngineImplTest, createWithFocusManagerAsNull) {
     std::shared_ptr<aace::engine::alexa::TemplateRuntimeEngineImpl> templateRuntimeEngineImplTemp;
@@ -204,7 +208,7 @@ TEST_F(TemplateRuntimeEngineImplTest, createWithFocusManagerAsNull) {
     EXPECT_EQ(nullptr, templateRuntimeEngineImplTemp) << "templateRuntimeEngineImpl pointer should be null";
 }
 /**
- * Test create() with nullptr parameters
+ * Test create() with nullptr CapabilitiesDelegate
  */
 TEST_F(TemplateRuntimeEngineImplTest, createWithCapabilitiesDelegateAsNull) {
     std::shared_ptr<aace::engine::alexa::TemplateRuntimeEngineImpl> templateRuntimeEngineImplTemp;
@@ -216,7 +220,7 @@ TEST_F(TemplateRuntimeEngineImplTest, createWithCapabilitiesDelegateAsNull) {
     EXPECT_EQ(nullptr, templateRuntimeEngineImplTemp) << "templateRuntimeEngineImpl pointer should be null";
 }
 /**
- * Test create() with nullptr parameters
+ * Test create() with nullptr DialogUXStateAggregator
  */
 TEST_F(TemplateRuntimeEngineImplTest, createWithDialogUXStateAggregatorAsNull) {
     std::shared_ptr<aace::engine::alexa::TemplateRuntimeEngineImpl> templateRuntimeEngineImplTemp;
@@ -228,7 +232,7 @@ TEST_F(TemplateRuntimeEngineImplTest, createWithDialogUXStateAggregatorAsNull) {
     EXPECT_EQ(nullptr, templateRuntimeEngineImplTemp) << "templateRuntimeEngineImpl pointer should be null";
 }
 /**
- * Test create() with nullptr parameters
+ * Test create() with nullptr ExceptionSender
  */
 TEST_F(TemplateRuntimeEngineImplTest, createWithExceptionSenderAsNull) {
     std::shared_ptr<aace::engine::alexa::TemplateRuntimeEngineImpl> templateRuntimeEngineImplTemp;
@@ -241,7 +245,7 @@ TEST_F(TemplateRuntimeEngineImplTest, createWithExceptionSenderAsNull) {
 }
 
 /**
- * Test create() with valid parameters
+ * Test render template
  */
 TEST_F( TemplateRuntimeEngineImplTest, testRenderTemplate ) {
     const std::string& testJsonPayload = CAPABILITIES_CONFIG_JSON;
@@ -250,7 +254,7 @@ TEST_F( TemplateRuntimeEngineImplTest, testRenderTemplate ) {
 }
 
 /**
- * Test create() with valid parameters
+ * Test clear template
  */
 TEST_F( TemplateRuntimeEngineImplTest, testClearTemplateCard ) {
     EXPECT_CALL(*m_mockTemplateRuntimePlatformInterface, clearTemplate());
@@ -258,7 +262,7 @@ TEST_F( TemplateRuntimeEngineImplTest, testClearTemplateCard ) {
 }
 
 /**
- * Test create() with valid parameters
+ * Test player info
  */
 TEST_F( TemplateRuntimeEngineImplTest, testRenderPlayerInfoCard ) {
     const std::string& testJsonPayload = CAPABILITIES_CONFIG_JSON;
@@ -269,7 +273,7 @@ TEST_F( TemplateRuntimeEngineImplTest, testRenderPlayerInfoCard ) {
 }
 
 /**
- * Test create() with valid parameters
+ * Test clear player info
  */
 TEST_F( TemplateRuntimeEngineImplTest, testclearPlayerInfoCard ) {
     EXPECT_CALL(*m_mockTemplateRuntimePlatformInterface, clearPlayerInfo());

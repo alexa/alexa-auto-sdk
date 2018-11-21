@@ -35,11 +35,6 @@ private:
 public:
     virtual ~NetworkEngineService() = default;
     
-    void addObserver( std::shared_ptr<NetworkInfoObserver> observer );
-    void removeObserver( std::shared_ptr<NetworkInfoObserver> observer );
-    
-    std::shared_ptr<aace::network::NetworkInfoProvider> getNetworkInfoProvider();
-
 protected:
     bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) override;
     

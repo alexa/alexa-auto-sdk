@@ -21,6 +21,7 @@
 void LocationProviderBinder::initialize( JNIEnv* env )
 {
     m_javaMethod_getLocation = env->GetMethodID( getJavaClass(), "getLocation", "()Lcom/amazon/aace/location/Location;" );
+    m_javaMethod_getCountry = env->GetMethodID( getJavaClass(), "getCountry", "()Ljava/lang/String;" );
 
     // Location class
     m_javaClass_Location = NativeLib::FindClass( env, "com/amazon/aace/location/Location" );
@@ -52,7 +53,21 @@ aace::location::Location LocationProviderBinder::getLocation()
         }
     }
 
-    return aace::location::Location( 0.0, 0.0 );
+    return aace::location::Location( aace::location::Location::UNDEFINED, aace::location::Location::UNDEFINED );
+}
+
+std::string LocationProviderBinder::getCountry()
+{
+    if( getJavaObject() != nullptr && m_javaMethod_getCountry != nullptr )
+    {
+        ThreadContext context;
+
+        if( context.isValid() ) {
+            return NativeLib::convert( context.getEnv(), (jstring) context.getEnv()->CallObjectMethod( getJavaObject(), m_javaMethod_getCountry ) );
+        }
+    }
+
+    return "";
 }
 
 // JNI

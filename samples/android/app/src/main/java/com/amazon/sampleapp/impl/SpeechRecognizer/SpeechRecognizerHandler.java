@@ -15,13 +15,7 @@
 
 package com.amazon.sampleapp.impl.SpeechRecognizer;
 
-import android.Manifest;
 import android.app.Activity;
-import android.content.pm.PackageManager;
-import android.media.AudioFormat;
-import android.media.AudioRecord;
-import android.media.MediaRecorder;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.SwitchCompat;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -30,125 +24,48 @@ import android.widget.TextView;
 import com.amazon.aace.alexa.SpeechRecognizer;
 import com.amazon.sampleapp.R;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
+import com.amazon.sampleapp.impl.Common.AudioInputManager;
 
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.RejectedExecutionException;
 
-public class SpeechRecognizerHandler extends SpeechRecognizer {
+public class SpeechRecognizerHandler extends SpeechRecognizer
+        implements AudioInputManager.AudioInputConsumer {
 
     private static final String sTag = "SpeechRecognizer";
 
+    private final AudioInputManager mAudioInputManager;
     private final Activity mActivity;
     private final LoggerHandler mLogger;
     private AudioCueObservable mAudioCueObservable = new AudioCueObservable();
-    private final ExecutorService mExecutor = Executors.newFixedThreadPool( 2 );
-    private AudioRecord mAudioInput;
-    private AudioReader mReader;
+    private final ExecutorService mExecutor = Executors.newFixedThreadPool( 1 );
     private boolean mWakeWordEnabled;
     private boolean mAllowStopCapture = false; // Only true if holdToTalk() returned true
 
-    public SpeechRecognizerHandler( Activity activity,
+    public SpeechRecognizerHandler( AudioInputManager audioInputManager,
+                                    Activity activity,
                                     LoggerHandler logger,
                                     boolean wakeWordSupported,
                                     boolean wakeWordEnabled ) {
         super( wakeWordSupported && wakeWordEnabled );
+        mAudioInputManager = audioInputManager;
         mActivity = activity;
         mLogger = logger;
         mWakeWordEnabled = wakeWordEnabled;
-        mAudioInput = createAudioInput();
 
         setupGUI( wakeWordSupported );
     }
 
-    private AudioRecord createAudioInput() {
-        AudioRecord audioRecord = null;
-        try {
-            audioRecord = new AudioRecord( MediaRecorder.AudioSource.MIC, 16000,
-                    AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT,
-                    1024 );
-        } catch ( IllegalArgumentException e ) {
-            mLogger.postError( sTag, "Cannot create audio input. Error: "
-                    + e.getMessage() );
-        }
-        return audioRecord;
-    }
-
     @Override
     public boolean startAudioInput() {
-        if ( mAudioInput == null ) {
-            mLogger.postWarn( sTag,
-                    "Cannot start audio input. AudioRecord could not be created" );
-            return false;
-        }
-
-        if ( mAudioInput.getState() != AudioRecord.STATE_INITIALIZED ) {
-            if ( ActivityCompat.checkSelfPermission( mActivity, Manifest.permission.RECORD_AUDIO )
-                    == PackageManager.PERMISSION_DENIED ) {
-                mLogger.postWarn( sTag,
-                        "Cannot start audio input. Microphone permission not granted" );
-                return false;
-            } else {
-                // Retry AudioRecord initialization. Microphone permission may have been granted
-                mAudioInput = createAudioInput();
-                if ( mAudioInput.getState() != AudioRecord.STATE_INITIALIZED ) {
-                    mLogger.postWarn( sTag, "Cannot initialize AudioRecord" );
-                    return false;
-                }
-            }
-        }
-        return startRecording();
-    }
-
-    private boolean startRecording() {
-        if ( mReader != null && mReader.isRunning() ) {
-            mLogger.postWarn( sTag,
-                    "startRecording() called but AudioRecorder thread is already running" );
-            return false;
-        } else {
-            // Start audio recording
-            try {
-                mAudioInput.startRecording();
-            } catch ( IllegalStateException e ) {
-                mLogger.postError( sTag, "AudioRecord cannot start recording. Error: "
-                        + e.getMessage() );
-                return false;
-            }
-
-            // Read recorded audio samples and pass to engine
-            try {
-                mExecutor.submit( mReader = new AudioReader() ); // Submit the audio reader thread
-            } catch ( RejectedExecutionException e ) {
-                mLogger.postError( sTag,
-                        "Audio reader task cannot be scheduled for execution. Error: "
-                                + e.getMessage() );
-                return false;
-            }
-            return true;
-        }
+        return mAudioInputManager.startAudioInput(this);
     }
 
     @Override
     public boolean stopAudioInput() {
-        if ( mAudioInput == null ) {
-            mLogger.postWarn( sTag,
-                    "stopAudioInput() called but AudioRecord was never initialized" );
-            return false;
-        }
-
-        // Cancel the audio reader and stop recording
-        if ( mReader != null ) mReader.cancel();
-        try {
-            mAudioInput.stop();
-        } catch ( IllegalStateException e ) {
-            mLogger.postError( sTag, "AudioRecord cannot stop recording. Error: "
-                    + e.getMessage() );
-            return false;
-        }
-
-        return true;
+        return mAudioInputManager.stopAudioInput(this);
     }
 
     @Override
@@ -179,28 +96,14 @@ public class SpeechRecognizerHandler extends SpeechRecognizer {
         mAllowStopCapture = false;
     }
 
-    //
-    // AudioReader class
-    //
+    @Override
+    public String getAudioInputConsumerName() {
+        return "SpeechRecognizer";
+    }
 
-    private class AudioReader implements Runnable {
-
-        private boolean mRunning = true;
-        private byte[] mBuffer = new byte[ 300 ];
-
-        void cancel() { mRunning = false; }
-
-        boolean isRunning() { return mRunning; }
-
-        @Override
-        public void run() {
-            int size ;
-
-            while ( mRunning ) {
-                size = mAudioInput.read( mBuffer, 0, mBuffer.length );
-                if ( size > 0 && mRunning ) write( mBuffer, size ); // Write audio samples to engine
-            }
-        }
+    @Override
+    public void onAudioInputAvailable(byte[] buffer, int size) {
+        write(buffer, size); // Write audio samples to engine
     }
 
     private void setupGUI( boolean wakeWordSupported ) {

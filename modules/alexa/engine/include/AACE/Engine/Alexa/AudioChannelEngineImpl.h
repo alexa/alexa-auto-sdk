@@ -42,14 +42,13 @@ class AudioChannelEngineImpl :
     public alexaClientSDK::avsCommon::utils::RequiresShutdown,
     public std::enable_shared_from_this<AudioChannelEngineImpl> {
 
-protected:
+public:
     AudioChannelEngineImpl( std::shared_ptr<aace::alexa::AudioChannel> audioChannelPlatformInterface, const std::string& name );
 
     virtual bool initializeAudioChannel( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager );
     
     virtual void doShutdown() override;
     
-public:
     virtual ~AudioChannelEngineImpl() = default;
 
     //

@@ -27,8 +27,10 @@ class AlexaCommsBinder :
         public aace::communication::AlexaComms {
 public:
     AlexaCommsBinder(
-        std::shared_ptr<aace::alexa::MediaPlayer> mediaPlayer,
-        std::shared_ptr<aace::alexa::Speaker> speaker);
+        std::shared_ptr<aace::alexa::MediaPlayer> ringtoneMediaPlayer,
+        std::shared_ptr<aace::alexa::Speaker> ringtoneSpeaker,
+        std::shared_ptr<aace::alexa::MediaPlayer> callAudioMediaPlayer,
+        std::shared_ptr<aace::alexa::Speaker> callAudioSpeaker);
 
 protected:
     void initialize( JNIEnv* env ) override;

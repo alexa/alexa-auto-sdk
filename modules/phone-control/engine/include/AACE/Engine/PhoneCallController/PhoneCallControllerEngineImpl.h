@@ -21,18 +21,19 @@
 #include <AVSCommon/SDKInterfaces/DirectiveSequencerInterface.h>
 #include <AVSCommon/SDKInterfaces/ExceptionEncounteredSenderInterface.h>
 #include <AVSCommon/SDKInterfaces/MessageSenderInterface.h>
+#include <AVSCommon/SDKInterfaces/FocusManagerInterface.h>
 
 #include <AACE/PhoneCallController/PhoneCallController.h>
 #include <AACE/PhoneCallController/PhoneCallControllerEngineInterfaces.h>
 #include "PhoneCallControllerCapabilityAgent.h"
-#include "PhoneCallControllerObserverInterface.h"
+#include "PhoneCallControllerInterface.h"
 
 namespace aace {
 namespace engine {
 namespace phoneCallController {
 
 class PhoneCallControllerEngineImpl :
-    public PhoneCallControllerObserverInterface,
+    public PhoneCallControllerInterface,
     public aace::phoneCallController::PhoneCallControllerEngineInterface,
     public alexaClientSDK::avsCommon::utils::RequiresShutdown,
     public std::enable_shared_from_this<PhoneCallControllerEngineImpl> {
@@ -45,7 +46,8 @@ private:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender );
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager );
 
 public:
     static std::shared_ptr<PhoneCallControllerEngineImpl> create (
@@ -54,16 +56,26 @@ public:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender );
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager );
 
     // PhoneCallControllerEngineInterface
     void onConnectionStateChanged( ConnectionState state  ) override;
-    void onCallActivated( const std::string& callId ) override;
-    void onCallFailed( const std::string& callId, const std::string& error, const std::string& message ) override;
-    void onCallTerminated( const std::string& callId ) override;
+    void onCallStateChanged ( CallState state, const std::string& callId, const std::string& callerId ) override;
+    void onCallFailed( const std::string& callId, CallError code, const std::string& message ) override;
+    void onCallerIdReceived( const std::string& callId, const std::string& callerId ) override;
+    void onSendDTMFSucceeded( const std::string& callId) override;
+    void onSendDTMFFailed( const std::string& callId, DTMFError code, const std::string& message ) override;
+    void onDeviceConfigurationUpdated( std::unordered_map<PhoneCallControllerEngineInterface::CallingDeviceConfigurationProperty, bool> configurationMap ) override;
+    std::string onCreateCallId() override;
 
-    // PhoneCallControllerObserverInterface
+    // PhoneCallControllerInterface
     bool dial( const std::string& payload ) override;
+    bool redial( const std::string& payload ) override;
+    void answer( const std::string& payload ) override;
+    void stop( const std::string& payload ) override;
+    void playRingtone( const std::string& payload ) override;
+    void sendDTMF( const std::string& payload ) override;
 
 protected:
     void doShutdown() override;

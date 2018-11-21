@@ -30,7 +30,13 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Network/NetworkEngineService.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Network/NetworkInfoObserver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Network/NetworkInfoProviderEngineImpl.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Network/NetworkObservableInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Vehicle/VehicleEngineService.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Vehicle/VehiclePropertyInterface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Storage/StorageEngineService.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Storage/JSONStorage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Storage/SQLiteStorage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Storage/LocalStorageInterface.h
 )
  
 source_group("Header Files" FILES ${HEADERS})
@@ -57,13 +63,22 @@ add_library(AACECoreEngine SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Location/LocationEngineService.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Network/NetworkEngineService.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Network/NetworkInfoProviderEngineImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Network/NetworkObservableInterface.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Vehicle/VehicleEngineService.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Vehicle/VehicleConfigurationImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Vehicle/VehiclePropertyInterface.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Storage/StorageEngineService.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Storage/JSONStorage.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Storage/SQLiteStorage.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Storage/StorageConfigurationImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Storage/LocalStorageInterface.cpp
 )
 
 find_path(RAPIDJSON_INCLUDE_DIR rapidjson/rapidjson.h
     CMAKE_FIND_ROOT_PATH_BOTH
 )
+
+find_package(SQLite3 REQUIRED)
 
 target_include_directories(AACECoreEngine
     PUBLIC
@@ -71,10 +86,14 @@ target_include_directories(AACECoreEngine
         $<INSTALL_INTERFACE:include>
     PRIVATE
         ${RAPIDJSON_INCLUDE_DIR}
+        ${SQLITE3_INCLUDE_DIRS}
 )
 
 target_link_libraries(AACECoreEngine
-    AACECorePlatform
+    PUBLIC
+        AACECorePlatform
+    PRIVATE
+        ${SQLITE3_LIBRARIES}
 )
 
 install(

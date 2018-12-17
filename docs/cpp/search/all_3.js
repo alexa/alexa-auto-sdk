@@ -1,5 +1,7 @@
 var searchData=
 [
+  ['datapoint',['Datapoint',['../classaace_1_1metrics_1_1_metrics_uploader_1_1_datapoint.html',1,'aace::metrics::MetricsUploader']]],
+  ['datapointtype',['DatapointType',['../classaace_1_1metrics_1_1_metrics_uploader.html#a67e6fa51b9ef4b8a9b293870363eb4b5',1,'aace::metrics::MetricsUploader']]],
   ['deviceconfigurationupdated',['deviceConfigurationUpdated',['../classaace_1_1phone_call_controller_1_1_phone_call_controller.html#a3d36c76efd0e96bd84196a8dcd5071de',1,'aace::phoneCallController::PhoneCallController']]],
   ['dial',['dial',['../classaace_1_1phone_call_controller_1_1_phone_call_controller.html#a398192e0728d2e352483c6967419aba4',1,'aace::phoneCallController::PhoneCallController']]],
   ['dialing',['DIALING',['../classaace_1_1phone_call_controller_1_1_phone_call_controller_engine_interface.html#aca981e480f3b8704f5c50c6f859b8432a6c9becac74f2d56eab5eeea8d8fb4b67',1,'aace::phoneCallController::PhoneCallControllerEngineInterface']]],

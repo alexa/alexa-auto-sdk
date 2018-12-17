@@ -26,6 +26,7 @@ var searchData=
   ['contactsuploaderstatuschanged',['contactsUploaderStatusChanged',['../classaace_1_1contact_uploader_1_1_contact_uploader.html#a739b78e1378111c68e5df42e0cc3f1e4',1,'aace::contactUploader::ContactUploader']]],
   ['contactuploader',['ContactUploader',['../classaace_1_1contact_uploader_1_1_contact_uploader.html',1,'aace::contactUploader']]],
   ['contactuploaderstatus',['ContactUploaderStatus',['../classaace_1_1contact_uploader_1_1_contact_uploader.html#ace68da7d67191dbd4df87a8a7274dcf5',1,'aace::contactUploader::ContactUploader']]],
+  ['counter',['COUNTER',['../classaace_1_1metrics_1_1_metrics_uploader.html#a67e6fa51b9ef4b8a9b293870363eb4b5a125e831262b4dbbd68c6878c5d3759f6',1,'aace::metrics::MetricsUploader']]],
   ['country_5flist',['COUNTRY_LIST',['../classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a6aa7ee80198586f3a51d0c0f8fb542cfaf5fc387fb3473b27dd6aa5455d6d5d83',1,'aace::vehicle::config::VehicleConfiguration']]],
   ['coverid',['coverId',['../classaace_1_1alexa_1_1_external_media_adapter_1_1_playback_state.html#ad0ddda86a145a2d25e053c41c75fa6d9',1,'aace::alexa::ExternalMediaAdapter::PlaybackState']]],
   ['create',['create',['../classaace_1_1core_1_1config_1_1_stream_configuration.html#a7168bd10c4756eb4087609edb9a4d587',1,'aace::core::config::StreamConfiguration::create()'],['../classaace_1_1core_1_1config_1_1_configuration_file.html#ad96c069ff3ba56714d05a1df4110c817',1,'aace::core::config::ConfigurationFile::create()']]],

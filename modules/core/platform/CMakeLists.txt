@@ -15,6 +15,7 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Vehicle/VehicleConfiguration.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Vehicle/VehicleProperties.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Storage/StorageConfiguration.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Metrics/MetricsUploader.h
 )
 
 source_group("Header Files" FILES ${HEADERS})
@@ -27,6 +28,7 @@ add_library(AACECorePlatform SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Location/LocationProvider.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Location/Location.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Network/NetworkInfoProvider.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Metrics/MetricsUploader.cpp
 )
 
 target_include_directories(AACECorePlatform

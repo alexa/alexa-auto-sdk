@@ -27,12 +27,18 @@ The following components are included with the Alexa Auto SDK:
      * [Contact Uploader](./modules/contact-uploader/README.md)
 
 * [Android Sample App](./samples/android/README.md): This directory contains the Android sample application that uses the Alexa Auto SDK to demonstrate end-to-end functionality.
-> **Important!** You need an [Amazon Developer Account](https://developer.amazon.com/home.html) to use the Alexa Auto SDK. Read the [Sample App](./samples/android/README.md) documentation for more details.
+
+Additional functionality is available with help from your Amazon Solutions Architect (SA) or Partner Manager:
+* [Wake Word support](#wake-word-extension)
+* [Alexa Communications](#alexa-communication-extension)
+* [Local Voice Control](#local-voice-control-extension)
 
 Alexa Auto SDK API Reference documentation is available for Android and C++. Access the Alexa Auto SDK API reference documentation from the links below.
 
 * [Alexa Auto SDK for Android](https://alexa.github.io/aac-sdk/docs/android/)
 * [Alexa Auto SDK for C++](https://alexa.github.io/aac-sdk/docs/cpp/)
+
+> **Important!** You need an [Amazon Developer Account](https://developer.amazon.com/home.html) to use the Alexa Auto SDK. Read the [Sample App](./samples/android/README.md) documentation for more details.
 
 ## General Build Requirements<a id="generalbuildreqs"></a>
 
@@ -137,6 +143,18 @@ The Phone Control Module includes Platform Interfaces and runtime Engine support
 
 Click [here](./modules/phone-control/README.md) for more information.
 
+## Additional Functionality
+The following extensions to the Alexa Auto SDK are available by request. Please contact your Amazon Solutions Architect (SA) or Partner Manager for more information.
+
+### Wake Word Extension
+Wake Word enables hands-free, voice-initiated interactions with Alexa. The Wake Word extension enables AmazonLite Wake Word support in the Alexa Auto SDK.
+
+### Alexa Communication Extension
+The Alexa Communication extension enables integration with Alexa-to-Alexa calling, Alexa-to-PSTN calling, and messaging capabilities.
+
+### Local Voice Control Extension
+The Local Voice Control extension provides car control functionality like climate control with and without an internet connection. It includes components that run an Alexa endpoint inside the vehicle's head unit. Local Voice Control is currently supported on Android 6.0.
+
 ## Getting Started With the Android Sample App
 
 The Android Sample App provides an example of how to use the Alexa Auto SDK. The [Android Sample App README](./samples/android/README.md) has detailed instructions about how to use the sample app.
@@ -145,18 +163,15 @@ The Android Sample App provides an example of how to use the Alexa Auto SDK. The
 
 > **Note**: Feature enhancements, updates, and resolved issues from previous releases are available to view in [CHANGELOG.md](./CHANGELOG.md)
 
-### v1.3.0 released on 2018-11-20:
+### v1.4.0 released on 2018-12-17:
 
 #### Enhancements
 
-Alexa Auto SDK now includes the following features and enhancements:
+Alexa Auto SDK now includes the following enhancement:
 
-* Android 8 and ARM v8a platform support.
-* Making calls to contacts from a locally paired mobile phone as long as the Alexa Auto SDK has a valid auth token. Read more about [Contact Uploader API](./modules/contact-uploader/README.md).
-* Redial, answer, terminate and decline calls using voice. End users can also send dual-tone multi-frequency (DTMF) via voice to interact with Interactive Voice Responders (IVRs). Read more here [Phone Call Controller](./modules/phone-control/README.md).
-* Switching to local media sources, generic controls and deep linking into 3rd party media applications compatible with the Amazon Media App Command and Control (MACC) specification using the External Media Player Interface 1.1. This allows customers to switch between  a CD player, AM/ FM player  and auxiliary input that is MACC compliant. Read more here [Handling External Media Adapter with MACCAndroidClient](./platforms/android/ALEXA.md#handlingexternalmediaadapterwithmaccandroidclient).  
-* Enhancement for 3rd party wake word engine to enable cloud based verification.
-* Provides a way to override Template Runtime display card timeout values for RenderTemplate and RenderPlayerInfo by updating the [templateRuntimeCapabilityAgent Engine configuration](https://alexa.github.io/aac-sdk/modules/core/#configuring-the-engine) values.
+* The Alexa Auto SDK now supports the Local Voice Control extension. The Local Voice Control extension enhances the Alexa Auto experience by providing voice based car controls whether connected to the internet or not. In this release, the Local Voice Control extension will provision access only to the car’s climate control
+
+> **Note**: This extension is available on request - Please contact your Amazon Solutions Architect (SA) or Partner Manager for more information.
 
 #### Resolved Issues
 
@@ -164,7 +179,7 @@ No resolved issues.
 
 #### Known Issues
 
-* The Alexa Auto SDK does not re-discover Media Apps Command and Control (MACC) compliant apps if they are unresponsive after being idle for a long period  (around 30 minutes).
+* The Alexa Auto SDK does not re-discover Media Apps Command and Control (MACC) compliant apps if they are unresponsive after being idle for a long period(around 30 minutes).
 * The Alexa Auto SDK Engine becomes unresponsive if it receives PLAY directive during shutdown. However since shutdown is triggered when car ignition is turned off, there is not direct customer impact expected.
 * When a timer sounds during an Alexa to Alexa call, uttering "stop" ends the call not the timer.
 * Multiple automotive devices using the same account at the same time, can access contacts from phones paired across those devices.

@@ -48,6 +48,10 @@
 #include "aace/communication/AlexaCommsBinder.h"
 #endif
 
+#ifdef INCLUDE_LOCAL_VOICE_CONTROL_MODULE
+#include "aace/carControl/ClimateControlInterfaceBinder.h"
+#endif
+
 #include "aace/navigation/NavigationBinder.h"
 
 #include "aace/phonecontrol/PhoneCallControllerBinder.h"
@@ -55,6 +59,8 @@
 #include "aace/contactuploader/ContactUploaderBinder.h"
 
 #include "aace/network/NetworkInfoProviderBinder.h"
+
+#include "aace/metrics/MetricsUploaderBinder.h"
 
 class EngineBinder : public PlatformInterfaceBinder {
 public:
@@ -101,8 +107,14 @@ private:
 
     std::shared_ptr<ContactUploaderBinder> createContactUploaderBinder( JNIEnv* env, jobject platformInterface );
 
+    std::shared_ptr<MetricsUploaderBinder> createMetricsUploaderBinder( JNIEnv* env, jobject platformInterface );
+
 #ifdef INCLUDE_ALEXA_COMMS_MODULE
     std::shared_ptr<AlexaCommsBinder> createAlexaCommsBinder( JNIEnv* env, jobject platformInterface );
+#endif
+
+#ifdef INCLUDE_LOCAL_VOICE_CONTROL_MODULE
+    std::shared_ptr<ClimateControlInterfaceBinder> createClimateControlInterfaceBinder( JNIEnv* env, jobject platformInterface );
 #endif
 
 private:
@@ -157,12 +169,21 @@ private:
     std::shared_ptr<aace::network::NetworkInfoProvider> m_networkInfo;
     ClassRef m_javaClass_NetworkInfoProvider;
 
+    // com.amazon.metrics.*
+    std::shared_ptr<aace::metrics::MetricsUploader> m_metricsUploader;
+    ClassRef m_javaClass_MetricsUploader;
+
 #ifdef INCLUDE_ALEXA_COMMS_MODULE
     // com.amazon.communication.*
     std::shared_ptr<aace::communication::AlexaComms> m_alexaComms;
     ClassRef m_javaClass_AlexaComms;
 #endif // INCLUDE_ALEXA_COMMS_MODULE
 
+#ifdef INCLUDE_LOCAL_VOICE_CONTROL_MODULE
+    // com.amazon.localvoicecontrol.*
+    std::shared_ptr<aace::carControl::ClimateControlInterface> m_climateControl;
+    ClassRef m_javaClass_ClimateControlInterface;
+#endif // INCLUDE_LOCAL_VOICE_CONTROL_MODULE
 };
 
 #endif //AACE_CORE_ENGINE_BINDER_H

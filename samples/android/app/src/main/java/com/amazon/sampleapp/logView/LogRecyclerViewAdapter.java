@@ -26,12 +26,12 @@ import android.view.ViewGroup;
 
 import com.amazon.aace.logger.Logger;
 import com.amazon.maccandroid.Log;
+import com.amazon.sampleapp.LimitedSizeArrayList;
 import com.amazon.sampleapp.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -39,9 +39,13 @@ import java.util.Set;
 public class LogRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final Context mContext;
 
+    // Max number of logs to be displayed in the adapter
+    private static final int MAX_NUM_FILTERED_LOGS = 500;
+
     // The items to display in your RecyclerView
     private List<LogEntry> mItems;
-    private List<LogEntry> mFilteredItems;
+    private LimitedSizeArrayList<LogEntry> mFilteredItems;
+
 
     // The items to filter out of the log
     private Set<String> mFilteredLevels;
@@ -60,7 +64,7 @@ public class LogRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     public LogRecyclerViewAdapter( List<LogEntry> items, Context context ) {
         mContext = context;
         mItems = items;
-        mFilteredItems = new ArrayList<>();
+        mFilteredItems = new LimitedSizeArrayList<>( MAX_NUM_FILTERED_LOGS );
         mFilteredItems.addAll( items );
         mFilteredLevels = new HashSet<>();
         mFilteredSources = new HashSet<>();

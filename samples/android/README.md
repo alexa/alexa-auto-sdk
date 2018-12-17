@@ -64,8 +64,8 @@ It is required that you add or update the following files:
 
 Use Android Studio to install and run the Sample App on your target device.
 
-* Minimum tested Android API level 22 or greater
-* Tested and required [Android NDK Revision 16b](https://developer.android.com/ndk/downloads/older_releases#ndk-16b-downloads)
+* Minimum tested Android API level 22
+* Minimum tested and recommended Android NDK Revision 16b
 
 ### Understanding the Sample App
 The Sample App provides an example of how to create and configure an instance of the Engine, extend the Alexa Auto SDK Platform Interfaces, and register the interface implementations with the Engine. The Platform Interface implementations are located in the `impl/` folder of the `com.amazon.sampleapp` directory with the `Handler` postfix. These classes extend the JNI wrapper classes, which mirror the Alexa Auto C++ API. You can read more about these interfaces in the following documentation:
@@ -188,8 +188,8 @@ PreRequisite: Install the Low Level Debugger (LLDB) package in Android Studio. T
 
 ### Resolved Issues
 
-* The issue where the PhoneCallController UI was limited and could not provide a way to enter a phone number and generate a unique call identifier to initiate a call outside the scope of an Alexa interaction is fixed.
-* The issue of the Sample App not running on some emulators, such as Nexus 6 API 25 and ARM 64-bit is fixed.
+* Growth in Memory consumption of Sample app was contained by  limiting the number of log entries displayed in the Sample app console to the last 500.
+
 
 ### Known Issues
 

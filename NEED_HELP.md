@@ -1,23 +1,26 @@
 # Need Help?
 
-## Accessing APIs During Development (Whitelisting)<a id="whitelisting"></a>
+## Accessing APIs During Development<a id="whitelisting"></a>
 
-The following functionality is only available after the device is whitelisted:
+The following functionality is available with help from your designated Amazon Solutions Architect (SA) or Partner Manager:
 
 * Amazon Music and other music service providers
+* Wake Word support
 * Phone Call Control
+* Alexa Communication
+* Local Voice Control
 
 You will need to provide the Amazon ID of your development device or product on the [AVS Developer Portal](https://developer.amazon.com/avs/home.html#/avs/home).
 
 1. Log into the [AVS Developer Portal](https://developer.amazon.com/avs/home.html#/avs/home).
 2. Click **Manage** to the right of your device in its listing on the [My Products](https://developer.amazon.com/avs/home.html#/avs/home) page. Take note of your **Amazon ID** for your device.
-3. Contact your designated Amazon Solutions Architect or Partner Manager and provide them with the **Amazon ID**.
+3. Contact your SA or Partner Manager and provide them with the **Amazon ID** and the functionality you'd like to request.
 
 ## Reporting an Issue<a id="reportinganissue"></a>
 
 ### Existing Alexa Auto SDK Customers
 
-Please reach out to the designated Amazon Solution Architect (SA) or Partner Manager for your company, and include the following information:
+Please reach out to the designated Amazon Solutions Architect (SA) or Partner Manager for your company, and include the following information:
 
 * **Overview** - provide a brief overview of the issue
 * **Steps to reproduce** - provide details of how to reproduce the issue

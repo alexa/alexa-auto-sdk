@@ -29,6 +29,7 @@ public class ExtraModules {
     private static String sTag = "ExtraModules";
 
     private boolean mIsAlexaCommsEnabled = false;
+    private boolean mIsLocalVoiceControlEnabled = false;
 
     public ExtraModules(Context context) {
         AssetManager assetManager = context.getAssets();
@@ -40,10 +41,12 @@ public class ExtraModules {
 
             final String enabled = "true";
             mIsAlexaCommsEnabled = enabled.equals(prop.getProperty("communications"));
+            mIsLocalVoiceControlEnabled = enabled.equals(prop.getProperty("localvoicecontrol"));
 
             StringBuilder summary = new StringBuilder();
             summary.append("Extra Module Status***\n")
                     .append("Alexa Comms :").append(mIsAlexaCommsEnabled).append("\n")
+                    .append("Local Voice Control:").append(mIsLocalVoiceControlEnabled).append("\n")
                     .append("****");
             android.util.Log.i(sTag, summary.toString());
         } catch (Exception exp) {
@@ -53,5 +56,9 @@ public class ExtraModules {
 
     public boolean isAlexaCommsEnabled() {
         return mIsAlexaCommsEnabled;
+    }
+
+    public boolean isLocalVoiceControlEnabled() {
+        return mIsLocalVoiceControlEnabled;
     }
 }

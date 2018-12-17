@@ -4,5 +4,9 @@
     "clientSecret": "<YOUR DEVICE'S CLIENT SECRET>",
     "productId" : "<YOUR DEVICE'S PRODUCT ID>",
     "productDsn" : "<YOUR DEVICE'S PRODUCT DSN>"
+  },
+  "metrics" : {
+    "metricsEnabled" : false,
+    "amazonId" : "<YOUR DEVICE'S AMAZON ID>"
   }
 }

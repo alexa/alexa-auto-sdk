@@ -14,7 +14,9 @@ SRC_URI += "file://0001-SpeechEncoder-Introduce-SpeechEncoder-with-OPUS-supp.pat
             file://0007-Alerts-Detailed-Info-Interface.patch \
             file://0008-AVS-Changes-for-HTTP-Get-and-Delete-Support.patch \
             file://0009-ExternalMediaPlayer-1.1-for-AAC-MACC.patch \
-            file://0010-Override-Publish-Capabilities-Check.patch"
+            file://0010-Override-Publish-Capabilities-Check.patch \
+            file://0011-InProcessAttachmentReader-ResetOnOverrun.patch \
+            file://0012-AVS-Metric-Changes.patch"
 
 # Enable OPUS by default
 PACKAGECONFIG += "opus"

@@ -2,6 +2,27 @@
 
 ___
 
+## v1.4.0 released on 2018-12-17:
+
+### Enhancements
+
+Alexa Auto SDK now includes the following enhancement:
+
+* The Alexa Auto SDK now supports the Local Voice Control extension. The Local Voice Control extension enhances the Alexa Auto experience by providing voice based car controls whether connected to the internet or not. In this release, the Local Voice Control extension will provision access only to the car’s climate control
+
+> **Note**: This extension is available on request - Please contact your Amazon Solutions Architect (SA) or Partner Manager for more information.
+
+### Resolved Issues
+
+No resolved issues.
+
+### Known Issues
+
+* The Alexa Auto SDK does not re-discover Media Apps Command and Control (MACC) compliant apps if they are unresponsive after being idle for a long period(around 30 minutes).
+* The Alexa Auto SDK Engine becomes unresponsive if it receives PLAY directive during shutdown. However since shutdown is triggered when car ignition is turned off, there is not direct customer impact expected.
+* When a timer sounds during an Alexa to Alexa call, uttering "stop" ends the call not the timer.
+* Multiple automotive devices using the same account at the same time, can access contacts from phones paired across those devices.
+
 ## v1.3.0 released on 2018-11-20:
 
 ### Enhancements

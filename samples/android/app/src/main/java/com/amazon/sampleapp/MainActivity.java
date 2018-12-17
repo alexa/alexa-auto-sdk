@@ -36,22 +36,29 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.amazon.aace.alexa.AlexaClient;
 import com.amazon.aace.alexa.AlexaProperties;
-import com.amazon.aace.alexa.LocalMediaSource;
 import com.amazon.aace.alexa.Speaker;
 import com.amazon.aace.alexa.config.AlexaConfiguration;
+import com.amazon.aace.carControl.CarControlConfiguration;
+import com.amazon.aace.carControl.ClimateControlInterface;
 import com.amazon.aace.communication.config.AlexaCommsConfiguration;
 import com.amazon.aace.core.CoreProperties;
 import com.amazon.aace.core.Engine;
 import com.amazon.aace.core.config.EngineConfiguration;
+import com.amazon.aace.localSkillService.config.LocalSkillServiceConfiguration;
+import com.amazon.aace.localVoiceControl.config.LocalVoiceControlConfiguration;
 import com.amazon.aace.logger.Logger;
 import com.amazon.aace.logger.config.LoggerConfiguration;
 import com.amazon.aace.modules.ExtraModules;
 import com.amazon.aace.storage.config.StorageConfiguration;
 import com.amazon.aace.vehicle.config.VehicleConfiguration;
+/* Sample Metrics Code */
+//import com.amazon.metricuploadservice.MetricsUploadService;
+//import com.amazon.metricuploadservice.MetricUploadConfiguration;
 import com.amazon.sampleapp.impl.Alerts.AlertsHandler;
 import com.amazon.sampleapp.impl.AlexaClient.AlexaClientHandler;
 import com.amazon.sampleapp.impl.AudioPlayer.AudioPlayerHandler;
 import com.amazon.sampleapp.impl.AuthProvider.AuthProviderHandler;
+import com.amazon.sampleapp.impl.CarControl.ClimateControlHandler;
 import com.amazon.sampleapp.impl.Common.AudioInputManager;
 import com.amazon.sampleapp.impl.Communication.AlexaCommsHandler;
 import com.amazon.sampleapp.impl.Communication.AlexaCommsView;
@@ -81,6 +88,9 @@ import java.util.Observable;
 import java.util.Observer;
 
 public class MainActivity extends AppCompatActivity implements Observer {
+
+    // Max number of logs to be kept in memory
+    private static final int MAX_NUM_LOGS = 2000;
 
     /* AACE Platform Interface Handlers */
 
@@ -116,10 +126,13 @@ public class MainActivity extends AppCompatActivity implements Observer {
     // Network
     private NetworkInfoProviderHandler mNetworkInfoProvider;
 
+    // Climate control
+    private ClimateControlHandler mClimateControl;
+
     /* Log View Components */
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mRecyclerAdapter;
-    private ArrayList<LogEntry> mLogList = new ArrayList<>();
+    private LimitedSizeArrayList<LogEntry> mLogList = new LimitedSizeArrayList<>( MAX_NUM_LOGS );
 
     /* Shared Preferences */
     private SharedPreferences mPreferences;
@@ -138,6 +151,9 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private MACCPlayer mMACCPlayer;
 
     private CDLocalMediaSource mCDLocalMediaSource;
+
+    /* Sample Metrics Code */
+    //    private MetricsUploadService mMetricsUploadService;
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
@@ -207,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
         // Retrieve device config from config file and update preferences
         String clientId = "", clientSecret = "", productId = "", productDsn = "";
-        JSONObject config = getConfigFromFile();
+        JSONObject config = getConfigFromFile("config");
         if ( config != null ) {
             try {
                 clientId = config.getString( "clientId" );
@@ -266,7 +282,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
         };
 
 
-
         boolean configureSucceeded = mEngine.configure( new EngineConfiguration[]{
                 //AlexaConfiguration.createCurlConfig( certsDir.getPath(), "wlan0" ), Uncomment this line to specify the interface name to use by AVS.
                 AlexaConfiguration.createCurlConfig( certsDir.getPath() ),
@@ -295,7 +310,11 @@ public class MainActivity extends AppCompatActivity implements Observer {
                         new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.MICROPHONE, "Single, roof mounted"),
                         // If this list is left blank, it will be fetched by the engine using amazon default endpoint
                         new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.COUNTRY_LIST, "US,GB,IE,CA,DE,AT,IN,JP,AU,NZ,FR")
-                })
+                }),
+                LocalVoiceControlConfiguration.createIPCConfig( appDataDir.getPath(), LocalVoiceControlConfiguration.SocketPermission.ALL, appDataDir.getPath(), LocalVoiceControlConfiguration.SocketPermission.ALL, "127.0.0.1", appDataDir.getPath() ),
+                //AlexaConfiguration.createTemplateRuntimeTimeoutConfig( timeoutList ),
+                LocalSkillServiceConfiguration.createLocalSkillServiceConfig( appDataDir.getPath() + "/LSS.socket", appDataDir.getPath() + "/ER.socket" ),
+                CarControlConfiguration.createCarControlConfig( appDataDir.getPath() + "/ApplianceDB.sqlite" )
         });
         if ( !configureSucceeded ) throw new RuntimeException( "Engine configuration failed" );
 
@@ -466,6 +485,21 @@ public class MainActivity extends AppCompatActivity implements Observer {
             commsView.setupUI(mAlexaCommsHandler);
         }
 
+        // Climate Control Handler
+        if (extraModules.isLocalVoiceControlEnabled()) {
+            if (!mEngine.registerPlatformInterface(
+                    mClimateControl = new ClimateControlHandler( this, mLogger )
+                )
+            ) throw new RuntimeException( "Could not register ClimateControl platform interface" );
+            mClimateControl.addClimateControlSwitch();
+            mClimateControl.addAirConditioningSwitch();
+            ClimateControlInterface.AirConditioningMode[] modes = { ClimateControlInterface.AirConditioningMode.MANUAL, ClimateControlInterface.AirConditioningMode.AUTO };
+            mClimateControl.addAirConditioningModeSelector( modes );
+            mClimateControl.addFanSwitch( ClimateControlInterface.FanZone.ALL );
+            mClimateControl.addFanSpeedControl( ClimateControlInterface.FanZone.ALL, 0, 100, 1 );
+            mClimateControl.addTemperatureControl( ClimateControlInterface.TemperatureZone.ALL, 60, 80, 1, ClimateControlInterface.TemperatureUnit.FAHRENHEIT );
+        }
+
         mMACCPlayer = new MACCPlayer(this,  mPlaybackController);
         if ( !mEngine.registerPlatformInterface( mMACCPlayer ) )  {
             Log.i("MACC", "registered not fine");
@@ -479,6 +513,14 @@ public class MainActivity extends AppCompatActivity implements Observer {
         if ( !mEngine.registerPlatformInterface(
                 mCDLocalMediaSource = new CDLocalMediaSource(this, mLogger, CDLocalMediaSource.Source.COMPACT_DISC )
         ) ) throw new RuntimeException( "Could not register Mock CD player Local Media Source platform interface" );
+
+        /* Sample Metrics Code */
+//        // Create and configure MetricsUploadService
+//        MetricUploadConfiguration metricUploadConfiguration = initializeMetricsConfiguration();
+//        mMetricsUploadService = new MetricsUploadService( this.getApplicationContext(), metricUploadConfiguration );
+//        if ( !mEngine.registerPlatformInterface( mMetricsUploadService) ) {
+//            throw new RuntimeException( "Could not register MetricsUploader platform interface" );
+//        }
 
         // Start the engine
         if ( !mEngine.start() ) throw new RuntimeException( "Could not start engine" );
@@ -507,6 +549,9 @@ public class MainActivity extends AppCompatActivity implements Observer {
         }
 
         if ( mNetworkInfoProvider != null ) { mNetworkInfoProvider.unregister(); }
+
+        /* Sample Metrics Code */
+//        if ( mMetricsUploadService != null ) { mMetricsUploadService.shutdown(); }
 
         if ( mEngine != null ) { mEngine.dispose(); }
 
@@ -663,7 +708,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         }
     }
 
-    private JSONObject getConfigFromFile() {
+    private JSONObject getConfigFromFile(String key) {
         JSONObject obj = null;
         try (
             InputStream is = getAssets().open(sDeviceConfigFile)
@@ -680,7 +725,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         JSONObject config = null;
         if ( obj != null ) {
             try {
-                config = obj.getJSONObject( "config" );
+                config = obj.getJSONObject( key );
             } catch ( JSONException e ) {
                 Log.w( sTag, "No device config specified in " + sDeviceConfigFile );
             }
@@ -713,6 +758,29 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 ( ( TextView ) findViewById( R.id.productDsn ) ).setText( productDsn );
             }
         });
-
     }
+
+    /* Sample Metrics Code */
+//    // Retrieve metrics config from config file and create configuration object
+//    private MetricUploadConfiguration initializeMetricsConfiguration() {
+//        String amazonId = "", productDsn = "";
+//        boolean metricsEnabled = false;
+//
+//        JSONObject config = getConfigFromFile("metrics");
+//        if ( config != null ) {
+//            try {
+//                amazonId = config.getString( "amazonId" );
+//                metricsEnabled = config.getBoolean("metricsEnabled");
+//            } catch ( JSONException e ) {
+//                Log.w( sTag, "Missing metrics config info in app_config.json" );
+//            }
+//        }
+//        productDsn = mPreferences.getString( this.getString( R.string.preference_product_dsn ), "" );
+//        try {
+//            return MetricUploadConfiguration.createMetricUploadConfiguration(amazonId, productDsn, metricsEnabled);
+//        } catch (IllegalArgumentException| NullPointerException ex ) {
+//            Log.e(sTag, "", ex);
+//            throw ex;
+//        }
+//    }
 }

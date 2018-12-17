@@ -73,7 +73,7 @@ static const std::vector<alexaClientSDK::afml::FocusManager::ChannelConfiguratio
 };
 
 // locales supported by AVS, https://developer.amazon.com/docs/alexa-voice-service/settings.html
-static const std::string SUPPORTED_LOCALES = "de-DE,en-AU,en-CA,en-GB,en-IN,en-US,es-ES,fr-FR,it-IT,ja-JP";
+static const std::string SUPPORTED_LOCALES = "de-DE,en-AU,en-CA,en-GB,en-IN,en-US,es-ES,es-MX,fr-FR,it-IT,ja-JP";
 
 // register the service
 REGISTER_SERVICE(AlexaEngineService)
@@ -322,7 +322,7 @@ bool AlexaEngineService::configure( std::shared_ptr<std::istream> configuration 
                             std::string name = encoder["name"].GetString();
 
                             // convert the name to lower case
-                            std::transform( name.begin(), name.end(), name.begin(), [](unsigned char c) -> unsigned char { return std::tolower(c); } );
+                            std::transform( name.begin(), name.end(), name.begin(), [](unsigned char c) -> unsigned char { return static_cast<unsigned char>(std::tolower(c)); } );
 
                             m_encoderName = name;
                             m_encoderEnabled = true;

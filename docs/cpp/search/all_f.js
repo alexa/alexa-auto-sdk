@@ -40,5 +40,6 @@ var searchData=
   ['stopped',['STOPPED',['../classaace_1_1alexa_1_1_alerts.html#a81cccb7e632cf26b7903d9c9c168fb22a09d4d696b4e935115b9313e3c412509a',1,'aace::alexa::Alerts::STOPPED()'],['../classaace_1_1alexa_1_1_media_player_engine_interface.html#a85a574bb13b13453df66ff2cac6a4f86a09d4d696b4e935115b9313e3c412509a',1,'aace::alexa::MediaPlayerEngineInterface::STOPPED()'],['../classaace_1_1alexa_1_1_audio_player.html#a17204286fb862354d6474a7d7a2fd7baa09d4d696b4e935115b9313e3c412509a',1,'aace::alexa::AudioPlayer::STOPPED()']]],
   ['storageconfiguration',['StorageConfiguration',['../classaace_1_1storage_1_1config_1_1_storage_configuration.html',1,'aace::storage::config']]],
   ['streamconfiguration',['StreamConfiguration',['../classaace_1_1core_1_1config_1_1_stream_configuration.html',1,'aace::core::config']]],
+  ['string',['STRING',['../classaace_1_1metrics_1_1_metrics_uploader.html#a67e6fa51b9ef4b8a9b293870363eb4b5a63b588d5559f64f89a416e656880b949',1,'aace::metrics::MetricsUploader']]],
   ['supportedoperations',['supportedOperations',['../classaace_1_1alexa_1_1_external_media_adapter_1_1_playback_state.html#a7f87f3ccce182708d81da10642971c6c',1,'aace::alexa::ExternalMediaAdapter::PlaybackState']]]
 ];

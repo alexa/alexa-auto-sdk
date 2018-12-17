@@ -1,0 +1,176 @@
+diff --git a/ACL/src/Transport/HTTP2Stream.cpp b/ACL/src/Transport/HTTP2Stream.cpp
+index 0a305e6..fac3f01 100644
+--- a/ACL/src/Transport/HTTP2Stream.cpp
++++ b/ACL/src/Transport/HTTP2Stream.cpp
+@@ -413,6 +413,7 @@ size_t HTTP2Stream::readCallback(char* data, size_t size, size_t nmemb, void* us
+         case AttachmentReader::ReadStatus::OK:
+         case AttachmentReader::ReadStatus::OK_WOULDBLOCK:
+         case AttachmentReader::ReadStatus::OK_TIMEDOUT:
++        case AttachmentReader::ReadStatus::OK_OVERRUN_RESET:
+             break;
+ 
+         // No more data to send - close the stream.
+diff --git a/ACL/test/Transport/MimeParserFuzzTest.cpp b/ACL/test/Transport/MimeParserFuzzTest.cpp
+index feefaac..ef34de5 100644
+--- a/ACL/test/Transport/MimeParserFuzzTest.cpp
++++ b/ACL/test/Transport/MimeParserFuzzTest.cpp
+@@ -241,6 +241,7 @@ void MimeParserFuzzTest::read() {
+ 
+             case AttachmentReader::ReadStatus::OK_WOULDBLOCK:
+             case AttachmentReader::ReadStatus::OK_TIMEDOUT:
++            case AttachmentReader::ReadStatus::OK_OVERRUN_RESET:
+             case AttachmentReader::ReadStatus::ERROR_OVERRUN:
+             case AttachmentReader::ReadStatus::ERROR_BYTES_LESS_THAN_WORD_SIZE:
+             case AttachmentReader::ReadStatus::ERROR_INTERNAL:
+diff --git a/AVSCommon/AVS/include/AVSCommon/AVS/Attachment/AttachmentReader.h b/AVSCommon/AVS/include/AVSCommon/AVS/Attachment/AttachmentReader.h
+index 4aaf730..612a72a 100644
+--- a/AVSCommon/AVS/include/AVSCommon/AVS/Attachment/AttachmentReader.h
++++ b/AVSCommon/AVS/include/AVSCommon/AVS/Attachment/AttachmentReader.h
+@@ -42,6 +42,10 @@ public:
+         OK_WOULDBLOCK,
+         /// On a request for n bytes, less than n bytes were available on a blocking read.
+         OK_TIMEDOUT,
++        /// The writer has corrupted the reader data. Reader position is resetted to current writer position.
++        /// Applicable only when @c AttachmentReader is created with policy to reset on overrun, else ERROR_OVERRUN
++        /// will be used.
++        OK_OVERRUN_RESET,
+         /// The underlying data representation is no longer readable.
+         CLOSED,
+         /// The writer has corrupted the reader data.  The attachment is no longer valid.
+@@ -124,6 +128,9 @@ inline std::ostream& operator<<(std::ostream& stream, const AttachmentReader::Re
+         case AttachmentReader::ReadStatus::OK_TIMEDOUT:
+             stream << "OK_TIMEDOUT";
+             break;
++        case AttachmentReader::ReadStatus::OK_OVERRUN_RESET:
++            stream << "OK_OVERRUN_RESET";
++            break;
+         case AttachmentReader::ReadStatus::CLOSED:
+             stream << "CLOSED";
+             break;
+diff --git a/AVSCommon/AVS/include/AVSCommon/AVS/Attachment/InProcessAttachmentReader.h b/AVSCommon/AVS/include/AVSCommon/AVS/Attachment/InProcessAttachmentReader.h
+index fa4faee..e024d93 100644
+--- a/AVSCommon/AVS/include/AVSCommon/AVS/Attachment/InProcessAttachmentReader.h
++++ b/AVSCommon/AVS/include/AVSCommon/AVS/Attachment/InProcessAttachmentReader.h
+@@ -47,6 +47,8 @@ public:
+      * @param index If being constructed from an existing @c SharedDataStream, the index indicates where to read from.
+      * @param reference The position in the stream @c offset is applied to.  This parameter defaults to 0, indicating
+      *     no offset from the specified reference.
++     * @param resetOnOverrun If overrun is detected on @c read, whether to close the attachment (default behavior) or
++     *     to reset the read position to where current write position is (and skip all the bytes in between).
+      * @return Returns a new InProcessAttachmentReader, or nullptr if the operation failed.  This parameter defaults
+      *     to @c ABSOLUTE, indicating offset is relative to the very beginning of the Attachment.
+      */
+@@ -54,7 +56,8 @@ public:
+         SDSTypeReader::Policy policy,
+         std::shared_ptr<SDSType> sds,
+         SDSTypeIndex offset = 0,
+-        SDSTypeReader::Reference reference = SDSTypeReader::Reference::ABSOLUTE);
++        SDSTypeReader::Reference reference = SDSTypeReader::Reference::ABSOLUTE,
++        bool resetOnOverrun = false);
+ 
+     /**
+      * Destructor.
+@@ -79,11 +82,16 @@ private:
+      *
+      * @param policy The @c ReaderPolicy of this object.
+      * @param sds The underlying @c SharedDataStream which this object will use.
++     * @param resetOnOverrun If overrun is detected on @c read, whether to close the attachment (default behavior) or
++     *     to reset the read position to where current write position is (and skip all the bytes in between).
+      */
+-    InProcessAttachmentReader(SDSTypeReader::Policy policy, std::shared_ptr<SDSType> sds);
++    InProcessAttachmentReader(SDSTypeReader::Policy policy, std::shared_ptr<SDSType> sds, bool resetOnOverrun);
+ 
+     /// The underlying @c SharedDataStream reader.
+     std::shared_ptr<SDSTypeReader> m_reader;
++
++    // On @c read overrun, Whether to close the attachment, or reset it to catch up with the write
++    bool m_resetOnOverrun;
+ };
+ 
+ }  // namespace attachment
+diff --git a/AVSCommon/AVS/src/Attachment/InProcessAttachmentReader.cpp b/AVSCommon/AVS/src/Attachment/InProcessAttachmentReader.cpp
+index af6e71f..194751f 100644
+--- a/AVSCommon/AVS/src/Attachment/InProcessAttachmentReader.cpp
++++ b/AVSCommon/AVS/src/Attachment/InProcessAttachmentReader.cpp
+@@ -37,8 +37,10 @@ std::unique_ptr<InProcessAttachmentReader> InProcessAttachmentReader::create(
+     SDSTypeReader::Policy policy,
+     std::shared_ptr<SDSType> sds,
+     SDSTypeIndex offset,
+-    SDSTypeReader::Reference reference) {
+-    auto reader = std::unique_ptr<InProcessAttachmentReader>(new InProcessAttachmentReader(policy, sds));
++    SDSTypeReader::Reference reference,
++    bool resetOnOverrun) {
++    auto reader = std::unique_ptr<InProcessAttachmentReader>(
++        new InProcessAttachmentReader(policy, sds, resetOnOverrun));
+ 
+     if (!reader->m_reader) {
+         ACSDK_ERROR(LX("createFailed").d("reason", "object not fully created"));
+@@ -53,7 +55,11 @@ std::unique_ptr<InProcessAttachmentReader> InProcessAttachmentReader::create(
+     return reader;
+ }
+ 
+-InProcessAttachmentReader::InProcessAttachmentReader(SDSTypeReader::Policy policy, std::shared_ptr<SDSType> sds) {
++InProcessAttachmentReader::InProcessAttachmentReader(
++    SDSTypeReader::Policy policy,
++    std::shared_ptr<SDSType> sds,
++    bool resetOnOverrun)
++    :   m_resetOnOverrun(resetOnOverrun) {
+     if (!sds) {
+         ACSDK_ERROR(LX("ConstructorFailed").d("reason", "SDS parameter is nullptr"));
+         return;
+@@ -123,9 +129,14 @@ std::size_t InProcessAttachmentReader::read(
+         switch (readResult) {
+             // This means the writer has overwritten the reader.  An attachment cannot recover from this.
+             case SDSType::Reader::Error::OVERRUN:
+-                *readStatus = ReadStatus::ERROR_OVERRUN;
+-                ACSDK_ERROR(LX("readFailed").d("reason", "memory overrun by writer"));
+-                close();
++                if (m_resetOnOverrun) {
++                    *readStatus = ReadStatus::OK_OVERRUN_RESET;
++                    m_reader->seek(0, SDSTypeReader::Reference::BEFORE_WRITER);
++                } else {
++                    *readStatus = ReadStatus::ERROR_OVERRUN;
++                    ACSDK_ERROR(LX("readFailed").d("reason", "memory overrun by writer"));
++                    close();
++                }
+                 break;
+ 
+             // This means there is still an active writer, but no data.  A read would block if the policy was blocking.
+diff --git a/AVSCommon/Utils/src/Network/InternetConnectionMonitor.cpp b/AVSCommon/Utils/src/Network/InternetConnectionMonitor.cpp
+index 731b23b..1573783 100644
+--- a/AVSCommon/Utils/src/Network/InternetConnectionMonitor.cpp
++++ b/AVSCommon/Utils/src/Network/InternetConnectionMonitor.cpp
+@@ -160,6 +160,8 @@ void InternetConnectionMonitor::testConnection() {
+             case avs::attachment::AttachmentReader::ReadStatus::OK_TIMEDOUT:
+                 testContent.append(buffer.data(), bytesRead);
+                 break;
++            case avs::attachment::AttachmentReader::ReadStatus::OK_OVERRUN_RESET:
++                break; // Attachment reader would never return this.
+             case avs::attachment::AttachmentReader::ReadStatus::ERROR_OVERRUN:
+             case avs::attachment::AttachmentReader::ReadStatus::ERROR_BYTES_LESS_THAN_WORD_SIZE:
+             case avs::attachment::AttachmentReader::ReadStatus::ERROR_INTERNAL:
+diff --git a/MediaPlayer/GStreamerMediaPlayer/src/AttachmentReaderSource.cpp b/MediaPlayer/GStreamerMediaPlayer/src/AttachmentReaderSource.cpp
+index df29af4..90feed1 100644
+--- a/MediaPlayer/GStreamerMediaPlayer/src/AttachmentReaderSource.cpp
++++ b/MediaPlayer/GStreamerMediaPlayer/src/AttachmentReaderSource.cpp
+@@ -119,6 +119,7 @@ gboolean AttachmentReaderSource::handleReadData() {
+         // Fall through if some data was read.
+         case AttachmentReader::ReadStatus::OK:
+         case AttachmentReader::ReadStatus::OK_WOULDBLOCK:
++        case AttachmentReader::ReadStatus::OK_OVERRUN_RESET:
+         // Fall through to retry reading later.
+         case AttachmentReader::ReadStatus::OK_TIMEDOUT:
+             if (size > 0) {
+diff --git a/PlaylistParser/src/PlaylistUtils.cpp b/PlaylistParser/src/PlaylistUtils.cpp
+index 3abce34..71c3984 100644
+--- a/PlaylistParser/src/PlaylistUtils.cpp
++++ b/PlaylistParser/src/PlaylistUtils.cpp
+@@ -102,6 +102,8 @@ bool extractPlaylistContent(std::unique_ptr<avsCommon::utils::HTTPContent> httpC
+             case avsCommon::avs::attachment::AttachmentReader::ReadStatus::OK_TIMEDOUT:
+                 playlistContent.append(buffer.data(), bytesRead);
+                 break;
++            case avsCommon::avs::attachment::AttachmentReader::ReadStatus::OK_OVERRUN_RESET:
++                break; // Attachment reader would never return this.
+             case avsCommon::avs::attachment::AttachmentReader::ReadStatus::ERROR_OVERRUN:
+             case avsCommon::avs::attachment::AttachmentReader::ReadStatus::ERROR_BYTES_LESS_THAN_WORD_SIZE:
+             case avsCommon::avs::attachment::AttachmentReader::ReadStatus::ERROR_INTERNAL:

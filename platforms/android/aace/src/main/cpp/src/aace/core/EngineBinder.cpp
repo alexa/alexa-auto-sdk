@@ -57,12 +57,17 @@ void EngineBinder::initialize( JNIEnv* env )
 
     m_javaClass_ContactUploader = NativeLib::FindClass( env, "com/amazon/aace/contactuploader/ContactUploader" );
 
+    m_javaClass_MetricsUploader = NativeLib::FindClass( env, "com/amazon/aace/metrics/MetricsUploader" );
+
     m_javaClass_NetworkInfoProvider = NativeLib::FindClass( env, "com/amazon/aace/network/NetworkInfoProvider" );
 
 #ifdef INCLUDE_ALEXA_COMMS_MODULE
     m_javaClass_AlexaComms = NativeLib::FindClass(env, "com/amazon/aace/communication/AlexaComms");
 #endif
 
+#ifdef INCLUDE_LOCAL_VOICE_CONTROL_MODULE
+    m_javaClass_ClimateControlInterface = NativeLib::FindClass( env, "com/amazon/aace/carControl/ClimateControlInterface" );
+#endif
 }
 
 std::shared_ptr<LoggerBinder> EngineBinder::createLoggerBinder( JNIEnv* env, jobject platformInterface )
@@ -381,6 +386,25 @@ std::shared_ptr<ContactUploaderBinder> EngineBinder::createContactUploaderBinder
     return contactUploaderBinder;
 }
 
+std::shared_ptr<MetricsUploaderBinder> EngineBinder::createMetricsUploaderBinder(JNIEnv *env, jobject platformInterface)
+{
+    // create the platform interface native binder
+    std::shared_ptr<MetricsUploaderBinder> metricsUploaderBinder = std::make_shared<MetricsUploaderBinder>();
+
+    // register the platform interface with the engine
+    m_engine->registerPlatformInterface( metricsUploaderBinder );
+
+    // bind the platform java interface to the native interface
+    jclass platformInterfaceClass = env->GetObjectClass( platformInterface );
+    jmethodID javaMethod_setNativeObject = env->GetMethodID( platformInterfaceClass, "setNativeObject", "(J)V" );
+
+    metricsUploaderBinder->bind( env, platformInterface );
+
+    env->CallVoidMethod( platformInterface, javaMethod_setNativeObject, (jlong) metricsUploaderBinder.get() );
+
+    return metricsUploaderBinder;
+}
+
 std::shared_ptr<NetworkInfoProviderBinder> EngineBinder::createNetworkInfoProviderBinder( JNIEnv* env, jobject platformInterface )
 {
     // create the platform interface native binder
@@ -438,6 +462,30 @@ std::shared_ptr<NotificationsBinder> EngineBinder::createNotificationsBinder( JN
 
     return notificationsBinder;
 }
+
+#ifdef INCLUDE_LOCAL_VOICE_CONTROL_MODULE
+std::shared_ptr<ClimateControlInterfaceBinder> EngineBinder::createClimateControlInterfaceBinder( JNIEnv* env, jobject platformInterface )
+{
+    jmethodID javaMethod;
+    
+    jclass platformInterfaceClass = env->GetObjectClass( platformInterface );
+
+    // create the platform interface native binder
+    std::shared_ptr<ClimateControlInterfaceBinder> climateControlInterfaceBinder = std::make_shared<ClimateControlInterfaceBinder>();
+
+    // register the platform interface with the engine
+    m_engine->registerPlatformInterface( climateControlInterfaceBinder );
+
+    // bind the platform java interface to the native interface
+    jmethodID javaMethod_setNativeObject = env->GetMethodID( platformInterfaceClass, "setNativeObject", "(J)V" );
+
+    climateControlInterfaceBinder->bind( env, platformInterface );
+
+    env->CallVoidMethod( platformInterface, javaMethod_setNativeObject, (jlong) climateControlInterfaceBinder.get() );
+
+    return climateControlInterfaceBinder;
+}
+#endif //INCLUDE_LOCAL_VOICE_CONTROL_MODULE
 
 std::shared_ptr<ExternalMediaAdapterBinder> EngineBinder::createExternalMediaAdapterBinder( JNIEnv* env, jobject platformInterface )
 {
@@ -571,6 +619,10 @@ bool EngineBinder::registerPlatformInterface( JNIEnv* env, jobject platformInter
         m_contactUploader = createContactUploaderBinder(env, platformInterface);
         return true;
     }
+    else if( env->IsInstanceOf( platformInterface, m_javaClass_MetricsUploader.get() ) ) {
+        m_metricsUploader = createMetricsUploaderBinder(env, platformInterface);
+        return true;
+    }
     else if( env->IsInstanceOf( platformInterface, m_javaClass_NetworkInfoProvider.get() ) ) {
         m_networkInfo = createNetworkInfoProviderBinder( env, platformInterface );
         return true;
@@ -589,6 +641,13 @@ bool EngineBinder::registerPlatformInterface( JNIEnv* env, jobject platformInter
         return true;
     }
 #endif //INCLUDE_ALEXA_COMMS_MODULE
+#ifdef INCLUDE_LOCAL_VOICE_CONTROL_MODULE
+
+    else if( env->IsInstanceOf( platformInterface, m_javaClass_ClimateControlInterface.get() ) ) {
+        m_climateControl = createClimateControlInterfaceBinder( env, platformInterface );
+        return true;
+    }
+#endif //INCLUDE_LOCAL_VOICE_CONTROL_MODULE
 
     return false;
 }

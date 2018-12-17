@@ -402,6 +402,7 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testCallFailed) {
 
     EXPECT_CALL(*m_mockGui, dial(testing::_)).Times(testing::Exactly(1)).WillOnce(testing::Return(true));
     EXPECT_CALL(*m_mockContextManager, setState(testing::_, testing::_, testing::_, testing::_)).Times(testing::Exactly(2));
+    EXPECT_CALL(*m_mockFocusManager, releaseChannel(testing::_, testing::_)).Times(testing::Exactly(1));
 
     m_capAgent->CapabilityAgent::preHandleDirective(directive, std::move(m_mockDirectiveHandlerResult));
     m_capAgent->CapabilityAgent::handleDirective(directive->getMessageId());
@@ -424,6 +425,7 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testCallStateChangedIdle) {
     auto callId = m_capAgent->createCallId();
     EXPECT_CALL(*m_mockContextManager, setState(testing::_, testing::_, testing::_, testing::_)).Times(testing::Exactly(1));
     EXPECT_CALL(*m_mockMessageSender, sendMessage(testing::_)).Times(testing::Exactly(1));
+    EXPECT_CALL(*m_mockFocusManager, releaseChannel(testing::_, testing::_)).Times(testing::Exactly(1));
 
     m_capAgent->callStateChanged( aace::phoneCallController::PhoneCallControllerEngineInterface::CallState::IDLE, callId, "" );
     m_wakeSetCompletedFuture.wait_for(TIMEOUT);
@@ -435,6 +437,7 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testCallStateChangedActive) {
     auto callId = m_capAgent->createCallId();
     EXPECT_CALL(*m_mockContextManager, setState(testing::_, testing::_, testing::_, testing::_)).Times(testing::Exactly(1));
     EXPECT_CALL(*m_mockMessageSender, sendMessage(testing::_)).Times(testing::Exactly(1));
+    EXPECT_CALL(*m_mockFocusManager, acquireChannel(testing::_, testing::_, testing::_)).Times(testing::Exactly(1)).WillOnce(testing::Return(true));
 
     m_capAgent->callStateChanged( aace::phoneCallController::PhoneCallControllerEngineInterface::CallState::ACTIVE, callId, "" );
     m_wakeSetCompletedFuture.wait_for(TIMEOUT);
@@ -447,6 +450,7 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testCallStateChangedOutboundRingi
     auto callId = m_capAgent->createCallId();
     EXPECT_CALL(*m_mockContextManager, setState(testing::_, testing::_, testing::_, testing::_)).Times(testing::Exactly(1));
     EXPECT_CALL(*m_mockMessageSender, sendMessage(testing::_)).Times(testing::Exactly(1));
+    EXPECT_CALL(*m_mockFocusManager, acquireChannel(testing::_, testing::_, testing::_)).Times(testing::Exactly(1)).WillOnce(testing::Return(true));
 
     m_capAgent->callStateChanged( aace::phoneCallController::PhoneCallControllerEngineInterface::CallState::OUTBOUND_RINGING, callId, "" );
     m_wakeSetCompletedFuture.wait_for(TIMEOUT);
@@ -459,6 +463,7 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testCallStateChangedCallReceived)
     auto callId = m_capAgent->createCallId();
     EXPECT_CALL(*m_mockContextManager, setState(testing::_, testing::_, testing::_, testing::_)).Times(testing::Exactly(1));
     EXPECT_CALL(*m_mockMessageSender, sendMessage(testing::_)).Times(testing::Exactly(1));
+    EXPECT_CALL(*m_mockFocusManager, acquireChannel(testing::_, testing::_, testing::_)).Times(testing::Exactly(1)).WillOnce(testing::Return(true));
 
     m_capAgent->callStateChanged( aace::phoneCallController::PhoneCallControllerEngineInterface::CallState::CALL_RECEIVED, callId, "" );
     m_wakeSetCompletedFuture.wait_for(TIMEOUT);
@@ -471,6 +476,7 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testCallStateChangedInboundRingin
     auto callId = m_capAgent->createCallId();
     EXPECT_CALL(*m_mockContextManager, setState(testing::_, testing::_, testing::_, testing::_)).Times(testing::Exactly(1));
     EXPECT_CALL(*m_mockMessageSender, sendMessage(testing::_)).Times(testing::Exactly(1));
+    EXPECT_CALL(*m_mockFocusManager, acquireChannel(testing::_, testing::_, testing::_)).Times(testing::Exactly(1)).WillOnce(testing::Return(true));
 
     m_capAgent->callStateChanged( aace::phoneCallController::PhoneCallControllerEngineInterface::CallState::INBOUND_RINGING, callId, "" );
     m_wakeSetCompletedFuture.wait_for(TIMEOUT);

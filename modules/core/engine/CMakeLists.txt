@@ -15,6 +15,7 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Core/ServiceDescription.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Logger/EngineLogger.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Logger/LoggerEngineService.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Logger/LoggerServiceInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Logger/LoggerEngineImpl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Logger/LogEntry.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Logger/LogEntryBuffer.h
@@ -37,6 +38,8 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Storage/JSONStorage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Storage/SQLiteStorage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Storage/LocalStorageInterface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Metrics/MetricsEngineService.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Metrics/MetricsUploaderEngineImpl.h
 )
  
 source_group("Header Files" FILES ${HEADERS})
@@ -49,6 +52,7 @@ add_library(AACECoreEngine SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ServiceDescription.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Logger/EngineLogger.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Logger/LoggerEngineService.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Logger/LoggerServiceInterface.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Logger/LoggerEngineImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Logger/LogEntry.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Logger/LogEntryBuffer.cpp
@@ -72,6 +76,8 @@ add_library(AACECoreEngine SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Storage/SQLiteStorage.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Storage/StorageConfigurationImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Storage/LocalStorageInterface.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Metrics/MetricsEngineService.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Metrics/MetricsUploaderEngineImpl.cpp
 )
 
 find_path(RAPIDJSON_INCLUDE_DIR rapidjson/rapidjson.h

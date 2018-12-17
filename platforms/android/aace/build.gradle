@@ -3,8 +3,15 @@ import java.util.regex.Pattern
 
 apply plugin: 'com.android.library'
 
-if (!project.hasProperty('INCLUDE_ALEXA_COMMS_MODULE'))
+if (project.hasProperty("INCLUDE_ALEXA_COMMS_MODULE"))
+    project.ext.INCLUDE_ALEXA_COMMS_MODULE = project.getProperties().get("INCLUDE_ALEXA_COMMS_MODULE").toBoolean()
+else
     project.ext.INCLUDE_ALEXA_COMMS_MODULE = false;
+
+if (project.hasProperty("INCLUDE_LOCAL_VOICE_CONTROL_MODULE"))
+    project.ext.INCLUDE_LOCAL_VOICE_CONTROL_MODULE = project.getProperties().get("INCLUDE_LOCAL_VOICE_CONTROL_MODULE").toBoolean()
+else
+    project.ext.INCLUDE_LOCAL_VOICE_CONTROL_MODULE = false;
 
 android {
     compileSdkVersion 26
@@ -13,14 +20,15 @@ android {
         minSdkVersion 22
         targetSdkVersion 23
         versionCode 1
-        versionName '1.3'
+        versionName '1.4'
         ndk {
             abiFilters = generateAbiFiltersDeploy()
         }
         externalNativeBuild {
             cmake {
                 arguments '-DANDROID_STL=c++_shared',
-                          '-DINCLUDE_ALEXA_COMMS_MODULE=' + (project.INCLUDE_ALEXA_COMMS_MODULE ? "ON" : "OFF")
+                          '-DINCLUDE_ALEXA_COMMS_MODULE=' + (project.INCLUDE_ALEXA_COMMS_MODULE ? "ON" : "OFF"),
+                          '-DINCLUDE_LOCAL_VOICE_CONTROL_MODULE=' + (project.INCLUDE_LOCAL_VOICE_CONTROL_MODULE ? "ON" : "OFF")
             }
         }
     }
@@ -132,9 +140,13 @@ String generateLine(int length) {
 void generatePropertiesForRuntime() {
     def runtimeProps = new Properties();
     runtimeProps.setProperty("communications", "false");
+    runtimeProps.setProperty("localvoicecontrol", "false");
 
     if (project.INCLUDE_ALEXA_COMMS_MODULE) {
         runtimeProps.setProperty("communications", "true");
+    }
+    if (project.INCLUDE_LOCAL_VOICE_CONTROL_MODULE) {
+        runtimeProps.setProperty("localvoicecontrol", "true");
     }
 
     def assetFolder = project.file('src/main/assets');

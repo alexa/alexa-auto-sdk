@@ -302,7 +302,7 @@ To implement a custom handler for GUI templates, the `aace::alexa::TemplateRunti
 
 The Engine provides methods for notifying it of playback controller events. If the platform has playback control features, it must inform the Engine.
 
-####PlayerInfo Only controls
+#### PlayerInfo Only controls
 
 The Template Runtime's Player Info template specifies some additional controls to be displayed. This is for GUI implementations which use the PlayerInfo template as a reference for their GUI displays. The controls available, for a given service, come down with the playerInfo template. For toggles, the synced state is also provided by the PlayerInfo template.
 

@@ -8,7 +8,7 @@ source ${THISDIR}/common.sh
 #
 
 usageExit() {
-	echo "Usage: oe [options] [<bbrecipe-file>|<meta-layer>|<extra-conf-file>]"
+	echo "Usage: oe [options] [<module-path>|<meta-layer>|<extra-bb-file>|<extra-conf-file>]"
 	echo ""
 	echo " -h,--help                  = Print usage information and exit."
 	echo ""
@@ -22,10 +22,11 @@ usageExit() {
 	echo " --package <recipe-name>    = Specify OE recipe name explicitly."
 	echo " --enable-sensitive-logs    = Enable sensitive logs only when building with debugging options."
 	echo " --enable-latency-logs      = Enable user perceived latency logs only when building with debugging options."
+	echo " --enable-tests             = Enable bulding test packages for AAC modules."
 	echo ""
 	echo "Additional options:"
-	echo "--force-docker              = Force builds to happen inside an ubuntu docker container."
-	echo "--no-tty                    = Runs docker commands without TTY to support CI tools such as Jenkins."
+	echo " --force-docker             = Force builds to happen inside an ubuntu docker container."
+	echo " --no-tty                   = Runs docker commands without TTY to support CI tools such as Jenkins."
 	echo ""
 	exit 1
 }
@@ -81,8 +82,27 @@ while [[ $# -gt 0 ]]; do
 		LATENCY_LOGS="1"
 		shift
 		;;
+		--enable-tests)
+		ENABLE_TESTS="1"
+		shift
+		;;
 		--force-docker)
 		FORCE_DOCKER="1"
+		shift
+		;;
+		--default-logger-enabled)
+		DEFAULT_LOGGER_ENABLED="$2"
+		shift
+		shift
+		;;
+		--default-logger-level)
+		DEFAULT_LOGGER_LEVEL="$2"
+		shift
+		shift
+		;;
+		--default-logger-sink)
+		DEFAULT_LOGGER_SINK="$2"
+		shift
 		shift
 		;;
 		--no-tty)
@@ -115,6 +135,7 @@ ANDROID_API_LEVEL=${ANDROID_API_LEVEL:-22}
 QNX_BASE=${QNX_BASE:-"${HOME}/qnx700"}
 SENSITIVE_LOGS=${SENSITIVE_LOGS:-0}
 LATENCY_LOGS=${LATENCY_LOGS:-0}
+ENABLE_TESTS=${ENABLE_TESTS:-0}
 
 EXTRA_MODULES=$@
 
@@ -127,8 +148,8 @@ EXTRA_MODULES=$@
 #
 
 if [ $(uname) = "Darwin" ] || ([ ! -f /.dockerenv ] && [ "${FORCE_DOCKER}" = "1" ]); then
-        if [ $(uname) = "Darwin" ]; then
-        	note "Builder only runs within Docker with macOS host"
+	if [ $(uname) = "Darwin" ]; then
+		note "Builder only runs within Docker with macOS host"
 	fi
 	if [[ ${TARGET} = *"native"* ]]; then
 		warn "\"native\" target will be built for Generic Linux"
@@ -251,33 +272,36 @@ qnx_checks() {
 
 EXTRA_BBFILES="${MODULES_PATH}/*/*.bb"
 EXTRA_BBLAYERS=""
+EXTRA_INSTALLS=""
 
-add_extra_bbfile() {
-	module=$(realpath ${1})
-	sub_module=${2}
+add_extra_module() {
+	local module=$(realpath ${1})
+	local module_name=$(basename ${module})
+	local sub_module=${2}
 	if [[ -d ${module} ]]; then
-		if [[ $(basename ${module}) == "meta-"* && -e ${module}/conf/layer.conf ]]; then
+		if [[ ${module_name} == "meta-"* && -e ${module}/conf/layer.conf ]]; then
 			note "Adding meta layer: ${module}"
 			EXTRA_BBLAYERS="${EXTRA_BBLAYERS} ${module}"
 		elif [[ ! ${sub_module} ]]; then
-			note "Search for sub modules: ${module}"
+			note "Search for modules & meta layers: ${module}"
 			for sub_module in $(find ${module} -mindepth 1 -maxdepth 1 -type d) ; do
-				add_extra_bbfile ${sub_module} 1
+				add_extra_module ${sub_module} 1
 			done
-		elif [[ ${sub_module} && $(basename ${module}) == "modules" ]]; then
+		elif [[ ${sub_module} && ${module_name} == "modules" ]]; then
 			note "Adding modules: ${module}"
 			EXTRA_BBFILES="${EXTRA_BBFILES} ${module}/*/*.bb"
 		fi
 	elif [[ -e ${module} ]]; then
-		if [[ ${module} == *".bb" ]]; then
-			note "Adding BB file: ${module}"
-			EXTRA_BBFILES="${EXTRA_BBFILES} ${module}"
-		elif [[ ${module} == *".conf" ]]; then
+		if [[ ${module} == *".conf" ]]; then
 			note "Adding extra conf file: ${module}"
 			echo "# Extra Config: ${module}" >> ${LOCAL_CONF}
 			cat ${module} >> ${LOCAL_CONF}
 			echo "" >> ${LOCAL_CONF}
 			echo "#####" >> ${LOCAL_CONF}
+		elif [[ ${module} == *".bb" ]]; then
+			note "Adding single module: ${module}"
+			EXTRA_BBFILES="${EXTRA_BBFILES} ${module}"
+			EXTRA_INSTALLS="${EXTRA_INSTALLS} ${module_name%".bb"}"
 		else
 			warn "Unknown file: ${module}"
 		fi
@@ -313,15 +337,16 @@ BBLAYERS = " \\
   ${HOST_SUPPORT_LAYER} \\
   ${OE_CORE_PATH}/meta \\
   ${BUILDER_HOME}/meta-aac \\
+  ${BUILDER_HOME}/meta-aac-builder \\
   "
 EOF
 
 	# Copy default local.conf
-	cp ${BUILDER_HOME}/meta-aac/conf/local.conf.sample ${LOCAL_CONF}
+	cp ${BUILDER_HOME}/meta-aac-builder/conf/local.conf.sample ${LOCAL_CONF}
 
 	# Find extra bb files & layers
 	for module in ${EXTRA_MODULES} ; do
-		add_extra_bbfile ${module}
+		add_extra_module ${module}
 	done
 
 	# Register extra modules
@@ -358,15 +383,32 @@ EOF
 		note "Enable user perceived latency logs"
 		echo "AAC_LATENCY_LOGS = \"1\"" >> ${LOCAL_CONF}
 	fi
+	if [ ${ENABLE_TESTS} = "1" ]; then
+		note "Enable tests to build"
+		echo "AAC_ENABLE_TESTS = \"ON\"" >> ${LOCAL_CONF}
+	fi
+
+	# Extra image installation
+	if [ ! -z ${EXTRA_INSTALLS} ]; then
+		echo "IMAGE_INSTALL_append = \"${EXTRA_INSTALLS}\"" >> ${LOCAL_CONF}
+	fi
+	if [ "${DEFAULT_LOGGER_ENABLED}" ]; then
+		note "Set default logger enabled: ${DEFAULT_LOGGER_ENABLED}"
+		echo "AAC_DEFAULT_LOGGER_ENABLED = \"${DEFAULT_LOGGER_ENABLED}\"" >> ${LOCAL_CONF}
+	fi
+	if [ "${DEFAULT_LOGGER_LEVEL}" ]; then
+		note "Set default logger level: ${DEFAULT_LOGGER_LEVEL}"
+		echo "AAC_DEFAULT_LOGGER_LEVEL = \"${DEFAULT_LOGGER_LEVEL}\"" >> ${LOCAL_CONF}
+	fi
+	if [ "${DEFAULT_LOGGER_SINK}" ]; then
+		note "Set default logger sink: ${DEFAULT_LOGGER_SINK}"
+		echo "AAC_DEFAULT_LOGGER_SINK = \"${DEFAULT_LOGGER_SINK}\"" >> ${LOCAL_CONF}
+	fi
 
 	# Extra properties from CLI
 	for extra_conf in "${EXTRA_CONFS[@]}"; do
 		echo "${extra_conf%=*} = \"${extra_conf#*=}\"" >> ${LOCAL_CONF}
 	done
-
-	# AAC version
-	echo "DISTRO_VERSION = \"${SDK_BASE_VERSION}\"" >> ${LOCAL_CONF}
-	echo "SDK_VERSION = \"${SDK_VERSION}\"" >> ${LOCAL_CONF}
 }
 
 execute_bitbake() {
@@ -374,7 +416,7 @@ execute_bitbake() {
 
 	# Set template
 	rm -f ${BUILD_DIR}/conf/templateconf.cfg
-	export TEMPLATECONF=${BUILDER_HOME}/meta-aac/conf
+	export TEMPLATECONF=${BUILDER_HOME}/meta-aac-builder/conf
 
 	# Initialize BB with a build directory
 	source ${OE_CORE_PATH}/oe-init-build-env ${BUILD_DIR}
@@ -391,10 +433,6 @@ copy_images() {
 	mkdir -p ${DEPLOY_DIR}/${TARGET}
 	cp -P ${BUILD_DIR}/tmp*/deploy/images/${TARGET}/${PACKAGE}* ${DEPLOY_DIR}/${TARGET}
 	echo "SDK Version: ${SDK_VERSION}" > ${DEPLOY_DIR}/buildinfo.txt
-	if [ -d ${SDK_HOME}/.repo ] && [ $(command -v repo) ]; then
-		echo "Repo Info:" >> ${DEPLOY_DIR}/buildinfo.txt
-		repo forall -c "echo \${REPO_PROJECT} =\> \${REPO_PATH}: \${REPO_LREV} >> ${DEPLOY_DIR}/buildinfo.txt"
-	fi
 }
 
 build() {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,12 +17,13 @@ package com.amazon.aace.alexa.config;
 
 import android.util.Log;
 
+import com.amazon.aace.alexa.EqualizerController.EqualizerBand;
+import com.amazon.aace.alexa.EqualizerController.EqualizerBandLevel;
 import com.amazon.aace.core.config.EngineConfiguration;
 import com.amazon.aace.core.config.StreamConfiguration;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,7 +34,7 @@ import java.nio.charset.StandardCharsets;
  */
 public class AlexaConfiguration {
 
-    private static final String sTag = AlexaConfiguration.class.getSimpleName();
+    private static final String TAG = AlexaConfiguration.class.getSimpleName();
 
     /**
      * Factory method used to programmatically generate device info configuration data.
@@ -72,14 +73,14 @@ public class AlexaConfiguration {
 
             config.put("deviceInfo", deviceInfoElement );
 
-        } catch ( JSONException e ) { Log.e( sTag, e.getMessage() ); }
+        } catch ( JSONException e ) { Log.e( TAG, e.getMessage() ); }
 
         String configStr = config.toString();
         try ( InputStream is = new ByteArrayInputStream(
                 configStr.getBytes( StandardCharsets.UTF_8.name() ) )
         ) {
             deviceConfig = StreamConfiguration.create( is );
-        } catch ( IOException e ) { Log.e( sTag, e.getMessage() ); }
+        } catch ( IOException e ) { Log.e( TAG, e.getMessage() ); }
 
         return deviceConfig;
     }
@@ -110,14 +111,14 @@ public class AlexaConfiguration {
             JSONObject alertsCapabilityAgentElement = new JSONObject();
             alertsCapabilityAgentElement.put( "databaseFilePath", databaseFilePath );
             config.put( "alertsCapabilityAgent", alertsCapabilityAgentElement );
-        } catch ( JSONException e ) { Log.e( sTag, e.getMessage() ); }
+        } catch ( JSONException e ) { Log.e( TAG, e.getMessage() ); }
 
         String configStr = config.toString();
         try ( InputStream is = new ByteArrayInputStream(
                 configStr.getBytes( StandardCharsets.UTF_8.name() ) )
         ) {
             alertsConfig = StreamConfiguration.create( is );
-        } catch ( IOException e ) { Log.e( sTag, e.getMessage() ); }
+        } catch ( IOException e ) { Log.e( TAG, e.getMessage() ); }
 
         return alertsConfig;
     }
@@ -148,14 +149,14 @@ public class AlexaConfiguration {
             JSONObject notificationsElement = new JSONObject();
             notificationsElement.put( "databaseFilePath", databaseFilePath );
             config.put( "notifications", notificationsElement );
-        } catch ( JSONException e ) { Log.e( sTag, e.getMessage() ); }
+        } catch ( JSONException e ) { Log.e( TAG, e.getMessage() ); }
 
         String configStr = config.toString();
         try ( InputStream is = new ByteArrayInputStream(
                 configStr.getBytes( StandardCharsets.UTF_8.name() ) )
         ) {
             notificationsConfig = StreamConfiguration.create( is );
-        } catch ( IOException e ) { Log.e( sTag, e.getMessage() ); }
+        } catch ( IOException e ) { Log.e( TAG, e.getMessage() ); }
 
         return notificationsConfig;
     }
@@ -185,14 +186,14 @@ public class AlexaConfiguration {
             JSONObject certifiedSenderElement = new JSONObject();
             certifiedSenderElement.put( "databaseFilePath", databaseFilePath );
             config.put( "certifiedSender", certifiedSenderElement );
-        } catch ( JSONException e ) { Log.e( sTag, e.getMessage() ); }
+        } catch ( JSONException e ) { Log.e( TAG, e.getMessage() ); }
 
         String configStr = config.toString();
         try ( InputStream is = new ByteArrayInputStream(
                 configStr.getBytes( StandardCharsets.UTF_8.name() ) )
         ) {
             certifiedSenderConfig = StreamConfiguration.create( is );
-        } catch ( IOException e ) { Log.e( sTag, e.getMessage() ); }
+        } catch ( IOException e ) { Log.e( TAG, e.getMessage() ); }
 
         return certifiedSenderConfig;
     }
@@ -250,14 +251,14 @@ public class AlexaConfiguration {
                 libcurlUtilsElement.put("CURLOPT_INTERFACE", iface);
             }
             config.put( "libcurlUtils", libcurlUtilsElement );
-        } catch ( JSONException e ) { Log.e( sTag, e.getMessage() ); }
+        } catch ( JSONException e ) { Log.e( TAG, e.getMessage() ); }
 
         String configStr = config.toString();
         try ( InputStream is = new ByteArrayInputStream(
                 configStr.getBytes( StandardCharsets.UTF_8.name() ) )
         ) {
             curlConfig = StreamConfiguration.create( is );
-        } catch ( IOException e ) { Log.e( sTag, e.getMessage() ); }
+        } catch ( IOException e ) { Log.e( TAG, e.getMessage() ); }
 
         return curlConfig;
     }
@@ -294,14 +295,14 @@ public class AlexaConfiguration {
             JSONObject defaultAVSClientSettingsElement = new JSONObject();
             defaultAVSClientSettingsElement.put( "locale", locale );
             settingsElement.put( "defaultAVSClientSettings", defaultAVSClientSettingsElement );
-        } catch ( JSONException e ) { Log.e( sTag, e.getMessage() ); }
+        } catch ( JSONException e ) { Log.e( TAG, e.getMessage() ); }
 
         String configStr = config.toString();
         try ( InputStream is = new ByteArrayInputStream(
                 configStr.getBytes( StandardCharsets.UTF_8.name() ) )
         ) {
             settingsConfig = StreamConfiguration.create( is );
-        } catch ( IOException e ) { Log.e( sTag, e.getMessage() ); }
+        } catch ( IOException e ) { Log.e( TAG, e.getMessage() ); }
 
         return settingsConfig;
     }
@@ -356,14 +357,14 @@ public class AlexaConfiguration {
             JSONObject miscStorageElement = new JSONObject();
             miscStorageElement.put( "databaseFilePath", databaseFilePath );
             config.put( "miscDatabase", miscStorageElement );
-        } catch ( JSONException e ) { Log.e( sTag, e.getMessage() ); }
+        } catch ( JSONException e ) { Log.e( TAG, e.getMessage() ); }
 
         String configStr = config.toString();
         try ( InputStream is = new ByteArrayInputStream(
                 configStr.getBytes( StandardCharsets.UTF_8.name() ) )
         ) {
             miscStorageConfig = StreamConfiguration.create( is );
-        } catch ( IOException e ) { Log.e( sTag, e.getMessage() ); }
+        } catch ( IOException e ) { Log.e( TAG, e.getMessage() ); }
 
         return miscStorageConfig;
     }
@@ -395,14 +396,14 @@ public class AlexaConfiguration {
             JSONObject systemElement = new JSONObject();
             systemElement.put( "firmwareVersion", firmwareVersion );
             aaceAlexaElement.put( "system", systemElement );
-        } catch ( JSONException e ) { Log.e( sTag, e.getMessage() ); }
+        } catch ( JSONException e ) { Log.e( TAG, e.getMessage() ); }
 
         String configStr = config.toString();
         try ( InputStream is = new ByteArrayInputStream(
                 configStr.getBytes( StandardCharsets.UTF_8.name() ) )
         ) {
             systemConfig = StreamConfiguration.create( is );
-        } catch ( IOException e ) { Log.e( sTag, e.getMessage() ); }
+        } catch ( IOException e ) { Log.e( TAG, e.getMessage() ); }
 
         return systemConfig;
     }
@@ -438,14 +439,14 @@ public class AlexaConfiguration {
             encoderElement.put( "name", encoderName );
             speechRecognizerElement.put( "encoder", encoderElement );
             aaceAlexaElement.put( "speechRecognizer", speechRecognizerElement );
-        } catch ( JSONException e ) { Log.e( sTag, e.getMessage() ); }
+        } catch ( JSONException e ) { Log.e( TAG, e.getMessage() ); }
 
         String configStr = config.toString();
         try ( InputStream is = new ByteArrayInputStream(
                 configStr.getBytes( StandardCharsets.UTF_8.name() ) )
         ) {
             speechRecognizerConfig = StreamConfiguration.create( is );
-        } catch ( IOException e ) { Log.e( sTag, e.getMessage() ); }
+        } catch ( IOException e ) { Log.e( TAG, e.getMessage() ); }
 
         return speechRecognizerConfig;
     }
@@ -552,15 +553,139 @@ public class AlexaConfiguration {
 
             config.put("templateRuntimeCapabilityAgent", templateRuntimeElement );
 
-        } catch ( JSONException e ) { Log.e( sTag, e.getMessage() ); }
+        } catch ( JSONException e ) { Log.e( TAG, e.getMessage() ); }
 
         String configStr = config.toString();
         try ( InputStream is = new ByteArrayInputStream(
                 configStr.getBytes( StandardCharsets.UTF_8.name() ) )
         ) {
             templateRuntimeConfig = StreamConfiguration.create( is );
-        } catch ( IOException e ) { Log.e( sTag, e.getMessage() ); }
+        } catch ( IOException e ) { Log.e( TAG, e.getMessage() ); }
 
         return templateRuntimeConfig;
+    }
+
+    /**
+     * Factory method used to programmatically generate equalizer controller configuration data.
+     * This is an optional configuration, and default settings will be used if configuration is not
+     * provided. This method produces configuration data according to the JSON structure in the
+     * sample below.
+     *
+     * @code{.json}
+     *  "equalizer": {
+     *      "bands": {
+     *          "BASS": true,
+     *          "MIDRANGE": false,
+     *          "TREBLE": true
+     *      },
+     *      "defaultState": {
+     *          "bands": {
+     *              "BASS": 4,
+     *              "TREBLE" : -1
+     *          }
+     *      },
+     *      "minLevel": -6,
+     *      "maxLevel": 6
+     *  }
+     * @endcode
+     *
+     * The configuration branches are used as follows:
+     *
+     * @li equalizer.bands: Specifies which bands are supported by the device and will be enabled
+     *  for control with Alexa. Each child key is the name of an Alexa-supported band
+     *  ("BASS", "MIDRANGE", or "TREBLE") and value is whether the device supports the band. Only
+     *  bands explicitly declared supported will be enabled in the SDK and Alexa. Omitting this
+     *  branch enables all bands by default.
+     *
+     * @li equalizer.defaultState: Describes the default or reset state of the equalizer. These
+     *  settings are used to reset the equalizer with Alexa such as by saying "Alexa, reset bass."
+     *  If this branch or its child is omitted, default values will be used.
+     * @li equalizer.defaultState.bands: Defines the default gain level setting in dB for each
+     *  supported equalizer band. Each element key is the name of a supported band and value is a
+     *  level (int) specifying the default gain in dB. All of the supported bands must be provided
+     *  once this branch is defined. All dB levels must obey the limits declared in
+     *  "equalizer.minLevel" and "equalizer.maxLevel". Omitting this branch uses the default 0db
+     *  for each band.
+     *
+     * @li equalizer.minLevel and equalizer.maxLevel: Integer values specifying the decibel level
+     *  range on which Alexa may operate for the supported bands. The device may support a
+     *  different range internally, but Alexa will know only about the limits declared here. Values
+     *  should be specified as absolute amplitude gain in integer dB and scaled to the platform's
+     *  internal range as necessary. If these values are omitted, the default range min -6dB and
+     *  max +6dB will be used.
+     *
+     * @param  supportedBands The supported equalizer bands. Corresponds to the "equalizer.bands"
+     *         config branch. Only bands provided will be enabled. Null @a supportedBands omits the
+     *         config branch. Nonnull @a supportedBands includes the branch and declares each band
+     *         in the set with a value "true".
+     * @param  minLevel The minimum gain level for the equalizer bands in integer dB. Corresponds
+     *         to "equalizer.minLevel".
+     * @param  maxLevel The maximum gain level for the equalizer bands in integer dB. Corresponds
+     *         to "equalizer.maxLevel".
+     * @param  defaultBandLevels The default or reset state of the equalizer bands. Corresponds to
+     *         the "equalizer.defaultState.bands" config branch. Null @a defaultBandLevels omits
+     *         the config branch.
+     */
+    public static EngineConfiguration createEqualizerControllerConfig(
+            EqualizerBand[] supportedBands,
+            int minLevel,
+            int maxLevel,
+            EqualizerBandLevel[] defaultBandLevels  ) {
+
+        EngineConfiguration equalizerConfig = null;
+
+        JSONObject config = new JSONObject();
+        try {
+            JSONObject equalizerElement = new JSONObject();
+
+            // enabled
+            equalizerElement.put( "enabled", true );
+
+            // minLevel
+            equalizerElement.put( "minLevel", minLevel );
+
+            // maxLevel
+            equalizerElement.put( "maxLevel", maxLevel );
+
+            // bands
+            if ( supportedBands != null ) {
+                JSONObject bandsElement = new JSONObject();
+                if ( supportedBands.length != 0 ) {
+                    for ( EqualizerBand band : supportedBands ) {
+                        if ( band != null ) bandsElement.put( band.toString(), true );
+                    }
+                }
+                equalizerElement.put( "bands", bandsElement );
+            }
+
+            // defaultState
+            if ( defaultBandLevels != null && defaultBandLevels.length != 0 ) {
+                JSONObject defaultStateElement = new JSONObject();
+
+                // defaultState.bands
+                JSONObject defaultBands = new JSONObject();
+                for ( EqualizerBandLevel bandLevel : defaultBandLevels ) {
+                    if ( bandLevel != null && bandLevel.getBand() != null ) {
+                        defaultBands.put( bandLevel.getBand().toString(), bandLevel.getLevel() );
+                    }
+                }
+                defaultStateElement.put( "bands", defaultBands );
+
+                equalizerElement.put( "defaultState", defaultStateElement );
+            }
+
+            // root
+            config.put("equalizer", equalizerElement );
+
+        } catch ( JSONException e ) { Log.e( TAG, e.getMessage() ); }
+
+        String configStr = config.toString();
+        try ( InputStream is = new ByteArrayInputStream(
+                configStr.getBytes( StandardCharsets.UTF_8.name() ) )
+        ) {
+            equalizerConfig = StreamConfiguration.create( is );
+        } catch ( IOException e ) { Log.e( TAG, e.getMessage() ); }
+
+        return equalizerConfig;
     }
 }

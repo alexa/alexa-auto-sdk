@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -20,12 +20,12 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.amazon.aace.logger.Logger;
-import com.amazon.maccandroid.Log;
 import com.amazon.sampleapp.LimitedSizeArrayList;
 import com.amazon.sampleapp.R;
 
@@ -37,41 +37,49 @@ import java.util.List;
 import java.util.Set;
 
 public class LogRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private final Context mContext;
+    /// A string to identify log entries originating from this file
+    private static final String TAG = "LogRecyclerViewAdapter";
 
-    // Max number of logs to be displayed in the adapter
-    private static final int MAX_NUM_FILTERED_LOGS = 500;
-
-    // The items to display in your RecyclerView
-    private List<LogEntry> mItems;
-    private LimitedSizeArrayList<LogEntry> mFilteredItems;
-
-
-    // The items to filter out of the log
-    private Set<String> mFilteredLevels;
-    private Set<String> mFilteredSources;
-    private boolean mHideCards;
-    private boolean mHideJsonTemplates;
-    private boolean mHideMapView;
-    private static final String GoogleMapsAPIkey = "com.google.android.geo.API_KEY";
-
-    private static final String sTag = "LogRecyclerViewAdapter";
-
+    // Integers to identify LogEntry types for view recycling
     public static final int TEXT_LOG = 0, BODY_TEMPLATE1 = 1, BODY_TEMPLATE2 = 2, LIST_TEMPLATE1 = 3,
             WEATHER_TEMPLATE = 4, SET_DESTINATION_TEMPLATE = 5, LOCAL_SEARCH_LIST_TEMPLATE1 = 6,
             RENDER_PLAYER_INFO = 7, CBL_CODE = 8, CBL_CODE_EXPIRED = 9, JSON_TEXT = 10;
-    public enum FILTER_TYPE { SOURCE, LEVEL, JSON, CARD }
-    public LogRecyclerViewAdapter( List<LogEntry> items, Context context ) {
+
+    /// Max number of logs to be kept in memory
+    private static final int MAX_NUM_LOGS = 2000;
+    /// Max number of logs to be displayed in the adapter
+    private static final int MAX_NUM_FILTERED_LOGS = 500;
+
+    /// The full list of log items
+    private List<LogEntry> mItems;
+    /// The log items to display in the RecyclerView
+    private List<LogEntry> mFilteredItems;
+
+    /// The log levels to hide from the log view
+    private Set<String> mHiddenLevels;
+    /// The log sources to hide from the log view
+    private Set<String> mHiddenSources;
+    /// Whether display card entries should be hidden from the log view
+    private boolean mHideCards;
+    /// Whether pretty-printed JSON text entries should be hidden from the log view
+    private boolean mHideJsonTemplates;
+
+    private boolean mHideMapView;
+    private static final String GoogleMapsAPIkey = "com.google.android.geo.API_KEY";
+
+    private final Context mContext;
+
+    public LogRecyclerViewAdapter( Context context ) {
         mContext = context;
-        mItems = items;
+
+        mItems = new LimitedSizeArrayList<>( MAX_NUM_LOGS );
         mFilteredItems = new LimitedSizeArrayList<>( MAX_NUM_FILTERED_LOGS );
-        mFilteredItems.addAll( items );
-        mFilteredLevels = new HashSet<>();
-        mFilteredSources = new HashSet<>();
+        mHiddenLevels = new HashSet<>();
+        mHiddenSources = new HashSet<>();
         mHideCards = false;
         mHideJsonTemplates = false;
-        mHideMapView = false;
 
+        mHideMapView = false;
         final PackageManager pm = mContext.getPackageManager();
         // check for API key before trying to load map
         try {
@@ -81,19 +89,19 @@ public class LogRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                 final String value = String.valueOf(info.metaData.get(GoogleMapsAPIkey));
                 if ( value.isEmpty() ) {
                     mHideMapView = true;
-                    Log.i(sTag, "No Google maps API key in AndroidManifest.xml");
+                    Log.i( TAG, "No Google maps API key in AndroidManifest.xml" );
                 }
             }
         } catch (final PackageManager.NameNotFoundException e) {
-            Log.i(sTag, e.toString());
+            Log.i( TAG, e.toString() );
         }
     }
 
-    // Return the size of your dataset (invoked by the layout manager)
+    /// Returns the size of the data set (invoked by the layout manager).
     @Override
-    public int getItemCount() { return mFilteredItems != null ? mFilteredItems.size() : mItems.size(); }
+    public int getItemCount() { return mFilteredItems.size(); }
 
-    //Returns the view type of the item at position for the purposes of view recycling.
+    /// Returns the view type of the item at @a position for view recycling.
     @Override
     public int getItemViewType( int position ) {
         if ( mFilteredItems.get( position ) != null ) {
@@ -103,11 +111,14 @@ public class LogRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     }
 
     /**
-     * This method creates different RecyclerView.ViewHolder objects based on the item view type.
+     * Called when RecyclerView needs a new RecyclerView.ViewHolder of the given type to represent
+     * an item. This new ViewHolder should be constructed with a new View that can represent the
+     * items of the given type.
      *
-     * @param viewGroup ViewGroup container for the item
-     * @param viewType type of view to be inflated
-     * @return viewHolder to be inflated
+     * @param viewGroup The ViewGroup into which the new View will be added after it is bound to an
+     *                  adapter position.
+     * @param viewType The view type of the new View.
+     * @return A new ViewHolder that holds a View of the given view type.
      */
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder( ViewGroup viewGroup, int viewType ) {
@@ -188,12 +199,13 @@ public class LogRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     }
 
     /**
-     * This method internally calls onBindViewHolder(ViewHolder, int) to update the
-     * RecyclerView.ViewHolder contents with the item at the given position
-     * and also sets up some private fields to be used by RecyclerView.
+     * Called by RecyclerView to display the data at the specified position.
+     * This method should update the contents of the itemView to reflect the item at the given
+     * position
      *
-     * @param viewHolder The type of RecyclerView.ViewHolder to populate
-     * @param position Item position in the viewgroup.
+     * @param viewHolder The ViewHolder which should be updated to represent the contents of the
+     *                   item at the given position in the data set.
+     * @param position The position of the item within the adapter's data set.
      */
     @Override
     public void onBindViewHolder( RecyclerView.ViewHolder viewHolder, int position ) {
@@ -204,7 +216,6 @@ public class LogRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
         LogEntry log = mFilteredItems.get( position );
         JSONObject json = log.getJSON();
-
         switch ( viewHolder.getItemViewType() ) {
             case TEXT_LOG:
                 ConfigureViewHolder.configureTextLog( ( ViewHolderTextLog ) viewHolder, json );
@@ -253,117 +264,98 @@ public class LogRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         }
     }
 
-    public void clear() {
-        final int size = mFilteredItems.size();
-        mItems.clear();
-        mFilteredItems.clear();
-        notifyItemRangeRemoved( 0, size );
+    /// Set whether display cards should be displayed in the log view.
+    /// Note: Modifies adapter contents. Call from the main thread *only*
+    public void setCardDisplayMode( boolean shouldDisplay ) {
+        mHideCards = !shouldDisplay;
+        updateFilteredItemList();
     }
 
-    //
-    // For filtering displayed logs by type (e.g. display cards, AVS source logs, etc.)
-    //
-
-    public void setCardDisplayMode( boolean display ) {
-        toggleFilterSwitch( display, "", FILTER_TYPE.CARD );
+    /// Sets whether pretty-printed JSON text should be displayed in the log view.
+    /// Note: Modifies adapter contents. Call from the main thread *only*
+    public void setJsonDisplayMode( boolean shouldDisplay ) {
+        mHideJsonTemplates = !shouldDisplay;
+        updateFilteredItemList();
     }
 
-    public void setJsonDisplayMode( boolean display ) {
-        toggleFilterSwitch( display, "", FILTER_TYPE.JSON );
-    }
-
+    /// Sets whether a log source type should be displayed in the log view.
+    /// Note: Modifies adapter contents. Call from the main thread *only*
     public void setSourceDisplayMode( String source, boolean display ) {
-        toggleFilterSwitch( display, source, FILTER_TYPE.SOURCE );
+        if ( !display ) mHiddenSources.add( source );
+        else mHiddenSources.remove( source );
+        updateFilteredItemList();
     }
 
-    // Filter out levels below selected level
-    public void filterLevelDisplay( Logger.Level selectedLevel ) {
+    /// Sets the log level filter. Hides levels below @a selectedLevel from the log view.
+    /// Note: Modifies adapter contents. Call from the main thread *only*
+    public void setDisplayLevel( Logger.Level selectedLevel ) {
         for ( Logger.Level level : Logger.Level.values() ) {
             if ( level.ordinal() >= selectedLevel.ordinal() ) {
-                includeInLog( FILTER_TYPE.LEVEL, level.toString() );
+                mHiddenLevels.remove( level.toString() );
             } else {
-                hideFromLog( FILTER_TYPE.LEVEL, level.toString() );
+                mHiddenLevels.add( level.toString() );
             }
         }
+        updateFilteredItemList();
     }
 
-    // Toggle filter mode for a type of log
-    private void toggleFilterSwitch( boolean isChecked,
-                                    String filter,
-                                    FILTER_TYPE type ) {
-        if ( !isChecked ) {
-            // Filter item type from log
-            hideFromLog( type, filter );
+    /// Inserts @c item to the log view backing list. @c item will be filtered from the view
+    /// as necessary.
+    /// Note: Modifies adapter contents. Call from the main thread *only*
+    public void insertItem( LogEntry item ) {
+        mItems.add( item );
+        if ( shouldDisplayItem( item ) ) mFilteredItems.add( item );
+        else return;
+
+        if ( mFilteredItems.size() < MAX_NUM_FILTERED_LOGS ) {
+            notifyItemInserted( getItemCount() - 1 );
         } else {
-            // Include item type in log
-            includeInLog( type, filter );
+            // Note: mFiltered items is a limited size array list that removes the first
+            // item and inserts a new item at the end when the max size is reached.
+            // A more efficient way to notify of this structural/item change than
+            // notifyDataSetChanged is TODO
+            notifyDataSetChanged();
         }
     }
 
-    // Filter item out of log
-    private void hideFromLog( FILTER_TYPE type, String value ) {
-        switch ( type ) {
-            case LEVEL:
-                mFilteredLevels.add( value );
-                break;
-            case SOURCE:
-                mFilteredSources.add( value );
-                break;
-            case CARD:
-                mHideCards = true;
-                break;
-            case JSON:
-                mHideJsonTemplates = true;
-                break;
-        }
-        filter();
-    }
-
-    // Show item in log
-    private void includeInLog( FILTER_TYPE type, String value ) {
-        switch ( type ) {
-            case LEVEL:
-                mFilteredLevels.remove( value );
-                break;
-            case SOURCE:
-                mFilteredSources.remove( value );
-                break;
-            case CARD:
-                mHideCards = false;
-                break;
-            case JSON:
-                mHideJsonTemplates = false;
-                break;
-        }
-        filter();
-    }
-
-    // Update filters
-    public void filter() {
+    /// Clears the log view and resets the data in the backing list.
+    /// Note: Modifies adapter contents. Call from the main thread *only*
+    public void clear() {
+        int count = getItemCount();
+        mItems.clear();
         mFilteredItems.clear();
+        notifyItemRangeRemoved( 0, count );
+    }
 
-        if ( mFilteredLevels.isEmpty() && mFilteredSources.isEmpty() && !mHideCards && !mHideJsonTemplates) {
-            mFilteredItems.addAll( mItems );
-        } else {
-            for ( LogEntry item : mItems ) {
-                JSONObject json = item.getJSON();
-                try {
-                    String level = json.getString( "level" );
-                    String source = json.getString( "source" );
-                    boolean isHiddenCard = mHideCards && item.getType() != TEXT_LOG
-                            && item.getType() != JSON_TEXT;
-                    boolean isHiddenJsonTemplate = mHideJsonTemplates && item.getType() == JSON_TEXT;
-
-                    if ( !mFilteredLevels.contains( level ) && !mFilteredSources.contains( source )
-                            && !isHiddenCard && !isHiddenJsonTemplate ) {
-                        mFilteredItems.add( item );
-                    }
-                } catch ( JSONException e ) {
-                    e.printStackTrace();
-                    mFilteredItems.add( item );
-                }
-            }
+    /// Reconstructs the filtered list of log entries to display.
+    /// Note: Will force the LayoutManager to rebind and relayout all visible views.
+    /// Note: Modifies adapter contents. Call from the main thread *only*
+    private void updateFilteredItemList() {
+        mFilteredItems.clear();
+        for ( LogEntry item : mItems ) {
+            if ( shouldDisplayItem( item ) ) mFilteredItems.add( item );
         }
         notifyDataSetChanged();
+    }
+
+    /// Checks whether @a item should be included in the filtered log view.
+    private boolean shouldDisplayItem( LogEntry item ) {
+        JSONObject json = item.getJSON();
+        try {
+            String level = json.getString( "level" );
+            if ( mHiddenLevels.contains( level ) ) return false;
+
+            String source = json.getString( "source" );
+            if ( mHiddenSources.contains( source ) ) return false;
+
+            int type = item.getType();
+            boolean isHiddenCard = mHideCards && type != TEXT_LOG && type != JSON_TEXT;
+            if ( isHiddenCard ) return false;
+
+            boolean isHiddenJsonTemplate = mHideJsonTemplates && type == JSON_TEXT;
+            if ( isHiddenJsonTemplate ) return false;
+
+            return true;
+        } catch ( JSONException e ) { return true; }
     }
 }

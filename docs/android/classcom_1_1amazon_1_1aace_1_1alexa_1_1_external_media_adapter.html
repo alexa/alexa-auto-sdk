@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">1.4.0</span>
+   &#160;<span id="projectnumber">1.5.0</span>
    </div>
   </td>
  </tr>
@@ -187,10 +187,11 @@ Public Member Functions</h2></td></tr>
     <tr><td class="paramname">accessToken</td><td>The handshake token between AVS, and the external media player app session</td></tr>
     <tr><td class="paramname">userName</td><td>The username proided by the external media player app, if available</td></tr>
     <tr><td class="paramname">forceLogin</td><td>True if no handshake is needed, and login is simply assumed</td></tr>
-    <tr><td class="paramname">tokenRefreshInterval</td><td>refresh interval of the accessToken, if available </td></tr>
+    <tr><td class="paramname">tokenRefreshInterval</td><td>refresh interval of the accessToken, if available</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation successfully handled the call, else <code>false</code> </dd></dl>
 
 </div>
 </div>
@@ -212,10 +213,11 @@ Public Member Functions</h2></td></tr>
 <p>Directive called after a discovered player initiates the logoutComplete event.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">localPlayerId</td><td>The opaque token that uniquely identifies the local external player app </td></tr>
+    <tr><td class="paramname">localPlayerId</td><td>The opaque token that uniquely identifies the local external player app</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation successfully handled the call, else <code>false</code> </dd></dl>
 
 </div>
 </div>
@@ -276,10 +278,11 @@ Public Member Functions</h2></td></tr>
     <tr><td class="paramname">index</td><td>If the playback context is an indexable container like a playlist, the index of the media item in the container</td></tr>
     <tr><td class="paramname">offset</td><td>Offset position within media item, in milliseconds</td></tr>
     <tr><td class="paramname">preload</td><td>Whether the media item should preload or not</td></tr>
-    <tr><td class="paramname">navigation</td><td>The app transition behavior </td></tr>
+    <tr><td class="paramname">navigation</td><td>The app transition behavior</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation successfully handled the call, else <code>false</code> </dd></dl>
 
 </div>
 </div>
@@ -316,7 +319,8 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_playback_controller.html">PlaybackController</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_playback_controller.html">PlaybackController</a></dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation successfully handled the call, else <code>false</code> </dd></dl>
 
 </div>
 </div>
@@ -349,10 +353,11 @@ Public Member Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">localPlayerId</td><td>The opaque token that uniquely identifies the local external player app</td></tr>
-    <tr><td class="paramname">offset</td><td>Offset position within media item, in milliseconds </td></tr>
+    <tr><td class="paramname">offset</td><td>Offset position within media item, in milliseconds</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation successfully handled the call, else <code>false</code> </dd></dl>
 
 </div>
 </div>
@@ -385,10 +390,11 @@ Public Member Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">localPlayerId</td><td>The opaque token that uniquely identifies the local external player app</td></tr>
-    <tr><td class="paramname">deltaOffset</td><td>Change in offset position within media item, in milliseconds </td></tr>
+    <tr><td class="paramname">deltaOffset</td><td>Change in offset position within media item, in milliseconds</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation successfully handled the call, else <code>false</code> </dd></dl>
 
 </div>
 </div>
@@ -410,10 +416,11 @@ Public Member Functions</h2></td></tr>
 <p>Called after discovered media have been reported. Returns list of players AVS has authorized.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">authorizedPlayers</td><td>List of discovered players, which AVS has authorized </td></tr>
+    <tr><td class="paramname">authorizedPlayers</td><td>List of discovered players, which AVS has authorized</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation successfully handled the call, else <code>false</code> </dd></dl>
 
 </div>
 </div>
@@ -435,10 +442,11 @@ Public Member Functions</h2></td></tr>
 <p>Must provide the local external media player apps , and  information to maintain cloud sync</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">localPlayerId</td><td>The opaque token that uniquely identifies the local external player app </td></tr>
+    <tr><td class="paramname">localPlayerId</td><td>The opaque token that uniquely identifies the local external player app</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>The current <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter_1_1_external_media_adapter_state.html">ExternalMediaAdapterState</a></code> for the specified media player, or <code>null</code> if the state is not available </dd></dl>
 
 </div>
 </div>
@@ -708,7 +716,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 1.4.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 1.5.0 - Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

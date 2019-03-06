@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">1.4.0</span>
+   &#160;<span id="projectnumber">1.5.0</span>
    </div>
   </td>
  </tr>
@@ -114,17 +114,26 @@ $(function() {
 <li>callStateChanged()
 : <a class="el" href="classaace_1_1phone_call_controller_1_1_phone_call_controller.html#a884b898f29116af5cb74c3f02d73cc1d">aace::phoneCallController::PhoneCallController</a>
 </li>
+<li>cancel()
+: <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#a08eafdc469f9d7d282878c5caa016237">aace::cbl::CBL</a>
+</li>
 <li>cancelNavigation()
 : <a class="el" href="classaace_1_1navigation_1_1_navigation.html#afbda005d6f22d549b01b3700144f1d2a">aace::navigation::Navigation</a>
 </li>
+<li>cblStateChanged()
+: <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#adf012d535ed61ac2f0df50a8dd01cac7">aace::cbl::CBL</a>
+</li>
 <li>clearPlayerInfo()
 : <a class="el" href="classaace_1_1alexa_1_1_template_runtime.html#a173cf6b23048bc7ee8436e931db3b5fc">aace::alexa::TemplateRuntime</a>
+</li>
+<li>clearRefreshToken()
+: <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#aabf78f56e306cc7cfe0d46ac084fbaf1">aace::cbl::CBL</a>
 </li>
 <li>clearTemplate()
 : <a class="el" href="classaace_1_1alexa_1_1_template_runtime.html#ace5c19caa541744cdc358bf6f375e259">aace::alexa::TemplateRuntime</a>
 </li>
 <li>configure()
-: <a class="el" href="classaace_1_1core_1_1_engine.html#afe5c533283f9f79917c0a5ddfbd0e718">aace::core::Engine</a>
+: <a class="el" href="classaace_1_1core_1_1_engine.html#a224b8c7fe1f66b210d4851ac31082364">aace::core::Engine</a>
 </li>
 <li>connectionStateChanged()
 : <a class="el" href="classaace_1_1phone_call_controller_1_1_phone_call_controller.html#acaa5a6e69479b162c2783134f62ab43c">aace::phoneCallController::PhoneCallController</a>
@@ -145,6 +154,9 @@ $(function() {
 <li>createCallId()
 : <a class="el" href="classaace_1_1phone_call_controller_1_1_phone_call_controller.html#a24de2d5e0fc97b239d8b9881341e6790">aace::phoneCallController::PhoneCallController</a>
 </li>
+<li>createCBLConfig()
+: <a class="el" href="classaace_1_1cbl_1_1config_1_1_c_b_l_configuration.html#ae3b3ea15f8a31592dbbea3ad7201b196">aace::cbl::config::CBLConfiguration</a>
+</li>
 <li>createCertifiedSenderConfig()
 : <a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a5d38a056525d20aad2114677d8d461ae">aace::alexa::config::AlexaConfiguration</a>
 </li>
@@ -156,6 +168,9 @@ $(function() {
 </li>
 <li>createDeviceInfoConfig()
 : <a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a6d122fd791d0e9a5bb54b940c84ffd98">aace::alexa::config::AlexaConfiguration</a>
+</li>
+<li>createEqualizerControllerConfig()
+: <a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a7aeaa30b4d3a97439228a5ec9d15de74">aace::alexa::config::AlexaConfiguration</a>
 </li>
 <li>createExternalMediaPlayerConfig()
 : <a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a4753ff7cfd440ba505e0508c2c77c07a">aace::alexa::config::AlexaConfiguration</a>
@@ -241,6 +256,9 @@ $(function() {
 <li>getAuthToken()
 : <a class="el" href="classaace_1_1alexa_1_1_auth_provider.html#ac2600cbd59d19ce4f9e5d5134913376f">aace::alexa::AuthProvider</a>
 </li>
+<li>getBandLevels()
+: <a class="el" href="classaace_1_1alexa_1_1_equalizer_controller.html#ac9c19ed0f79cfef1675a950560320b1e">aace::alexa::EqualizerController</a>
+</li>
 <li>getCountry()
 : <a class="el" href="classaace_1_1location_1_1_location_provider.html#aea9910732c32ee028b109ff24bd61ef8">aace::location::LocationProvider</a>
 </li>
@@ -264,6 +282,9 @@ $(function() {
 </li>
 <li>getProperty()
 : <a class="el" href="classaace_1_1core_1_1_engine.html#abab5399f2030131a54f1ba93e4981508">aace::core::Engine</a>
+</li>
+<li>getRefreshToken()
+: <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#ae957213803bd5ca4a6a19d4133160963">aace::cbl::CBL</a>
 </li>
 <li>getSpeaker()
 : <a class="el" href="classaace_1_1alexa_1_1_audio_channel.html#a5ac3e6fb25db1e8af5dfb842ae1732a8">aace::alexa::AudioChannel</a>
@@ -318,8 +339,17 @@ $(function() {
 
 
 <h3><a id="index_l"></a>- l -</h3><ul>
+<li>localAdjustBandLevels()
+: <a class="el" href="classaace_1_1alexa_1_1_equalizer_controller.html#a3b65b2452d162ab9e074a6d4cc2a0168">aace::alexa::EqualizerController</a>
+</li>
 <li>localMuteSet()
 : <a class="el" href="classaace_1_1alexa_1_1_speaker.html#a636838f5aca44db29ce094a4e40b949c">aace::alexa::Speaker</a>
+</li>
+<li>localResetBands()
+: <a class="el" href="classaace_1_1alexa_1_1_equalizer_controller.html#a37364dafdb7c7302247c20ed2e4f73c3">aace::alexa::EqualizerController</a>
+</li>
+<li>localSetBandLevels()
+: <a class="el" href="classaace_1_1alexa_1_1_equalizer_controller.html#ab09a3198bf598b88714b59b505198e0d">aace::alexa::EqualizerController</a>
 </li>
 <li>localStop()
 : <a class="el" href="classaace_1_1alexa_1_1_alerts.html#a0ad3204360a08a578af1af59013f64a8">aace::alexa::Alerts</a>
@@ -416,6 +446,9 @@ $(function() {
 <li>sendDTMFSucceeded()
 : <a class="el" href="classaace_1_1phone_call_controller_1_1_phone_call_controller.html#a4d89b0bc7309cd32a096641a45f559e5">aace::phoneCallController::PhoneCallController</a>
 </li>
+<li>setBandLevels()
+: <a class="el" href="classaace_1_1alexa_1_1_equalizer_controller.html#a9f0774201117c45bc87f68e571f2478e">aace::alexa::EqualizerController</a>
+</li>
 <li>setDestination()
 : <a class="el" href="classaace_1_1navigation_1_1_navigation.html#a8f818b03bb8adc3335140d4402ad5634">aace::navigation::Navigation</a>
 </li>
@@ -431,6 +464,9 @@ $(function() {
 <li>setProperty()
 : <a class="el" href="classaace_1_1core_1_1_engine.html#a65f89859ff67cfaa56051785543ceae2">aace::core::Engine</a>
 </li>
+<li>setRefreshToken()
+: <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#aeb62feeb8cdaad65b1d8dea41f243d7b">aace::cbl::CBL</a>
+</li>
 <li>setVolume()
 : <a class="el" href="classaace_1_1alexa_1_1_speaker.html#a06f376ab6028d0578faf2fe4be06b52b">aace::alexa::Speaker</a>
 </li>
@@ -438,7 +474,8 @@ $(function() {
 : <a class="el" href="classaace_1_1core_1_1_engine.html#a8d127cbe960a7e4e86fb404289011901">aace::core::Engine</a>
 </li>
 <li>start()
-: <a class="el" href="classaace_1_1core_1_1_engine.html#ace84ee80b94b7da5c7f38390d5a160d7">aace::core::Engine</a>
+: <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#a98ab22f22a9e395718c09730b35c9bdf">aace::cbl::CBL</a>
+, <a class="el" href="classaace_1_1core_1_1_engine.html#ace84ee80b94b7da5c7f38390d5a160d7">aace::core::Engine</a>
 </li>
 <li>startAudioInput()
 : <a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#a0a075e7b0fa1934dda8b517c251480b9">aace::alexa::SpeechRecognizer</a>
@@ -483,7 +520,7 @@ $(function() {
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 1.4.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 1.5.0 - Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

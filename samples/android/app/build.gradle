@@ -5,9 +5,9 @@ android {
     defaultConfig {
         applicationId "com.amazon.sampleapp"
         minSdkVersion 22
-        targetSdkVersion 23
+        targetSdkVersion 26
         versionCode 1
-        versionName "1.4"
+        versionName "1.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -23,6 +23,8 @@ android {
 dependencies {
     compileProjectAace()
     compileProjectMacc()
+    compileProjectMetric()
+    checkForLWALibrary()
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support:design:26.1.0'
@@ -32,18 +34,11 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation 'com.android.support:recyclerview-v7:26.1.0'
-    implementation files('../login-with-amazon-sdk.jar')
     implementation 'com.google.android.exoplayer:exoplayer-core:2.7.1'
     implementation 'com.google.android.exoplayer:exoplayer-dash:2.7.1'
     implementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.7.1'
     implementation 'com.google.android.exoplayer:exoplayer-hls:2.7.1'
     implementation 'com.google.android.gms:play-services-maps:16.0.0'
-}
-
-preBuild {
-    doLast {
-        checkApiFileExists()
-    }
 }
 
 void compileProjectAace() {
@@ -100,13 +95,48 @@ void compileProjectMacc() {
     logger.lifecycle(compileMsg)
 }
 
-void checkApiFileExists() {
-    String filename = "api_key.txt"
-    String apiKeyPath = String.format("./src/main/assets/%s", filename)
-    if (!file(apiKeyPath).exists()) {
-        String errMsg = String.format("The %s does not exist. Please create the file in %s", filename, apiKeyPath)
-        String fullErrMsg = project.generateWrappedMessage(errMsg)
-        project.logger.error(fullErrMsg)
-        throw new GradleException(fullErrMsg)
+void compileProjectMetric() {
+    if (gradle.ext.metricsEnabled) {
+        String libsPath = "app/src/main/libs/"
+        File debugAar = new File(libsPath + "metricuploadservice-debug.aar")
+        File releaseAar = new File(libsPath + "metricuploadservice-release.aar")
+        List<String> aarNames = new ArrayList<>()
+        String compileMsg, msg
+        if (debugAar.exists()) {
+            aarNames.add(debugAar.getName())
+        }
+        if (releaseAar.exists()) {
+            aarNames.add(releaseAar.getName())
+            dependencies.implementation(name: 'metricuploadservice-release', ext: 'aar')
+            msg = "Attempting to build SampleApp with the metricuploadservice-release.aar file"
+        } else {
+            dependencies.implementation project(':metricuploadservice')
+            msg = "The metricuploadservice-release.aar was not found. Building SampleApp without the .aar file"
+        }
+
+        StringBuilder sb = new StringBuilder()
+        sb.append("The metricuploadservice .aar files found were: ").append(aarNames.toString())
+        String foundFilesMsg = generateWrappedMessage(sb.toString())
+        logger.lifecycle(foundFilesMsg)
+
+        compileMsg = generateWrappedMessage(msg)
+        logger.lifecycle(compileMsg)
+    }
+}
+
+void checkForLWALibrary() {
+    if (file('libs/login-with-amazon-sdk.jar').exists()) {
+        StringBuilder sb = new StringBuilder()
+        sb.append("Login with Amazon SDK found")
+        String foundFilesMsg = generateWrappedMessage(sb.toString())
+        logger.lifecycle(foundFilesMsg)
+    } else {
+        android {
+            sourceSets {
+                main {
+                    java.exclude('**/LoginWithAmazonBrowser.java')
+                }
+            }
+        }
     }
 }

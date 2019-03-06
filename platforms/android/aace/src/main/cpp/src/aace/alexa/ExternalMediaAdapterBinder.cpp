@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -303,9 +303,9 @@ bool ExternalMediaAdapterBinder::authorize( const std::vector<AuthorizedPlayerIn
     return result;
 }
 
-aace::alexa::ExternalMediaAdapter::ExternalMediaAdapterState ExternalMediaAdapterBinder::getState( const std::string& localPlayerId )
+bool ExternalMediaAdapterBinder::getState( const std::string& localPlayerId, ExternalMediaAdapterState& state )
 {
-    aace::alexa::ExternalMediaAdapter::ExternalMediaAdapterState state;
+    bool success = false;
 
     if( getJavaObject() != nullptr && m_javaMethod_getState_localPlayerId != nullptr )
     {
@@ -461,12 +461,15 @@ aace::alexa::ExternalMediaAdapter::ExternalMediaAdapterState ExternalMediaAdapte
 
                 env->DeleteLocalRef( localPlaybackState );
                 env->DeleteLocalRef( localExternalMediaAdapterState );
+
+                success = true;
             }
 
             env->DeleteLocalRef( localPlayerIdStr );
         }
     }
-    return state;
+    
+    return success;
 }
 
 jobject ExternalMediaAdapterBinder::convert( aace::alexa::ExternalMediaAdapter::PlayControlType type )

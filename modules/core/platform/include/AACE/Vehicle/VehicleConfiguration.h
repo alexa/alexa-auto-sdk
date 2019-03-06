@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -90,7 +90,12 @@ public:
         /**
          * Comma-separated list countries (ISO country codes)
          */
-        COUNTRY_LIST
+        COUNTRY_LIST,
+
+        /**
+         * Vehicle identifier
+         */
+        VEHICLE_IDENTIFIER
     };
     
     /**
@@ -118,7 +123,8 @@ public:
      *          "arch": "<HARDWARE_ARCH>",
      *          "language": "<LANGUAGE>",
      *          "microphone": "<MICROPHONE>",
-     *          "countries": "<COUNTRY_LIST>"
+     *          "countries": "<COUNTRY_LIST>",
+     *          "vehicleIdentifier": "<VEHICLE_IDENTIFIER>"
      *      }
      *   }
      * }
@@ -180,6 +186,9 @@ inline std::ostream& operator<<(std::ostream& stream, const VehicleConfiguration
             break;
         case VehicleConfiguration::VehiclePropertyType::COUNTRY_LIST:
             stream << "COUNTRY_LIST";
+            break;
+        case VehicleConfiguration::VehiclePropertyType::VEHICLE_IDENTIFIER:
+            stream << "VEHICLE_IDENTIFIER";
             break;
     }
     return stream;

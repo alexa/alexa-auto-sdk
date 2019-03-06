@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -34,11 +34,8 @@
 #include <KWD/AbstractKeywordDetector.h>
 #include <SpeechEncoder/SpeechEncoder.h>
 
-#if defined AMAZONLITE_WAKEWORD_SUPPORT
-#include <AmazonLite/PryonLiteKeywordDetector.h>
-#endif
-
 #include "AACE/Alexa/SpeechRecognizer.h"
+#include "WakewordEngineAdapter.h"
 
 namespace aace {
 namespace engine {
@@ -63,7 +60,8 @@ private:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::UserInactivityMonitorInterface> userInactivityMonitor,
-        std::shared_ptr<alexaClientSDK::speechencoder::SpeechEncoder> speechEncoder );
+        std::shared_ptr<alexaClientSDK::speechencoder::SpeechEncoder> speechEncoder,
+        std::shared_ptr<aace::engine::alexa::WakewordEngineAdapter> wakewordEngineAdapter );
 
 public:
     static std::shared_ptr<SpeechRecognizerEngineImpl> create(
@@ -77,7 +75,8 @@ public:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::UserInactivityMonitorInterface> userInactivityMonitor,
-        std::shared_ptr<alexaClientSDK::speechencoder::SpeechEncoder> speechEncoder = nullptr );
+        std::shared_ptr<alexaClientSDK::speechencoder::SpeechEncoder> speechEncoder = nullptr,
+        std::shared_ptr<aace::engine::alexa::WakewordEngineAdapter> wakewordEngineAdapter = nullptr );
 
     // SpeechRecognizerEngineInterface
     bool onStartCapture( Initiator initiator, uint64_t keywordBegin, uint64_t keywordEnd, const std::string& keyword ) override;
@@ -128,8 +127,7 @@ private:
     
     unsigned int m_wordSize;
     
-    std::shared_ptr<alexaClientSDK::kwd::AbstractKeywordDetector> m_wakewordDetector;
-    
+    std::shared_ptr<aace::engine::alexa::WakewordEngineAdapter> m_wakewordEngineAdapter;
     bool m_expectingAudio = false;
     bool m_wakewordEnabled = false;
     
@@ -140,6 +138,7 @@ private:
     std::mutex m_expectingAudioMutex;
     std::condition_variable m_expectingAudioState_cv;
 
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> m_directiveSequencer;
 };
 
 } // aace::engine::alexa

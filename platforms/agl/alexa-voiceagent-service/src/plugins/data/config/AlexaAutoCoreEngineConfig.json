@@ -1,0 +1,69 @@
+{
+  "deviceInfo":
+  {
+    "clientId":"<YOUR_CLIENT_ID>",
+    "deviceSerialNumber":"<YOUR_SERIAL_NUMBER>",
+    "productId":"<YOUR_PRODUCT_ID>"
+  },
+  "libcurlUtils":
+  {
+    "CURLOPT_CAPATH":"/etc/ssl/certs"
+  },
+  "miscDatabase":
+  {
+    "databaseFilePath":"./miscDatabase.db"
+  },
+  "certifiedSender":
+  {
+    "databaseFilePath":"./certifiedSender.db"
+  },
+  "alertsCapabilityAgent":
+  {
+    "databaseFilePath":"./alertsCapabilityAgent.db"
+  },
+  "notifications":
+  {
+    "databaseFilePath":"./notifications.db"
+  },
+  "settings":
+  {
+    "databaseFilePath":"./settings.db",
+    "defaultAVSClientSettings":
+    {
+      "locale":"en-US"
+    }
+  },
+  "aace.storage": {
+    "localStoragePath": "./sample-aace.db",
+    "storageType": "sqlite"
+  },
+  "aace.vehicle": {
+    "info": {
+      "make": "Amazon",
+      "model": "AACE",
+      "year": "2018",
+      "trim": "aac",
+      "geography": "US",
+      "version": "1.2.3",
+      "os": "sample-aace",
+      "arch": "sample-aace",
+      "language": "en_US",
+      "microphone": "SingleArray",
+      "countries": "US,GB,IE,CA,DE,AT,IN,JP,AU,NZ,FR"
+    },
+    "operatingCountry": "US",
+    "currentLocation": "36.1363,-115.1513"
+  },
+  "aace.audio": {
+    "speechRecognizer": "hw:ep812ch",
+    "speechSynthesizer": "navigation",
+    "audioPlayer": "emergency"
+  },
+  "aace.wakeword": {
+    "enabled":true
+  },
+  "aace.cbl": {
+    "enabled": true
+  }
+
+}

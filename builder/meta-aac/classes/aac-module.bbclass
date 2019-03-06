@@ -11,8 +11,8 @@ python () {
 
 AAC_PATCHES ??= ""
 
-# Override with the meta-aac layer version
-PV = "${DISTRO_VERSION}"
+# Override with the aac-sdk version
+PV = "${@aac.get_version(d)}"
 
 HOMEPAGE ?= "http://github.com/alexa/aac-sdk"
 LICENSE ?= "CLOSED"
@@ -20,13 +20,20 @@ LICENSE ?= "CLOSED"
 inherit cmake unittests
 
 FILES_${PN}-dev += "${datadir}/cmake"
-EXTRA_OECMAKE += "-DAAC_HOME=${STAGING_DIR_HOST}${prefix} \
-                  -DCMAKE_BUILD_TYPE=${OECMAKE_BUILD_TYPE} \
+EXTRA_OECMAKE += "-DAAC_HOME=${STAGING_DIR_HOST}${AAC_PREFIX} \
+                  -DCMAKE_BUILD_TYPE=${AAC_BUILD_TYPE} \
                   -DAAC_EMIT_SENSITIVE_LOGS=${AAC_SENSITIVE_LOGS} \
                   -DAAC_EMIT_LATENCY_LOGS=${AAC_LATENCY_LOGS} \
-                  -DAAC_ENABLE_TESTS=ON \
-                  -DAAC_VERSION=${PV} \
-                  -DSDK_VERSION=${SDK_VERSION}"
+                  -DAAC_ENABLE_TESTS=${AAC_ENABLE_TESTS} \
+                  -DAAC_VERSION=${PV}"
+
+# Install AAC artifacts explicitly into AAC_PREFIX dir
+EXTRA_OECMAKE_append = " -DCMAKE_INSTALL_PREFIX:PATH=${AAC_PREFIX}"
+FILES_${PN} = "${AAC_PREFIX}/*"
+SYSROOT_DIRS_append = " ${AAC_PREFIX}"
+
+# Add search path for AVS Device SDK
+OECMAKE_EXTRA_ROOT_PATH = "${STAGING_DIR_HOST}${AAC_PREFIX}"
 
 do_install_append() {
 	mkdir -p ${D}${testbindir}/${PN}

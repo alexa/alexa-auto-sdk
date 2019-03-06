@@ -3,13 +3,13 @@ if [ -z ${BUILDER_HOME} ]; then
 fi
 
 error() {
-	echo "ERROR: $1" && exit 1
+	echo -e "\e[1;31mERROR\e[0;31m: $1\e[0m" && exit 1
 }
 
 note() {
-	echo "NOTE: $1"
+	echo -e "\e[1mNOTE\e[0m: $1"
 }
 
 warn() {
-	echo "WARNING: $1"
+	echo -e "\e[1;33mWARNING\e[0;31m: $1\e[0m"
 }

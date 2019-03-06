@@ -7,7 +7,6 @@ execute_process(
 )
 
 project(AAC VERSION ${SDK_BASE_VERSION})
-set(SDK_VERSION ${SDK_VERSION})
 
 message(STATUS "Alexa Auto SDK - ${SDK_VERSION}")
 
@@ -31,6 +30,7 @@ else()
     add_subdirectory(modules/navigation)
     add_subdirectory(modules/phone-control)
     add_subdirectory(modules/contact-uploader)
+    add_subdirectory(modules/cbl)
 endif()
 
 if(EXTRA_MODULES)

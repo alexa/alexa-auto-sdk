@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -18,20 +18,20 @@
 void MetricsUploaderBinder::initialize( JNIEnv* env )
 {
     //Record method
-    m_javaMethod_record = env->GetMethodID( getJavaClass(), "record", "([Lcom/amazon/aace/metrics/MetricsUploader$Datapoint;Ljava/util/HashMap;)Z");
+    m_javaMethod_record = env->GetMethodID( getJavaClass(), "record", "([Lcom/amazon/metricuploadservice/MetricsUploader$Datapoint;Ljava/util/HashMap;)Z");
 
     //Datapoint
-    m_javaClass_Datapoint = NativeLib::FindClass( env, "com/amazon/aace/metrics/MetricsUploader$Datapoint" );
+    m_javaClass_Datapoint = NativeLib::FindClass( env, "com/amazon/metricuploadservice/MetricsUploader$Datapoint" );
     m_javaField_Datapoint_name = env->GetFieldID( m_javaClass_Datapoint.get(), "name", "Ljava/lang/String;" );
     m_javaField_Datapoint_value = env->GetFieldID( m_javaClass_Datapoint.get(), "value", "Ljava/lang/String;" );
     m_javaField_Datapoint_count = env->GetFieldID( m_javaClass_Datapoint.get(), "count", "I" );
-    m_javaField_Datapoint_type = env->GetFieldID( m_javaClass_Datapoint.get(), "type", "Lcom/amazon/aace/metrics/MetricsUploader$DatapointType;" );
+    m_javaField_Datapoint_type = env->GetFieldID( m_javaClass_Datapoint.get(), "type", "Lcom/amazon/metricuploadservice/MetricsUploader$DatapointType;" );
 
     //DatapointType
-    jclass datapointTypeEnumClass = env->FindClass( "com/amazon/aace/metrics/MetricsUploader$DatapointType" );
-    m_enum_DatapointType_TIMER = NativeLib::FindEnum( env, datapointTypeEnumClass, "TIMER", "Lcom/amazon/aace/metrics/MetricsUploader$DatapointType;" );
-    m_enum_DatapointType_STRING = NativeLib::FindEnum( env, datapointTypeEnumClass, "STRING", "Lcom/amazon/aace/metrics/MetricsUploader$DatapointType;" );
-    m_enum_DatapointType_COUNTER = NativeLib::FindEnum( env, datapointTypeEnumClass, "COUNTER", "Lcom/amazon/aace/metrics/MetricsUploader$DatapointType;" );
+    jclass datapointTypeEnumClass = env->FindClass( "com/amazon/metricuploadservice/MetricsUploader$DatapointType" );
+    m_enum_DatapointType_TIMER = NativeLib::FindEnum( env, datapointTypeEnumClass, "TIMER", "Lcom/amazon/metricuploadservice/MetricsUploader$DatapointType;" );
+    m_enum_DatapointType_STRING = NativeLib::FindEnum( env, datapointTypeEnumClass, "STRING", "Lcom/amazon/metricuploadservice/MetricsUploader$DatapointType;" );
+    m_enum_DatapointType_COUNTER = NativeLib::FindEnum( env, datapointTypeEnumClass, "COUNTER", "Lcom/amazon/metricuploadservice/MetricsUploader$DatapointType;" );
 }
 
 bool MetricsUploaderBinder::record( const std::vector<aace::metrics::MetricsUploader::Datapoint>& datapoints, const std::unordered_map<std::string, std::string>& metadata ) 

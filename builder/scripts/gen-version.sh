@@ -5,6 +5,8 @@ THISDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export BUILDER_HOME=${THISDIR}/..
 export SDK_HOME=${BUILDER_HOME}/..
 
+source ${THISDIR}/version
+
 PARAMS="$@"
 POSITIONAL=()
 while [[ $# -gt 0 ]]; do
@@ -18,6 +20,10 @@ while [[ $# -gt 0 ]]; do
 		PRINT_LOCAL="0"
 		shift
 		;;
+		-c|--codename)
+		printf '%s' ${AAC_CODENAME}
+		exit
+		;;
 		*)
 		POSITIONAL+=("$1")
 		shift
@@ -30,17 +36,9 @@ set -- "${POSITIONAL[@]}"
 PRINT_BASE=${PRINT_BASE:-1}
 PRINT_LOCAL=${PRINT_LOCAL:-1}
 
-baseversion() {
-	cat ${THISDIR}/version.txt
-}
-
 localversion() {
 	timestamp=`date +%y%m%d%H%M%S`
-	if [ -d .repo ]; then
-		# SDK is managed with repo tool
-		devname=`whoami`
-		printf '%s%s%s' -wip -$devname -$timestamp
-	elif [ ! -z ${CODEBUILD_SRC_DIR} ]; then
+	if [ ! -z ${CODEBUILD_SRC_DIR} ]; then
 		# SDK is cloned via CodeBuild
 		printf '%s%s' -ci -$timestamp
 	elif test -z "$(git rev-parse --show-cdup 2>/dev/null)" &&
@@ -62,7 +60,7 @@ localversion() {
 cd ${SDK_HOME}
 
 if [ ${PRINT_BASE} = "1" ]; then
-	baseversion
+	printf '%s' ${AAC_VERSION}
 fi
 
 if [ ${PRINT_LOCAL} = "1" ]; then

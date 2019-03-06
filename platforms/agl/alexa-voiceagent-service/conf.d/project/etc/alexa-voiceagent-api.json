@@ -1,0 +1,64 @@
+{
+  "$schema": "http://iot.bzh/download/public/schema/json/ctl-schema.json",
+  "metadata": {
+    "uid": "alexa-voiceagent",
+    "version": "0.1",
+    "api": "alexa-voiceagent",
+    "info": "AGL Speech framework Voice Agent APIs (Alexa)"
+  },
+
+  "plugins": [{
+    "uid": "alexa-voiceagent",
+    "info": "Plugin to handle AGL Speech framework Voice Agent APIs (Alexa)",
+    "libs": [
+      "alexa-voiceagent-api.ctlso"
+    ]
+  }],
+
+  "events": [{
+      "uid": "vshl-capabilities/connection_state_changed",
+      "action": "plugin://alexa-voiceagent#onPhoneConnectionStateChanged"
+    },{
+      "uid": "vshl-capabilities/call_state_changed",
+      "action": "plugin://alexa-voiceagent#onPhoneCallStateChanged"
+    },{
+      "uid": "vshl-capabilities/call_failed",
+      "action": "plugin://alexa-voiceagent#onPhoneCallFailed"
+    },{
+      "uid": "vshl-capabilities/caller_id_received",
+      "action": "plugin://alexa-voiceagent#onPhoneCallerIdReceived"
+    },{
+      "uid": "vshl-capabilities/send_dtmf_succeeded",
+      "action": "plugin://alexa-voiceagent#onPhoneSendDTMFSucceded"
+    },{
+      "uid": "vshl-capabilities/button_pressed",
+      "action": "plugin://alexa-voiceagent#onPlaybackButtonPressed"
+  }],
+
+  "controls": [{
+      "uid": "setVoiceAgentId",
+      "privileges": "urn:AGL:permission:alexa-voiceagent:setVoiceAgentId:public",
+      "action": "plugin://alexa-voiceagent#setVoiceAgentId"
+    }, {
+      "uid": "setAuthToken",
+      "privileges": "urn:AGL:permission:alexa-voiceagent:setAuthToken:public",
+      "action": "plugin://alexa-voiceagent#setAuthToken"
+    }, {
+      "uid": "setRefreshToken",
+      "privileges": "urn:AGL:permission:alexa-voiceagent:setRefreshToken:public",
+      "action": "plugin://alexa-voiceagent#setRefreshToken"
+    }, {
+      "uid": "subscribe",
+      "privileges": "urn:AGL:permission:alexa-voiceagent:subscribe:public",
+      "action": "plugin://alexa-voiceagent#subscribe"
+    }, {
+      "uid": "subscribeToCBLEvents",
+      "privileges": "urn:AGL:permission:alexa-voiceagent:subscribeToCBLEvents:public",
+      "action": "plugin://alexa-voiceagent#subscribeToCBLEvents"
+    }, {
+      "uid": "startListening",
+      "privileges": "urn:AGL:permission:alexa-voiceagent:startListening:public",
+      "action": "plugin://alexa-voiceagent#startListening"
+    }
+  ]
+}

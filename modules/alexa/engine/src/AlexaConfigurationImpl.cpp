@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -320,6 +320,64 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
     document.Accept( writer );
 
     return aace::core::config::StreamConfiguration::create( std::make_shared<std::stringstream>( buffer.GetString() ) );
+}
+
+std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createEqualizerControllerConfig(
+    std::initializer_list<EqualizerBand> supportedBands,
+    int minLevel,
+    int maxLevel,
+    std::initializer_list<EqualizerBandLevel> defaultBandLevels  ) {
+
+    rapidjson::Document document(rapidjson::kObjectType);
+
+    rapidjson::Value equalizerElement(rapidjson::kObjectType);
+
+    // enabled
+    equalizerElement.AddMember( "enabled", rapidjson::Value().SetBool(true), document.GetAllocator() );
+
+    // minLevel
+    equalizerElement.AddMember( "minLevel", rapidjson::Value().SetInt(minLevel), document.GetAllocator() );
+
+    // maxLevel
+    equalizerElement.AddMember( "maxLevel", rapidjson::Value().SetInt(maxLevel), document.GetAllocator() );
+
+    // bands
+    if( supportedBands.size() != 0 ) {
+        rapidjson::Value bandsElement(rapidjson::kObjectType);
+        for( const auto& band : supportedBands ) {
+            const std::string& name = equalizerBandToString( band );
+            bandsElement.AddMember( 
+                rapidjson::Value().SetString(name.c_str(), name.length(), document.GetAllocator()),
+                rapidjson::Value().SetBool(true), document.GetAllocator() );
+        }
+        equalizerElement.AddMember( "bands", bandsElement, document.GetAllocator() );
+    }
+
+    // defaultState
+    if( defaultBandLevels.size() != 0 ) {
+        rapidjson::Value defaultStateElement(rapidjson::kObjectType);
+        
+        // defaultState.bands
+        rapidjson::Value defaultStateBandsElement(rapidjson::kObjectType);
+        for( const auto& band : defaultBandLevels ) {
+            const std::string& bandName = equalizerBandToString( band.first );
+            defaultStateBandsElement.AddMember( 
+                rapidjson::Value().SetString(bandName.c_str(), bandName.length(), document.GetAllocator()), 
+                rapidjson::Value().SetInt(band.second), 
+                document.GetAllocator() );
+        }
+        defaultStateElement.AddMember( "bands", defaultStateBandsElement, document.GetAllocator() );
+        equalizerElement.AddMember( "defaultState", defaultStateElement, document.GetAllocator() );
+    }
+
+    // root
+    document.AddMember( "equalizer", equalizerElement, document.GetAllocator() );
+
+    // create event string
+    rapidjson::StringBuffer buffer;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+    document.Accept(writer);
+    return aace::core::config::StreamConfiguration::create(std::make_shared<std::stringstream>(buffer.GetString()));
 }
 
 } // aace::alexa::config

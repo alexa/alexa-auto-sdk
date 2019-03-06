@@ -3,7 +3,7 @@ HOMEPAGE = "https://developer.amazon.com/avs/sdk"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=d92e60ee98664c54f68aa515a6169708"
 
-DEPENDS = "curl nghttp2 googletest sqlite3"
+DEPENDS = "curl nghttp2 googletest sqlite3 openssl"
 
 SRC_URI = "https://github.com/alexa/avs-device-sdk/archive/v${PV}.tar.gz"
 
@@ -12,7 +12,7 @@ BB_STRICT_CHECKSUM = "0"
 
 inherit pkgconfig cmake devlibsonly unittests
 
-EXTRA_OECMAKE += "-DCMAKE_BUILD_TYPE=${OECMAKE_BUILD_TYPE} \
+EXTRA_OECMAKE += "-DCMAKE_BUILD_TYPE=${AAC_BUILD_TYPE} \
                   -DACSDK_EMIT_SENSITIVE_LOGS=${AAC_SENSITIVE_LOGS} \
                   -DACSDK_LATENCY_LOG=${AAC_LATENCY_LOGS}"
 # Use GStreamer & PortAudio from Homebrew install
@@ -21,7 +21,11 @@ EXTRA_OECMAKE_append_darwin = " -DGSTREAMER_MEDIA_PLAYER=ON \
                                 -DPORTAUDIO_LIB_PATH=/usr/local/lib/libportaudio.a \
                                 -DPORTAUDIO_INCLUDE_DIR=/usr/local/include"
 
-FILES_${PN}-test += "${libdir}/libIntegration${SOLIBS}"
+# Install AVS artifacts explicitly into AAC_PREFIX dir
+EXTRA_OECMAKE_append = " -DCMAKE_INSTALL_PREFIX:PATH=${AAC_PREFIX}"
+FILES_${PN} = "${AAC_PREFIX}/*"
+FILES_${PN}-test += "${AAC_PREFIX}/lib/libIntegration${SOLIBS}"
+SYSROOT_DIRS_append = " ${AAC_PREFIX}"
 
 # WakeWord: KITT.AI
 KITTAT_CMAKE_OPTIONS = "\
@@ -39,15 +43,18 @@ SENSORY_CMAKE_OPTIONS = "\
 "
 PACKAGECONFIG[sensory] = "${SENSORY_CMAKE_OPTIONS},,truly-handsfree"
 
+# Opus encoding (v1.11 or later)
+PACKAGECONFIG[opus] = "-DOPUS=ON,,libopus"
+
 do_install_append() {
 	mkdir -p ${D}${testbindir}/${PN}
 	find ./ -name "*Test" -exec cp {} ${D}${testbindir}/${PN} \;
 	if [ -f ${B}/Integration/src/libIntegration${SOLIBS} ]; then
-		cp -R ${B}/Integration/src/libIntegration${SOLIBS} ${D}${libdir}
+		cp -R ${B}/Integration/src/libIntegration${SOLIBS} ${D}${AAC_PREFIX}/lib
 	fi
-	mkdir -p ${D}${includedir}
-	cp -R ${S}/ThirdParty/rapidjson/rapidjson-1.1.0/include/* ${D}${includedir}
+	mkdir -p ${D}${AAC_PREFIX}/include
+	cp -R ${S}/ThirdParty/rapidjson/rapidjson-1.1.0/include/* ${D}${AAC_PREFIX}/include
 	# Copy the Mock headers from AVS SDK
-	mkdir -p ${D}${includedir}/AVSCommon/SDKInterfaces/test
-	cp -R ${S}/AVSCommon/SDKInterfaces/test/AVSCommon/SDKInterfaces/* ${D}${includedir}/AVSCommon/SDKInterfaces/test
+	mkdir -p ${D}${AAC_PREFIX}/include/AVSCommon/SDKInterfaces/test
+	cp -R ${S}/AVSCommon/SDKInterfaces/test/AVSCommon/SDKInterfaces/* ${D}${AAC_PREFIX}/include/AVSCommon/SDKInterfaces/test
 }

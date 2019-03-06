@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -35,7 +35,6 @@ static const std::string EXTERNAL_MEDIA_PLAYER_AGENT = "Alexa Auto SDK";
 
 ExternalMediaAdapterEngineImpl::ExternalMediaAdapterEngineImpl( std::shared_ptr<aace::alexa::ExternalMediaAdapter> platformMediaAdapter, std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender, std::shared_ptr<FocusHandlerInterface> focusHandler ) :
     aace::engine::alexa::ExternalMediaAdapterHandler( platformMediaAdapter->getSpeaker(), discoveredPlayerSender, focusHandler ),
-    alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
     m_platformMediaAdapter( platformMediaAdapter ) {
 }
 
@@ -187,7 +186,10 @@ bool ExternalMediaAdapterEngineImpl::handleGetAdapterState( const std::string& l
 {
     try
     {
-        auto platformState = m_platformMediaAdapter->getState( localPlayerId );
+        aace::alexa::ExternalMediaAdapter::ExternalMediaAdapterState platformState;
+    
+        // get the external media adapter state from the platform interface
+        ThrowIfNot( m_platformMediaAdapter->getState( localPlayerId, platformState ), "getPlatformExternalMediaAdapterStateFailed" );
         
         // session state
         if( platformState.sessionState.spiVersion.empty() == false ) {

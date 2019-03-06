@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -27,8 +27,10 @@ import android.widget.TextView;
 
 import com.amazon.aace.network.NetworkInfoProvider;
 import com.amazon.sampleapp.R;
-import com.amazon.sampleapp.impl.AuthProvider.AuthProviderHandler;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class NetworkInfoProviderHandler extends NetworkInfoProvider {
 
@@ -41,13 +43,17 @@ public class NetworkInfoProviderHandler extends NetworkInfoProvider {
     private final NetworkChangeReceiver mReceiver;
     private final TextView mNetworkStatusText;
     private NetworkStatus mStatus;
-    private AuthProviderHandler mAuthProvider;
+
+    // List of Network Connection observers
+    private Set<NetworkConnectionObserver> mObservers;
 
     public NetworkInfoProviderHandler( Activity activity, LoggerHandler logger ) {
         mActivity = activity;
         mLogger = logger;
         mStatus = NetworkStatus.UNKNOWN;
         mNetworkStatusText = activity.findViewById( R.id.networkStatus );
+
+        mObservers = new HashSet<>(1);
 
         Context context = mActivity.getApplicationContext();
         // Note: >=API 24 should use NetworkCallback to receive network change updates
@@ -59,11 +65,6 @@ public class NetworkInfoProviderHandler extends NetworkInfoProvider {
         mConnectivityManager = ( ConnectivityManager ) context.getSystemService( Context.CONNECTIVITY_SERVICE );
 
         updateNetworkStatus();
-
-    }
-
-    public void setAuthProvider(AuthProviderHandler authProvider) {
-        mAuthProvider = authProvider;
     }
 
     @Override
@@ -87,12 +88,7 @@ public class NetworkInfoProviderHandler extends NetworkInfoProvider {
                         mStatus, rssi ) );
                 updateGUI( mStatus );
                 networkStatusChanged( mStatus, rssi );
-
-                // Notify AuthProvider to login if we aren't logged on yet
-                if (mStatus == NetworkStatus.CONNECTED && mAuthProvider != null) {
-                    mLogger.postInfo( sTag, String.format( "Calling auth provider to reinitialize if needed" ));
-                    mAuthProvider.onInitialize();
-                }
+                notifyConnectionStatusObservers( mStatus );
             }
         }
     }
@@ -131,6 +127,19 @@ public class NetworkInfoProviderHandler extends NetworkInfoProvider {
             }
         } else {
             mStatus = NetworkStatus.UNKNOWN;
+        }
+    }
+
+    // Connection State Observable methods
+    public void registerNetworkConnectionObserver( NetworkConnectionObserver observer ) {
+        if ( observer == null ) return;
+        mObservers.add( observer );
+        observer.onConnectionStatusChanged( mStatus );
+    }
+
+    private void notifyConnectionStatusObservers( NetworkStatus status ){
+        for ( NetworkConnectionObserver observer : mObservers ) {
+            observer.onConnectionStatusChanged( status );
         }
     }
 }

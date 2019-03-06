@@ -7,6 +7,7 @@
   },
   "metrics" : {
     "metricsEnabled" : false,
-    "amazonId" : "<YOUR DEVICE'S AMAZON ID>"
+    "amazonId" : "<YOUR DEVICE'S AMAZON ID>",
+    "stage" : "<YOUR STAGING ENVIRONMENT: Beta, Gamma, Prod>"
   }
 }

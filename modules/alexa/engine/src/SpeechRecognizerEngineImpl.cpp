@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 #include <exception>
 #include <climits>
 
+#include "AACE/Engine/Alexa/UPLService.h"
 #include "AACE/Engine/Alexa/SpeechRecognizerEngineImpl.h"
 #include "AACE/Engine/Alexa/AlexaMetrics.h"
 #include "AACE/Engine/Core/EngineMacros.h"
@@ -50,15 +51,18 @@ bool SpeechRecognizerEngineImpl::initialize(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::UserInactivityMonitorInterface> userInactivityMonitor,
-    std::shared_ptr<alexaClientSDK::speechencoder::SpeechEncoder> speechEncoder ) {
+    std::shared_ptr<alexaClientSDK::speechencoder::SpeechEncoder> speechEncoder,
+    std::shared_ptr<aace::engine::alexa::WakewordEngineAdapter> wakewordEngineAdapter ) {
 
     try
     {
         ThrowIfNull( directiveSequencer, "invalidDirectiveSequencer" );
         ThrowIfNull( capabilitiesDelegate, "invalidCapabilitiesDelegate" );
 
-        m_audioInputProcessor = alexaClientSDK::capabilityAgents::aip::AudioInputProcessor::create(directiveSequencer, messageSender, contextManager, focusManager, dialogUXStateAggregator, exceptionSender, userInactivityMonitor, alexaClientSDK::capabilityAgents::aip::AudioProvider::null(), speechEncoder);
+        m_audioInputProcessor = alexaClientSDK::capabilityAgents::aip::AudioInputProcessor::create(directiveSequencer, messageSender, contextManager, focusManager, dialogUXStateAggregator, exceptionSender, userInactivityMonitor, speechEncoder);
         ThrowIfNull( m_audioInputProcessor, "couldNotCreateAudioInputProcessor" );
+
+        ThrowIfNot( initializeAudioInputStream(), "initializeAudioInputStreamFailed" );
 
         // add dialog state observer to aip
         m_audioInputProcessor->addObserver( shared_from_this() );
@@ -69,6 +73,14 @@ bool SpeechRecognizerEngineImpl::initialize(
 
         // register capability with delegate
         ThrowIfNot( capabilitiesDelegate->registerCapability( m_audioInputProcessor ), "registerCapabilityFailed");
+
+        m_wakewordEngineAdapter = wakewordEngineAdapter;
+        if( m_wakewordEngineAdapter != nullptr ) {
+            ThrowIfNot( m_wakewordEngineAdapter->initialize( m_audioInputStream, m_audioFormat ), "wakewordInitializeFailed" );
+            m_wakewordEngineAdapter->addKeyWordObserver( shared_from_this() );
+        }
+        
+        m_directiveSequencer = directiveSequencer;
 
         return true;
     }
@@ -89,7 +101,8 @@ std::shared_ptr<SpeechRecognizerEngineImpl> SpeechRecognizerEngineImpl::create(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::UserInactivityMonitorInterface> userInactivityMonitor,
-    std::shared_ptr<alexaClientSDK::speechencoder::SpeechEncoder> speechEncoder ) {
+    std::shared_ptr<alexaClientSDK::speechencoder::SpeechEncoder> speechEncoder,
+    std::shared_ptr<aace::engine::alexa::WakewordEngineAdapter> wakewordEngineAdapter ) {
 
     std::shared_ptr<SpeechRecognizerEngineImpl> speechRecognizerEngineImpl = nullptr;
 
@@ -99,7 +112,7 @@ std::shared_ptr<SpeechRecognizerEngineImpl> SpeechRecognizerEngineImpl::create(
 
         speechRecognizerEngineImpl = std::shared_ptr<SpeechRecognizerEngineImpl>(new SpeechRecognizerEngineImpl(speechRecognizerPlatformInterface, audioFormat));
 
-        ThrowIfNot( speechRecognizerEngineImpl->initialize( directiveSequencer, messageSender, contextManager, focusManager, dialogUXStateAggregator, capabilitiesDelegate, exceptionSender, userInactivityMonitor, speechEncoder ), "initializeSpeechRecognizerEngineImplFailed" );
+        ThrowIfNot( speechRecognizerEngineImpl->initialize( directiveSequencer, messageSender, contextManager, focusManager, dialogUXStateAggregator, capabilitiesDelegate, exceptionSender, userInactivityMonitor, speechEncoder, wakewordEngineAdapter ), "initializeSpeechRecognizerEngineImplFailed" );
 
         return speechRecognizerEngineImpl;
     }
@@ -120,6 +133,10 @@ void SpeechRecognizerEngineImpl::doShutdown()
 
     if( m_audioInputProcessor != nullptr ) {
         m_audioInputProcessor->shutdown();
+    }
+
+    if( m_wakewordEngineAdapter != nullptr ) {
+        m_wakewordEngineAdapter->removeKeyWordObserver( shared_from_this() );
     }
 
     if( m_speechRecognizerPlatformInterface != nullptr ) {
@@ -176,11 +193,6 @@ bool SpeechRecognizerEngineImpl::onStartCapture( Initiator initiator, uint64_t k
     try
     {
         ThrowIf( m_state == alexaClientSDK::avsCommon::sdkInterfaces::AudioInputProcessorObserverInterface::State::RECOGNIZING, "alreadyRecognizing" );
-        
-        // initialize the audio input stream if it does not exist
-        if( m_audioInputWriter == nullptr ) {
-            ThrowIfNot( initializeAudioInputStream(), "initializeAudioInputStreamFailed" );
-        }
 
         // create a new audio provider for the specified initiator type
         std::shared_ptr<alexaClientSDK::capabilityAgents::aip::AudioProvider> audioProvider;
@@ -263,7 +275,10 @@ bool SpeechRecognizerEngineImpl::startCapture(
     {
         // ask the aip to start recognizing input
         ALEXA_METRIC(LX(TAG, "startCapture"), aace::engine::alexa::AlexaMetrics::Location::SPEECH_START_CAPTURE);
-        ThrowIfNot( m_audioInputProcessor->recognize( *audioProvider, initiator, begin, keywordEnd, keyword ).get(), "recognizeFailed" );
+        aace::engine::alexa::UPLService::getInstance()->updateDialogStateForId(aace::engine::alexa::UPLService::DialogState::START_CAPTURE, "", 
+            m_directiveSequencer->isCurrentDialogRequestOnline());
+
+        ThrowIfNot( m_audioInputProcessor->recognize( *audioProvider, initiator, std::chrono::steady_clock::now(), begin, keywordEnd, keyword ).get(), "recognizeFailed" );
         
         if( m_expectingAudio == false )
         {
@@ -288,11 +303,7 @@ bool SpeechRecognizerEngineImpl::startCapture(
 }
 
 bool SpeechRecognizerEngineImpl::isWakewordSupported() {
-#if defined AMAZONLITE_WAKEWORD_SUPPORT
-    return true;
-#else
-    return false;
-#endif
+    return m_wakewordEngineAdapter != nullptr;
 }
 
 bool SpeechRecognizerEngineImpl::isWakewordEnabled() {
@@ -308,18 +319,8 @@ bool SpeechRecognizerEngineImpl::enableWakewordDetection()
         
         // check if wakeword detection is already enabled
         ReturnIf( m_wakewordEnabled, true );
-        
-        // initialize the audio input stream
-        ThrowIfNot( initializeAudioInputStream(), "initializeAudioInputStreamFailed" );
-        
-        // create the wakeword detector
-    #if defined AMAZONLITE_WAKEWORD_SUPPORT
-        m_wakewordDetector = alexaClientSDK::kwd::PryonLiteKeywordDetector::create( m_audioInputStream, m_audioFormat, {}, {});
-    #endif
-        ThrowIfNull( m_wakewordDetector, "couldNotCreateWakewordDetector" );
 
-        // add the keyword observer to the wakeword detector
-        m_wakewordDetector->addKeyWordObserver( shared_from_this() );
+        ThrowIfNot( m_wakewordEngineAdapter->enable(), "enableFailed" );
 
         // set the wakeword enabled and expecting audio flags to true
         m_wakewordEnabled = true;
@@ -331,7 +332,6 @@ bool SpeechRecognizerEngineImpl::enableWakewordDetection()
         return true;
     }
     catch( std::exception& ex ) {
-        m_wakewordDetector.reset();
         m_wakewordEnabled = false;
         setExpectingAudioState( false );
         AACE_ERROR(LX(TAG,"enableWakewordDetection").d("reason",ex.what()));
@@ -359,7 +359,8 @@ bool SpeechRecognizerEngineImpl::disableWakewordDetection()
         success = false;
     }
 
-    m_wakewordDetector.reset();
+    m_wakewordEngineAdapter->disable();
+
     m_wakewordEnabled = false;
     setExpectingAudioState( false );
 
@@ -375,6 +376,11 @@ void SpeechRecognizerEngineImpl::onStateChanged( alexaClientSDK::avsCommon::sdkI
     if( state == alexaClientSDK::avsCommon::sdkInterfaces::AudioInputProcessorObserverInterface::State::BUSY )
     {
         ALEXA_METRIC(LX(TAG, "onStateChanged"), aace::engine::alexa::AlexaMetrics::Location::SPEECH_STOP_CAPTURE);
+        ALEXA_METRIC(LX(TAG, "stopCapture").d("dialogRequestId", m_directiveSequencer->getCurrentDialogRequestId()), aace::engine::alexa::AlexaMetrics::Location::SPEECH_STOP_CAPTURE);
+
+        aace::engine::alexa::UPLService::getInstance()->updateDialogStateForId(aace::engine::alexa::UPLService::DialogState::STOP_CAPTURE, 
+            m_directiveSequencer->getCurrentDialogRequestId(), m_directiveSequencer->isCurrentDialogRequestOnline());
+
         if( m_expectingAudio )
         {
             ALEXA_METRIC(LX(TAG, "onStateChanged"), aace::engine::alexa::AlexaMetrics::Location::END_OF_SPEECH);

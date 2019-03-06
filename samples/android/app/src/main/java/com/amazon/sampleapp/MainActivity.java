@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -16,28 +16,41 @@
 package com.amazon.sampleapp;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.amazon.aace.alexa.AlexaClient;
 import com.amazon.aace.alexa.AlexaProperties;
 import com.amazon.aace.alexa.Speaker;
 import com.amazon.aace.alexa.config.AlexaConfiguration;
+import com.amazon.aace.amazonLite.config.AmazonLiteConfiguration;
 import com.amazon.aace.carControl.CarControlConfiguration;
 import com.amazon.aace.carControl.ClimateControlInterface;
 import com.amazon.aace.communication.config.AlexaCommsConfiguration;
@@ -51,20 +64,22 @@ import com.amazon.aace.logger.config.LoggerConfiguration;
 import com.amazon.aace.modules.ExtraModules;
 import com.amazon.aace.storage.config.StorageConfiguration;
 import com.amazon.aace.vehicle.config.VehicleConfiguration;
-/* Sample Metrics Code */
-//import com.amazon.metricuploadservice.MetricsUploadService;
-//import com.amazon.metricuploadservice.MetricUploadConfiguration;
 import com.amazon.sampleapp.impl.Alerts.AlertsHandler;
 import com.amazon.sampleapp.impl.AlexaClient.AlexaClientHandler;
 import com.amazon.sampleapp.impl.AudioPlayer.AudioPlayerHandler;
 import com.amazon.sampleapp.impl.AuthProvider.AuthProviderHandler;
+import com.amazon.sampleapp.impl.AuthProvider.LoginWithAmazonCBL;
+/* LWA Browser Sample Implementation */
+//import com.amazon.sampleapp.impl.AuthProvider.LoginWithAmazonBrowser;
 import com.amazon.sampleapp.impl.CarControl.ClimateControlHandler;
 import com.amazon.sampleapp.impl.Common.AudioInputManager;
 import com.amazon.sampleapp.impl.Communication.AlexaCommsHandler;
 import com.amazon.sampleapp.impl.Communication.AlexaCommsView;
 import com.amazon.sampleapp.impl.ContactIngestion.ContactUploader.ContactUploaderHandler;
+import com.amazon.sampleapp.impl.EqualizerController.EqualizerConfiguration;
 import com.amazon.sampleapp.impl.ExternalMediaPlayer.MACCPlayer;
 import com.amazon.sampleapp.impl.LocalMediaSource.CDLocalMediaSource;
+import com.amazon.sampleapp.impl.EqualizerController.EqualizerControllerHandler;
 import com.amazon.sampleapp.impl.LocationProvider.LocationProviderHandler;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 import com.amazon.sampleapp.impl.MediaPlayer.MediaPlayerHandler;
@@ -79,18 +94,25 @@ import com.amazon.sampleapp.impl.SpeechSynthesizer.SpeechSynthesizerHandler;
 import com.amazon.sampleapp.impl.TemplateRuntime.TemplateRuntimeHandler;
 import com.amazon.sampleapp.logView.LogEntry;
 import com.amazon.sampleapp.logView.LogRecyclerViewAdapter;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Observable;
 import java.util.Observer;
 
-public class MainActivity extends AppCompatActivity implements Observer {
+/* Sample Metrics Code */
+//import com.amazon.metricuploadservice.MetricsUploadService;
+//import com.amazon.metricuploadservice.MetricUploadConfiguration;
 
-    // Max number of logs to be kept in memory
-    private static final int MAX_NUM_LOGS = 2000;
+public class MainActivity extends AppCompatActivity implements Observer {
 
     /* AACE Platform Interface Handlers */
 
@@ -103,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private AudioPlayerHandler mAudioPlayer;
     private AuthProviderHandler mAuthProvider;
     private AlexaCommsHandler mAlexaCommsHandler;
+    private EqualizerControllerHandler mEqualizerControllerHandler;
     private NotificationsHandler mNotifications;
     private PhoneCallControllerHandler mPhoneCallController;
     private ContactUploaderHandler mContactUploader;
@@ -131,8 +154,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
     /* Log View Components */
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mRecyclerAdapter;
-    private LimitedSizeArrayList<LogEntry> mLogList = new LimitedSizeArrayList<>( MAX_NUM_LOGS );
+    private LogRecyclerViewAdapter mRecyclerAdapter;
 
     /* Shared Preferences */
     private SharedPreferences mPreferences;
@@ -147,13 +169,15 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private static final String sDeviceConfigFile = "app_config.json";
     private static final int sPermissionRequestCode = 0;
     private static final String[] sRequiredPermissions = { Manifest.permission.RECORD_AUDIO,
-            Manifest.permission.ACCESS_COARSE_LOCATION };
+            Manifest.permission.ACCESS_FINE_LOCATION };
     private MACCPlayer mMACCPlayer;
 
     private CDLocalMediaSource mCDLocalMediaSource;
+    private LVEConfigReceiver mLVEConfigReceiver;
+    private MenuItem mTapToTalkIcon;
 
     /* Sample Metrics Code */
-    //    private MetricsUploadService mMetricsUploadService;
+//    private MetricsUploadService mMetricsUploadService;
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
@@ -202,24 +226,28 @@ public class MainActivity extends AppCompatActivity implements Observer {
         // Set the main view content
         setContentView( R.layout.activity_main );
 
+        // Initialize LVE Interaction service which will handle the initialization of LVE
+        initLVE();
+
         // Add support action toolbar for action buttons
         setSupportActionBar( ( Toolbar ) findViewById( R.id.actionToolbar ) );
-
-        // Get shared preferences
-        mPreferences = getSharedPreferences( getString( R.string.preference_file_key ),
-                Context.MODE_PRIVATE );
 
         // Initialize RecyclerView list for log view
         mRecyclerView = findViewById( R.id.rvLog );
         mRecyclerView.setHasFixedSize( true );
         mRecyclerView.setLayoutManager( new LinearLayoutManager( this ) );
-        mRecyclerAdapter = new LogRecyclerViewAdapter( mLogList, getApplicationContext() );
+        mRecyclerAdapter = new LogRecyclerViewAdapter( getApplicationContext() );
         mRecyclerView.setAdapter( mRecyclerAdapter );
+        setUpLogViewOptions();
 
         // Initialize sound effects for speech recognition
         mAudioCueStartVoice = MediaPlayer.create( this, R.raw.med_ui_wakesound );
         mAudioCueStartTouch = MediaPlayer.create( this, R.raw.med_ui_wakesound_touch );
         mAudioCueEnd = MediaPlayer.create( this, R.raw.med_ui_endpointing_touch );
+
+        // Get shared preferences
+        mPreferences = getSharedPreferences( getString( R.string.preference_file_key ),
+                Context.MODE_PRIVATE );
 
         // Retrieve device config from config file and update preferences
         String clientId = "", clientSecret = "", productId = "", productDsn = "";
@@ -239,9 +267,16 @@ public class MainActivity extends AppCompatActivity implements Observer {
         // Display device config settings in GUI
         updateDeviceConfigGUI( clientId, clientSecret, productId, productDsn );
 
+    }
+
+    /**
+     * Continue starting the Engine with the config received from LVE Service.
+     * @param config  json string with LVE config if LVE is supported. null otherwise.
+     */
+    private void onLVEConfigReceived(String config) {
         // Initialize AAC engine and register platform interfaces
         try {
-            startEngine();
+            startEngine(config);
         } catch ( RuntimeException e ) {
             Log.e( sTag, "Could not start engine. Reason: " + e.getMessage() );
             return;
@@ -252,12 +287,32 @@ public class MainActivity extends AppCompatActivity implements Observer {
         mSpeechRecognizer.addObserver( this );
     }
 
-    private void startEngine() throws RuntimeException {
+    /**
+     * Registers Broadcast receiver callbacks and starts LVEInteractionService that will initialize LVE
+     */
+    private void initLVE() {
+        //Register Broadcast receiver that will receive configuration back from the LVEInteractionService
+        mLVEConfigReceiver = new LVEConfigReceiver();
+        IntentFilter filter = new IntentFilter(LVEInteractionService.LVE_RECEIVER_INTENT);
+        filter.addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mLVEConfigReceiver, filter);
+
+        // Start LVEInteractionService. This service is responsible for communicating with LVE
+        startService(new Intent(this, LVEInteractionService.class));
+    }
+
+    /**
+     * Configure the Engine and register platform interface instances
+     * @param json json string with LVE config if LVE is supported. null otherwise.
+     * @throws RuntimeException
+     */
+    private void startEngine(String json) throws RuntimeException {
 
         // Copy certs to the cache directory
         File cacheDir = getCacheDir();
         File appDataDir = new File( cacheDir, "appdata" );
         File certsDir = new File( appDataDir, "certs" );
+        File modelsDir = new File( appDataDir, "models" );
         try {
             String[] certAssets = getAssets().list("certs");
             for ( String next : certAssets ) {
@@ -267,61 +322,29 @@ public class MainActivity extends AppCompatActivity implements Observer {
             Log.w( sTag, "Cannot copy certs to cache directory. Error: " + e.getMessage() );
         }
 
+        try {
+            String[] modelsAssert = getAssets().list("models");
+            // copy models forcefully on every start, so that during an app update (for instance an update
+            // where models in assets folder are updated) the models are also updated on the device.
+            for (String next : modelsAssert) {
+                copyAsset("models/" + next, new File(modelsDir, next), true);
+            }
+        } catch (IOException e) {
+            Log.w(sTag, "Cannot copy models to cache directory. Error: " + e.getMessage());
+        }
+
         // Create AAC engine
         mEngine = Engine.create();
+        ArrayList<EngineConfiguration> configuration = getEngineConfigurations(json, appDataDir, certsDir, modelsDir);
 
-        // Configure the engine
-        String productDsn = mPreferences.getString( getString( R.string.preference_product_dsn ), "" );
-        String clientId = mPreferences.getString( getString( R.string.preference_client_id ), "" );
-        String productId = mPreferences.getString( getString( R.string.preference_product_id ), "" );
-
-        AlexaConfiguration.TemplateRuntimeTimeout [] timeoutList = new AlexaConfiguration.TemplateRuntimeTimeout[ ]{
-                new AlexaConfiguration.TemplateRuntimeTimeout ( AlexaConfiguration.TemplateRuntimeTimeoutType.DISPLAY_CARD_TTS_FINISHED_TIMEOUT, 8000 ),
-                new AlexaConfiguration.TemplateRuntimeTimeout ( AlexaConfiguration.TemplateRuntimeTimeoutType.DISPLAY_CARD_AUDIO_PLAYBACK_FINISHED_TIMEOUT, 8000),
-                new AlexaConfiguration.TemplateRuntimeTimeout ( AlexaConfiguration.TemplateRuntimeTimeoutType.DISPLAY_CARD_AUDIO_PLAYBACK_STOPPED_PAUSED_TIMEOUT, 1800000)
-        };
-
-
-        boolean configureSucceeded = mEngine.configure( new EngineConfiguration[]{
-                //AlexaConfiguration.createCurlConfig( certsDir.getPath(), "wlan0" ), Uncomment this line to specify the interface name to use by AVS.
-                AlexaConfiguration.createCurlConfig( certsDir.getPath() ),
-                AlexaConfiguration.createDeviceInfoConfig(  productDsn, clientId, productId ),
-                AlexaConfiguration.createMiscStorageConfig( appDataDir.getPath() + "/miscStorage.sqlite" ),
-                AlexaConfiguration.createCertifiedSenderConfig( appDataDir.getPath() + "/certifiedSender.sqlite" ),
-                AlexaConfiguration.createAlertsConfig( appDataDir.getPath() + "/alerts.sqlite" ),
-                AlexaConfiguration.createSettingsConfig( appDataDir.getPath() + "/settings.sqlite" ),
-                AlexaConfiguration.createNotificationsConfig( appDataDir.getPath() + "/notifications.sqlite" ),
-                StorageConfiguration.createLocalStorageConfig( appDataDir.getPath() + "/localStorage.sqlite" ),
-                LoggerConfiguration.createSyslogSinkConfig( "syslog", Logger.Level.VERBOSE ),
-                AlexaCommsConfiguration.createCommsConfig( certsDir.getPath() ),
-                //AlexaConfiguration.createTemplateRuntimeTimeoutConfig( timeoutList )
-                // Example Vehicle Config
-                VehicleConfiguration.createVehicleInfoConfig( new VehicleConfiguration.VehicleProperty[]{
-                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.MAKE, "Amazon"),
-                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.MODEL, "AmazonCarOne"),
-                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.TRIM, "Advance"),
-                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.YEAR, "2025"),
-                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.GEOGRAPHY, "US"),
-                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.VERSION, String.format(
-                            "Vehicle Software Version 1.0 (Auto SDK Version %s)", mEngine.getProperty( CoreProperties.VERSION ) ) ),
-                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.OPERATING_SYSTEM, "Android 8.1 Oreo API Level 26"),
-                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.HARDWARE_ARCH, "Armv8a"),
-                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.LANGUAGE, "en-US"),
-                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.MICROPHONE, "Single, roof mounted"),
-                        // If this list is left blank, it will be fetched by the engine using amazon default endpoint
-                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.COUNTRY_LIST, "US,GB,IE,CA,DE,AT,IN,JP,AU,NZ,FR")
-                }),
-                LocalVoiceControlConfiguration.createIPCConfig( appDataDir.getPath(), LocalVoiceControlConfiguration.SocketPermission.ALL, appDataDir.getPath(), LocalVoiceControlConfiguration.SocketPermission.ALL, "127.0.0.1", appDataDir.getPath() ),
-                //AlexaConfiguration.createTemplateRuntimeTimeoutConfig( timeoutList ),
-                LocalSkillServiceConfiguration.createLocalSkillServiceConfig( appDataDir.getPath() + "/LSS.socket", appDataDir.getPath() + "/ER.socket" ),
-                CarControlConfiguration.createCarControlConfig( appDataDir.getPath() + "/ApplianceDB.sqlite" )
-        });
+        EngineConfiguration[] configurationArray = configuration.toArray(new EngineConfiguration[configuration.size()]);
+        boolean configureSucceeded = mEngine.configure( configurationArray );
         if ( !configureSucceeded ) throw new RuntimeException( "Engine configuration failed" );
 
         // Create the platform implementation handlers and register them with the engine
         // Logger
         if ( !mEngine.registerPlatformInterface(
-                mLogger = new LoggerHandler(this, ( LogRecyclerViewAdapter ) mRecyclerAdapter )
+                mLogger = new LoggerHandler()
             )
         ) throw new RuntimeException( "Could not register Logger platform interface" );
 
@@ -351,9 +374,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
             )
         ) throw new RuntimeException( "Could not register PlaybackController platform interface" );
 
+        ExtraModules extraModules = new ExtraModules(getApplicationContext());
+
         // SpeechRecognizer
-        boolean wakeWordSupported =
-                mEngine.getProperty( AlexaProperties.WAKEWORD_SUPPORTED ).equals( "true" );
+        boolean wakeWordSupported = extraModules.isAmazonLiteEnabled();
         if ( !mEngine.registerPlatformInterface(
                 mSpeechRecognizer = new SpeechRecognizerHandler(
                         mAudioInputManager,
@@ -419,13 +443,20 @@ public class MainActivity extends AppCompatActivity implements Observer {
             )
         ) throw new RuntimeException( "Could not register NetworkInfoProvider platform interface" );
 
+        // CBL Auth Handler
+        LoginWithAmazonCBL LoginHandler = new LoginWithAmazonCBL( this, mLogger );
+
+        // LWA Auth Handler - replace CBL to use LWA browser instead
+        //LoginWithAmazonBrowser LoginHandler = new LoginWithAmazonBrowser( this, mLogger, this.getLifecycle() );
+
         // AuthProvider
         if ( !mEngine.registerPlatformInterface(
-                mAuthProvider = new AuthProviderHandler( this, mLogger, mNetworkInfoProvider )
+                mAuthProvider = new AuthProviderHandler( this, mLogger, LoginHandler)
             )
         ) throw new RuntimeException( "Could not register AuthProvider platform interface" );
 
-        mNetworkInfoProvider.setAuthProvider(mAuthProvider);
+        // Set auth handler as connection observer
+        mNetworkInfoProvider.registerNetworkConnectionObserver( LoginHandler );
 
         // Navigation
         if ( !mEngine.registerPlatformInterface(
@@ -455,7 +486,12 @@ public class MainActivity extends AppCompatActivity implements Observer {
             )
         ) throw new RuntimeException("Could not register ContactUploader platform interface");
 
-        ExtraModules extraModules = new ExtraModules(getApplicationContext());
+        // EqualizerController
+        if ( !mEngine.registerPlatformInterface(
+                mEqualizerControllerHandler = new EqualizerControllerHandler( this, mLogger )
+            )
+        ) throw new RuntimeException( "Could not register EqualizerController platform interface" );
+
         // Alexa Comms Handler
         if (extraModules.isAlexaCommsEnabled()) {
             MediaPlayerHandler ringtoneMediaPlayerHandler = new MediaPlayerHandler(
@@ -521,13 +557,150 @@ public class MainActivity extends AppCompatActivity implements Observer {
 //        if ( !mEngine.registerPlatformInterface( mMetricsUploadService) ) {
 //            throw new RuntimeException( "Could not register MetricsUploader platform interface" );
 //        }
+        // Alexa Locale
+        final String supportedLocales = mEngine.getProperty(AlexaProperties.SUPPORTED_LOCALES);
+        final String[] localesArray = supportedLocales.split(",");
+
+        ArrayAdapter<String> localeAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, localesArray);
+
+        Spinner spinnerView = (Spinner) findViewById(R.id.locale_spinner);
+        spinnerView.setAdapter(localeAdapter);
+
+        final String defaultLocale = mEngine.getProperty(AlexaProperties.LOCALE);
+
+        int localePosition = localeAdapter.getPosition(defaultLocale);
+        if (localePosition < 0) {
+            Log.e( sTag, defaultLocale + " is not in the Supported Locales" );
+            localePosition = 0;
+        }
+        spinnerView.setSelection ( localePosition );
+
+        spinnerView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected (AdapterView<?> arg0, View arg1,
+                                        int position, long arg3) {
+                String s = localesArray[position];
+                if( !mEngine.getProperty(AlexaProperties.LOCALE).equals(s) ) {
+
+                    Toast.makeText(MainActivity.this, "Switching Alexa locale to " + s,
+                            Toast.LENGTH_SHORT).show();
+
+                    mEngine.setProperty(AlexaProperties.LOCALE, s);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+                // TODO Auto-generated method stub
+            }
+        });
 
         // Start the engine
         if ( !mEngine.start() ) throw new RuntimeException( "Could not start engine" );
         //log whether LocationProvider gave a supported country
         mLogger.postInfo( "Country Supported: ",  mEngine.getProperty( AlexaProperties.COUNTRY_SUPPORTED ));
-        mAuthProvider.onInitialize();
+
         mContactUploader.onInitialize();
+        mAuthProvider.onInitialize();
+        initTapToTalk();
+    }
+
+    /**
+     * Get the configurations to start the Engine
+     * @param json json string with LVE config if LVE is supported. null otherwise.
+     * @param appDataDir path to app's data directory
+     * @param certsDir path to certificates directory
+     * @return List of Engine configurations
+     */
+    private ArrayList<EngineConfiguration> getEngineConfigurations(String json, File appDataDir, File certsDir, File modelsDir) {
+        // Configure the engine
+        String productDsn = mPreferences.getString( getString( R.string.preference_product_dsn ), "" );
+        String clientId = mPreferences.getString( getString( R.string.preference_client_id ), "" );
+        String productId = mPreferences.getString( getString( R.string.preference_product_id ), "" );
+
+        AlexaConfiguration.TemplateRuntimeTimeout [] timeoutList = new AlexaConfiguration.TemplateRuntimeTimeout[ ]{
+                new AlexaConfiguration.TemplateRuntimeTimeout ( AlexaConfiguration.TemplateRuntimeTimeoutType.DISPLAY_CARD_TTS_FINISHED_TIMEOUT, 8000 ),
+                new AlexaConfiguration.TemplateRuntimeTimeout ( AlexaConfiguration.TemplateRuntimeTimeoutType.DISPLAY_CARD_AUDIO_PLAYBACK_FINISHED_TIMEOUT, 8000),
+                new AlexaConfiguration.TemplateRuntimeTimeout ( AlexaConfiguration.TemplateRuntimeTimeoutType.DISPLAY_CARD_AUDIO_PLAYBACK_STOPPED_PAUSED_TIMEOUT, 1800000)
+        };
+
+        AmazonLiteConfiguration.AmazonLiteModelConfig[] modelsInfoList = new AmazonLiteConfiguration.AmazonLiteModelConfig[]{
+                new AmazonLiteConfiguration.AmazonLiteModelConfig("de-DE", "D.de-DE.alexa.bin"),
+                new AmazonLiteConfiguration.AmazonLiteModelConfig("en-IN", "D.en-IN.alexa.bin"),
+                new AmazonLiteConfiguration.AmazonLiteModelConfig("en-US", "D.en-US.alexa.bin"),
+                new AmazonLiteConfiguration.AmazonLiteModelConfig("es-ES", "D.es-ES.alexa.bin"),
+                new AmazonLiteConfiguration.AmazonLiteModelConfig("fr-FR", "D.fr-FR.alexa.bin"),
+                new AmazonLiteConfiguration.AmazonLiteModelConfig("it-IT", "D.it-IT.alexa.bin"),
+                new AmazonLiteConfiguration.AmazonLiteModelConfig("ja-JP", "D.ja-JP.alexa.bin"),
+                new AmazonLiteConfiguration.AmazonLiteModelConfig("en-GB", "U_250k.en-GB.alexa.bin"),
+                new AmazonLiteConfiguration.AmazonLiteModelConfig("en-AU", "D.en-US.alexa.bin"), // Mapped to en_US
+                new AmazonLiteConfiguration.AmazonLiteModelConfig("en-CA", "D.en-US.alexa.bin"), // Mapped to en_US
+                new AmazonLiteConfiguration.AmazonLiteModelConfig("fr-CA", "D.fr-FR.alexa.bin"), // Mapped to fr_FR
+                new AmazonLiteConfiguration.AmazonLiteModelConfig("es-MX", "D.es-ES.alexa.bin")  // Mapped to es_ES
+        };
+
+        JSONObject config = null;
+        ArrayList<EngineConfiguration> configuration = new ArrayList<EngineConfiguration>(Arrays.asList(
+                //AlexaConfiguration.createCurlConfig( certsDir.getPath(), "wlan0" ), Uncomment this line to specify the interface name to use by AVS.
+                AlexaConfiguration.createCurlConfig(certsDir.getPath()),
+                AlexaConfiguration.createDeviceInfoConfig(productDsn, clientId, productId),
+                AlexaConfiguration.createMiscStorageConfig(appDataDir.getPath() + "/miscStorage.sqlite"),
+                AlexaConfiguration.createCertifiedSenderConfig(appDataDir.getPath() + "/certifiedSender.sqlite"),
+                AlexaConfiguration.createAlertsConfig(appDataDir.getPath() + "/alerts.sqlite"),
+                AlexaConfiguration.createSettingsConfig(appDataDir.getPath() + "/settings.sqlite"),
+                AlexaConfiguration.createNotificationsConfig(appDataDir.getPath() + "/notifications.sqlite"),
+                AlexaConfiguration.createEqualizerControllerConfig(
+                        EqualizerConfiguration.getSupportedBands(),
+                        EqualizerConfiguration.getMinBandLevel(),
+                        EqualizerConfiguration.getMaxBandLevel(),
+                        EqualizerConfiguration.getDefaultBandLevels() ),
+                // Uncomment the below line to specify the template runtime values
+                //AlexaConfiguration.createTemplateRuntimeTimeoutConfig( timeoutList ),
+                StorageConfiguration.createLocalStorageConfig(appDataDir.getPath() + "/localStorage.sqlite"),
+                AlexaCommsConfiguration.createCommsConfig(certsDir.getPath()),
+
+                // Example Vehicle Config
+                VehicleConfiguration.createVehicleInfoConfig(new VehicleConfiguration.VehicleProperty[]{
+                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.MAKE, "Amazon"),
+                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.MODEL, "AmazonCarOne"),
+                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.TRIM, "Advance"),
+                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.YEAR, "2025"),
+                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.GEOGRAPHY, "US"),
+                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.VERSION, String.format(
+                                "Vehicle Software Version 1.0 (Auto SDK Version %s)", mEngine.getProperty(CoreProperties.VERSION))),
+                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.OPERATING_SYSTEM, "Android 8.1 Oreo API Level 26"),
+                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.HARDWARE_ARCH, "Armv8a"),
+                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.LANGUAGE, "en-US"),
+                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.MICROPHONE, "Single, roof mounted"),
+                        // If this list is left blank, it will be fetched by the engine using amazon default endpoint
+                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.COUNTRY_LIST, "US,GB,IE,CA,DE,AT,IN,JP,AU,NZ,FR"),
+                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.VEHICLE_IDENTIFIER, "123456789a")
+                })
+                // Uncomment the below line to enable the runtime switching of the wakeword model.
+                // Also, ensure that the wakeword models are copied from the package to the assets/models folder.
+                // AmazonLiteConfiguration.createAmazonLiteConfig(modelsDir.getPath(), modelsInfoList)
+        ));
+
+        // If LVE is supported and available, we get the LVE config from LVE apk.
+        // Use this config to initialize the local skills.
+        // If LVE is not supported or available, initialize with default config
+        if (json != null) {
+            try {
+                config = new JSONObject(json);
+                configuration.add(LocalVoiceControlConfiguration.createIPCConfig( config.getString("AlexaHybrid.SDK.ExecutionController.SocketDirectory"), LocalVoiceControlConfiguration.SocketPermission.ALL, config.getString("AlexaHybrid.SDK.PlatformServices.SocketDirectory"), LocalVoiceControlConfiguration.SocketPermission.ALL, "127.0.0.1", config.getString("AlexaHybrid.SDK.ExecutionController.UnixDomainSocketDirectory") ));
+                configuration.add(LocalSkillServiceConfiguration.createLocalSkillServiceConfig( config.getString("LocalSkillService.Server.Endpoint"), config.getString("AlexaHybrid.SDK.ArtifactManager.IngestionEP") ));
+                configuration.add(CarControlConfiguration.createCarControlConfig( config.getString("Skill.SmartHomeSkillId.CHRDatabaseFile") ));
+            }
+            catch( Throwable ex ) {
+                ex.printStackTrace();
+            }
+        } else {
+            configuration.add(LocalVoiceControlConfiguration.createIPCConfig( appDataDir.getPath(), LocalVoiceControlConfiguration.SocketPermission.ALL, appDataDir.getPath(), LocalVoiceControlConfiguration.SocketPermission.ALL, "127.0.0.1", appDataDir.getPath() ));
+            configuration.add(LocalSkillServiceConfiguration.createLocalSkillServiceConfig( appDataDir.getPath() + "/LSS.socket", appDataDir.getPath() + "/ER.socket" ));
+            configuration.add(CarControlConfiguration.createCarControlConfig( appDataDir.getPath() + "/ApplianceDB.sqlite" ));
+        }
+        return configuration;
     }
 
     @Override
@@ -548,20 +721,15 @@ public class MainActivity extends AppCompatActivity implements Observer {
             mAudioCueEnd = null;
         }
 
-        if ( mNetworkInfoProvider != null ) { mNetworkInfoProvider.unregister(); }
+        if ( mLVEConfigReceiver != null ) {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(mLVEConfigReceiver);
+        }
 
-        /* Sample Metrics Code */
-//        if ( mMetricsUploadService != null ) { mMetricsUploadService.shutdown(); }
+        if ( mNetworkInfoProvider != null ) { mNetworkInfoProvider.unregister(); }
 
         if ( mEngine != null ) { mEngine.dispose(); }
 
         super.onDestroy();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if ( mAuthProvider != null ) mAuthProvider.onResume();
     }
 
     @Override
@@ -570,12 +738,17 @@ public class MainActivity extends AppCompatActivity implements Observer {
         getMenuInflater().inflate( R.menu.menu_main, menu );
 
         // Set tap-to-talk and hold-to-talk actions
-        final MenuItem icon = menu.findItem( R.id.action_talk );
-        if ( icon != null && mAlexaClient != null && mSpeechRecognizer != null ) {
-            icon.setActionView( R.layout.menu_item_talk );
+        mTapToTalkIcon = menu.findItem( R.id.action_talk );
+        initTapToTalk();
+        return true;
+    }
+
+    private void initTapToTalk() {
+        if ( mTapToTalkIcon != null && mAlexaClient != null && mSpeechRecognizer != null ) {
+            mTapToTalkIcon.setActionView( R.layout.menu_item_talk );
 
             // Set hold-to-talk action
-            icon.getActionView().setOnClickListener( new View.OnClickListener() {
+            mTapToTalkIcon.getActionView().setOnClickListener( new View.OnClickListener() {
                 @Override
                 public void onClick( View v ) {
                     if ( mAlexaClient.getConnectionStatus()
@@ -591,7 +764,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
             });
 
             // Start hold-to-talk button action
-            icon.getActionView().setOnLongClickListener( new View.OnLongClickListener() {
+            mTapToTalkIcon.getActionView().setOnLongClickListener( new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick( View v ) {
                     if ( mAlexaClient.getConnectionStatus()
@@ -609,7 +782,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
             });
 
             // Release hold-to-talk button action
-            icon.getActionView().setOnTouchListener( new View.OnTouchListener() {
+            mTapToTalkIcon.getActionView().setOnTouchListener( new View.OnTouchListener() {
                 @Override
                 public boolean onTouch( View v, MotionEvent m ) {
                     // Talk button released
@@ -623,8 +796,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 }
             });
         }
-
-        return true;
     }
 
     @Override
@@ -647,27 +818,22 @@ public class MainActivity extends AppCompatActivity implements Observer {
         }
     }
 
-    // For updating log view
     @Override
     public void update( Observable observable, Object object ) {
-
-        if ( object instanceof LogEntry ) {
-            // Append entry to log list
-            final LogEntry entry = ( LogEntry ) object;
-
-            runOnUiThread( new Runnable() {
-                @Override
-                public void run() {
-                    // Insert entry into RecyclerView and update view
-                    mLogList.add( entry );
-                    mRecyclerAdapter.notifyItemInserted( mLogList.size() - 1 );
-                    ( ( LogRecyclerViewAdapter ) mRecyclerAdapter ).filter();
-                    int count = mRecyclerAdapter.getItemCount();
-                    int position = count > 0 ? count - 1 : 0;
-                    mRecyclerView.smoothScrollToPosition( position );
-                }
-            });
-
+        if ( observable instanceof LoggerHandler.LoggerObservable ) {
+            if ( object instanceof LogEntry ) {
+                final LogEntry entry = ( LogEntry ) object;
+                runOnUiThread( new Runnable() {
+                    public void run() {
+                        // Insert log entry into log view
+                        mRecyclerAdapter.insertItem( entry );
+                        // Scroll to bottom of log view
+                        int count = mRecyclerAdapter.getItemCount();
+                        int position = count > 0 ? count - 1 : 0;
+                        mRecyclerView.scrollToPosition( position );
+                    }
+                } );
+            }
         } else if ( observable instanceof SpeechRecognizerHandler.AudioCueObservable ) {
             if ( object.equals( SpeechRecognizerHandler.AudioCueState.START_TOUCH ) ) {
                 // Play touch-initiated listening audio cue
@@ -763,7 +929,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     /* Sample Metrics Code */
 //    // Retrieve metrics config from config file and create configuration object
 //    private MetricUploadConfiguration initializeMetricsConfiguration() {
-//        String amazonId = "", productDsn = "";
+//        String amazonId = "", stageStr = "", productDsn = "";
 //        boolean metricsEnabled = false;
 //
 //        JSONObject config = getConfigFromFile("metrics");
@@ -771,16 +937,114 @@ public class MainActivity extends AppCompatActivity implements Observer {
 //            try {
 //                amazonId = config.getString( "amazonId" );
 //                metricsEnabled = config.getBoolean("metricsEnabled");
+//                stageStr = config.getString( "stage" );
 //            } catch ( JSONException e ) {
 //                Log.w( sTag, "Missing metrics config info in app_config.json" );
 //            }
 //        }
 //        productDsn = mPreferences.getString( this.getString( R.string.preference_product_dsn ), "" );
 //        try {
-//            return MetricUploadConfiguration.createMetricUploadConfiguration(amazonId, productDsn, metricsEnabled);
+//            MetricUploadConfiguration.Stage stage = null;
+//            if (metricsEnabled) {
+//                stage = MetricUploadConfiguration.Stage.valueOf(stageStr);
+//            }
+//            return MetricUploadConfiguration.createMetricUploadConfiguration(amazonId, productDsn, stage, metricsEnabled);
 //        } catch (IllegalArgumentException| NullPointerException ex ) {
 //            Log.e(sTag, "", ex);
 //            throw ex;
 //        }
 //    }
+
+    /// Set up log view filtering options
+    private void setUpLogViewOptions() {
+        LayoutInflater inf = getLayoutInflater();
+
+        // Add switch for each log source type
+        String[] sources = { "CLI", "AAC", "AVS" };
+        LinearLayout sourceContainer = findViewById( R.id.sourceSwitchContainer );
+        for ( final String source : sources ) {
+            View switchItem = ( inf.inflate( R.layout.drawer_switch, sourceContainer, false ) );
+            ( (TextView) switchItem.findViewById( R.id.text ) ).setText( source );
+            SwitchCompat drawerSwitch = switchItem.findViewById( R.id.drawerSwitch );
+            drawerSwitch.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
+                public void onCheckedChanged( CompoundButton buttonView, boolean isChecked ) {
+                    mRecyclerAdapter.setSourceDisplayMode( source, isChecked );
+                }
+            });
+            sourceContainer.addView( switchItem );
+        }
+
+        // Add option in dropdown selector for each log level
+        Spinner spinner = findViewById( R.id.levelSpinner );
+        ArrayAdapter<Logger.Level> adapter = new ArrayAdapter<>( this, android.R.layout.simple_spinner_item );
+        adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
+
+        for ( Logger.Level level : Logger.Level.values() ) {
+            if ( level == Logger.Level.METRIC ) {
+                continue;
+            }
+            adapter.add( level );
+        }
+
+        spinner.setAdapter( adapter );
+        spinner.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected( AdapterView<?> parent, View view, int position, long id ) {
+                Logger.Level level = ( Logger.Level ) parent.getItemAtPosition(position);
+                mRecyclerAdapter.setDisplayLevel( level );
+                mRecyclerView.scrollToPosition( mRecyclerAdapter.getItemCount() - 1 );
+            }
+            public void onNothingSelected( AdapterView<?> parent ) {}
+        });
+
+        // Add switch to display or hide card logs
+        View cardItem = findViewById( R.id.toggleCards );
+        ( ( TextView ) cardItem.findViewById( R.id.text ) ).setText( R.string.log_switch_cards );
+        SwitchCompat cardSwitch = cardItem.findViewById( R.id.drawerSwitch );
+        cardSwitch.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged( CompoundButton buttonView, boolean isChecked ) {
+                mRecyclerAdapter.setCardDisplayMode( isChecked );
+            }
+        });
+
+        // Add switch to display or hide pretty-printed JSON template logs
+        View tempItem = findViewById( R.id.toggleTemplates );
+        ( ( TextView ) tempItem.findViewById( R.id.text ) ).setText( R.string.log_switch_template );
+        SwitchCompat tempSwitch = tempItem.findViewById( R.id.drawerSwitch );
+        tempSwitch.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged( CompoundButton buttonView, boolean isChecked ) {
+                mRecyclerAdapter.setJsonDisplayMode( isChecked );
+            }
+        });
+
+        // Clear log button
+        findViewById( R.id.clearLogButton ).setOnClickListener(
+            new View.OnClickListener() {
+                public void onClick( View v ) { mRecyclerAdapter.clear(); }
+            }
+        );
+
+        // Set initial level selection to INFO
+        spinner.setSelection( Logger.Level.INFO.ordinal() );
+        mRecyclerAdapter.setDisplayLevel( Logger.Level.INFO );
+    }
+
+    /**
+     * Broadcast receiver to receive Configurations from LVEInteractionService
+     */
+    class LVEConfigReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (LVEInteractionService.LVE_RECEIVER_INTENT.equals(intent.getAction())) {
+                if (intent.hasExtra(LVEInteractionService.LVE_RECEIVER_FAILURE_REASON)) {
+                    String reason = intent.getStringExtra(LVEInteractionService.LVE_RECEIVER_FAILURE_REASON);
+                    onLVEConfigReceived(null);
+                    Log.e( sTag, "Failed to init AHE : " + reason);
+                } else if (intent.hasExtra(LVEInteractionService.LVE_RECEIVER_CONFIGURATION)) {
+                    Log.i( sTag, "Received config from LVE starting engine now : ");
+                    String config = intent.getStringExtra(LVEInteractionService.LVE_RECEIVER_CONFIGURATION);
+                    onLVEConfigReceived(config);
+                }
+            }
+        }
+    }
 }

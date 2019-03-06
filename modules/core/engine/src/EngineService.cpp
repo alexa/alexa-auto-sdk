@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -43,10 +43,10 @@ bool EngineService::handleInitializeEngineEvent( std::shared_ptr<aace::engine::c
     try
     {
         ThrowIf( m_initialized, "serviceAlreadyInitialized" );
-        
+
         // set the service engine context
         m_context = context;
-        
+
         // delegate the intialize request to the service handler
         ThrowIfNot( initialize(), "initializeServiceFailed" );
 
@@ -56,6 +56,7 @@ bool EngineService::handleInitializeEngineEvent( std::shared_ptr<aace::engine::c
         return true;
     }
     catch( std::exception& ex ) {
+        m_context.reset();
         AACE_ERROR(LX(TAG,"handleInitializeEngineEvent").d("reason", ex.what()));
         return false;
     }
@@ -95,6 +96,8 @@ bool EngineService::handleShutdownEngineEvent()
 
         // set the service initialized flag to false
         m_initialized = false;
+
+        m_context.reset();
 
         return true;
     }

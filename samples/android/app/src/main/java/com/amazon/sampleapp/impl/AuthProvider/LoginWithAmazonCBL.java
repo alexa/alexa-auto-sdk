@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -16,11 +16,16 @@
 package com.amazon.sampleapp.impl.AuthProvider;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 
 import com.amazon.aace.alexa.AuthProvider;
+import com.amazon.aace.network.NetworkInfoProvider;
 import com.amazon.sampleapp.R;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
+import com.amazon.sampleapp.impl.NetworkInfoProvider.NetworkConnectionObserver;
 import com.amazon.sampleapp.logView.LogRecyclerViewAdapter;
 
 import org.json.JSONException;
@@ -34,7 +39,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.Observable;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
@@ -43,7 +49,11 @@ import java.util.regex.Pattern;
 
 import javax.net.ssl.HttpsURLConnection;
 
-class LoginWithAmazonCBL extends Observable {
+/*
+* Login with Amazon Code Based Linking implementation.
+* See https://developer.amazon.com/docs/alexa-voice-service/code-based-linking-other-platforms.html for additional reference.
+*/
+public class LoginWithAmazonCBL implements AuthHandler, NetworkConnectionObserver {
 
     private static final String sTag = "CBL";
 
@@ -74,7 +84,17 @@ class LoginWithAmazonCBL extends Observable {
     private final SharedPreferences mPreferences;
     private final Activity mActivity;
     private final LoggerHandler mLogger;
-    private final AuthProviderHandler mAuthProvider;
+
+    // List of Authentication observers
+    private Set<AuthStateObserver> mObservers;
+
+    private AuthProvider.AuthState mCurrentAuthState;
+    private AuthProvider.AuthError mCurrentAuthError;
+    private String mCurrentAuthToken;
+
+    // assume connected in case of no network info provider
+    private boolean mConnected = true;
+
     private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
     private String mClientId;
     private String mClientSecret;
@@ -85,24 +105,22 @@ class LoginWithAmazonCBL extends Observable {
     private TimerTask mAuthorizationTimerTask;
     private TimerTask mRefreshTimerTask;
 
-    LoginWithAmazonCBL( Activity activity,
-                        SharedPreferences preferences,
-                        LoggerHandler logger,
-                        AuthProviderHandler auth ) {
+    public LoginWithAmazonCBL( Activity activity,
+                       LoggerHandler logger ) {
         mActivity = activity;
-        mPreferences = preferences;
+        mPreferences = activity.getSharedPreferences(
+                activity.getString( R.string.preference_file_key ), Context.MODE_PRIVATE );
         mLogger = logger;
-        mAuthProvider = auth;
 
         mClientId = mPreferences.getString( mActivity.getString( R.string.preference_client_id ), "" );
         mClientSecret = mPreferences.getString( mActivity.getString( R.string.preference_client_secret ), "" );
         mProductID = mPreferences.getString( mActivity.getString( R.string.preference_product_id ), "" );
         mProductDSN = mPreferences.getString( mActivity.getString( R.string.preference_product_dsn ), "" );
-    }
+        mObservers = new HashSet<>(1);
 
-    void login() {
-        mLogger.postInfo( sTag, "Attempting to authenticate" );
-        requestDeviceAuthorization();
+        mCurrentAuthState = AuthProvider.AuthState.UNINITIALIZED;
+        mCurrentAuthError = AuthProvider.AuthError.NO_ERROR;
+        mCurrentAuthToken = "";
     }
 
     private void requestDeviceAuthorization() {
@@ -227,31 +245,28 @@ class LoginWithAmazonCBL extends Observable {
                                 }
 
                                 JSONObject responseJSON = new JSONObject( response.toString() );
-                                String accessToken = responseJSON.getString( "access_token" );
+                                mCurrentAuthToken = responseJSON.getString( "access_token" );
                                 String refreshToken = responseJSON.getString( "refresh_token" );
                                 String expiresInSeconds = responseJSON.getString( "expires_in" );
 
                                 // Write refresh token to shared preferences
                                 SharedPreferences.Editor editor = mPreferences.edit();
                                 editor.putString( mActivity.getString( R.string.preference_refresh_token ), refreshToken );
-                                editor.putString( mActivity.getString( R.string.preference_login_method ), LoginWithAmazon.CBL_LOGIN_METHOD_KEY );
                                 editor.apply();
 
                                 // Refresh access token automatically before expiry
                                 startRefreshTimer( Long.parseLong( expiresInSeconds ), refreshToken );
 
-                                // Inform AuthProvider of refreshed state
                                 mLogger.postVerbose( sTag,
-                                        "Refreshing Auth State with token: " + accessToken );
-                                mAuthProvider.setAuthToken( accessToken );
-                                mAuthProvider.onAuthStateChanged( AuthProvider.AuthState.REFRESHED,
-                                        AuthProvider.AuthError.NO_ERROR );
-                                setChanged();
-                                notifyObservers( "logged in" );
+                                        "AuthState and token refreshed");
+
+                                mCurrentAuthState = AuthProvider.AuthState.REFRESHED;
+                                mCurrentAuthError = AuthProvider.AuthError.NO_ERROR;
+                                notifyAuthObservers();
 
                                 // Fetch User Profile if profile scope was authorized
                                 if ( sScopeValue.contains( "profile" ) ) {
-                                    requestUserProfile( accessToken );
+                                    requestUserProfile( mCurrentAuthToken );
                                 }
                             }
 
@@ -419,19 +434,17 @@ class LoginWithAmazonCBL extends Observable {
                 if ( responseJSON != null ) {
                     try {
                         String expiresInSeconds = responseJSON.getString( "expires_in" );
-                        String accessToken = responseJSON.getString( "access_token" );
+                        mCurrentAuthToken = responseJSON.getString( "access_token" );
 
                         // Refresh access token automatically before expiry
                         startRefreshTimer( Long.parseLong( expiresInSeconds ), mRefreshToken );
 
-                        // Inform Auth Provider of refreshed state
                         mLogger.postVerbose( sTag,
-                                "Refreshing Auth State with token: " + accessToken );
-                        mAuthProvider.setAuthToken( accessToken );
-                        mAuthProvider.onAuthStateChanged( AuthProvider.AuthState.REFRESHED,
-                                AuthProvider.AuthError.NO_ERROR );
-                        setChanged();
-                        notifyObservers( "logged in" );
+                                "AuthState and token refreshed");
+
+                        mCurrentAuthState = AuthProvider.AuthState.REFRESHED;
+                        mCurrentAuthError = AuthProvider.AuthError.NO_ERROR;
+                        notifyAuthObservers();
 
                     } catch ( JSONException e ) {
                         mLogger.postError( sTag, "Error refreshing auth token. Error: "
@@ -439,25 +452,70 @@ class LoginWithAmazonCBL extends Observable {
                     }
 
                 } else {
-                    mAuthProvider.clearAuthToken();
-                    mAuthProvider.onAuthStateChanged( AuthProvider.AuthState.UNINITIALIZED,
-                            AuthProvider.AuthError.AUTHORIZATION_FAILED );
+                    mCurrentAuthState = AuthProvider.AuthState.UNINITIALIZED;
+                    mCurrentAuthError = AuthProvider.AuthError.AUTHORIZATION_FAILED;
+                    mCurrentAuthToken = "";
+                    notifyAuthObservers();
                     mLogger.postError( sTag, "Error refreshing auth token" );
                 }
 
             } else mLogger.postWarn( sTag, String.format(
-                "Invalid Auth Parameters, clientID: %s, clientSecret: %s, refreshToken: %s",
+                "Invalid Auth Parameters, clientID: %s, clientSecret: %s",
                     mClientId, mClientSecret, mRefreshToken ) );
         }
     }
 
     private void startRefreshTimer( Long delaySeconds, final String refreshToken ) {
         mTimer.schedule( mRefreshTimerTask = new TimerTask() {
-            public void run() { refreshAuthToken( refreshToken ); }
+            public void run() {
+                if ( !mConnected ) {
+                    mLogger.postInfo(sTag, "No Internet connection, cannot refresh connection for the logged in user. Please verify your network settings.");
+                    mActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                            builder.setTitle("No Internet Connection");
+                            builder.setIcon(android.R.drawable.ic_dialog_alert);
+                            builder.setMessage("Cannot refresh connection for the logged in user.\nPlease verify your network settings and restart the app to retry or click 'Logout' to log out.");
+                            builder.setCancelable(false);
+                            builder.setPositiveButton("OK", null);
+                            builder.setNegativeButton("Logout", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    deauthorize();
+                                }
+                            });
+                            AlertDialog alert = builder.create();
+                            alert.show();
+                        }
+                    });
+                } else refreshAuthToken( refreshToken );
+
+            }
         }, delaySeconds * 1000 - sRefreshAccessTokenTime );
     }
 
-    void logout() {
+    public void authorize() {
+        mLogger.postInfo( sTag, "Attempting to authenticate" );
+        if ( mConnected ) {
+            if ( mAuthorizationTimerTask != null ) {
+                mAuthorizationTimerTask.cancel();
+            }
+            requestDeviceAuthorization();
+        } else {
+            mLogger.postWarn( sTag, "Internet not available. Please verify your network settings." );
+            AlertDialog.Builder builder = new AlertDialog.Builder( mActivity ) ;
+            builder.setTitle( "Internet not available" );
+            builder.setIcon( android.R.drawable.ic_dialog_alert );
+            builder.setMessage( "Please verify your network settings." );
+            builder.setCancelable( false );
+            builder.setPositiveButton( "OK", null );
+            AlertDialog alert = builder.create();
+            alert.show();
+        }
+    }
+
+    public void deauthorize() {
         mLogger.postInfo( sTag, "Attempting to un-authenticate" );
 
         // stop refresh timer task
@@ -466,22 +524,12 @@ class LoginWithAmazonCBL extends Observable {
         // Clear refresh token in preferences
         SharedPreferences.Editor editor = mPreferences.edit();
         editor.putString( mActivity.getString( R.string.preference_refresh_token ), "" );
-        editor.putString( mActivity.getString( R.string.preference_login_method ), "" );
         editor.apply();
 
-        // Notify AuthProvider of unauthenticated state
-        mAuthProvider.clearAuthToken();
-        mAuthProvider.onAuthStateChanged( AuthProvider.AuthState.UNINITIALIZED,
-                AuthProvider.AuthError.NO_ERROR );
-
-        // Notify observers to update GUI
-        setChanged();
-        notifyObservers( "logged out" );
-    }
-
-    void onInitialize() {
-        String refreshToken = mPreferences.getString( mActivity.getString( R.string.preference_refresh_token ), "" );
-        if ( !refreshToken.equals( "" ) ) refreshAuthToken( refreshToken );
+        mCurrentAuthState = AuthProvider.AuthState.UNINITIALIZED;
+        mCurrentAuthError = AuthProvider.AuthError.NO_ERROR;
+        mCurrentAuthToken = "";
+        notifyAuthObservers();
     }
 
     private JSONObject getResponseJSON( InputStream inStream ) {
@@ -507,9 +555,43 @@ class LoginWithAmazonCBL extends Observable {
         return null;
     }
 
-    void cancelPendingAuthorization() {
-        if ( mAuthorizationTimerTask != null ) {
-            mAuthorizationTimerTask.cancel();
+    // Auth State Observable methods
+    public void registerAuthStateObserver( AuthStateObserver observer ) {
+        if (observer == null) return;
+        mObservers.add(observer);
+        observer.onAuthStateChanged( mCurrentAuthState, mCurrentAuthError, mCurrentAuthToken);
+    }
+
+    private void notifyAuthObservers(){
+        if (mObservers == null) return;
+        for (AuthStateObserver observer : mObservers) {
+            observer.onAuthStateChanged( mCurrentAuthState, mCurrentAuthError, mCurrentAuthToken );
+        }
+    }
+
+    // Network Connection Observer methods
+    public void onConnectionStatusChanged( NetworkInfoProvider.NetworkStatus status ){
+        if ( status == NetworkInfoProvider.NetworkStatus.CONNECTED ) {
+            mConnected = true;
+        } else mConnected = false;
+        mExecutor.execute( new ConnectionStateChangedRunnable( mConnected ) );
+    }
+
+    private class ConnectionStateChangedRunnable implements Runnable {
+        private boolean mConnectionStatus;
+        ConnectionStateChangedRunnable( boolean connected ){
+            mConnectionStatus = connected;
+        }
+        public void run() {
+            String refreshToken = mPreferences.getString( mActivity.getString( R.string.preference_refresh_token ), "" );
+            // call refresh on connect if auth state is not refreshed, and have a saved refresh token
+            if ( mCurrentAuthState != AuthProvider.AuthState.REFRESHED && !"".equals( refreshToken ) ) {
+                if ( mConnectionStatus ) {
+                    refreshAuthToken( refreshToken );
+                } else {
+                    mLogger.postInfo(sTag, "No internet connection, cannot refresh connection for the previously logged in user.");
+                }
+            }
         }
     }
 }

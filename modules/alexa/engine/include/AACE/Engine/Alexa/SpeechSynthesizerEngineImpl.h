@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -69,9 +69,13 @@ public:
 
 protected:
     virtual void doShutdown() override;
+    
+    void handlePrePlaybackStarted( SourceId id ) override;
+    void handlePrePlaybackFinished( SourceId id ) override;
 
 private:
     std::shared_ptr<alexaClientSDK::capabilityAgents::speechSynthesizer::SpeechSynthesizer> m_speechSynthesizerCapabilityAgent;
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> m_directiveSequencer;
 };
 
 } // aace::engine::alexa

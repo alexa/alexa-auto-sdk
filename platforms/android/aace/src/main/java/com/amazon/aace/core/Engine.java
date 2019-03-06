@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -75,6 +75,15 @@ public class Engine extends PlatformInterface
         return stop( getNativeObject() );
     }
 
+    /**
+     * Shuts down the engine and releases all of its resources
+     *
+     * @return @c true if the Engine was shut down, else @c false
+     */
+    public boolean shutdown() {
+        return shutdown( getNativeObject() );
+    }
+
     public boolean dispose() {
         return dispose( getNativeObject() );
     }
@@ -128,6 +137,7 @@ public class Engine extends PlatformInterface
     private native boolean configure( long nativeObject, EngineConfiguration[] configurationList );
     private native boolean start( long nativeObject );
     private native boolean stop( long nativeObject );
+    private native boolean shutdown( long nativeObject );
     private native boolean dispose( long nativeObject );
     private native boolean registerPlatformInterface( long nativeObject, PlatformInterface platformInterface );
     private native boolean setProperty( long nativeObject, String key, String value );

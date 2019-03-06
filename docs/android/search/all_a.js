@@ -15,5 +15,6 @@ var searchData=
   ['mediumurl',['mediumURL',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter_1_1_playback_state.html#a0ffbc07279f9d573de7cd2a8897dd542',1,'com.amazon.aace.alexa.ExternalMediaAdapter.PlaybackState.mediumURL()'],['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source_1_1_playback_state.html#ac1c03cc752004d6810a6b18d3fc05fa0',1,'com.amazon.aace.alexa.LocalMediaSource.PlaybackState.mediumURL()']]],
   ['metric',['METRIC',['../enumcom_1_1amazon_1_1aace_1_1logger_1_1_logger_1_1_level.html#a3fb8000c5538432243c47b03951b0aa3',1,'com::amazon::aace::logger::Logger::Level']]],
   ['microphone',['MICROPHONE',['../enumcom_1_1amazon_1_1aace_1_1vehicle_1_1config_1_1_vehicle_configuration_1_1_vehicle_property_type.html#a86317253c5a92a11853d1192fd8459f9',1,'com::amazon::aace::vehicle::config::VehicleConfiguration::VehiclePropertyType']]],
+  ['midrange',['MIDRANGE',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_equalizer_controller_1_1_equalizer_band.html#a8a95ff66b0429c976d07f5ee12269a00',1,'com::amazon::aace::alexa::EqualizerController::EqualizerBand']]],
   ['model',['MODEL',['../enumcom_1_1amazon_1_1aace_1_1vehicle_1_1config_1_1_vehicle_configuration_1_1_vehicle_property_type.html#a5dfe79dfa6301ba1efaca475e7061b9e',1,'com::amazon::aace::vehicle::config::VehicleConfiguration::VehiclePropertyType']]]
 ];

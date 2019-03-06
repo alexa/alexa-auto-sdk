@@ -8,6 +8,7 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/AlexaEngineInterfaces.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/AudioChannel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/AudioPlayer.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/EqualizerController.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/MediaPlayer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/PlaybackController.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/Speaker.h
@@ -29,6 +30,7 @@ add_library(AACEAlexaPlatform SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AlexaClient.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AudioChannel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AudioPlayer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/EqualizerController.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/MediaPlayer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Speaker.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/PlaybackController.cpp

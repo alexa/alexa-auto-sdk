@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ void EngineBinder::initialize( JNIEnv* env )
     m_javaClass_AuthProvider = NativeLib::FindClass( env, "com/amazon/aace/alexa/AuthProvider" );
     m_javaClass_ExternalMediaAdapter = NativeLib::FindClass( env, "com/amazon/aace/alexa/ExternalMediaAdapter" );
     m_javaClass_LocalMediaSource = NativeLib::FindClass( env, "com/amazon/aace/alexa/LocalMediaSource" );
+    m_javaClass_EqualizerController = NativeLib::FindClass( env, "com/amazon/aace/alexa/EqualizerController" );
     m_javaClass_Notifications = NativeLib::FindClass( env, "com/amazon/aace/alexa/Notifications" );
     m_javaClass_PlaybackController = NativeLib::FindClass( env, "com/amazon/aace/alexa/PlaybackController" );
     m_javaClass_SpeechRecognizer = NativeLib::FindClass( env, "com/amazon/aace/alexa/SpeechRecognizer" );
@@ -57,9 +58,11 @@ void EngineBinder::initialize( JNIEnv* env )
 
     m_javaClass_ContactUploader = NativeLib::FindClass( env, "com/amazon/aace/contactuploader/ContactUploader" );
 
-    m_javaClass_MetricsUploader = NativeLib::FindClass( env, "com/amazon/aace/metrics/MetricsUploader" );
+    m_javaClass_MetricsUploader = NativeLib::FindClass( env, "com/amazon/metricuploadservice/MetricsUploader" );
 
     m_javaClass_NetworkInfoProvider = NativeLib::FindClass( env, "com/amazon/aace/network/NetworkInfoProvider" );
+
+    m_javaClass_CBL = NativeLib::FindClass( env, "com/amazon/aace/cbl/CBL" );
 
 #ifdef INCLUDE_ALEXA_COMMS_MODULE
     m_javaClass_AlexaComms = NativeLib::FindClass(env, "com/amazon/aace/communication/AlexaComms");
@@ -280,6 +283,30 @@ std::shared_ptr<TemplateRuntimeBinder> EngineBinder::createTemplateRuntimeBinder
     return templateRuntimeBinder;
 }
 
+std::shared_ptr<EqualizerControllerBinder> EngineBinder::createEqualizerControllerBinder( 
+    JNIEnv* env, 
+    jobject platformInterface )
+{
+    // create the platform interface native binder
+    std::shared_ptr<EqualizerControllerBinder> equalizerControllerBinder = 
+        std::make_shared<EqualizerControllerBinder>();
+
+    // bind the platform java interface to the native interface
+    jclass platformInterfaceClass = env->GetObjectClass( platformInterface );
+    jmethodID javaMethod_setNativeObject = env->GetMethodID( platformInterfaceClass, "setNativeObject", "(J)V" );
+
+    equalizerControllerBinder->bind( env, platformInterface );
+
+    env->CallVoidMethod( platformInterface, javaMethod_setNativeObject, (jlong) equalizerControllerBinder.get() );
+
+    // register the platform interface with the engine
+    // note: must fully initialize equalizerControllerBinder before registering with the engine. We get
+    // calls to getBandLevels, getMode, and setBandLevels immediately on registration
+    m_engine->registerPlatformInterface( equalizerControllerBinder );
+
+    return equalizerControllerBinder;
+}
+
 std::shared_ptr<LocationProviderBinder> EngineBinder::createLocationProviderBinder( JNIEnv* env, jobject platformInterface )
 {
     // create the platform interface native binder
@@ -403,6 +430,24 @@ std::shared_ptr<MetricsUploaderBinder> EngineBinder::createMetricsUploaderBinder
     env->CallVoidMethod( platformInterface, javaMethod_setNativeObject, (jlong) metricsUploaderBinder.get() );
 
     return metricsUploaderBinder;
+}
+
+std::shared_ptr<CBLBinder> EngineBinder::createCBLBinder( JNIEnv* env, jobject platformInterface) {
+    // create the platform interface native binder
+    std::shared_ptr<CBLBinder> cblBinder = std::make_shared<CBLBinder>();
+
+    // register the platform interface with the engine
+    m_engine->registerPlatformInterface( cblBinder );
+
+    // bind the platform java interface to the native interface
+    jclass platformInterfaceClass = env->GetObjectClass( platformInterface );
+    jmethodID javaMethod_setNativeObject = env->GetMethodID( platformInterfaceClass, "setNativeObject", "(J)V" );
+
+    cblBinder->bind( env, platformInterface );
+
+    env->CallVoidMethod( platformInterface, javaMethod_setNativeObject, (jlong) cblBinder.get() );
+
+    return cblBinder;
 }
 
 std::shared_ptr<NetworkInfoProviderBinder> EngineBinder::createNetworkInfoProviderBinder( JNIEnv* env, jobject platformInterface )
@@ -619,7 +664,7 @@ bool EngineBinder::registerPlatformInterface( JNIEnv* env, jobject platformInter
         m_contactUploader = createContactUploaderBinder(env, platformInterface);
         return true;
     }
-    else if( env->IsInstanceOf( platformInterface, m_javaClass_MetricsUploader.get() ) ) {
+    else if( m_javaClass_MetricsUploader.get() && env->IsInstanceOf( platformInterface, m_javaClass_MetricsUploader.get() ) ) {
         m_metricsUploader = createMetricsUploaderBinder(env, platformInterface);
         return true;
     }
@@ -633,6 +678,14 @@ bool EngineBinder::registerPlatformInterface( JNIEnv* env, jobject platformInter
     }
     else if( env->IsInstanceOf( platformInterface, m_javaClass_LocalMediaSource.get() ) ) {
         m_localMediaSource = createLocalMediaSourceBinder( env, platformInterface );
+        return true;
+    }
+    else if( env->IsInstanceOf( platformInterface, m_javaClass_EqualizerController.get() ) ) {
+        m_equalizerController = createEqualizerControllerBinder( env, platformInterface );
+        return true;
+    }
+    else if( env->IsInstanceOf( platformInterface, m_javaClass_CBL.get() ) ) {
+        m_cbl = createCBLBinder( env, platformInterface );
         return true;
     }
 #ifdef INCLUDE_ALEXA_COMMS_MODULE
@@ -746,7 +799,13 @@ Java_com_amazon_aace_core_Engine_stop( JNIEnv * env , jobject /* this */, jlong 
 }
 
 JNIEXPORT jboolean JNICALL
+Java_com_amazon_aace_core_Engine_shutdown( JNIEnv * env , jobject /* this */, jlong cptr ) {
+    return ENGINE(cptr)->getEngine()->shutdown();
+}
+
+JNIEXPORT jboolean JNICALL
 Java_com_amazon_aace_core_Engine_dispose( JNIEnv * env , jobject /* this */, jlong cptr ) {
+    ENGINE(cptr)->getEngine()->shutdown();
     return ENGINE(cptr)->dispose();
 }
 

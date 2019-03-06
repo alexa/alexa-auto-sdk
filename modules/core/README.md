@@ -107,6 +107,8 @@ The following JSON example lists all of the information that can be used to enha
          "arch": "<HARDWARE_ARCH>",
          "language": "<LANGUAGE>",
          "microphone": "<MICROPHONE>"
+         "countries": "<COUNTRY_LIST>",
+         "vehicleIdentifier": "<VEHICLE_IDENTIFIER>"
      }
   }
 }

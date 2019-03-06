@@ -1,7 +1,7 @@
 SUMMARY = "Snowboy Hotword Detection by KITT.AI"
 HOMEPAGE = "https://snowboy.kitt.ai/"
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=6b01f1a7b5debe3589458fdf149ff369"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=8d385adc93db3f7e5d092b82fb2c9353"
 
 SRC_URI = "https://github.com/Kitt-AI/snowboy/archive/v${PV}.tar.gz"
 SRC_URI[md5sum] = "e16e117914f76f4a35facb16b0fcd61b"

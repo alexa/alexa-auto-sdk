@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -114,6 +114,9 @@ public class SpeechRecognizerHandler extends SpeechRecognizer
         // Wake Word not supported message
         final View message = mActivity.findViewById( R.id.wakeWordNotSupportedMessage );
 
+        // Wakeword locale switching Message
+        final TextView localeMessage = mActivity.findViewById(R.id.wakeWordLocaleChangeMessage);
+
         // Show toggle Wake Word option only if Wake Word supported
         if ( wakeWordSupported ) {
 
@@ -125,6 +128,9 @@ public class SpeechRecognizerHandler extends SpeechRecognizer
                     toggleItem.setVisibility( View.VISIBLE );
                     message.setVisibility( View.GONE );
                     wakeWordSwitch.setChecked( mWakeWordEnabled );
+                    if ( mWakeWordEnabled ) {
+                        localeMessage.setVisibility( View.VISIBLE );
+                    }
                 }
             } );
 
@@ -140,6 +146,12 @@ public class SpeechRecognizerHandler extends SpeechRecognizer
                                 enableWakewordDetection();
                             }
                         } );
+                        mActivity.runOnUiThread( new Runnable() {
+                            @Override
+                            public void run() {
+                                localeMessage.setVisibility( View.VISIBLE );
+                            }
+                        });
                     } else {
                         mLogger.postInfo( sTag, "Disabling Wake Word" );
                         mExecutor.submit( new Runnable() {
@@ -148,6 +160,12 @@ public class SpeechRecognizerHandler extends SpeechRecognizer
                                 disableWakewordDetection();
                             }
                         } );
+                        mActivity.runOnUiThread( new Runnable() {
+                            @Override
+                            public void run() {
+                                localeMessage.setVisibility( View.GONE );
+                            }
+                        });
                     }
                     mWakeWordEnabled = isChecked;
                 }
@@ -158,6 +176,7 @@ public class SpeechRecognizerHandler extends SpeechRecognizer
                 public void run() {
                     toggleItem.setVisibility( View.GONE );
                     message.setVisibility( View.VISIBLE );
+                    localeMessage.setVisibility( View.GONE );
                 }
             } );
         }

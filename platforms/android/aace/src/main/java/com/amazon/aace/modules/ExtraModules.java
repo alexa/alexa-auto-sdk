@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ public class ExtraModules {
 
     private boolean mIsAlexaCommsEnabled = false;
     private boolean mIsLocalVoiceControlEnabled = false;
+    private boolean mIsAmazonLiteEnabled = false;
 
     public ExtraModules(Context context) {
         AssetManager assetManager = context.getAssets();
@@ -42,11 +43,13 @@ public class ExtraModules {
             final String enabled = "true";
             mIsAlexaCommsEnabled = enabled.equals(prop.getProperty("communications"));
             mIsLocalVoiceControlEnabled = enabled.equals(prop.getProperty("localvoicecontrol"));
+            mIsAmazonLiteEnabled = enabled.equals(prop.getProperty("amazonlite"));
 
             StringBuilder summary = new StringBuilder();
             summary.append("Extra Module Status***\n")
                     .append("Alexa Comms :").append(mIsAlexaCommsEnabled).append("\n")
                     .append("Local Voice Control:").append(mIsLocalVoiceControlEnabled).append("\n")
+                    .append("AmazonLite:").append(mIsAmazonLiteEnabled).append("\n")
                     .append("****");
             android.util.Log.i(sTag, summary.toString());
         } catch (Exception exp) {
@@ -60,5 +63,9 @@ public class ExtraModules {
 
     public boolean isLocalVoiceControlEnabled() {
         return mIsLocalVoiceControlEnabled;
+    }
+
+    public boolean isAmazonLiteEnabled() {
+        return mIsAmazonLiteEnabled;
     }
 }

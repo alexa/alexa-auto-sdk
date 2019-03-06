@@ -2,15 +2,39 @@
 
 ___
 
+## v1.5.0 released on 2019-03-06:
+
+### Enhancements
+
+* Added a C++ sample application to demonstrate use cases that the Alexa Auto SDK supports. Read more about the C++ Sample App [here](./samples/cpp/README.md).
+* Released the code for the AGL Alexa Voice Agent, a binding for Automotive Grade Linux powered by Alexa Auto SDK v1.5. The software is shipped as a standard AGL binding that exposes an API for speech recognition using the Alexa Voice Service. Please refer to the [AGL Alexa Voice Agent documentation](./platforms/agl/alexa-voiceagent-service/README.md) for instructions to build, install, and test the binding on an R-Car M3 board.
+* Added support for runtime selection of the AmazonLite wake word locale. The AmazonLite locale will automatically switch when the AVS locale is switched.
+* Added support for optionally logging and uploading Alexa Auto SDK metrics to the Amazon cloud. Voice request metrics, for example, include start and end timestamps of user and Alexa speech and UPL between the request and Alexa’s response. Please contact your SA or Partner Manager for details or to request this package for Android.
+* Added support for an optional platform interface `EqualizerController`. The Equalizer Controller enables Alexa voice control of device audio equalizer settings by making gain adjustments to three frequency bands (“BASS”, “MIDRANGE”, and/or “TREBLE”).
+* Added an optional Code-Based Linking (CBL) authorization implementation in the Engine. With the new `cbl` module, the Engine handles acquiring access tokens. A `CBL` platform implementation should be registered with the Engine in place of an `AuthProvider` implementation to use this method for authorization.
+* Improved the usage and deployment of the Local Voice Engine extension on Android. Please contact your SA or Partner Manager for more information.
+* Updated the vehicle information configuration API to include a vehicle identifier. An `aace.vehicle.info.vehicleIdentifier` property of vehicle configuration is now available through the existing `VehicleConfiguration`.
+
+### Resolved Issues
+
+* Fixed an issue where barging in while many unprocessed Speak directives are queued could cause SpeechSynthesizer to become unresponsive or crash
+* Added an `EXPECTING` state to the `AlexaClient DialogState` to accommodate multi-turn for hold-to-talk interactions. When more user input is required during an interaction, tap-to-talk interactions will transition directly from `EXPECTING` to `LISTENING` whereas hold-to-talk will remain in the `EXPECTING` state until listening is manually triggered.
+* Fixed an issue where the Android Sample App could get stuck in a loop of INVALID_REQUEST_EXCEPTION errors being thrown repeatedly after MACCAndroidClient reported an error. Note: To fix this, the C++ `ExternalMediaAdapter::getState` method signature changed to allow the implementation to say whether the state it provides is valid. This change is not backward compatible.
+* Fixed an issue where the Android Sample App created a syslog sink and logged VERBOSE in release builds. Note: As part of the fix, the default Engine logger sink id changed from *console* to *default*. Existing calls to `LoggerConfiguration::createLoggerRuleConfig` with sink id `"console"` should be changed to sink id `"default"`.
+
+### Known Issues
+
+* The Alexa Auto SDK Engine becomes unresponsive if it receives a ```Play``` directive during shutdown. However, since shutdown is triggered when car ignition is turned off, there is no direct customer impact expected.
+* When a timer sounds during an Alexa-to-Alexa call, uttering "stop" ends the call, not the timer.
+* Multiple automotive devices using the same account at the same time can access contacts from phones paired across those devices.
+
 ## v1.4.0 released on 2018-12-17:
 
 ### Enhancements
 
-Alexa Auto SDK now includes the following enhancement:
+* The Alexa Auto SDK now supports the Local Voice Control extension. The Local Voice Control extension enhances the Alexa Auto experience by providing voice-based car controls whether connected to the internet or not. In this release, the Local Voice Control extension will provision access only to the car’s climate control.
 
-* The Alexa Auto SDK now supports the Local Voice Control extension. The Local Voice Control extension enhances the Alexa Auto experience by providing voice based car controls whether connected to the internet or not. In this release, the Local Voice Control extension will provision access only to the car’s climate control
-
-> **Note**: This extension is available on request - Please contact your Amazon Solutions Architect (SA) or Partner Manager for more information.
+    > **Note**: This extension is available on request - Please contact your Amazon Solutions Architect (SA) or Partner Manager for more information.
 
 ### Resolved Issues
 
@@ -18,21 +42,18 @@ No resolved issues.
 
 ### Known Issues
 
-* The Alexa Auto SDK does not re-discover Media Apps Command and Control (MACC) compliant apps if they are unresponsive after being idle for a long period(around 30 minutes).
-* The Alexa Auto SDK Engine becomes unresponsive if it receives PLAY directive during shutdown. However since shutdown is triggered when car ignition is turned off, there is not direct customer impact expected.
-* When a timer sounds during an Alexa to Alexa call, uttering "stop" ends the call not the timer.
-* Multiple automotive devices using the same account at the same time, can access contacts from phones paired across those devices.
+* The Alexa Auto SDK Engine becomes unresponsive if it receives a ```Play``` directive during shutdown. However, since shutdown is triggered when car ignition is turned off, there is no direct customer impact expected.
+* When a timer sounds during an Alexa-to-Alexa call, uttering "stop" ends the call, not the timer.
+* Multiple automotive devices using the same account at the same time can access contacts from phones paired across those devices.
 
 ## v1.3.0 released on 2018-11-20:
 
 ### Enhancements
 
-Alexa Auto SDK now includes the following features and enhancements:
-
 * Android 8 and ARM v8a platform support.
-* Making calls to contacts from a locally paired mobile phone as long as the Alexa Auto SDK has a valid auth token. Read more about [Contact Uploader API](./modules/contact-uploader/README.md).
-* Redial, answer, terminate and decline calls using voice. End users can also send dual-tone multi-frequency (DTMF) via voice to interact with Interactive Voice Responders (IVRs). Read more here [Phone Call Controller](./modules/phone-control/README.md).
-* Switching to local media sources, generic controls and deep linking into 3rd party media applications compatible with the Amazon Media App Command and Control (MACC) specification using the External Media Player Interface 1.1. This allows customers to switch between  a CD player, AM/ FM player  and auxiliary input that is MACC compliant. Read more here [Handling External Media Adapter with MACCAndroidClient](./platforms/android/ALEXA.md#handlingexternalmediaadapterwithmaccandroidclient).  
+* Making calls to contacts from a locally-paired mobile phone as long as the Alexa Auto SDK has a valid auth token. Read more about [Contact Uploader API](./modules/contact-uploader/README.md).
+* Redial, answer, terminate, and decline calls using voice. End users can also send dual-tone multi-frequency (DTMF) via voice to interact with Interactive Voice Responders (IVRs). Read more here [Phone Call Controller](./modules/phone-control/README.md).
+* Switching to local media sources, generic controls and deep linking into 3rd party media applications compatible with the Amazon Media App Command and Control (MACC) specification using the External Media Player Interface 1.1. This allows customers to switch between a CD player, AM/FM player, and auxiliary input that is MACC-compliant. Read more here [Handling External Media Adapter with MACCAndroidClient](./platforms/android/ALEXA.md#handlingexternalmediaadapterwithmaccandroidclient).  
 * Enhancement for 3rd party wake word engine to enable cloud based verification.
 * Provides a way to override Template Runtime display card timeout values for RenderTemplate and RenderPlayerInfo by updating the [templateRuntimeCapabilityAgent Engine configuration](https://alexa.github.io/aac-sdk/modules/core/#configuring-the-engine) values.
 
@@ -42,10 +63,9 @@ No resolved issues.
 
 ### Known Issues
 
-* The Alexa Auto SDK does not re-discover Media Apps Command and Control (MACC) compliant apps if they are unresponsive after being idle for a long period  (around 30 minutes).
-* The Alexa Auto SDK Engine becomes unresponsive if it receives PLAY directive during shutdown. However since shutdown is triggered when car ignition is turned off, there is not direct customer impact expected.
-* When a timer sounds during an Alexa to Alexa call, uttering "stop" ends the call not the timer.
-* Multiple automotive devices using the same account at the same time, can access contacts from phones paired across those devices.
+* The Alexa Auto SDK Engine becomes unresponsive if it receives a ```Play``` directive during shutdown. However, since shutdown is triggered when car ignition is turned off, there is no direct customer impact expected.
+* When a timer sounds during an Alexa-to-Alexa call, uttering "stop" ends the call, not the timer.
+* Multiple automotive devices using the same account at the same time can access contacts from phones paired across those devices.
 
 ## v1.2.0 released on 2018-10-15:
 
@@ -56,7 +76,7 @@ No resolved issues.
 
 ### Resolved Issues
 
-* If a location is not available, the location state is set to ```unavailable```. Previously it was treated as ```(0,0)``` which was a valid value for longitude and latitude.
+* If a location is not available, the location state is set to ```unavailable```. Previously it was treated as ```(0,0)```, which was a valid value for longitude and latitude.
 * Fixed an issue related to stopping an alert where there could be up to a 10 second delay before the alert completely stopped.
 * Fixed issue where the ```TemplateRuntime``` platform interface could not be registered before ```AudioPlayer```.
 
@@ -72,9 +92,8 @@ This release is for bug fixes only. There are no new features or enhancements.
 
 ### Resolved Issues
 
-Issues fixed in this release:
 
-* Update a dependency build recipe to skip the checksum verification to allow for document changes in the current tag.
+* Updated a dependency build recipe to skip the checksum verification to allow for document changes in the current tag.
 
 ### Known Issues
 
@@ -84,24 +103,16 @@ There are no known issues in this release.
 
 ### Enhancements
 
-* Added support for choosing one of multiple network adaptors before starting the engine.
-
-* Added support for latest Amazon Wakeword engine.
-
+* Added support for choosing one of multiple network adaptors before starting the Engine.
+* Added support for the latest Amazon Wakeword Engine.
 * Added custom volume control support for infotainment system's native input volume range. The range that comes down to the device will be 0 to 100.
-
 * Added support for encoding the utterance in OPUS format with the Amazon Wakeword Engine as well as PTT. Our builder pulls the libopus source code as a part of build process.
-
-* Added Locale API to return the list of Alexa supported locales.
-
+* Added Locale API to return the list of Alexa-supported locales.
 * Updated Vehicle Information API to capture the microphone details.
-
-* Added support for routines, music alarms, timers and alarms volume management and deleting all timers and alarms.
-
-* Added support for TemplateRuntime Interface 1.1 which provides visual playback control for Alexa enabled products with TemplateRuntime Interface support. This includes upgrades to PlaybackController Interface 1.1 and TemplateRuntime Interface 1.1.
-    * > **Note**: The older button-press APIs (`playButtonPressed()` or `nextButtonPressed()`) have been deprecated in favor of the new generic `buttonPressed(PlaybackButtonType)`.
-
-* Updated the builder script to confirm compiance with open source component licenses.
+* Added support for routines, music alarms, timers and alarms volume management, and deleting all timers and alarms.
+* Added support for TemplateRuntime Interface 1.1, which provides visual playback control for Alexa-enabled products with TemplateRuntime Interface support. This includes upgrades to PlaybackController Interface 1.1 and TemplateRuntime Interface 1.1.
+    * > **Note**: The older button-press APIs (`playButtonPressed()`, `nextButtonPressed()`, etc.) have been deprecated in favor of the new generic `buttonPressed(PlaybackButtonType)`.
+* Updated the builder script to confirm compliance with open source component licenses.
 
 ### Resolved Issues
 
@@ -133,8 +144,6 @@ This release is for bug fixes only. There are no new features or enhancements.
 
 ### Resolved Issues
 
-Issues fixed in this release:
-
 * The Engine now reconnects to Alexa when the `NetworkInfoProvider` updates the network status.
 * All shared memory objects are now freed when the Engine object is disposed.
 * We fixed a media playback state issue in the Engine that caused an unexpected pause and resume for a media stream that was already stopped.
@@ -150,37 +159,27 @@ Issues fixed in this release:
 
 There are no known issues in this release.
 
-## **v1.0.0**
-
-* v1.0.0 released on 2018-06-29
-* Support for phone control APIs
-* Support for CancelNavigation() in the Navigation API
-* Support for Amazon Wake Word Engine (WWE)
+## v1.0.0 released on 2018-06-29:
 
 ### **Enhancements**
 
-The following enhancements were added to the Alexa Auto SDK since the v1.0.0 Beta release.
-
-* Alexa Auto SDK now supports 2 Navigation directives.
+* Alexa Auto SDK now supports two ```Navigation``` directives.
     * **`SetDestination`**
     * **`CancelNavigation`**
-* For Phone Control we now support the Dial Directive with three events.
+* Added support for phone control APIs. The ```PhoneCallController``` platform interface supports the **`Dial`** directive with three events:
     * **`CallActivated`**
     * **`CallTerminated`**
     * **`CallFailed`**
+* Support for Amazon Wake Word Engine (WWE)
 
 ### **Known Issues**
 
-The following are know issues in this release.
-
 * The Engine doesn't immediately reconnect to AVS when the **`NetworkInfoProvider`** updates network status.
-* Some shared memory objects are not freed when Engine object is disposed.
+* Some shared memory objects are not freed when the Engine object is disposed.
 
 Sample App issues are documented in the [Sample App README](./samples/android/README.md).
 
-## **v1.0.0 Beta**
-
-* v1.0.0 Beta released on 2018-04-29
+## v1.0.0 Beta released on 2018-04-29:
 
 ### **Enhancements**
 
@@ -208,4 +207,4 @@ The following enhancements were added to the Alexa Auto SDK since the last Alpha
   * E/AAC:aace.alexa.AudioChannelEngineImpl:pause:reason=invalidSource,expectedState=X
 * On App startup we see the following messages (none of these will cause any issues):
    * E/AVS:SQLiteAlertStorage:openFailed::File specified does not exist.:file path=/data/user/0/com.amazon.sampleapp/cache/appdata/alerts.sqlite
-* Several minor documentation issues which will be address in the GA release
+* Several minor documentation issues that will be addressed in the GA release

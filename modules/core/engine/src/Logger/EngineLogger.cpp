@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -19,7 +19,12 @@
 #include "AACE/Engine/Logger/EngineLogger.h"
 #include "AACE/Engine/Logger/LogFormatter.h"
 #include "AACE/Engine/Logger/ThreadMoniker.h"
+#if AAC_DEFAULT_LOGGER_SINK_CONSOLE
 #include "AACE/Engine/Logger/Sinks/ConsoleSink.h"
+#endif
+#if AAC_DEFAULT_LOGGER_SINK_SYSLOG
+#include "AACE/Engine/Logger/Sinks/SyslogSink.h"
+#endif
 #include "AACE/Engine/Core/EngineMacros.h"
 
 namespace aace {
@@ -40,25 +45,61 @@ std::shared_ptr<EngineLogger> EngineLogger::getInstance()
 
 EngineLogger::EngineLogger()
 {
-    auto sink = aace::engine::logger::sink::ConsoleSink::create( "console" );
+#if AAC_DEFAULT_LOGGER_ENABLED
+#if AAC_DEFAULT_LOGGER_SINK
+#if AAC_DEFAULT_LOGGER_SINK_CONSOLE
+   auto sink = aace::engine::logger::sink::ConsoleSink::create( "default" );
+#elif AAC_DEFAULT_LOGGER_SINK_SYSLOG
+   auto sink = aace::engine::logger::sink::SyslogSink::create( "default" );
+#else
+#error "Unknown logger sink"
+#endif
 
-#ifdef DEBUG
+#if AAC_DEFAULT_LOGGER_LEVEL
+#if AAC_DEFAULT_LOGGER_LEVEL_VERBOSE
     auto rule = aace::engine::logger::sink::Rule::create( Level::VERBOSE,
         aace::engine::logger::sink::Rule::EMPTY,
         aace::engine::logger::sink::Rule::EMPTY,
         aace::engine::logger::sink::Rule::EMPTY );
-#else
+#elif AAC_DEFAULT_LOGGER_LEVEL_INFO
     auto rule = aace::engine::logger::sink::Rule::create( Level::INFO,
         aace::engine::logger::sink::Rule::EMPTY,
         aace::engine::logger::sink::Rule::EMPTY,
         aace::engine::logger::sink::Rule::EMPTY );
+#elif AAC_DEFAULT_LOGGER_LEVEL_METRIC
+    auto rule = aace::engine::logger::sink::Rule::create( Level::METRIC,
+        aace::engine::logger::sink::Rule::EMPTY,
+        aace::engine::logger::sink::Rule::EMPTY,
+        aace::engine::logger::sink::Rule::EMPTY );
+#elif AAC_DEFAULT_LOGGER_LEVEL_WARN
+    auto rule = aace::engine::logger::sink::Rule::create( Level::WARN,
+        aace::engine::logger::sink::Rule::EMPTY,
+        aace::engine::logger::sink::Rule::EMPTY,
+        aace::engine::logger::sink::Rule::EMPTY );
+#elif AAC_DEFAULT_LOGGER_LEVEL_ERROR
+    auto rule = aace::engine::logger::sink::Rule::create( Level::ERROR,
+        aace::engine::logger::sink::Rule::EMPTY,
+        aace::engine::logger::sink::Rule::EMPTY,
+        aace::engine::logger::sink::Rule::EMPTY );
+#elif AAC_DEFAULT_LOGGER_LEVEL_CRITICAL
+    auto rule = aace::engine::logger::sink::Rule::create( Level::CRITICAL,
+        aace::engine::logger::sink::Rule::EMPTY,
+        aace::engine::logger::sink::Rule::EMPTY,
+        aace::engine::logger::sink::Rule::EMPTY );
+#else
+#error "Unknown logger level"
 #endif
 
     // add the default rule to the sink
     sink->addRule( rule, false );
 
+#endif // AAC_DEFAULT_LOGGER_LEVEL
+
     // add the console sink to the logger
     addSink( sink, false );
+
+#endif // AAC_DEFAULT_LOGGER_SINK
+#endif // AAC_DEFAULT_LOGGER_ENABLED
 }
 
 void EngineLogger::addObserver( std::shared_ptr<aace::engine::logger::LogEventObserver> observer ) {

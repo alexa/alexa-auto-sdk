@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">1.4.0</span>
+   &#160;<span id="projectnumber">1.5.0</span>
    </div>
   </td>
  </tr>
@@ -124,11 +124,20 @@ $(function() {
 <li>callStateChanged()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a297a3c5a3bf26b7c54dcb8a00ce835e8">com.amazon.aace.phonecontrol.PhoneCallController</a>
 </li>
+<li>cancel()
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1cbl_1_1_c_b_l.html#a75298918ee94a5f4f5621824d0665ff7">com.amazon.aace.cbl.CBL</a>
+</li>
 <li>cancelNavigation()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1navigation_1_1_navigation.html#ab8bfcea62eb634ece636a1264b5b5a89">com.amazon.aace.navigation.Navigation</a>
 </li>
+<li>cblStateChanged()
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1cbl_1_1_c_b_l.html#a4fa7869897582b5a35c2272028fd09cc">com.amazon.aace.cbl.CBL</a>
+</li>
 <li>clearPlayerInfo()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_template_runtime.html#a8a8b02e8e2dd5ead01111aeba4f8a5da">com.amazon.aace.alexa.TemplateRuntime</a>
+</li>
+<li>clearRefreshToken()
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1cbl_1_1_c_b_l.html#a6bc55422ee3efe89816c2824d1c1b2e4">com.amazon.aace.cbl.CBL</a>
 </li>
 <li>clearTemplate()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_template_runtime.html#a298e0e13beabd319017ddd30e40dbdec">com.amazon.aace.alexa.TemplateRuntime</a>
@@ -168,6 +177,9 @@ $(function() {
 <li>createDeviceInfoConfig()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1config_1_1_alexa_configuration.html#a44895223158954aff8768081b339bead">com.amazon.aace.alexa.config.AlexaConfiguration</a>
 </li>
+<li>createEqualizerControllerConfig()
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1config_1_1_alexa_configuration.html#ad6ec6b52d369a54fee1db47cedf55c5c">com.amazon.aace.alexa.config.AlexaConfiguration</a>
+</li>
 <li>createFileSinkConfig()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1logger_1_1config_1_1_logger_configuration.html#a8ca4afafac23ca569ec6824c7f62beb2">com.amazon.aace.logger.config.LoggerConfiguration</a>
 </li>
@@ -175,7 +187,7 @@ $(function() {
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1storage_1_1config_1_1_storage_configuration.html#a2503f121dc906abafc34617b31c3acf9">com.amazon.aace.storage.config.StorageConfiguration</a>
 </li>
 <li>createLoggerRuleConfig()
-: <a class="el" href="classcom_1_1amazon_1_1aace_1_1logger_1_1config_1_1_logger_configuration.html#a992dd799906b58563a5e14e824ad7677">com.amazon.aace.logger.config.LoggerConfiguration</a>
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1logger_1_1config_1_1_logger_configuration.html#abe7be69582a42f2f71d5623c52698eca">com.amazon.aace.logger.config.LoggerConfiguration</a>
 </li>
 <li>createMiscStorageConfig()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1config_1_1_alexa_configuration.html#a30115b82720fc96a82f0a23326992744">com.amazon.aace.alexa.config.AlexaConfiguration</a>
@@ -187,7 +199,7 @@ $(function() {
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a94365db864868340e33b74617d7dbc5f">com.amazon.aace.vehicle.config.VehicleConfiguration</a>
 </li>
 <li>createSettingsConfig()
-: <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1config_1_1_alexa_configuration.html#a2f5e125b128931125fc8c4a70087edf6">com.amazon.aace.alexa.config.AlexaConfiguration</a>
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1config_1_1_alexa_configuration.html#a82e1bc90d7cf9cd8bcbc41af797ed115">com.amazon.aace.alexa.config.AlexaConfiguration</a>
 </li>
 <li>createSpeechRecognizerConfig()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1config_1_1_alexa_configuration.html#a5747bc721e826a9e04635b2781fa4216">com.amazon.aace.alexa.config.AlexaConfiguration</a>
@@ -246,6 +258,9 @@ $(function() {
 <li>getAuthToken()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider.html#aeedf509b073beea5fd1bf29a170e1c57">com.amazon.aace.alexa.AuthProvider</a>
 </li>
+<li>getBandLevels()
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_equalizer_controller.html#a8146f0ae36888847ce00ea09f82761dc">com.amazon.aace.alexa.EqualizerController</a>
+</li>
 <li>getBytes()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1config_1_1_engine_configuration.html#a1538158498ec579fddbb4b4488910e0f">com.amazon.aace.core.config.EngineConfiguration</a>
 </li>
@@ -272,6 +287,9 @@ $(function() {
 </li>
 <li>getProperty()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_engine.html#a9aa96efbfcb7b0132917957bccb85159">com.amazon.aace.core.Engine</a>
+</li>
+<li>getRefreshToken()
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1cbl_1_1_c_b_l.html#aa7a91ec3198415d309d3a5d061cb974f">com.amazon.aace.cbl.CBL</a>
 </li>
 <li>getSource()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source.html#a8584bf0a72f7352c0f6b9e08d81d67ed">com.amazon.aace.alexa.LocalMediaSource</a>
@@ -325,8 +343,17 @@ $(function() {
 
 
 <h3><a id="index_l"></a>- l -</h3><ul>
+<li>localAdjustBandLevels()
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_equalizer_controller.html#ac81e7032b16451fed430d24547e84a6c">com.amazon.aace.alexa.EqualizerController</a>
+</li>
 <li>localMuteSet()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speaker.html#a118d82562a15bb6aee00178e2be559f7">com.amazon.aace.alexa.Speaker</a>
+</li>
+<li>localResetBands()
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_equalizer_controller.html#a8f9bd9ff880fb67cb3238f0e336d1024">com.amazon.aace.alexa.EqualizerController</a>
+</li>
+<li>localSetBandLevels()
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_equalizer_controller.html#a27bea1cb94c484fafbcace94f8f1453d">com.amazon.aace.alexa.EqualizerController</a>
 </li>
 <li>localStop()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_alerts.html#a63b23b1c42de28e35aa943265f7e562d">com.amazon.aace.alexa.Alerts</a>
@@ -456,6 +483,9 @@ $(function() {
 <li>sendDTMFSucceeded()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#abbef49449a17271bc67e885054c50416">com.amazon.aace.phonecontrol.PhoneCallController</a>
 </li>
+<li>setBandLevels()
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_equalizer_controller.html#a3acad44f203be8b5a06f426d0c9db7fd">com.amazon.aace.alexa.EqualizerController</a>
+</li>
 <li>setDestination()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1navigation_1_1_navigation.html#a2024335dacfc051daf860328780f302b">com.amazon.aace.navigation.Navigation</a>
 </li>
@@ -475,11 +505,18 @@ $(function() {
 <li>setProperty()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_engine.html#a2739fa7b37aa1c292d5a55c6e0127189">com.amazon.aace.core.Engine</a>
 </li>
+<li>setRefreshToken()
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1cbl_1_1_c_b_l.html#ad320c677bafca842107daa2419bbc675">com.amazon.aace.cbl.CBL</a>
+</li>
 <li>setVolume()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speaker.html#a9ae57557d5c9009cdd8ba40f8397a9d3">com.amazon.aace.alexa.Speaker</a>
 </li>
+<li>shutdown()
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_engine.html#ac60d6cec1e0775c3bf39de93465198ad">com.amazon.aace.core.Engine</a>
+</li>
 <li>start()
-: <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_engine.html#a363681ccf0a37aa487dd32a0b1d3ce15">com.amazon.aace.core.Engine</a>
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1cbl_1_1_c_b_l.html#ae628b6fbb8421609b19f24e462b6a2aa">com.amazon.aace.cbl.CBL</a>
+, <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_engine.html#a363681ccf0a37aa487dd32a0b1d3ce15">com.amazon.aace.core.Engine</a>
 </li>
 <li>startAudioInput()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#aba3da69e8833ec5b855b4a0155d03f9d">com.amazon.aace.alexa.SpeechRecognizer</a>
@@ -531,7 +568,7 @@ $(function() {
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 1.4.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 1.5.0 - Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

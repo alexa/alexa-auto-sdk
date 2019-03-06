@@ -2,8 +2,7 @@
 
 ### Overview
 
-The Android Sample App demonstrates a basic platform implementation of Alexa Auto SDK integration. It provides an example of creating and configuring an instance of the Engine, overriding the default implementation of each Alexa Auto Platform Interface, and registering those custom interface handlers with the Engine. It includes two example implementations of authorizing with AVS via Login with Amazon (LWA),
-detailed logs for interactions with the Alexa Auto SDK and developer convenience features for viewing those logs in the application, and UI elements relevant to each Platform Interface implementation. The purpose of the Android Sample App is to provide developers with useful example code to facilitate integration with the Alexa Auto SDK.
+The Android Sample App demonstrates a basic platform implementation of Alexa Auto SDK integration. It provides an example of creating and configuring an instance of the Engine, overriding the default implementation of each Alexa Auto Platform Interface, and registering those custom interface handlers with the Engine. It includes one default example implementation of authorizing with AVS via Code Based Linking (CBL), and one additional authorization method via Login With Amazon (LWA) browser which requires some additional setup. It also includes detailed logs for interactions with the Alexa Auto SDK and developer convenience features for viewing those logs in the application, and UI elements relevant to each Platform Interface implementation. The purpose of the Android Sample App is to provide developers with useful example code to facilitate integration with the Alexa Auto SDK.
 
 Click [here](#androidsampleapprelnote) to read the release notes for this sample app.
 
@@ -49,14 +48,8 @@ In order to use the certain Alexa Auto SDK functionality, your product needs to 
 1. Open the `${AAC_SDK_HOME}/samples/android` folder and click the <strong>Open</strong> button. (Tested with Android Studio version 3.x)
 1. Include the [Alexa Auto SDK Build Dependencies](#alexa-auto-sdk-build-dependencies).
 If you do not use the pre-built aace-release.aar, you must select **Build > Refresh Linked C++ Projects** in Android Studio to update the dependencies.
-**Important**: Be sure you read and understand [Authorization with AVS in the Sample App](#authorization-with-avs-in-the-sample-app). You may need to complete some of the tasks in this section before you proceed.
-It is required that you add or update the following files:
-    -  [api_key.txt](https://developer.amazon.com/docs/login-with-amazon/create-android-project.html#add-api-key)
-    - app_config.json (_See step five below._)
-    - [login-with-amazon-sdk.jar](https://developer.amazon.com/docs/login-with-amazon/create-android-project.html#install-lwa-library)
 1. Read about [authorization with AVS in the Sample App](#authorization-with-avs-in-the-sample-app) and follow further setup instructions, if necessary.
-1. Populate the app_config.json file in the assets directory with the Client ID, Client Secret, and Product ID for your product. Product DSN may be any unique identifier. The contents of this file are required for configuring the Engine as well as authorizing with Code-Based Linking.
-
+1. Populate the app_config.json file in the assets directory with the Client ID, Client Secret, and Product ID for your product. Product DSN may be any unique identifier. The contents of this file are required for authorization.
 > ***Note***: Android Studio builds and signs the Android Package File.
 
 
@@ -75,7 +68,7 @@ The Sample App provides an example of how to create and configure an instance of
 - [Navigation Module](../../platforms/android/NAVIGATION.md)
 - [Phone Control Module](../../platforms/android/PHONECONTROL.md)
 
-The Sample App GUI consists of a menu bar and a log console. The expandable menu icon in the menu bar opens an options menu to the right of the screen that contains GUI elements relevant to the Platform Interface implementations as well as the authentication UI. Toggle the login method selector to switch between authentication with LWA Code-Based Linking and browser Login with Amazon. Interacting with Alexa and the Engine requires successful authentication with AVS. You can log out using the **Log Out** button in the options menu, which will clear the saved refresh token.
+The Sample App GUI consists of a menu bar and a log console. The expandable menu icon in the menu bar opens an options menu to the right of the screen that contains GUI elements relevant to the Platform Interface implementations as well as the authentication UI. Interacting with Alexa and the Engine requires successful authentication with AVS. You can log out using the **Log Out** button in the options menu, which will clear the saved refresh token.
 
 The microphone icon on the menu bar may be used to initiate a speech interaction with Alexa, either via tap-to-talk (press and release) or hold-to-talk (press and hold). You may also initiate an interaction with the Alexa wake word, and the Sample App provides a switch in the options menu to enable or disable wake word when supported.
 
@@ -91,33 +84,36 @@ Some Alexa interactions will return data for rendering a [Display Card](https://
 
 ### Authorization with AVS in the Sample App
 
-To access the Alexa Voice Service (AVS) it is required that your product acquire [Login with Amazon (LWA)](https://developer.amazon.com/login-with-amazon) access tokens. The Android Sample App demonstrates two methods to acquire such tokens:
+To access the Alexa Voice Service (AVS) it is required that your product acquire valid access tokens. By default the Android Sample App demonstrates the CBL method to acquire such tokens:
 
-- **Code-Based Linking (CBL)**: The user is provided with a short alphanumeric code and a URL in which to enter the code on any web browser-enabled device. [Read more about CBL](https://developer.amazon.com/docs/alexa-voice-service/code-based-linking-other-platforms.html), if desired. The Sample App implementation of CBL requires no further setup. It includes an example of optionally fetching user profile information, which requires you[ add your company privacy policy URL and a logo image to your security profile](#register-security-profile-with-login-with-amazon).
+- **Code-Based Linking (CBL)**: The user is provided with a short alphanumeric code and a URL in which to enter the code on any web browser-enabled device. [Read more about CBL](https://developer.amazon.com/docs/alexa-voice-service/code-based-linking-other-platforms.html), if desired. The Sample App implementation of CBL requires no further setup. It includes an example of optionally fetching user profile information, which requires you [add your company privacy policy URL and a logo image to your security profile](#register-security-profile-with-login-with-amazon).
+- **Login With Amazon Browser**: The app launches a browser window where the user can login with their Amazon credentials. This can be used instead of the CBL implementation, but requires [additional setup](#login-with-amazon-browser-setup). 
 
-- Using the **Login with Amazon SDK**: The Sample App implements a usage of the Login with Amazon SDK for Android that launches a web brower on the device and prompts the user to log in with their Amazon account. Using this method to authorize in the Sample App requires additional setup:
-	- [Add the LWA library to the project](#getting-the-lwa-library)
-	- [Register Security Profile with Login With Amazon](#register-security-profile-with-login-with-amazon)
-	- [Get an API Key](#generating-the-api-key)
+#### Register Security Profile with Login With Amazon
 
-> **Note**: If you do not wish to use the LWA library method for authentication in the Sample App, no further reading is required for this section.
+In the [Amazon Developer portal](https://developer.amazon.com), go to **Login With Amazon**.
+Here you will be able to register the security profile you associated with your product. You will need to provide your company privacy policy URL and a logo image.
 
-#### Getting the LWA library
+#### Login with Amazon Browser Setup
+
+In order to use LWA with browser instead of CBL, the following steps must be completed: 
+
+- [Add the LWA library to the project](#getting-the-lwa-library)
+- [Get an API Key](#generating-the-api-key)
+- [Change Auth Handler registration code](#LWA-code-changes)
+
+##### Getting the LWA library
 
 Download and expand the [Amazon Developer SDK for Android](https://developer.amazon.com/sdk-download) and add the library to your Android Studio project:
 
 1. Navigate to the `Login With Amazon` folder
-2. Add library `login-with-amazon-sdk.jar` to the Android Studio project (In the `AAC_SDK_PATH/samples/android/` folder)
-3. Ensure the library is added as a dependency to the `app` module in the build.gradle. (If it is not automatically linked, right-click and select **"Add As Library..."**)
+2. Copy the `login-with-amazon-sdk.jar` library to the Android Sample App libs folder ( In the `AAC_SDK_PATH/samples/android/app/libs` directory)
 
-#### Register Security Profile with Login With Amazon
 
-In the [Amazon Developer portal](https://developer.amazon.com), go to **APPS & SERVICES > Login With Amazon**.
-Here you will be able to register the security profile you associated with your product. You will need to provide your company privacy policy URL and a logo image.
+##### Generating the API key
 
-#### Generating the API key
-
-You will need an API key to get started. The API key is generated when you associate your Android Sample App with a Security Profile in the Developer Portal. You need to add the Sample App package identifier and Android Studio's debug runtime signature to the Security Profile for your product according to the following instructions:
+You will need an [API key](https://developer.amazon.com/docs/login-with-amazon/create-android-project.html#add-api-key)
+ to get started. The API key can be generated when you associate your Android Sample App with a Security Profile in the Developer Portal. You need to add the Sample App package identifier and Android Studio's debug runtime signature to the Security Profile for your product according to the following instructions:
 
 1. Select the **Security Profile > Android/Kindle** settings for your product in the Developer Portal.
 2. Fill in the fields as follows:
@@ -146,6 +142,23 @@ You will need an API key to get started. The API key is generated when you assoc
 5. Copy the API key and paste it into the `api_key.txt` file in the Android Studio project according to [Add Your API Key to Your Project](https://alexa.design/dev-create-lwa-project).
 
 See [Register for Login With Amazon](http://alexa.design/dev-lwa-register) for more details about registering with LWA.
+
+##### LWA Code Changes
+
+A few minor code changes must be made to switch to using LWA with browser over CBL. 
+
+1. In the MainActivity.java, uncomment the import statement below the `// LWA Browser Sample Code` comment. 
+2. In the MainActivity.java, comment out the `// CBL Auth Handler`, uncomment the `// LWA Auth Handler`. 
+
+##### Local Voice Engine (LVE) Code Changes
+
+In order to communicate with the LVE app, the Alexa Auto app should share the same user ID as the LVE app. To achieve that, you need to update the Android manifest file of your Alexa Auto app to have the `android:sharedUserId` set to `com.amazon.AlexaAutoUserId`
+For example:
+```
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    android:sharedUserId="com.amazon.AlexaAutoUserId"
+    package="<YOUR_ALEXA_AUTO_APP_PACKAGE_NAME>">
+```
 
 ### Enable Google Maps for Navigation view ( Optional )
 
@@ -184,19 +197,21 @@ PreRequisite: Install the Low Level Debugger (LLDB) package in Android Studio. T
 
 > **Note**: If the LLDB window isn't visible in debug tab, change the debug configuration to dual mode debugging.
 
-## Android Sample App Release Notes<a id="androidsampleapprelnote"></a>
+## Release Notes<a id="releasenotes"></a>
 
-### Resolved Issues
+### v1.5.0 released on 2019-03-06:
 
-* Growth in Memory consumption of Sample app was contained by  limiting the number of log entries displayed in the Sample app console to the last 500.
+#### Resolved Issues
 
+* No resolved issues
 
-### Known Issues
+#### Known Issues
 
+* The `MediaPlayer.prepare` method implementation in `MediaPlayerHandler` blocks returning until it reads the full audio attachment from the Engine on the caller's thread. It should not do this and instead should return quickly and read the attachment on a separate thread.
+* The MACCAndroidClient does not rediscover Media App Command and Control (MACC) compliant apps if they are unresponsive after being idle for a long period (around 30 minutes).
 * Display card rendering is not adaptable to a variety of screen sizes.
 * When authenticated with CBL, if network connectivity is lost while refreshing the access token, the Sample App does not automatically attempt to refresh the token when connectivity is restored, and the GUI incorrectly displays the "log in" button even though a refresh token is present. Restoring an authorized state requires either restarting the app or following the log in steps again with network connectivity.
 * Particular sections of the Flash Briefing do not resume from a paused state properly. Attempting to play after pause in some cases may restart the media playback.
-* The Sample App does not implement managing inter-app audio focus, so other apps will not recognize its audio playback appropriately.
+* The app does not implement managing inter-app audio focus, so other apps will not recognize its audio playback appropriately.
 * Alexa dialog playback may stop abruptly when switching between wifi and mobile data.
-* The Android Sample App can sometimes fails to configure and initialize correctly, leaving a blank screen.
-* Sample App disconnects after remaining idle for some time and takes a while to reconnect.
+* The app disconnects from AVS after remaining idle for some time and takes a while to reconnect.

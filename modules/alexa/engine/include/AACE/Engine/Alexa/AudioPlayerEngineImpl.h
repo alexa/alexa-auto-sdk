@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -80,7 +80,7 @@ public:
     }
     
     void removeObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface> observer ) override {
-        m_audioPlayerCapabilityAgent->addObserver( observer );
+        m_audioPlayerCapabilityAgent->removeObserver( observer );
     }
     
     std::chrono::milliseconds getAudioItemOffset() override {

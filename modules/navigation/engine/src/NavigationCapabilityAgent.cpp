@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -103,8 +103,9 @@ void NavigationCapabilityAgent::cancelDirective( std::shared_ptr<DirectiveInfo> 
 alexaClientSDK::avsCommon::avs::DirectiveHandlerConfiguration NavigationCapabilityAgent::getConfiguration() const
 {
     alexaClientSDK::avsCommon::avs::DirectiveHandlerConfiguration configuration;
-    configuration[SET_DESTINATION] = alexaClientSDK::avsCommon::avs::BlockingPolicy::HANDLE_IMMEDIATELY;
-    configuration[CANCEL_NAVIGATION] = alexaClientSDK::avsCommon::avs::BlockingPolicy::HANDLE_IMMEDIATELY;
+    auto audioVisualBlockingPolicy = alexaClientSDK::avsCommon::avs::BlockingPolicy( alexaClientSDK::avsCommon::avs::BlockingPolicy::MEDIUMS_AUDIO_AND_VISUAL, true);
+    configuration[SET_DESTINATION] = audioVisualBlockingPolicy;
+    configuration[CANCEL_NAVIGATION] = audioVisualBlockingPolicy;
     return configuration;
 }
 

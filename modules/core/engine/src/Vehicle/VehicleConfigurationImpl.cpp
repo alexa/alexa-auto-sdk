@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ std::string getVehiclePropertyAttribute( VehiclePropertyType property )
         case VehiclePropertyType::LANGUAGE: return "language";
         case VehiclePropertyType::MICROPHONE: return "microphone";
         case VehiclePropertyType::COUNTRY_LIST: return "countries";
+        case VehiclePropertyType::VEHICLE_IDENTIFIER: return "vehicleIdentifier";
     }
     
     return "";

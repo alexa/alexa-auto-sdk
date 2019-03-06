@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@
 #include <SpeechEncoder/OpusEncoderContext.h>
 #include <AVSCommon/SDKInterfaces/HTTPContentFetcherInterface.h>
 #include <AVSCommon/Utils/LibcurlUtils/HTTPContentFetcherFactory.h>
+#include <AVSCommon/Utils/LibcurlUtils/LibcurlHTTP2ConnectionFactory.h>
 #include <Settings/SQLiteSettingStorage.h>
 
 #include <rapidjson/document.h>
@@ -123,14 +124,10 @@ bool AlexaEngineService::configure( const std::vector<std::shared_ptr<std::istre
 
         // register the AlexaComponentInterface
         ThrowIfNot( registerServiceInterface<AlexaComponentInterface>( shared_from_this() ), "registerAlexaComponentInterfaceFailed" );
-
-        // create the authdelegate using the factory method if provided, otherwise create
-        // an AuthDelegateRouter to support the AuthProvider platform interface...
-        m_authDelegate = newFactoryInstance<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface>( []() {
-            return std::make_shared<AuthDelegateRouter>();
-        });
-        ThrowIfNull( m_authDelegate, "crateAuthDelegateFailed" );
-        m_authDelegate->addAuthObserver( shared_from_this() );
+        
+        // create the auth delegate router and add the auth observer
+        m_authDelegateRouter = std::make_shared<AuthDelegateRouter>();
+        m_authDelegateRouter->addAuthObserver( shared_from_this() );
         
         // create the customer data manager
         m_customerDataManager = std::make_shared<alexaClientSDK::registrationManager::CustomerDataManager>();
@@ -144,7 +141,7 @@ bool AlexaEngineService::configure( const std::vector<std::shared_ptr<std::istre
         ThrowIfNull( m_deviceInfo, "createDeviceInfoFailed" );
         
         // create capabilities delegate
-        m_capabilitiesDelegate = alexaClientSDK::capabilitiesDelegate::CapabilitiesDelegate::create( m_authDelegate, miscStorage, alexaClientSDK::avsCommon::utils::libcurlUtils::HttpPut::create(), m_customerDataManager, config, m_deviceInfo );
+        m_capabilitiesDelegate = alexaClientSDK::capabilitiesDelegate::CapabilitiesDelegate::create( m_authDelegateRouter, miscStorage, alexaClientSDK::avsCommon::utils::libcurlUtils::HttpPut::create(), m_customerDataManager, config, m_deviceInfo );
         ThrowIfNull( m_capabilitiesDelegate, "createCapabilitiesDelegateFailed");
         
         m_capabilitiesDelegate->addCapabilitiesObserver( shared_from_this() );
@@ -153,7 +150,7 @@ bool AlexaEngineService::configure( const std::vector<std::shared_ptr<std::istre
         ThrowIfNull( m_contextManager, "createContextManagerFailed" );
 
         m_clientObserver = AlexaEngineClientObserver::create();
-        m_authDelegate->addAuthObserver( m_clientObserver );
+        m_authDelegateRouter->addAuthObserver( m_clientObserver );
 
         m_dialogUXStateAggregator = std::make_shared<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator>();
         ThrowIfNull( m_dialogUXStateAggregator, "createDialogStateAggregatorFailed" );
@@ -178,17 +175,20 @@ bool AlexaEngineService::configure( const std::vector<std::shared_ptr<std::istre
 
         // register capability with delegate
         ThrowIfNot( m_capabilitiesDelegate->registerCapability( m_visualActivityTracker ), "registerCapabilityFailed");
+
+        m_connectionFactory = std::make_shared<alexaClientSDK::avsCommon::utils::libcurlUtils::LibcurlHTTP2ConnectionFactory>();
+        ThrowIfNull( m_connectionFactory, "createLibcurlHTTP2ConnectionFactoryFailed" );
         
         m_postConnectSynchronizerFactory = alexaClientSDK::acl::PostConnectSynchronizerFactory::create( m_contextManager );
         ThrowIfNull( m_postConnectSynchronizerFactory, "createPostConnectSynchronizerFactoryFailed" );
 
-        m_transportFactory = std::make_shared<alexaClientSDK::acl::HTTP2TransportFactory>( m_postConnectSynchronizerFactory );
+        m_transportFactory = std::make_shared<alexaClientSDK::acl::HTTP2TransportFactory>( m_connectionFactory, m_postConnectSynchronizerFactory );
         ThrowIfNull( m_transportFactory, "createTransportFactoryFailed" );
 
         // create the message router using the factory method if provided, otherwise create
         // the default device sdk message router...
         m_messageRouter = newFactoryInstance<alexaClientSDK::acl::MessageRouterInterface>( [this]() {
-            return std::make_shared<alexaClientSDK::acl::MessageRouter>( m_authDelegate, m_attachmentManager, m_transportFactory );
+            return std::make_shared<alexaClientSDK::acl::MessageRouter>( m_authDelegateRouter, m_attachmentManager, m_transportFactory );
         });
         ThrowIfNull( m_messageRouter, "crateMessageRouterFailed" );
 
@@ -366,6 +366,33 @@ bool AlexaEngineService::setup()
 {
     try
     {
+        auto authDelegate = newFactoryInstance<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface>( []() {
+            return nullptr;
+        });
+        
+        if( authDelegate != nullptr ) {
+            m_authDelegateRouter->setAuthDelegate( authDelegate );
+        }
+        else if( m_authProviderPlatformInterface != nullptr )
+        {
+            m_authProviderEngineImpl = aace::engine::alexa::AuthProviderEngineImpl::create( m_authProviderPlatformInterface );
+
+            if( m_authProviderEngineImpl != nullptr )
+            {
+                // set the auth delegate router's auth delegate to the new auth provider impl
+                m_authDelegateRouter->setAuthDelegate( m_authProviderEngineImpl );
+
+                // set the auth provider engine interface reference
+                m_authProviderPlatformInterface->setEngineInterface( m_authProviderEngineImpl );
+            }
+            else {
+                AACE_ERROR(LX(TAG,"setup").d("reason","createAuthProviderEngineImplFailed"));
+            }
+        }
+        else {
+            AACE_WARN(LX(TAG,"setup").d("reason","authDelegateNotRegistered"));
+        }
+
         // get the location provider interface from the location service
         auto locationProvider = getContext()->getServiceInterface<aace::location::LocationProvider>( "aace.location" );
 
@@ -394,6 +421,12 @@ bool AlexaEngineService::setup()
         // available then we always treat the network status as CONNECTED
         m_networkStatus = networkProvider != nullptr ? networkProvider->getNetworkStatus() : NetworkStatus::CONNECTED;
         
+        // get the current vehicle country
+        auto country = getVehicleCountry();
+        
+        // check if the vehicle is in a supported country
+        m_countrySupported = isCountrySupported( country );
+        
         return true;
     }
     catch( std::exception& ex ) {
@@ -410,7 +443,18 @@ bool AlexaEngineService::start()
         m_authState = m_authProviderEngineImpl != nullptr ? static_cast<AuthObserverInterface::State>( m_authProviderEngineImpl->getAuthState() ) : AuthObserverInterface::State::UNINITIALIZED;
     
         if( m_authState == AuthObserverInterface::State::REFRESHED ) {
+            if ( m_authProviderEngineImpl != nullptr )
+            {
+                m_authProviderEngineImpl->onAuthStateChanged( 
+                        static_cast<aace::alexa::AuthProviderEngineInterface::AuthState>( m_authState ), aace::alexa::AuthProviderEngineInterface::AuthError::NO_ERROR );
+            }
             connect();
+        }
+
+        // enable speech recognizer wakeword if enabled by engine/platform implementations
+        if( m_speechRecognizerEngineImpl != nullptr && m_speechRecognizerEngineImpl->isWakewordEnabled() ) {
+            AACE_DEBUG(LX(TAG,"start").d("isWakewordEnabled", m_speechRecognizerEngineImpl->isWakewordEnabled()));
+            ThrowIfNot( m_speechRecognizerEngineImpl->enableWakewordDetection(), "enabledWakewordDetectionFailed" );
         }
 
         return true;
@@ -427,6 +471,10 @@ bool AlexaEngineService::stop()
     {
         // disable the avs connection and wait for the disconnected state
         disconnect();
+
+        if( m_speechRecognizerEngineImpl != nullptr && m_speechRecognizerEngineImpl->isWakewordEnabled() ) {
+            ThrowIfNot( m_speechRecognizerEngineImpl->disableWakewordDetection(), "disableWakewordDetectionFailed" );
+        }
 
         return true;
     }
@@ -486,6 +534,12 @@ bool AlexaEngineService::shutdown()
             AACE_DEBUG(LX(TAG,"shutdown").m("AuthProviderEngineImpl"));
             m_authProviderEngineImpl->shutdown();
             m_authProviderEngineImpl.reset();
+        }
+
+        if( m_equalizerControllerEngineImpl != nullptr ) {
+            AACE_DEBUG(LX(TAG,"shutdown").m("EqualizerControllerEngineImpl"));
+            m_equalizerControllerEngineImpl->shutdown();
+            m_equalizerControllerEngineImpl.reset();
         }
         
         if( m_externalMediaPlayerEngineImpl != nullptr ) {
@@ -566,8 +620,8 @@ bool AlexaEngineService::shutdown()
             m_logger.reset();
         }
 
-        if( m_authDelegate != nullptr ) {
-            m_authDelegate.reset();
+        if( m_authDelegateRouter != nullptr ) {
+            m_authDelegateRouter.reset();
         }
         
         if( m_interactionModelCapabilityAgent != nullptr ) {
@@ -614,6 +668,9 @@ bool AlexaEngineService::setProperty( const std::string& key, const std::string&
         else if( key.compare( aace::alexa::property::SUPPORTED_LOCALES ) == 0 ) {
             Throw( "readOnlyProperty" );
         }
+        else if( key.compare( aace::alexa::property::COUNTRY_SUPPORTED ) == 0 ) {
+            Throw( "readOnlyProperty" );
+        }
         else if( key.compare( "aace.alexa.capabilities.endpoint" ) == 0 ) {
             m_capabilitiesEndpoint = value;
             if( m_configured ) {
@@ -627,6 +684,11 @@ bool AlexaEngineService::setProperty( const std::string& key, const std::string&
             
             auto setting = key.substr( std::strlen( "aace.alexa.setting." ) );
             ThrowIfNot( m_settings->changeSetting( setting, value ).get(), "changeSettingsFailed" );
+
+            if( key.compare(aace::alexa::property::LOCALE ) == 0 ) {
+                // Cascading the LOCALE change to Wakeword Engine.
+                getContext()->setProperty( aace::engine::wakeword::property::WAKEWORD_ENGINE_LOCALE, value );
+            }
         }
         else {
             return false;
@@ -653,14 +715,28 @@ std::string AlexaEngineService::getProperty( const std::string& key )
             return std::to_string( m_firmwareVersion );
         }
         else if( key.compare( aace::alexa::property::WAKEWORD_SUPPORTED ) == 0 ) {
-        #if defined AMAZONLITE_WAKEWORD_SUPPORT
-            return "true";
-        #else
-            return "false";
-        #endif
+            if( m_speechRecognizerEngineImpl != nullptr && m_speechRecognizerEngineImpl->isWakewordSupported() ) {
+                return "true";
+            } else {
+                return "false";
+            }
         }
         else if( key.compare( aace::alexa::property::SUPPORTED_LOCALES ) == 0 ) {
             return SUPPORTED_LOCALES;
+        }
+        else if( key.compare( aace::alexa::property::COUNTRY_SUPPORTED ) == 0 )
+        {
+            rapidjson::Document document( rapidjson::kObjectType );
+
+            document.AddMember( "supported", rapidjson::Value().SetBool( m_countrySupported ), document.GetAllocator() );
+
+            // build the json state string
+            rapidjson::StringBuffer buffer;
+            rapidjson::Writer<rapidjson::StringBuffer> writer( buffer );
+
+            ThrowIfNot( document.Accept( writer ), "failedToWriteJsonDocument" );
+
+            return buffer.GetString();
         }
         else if( key.compare( "aace.alexa.capabilities.endpoint" ) == 0 ) {
             return m_capabilitiesEndpoint;
@@ -670,7 +746,10 @@ std::string AlexaEngineService::getProperty( const std::string& key )
             auto pos = key.find( "aace.alexa.setting." );
             
             if( pos == 0 ) {
-                Throw( "writeOnlyProperty" );
+                std::string value = std::string();
+
+                ThrowIfNot( m_settings->getSetting( "locale", value ), "getSettingFailed" );
+                return value;
             }
         }
     }
@@ -717,11 +796,6 @@ bool AlexaEngineService::connect()
                     m_settings->sendDefaultSettings();
                 }
             }
-            
-            // enabled speech recognizer wakeword if enabled by engine/platform implementations
-            if( m_speechRecognizerEngineImpl != nullptr && m_speechRecognizerEngineImpl->isWakewordEnabled() ) {
-                ThrowIfNot( m_speechRecognizerEngineImpl->enableWakewordDetection(), "enabledWakewordDetectionFailed" );
-            }
         }
 
         return true;
@@ -738,10 +812,6 @@ bool AlexaEngineService::disconnect()
     {
         std::lock_guard<std::mutex> lock( m_connectionMutex );
 
-        if( m_speechRecognizerEngineImpl != nullptr ) {
-            ThrowIfNot( m_speechRecognizerEngineImpl->disableWakewordDetection(), "disableWakewordDetectionFailed" );
-        }
-
         ThrowIfNot( m_configured, "alexaServiceNotConfigured" );
         m_connectionManager->disable();
 
@@ -751,6 +821,77 @@ bool AlexaEngineService::disconnect()
         AACE_ERROR(LX(TAG,"disconnect").d("reason", ex.what()));
         return false;
     }
+}
+
+std::string AlexaEngineService::getVehicleCountry()
+{
+    try
+    {
+        // get the operating country code
+        std::string country = getContext()->getProperty( aace::vehicle::property::OPERATING_COUNTRY );
+        
+        // if not operating country has been set, then get the location
+        // based country from the location provider...
+        if( country.empty() )
+        {
+            // get the location provider interface from the location service
+            auto locationProvider = getContext()->getServiceInterface<aace::location::LocationProvider>( "aace.location" );
+
+            // if there is a registered location provider, get the location based country
+            if( locationProvider != nullptr ) {
+                country = locationProvider->getCountry();
+            }
+            
+            // fail if we couldn't get a country code for the vehicle
+            ThrowIf( country.empty(), "vehicleCountryNotAvailable" );
+        }
+        
+        return country;
+    
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"getCountry").d("reason", ex.what()));
+        return "";
+    }
+}
+
+bool AlexaEngineService::isCountrySupported( const std::string& country )
+{
+    try
+    {
+        ReturnIf( country.empty(), false );
+    
+        // get the vehicle info property service
+        auto vehicleProperties = getContext()->getServiceInterface<aace::engine::vehicle::VehiclePropertyInterface>( "aace.vehicle" );
+        ThrowIfNull( vehicleProperties, "vehiclePropertyInterfaceInvalid" );
+        
+        // get the supported country list from the vehicle info properties
+        auto supportedCountryList = vehicleProperties->getVehicleProperty( aace::engine::vehicle::VehicleEngineService::VehiclePropertyType::COUNTRY_LIST );
+
+        // check if the country is in the vehicle country list
+        return isCountryInList( supportedCountryList, country );
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"getCountrySupportedResult").d("reason", ex.what()));
+    }
+
+    return false;
+}
+
+bool AlexaEngineService::isCountryInList( const std::string& countryList, const std::string& country )
+{
+    ReturnIf( countryList.empty() || country.empty(), false );
+
+    std::istringstream stream( countryList );
+    std::string next;
+    
+    while( getline( stream, next, ',' ) ) {
+        if( next == country ) {
+            return true;
+        }
+    }
+    
+    return false;
 }
 
 void AlexaEngineService::onCapabilitiesStateChange( CapabilitiesObserverInterface::State newState, CapabilitiesObserverInterface::Error newError)
@@ -855,6 +996,7 @@ bool AlexaEngineService::registerPlatformInterface( std::shared_ptr<aace::core::
         ReturnIf( registerPlatformInterfaceType<aace::alexa::AuthProvider>( platformInterface ), true );
         ReturnIf( registerPlatformInterfaceType<aace::alexa::ExternalMediaAdapter>( platformInterface ), true );
         ReturnIf( registerPlatformInterfaceType<aace::alexa::LocalMediaSource>( platformInterface ), true );
+        ReturnIf( registerPlatformInterfaceType<aace::alexa::EqualizerController>( platformInterface ), true );
 
         return false;
     }
@@ -877,7 +1019,7 @@ bool AlexaEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::al
         // add observers
         m_connectionManager->addConnectionStatusObserver( m_alexaClientEngineImpl );
         m_dialogUXStateAggregator->addObserver( m_alexaClientEngineImpl );
-        m_authDelegate->addAuthObserver( m_alexaClientEngineImpl );
+        m_authDelegateRouter->addAuthObserver( m_alexaClientEngineImpl );
 
         return true;
     }
@@ -898,15 +1040,21 @@ bool AlexaEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::al
         std::shared_ptr<alexaClientSDK::speechencoder::EncoderContext> encoderCtx = nullptr;
         if( m_encoderEnabled ) {
             if( m_encoderName == "opus" ) {
-                encoderCtx = alexaClientSDK::speechencoder::OpusEncoderContext::create();
+                encoderCtx = std::make_shared<alexaClientSDK::speechencoder::OpusEncoderContext>();
             } else {
                 Throw( "Unsupported encoder.name" );
             }
         }
         if( encoderCtx ) {
-            speechEncoder = alexaClientSDK::speechencoder::SpeechEncoder::create( encoderCtx );
+            speechEncoder = std::make_shared<alexaClientSDK::speechencoder::SpeechEncoder>(encoderCtx);
         }
-        m_speechRecognizerEngineImpl = aace::engine::alexa::SpeechRecognizerEngineImpl::create( speechRecognizer, m_audioFormat, m_directiveSequencer, m_connectionManager, m_contextManager, m_audioFocusManager, m_dialogUXStateAggregator, m_capabilitiesDelegate, m_exceptionSender, m_userActivityMonitor, speechEncoder );
+
+        // create the wakeword  engine using the factory method if provided, otherwise return the null.
+        auto wakewordEngineAdapter = newFactoryInstance<aace::engine::alexa::WakewordEngineAdapter>( []() {
+            return nullptr;
+        });
+
+        m_speechRecognizerEngineImpl = aace::engine::alexa::SpeechRecognizerEngineImpl::create( speechRecognizer, m_audioFormat, m_directiveSequencer, m_connectionManager, m_contextManager, m_audioFocusManager, m_dialogUXStateAggregator, m_capabilitiesDelegate, m_exceptionSender, m_userActivityMonitor, speechEncoder, wakewordEngineAdapter );
         ThrowIfNull( m_speechRecognizerEngineImpl, "createSpeechRecognizerEngineImplFailed" );
 
         // set the speech recognizer engine interface reference
@@ -1047,21 +1195,11 @@ bool AlexaEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::al
 {
     try
     {
-        ThrowIfNotNull( m_authProviderEngineImpl, "platformInterfaceAlreadyRegistered" );
-        ThrowIfNull( m_authDelegate, "authDelegateInvalid" );
-
-        // cast the auth delegate to an AuthDelegateRouter
-        auto authDelegateRouter = std::dynamic_pointer_cast<AuthDelegateRouter>( m_authDelegate );
-        ThrowIfNull( authDelegateRouter, "authDelegateRouterInvalid" );
-
-        m_authProviderEngineImpl = aace::engine::alexa::AuthProviderEngineImpl::create( authProvider );
-        ThrowIfNull( m_authProviderEngineImpl, "createAuthProviderEngineImplFailed" );
-
-        // set the auth delegate router's auth delegate to the new auth provider impl
-        authDelegateRouter->setAuthDelegate( m_authProviderEngineImpl );
-
-        // set the auth provider engine interface reference
-        authProvider->setEngineInterface( m_authProviderEngineImpl );
+        ThrowIfNotNull( m_authProviderPlatformInterface, "platformInterfaceAlreadyRegistered" );
+        
+        // set the auth provider platform interface reference and defer creating the engine impl
+        // until setup, so that we can prioritize engine based implementations frist
+        m_authProviderPlatformInterface = authProvider;
 
         return true;
     }
@@ -1128,12 +1266,41 @@ bool AlexaEngineService::createExternalMediaPlayerImpl()
     }
 }
 
+bool AlexaEngineService::registerPlatformInterfaceType( 
+    std::shared_ptr<aace::alexa::EqualizerController> equalizerController ) {
+    try
+    {
+        ThrowIfNotNull( m_equalizerControllerEngineImpl, "platformInterfaceAlreadyRegistered" );
+
+        // create the equalizer controller engine implementation
+        m_equalizerControllerEngineImpl = 
+            aace::engine::alexa::EqualizerControllerEngineImpl::create( 
+                equalizerController, 
+                m_directiveSequencer, 
+                m_capabilitiesDelegate, 
+                m_dataManager, 
+                m_exceptionSender, 
+                m_contextManager, 
+                m_connectionManager );
+        ThrowIfNull( m_equalizerControllerEngineImpl, "createEqualizerControllerEngineImplFailed" );
+
+        // set the equalizer controller engine interface reference
+        equalizerController->setEngineInterface( m_equalizerControllerEngineImpl );  
+
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"registerPlatformInterfaceType<EqualizerController>").d("reason", ex.what()));
+        return false;
+    }
+}
+
 //
 // AlexaComponentInterface
 //
 
 std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> AlexaEngineService::getAuthDelegate() {
-    return m_authDelegate;
+    return m_authDelegateRouter;
 }
 
 std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> AlexaEngineService::getCapabilitiesDelegate() {
@@ -1190,6 +1357,14 @@ std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentManager> A
 
 std::shared_ptr<alexaClientSDK::acl::TransportFactoryInterface> AlexaEngineService::getTransportFactory() {
     return m_transportFactory;
+}
+
+std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> AlexaEngineService::getDeviceInfo() {
+    return m_deviceInfo;
+}
+
+std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> AlexaEngineService::getCustomerDataManager() {
+    return m_dataManager;
 }
 
 //
@@ -1317,6 +1492,10 @@ void AuthDelegateRouter::setAuthDelegate( std::shared_ptr<alexaClientSDK::avsCom
     }
 }
 
+std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> AuthDelegateRouter::getAuthDelegate() {
+    return m_authDelegate;
+}
+
 void AuthDelegateRouter::addAuthObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer )
 {
     std::lock_guard<std::mutex> lock( m_mutex ) ;
@@ -1349,6 +1528,13 @@ std::string AuthDelegateRouter::getAuthToken()
     catch( std::exception& ex ) {
         AACE_WARN(LX(TAG + ".AuthDelegateRouter","getAuthToken").d("reason",ex.what()));
         return nullptr;
+    }
+}
+
+void AuthDelegateRouter::onAuthFailure( const std::string& token )
+{
+    if( m_authDelegate != nullptr ) {
+        m_authDelegate->onAuthFailure( token );
     }
 }
 

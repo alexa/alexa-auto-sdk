@@ -1,0 +1,298 @@
+{
+    "id": "main",
+    "item": [
+        {
+            "do": "notify/onCBLStart",
+            "key": "A",
+            "name": "Authenticate with CBL"
+        },
+        {
+            "do": "notify/onCBLCancel",
+            "key": "C",
+            "name": "Cancel Authentication"
+        },
+        {
+            "do": "Logout",
+            "key": "O",
+            "name": "Logout"
+        },
+        {
+            "do": "GoTo",
+            "key": "F",
+            "name": "Audio File Input",
+            "value": {
+                "id": "audio-file",
+                "item": [
+                    {
+                        "do": "AudioFile",
+                        "key": "1",
+                        "name": "Alexa, tell me a joke",
+                        "value": "./inputs/alexa_tell_me_a_joke.wav"
+                    },
+                    {
+                        "do": "AudioFile",
+                        "key": "2",
+                        "name": "Alexa, what will today’s weather be?",
+                        "value": "./inputs/alexa_what_will_todays_weather_be.wav"
+                    },
+                    {
+                        "do": "AudioFile",
+                        "key": "3",
+                        "name": "Alexa, stop",
+                        "value": "./inputs/alexa_stop.wav"
+                    },
+                    {
+                        "do": "notify/onSpeechRecognizerDisableWakewordDetection",
+                        "key": "D",
+                        "name": "Disable wake word detection"
+                    },
+                    {
+                        "do": "notify/onSpeechRecognizerEnableWakewordDetection",
+                        "key": "E",
+                        "name": "Enable wake word detection"
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Audio File Input Menu"
+            }
+        },
+        {
+            "do": "notify/onSpeechRecognizerTapToTalk",
+            "key": "T",
+            "name": "Tap (for Tap-to-Talk)"
+        },
+        {
+            "do": "notify/onSpeechRecognizerHoldToTalk",
+            "key": "B",
+            "name": "Begin Capture (for Hold-to-Talk)",
+            "note": "Tap ${KEYOPEN}S${KEYCLOSE} to stop capturing"
+        },
+        {
+            "do": "notify/onSpeechRecognizerStopCapture",
+            "key": "S",
+            "name": "Stop Capture"
+        },
+        {
+            "do": "GoTo",
+            "key": "E",
+            "name": "Endpoint",
+            "value": {
+                "id": "endpoint",
+                "item": [
+                    {
+                        "do": "SetEndpoint",
+                        "key": "1",
+                        "name": "Asia",
+                        "value": "https://avs-alexa-fe.amazon.com"
+                    },
+                    {
+                        "do": "SetEndpoint",
+                        "key": "2",
+                        "name": "Europe",
+                        "value": "https://avs-alexa-eu.amazon.com"
+                    },
+                    {
+                        "do": "SetEndpoint",
+                        "key": "3",
+                        "name": "North America",
+                        "value": "https://avs-alexa-na.amazon.com"
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Endpoint Menu"
+            }
+        },
+        {
+            "do": "GoTo",
+            "key": "G",
+            "name": "Geolocation",
+            "value": {
+                "id": "LOCATION",
+                "index": 0,
+                "item": [
+                    {
+                        "do": "Select",
+                        "key": "H",
+                        "name": "Use home location",
+                        "value": {
+                            "latitude": 37.3790629,
+                            "longitude": -122.116578
+                        }
+                    },
+                    {
+                        "do": "Select",
+                        "key": "W",
+                        "name": "Use work location",
+                        "value": {
+                            "latitude": 37.40940725,
+                            "longitude": -122.03644610148677
+                        }
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Geolocation Menu"
+            }
+        },
+        {
+            "do": "GoTo",
+            "key": "L",
+            "name": "Locale",
+            "value": {
+                "id": "LOCALE",
+                "item": [
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Locale Menu"
+            }
+        },
+        {
+            "do": "GoTo",
+            "key": "P",
+            "name": "Logger Level",
+            "value": {
+                "id": "logger-level",
+                "index": 0,
+                "item": [
+                    {
+                        "do": "SetLoggerLevel",
+                        "key": "V",
+                        "name": "VERBOSE",
+                        "value": "VERBOSE"
+                    },
+                    {
+                        "do": "SetLoggerLevel",
+                        "key": "I",
+                        "name": "INFO",
+                        "value": "INFO"
+                    },
+                    {
+                        "do": "SetLoggerLevel",
+                        "key": "M",
+                        "name": "METRIC",
+                        "value": "METRIC"
+                    },
+                    {
+                        "do": "SetLoggerLevel",
+                        "key": "W",
+                        "name": "WARN",
+                        "value": "WARN"
+                    },
+                    {
+                        "do": "SetLoggerLevel",
+                        "key": "E",
+                        "name": "ERROR",
+                        "value": "ERROR"
+                    },
+                    {
+                        "do": "SetLoggerLevel",
+                        "key": "C",
+                        "name": "CRITICAL",
+                        "value": "CRITICAL"
+                    },
+                    {
+                        "do": "SetLoggerLevel",
+                        "key": "N",
+                        "name": "None",
+                        "value": ""
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Logger Level Menu"
+            }
+        },
+        {
+            "do": "GoTo",
+            "key": "V",
+            "name": "Volume",
+            "value": {
+                "id": "volume",
+                "item": [
+                    {
+                        "do": "notify/onAudioManagerSpeaker",
+                        "key": "1",
+                        "name": "Volume up",
+                        "value": "Speaker/volume/+10"
+                    },
+                    {
+                        "do": "notify/onAudioManagerSpeaker",
+                        "key": "2",
+                        "name": "Volume down",
+                        "value": "Speaker/volume/-10"
+                    },
+                    {
+                        "do": "notify/onAudioManagerSpeaker",
+                        "key": "3",
+                        "name": "Mute",
+                        "value": "Speaker/mute/true"
+                    },
+                    {
+                        "do": "notify/onAudioManagerSpeaker",
+                        "key": "4",
+                        "name": "Unmute",
+                        "value": "Speaker/mute/false"
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Volume Menu"
+            }
+        },
+        {
+            "do": "Help",
+            "key": "?",
+            "name": "Print the current menu"
+        },
+        {
+            "do": "Restart",
+            "key": "R",
+            "name": "Restart application"
+        },
+        {
+            "do": "Quit",
+            "key": "Q",
+            "name": "Quit application"
+        }
+    ],
+    "name": "Main Menu",
+    "text": {
+        "banner": [
+            "",
+            "        _____  __    __    ____                __      ___           ",
+            "       / ___/_/ /___/ /_  / __/__ ___ _  ___  / /__   / _ | ___  ___ ",
+            "      / /__/_  __/_  __/ _\\ \\/ _ `/  ' \\/ _ \\/ / -_) / __ |/ _ \\/ _ \\",
+            "      \\___/ /_/   /_/   /___/\\_,_/_/_/_/ .__/_/\\__/ /_/ |_/ .__/ .__/",
+            "                                      /_/                /_/  /_/    ",
+            "",
+            "  Copyright 2018-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved."
+        ],
+        "keyTapError": [
+            "${KEYOPEN}${KEY}${KEYCLOSE} is not valid in this menu\u0007"
+        ],
+        "keyTapped": [
+            "Tapped ${KEYOPEN}${KEY}${KEYCLOSE}"
+        ]
+    }
+}

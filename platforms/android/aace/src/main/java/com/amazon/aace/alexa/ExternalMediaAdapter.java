@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -524,6 +524,9 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
      * @param  forceLogin True if no handshake is needed, and login is simply assumed
      *
      * @param  tokenRefreshInterval refresh interval of the accessToken, if available
+     *
+     * @return @c true if the platform implementation successfully handled the call,
+     * else @c false
      */
     public boolean login( String localPlayerId, String accessToken, String userName, boolean forceLogin, long tokenRefreshInterval ) {
         return false;
@@ -533,6 +536,9 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
      * Directive called after a discovered player initiates the logoutComplete event.
      *
      * @param  localPlayerId The opaque token that uniquely identifies the local external player app
+     *
+     * @return @c true if the platform implementation successfully handled the call,
+     * else @c false
      */
     public boolean logout( String localPlayerId ) {
         return false;
@@ -552,6 +558,9 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
      * @param  preload Whether the media item should preload or not
      *
      * @param  navigation The app transition behavior
+     *
+     * @return @c true if the platform implementation successfully handled the call,
+     * else @c false
      */
     public boolean play( String localPlayerId, String playContextToken, long index, long offset, boolean preload, Navigation navigation ) {
         return false;
@@ -565,6 +574,9 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
      * @param  playControlType Playback control type being invoked
      *
      * @sa PlaybackController
+     *
+     * @return @c true if the platform implementation successfully handled the call,
+     * else @c false
      */
     public boolean playControl( String localPlayerId, PlayControlType playControlType ) {
         return false;
@@ -576,6 +588,9 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
      * @param  localPlayerId The opaque token that uniquely identifies the local external player app
      *
      * @param  offset Offset position within media item, in milliseconds
+     *
+     * @return @c true if the platform implementation successfully handled the call,
+     * else @c false
      */
     public boolean seek( String localPlayerId, long offset ) {
         return false;
@@ -587,6 +602,9 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
      * @param  localPlayerId The opaque token that uniquely identifies the local external player app
      *
      * @param  deltaOffset Change in offset position within media item, in milliseconds
+     *
+     * @return @c true if the platform implementation successfully handled the call,
+     * else @c false
      */
     public boolean adjustSeek( String localPlayerId, long deltaOffset ) {
         return false;
@@ -596,6 +614,9 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
      * Called after discovered media have been reported. Returns list of players AVS has authorized.
      *
      * @param authorizedPlayers List of discovered players, which AVS has authorized
+     *
+     * @return @c true if the platform implementation successfully handled the call,
+     * else @c false
      */
     public boolean authorize( AuthorizedPlayerInfo[] authorizedPlayers ) {
         return false;
@@ -605,6 +626,9 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
      * Must provide the local external media player apps @PlaybackState, and @SessionState information to maintain cloud sync
      *
      * @param localPlayerId The opaque token that uniquely identifies the local external player app
+     *
+     * @return The current @c ExternalMediaAdapterState for the specified media player, or @c null if
+     * the state is not available
      */
     public ExternalMediaAdapterState getState( String localPlayerId ) {
         return null;

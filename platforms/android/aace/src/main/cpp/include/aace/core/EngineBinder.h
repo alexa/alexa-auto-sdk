@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@
 #include "aace/alexa/NotificationsBinder.h"
 #include "aace/alexa/ExternalMediaAdapterBinder.h"
 #include "aace/alexa/LocalMediaSourceBinder.h"
+#include "aace/alexa/EqualizerControllerBinder.h"
 
 #ifdef INCLUDE_ALEXA_COMMS_MODULE
 #include "aace/communication/AlexaCommsBinder.h"
@@ -61,6 +62,8 @@
 #include "aace/network/NetworkInfoProviderBinder.h"
 
 #include "aace/metrics/MetricsUploaderBinder.h"
+
+#include "aace/cbl/CBLBinder.h"
 
 class EngineBinder : public PlatformInterfaceBinder {
 public:
@@ -97,17 +100,21 @@ private:
     std::shared_ptr<AlertsBinder> createAlertsBinder( JNIEnv* env, jobject platformInterface );
     std::shared_ptr<NotificationsBinder> createNotificationsBinder( JNIEnv* env, jobject platformInterface );
     std::shared_ptr<TemplateRuntimeBinder> createTemplateRuntimeBinder( JNIEnv* env, jobject platformInterface );
-    std::shared_ptr<LocationProviderBinder> createLocationProviderBinder( JNIEnv* env, jobject platformInterface );
     std::shared_ptr<PlaybackControllerBinder> createPlaybackControllerBinder( JNIEnv* env, jobject platformInterface );
-    std::shared_ptr<NavigationBinder> createNavigationBinder( JNIEnv* env, jobject platformInterface );
+    std::shared_ptr<EqualizerControllerBinder> createEqualizerControllerBinder( JNIEnv* env, jobject platformInterface );
 
+    std::shared_ptr<LocationProviderBinder> createLocationProviderBinder( JNIEnv* env, jobject platformInterface );
     std::shared_ptr<NetworkInfoProviderBinder> createNetworkInfoProviderBinder( JNIEnv* env, jobject platformInterface );
+
+    std::shared_ptr<NavigationBinder> createNavigationBinder( JNIEnv* env, jobject platformInterface );
 
     std::shared_ptr<PhoneCallControllerBinder> createPhoneCallControllerBinder( JNIEnv* env, jobject platformInterface );
 
     std::shared_ptr<ContactUploaderBinder> createContactUploaderBinder( JNIEnv* env, jobject platformInterface );
 
     std::shared_ptr<MetricsUploaderBinder> createMetricsUploaderBinder( JNIEnv* env, jobject platformInterface );
+
+    std::shared_ptr<CBLBinder> createCBLBinder( JNIEnv* env, jobject platformInterface);
 
 #ifdef INCLUDE_ALEXA_COMMS_MODULE
     std::shared_ptr<AlexaCommsBinder> createAlexaCommsBinder( JNIEnv* env, jobject platformInterface );
@@ -128,6 +135,7 @@ private:
     std::shared_ptr<aace::alexa::AudioPlayer> m_audioPlayer;
     std::shared_ptr<aace::alexa::ExternalMediaAdapter> m_externalMediaAdapter;
     std::shared_ptr<aace::alexa::LocalMediaSource> m_localMediaSource;
+    std::shared_ptr<aace::alexa::EqualizerController> m_equalizerController;
     std::shared_ptr<aace::alexa::Notifications> m_notifications;
     std::shared_ptr<aace::alexa::PlaybackController> m_playbackController;
     std::shared_ptr<aace::alexa::SpeechRecognizer> m_speechRecognizer;
@@ -139,6 +147,7 @@ private:
     ClassRef m_javaClass_AuthProvider;
     ClassRef m_javaClass_ExternalMediaAdapter;
     ClassRef m_javaClass_LocalMediaSource;
+    ClassRef m_javaClass_EqualizerController;
     ClassRef m_javaClass_Notifications;
     ClassRef m_javaClass_PlaybackController;
     ClassRef m_javaClass_SpeechRecognizer;
@@ -172,6 +181,10 @@ private:
     // com.amazon.metrics.*
     std::shared_ptr<aace::metrics::MetricsUploader> m_metricsUploader;
     ClassRef m_javaClass_MetricsUploader;
+
+    // com.amazon.cbl.*
+    std::shared_ptr<aace::cbl::CBL> m_cbl;
+    ClassRef m_javaClass_CBL;
 
 #ifdef INCLUDE_ALEXA_COMMS_MODULE
     // com.amazon.communication.*

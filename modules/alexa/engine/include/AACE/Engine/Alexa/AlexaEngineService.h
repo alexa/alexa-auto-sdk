@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@
 #include <AVSCommon/Utils/DeviceInfo.h>
 #include <AVSCommon/Utils/LibcurlUtils/HttpPutInterface.h>
 #include <AVSCommon/Utils/AudioFormat.h>
+#include <AVSCommon/Utils/HTTP2/HTTP2ConnectionFactoryInterface.h>
 #include <AVSCommon/AVS/Attachment/AttachmentManager.h>
 #include <AVSCommon/AVS/DialogUXStateAggregator.h>
 #include <AVSCommon/AVS/ExceptionEncounteredSender.h>
@@ -88,6 +89,8 @@
 #include "AuthProviderEngineImpl.h"
 #include "AlexaComponentInterface.h"
 #include "ExternalMediaPlayerEngineImpl.h"
+#include "WakewordEngineAdapterProperty.h"
+#include "EqualizerControllerEngineImpl.h"
 
 namespace aace {
 namespace engine {
@@ -141,6 +144,8 @@ public:
     std::shared_ptr<alexaClientSDK::adsl::MessageInterpreter> getMessageInterpreter() override;
     std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentManager> getAttachmentManager() override;
     std::shared_ptr<alexaClientSDK::acl::TransportFactoryInterface> getTransportFactory() override;
+    std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> getDeviceInfo() override;
+    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> getCustomerDataManager() override;
 
 protected:
     bool configure( const std::vector<std::shared_ptr<std::istream>>& configuration ) override;
@@ -178,6 +183,11 @@ private:
     bool connect();
     bool disconnect();
 
+    // country supported
+    std::string getVehicleCountry();
+    bool isCountrySupported( const std::string& country );
+    bool isCountryInList( const std::string& countryList, const std::string& country );
+
     // platform interface registration
     template <class T>
     bool registerPlatformInterfaceType( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) {
@@ -196,6 +206,7 @@ private:
     bool registerPlatformInterfaceType( std::shared_ptr<aace::alexa::AuthProvider> authProvider );
     bool registerPlatformInterfaceType( std::shared_ptr<aace::alexa::ExternalMediaAdapter> externalMediaAdapter );
     bool registerPlatformInterfaceType( std::shared_ptr<aace::alexa::LocalMediaSource> localMediaSource );
+    bool registerPlatformInterfaceType( std::shared_ptr<aace::alexa::EqualizerController> equalizerController );
 
     bool createExternalMediaPlayerImpl();
 
@@ -221,9 +232,10 @@ private:
     std::shared_ptr<alexaClientSDK::capabilityAgents::settings::Settings> m_settings;
     std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> m_dataManager;
     std::shared_ptr<alexaClientSDK::acl::PostConnectFactoryInterface> m_postConnectSynchronizerFactory;
+    std::shared_ptr<alexaClientSDK::avsCommon::utils::http2::HTTP2ConnectionFactoryInterface> m_connectionFactory;
     std::shared_ptr<alexaClientSDK::acl::TransportFactoryInterface> m_transportFactory;
     std::shared_ptr<alexaClientSDK::afml::VisualActivityTracker> m_visualActivityTracker;
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> m_authDelegate;
+    std::shared_ptr<AuthDelegateRouter> m_authDelegateRouter;
     std::shared_ptr<alexaClientSDK::capabilitiesDelegate::CapabilitiesDelegate> m_capabilitiesDelegate;
     std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> m_customerDataManager;
     std::shared_ptr<alexaClientSDK::capabilityAgents::interactionModel::InteractionModelCapabilityAgent> m_interactionModelCapabilityAgent;
@@ -231,6 +243,7 @@ private:
     std::shared_ptr<PlaybackRouterDelegate> m_playbackRouterDelegate;
 
     std::shared_ptr<aace::engine::storage::LocalStorageInterface> m_localStorage;
+    std::shared_ptr<aace::alexa::AuthProvider> m_authProviderPlatformInterface;
 
     std::string m_endpoint = "https://avs-alexa-na.amazon.com";
     std::string m_capabilitiesEndpoint = "https://api.amazonalexa.com";
@@ -249,6 +262,7 @@ private:
 
     std::string m_encoderName;
     bool m_encoderEnabled;
+    bool m_countrySupported = false;
 
     // engine implementation object references
     std::shared_ptr<aace::engine::alexa::AlexaClientEngineImpl> m_alexaClientEngineImpl;
@@ -261,6 +275,7 @@ private:
     std::shared_ptr<aace::engine::alexa::PlaybackControllerEngineImpl> m_playbackControllerEngineImpl;
     std::shared_ptr<aace::engine::alexa::TemplateRuntimeEngineImpl> m_templateRuntimeEngineImpl;
     std::shared_ptr<aace::engine::alexa::ExternalMediaPlayerEngineImpl> m_externalMediaPlayerEngineImpl;
+    std::shared_ptr<aace::engine::alexa::EqualizerControllerEngineImpl> m_equalizerControllerEngineImpl;
 
     // logger
     std::shared_ptr<AlexaEngineLogger> m_logger;
@@ -330,11 +345,13 @@ public:
     AuthDelegateRouter() = default;
 
     void setAuthDelegate( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate );
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> getAuthDelegate();
 
     // alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface
     void addAuthObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer ) override;
     void removeAuthObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer ) override;
     std::string getAuthToken() override;
+    void onAuthFailure( const std::string& token ) override;
     
 private:
     std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface>> m_observers;

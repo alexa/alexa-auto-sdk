@@ -33,10 +33,6 @@ case ${COMMAND} in
 		agreement_check
 		${BUILDER_HOME}/scripts/run-bitbake.sh $@
 		;;
-	"cmake")
-		agreement_check
-		${BUILDER_HOME}/scripts/run-cmake.sh $@
-		;;
 	"docker")
 		${BUILDER_HOME}/scripts/run-docker.sh $@
 		;;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -68,6 +68,7 @@ public class PhoneCallControllerHandler extends PhoneCallController {
         mActivity = activity;
         mLogger = logger;
         mCallId = "";
+        mCallState = CallState.IDLE;
         mConnectionState = ConnectionState.DISCONNECTED;
         setupGUI();
         updateGUI();
@@ -172,7 +173,7 @@ public class PhoneCallControllerHandler extends PhoneCallController {
             callFailed( callId, CallError.OTHER, "Call ID does not match" );
         }
         if( mCallState == CallState.INBOUND_RINGING || mCallState == CallState.CALL_RECEIVED ) {
-            handleDeclineCall();
+            handleDeclineCall( false );
         } else {
             handleEndCall();
         }
@@ -259,25 +260,10 @@ public class PhoneCallControllerHandler extends PhoneCallController {
         updateGUI();
     }
 
-    private void handleRemoteAnswerCall() {
-        mCallActivated = true;
-        mCallState = CallState.ACTIVE;
-        callStateChanged( CallState.ACTIVE, mCallId );
-        updateGUI();
-    }
-
-    private void handleDeclineCall() {
-        mRemoteCallStarted = false;
-        mLocalCallStarted = false;
-        mCallState = CallState.IDLE;
-        callStateChanged( CallState.IDLE, mCallId );
-        mCurrentCallNumber = "";
-        mCallId = "";
-        updateGUI();
-    }
-
-    private void handleRemoteDeclineCall() {
-        mLastCalledNumber = mCurrentCallNumber;
+    private void handleDeclineCall( boolean remoteDeclined ) {
+        if ( remoteDeclined ) {
+            mLastCalledNumber = mCurrentCallNumber;
+        }
         mRemoteCallStarted = false;
         mLocalCallStarted = false;
         mCallState = CallState.IDLE;
@@ -295,22 +281,6 @@ public class PhoneCallControllerHandler extends PhoneCallController {
         mLocalCallStarted = false;
         mCallActivated = false;
         mCallState = CallState.IDLE;
-        mLastCalledNumber = mCurrentCallNumber;
-        callStateChanged( CallState.IDLE, mCallId );
-        mCurrentCallNumber = "";
-        mCallId = "";
-        updateGUI();
-    }
-
-    private void handleRemoteEndCall() {
-        if ( mLocalCallStarted ) {
-            mLastCalledNumber = mCurrentCallNumber;
-        }
-        mRemoteCallStarted = false;
-        mLocalCallStarted = false;
-        mCallActivated = false;
-        mCallState = CallState.IDLE;
-        mLastCalledNumber = mCurrentCallNumber;
         callStateChanged( CallState.IDLE, mCallId );
         mCurrentCallNumber = "";
         mCallId = "";
@@ -402,7 +372,7 @@ public class PhoneCallControllerHandler extends PhoneCallController {
 
     }
     private void onLocalDecline() {
-        handleDeclineCall();
+        handleDeclineCall( false );
     }
 
     private void onRemoteInitiate() {
@@ -410,15 +380,15 @@ public class PhoneCallControllerHandler extends PhoneCallController {
     }
 
     private void onRemoteEnd() {
-        handleRemoteEndCall();
+        handleEndCall();
     }
 
     private void onRemoteAnswer() {
-        handleRemoteAnswerCall();
+        handleAnswerCall();
     }
 
     private void onRemoteDecline() {
-        handleRemoteDeclineCall();
+        handleDeclineCall( true );
     }
 
     /* For Updating GUI */
@@ -497,7 +467,7 @@ public class PhoneCallControllerHandler extends PhoneCallController {
         mActivity.runOnUiThread( new Runnable() {
             @Override
             public void run() {
-                if ( mCallState == null || mCallState == CallState.IDLE) {
+                if ( mCallState == CallState.IDLE ) {
                     mCallStateView.setText( "" );
                 } else {
                     mCallStateView.setText( mCallState.toString() );

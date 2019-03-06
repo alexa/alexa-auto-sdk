@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -499,6 +499,9 @@ abstract public class LocalMediaSource extends PlatformInterface
      * Called after the discovered local media source have been registered.
      *
      * @param authorized As long as the registered platform interface includes a supported Source type, AVS will return true.
+     *
+     * @return @c true if the platform implementation successfully handled the call,
+     * else @c false
      */
     public boolean authorize( boolean authorized ) {
         return true;
@@ -506,6 +509,9 @@ abstract public class LocalMediaSource extends PlatformInterface
 
     /**
      * Called when the user first calls play for the local media via voice control. ( Currently this is not used in LocalMediaSource)
+     *
+     * @return @c true if the platform implementation successfully handled the call,
+     * else @c false
      */
     public boolean play( String payload ) {
         return false;
@@ -517,6 +523,9 @@ abstract public class LocalMediaSource extends PlatformInterface
      * @param  controlType Playback control type being invoked
      *
      * @sa PlaybackController
+     *
+     * @return @c true if the platform implementation successfully handled the call,
+     * else @c false
      */
     public boolean playControl( PlayControlType controlType ) {
         return false;
@@ -526,6 +535,9 @@ abstract public class LocalMediaSource extends PlatformInterface
      * Called when the user invokes local media seek via speech.
      *
      * @param  offset Offset position within media item, in milliseconds
+     *
+     * @return @c true if the platform implementation successfully handled the call,
+     * else @c false
      */
     public boolean seek( long offset ) {
         return false;
@@ -535,6 +547,9 @@ abstract public class LocalMediaSource extends PlatformInterface
      * Called when the user invokes local media adjust seek via speech.
      *
      * @param  deltaOffset Change in offset position within media item, in milliseconds
+     *
+     * @return @c true if the platform implementation successfully handled the call,
+     * else @c false
      */
     public boolean adjustSeek( long deltaOffset ) {
         return false;
@@ -542,6 +557,9 @@ abstract public class LocalMediaSource extends PlatformInterface
 
     /**
      * Must provide the local media source @PlaybackState, and @SessionState information to maintain cloud sync
+     *
+     * @return The current @c LocalMediaSourceState for the local media source, or @c null if
+     * the state is not available
      */
     public LocalMediaSourceState getState() {
         return null;

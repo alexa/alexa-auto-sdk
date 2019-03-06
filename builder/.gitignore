@@ -10,3 +10,4 @@ build/
 deploy/
 
 .DS_Store
+*.pyc

@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">1.4.0</span>
+   &#160;<span id="projectnumber">1.5.0</span>
    </div>
   </td>
  </tr>
@@ -138,10 +138,11 @@ Public Member Functions</h2></td></tr>
 <p>Called after the discovered local media source have been registered.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">authorized</td><td>As long as the registered platform interface includes a supported <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source_1_1_source.html">Source</a> type, AVS will return true. </td></tr>
+    <tr><td class="paramname">authorized</td><td>As long as the registered platform interface includes a supported <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source_1_1_source.html">Source</a> type, AVS will return true.</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation successfully handled the call, else <code>false</code> </dd></dl>
 
 </div>
 </div>
@@ -160,7 +161,8 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Called when the user first calls play for the local media via voice control. ( Currently this is not used in <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source.html">LocalMediaSource</a>) </p>
+<p>Called when the user first calls play for the local media via voice control. ( Currently this is not used in <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source.html">LocalMediaSource</a>)</p>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation successfully handled the call, else <code>false</code> </dd></dl>
 
 </div>
 </div>
@@ -186,7 +188,8 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_playback_controller.html">PlaybackController</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_playback_controller.html">PlaybackController</a></dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation successfully handled the call, else <code>false</code> </dd></dl>
 
 </div>
 </div>
@@ -208,10 +211,11 @@ Public Member Functions</h2></td></tr>
 <p>Called when the user invokes local media seek via speech.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">offset</td><td>Offset position within media item, in milliseconds </td></tr>
+    <tr><td class="paramname">offset</td><td>Offset position within media item, in milliseconds</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation successfully handled the call, else <code>false</code> </dd></dl>
 
 </div>
 </div>
@@ -233,10 +237,11 @@ Public Member Functions</h2></td></tr>
 <p>Called when the user invokes local media adjust seek via speech.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">deltaOffset</td><td>Change in offset position within media item, in milliseconds </td></tr>
+    <tr><td class="paramname">deltaOffset</td><td>Change in offset position within media item, in milliseconds</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation successfully handled the call, else <code>false</code> </dd></dl>
 
 </div>
 </div>
@@ -254,7 +259,8 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Must provide the local media source , and  information to maintain cloud sync </p>
+<p>Must provide the local media source , and  information to maintain cloud sync</p>
+<dl class="section return"><dt>Returns</dt><dd>The current <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source_1_1_local_media_source_state.html">LocalMediaSourceState</a></code> for the local media source, or <code>null</code> if the state is not available </dd></dl>
 
 </div>
 </div>
@@ -392,7 +398,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 1.4.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 1.5.0 - Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

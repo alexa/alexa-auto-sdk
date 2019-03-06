@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -91,6 +91,8 @@ public:
     alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::Type getSpeakerType() override;
     
 protected:
+    using SourceId = alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId;
+
     std::shared_ptr<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerObserverInterface> getObserver() {
         return m_observer;
     }
@@ -101,6 +103,11 @@ protected:
     
     bool validateSource( alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id );
     
+    virtual void handlePrePlaybackStarted( SourceId id );
+    virtual void handlePostPlaybackStarted( SourceId id );
+    virtual void handlePrePlaybackFinished( SourceId id );
+    virtual void handlePostPlaybackFinished( SourceId id );
+
 private:
     enum class PendingEventState {
         NONE, PLAYBACK_STARTED, PLAYBACK_PAUSED, PLAYBACK_RESUMED, PLAYBACK_STOPPED
@@ -110,8 +117,6 @@ private:
         NONE, PLAY, PAUSE, RESUME, STOP
     };
     
-    using SourceId = alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId;
-
     void sendPendingEvent();
     void sendEvent( PendingEventState state );
     void resetSource();
@@ -136,7 +141,6 @@ private:
     std::shared_ptr<aace::alexa::AudioChannel> m_audioChannelPlatformInterface;
     std::shared_ptr<aace::alexa::MediaPlayer> m_mediaPlayerPlatformInterface;
     std::shared_ptr<aace::alexa::Speaker> m_speakerPlatformInterface;
-
     std::shared_ptr<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerObserverInterface> m_observer;
     std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader> m_attachmentReader;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> m_speakerManager;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 #include "AACE/Engine/Core/EngineService.h"
 #include "AACE/Engine/Vehicle/VehiclePropertyInterface.h"
+#include "AACE/Engine/Metrics/MetricEvent.h"
 
 #include "AACE/Vehicle/VehicleConfiguration.h"
 
@@ -59,19 +60,22 @@ public:
     
 protected:
     bool initialize() override;
+    bool setup() override;
     bool configure( const std::vector<std::shared_ptr<std::istream>>& configuration ) override;
     bool setProperty( const std::string& key, const std::string& value ) override;
     std::string getProperty( const std::string& key ) override;
-
 private:
     bool configure( std::shared_ptr<std::istream> configuration );
-    
+
     bool checkVehicleConfigProperty( rapidjson::Value& root, const char* key, bool warnIfMissing = true );
     std::string getVehicleConfigProperty( rapidjson::Value& root, const char* key, const char* defaultValue = "", bool warnIfMissing = true );
-    
+    std::string getVehiclePropertyAttribute( VehiclePropertyType property);
+    std::shared_ptr<aace::engine::metrics::MetricEvent> generateVehiclePropertiesMetric();
+
 private:
     std::unordered_map<VehiclePropertyType,std::string,EnumHash> m_vehiclePropertyMap;
     std::string m_operatingCountry;
+    std::shared_ptr<aace::engine::metrics::MetricEvent> m_vehiclePropertiesMetric;
 };
 
 } // aace::engine::vehicle

@@ -1,0 +1,99 @@
+body.page-content {
+	height: 100%;
+	width: auto;
+	margin-top: 20px;
+	background-size: cover;
+	background-position: center;
+}
+
+img {
+	float: right;
+}
+
+ol {
+	display: flex;
+	flex-direction: column;
+}
+
+#question,
+#output,
+#outevt {
+	white-space: pre-wrap;
+}
+
+div.row {
+	display: flex;
+	flex-direction: row;
+}
+
+div.col1 {
+	flex-basis: 0;
+	flex-grow: 1;
+	width: 100%;
+}
+
+div.col2 {
+	flex-basis: 0;
+	flex-grow: 1;
+	width: 30ch;
+}
+
+button {
+	margin-right: 10px;
+	padding: 6px 8px;
+	font-size: large;
+}
+
+pre {
+	outline: 1px solid #ccc;
+	padding: 5px;
+	margin: 5px;
+	background-color: white;
+	opacity: 0.85;
+	min-height: 5pc;
+	max-height: 5pc;
+	overflow: auto;
+}
+
+.string {
+	color: green;
+}
+
+.number {
+	color: darkorange;
+}
+
+.boolean {
+	color: blue;
+}
+
+.null {
+	color: magenta;
+}
+
+.key {
+	color: red;
+}
+
+dialog {
+	padding: 0;
+	border: 0;
+	border-radius: 0.6rem;
+	box-shadow: 0 0 1em black;
+}
+
+dialog::backdrop {
+	/* make the backdrop a semi-transparent black */
+	background-color: rgba(0, 0, 0, 0.4);
+}
+
+h3.dialogheader {
+	background-color: lightgreen;
+	padding: 1ch;
+}
+
+footer {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}

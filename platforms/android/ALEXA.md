@@ -378,6 +378,82 @@ public class PlaybackControllerHandler extends PlaybackController
 
 ```
 
+### Handling equalizer control
+
+The Equalizer Controller enables Alexa voice control of the device's audio equalizer settings, which includes making gain level adjustments to any of the supported frequency bands ("BASS", "MIDRANGE", and/or "TREBLE") using the device's onboard audio processing. 
+
+The platform implementation is responsible for the following:
+* Determining how each supported band affects the audio
+* Mapping Alexa's equalizer bands to the bands supported on the device, if they do not directly correspond
+* Scaling Alexa's level values as necessary so that each step corresponds to one decibel of amplitude gain on the device
+* Applying equalization to only selected portions of the audio output so that Alexa's speech, alarms, etc. will not be affected
+* Persisting settings across power cycles
+
+The Equalizer Controller is configurable to the device's capabilities. See `com.amazon.aace.alexa.config.AlexaConfiguration.createEqualizerControllerConfig` for details on configuring the supported bands, default state, and decibel adjustment range.
+
+To implement a custom handler for Equalizer Controller the `com.amazon.aace.alexa.EqualizerController` class should be extended:
+
+```
+public class EqualizerControllerHandler extends EqualizerController {
+	@Override
+	public void setBandLevels( EqualizerBandLevel[] bandLevels ) {
+		// Handle performing audio equalization on the device
+		// according to the provided band dB level settings
+		
+		// This invocation may come from "Alexa, reset bass", 
+		// "Alexa, reset my equalizer", "Alexa, increase treble", etc.
+	}
+
+	@Override
+	public EqualizerBandLevel[] getBandLevels() {
+		// Return the current band level settings on the device
+		return mCurrentBandLevels;
+	}
+
+	...
+}
+...
+
+// Configure the Engine
+// For example, 2 supported bands with amplitude gains ranging from -8dB to +8dB, each with a default of 0dB
+EqualizerBand[] bands = new EqualizerBand[]{ EqualizerBand.BASS, EqualizerBand.TREBLE };
+EqualizerBandLevel[] defaults = new EqualizerBandLevel[]{ 
+	new EqualizerBandLevel( EqualizerBand.BASS, 0 ), 
+	new EqualizerBandLevel( EqualizerBand.TREBLE, 0 )};
+EngineConfiguration eqConfig = AlexaConfiguration.createEqualizerControllerConfig( bands, -8, 8, defaults );
+
+mEngine.configure( new EngineConfiguration[]{
+	// other config objects,
+	eqConfig,
+	...
+});
+
+...
+
+// Register the platform interface implementation with the Engine
+EqualizerController mEqController = new EqualizerControllerHandler();
+mEngine.registerPlatformInterface( mEqController );
+
+...
+
+// If level changes are adjusted using local on-device controls, call inherited methods to notify the Engine:
+
+// To set a band to an absolute gain level in decibels
+EqualizerBandLevel[] settings = new EqualizerBandLevel[]{ 
+	new EqualizerBandLevel( EqualizerBand.BASS, 4 )}; // Sets bass amplitude to +4dB
+mEqController.localSetBandLevels( settings );
+
+// To make a relative adjustment to level settings
+EqualizerBandLevel[] adjustments = new EqualizerBandLevel[]{ 
+	new EqualizerBandLevel( EqualizerBand.BASS, -2 )}; // Decreases bass gain by 2dB
+mEqController.localAdjustBandLevels( adjustments );
+
+// To reset gain levels to the configured defaults (usually 0dB)
+EqualizerBand[] bands = new EqualizerBand[]{ EqualizerBand.BASS, EqualizerBand.TREBLE }; // Resets bass and treble bands
+mEqController.localResetBands( bands );
+```
+
+
 ### Handling External Media Adapter with MACCAndroidClient  
 
 The External Media Adapter interface allows the platform to declare and integrate with an external media source. In our MACC Player example, we handle the registration of the MACC Client callbacks for discovery and authorization.

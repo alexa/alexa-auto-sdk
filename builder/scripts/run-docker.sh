@@ -6,13 +6,13 @@ THISDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source ${THISDIR}/common.sh
 
 VM_HOME="/home/builder"
-IMAGE_REVISION="20181010"
+IMAGE_REVISION="20190128"
 IMAGE_NAME="aac/ubuntu-base:${IMAGE_REVISION}"
 VOLUME_NAME="buildervolume"
 VOLUME_MOUNT_POINT="/workdir"
 
 if [[ "${NO_TTY}" != "1" ]]; then
-    TTY="-t"
+	TTY="-t"
 fi
 
 EXTRA_OPTIONS=""
@@ -25,6 +25,7 @@ execute_command() {
 	-v ${VOLUME_NAME}:${VOLUME_MOUNT_POINT} \
 	-v ${SDK_HOME}:${VM_HOME}/aac \
 	-e ANDROID_TOOLCHAIN=${VOLUME_MOUNT_POINT}/android \
+	-e AGL_SDK_BASE=${VOLUME_MOUNT_POINT}/agl-sdk \
 	-e HOST_PWD=${PWD} \
 	-e HOST_SDK_HOME=${SDK_HOME} \
 	${EXTRA_OPTIONS} \

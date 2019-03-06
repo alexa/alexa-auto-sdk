@@ -1,0 +1,11 @@
+*.tar.gz
+.DS_Store
+.clang-format
+.clang-tidy
+.vscode
+DO-NOT-COMMIT.json
+build
+config.json
+default.profdata
+default.profraw
+extras

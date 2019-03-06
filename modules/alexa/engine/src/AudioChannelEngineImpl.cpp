@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -322,16 +322,37 @@ void AudioChannelEngineImpl::executeMediaError( SourceId id, MediaError error, c
     }
 }
 
+void AudioChannelEngineImpl::handlePrePlaybackStarted( SourceId id )
+{
+    AACE_DEBUG(LX(TAG,"handlePrePlaybackStarted").d("Event","Handling pre-playback started"));
+}
+
+void AudioChannelEngineImpl::handlePostPlaybackStarted( SourceId id )
+{
+    AACE_DEBUG(LX(TAG,"handlePostPlaybackStarted").d("Event","Handling post-playback started"));
+}
+
+void AudioChannelEngineImpl::handlePrePlaybackFinished( SourceId id )
+{
+    AACE_DEBUG(LX(TAG,"handlePrePlaybackFinished").d("Event","Handling pre-playback finished"));
+}
+
+void AudioChannelEngineImpl::handlePostPlaybackFinished( SourceId id ) 
+{
+    AACE_DEBUG(LX(TAG,"handlePostPlaybackFinished").d("Event","Handling post-playback finished"));
+}
+
 void AudioChannelEngineImpl::executePlaybackStarted( SourceId id )
 {
     try
     {
-        ALEXA_METRIC(LX(TAG, "executePlaybackStarted").d("channelName", m_name), aace::engine::alexa::AlexaMetrics::Location::PLAYBACK_STARTED);
+        handlePrePlaybackStarted( id );
         ThrowIf( id == ERROR, "invalidSource" );
         
         if( m_observer != nullptr ) {
             m_observer->onPlaybackStarted( id );
         }
+        handlePostPlaybackStarted( id );
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"executePlaybackStarted").d("reason", ex.what()).d("expectedState",m_pendingEventState));
@@ -342,13 +363,18 @@ void AudioChannelEngineImpl::executePlaybackFinished( SourceId id )
 {
     try
     {
+        handlePrePlaybackFinished( id );
         ThrowIf( id == ERROR, "invalidSource" );
         
         if( m_observer != nullptr ) {
             m_observer->onPlaybackFinished( id );
         }
         
+        // save the player offset
+        m_savedOffset = std::chrono::milliseconds( m_mediaPlayerPlatformInterface->getPosition() );
+
         m_currentId = ERROR;
+        handlePostPlaybackFinished( id );
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"executePlaybackFinished").d("reason", ex.what()).d("expectedState",m_pendingEventState));

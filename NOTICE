@@ -1,5 +1,5 @@
 Alexa Auto SDK
-Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 *************************
 ALEXA AUTO SDK COMPONENTS
@@ -8,12 +8,16 @@ The following Alexa Auto SDK components are licensed under the Apache License, V
 
 builder
 modules/alexa
-modules/core
+modules/cbl
 modules/contact-uploader
+modules/core
 modules/navigation
 modules/phone-control
+platforms/agl
 platforms/android
 samples/android
+samples/audio
+samples/cpp
 
 You may not use this file except in compliance with the License. A copy of
 the License is located at
@@ -28,7 +32,25 @@ limitations under the License.
 **********************
 THIRD PARTY COMPONENTS
 **********************
+
+C++ Sample App includes the following open source libraries:
+
+----------------------------------------
+Guidelines Support Library (GSL) gsl_assert (<gsl/contracts.h>)
+https://github.com/Microsoft/GSL/blob/master/include/gsl/gsl_assert
+
+Copyright (c) 2015 Microsoft Corporation. All rights reserved.
+This code is licensed under the MIT License (MIT).
+https://github.com/Microsoft/GSL/blob/master/LICENSE
+----------------------------------------
+JSON for Modern C++
+https://github.com/nlohmann/json
+
+Copyright (c) 2013-2018 Niels Lohmann <http://nlohmann.me>.
+Licensed under the MIT License <http://opensource.org/licenses/MIT>.
+
 SDK html documentation includes the following open source libraries:
+
 ----------------------------------------
 jQuery JavaScript Library v1.7.1
 http://jquery.com/

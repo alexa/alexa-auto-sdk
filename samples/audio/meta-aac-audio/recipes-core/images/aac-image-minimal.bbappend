@@ -1,0 +1,1 @@
+IMAGE_INSTALL += "aac-sample-audio"

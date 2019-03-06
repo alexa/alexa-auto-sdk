@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -41,8 +41,7 @@ namespace alexa {
 
 class ExternalMediaAdapterEngineImpl :
     public ExternalMediaAdapterHandler,
-    public aace::alexa::ExternalMediaAdapterEngineInterface,
-    public alexaClientSDK::avsCommon::utils::RequiresShutdown {
+    public aace::alexa::ExternalMediaAdapterEngineInterface {
 
 private:
     ExternalMediaAdapterEngineImpl( std::shared_ptr<aace::alexa::ExternalMediaAdapter> platformMediaAdapter, std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender, std::shared_ptr<FocusHandlerInterface> focusHandler );
@@ -72,8 +71,6 @@ protected:
     bool handleSeek( const std::string& localPlayerId, std::chrono::milliseconds offset ) override;
     bool handleAdjustSeek( const std::string& localPlayerId, std::chrono::milliseconds deltaOffset ) override;
     bool handleGetAdapterState( const std::string& localPlayerId, alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::AdapterState& state ) override;
-
-    // alexaClientSDK::avsCommon::utils::RequiresShutdown
     void doShutdown() override;
 
 private:

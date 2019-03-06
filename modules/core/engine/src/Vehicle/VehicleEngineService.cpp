@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -45,6 +45,25 @@ std::string VehicleEngineService::getVehicleProperty( VehiclePropertyType type )
     return it != m_vehiclePropertyMap.end() ? it->second : "";
 }
 
+std::string VehicleEngineService::getVehiclePropertyAttribute( VehiclePropertyType property ) {
+    switch( property )
+    {
+        case VehiclePropertyType::MAKE: return "Make";
+        case VehiclePropertyType::MODEL: return "Model";
+        case VehiclePropertyType::YEAR: return "Year";
+        case VehiclePropertyType::TRIM: return "Trim";
+        case VehiclePropertyType::GEOGRAPHY: return "Geography";
+        case VehiclePropertyType::VERSION: return "SWVersion";
+        case VehiclePropertyType::OPERATING_SYSTEM: return "OS";
+        case VehiclePropertyType::HARDWARE_ARCH: return "HW";
+        case VehiclePropertyType::LANGUAGE: return "Language";
+        case VehiclePropertyType::MICROPHONE: return "Microphone";
+        case VehiclePropertyType::COUNTRY_LIST: return "Countries";
+        case VehiclePropertyType::VEHICLE_IDENTIFIER: return "VehicleIdentifier";
+    }
+    return "";
+}
+
 bool VehicleEngineService::initialize() {
     ThrowIfNot( registerServiceInterface<VehiclePropertyInterface>( shared_from_this() ), "registerVehiclePropertyInterfaceFailed" );
     return true;
@@ -60,6 +79,8 @@ bool VehicleEngineService::configure( const std::vector<std::shared_ptr<std::ist
     // warn if the vehicle property map has not been configured
     if( m_vehiclePropertyMap.empty() ) {
         AACE_WARN(LX(TAG,"configure").m("vehicleInfoNotConfigured"));
+    } else {
+        m_vehiclePropertiesMetric = generateVehiclePropertiesMetric();
     }
     
     // get the operating country from the settings
@@ -69,6 +90,22 @@ bool VehicleEngineService::configure( const std::vector<std::shared_ptr<std::ist
         m_operatingCountry = localStorage->get( VEHICLE_SERVICE_LOCAL_STORAGE_TABLE, "operatingCountry", m_operatingCountry );
     }
     
+    return true;
+}
+
+bool VehicleEngineService::setup()
+{
+    try
+    {
+        if ( m_vehiclePropertiesMetric != nullptr ) {
+            m_vehiclePropertiesMetric->record();
+        }
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"setup").d("reason", ex.what()));
+        return false;
+    }
+
     return true;
 }
 
@@ -112,7 +149,7 @@ bool VehicleEngineService::configure( std::shared_ptr<std::istream> configuratio
         ReturnIfNot( root.HasMember( "aace.vehicle" ) && root["aace.vehicle"].IsObject(), false );
         
         auto vehicleConfigRoot = root["aace.vehicle"].GetObject();
-        
+
         if( vehicleConfigRoot.HasMember( "info" ) && vehicleConfigRoot["info"].IsObject() )
         {
             rapidjson::Value info = vehicleConfigRoot["info"].GetObject();
@@ -128,6 +165,7 @@ bool VehicleEngineService::configure( std::shared_ptr<std::istream> configuratio
             m_vehiclePropertyMap[VehiclePropertyType::LANGUAGE] = getVehicleConfigProperty( info, "language" );
             m_vehiclePropertyMap[VehiclePropertyType::MICROPHONE] = getVehicleConfigProperty(info, "microphone" );
             m_vehiclePropertyMap[VehiclePropertyType::COUNTRY_LIST] = getVehicleConfigProperty(info, "countries" );
+            m_vehiclePropertyMap[VehiclePropertyType::VEHICLE_IDENTIFIER] = getVehicleConfigProperty(info, "vehicleIdentifier");
         }
         
         if( vehicleConfigRoot.HasMember( "operatingCountry" ) && vehicleConfigRoot["operatingCountry"].IsString() ) {
@@ -180,6 +218,29 @@ std::string VehicleEngineService::getProperty( const std::string& key )
     }
     
     return std::string();
+}
+
+std::shared_ptr<aace::engine::metrics::MetricEvent> VehicleEngineService::generateVehiclePropertiesMetric() {
+    std::string program = "AlexaAuto_Vehicle";
+    std::string source = "VehicleConfiguration";
+    std::shared_ptr<aace::engine::metrics::MetricEvent> currentMetric = 
+        std::shared_ptr<aace::engine::metrics::MetricEvent>(new aace::engine::metrics::MetricEvent(program, source));
+
+    for( auto itr : m_vehiclePropertyMap ) {
+        VehiclePropertyType property = itr.first;
+        std::string dataPointName = getVehiclePropertyAttribute(property);
+        std::string dataPointValue = itr.second;
+
+        // sanitize any delimiter characters from dataPointValue to maintain metric formatting
+        char delimiters[] = ";=,:";
+        for (char delimiter : delimiters)
+        {
+            std::replace( dataPointValue.begin(), dataPointValue.end(), delimiter, '-');
+        }
+
+        currentMetric->addString(dataPointName, dataPointValue);
+    }
+    return currentMetric;
 }
 
 } // aace::engine::vehicle

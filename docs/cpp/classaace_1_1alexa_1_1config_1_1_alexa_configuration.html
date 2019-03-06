@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">1.4.0</span>
+   &#160;<span id="projectnumber">1.5.0</span>
    </div>
   </td>
  </tr>
@@ -86,6 +86,10 @@ Public Types</h2></td></tr>
 <tr class="separator:abf68ff89209ddbd51fbd9fa7abe21b41"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a27fcf72e4bbe6b90e7d86f14c09c577c"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a27fcf72e4bbe6b90e7d86f14c09c577c">TemplateRuntimeTimeout</a> = std::pair&lt; <a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#abf68ff89209ddbd51fbd9fa7abe21b41">TemplateRuntimeTimeoutType</a>, std::chrono::milliseconds &gt;</td></tr>
 <tr class="separator:a27fcf72e4bbe6b90e7d86f14c09c577c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aabb71d98c3dd763d0522a5e688a0eab1"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#aabb71d98c3dd763d0522a5e688a0eab1">EqualizerBand</a> = <a class="el" href="classaace_1_1alexa_1_1_equalizer_controller_engine_interface.html#a733a5c62b16ef4f62b5c94d16f314cb3">aace::alexa::EqualizerControllerEngineInterface::EqualizerBand</a></td></tr>
+<tr class="separator:aabb71d98c3dd763d0522a5e688a0eab1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aba7e45428c26995d0827c5eccd61f9ab"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#aba7e45428c26995d0827c5eccd61f9ab">EqualizerBandLevel</a> = <a class="el" href="classaace_1_1alexa_1_1_equalizer_controller_engine_interface.html#a52700a22664c28b42854f75d2f67e653">aace::alexa::EqualizerControllerEngineInterface::EqualizerBandLevel</a></td></tr>
+<tr class="separator:aba7e45428c26995d0827c5eccd61f9ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -111,6 +115,8 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:a9988d9ebfde9e2c74a7f814de7ab8189"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4753ff7cfd440ba505e0508c2c77c07a"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; <a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a4753ff7cfd440ba505e0508c2c77c07a">createExternalMediaPlayerConfig</a> (const std::string &amp;agent)</td></tr>
 <tr class="separator:a4753ff7cfd440ba505e0508c2c77c07a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7aeaa30b4d3a97439228a5ec9d15de74"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; <a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a7aeaa30b4d3a97439228a5ec9d15de74">createEqualizerControllerConfig</a> (std::initializer_list&lt; <a class="el" href="classaace_1_1alexa_1_1_equalizer_controller_engine_interface.html#a733a5c62b16ef4f62b5c94d16f314cb3">EqualizerBand</a> &gt; supportedBands={}, int minLevel=-6, int maxLevel=6, std::initializer_list&lt; <a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#aba7e45428c26995d0827c5eccd61f9ab">EqualizerBandLevel</a> &gt; defaultBandLevels={})</td></tr>
+<tr class="separator:a7aeaa30b4d3a97439228a5ec9d15de74"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A factory interface for creating Alexa configuration objects </p>
@@ -127,6 +133,38 @@ Static Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Identifies a Template Runtime configuration with a type and value pair </p>
+
+</div>
+</div>
+<a id="aabb71d98c3dd763d0522a5e688a0eab1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aabb71d98c3dd763d0522a5e688a0eab1">&#9670;&nbsp;</a></span>EqualizerBand</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="classaace_1_1alexa_1_1_equalizer_controller_engine_interface.html#a733a5c62b16ef4f62b5c94d16f314cb3">aace::alexa::config::AlexaConfiguration::EqualizerBand</a> =  <a class="el" href="classaace_1_1alexa_1_1_equalizer_controller_engine_interface.html#a733a5c62b16ef4f62b5c94d16f314cb3">aace::alexa::EqualizerControllerEngineInterface::EqualizerBand</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Describes the equalizer bands supported by Alexa. The platform implementation may support a subset of these.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classaace_1_1alexa_1_1_equalizer_controller_engine_interface.html#a733a5c62b16ef4f62b5c94d16f314cb3">aace::alexa::EqualizerControllerEngineInterface::EqualizerBand</a> </dd></dl>
+
+</div>
+</div>
+<a id="aba7e45428c26995d0827c5eccd61f9ab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aba7e45428c26995d0827c5eccd61f9ab">&#9670;&nbsp;</a></span>EqualizerBandLevel</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#aba7e45428c26995d0827c5eccd61f9ab">aace::alexa::config::AlexaConfiguration::EqualizerBandLevel</a> =  <a class="el" href="classaace_1_1alexa_1_1_equalizer_controller_engine_interface.html#a52700a22664c28b42854f75d2f67e653">aace::alexa::EqualizerControllerEngineInterface::EqualizerBandLevel</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Describes the level of gain of a particular equalizer band as an integer dB value. This is an <code><a class="el" href="classaace_1_1alexa_1_1_equalizer_controller.html#ac79148250b90df9f0ce22b223d3db2c4">aace::alexa::EqualizerController::EqualizerBand</a></code> and <code>int</code> pair.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classaace_1_1alexa_1_1_equalizer_controller_engine_interface.html#a52700a22664c28b42854f75d2f67e653">aace::alexa::EqualizerControllerEngineInterface::EqualizerBandLevel</a> </dd></dl>
 
 </div>
 </div>
@@ -575,12 +613,81 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a7aeaa30b4d3a97439228a5ec9d15de74"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7aeaa30b4d3a97439228a5ec9d15de74">&#9670;&nbsp;</a></span>createEqualizerControllerConfig()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static std::shared_ptr&lt;<a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a>&gt; aace::alexa::config::AlexaConfiguration::createEqualizerControllerConfig </td>
+          <td>(</td>
+          <td class="paramtype">std::initializer_list&lt; <a class="el" href="classaace_1_1alexa_1_1_equalizer_controller_engine_interface.html#a733a5c62b16ef4f62b5c94d16f314cb3">EqualizerBand</a> &gt;&#160;</td>
+          <td class="paramname"><em>supportedBands</em> = <code>{}</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>minLevel</em> = <code>-6</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>maxLevel</em> = <code>6</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::initializer_list&lt; <a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#aba7e45428c26995d0827c5eccd61f9ab">EqualizerBandLevel</a> &gt;&#160;</td>
+          <td class="paramname"><em>defaultBandLevels</em> = <code>{}</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Factory method used to programmatically generate equalizer controller configuration data. This is an optional configuration, and default settings will be used if configuration is not provided. This method produces configuration data according to the JSON structure in the sample below.</p>
+<div class="fragment"><div class="line">&quot;equalizer&quot;: {</div><div class="line">    &quot;bands&quot;: {</div><div class="line">        &quot;BASS&quot;: true,</div><div class="line">        &quot;MIDRANGE&quot;: false,</div><div class="line">        &quot;TREBLE&quot;: true</div><div class="line">    },</div><div class="line">    &quot;defaultState&quot;: {</div><div class="line">        &quot;bands&quot;: {</div><div class="line">            &quot;BASS&quot;: 4,</div><div class="line">            &quot;TREBLE&quot;: -1</div><div class="line">        }</div><div class="line">    },</div><div class="line">    &quot;minLevel&quot;: -6,</div><div class="line">    &quot;maxLevel&quot;: 6</div><div class="line">}</div></div><!-- fragment --><p>The configuration branches are used as follows:</p>
+<ul>
+<li>equalizer.bands: Specifies which bands are supported by the device and will be enabled for control with Alexa. Each child key is the name of an Alexa-supported band ("BASS", "MIDRANGE", or "TREBLE") and value is whether the device supports the band. Only bands explicitly declared supported will be enabled in the SDK and Alexa. Omitting this branch enables all bands by default.</li>
+</ul>
+<ul>
+<li>equalizer.defaultState: Describes the default or reset state of the equalizer. These settings are used to reset the equalizer with Alexa such as by saying "Alexa, reset bass." If this branch or its child is omitted, default values will be used. </li>
+<li>equalizer.defaultState.bands: Defines the default gain level setting in dB for each supported equalizer band. Each element key is the name of a supported band and value is a level (int) specifying the default gain in dB. All of the supported bands must be provided once this branch is defined. All dB levels must obey the limits declared in "equalizer.minLevel" and "equalizer.maxLevel". Omitting this branch uses the default 0dB for each band.</li>
+</ul>
+<ul>
+<li>equalizer.minLevel and equalizer.maxLevel: Integer values specifying the decibel level range on which Alexa may operate for the supported bands. The device may support a different range internally, but Alexa will know only about the limits declared here. Values should be specified as absolute amplitude gain in integer dB and scaled to the platform's internal range as necessary. If these values are omitted, the default range min -6dB and max +6dB will be used.</li>
+</ul>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">supportedBands</td><td>A list of supported equalizer bands. Corresponds to the "equalizer.bands" config branch. Only bands provided in the list will be enabled. Unspecified or empty <em>supportedBands</em> omits the config branch. Nonempty <em>supportedBands</em> includes the branch and declares each band in the list with a value "true". </td></tr>
+    <tr><td class="paramname">minLevel</td><td>The minimum gain level for the equalizer bands in integer dB. Corresponds to "equalizer.minLevel". Unspecified <em>minLevel</em> uses the -6dB default. </td></tr>
+    <tr><td class="paramname">maxLevel</td><td>The maximum gain level for the equalizer bands in integer dB. Corresponds to "equalizer.maxLevel". Unspecified <em>maxLevel</em> uses the +6dB default. </td></tr>
+    <tr><td class="paramname">defaultBandLevels</td><td>The default or reset state of the equalizer bands. Corresponds to the "equalizer.defaultState.bands" config branch. Unspecified or empty <em>defaultBandLevels</em> omits the config branch. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <html>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 1.4.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 1.5.0 - Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

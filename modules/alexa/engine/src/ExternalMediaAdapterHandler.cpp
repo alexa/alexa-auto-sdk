@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -33,7 +33,11 @@ static const std::string TAG("aace.alexa.ExternalMediaAdapterHandler");
 // external media player agent constant
 static const std::string EXTERNAL_MEDIA_PLAYER_AGENT = "alexaAutoSDK";
 
-ExternalMediaAdapterHandler::ExternalMediaAdapterHandler( std::shared_ptr<aace::alexa::Speaker> speakerPlatformInterface, std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender, std::shared_ptr<FocusHandlerInterface> focusHandler ) : m_speakerPlatformInterface( speakerPlatformInterface ), m_discoveredPlayerSender( discoveredPlayerSender ), m_focusHandler( focusHandler ) {
+ExternalMediaAdapterHandler::ExternalMediaAdapterHandler( std::shared_ptr<aace::alexa::Speaker> speakerPlatformInterface, std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender, std::shared_ptr<FocusHandlerInterface> focusHandler ) : 
+    alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
+    m_speakerPlatformInterface( speakerPlatformInterface ), 
+    m_discoveredPlayerSender( discoveredPlayerSender ), 
+    m_focusHandler( focusHandler ) {
 }
 
 bool ExternalMediaAdapterHandler::initializeAdapterHandler( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager )

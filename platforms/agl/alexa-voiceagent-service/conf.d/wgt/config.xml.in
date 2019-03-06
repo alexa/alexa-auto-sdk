@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget xmlns="http://www.w3.org/ns/widgets" id="@PROJECT_NAME@" version="0.1">
+    <name>@PROJECT_NAME@</name>
+    <icon src="@PROJECT_ICON@"/>
+    <content src="@WIDGET_ENTRY_POINT@" type="@WIDGET_TYPE@"/>
+    <description>@PROJECT_DESCRIPTION@</description>
+    <author>@PROJECT_AUTHOR@ &lt;@PROJECT_AUTHOR_MAIL@&gt;</author>
+    <license>@PROJECT_LICENSE@</license>
+
+    <feature name="urn:AGL:widget:required-permission">
+        <param name="urn:AGL:permission::public:no-htdocs" value="required" />
+        <param name="urn:AGL:permission:audio:public:audiostream" value="required" />
+        <param name="urn:AGL:permission::public:hidden" value="required" />
+    </feature>
+
+    <feature name="urn:AGL:widget:provided-api">
+        <param name="alexa-voiceagent" value="ws" />
+    </feature>
+
+    <feature name="urn:AGL:widget:required-binding">
+        <param name="@WIDGET_ENTRY_POINT@" value="local" />
+    </feature>
+
+    <feature name="urn:AGL:widget:required-api">
+        <param name="ahl-4a" value="ws" />
+        <param name="vshl-capabilities" value="ws" />
+	  </feature>
+</widget>

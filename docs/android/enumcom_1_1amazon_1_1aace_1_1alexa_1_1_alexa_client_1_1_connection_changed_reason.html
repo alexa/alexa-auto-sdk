@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">1.4.0</span>
+   &#160;<span id="projectnumber">1.5.0</span>
    </div>
   </td>
  </tr>
@@ -74,6 +74,12 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
+<tr class="memitem:accdacec235ded90798b9740ae4097314"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_connection_changed_reason.html#accdacec235ded90798b9740ae4097314">NONE</a></td></tr>
+<tr class="separator:accdacec235ded90798b9740ae4097314"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a850ede07c92d1e48f8d1eacddb190d58"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_connection_changed_reason.html#a850ede07c92d1e48f8d1eacddb190d58">SUCCESS</a></td></tr>
+<tr class="separator:a850ede07c92d1e48f8d1eacddb190d58"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a24c07684a8aa086e8cab5c34e84ba245"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_connection_changed_reason.html#a24c07684a8aa086e8cab5c34e84ba245">UNRECOVERABLE_ERROR</a></td></tr>
+<tr class="separator:a24c07684a8aa086e8cab5c34e84ba245"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a27dd6905ea8b269e891cb7af615349af"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_connection_changed_reason.html#a27dd6905ea8b269e891cb7af615349af">ACL_CLIENT_REQUEST</a></td></tr>
 <tr class="separator:a27dd6905ea8b269e891cb7af615349af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae296bd017d5b9aff977a96b358ed31da"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_connection_changed_reason.html#ae296bd017d5b9aff977a96b358ed31da">ACL_DISABLED</a></td></tr>
@@ -106,6 +112,51 @@ Public Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Describes the reason for a change in AVS connection status </p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
+<a id="accdacec235ded90798b9740ae4097314"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#accdacec235ded90798b9740ae4097314">&#9670;&nbsp;</a></span>NONE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">com.amazon.aace.alexa.AlexaClient.ConnectionChangedReason.NONE</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>No reason specified. </p>
+
+</div>
+</div>
+<a id="a850ede07c92d1e48f8d1eacddb190d58"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a850ede07c92d1e48f8d1eacddb190d58">&#9670;&nbsp;</a></span>SUCCESS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">com.amazon.aace.alexa.AlexaClient.ConnectionChangedReason.SUCCESS</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>The connection status changed due to a successful operation. </p>
+
+</div>
+</div>
+<a id="a24c07684a8aa086e8cab5c34e84ba245"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a24c07684a8aa086e8cab5c34e84ba245">&#9670;&nbsp;</a></span>UNRECOVERABLE_ERROR</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">com.amazon.aace.alexa.AlexaClient.ConnectionChangedReason.UNRECOVERABLE_ERROR</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>The connection status changed due to an error from which there is no recovery. </p>
+
+</div>
+</div>
 <a id="a27dd6905ea8b269e891cb7af615349af"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a27dd6905ea8b269e891cb7af615349af">&#9670;&nbsp;</a></span>ACL_CLIENT_REQUEST</h2>
 
@@ -321,7 +372,7 @@ Public Attributes</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 1.4.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 1.5.0 - Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

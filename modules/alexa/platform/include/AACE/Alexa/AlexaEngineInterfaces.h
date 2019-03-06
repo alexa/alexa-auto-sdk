@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -486,6 +486,89 @@ public:
     virtual void onPlayerError( const std::string& errorName, long code, const std::string& description, bool fatal ) = 0;
     virtual void onSetFocus() = 0;
 };
+
+/**
+ * EqualizerControllerEngineInterface
+ */
+class EqualizerControllerEngineInterface {
+public:
+
+    /**
+     * Describes the equalizer bands supported by Alexa. The platform implementation may support a subset of these.
+     */
+    enum class EqualizerBand {
+        /// Bass equalizer band
+        BASS,
+        /// Mid-range equalizer band
+        MIDRANGE,
+        /// Treble equalizer band
+        TREBLE
+    };
+
+    /**
+     * Describes the level of gain of a particular equalizer band as an integer dB value. This is an
+     * @c aace::alexa::EqualizerController::EqualizerBand and @c int pair.
+     */ 
+    using EqualizerBandLevel = std::pair<EqualizerBand,int>;
+
+    /**
+     * @internal
+     * Notifies the Engine that gain levels for one or more equalizer bands are being set directly on the device. If 
+     * unsupported levels are provided, the Engine should truncate the settings to the configured range.
+     * 
+     * @param [in] bandLevels The equalizer bands to change and their gain settings as integer dB values.
+     */
+    virtual void onLocalSetBandLevels( const std::vector<EqualizerBandLevel>& bandLevels ) = 0;
+
+    /**
+     * @internal
+     * Notifies the Engine that relative adjustments to equalizer band gain levels are being made directly on the 
+     * device. If adjustments put the band level settings beyond the configured dB range, the Engine should truncate 
+     * the settings to the configured range.
+     * 
+     * @param [in] bandAdjustments The equalizer bands to adjust and their relative gain adjustments as integer dB 
+     *             values.
+     */
+    virtual void onLocalAdjustBandLevels( const std::vector<EqualizerBandLevel>& bandAdjustments ) = 0;
+
+    /**
+     * @internal
+     * Notifies the Engine that the gain levels for the equalizer bands are being reset to their defaults.
+     * 
+     * @param [in] bands The equalizer bands to reset. Empty @a bands resets all supported equalizer bands.
+     */
+    virtual void onLocalResetBands( const std::vector<EqualizerBand>& bands ) = 0;
+};
+
+/**
+ * Provides a string representation for an @c EqualizerControllerEngineInterface::EqualizerBand
+ *
+ * @param band The @c EqualizerBand
+ * @return A string representation for the @c EqualizerBand
+ */
+inline std::string equalizerBandToString( const EqualizerControllerEngineInterface::EqualizerBand& band ) {
+    switch (band) {
+        case EqualizerControllerEngineInterface::EqualizerBand::BASS:
+            return "BASS";
+        case EqualizerControllerEngineInterface::EqualizerBand::MIDRANGE:
+            return "MIDRANGE";
+        case EqualizerControllerEngineInterface::EqualizerBand::TREBLE:
+            return "TREBLE";
+    }
+    return "UNKNOWN";
+}
+
+/**
+ * Write an @c EqualizerControllerEngineInterface::EqualizerBand value to an @c ostream as a string
+ *
+ * @param stream The stream to write to
+ * @param band The @c EqualizerBand value to write to the @c ostream
+ * @return The @c ostream argument that was written to
+ */
+inline std::ostream& operator<<( std::ostream& stream, const EqualizerControllerEngineInterface::EqualizerBand& band ) {
+    stream << equalizerBandToString(band);
+    return stream;
+}
 
 } // aace::alexa
 } // aace

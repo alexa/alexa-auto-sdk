@@ -60,8 +60,6 @@
     <string name="product_dsn">PRODUCT DSN:</string>
 
     <!-- Auth -->
-    <string name="auth_lwa_cbl">LWA WITH CBL</string>
-    <string name="auth_lwa_browser">LWA WITH BROWSER</string>
     <string name="auth_logout">LOG OUT</string>
     <string name="auth_product_id">PRODUCT ID</string>
     <string name="auth_product_dsn">PRODUCT DSN</string>
@@ -76,6 +74,11 @@
     <string name="wake_word">WAKE WORD</string>
     <string name="wake_word_enabled">ENABLE WAKE WORD</string>
     <string name="wake_word_not_supported">WAKE WORD NOT SUPPORTED</string>
+    <string name="wake_word_locale">CHANGING ALEXA LOCALE ALSO CHANGES THE WAKEWORD LOCALE WHEN RUNTIME SWITCHING IS CONFIGURED.</string>
+
+    <!-- Alexa Locale -->
+    <string name="alexa_locale">ALEXA LOCALE</string>
+    <string name="locale_text">SELECTED LOCALE</string>
 
     <!-- Alerts -->
     <string name="alerts">ALERTS</string>
@@ -104,6 +107,7 @@
     <string name="loc_address">ADDRESS</string>
     <string name="loc_switch_mock">ENABLE MOCK LOCATION</string>
     <string name="loc_set">SET LOCATION</string>
+    <string name="loc_unavailable">Not Available</string>
 
     <!-- Playback Controller -->
     <string name="playback_controller">PLAYBACK CONTROLLER</string>
@@ -118,6 +122,12 @@
     <string name="playback_thumbs_up">THUMBS UP</string>
     <string name="playback_thumbs_down">THUMBS DOWN</string>
 
+    <!-- Equalizer Controller -->
+    <string name="eq_controller">EQUALIZER CONTROLLER</string>
+    <string name="eq_bands">BANDS</string>
+    <string name="eq_reset_bands">RESET BANDS</string>
+    <string name="eq_band_level_unit">dB</string>
+
     <!-- Display Cards -->
     <string name="card_down_arrow">Down Arrow</string>
     <string name="card_up_arrow">Up Arrow</string>
@@ -130,7 +140,6 @@
     <string name="preference_product_id">Product ID Key</string>
     <string name="preference_product_dsn">Product DSN Key</string>
     <string name="preference_refresh_token">Refresh Token Key</string>
-    <string name="preference_login_method">Login Method Key</string>
 
     <!-- Alexa Comms -->
     <string name="alexa_comms_view_title">ALEXA COMMUNICATIONS</string>

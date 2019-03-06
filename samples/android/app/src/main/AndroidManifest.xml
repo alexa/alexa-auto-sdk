@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.amazon.sampleapp">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    android:sharedUserId="com.amazon.AlexaAutoUserId"
+    package="com.amazon.sampleapp">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
+    <!-- Needed if the app targets Android 5.0 (API level 21) or higher. -->
+    <uses-feature android:name="android.hardware.location.gps" />
+    <uses-feature android:name="android.hardware.location.network" />
+
     <!-- Permissions necessary for 3rd party metrics library -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- Permissions required to be able to start LVE -->
+    <uses-permission android:name="com.amazon.alexaauto.lve" />
 
     <application
         android:allowBackup="true"
@@ -27,6 +36,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity android:name="com.amazon.identity.auth.device.workflow.WorkflowActivity"
             android:theme="@android:style/Theme.NoDisplay"
             android:allowTaskReparenting="true"
@@ -39,6 +49,8 @@
                 <data android:host="${applicationId}" android:scheme="amzn"/>
             </intent-filter>
         </activity>
+
+        <service android:name=".LVEInteractionService" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -58,6 +58,7 @@ public:
 class ExternalMediaAdapterHandler :
     public aace::alexa::SpeakerEngineInterface,
     public alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface,
+    public alexaClientSDK::avsCommon::utils::RequiresShutdown,
     public std::enable_shared_from_this<ExternalMediaAdapterHandler> {
     
 protected:
@@ -82,6 +83,9 @@ protected:
     virtual bool handleSeek( const std::string& playerId, std::chrono::milliseconds offset ) = 0;
     virtual bool handleAdjustSeek( const std::string& playerId, std::chrono::milliseconds deltaOffset ) = 0;
     virtual bool handleGetAdapterState( const std::string& playerId, alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::AdapterState& state ) = 0;
+
+    // alexaClientSDK::avsCommon::utils::RequiresShutdown
+    virtual void doShutdown() override = 0;
 
 public:
     std::vector<PlayerInfo> authorizeDiscoveredPlayers( const std::vector<PlayerInfo>& authorizedPlayerList );

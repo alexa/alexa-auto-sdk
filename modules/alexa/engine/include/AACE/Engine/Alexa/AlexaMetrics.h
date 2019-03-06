@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ public:
         PLAYBACK_REQUEST_RESUME,
         PLAYBACK_STARTED,
         PLAYBACK_RESUMED,
+        PLAYBACK_FINISHED,
         END_OF_SPEECH
     };
     
@@ -59,6 +60,9 @@ inline std::ostream& operator<<(std::ostream& stream, const AlexaMetrics::Locati
             break;
         case AlexaMetrics::Location::PLAYBACK_RESUMED:
             stream << "PLAYBACK_RESUMED";
+            break;
+        case AlexaMetrics::Location::PLAYBACK_FINISHED:
+            stream << "PLAYBACK_FINISHED";
             break;
         case AlexaMetrics::Location::END_OF_SPEECH:
             stream << "END_OF_SPEECH";

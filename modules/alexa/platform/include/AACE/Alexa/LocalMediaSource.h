@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -79,11 +79,17 @@ public:
      * Called after the discovered local media source have been registered.
      *
      * @param [in] authorized As long as the registered platform interface includes a supported Source type, AVS will return true.
+     * 
+     * @return @c true if the platform implementation successfully handled the call, 
+     * else @c false
      */
     virtual bool authorize( bool authorized ) = 0;
 
     /**
      * Called when the user first calls play for the local media via voice control. ( Currently this is not used in LocalMediaSource )
+     * 
+     * @return @c true if the platform implementation successfully handled the call, 
+     * else @c false
      */
     virtual bool play( const std::string& payload ) = 0;
 
@@ -91,6 +97,9 @@ public:
      * Occurs during playback control via voice interaction or PlaybackController interface
      *
      * @param [in] controlType Playback control type being invoked
+     * 
+     * @return @c true if the platform implementation successfully handled the call, 
+     * else @c false
      *
      * @sa PlaybackController
      */
@@ -100,6 +109,9 @@ public:
      * Called when the user invokes media seek via speech.
      *
      * @param [in] offset Offset position within media item, in milliseconds
+     * 
+     * @return @c true if the platform implementation successfully handled the call, 
+     * else @c false
      */
     virtual bool seek( std::chrono::milliseconds offset ) = 0;
 
@@ -107,6 +119,9 @@ public:
      * Called when the user invokes media seek adjustment via speech.
      *
      * @param [in] deltaOffset Change in offset position within media item, in milliseconds
+     * 
+     * @return @c true if the platform implementation successfully handled the call, 
+     * else @c false
      */
     virtual bool adjustSeek( std::chrono::milliseconds deltaOffset ) = 0;
 

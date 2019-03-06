@@ -11,6 +11,9 @@ var searchData=
   ['snoozed',['SNOOZED',['../classaace_1_1alexa_1_1_alerts.html#a81cccb7e632cf26b7903d9c9c168fb22adbd414f9aaabb67e8430e9520f604a79',1,'aace::alexa::Alerts']]],
   ['speaking',['SPEAKING',['../classaace_1_1alexa_1_1_alexa_client.html#a5f3b9fc09843bc68b5bb9f0ed6b8586eaddee564b336f5de690b746eb04e62114',1,'aace::alexa::AlexaClient']]],
   ['started',['STARTED',['../classaace_1_1alexa_1_1_alerts.html#a81cccb7e632cf26b7903d9c9c168fb22a17130e6c806885e23770df1519b18eb7',1,'aace::alexa::Alerts']]],
+  ['starting',['STARTING',['../classaace_1_1cbl_1_1_c_b_l.html#a9d56e447b5e1fa27a79e9c0932af2baba034312d8adc8099c1c6f53aaff745e26',1,'aace::cbl::CBL']]],
   ['stopped',['STOPPED',['../classaace_1_1alexa_1_1_alerts.html#a81cccb7e632cf26b7903d9c9c168fb22a09d4d696b4e935115b9313e3c412509a',1,'aace::alexa::Alerts::STOPPED()'],['../classaace_1_1alexa_1_1_media_player_engine_interface.html#a85a574bb13b13453df66ff2cac6a4f86a09d4d696b4e935115b9313e3c412509a',1,'aace::alexa::MediaPlayerEngineInterface::STOPPED()'],['../classaace_1_1alexa_1_1_audio_player.html#a17204286fb862354d6474a7d7a2fd7baa09d4d696b4e935115b9313e3c412509a',1,'aace::alexa::AudioPlayer::STOPPED()']]],
-  ['string',['STRING',['../classaace_1_1metrics_1_1_metrics_uploader.html#a67e6fa51b9ef4b8a9b293870363eb4b5a63b588d5559f64f89a416e656880b949',1,'aace::metrics::MetricsUploader']]]
+  ['stopping',['STOPPING',['../classaace_1_1cbl_1_1_c_b_l.html#a9d56e447b5e1fa27a79e9c0932af2babaf6cdb3c6710b50ec65ee07f740847e10',1,'aace::cbl::CBL']]],
+  ['string',['STRING',['../classaace_1_1metrics_1_1_metrics_uploader.html#a67e6fa51b9ef4b8a9b293870363eb4b5a63b588d5559f64f89a416e656880b949',1,'aace::metrics::MetricsUploader']]],
+  ['success',['SUCCESS',['../classaace_1_1alexa_1_1_alexa_client.html#a05af151f4b7fdd47b9ea56e504074e05ad0749aaba8b833466dfcbb0428e4f89c',1,'aace::alexa::AlexaClient::SUCCESS()'],['../classaace_1_1cbl_1_1_c_b_l.html#a4a095678f1d75f972b59f09b7c3aae0aad0749aaba8b833466dfcbb0428e4f89c',1,'aace::cbl::CBL::SUCCESS()']]]
 ];

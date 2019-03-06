@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">1.4.0</span>
+   &#160;<span id="projectnumber">1.5.0</span>
    </div>
   </td>
  </tr>
@@ -318,7 +318,7 @@ Protected Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Checks if playback of the current audio source must be repeated when finished playing. If this call returns <code>true</code>, the platform implementation should repeat the current audio source. If <code>false</code> is returned, the platform implementation should call <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a7f1ca70c91de1fa6aaf537dcc53ae24f">mediaStateChanged()</a></code> with <code><a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player_1_1_media_state.html#afa3f10bdbab0bc0aef93de88791f6967">MediaState.STOPPED</a></code> when the audio is finished playing.</p>
+<p>Checks if playback of the current audio source must be repeated when finished playing. If this call returns <code>true</code>, the platform implementation should repeat the current audio source. If <code>false</code> is returned, the platform implementation should call <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player.html#a7f1ca70c91de1fa6aaf537dcc53ae24f">mediaStateChanged()</a></code> with <code><a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_media_player_1_1_media_state.html#afa3f10bdbab0bc0aef93de88791f6967">MediaState.STOPPED</a></code> when the audio is finished playing. Note that when <code>stop</code> has been called, audio source should stop repeating regardless of this value.</p>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform media player must repeat playback of the current audio source, else <code>false</code> </dd></dl>
 
 </div>
@@ -493,7 +493,7 @@ Protected Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 1.4.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 1.5.0 - Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

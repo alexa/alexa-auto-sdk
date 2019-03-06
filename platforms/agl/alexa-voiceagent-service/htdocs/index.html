@@ -1,0 +1,43 @@
+<html>
+
+<head>
+    <title>ALEXA VOICEAGENT API TESTER</title>
+    <link rel="stylesheet" href="binding.css">
+    <script type="text/javascript" src="AFB.js"></script>
+    <script type="text/javascript" src="binding.js"></script>
+</head>
+
+<body class="page-content" onload="connect()">
+
+    <h1>Alexa Voice Agent API Tester</h1>
+
+    <button id="connected" onclick="init()">Binder WS Fail</button>
+    <button id="monitoring" onclick="window.open('/monitoring/monitor.html','_monitor_ctl')">Debug/Monitoring</a>
+    </button>
+    <button onclick="clearPre('question'); clearPre('output'); clearPre('outevt');">Clear</button> <br><br>
+    ALEXA VOICEAGENT URL: <input type="text" id="alexa-voiceagent-address" value="localhost:1111" onchange="connectAlexa()">
+    <br>
+    <br>
+
+    <div id="top" class="row">
+    <div id='actions' class="col1">
+        <div>
+          <h2>ALEXA VOICE AGENT APIs</h2>
+          <p>Alexa Voice Agent Service</p>
+          <button onclick="subscribeToCBLEvents();">Subscribe to CBL Events</button>
+        </div>
+
+        <div id="agentsDiv">
+        </div>
+    </div>
+
+    <div id="main" style="visibility:hidden" class="col2">
+        <ol>
+            <li>Question <pre id="question"></pre>
+            <li>Response <pre id="output"></pre>
+            <li>Events: <pre id="outevt"></pre>
+        </ol>
+    </div>
+    </div>
+
+</body>

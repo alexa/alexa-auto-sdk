@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -335,7 +335,7 @@ static const std::unordered_map<std::string,aace::alexa::ExternalMediaAdapter::N
 
 static aace::alexa::ExternalMediaAdapter::Navigation getNavigationEnum( std::string name )
 {
-    std::transform( name.begin(), name.end(), name.begin(), [](unsigned char c) -> unsigned char { return std::toupper(c); } );
+    std::transform( name.begin(), name.end(), name.begin(), [](unsigned char c) -> unsigned char { return static_cast<unsigned char>(std::toupper(c)); } );
     
     auto it = NAVIGATION_ENUM_MAP.find( name );
     
@@ -739,6 +739,10 @@ void ExternalMediaPlayerEngineImpl::onConnectionStatusChanged( const Status stat
 // alexaClientSDK::avsCommon::utils::RequiresShutdown
 void ExternalMediaPlayerEngineImpl::doShutdown()
 {
+    // shut down external media adapters
+    for( auto& adapter : m_externalMediaAdapterList ) {
+        adapter->shutdown();
+    }
     // clear the external media adapter list
     m_externalMediaAdapterList.clear();
 

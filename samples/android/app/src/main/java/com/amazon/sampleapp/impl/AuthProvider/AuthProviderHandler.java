@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -16,26 +16,38 @@
 package com.amazon.sampleapp.impl.AuthProvider;
 
 import android.app.Activity;
-import android.content.Context;
+import android.view.View;
+import android.widget.ImageButton;
 
 import com.amazon.aace.alexa.AuthProvider;
+import com.amazon.sampleapp.R;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
-import com.amazon.sampleapp.impl.NetworkInfoProvider.NetworkInfoProviderHandler;
 
-public class AuthProviderHandler extends AuthProvider {
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+public class AuthProviderHandler extends AuthProvider implements AuthStateObserver {
 
     private static final String sTag = "AuthProvider";
 
     private final LoggerHandler mLogger;
-    private final LoginWithAmazon mLwa;
+    private final Activity mActivity;
+    private AuthHandler mAuthHandler;
+
     private AuthState mAuthState = AuthState.UNINITIALIZED;
     private String mAuthToken = "";
 
-    public AuthProviderHandler( Activity activity, LoggerHandler logger, NetworkInfoProviderHandler networkInfoProviderHandler ) {
-        mLogger = logger;
+    private View mLoginView, mLogoutView;
 
-        // Authenticate with LWA
-        mLwa = new LoginWithAmazon( mLogger, activity, this, networkInfoProviderHandler );
+    private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
+
+    public AuthProviderHandler(Activity activity, LoggerHandler logger, AuthHandler handler ) {
+        mLogger = logger;
+        mActivity = activity;
+
+        mAuthHandler = handler;
+
+        setupGUI();
     }
 
     @Override
@@ -52,17 +64,73 @@ public class AuthProviderHandler extends AuthProvider {
         return mAuthState;
     }
 
-    public void onAuthStateChanged( AuthState authState, AuthError authError ) {
-        mAuthState = authState;
-        mLogger.postInfo( sTag, String.format( "Auth State Changed. STATE: %s, ERROR: %s",
-                authState, authError ) );
-        authStateChange( authState, authError );
+    public void onAuthStateChanged( AuthState state, AuthError error, String token ) {
+        mAuthToken = token;
+        mAuthState = state;
+        mLogger.postVerbose( sTag, String.format( "Auth State Changed. STATE: %s, ERROR: %s ", mAuthState, error) );
+        mExecutor.execute( new AuthStateChangedRunnable( mAuthState, error));
     }
 
-    void setAuthToken( String authToken ) { mAuthToken = authToken; }
+    private class AuthStateChangedRunnable implements Runnable {
+        AuthState state;
+        AuthError error;
+        AuthStateChangedRunnable( AuthState s, AuthError e){
+            state = s;
+            error = e;
+        }
+        public void run() {
+            switch( state ){
+                case REFRESHED:
+                    updateLoginView( true );
+                    break;
+                case UNINITIALIZED:
+                    updateLoginView( false );
+                    break;
+            }
+            // call to update engine
+            authStateChange( state, error );
+        }
+    }
 
-    void clearAuthToken() { mAuthToken = ""; }
+    private void setupGUI() {
+        // Login button
+        mLoginView = mActivity.findViewById( R.id.login );
+        ImageButton loginButton = mLoginView.findViewById( R.id.loginButton );
+        loginButton.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick( View v ) {
+                mAuthHandler.authorize();
+            }
+        } );
 
-    public void onResume() { if ( mLwa != null ) mLwa.onResume(); }
-    public void onInitialize() { if ( mLwa != null ) mLwa.onInitialize(); }
+        // Logout button
+        mLogoutView = mActivity.findViewById( R.id.logout );
+        mLogoutView.findViewById( R.id.logoutButton ).setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick( View v ) { mAuthHandler.deauthorize(); }
+                }
+        );
+    }
+
+    private void updateLoginView(final boolean loggedIn ) {
+        mActivity.runOnUiThread( new Runnable() {
+            @Override
+            public void run() {
+                if ( loggedIn ) {
+                    mLoginView.setVisibility( View.GONE ) ;
+                    mLogoutView.setVisibility( View.VISIBLE );
+                } else {
+                    mLoginView.setVisibility( View.VISIBLE );
+                    mLogoutView.setVisibility( View.GONE );
+                }
+            }
+        });
+    }
+
+    // After Engine has been started, register this as observer of the auth handler
+    public void onInitialize(){
+        mAuthHandler.registerAuthStateObserver( this );
+    }
+
 }

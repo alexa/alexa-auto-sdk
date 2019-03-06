@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -24,9 +24,7 @@ namespace aace {
 namespace engine {
 namespace metrics {
 
-static const std::string METRIC_RECORD_KEYWORD = "MetricEvent:record";
-static const std::string AVS_KEYWORD = "AVS";
-static const std::string ALEXA_AUTO_KEYWORD = "AlexaAuto";
+static const std::string METRIC_RECORD_KEYWORD = "MetricEvent";
 static const std::string PRIORITY_KEY = "Priority";
 static const std::string PROGRAM_KEY = "Program";
 static const std::string SOURCE_KEY = "Source";
@@ -34,7 +32,7 @@ static const std::string TIMER_KEY = "TI";
 static const std::string STRING_KEY = "DV";
 static const std::string COUNTER_KEY = "CT";
 
-static const std::regex metricRegex("^([^=]+)=([^:]+):([^:]+):(.+):(NR|HI)");
+static const std::regex metricRegex("^([^:]+):([^:]+):([^:]+):(.+):(NR|HI)");
 static const std::regex dataRegex("([^;=,:]+)=([^;=,:]+);([^;=,:]+);([0-9]+),");
 
 MetricsUploaderEngineImpl::MetricsUploaderEngineImpl( std::shared_ptr<aace::metrics::MetricsUploader> platformMetricsUploaderInterface ) :
@@ -105,12 +103,6 @@ void MetricsUploaderEngineImpl::log( Level level, std::chrono::system_clock::tim
             //Validate values are not empty/null
             if( programName.empty() || sourceName.empty() || datapoints.empty() || priority.empty() ) {
                 return;
-            }
-
-            //Check for any AVS program names and rename as AlexaAuto.
-            //If program name is not AVS related, then leave it as is. Origin could be AHE or CarControlSkills
-            if ( programName.find(AVS_KEYWORD) != std::string::npos ) {
-                programName.replace(programName.find(AVS_KEYWORD), AVS_KEYWORD.length(), ALEXA_AUTO_KEYWORD);
             }
 
             //Create metadata map

@@ -5,7 +5,7 @@ if(EXTERNALMEDIAPLAYER_1_1)
 endif()
 
 # Find AVS
-find_package(AVS 1.9)
+find_package(AVS 1.10)
 
 set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AlertsEngineImpl.h
@@ -17,6 +17,7 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AlexaMetrics.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AudioChannelEngineImpl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AudioPlayerEngineImpl.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/EqualizerControllerEngineImpl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/PlaybackControllerEngineImpl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/SpeechRecognizerEngineImpl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/SpeechSynthesizerEngineImpl.h
@@ -27,6 +28,7 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/ExternalMediaAdapterEngineImpl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/ExternalMediaAdapterHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/LocalMediaSourceEngineImpl.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/UPLService.h
 )
 
 source_group("Header Files" FILES ${HEADERS})
@@ -42,6 +44,7 @@ add_library(AACEAlexaEngine SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AlexaEngineClientObserver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AudioChannelEngineImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AudioPlayerEngineImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/EqualizerControllerEngineImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/PlaybackControllerEngineImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/SpeechRecognizerEngineImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/SpeechSynthesizerEngineImpl.cpp
@@ -52,6 +55,7 @@ add_library(AACEAlexaEngine SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ExternalMediaAdapterEngineImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/LocalMediaSourceEngineImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ExternalMediaAdapterHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/UPLService.cpp
 )
 
 target_include_directories(AACEAlexaEngine
@@ -69,28 +73,6 @@ target_link_libraries(AACEAlexaEngine
     PRIVATE
         ${AVS_LIBRARIES}
 )
-
-if(AMAZONLITE_KEY_WORD_DETECTOR)
-    add_definitions(-DAMAZONLITE_WAKEWORD_SUPPORT)
-    find_path(AMAZONLITE_INCLUDE_DIR AmazonLite/PryonLiteKeywordDetector.h
-        CMAKE_FIND_ROOT_PATH_BOTH
-    )
-    find_library(AMAZONLITE_LIBRARY AMAZONLITE
-        CMAKE_FIND_ROOT_PATH_BOTH
-    )
-    find_library(AVS_KWD_PROVIDER_LIBRARY KeywordDetectorProvider
-        CMAKE_FIND_ROOT_PATH_BOTH
-    )
-    target_include_directories(AACEAlexaEngine
-        PRIVATE
-            ${AMAZONLITE_INCLUDE_DIR}
-    )
-    target_link_libraries(AACEAlexaEngine
-        PRIVATE
-            ${AVS_KWD_PROVIDER_LIBRARY}
-            ${AMAZONLITE_LIBRARY}
-    )
-endif()
 
 install(
     TARGETS AACEAlexaEngine

@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">1.4.0</span>
+   &#160;<span id="projectnumber">1.5.0</span>
    </div>
   </td>
  </tr>
@@ -80,6 +80,8 @@ Public Types</h2></td></tr>
 <br />
 &#160;&#160;<a class="el" href="classaace_1_1alexa_1_1_alexa_client.html#a5f3b9fc09843bc68b5bb9f0ed6b8586eac0ff938e396e72c225bd66562b80a77e">DialogState::LISTENING</a>, 
 <br />
+&#160;&#160;<a class="el" href="classaace_1_1alexa_1_1_alexa_client.html#a5f3b9fc09843bc68b5bb9f0ed6b8586eabd416d769c9ba62060c04ae8455e98d2">DialogState::EXPECTING</a>, 
+<br />
 &#160;&#160;<a class="el" href="classaace_1_1alexa_1_1_alexa_client.html#a5f3b9fc09843bc68b5bb9f0ed6b8586ea18004389aa6f827c608aad2441a2bc53">DialogState::THINKING</a>, 
 <br />
 &#160;&#160;<a class="el" href="classaace_1_1alexa_1_1_alexa_client.html#a5f3b9fc09843bc68b5bb9f0ed6b8586eaddee564b336f5de690b746eb04e62114">DialogState::SPEAKING</a>
@@ -96,6 +98,12 @@ Public Types</h2></td></tr>
  }</td></tr>
 <tr class="separator:a375451d4d9cb626701ac8cbaa02ffbe2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a05af151f4b7fdd47b9ea56e504074e05"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_alexa_client.html#a05af151f4b7fdd47b9ea56e504074e05">ConnectionChangedReason</a> { <br />
+&#160;&#160;<a class="el" href="classaace_1_1alexa_1_1_alexa_client.html#a05af151f4b7fdd47b9ea56e504074e05ab50339a10e1de285ac99d4c3990b8693">ConnectionChangedReason::NONE</a>, 
+<br />
+&#160;&#160;<a class="el" href="classaace_1_1alexa_1_1_alexa_client.html#a05af151f4b7fdd47b9ea56e504074e05ad0749aaba8b833466dfcbb0428e4f89c">ConnectionChangedReason::SUCCESS</a>, 
+<br />
+&#160;&#160;<a class="el" href="classaace_1_1alexa_1_1_alexa_client.html#a05af151f4b7fdd47b9ea56e504074e05aa0d7ca35e85a9f7eb269d17c780ab691">ConnectionChangedReason::UNRECOVERABLE_ERROR</a>, 
+<br />
 &#160;&#160;<a class="el" href="classaace_1_1alexa_1_1_alexa_client.html#a05af151f4b7fdd47b9ea56e504074e05a5cd351b726751149c0464e3d9c23dcf1">ConnectionChangedReason::ACL_CLIENT_REQUEST</a>, 
 <br />
 &#160;&#160;<a class="el" href="classaace_1_1alexa_1_1_alexa_client.html#a05af151f4b7fdd47b9ea56e504074e05aa81589ff9e0102b95f3eafce18463d1a">ConnectionChangedReason::ACL_DISABLED</a>, 
@@ -164,6 +172,8 @@ Public Member Functions</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><a id="a5f3b9fc09843bc68b5bb9f0ed6b8586eac0ff938e396e72c225bd66562b80a77e"></a>LISTENING&#160;</td><td class="fielddoc"><p>Alexa is currently listening. </p>
 </td></tr>
+<tr><td class="fieldname"><a id="a5f3b9fc09843bc68b5bb9f0ed6b8586eabd416d769c9ba62060c04ae8455e98d2"></a>EXPECTING&#160;</td><td class="fielddoc"><p>Alexa is currently expecting a response from the user. </p>
+</td></tr>
 <tr><td class="fieldname"><a id="a5f3b9fc09843bc68b5bb9f0ed6b8586ea18004389aa6f827c608aad2441a2bc53"></a>THINKING&#160;</td><td class="fielddoc"><p>A user request has completed, and no more user input is being accepted. Alexa is waiting for a response from AVS. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="a5f3b9fc09843bc68b5bb9f0ed6b8586eaddee564b336f5de690b746eb04e62114"></a>SPEAKING&#160;</td><td class="fielddoc"><p>Alexa is responding to a request with speech. </p>
@@ -224,7 +234,13 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Describes the reason for a change in AVS connection status </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a05af151f4b7fdd47b9ea56e504074e05a5cd351b726751149c0464e3d9c23dcf1"></a>ACL_CLIENT_REQUEST&#160;</td><td class="fielddoc"><p>The connection status changed due to a client request. </p>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a05af151f4b7fdd47b9ea56e504074e05ab50339a10e1de285ac99d4c3990b8693"></a>NONE&#160;</td><td class="fielddoc"><p>No reason specified. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a05af151f4b7fdd47b9ea56e504074e05ad0749aaba8b833466dfcbb0428e4f89c"></a>SUCCESS&#160;</td><td class="fielddoc"><p>The connection status changed due to a successful operation. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a05af151f4b7fdd47b9ea56e504074e05aa0d7ca35e85a9f7eb269d17c780ab691"></a>UNRECOVERABLE_ERROR&#160;</td><td class="fielddoc"><p>The connection status changed due to an error from which there is no recovery. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a05af151f4b7fdd47b9ea56e504074e05a5cd351b726751149c0464e3d9c23dcf1"></a>ACL_CLIENT_REQUEST&#160;</td><td class="fielddoc"><p>The connection status changed due to a client request. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="a05af151f4b7fdd47b9ea56e504074e05aa81589ff9e0102b95f3eafce18463d1a"></a>ACL_DISABLED&#160;</td><td class="fielddoc"><p>The connection attempt failed because connection was disabled. </p>
 </td></tr>
@@ -384,7 +400,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 1.4.0 - Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 1.5.0 - Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

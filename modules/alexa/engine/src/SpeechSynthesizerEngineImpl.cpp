@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  */
 
 #include "AACE/Engine/Alexa/SpeechSynthesizerEngineImpl.h"
+#include "AACE/Engine/Alexa/UPLService.h"
+#include "AACE/Engine/Alexa/AlexaMetrics.h"
 #include "AACE/Engine/Core/EngineMacros.h"
 
 namespace aace {
@@ -56,6 +58,8 @@ bool SpeechSynthesizerEngineImpl::initialize(
 
         // register capability with delegate
         ThrowIfNot( capabilitiesDelegate->registerCapability( m_speechSynthesizerCapabilityAgent ), "registerCapabilityFailed");
+
+        m_directiveSequencer = directiveSequencer;
 
         return true;
     }
@@ -107,6 +111,21 @@ void SpeechSynthesizerEngineImpl::doShutdown()
     }
 }
 
+void SpeechSynthesizerEngineImpl::handlePrePlaybackStarted( SourceId id )
+{
+    ALEXA_METRIC(LX(TAG, "executePlaybackStarted").d("dialogrequestid", m_directiveSequencer->getCurrentDialogRequestId()), 
+        aace::engine::alexa::AlexaMetrics::Location::PLAYBACK_STARTED);            
+    aace::engine::alexa::UPLService::getInstance()->updateDialogStateForId(aace::engine::alexa::UPLService::DialogState::PLAYBACK_STARTED, 
+        m_directiveSequencer->getCurrentDialogRequestId(), m_directiveSequencer->isCurrentDialogRequestOnline());
+}
+
+void SpeechSynthesizerEngineImpl::handlePrePlaybackFinished( SourceId id )
+{
+    ALEXA_METRIC(LX(TAG, "executePlaybackFinished").d("dialogrequestid", m_directiveSequencer->getCurrentDialogRequestId()), 
+        aace::engine::alexa::AlexaMetrics::Location::PLAYBACK_FINISHED);
+    aace::engine::alexa::UPLService::getInstance()->updateDialogStateForId(aace::engine::alexa::UPLService::DialogState::PLAYBACK_FINISHED, 
+        m_directiveSequencer->getCurrentDialogRequestId(), m_directiveSequencer->isCurrentDialogRequestOnline());
+}
 
 } // aace::engine::alexa
 } // aace::engine

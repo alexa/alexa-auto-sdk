@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ static const std::string TAG("aace.alexa.LocalMediaSourceEngineImpl");
 
 LocalMediaSourceEngineImpl::LocalMediaSourceEngineImpl( std::shared_ptr<aace::alexa::LocalMediaSource> platformLocalMediaSource, const std::string& localPlayerId, std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender, std::shared_ptr<FocusHandlerInterface> focusHandler ) :
     aace::engine::alexa::ExternalMediaAdapterHandler( platformLocalMediaSource->getSpeaker(), discoveredPlayerSender, focusHandler ),
-    alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
     m_platformLocalMediaSource( platformLocalMediaSource ),
     m_localPlayerId( localPlayerId ) {
 }

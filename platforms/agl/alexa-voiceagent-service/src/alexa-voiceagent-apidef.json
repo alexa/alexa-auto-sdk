@@ -1,0 +1,109 @@
+{
+  "openapi": "3.0.0",
+  "$schema": "http://iot.bzh/download/openapi/schema-3.0/default-schema.json",
+  "info": {
+    "description": "",
+    "title": "AGL Speech framework Voice Agent APIs (Alexa)",
+    "version": "0.1",
+    "x-binding-c-generator": {
+      "api": "alexa-voiceagent",
+      "version": 3,
+      "prefix": "afv_",
+      "postfix": "",
+      "start": null,
+      "onevent": null,
+      "init": "init",
+      "scope": "",
+      "private": false,
+      "noconcurrency": true
+    }
+  },
+  "servers": [{
+    "url": "ws://{host}:{port}/api/monitor",
+    "description": "TS caching binding",
+    "variables": {
+      "host": {
+        "default": "localhost"
+      },
+      "port": {
+        "default": "1234"
+      }
+    },
+    "x-afb-events": [{
+      "$ref": "#/components/schemas/afb-event"
+    }]
+  }],
+  "components": {
+    "schemas": {
+      "afb-reply": {
+        "$ref": "#/components/schemas/afb-reply-v3"
+      },
+      "afb-event": {
+        "$ref": "#/components/schemas/afb-event-v3"
+      },
+      "afb-reply-v3": {
+        "title": "Generic response.",
+        "type": "object",
+        "required": ["jtype", "request"],
+        "properties": {
+          "jtype": {
+            "type": "string",
+            "const": "afb-reply"
+          },
+          "request": {
+            "type": "object",
+            "required": ["status"],
+            "properties": {
+              "status": {
+                "type": "string"
+              },
+              "info": {
+                "type": "string"
+              },
+              "token": {
+                "type": "string"
+              },
+              "uuid": {
+                "type": "string"
+              },
+              "reqid": {
+                "type": "string"
+              }
+            }
+          },
+          "response": {
+            "type": "object"
+          }
+        }
+      },
+      "afb-event-v3": {
+        "type": "object",
+        "required": ["jtype", "event"],
+        "properties": {
+          "jtype": {
+            "type": "string",
+            "const": "afb-event"
+          },
+          "event": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "A complex object array response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/afb-reply"
+            }
+          }
+        }
+      }
+    }
+  }
+}

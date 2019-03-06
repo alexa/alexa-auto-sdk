@@ -6,6 +6,8 @@ This directory contains a collection of software which is required to build the 
 
 The **Alexa Auto SDK Builder** is based on [OpenEmbedded](https://www.openembedded.org/) that provides a simple way to cross compile all the Alexa Auto SDK software components for various target platforms. Recommended for developers who wants to use platforms such as **Android** and **QNX**.
 
+For target platforms already based on OpenEmbedded infrastructure, such as [Yocto/Poky](https://www.yoctoproject.org/), you can use OE generated SDK or alternatively you may use `meta-aac` layer to build and install Alexa Auto SDK into your system. See [Alexa Auto SDK OE layer](#meta-aac) below for `meta-aac` layer usage.
+
 ## Quick Start
 
 Run the build process as follows (where `AAC_SDK_HOME` is the location you've installed the AAC SDK.):
@@ -13,6 +15,7 @@ Run the build process as follows (where `AAC_SDK_HOME` is the location you've in
 ```
 $ ${AAC_SDK_HOME}/builder/build.sh (oe) <args>
 ```
+
 ## Alexa Auto SDK Builder
 
 Developers who want to build the complete Alexa Auto SDK software for various cross targets can use OpenEmbedded based building system *Alexa Auto SDK Builder*.
@@ -62,7 +65,7 @@ $ apt-get install libssl-dev
 
 To use Builder on macOS hosts, [Docker CE for Mac](https://www.docker.com/docker-mac) must be installed according to its official guide.
 
-Upon first run, Builder will build the Docker image `aac/ubuntu-base:latest` and create a dedicated Docker volume `buildervolume` for running the Alexa Auto SDK Builder in your Docker environment. This might take up to an hour to complete.
+Upon first run, Builder will build the Docker image `aac/ubuntu-base:<revision>` and create a dedicated Docker volume `buildervolume` for running the Alexa Auto SDK Builder in your Docker environment. This might take up to an hour to complete.
 
 >**IMPORTANT NOTE on macOS:** If you are trying to build for QNX targets with macOS host, QNX 7.0.0 SDP must be installed within *Case-Sensitive* file system, with additional Linux tools installation. You may need to use external drive for installation since your system file system is NOT *Case-Sensitive* by default.
 
@@ -98,8 +101,15 @@ The following build targets are available:
 | QNX AArch64                | `qnx7arm64`     |
 | QNX x86-64                 | `qnx7x86-64`    |
 
+*(Preview)* For all other targets/toolchains, please refer to the files `meta-aac-builder/conf/machine/*.conf`. Those targets are provided by default for Poky based Linux systems:
 
->*Note: Using Builder to build the Alexa Auto SDK for macOS targets is not currently supported. [Building the Alexa Auto SDK with CMake](ConfigureCMake.md) provides instructions for building for Mac.*
+>*Note: Using Builder to build the Alexa Auto SDK for macOS targets is not currently supported.*
+
+| Platform Name                          | `-t` value      |
+| -------------------------------------- | --------------- |
+| AGL AArch64                            | `aglarm64`      |
+| *(Preview)* Poky Linux ARMv7a (+NEON)  | `pokyarm`       |
+| *(Preview)* Poky Linux AArch64         | `pokyarm64`     |
 
 For example, to build all the Alexa Auto SDK modules and their dependencies for an *Android ARMv7a* target, run the following command:
 
@@ -143,3 +153,31 @@ On some Android Samsung devices, OpenSSL caused the Alexa Auto sample app to ter
 $ echo "PACKAGECONFIG_pn-curl = \"mbedtls nghttp2\"" >> ${HOME}/aac-extra.conf
 $ ${AAC_SDK_HOME}/builder/build.sh oe <options> ${HOME}/aac-extra.conf
 ```
+
+## Alexa Auto SDK OE layer <a name = "meta-aac"></a>
+
+Developers who want to integrate Alexa Auto SDK software into existing OpenEmbedded based system can use *Alexa Auto SDK OE layer* a.k.a `meta-aac`, without using *Alexa Auto SDK Builder*.
+
+>*Note: For Android and QNX targets should use Alexa Auto SDK Builder. This method may require advanced OpenEmbedded system administration skills.*
+
+The recommended and tested platform is **Poky Linux 2.4 (rocko)**.
+
+### Adding layers and module recipes
+
+You need to add the following OE layers into your setup.
+
+* Alexa Auto SDK OE layer: `${AAC_SDK_HOME}/builder/meta-aac`
+
+Additionally, you may need to add the individual Alexa Auto SDK module recipes by adding them to `BBFILES`. To add all SDK modules, you can simply add the following line to your `bblayers.conf`:
+
+***Note that ${AAC_SDK_HOME} needs to be interpreted as the actual full path.***
+
+```
+BBFILES += "${AAC_SDK_HOME}/modules/*/*.bb"
+```
+
+### cURL with ngHTTP2
+
+The `curl` package must be configured with the `nghttp2` feature enabled. The `meta-aac` layer defines a default `PACKAGECONFIG` for `curl` but if your system has its own definition, you need to modify `PACKAGECONFIG` to include `nghttp2`.
+
+Note that we provide the default `nghttp2` recipe within the `meta-aac` layer, but you may use other alternatives.

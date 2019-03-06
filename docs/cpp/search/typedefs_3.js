@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['initiator',['Initiator',['../classaace_1_1alexa_1_1_speech_recognizer.html#a0cb2f19f83b36509b8db7aa5ac5b1233',1,'aace::alexa::SpeechRecognizer']]]
+  ['equalizerband',['EqualizerBand',['../classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#aabb71d98c3dd763d0522a5e688a0eab1',1,'aace::alexa::config::AlexaConfiguration::EqualizerBand()'],['../classaace_1_1alexa_1_1_equalizer_controller.html#ac79148250b90df9f0ce22b223d3db2c4',1,'aace::alexa::EqualizerController::EqualizerBand()']]],
+  ['equalizerbandlevel',['EqualizerBandLevel',['../classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#aba7e45428c26995d0827c5eccd61f9ab',1,'aace::alexa::config::AlexaConfiguration::EqualizerBandLevel()'],['../classaace_1_1alexa_1_1_equalizer_controller_engine_interface.html#a52700a22664c28b42854f75d2f67e653',1,'aace::alexa::EqualizerControllerEngineInterface::EqualizerBandLevel()'],['../classaace_1_1alexa_1_1_equalizer_controller.html#a5785072a612afeff083b230978275347',1,'aace::alexa::EqualizerController::EqualizerBandLevel()']]]
 ];

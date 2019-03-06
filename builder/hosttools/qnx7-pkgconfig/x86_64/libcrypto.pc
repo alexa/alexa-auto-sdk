@@ -1,0 +1,13 @@
+# Package Information for pkg-config
+
+prefix=/usr
+exec_prefix=/x86_64/usr
+libdir=/x86_64/usr/lib
+includedir=/usr/include
+
+Name: OpenSSL-libcrypto
+Description: OpenSSL cryptography library
+Version: 1.0.2j
+Libs: -L${libdir} -lcrypto
+Libs.private: -lpthread 
+Cflags: -I${includedir}

@@ -496,6 +496,10 @@ The following table describes the possible values for `LocalMediaSourceState`, a
 | playerCookie      | String  |   A player may declare arbitrary information for itself. optional |
 | spiVersion      | String  |   "1.0" required  |
 
+
+> **Note**: Local Media Source Switching currently works only in US region.
+
+
 ### Using External Media Adapter to handle external media apps
 
 The External Media Adapter allows the platform to declare and use external media application sources such as Spotify. Each External media adapter should be registered and implemented along with it's associated external client. On startup, discovery must be run in order to validate each external media application. This will allow AVS to excercise playback control over that source type. Currently this feature is only officially supported on the Android platform. 

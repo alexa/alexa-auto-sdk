@@ -95,7 +95,7 @@ void Context::play()
 void Context::stop()
 {
 	AACE_DEBUG(LX(TAG, "stop"));
-	gst_element_set_state(m_pipeline, GST_STATE_READY);
+	gst_element_set_state(m_pipeline, GST_STATE_NULL);
 }
 
 void Context::pause()

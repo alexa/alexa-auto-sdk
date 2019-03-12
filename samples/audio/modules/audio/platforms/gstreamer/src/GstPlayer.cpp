@@ -64,7 +64,7 @@ bool GstPlayer::init()
 		m_sink = GstUtils::createElement(m_bin, "autoaudiosink", "sink");
 	} else {
 		AACE_INFO(LX(TAG, "init").m("Using ALSA device").d("device", m_device));
-		m_sink = GstUtils::createElement(m_pipeline, "alsasink", "sink");
+		m_sink = GstUtils::createElement(m_bin, "alsasink", "sink");
 		if (m_sink)
 			g_object_set(G_OBJECT(m_sink), "device", m_device.c_str(), NULL);
 	}

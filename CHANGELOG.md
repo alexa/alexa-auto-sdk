@@ -12,7 +12,7 @@ ___
 * Added support for optionally logging and uploading Alexa Auto SDK metrics to the Amazon cloud. Voice request metrics, for example, include start and end timestamps of user and Alexa speech and UPL between the request and Alexa’s response. Please contact your SA or Partner Manager for details or to request this package for Android.
 * Added support for an optional platform interface `EqualizerController`. The Equalizer Controller enables Alexa voice control of device audio equalizer settings by making gain adjustments to three frequency bands (“BASS”, “MIDRANGE”, and/or “TREBLE”).
 * Added an optional Code-Based Linking (CBL) authorization implementation in the Engine. With the new `cbl` module, the Engine handles acquiring access tokens. A `CBL` platform implementation should be registered with the Engine in place of an `AuthProvider` implementation to use this method for authorization.
-* Improved the usage and deployment of the Local Voice Engine extension on Android. Please contact your SA or Partner Manager for more information.
+* Improved the usage and deployment of the Local Voice Control extension on Android. Please contact your SA or Partner Manager for more information.
 * Updated the vehicle information configuration API to include a vehicle identifier. An `aace.vehicle.info.vehicleIdentifier` property of vehicle configuration is now available through the existing `VehicleConfiguration`.
 
 ### Resolved Issues

@@ -157,7 +157,7 @@ Wake Word enables hands-free, voice-initiated interactions with Alexa. The Wake 
 The Alexa Communication extension enables integration with Alexa-to-Alexa calling, Alexa-to-PSTN calling, and messaging capabilities.
 
 ### Local Voice Control Extension
-The Local Voice Control extension provides car control functionality like climate control with and without an internet connection. It includes components that run an Alexa endpoint inside the vehicle's head unit. Local Voice Control is currently supported on Android 6.0, x86 64-bit and ARM 64-bit.
+The Local Voice Control extension provides car control functionality like climate control with and without an internet connection. It includes components that run an Alexa endpoint inside the vehicle's head unit. Local Voice Control is currently supported on Android, x86 64-bit and ARM 64-bit.
 
 ### Metrics Uploading Extension
 The Metrics Uploading extension enables logging and uploading Alexa Auto SDK metrics to the Amazon cloud. Voice request metrics, for example, include start and end timestamps of user and Alexa speech and UPL between the request and Alexa’s response. Metrics may be tagged Beta, Gamma, or Prod depending on the vehicle lifecycle. The Metrics Uploading extension is currently available for Android platforms.

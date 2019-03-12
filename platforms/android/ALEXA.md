@@ -719,6 +719,7 @@ The following table describes the possible values for LocalMediaSourceState, and
 | spiVersion      | String  |   "1.0" required  |
 
 
+
 The Local Media Source handler should also create its own Speaker implementation. It should handle adjusting volume, and setting mute for the source. It does not need to specify a type.
 
 ```
@@ -733,6 +734,10 @@ private static class CDSpeaker extends Speaker {
     	// set CD player volume
     	...
 ```
+
+
+**NOTE: Local Media Source Switching currently works only in US region**
+
 
 
 ## Alexa Engine Properties

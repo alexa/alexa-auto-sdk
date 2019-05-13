@@ -26,13 +26,13 @@ if(AGL_FRAMEWORK)
 endif()
 
 add_library(AACEGStreamerAudio SHARED
+	src/common/Context.cpp
+	src/common/GstPlayer.cpp
+	src/common/GstRecorder.cpp
+	src/common/GstUtils.cpp
 	src/AudioManager.cpp
-	src/Context.cpp
 	src/GstAudioCapture.cpp
 	src/GstMediaPlayer.cpp
-	src/GstPlayer.cpp
-	src/GstUtils.cpp
-	src/InputChannel.cpp
 	${PLATFORM_EXTRA_SOURCES}
 )
 

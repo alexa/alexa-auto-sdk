@@ -13,8 +13,6 @@
  * permissions and limitations under the License.
  */
 
-#include <AACE/Engine/Core/EngineMacros.h>
-
 #include "Context.h"
 #include "GstUtils.h"
 
@@ -34,8 +32,6 @@ static gboolean busMessageCallback(GstBus *bus, GstMessage *msg, gpointer pointe
 }
 #endif
 
-static const std::string TAG("aace.gstreamer.Context");
-
 Context::~Context()
 {
 	teardownPipeline();
@@ -48,20 +44,18 @@ GstElement *Context::getGstElement()
 
 bool Context::createPipeline(const std::string &name, const std::string &element)
 {
-	AACE_DEBUG(LX(TAG, "createPipeline"));
-
 	if (m_pipeline) {
-		AACE_ERROR(LX(TAG, "createPipeline").m("Pipeline is not NULL"));
+		g_warning("createPipeline: Pipeline is not NULL\n");
 		return false;
 	}
 
-	if (element.empty()) {
+	if (element.empty())
 		m_pipeline = gst_pipeline_new(name.c_str());
-	} else {
+	else
 		m_pipeline = gst_element_factory_make(element.c_str(), name.c_str());
-	}
+
 	if (!m_pipeline) {
-		AACE_ERROR(LX(TAG, "createPipeline").m("Pipeline creation failed"));
+		g_warning("createPipeline: Pipeline creation failed\n");
 		return false;
 	}
 
@@ -71,7 +65,7 @@ bool Context::createPipeline(const std::string &name, const std::string &element
 void Context::teardownPipeline()
 {
 	if (!m_pipeline) {
-		AACE_ERROR(LX(TAG, "Pipeline not available"));
+		g_warning("teardownPipeline: Pipeline not available\n");
 		return;
 	}
 
@@ -88,19 +82,16 @@ void Context::teardownPipeline()
 
 void Context::play()
 {
-	AACE_DEBUG(LX(TAG, "play"));
 	gst_element_set_state(m_pipeline, GST_STATE_PLAYING);
 }
 
 void Context::stop()
 {
-	AACE_DEBUG(LX(TAG, "stop"));
 	gst_element_set_state(m_pipeline, GST_STATE_NULL);
 }
 
 void Context::pause()
 {
-	AACE_DEBUG(LX(TAG, "pause"));
 	gst_element_set_state(m_pipeline, GST_STATE_PAUSED);
 }
 
@@ -124,7 +115,7 @@ bool Context::seek(int64_t position)
 	return true;
 }
 
-void Context::setListener(const std::shared_ptr<Listener> &listener)
+void Context::setListener(Listener *listener)
 {
 	m_listener = listener;
 }
@@ -136,6 +127,11 @@ void Context::startMainEventLoop()
 	m_workerContext = g_main_context_new();
 	m_mainLoop = g_main_loop_new(m_workerContext, false);
 	m_mainLoopThread = std::thread(&Context::gloop, this);
+}
+
+guint Context::attachSource(GSource *source)
+{
+	return g_source_attach(source, m_workerContext);
 }
 
 void Context::gloop()
@@ -160,45 +156,37 @@ bool Context::onBusMessage(GstBus *bus, GstMessage *msg)
 			gchar *dbg_info = NULL;
 			gst_message_parse_error (msg, &err, &dbg_info);
 			gst_element_set_state(m_pipeline, GST_STATE_READY);
-			g_printerr("ERROR from element %s: %s\n", GST_OBJECT_NAME (msg->src), err->message);
-			g_printerr("Debugging info: %s\n", (dbg_info) ? dbg_info : "none");
+			g_warning("ERROR from element %s: %s\n", GST_OBJECT_NAME (msg->src), err->message);
+			g_warning("Debugging info: %s\n", (dbg_info) ? dbg_info : "none");
 			g_error_free(err);
 			g_free(dbg_info);
-			if (m_listener) {
+			if (m_listener)
 				m_listener->onStreamError();
-			}
 		}
 		break;
 	case GST_MESSAGE_EOS:
-		AACE_DEBUG(LX(TAG, "onBusMessage").m("End-Of-Stream"));
 		gst_element_set_state(m_pipeline, GST_STATE_READY);
-		if (m_listener) {
+		if (m_listener)
 			m_listener->onStreamEnd();
-		}
 		break;
 	case GST_MESSAGE_STREAM_START:
-		AACE_DEBUG(LX(TAG, "onBusMessage").m("Stream Start"));
-		if (m_listener) {
+		if (m_listener)
 			m_listener->onStreamStart();
-		}
 		break;
 	case GST_MESSAGE_STATE_CHANGED:
 		if (GST_MESSAGE_SRC(msg) == GST_OBJECT_CAST(m_pipeline)) {
 			GstState oldState, newState;
 			gst_message_parse_state_changed(msg, &oldState, &newState, NULL);
-#if 0
-			g_print("Element %s changed state from %s to %s.\n",
+			g_debug("Element %s changed state from %s to %s.\n",
 				GST_OBJECT_NAME(msg->src),
 				gst_element_state_get_name(oldState),
 				gst_element_state_get_name(newState));
-#endif
-			if (m_listener) {
+			if (m_listener)
 				m_listener->onStateChanged(newState);
-			}
 		}
 		break;
 	default:
-		AACE_DEBUG(LX(TAG, "onBusMessage").d("type", GST_MESSAGE_TYPE(msg)));
+		g_debug("Unknown Bus message: %d\n", GST_MESSAGE_TYPE(msg));
 	}
 	return true;
 }

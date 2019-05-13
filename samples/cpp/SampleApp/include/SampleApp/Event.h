@@ -40,6 +40,11 @@ enum class Event {
     // AudioManager
     onAudioManagerSpeaker,
 
+    // Communication
+    onCommunicationAcceptCall,
+    onCommunicationStopCall,
+    onCommunicationShowState,
+
     // CBL
     onCBLStart,
     onCBLCancel,
@@ -84,6 +89,7 @@ enum class Event {
     onPhoneCallControllerCallerIdReceived,
     onPhoneCallControllerSendDTMFSucceeded,
     onPhoneCallControllerSendDTMFFailed,
+    onPhoneCallControllerShowPayload,
     // onPhoneCallControllerDeviceConfigurationUpdated,
 
 };
@@ -99,6 +105,11 @@ static const std::map<std::string, Event> EventEnumerator{
 
     // AudioManager
     {"onAudioManagerSpeaker", Event::onAudioManagerSpeaker},
+
+    // Communications
+    {"onCommunicationAcceptCall", Event::onCommunicationAcceptCall},
+    {"onCommunicationStopCall", Event::onCommunicationStopCall},
+    {"onCommunicationShowState", Event::onCommunicationShowState},
 
     // CBL
     {"onCBLStart", Event::onCBLStart},
@@ -144,6 +155,7 @@ static const std::map<std::string, Event> EventEnumerator{
     {"onPhoneCallControllerCallerIdReceived", Event::onPhoneCallControllerCallerIdReceived},
     {"onPhoneCallControllerSendDTMFSucceeded", Event::onPhoneCallControllerSendDTMFSucceeded},
     {"onPhoneCallControllerSendDTMFFailed", Event::onPhoneCallControllerSendDTMFFailed},
+    {"onPhoneCallControllerShowPayload", Event::onPhoneCallControllerShowPayload},
     // {"onPhoneCallControllerDeviceConfigurationUpdated", Event::onPhoneCallControllerDeviceConfigurationUpdated},
 
 };

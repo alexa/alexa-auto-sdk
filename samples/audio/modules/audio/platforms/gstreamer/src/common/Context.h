@@ -30,12 +30,14 @@ class Context {
 public:
 	class Listener {
 	public:
-		virtual void onStreamStart() = 0;
-		virtual void onStreamEnd() = 0;
-		virtual void onStreamError() = 0;
-		virtual void onStateChanged(GstState state) = 0;
+		virtual void onStreamStart() {};
+		virtual void onStreamEnd() {};
+		virtual void onStreamError() {};
+		virtual void onStreamNearlyEnd() {};
+		virtual void onStateChanged(GstState state) {};
+		virtual void onStreamData(const int16_t *data, const size_t length) {};
+		virtual void onDataRequested() {};
 	};
-
 
 	Context() = default;
 	~Context();
@@ -49,9 +51,11 @@ public:
 	int64_t getPosition();
 	bool seek(int64_t position);
 
-	void setListener(const std::shared_ptr<Listener> &listener);
+	void setListener(Listener *listener);
 
 #ifdef USE_GLOOP
+	guint attachSource(GSource *source);
+
 	// Event handlers for GStreamer
 	bool onBusMessage(GstBus *bus, GstMessage *msg);
 #endif
@@ -61,7 +65,7 @@ protected:
 	void teardownPipeline();
 
 	GstElement *m_pipeline = NULL;
-	std::shared_ptr<Listener> m_listener = nullptr;
+	Listener *m_listener = NULL;
 
 #ifdef USE_GLOOP
 	void startMainEventLoop();

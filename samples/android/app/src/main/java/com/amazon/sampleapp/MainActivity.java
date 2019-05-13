@@ -24,6 +24,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -107,6 +108,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.UUID;
 
 /* Sample Metrics Code */
 //import com.amazon.metricuploadservice.MetricsUploadService;
@@ -257,9 +259,21 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 clientId = config.getString( "clientId" );
                 clientSecret = config.getString( "clientSecret" );
                 productId = config.getString( "productId" );
-                productDsn = config.getString( "productDsn" );
             } catch ( JSONException e ) {
                 Log.w( sTag, "Missing device info in app_config.json" );
+            }
+            try {
+                productDsn = config.getString( "productDsn" );
+            } catch ( JSONException e ) {
+                try {
+                    // set Android ID as product DSN
+                    productDsn = Settings.Secure.getString(getContentResolver(),
+                            Settings.Secure.ANDROID_ID);
+                    Log.i(sTag, "android id for DSN: " + productDsn);
+                } catch ( Error error ) {
+                    productDsn = UUID.randomUUID().toString();
+                    Log.w(sTag, "android id not found, generating random DSN: " + productDsn);
+                }
             }
         }
         updateDevicePreferences( clientId, clientSecret, productId, productDsn );

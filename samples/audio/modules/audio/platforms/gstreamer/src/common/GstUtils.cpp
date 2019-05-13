@@ -13,42 +13,36 @@
  * permissions and limitations under the License.
  */
 
-#include <AACE/Engine/Core/EngineMacros.h>
-
 #include "GstUtils.h"
 
 namespace aace {
 namespace audio {
 
-static const std::string TAG("aace.gstreamer.GstUtils");
-
-void GstUtils::initializeGStreamer()
+bool GstUtils::initializeGStreamer()
 {
+	GError *err = NULL;
+	bool result;
 	int argc = 0;
 	char **argv = {};
-	gst_init(&argc, &argv);
+	if (!(result = gst_init_check(&argc, &argv, &err)))
+		g_warning("ERROR: %s\n", err->message);
+	if (err)
+		g_error_free(err);
+	return result;
 }
 
 GstElement *GstUtils::createElement(
 	GstElement *bin, const std::string &factory, const std::string &name)
 {
-	AACE_DEBUG(LX(TAG, "createElement")
-		.d("factory", factory)
-		.d("name", name));
-
+	g_debug("createElement: factory=%s, name=%s\n", factory.c_str(), name.c_str());
 	GstElement *element = gst_element_factory_make(factory.c_str(), name.c_str());
 	if (!element) {
-		AACE_ERROR(LX(TAG, "createElement")
-			.m("Unable to create")
-			.d("factory", factory)
-			.d("name", name));
+		g_warning("Unable to create: factory=%s, name=%s\n", factory.c_str(), name.c_str());
 		return NULL;
 	}
 	
 	if (!gst_bin_add(GST_BIN(bin), element)) {
-		AACE_ERROR(LX(TAG, "createElement")
-			.m("Unable to add")
-			.d("name", name));
+		g_warning("Unable to add: name=%s\n",  name.c_str());
 		gst_object_unref(element);
 		return NULL;
 	}

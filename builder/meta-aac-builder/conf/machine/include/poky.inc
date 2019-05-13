@@ -1,9 +1,15 @@
-POKY_SDK ??= "/opt/poky/2.4.4"
+POKY_SDK ??= "/opt/poky/2.6.1"
 POKY_DISTRO ?= "poky"
 
 TARGET_VENDOR = "-poky"
 TARGET_SYSROOT = "${POKY_SDK}/sysroots/${MULTIMACH_TARGET_SYS}"
 OECORE_NATIVE_SYSROOT = "${POKY_SDK}/sysroots/x86_64-${POKY_DISTRO}sdk-linux"
+
+# Newer version of LD linker has some strange behavior: -rpath will be
+# ignored to search indirect dependencies. Only -rpath-link seems to
+# be working.
+OECMAKE_C_LINK_FLAGS += "-Wl,-rpath-link,${STAGING_DIR_HOST}${libdir}"
+OECMAKE_CXX_LINK_FLAGS += "-Wl,-rpath-link,${STAGING_DIR_HOST}${libdir}"
 
 # CMake
 OECMAKE_EXTRA_ROOT_PATH += "${TARGET_SYSROOT}"

@@ -13,11 +13,10 @@
  * permissions and limitations under the License.
  */
 
-#include <AACE/Engine/Core/EngineMacros.h>
-
+#include <thread>
 #include <gst/app/gstappsink.h>
 
-#include "InputChannel.h"
+#include "GstRecorder.h"
 #include "GstUtils.h"
 
 #define USE_APPSINK_CALLBACK 1
@@ -42,7 +41,7 @@ static GstFlowReturn newPrerollCallback(GstAppSink *sink, gpointer pointer)
 
 static GstFlowReturn newSampleCallback(GstAppSink *sink, gpointer pointer)
 {
-	auto source = static_cast<InputChannel*>(pointer);
+	auto source = static_cast<GstRecorder*>(pointer);
 	return source->onNewSample();
 }
 
@@ -54,47 +53,49 @@ GstAppSinkCallbacks appSinkCallbacks = {
 };
 #endif
 
-static const std::string TAG("aace.gstreamer.InputChannel");
-
-std::unique_ptr<InputChannel> InputChannel::create(
+std::unique_ptr<GstRecorder> GstRecorder::create(
 	const std::string &name,
-	GstCaps *caps,
-	const std::shared_ptr<Listener>& listener)
+	const std::string &device)
 {
-	std::unique_ptr<InputChannel> sink(new InputChannel(name, listener));
-	if (!sink->init(caps))
+	std::unique_ptr<GstRecorder> audioCapture(new GstRecorder(name, device));
+
+	if (!audioCapture->init())
 		return nullptr;
 
-	return sink;
+	return audioCapture;
 }
 
-InputChannel::InputChannel(
-	const std::string &name,
-	const std::shared_ptr<Listener>& listener) :
-		m_name{name},
-		m_listener{listener} {}
+GstRecorder::GstRecorder(const std::string &name, const std::string &device) :
+	m_name{name},
+	m_device{device} {}
 
-GstElement *InputChannel::getGstElement()
+bool GstRecorder::init()
 {
-	return m_bin;
-}
+	auto pipelineName = "AudioCapture:" + m_name;
 
-bool InputChannel::init(GstCaps *caps)
-{
-	m_bin = gst_bin_new("InputChannel");
-	//m_bin = gst_element_factory_make("bin", NULL);
-	if (!m_bin)
+	if (!createPipeline(pipelineName))
 		return false;
 
-	GstElement *convert = GstUtils::createElement(m_bin, "audioconvert", "convert");
+	if (m_device.empty()) {
+		m_source = GstUtils::createElement(m_pipeline, "autoaudiosrc", "source");
+	} else {
+		g_info("Using ALSA device: %s\n", m_device.c_str());
+		m_source = GstUtils::createElement(m_pipeline, "alsasrc", "source");
+		if (m_source)
+			g_object_set(G_OBJECT(m_source), "device", m_device.c_str(), NULL);
+	}
+	if (!m_source)
+		return false;
+
+	GstElement *convert = GstUtils::createElement(m_pipeline, "audioconvert", "convert");
 	if (!convert)
 		return false;
 
-	GstElement *resample = GstUtils::createElement(m_bin, "audioresample", "resample");
+	GstElement *resample = GstUtils::createElement(m_pipeline, "audioresample", "resample");
 	if (!resample)
 		return false;
 
-	m_sink = GstUtils::createElement(m_bin, "appsink", "sink");
+	m_sink = GstUtils::createElement(m_pipeline, "appsink", "sink");
 	if (!m_sink)
 		return false;
 
@@ -105,23 +106,32 @@ bool InputChannel::init(GstCaps *caps)
 	g_signal_connect(m_sink, "new-sample", G_CALLBACK(newSampleCallback), this);
 #endif
 
+	// Caps for microphone capture
+	GstCaps *caps = gst_caps_new_simple(
+		"audio/x-raw",
+		"format", G_TYPE_STRING, "S16LE",
+		"channels", G_TYPE_INT, 1,
+		"rate", G_TYPE_INT, 16000,
+		"layout", G_TYPE_STRING, "interleaved",
+		NULL);
+
 	// Setup appsink caps
 	gst_app_sink_set_caps(GST_APP_SINK(m_sink), caps);
+	gst_caps_unref(caps);
 
-	if (!gst_element_link_many(convert, resample, m_sink, NULL)) {
-		AACE_ERROR(LX(TAG, "init").m("Link failed"));
+	if (!gst_element_link_many(m_source, convert, resample, m_sink, NULL)) {
+		g_warning("GstRecorder::init - Link failed\n");
 		return false;
 	}
 
-	// Add sink pad to bin
-	GstPad *sinkPad = gst_element_get_static_pad(convert, "sink");
-	gst_element_add_pad(m_bin, gst_ghost_pad_new("sink", sinkPad));
-	gst_object_unref(sinkPad);
+#ifdef USE_GLOOP
+	startMainEventLoop();
+#endif
 
 	return true;
 }
 
-GstFlowReturn InputChannel::onNewSample()
+GstFlowReturn GstRecorder::onNewSample()
 {
 	GstSample *sample;
 	GstMapInfo info;
@@ -135,16 +145,16 @@ GstFlowReturn InputChannel::onNewSample()
 
 	buffer = gst_sample_get_buffer(sample);
 	if (!buffer) {
-		AACE_ERROR(LX(TAG, "onNewSample").m("No buffer on the sample"));
+		g_warning("No buffer on the sample\n");
 		goto exit;
 	}
 
 	if (!gst_buffer_map(buffer, &info, GST_MAP_READ)) {
-		AACE_ERROR(LX(TAG, "onNewSample").m("Couldn't map buffer"));
+		g_warning("Couldn't map buffer\n");
 		goto exit;
 	}
 
-	m_listener->onWrite(&info);
+	m_listener->onStreamData((int16_t *) info.data, info.size / 2);
 
 	gst_buffer_unmap(buffer, &info);
 

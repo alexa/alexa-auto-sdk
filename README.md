@@ -6,9 +6,9 @@ Alexa Auto SDK contains essential client-side software required to integrate Ale
 
 * [What is Included](#whatsincluded)
 * [General Build Requirements](#generalbuildreqs)
-* [Vehicle Configuration Information](#vehicleconfigurationdatarequirements)
 * [Build the Alexa Auto SDK](#buildthesdk)
 * [Alexa Auto SDK Architecture](#architecture)
+* [Vehicle Configuration Information](#vehicleconfigurationdatarequirements)
 * [Release Notes and Known Issues](#relnotesknownissues)
 
 > **Tip**: Try looking at [Need Help?](./NEED_HELP.md) if you don't see the topic you are looking for.
@@ -74,16 +74,6 @@ During the build time, the following dependencies are fetched and built for the 
 
 > **Note**: that *OpenEmbedded-Core* will fetch and build additional components for preparing the dedicated toolchain for your environment (Such as *GNU Binutils*). Please refer to the [Yocto project](https://www.yoctoproject.org/software-overview/) to understand how it works.
 
-
-## Vehicle Configuration Information<a id="vehicleconfigurationdatarequirements"></a>
-
-The Vehicle Configuration class provides an interface for vehicle information to be supplied to the SDK. This information is required to pass the certification process.
-
-Read detailed information about the vehicle configuration class in the API reference documentation.
-
-* [Alexa Auto SDK for Android](https://alexa.github.io/aac-sdk/docs/android/)
-* [Alexa Auto SDK for C++](https://alexa.github.io/aac-sdk/docs/cpp/)
-
 ## Build the Alexa Auto SDK<a id="buildthesdk"></a>
 
 To build the Alexa Auto SDK you should read and understand the instructions in the [Builder README](./builder/README.md).
@@ -97,13 +87,18 @@ Alexa Auto SDK is supported on the following platforms:
 * Android 5.1 Lollipop API Level 22 or higher.
     * ARM 32-bit
     * ARM 64-bit
-    * x86
+    * x86 32-bit
     * x86 64-bit
 * QNX 7.0
     * ARM 64-bit
     * x86 64-bit
 * AGL
     * ARM 64-bit
+* Generic Linux
+    * x86 64-bit
+* Poky Linux
+    * ARMv7a (+NEON)
+    * AArch64
 
 > **Note**: For Android targets, Alexa Auto SDK is available as a prebuilt library on GitHub. Read the instructions about accessing and using the library in the [samples/android/ directory](./samples/android/README.md).
 
@@ -157,7 +152,7 @@ Wake Word enables hands-free, voice-initiated interactions with Alexa. The Wake 
 The Alexa Communication extension enables integration with Alexa-to-Alexa calling, Alexa-to-PSTN calling, and messaging capabilities.
 
 ### Local Voice Control Extension
-The Local Voice Control extension provides car control functionality like climate control with and without an internet connection. It includes components that run an Alexa endpoint inside the vehicle's head unit. Local Voice Control is currently supported on Android, x86 64-bit and ARM 64-bit.
+The Local Voice Control extension provides car control functionality like climate control with and without an internet connection. It includes components that run an Alexa endpoint inside the vehicle's head unit. Local Voice Control is currently supported on Linux x86 64-bit, Linux ARM 32/64-bit, Android x86 32/64-bit, and Android ARM 32/64-bit.
 
 ### Metrics Uploading Extension
 The Metrics Uploading extension enables logging and uploading Alexa Auto SDK metrics to the Amazon cloud. Voice request metrics, for example, include start and end timestamps of user and Alexa speech and UPL between the request and Alexa’s response. Metrics may be tagged Beta, Gamma, or Prod depending on the vehicle lifecycle. The Metrics Uploading extension is currently available for Android platforms.
@@ -165,6 +160,10 @@ The Metrics Uploading extension enables logging and uploading Alexa Auto SDK met
 ## Getting Started With a Sample App
 
 The [Android Sample App](./samples/android/README.md) and [C++ Sample App](./samples/cpp/README.md) each provide an example of using the Alexa Auto SDK. Their respective READMEs have detailed instructions for setup and usage.
+
+## Vehicle Configuration Information<a id="vehicleconfigurationdatarequirements"></a>
+
+Vehicle information must be supplied to the Alexa Auto SDK in order to pass the certification process. See additional information about vehicle configuration in the [C++](./modules/core/README.md#vehicle-information-requirements) or [Android](./platforms/android/CORE.md#vehicle-information-requirements) Core module documentation.
 
 ## Release Notes and Known Issues<a id="relnotesknownissues"></a>
 

@@ -13,47 +13,42 @@
  * permissions and limitations under the License.
  */
 
-#ifndef AACE_AUDIO_GSTREAMER_INPUTCHANNEL_H_
-#define AACE_AUDIO_GSTREAMER_INPUTCHANNEL_H_
+#ifndef AACE_AUDIO_GSTREAMER_GSTRECORDER_H_
+#define AACE_AUDIO_GSTREAMER_GSTRECORDER_H_
 
+#include <memory>
 #include <gst/gst.h>
+
+#include "Context.h"
 
 namespace aace {
 namespace audio {
 
-class InputChannel {
+class GstRecorder : public Context
+{
 public:
-	class Listener {
-	public:
-		virtual ssize_t onWrite(GstMapInfo *info) = 0;
-	};
-
-	static std::unique_ptr<InputChannel> create(
+	static std::unique_ptr<GstRecorder> create(
 		const std::string &name,
-		GstCaps *caps,
-		const std::shared_ptr<Listener> &listener);
+		const std::string &device);
 
-	~InputChannel() = default;
-
-	GstElement *getGstElement();
+	GstRecorder(
+		const std::string &name,
+		const std::string &device);
 
 	// Event handlers for GStreamer
 	GstFlowReturn onNewSample();
 
 private:
-	InputChannel(
-		const std::string &name,
-		const std::shared_ptr<Listener> &listener);
+	bool init();
 
-	bool init(GstCaps *caps);
+	GstElement *m_source = NULL;
+	GstElement *m_sink = NULL;
 
 	const std::string m_name;
-	std::shared_ptr<Listener> m_listener;
-	GstElement *m_bin = NULL;
-	GstElement *m_sink = NULL;
+	const std::string m_device;
 };
 
 }
 }
 
-#endif //AACE_AUDIO_GSTREAMER_INPUTCHANNEL_H_
+#endif //AACE_AUDIO_GSTREAMER_GSTRECORDER_H_

@@ -2,8 +2,7 @@
   "config": {
     "clientId": "<YOUR DEVICE'S CLIENT ID>",
     "clientSecret": "<YOUR DEVICE'S CLIENT SECRET>",
-    "productId" : "<YOUR DEVICE'S PRODUCT ID>",
-    "productDsn" : "<YOUR DEVICE'S PRODUCT DSN>"
+    "productId" : "<YOUR DEVICE'S PRODUCT ID>"
   },
   "metrics" : {
     "metricsEnabled" : false,

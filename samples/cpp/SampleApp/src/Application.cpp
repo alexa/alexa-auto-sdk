@@ -121,6 +121,20 @@ void Application::printMenu(std::shared_ptr<ApplicationContext> applicationConte
             auto underline = false;
             if (action == "AudioFile") {
                 // nothing to do
+            } else if (action == "GoTo") {
+                auto menuId = std::string{};
+                auto value = item.at("value"); // required item.value
+                if (value.is_object()) {
+                    menuId = value.at("id").get<std::string>(); // required item.id
+                } else {
+                    menuId = value.get<std::string>();
+                }
+                if (menuId == "comms") {
+#ifndef ALEXACOMMS
+                    printable = false;
+#endif // ALEXACOMMS
+                }
+                //
             } else if (action == "Select") {
                 underline = (menu.count("index") && menu.at("index").get<unsigned>() == index);
             } else if (action == "SetEndpoint") {
@@ -309,7 +323,11 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     // Configure the engine
     auto configured = engine->configure(configurationFiles);
     if (!configured) {
+        // Note: not logging anything here as loggerHandler is not available yet
         console->printLine("Error: could not be configured");
+        if (!engine->shutdown()) {
+            console->printLine("Error: could not be shutdown");
+        }
         return Status::Failure;
     }
 
@@ -325,13 +343,20 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     Ensures(alertsChannel.mediaPlayer != nullptr && alertsChannel.speaker != nullptr);
     auto audioPlayerChannel = audioManager->openOutputChannel("AudioPlayer");
     Ensures(audioPlayerChannel.mediaPlayer != nullptr && audioPlayerChannel.speaker != nullptr);
+#ifdef ALEXACOMMS
+    auto commsRingtoneChannel = audioManager->openOutputChannel("CommunicationRingtone");
+    Ensures(commsRingtoneChannel.mediaPlayer != nullptr && commsRingtoneChannel.speaker != nullptr);
+    auto commsCallAudioChannel = audioManager->openOutputChannel("CommunicationCallAudio", "", "raw");
+    Ensures(commsCallAudioChannel.mediaPlayer != nullptr && commsCallAudioChannel.speaker != nullptr);
+#endif
     auto localMediaSourceChannel = audioManager->openOutputChannel("LocalMediaSource");
     Ensures(localMediaSourceChannel.mediaPlayer != nullptr && localMediaSourceChannel.speaker != nullptr);
     auto notificationsChannel = audioManager->openOutputChannel("Notifications");
     Ensures(notificationsChannel.mediaPlayer != nullptr && notificationsChannel.speaker != nullptr);
     auto speechSynthesizerChannel = audioManager->openOutputChannel("SpeechSynthesizer");
     Ensures(speechSynthesizerChannel.mediaPlayer != nullptr && speechSynthesizerChannel.speaker != nullptr);
-    auto inputChannel = audioManager->openInputChannel("SpeechRecognizer");
+    auto inputChannel = audioManager->openInputChannel("SharedChannel", applicationContext->getAudioInputDevice());
+    auto audioInputManager = std::make_shared<AudioInputManager>(activity, loggerHandler, inputChannel.audioCapture);
 
     // Special case for Audio I/O Speaker support
     activity->registerObserver(Event::onAudioManagerSpeaker, [=](const std::string &value) {
@@ -347,6 +372,10 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
                 static const std::map<std::string, std::shared_ptr<aace::alexa::Speaker>> SpeakerEnumerator{
                     {"AlertsSpeaker", alertsChannel.speaker},
                     {"AudioPlayerSpeaker", audioPlayerChannel.speaker},
+                    #ifdef ALEXACOMMS
+                    {"CallAudioSpeaker", commsCallAudioChannel.speaker},
+                    {"RingtoneSpeaker", commsRingtoneChannel.speaker},
+                    #endif
                     {"LocalMediaSourceSpeaker", localMediaSourceChannel.speaker},
                     {"NotificationsSpeaker", notificationsChannel.speaker},
                     {"SpeechSynthesizerSpeaker", speechSynthesizerChannel.speaker}
@@ -375,7 +404,9 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
                             if (value > max || value < min) {
                                 value = std::min(std::max(value, min), max);
                             }
-                            speaker.second->localVolumeSet(value);
+                            if (speaker.second->getVolume() != value) {
+                                speaker.second->localVolumeSet(value);
+                            }
                         }
                     }
                     return true;
@@ -404,6 +435,22 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     auto cblHandler = cbl::CBLHandler::create(activity, loggerHandler);
     Ensures(cblHandler != nullptr);
     Ensures(engine->registerPlatformInterface(cblHandler));
+
+#ifdef ALEXACOMMS
+    // Communications
+    auto communicationHandler =
+        communication::CommunicationHandler::create(activity, loggerHandler, audioInputManager, commsRingtoneChannel.mediaPlayer, commsRingtoneChannel.speaker,
+                                                    commsCallAudioChannel.mediaPlayer, commsCallAudioChannel.speaker);
+    Ensures(communicationHandler != nullptr);
+    if (!engine->registerPlatformInterface(communicationHandler)) {
+        loggerHandler->log(Level::INFO, "Application:Engine", "failed to register communication handler");
+        console->printLine("Error: could not register communication handler (check config)");
+        if (!engine->shutdown()) {
+            console->printLine("Error: could not be shutdown");
+        }
+        return Status::Failure;
+    }
+#endif // ALEXACOMMS
 
     // Equalizer Controller
     auto equalizerControllerHandler = alexa::EqualizerControllerHandler::create(activity, loggerHandler);
@@ -448,7 +495,7 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
 
     // Speech Recognizer
     auto speechRecognizerHandler =
-        alexa::SpeechRecognizerHandler::create(activity, loggerHandler, inputChannel.audioCapture, applicationContext->isWakeWordSupported());
+        alexa::SpeechRecognizerHandler::create(activity, loggerHandler, audioInputManager, applicationContext->isWakeWordSupported());
     Ensures(speechRecognizerHandler != nullptr);
     Ensures(engine->registerPlatformInterface(speechRecognizerHandler));
 
@@ -475,12 +522,40 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     Ensures(templateRuntimeHandler != nullptr);
     Ensures(engine->registerPlatformInterface(templateRuntimeHandler));
 
+#ifdef LOCALVOICECONTROL
+    // Climate Control
+    auto climateControlHandler = carControl::ClimateControlHandler::create(activity, loggerHandler);
+    Ensures(climateControlHandler != nullptr);
+    if (!engine->registerPlatformInterface(climateControlHandler)) {
+        loggerHandler->log(Level::INFO, "Application:Engine", "failed to register climate control handler");
+        console->printLine("Error: could not register climate control handler (check config)");
+        if (!engine->shutdown()) {
+            console->printLine("Error: could not be shutdown");
+        }
+        return Status::Failure;
+    }
+    Ensures(climateControlHandler->addClimateControlSwitch());
+    Ensures(climateControlHandler->addAirConditioningSwitch());
+    Ensures(climateControlHandler->addAirConditioningModeSelector(
+        {aace::carControl::ClimateControlInterface::AirConditioningMode::MANUAL, aace::carControl::ClimateControlInterface::AirConditioningMode::AUTO}));
+    Ensures(climateControlHandler->addFanSwitch(aace::carControl::ClimateControlInterface::FanZone::ALL));
+    Ensures(climateControlHandler->addFanSpeedControl(aace::carControl::ClimateControlInterface::FanZone::ALL, 0, 100, 1));
+    Ensures(climateControlHandler->addTemperatureControl(aace::carControl::ClimateControlInterface::TemperatureZone::ALL, 60, 80, 1,
+                                                         aace::carControl::ClimateControlInterface::TemperatureUnit::FAHRENHEIT));
+#endif // LOCALVOICECONTROL
+
     // Start the engine
     if (engine->start()) {
         loggerHandler->log(Level::INFO, "Application:Engine", "started successfully");
     } else {
         loggerHandler->log(Level::INFO, "Application:Engine", "failed to start");
         console->printLine("Error: could not be started (check logs)");
+        if (engine->shutdown()) {
+            loggerHandler->log(Level::INFO, "Application:Engine", "shutdown successfully");
+        } else {
+            loggerHandler->log(Level::INFO, "Application:Engine", "failed to shutdown");
+            console->printLine("Error: could not be shutdown (check logs)");
+        }
         return Status::Failure;
     }
 
@@ -557,6 +632,11 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     // CBL
     cblHandler.reset();
 
+#ifdef ALEXACOMMS
+    // Communications
+    communicationHandler.reset();
+#endif
+
     // Equalizer Controller
     equalizerControllerHandler.reset();
 
@@ -592,6 +672,11 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
 
     // Template Runtime
     templateRuntimeHandler.reset();
+
+#ifdef LOCALVOICECONTROL
+    // Climate Control
+    climateControlHandler.reset();
+#endif // LOCALVOICECONTROL
 
     // Print and return the application status
     console->printLine(status);

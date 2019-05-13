@@ -34,7 +34,7 @@ namespace alexa {
 
 SpeechRecognizerHandler::SpeechRecognizerHandler(std::weak_ptr<Activity> activity,
                                                  std::weak_ptr<logger::LoggerHandler> loggerHandler,
-                                                 std::shared_ptr<aace::audio::AudioCapture> platformAudioCapture,
+                                                 std::shared_ptr<sampleApp::AudioInputManager> platformAudioCapture,
                                                  bool wakewordDetectionEnabled)
     : aace::alexa::SpeechRecognizer{wakewordDetectionEnabled}
     , m_activity{std::move(activity)}
@@ -77,8 +77,8 @@ bool SpeechRecognizerHandler::streamAudioFile(const std::string &audioFilePath) 
     if (!activity) {
         return false;
     }
-    auto executorService = activity->getExecutorService();
-    if (!executorService) {
+    auto executor = activity->getExecutor();
+    if (!executor) {
         return false;
     }
     std::shared_ptr<AudioFileReader> stream = std::make_shared<AudioFileReader>(audioFilePath);
@@ -88,7 +88,7 @@ bool SpeechRecognizerHandler::streamAudioFile(const std::string &audioFilePath) 
     }
     m_isStreamingAudioFile = true;
     m_shouldStopStreamingAudioFile = false;
-    m_streamTask = executorService->call([=]() {
+    m_streamTask = executor->submit([=]() {
         const size_t size = 160;
         int16_t samples[size];
         size_t count = 0;
@@ -154,7 +154,7 @@ bool SpeechRecognizerHandler::startAudioInput() {
         m_audioFilePath.clear();
         return streamAudioFile(audioFilePath);
     }
-    return m_platformAudioCapture->startAudioInput([this](const int16_t *data, const size_t size) {
+    return m_platformAudioCapture->startAudioInput("SpeechRecognizer", [this](const int16_t *data, const size_t size) {
         if (m_isStreamingAudioFile.load()) {
             // Special case to support audio file input
             return (ssize_t)size;
@@ -165,7 +165,7 @@ bool SpeechRecognizerHandler::startAudioInput() {
 
 bool SpeechRecognizerHandler::stopAudioInput() {
     log(logger::LoggerHandler::Level::INFO, "stopAudioInput");
-    return m_platformAudioCapture->stopAudioInput();
+    return m_platformAudioCapture->stopAudioInput("SpeechRecognizer");
 }
 
 // private

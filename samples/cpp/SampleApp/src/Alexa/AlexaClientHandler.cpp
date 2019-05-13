@@ -62,10 +62,8 @@ void AlexaClientHandler::dialogStateChanged(AlexaClient::DialogState state) {
     });
     // Special case for test automation
     if (state == AlexaClient::DialogState::IDLE) {
-        if (auto executorService = activity->getExecutorService()) {
-            executorService->run([=]() {
-                activity->notify(Event::onTestAutomationProcess);
-            });
+        if (auto executor = activity->getExecutor()) {
+            executor->submit([=]() { activity->notify(Event::onTestAutomationProcess); });
         }
     }
 }
@@ -109,10 +107,8 @@ void AlexaClientHandler::connectionStatusChanged(AlexaClient::ConnectionStatus s
     // Special case for test automation
     if (status == AlexaClient::ConnectionStatus::CONNECTED) {
         if (reason == AlexaClient::ConnectionChangedReason::ACL_CLIENT_REQUEST) {
-            if (auto executorService = activity->getExecutorService()) {
-                executorService->run([=]() {
-                    activity->notify(Event::onTestAutomationConnect);
-                });
+            if (auto executor = activity->getExecutor()) {
+                executor->submit([=]() { activity->notify(Event::onTestAutomationConnect); });
             }
         }
     }

@@ -2,6 +2,25 @@
 
 ___
 
+## v1.6.0 released on 2019-05-16:
+
+### Enhancements
+
+* General availability for Linux target platforms, including: Linux x86-64, Linux ARM 64 (armv8a), and Linux ARM 32 (armv7a).
+* Alexa Auto SDK v1.6.0 enhances the C++ Sample App by improving the reference implementation for Linux platforms. Read more about the C++ Sample App [here](./samples/cpp/README.md).
+
+### Resolved Issues
+
+* Fixed an issue where Alexa Auto SDK Engine becomes unresponsive if it receives a `Play` directive during shutdown.
+* Made changes to External Media Player events to send the service id and agent details, which are now mandated by the Alexa Music service. If you are using previous versions with Local Media Source switching or third-party app with MACC, you should upgrade to Alexa Auto SDK v1.6.0 to continue using the corresponding functionality.
+  
+### Known Issues
+
+* If the local timezone of the device differs from the timezone that was configured through the Alexa companion app, you may experience unexpected behavior. For example, if your device shows 12pm PST, but the device on the Alexa companion app is configured with an EST timezone, then asking "Alexa set an alarm for 1pm today," will return, "Sorry I can't set alarms in the past.”
+* If you play your notifications while music is playing, you will hear the music for a split second between the end of one notification and the start of the next.
+* When a timer sounds during an Alexa-to-Alexa call, uttering "stop" ends the call, not the timer.
+* Multiple automotive devices using the same account at the same time can access contacts from phones paired across those devices.
+
 ## v1.5.0 released on 2019-03-06:
 
 ### Enhancements
@@ -24,7 +43,7 @@ ___
 
 ### Known Issues
 
-* The Alexa Auto SDK Engine becomes unresponsive if it receives a ```Play``` directive during shutdown. However, since shutdown is triggered when car ignition is turned off, there is no direct customer impact expected.
+* The Alexa Auto SDK Engine becomes unresponsive if it receives a `Play` directive during shutdown. However, since shutdown is triggered when car ignition is turned off, there is no direct customer impact expected.
 * When a timer sounds during an Alexa-to-Alexa call, uttering "stop" ends the call, not the timer.
 * Multiple automotive devices using the same account at the same time can access contacts from phones paired across those devices.
 

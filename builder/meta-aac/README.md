@@ -7,7 +7,7 @@ This layer enables Alexa Auto SDK components into the OpenEmbedded build infrast
 This layer depends on
 * [OpenEmbedded-Core](git://git.openembedded.org/openembedded-core)
   * Layers: meta
-  * Branch: rocko
+  * Branch: thud or rocko
 
 ## Available Options
 

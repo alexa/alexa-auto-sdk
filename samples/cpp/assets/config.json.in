@@ -33,15 +33,16 @@
         "info": {
             "make": "Amazon",
             "model": "AACE",
-            "year": "2018",
+            "year": "2019",
             "trim": "aac",
             "geography": "US",
             "version": "1.2.3",
-            "os": "sample-aace",
-            "arch": "sample-aace",
-            "language": "en_US",
+            "os": "Sample OS 1.0",
+            "arch": "Sample Arch 1.0",
+            "language": "en-US",
             "microphone": "SingleArray",
-            "countries": "US,GB,IE,CA,DE,AT,IN,JP,AU,NZ,FR"
+            "countries": "US,GB,IE,CA,DE,AT,IN,JP,AU,NZ,FR",
+            "vehicleIdentifier": "Sample Identifier ABC"
         },
         "operatingCountry": "US"
     }

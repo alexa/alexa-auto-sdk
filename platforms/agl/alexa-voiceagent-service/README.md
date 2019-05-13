@@ -45,7 +45,7 @@ Alexa Voice Agent depends on Auto SDK. See the [Alexa Auto SDK Builder](../../..
 
 For example, to build Alexa Auto SDK modules and needed dependencies for an *AGL ARM64* target, run the following commands:
 ```
-$ git clone --recursive https://github.com/alexa/aac-sdk.git
+$ git clone https://github.com/alexa/aac-sdk.git
 $ ${AAC_SDK_HOME}/builder/build.sh oe -t aglarm64 ${AAC_SDK_HOME}/samples/audio
 $ pushd ${AAC_SDK_HOME}/builder/deploy/aglarm64/
 $ tar -xvf aac-image-minimal-aglarm64.tar.gz
@@ -67,13 +67,15 @@ Open `${AAC_SDK_HOME}/platforms/agl/alexa-voiceagent-service/src/plugins/data/co
 ## Build Instructions
 **Prerequisite**: Install the AGL SDK, preferably the latest stable release from [AGL artifacts](https://download.automotivelinux.org/AGL/release/). The AGL SDK contains [application framework libraries](http://docs.automotivelinux.org/master/docs/apis_services/en/dev/reference/af-binder/reference-v3/func-api.html) that we depend on for making inter-binding calls and publishing AGL events.
 1. Go to the ${AAC_SDK_HOME}/platform/agl/alexa-voiceagent-service directory
-2. mkdir build
-3. pushd build
-4. source /opt/agl-sdk/\<sdk-version>/environment-setup-aarch64-agl-linux
-5. cmake .. -DAAC_HOME=${AAC_INSTALL_ROOT}
-6. make autobuild
-7. popd
-8. ./autobuild/agl/autobuild package
+2. git submodule add https://gerrit.automotivelinux.org/gerrit/apps/app-afb-helpers-submodule afb-helpers
+3. git submodule add https://gerrit.automotivelinux.org/gerrit/apps/app-controller-submodule app-controller
+4. mkdir build
+5. pushd build
+6. source /opt/agl-sdk/\<sdk-version>/environment-setup-aarch64-agl-linux
+7. cmake .. -DAAC_HOME=${AAC_INSTALL_ROOT}
+8. make autobuild
+9. popd
+10. ./autobuild/agl/autobuild package
 
 This should generate the **alexa-voiceagent-service.wgt** in the build folder successfully.
 

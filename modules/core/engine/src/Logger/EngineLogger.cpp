@@ -19,10 +19,10 @@
 #include "AACE/Engine/Logger/EngineLogger.h"
 #include "AACE/Engine/Logger/LogFormatter.h"
 #include "AACE/Engine/Logger/ThreadMoniker.h"
-#if AAC_DEFAULT_LOGGER_SINK_CONSOLE
+#ifdef AAC_DEFAULT_LOGGER_SINK_CONSOLE
 #include "AACE/Engine/Logger/Sinks/ConsoleSink.h"
 #endif
-#if AAC_DEFAULT_LOGGER_SINK_SYSLOG
+#ifdef AAC_DEFAULT_LOGGER_SINK_SYSLOG
 #include "AACE/Engine/Logger/Sinks/SyslogSink.h"
 #endif
 #include "AACE/Engine/Core/EngineMacros.h"
@@ -45,43 +45,43 @@ std::shared_ptr<EngineLogger> EngineLogger::getInstance()
 
 EngineLogger::EngineLogger()
 {
-#if AAC_DEFAULT_LOGGER_ENABLED
-#if AAC_DEFAULT_LOGGER_SINK
-#if AAC_DEFAULT_LOGGER_SINK_CONSOLE
+#ifdef AAC_DEFAULT_LOGGER_ENABLED
+#ifdef AAC_DEFAULT_LOGGER_SINK
+#if defined AAC_DEFAULT_LOGGER_SINK_CONSOLE
    auto sink = aace::engine::logger::sink::ConsoleSink::create( "default" );
-#elif AAC_DEFAULT_LOGGER_SINK_SYSLOG
+#elif defined AAC_DEFAULT_LOGGER_SINK_SYSLOG
    auto sink = aace::engine::logger::sink::SyslogSink::create( "default" );
 #else
 #error "Unknown logger sink"
 #endif
 
-#if AAC_DEFAULT_LOGGER_LEVEL
-#if AAC_DEFAULT_LOGGER_LEVEL_VERBOSE
+#ifdef AAC_DEFAULT_LOGGER_LEVEL
+#if defined AAC_DEFAULT_LOGGER_LEVEL_VERBOSE
     auto rule = aace::engine::logger::sink::Rule::create( Level::VERBOSE,
         aace::engine::logger::sink::Rule::EMPTY,
         aace::engine::logger::sink::Rule::EMPTY,
         aace::engine::logger::sink::Rule::EMPTY );
-#elif AAC_DEFAULT_LOGGER_LEVEL_INFO
+#elif defined AAC_DEFAULT_LOGGER_LEVEL_INFO
     auto rule = aace::engine::logger::sink::Rule::create( Level::INFO,
         aace::engine::logger::sink::Rule::EMPTY,
         aace::engine::logger::sink::Rule::EMPTY,
         aace::engine::logger::sink::Rule::EMPTY );
-#elif AAC_DEFAULT_LOGGER_LEVEL_METRIC
+#elif defined AAC_DEFAULT_LOGGER_LEVEL_METRIC
     auto rule = aace::engine::logger::sink::Rule::create( Level::METRIC,
         aace::engine::logger::sink::Rule::EMPTY,
         aace::engine::logger::sink::Rule::EMPTY,
         aace::engine::logger::sink::Rule::EMPTY );
-#elif AAC_DEFAULT_LOGGER_LEVEL_WARN
+#elif defined AAC_DEFAULT_LOGGER_LEVEL_WARN
     auto rule = aace::engine::logger::sink::Rule::create( Level::WARN,
         aace::engine::logger::sink::Rule::EMPTY,
         aace::engine::logger::sink::Rule::EMPTY,
         aace::engine::logger::sink::Rule::EMPTY );
-#elif AAC_DEFAULT_LOGGER_LEVEL_ERROR
+#elif defined AAC_DEFAULT_LOGGER_LEVEL_ERROR
     auto rule = aace::engine::logger::sink::Rule::create( Level::ERROR,
         aace::engine::logger::sink::Rule::EMPTY,
         aace::engine::logger::sink::Rule::EMPTY,
         aace::engine::logger::sink::Rule::EMPTY );
-#elif AAC_DEFAULT_LOGGER_LEVEL_CRITICAL
+#elif defined AAC_DEFAULT_LOGGER_LEVEL_CRITICAL
     auto rule = aace::engine::logger::sink::Rule::create( Level::CRITICAL,
         aace::engine::logger::sink::Rule::EMPTY,
         aace::engine::logger::sink::Rule::EMPTY,

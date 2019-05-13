@@ -6,6 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=d92e60ee98664c54f68aa515a6169708"
 DEPENDS = "curl nghttp2 googletest sqlite3 openssl"
 
 SRC_URI = "https://github.com/alexa/avs-device-sdk/archive/v${PV}.tar.gz"
+SRC_URI += "file://0001-Fix-SIGBUS-due-to-unaligned-access.patch"
 
 # Skip checksum verification
 BB_STRICT_CHECKSUM = "0"
@@ -15,17 +16,26 @@ inherit pkgconfig cmake devlibsonly unittests
 EXTRA_OECMAKE += "-DCMAKE_BUILD_TYPE=${AAC_BUILD_TYPE} \
                   -DACSDK_EMIT_SENSITIVE_LOGS=${AAC_SENSITIVE_LOGS} \
                   -DACSDK_LATENCY_LOG=${AAC_LATENCY_LOGS}"
-# Use GStreamer & PortAudio from Homebrew install
-EXTRA_OECMAKE_append_darwin = " -DGSTREAMER_MEDIA_PLAYER=ON \
-                                -DPORTAUDIO=ON \
-                                -DPORTAUDIO_LIB_PATH=/usr/local/lib/libportaudio.a \
-                                -DPORTAUDIO_INCLUDE_DIR=/usr/local/include"
 
 # Install AVS artifacts explicitly into AAC_PREFIX dir
 EXTRA_OECMAKE_append = " -DCMAKE_INSTALL_PREFIX:PATH=${AAC_PREFIX}"
 FILES_${PN} = "${AAC_PREFIX}/*"
 FILES_${PN}-test += "${AAC_PREFIX}/lib/libIntegration${SOLIBS}"
 SYSROOT_DIRS_append = " ${AAC_PREFIX}"
+
+# GStreamer
+GSTREAMER_CMAKE_OPTIONS = "\
+  -DGSTREAMER_MEDIA_PLAYER=ON \
+"
+PACKAGECONFIG[gstreamer] = "${GSTREAMER_CMAKE_OPTIONS},,gstreamer1.0"
+
+# PortAudio
+PORTAUDIO_CMAKE_OPTIONS = "\
+  -DPORTAUDIO=ON \
+  -DPORTAUDIO_LIB_PATH=${STAGING_DIR_HOST}${libdir}/libportaudio.a \
+  -DPORTAUDIO_INCLUDE_DIR=${STAGING_DIR_HOST}${includedir} \
+"
+PACKAGECONFIG[portaudio] = "${PORTAUDIO_CMAKE_OPTIONS},,portaudio-v19"
 
 # WakeWord: KITT.AI
 KITTAT_CMAKE_OPTIONS = "\

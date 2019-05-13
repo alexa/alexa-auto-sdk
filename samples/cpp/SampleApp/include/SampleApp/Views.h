@@ -24,7 +24,23 @@
 
 namespace sampleApp {
 
-static std::mutex g_viewsMutex;
+static std::mutex g_clogMutex;
+
+// Asynchronous clog output
+struct aclog {
+    std::unique_lock<std::mutex> lock;
+    aclog() : lock(std::unique_lock<std::mutex>(g_clogMutex)) {}
+
+    template <typename T> aclog &operator<<(const T &t) {
+        std::clog << t;
+        return *this;
+    }
+
+    aclog &operator<<(std::ostream &(*fp)(std::ostream &)) {
+        std::clog << fp;
+        return *this;
+    }
+};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -36,6 +52,7 @@ class View {
   private:
     std::string m_id{};
     std::string m_text{};
+    static const std::string m_ruler;
 
   protected:
     View(const std::string &id);
@@ -62,22 +79,17 @@ class View {
         PlayerInfo
     };
     static std::shared_ptr<View> create(const std::string &id);
-    template <typename Head> void print(Head head) {
-        std::lock_guard<std::mutex> guard(g_viewsMutex);
-        std::clog << head << std::flush;
-    }
+    template <typename Head> void print(Head head) { aclog() << head << std::flush; }
     template <typename Head, typename... Tail> void print(Head head, Tail... tail) {
-        std::clog << head << ' ';
+        aclog() << head << ' ';
         print(tail...);
     }
-    template <typename Head> void printLine(Head head) {
-        std::lock_guard<std::mutex> guard(g_viewsMutex);
-        std::clog << head << std::endl;
-    }
+    template <typename Head> void printLine(Head head) { aclog() << head << std::endl; }
     template <typename Head, typename... Tail> void printLine(Head head, Tail... tail) {
-        std::clog << head << ' ';
+        aclog() << head << ' ';
         printLine(tail...);
     }
+    void printRuler() { printLine(m_ruler); }
     virtual auto clear(Type type) -> void;
     virtual auto getId() -> std::string;
     virtual auto getText() -> std::string;

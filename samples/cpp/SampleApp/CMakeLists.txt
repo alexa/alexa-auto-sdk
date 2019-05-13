@@ -30,6 +30,17 @@ if(AAC_HOME)
     include(${AAC_HOME}/share/cmake/AACECBL.cmake)
     if(AMAZONLITE)
         include(${AAC_HOME}/share/cmake/AACEAmazonLite.cmake)
+        add_definitions(-DAMAZONLITE)
+    endif()
+    if(LOCALVOICECONTROL)
+        include(${AAC_HOME}/share/cmake/AACELocalVoiceControl.cmake)
+        include(${AAC_HOME}/share/cmake/AACELocalSkillService.cmake)
+        include(${AAC_HOME}/share/cmake/AACECarControl.cmake)
+        add_definitions(-DLOCALVOICECONTROL)
+    endif()
+    if(ALEXACOMMS)
+        include(${AAC_HOME}/share/cmake/AACECommunication.cmake)
+        add_definitions(-DALEXACOMMS)
     endif()
 endif()
 
@@ -39,15 +50,95 @@ find_package(CURL REQUIRED)
 # Find SQLite3 package for the sample app.
 find_package(SQLite3 REQUIRED)
 
-file(GLOB CXX_HEADER_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/*.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/*/*.h
+set(CXX_HEADER_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Activity.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Alexa/AlertsHandler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Alexa/AlexaClientHandler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Alexa/AudioChannelHandler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Alexa/AudioPlayerHandler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Alexa/EqualizerControllerHandler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Alexa/LocalMediaSourceHandler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Alexa/NotificationsHandler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Alexa/PlaybackControllerHandler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Alexa/SpeechRecognizerHandler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Alexa/SpeechSynthesizerHandler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Alexa/TemplateRuntimeHandler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Application.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/ApplicationContext.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Args.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/AudioFileReader.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/AudioInputManager.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/CBL/CBLHandler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/DefaultMediaPlayer.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Event.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Executor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Location/LocationProviderHandler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Logger/LoggerHandler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Navigation/NavigationHandler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Network/NetworkInfoProviderHandler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/PhoneControl/PhoneControlHandler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Status.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Subject.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/TaskQueue.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/TaskThread.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/TTY.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Views.h
 )
 
-file(GLOB CXX_SOURCE_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/*/*.cpp
+if(LOCALVOICECONTROL)
+    set(CXX_HEADER_FILES ${CXX_HEADER_FILES}
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/CarControl/ClimateControlHandler.h
+    )
+endif()
+
+if(ALEXACOMMS)
+    set(CXX_HEADER_FILES ${CXX_HEADER_FILES}
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Communication/CommunicationHandler.h
+    )
+endif()
+
+set(CXX_SOURCE_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Activity.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/AlertsHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/AlexaClientHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/AudioChannelHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/AudioPlayerHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/EqualizerControllerHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/LocalMediaSourceHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/NotificationsHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/PlaybackControllerHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/SpeechRecognizerHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/SpeechSynthesizerHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/TemplateRuntimeHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Application.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ApplicationContext.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/AudioFileReader.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/AudioInputManager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/CBL/CBLHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/DefaultMediaPlayer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Executor.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Location/LocationProviderHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Logger/LoggerHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Navigation/NavigationHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Network/NetworkInfoProviderHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/PhoneControl/PhoneControlHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/TaskQueue.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/TaskThread.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Views.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
 )
+
+if(LOCALVOICECONTROL)
+    set(CXX_SOURCE_FILES ${CXX_SOURCE_FILES}
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/CarControl/ClimateControlHandler.cpp
+    )
+endif()
+
+if(ALEXACOMMS)
+    set(CXX_SOURCE_FILES ${CXX_SOURCE_FILES}
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Communication/CommunicationHandler.cpp
+    )
+endif()
 
 source_group("Header Files" FILES ${CXX_HEADER_FILES})
 
@@ -72,7 +163,6 @@ target_link_libraries(SampleApp
     AACENavigationEngine
     AACEPhoneControlPlatform
     AACEPhoneControlEngine
-    AACEGStreamerAudio
     AACECBLPlatform
     AACECBLEngine
     ${CURL_LIBRARIES}
@@ -81,7 +171,38 @@ target_link_libraries(SampleApp
 
 if(AMAZONLITE)
     target_link_libraries(SampleApp
+        # AACEAmazonLitePlatform
         AACEAmazonLiteEngine
+    )
+endif()
+
+if(FILEAUDIO)
+    target_link_libraries(SampleApp
+        AACEFileAudio
+    )
+endif()
+
+if(GSTREAMER)
+    target_link_libraries(SampleApp
+        AACEGStreamerAudio
+    )
+endif()
+
+if(LOCALVOICECONTROL)
+    target_link_libraries(SampleApp
+        AACELocalSkillServicePlatform
+        AACELocalSkillServiceEngine
+        AACECarControlPlatform
+        AACECarControlEngine
+        AACELocalVoiceControlPlatform
+        AACELocalVoiceControlEngine
+    )
+endif()
+
+if(ALEXACOMMS)
+    target_link_libraries(SampleApp
+        AACECommunicationPlatform
+        AACECommunicationEngine
     )
 endif()
 

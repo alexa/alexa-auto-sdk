@@ -20,9 +20,10 @@
 #include "SampleApp/Activity.h"
 #include "SampleApp/ApplicationContext.h"
 #include "SampleApp/AudioFileReader.h"
+#include "SampleApp/AudioInputManager.h"
 #include "SampleApp/DefaultMediaPlayer.h"
 #include "SampleApp/Event.h"
-#include "SampleApp/ExecutorService.h"
+#include "SampleApp/Executor.h"
 #include "SampleApp/Status.h"
 #include "SampleApp/Subject.h"
 #include "SampleApp/Views.h"
@@ -43,6 +44,11 @@
 // Sample Code-Based Linking (CBL) Interfaces
 #include "SampleApp/CBL/CBLHandler.h"
 
+// Sample Communications Platform Interfaces
+#ifdef ALEXACOMMS
+#include "SampleApp/Communication/CommunicationHandler.h"
+#endif // ALEXACOMMS
+
 // Sample Location Platform Interfaces
 #include "SampleApp/Location/LocationProviderHandler.h"
 
@@ -57,6 +63,11 @@
 
 // Sample PhoneControl Platform Interfaces
 #include "SampleApp/PhoneControl/PhoneControlHandler.h"
+
+// Sample ClimateControl Platform Interfaces
+#ifdef LOCALVOICECONTROL
+#include "SampleApp/CarControl/ClimateControlHandler.h"
+#endif // LOCALVOICECONTROL
 
 // Alexa Auto Core
 #include <AACE/Core/CoreProperties.h>

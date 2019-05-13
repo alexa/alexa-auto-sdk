@@ -31,11 +31,20 @@ public:
 		const std::string &name,
 		const std::string &device);
 
-	~GstPlayer();
-
 	void setURI(const std::string &uri);
 	void setVolume(double volume);
 	void setMute(bool mute);
+
+	// AppSrc interface
+	void setStreamCapabilities(const std::string &caps);
+	ssize_t write(const char *data, const size_t size);
+	void notifyEndOfStream();
+
+	// Event handlers for GStreamer
+	void aboutToFinish();
+	void sourceSetup(GstElement *source);
+	void onNeedData(ssize_t length);
+	void onEnoughData();
 
 private:
 	GstPlayer(
@@ -50,6 +59,8 @@ private:
 
 	const std::string m_name;
 	const std::string m_device;
+
+	std::string m_caps;
 };
 
 }

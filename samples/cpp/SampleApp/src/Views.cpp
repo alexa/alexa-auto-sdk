@@ -34,6 +34,8 @@ namespace sampleApp {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+const std::string View::m_ruler = "\n" + std::string(80, '#') + "\n";
+
 View::View(const std::string &id) : m_id{std::move(id)} {}
 
 std::shared_ptr<View> View::create(const std::string &id) { return std::shared_ptr<View>(new View(id)); }

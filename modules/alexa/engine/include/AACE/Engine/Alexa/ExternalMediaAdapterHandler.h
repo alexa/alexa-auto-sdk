@@ -42,9 +42,13 @@ namespace alexa {
 class DiscoveredPlayerSenderInterface;
 class FocusHandlerInterface;
 
+static const std::string VALIDATION_SIGNING_CERTIFICATE = "SIGNING_CERTIFICATE";
+static const std::string VALIDATION_GENERATED_CERTIFICATE = "GENERATED_CERTIFICATE";
+static const std::string VALIDATION_NONE = "NONE";
+
 class PlayerInfo {
 public:
-    PlayerInfo( const std::string& localId = "", const std::string& spi = "" );
+    PlayerInfo( const std::string& localId = "", const std::string& spi = "", bool authorized = false );
 
 public:
     std::string localPlayerId;

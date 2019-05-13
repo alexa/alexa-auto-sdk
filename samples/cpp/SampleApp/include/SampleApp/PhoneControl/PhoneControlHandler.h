@@ -21,12 +21,16 @@
 
 #include <AACE/PhoneCallController/PhoneCallController.h>
 
+// JSON for Modern C++
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
 namespace sampleApp {
 namespace phoneControl {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  PhoneControlHandler
+//  PhoneCallControlHandler
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -53,11 +57,38 @@ class PhoneCallControllerHandler : public aace::phoneCallController::PhoneCallCo
     auto stop(const std::string &payload) -> void override;
     auto sendDTMF(const std::string &payload) -> void override;
 
+  public:
+    /**
+     * Helper method to display the current payload data.
+     */
+    void showPayload();
+
+  private:
+    void createCall();
+    void updateCallId(const std::string &payload);
+    void updateCallerId(const std::string &value);
+    void updatePayload(const std::string &payload = "");
+    std::string getPhoneNumber(const json &payload);
+    std::string getCallId(const json &payload);
+    std::string callStateToString();
+
   private:
     std::weak_ptr<View> m_console{};
 
     auto log(logger::LoggerHandler::Level level, const std::string &message) -> void;
     auto setupUI() -> void;
+
+    /// Payload for current call incoming or outgoing
+    json m_currentCall;
+
+    /// Last number dialed
+    json m_outgoingCall;
+
+    /// Call state
+    CallState m_callState;
+
+    /// Call error
+    std::string m_callError;
 };
 
 } // namespace phoneControl

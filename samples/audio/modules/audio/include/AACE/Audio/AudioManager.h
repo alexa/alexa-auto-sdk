@@ -39,8 +39,9 @@ public:
 	 *
 	 * @param name The identification of this channel
 	 * @param device The platform implementation specific parameter to identify the device
+	 * @param streamFormat The audio format type of the stream
 	 */
-	AudioOutputChannel openOutputChannel(const std::string &name, const std::string &device = "");
+	AudioOutputChannel openOutputChannel(const std::string &name, const std::string &device = "", const std::string &streamFormat = "mp3");
 
 	/**
 	 * Open a new audio input channel

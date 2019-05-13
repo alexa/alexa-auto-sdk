@@ -1,6 +1,0 @@
-[submodule "platforms/agl/alexa-voiceagent-service/afb-helpers"]
-	path = platforms/agl/alexa-voiceagent-service/afb-helpers
-	url = https://gerrit.automotivelinux.org/gerrit/apps/app-afb-helpers-submodule
-[submodule "platforms/agl/alexa-voiceagent-service/app-controller"]
-	path = platforms/agl/alexa-voiceagent-service/app-controller
-	url = https://gerrit.automotivelinux.org/gerrit/apps/app-controller-submodule

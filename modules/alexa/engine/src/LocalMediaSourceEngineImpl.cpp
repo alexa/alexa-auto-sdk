@@ -78,7 +78,7 @@ bool LocalMediaSourceEngineImpl::initialize( std::shared_ptr<alexaClientSDK::avs
         
         info.localPlayerId = m_localPlayerId;
         info.spiVersion = "1.0";
-        info.validationMethod = "NONE";
+        info.validationMethod = VALIDATION_NONE;
         info.validationData.push_back( "None" );
         
         reportDiscoveredPlayers( { info } );

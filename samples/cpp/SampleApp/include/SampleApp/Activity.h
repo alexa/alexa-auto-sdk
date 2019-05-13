@@ -17,7 +17,7 @@
 #define SAMPLEAPP_ACTIVITY_H
 
 #include "SampleApp/Event.h"
-#include "SampleApp/ExecutorService.h"
+#include "SampleApp/Executor.h"
 #include "SampleApp/Subject.h"
 #include "SampleApp/Views.h"
 
@@ -40,7 +40,7 @@ class Activity : public Subject<Event> {
   private:
     bool m_singleThreadedUI{false};
     std::shared_ptr<ApplicationContext> m_applicationContext{};
-    std::shared_ptr<ExecutorService> m_executorService{};
+    std::shared_ptr<Executor> m_executor{};
     std::vector<std::shared_ptr<View>> m_views{};
 
   protected:
@@ -52,13 +52,13 @@ class Activity : public Subject<Event> {
         if (m_singleThreadedUI) {
             run(args...); // UI runs on the main thread
         } else {
-            m_executorService->run(args...);
+            m_executor->submit(args...);
         }
     };
     template <typename Func, typename... Args> auto run(Func &&func, Args &&... args) -> void { func(std::forward<Args>(args)...); }
     auto findViewById(const std::string &id) -> std::weak_ptr<View>;
     auto getApplicationContext() -> std::shared_ptr<ApplicationContext>;
-    auto getExecutorService() -> std::shared_ptr<ExecutorService>;
+    auto getExecutor() -> std::shared_ptr<Executor>;
 };
 
 } // namespace sampleApp

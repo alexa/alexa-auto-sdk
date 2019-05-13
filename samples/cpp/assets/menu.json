@@ -78,6 +78,100 @@
         },
         {
             "do": "GoTo",
+            "key": "H",
+            "name": "Phone Call Controller",
+            "value": {
+                "id": "pcc",
+                "item": [
+                    {
+                        "do": "notify/onPhoneCallControllerConnectionStateChanged",
+                        "key": "1",
+                        "name": "Connect phone",
+                        "value": "CONNECTED"
+                    },
+                    {
+                        "do": "notify/onPhoneCallControllerConnectionStateChanged",
+                        "key": "2",
+                        "name": "Disconnect phone",
+                        "value": "DISCONNECTED"
+                    },
+                    {
+                        "do": "notify/onPhoneCallControllerCallStateChanged",
+                        "key": "3",
+                        "name": "Simulate outgoing call",
+                        "value": "OUTBOUND_RINGING/11111111111111111"
+                    },
+                    {
+                        "do": "notify/onPhoneCallControllerCallStateChanged",
+                        "key": "4",
+                        "name": "Simulate incoming call",
+                        "value": "INBOUND_RINGING"
+                    },
+                    {
+                        "do": "notify/onPhoneCallControllerCallStateChanged",
+                        "key": "5",
+                        "name": "Accept incoming call",
+                        "value": "ACTIVE"
+                    },
+                    {
+                        "do": "notify/onPhoneCallControllerCallStateChanged",
+                        "key": "6",
+                        "name": "Stop/Drop call",
+                        "value": "IDLE"
+                    },
+                    {
+                        "do": "notify/onPhoneCallControllerCallFailed",
+                        "key": "7",
+                        "name": "Simulate failed outgoing call",
+                        "value": "11111111111111111/BUSY/Busy"
+                    },
+                    {
+                        "do": "notify/onPhoneCallControllerShowPayload",
+                        "key": "8",
+                        "name": "Show call information"
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Phone Call Controller Menu"
+            }
+        },
+        {
+            "do": "GoTo",
+            "key": "M",
+            "name": "Communications",
+            "value": {
+                "id": "comms",
+                "item": [
+                    {
+                        "do": "notify/onCommunicationAcceptCall",
+                        "key": "1",
+                        "name": "Accept call"
+                    },
+                    {
+                        "do": "notify/onCommunicationStopCall",
+                        "key": "2",
+                        "name": "Stop call"
+                    },
+                    {
+                        "do": "notify/onCommunicationShowState",
+                        "key": "3",
+                        "name": "Show state"
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Alexa Communications Menu"
+            }
+        },
+        {
+            "do": "GoTo",
             "key": "E",
             "name": "Endpoint",
             "value": {

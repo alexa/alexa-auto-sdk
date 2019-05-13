@@ -54,20 +54,24 @@ void TemplateRuntimeHandler::renderTemplate(const std::string &payload) {
     m_startTemplate = std::chrono::system_clock::now();
     activity->runOnUIThread([=]() {
         auto applicationContext = activity->getApplicationContext();
-        auto command = applicationContext->getRenderTemplateCommand();
+        auto command = applicationContext->getPayloadScriptCommand();
         if (!command.empty()) {
             if (auto console = m_console.lock()) {
                 auto path = applicationContext->makeTempPath("Template", "json");
                 if (applicationContext->saveContent(path, payload)) {
-                    console->print(applicationContext->executeCommand((command + ' ' + path).c_str()));
+                    auto result = applicationContext->executeCommand((command + " Template " + path).c_str());
+                    if (!result.empty()) {
+                        console->print(result);
+                        return;
+                    }
                 } else {
                     console->printLine("Template script error");
+                    return;
                 }
             }
-        } else {
-            if (auto card = activity->findViewById("id:card").lock()) {
-                card->set(payload, View::Type::Template);
-            }
+        }
+        if (auto card = activity->findViewById("id:card").lock()) {
+            card->set(payload, View::Type::Template);
         }
     });
 }
@@ -96,20 +100,24 @@ void TemplateRuntimeHandler::renderPlayerInfo(const std::string &payload) {
     m_startPlayerInfo = std::chrono::system_clock::now();
     activity->runOnUIThread([=]() {
         auto applicationContext = activity->getApplicationContext();
-        auto command = applicationContext->getRenderPlayerInfoCommand();
+        auto command = applicationContext->getPayloadScriptCommand();
         if (!command.empty()) {
             if (auto console = m_console.lock()) {
                 auto path = applicationContext->makeTempPath("PlayerInfo", "json");
                 if (applicationContext->saveContent(path, payload)) {
-                    console->print(applicationContext->executeCommand((command + ' ' + path).c_str()));
+                    auto result = applicationContext->executeCommand((command + " PlayerInfo " + path).c_str());
+                    if (!result.empty()) {
+                        console->print(result);
+                        return;
+                    }
                 } else {
                     console->printLine("PlayerInfo script error");
+                    return;
                 }
             }
-        } else {
-            if (auto card = activity->findViewById("id:card").lock()) {
-                card->set(payload, View::Type::PlayerInfo);
-            }
+        }
+        if (auto card = activity->findViewById("id:card").lock()) {
+            card->set(payload, View::Type::PlayerInfo);
         }
     });
 }

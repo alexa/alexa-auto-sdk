@@ -49,7 +49,7 @@ In order to use the certain Alexa Auto SDK functionality, your product needs to 
 1. Include the [Alexa Auto SDK Build Dependencies](#alexa-auto-sdk-build-dependencies).
 If you do not use the pre-built aace-release.aar, you must select **Build > Refresh Linked C++ Projects** in Android Studio to update the dependencies.
 1. Read about [authorization with AVS in the Sample App](#authorization-with-avs-in-the-sample-app) and follow further setup instructions, if necessary.
-1. Populate the app_config.json file in the assets directory with the Client ID, Client Secret, and Product ID for your product. Product DSN may be any unique identifier. The contents of this file are required for authorization.
+1. Populate the app\_config.json file in the assets directory with the Client ID, Client Secret, and Product ID for your product. Product DSN may be any unique identifier, and can be added with the key "productDsn". By default this is the device specific  ANDROID\_ID. The contents of this file are required for authorization.
 > ***Note***: Android Studio builds and signs the Android Package File.
 
 
@@ -67,6 +67,8 @@ The Sample App provides an example of how to create and configure an instance of
 - [Alexa Module](../../platforms/android/ALEXA.md)
 - [Navigation Module](../../platforms/android/NAVIGATION.md)
 - [Phone Control Module](../../platforms/android/PHONECONTROL.md)
+
+>**Note:** The Android Sample App includes a simulated local phone that leverages the Phone Control Module. However, it cannot currently use cellular voice connections paired with or installed in the host device. This simulator can be used as an example of how to implement the Phone Control interface on the host platform to perform actions such as dialing, hanging up, etc.
 
 The Sample App GUI consists of a menu bar and a log console. The expandable menu icon in the menu bar opens an options menu to the right of the screen that contains GUI elements relevant to the Platform Interface implementations as well as the authentication UI. Interacting with Alexa and the Engine requires successful authentication with AVS. You can log out using the **Log Out** button in the options menu, which will clear the saved refresh token.
 
@@ -199,19 +201,20 @@ PreRequisite: Install the Low Level Debugger (LLDB) package in Android Studio. T
 
 ## Release Notes<a id="releasenotes"></a>
 
-### v1.5.0 released on 2019-03-06:
+### v1.6.0 released on 2019-05-16:
 
-#### Resolved Issues
+#### Enhancements
 
-* No resolved issues
-
+* The sample app can now generate a default device serial number (DSN) if one is not specified through the configuration file at build time.
+  
 #### Known Issues
 
+* Music playback may continue after logging out from the app.
 * The `MediaPlayer.prepare` method implementation in `MediaPlayerHandler` blocks returning until it reads the full audio attachment from the Engine on the caller's thread. It should not do this and instead should return quickly and read the attachment on a separate thread.
 * The MACCAndroidClient does not rediscover Media App Command and Control (MACC) compliant apps if they are unresponsive after being idle for a long period (around 30 minutes).
 * Display card rendering is not adaptable to a variety of screen sizes.
 * When authenticated with CBL, if network connectivity is lost while refreshing the access token, the Sample App does not automatically attempt to refresh the token when connectivity is restored, and the GUI incorrectly displays the "log in" button even though a refresh token is present. Restoring an authorized state requires either restarting the app or following the log in steps again with network connectivity.
 * Particular sections of the Flash Briefing do not resume from a paused state properly. Attempting to play after pause in some cases may restart the media playback.
 * The app does not implement managing inter-app audio focus, so other apps will not recognize its audio playback appropriately.
-* Alexa dialog playback may stop abruptly when switching between wifi and mobile data.
+* Alexa dialog playback may stop abruptly when switching between Wi-Fi and mobile data.
 * The app disconnects from AVS after remaining idle for some time and takes a while to reconnect.

@@ -17,6 +17,7 @@
 #define AACE_AUDIO_GSTREAMER_GSTUTILS_H_
 
 #include <memory>
+#include <string>
 #include <gst/gst.h>
 
 namespace aace {
@@ -25,7 +26,7 @@ namespace audio {
 class GstUtils
 {
 public:
-	static void initializeGStreamer();
+	static bool initializeGStreamer();
 
 	static GstElement *createElement(
 		GstElement *bin, const std::string &factory, const std::string &name);

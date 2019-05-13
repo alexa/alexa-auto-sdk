@@ -20,16 +20,14 @@
 #include <gst/gst.h>
 #include <AACE/Audio/AudioCapture.h>
 
-#include "Context.h"
-#include "InputChannel.h"
+#include "common/GstRecorder.h"
 
 namespace aace {
 namespace audio {
 
 class GstAudioCapture :
 	public AudioCapture,
-	public Context,
-	public InputChannel::Listener,
+	public Context::Listener,
 	public std::enable_shared_from_this<GstAudioCapture>
 {
 public:
@@ -40,9 +38,10 @@ public:
 	GstAudioCapture(
 		const std::string &name,
 		const std::string &device);
-	~GstAudioCapture();
+	~GstAudioCapture() = default;
 
-	ssize_t onWrite(GstMapInfo *info) override;
+	// Context::Listener interface
+	void onStreamData(const int16_t *data, const size_t length) override;
 
 	// AudioCapture interface
 	bool startAudioInput(const std::function<ssize_t(const int16_t*, const size_t)> &listener) override;
@@ -51,11 +50,11 @@ public:
 private:
 	bool init();
 
-	GstElement *m_source = NULL;
-
 	const std::string m_name;
 	const std::string m_device;
-	std::shared_ptr<InputChannel> m_channel;
+
+	std::unique_ptr<GstRecorder> m_recorder;
+
 	std::function<ssize_t(const int16_t*, const size_t)> m_listener;
 };
 

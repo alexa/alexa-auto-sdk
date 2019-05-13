@@ -5,9 +5,16 @@ LIC_FILES_CHKSUM = "file://include/AACE/Audio/AudioManager.h;beginline=4;endline
 DEPENDS = "aac-module-alexa"
 export AAC_PKG_CONFIG_PROVIDED = "gstreamer-1.0 gstreamer-app-1.0"
 
-EXTRA_OECMAKE += "-DGSTREAMER=ON"
+# Use GStreamer by default
+AUDIO_PLATFORM ?= "-DGSTREAMER=ON"
+# Except QNX and Android
+AUDIO_PLATFORM_qnx = "-DFILEAUDIO=ON"
+AUDIO_PLATFORM_android = ""
 
-AAC_PKG_CONFIG_PROVIDED_append_agl = " afb-daemon"
-EXTRA_OECMAKE_append_agl = " -DAGL_FRAMEWORK=ON"
+EXTRA_OECMAKE += "${AUDIO_PLATFORM}"
+
+# Enable 4A support for AGL
+PACKAGECONFIG[agl] = "-DAGL_FRAMEWORK=ON,,af-binder"
+PACKAGECONFIG_append_agl = " agl"
 
 inherit pkgconfig aac-module devlibsonly

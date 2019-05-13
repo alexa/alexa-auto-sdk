@@ -1,13 +1,5 @@
-bitbake
-extras
-
-android-toolchain/
-amazon-sources/
-downloads/
-
-build/
-
-deploy/
-
-.DS_Store
+/android-toolchain
+/downloads
+/build
+/deploy
 *.pyc

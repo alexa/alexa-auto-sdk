@@ -383,7 +383,7 @@ auto eqConfig = aace::alexa::config::AlexaConfiguration::createEqualizerControll
     {EqualizerBand::BASS, EqualizerBand::TREBLE},
     -8,
      8,
-    {{EqualizerBand::BASS, 0}, {EqualizerBand::TREBLE, 0}} );
+    { {EqualizerBand::BASS, 0}, {EqualizerBand::TREBLE, 0} } );
 engine->configure( { //other config objects..., eqConfig, ... } );
 
 ...
@@ -397,11 +397,11 @@ engine->registerPlatformInterface( m_equalizerController );
 // If levels are adjusted using local on-device controls, call inherited methods to notify the Engine:
 
 // To set a band to an absolute gain level in decibels
-std::vector<EqualizerBandLevel> settings{{EqualizerBand::BASS, 4}}; // Sets bass amplitude to +4dB
+std::vector<EqualizerBandLevel> settings{ {EqualizerBand::BASS, 4} }; // Sets bass amplitude to +4dB
 m_equalizerController->localSetBandLevels( settings );
 
 // To make a relative adjustment to level settings
-std::vector<EqualizerBandLevel> adjustments{{EqualizerBand::BASS, -2}}; // Decreases bass gain by 2dB
+std::vector<EqualizerBandLevel> adjustments{ {EqualizerBand::BASS, -2} }; // Decreases bass gain by 2dB
 m_equalizerController->localAdjustBandLevels( adjustments );
 
 // To reset gain levels to the configured defaults (usually 0dB)

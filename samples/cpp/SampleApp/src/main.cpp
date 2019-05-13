@@ -82,25 +82,22 @@ static void usageExit(std::string &name) {
                  "  --menu MENU\n"
                  "      (Required) Menu file.\n"
                  "\n"
+                 "  --audio-input-device DEVICE\n"
+                 "      Specify the audio input device.\n"
+                 "\n"
                  "  --browser COMMAND\n"
                  "      Open URL with the specified browser.\n"
                  "\n"
                  "  --media-player COMMAND\n"
                  "      Play audio with the specified media player.\n"
                  "\n"
-                 "  --render-player-info COMMAND\n"
-                 "      Parse JSON and return the result.\n"
-                 "\n"
-                 "  --render-template COMMAND\n"
-                 "      Parse JSON and return the result.\n"
+                 "  --payload-script COMMAND\n"
+                 "      Parse a JSON payload to print in the console.\n"
+                 "      Supported payloads include PlayerInfo and Template.\n"
                  "\n"
                  "  -s\n"
                  "  --single-threaded-ui\n"
                  "      Application UI runs on the main thread (default is async).\n"
-                 "\n"
-                 "  -w\n"
-                 "  --wake-word\n"
-                 "      Create wake word detection enabled Speech Recognizer. (Requires wake word support.)\n"
                  "\n"
                  "  -h\n"
                  "  --help\n"
@@ -183,28 +180,33 @@ int main(int argc, const char *argv[]) {
                     }
                     arg = list[i];
                     applicationContext->setBrowserCommand(arg);
+                } else if (c2(arg, ' ', "audio-input-device")) {
+                    if (++i == size) {
+                        missingArgumentExit(name, arg);
+                    }
+                    arg = list[i];
+                    applicationContext->setAudioInputDevice(arg);
                 } else if (c2(arg, ' ', "media-player")) {
                     if (++i == size) {
                         missingArgumentExit(name, arg);
                     }
                     arg = list[i];
                     applicationContext->setMediaPlayerCommand(arg);
+                } else if (c2(arg, ' ', "payload-script")) {
+                    if (++i == size) {
+                        missingArgumentExit(name, arg);
+                    }
+                    arg = list[i];
+                    applicationContext->setPayloadScriptCommand(arg);
                 } else if (c2(arg, ' ', "render-player-info")) {
-                    if (++i == size) {
-                        missingArgumentExit(name, arg);
-                    }
-                    arg = list[i];
-                    applicationContext->setRenderPlayerInfoCommand(arg);
+                    std::cerr << "--render-player-info option is deprecated (replaced with generic --payload-script)\n";
                 } else if (c2(arg, ' ', "render-template")) {
-                    if (++i == size) {
-                        missingArgumentExit(name, arg);
-                    }
-                    arg = list[i];
-                    applicationContext->setRenderTemplateCommand(arg);
+                    std::cerr << "--render-template option is deprecated (replaced with generic --payload-script)\n";
                 } else if (c2(arg, 's', "single-threaded-ui")) {
                     applicationContext->setSingleThreadedUI(true);
                 } else if (c2(arg, 'w', "wake-word")) {
-                    applicationContext->setWakeWordSupported(true);
+                    auto support = applicationContext->isWakeWordSupported() ? "wake word supported" : "wake word not supported";
+                    std::cerr << "--wake-word option is deprecated (" << support << ")\n";
                 } else if (c2(arg, 'h', "help") || c2(arg, '?')) {
                     usageExit(name);
                 } else {

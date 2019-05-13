@@ -15,9 +15,9 @@
 
 #include <thread>
 #include <AACE/Engine/Core/EngineMacros.h>
+#include <gst/app/gstappsink.h>
 
 #include "GstAudioCapture.h"
-#include "GstUtils.h"
 
 namespace aace {
 namespace audio {
@@ -40,86 +40,34 @@ GstAudioCapture::GstAudioCapture(const std::string &name, const std::string &dev
 	m_name{name},
 	m_device{device} {}
 
-GstAudioCapture::~GstAudioCapture()
-{
-	teardownPipeline();
-}
-
 bool GstAudioCapture::init()
 {
-	AACE_DEBUG(LX(TAG, "init"));
-
-	auto pipelineName = "AudioCapture:" + m_name;
-
-	if (!createPipeline(pipelineName))
+	m_recorder = GstRecorder::create(m_name, m_device);
+	if (!m_recorder)
 		return false;
 
-	if (m_device.empty()) {
-		m_source = GstUtils::createElement(m_pipeline, "autoaudiosrc", "source");
-	} else {
-		AACE_INFO(LX(TAG, "init").m("Using ALSA device").d("device", m_device));
-		m_source = GstUtils::createElement(m_pipeline, "alsasrc", "source");
-		if (m_source)
-			g_object_set(G_OBJECT(m_source), "device", m_device.c_str(), NULL);
-	}
-	if (!m_source)
-		return false;
-
-	// Caps for microphone capture
-	GstCaps *caps = gst_caps_new_simple(
-		"audio/x-raw",
-		"format", G_TYPE_STRING, "S16LE",
-		"channels", G_TYPE_INT, 1,
-		"rate", G_TYPE_INT, 16000,
-		"layout", G_TYPE_STRING, "interleaved",
-		NULL);
-
-	m_channel = InputChannel::create("SpeechRecognizer", caps, shared_from_this());
-	if (!m_channel) {
-		gst_caps_unref(caps);
-		return false;
-	}
-	gst_caps_unref(caps);
-
-	GstElement *sink = m_channel->getGstElement();
-	// Add sink bin to parent
-	if (!gst_bin_add(GST_BIN(m_pipeline), sink)) {
-		AACE_ERROR(LX(TAG, "init").m("Can't add the sink to bin"));
-		// Dispose sink
-		gst_object_unref(sink);
-		m_channel.reset();
-		return false;
-	}
-
-	if (!gst_element_link_many(m_source, sink, NULL)) {
-		AACE_ERROR(LX(TAG, "init").m("Gst link error"));
-		return false;
-	}
-
-#ifdef USE_GLOOP
-	startMainEventLoop();
-#endif
+	m_recorder->setListener(this);
 
 	return true;
 }
 
-ssize_t GstAudioCapture::onWrite(GstMapInfo *info)
+void GstAudioCapture::onStreamData(const int16_t *data, const size_t length)
 {
-	return m_listener((int16_t *) info->data, info->size / 2);
+	m_listener(data, length);
 }
 
 bool GstAudioCapture::startAudioInput(const std::function<ssize_t(const int16_t*, const size_t)> &listener)
 {
 	m_listener = listener;
 	AACE_DEBUG(LX(TAG, "play"));
-	play();
+	m_recorder->play();
 	return true;
 }
 
 bool GstAudioCapture::stopAudioInput()
 {
 	AACE_DEBUG(LX(TAG, "stop"));
-	stop();
+	m_recorder->stop();
 	return true;
 }
 

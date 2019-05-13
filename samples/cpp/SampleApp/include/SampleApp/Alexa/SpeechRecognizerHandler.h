@@ -18,6 +18,7 @@
 
 #include "SampleApp/Activity.h"
 #include "SampleApp/AudioFileReader.h"
+#include "SampleApp/AudioInputManager.h"
 #include "SampleApp/Logger/LoggerHandler.h"
 
 #include <AACE/Alexa/SpeechRecognizer.h>
@@ -42,7 +43,7 @@ class SpeechRecognizerHandler : public aace::alexa::SpeechRecognizer /* isa Plat
   private:
     std::weak_ptr<Activity> m_activity{};
     std::weak_ptr<logger::LoggerHandler> m_loggerHandler{};
-    std::shared_ptr<aace::audio::AudioCapture> m_platformAudioCapture{};
+    std::shared_ptr<sampleApp::AudioInputManager> m_platformAudioCapture{};
 
     std::string m_audioFilePath{};
     std::atomic<bool> m_isStreamingAudioFile{false};
@@ -52,7 +53,7 @@ class SpeechRecognizerHandler : public aace::alexa::SpeechRecognizer /* isa Plat
   protected:
     SpeechRecognizerHandler(std::weak_ptr<Activity> activity,
                             std::weak_ptr<logger::LoggerHandler> loggerHandler,
-                            std::shared_ptr<aace::audio::AudioCapture> platformAudioCapture,
+                            std::shared_ptr<sampleApp::AudioInputManager> platformAudioCapture,
                             bool wakewordDetectionEnabled);
 
   public:

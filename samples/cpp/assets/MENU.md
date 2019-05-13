@@ -167,7 +167,7 @@ The value of the menu item. The value type is determined by the associated actio
 
 ### AudioFile<a id="audiofile"></a>
 
-The **AudioFile** action sends the specified audio file to Alexa as if it were an utterance. The audio file path is relative to the menu file.
+The **AudioFile** action sends the specified audio file to Alexa as if it were an utterance. The audio file path is relative to the menu file. To extend this menu, save your audio files under `assets/inputs/` and add menu items that point to those files.
 
 For example:
 
@@ -180,7 +180,7 @@ For example:
 }
 ```
 
-Audio files must be 16KHz mono, 16-bit little-endian in PCM WAV format.
+>**Note:** Audio files must be 16KHz mono, 16-bit little-endian in PCM WAV format. Make sure that the audio starts with the `Alexa` wakeword.  
 
 ### GoBack<a id="goback"></a>
 
@@ -445,6 +445,8 @@ Supported properties:
 
 The **notify/*** action exercises the application platform interfaces with event/value notifications.
 
+>**Note:** Values within `[]` are optional.
+
 | Event                                       | Value
 | ------------------------------------------- | -------------------------------------------
 | onStopActive                                | -
@@ -456,6 +458,10 @@ The **notify/*** action exercises the application platform interfaces with event
 | **CBL**                                     |
 | onCBLStart                                  | -
 | onCBLCancel                                 | -
+| **Communications**                          |
+| onCommunicationAcceptCall                   | -
+| onCommunicationStopCall                     | -
+| onCommunicationShowState                    | -
 | **PlaybackController**                      |
 | onPlaybackControllerButtonPressed           | `button`
 | onPlaybackControllerTogglePressed           | `toggle/action`
@@ -474,11 +480,12 @@ The **notify/*** action exercises the application platform interfaces with event
 | onNetworkInfoProviderNetworkStatusChanged   | `status/wifiSignalStrength`
 | **PhoneCallController**                     |
 | onPhoneCallControllerConnectionStateChanged | `state`
-| onPhoneCallControllerCallStateChanged       | `state/callId/callerId`
+| onPhoneCallControllerCallStateChanged       | `state[/callId[/callerId]]`
 | onPhoneCallControllerCallFailed             | `callId/code/message`
 | onPhoneCallControllerCallerIdReceived       | `callId/callerId`
 | onPhoneCallControllerSendDTMFSucceeded      | `callId`
 | onPhoneCallControllerSendDTMFFailed         | `callId/code/message`
+| onPhoneCallControllerShowPayload            | -
 
 For example:
 

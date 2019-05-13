@@ -27,7 +27,7 @@ All development and testing of the C++ Sample App has been performed on Linux Ub
 
 ### Configuration File<a id="configuration-file"></a>
 
-The C++ Sample App requires a configuration file for device information and Alexa settings. See details in [Setup](#setup).
+The C++ Sample App requires one or more configuration files for device information, module configuration, and Alexa settings. See details in [Setup](#setup).
 
 ## Setup<a id="setup"></a>
 
@@ -48,7 +48,11 @@ $ export AAC_SDK_HOME=$(pwd)
 
 >**Note:** Most of the commands that follow are meant to be run from this `aac-sdk` directory.
 
-Edit the [config file template](./assets/config.json.in) and save as `samples/cpp/assets/config.json`. Replace the `${YOUR_CLIENT_ID}`, `${YOUR_DEVICE_SERIAL_NUMBER}`, and `${YOUR_PRODUCT_ID}` placeholders with [your own values](#amazon-developer-account).
+One or more configuration files can be passed to the sample app using the `--config <config-file-path>` flag. When additional modules are built with the sample app, it may be necessary to pass module specific configuration. Please refer to the `README` file within each extra module to get configuration information. For convenience, a [config file template](./assets/config.json.in) has been included for the core Auto SDK modules. The template must be customized with customer specific values.
+
+Edit the [config file template](./assets/config.json.in) and save as `samples/cpp/assets/config.json`. Replace the `${YOUR_CLIENT_ID}`, `${YOUR_DEVICE_SERIAL_NUMBER}`, and `${YOUR_PRODUCT_ID}` placeholders with [your own values](#amazon-developer-account). Additionally, you may customize the value of the database file paths that are included in the template. For example, the `databaseFilePath` for the `miscDatabase` field could be changed to `/my/db/folder/miscDB.db` instead of `./miscDatabase.db`. However, if the database directory path is modified, you must ensure that the directory exists and has write permissions. Therefore, for the previous example, you must ensure that `/my/db/folder` exists and has write permissions.
+
+>**Note:** The Auto SDK engine will fail to start if the database directory path does not exist or does not have write permissions.
 
 ```json
 {
@@ -57,11 +61,54 @@ Edit the [config file template](./assets/config.json.in) and save as `samples/cp
         "deviceSerialNumber": "${YOUR_DEVICE_SERIAL_NUMBER}",
         "productId": "${YOUR_PRODUCT_ID}"
     },
-    ...
+    "libcurlUtils": {
+        "CURLOPT_CAPATH": "/etc/ssl/certs"
+    },
+    "miscDatabase": {
+        "databaseFilePath": "./miscDatabase.db"
+    },
+    "certifiedSender": {
+        "databaseFilePath": "./certifiedSender.db"
+    },
+    "alertsCapabilityAgent": {
+        "databaseFilePath": "./alertsCapabilityAgent.db"
+    },
+    "notifications": {
+        "databaseFilePath": "./notifications.db"
+    },
+    "settings": {
+        "databaseFilePath": "./settings.db",
+        "defaultAVSClientSettings": {
+            "locale": "en-US"
+        }
+    },
+    "aace.storage": {
+        "localStoragePath": "./sample-aace.db",
+        "storageType": "sqlite"
+    },
+    "aace.vehicle": {
+        "info": {
+            "make": "Amazon",
+            "model": "AACE",
+            "year": "2019",
+            "trim": "aac",
+            "geography": "US",
+            "version": "1.2.3",
+            "os": "Sample OS 1.0",
+            "arch": "Sample Arch 1.0",
+            "language": "en-US",
+            "microphone": "SingleArray",
+            "countries": "US,GB,IE,CA,DE,AT,IN,JP,AU,NZ,FR",
+            "vehicleIdentifier": "Sample Identifier ABC"
+        },
+        "operatingCountry": "US"
+    }
 }
 ```
 
 You must replace placeholders with [your own values](#amazon-developer-account). The `clientId` is the one found in your device's Security Profile under the "Other devices and platforms" tab. The `deviceSerialNumber` can be arbitrary but should not contain spaces and must be unique.
+
+Vehicle information (`aace.vehicle`) should also be modified to match the customer vehicle specifics.
 
 Install dependencies:
 
@@ -103,7 +150,7 @@ From `${AAC_SDK_HOME}`, launch the C++ Sample App, specifying your config and me
 $ /opt/AAC/bin/SampleApp --cbreak --config samples/cpp/assets/config.json --menu samples/cpp/assets/menu.json > SampleApp.log
 ```
 
->**Note:** The [config file](./assets/config.json) *(you must create this file)* contains your device information and Alexa settings. The [menu file](./assets/menu.json) drives the hierarchical interactive text based menu system. Refer to the [menu documentation](./assets/MENU.md) for more information.
+>**Note:** The `config.json` file *(you must create this file)* contains your device information and Alexa settings. The [menu file](./assets/menu.json) drives the hierarchical interactive text based menu system. Refer to the [menu documentation](./assets/MENU.md) for more information.
 
 If everything works as expected, you should see the Main Menu. Press `A` to authenticate with [CBL](https://developer.amazon.com/docs/alexa-voice-service/code-based-linking-other-platforms.html).
 
@@ -112,6 +159,10 @@ Open a new terminal and tail the SampleApp.log file:
 ```shell
 $ tail -f SampleApp.log
 ```
+## Audio Menu
+
+The C++ Sample App provides an [audio file menu](./assets/MENU.md#audiofile) to send pre-recorded utterances. Responses are saves as MP3 audio files within the current directory where the app was run. Refer to the [audio file menu](./assets/MENU.md#audiofile) documentation for information on how to extend this menu with custom audio files.
+
 ## Troubleshooting<a id="troubleshooting"></a>
 
 When interacting with Alexa, if the Dialog State goes from `LISTENING` immediately to `IDLE`, you might not be logged in. Try logging into your account via CBL by tapping `A` from the Main Menu.
@@ -134,21 +185,28 @@ To resolve this, edit the `samples/cpp/assets/config.json` file and choose a uni
 
 <a id="releasenotes"></a>
 
-# Release Notes<a id="release-notes"></a>
-
-## v1.5.0 released on 2019-03-06:<a id="v150-released-on-2019-03-06"></a>
+## v1.6.0 released on 2019-05-16:<a id="v160-released-on-2019-05-16"></a>
 
 ### Enhancements<a id="enhancements"></a>
 
-* This is the first release of the C++ Sample App.
+* Phone Call Controller support
+* Alexa Communications support
+* Local Voice Control support
+* QNX platform support
+* Can now specify the ALSA device used for audio input
 
 ### Known Issues<a id="known-issues"></a>
 
+* Content from media streaming services (e.g., TuneIn) that deliver ASHX URLs is not currently supported.
+* Unable to play Audible books on Poky Linux for iMX8 (ARM 64-bit) due to stream errors encountered by GStreamer media player.
 * Increasing/decreasing speaker volume in quick succession causes lag and delayed responses from Alexa.
 * Refer to the [Sample Audio Implementation documentation](../audio/README.md) for known issues related to audio.
+* Switching to LocalMediaSource does not set focus, causing the current audio to continue playing.
 
 ### Limitations<a id="limitations"></a>
 
-* Alexa Communications is not supported.
-* Local Voice Control is not supported.
-* QNX platform is not supported.
+* QNX is supported with file audio only. The following are additional limitations on QNX: 
+  * There is no direct microphone or speaker support.
+  * Use the Audio File Input menu of the C++ Sample App to test utterances.
+  * Response audio will be saved as MP3 files in the current working directory.
+  * Content from streaming services is not supported.

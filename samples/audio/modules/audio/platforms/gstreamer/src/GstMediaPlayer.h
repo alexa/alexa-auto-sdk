@@ -23,7 +23,7 @@
 #include <AACE/Alexa/MediaPlayer.h>
 #include <AACE/Alexa/Speaker.h>
 
-#include "GstPlayer.h"
+#include "common/GstPlayer.h"
 
 namespace aace {
 namespace audio {
@@ -33,18 +33,24 @@ static constexpr uint8_t DEFAULT_VOLUME = 100;
 class GstMediaPlayer :
 	public alexa::MediaPlayer,
 	public alexa::Speaker,
-	public Context::Listener,
-	public std::enable_shared_from_this<GstMediaPlayer>
+	public Context::Listener
 {
 public:
+	enum class StreamType {
+		MP3_FILE,
+		MP3_STREAM,
+		RAW_STREAM
+	};
+
 	static std::shared_ptr<GstMediaPlayer> create(
+		const StreamType &type,
 		const std::string &name,
-		const std::shared_ptr<GstPlayer> &player);
+		const std::string &device);
 
 	GstMediaPlayer(
+		const StreamType &type,
 		const std::string &name,
-		const std::shared_ptr<GstPlayer> &player);
-
+		const std::string &device);
 	~GstMediaPlayer() = default;
 
 	// Context::Listener interface
@@ -52,6 +58,7 @@ public:
 	void onStreamEnd() override;
 	void onStreamError() override;
 	void onStateChanged(GstState state) override;
+	void onDataRequested() override;
 
 	// MediaPlayer interface
 	bool prepare() override;
@@ -70,14 +77,20 @@ public:
 	int8_t getVolume() override;
 	bool isMuted() override;
 
+	bool writeStreamToFile(const std::string &path);
+	bool writeStreamToPipeline();
+
 private:
 	bool init();
 	void setURI(const std::string &uri);
+	void applyCurrentVolume();
 
 	const std::string TAG;
+	const StreamType m_type;
 	const std::string m_name;
+	const std::string m_device;
 
-	std::shared_ptr<GstPlayer> m_player;
+	std::unique_ptr<GstPlayer> m_player;
 
 	std::atomic<uint64_t> m_pendingPosition;
 	std::string m_currentURI;
@@ -85,6 +98,12 @@ private:
 	bool m_currentMute = false;
 	int64_t m_currentPosition = 0;
 	std::atomic<bool> m_stopRequested;
+
+	std::string m_tmpFile;
+
+#ifdef USE_GLOOP
+	GSource *m_timeoutSource = NULL;
+#endif
 };
 
 }

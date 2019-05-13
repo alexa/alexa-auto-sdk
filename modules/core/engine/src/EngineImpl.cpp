@@ -15,6 +15,9 @@
 
 #include <unordered_map>
 #include <forward_list>
+#ifndef NO_SIGPIPE
+#include <csignal>
+#endif
 
 #include "AACE/Engine/Core/EngineImpl.h"
 #include "AACE/Engine/Core/EngineService.h"
@@ -68,6 +71,10 @@ bool EngineImpl::initialize()
     try
     {
         AACE_INFO(LX(TAG,"initialize").d("engineVersion",aace::engine::core::version::getEngineVersion()));
+    #ifndef NO_SIGPIPE
+        AACE_VERBOSE(LX(TAG,"initialize").d("signal","SIGPIPE").d("value","SIG_IGN"));
+        ThrowIf( std::signal( SIGPIPE, SIG_IGN ) == SIG_ERR, "setSignalFailed" );
+    #endif
 
         ThrowIf( m_initialized, "engineAlreadyInitialized" );
         ThrowIfNot( checkServices(), "checkServicesFailed" );

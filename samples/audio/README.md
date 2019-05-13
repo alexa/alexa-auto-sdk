@@ -108,4 +108,6 @@ bool SpeechRecognizerHandler::stopAudioInput() {
    ```
 
 ## Known Issues
+
 * TuneIn (including streams from many Flash Briefing and Sports Update skills) uses the .ashx playlist URL format for playback. This implementation does not include a parser for ashx audio playlists, so streams from TuneIn may not be able to play.
+* Lowering the volume by an amount that is larger than the current volume will result in the volume being set to its maximum.

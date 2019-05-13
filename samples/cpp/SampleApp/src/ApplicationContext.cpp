@@ -83,6 +83,8 @@ std::string ApplicationContext::getApplicationDirPath() { return m_applicationDi
 
 std::string ApplicationContext::getApplicationPath() { return m_applicationPath; }
 
+std::string ApplicationContext::getAudioInputDevice() { return m_audioInputDevice; }
+
 std::string ApplicationContext::getBrowserCommand() { return m_browserCommand; }
 
 std::string ApplicationContext::getConfigFilePath(size_t index) { return m_configFilePaths[index]; }
@@ -102,6 +104,8 @@ std::string ApplicationContext::getDirPath(const std::string &path) {
 
 logger::LoggerHandler::Level ApplicationContext::getLevel() { return m_level; }
 
+int ApplicationContext::getMaximumAVSVolume() { return 100; };
+
 std::string ApplicationContext::getMediaPlayerCommand() { return m_mediaPlayerCommand; }
 
 json ApplicationContext::getMenu(const std::string &id) {
@@ -111,8 +115,6 @@ json ApplicationContext::getMenu(const std::string &id) {
     return nullptr;
 }
 
-int ApplicationContext::getMaximumAVSVolume() { return 100; };
-
 std::vector<std::string> ApplicationContext::getMenuFilePaths() { return m_menuFilePaths; }
 
 json ApplicationContext::getMenuItemValue(const std::string &id, const json defaultValue) {
@@ -120,7 +122,7 @@ json ApplicationContext::getMenuItemValue(const std::string &id, const json defa
         auto menu = m_menuRegister.at(id);
         if (menu.count("index") && menu.count("item")) {
             auto index = menu.at("index").get<ssize_t>();
-            if ((index >= 0) && (index < menu.at("item").size())) {
+            if ((index >= 0) && (index < (ssize_t)menu.at("item").size())) {
                 auto item = menu.at("item")[index];
                 if (item.count("value")) {
                     return item.at("value");
@@ -150,9 +152,7 @@ json ApplicationContext::getMenuValue(const std::string &id, const json defaultV
 
 int ApplicationContext::getMinimumAVSVolume() { return 0; };
 
-std::string ApplicationContext::getRenderPlayerInfoCommand() { return m_renderPlayerInfoCommand; }
-
-std::string ApplicationContext::getRenderTemplateCommand() { return m_renderTemplateCommand; }
+std::string ApplicationContext::getPayloadScriptCommand() { return m_payloadScriptCommand; }
 
 std::string ApplicationContext::getUserConfigFilePath() { return m_userConfigFilePath; }
 
@@ -168,7 +168,13 @@ bool ApplicationContext::isSingleThreadedUI() { return m_singleThreadedUI; }
 
 bool ApplicationContext::isTestAutomation() { return m_testAutomation; }
 
-bool ApplicationContext::isWakeWordSupported() { return m_wakeWordSupported; }
+bool ApplicationContext::isWakeWordSupported() {
+#ifdef AMAZONLITE
+    return true;
+#else
+    return false;
+#endif // AMAZONLITE
+}
 
 std::string ApplicationContext::makeTempPath(const std::string &name, const std::string &extension) {
     static std::map<std::string, unsigned> Count{};
@@ -206,6 +212,8 @@ bool ApplicationContext::saveContent(const std::string &path, const std::string 
     return true;
 }
 
+void ApplicationContext::setAudioInputDevice(const std::string &audioInputDevice) { m_audioInputDevice = audioInputDevice; }
+
 void ApplicationContext::setBrowserCommand(const std::string &browserCommand) { m_browserCommand = browserCommand; }
 
 void ApplicationContext::setLevel(const logger::LoggerHandler::Level level) {
@@ -215,15 +223,11 @@ void ApplicationContext::setLevel(const logger::LoggerHandler::Level level) {
 
 void ApplicationContext::setMediaPlayerCommand(const std::string &mediaPlayerCommand) { m_mediaPlayerCommand = mediaPlayerCommand; }
 
-void ApplicationContext::setRenderPlayerInfoCommand(const std::string &renderPlayerInfoCommand) { m_renderPlayerInfoCommand = renderPlayerInfoCommand; }
-
-void ApplicationContext::setRenderTemplateCommand(const std::string &renderTemplateCommand) { m_renderTemplateCommand = renderTemplateCommand; }
+void ApplicationContext::setPayloadScriptCommand(const std::string &payloadScriptCommand) { m_payloadScriptCommand = payloadScriptCommand; }
 
 void ApplicationContext::setSingleThreadedUI(bool singleThreadedUI) { m_singleThreadedUI = singleThreadedUI; }
 
 void ApplicationContext::setUserConfigFilePath(const std::string &userConfigFilePath) { m_userConfigFilePath = userConfigFilePath; };
-
-void ApplicationContext::setWakeWordSupported(bool wakeWordDetectionEnabled) { m_wakeWordSupported = wakeWordDetectionEnabled; }
 
 // private
 

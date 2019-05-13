@@ -93,8 +93,8 @@ bool DefaultMediaPlayer::play() {
     if (!activity) {
         return false;
     }
-    auto executorService = activity->getExecutorService();
-    if (!executorService) {
+    auto executor = activity->getExecutor();
+    if (!executor) {
         return false;
     }
     log(logger::LoggerHandler::Level::INFO, "MediaState::PLAYING");
@@ -105,7 +105,7 @@ bool DefaultMediaPlayer::play() {
             console->print(m_applicationContext->executeCommand((command + ' ' + m_tempPath).c_str()));
         }
     }
-    executorService->run([=]() {
+    executor->submit([=]() {
         log(logger::LoggerHandler::Level::INFO, "MediaState::STOPPED");
         mediaStateChanged(MediaState::STOPPED);
     });

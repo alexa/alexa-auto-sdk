@@ -389,7 +389,7 @@ void ExternalMediaAdapterHandler::reportDiscoveredPlayers( const std::vector<aac
 {
     // add the player info to the registered player map
     for( const auto& next : discoveredPlayers ) {
-        m_playerInfoMap[next.localPlayerId] = PlayerInfo( next.localPlayerId, next.spiVersion );
+        m_playerInfoMap[next.localPlayerId] = PlayerInfo( next.localPlayerId, next.spiVersion, next.validationMethod == VALIDATION_NONE );
     }
 
     // used the discovered player sender to report the players
@@ -424,7 +424,7 @@ bool ExternalMediaAdapterHandler::removeDiscoveredPlayer( const std::string& loc
 // PlayerInfo
 //
 
-PlayerInfo::PlayerInfo( const std::string& localId, const std::string& spi ) : localPlayerId( localId ), spiVersion( spi ) {
+PlayerInfo::PlayerInfo( const std::string& localId, const std::string& spi, bool auth ) : localPlayerId( localId ), spiVersion( spi ), authorized( auth ) {
 }
 
 

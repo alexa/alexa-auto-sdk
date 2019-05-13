@@ -16,9 +16,8 @@
 #include <AACE/Audio/AudioManager.h>
 
 #include "GstMediaPlayer.h"
-#include "GstUtils.h"
 #include "GstAudioCapture.h"
-#include "GstPlayer.h"
+#include "common/GstUtils.h"
 
 #ifdef USE_AGL_FRAMEWORK
 #include "agl/AGLAudioManager.h"
@@ -57,23 +56,25 @@ bool AudioManager::init(void *platformData)
 	return true;
 }
 
-AudioOutputChannel AudioManager::openOutputChannel(const std::string &name, const std::string &device)
+AudioOutputChannel AudioManager::openOutputChannel(const std::string &name, const std::string &device, const std::string &streamFormat)
 {
 #ifdef USE_AGL_FRAMEWORK
 	// Request ALSA device
-	auto roleDevice = m_impl->mgr->openAHLChannel(device);
+	auto alsaDevice = m_impl->mgr->openAHLChannel(device);
 
-	if (roleDevice.empty())
+	if (alsaDevice.empty())
 		return {
 			nullptr,
 			nullptr
 		};
-
-	std::shared_ptr<GstPlayer> player = GstPlayer::create(name, roleDevice);
 #else
-	std::shared_ptr<GstPlayer> player = GstPlayer::create(name, device);
+	auto alsaDevice = device;
 #endif
-	std::shared_ptr<GstMediaPlayer> mediaPlayer = GstMediaPlayer::create(name, player);
+	std::shared_ptr<GstMediaPlayer> mediaPlayer = nullptr;
+	if (streamFormat == "mp3")
+		mediaPlayer = GstMediaPlayer::create(GstMediaPlayer::StreamType::MP3_FILE, name, alsaDevice);
+	else if (streamFormat == "raw")
+		mediaPlayer = GstMediaPlayer::create(GstMediaPlayer::StreamType::RAW_STREAM, name, alsaDevice);
 
 	return {
 		mediaPlayer,
@@ -82,9 +83,7 @@ AudioOutputChannel AudioManager::openOutputChannel(const std::string &name, cons
 }
 
 AudioInputChannel AudioManager::openInputChannel(const std::string &name, const std::string &device) {
-	std::shared_ptr<GstAudioCapture> audioCapture
-		= GstAudioCapture::create(name, device);
-
+	std::shared_ptr<GstAudioCapture> audioCapture = GstAudioCapture::create(name, device);
 	return {
 		audioCapture
 	};

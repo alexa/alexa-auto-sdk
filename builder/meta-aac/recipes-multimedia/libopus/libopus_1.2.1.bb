@@ -11,3 +11,5 @@ SRC_URI[sha256sum] = "cfafd339ccd9c5ef8d6ab15d7e1a412c054bf4cb4ecbbbcc78c12ef2de
 S = "${WORKDIR}/opus-${PV}"
 
 inherit autotools pkgconfig
+
+PACKAGECONFIG[ne10] = "--with-NE10=${STAGING_EXECPREFIXDIR},--without-NE10,ne10"

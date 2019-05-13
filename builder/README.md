@@ -88,6 +88,9 @@ The following `options` are available:
 * `-c,--clean` option to clean build. If the OE recipe name is specified with `--package` option, the only specified recipe will be cleaned.
 * *(Android target only)* `--android-api <integer>` option to explicitly specify Android API level. Defaults to `22`.
 * *(QNX7 target only)* `--qnx7sdp-path <path>` option to specify QNX 7.0.0 SDP installation (in host). If you run Builder within Docker environment, host QNX SDP tools are always used. So make sure you have installed Linux tools within SDP even if your host is macOS.
+* `--default-logger-enabled <enabled>` option to enable/disable the default engine logger ( `On` | `Off` ). Defaults to `On`. If enabled, there must be logger level and sink, either explicitly set or default.
+* `--default-logger-level <level>` option to set the logger level for the default engine logger ( `Verbose` | `Info` | `Metric` | `Warn` | `Error` | `Critical` ). Defaults to `Info` for release builds, and `Verbose` for debug builds.
+* `--default-logger-sink <sink>` option to set the logger sink for the default engine logger ( `Console` | `Syslog` ). Defaults to `Syslog` for Android build targets, and `Console` for all other build targets.
 
 The following build targets are available:
 
@@ -101,17 +104,27 @@ The following build targets are available:
 | QNX AArch64                | `qnx7arm64`     |
 | QNX x86-64                 | `qnx7x86-64`    |
 
-*(Preview)* For all other targets/toolchains, please refer to the files `meta-aac-builder/conf/machine/*.conf`. Those targets are provided by default for Poky based Linux systems:
+For all other targets/toolchains, please refer to the files `meta-aac-builder/conf/machine/*.conf`. Those targets are provided by default for Poky based Linux systems:
 
->*Note: Using Builder to build the Alexa Auto SDK for macOS targets is not currently supported.*
+>**Note**: Using Builder to build the Alexa Auto SDK for macOS targets is not currently supported.
 
 | Platform Name                          | `-t` value      |
 | -------------------------------------- | --------------- |
 | AGL AArch64                            | `aglarm64`      |
-| *(Preview)* Poky Linux ARMv7a (+NEON)  | `pokyarm`       |
-| *(Preview)* Poky Linux AArch64         | `pokyarm64`     |
+| Poky Linux ARMv7a (+NEON)              | `pokyarm`       |
+| Poky Linux AArch64                     | `pokyarm64`     |
 
-For example, to build all the Alexa Auto SDK modules and their dependencies for an *Android ARMv7a* target, run the following command:
+If you are building a Poky Linux ARM target, make sure you have the appropriate toolchain for your target platform prior to running the Alexa Auto SDK Builder. For example, if you are building a Poky Linux ARM target `pokyarm64` on an Ubuntu system you could download and run the the following script
+
+> http://downloads.yoctoproject.org/releases/yocto/yocto-2.6.1/toolchain/x86_64/poky-glibc-x86_64-core-image-sato-aarch64-toolchain-2.6.1.sh
+
+To build all the Alexa Auto SDK modules and their dependencies for a *Poky Linux AArch64* target, run the following command:
+
+```
+$ ${AAC_SDK_HOME}/builder/build.sh oe -t pokyarm64
+```
+
+Similarly, to build an *Android ARMv7a* target, run the following command:
 
 ```
 $ ${AAC_SDK_HOME}/builder/build.sh oe -t androidarm

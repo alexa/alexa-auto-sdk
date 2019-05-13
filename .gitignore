@@ -1,6 +1,6 @@
 .repo
 .DS_Store
-docs
-extras
+/docs
+/extras
 .vscode
-build
+/build

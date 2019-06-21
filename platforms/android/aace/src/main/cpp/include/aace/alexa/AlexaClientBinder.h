@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -59,6 +59,7 @@ private:
     // DialogState
     ObjectRef m_enum_DialogState_IDLE;
     ObjectRef m_enum_DialogState_LISTENING;
+    ObjectRef m_enum_DialogState_EXPECTING;
     ObjectRef m_enum_DialogState_THINKING;
     ObjectRef m_enum_DialogState_SPEAKING;
 
@@ -90,6 +91,9 @@ private:
     ObjectRef m_enum_ConnectionStatus_CONNECTED;
 
     // ConnectionChangedReason
+    ObjectRef m_enum_ConnectionChangedReason_NONE;
+    ObjectRef m_enum_ConnectionChangedReason_SUCCESS;
+    ObjectRef m_enum_ConnectionChangedReason_UNRECOVERABLE_ERROR;
     ObjectRef m_enum_ConnectionChangedReason_ACL_CLIENT_REQUEST;
     ObjectRef m_enum_ConnectionChangedReason_ACL_DISABLED;
     ObjectRef m_enum_ConnectionChangedReason_DNS_TIMEDOUT;

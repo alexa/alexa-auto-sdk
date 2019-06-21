@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -348,6 +348,9 @@ void AudioChannelEngineImpl::executePlaybackFinished( SourceId id )
             m_observer->onPlaybackFinished( id );
         }
         
+        // save the player offset
+        m_savedOffset = std::chrono::milliseconds( m_mediaPlayerPlatformInterface->getPosition() );
+
         m_currentId = ERROR;
     }
     catch( std::exception& ex ) {
@@ -544,6 +547,8 @@ void AudioChannelEngineImpl::onLocalMuteSet( bool mute )
 
 alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId AudioChannelEngineImpl::setSource( std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader> attachmentReader, const alexaClientSDK::avsCommon::utils::AudioFormat* format )
 {
+    std::unique_lock<std::mutex> lock( m_mutex );
+
     try
     {
         AACE_DEBUG(LX(TAG,"setSource").d("type","attachment"));
@@ -565,6 +570,8 @@ alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId Au
 
 alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId AudioChannelEngineImpl::setSource( std::shared_ptr<std::istream> stream, bool repeat )
 {
+    std::unique_lock<std::mutex> lock( m_mutex );
+
     try
     {
         AACE_DEBUG(LX(TAG,"setSource").d("type","stream"));
@@ -587,7 +594,7 @@ alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId Au
     return m_currentId;
 }
 
-alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId AudioChannelEngineImpl::setSource( const std::string& url, std::chrono::milliseconds offset )
+alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId AudioChannelEngineImpl::setSource( const std::string& url, std::chrono::milliseconds offset, bool repeat )
 {
     std::unique_lock<std::mutex> lock( m_mutex );
 
@@ -598,6 +605,7 @@ alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId Au
         resetSource();
         
         m_url = url;
+        m_repeat = repeat;
         m_currentId = nextId();
 
         ThrowIfNot( m_mediaPlayerPlatformInterface->prepare( m_url ), "platformMediaPlayerPrepareFailed" );

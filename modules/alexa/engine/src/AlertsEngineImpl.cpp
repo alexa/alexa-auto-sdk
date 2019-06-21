@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -150,8 +150,9 @@ void AlertsEngineImpl::removeAllAlerts()
 }
 
 // AlertObserverInterface
-void AlertsEngineImpl::onAlertStateChange( const std::string& alertToken, alexaClientSDK::capabilityAgents::alerts::AlertObserverInterface::State state, const std::string& reason )
+void AlertsEngineImpl::onAlertStateChange( const std::string& alertToken, const std::string& alertType, alexaClientSDK::capabilityAgents::alerts::AlertObserverInterface::State state, const std::string& reason )
 {
+    // NOTE: alertType (added in AVS Device SDK 1.12.1) is not provided in alertStateChanged() for compatibility reasons.
     if( m_alertsPlatformInterface != nullptr ) {
         m_alertsPlatformInterface->alertStateChanged( alertToken, static_cast<aace::alexa::Alerts::AlertState>( state ), reason );
     }

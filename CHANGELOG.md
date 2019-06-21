@@ -2,6 +2,36 @@
 
 ___
 
+## v1.3.1 released on 2019-06-21:
+
+### Enhancements
+
+This release of Alexa Auto SDK includes updates for music certification.
+
+### Resolved Issues
+
+Resolved issues are limited to music certification updates:
+
+* Migrated to AVS Device SDK v1.12.1 for music certification. As part of the migration there is a new dependency on `openssl`. Developers using their own build system may need to make changes in order to accomodate this new dependency when linking AVS Device SDK.
+* Fixed ExternalMediaPlayerAdapter getState() failure that triggered `INVALID_REQUEST_EXCEPTION/Bad Request` exceptions.
+* Fixed live radio offset for stations that use a dynamic window (`mime=audio/mp4a-latm`).
+* Updated the Android Sample App log view implementation for improved stability and performance.
+* Bug fixes and documentation updates:
+  - Additional test in `AuthProviderEngineImpl::doShutdown()` to avoid null pointer exception.
+  - Fixed an issue with `SQLiteStorage::removeKey()` where the `DELETE FROM` statement repeated the `FROM`.
+  - Fixed a race condition in `AudioChannelEngineImpl::setSource()` with back to back TTS.
+  - Internal calls to `AudioChannelEngineImpl::executePlaybackFinished()` now save the player offset.
+  - Internal calls to `AudioPlayerEngineImpl::removeObserver()` now remove an AudioPlayerObserverInterface observer instance instead of adding it.
+  - Use `static_cast<unsigned char>` for upper/lower character conversions.
+
+The platform interfaces have not changed, however the following C++ and Android enums are updated:
+* The enum class `DialogState` inserts the `EXPECTING` enum constant.
+* The enum class `ConnectionChangedReason` inserts `NONE`, `SUCCESS`, and `UNRECOVERABLE_ERROR` enum constants.
+
+### Known Issues
+
+All known issues from v1.3.0.
+
 ## v1.3.0 released on 2018-11-20:
 
 ### Enhancements

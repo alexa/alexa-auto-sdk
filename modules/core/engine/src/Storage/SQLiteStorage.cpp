@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -254,7 +254,7 @@ bool SQLiteStorage::removeKey( const std::string& table, const std::string& key 
         ThrowIfNull( m_db, "invalidDatabase" );
         ThrowIfNot( containsKey( table, key ), "invalidKey" );
         
-        auto sql = createStatement( "DELETE FROM FROM '%s' WHERE key='%s';", table.c_str(), key.c_str() );
+        auto sql = createStatement( "DELETE FROM '%s' WHERE key='%s';", table.c_str(), key.c_str() );
         ThrowIfNot( query( sql ), "removeKeyFailed" );
 
         return true;

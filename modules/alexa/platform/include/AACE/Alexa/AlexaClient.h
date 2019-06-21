@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -48,6 +48,11 @@ public:
          * Alexa is currently listening.
          */
         LISTENING,
+
+        /**
+         * Alexa is currently expecting a response from the user.
+         */
+        EXPECTING,
 
         /**
          * A user request has completed, and no more user input is being accepted.
@@ -109,6 +114,21 @@ public:
      * Describes the reason for a change in AVS connection status
      */
     enum class ConnectionChangedReason {
+
+        /**
+         * No reason specified.
+         */
+        NONE,
+
+        /**
+         * The connection status changed due to a successful operation.
+         */
+        SUCCESS,
+
+        /**
+         * The connection status changed due to an error from which there is no recovery.
+         */
+        UNRECOVERABLE_ERROR,
 
         /**
          * The connection status changed due to a client request.
@@ -198,6 +218,9 @@ inline std::ostream& operator<<(std::ostream& stream, const AlexaClient::DialogS
         case AlexaClient::DialogState::LISTENING:
             stream << "LISTENING";
             break;
+        case AlexaClient::DialogState::EXPECTING:
+            stream << "EXPECTING";
+            break;
         case AlexaClient::DialogState::THINKING:
             stream << "THINKING";
             break;
@@ -225,6 +248,15 @@ inline std::ostream& operator<<(std::ostream& stream, const AlexaClient::Connect
 
 inline std::ostream& operator<<(std::ostream& stream, const AlexaClient::ConnectionChangedReason& reason) {
     switch (reason) {
+        case AlexaClient::ConnectionChangedReason::NONE:
+            stream << "NONE";
+            break;
+        case AlexaClient::ConnectionChangedReason::SUCCESS:
+            stream << "SUCCESS";
+            break;
+        case AlexaClient::ConnectionChangedReason::UNRECOVERABLE_ERROR:
+            stream << "UNRECOVERABLE_ERROR";
+            break;
         case AlexaClient::ConnectionChangedReason::ACL_CLIENT_REQUEST:
             stream << "ACL_CLIENT_REQUEST";
             break;

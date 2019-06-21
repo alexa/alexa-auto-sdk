@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <AVSCommon/AVS/DialogUXStateAggregator.h>
 #include <AVSCommon/AVS/ExceptionEncounteredSender.h>
 #include <AVSCommon/AVS/Attachment/AttachmentManager.h>
+#include <AVSCommon/Utils/DeviceInfo.h>
 #include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
 #include <AVSCommon/SDKInterfaces/DirectiveSequencerInterface.h>
 #include <AVSCommon/SDKInterfaces/DialogUXStateObserverInterface.h>
@@ -31,6 +32,7 @@
 #include <ACL/Transport/TransportFactoryInterface.h>
 #include <ContextManager/ContextManager.h>
 #include <AFML/FocusManager.h>
+#include <RegistrationManager/RegistrationManager.h>
 
 namespace aace {
 namespace engine {
@@ -56,6 +58,8 @@ public:
     virtual std::shared_ptr<alexaClientSDK::adsl::MessageInterpreter> getMessageInterpreter() = 0;
     virtual std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentManager> getAttachmentManager() = 0;
     virtual std::shared_ptr<alexaClientSDK::acl::TransportFactoryInterface> getTransportFactory() = 0;
+    virtual std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> getDeviceInfo() = 0;
+    virtual std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> getCustomerDataManager() = 0;
 };
 
 }  // aace::engine:alexa

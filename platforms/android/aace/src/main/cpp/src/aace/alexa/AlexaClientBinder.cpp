@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ void AlexaClientBinder::initialize( JNIEnv* env )
     jclass dialogStateEnumClass = env->FindClass( "com/amazon/aace/alexa/AlexaClient$DialogState" );
     m_enum_DialogState_IDLE = NativeLib::FindEnum( env, dialogStateEnumClass, "IDLE", "Lcom/amazon/aace/alexa/AlexaClient$DialogState;" );
     m_enum_DialogState_LISTENING = NativeLib::FindEnum( env, dialogStateEnumClass, "LISTENING", "Lcom/amazon/aace/alexa/AlexaClient$DialogState;" );
+    m_enum_DialogState_EXPECTING = NativeLib::FindEnum( env, dialogStateEnumClass, "EXPECTING", "Lcom/amazon/aace/alexa/AlexaClient$DialogState;" );
     m_enum_DialogState_THINKING = NativeLib::FindEnum( env, dialogStateEnumClass, "THINKING", "Lcom/amazon/aace/alexa/AlexaClient$DialogState;" );
     m_enum_DialogState_SPEAKING = NativeLib::FindEnum( env, dialogStateEnumClass, "SPEAKING", "Lcom/amazon/aace/alexa/AlexaClient$DialogState;" );
 
@@ -64,6 +65,9 @@ void AlexaClientBinder::initialize( JNIEnv* env )
 
     // ConnectionChangedReason
     jclass connectionChangedReasonEnumClass = env->FindClass( "com/amazon/aace/alexa/AlexaClient$ConnectionChangedReason" );
+    m_enum_ConnectionChangedReason_NONE = NativeLib::FindEnum( env, connectionChangedReasonEnumClass, "NONE", "Lcom/amazon/aace/alexa/AlexaClient$ConnectionChangedReason;" );
+    m_enum_ConnectionChangedReason_SUCCESS = NativeLib::FindEnum( env, connectionChangedReasonEnumClass, "SUCCESS", "Lcom/amazon/aace/alexa/AlexaClient$ConnectionChangedReason;" );
+    m_enum_ConnectionChangedReason_UNRECOVERABLE_ERROR = NativeLib::FindEnum( env, connectionChangedReasonEnumClass, "UNRECOVERABLE_ERROR", "Lcom/amazon/aace/alexa/AlexaClient$ConnectionChangedReason;" );
     m_enum_ConnectionChangedReason_ACL_CLIENT_REQUEST = NativeLib::FindEnum( env, connectionChangedReasonEnumClass, "ACL_CLIENT_REQUEST", "Lcom/amazon/aace/alexa/AlexaClient$ConnectionChangedReason;" );
     m_enum_ConnectionChangedReason_ACL_DISABLED = NativeLib::FindEnum( env, connectionChangedReasonEnumClass, "ACL_DISABLED", "Lcom/amazon/aace/alexa/AlexaClient$ConnectionChangedReason;" );
     m_enum_ConnectionChangedReason_DNS_TIMEDOUT = NativeLib::FindEnum( env, connectionChangedReasonEnumClass, "DNS_TIMEDOUT", "Lcom/amazon/aace/alexa/AlexaClient$ConnectionChangedReason;" );
@@ -124,6 +128,8 @@ jobject AlexaClientBinder::convert( aace::alexa::AlexaClient::DialogState state 
             return m_enum_DialogState_IDLE.get();
         case aace::alexa::AlexaClient::DialogState::LISTENING:
             return m_enum_DialogState_LISTENING.get();
+        case aace::alexa::AlexaClient::DialogState::EXPECTING:
+            return m_enum_DialogState_EXPECTING.get();
         case aace::alexa::AlexaClient::DialogState::THINKING:
             return m_enum_DialogState_THINKING.get();
         case aace::alexa::AlexaClient::DialogState::SPEAKING:
@@ -141,6 +147,9 @@ aace::alexa::AlexaClient::DialogState AlexaClientBinder::convertDialogState( job
     }
     else if( env->IsSameObject( obj, m_enum_DialogState_LISTENING.get() ) ) {
         return aace::alexa::AlexaClient::DialogState::LISTENING;
+    }
+    else if( env->IsSameObject( obj, m_enum_DialogState_EXPECTING.get() ) ) {
+        return aace::alexa::AlexaClient::DialogState::EXPECTING;
     }
     else if( env->IsSameObject( obj, m_enum_DialogState_THINKING.get() ) ) {
         return aace::alexa::AlexaClient::DialogState::THINKING;
@@ -299,6 +308,12 @@ jobject AlexaClientBinder::convert( aace::alexa::AlexaClient::ConnectionChangedR
 {
     switch( reason )
     {
+        case aace::alexa::AlexaClient::ConnectionChangedReason::NONE:
+            return m_enum_ConnectionChangedReason_NONE.get();
+        case aace::alexa::AlexaClient::ConnectionChangedReason::SUCCESS:
+            return m_enum_ConnectionChangedReason_SUCCESS.get();
+        case aace::alexa::AlexaClient::ConnectionChangedReason::UNRECOVERABLE_ERROR:
+            return m_enum_ConnectionChangedReason_UNRECOVERABLE_ERROR.get();
         case aace::alexa::AlexaClient::ConnectionChangedReason::ACL_CLIENT_REQUEST:
             return m_enum_ConnectionChangedReason_ACL_CLIENT_REQUEST.get();
         case aace::alexa::AlexaClient::ConnectionChangedReason::ACL_DISABLED:
@@ -335,7 +350,16 @@ aace::alexa::AlexaClient::ConnectionChangedReason AlexaClientBinder::convertConn
 {
     JNIEnv* env = NativeLib::getJNIEnv();
 
-    if( env->IsSameObject( obj, m_enum_ConnectionChangedReason_ACL_CLIENT_REQUEST ) ) {
+    if( env->IsSameObject( obj, m_enum_ConnectionChangedReason_NONE ) ) {
+        return aace::alexa::AlexaClient::ConnectionChangedReason::NONE;
+    }
+    else if( env->IsSameObject( obj, m_enum_ConnectionChangedReason_SUCCESS ) ) {
+        return aace::alexa::AlexaClient::ConnectionChangedReason::SUCCESS;
+    }
+    else if( env->IsSameObject( obj, m_enum_ConnectionChangedReason_UNRECOVERABLE_ERROR ) ) {
+        return aace::alexa::AlexaClient::ConnectionChangedReason::UNRECOVERABLE_ERROR;
+    }
+    else if( env->IsSameObject( obj, m_enum_ConnectionChangedReason_ACL_CLIENT_REQUEST ) ) {
         return aace::alexa::AlexaClient::ConnectionChangedReason::ACL_CLIENT_REQUEST;
     }
     else if( env->IsSameObject( obj, m_enum_ConnectionChangedReason_ACL_DISABLED ) ) {

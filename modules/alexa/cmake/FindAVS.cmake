@@ -9,7 +9,7 @@
 #    cp AutoCoreEngineSDK/cmake/FindAVS.cmake WakeWordEngines/cmake
 # 3. Update AVS_VERSION when upgrading to a new version
 
-set(AVS_VERSION 1.9)
+set(AVS_VERSION 1.12.1)
 
 find_path(AVS_COMMON_INCLUDE_DIR AVSCommon)
 

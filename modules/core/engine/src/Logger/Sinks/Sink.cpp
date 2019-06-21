@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ std::shared_ptr<Rule> Rule::create( Level level, const std::string& source, cons
 std::shared_ptr<Rule> Rule::create( const std::string& level, const std::string& source, const std::string& tag, const std::string& message )
 {
     std::string lvlUp = level;
-    std::transform( lvlUp.begin(), lvlUp.end(), lvlUp.begin(), [](unsigned char c) -> unsigned char { return std::toupper(c); } );
+    std::transform( lvlUp.begin(), lvlUp.end(), lvlUp.begin(), [](unsigned char c) -> unsigned char { return static_cast<unsigned char>(std::toupper(c)); } );
     Level lv;
     
     if( lvlUp.compare( "CRITICAL" ) == 0 ) {

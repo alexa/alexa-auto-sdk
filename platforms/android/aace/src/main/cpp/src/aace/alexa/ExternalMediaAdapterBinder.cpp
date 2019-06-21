@@ -306,6 +306,7 @@ bool ExternalMediaAdapterBinder::authorize( const std::vector<AuthorizedPlayerIn
 aace::alexa::ExternalMediaAdapter::ExternalMediaAdapterState ExternalMediaAdapterBinder::getState( const std::string& localPlayerId )
 {
     aace::alexa::ExternalMediaAdapter::ExternalMediaAdapterState state;
+    state.valid = false;
 
     if( getJavaObject() != nullptr && m_javaMethod_getState_localPlayerId != nullptr )
     {
@@ -461,6 +462,8 @@ aace::alexa::ExternalMediaAdapter::ExternalMediaAdapterState ExternalMediaAdapte
 
                 env->DeleteLocalRef( localPlaybackState );
                 env->DeleteLocalRef( localExternalMediaAdapterState );
+
+                state.valid = true;
             }
 
             env->DeleteLocalRef( localPlayerIdStr );

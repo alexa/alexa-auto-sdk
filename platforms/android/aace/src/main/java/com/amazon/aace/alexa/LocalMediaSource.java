@@ -23,7 +23,11 @@ package com.amazon.aace.alexa;
 import com.amazon.aace.core.PlatformInterface;
 
 /**
- * TODO @c LocalMediaSource class ...
+ * @c LocalMediaSource should be extended to use Alexa to switch among media sources local to the device.
+ * It supports bluetooth, USB, FM radio, AM radio, satellite radio, audio line, and CD player sources.
+ * It enables playback for these sources via Alexa (e.g. "Alexa, play the CD player"), or via the playback controller.
+ *
+ * @sa PlaybackController
  */
 abstract public class LocalMediaSource extends PlatformInterface
 {
@@ -133,7 +137,7 @@ abstract public class LocalMediaSource extends PlatformInterface
          */
         AM_RADIO("AM_RADIO"),
         /**
-         * satelite radio source
+         * satellite radio source
          */
         SATELLITE_RADIO("SATELLITE_RADIO"),
         /**

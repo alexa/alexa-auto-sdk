@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -116,12 +116,14 @@ void PhoneCallControllerCapabilityAgent::cancelDirective(std::shared_ptr<Directi
 
 alexaClientSDK::avsCommon::avs::DirectiveHandlerConfiguration PhoneCallControllerCapabilityAgent::getConfiguration() const {
     alexaClientSDK::avsCommon::avs::DirectiveHandlerConfiguration configuration;
-    configuration[DIAL] = alexaClientSDK::avsCommon::avs::BlockingPolicy::NON_BLOCKING;
-    configuration[REDIAL] = alexaClientSDK::avsCommon::avs::BlockingPolicy::NON_BLOCKING;
-    configuration[ANSWER] = alexaClientSDK::avsCommon::avs::BlockingPolicy::NON_BLOCKING;
-    configuration[STOP] = alexaClientSDK::avsCommon::avs::BlockingPolicy::NON_BLOCKING;
-    configuration[PLAY_RINGTONE] = alexaClientSDK::avsCommon::avs::BlockingPolicy::NON_BLOCKING;
-    configuration[SEND_DTMF] = alexaClientSDK::avsCommon::avs::BlockingPolicy::NON_BLOCKING;
+    auto audioNonBlockingPolicy = alexaClientSDK::avsCommon::avs::BlockingPolicy( alexaClientSDK::avsCommon::avs::BlockingPolicy::MEDIUM_AUDIO,
+        false);
+    configuration[DIAL] = audioNonBlockingPolicy;
+    configuration[REDIAL] = audioNonBlockingPolicy;
+    configuration[ANSWER] = audioNonBlockingPolicy;
+    configuration[STOP] = audioNonBlockingPolicy;
+    configuration[PLAY_RINGTONE] = audioNonBlockingPolicy;
+    configuration[SEND_DTMF] = audioNonBlockingPolicy;
     return configuration;
 }
 

@@ -74,6 +74,10 @@ ANDROID_MACHINE = "${ANDROID_ABI}-${ANDROID_PLATFORM}"
 IMAGE_NAME = "${IMAGE_BASENAME}-${ANDROID_MACHINE}-${DATETIME}"
 IMAGE_LINK_NAME = "${IMAGE_BASENAME}-${ANDROID_MACHINE}"
 
+# Nothing are provided from host
+AAC_ASSUME_PROVIDED = ""
+AAC_PKG_CONFIG_PROVIDED = ""
+
 ##################################################################
 # OE extra functions
 ##################################################################

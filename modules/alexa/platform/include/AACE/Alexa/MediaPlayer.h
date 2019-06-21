@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -152,6 +152,7 @@ public:
      * If this call returns @c true, the platform implementation should repeat the current audio source. If @c false
      * is returned, the platform implementation should call @c mediaStateChanged() with @c MediaState.STOPPED when the
      * audio is finished playing.
+     * Note that when @c stop has been called, audio source should stop repeating regardless of this value.
      *
      * @return @c true if the platform media player must repeat playback of the current audio source,
      * else @c false

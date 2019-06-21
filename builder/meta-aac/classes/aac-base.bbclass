@@ -8,6 +8,7 @@ python () {
         d.delVar('PKG_CONFIG_SYSTEM_INCLUDE_PATH')
         d.setVar('AAC_PKG_CONFIG', "${STAGING_BINDIR_NATIVE}/pkg-config")
         d.setVarFlag('AAC_PKG_CONFIG', "export", "1")
+        d.setVarFlag('AAC_PKG_CONFIG_PROVIDED', "export", "1")
 }
 
 modify_find_root_path_mode() {

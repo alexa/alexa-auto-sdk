@@ -36,7 +36,7 @@ if [ ${#PKG_NAMES[@]} == 1 ]; then
 	fi
 	if [ $(contains ${pkgname} "${AAC_PKG_CONFIG_PROVIDED}") == 1 ]; then
 		# Use system package
-		export PKG_CONFIG_SYSROOT_DIR="${AAC_PKG_COFIG_SYSROOT_DIR}"
+		export PKG_CONFIG_SYSROOT_DIR="${AAC_PKG_CONFIG_SYSROOT_DIR}"
 		export PKG_CONFIG_LIBDIR="${AAC_PKG_CONFIG_LIBDIR}"
 	fi
 fi

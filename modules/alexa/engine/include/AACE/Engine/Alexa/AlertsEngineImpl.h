@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -86,7 +86,7 @@ public:
     void removeAllAlerts() override;
     
     // AlertObserverInterface
-    void onAlertStateChange( const std::string & alertToken, State state, const std::string & reason ) override;
+    void onAlertStateChange( const std::string & alertToken, const std::string & alertType, State state, const std::string & reason );
 
     void onAlertCreated( const std::string & alertToken, const std::string & detailedInfo ) override;
 

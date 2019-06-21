@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -34,8 +34,12 @@ AuthProviderEngineImpl::AuthProviderEngineImpl( std::shared_ptr<aace::alexa::Aut
     m_authError( AuthError::NO_ERROR ) {
 }
 
-void AuthProviderEngineImpl::doShutdown() {
-    m_authProviderPlatformInterface->setEngineInterface( nullptr );
+void AuthProviderEngineImpl::doShutdown()
+{
+    if( m_authProviderPlatformInterface != nullptr ) {
+        m_authProviderPlatformInterface->setEngineInterface( nullptr );
+    }
+    
     m_observers.clear();
 }
 
@@ -54,6 +58,11 @@ std::string AuthProviderEngineImpl::getAuthToken()
         AACE_ERROR(LX(TAG,"getAuthToken").d("reason", ex.what()));
         return std::string();
     }
+}
+
+void AuthProviderEngineImpl::onAuthFailure( const std::string& token )
+{
+    AACE_DEBUG(LX(TAG,"onAuthFailure").sensitive("token",token));
 }
 
 void AuthProviderEngineImpl::addAuthObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer )

@@ -26,12 +26,19 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.amazon.aace.alexa.AlexaClient;
@@ -118,8 +125,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
     /* Log View Components */
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mRecyclerAdapter;
-    private ArrayList<LogEntry> mLogList = new ArrayList<>();
+    private LogRecyclerViewAdapter mRecyclerAdapter;
 
     /* Shared Preferences */
     private SharedPreferences mPreferences;
@@ -189,21 +195,22 @@ public class MainActivity extends AppCompatActivity implements Observer {
         // Add support action toolbar for action buttons
         setSupportActionBar( ( Toolbar ) findViewById( R.id.actionToolbar ) );
 
-        // Get shared preferences
-        mPreferences = getSharedPreferences( getString( R.string.preference_file_key ),
-                Context.MODE_PRIVATE );
-
         // Initialize RecyclerView list for log view
         mRecyclerView = findViewById( R.id.rvLog );
         mRecyclerView.setHasFixedSize( true );
         mRecyclerView.setLayoutManager( new LinearLayoutManager( this ) );
-        mRecyclerAdapter = new LogRecyclerViewAdapter( mLogList, getApplicationContext() );
+        mRecyclerAdapter = new LogRecyclerViewAdapter( getApplicationContext() );
         mRecyclerView.setAdapter( mRecyclerAdapter );
+        setUpLogViewOptions();
 
         // Initialize sound effects for speech recognition
         mAudioCueStartVoice = MediaPlayer.create( this, R.raw.med_ui_wakesound );
         mAudioCueStartTouch = MediaPlayer.create( this, R.raw.med_ui_wakesound_touch );
         mAudioCueEnd = MediaPlayer.create( this, R.raw.med_ui_endpointing_touch );
+
+        // Get shared preferences
+        mPreferences = getSharedPreferences( getString( R.string.preference_file_key ),
+                Context.MODE_PRIVATE );
 
         // Retrieve device config from config file and update preferences
         String clientId = "", clientSecret = "", productId = "", productDsn = "";
@@ -302,7 +309,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         // Create the platform implementation handlers and register them with the engine
         // Logger
         if ( !mEngine.registerPlatformInterface(
-                mLogger = new LoggerHandler(this, ( LogRecyclerViewAdapter ) mRecyclerAdapter )
+                mLogger = new LoggerHandler()
             )
         ) throw new RuntimeException( "Could not register Logger platform interface" );
 
@@ -602,27 +609,22 @@ public class MainActivity extends AppCompatActivity implements Observer {
         }
     }
 
-    // For updating log view
     @Override
     public void update( Observable observable, Object object ) {
-
-        if ( object instanceof LogEntry ) {
-            // Append entry to log list
-            final LogEntry entry = ( LogEntry ) object;
-
-            runOnUiThread( new Runnable() {
-                @Override
-                public void run() {
-                    // Insert entry into RecyclerView and update view
-                    mLogList.add( entry );
-                    mRecyclerAdapter.notifyItemInserted( mLogList.size() - 1 );
-                    ( ( LogRecyclerViewAdapter ) mRecyclerAdapter ).filter();
-                    int count = mRecyclerAdapter.getItemCount();
-                    int position = count > 0 ? count - 1 : 0;
-                    mRecyclerView.smoothScrollToPosition( position );
-                }
-            });
-
+        if ( observable instanceof LoggerHandler.LoggerObservable ) {
+            if ( object instanceof LogEntry ) {
+                final LogEntry entry = ( LogEntry ) object;
+                runOnUiThread( new Runnable() {
+                    public void run() {
+                        // Insert log entry into log view
+                        mRecyclerAdapter.insertItem( entry );
+                        // Scroll to bottom of log view
+                        int count = mRecyclerAdapter.getItemCount();
+                        int position = count > 0 ? count - 1 : 0;
+                        mRecyclerView.scrollToPosition( position );
+                    }
+                } );
+            }
         } else if ( observable instanceof SpeechRecognizerHandler.AudioCueObservable ) {
             if ( object.equals( SpeechRecognizerHandler.AudioCueState.START_TOUCH ) ) {
                 // Play touch-initiated listening audio cue
@@ -713,6 +715,102 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 ( ( TextView ) findViewById( R.id.productDsn ) ).setText( productDsn );
             }
         });
+    }
 
+    /* Sample Metrics Code */
+//    // Retrieve metrics config from config file and create configuration object
+//    private MetricUploadConfiguration initializeMetricsConfiguration() {
+//        String amazonId = "", productDsn = "";
+//        boolean metricsEnabled = false;
+//
+//        JSONObject config = getConfigFromFile("metrics");
+//        if ( config != null ) {
+//            try {
+//                amazonId = config.getString( "amazonId" );
+//                metricsEnabled = config.getBoolean("metricsEnabled");
+//            } catch ( JSONException e ) {
+//                Log.w( sTag, "Missing metrics config info in app_config.json" );
+//            }
+//        }
+//        productDsn = mPreferences.getString( this.getString( R.string.preference_product_dsn ), "" );
+//        try {
+//            return MetricUploadConfiguration.createMetricUploadConfiguration(amazonId, productDsn, metricsEnabled);
+//        } catch (IllegalArgumentException| NullPointerException ex ) {
+//            Log.e(sTag, "", ex);
+//            throw ex;
+//        }
+//    }
+
+    /// Set up log view filtering options
+    private void setUpLogViewOptions() {
+        LayoutInflater inf = getLayoutInflater();
+
+        // Add switch for each log source type
+        String[] sources = { "CLI", "AAC", "AVS" };
+        LinearLayout sourceContainer = findViewById( R.id.sourceSwitchContainer );
+        for ( final String source : sources ) {
+            View switchItem = ( inf.inflate( R.layout.drawer_switch, sourceContainer, false ) );
+            ( (TextView) switchItem.findViewById( R.id.text ) ).setText( source );
+            SwitchCompat drawerSwitch = switchItem.findViewById( R.id.drawerSwitch );
+            drawerSwitch.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
+                public void onCheckedChanged( CompoundButton buttonView, boolean isChecked ) {
+                    mRecyclerAdapter.setSourceDisplayMode( source, isChecked );
+                }
+            });
+            sourceContainer.addView( switchItem );
+        }
+
+        // Add option in dropdown selector for each log level
+        Spinner spinner = findViewById( R.id.levelSpinner );
+        ArrayAdapter<Logger.Level> adapter = new ArrayAdapter<>( this, android.R.layout.simple_spinner_item );
+        adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
+
+        for ( Logger.Level level : Logger.Level.values() ) {
+            if ( level == Logger.Level.METRIC ) {
+                continue;
+            }
+            adapter.add( level );
+        }
+
+        spinner.setAdapter( adapter );
+        spinner.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected( AdapterView<?> parent, View view, int position, long id ) {
+                Logger.Level level = ( Logger.Level ) parent.getItemAtPosition(position);
+                mRecyclerAdapter.setDisplayLevel( level );
+                mRecyclerView.scrollToPosition( mRecyclerAdapter.getItemCount() - 1 );
+            }
+            public void onNothingSelected( AdapterView<?> parent ) {}
+        });
+
+        // Add switch to display or hide card logs
+        View cardItem = findViewById( R.id.toggleCards );
+        ( ( TextView ) cardItem.findViewById( R.id.text ) ).setText( R.string.log_switch_cards );
+        SwitchCompat cardSwitch = cardItem.findViewById( R.id.drawerSwitch );
+        cardSwitch.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged( CompoundButton buttonView, boolean isChecked ) {
+                mRecyclerAdapter.setCardDisplayMode( isChecked );
+            }
+        });
+
+        // Add switch to display or hide pretty-printed JSON template logs
+        View tempItem = findViewById( R.id.toggleTemplates );
+        ( ( TextView ) tempItem.findViewById( R.id.text ) ).setText( R.string.log_switch_template );
+        SwitchCompat tempSwitch = tempItem.findViewById( R.id.drawerSwitch );
+        tempSwitch.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged( CompoundButton buttonView, boolean isChecked ) {
+                mRecyclerAdapter.setJsonDisplayMode( isChecked );
+            }
+        });
+
+        // Clear log button
+        findViewById( R.id.clearLogButton ).setOnClickListener(
+            new View.OnClickListener() {
+                public void onClick( View v ) { mRecyclerAdapter.clear(); }
+            }
+        );
+
+        // Set initial level selection to INFO
+        spinner.setSelection( Logger.Level.INFO.ordinal() );
+        mRecyclerAdapter.setDisplayLevel( Logger.Level.INFO );
     }
 }

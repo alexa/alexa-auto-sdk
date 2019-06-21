@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ bool SpeechRecognizerEngineImpl::initialize(
         ThrowIfNull( directiveSequencer, "invalidDirectiveSequencer" );
         ThrowIfNull( capabilitiesDelegate, "invalidCapabilitiesDelegate" );
 
-        m_audioInputProcessor = alexaClientSDK::capabilityAgents::aip::AudioInputProcessor::create(directiveSequencer, messageSender, contextManager, focusManager, dialogUXStateAggregator, exceptionSender, userInactivityMonitor, alexaClientSDK::capabilityAgents::aip::AudioProvider::null(), speechEncoder);
+        m_audioInputProcessor = alexaClientSDK::capabilityAgents::aip::AudioInputProcessor::create(directiveSequencer, messageSender, contextManager, focusManager, dialogUXStateAggregator, exceptionSender, userInactivityMonitor, speechEncoder, alexaClientSDK::capabilityAgents::aip::AudioProvider::null());
         ThrowIfNull( m_audioInputProcessor, "couldNotCreateAudioInputProcessor" );
 
         // add dialog state observer to aip
@@ -263,7 +263,7 @@ bool SpeechRecognizerEngineImpl::startCapture(
     {
         // ask the aip to start recognizing input
         ALEXA_METRIC(LX(TAG, "startCapture"), aace::engine::alexa::AlexaMetrics::Location::SPEECH_START_CAPTURE);
-        ThrowIfNot( m_audioInputProcessor->recognize( *audioProvider, initiator, begin, keywordEnd, keyword ).get(), "recognizeFailed" );
+        ThrowIfNot( m_audioInputProcessor->recognize( *audioProvider, initiator, std::chrono::steady_clock::now(), begin, keywordEnd, keyword ).get(), "recognizeFailed" );
         
         if( m_expectingAudio == false )
         {

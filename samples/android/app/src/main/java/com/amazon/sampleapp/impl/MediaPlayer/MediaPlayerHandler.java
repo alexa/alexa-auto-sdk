@@ -34,6 +34,7 @@ import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 
@@ -55,6 +56,13 @@ public class MediaPlayerHandler extends com.amazon.aace.alexa.MediaPlayer {
     private final MediaSourceFactory mMediaSourceFactory;
     private PlaybackControllerHandler mPlaybackController;
     private SimpleExoPlayer mPlayer;
+    private Timeline.Period mPeriod;
+    private long mPosition;
+    private long mLivePausedPosition;
+    private int mSavedPeriodIndex;
+    private long mLivePausedOffset;
+    private long mLiveResumedOffset;
+    private boolean mNewPlayReceieved;
 
     public MediaPlayerHandler( Activity activity,
                                LoggerHandler logger,
@@ -67,6 +75,7 @@ public class MediaPlayerHandler extends com.amazon.aace.alexa.MediaPlayer {
         mName = name;
         mSpeaker = new SpeakerHandler( speakerType );
         mMediaSourceFactory = new MediaSourceFactory( mContext, mLogger, mName );
+        mPeriod = new Timeline.Period();
 
         if ( controller != null ) {
             mPlaybackController = controller;
@@ -84,6 +93,10 @@ public class MediaPlayerHandler extends com.amazon.aace.alexa.MediaPlayer {
     private void resetPlayer() {
         mPlayer.setRepeatMode( Player.REPEAT_MODE_OFF );
         mPlayer.setPlayWhenReady( false );
+        mPlayer.stop(true);
+        // reset live station offsets
+        mLiveResumedOffset = 0;
+        mLivePausedPosition = 0;
     }
 
     public boolean isPlaying() {
@@ -152,6 +165,8 @@ public class MediaPlayerHandler extends com.amazon.aace.alexa.MediaPlayer {
     @Override
     public boolean play() {
         mLogger.postVerbose( sTag, String.format( "(%s) Handling play()", mName ) );
+        mNewPlayReceieved = true; // remember new play received
+        mSavedPeriodIndex = mPlayer.getCurrentPeriodIndex(); // remember period index
         mPlayer.setPlayWhenReady( true );
         return true;
     }
@@ -169,6 +184,13 @@ public class MediaPlayerHandler extends com.amazon.aace.alexa.MediaPlayer {
     @Override
     public boolean pause() {
         mLogger.postVerbose( sTag, String.format( "(%s) Handling pause()", mName ) );
+
+        Timeline currentTimeline = mPlayer.getCurrentTimeline();
+        if( !currentTimeline.isEmpty() && mPlayer.isCurrentWindowDynamic() ) { // If pausing live station.
+            mLivePausedOffset = 0;
+            mLivePausedPosition = mPosition; // save paused position
+        }
+
         mPlayer.setPlayWhenReady( false );
         return true;
     }
@@ -176,6 +198,18 @@ public class MediaPlayerHandler extends com.amazon.aace.alexa.MediaPlayer {
     @Override
     public boolean resume() {
         mLogger.postVerbose( sTag, String.format( "(%s) Handling resume()", mName ) );
+
+        Timeline currentTimeline = mPlayer.getCurrentTimeline();
+        if ( !currentTimeline.isEmpty() && mPlayer.isCurrentWindowDynamic() ) {  // If resuming live station reset to 0.
+            mPlayer.seekToDefaultPosition(); // reset player position to its default
+            mLivePausedOffset = Math.abs( mPlayer.getCurrentPosition() ); // get the new position
+            mLivePausedOffset -= currentTimeline.getPeriod(mSavedPeriodIndex, mPeriod).getPositionInWindowMs(); // adjust for window
+            mLivePausedOffset -= mLiveResumedOffset; // adjust for stopped offset
+            mLivePausedOffset -= mLivePausedPosition; // adjust for paused offset
+
+            mLivePausedPosition = 0; // reset paused position
+        }
+
         mPlayer.setPlayWhenReady( true );
         return true;
     }
@@ -184,19 +218,41 @@ public class MediaPlayerHandler extends com.amazon.aace.alexa.MediaPlayer {
     public boolean setPosition( long position ) {
         mLogger.postVerbose( sTag, String.format( "(%s) Handling setPosition(%s)", mName, position ) );
         mPlayer.seekTo( position );
+        mLiveResumedOffset -= position;
         return true;
     }
 
     @Override
-    public long getPosition() { return Math.abs( mPlayer.getCurrentPosition() ); }
+    public long getPosition() {
+        Timeline currentTimeline = mPlayer.getCurrentTimeline();
+        mPosition = Math.abs( mPlayer.getCurrentPosition() );
+        if ( !currentTimeline.isEmpty() && mPlayer.isCurrentWindowDynamic() ) {
+            if ( mLivePausedPosition == 0 ) { // not during pause
+                mPosition -= currentTimeline.getPeriod(mSavedPeriodIndex, mPeriod).getPositionInWindowMs(); // Adjust position to be relative to start of period rather than window.
+                mPosition -= mLiveResumedOffset; // Offset saved for live station stopped / played
+                mPosition -= mLivePausedOffset; // Offset saved for live station paused / resumed
+            } else{
+                mLogger.postVerbose( sTag, String.format( "(%s) Handling livePaused getPosition(%s)", mName, mLivePausedPosition ) );
+                return mLivePausedPosition; // the saved position during a live station paused state
+            }
+        }
+        mLogger.postVerbose( sTag, String.format( "(%s) Handling getPosition(%s)", mName, mPosition ) );
+        return mPosition;
+    }
 
     //
     // Handle ExoPlayer state changes and notify Engine
     //
-
     private void onPlaybackStarted () {
         mLogger.postVerbose( sTag, String.format( "(%s) Media State Changed. STATE: PLAYING", mName ) );
         mediaStateChanged( MediaState.PLAYING );
+
+        if ( mNewPlayReceieved && mPlayer.isCurrentWindowDynamic() ) { // remember offset if new play for live station
+            mPlayer.seekToDefaultPosition();
+            mLiveResumedOffset += Math.abs( mPlayer.getCurrentPosition() );
+            mNewPlayReceieved = false;
+        }
+
         if ( mPlaybackController != null ) { mPlaybackController.start(); }
     }
 

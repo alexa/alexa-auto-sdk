@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -34,7 +34,30 @@ public class AlexaCommsConfiguration {
 
     private static final String sTag = AlexaCommsConfiguration.class.getSimpleName();
 
+
+    /**
+     * Creates configuration for A2A calling.
+     *
+     * @param certsPath Path where certificate(s) required for connecting to AVS cloud can be found.
+     * @return Configuration object.
+     */
     static public EngineConfiguration createCommsConfig(String certsPath) {
+        // By default do not connect to AWS IOT metrics services. The space in a string is intentional
+        // to express the intent that we do not wish to connect to metrics services.
+        return createCommsConfig(certsPath, " ", " ", "");
+    }
+
+    /**
+     * Creates configuration for A2A calling.
+     *
+     * @param certsPath Path where certificate(s) required for connecting to AVS cloud can be found.
+     * @param metricsDeviceTypeId AWS IOT device type id for connecting to AWS metrics services.
+     * @param metricsIOTHostAddress AWS IOT metrics services host address.
+     * @param metricsIOTCertDirPath Directory where AWS IOT certificate for connecting to metric service can be found.
+     * @return Configuration object.
+     */
+     static public EngineConfiguration createCommsConfig(
+             String certsPath, String metricsDeviceTypeId, String metricsIOTHostAddress, String metricsIOTCertDirPath) {
         EngineConfiguration commsConfig = null;
 
         try {
@@ -45,6 +68,9 @@ public class AlexaCommsConfiguration {
 
             File sipCertificateFile = new File(certsPath, "09789157.0");
             commsElement.put("sipCertificateFilePath", sipCertificateFile.getAbsolutePath());
+            commsElement.put("iotCertificateDirPath", metricsIOTCertDirPath);
+            commsElement.put("deviceTypeId", metricsDeviceTypeId);
+            commsElement.put("iotHostAddress", metricsIOTHostAddress);
 
             JSONObject inputDeviceSettingsElement = new JSONObject();
             inputDeviceSettingsElement.put("driverName", "audioproxy");

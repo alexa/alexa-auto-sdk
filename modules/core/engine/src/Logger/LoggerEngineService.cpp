@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -129,7 +129,7 @@ std::shared_ptr<aace::engine::logger::sink::Sink> LoggerEngineService::createSin
         std::string type = obj["type"].GetString();
         
         // convert the type to lower case
-        std::transform( type.begin(), type.end(), type.begin(), [](unsigned char c) -> unsigned char { return std::tolower(c); } );
+        std::transform( type.begin(), type.end(), type.begin(), [](unsigned char c) -> unsigned char { return static_cast<unsigned char>(std::tolower(c)); } );
         
         // create the new sink
         std::shared_ptr<aace::engine::logger::sink::Sink> sink = nullptr;

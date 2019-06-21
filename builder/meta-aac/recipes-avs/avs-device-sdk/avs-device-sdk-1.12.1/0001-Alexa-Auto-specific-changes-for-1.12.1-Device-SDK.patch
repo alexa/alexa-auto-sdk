@@ -1,21 +1,44 @@
-From cea1bb3f82c9148a21d415cae501ea00c691d81d Mon Sep 17 00:00:00 2001
-From: Mark Wharton <mark@jynx.com>
-Date: Tue, 13 Nov 2018 16:21:48 -0800
-Subject: [PATCH] ExternalMediaPlayer 1.1 for AAC/MACC
+From f152d56600913ff39074f80529e0db7faadf76ae Mon Sep 17 00:00:00 2001
+From: Shotaro Uchida <fantom@xmaker.mx>
+Date: Wed, 8 May 2019 08:58:39 -0700
+Subject: [PATCH] Alexa Auto specific changes for 1.12.1 Device SDK
 
+For internal reference: 5c9d2cd404161f8327c6c1a8e48afc320df9076b
 ---
  .../AVS/ExternalMediaPlayer/AdapterUtils.h    |  25 +-
- .../ExternalMediaAdapterConstants.h           |   6 +
+ .../ExternalMediaAdapterConstants.h           |   9 +
+ AVSCommon/AVS/src/BlockingPolicy.cpp          |   4 +-
  .../src/ExternalMediaPlayer/AdapterUtils.cpp  |  15 +-
+ AVSCommon/CMakeLists.txt                      |   2 +
  .../ExternalMediaAdapterHandlerInterface.h    | 125 ++++
- .../ExternalMediaAdapterInterface.h           |  36 +
+ .../ExternalMediaAdapterInterface.h           |  36 ++
  .../ExternalMediaPlayerInterface.h            |  24 +-
+ .../LibcurlUtils/CurlEasyHandleWrapper.h      |   4 +-
+ .../AVSCommon/Utils/LibcurlUtils/HttpDelete.h |  83 +++
+ .../Utils/LibcurlUtils/HttpDeleteInterface.h  |  53 ++
+ .../AVSCommon/Utils/LibcurlUtils/HttpGet.h    |  83 +++
+ .../Utils/LibcurlUtils/HttpGetInterface.h     |  53 ++
+ .../LibcurlUtils/CurlEasyHandleWrapper.cpp    |   3 +
+ .../Utils/src/LibcurlUtils/HttpDelete.cpp     | 124 ++++
+ AVSCommon/Utils/src/LibcurlUtils/HttpGet.cpp  | 124 ++++
  CMakeLists.txt                                |   4 +
- .../ExternalMediaPlayer/ExternalMediaPlayer.h | 109 +++
- .../src/ExternalMediaPlayer.cpp               | 638 +++++++++++++++++-
- .../test/ExternalMediaPlayerTest.cpp          | 218 +++++-
- 10 files changed, 1161 insertions(+), 39 deletions(-)
+ .../CapabilitiesDelegate.h                    |   6 +
+ .../src/CapabilitiesDelegate.cpp              |  15 +-
+ .../include/Alerts/AlertObserverInterface.h   |  23 +
+ .../include/Alerts/AlertsCapabilityAgent.h    |  41 ++
+ .../Alerts/src/AlertsCapabilityAgent.cpp      |  54 ++
+ .../ExternalMediaPlayer/ExternalMediaPlayer.h | 100 ++++
+ .../src/ExternalMediaPlayer.cpp               | 547 +++++++++++++++++-
+ .../test/ExternalMediaPlayerTest.cpp          | 218 ++++++-
+ .../TemplateRuntime/src/TemplateRuntime.cpp   |   4 +-
+ 26 files changed, 1731 insertions(+), 48 deletions(-)
  create mode 100644 AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaAdapterHandlerInterface.h
+ create mode 100644 AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpDelete.h
+ create mode 100644 AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpDeleteInterface.h
+ create mode 100644 AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpGet.h
+ create mode 100644 AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpGetInterface.h
+ create mode 100644 AVSCommon/Utils/src/LibcurlUtils/HttpDelete.cpp
+ create mode 100644 AVSCommon/Utils/src/LibcurlUtils/HttpGet.cpp
 
 diff --git a/AVSCommon/AVS/include/AVSCommon/AVS/ExternalMediaPlayer/AdapterUtils.h b/AVSCommon/AVS/include/AVSCommon/AVS/ExternalMediaPlayer/AdapterUtils.h
 index cd5672e..8b7c62c 100644
@@ -72,22 +95,42 @@ index cd5672e..8b7c62c 100644
  /**
   * Method to iterate over a vector of supported operation in playback state and convert to JSON.
 diff --git a/AVSCommon/AVS/include/AVSCommon/AVS/ExternalMediaPlayer/ExternalMediaAdapterConstants.h b/AVSCommon/AVS/include/AVSCommon/AVS/ExternalMediaPlayer/ExternalMediaAdapterConstants.h
-index e5a4ee0..e84e737 100644
+index e5a4ee0..1ed8f86 100644
 --- a/AVSCommon/AVS/include/AVSCommon/AVS/ExternalMediaPlayer/ExternalMediaAdapterConstants.h
 +++ b/AVSCommon/AVS/include/AVSCommon/AVS/ExternalMediaPlayer/ExternalMediaAdapterConstants.h
-@@ -31,6 +31,12 @@ const char USERNAME[] = "username";
+@@ -31,6 +31,15 @@ const char USERNAME[] = "username";
  const char IS_GUEST[] = "isGuest";
  const char LAUNCHED[] = "launched";
  const char ACTIVE[] = "active";
 +#ifdef EXTERNALMEDIAPLAYER_1_1
 +const char SPI_VERSION[] = "spiVersion";
++const char SPI_VERSION_DEFAULT[] = "1.0";
 +const char PLAYER_COOKIE[] = "playerCookie";
 +const char SKILL_TOKEN[] = "skillToken";
 +const char PLAYBACK_SESSION_ID[] = "playbackSessionId";
++const char AGENT[] = "agent";
++const char AGENT_DEFAULT[] = "RUHAV8PRLD";
 +#endif
  
  // The key values used in the context payload from External Media Player to AVS.
  const char STATE[] = "state";
+diff --git a/AVSCommon/AVS/src/BlockingPolicy.cpp b/AVSCommon/AVS/src/BlockingPolicy.cpp
+index e86209c..dc2926e 100644
+--- a/AVSCommon/AVS/src/BlockingPolicy.cpp
++++ b/AVSCommon/AVS/src/BlockingPolicy.cpp
+@@ -30,10 +30,10 @@ using namespace avsCommon::avs;
+ using namespace avsCommon::utils::json;
+ 
+ /// Flag indicating @c AUDIO medium is used.
+-static const BlockingPolicy::Mediums MEDIUM_FLAG_AUDIO{1};
++static const long MEDIUM_FLAG_AUDIO = 1;
+ 
+ /// Flag indicating @c VISUAL medium is used.
+-static const BlockingPolicy::Mediums MEDIUM_FLAG_VISUAL{2};
++static const long MEDIUM_FLAG_VISUAL = 2;
+ 
+ /// String to identify log entries originating from this file.
+ static const std::string TAG("BlockingPolicy");
 diff --git a/AVSCommon/AVS/src/ExternalMediaPlayer/AdapterUtils.cpp b/AVSCommon/AVS/src/ExternalMediaPlayer/AdapterUtils.cpp
 index 169dda8..8eca67a 100644
 --- a/AVSCommon/AVS/src/ExternalMediaPlayer/AdapterUtils.cpp
@@ -125,6 +168,19 @@ index 169dda8..8eca67a 100644
  
      return playerJson;
  }
+diff --git a/AVSCommon/CMakeLists.txt b/AVSCommon/CMakeLists.txt
+index 3df8548..a296d8a 100644
+--- a/AVSCommon/CMakeLists.txt
++++ b/AVSCommon/CMakeLists.txt
+@@ -49,6 +49,8 @@ add_library(AVSCommon SHARED
+     Utils/src/LibcurlUtils/HTTPContentFetcherFactory.cpp
+     Utils/src/LibcurlUtils/HttpPost.cpp
+     Utils/src/LibcurlUtils/HttpPut.cpp
++    Utils/src/LibcurlUtils/HttpGet.cpp
++    Utils/src/LibcurlUtils/HttpDelete.cpp
+     Utils/src/LibcurlUtils/HTTPResponse.cpp
+     Utils/src/LibcurlUtils/LibCurlHttpContentFetcher.cpp
+     Utils/src/LibcurlUtils/LibcurlHTTP2Connection.cpp
 diff --git a/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaAdapterHandlerInterface.h b/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaAdapterHandlerInterface.h
 new file mode 100644
 index 0000000..d48fc1e
@@ -257,7 +313,7 @@ index 0000000..d48fc1e
 +
 +#endif  // ALEXA_CLIENT_SDK_AVSCOMMON_SDKINTERFACES_INCLUDE_AVSCOMMON_SDKINTERFACES_EXTERNALMEDIAADAPTERHANDLERINTERFACE_H_
 diff --git a/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaAdapterInterface.h b/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaAdapterInterface.h
-index b3e279d..94db2bd 100644
+index 152a626..77273b2 100644
 --- a/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaAdapterInterface.h
 +++ b/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaAdapterInterface.h
 @@ -267,6 +267,21 @@ struct AdapterSessionState {
@@ -366,8 +422,593 @@ index 4b67622..fe9c174 100644
      /**
       * Method to set the player in focus after an adapter has acquired the channel.
       *
+diff --git a/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/CurlEasyHandleWrapper.h b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/CurlEasyHandleWrapper.h
+index 72a7834..19a190a 100644
+--- a/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/CurlEasyHandleWrapper.h
++++ b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/CurlEasyHandleWrapper.h
+@@ -73,7 +73,9 @@ public:
+         /// HTTP POST
+         kPOST,
+         /// HTTP PUT
+-        kPUT
++        kPUT,
++        /// HTTP DELETE
++        kDELETE
+     };
+ 
+     /**
+diff --git a/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpDelete.h b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpDelete.h
+new file mode 100644
+index 0000000..0bfbaa1
+--- /dev/null
++++ b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpDelete.h
+@@ -0,0 +1,83 @@
++/*
++ * Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License").
++ * You may not use this file except in compliance with the License.
++ * A copy of the License is located at
++ *
++ *     http://aws.amazon.com/apache2.0/
++ *
++ * or in the "license" file accompanying this file. This file is distributed
++ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied. See the License for the specific language governing
++ * permissions and limitations under the License.
++ */
++
++#ifndef ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LIBCURLUTILS_HTTPDELETE_H_
++#define ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LIBCURLUTILS_HTTPDELETE_H_
++
++#include <memory>
++#include <mutex>
++#include <string>
++
++#include <curl/curl.h>
++
++#include "AVSCommon/Utils/LibcurlUtils/CurlEasyHandleWrapper.h"
++#include "HttpDeleteInterface.h"
++
++namespace alexaClientSDK {
++namespace avsCommon {
++namespace utils {
++namespace libcurlUtils {
++
++/// LIBCURL based implementation of HttpDeleteInterface.
++class HttpDelete : public HttpDeleteInterface {
++public:
++    /**
++     * Create a new HttpDelete instance, passing ownership of the new instance on to the caller.
++     *
++     * @return Returns an std::unique_ptr to the new HttpDelete instance, or @c nullptr of the operation failed.
++     */
++    static std::unique_ptr<HttpDelete> create();
++
++    /**
++     * HttpDelete destructor
++     */
++    ~HttpDelete() = default;
++
++    /**
++     * Deleted copy constructor.
++     *
++     * @param rhs The 'right hand side' to not copy.
++     */
++    HttpDelete(const HttpDelete& rhs) = delete;
++
++    /**
++     * Deleted assignment operator.
++     *
++     * @param rhs The 'right hand side' to not copy.
++     * @return The object assigned to.
++     */
++    HttpDelete& operator=(const HttpDelete& rhs) = delete;
++
++    HTTPResponse doDelete(const std::string& url, const std::vector<std::string>& headers) override;
++
++private:
++    /**
++     * Default HttpDelete constructor.
++     */
++    HttpDelete() = default;
++
++    /// Mutex to serialize access to @c m_curl.
++    std::mutex m_mutex;
++
++    /// CURL handle with which to make requests
++    CurlEasyHandleWrapper m_curl;
++};
++
++}  // namespace libcurlUtils
++}  // namespace utils
++}  // namespace avsCommon
++}  // namespace alexaClientSDK
++
++#endif  // ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LIBCURLUTILS_HTTPDELETE_H_
+diff --git a/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpDeleteInterface.h b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpDeleteInterface.h
+new file mode 100644
+index 0000000..1a948d8
+--- /dev/null
++++ b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpDeleteInterface.h
+@@ -0,0 +1,53 @@
++/*
++ * Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License").
++ * You may not use this file except in compliance with the License.
++ * A copy of the License is located at
++ *
++ *     http://aws.amazon.com/apache2.0/
++ *
++ * or in the "license" file accompanying this file. This file is distributed
++ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied. See the License for the specific language governing
++ * permissions and limitations under the License.
++ */
++
++#ifndef ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LIBCURLUTILS_HTTPDELETEINTERFACE_H_
++#define ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LIBCURLUTILS_HTTPDELETEINTERFACE_H_
++
++#include <string>
++#include <vector>
++
++#include <AVSCommon/Utils/LibcurlUtils/HTTPResponse.h>
++
++namespace alexaClientSDK {
++namespace avsCommon {
++namespace utils {
++namespace libcurlUtils {
++
++/// Minimal interface for making HTTP DELETE requests.
++class HttpDeleteInterface {
++public:
++    /// Virtual destructor to assure proper cleanup of derived types.
++    virtual ~HttpDeleteInterface() = default;
++
++    /**
++     * Perform an HTTP DELETE request returning the response body as a string. This method blocks for the duration
++     * of the request.
++     *
++     * @param url The URL to send the DELETE to.
++     * @param headers vector of strings to add in the header.
++     * @return An object describing the response to the DELETE request.
++     */
++    virtual HTTPResponse doDelete(
++        const std::string& url,
++        const std::vector<std::string>& headers) = 0;
++};
++
++}  // namespace libcurlUtils
++}  // namespace utils
++}  // namespace avsCommon
++}  // namespace alexaClientSDK
++
++#endif  // ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LIBCURLUTILS_HTTPDELETEINTERFACE_H_
+diff --git a/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpGet.h b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpGet.h
+new file mode 100644
+index 0000000..5068502
+--- /dev/null
++++ b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpGet.h
+@@ -0,0 +1,83 @@
++/*
++ * Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License").
++ * You may not use this file except in compliance with the License.
++ * A copy of the License is located at
++ *
++ *     http://aws.amazon.com/apache2.0/
++ *
++ * or in the "license" file accompanying this file. This file is distributed
++ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied. See the License for the specific language governing
++ * permissions and limitations under the License.
++ */
++
++#ifndef ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LIBCURLUTILS_HTTPGET_H_
++#define ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LIBCURLUTILS_HTTPGET_H_
++
++#include <memory>
++#include <mutex>
++#include <string>
++
++#include <curl/curl.h>
++
++#include "AVSCommon/Utils/LibcurlUtils/CurlEasyHandleWrapper.h"
++#include "HttpGetInterface.h"
++
++namespace alexaClientSDK {
++namespace avsCommon {
++namespace utils {
++namespace libcurlUtils {
++
++/// LIBCURL based implementation of HttpGetInterface.
++class HttpGet : public HttpGetInterface {
++public:
++    /**
++     * Create a new HttpGet instance, passing ownership of the new instance on to the caller.
++     *
++     * @return Returns an std::unique_ptr to the new HttpGet instance, or @c nullptr of the operation failed.
++     */
++    static std::unique_ptr<HttpGet> create();
++
++    /**
++     * HttpGet destructor
++     */
++    ~HttpGet() = default;
++
++    /**
++     * Deleted copy constructor.
++     *
++     * @param rhs The 'right hand side' to not copy.
++     */
++    HttpGet(const HttpGet& rhs) = delete;
++
++    /**
++     * Deleted assignment operator.
++     *
++     * @param rhs The 'right hand side' to not copy.
++     * @return The object assigned to.
++     */
++    HttpGet& operator=(const HttpGet& rhs) = delete;
++
++    HTTPResponse doGet(const std::string& url, const std::vector<std::string>& headers) override;
++
++private:
++    /**
++     * Default HttpGet constructor.
++     */
++    HttpGet() = default;
++
++    /// Mutex to serialize access to @c m_curl.
++    std::mutex m_mutex;
++
++    /// CURL handle with which to make requests
++    CurlEasyHandleWrapper m_curl;
++};
++
++}  // namespace libcurlUtils
++}  // namespace utils
++}  // namespace avsCommon
++}  // namespace alexaClientSDK
++
++#endif  // ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LIBCURLUTILS_HTTPGET_H_
+diff --git a/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpGetInterface.h b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpGetInterface.h
+new file mode 100644
+index 0000000..770b206
+--- /dev/null
++++ b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpGetInterface.h
+@@ -0,0 +1,53 @@
++/*
++ * Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License").
++ * You may not use this file except in compliance with the License.
++ * A copy of the License is located at
++ *
++ *     http://aws.amazon.com/apache2.0/
++ *
++ * or in the "license" file accompanying this file. This file is distributed
++ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied. See the License for the specific language governing
++ * permissions and limitations under the License.
++ */
++
++#ifndef ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LIBCURLUTILS_HTTPGETINTERFACE_H_
++#define ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LIBCURLUTILS_HTTPGETINTERFACE_H_
++
++#include <string>
++#include <vector>
++
++#include <AVSCommon/Utils/LibcurlUtils/HTTPResponse.h>
++
++namespace alexaClientSDK {
++namespace avsCommon {
++namespace utils {
++namespace libcurlUtils {
++
++/// Minimal interface for making HTTP GET requests.
++class HttpGetInterface {
++public:
++    /// Virtual destructor to assure proper cleanup of derived types.
++    virtual ~HttpGetInterface() = default;
++
++    /**
++     * Perform an HTTP Get request returning the response body as a string. This method blocks for the duration
++     * of the request.
++     *
++     * @param url The URL to send the GET to.
++     * @param headers vector of strings to add in the header.
++     * @return An object describing the response to the GET request.
++     */
++    virtual HTTPResponse doGet(
++        const std::string& url,
++        const std::vector<std::string>& headers) = 0;
++};
++
++}  // namespace libcurlUtils
++}  // namespace utils
++}  // namespace avsCommon
++}  // namespace alexaClientSDK
++
++#endif  // ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LIBCURLUTILS_HTTPGETINTERFACE_H_
+diff --git a/AVSCommon/Utils/src/LibcurlUtils/CurlEasyHandleWrapper.cpp b/AVSCommon/Utils/src/LibcurlUtils/CurlEasyHandleWrapper.cpp
+index b384584..c98470e 100644
+--- a/AVSCommon/Utils/src/LibcurlUtils/CurlEasyHandleWrapper.cpp
++++ b/AVSCommon/Utils/src/LibcurlUtils/CurlEasyHandleWrapper.cpp
+@@ -242,6 +242,9 @@ bool CurlEasyHandleWrapper::setTransferType(TransferType type) {
+         case TransferType::kPUT:
+             ret = setopt(CURLOPT_UPLOAD, 1L);
+             break;
++        case TransferType::kDELETE:
++            ret = setopt(CURLOPT_CUSTOMREQUEST, "DELETE");
++            break;
+     }
+     return ret;
+ }
+diff --git a/AVSCommon/Utils/src/LibcurlUtils/HttpDelete.cpp b/AVSCommon/Utils/src/LibcurlUtils/HttpDelete.cpp
+new file mode 100644
+index 0000000..b41bace
+--- /dev/null
++++ b/AVSCommon/Utils/src/LibcurlUtils/HttpDelete.cpp
+@@ -0,0 +1,124 @@
++/*
++ * Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License").
++ * You may not use this file except in compliance with the License.
++ * A copy of the License is located at
++ *
++ *     http://aws.amazon.com/apache2.0/
++ *
++ * or in the "license" file accompanying this file. This file is distributed
++ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied. See the License for the specific language governing
++ * permissions and limitations under the License.
++ */
++
++#include <cstdlib>
++#include <cstring>
++#include <vector>
++
++#include <AVSCommon/Utils/LibcurlUtils/CallbackData.h>
++#include <AVSCommon/Utils/LibcurlUtils/HttpResponseCodes.h>
++#include <AVSCommon/Utils/LibcurlUtils/HttpDelete.h>
++#include <AVSCommon/Utils/Logger/Logger.h>
++
++namespace alexaClientSDK {
++namespace avsCommon {
++namespace utils {
++namespace libcurlUtils {
++
++using namespace alexaClientSDK::avsCommon::utils;
++
++/// String to identify log entries originating from this file.
++static const std::string TAG("HttpDelete");
++
++/**
++ * Create a LogEntry using this file's TAG and the specified event string.
++ *
++ * @param The event string for this @c LogEntry.
++ */
++#define LX(event) alexaClientSDK::avsCommon::utils::logger::LogEntry(TAG, event)
++
++/**
++ * Write callback function used for CURLOPT_WRITEFUNCTION option in libcurl
++ */
++static size_t writeCallback(char* dataBuffer, size_t blockSize, size_t numBlocks, void* dataStream);
++
++std::unique_ptr<HttpDelete> HttpDelete::create() {
++    std::unique_ptr<HttpDelete> httpDelete(new HttpDelete());
++    if (httpDelete->m_curl.isValid()) {
++        return httpDelete;
++    }
++    return nullptr;
++}
++
++HTTPResponse HttpDelete::doDelete(const std::string& url, const std::vector<std::string>& headers ) {
++    std::lock_guard<std::mutex> lock(m_mutex);
++    const std::string errorEvent = "doDeleteFailed";
++    const std::string errorReasonKey = "reason";
++    HTTPResponse httpResponse;
++
++    if (!m_curl.reset()) {
++        ACSDK_ERROR(LX(errorEvent).d(errorReasonKey, "unableToResetCurlHandle"));
++        return httpResponse;
++    }
++
++    if (!m_curl.setURL(url)) {
++        ACSDK_ERROR(LX(errorEvent).d(errorReasonKey, "unableToSetUrl"));
++        return httpResponse;
++    }
++
++    if (!m_curl.setTransferType(CurlEasyHandleWrapper::TransferType::kDELETE)) {
++        ACSDK_ERROR(LX(errorEvent).d(errorReasonKey, "unableToSetHttpRequestType"));
++        return httpResponse;
++    }
++
++    for (auto header : headers) {
++        if (!m_curl.addHTTPHeader(header)) {
++            ACSDK_ERROR(LX(errorEvent).d(errorReasonKey, "unableToAddHttpHeader"));
++            return httpResponse;
++        }
++    }
++
++    CallbackData responseData;
++    if (!m_curl.setWriteCallback(writeCallback, &responseData)) {
++        ACSDK_ERROR(LX(errorEvent).d(errorReasonKey, "unableToSetWriteCallback"));
++        return httpResponse;
++    }
++
++    CURLcode curlResult = m_curl.perform();
++    if (curlResult != CURLE_OK) {
++        ACSDK_ERROR(
++            LX(errorEvent).d(errorReasonKey, "curlFailedWithCode: " + std::string(curl_easy_strerror(curlResult))));
++        return httpResponse;
++    }
++
++    size_t responseSize = responseData.getSize();
++    if (responseSize > 0) {
++        std::vector<char> responseBody(responseSize + 1, 0);
++        responseData.getData(responseBody.data(), responseSize);
++        httpResponse.body = std::string(responseBody.data());
++    } else {
++        httpResponse.body = "";
++    }
++    httpResponse.code = m_curl.getHTTPResponseCode();
++
++    return httpResponse;
++}
++
++size_t writeCallback(char* dataBuffer, size_t blockSize, size_t numBlocks, void* dataStream) {
++    if (!dataStream) {
++        ACSDK_ERROR(LX("writeCallbackFailed").d("reason", "nullDataStream"));
++        return 0;
++    }
++
++    size_t realSize = blockSize * numBlocks;
++    CallbackData* callbackData = reinterpret_cast<CallbackData*>(dataStream);
++
++    return callbackData->appendData(dataBuffer, realSize);
++}
++
++}  // namespace libcurlUtils
++}  // namespace utils
++}  // namespace avsCommon
++}  // namespace alexaClientSDK
+diff --git a/AVSCommon/Utils/src/LibcurlUtils/HttpGet.cpp b/AVSCommon/Utils/src/LibcurlUtils/HttpGet.cpp
+new file mode 100644
+index 0000000..ee45dfd
+--- /dev/null
++++ b/AVSCommon/Utils/src/LibcurlUtils/HttpGet.cpp
+@@ -0,0 +1,124 @@
++/*
++ * Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License").
++ * You may not use this file except in compliance with the License.
++ * A copy of the License is located at
++ *
++ *     http://aws.amazon.com/apache2.0/
++ *
++ * or in the "license" file accompanying this file. This file is distributed
++ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied. See the License for the specific language governing
++ * permissions and limitations under the License.
++ */
++
++#include <cstdlib>
++#include <cstring>
++#include <vector>
++
++#include <AVSCommon/Utils/LibcurlUtils/CallbackData.h>
++#include <AVSCommon/Utils/LibcurlUtils/HttpResponseCodes.h>
++#include <AVSCommon/Utils/LibcurlUtils/HttpGet.h>
++#include <AVSCommon/Utils/Logger/Logger.h>
++
++namespace alexaClientSDK {
++namespace avsCommon {
++namespace utils {
++namespace libcurlUtils {
++
++using namespace alexaClientSDK::avsCommon::utils;
++
++/// String to identify log entries originating from this file.
++static const std::string TAG("HttpGet");
++
++/**
++ * Create a LogEntry using this file's TAG and the specified event string.
++ *
++ * @param The event string for this @c LogEntry.
++ */
++#define LX(event) alexaClientSDK::avsCommon::utils::logger::LogEntry(TAG, event)
++
++/**
++ * Write callback function used for CURLOPT_WRITEFUNCTION option in libcurl
++ */
++static size_t writeCallback(char* dataBuffer, size_t blockSize, size_t numBlocks, void* dataStream);
++
++std::unique_ptr<HttpGet> HttpGet::create() {
++    std::unique_ptr<HttpGet> httpGet(new HttpGet());
++    if (httpGet->m_curl.isValid()) {
++        return httpGet;
++    }
++    return nullptr;
++}
++
++HTTPResponse HttpGet::doGet(const std::string& url, const std::vector<std::string>& headers ) {
++    std::lock_guard<std::mutex> lock(m_mutex);
++    const std::string errorEvent = "doGetFailed";
++    const std::string errorReasonKey = "reason";
++    HTTPResponse httpResponse;
++
++    if (!m_curl.reset()) {
++        ACSDK_ERROR(LX(errorEvent).d(errorReasonKey, "unableToResetCurlHandle"));
++        return httpResponse;
++    }
++
++    if (!m_curl.setURL(url)) {
++        ACSDK_ERROR(LX(errorEvent).d(errorReasonKey, "unableToSetUrl"));
++        return httpResponse;
++    }
++
++    if (!m_curl.setTransferType(CurlEasyHandleWrapper::TransferType::kGET)) {
++        ACSDK_ERROR(LX(errorEvent).d(errorReasonKey, "unableToSetHttpRequestType"));
++        return httpResponse;
++    }
++
++    for (auto header : headers) {
++        if (!m_curl.addHTTPHeader(header)) {
++            ACSDK_ERROR(LX(errorEvent).d(errorReasonKey, "unableToAddHttpHeader"));
++            return httpResponse;
++        }
++    }
++
++    CallbackData responseData;
++    if (!m_curl.setWriteCallback(writeCallback, &responseData)) {
++        ACSDK_ERROR(LX(errorEvent).d(errorReasonKey, "unableToSetWriteCallback"));
++        return httpResponse;
++    }
++
++    CURLcode curlResult = m_curl.perform();
++    if (curlResult != CURLE_OK) {
++        ACSDK_ERROR(
++            LX(errorEvent).d(errorReasonKey, "curlFailedWithCode: " + std::string(curl_easy_strerror(curlResult))));
++        return httpResponse;
++    }
++
++    size_t responseSize = responseData.getSize();
++    if (responseSize > 0) {
++        std::vector<char> responseBody(responseSize + 1, 0);
++        responseData.getData(responseBody.data(), responseSize);
++        httpResponse.body = std::string(responseBody.data());
++    } else {
++        httpResponse.body = "";
++    }
++    httpResponse.code = m_curl.getHTTPResponseCode();
++
++    return httpResponse;
++}
++
++size_t writeCallback(char* dataBuffer, size_t blockSize, size_t numBlocks, void* dataStream) {
++    if (!dataStream) {
++        ACSDK_ERROR(LX("writeCallbackFailed").d("reason", "nullDataStream"));
++        return 0;
++    }
++
++    size_t realSize = blockSize * numBlocks;
++    CallbackData* callbackData = reinterpret_cast<CallbackData*>(dataStream);
++
++    return callbackData->appendData(dataBuffer, realSize);
++}
++
++}  // namespace libcurlUtils
++}  // namespace utils
++}  // namespace avsCommon
++}  // namespace alexaClientSDK
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 5b990ff..d22e481 100644
+index 308f74f..64efd46 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -6,6 +6,10 @@ set(PROJECT_BRIEF "A cross-platform, modular SDK for interacting with the Alexa
@@ -381,24 +1022,279 @@ index 5b990ff..d22e481 100644
  
  include(build/BuildDefaults.cmake)
  include(tools/Testing.cmake)
+diff --git a/CapabilitiesDelegate/include/CapabilitiesDelegate/CapabilitiesDelegate.h b/CapabilitiesDelegate/include/CapabilitiesDelegate/CapabilitiesDelegate.h
+index e23f573..9a7df5f 100644
+--- a/CapabilitiesDelegate/include/CapabilitiesDelegate/CapabilitiesDelegate.h
++++ b/CapabilitiesDelegate/include/CapabilitiesDelegate/CapabilitiesDelegate.h
+@@ -101,6 +101,9 @@ public:
+     void clearData() override;
+     /// @}
+ 
++    // publish capabilities again in case of new client login to same device
++    void setCapabilitiesPublishOverride( bool overriden );
++
+ private:
+     /**
+      * CapabilitiesDelegate constructor.
+@@ -300,6 +303,9 @@ private:
+     /// To indicate if CapabilitiesDelegate is being shutdown
+     bool m_isCapabilitiesDelegateShutdown;
+ 
++    /// To indicate if CapabilitiesDelegate should publish anyway ( in case of same capabilities with new user account )
++    bool m_capabilitiesDelegatePublishOverride;
++
+     /// Used to let CapabilitiesDelegate know that it no longer needs to wait to publish.
+     std::condition_variable m_publishWaitDone;
+ 
+diff --git a/CapabilitiesDelegate/src/CapabilitiesDelegate.cpp b/CapabilitiesDelegate/src/CapabilitiesDelegate.cpp
+index d051293..f0c8cc5 100644
+--- a/CapabilitiesDelegate/src/CapabilitiesDelegate.cpp
++++ b/CapabilitiesDelegate/src/CapabilitiesDelegate.cpp
+@@ -385,7 +385,8 @@ CapabilitiesDelegate::CapabilitiesDelegate(
+         m_httpPut{httpPut},
+         m_deviceInfo{deviceInfo},
+         m_currentAuthState{AuthObserverInterface::State::UNINITIALIZED},
+-        m_isCapabilitiesDelegateShutdown{false} {
++        m_isCapabilitiesDelegateShutdown{false},
++        m_capabilitiesDelegatePublishOverride{false} {
+ }
+ 
+ void CapabilitiesDelegate::doShutdown() {
+@@ -1055,6 +1056,11 @@ void CapabilitiesDelegate::getPreviouslySentCapabilitiesPublishData() {
+ bool CapabilitiesDelegate::isCapabilitiesPublishDataDifferent() {
+     getPreviouslySentCapabilitiesPublishData();
+ 
++    // explicitly set overidden
++    if ( m_capabilitiesDelegatePublishOverride ) {
++        return true;
++    }
++
+     if ((!m_previousDeviceInfo) || (*m_previousDeviceInfo != *m_deviceInfo)) {
+         return true;
+     }
+@@ -1190,5 +1196,12 @@ void CapabilitiesDelegate::invalidateCapabilities() {
+     }
+ }
+ 
++void CapabilitiesDelegate::setCapabilitiesPublishOverride( bool overriden ) {
++    ACSDK_DEBUG0(LX("setCapabilitiesPublishOverride")
++                   .m("overriding capabilities publish"));
++    if (overriden) m_capabilitiesState = CapabilitiesObserverInterface::State::UNINITIALIZED;
++    m_capabilitiesDelegatePublishOverride = overriden;
++}
++
+ }  // namespace capabilitiesDelegate
+ }  // namespace alexaClientSDK
+diff --git a/CapabilityAgents/Alerts/include/Alerts/AlertObserverInterface.h b/CapabilityAgents/Alerts/include/Alerts/AlertObserverInterface.h
+index 1fd2b42..3126349 100644
+--- a/CapabilityAgents/Alerts/include/Alerts/AlertObserverInterface.h
++++ b/CapabilityAgents/Alerts/include/Alerts/AlertObserverInterface.h
+@@ -70,6 +70,29 @@ public:
+         State state,
+         const std::string& reason = "") = 0;
+ 
++    /**
++     * A callback function to notify an object that an alert has been created with additional information about the alert.
++     *
++     * @param alertToken The AVS token of the alert.
++     * @param detailedInfo The JSON payload of detailed alert info :
++     * {
++     *      "time" : <String>
++     *      "type" : <String>
++     *      "label" : <String>
++     * }
++     * time The time string ( Scheduled Time ISO_8601 ).
++     * type The type of the alert ( ALERT, REMINDER, TIMER ).
++     * label The label of the TIMER, description for REMINDER, or empty string for ALARM.
++     */
++    virtual void onAlertCreated(const std::string& alertToken, const std::string& detailedInfo) {};
++
++    /**
++     * A callback function to notify an object that an alert has been deleted.
++     *
++     * alertToken The AVS token of the alert.
++     */
++    virtual void onAlertDeleted(const std::string& alertToken) {};
++
+     /**
+      * Convert a @c State to a @c std::string.
+      *
+diff --git a/CapabilityAgents/Alerts/include/Alerts/AlertsCapabilityAgent.h b/CapabilityAgents/Alerts/include/Alerts/AlertsCapabilityAgent.h
+index 408226a..13911b6 100644
+--- a/CapabilityAgents/Alerts/include/Alerts/AlertsCapabilityAgent.h
++++ b/CapabilityAgents/Alerts/include/Alerts/AlertsCapabilityAgent.h
+@@ -274,6 +274,32 @@ private:
+         AlertObserverInterface::State state,
+         const std::string& reason);
+ 
++    /**
++     * A callback function to notify an object that an alert has been created with additional information about the alert.
++     *
++     * @param alertToken The AVS token of the alert.
++     * @param detailedInfo The JSON payload of detailed alert info :
++     * {
++     *      "time" : <String>
++     *      "type" : <String>
++     *      "label" : <String>
++     * }
++     * time The time string ( Scheduled Time ISO_8601 ).
++     * type The type of the alert ( ALERT, REMINDER, TIMER ).
++     * label The label of the TIMER, description for REMINDER, or empty string for ALARM.
++     */
++    void executeOnAlertCreated(
++        const std::string& alertToken,
++        const std::string& jsonPayload);
++
++    /**
++     * A handler function which will be called by our internal executor when an alert is deleted.
++     *
++     * alertToken The AVS token of the alert.
++     */
++    void executeOnAlertDeleted(
++        const std::string& alertToken);
++
+     /**
+      * A handler function which will be called by our internal executor to add an alert observer.
+      *
+@@ -302,6 +328,21 @@ private:
+         AlertObserverInterface::State state,
+         const std::string& reason = "");
+ 
++    /**
++     * A handler function which will be called by our internal executor to notify the observer of detailed alert info.
++     *
++     * @param alertToken The alert token. See AlertObserverInterface for more.
++     * @param jsonInfo The detailed JSON info. See AlertObserverInterface for more.
++     */
++    void executeNotifyAlertCreatedObservers(const std::string& alertToken, const std::string& jsonInfo);
++
++    /**
++     * A handler function which will be called by our internal executor to notify the observer of an alert deleted.
++     *
++     * @param alertToken The alert token. See AlertObserverInterface for more.
++     */
++    void executeNotifyAlertDeletedObservers(const std::string& alertToken);
++
+     /**
+      * A handler function which will be called by our internal executor to remove all alerts currently being managed.
+      */
+diff --git a/CapabilityAgents/Alerts/src/AlertsCapabilityAgent.cpp b/CapabilityAgents/Alerts/src/AlertsCapabilityAgent.cpp
+index 214e413..008657a 100644
+--- a/CapabilityAgents/Alerts/src/AlertsCapabilityAgent.cpp
++++ b/CapabilityAgents/Alerts/src/AlertsCapabilityAgent.cpp
+@@ -59,6 +59,9 @@ static const std::string ALERTS_CAPABILITY_INTERFACE_VERSION = "1.3";
+ /// The value for Type which we need for json parsing.
+ static const std::string KEY_TYPE = "type";
+ 
++/// The value for Label which we need for json parsing.
++static const std::string KEY_LABEL = "label";
++
+ // ==== Directives ===
+ 
+ /// The value of the SetAlert Directive.
+@@ -464,6 +467,27 @@ bool AlertsCapabilityAgent::handleSetAlert(
+ 
+     updateContextManager();
+ 
++    Document document( rapidjson::kObjectType );;
++    document.AddMember("time", parsedAlert->getScheduledTime_ISO_8601(), document.GetAllocator());
++    document.AddMember("type", parsedAlert->getTypeName(), document.GetAllocator());
++    std::string label;
++    if (!retrieveValue(payload, KEY_LABEL, &label)) {
++        document.AddMember("label", "", document.GetAllocator());
++    } else {
++        document.AddMember("label", label, document.GetAllocator());
++    }
++    // build the json state string
++    rapidjson::StringBuffer buffer;
++    rapidjson::Writer<rapidjson::StringBuffer> writer( buffer );
++
++    if (!document.Accept( writer )) {
++        ACSDK_ERROR(LX("failedToWriteJsonDocument").m("Alert DetailedInfo not sent"));
++    } else {
++        std::string payload = buffer.GetString();
++        std::string token = parsedAlert->getToken();
++        m_executor.submit([this, token, payload]() { executeOnAlertCreated( token, payload); });
++    }
++
+     return true;
+ }
+ 
+@@ -483,6 +507,9 @@ bool AlertsCapabilityAgent::handleDeleteAlert(
+ 
+     updateContextManager();
+ 
++    std::string token = *alertToken;
++    m_executor.submit([this, token]() { executeOnAlertDeleted(token); });
++
+     return true;
+ }
+ 
+@@ -512,6 +539,8 @@ bool AlertsCapabilityAgent::handleDeleteAlerts(
+         if (!convertToValue(tokenArray[i], &token)) {
+             ACSDK_WARN(LX("handleDeleteAlertsFailed").d("reason", "invalid token in payload"));
+             continue;
++        } else {
++            m_executor.submit([this, token]() { executeOnAlertDeleted(token); });
+         }
+         alertTokens.push_back(token);
+     }
+@@ -845,6 +874,14 @@ void AlertsCapabilityAgent::executeOnAlertStateChange(
+     });
+ }
+ 
++void AlertsCapabilityAgent::executeOnAlertCreated(const std::string& alertToken, const std::string& payload){
++    m_executor.submit([this, alertToken, payload]() { executeNotifyAlertCreatedObservers(alertToken, payload); });
++}
++
++void AlertsCapabilityAgent::executeOnAlertDeleted(const std::string& alertToken){
++    m_executor.submit([this, alertToken]() { executeNotifyAlertDeletedObservers(alertToken); });
++}
++
+ void AlertsCapabilityAgent::executeAddObserver(std::shared_ptr<AlertObserverInterface> observer) {
+     ACSDK_DEBUG1(LX("executeAddObserver").d("observer", observer.get()));
+     m_observers.insert(observer);
+@@ -870,6 +907,23 @@ void AlertsCapabilityAgent::executeNotifyObservers(
+     }
+ }
+ 
++void AlertsCapabilityAgent::executeNotifyAlertCreatedObservers(
++    const std::string& alertToken,
++    const std::string& payload) {
++        ACSDK_DEBUG1(LX("executeNotifyAlertCreatedObservers").d("alertToken", alertToken).sensitive("payload", payload));
++    for (auto observer : m_observers) {
++        observer->onAlertCreated(alertToken, payload);
++    }
++}
++
++void AlertsCapabilityAgent::executeNotifyAlertDeletedObservers(
++    const std::string& alertToken) {
++        ACSDK_DEBUG1(LX("executeNotifyAlertDeletedObservers").d("alertToken", alertToken));
++    for (auto observer : m_observers) {
++        observer->onAlertDeleted(alertToken);
++    }
++}
++
+ void AlertsCapabilityAgent::executeRemoveAllAlerts() {
+     ACSDK_DEBUG1(LX("executeRemoveAllAlerts"));
+     m_alertScheduler.clearData();
 diff --git a/CapabilityAgents/ExternalMediaPlayer/include/ExternalMediaPlayer/ExternalMediaPlayer.h b/CapabilityAgents/ExternalMediaPlayer/include/ExternalMediaPlayer/ExternalMediaPlayer.h
-index 61d7c52..6aad0e0 100644
+index e7919eb..3bfab0a 100644
 --- a/CapabilityAgents/ExternalMediaPlayer/include/ExternalMediaPlayer/ExternalMediaPlayer.h
 +++ b/CapabilityAgents/ExternalMediaPlayer/include/ExternalMediaPlayer/ExternalMediaPlayer.h
-@@ -20,6 +20,12 @@
+@@ -20,6 +20,11 @@
  #include <memory>
  #include <string>
  
 +#ifdef EXTERNALMEDIAPLAYER_1_1
 +#include <AVSCommon/AVS/CapabilityConfiguration.h>
 +#include <AVSCommon/AVS/PlayerActivity.h>
-+#include <AVSCommon/SDKInterfaces/CapabilityConfigurationInterface.h>
 +#include <AVSCommon/SDKInterfaces/ExternalMediaAdapterHandlerInterface.h>
 +#endif
  #include <AVSCommon/AVS/CapabilityAgent.h>
  #include <AVSCommon/AVS/DirectiveHandlerConfiguration.h>
- #include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
-@@ -39,6 +45,23 @@ namespace alexaClientSDK {
+ #include <AVSCommon/SDKInterfaces/CapabilityConfigurationInterface.h>
+@@ -41,6 +46,23 @@ namespace alexaClientSDK {
  namespace capabilityAgents {
  namespace externalMediaPlayer {
  
@@ -422,23 +1318,11 @@ index 61d7c52..6aad0e0 100644
  /**
   * This class implements the @c ExternalMediaPlayer capability agent. This agent is responsible for handling
   * music service providers which manage their PLAY queue.
-@@ -48,6 +71,9 @@ namespace externalMediaPlayer {
- class ExternalMediaPlayer
-         : public avsCommon::avs::CapabilityAgent
-         , public avsCommon::utils::RequiresShutdown
-+#ifdef EXTERNALMEDIAPLAYER_1_1
-+        , public avsCommon::sdkInterfaces::CapabilityConfigurationInterface
-+#endif
-         , public avsCommon::sdkInterfaces::ExternalMediaPlayerInterface
-         , public avsCommon::sdkInterfaces::PlaybackHandlerInterface
-         , public std::enable_shared_from_this<ExternalMediaPlayer> {
-@@ -101,6 +127,23 @@ public:
+@@ -104,6 +126,21 @@ public:
          std::shared_ptr<avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
          std::shared_ptr<avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter);
  
 +#ifdef EXTERNALMEDIAPLAYER_1_1
-+    std::unordered_set<std::shared_ptr<avsCommon::avs::CapabilityConfiguration>> getCapabilityConfigurations() override;
-+
 +    void addAdapterHandler(std::shared_ptr<avsCommon::sdkInterfaces::ExternalMediaAdapterHandlerInterface> adapterHandler);
 +    void removeAdapterHandler(std::shared_ptr<avsCommon::sdkInterfaces::ExternalMediaAdapterHandlerInterface> adapterHandler);
 +#endif
@@ -456,7 +1340,7 @@ index 61d7c52..6aad0e0 100644
      /// @name StateProviderInterface Functions
      /// @{
      void provideState(const avsCommon::avs::NamespaceAndName& stateProviderName, unsigned int stateRequestToken)
-@@ -126,6 +169,12 @@ public:
+@@ -129,6 +166,12 @@ public:
  
      /// @name Overridden ExternalMediaPlayerInterface methods.
      /// @{
@@ -469,7 +1353,7 @@ index 61d7c52..6aad0e0 100644
      virtual void setPlayerInFocus(const std::string& playerInFocus) override;
      /// @}
  
-@@ -148,12 +197,20 @@ private:
+@@ -174,12 +217,20 @@ private:
      /**
       * This method returns the ExternalMediaPlayer session state registered in the ExternalMediaPlayer namespace.
       */
@@ -490,7 +1374,7 @@ index 61d7c52..6aad0e0 100644
  
      /**
       * This function deserializes a @c Directive's payload into a @c rapidjson::Document.
-@@ -196,6 +253,15 @@ private:
+@@ -222,6 +273,15 @@ private:
          std::shared_ptr<avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
          std::shared_ptr<avsCommon::sdkInterfaces::ContextManagerInterface> contextManager);
  
@@ -506,7 +1390,7 @@ index 61d7c52..6aad0e0 100644
      /**
       * Send the handling completed notification and clean up the resources the specified @c DirectiveInfo.
       *
-@@ -252,6 +318,19 @@ private:
+@@ -278,6 +338,19 @@ private:
          std::shared_ptr<DirectiveInfo> info,
          rapidjson::Document* document);
  
@@ -526,14 +1410,11 @@ index 61d7c52..6aad0e0 100644
      /**
       * Handler for login directive.
       *
-@@ -328,6 +407,36 @@ private:
-     /// The id of the player which currently has focus.
-     std::string m_playerInFocus;
+@@ -394,6 +467,33 @@ private:
+         std::shared_ptr<avsCommon::sdkInterfaces::externalMediaPlayer::ExternalMediaPlayerObserverInterface>>
+         m_observers;
  
 +#ifdef EXTERNALMEDIAPLAYER_1_1
-+    /// Set of capability configurations that will get published using the Capabilities API
-+    std::unordered_set<std::shared_ptr<avsCommon::avs::CapabilityConfiguration>> m_capabilityConfigurations;
-+
 +    std::unordered_set<std::shared_ptr<avsCommon::sdkInterfaces::ExternalMediaAdapterHandlerInterface>> m_adapterHandlers;
 +#endif
 +
@@ -564,50 +1445,27 @@ index 61d7c52..6aad0e0 100644
       * @c Executor which queues up operations from asynchronous API calls.
       *
 diff --git a/CapabilityAgents/ExternalMediaPlayer/src/ExternalMediaPlayer.cpp b/CapabilityAgents/ExternalMediaPlayer/src/ExternalMediaPlayer.cpp
-index 51651ad..18a8616 100644
+index 7e6c43a..e27f0a4 100644
 --- a/CapabilityAgents/ExternalMediaPlayer/src/ExternalMediaPlayer.cpp
 +++ b/CapabilityAgents/ExternalMediaPlayer/src/ExternalMediaPlayer.cpp
-@@ -65,10 +65,67 @@ static const std::string PLAYLISTCONTROLLER_NAMESPACE = "Alexa.PlaylistControlle
- static const std::string SEEKCONTROLLER_NAMESPACE = "Alexa.SeekController";
- static const std::string FAVORITESCONTROLLER_NAMESPACE = "Alexa.FavoritesController";
+@@ -75,8 +75,13 @@ static const std::string EXTERNALMEDIAPLAYER_CAPABILITY_INTERFACE_TYPE = ALEXA_I
+ /// ExternalMediaPlayer interface name
+ static const std::string EXTERNALMEDIAPLAYER_CAPABILITY_INTERFACE_NAME = "ExternalMediaPlayer";
+ /// ExternalMediaPlayer interface version
++#ifdef EXTERNALMEDIAPLAYER_1_1
++static const std::string EXTERNALMEDIAPLAYER_CAPABILITY_INTERFACE_VERSION = "1.1";
++#else
+ static const std::string EXTERNALMEDIAPLAYER_CAPABILITY_INTERFACE_VERSION = "1.0";
++#endif
  
 +#ifdef EXTERNALMEDIAPLAYER_1_1
-+// Capability constants
-+/// The AlexaInterface constant type.
-+static const std::string ALEXA_INTERFACE_TYPE = "AlexaInterface";
-+
-+/// externalMediaPlayer capability constants
-+/// externalMediaPlayer interface type
-+static const std::string EXTERNALMEDIAPLAYER_CAPABILITY_INTERFACE_TYPE = ALEXA_INTERFACE_TYPE;
-+/// externalMediaPlayer interface name
-+static const std::string EXTERNALMEDIAPLAYER_CAPABILITY_INTERFACE_NAME = "ExternalMediaPlayer";
-+/// externalMediaPlayer interface version
-+static const std::string EXTERNALMEDIAPLAYER_CAPABILITY_INTERFACE_VERSION = "1.1";
-+
-+/// Alexa.PlaybackStateReporter name.
-+static const std::string PLAYBACKSTATEREPORTER_CAPABILITY_INTERFACE_NAME = PLAYBACKSTATEREPORTER_STATE_NAMESPACE;
-+/// Alexa.PlaybackStateReporter version.
-+static const std::string PLAYBACKSTATEREPORTER_CAPABILITY_INTERFACE_VERSION = "1.0";
-+
-+/// Alexa.PlaybackController name.
-+static const std::string PLAYBACKCONTROLLER_CAPABILITY_INTERFACE_NAME = PLAYBACKCONTROLLER_NAMESPACE;
-+/// Alexa.PlaybackController version.
-+static const std::string PLAYBACKCONTROLLER_CAPABILITY_INTERFACE_VERSION = "1.0";
-+
-+/// Alexa.PlaylistController name.
-+static const std::string PLAYLISTCONTROLLER_CAPABILITY_INTERFACE_NAME = PLAYLISTCONTROLLER_NAMESPACE;
-+/// Alexa.PlaylistController version.
-+static const std::string PLAYLISTCONTROLLER_CAPABILITY_INTERFACE_VERSION = "1.0";
-+
-+/// Alexa.SeekController name.
-+static const std::string SEEKCONTROLLER_CAPABILITY_INTERFACE_NAME = SEEKCONTROLLER_NAMESPACE;
-+/// Alexa.SeekController version.
-+static const std::string SEEKCONTROLLER_CAPABILITY_INTERFACE_VERSION = "1.0";
-+
-+/// Alexa.FavoritesController name.
-+static const std::string FAVORITESCONTROLLER_CAPABILITY_INTERFACE_NAME = FAVORITESCONTROLLER_NAMESPACE;
-+/// Alexa.FavoritesController version.
-+static const std::string FAVORITESCONTROLLER_CAPABILITY_INTERFACE_VERSION = "1.0";
+ /// Alexa.PlaybackStateReporter name.
+ static const std::string PLAYBACKSTATEREPORTER_CAPABILITY_INTERFACE_NAME = PLAYBACKSTATEREPORTER_STATE_NAMESPACE;
+ /// Alexa.PlaybackStateReporter version.
+@@ -101,11 +106,30 @@ static const std::string SEEKCONTROLLER_CAPABILITY_INTERFACE_VERSION = "1.0";
+ static const std::string FAVORITESCONTROLLER_CAPABILITY_INTERFACE_NAME = FAVORITESCONTROLLER_NAMESPACE;
+ /// Alexa.FavoritesController version.
+ static const std::string FAVORITESCONTROLLER_CAPABILITY_INTERFACE_VERSION = "1.0";
 +#endif
 +
 +#ifdef EXTERNALMEDIAPLAYER_1_1
@@ -624,7 +1482,7 @@ index 51651ad..18a8616 100644
 +/// The duration to wait for a state change in @c onFocusChanged before failing.
 +static const std::chrono::seconds TIMEOUT{2};
 +#endif
-+
+ 
  // The @c External media player play directive signature.
  static const NamespaceAndName PLAY_DIRECTIVE{EXTERNALMEDIAPLAYER_NAMESPACE, "Play"};
  static const NamespaceAndName LOGIN_DIRECTIVE{EXTERNALMEDIAPLAYER_NAMESPACE, "Login"};
@@ -635,19 +1493,7 @@ index 51651ad..18a8616 100644
  
  // The @c Transport control directive signatures.
  static const NamespaceAndName RESUME_DIRECTIVE{PLAYBACKCONTROLLER_NAMESPACE, "Play"};
-@@ -110,9 +167,21 @@ static const int64_t MAX_PAST_OFFSET = -86400000;
- /// The max relative time in the past that we can  seek to in milliseconds(+12 hours in ms).
- static const int64_t MAX_FUTURE_OFFSET = 86400000;
- 
-+#ifdef EXTERNALMEDIAPLAYER_1_1
-+/**
-+ * Creates the ExternalMediaPlayer capability configuration.
-+ *
-+ * @return The ExternalMediaPlayer capability configuration.
-+ */
-+static std::shared_ptr<avsCommon::avs::CapabilityConfiguration> getExternalMediaPlayerCapabilityConfiguration();
-+#endif
-+
+@@ -157,6 +181,9 @@ static std::shared_ptr<avsCommon::avs::CapabilityConfiguration> getExternalMedia
  /// The @c m_directiveToHandlerMap Map of the directives to their handlers.
  std::unordered_map<NamespaceAndName, std::pair<RequestType, ExternalMediaPlayer::DirectiveHandler>>
      ExternalMediaPlayer::m_directiveToHandlerMap = {
@@ -657,21 +1503,21 @@ index 51651ad..18a8616 100644
          {LOGIN_DIRECTIVE, std::make_pair(RequestType::LOGIN, &ExternalMediaPlayer::handleLogin)},
          {LOGOUT_DIRECTIVE, std::make_pair(RequestType::LOGOUT, &ExternalMediaPlayer::handleLogout)},
          {PLAY_DIRECTIVE, std::make_pair(RequestType::PLAY, &ExternalMediaPlayer::handlePlay)},
-@@ -135,7 +204,12 @@ std::unordered_map<NamespaceAndName, std::pair<RequestType, ExternalMediaPlayer:
-         {SEEK_DIRECTIVE, std::make_pair(RequestType::SEEK, &ExternalMediaPlayer::handleSeek)},
-         {ADJUSTSEEK_DIRECTIVE, std::make_pair(RequestType::ADJUST_SEEK, &ExternalMediaPlayer::handleAdjustSeek)}};
+@@ -182,7 +209,12 @@ std::unordered_map<NamespaceAndName, std::pair<RequestType, ExternalMediaPlayer:
+ auto audioNonBlockingPolicy = BlockingPolicy(BlockingPolicy::MEDIUM_AUDIO, false);
+ auto neitherNonBlockingPolicy = BlockingPolicy(BlockingPolicy::MEDIUMS_NONE, false);
  
 +#ifdef EXTERNALMEDIAPLAYER_1_1
-+static DirectiveHandlerConfiguration g_configuration = {{AUTHORIZEDISCOVEREDPLAYERS_DIRECTIVE, BlockingPolicy::NON_BLOCKING},
-+                                                        {PLAY_DIRECTIVE, BlockingPolicy::NON_BLOCKING},
++static DirectiveHandlerConfiguration g_configuration = {{AUTHORIZEDISCOVEREDPLAYERS_DIRECTIVE, audioNonBlockingPolicy},
++                                                        {PLAY_DIRECTIVE, audioNonBlockingPolicy},
 +#else
- static DirectiveHandlerConfiguration g_configuration = {{PLAY_DIRECTIVE, BlockingPolicy::NON_BLOCKING},
+ static DirectiveHandlerConfiguration g_configuration = {{PLAY_DIRECTIVE, audioNonBlockingPolicy},
 +#endif
-                                                         {LOGIN_DIRECTIVE, BlockingPolicy::NON_BLOCKING},
-                                                         {LOGOUT_DIRECTIVE, BlockingPolicy::NON_BLOCKING},
-                                                         {RESUME_DIRECTIVE, BlockingPolicy::NON_BLOCKING},
-@@ -156,18 +230,45 @@ static DirectiveHandlerConfiguration g_configuration = {{PLAY_DIRECTIVE, Blockin
-                                                         {UNFAVORITE_DIRECTIVE, BlockingPolicy::NON_BLOCKING}};
+                                                         {LOGIN_DIRECTIVE, neitherNonBlockingPolicy},
+                                                         {LOGOUT_DIRECTIVE, neitherNonBlockingPolicy},
+                                                         {RESUME_DIRECTIVE, audioNonBlockingPolicy},
+@@ -203,15 +235,21 @@ static DirectiveHandlerConfiguration g_configuration = {{PLAY_DIRECTIVE, audioNo
+                                                         {UNFAVORITE_DIRECTIVE, neitherNonBlockingPolicy}};
  
  static std::unordered_map<PlaybackButton, RequestType> g_buttonToRequestType = {
 +#ifdef EXTERNALMEDIAPLAYER_1_1
@@ -693,31 +1539,7 @@ index 51651ad..18a8616 100644
      {PlaybackToggle::THUMBS_UP, std::make_pair(RequestType::FAVORITE, RequestType::DESELECT_FAVORITE)},
      {PlaybackToggle::THUMBS_DOWN, std::make_pair(RequestType::UNFAVORITE, RequestType::DESELECT_UNFAVORITE)}};
  
-+#ifdef EXTERNALMEDIAPLAYER_1_1
-+/**
-+ * Generate a @c CapabilityConfiguration object.
-+ *
-+ * @param type The Capability interface type.
-+ * @param interface The Capability interface name.
-+ * @param version The Capability interface verison.
-+ */
-+static std::shared_ptr<CapabilityConfiguration> generateCapabilityConfiguration(
-+    const std::string& type,
-+    const std::string& interface,
-+    const std::string& version) {
-+    std::unordered_map<std::string, std::string> configMap;
-+    configMap.insert({CAPABILITY_INTERFACE_TYPE_KEY, type});
-+    configMap.insert({CAPABILITY_INTERFACE_NAME_KEY, interface});
-+    configMap.insert({CAPABILITY_INTERFACE_VERSION_KEY, version});
-+
-+    return std::make_shared<CapabilityConfiguration>(configMap);
-+}
-+#endif
-+
- std::shared_ptr<ExternalMediaPlayer> ExternalMediaPlayer::create(
-     const AdapterMediaPlayerMap& mediaPlayers,
-     const AdapterSpeakerMap& speakers,
-@@ -213,6 +314,10 @@ std::shared_ptr<ExternalMediaPlayer> ExternalMediaPlayer::create(
+@@ -279,6 +317,10 @@ std::shared_ptr<ExternalMediaPlayer> ExternalMediaPlayer::create(
      externalMediaPlayer->createAdapters(
          mediaPlayers, speakers, adapterCreationMap, messageSender, focusManager, contextManager);
  
@@ -728,7 +1550,7 @@ index 51651ad..18a8616 100644
      return externalMediaPlayer;
  }
  
-@@ -225,9 +330,271 @@ ExternalMediaPlayer::ExternalMediaPlayer(
+@@ -291,10 +333,18 @@ ExternalMediaPlayer::ExternalMediaPlayer(
          RequiresShutdown{"ExternalMediaPlayer"},
          m_speakerManager{speakerManager},
          m_contextManager{contextManager},
@@ -740,48 +1562,28 @@ index 51651ad..18a8616 100644
 +        m_currentActivity{avsCommon::avs::PlayerActivity::IDLE} {
 +#else
          m_playbackRouter{playbackRouter} {
+-    // Register all supported capabilities.
 +#endif
+     m_capabilityConfigurations.insert(getExternalMediaPlayerCapabilityConfiguration());
+-
 +#ifdef EXTERNALMEDIAPLAYER_1_1
 +    // Register all supported capabilities.
-+    m_capabilityConfigurations.insert(getExternalMediaPlayerCapabilityConfiguration());
-+
-+    m_capabilityConfigurations.insert(generateCapabilityConfiguration(
-+        ALEXA_INTERFACE_TYPE,
-+        PLAYBACKSTATEREPORTER_CAPABILITY_INTERFACE_NAME,
-+        PLAYBACKSTATEREPORTER_CAPABILITY_INTERFACE_VERSION));
-+
-+    m_capabilityConfigurations.insert(generateCapabilityConfiguration(
-+        ALEXA_INTERFACE_TYPE,
-+        PLAYBACKCONTROLLER_CAPABILITY_INTERFACE_NAME,
-+        PLAYBACKCONTROLLER_CAPABILITY_INTERFACE_VERSION));
-+
-+    m_capabilityConfigurations.insert(generateCapabilityConfiguration(
-+        ALEXA_INTERFACE_TYPE,
-+        PLAYLISTCONTROLLER_CAPABILITY_INTERFACE_NAME,
-+        PLAYLISTCONTROLLER_CAPABILITY_INTERFACE_VERSION));
-+
-+    m_capabilityConfigurations.insert(generateCapabilityConfiguration(
-+        ALEXA_INTERFACE_TYPE, SEEKCONTROLLER_CAPABILITY_INTERFACE_NAME, SEEKCONTROLLER_CAPABILITY_INTERFACE_VERSION));
-+
-+    m_capabilityConfigurations.insert(generateCapabilityConfiguration(
-+        ALEXA_INTERFACE_TYPE,
-+        FAVORITESCONTROLLER_CAPABILITY_INTERFACE_NAME,
-+        FAVORITESCONTROLLER_CAPABILITY_INTERFACE_VERSION));
+     m_capabilityConfigurations.insert(generateCapabilityConfiguration(
+         ALEXA_INTERFACE_TYPE,
+         PLAYBACKSTATEREPORTER_CAPABILITY_INTERFACE_NAME,
+@@ -317,6 +367,7 @@ ExternalMediaPlayer::ExternalMediaPlayer(
+         ALEXA_INTERFACE_TYPE,
+         FAVORITESCONTROLLER_CAPABILITY_INTERFACE_NAME,
+         FAVORITESCONTROLLER_CAPABILITY_INTERFACE_VERSION));
 +#endif
  }
  
+ std::shared_ptr<CapabilityConfiguration> getExternalMediaPlayerCapabilityConfiguration() {
+@@ -326,6 +377,222 @@ std::shared_ptr<CapabilityConfiguration> getExternalMediaPlayerCapabilityConfigu
+         EXTERNALMEDIAPLAYER_CAPABILITY_INTERFACE_VERSION);
+ }
+ 
 +#ifdef EXTERNALMEDIAPLAYER_1_1
-+std::shared_ptr<CapabilityConfiguration> getExternalMediaPlayerCapabilityConfiguration() {
-+    return generateCapabilityConfiguration(
-+        EXTERNALMEDIAPLAYER_CAPABILITY_INTERFACE_TYPE,
-+        EXTERNALMEDIAPLAYER_CAPABILITY_INTERFACE_NAME,
-+        EXTERNALMEDIAPLAYER_CAPABILITY_INTERFACE_VERSION);
-+}
-+
-+std::unordered_set<std::shared_ptr<avsCommon::avs::CapabilityConfiguration>> ExternalMediaPlayer::getCapabilityConfigurations() {
-+    return m_capabilityConfigurations;
-+}
-+
 +void ExternalMediaPlayer::addAdapterHandler(
 +    std::shared_ptr<avsCommon::sdkInterfaces::ExternalMediaAdapterHandlerInterface> adapterHandler) {
 +    ACSDK_DEBUG5(LX("addAdapterHandler"));
@@ -1000,7 +1802,7 @@ index 51651ad..18a8616 100644
  void ExternalMediaPlayer::provideState(
      const avsCommon::avs::NamespaceAndName& stateProviderName,
      unsigned int stateRequestToken) {
-@@ -301,6 +668,12 @@ std::shared_ptr<ExternalMediaAdapterInterface> ExternalMediaPlayer::preprocessDi
+@@ -399,6 +666,12 @@ std::shared_ptr<ExternalMediaAdapterInterface> ExternalMediaPlayer::preprocessDi
          return nullptr;
      }
  
@@ -1013,7 +1815,7 @@ index 51651ad..18a8616 100644
      auto adapterIt = m_adapters.find(playerId);
      if (adapterIt == m_adapters.end()) {
          ACSDK_ERROR(LX("preprocessDirectiveFailed").d("reason", "noAdapterForPlayerId").d(PLAYER_ID, playerId));
-@@ -318,11 +691,36 @@ std::shared_ptr<ExternalMediaAdapterInterface> ExternalMediaPlayer::preprocessDi
+@@ -416,11 +689,36 @@ std::shared_ptr<ExternalMediaAdapterInterface> ExternalMediaPlayer::preprocessDi
      return adapter;
  }
  
@@ -1050,7 +1852,7 @@ index 51651ad..18a8616 100644
          return;
      }
  
-@@ -361,6 +759,14 @@ void ExternalMediaPlayer::handleLogout(std::shared_ptr<DirectiveInfo> info, Requ
+@@ -459,6 +757,14 @@ void ExternalMediaPlayer::handleLogout(std::shared_ptr<DirectiveInfo> info, Requ
  
      auto adapter = preprocessDirective(info, &payload);
      if (!adapter) {
@@ -1065,7 +1867,7 @@ index 51651ad..18a8616 100644
          return;
      }
  
-@@ -373,6 +779,15 @@ void ExternalMediaPlayer::handlePlay(std::shared_ptr<DirectiveInfo> info, Reques
+@@ -471,6 +777,15 @@ void ExternalMediaPlayer::handlePlay(std::shared_ptr<DirectiveInfo> info, Reques
  
      auto adapter = preprocessDirective(info, &payload);
      if (!adapter) {
@@ -1081,7 +1883,7 @@ index 51651ad..18a8616 100644
          return;
      }
  
-@@ -393,8 +808,41 @@ void ExternalMediaPlayer::handlePlay(std::shared_ptr<DirectiveInfo> info, Reques
+@@ -491,8 +806,41 @@ void ExternalMediaPlayer::handlePlay(std::shared_ptr<DirectiveInfo> info, Reques
          index = 0;
      }
  
@@ -1123,7 +1925,7 @@ index 51651ad..18a8616 100644
  }
  
  void ExternalMediaPlayer::handleSeek(std::shared_ptr<DirectiveInfo> info, RequestType request) {
-@@ -402,6 +850,14 @@ void ExternalMediaPlayer::handleSeek(std::shared_ptr<DirectiveInfo> info, Reques
+@@ -500,6 +848,14 @@ void ExternalMediaPlayer::handleSeek(std::shared_ptr<DirectiveInfo> info, Reques
  
      auto adapter = preprocessDirective(info, &payload);
      if (!adapter) {
@@ -1138,7 +1940,7 @@ index 51651ad..18a8616 100644
          return;
      }
  
-@@ -421,6 +877,14 @@ void ExternalMediaPlayer::handleAdjustSeek(std::shared_ptr<DirectiveInfo> info,
+@@ -519,6 +875,14 @@ void ExternalMediaPlayer::handleAdjustSeek(std::shared_ptr<DirectiveInfo> info,
  
      auto adapter = preprocessDirective(info, &payload);
      if (!adapter) {
@@ -1153,7 +1955,7 @@ index 51651ad..18a8616 100644
          return;
      }
  
-@@ -448,6 +912,15 @@ void ExternalMediaPlayer::handlePlayControl(std::shared_ptr<DirectiveInfo> info,
+@@ -546,6 +910,15 @@ void ExternalMediaPlayer::handlePlayControl(std::shared_ptr<DirectiveInfo> info,
  
      auto adapter = preprocessDirective(info, &payload);
      if (!adapter) {
@@ -1169,7 +1971,7 @@ index 51651ad..18a8616 100644
          return;
      }
  
-@@ -466,6 +939,38 @@ DirectiveHandlerConfiguration ExternalMediaPlayer::getConfiguration() const {
+@@ -564,6 +937,38 @@ DirectiveHandlerConfiguration ExternalMediaPlayer::getConfiguration() const {
      return g_configuration;
  }
  
@@ -1208,7 +2010,7 @@ index 51651ad..18a8616 100644
  void ExternalMediaPlayer::setPlayerInFocus(const std::string& playerInFocus) {
      ACSDK_DEBUG9(LX("setPlayerInFocus").d("playerInFocus", playerInFocus));
      m_playerInFocus = playerInFocus;
-@@ -473,19 +978,28 @@ void ExternalMediaPlayer::setPlayerInFocus(const std::string& playerInFocus) {
+@@ -571,19 +976,28 @@ void ExternalMediaPlayer::setPlayerInFocus(const std::string& playerInFocus) {
  }
  
  void ExternalMediaPlayer::onButtonPressed(PlaybackButton button) {
@@ -1244,7 +2046,7 @@ index 51651ad..18a8616 100644
              return;
          }
  
-@@ -494,37 +1008,48 @@ void ExternalMediaPlayer::onButtonPressed(PlaybackButton button) {
+@@ -592,37 +1006,48 @@ void ExternalMediaPlayer::onButtonPressed(PlaybackButton button) {
  }
  
  void ExternalMediaPlayer::onTogglePressed(PlaybackToggle toggle, bool action) {
@@ -1310,7 +2112,7 @@ index 51651ad..18a8616 100644
      // Reset the EMP from being a state provider. If not there would be calls from the adapter to provide context
      // which will try to add tasks to the executor thread.
      m_contextManager->setStateProvider(SESSION_STATE, nullptr);
-@@ -552,6 +1077,29 @@ void ExternalMediaPlayer::removeDirective(std::shared_ptr<DirectiveInfo> info) {
+@@ -650,6 +1075,29 @@ void ExternalMediaPlayer::removeDirective(std::shared_ptr<DirectiveInfo> info) {
      }
  }
  
@@ -1340,7 +2142,7 @@ index 51651ad..18a8616 100644
  void ExternalMediaPlayer::setHandlingCompleted(std::shared_ptr<DirectiveInfo> info) {
      if (info && info->result) {
          info->result->setCompleted();
-@@ -582,10 +1130,28 @@ void ExternalMediaPlayer::executeProvideState(
+@@ -680,10 +1128,28 @@ void ExternalMediaPlayer::executeProvideState(
      ACSDK_DEBUG(LX("executeProvideState").d("sendToken", sendToken).d("stateRequestToken", stateRequestToken));
      std::string state;
  
@@ -1369,7 +2171,7 @@ index 51651ad..18a8616 100644
      } else {
          ACSDK_ERROR(LX("executeProvideState").d("reason", "unknownStateProviderName"));
          return;
-@@ -603,7 +1169,11 @@ void ExternalMediaPlayer::executeProvideState(
+@@ -701,12 +1167,19 @@ void ExternalMediaPlayer::executeProvideState(
      }
  }
  
@@ -1381,8 +2183,17 @@ index 51651ad..18a8616 100644
      rapidjson::Document state(rapidjson::kObjectType);
      rapidjson::Document::AllocatorType& stateAlloc = state.GetAllocator();
  
-@@ -619,6 +1189,13 @@ std::string ExternalMediaPlayer::provideSessionState() {
-         players.PushBack(playerJson, stateAlloc);
+     state.AddMember(rapidjson::StringRef(PLAYER_IN_FOCUS), m_playerInFocus, stateAlloc);
+-
++#ifdef EXTERNALMEDIAPLAYER_1_1
++    state.AddMember(rapidjson::StringRef(SPI_VERSION), rapidjson::StringRef(SPI_VERSION_DEFAULT), stateAlloc);
++    state.AddMember(rapidjson::StringRef(AGENT), rapidjson::StringRef(AGENT_DEFAULT), stateAlloc);
++#endif
+     rapidjson::Value players(rapidjson::kArrayType);
+     for (const auto& adapter : m_adapters) {
+         if (!adapter.second) {
+@@ -719,6 +1192,13 @@ std::string ExternalMediaPlayer::provideSessionState() {
+         notifyObservers(state.playerId, &update);
      }
  
 +#ifdef EXTERNALMEDIAPLAYER_1_1
@@ -1395,7 +2206,7 @@ index 51651ad..18a8616 100644
      state.AddMember(rapidjson::StringRef(PLAYERS), players, stateAlloc);
  
      rapidjson::StringBuffer buffer;
-@@ -631,7 +1208,11 @@ std::string ExternalMediaPlayer::provideSessionState() {
+@@ -731,7 +1211,11 @@ std::string ExternalMediaPlayer::provideSessionState() {
      return buffer.GetString();
  }
  
@@ -1407,8 +2218,8 @@ index 51651ad..18a8616 100644
      rapidjson::Document state(rapidjson::kObjectType);
      rapidjson::Document::AllocatorType& stateAlloc = state.GetAllocator();
  
-@@ -650,6 +1231,13 @@ std::string ExternalMediaPlayer::providePlaybackState() {
-         players.PushBack(playerJson, stateAlloc);
+@@ -753,6 +1237,13 @@ std::string ExternalMediaPlayer::providePlaybackState() {
+         notifyObservers(state.playerId, &update);
      }
  
 +#ifdef EXTERNALMEDIAPLAYER_1_1
@@ -1422,10 +2233,10 @@ index 51651ad..18a8616 100644
  
      rapidjson::StringBuffer buffer;
 diff --git a/CapabilityAgents/ExternalMediaPlayer/test/ExternalMediaPlayerTest.cpp b/CapabilityAgents/ExternalMediaPlayer/test/ExternalMediaPlayerTest.cpp
-index c124c20..e464c4f 100644
+index 9976346..d4cdfde 100644
 --- a/CapabilityAgents/ExternalMediaPlayer/test/ExternalMediaPlayerTest.cpp
 +++ b/CapabilityAgents/ExternalMediaPlayer/test/ExternalMediaPlayerTest.cpp
-@@ -90,6 +90,9 @@ static const std::string FAVORITESCONTROLLER_NAMESPACE = "Alexa.FavoritesControl
+@@ -96,6 +96,9 @@ static const std::string PLAYER_STATE = "IDLE";
  static const NamespaceAndName PLAY_DIRECTIVE{EXTERNALMEDIAPLAYER_NAMESPACE, "Play"};
  static const NamespaceAndName LOGIN_DIRECTIVE{EXTERNALMEDIAPLAYER_NAMESPACE, "Login"};
  static const NamespaceAndName LOGOUT_DIRECTIVE{EXTERNALMEDIAPLAYER_NAMESPACE, "Logout"};
@@ -1435,7 +2246,7 @@ index c124c20..e464c4f 100644
  
  // The @c Transport control directive signatures.
  static const NamespaceAndName RESUME_DIRECTIVE{PLAYBACKCONTROLLER_NAMESPACE, "Play"};
-@@ -130,7 +133,15 @@ static const std::string IDLE_SESSION_STATE =
+@@ -136,7 +139,15 @@ static const std::string IDLE_SESSION_STATE =
              "\"username\":\"\","
              "\"isGuest\":false,"
              "\"launched\":false,"
@@ -1452,7 +2263,7 @@ index c124c20..e464c4f 100644
      "]}";
  
  static const std::string IDLE_PLAYBACK_STATE =
-@@ -232,7 +243,12 @@ public:
+@@ -260,7 +271,12 @@ public:
              bool forceLogin,
              std::chrono::milliseconds tokenRefreshInterval));
      MOCK_METHOD0(handleLogout, void());
@@ -1465,8 +2276,8 @@ index c124c20..e464c4f 100644
      MOCK_METHOD1(handlePlayControl, void(RequestType requestType));
      MOCK_METHOD1(handleSeek, void(std::chrono::milliseconds offset));
      MOCK_METHOD1(handleAdjustSeek, void(std::chrono::milliseconds deltaOffset));
-@@ -266,6 +282,53 @@ MockExternalMediaPlayerAdapter::getInstance(
-     return MockExternalMediaPlayerAdapter::m_currentActiveMediaPlayerAdapter;
+@@ -320,6 +336,53 @@ std::shared_ptr<MockExternalMediaPlayerObserver> MockExternalMediaPlayerObserver
+ MockExternalMediaPlayerObserver::MockExternalMediaPlayerObserver() {
  }
  
 +#ifdef EXTERNALMEDIAPLAYER_1_1
@@ -1519,7 +2330,7 @@ index c124c20..e464c4f 100644
  /**
   * Method to create payload with parse error.
   *
-@@ -279,7 +342,15 @@ static std::string createPlayPayloadWithParseError(
+@@ -333,7 +396,15 @@ static std::string createPlayPayloadWithParseError(
      const std::string& playContext,
      int index,
      int64_t offsetInMilliseconds,
@@ -1536,7 +2347,7 @@ index c124c20..e464c4f 100644
      // clang-format off
      const std::string PLAY_PAYLOAD_TEST =
          "{"
-@@ -287,6 +358,13 @@ static std::string createPlayPayloadWithParseError(
+@@ -341,6 +412,13 @@ static std::string createPlayPayloadWithParseError(
              "\"offsetInMilliseconds\":" + std::to_string(offsetInMilliseconds) + "\","
              "\"playerId\":\"" + playerId + "\","
              "\"index\":\"" + std::to_string(index) + "\","
@@ -1550,7 +2361,7 @@ index c124c20..e464c4f 100644
          "}";
      // clang-format on
  
-@@ -323,7 +401,15 @@ static std::string createPlayPayload(
+@@ -377,7 +455,15 @@ static std::string createPlayPayload(
      const std::string& playContext,
      int index,
      int64_t offsetInMilliseconds,
@@ -1567,7 +2378,7 @@ index c124c20..e464c4f 100644
      // clang-format off
      const std::string PLAY_PAYLOAD_TEST =
          "{"
-@@ -331,6 +417,13 @@ static std::string createPlayPayload(
+@@ -385,6 +471,13 @@ static std::string createPlayPayload(
              "\"offsetInMilliseconds\":\"" + std::to_string(offsetInMilliseconds) + "\","
              "\"playerId\":\"" + playerId + "\","
              "\"index\":\"" + std::to_string(index) + "\""
@@ -1581,7 +2392,7 @@ index c124c20..e464c4f 100644
          "}";
      // clang-format on
  
-@@ -345,13 +438,28 @@ static std::string createPlayPayload(
+@@ -399,13 +492,28 @@ static std::string createPlayPayload(
   * @param playerId The business name of the player.
   * @return A string representation of the payload.
   */
@@ -1611,7 +2422,7 @@ index c124c20..e464c4f 100644
          "}";
      // clang-format on
  
-@@ -369,13 +477,28 @@ static std::string createPlayPayloadNoContext(int index, int64_t offsetInMillise
+@@ -423,13 +531,28 @@ static std::string createPlayPayloadNoContext(int index, int64_t offsetInMillise
  static std::string createPlayPayloadNoPlayerId(
      const std::string& playContext,
      int index,
@@ -1641,7 +2452,7 @@ index c124c20..e464c4f 100644
          "}";
  
      // clang-format on
-@@ -394,13 +517,28 @@ static std::string createPlayPayloadNoPlayerId(
+@@ -448,13 +571,28 @@ static std::string createPlayPayloadNoPlayerId(
  static std::string createPlayPayloadNoIndex(
      const std::string& playContext,
      int64_t offsetInMilliseconds,
@@ -1671,7 +2482,7 @@ index c124c20..e464c4f 100644
          "}";
  
      // clang-format on
-@@ -416,13 +554,28 @@ static std::string createPlayPayloadNoIndex(
+@@ -470,13 +608,28 @@ static std::string createPlayPayloadNoIndex(
   * @param playerId The business name of the player.
   * @return A string representation of the payload.
   */
@@ -1701,17 +2512,17 @@ index c124c20..e464c4f 100644
          "}";
  
      // clang-format on
-@@ -742,6 +895,9 @@ TEST_F(ExternalMediaPlayerTest, testCreateWithAdapterCreationFailures) {
- TEST_F(ExternalMediaPlayerTest, testGetConfiguration) {
-     auto configuration = m_externalMediaPlayer->getConfiguration();
-     ASSERT_EQ(configuration[PLAY_DIRECTIVE], BlockingPolicy::NON_BLOCKING);
+@@ -813,6 +966,9 @@ TEST_F(ExternalMediaPlayerTest, testGetConfiguration) {
+ 
+     // TODO: ARC-227 Verify default values
+     ASSERT_EQ(configuration[PLAY_DIRECTIVE], audioNonBlockingPolicy);
 +#ifdef EXTERNALMEDIAPLAYER_1_1
-+    ASSERT_EQ(configuration[AUTHORIZEDISCOVEREDPLAYERS_DIRECTIVE], BlockingPolicy::NON_BLOCKING);
++    ASSERT_EQ(configuration[AUTHORIZEDISCOVEREDPLAYERS_DIRECTIVE], audioNonBlockingPolicy);
 +#endif
-     ASSERT_EQ(configuration[LOGIN_DIRECTIVE], BlockingPolicy::NON_BLOCKING);
-     ASSERT_EQ(configuration[LOGOUT_DIRECTIVE], BlockingPolicy::NON_BLOCKING);
-     ASSERT_EQ(configuration[RESUME_DIRECTIVE], BlockingPolicy::NON_BLOCKING);
-@@ -815,7 +971,11 @@ TEST_F(ExternalMediaPlayerTest, testPlayParserError) {
+     ASSERT_EQ(configuration[LOGIN_DIRECTIVE], neitherNonBlockingPolicy);
+     ASSERT_EQ(configuration[LOGOUT_DIRECTIVE], neitherNonBlockingPolicy);
+     ASSERT_EQ(configuration[RESUME_DIRECTIVE], audioNonBlockingPolicy);
+@@ -886,7 +1042,11 @@ TEST_F(ExternalMediaPlayerTest, testPlayParserError) {
          PLAY_DIRECTIVE.nameSpace, PLAY_DIRECTIVE.name, MESSAGE_ID_TEST, DIALOG_REQUEST_ID_TEST);
  
      std::shared_ptr<AVSDirective> directive = AVSDirective::create(
@@ -1723,7 +2534,7 @@ index c124c20..e464c4f 100644
  
      EXPECT_CALL(*(m_mockExceptionSender.get()), sendExceptionEncountered(_, _, _));
      EXPECT_CALL(*m_mockDirectiveHandlerResult, setFailed(_));
-@@ -832,7 +992,11 @@ TEST_F(ExternalMediaPlayerTest, testPlayNoAdapter) {
+@@ -903,7 +1063,11 @@ TEST_F(ExternalMediaPlayerTest, testPlayNoAdapter) {
          PLAY_DIRECTIVE.nameSpace, PLAY_DIRECTIVE.name, MESSAGE_ID_TEST, DIALOG_REQUEST_ID_TEST);
  
      std::shared_ptr<AVSDirective> directive =
@@ -1735,7 +2546,7 @@ index c124c20..e464c4f 100644
  
      EXPECT_CALL(*(m_mockExceptionSender.get()), sendExceptionEncountered(_, _, _));
      EXPECT_CALL(*m_mockDirectiveHandlerResult, setFailed(_));
-@@ -849,7 +1013,11 @@ TEST_F(ExternalMediaPlayerTest, testPlayNoPlayContext) {
+@@ -920,7 +1084,11 @@ TEST_F(ExternalMediaPlayerTest, testPlayNoPlayContext) {
          PLAY_DIRECTIVE.nameSpace, PLAY_DIRECTIVE.name, MESSAGE_ID_TEST, DIALOG_REQUEST_ID_TEST);
  
      std::shared_ptr<AVSDirective> directive = AVSDirective::create(
@@ -1747,7 +2558,7 @@ index c124c20..e464c4f 100644
  
      EXPECT_CALL(*(m_mockExceptionSender.get()), sendExceptionEncountered(_, _, _));
      EXPECT_CALL(*m_mockDirectiveHandlerResult, setFailed(_));
-@@ -866,7 +1034,11 @@ TEST_F(ExternalMediaPlayerTest, testPlayNoPlayerId) {
+@@ -937,7 +1105,11 @@ TEST_F(ExternalMediaPlayerTest, testPlayNoPlayerId) {
          PLAY_DIRECTIVE.nameSpace, PLAY_DIRECTIVE.name, MESSAGE_ID_TEST, DIALOG_REQUEST_ID_TEST);
  
      std::shared_ptr<AVSDirective> directive =
@@ -1759,7 +2570,7 @@ index c124c20..e464c4f 100644
  
      EXPECT_CALL(*(m_mockExceptionSender.get()), sendExceptionEncountered(_, _, _));
      EXPECT_CALL(*m_mockDirectiveHandlerResult, setFailed(_));
-@@ -883,9 +1055,17 @@ TEST_F(ExternalMediaPlayerTest, testPlayNoOffset) {
+@@ -954,9 +1126,17 @@ TEST_F(ExternalMediaPlayerTest, testPlayNoOffset) {
          PLAY_DIRECTIVE.nameSpace, PLAY_DIRECTIVE.name, MESSAGE_ID_TEST, DIALOG_REQUEST_ID_TEST);
  
      std::shared_ptr<AVSDirective> directive = AVSDirective::create(
@@ -1777,7 +2588,7 @@ index c124c20..e464c4f 100644
      EXPECT_CALL(*m_mockDirectiveHandlerResult, setCompleted());
  
      m_externalMediaPlayer->CapabilityAgent::preHandleDirective(directive, std::move(m_mockDirectiveHandlerResult));
-@@ -900,15 +1080,39 @@ TEST_F(ExternalMediaPlayerTest, testPlayNoIndex) {
+@@ -971,15 +1151,39 @@ TEST_F(ExternalMediaPlayerTest, testPlayNoIndex) {
          PLAY_DIRECTIVE.nameSpace, PLAY_DIRECTIVE.name, MESSAGE_ID_TEST, DIALOG_REQUEST_ID_TEST);
  
      std::shared_ptr<AVSDirective> directive = AVSDirective::create(
@@ -1817,6 +2628,26 @@ index c124c20..e464c4f 100644
  /**
   * Test successful logout.
   */
+diff --git a/CapabilityAgents/TemplateRuntime/src/TemplateRuntime.cpp b/CapabilityAgents/TemplateRuntime/src/TemplateRuntime.cpp
+index 880482f..52023b8 100644
+--- a/CapabilityAgents/TemplateRuntime/src/TemplateRuntime.cpp
++++ b/CapabilityAgents/TemplateRuntime/src/TemplateRuntime.cpp
+@@ -86,13 +86,13 @@ static const std::string AUDIO_ITEM_ID_TAG{"audioItemId"};
+ static const size_t MAXIMUM_QUEUE_SIZE{100};
+ 
+ /// Default timeout for clearing the RenderTemplate display card when SpeechSynthesizer is in FINISHED state.
+-static const std::chrono::milliseconds DEFAULT_TTS_FINISHED_TIMEOUT_MS{2000};
++static const std::chrono::milliseconds DEFAULT_TTS_FINISHED_TIMEOUT_MS{8000};
+ 
+ /// Default timeout for clearing the RenderPlayerInfo display card when AudioPlayer is in FINISHED state.
+ static const std::chrono::milliseconds DEFAULT_AUDIO_FINISHED_TIMEOUT_MS{2000};
+ 
+ /// Default timeout for clearing the RenderPlayerInfo display card when AudioPlayer is in STOPPED/PAUSED state.
+-static const std::chrono::milliseconds DEFAULT_AUDIO_STOPPED_PAUSED_TIMEOUT_MS{60000};
++static const std::chrono::milliseconds DEFAULT_AUDIO_STOPPED_PAUSED_TIMEOUT_MS{1800000};
+ 
+ /**
+  * Creates the TemplateRuntime capability configuration.
 -- 
-2.18.0
+2.20.1
 

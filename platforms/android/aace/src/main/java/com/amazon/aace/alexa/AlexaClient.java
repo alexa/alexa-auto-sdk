@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -37,6 +37,11 @@ public class AlexaClient extends PlatformInterface
          * @hideinitializer
          */
         LISTENING("LISTENING"),
+        /**
+         * Alexa is currently expecting a response from the user.
+         * @hideinitializer
+         */
+        EXPECTING("EXPECTING"),
         /**
          * A user request has completed, and no more user input is being accepted.
          * Alexa is waiting for a response from AVS.
@@ -257,6 +262,21 @@ public class AlexaClient extends PlatformInterface
      */
     public enum ConnectionChangedReason
     {
+        /**
+         * No reason specified.
+         * @hideinitializer
+         */
+        NONE("NONE"),
+        /**
+         * The connection status changed due to a successful operation.
+         * @hideinitializer
+         */
+        SUCCESS("SUCCESS"),
+        /**
+         * The connection status changed due to an error from which there is no recovery.
+         * @hideinitializer
+         */
+        UNRECOVERABLE_ERROR("UNRECOVERABLE_ERROR"),
         /**
          * The connection status changed due to a client request.
          * @hideinitializer

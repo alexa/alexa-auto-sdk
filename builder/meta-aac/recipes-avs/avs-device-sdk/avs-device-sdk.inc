@@ -3,7 +3,7 @@ HOMEPAGE = "https://developer.amazon.com/avs/sdk"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=d92e60ee98664c54f68aa515a6169708"
 
-DEPENDS = "curl nghttp2 googletest sqlite3"
+DEPENDS = "curl nghttp2 googletest sqlite3 openssl"
 
 SRC_URI = "https://github.com/alexa/avs-device-sdk/archive/v${PV}.tar.gz"
 

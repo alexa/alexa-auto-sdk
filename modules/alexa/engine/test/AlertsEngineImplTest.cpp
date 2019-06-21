@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -366,19 +366,19 @@ TEST_F(AlertsEngineImplTest, createWithCustomerDataManagerAsNull) {
 
 TEST_F(AlertsEngineImplTest, verifyAlertStateChangeForReadyCallback) {
     EXPECT_CALL(*m_mockAlertsPlatformInterface, alertStateChanged(testing::_,aace::alexa::Alerts::AlertState::READY,"READY") );
-    m_alertsEngineImpl->onAlertStateChange("DummyToken",
+    m_alertsEngineImpl->onAlertStateChange("DummyToken", "DummyType",
         alexaClientSDK::capabilityAgents::alerts::AlertObserverInterface::State::READY, "READY");
 }
 
 TEST_F(AlertsEngineImplTest, verifyAlertStateChangeForErrorCallback) {
     EXPECT_CALL(*m_mockAlertsPlatformInterface, alertStateChanged(testing::_,aace::alexa::Alerts::AlertState::ERROR,"ERROR") );
-    m_alertsEngineImpl->onAlertStateChange("DummyToken",
+    m_alertsEngineImpl->onAlertStateChange("DummyToken", "DummyType",
         alexaClientSDK::capabilityAgents::alerts::AlertObserverInterface::State::ERROR, "ERROR");
 }
 
 TEST_F(AlertsEngineImplTest, verifyAlertStateChangeForCompletedCallback) {
     EXPECT_CALL(*m_mockAlertsPlatformInterface, alertStateChanged(testing::_,aace::alexa::Alerts::AlertState::COMPLETED,"COMPLETED") );
-    m_alertsEngineImpl->onAlertStateChange("DummyToken",
+    m_alertsEngineImpl->onAlertStateChange("DummyToken", "DummyType",
         alexaClientSDK::capabilityAgents::alerts::AlertObserverInterface::State::COMPLETED, "COMPLETED");
 }
 

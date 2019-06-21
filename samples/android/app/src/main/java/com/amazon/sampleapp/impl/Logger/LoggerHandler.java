@@ -15,21 +15,10 @@
 
 package com.amazon.sampleapp.impl.Logger;
 
-import android.app.Activity;
 import android.graphics.Color;
-import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.CompoundButton;
-import android.widget.LinearLayout;
-import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.amazon.aace.logger.Logger;
-import com.amazon.sampleapp.R;
 import com.amazon.sampleapp.logView.LogEntry;
 import com.amazon.sampleapp.logView.LogRecyclerViewAdapter;
 
@@ -57,26 +46,18 @@ public class LoggerHandler extends Logger {
     private static final int sColorError = Color.parseColor( "#D50000" ); // Red
     private static final int sColorJsonTemplate = Color.parseColor( "#F9B702" ); // Gold
 
-    private static final String[] sSources = { "CLI", "AAC", "AVS" };
     private static final SimpleDateFormat sTimeFormat // Note: not thread safe
             = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault() );
     private static final Level sLevel = Level.VERBOSE;
     private static final String sClientSourceTag = "CLI";
 
-    private final Activity mActivity;
-    private final LogRecyclerViewAdapter mLogAdapter;
     private LoggerObservable mObservable;
 
-    public LoggerHandler( Activity activity, LogRecyclerViewAdapter adapter ) {
-        mActivity = activity;
-        mLogAdapter = adapter;
+    public LoggerHandler() {
         mObservable = new LoggerObservable();
-
-        setupGUIFilterOptions();
-        mLogAdapter.filterLevelDisplay( Level.INFO ); // Show info level and above by default
     }
 
-    // Handle AACE log events
+    // Handle log from Auto SDK
     @Override
     public boolean logEvent( Level level, long time, String source, String message ) {
         if ( level.ordinal() >= sLevel.ordinal() ) {
@@ -119,7 +100,7 @@ public class LoggerHandler extends Logger {
         return true;
     }
 
-    /* Client level log methods. Will use AACE Logger */
+    /* Client level log methods. Will use Auto SDK Logger */
 
     public void postVerbose( String tag, String message ) { log( Level.VERBOSE, tag, message ); }
     public void postInfo( String tag, String message ) { log( Level.INFO, tag, message ); }
@@ -135,7 +116,7 @@ public class LoggerHandler extends Logger {
         } catch ( IOException e ) { Log.e( sClientSourceTag, "Error: ", e ); }
     }
 
-    /* Additional client logs. Will insert log into GUI log view but not use AACE Logger */
+    /* Additional client logs. Will insert log into GUI log view but not use Auto SDK Logger */
 
     // Client log for JSON Templates
     public void postJSONTemplate( String tag, String message ) {
@@ -172,85 +153,9 @@ public class LoggerHandler extends Logger {
         mObservable.log( json, logType );
     }
 
-    /* For updating GUI */
-
-    private void setupGUIFilterOptions() {
-        LayoutInflater inf = mActivity.getLayoutInflater();
-
-        // Add switch for each source type
-        LinearLayout sourceContainer = mActivity.findViewById( R.id.sourceSwitchContainer );
-        for ( final String source : sSources ) {
-            View switchItem = ( inf.inflate( R.layout.drawer_switch, sourceContainer, false ) );
-            ( (TextView) switchItem.findViewById( R.id.text ) ).setText( source );
-            SwitchCompat drawerSwitch = switchItem.findViewById( R.id.drawerSwitch );
-            drawerSwitch.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
-                 @Override
-                 public void onCheckedChanged( CompoundButton buttonView, boolean isChecked ) {
-                     mLogAdapter.setSourceDisplayMode( source, isChecked );
-                 }
-            });
-            sourceContainer.addView( switchItem );
-        }
-
-        // Add option for each level type
-        Spinner spinner = mActivity.findViewById( R.id.levelSpinner );
-        ArrayAdapter adapter = new ArrayAdapter( mActivity, android.R.layout.simple_spinner_item );
-        adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
-
-        for ( Logger.Level level : Logger.Level.values() ) {
-            if ( level == Level.METRIC ) {
-                continue;
-            }
-            adapter.add( level );
-        }
-
-        spinner.setAdapter( adapter );
-        spinner.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected( AdapterView<?> parent, View view, int position, long id ) {
-                Logger.Level level = ( Logger.Level ) parent.getItemAtPosition(position);
-                mLogAdapter.filterLevelDisplay( level );
-            }
-
-            @Override
-            public void onNothingSelected( AdapterView<?> parent ) {}
-        });
-        spinner.setSelection( Level.INFO.ordinal() );
-
-        // Switch for display cards
-        View cardItem = mActivity.findViewById( R.id.toggleCards );
-        ( ( TextView ) cardItem.findViewById( R.id.text ) ).setText( R.string.log_switch_cards );
-        SwitchCompat cardSwitch = cardItem.findViewById( R.id.drawerSwitch );
-        cardSwitch.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged( CompoundButton buttonView, boolean isChecked ) {
-                mLogAdapter.setCardDisplayMode( isChecked );
-            }
-        });
-
-        // Switch for JSON templates
-        View tempItem = mActivity.findViewById( R.id.toggleTemplates );
-        ( ( TextView ) tempItem.findViewById( R.id.text ) ).setText( R.string.log_switch_template );
-        SwitchCompat tempSwitch = tempItem.findViewById( R.id.drawerSwitch );
-        tempSwitch.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged( CompoundButton buttonView, boolean isChecked ) {
-                mLogAdapter.setJsonDisplayMode( isChecked );
-            }
-        });
-
-        // Clear log button
-        mActivity.findViewById( R.id.clearLogButton ).setOnClickListener(
-            new View.OnClickListener() {
-                @Override
-                public void onClick( View v ) { mLogAdapter.clear(); }
-            }
-        );
-    }
-
     /* Logger Observable for inserting logs into GUI log view */
 
-    private static class LoggerObservable extends Observable {
+    public static class LoggerObservable extends Observable {
 
         public void log( String message ) {
             setChanged();
@@ -269,7 +174,6 @@ public class LoggerHandler extends Logger {
     }
 
     public void addLogObserver( Observer observer ) {
-        if ( mObservable == null ) mObservable = new LoggerObservable();
         mObservable.addObserver( observer );
     }
 }

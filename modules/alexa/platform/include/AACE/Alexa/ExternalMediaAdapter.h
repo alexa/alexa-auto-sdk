@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -387,6 +387,9 @@ public:
 
         /// Variable to hold the playback state.
         PlaybackState playbackState;
+
+        /// State is valid or not.
+        bool valid;
     };
 
     /**
@@ -418,6 +421,9 @@ public:
      * @param [in] forceLogin True if no handshake is needed, and login is simply assumed
      *
      * @param [in] tokenRefreshInterval refresh interval of the accessToken, if available
+     * 
+     * @return @c true if the platform implementation successfully handled the call, 
+     * else @c false
      */
     virtual bool login( const std::string& localPlayerId, const std::string& accessToken, const std::string& userName, bool forceLogin, std::chrono::milliseconds tokenRefreshInterval ) = 0;
 
@@ -425,6 +431,9 @@ public:
      * Directive called after a discovered player initiates the logoutComplete event.
      *
      * @param [in] localPlayerId The opaque token that uniquely identifies the local external player app
+     * 
+     * @return @c true if the platform implementation successfully handled the call, 
+     * else @c false
      */
     virtual bool logout( const std::string& localPlayerId ) = 0;
 
@@ -442,6 +451,9 @@ public:
      * @param [in] preload Whether the media item should preload or not
      *
      * @param [in] navigation The app transition behavior
+     * 
+     * @return @c true if the platform implementation successfully handled the call, 
+     * else @c false
      */
     virtual bool play( const std::string& localPlayerId, const std::string& playContextToken, int64_t index, std::chrono::milliseconds offset, bool preload, Navigation navigation ) = 0;
 
@@ -452,6 +464,9 @@ public:
      *
      * @param [in] playControlType Playback control type being invoked
      *
+     * @return @c true if the platform implementation successfully handled the call, 
+     * else @c false
+     * 
      * @sa PlaybackController
      */
     virtual bool playControl( const std::string& localPlayerId, PlayControlType controlType ) = 0;
@@ -462,6 +477,9 @@ public:
      * @param [in] localPlayerId The opaque token that uniquely identifies the local external player app
      *
      * @param [in] offset Offset position within media item, in milliseconds
+     * 
+     * @return @c true if the platform implementation successfully handled the call, 
+     * else @c false
      */
     virtual bool seek( const std::string& localPlayerId, std::chrono::milliseconds offset ) = 0;
 
@@ -471,6 +489,9 @@ public:
      * @param [in] localPlayerId The opaque token that uniquely identifies the local external player app
      *
      * @param [in] deltaOffset Change in offset position within media item, in milliseconds
+     * 
+     * @return @c true if the platform implementation successfully handled the call, 
+     * else @c false
      */
     virtual bool adjustSeek( const std::string& localPlayerId, std::chrono::milliseconds deltaOffset ) = 0;
 
@@ -478,6 +499,9 @@ public:
      * Called after discovered media have been reported. Returns list of players AVS has authorized.
      *
      * @param [in] authorizedPlayers List of discovered players, which AVS has authorized
+     * 
+     * @return @c true if the platform implementation successfully handled the call, 
+     * else @c false
      */
     virtual bool authorize( const std::vector<AuthorizedPlayerInfo>& authorizedPlayers ) = 0;
 

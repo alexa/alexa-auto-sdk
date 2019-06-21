@@ -201,7 +201,7 @@ PreRequisite: Install the Low Level Debugger (LLDB) package in Android Studio. T
 
 ## Release Notes<a id="releasenotes"></a>
 
-### v1.6.0 released on 2019-05-16:
+### v1.6.1 released on 2019-06-21:
 
 #### Enhancements
 

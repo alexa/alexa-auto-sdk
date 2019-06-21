@@ -2,6 +2,24 @@
 
 ___
 
+## v1.6.1 released on 2019-06-21:
+ 
+### Enhancements
+
+This release of Alexa Auto SDK includes updates for music certification.
+
+### Resolved Issues
+
+Resolved issues are limited to music certification updates:
+
+* Added fixes from AVS Device SDK v1.12.1 for music certification. 
+* Fixed live radio offset for stations that use a dynamic window (`mime=audio/mp4a-latm`).
+* Documentation updates.
+
+### Known Issues
+
+All known issues from v1.6.0. 
+
 ## v1.6.0 released on 2019-05-16:
 
 ### Enhancements

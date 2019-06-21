@@ -185,7 +185,7 @@ To resolve this, edit the `samples/cpp/assets/config.json` file and choose a uni
 
 <a id="releasenotes"></a>
 
-## v1.6.0 released on 2019-05-16:<a id="v160-released-on-2019-05-16"></a>
+## v1.6.1 released on 2019-06-21:<a id="v160-released-on-2019-06-21"></a>
 
 ### Enhancements<a id="enhancements"></a>
 

@@ -4,7 +4,7 @@
 
 The Android Sample App demonstrates a basic platform implementation of Alexa Auto SDK integration. It provides an example of creating and configuring an instance of the Engine, overriding the default implementation of each Alexa Auto Platform Interface, and registering those custom interface handlers with the Engine. It includes one default example implementation of authorizing with AVS via Code Based Linking (CBL), and one additional authorization method via Login With Amazon (LWA) browser which requires some additional setup. It also includes detailed logs for interactions with the Alexa Auto SDK and developer convenience features for viewing those logs in the application, and UI elements relevant to each Platform Interface implementation. The purpose of the Android Sample App is to provide developers with useful example code to facilitate integration with the Alexa Auto SDK.
 
-Click [here](#androidsampleapprelnote) to read the release notes for this sample app.
+Click [here](#releasenotes) to read the release notes for this sample app.
 
 ### Setup
 

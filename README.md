@@ -31,8 +31,8 @@ The following components are included with the Alexa Auto SDK:
 
 Alexa Auto SDK API Reference documentation is available for Android and C++. Access the Alexa Auto SDK API reference documentation from the links below.
 
-* [Alexa Auto SDK for Android](https://alexa.github.io/aac-sdk/docs/android/)
-* [Alexa Auto SDK for C++](https://alexa.github.io/aac-sdk/docs/cpp/)
+* [Alexa Auto SDK for Android](https://alexa.github.io/alexa-auto-sdk/docs/android/)
+* [Alexa Auto SDK for C++](https://alexa.github.io/alexa-auto-sdk/docs/cpp/)
 
 ## General Build Requirements<a id="generalbuildreqs"></a>
 
@@ -71,8 +71,8 @@ The Vehicle Configuration class provides an interface for vehicle information to
 
 Read detailed information about the vehicle configuration class in the API reference documentation.
 
-* [Alexa Auto SDK for Android](https://alexa.github.io/aac-sdk/docs/android/)
-* [Alexa Auto SDK for C++](https://alexa.github.io/aac-sdk/docs/cpp/)
+* [Alexa Auto SDK for Android](https://alexa.github.io/alexa-auto-sdk/docs/android/)
+* [Alexa Auto SDK for C++](https://alexa.github.io/alexa-auto-sdk/docs/cpp/)
 
 ## Build the Alexa Auto SDK<a id="buildthesdk"></a>
 

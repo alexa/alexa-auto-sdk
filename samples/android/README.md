@@ -28,7 +28,7 @@ There are two options for including the Alexa Auto SDK dependencies:
 
 ##### Option 1: Use the pre-built aace-release.aar
 
-To use the pre-built aace-release.aar, first download aace-release.aar from [Alexa Auto SDK Releases](https://github.com/alexa/aac-sdk/releases) to `${AAC_SDK_HOME}/samples/android/app/src/main/libs` *(you may need to create a libs directory)*, then follow steps to [configure the project in Android Studio](#configure-the-project-in-android-studio).
+To use the pre-built aace-release.aar, first download aace-release.aar from [Alexa Auto SDK Releases](https://github.com/alexa/alexa-auto-sdk/releases) to `${AAC_SDK_HOME}/samples/android/app/src/main/libs` *(you may need to create a libs directory)*, then follow steps to [configure the project in Android Studio](#configure-the-project-in-android-studio).
 
 > **Note**: Make sure to download the aace-release.aar corresponding to the version of Alexa Auto SDK that you are using.
 

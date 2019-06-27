@@ -38,15 +38,15 @@ $ mkdir ~/Projects
 $ cd ~/Projects
 ```
 
-Clone the `aac-sdk` repository into your project directory:
+Clone the `alexa-auto-sdk` repository into your project directory:
 
 ```shell
-$ git clone https://github.com/alexa/aac-sdk.git
-$ cd aac-sdk
+$ git clone https://github.com/alexa/alexa-auto-sdk.git
+$ cd alexa-auto-sdk
 $ export AAC_SDK_HOME=$(pwd)
 ```
 
->**Note:** Most of the commands that follow are meant to be run from this `aac-sdk` directory.
+>**Note:** Most of the commands that follow are meant to be run from this `alexa-auto-sdk` directory.
 
 Edit the [config file template](./assets/config.json.in) and save as `samples/cpp/assets/config.json`. Replace the `${YOUR_CLIENT_ID}`, `${YOUR_DEVICE_SERIAL_NUMBER}`, and `${YOUR_PRODUCT_ID}` placeholders with [your own values](#amazon-developer-account).
 

@@ -1,13 +1,13 @@
 # Automotive Grade Linux Alexa Voice Agent Binding
 
 ## Overview
-AGL Alexa Voice Agent is an Alexa client software that gets plugged into the AGL speech framework to voice enable applications as described in the speech [architecture](https://confluence.automotivelinux.org/display/SPE/Speech+EG+Architecture). It is implemented as a standard AGL [binding](http://docs.automotivelinux.org/master/docs/apis_services/en/dev/reference/af-binder/afb-daemon-vocabulary.html#binding) that exposes API for
+AGL Alexa Voice Agent is an Alexa client software that gets plugged into the AGL speech framework to voice enable applications as described in the speech [architecture](https://confluence.automotivelinux.org/display/SPE/Speech+EG+Architecture). It is implemented as a standard AGL [binding](https://docs.automotivelinux.org/docs/en/master/apis_services/reference/af-main/1-afm-daemons.html) that exposes API for
 * Speech recognition start and cancel.
 * Subscription to events containing Alexa's dialog, authentication, and connection states.
 * Subscription to events containing Alexa's capability messages or directives.
 * User authentication and authorization using Amazon's [Login with Amazon (LWA) Code-Based Linking](https://developer.amazon.com/docs/login-with-amazon/minitoc-lwa-other-devices.html).
 
-[Alexa Auto SDK](https://gitlab.automotive.alexa.a2z.com/alexa-auto-hut/aac-sdk) is the underlying technology that powers the speech recognition capabilities of this binding.
+[Alexa Auto SDK](https://github.com/alexa/alexa-auto-sdk) is the underlying technology that powers the speech recognition capabilities of this binding.
 
 ## Architecture
 ![architecture](./assets/architecture.png)
@@ -45,7 +45,7 @@ Alexa Voice Agent depends on Auto SDK. See the [Alexa Auto SDK Builder](../../..
 
 For example, to build Alexa Auto SDK modules and needed dependencies for an *AGL ARM64* target, run the following commands:
 ```
-$ git clone https://github.com/alexa/aac-sdk.git
+$ git clone https://github.com/alexa/alexa-auto-sdk.git
 $ ${AAC_SDK_HOME}/builder/build.sh oe -t aglarm64 ${AAC_SDK_HOME}/samples/audio
 $ pushd ${AAC_SDK_HOME}/builder/deploy/aglarm64/
 $ tar -xvf aac-image-minimal-aglarm64.tar.gz
@@ -65,7 +65,7 @@ Open `${AAC_SDK_HOME}/platforms/agl/alexa-voiceagent-service/src/plugins/data/co
 3. Update the **aace.audio** section's **speechRecognizer** with Audio4a input role, **speechSynthesizer** and **audioPlayer** with Audio4a output roles if necessary. Otherwise use the default values in the config file. The **speechRecognizer** role *hw:ep812ch* maps to Microchip's mic array.
 
 ## Build Instructions
-**Prerequisite**: Install the AGL SDK, preferably the latest stable release from [AGL artifacts](https://download.automotivelinux.org/AGL/release/). The AGL SDK contains [application framework libraries](http://docs.automotivelinux.org/master/docs/apis_services/en/dev/reference/af-binder/reference-v3/func-api.html) that we depend on for making inter-binding calls and publishing AGL events.
+**Prerequisite**: Install the AGL SDK, preferably the latest stable release from [AGL artifacts](https://iot.bzh/download/public/2019/AGL_Images/). The AGL SDK contains [application framework libraries](https://docs.automotivelinux.org/docs/en/master/apis_services/reference/af-binder/reference-v3/func-api.html) that we depend on for making inter-binding calls and publishing AGL events.
 1. Go to the ${AAC_SDK_HOME}/platform/agl/alexa-voiceagent-service directory
 2. git submodule add https://gerrit.automotivelinux.org/gerrit/apps/app-afb-helpers-submodule afb-helpers
 3. git submodule add https://gerrit.automotivelinux.org/gerrit/apps/app-controller-submodule app-controller

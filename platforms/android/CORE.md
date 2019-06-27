@@ -31,8 +31,8 @@ m_engine.configure( new EngineConfiguration[]{
 
 Read about the `AlexaConfiguration Class` for more information about configurable methods.
 
-* [Alexa Auto SDK for Android](https://alexa.github.io/aac-sdk/docs/android/)
-* [Alexa Auto SDK for C++](https://alexa.github.io/aac-sdk/docs/cpp/)
+* [Alexa Auto SDK for Android](https://alexa.github.io/alexa-auto-sdk/docs/android/)
+* [Alexa Auto SDK for C++](https://alexa.github.io/alexa-auto-sdk/docs/cpp/)
 
 **NOTE:** The Engine's `configure()` method can only be called once and must be called before registering any platform interfaces or starting the Engine.
 

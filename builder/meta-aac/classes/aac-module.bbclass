@@ -11,10 +11,10 @@ python () {
 
 AAC_PATCHES ??= ""
 
-# Override with the aac-sdk version
+# Override with the sdk version
 PV = "${@aac.get_version(d)}"
 
-HOMEPAGE ?= "http://github.com/alexa/aac-sdk"
+HOMEPAGE ?= "http://github.com/alexa/alexa-auto-sdk"
 LICENSE ?= "CLOSED"
 
 inherit cmake unittests

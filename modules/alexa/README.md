@@ -22,7 +22,7 @@ There are 3 steps to this process:
 2. Your SA processes your request with the appropriate Alexa teams.
 3. You'll receive a single zip file containing the necessary packages, instructions, and scripts.
 
-All that's left for you to do is create an "extras" directory under your "aac-sdk" directory for the packages and follow the instructions in the README file included in the package.
+All that's left for you to do is create an "extras" directory under your "alexa-auto-sdk" directory for the packages and follow the instructions in the README file included in the package.
 
 ### Handling Alexa state changes
 

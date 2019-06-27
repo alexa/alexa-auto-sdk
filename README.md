@@ -35,8 +35,8 @@ Additional functionality is available with help from your Amazon Solutions Archi
 
 Alexa Auto SDK API Reference documentation is available for Android and C++. Access the Alexa Auto SDK API reference documentation from the links below.
 
-* [Alexa Auto SDK for Android](https://alexa.github.io/aac-sdk/docs/android/)
-* [Alexa Auto SDK for C++](https://alexa.github.io/aac-sdk/docs/cpp/)
+* [Alexa Auto SDK for Android](https://alexa.github.io/alexa-auto-sdk/docs/android/)
+* [Alexa Auto SDK for C++](https://alexa.github.io/alexa-auto-sdk/docs/cpp/)
 
 > **Important!** You need an [Amazon Developer Account](https://developer.amazon.com/home.html) to use the Alexa Auto SDK. Read the [Sample App](./samples/android/README.md) documentation for more details.
 
@@ -77,8 +77,8 @@ The Vehicle Configuration class provides an interface for vehicle information to
 
 Read detailed information about the vehicle configuration class in the API reference documentation.
 
-* [Alexa Auto SDK for Android](https://alexa.github.io/aac-sdk/docs/android/)
-* [Alexa Auto SDK for C++](https://alexa.github.io/aac-sdk/docs/cpp/)
+* [Alexa Auto SDK for Android](https://alexa.github.io/alexa-auto-sdk/docs/android/)
+* [Alexa Auto SDK for C++](https://alexa.github.io/alexa-auto-sdk/docs/cpp/)
 
 ## Build the Alexa Auto SDK<a id="buildthesdk"></a>
 

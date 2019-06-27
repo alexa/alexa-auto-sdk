@@ -14,7 +14,7 @@ AAC_PATCHES ??= ""
 # Override with the meta-aac layer version
 PV = "${DISTRO_VERSION}"
 
-HOMEPAGE ?= "http://github.com/alexa/aac-sdk"
+HOMEPAGE ?= "http://github.com/alexa/alexa-auto-sdk"
 LICENSE ?= "CLOSED"
 
 inherit cmake unittests

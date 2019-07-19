@@ -162,6 +162,26 @@ public class LoginWithAmazonCBL implements AuthHandler, NetworkConnectionObserve
                         int responseCode = con.getResponseCode();
                         if ( responseCode == sResponseOk ) response = con.getInputStream();
 
+                        JSONObject responseJSON = getResponseJSON( response );
+                        if ( responseJSON != null ) {
+                            String uri = responseJSON.getString( "verification_uri" );
+                            String code = responseJSON.getString( "user_code" );
+
+                            // Log card
+                            JSONObject renderJSON = new JSONObject();
+                            renderJSON.put( "verification_uri", uri );
+                            renderJSON.put( "user_code", code );
+                            mLogger.postDisplayCard( renderJSON, LogRecyclerViewAdapter.CBL_CODE );
+
+                            // Log response
+                            mLogger.postInfo( sTag,
+                                    String.format( "Verification URI with user code: %s?cbl-code=%s",
+                                            uri, code ) );
+
+                            requestDeviceToken( responseJSON );
+
+                        } else mLogger.postError( sTag, "Error requesting device authorization" );
+
                     } catch ( IOException e ) {
                         mLogger.postError( sTag, e.getMessage() );
                     } finally {
@@ -176,26 +196,6 @@ public class LoginWithAmazonCBL implements AuthHandler, NetworkConnectionObserve
                             }
                         }
                     }
-
-                    JSONObject responseJSON = getResponseJSON( response );
-                    if ( responseJSON != null ) {
-                        String uri = responseJSON.getString( "verification_uri" );
-                        String code = responseJSON.getString( "user_code" );
-
-                        // Log card
-                        JSONObject renderJSON = new JSONObject();
-                        renderJSON.put( "verification_uri", uri );
-                        renderJSON.put( "user_code", code );
-                        mLogger.postDisplayCard( renderJSON, LogRecyclerViewAdapter.CBL_CODE );
-
-                        // Log response
-                        mLogger.postInfo( sTag,
-                                String.format( "Verification URI with user code: %s?cbl-code=%s",
-                                uri, code ) );
-
-                        requestDeviceToken( responseJSON );
-
-                    } else mLogger.postError( sTag, "Error requesting device authorization" );
 
                 } else mLogger.postWarn( sTag, "Cannot authenticate. Please review the configuration file in the app's assets directory." );
 
@@ -414,6 +414,36 @@ public class LoginWithAmazonCBL implements AuthHandler, NetworkConnectionObserve
                     int responseCode = con.getResponseCode();
                     if ( responseCode == sResponseOk ) response = con.getInputStream();
 
+                    JSONObject responseJSON = getResponseJSON( response );
+
+                    if ( responseJSON != null ) {
+                        try {
+                            String expiresInSeconds = responseJSON.getString( "expires_in" );
+                            mCurrentAuthToken = responseJSON.getString( "access_token" );
+
+                            // Refresh access token automatically before expiry
+                            startRefreshTimer( Long.parseLong( expiresInSeconds ), mRefreshToken );
+
+                            mLogger.postVerbose( sTag,
+                                    "AuthState and token refreshed");
+
+                            mCurrentAuthState = AuthProvider.AuthState.REFRESHED;
+                            mCurrentAuthError = AuthProvider.AuthError.NO_ERROR;
+                            notifyAuthObservers();
+
+                        } catch ( JSONException e ) {
+                            mLogger.postError( sTag, "Error refreshing auth token. Error: "
+                                    + e.getMessage() );
+                        }
+
+                    } else {
+                        mCurrentAuthState = AuthProvider.AuthState.UNINITIALIZED;
+                        mCurrentAuthError = AuthProvider.AuthError.AUTHORIZATION_FAILED;
+                        mCurrentAuthToken = "";
+                        notifyAuthObservers();
+                        mLogger.postError( sTag, "Error refreshing auth token" );
+                    }
+
                 } catch ( IOException e ) {
                     mLogger.postError( sTag, e.getMessage() );
                 } finally {
@@ -427,36 +457,6 @@ public class LoginWithAmazonCBL implements AuthHandler, NetworkConnectionObserve
                                     + e.getMessage() );
                         }
                     }
-                }
-
-                JSONObject responseJSON = getResponseJSON( response );
-
-                if ( responseJSON != null ) {
-                    try {
-                        String expiresInSeconds = responseJSON.getString( "expires_in" );
-                        mCurrentAuthToken = responseJSON.getString( "access_token" );
-
-                        // Refresh access token automatically before expiry
-                        startRefreshTimer( Long.parseLong( expiresInSeconds ), mRefreshToken );
-
-                        mLogger.postVerbose( sTag,
-                                "AuthState and token refreshed");
-
-                        mCurrentAuthState = AuthProvider.AuthState.REFRESHED;
-                        mCurrentAuthError = AuthProvider.AuthError.NO_ERROR;
-                        notifyAuthObservers();
-
-                    } catch ( JSONException e ) {
-                        mLogger.postError( sTag, "Error refreshing auth token. Error: "
-                                + e.getMessage() );
-                    }
-
-                } else {
-                    mCurrentAuthState = AuthProvider.AuthState.UNINITIALIZED;
-                    mCurrentAuthError = AuthProvider.AuthError.AUTHORIZATION_FAILED;
-                    mCurrentAuthToken = "";
-                    notifyAuthObservers();
-                    mLogger.postError( sTag, "Error refreshing auth token" );
                 }
 
             } else mLogger.postWarn( sTag, String.format(

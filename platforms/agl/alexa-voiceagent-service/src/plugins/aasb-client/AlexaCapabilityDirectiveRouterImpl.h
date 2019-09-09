@@ -104,14 +104,6 @@ public:
      */
     bool subscribeToCBLEvents(agl::common::interfaces::IAFBRequest& subscriber);
 
-    /**
-     * This method is called in response to AASB CBL's get refresh token directive.
-     * When this call arrives we can safely assume that the CBL implementation of
-     * AASB has received the latest refresh token. This method is used to unblock
-     * the thread that handled ACTION_CBL_GET_REFRESH_TOKEN directive.
-     */
-    void didReceiveGetRefreshTokenResponse();
-
 private:
     AlexaCapabilityDirectiveRouterImpl(
         std::shared_ptr<agl::common::interfaces::ILogger> logger,
@@ -204,15 +196,6 @@ private:
 
     /// AFB Event for publishing code pair expired event.
     std::shared_ptr<agl::common::interfaces::IAFBApi::IAFBEvent> m_cblCodePairExpiredEvent;
-
-    /// AFB Event for publishing CBL set refresh token event.
-    std::shared_ptr<agl::common::interfaces::IAFBApi::IAFBEvent> m_cblSetRefreshTokenEvent;
-
-    /// AFB Event for publishing CBL clear refresh token event.
-    std::shared_ptr<agl::common::interfaces::IAFBApi::IAFBEvent> m_cblClearRefreshTokenEvent;
-
-    /// AFB Event for publishing CBL get refresh token event.
-    std::shared_ptr<agl::common::interfaces::IAFBApi::IAFBEvent> m_cblGetRefreshTokenEvent;
 
     /// All external directive listeners who are asked to process directives if directive
     /// belongs to their registered topic (registered through @c registerDirectiveListener)

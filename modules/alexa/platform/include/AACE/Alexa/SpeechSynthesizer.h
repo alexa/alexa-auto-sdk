@@ -16,7 +16,7 @@
 #ifndef AACE_ALEXA_SPEECH_SYNTHESIZER_H
 #define AACE_ALEXA_SPEECH_SYNTHESIZER_H
 
-#include "AudioChannel.h"
+#include <AACE/Core/PlatformInterface.h>
 
 /** @file */
 
@@ -32,9 +32,9 @@ namespace alexa {
  *
  * @sa AudioChannel
  */
-class SpeechSynthesizer : public AudioChannel {
+class SpeechSynthesizer : public aace::core::PlatformInterface {
 protected:
-    SpeechSynthesizer( std::shared_ptr<aace::alexa::MediaPlayer> mediaPlayer, std::shared_ptr<aace::alexa::Speaker> speaker );
+    SpeechSynthesizer() = default;
 
 public:
     virtual ~SpeechSynthesizer();

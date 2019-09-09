@@ -20,27 +20,11 @@
 #include <iostream> // std::clog
 #include <memory>   // std::shared_ptr
 #include <mutex>    // std::mutex etc.
+#include <sstream>  // std::stringstream
 #include <string>   // std::string
+#include <vector>   // std::vector
 
 namespace sampleApp {
-
-static std::mutex g_clogMutex;
-
-// Asynchronous clog output
-struct aclog {
-    std::unique_lock<std::mutex> lock;
-    aclog() : lock(std::unique_lock<std::mutex>(g_clogMutex)) {}
-
-    template <typename T> aclog &operator<<(const T &t) {
-        std::clog << t;
-        return *this;
-    }
-
-    aclog &operator<<(std::ostream &(*fp)(std::ostream &)) {
-        std::clog << fp;
-        return *this;
-    }
-};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -79,15 +63,29 @@ class View {
         PlayerInfo
     };
     static std::shared_ptr<View> create(const std::string &id);
-    template <typename Head> void print(Head head) { aclog() << head << std::flush; }
-    template <typename Head, typename... Tail> void print(Head head, Tail... tail) {
-        aclog() << head << ' ';
-        print(tail...);
+    template <typename... Args> void print(Args &&... args) {
+        std::stringstream stream;
+        print(stream, args...);
     }
-    template <typename Head> void printLine(Head head) { aclog() << head << std::endl; }
-    template <typename Head, typename... Tail> void printLine(Head head, Tail... tail) {
-        aclog() << head << ' ';
-        printLine(tail...);
+    template <typename Head> void print(std::stringstream &stream, Head head) {
+        stream << head << std::flush;
+        std::clog << stream.str();
+    }
+    template <typename Head, typename... Tail> void print(std::stringstream &stream, Head head, Tail... tail) {
+        stream << head << ' ';
+        print(stream, tail...);
+    }
+    template <typename... Args> void printLine(Args &&... args) {
+        std::stringstream stream;
+        printLine(stream, args...);
+    }
+    template <typename Head> void printLine(std::stringstream &stream, Head head) {
+        stream << head << std::endl;
+        std::clog << stream.str();
+    }
+    template <typename Head, typename... Tail> void printLine(std::stringstream &stream, Head head, Tail... tail) {
+        stream << head << ' ';
+        printLine(stream, tail...);
     }
     void printRuler() { printLine(m_ruler); }
     virtual auto clear(Type type) -> void;

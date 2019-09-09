@@ -23,6 +23,7 @@ class CBLEngineInterface {
 public:
     virtual void onStart() = 0;
     virtual void onCancel() = 0;
+    virtual void onReset() = 0;
 };
 
 } // aace::cbl

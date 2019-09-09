@@ -29,114 +29,42 @@ namespace aace {
 namespace alexa {
 
 /**
- * MediaPlayerEngineInterface
+ * AlexaSpeakerEngineInterface
  */
-class MediaPlayerEngineInterface {
+class AlexaSpeakerEngineInterface {
 public:
-
     /**
-     * Describes an error during a media playback operation
+     * Specifies the type of the AlexaSpeaker to control
      */
-    enum class MediaError {
+    enum class SpeakerType {
 
         /**
-         * An unknown error occurred.
+         * The Speaker type that is controlled by AVS
          */
-        MEDIA_ERROR_UNKNOWN,
+        ALEXA_VOLUME,
 
         /**
-         * The server recognized the request as malformed (e.g. bad request, unauthorized, forbidden, not found, etc).
+         * The Speaker type that is controlled locally by the platform
          */
-        MEDIA_ERROR_INVALID_REQUEST,
-
-        /**
-         * The client was unable to reach the service.
-         */
-        MEDIA_ERROR_SERVICE_UNAVAILABLE,
-
-        /**
-         * The server accepted the request but was unable to process it as expected.
-         */
-        MEDIA_ERROR_INTERNAL_SERVER_ERROR,
-
-        /**
-         * There was an internal error on the client.
-         */
-        MEDIA_ERROR_INTERNAL_DEVICE_ERROR
+        ALERTS_VOLUME
     };
-    
-    /**
-     * Describes the playback state of the platform media player
-     */
-    enum class MediaState {
 
-        /**
-         * The media player is not currently playing. It may have paused, stopped, or finished.
-         */
-        STOPPED,
-
-        /**
-         * The media player is currently playing.
-         */
-        PLAYING,
-
-        /**
-         * The media player is currently buffering data.
-         */
-        BUFFERING
-    };
-    
-    virtual void onMediaStateChanged( MediaState state ) = 0;
-    virtual void onMediaError( MediaError error, const std::string& description ) = 0;
-    virtual ssize_t read( char* data, const size_t size ) = 0;
-    virtual bool isRepeating() = 0;
-    virtual bool isClosed() = 0;
+    virtual void onLocalSetVolume( SpeakerType type, int8_t volume ) = 0;
+    virtual void onLocalAdjustVolume( SpeakerType type, int8_t delta ) = 0;
+    virtual void onLocalSetMute( SpeakerType type, bool mute ) = 0;
 };
 
-inline std::ostream& operator<<(std::ostream& stream, const MediaPlayerEngineInterface::MediaState& state) {
-    switch (state) {
-        case MediaPlayerEngineInterface::MediaState::STOPPED:
-            stream << "STOPPED";
+inline std::ostream& operator<<(std::ostream& stream, const AlexaSpeakerEngineInterface::SpeakerType& type) {
+    switch (type) {
+        case AlexaSpeakerEngineInterface::SpeakerType::ALEXA_VOLUME:
+            stream << "ALEXA_VOLUME";
             break;
-        case MediaPlayerEngineInterface::MediaState::PLAYING:
-            stream << "PLAYING";
-            break;
-        case MediaPlayerEngineInterface::MediaState::BUFFERING:
-            stream << "BUFFERING";
+        case AlexaSpeakerEngineInterface::SpeakerType::ALERTS_VOLUME:
+            stream << "ALERTS_VOLUME";
             break;
     }
     return stream;
 }
-
-inline std::ostream& operator<<(std::ostream& stream, const MediaPlayerEngineInterface::MediaError& error) {
-    switch (error) {
-        case MediaPlayerEngineInterface::MediaError::MEDIA_ERROR_UNKNOWN:
-            stream << "MEDIA_ERROR_UNKNOWN";
-            break;
-        case MediaPlayerEngineInterface::MediaError::MEDIA_ERROR_INVALID_REQUEST:
-            stream << "MEDIA_ERROR_INVALID_REQUEST";
-            break;
-        case MediaPlayerEngineInterface::MediaError::MEDIA_ERROR_SERVICE_UNAVAILABLE:
-            stream << "MEDIA_ERROR_SERVICE_UNAVAILABLE";
-            break;
-        case MediaPlayerEngineInterface::MediaError::MEDIA_ERROR_INTERNAL_SERVER_ERROR:
-            stream << "MEDIA_ERROR_INTERNAL_SERVER_ERROR";
-            break;
-        case MediaPlayerEngineInterface::MediaError::MEDIA_ERROR_INTERNAL_DEVICE_ERROR:
-            stream << "MEDIA_ERROR_INTERNAL_DEVICE_ERROR";
-            break;
-    }
-    return stream;
-}
-
-/**
- * SpeakerEngineInterface
- */
-class SpeakerEngineInterface {
-public:
-    virtual void onLocalVolumeSet( int8_t volume ) = 0;
-    virtual void onLocalMuteSet( bool mute ) = 0;
-};
 
 /**
  * SpeechRecognizerEngineInterface
@@ -169,7 +97,6 @@ public:
 
     virtual bool onStartCapture( Initiator initiator, uint64_t keywordBegin, uint64_t keywordEnd, const std::string& keyword ) = 0;
     virtual bool onStopCapture() = 0;
-    virtual ssize_t write( const int16_t* data, const size_t size ) = 0;
     virtual bool enableWakewordDetection() = 0;
     virtual bool disableWakewordDetection() = 0;
 };

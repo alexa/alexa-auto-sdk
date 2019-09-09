@@ -1,32 +1,36 @@
 {
-    "deviceInfo": {
-        "clientId": "${YOUR_CLIENT_ID}",
-        "deviceSerialNumber": "${YOUR_DEVICE_SERIAL_NUMBER}",
-        "productId": "${YOUR_PRODUCT_ID}"
-    },
-    "libcurlUtils": {
-        "CURLOPT_CAPATH": "/etc/ssl/certs"
-    },
-    "miscDatabase": {
-        "databaseFilePath": "./miscDatabase.db"
-    },
-    "certifiedSender": {
-        "databaseFilePath": "./certifiedSender.db"
-    },
-    "alertsCapabilityAgent": {
-        "databaseFilePath": "./alertsCapabilityAgent.db"
-    },
-    "notifications": {
-        "databaseFilePath": "./notifications.db"
-    },
-    "settings": {
-        "databaseFilePath": "./settings.db",
-        "defaultAVSClientSettings": {
-            "locale": "en-US"
+    "aace.alexa": {
+        "avsDeviceSDK": {
+            "deviceInfo": {
+                "clientId": "${YOUR_CLIENT_ID}",
+                "deviceSerialNumber": "${YOUR_DEVICE_SERIAL_NUMBER}",
+                "productId": "${YOUR_PRODUCT_ID}"
+            },
+            "libcurlUtils": {
+                "CURLOPT_CAPATH": "/opt/AAC/etc/certs"
+            },
+            "miscDatabase": {
+                "databaseFilePath": "/opt/AAC/data/miscDatabase.db"
+            },
+            "certifiedSender": {
+                "databaseFilePath": "/opt/AAC/data/certifiedSender.db"
+            },
+            "alertsCapabilityAgent": {
+                "databaseFilePath": "/opt/AAC/data/alertsCapabilityAgent.db"
+            },
+            "notifications": {
+                "databaseFilePath": "/opt/AAC/data/notifications.db"
+            },
+            "settings": {
+                "databaseFilePath": "/opt/AAC/data/settings.db",
+                "defaultAVSClientSettings": {
+                    "locale": "en-US"
+                }
+            }
         }
     },
     "aace.storage": {
-        "localStoragePath": "./sample-aace.db",
+        "localStoragePath": "/opt/AAC/data/aace-storage.db",
         "storageType": "sqlite"
     },
     "aace.vehicle": {
@@ -45,5 +49,8 @@
             "vehicleIdentifier": "Sample Identifier ABC"
         },
         "operatingCountry": "US"
+    },
+    "aace.cbl" : {
+        "enableUserProfile": false
     }
 }

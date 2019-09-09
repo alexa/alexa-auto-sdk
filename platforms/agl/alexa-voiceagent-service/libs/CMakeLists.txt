@@ -21,16 +21,22 @@ add_aace_library(AACENavigationEngine)
 add_aace_library(AACENavigationPlatform)
 add_aace_library(AACEPhoneControlEngine)
 add_aace_library(AACEPhoneControlPlatform)
-add_aace_library(AACEGStreamerAudio)
 
 function(add_avs_library libname imppath)
+
     PROJECT_TARGET_ADD(${libname})
     add_library(${libname} SHARED IMPORTED GLOBAL)
     # Set LABELS and IMPORTED_LOCATION for AGL app-templates
+
+    get_filename_component(realname ${imppath} REALPATH)
+    get_filename_component(basename ${imppath} NAME)
+
     set_target_properties(${libname} PROPERTIES
-        LABELS LIBRARY
-        IMPORTED_LOCATION ${imppath}
+        IMPORTED_LOCATION ${realname}
     )
+
+    configure_file( ${realname} ${CMAKE_BINARY_DIR}/package/lib/${basename} COPYONLY)
+
 endfunction()
 
 add_avs_library(ACL ${AAC_HOME}/lib/libACL.so)
@@ -66,7 +72,7 @@ add_avs_library(SpeechSynthesizer ${AAC_HOME}/lib/libSpeechSynthesizer.so)
 add_avs_library(TemplateRuntime ${AAC_HOME}/lib/libTemplateRuntime.so)
 #add_avs_library(curl ${AAC_HOME}/lib/libcurl.so.4.5.0)
 add_avs_library(curl ${AAC_HOME}/lib/libcurl.so.4)
-#add_avs_library(nghttp2 ${AAC_HOME}/lib/libnghttp2.so.14.16.1)
+#add_avs_library(nghttp2 ${AAC_HOME}/lib/libnghttp2.so.14.16)
 add_avs_library(nghttp2 ${AAC_HOME}/lib/libnghttp2.so.14)
 #add_avs_library(opus ${AAC_HOME}/lib/libopus.so.0.6.1)
 add_avs_library(opus ${AAC_HOME}/lib/libopus.so.0)
@@ -75,9 +81,38 @@ add_avs_library(sqlite3 ${AAC_HOME}/lib/libsqlite3.so.0)
 add_avs_library(equalizer ${AAC_HOME}/lib/libEqualizer.so)
 add_avs_library(EqualizerImplementations ${AAC_HOME}/lib/libEqualizerImplementations.so)
 
-if(EXISTS ${AAC_HOME}/lib/libpryon_lite.so.1.11)
+if(EXISTS ${AAC_HOME}/lib/libpryon_lite.so.1.13)
     add_aace_library(AACEAmazonLiteEngine)
     add_avs_library(AMAZONLITE ${AAC_HOME}/lib/libAMAZONLITE.so)
     add_avs_library(KeywordDetectorProvider ${AAC_HOME}/lib/libKeywordDetectorProvider.so)
-    add_avs_library(pryon_lite ${AAC_HOME}/lib/libpryon_lite.so.1.11)
+    add_avs_library(pryon_lite ${AAC_HOME}/lib/libpryon_lite.so.1.13)
+endif()
+
+if(EXISTS ${AAC_HOME}/lib/libAACEGStreamerEngine.so)
+    add_aace_library(AACEGStreamerEngine)
+endif()
+
+if(EXISTS ${AAC_HOME}/share/cmake/AACELocalVoiceControl.cmake)
+    add_aace_library(AACELocalVoiceControlEngine)
+    add_aace_library(AACELocalVoiceControlPlatform)
+    add_avs_library(libHybridProxy ${AAC_HOME}/lib/libHybridProxy.so)
+    add_avs_library(libahe_logger ${AAC_HOME}/lib/libahe_logger.so)
+    add_avs_library(libahe_platform_interfaces ${AAC_HOME}/lib/libahe_platform_interfaces_ipc.so)
+    add_avs_library(libboost_atomic ${AAC_HOME}/lib/libboost_atomic.so.1.68.0)
+    add_avs_library(libboost_chrono ${AAC_HOME}/lib/libboost_chrono.so.1.68.0)
+    add_avs_library(libboost_date_time ${AAC_HOME}/lib/libboost_date_time.so.1.68.0)
+    add_avs_library(libboost_filesystem ${AAC_HOME}/lib/libboost_filesystem.so.1.68.0)
+    add_avs_library(libboost_program_options ${AAC_HOME}/lib/libboost_program_options.so.1.68.0)
+    add_avs_library(libboost_system ${AAC_HOME}/lib/libboost_system.so.1.68.0)
+    add_avs_library(libboost_thread ${AAC_HOME}/lib/libboost_thread.so.1.68.0)
+    add_avs_library(libnanomsg ${AAC_HOME}/lib/libnanomsg.so.5.1.0)
+
+    if(EXISTS ${AAC_HOME}/share/cmake/AACELocalSkillService.cmake)
+        add_aace_library(AACELocalSkillServiceEngine)
+        add_aace_library(AACELocalSkillServicePlatform)
+        if(EXISTS ${AAC_HOME}/share/cmake/AACECarControl.cmake)
+            add_aace_library(AACECarControlEngine)
+            add_aace_library(AACECarControlPlatform)
+        endif()
+    endif()
 endif()

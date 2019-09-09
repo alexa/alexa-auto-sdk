@@ -1,20 +1,29 @@
-# Contact Uploader API
+# Contact Uploader Module
 
-## Overview
+The Alexa Auto SDK Contact Uploader module provides a platform interface that you can implement to upload contacts from a paired connected phone to the Alexa cloud. 
 
-The Contact Uploader API enables the OEMs to upload contacts from a paired connected phone to the Alexa cloud. Alexa Communications can use the uploaded contacts to make calls, announce the caller's name, send messages and more. These contacts are not available for use with any other Alexa devices.
+**Table of Contents**
 
-## Handling Contact Uploader API
+* [Overview](#overview)
+* [Implementing a Contact Uploader Handler](#using-the-contact-uploader)
 
-It is the platform implementation's responsibility to monitor phone connectivity with the head unit and call the Contact Uploader API. The Contact Uploader Engine handles the platform implementation for uploading and removing contacts from the Alexa cloud.
+## Overview <a id ="overview"></a>
 
-It is the responsibility of the platform implementation to prompt users for consent to upload the contacts from a connected phone.
+Alexa Communications can use contacts uploaded via the Contact Uploader module to make calls and announce the caller's name. These contacts are not available for use with any other Alexa devices.
 
-> ***Important!*** Contact uploading and removal should be a separate process from the user interface thread.
+> **Note**: The Contact Uploader module supports only phone contacts and only online use cases. It is on the deprecation path beginning with Alexa Auto SDK release 2.0.0 and is being superseded by the [Address Book module](../address-book/README.md). All new implementations should use the Address Book module instead of the Contact Uploader module.
 
-Extend the `contactUploader` class to implement a custom contact uploader.
+The platform implementation is responsible for managing the life cycle of a contacts list. This includes:
 
- ```aace::contactUploader::ContactUploader```
+* obtaining consent from end users to allow Alexa to use their data.
+* notifying the Alexa Auto SDK when end users revoke permission for Alexa to use their data (this notification ensures that the Alexa Auto SDK engine will remove the user data from the Alexa cloud).
+
+
+> **Important!** Contact uploading and removal should be a separate process from the user interface process.
+
+## Implementing a Contact Uploader Handler<a id ="using-the-contact-uploader"></a>
+
+To implement a custom ContactUploader handler, extend the `ContactUploader` class:
 
     #include <AACE/ContactUploader/ContactUploader.h>
 
@@ -47,5 +56,5 @@ Extend the `contactUploader` class to implement a custom contact uploader.
 
     };
 
-    //engine config
+    // Register the platform interface with the Engine
     engine->registerPlatformInterface( std::make_shared<MyContactUploader>() );

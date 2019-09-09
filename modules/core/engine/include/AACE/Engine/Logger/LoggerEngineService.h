@@ -41,14 +41,15 @@ public:
 
     // LoggerServiceInterface
     bool addSink( std::shared_ptr<aace::engine::logger::sink::Sink> sink ) override;
+    bool removeSink( const std::string& id ) override;
 
 protected:
-    bool configure( const std::vector<std::shared_ptr<std::istream>>& configuration ) override;
+    bool initialize() override;
+    bool configure( std::shared_ptr<std::istream> configuration ) override;
+    bool shutdown() override;
     bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) override;
 
 private:
-    bool configure( std::shared_ptr<std::istream> configuration );
-    
     std::shared_ptr<aace::engine::logger::sink::Sink> createSink( const rapidjson::Value& config );
     std::shared_ptr<aace::engine::logger::sink::Rule> createRule( const rapidjson::Value& config );
 
@@ -60,6 +61,7 @@ private:
     }
     
     bool registerPlatformInterfaceType( std::shared_ptr<aace::logger::Logger> logger );
+    std::shared_ptr<aace::logger::Logger> m_logger;
 
 private:
     std::shared_ptr<aace::engine::logger::LoggerEngineImpl> m_loggerEngineImpl;

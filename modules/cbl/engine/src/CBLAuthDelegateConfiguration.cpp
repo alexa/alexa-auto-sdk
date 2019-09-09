@@ -63,14 +63,14 @@ static const std::string REFRESH_TOKEN_PATH = "token";
 std::shared_ptr<CBLAuthDelegateConfiguration> CBLAuthDelegateConfiguration::create(
     std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
     std::chrono::seconds codePairRequestTimeout,
-    const std::string& lwaUrl ) {
+    std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints ) {
     
     try {
         AACE_DEBUG(LX(TAG,"create"));
         std::shared_ptr<CBLAuthDelegateConfiguration> configuration = std::shared_ptr<CBLAuthDelegateConfiguration>( new CBLAuthDelegateConfiguration() );
         ThrowIfNull( configuration, "CBLAuthDelegateConfigurationInvalid" )
 
-        configuration->initialize( deviceInfo, codePairRequestTimeout, lwaUrl );
+        configuration->initialize( deviceInfo, codePairRequestTimeout, alexaEndpoints );
         return configuration;
     }
     catch( std::exception& ex ) {
@@ -82,7 +82,7 @@ std::shared_ptr<CBLAuthDelegateConfiguration> CBLAuthDelegateConfiguration::crea
 bool CBLAuthDelegateConfiguration::initialize(
         std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
         std::chrono::seconds codePairRequestTimeout,
-        const std::string& lwaUrl ) {
+        std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints ) {
 
     try {
         AACE_DEBUG(LX(TAG,"init"));
@@ -91,12 +91,8 @@ bool CBLAuthDelegateConfiguration::initialize(
         m_requestTimeout = DEFAULT_REQUEST_TIMEOUT;
         m_codePairRequestTimeout = codePairRequestTimeout;
         m_accessTokenRefreshHeadStart = DEFAULT_ACCESS_TOKEN_REFRESH_HEAD_START;
+        m_alexaEndpoints = alexaEndpoints;
 
-        m_requestCodePairUrl = lwaUrl + REQUEST_CODE_PAIR_PATH;
-        m_requestTokenUrl = lwaUrl + REQUEST_TOKEN_PATH;
-        m_refreshTokenUrl = lwaUrl + REFRESH_TOKEN_PATH;
-
-        
         if (initScopeData() == false ) {
             Throw( "initScopeDataFailed" )
         }
@@ -134,15 +130,15 @@ std::chrono::seconds CBLAuthDelegateConfiguration::getAccessTokenRefreshHeadStar
 }
 
 std::string CBLAuthDelegateConfiguration::getRequestCodePairUrl() const {
-    return m_requestCodePairUrl;
+    return m_alexaEndpoints->getLWAEndpoint() + REQUEST_CODE_PAIR_PATH;
 }
 
 std::string CBLAuthDelegateConfiguration::getRequestTokenUrl() const {
-    return m_requestTokenUrl;
+    return m_alexaEndpoints->getLWAEndpoint() + REQUEST_TOKEN_PATH;
 }
 
 std::string CBLAuthDelegateConfiguration::getRefreshTokenUrl() const {
-    return m_refreshTokenUrl;
+    return m_alexaEndpoints->getLWAEndpoint() + REFRESH_TOKEN_PATH;
 }
 
 std::string CBLAuthDelegateConfiguration::getScopeData() const {

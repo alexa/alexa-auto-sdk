@@ -31,16 +31,16 @@ namespace afb {
  */
 class AFBRequestImpl : public agl::common::interfaces::IAFBRequest {
 public:
-    static std::unique_ptr<AFBRequestImpl> create(AFB_ReqT afbRequest);
+    static std::unique_ptr<AFBRequestImpl> create(afb_req_t afbRequest);
 
     // {@c IAFBRequest Implementation
     void* getNativeRequest() override;
     // @c IAFBRequest Implementation }
 
 private:
-    AFBRequestImpl(AFB_ReqT afbRequest);
+    AFBRequestImpl(afb_req_t afbRequest);
 
-    AFB_ReqT mAfbRequest;
+    afb_req_t mAfbRequest;
 };
 
 }  // namespace afb

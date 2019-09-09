@@ -6,23 +6,23 @@
     <LinearLayout
         android:layout_width="325dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:background="@color/drawerBackground"
+        android:orientation="vertical"
         android:paddingStart="8dp"
-        android:paddingEnd="8dp" >
+        android:paddingEnd="8dp">
 
         <!-- Container for login -->
         <LinearLayout
             android:id="@+id/login"
-            android:visibility="visible"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="4dp"
+            android:background="@color/drawerSection"
+            android:orientation="vertical"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
-            android:background="@color/drawerSection" >
+            android:visibility="visible">
 
             <!-- Login with Amazon button -->
             <ImageButton
@@ -30,8 +30,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginBottom="8dp"
                 android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
                 android:background="@null"
                 android:src="@drawable/lwa_btn_src" />
         </LinearLayout>
@@ -39,26 +39,26 @@
         <!-- Container for logout -->
         <LinearLayout
             android:id="@+id/logout"
-            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
-            android:background="@color/drawerSection" >
+            android:background="@color/drawerSection"
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <!-- Log out button -->
             <TextView
                 android:id="@+id/logoutButton"
                 style="@style/button"
-                android:text="@string/auth_logout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/auth_logout" />
         </LinearLayout>
 
         <!-- Config Info -->
@@ -66,12 +66,12 @@
             android:id="@+id/configContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="4dp"
+            android:background="@color/drawerSection"
+            android:orientation="vertical"
             android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:background="@color/drawerSection" >
+            android:paddingEnd="8dp">
 
             <!-- Header -->
             <TextView
@@ -84,71 +84,61 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="8dp"
-                android:orientation="vertical" >
+                android:orientation="vertical"
+                android:paddingTop="8dp">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/client_id"
                     android:layout_gravity="start"
+                    android:text="@string/client_id"
                     android:textSize="12sp" />
+
                 <TextView
                     android:id="@+id/clientId"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="start"
                     android:layout_marginBottom="8dp"
                     android:paddingStart="8dp"
                     android:paddingEnd="8dp"
                     android:textColor="@color/drawerTextStatus"
-                    android:layout_gravity="start"
                     android:textSize="12sp" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/client_secret"
                     android:layout_gravity="start"
-                    android:textSize="12sp" />
-                <TextView
-                    android:id="@+id/clientSecret"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="8dp"
-                    android:textColor="@color/drawerTextStatus"
-                    android:layout_gravity="start"
-                    android:textSize="12sp" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:text="@string/product_id"
-                    android:layout_gravity="start"
                     android:textSize="12sp" />
+
                 <TextView
                     android:id="@+id/productId"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="start"
                     android:layout_marginBottom="8dp"
                     android:paddingStart="8dp"
                     android:paddingEnd="8dp"
                     android:textColor="@color/drawerTextStatus"
-                    android:layout_gravity="start"
                     android:textSize="12sp" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/product_dsn"
                     android:layout_gravity="start"
+                    android:text="@string/product_dsn"
                     android:textSize="12sp" />
+
                 <TextView
                     android:id="@+id/productDsn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="start"
                     android:layout_marginBottom="8dp"
                     android:paddingStart="8dp"
                     android:paddingEnd="8dp"
                     android:textColor="@color/drawerTextStatus"
-                    android:layout_gravity="start"
                     android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>
@@ -158,12 +148,12 @@
             android:id="@+id/clientStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
+            android:background="@color/drawerSection"
+            android:orientation="vertical"
             android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:background="@color/drawerSection" >
+            android:paddingEnd="8dp">
 
             <!-- Header -->
             <TextView
@@ -181,29 +171,32 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
                     android:layout_alignParentStart="true"
-                    android:layout_marginEnd="8dp">
+                    android:layout_marginEnd="8dp"
+                    android:orientation="vertical">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="start"
                         android:layout_marginBottom="8dp"
                         android:text="@string/client_connection_status"
-                        android:layout_gravity="start"
                         android:textSize="12sp" />
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="start"
                         android:layout_marginBottom="8dp"
                         android:text="@string/client_auth_state"
-                        android:layout_gravity="start"
                         android:textSize="12sp" />
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="start"
                         android:layout_marginBottom="8dp"
                         android:text="@string/client_dialog_state"
-                        android:layout_gravity="start"
                         android:textSize="12sp" />
                 </LinearLayout>
 
@@ -213,29 +206,32 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:orientation="vertical">
+
                     <TextView
                         android:id="@+id/connectionState"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="end"
                         android:layout_marginBottom="8dp"
                         android:textColor="@color/drawerTextStatus"
-                        android:layout_gravity="end"
                         android:textSize="12sp" />
+
                     <TextView
                         android:id="@+id/authState"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="end"
                         android:layout_marginBottom="8dp"
                         android:textColor="@color/drawerTextStatus"
-                        android:layout_gravity="end"
                         android:textSize="12sp" />
+
                     <TextView
                         android:id="@+id/dialogState"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="end"
                         android:layout_marginBottom="8dp"
                         android:textColor="@color/drawerTextStatus"
-                        android:layout_gravity="end"
                         android:textSize="12sp" />
                 </LinearLayout>
             </RelativeLayout>
@@ -274,10 +270,10 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:paddingRight="10dp"
                     android:text="@string/locale_text"
                     android:textColor="@color/drawerHeader"
-                    android:textSize="16sp"
-                    android:paddingRight="10dp"/>
+                    android:textSize="16sp" />
 
                 <Spinner
                     android:id="@+id/locale_spinner"
@@ -290,15 +286,15 @@
 
         <!-- Wake Word -->
         <LinearLayout
+            android:id="@+id/wakeWord"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/wakeWord"
-            android:orientation="vertical"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
+            android:background="@color/drawerSection"
+            android:orientation="vertical"
             android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:background="@color/drawerSection" >
+            android:paddingEnd="8dp">
             <!-- Header -->
             <TextView
                 android:layout_width="wrap_content"
@@ -306,50 +302,52 @@
                 android:text="@string/wake_word"
                 android:textColor="@color/drawerHeader"
                 android:textSize="18sp" />
+
             <TextView
                 android:id="@+id/wakeWordNotSupportedMessage"
-                android:visibility="visible"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="start"
                 android:layout_marginTop="2dp"
                 android:layout_marginBottom="4dp"
                 android:text="@string/wake_word_not_supported"
-                android:layout_gravity="start"
-                android:textSize="12sp" />
+                android:textSize="12sp"
+                android:visibility="visible" />
             <!-- Switch -->
             <include
-                layout="@layout/drawer_switch"
-                android:visibility="gone"
                 android:id="@+id/toggleWakeWord"
-                android:layout_marginTop="2dp"
-                android:layout_marginBottom="4dp"
+                layout="@layout/drawer_switch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center|center_horizontal" />
+                android:layout_gravity="center|center_horizontal"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="4dp"
+                android:visibility="gone" />
+
             <TextView
                 android:id="@+id/wakeWordLocaleChangeMessage"
-                android:visibility="invisible"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
                 android:layout_alignParentStart="true"
-                android:text="@string/wake_word_locale"
                 android:layout_gravity="start"
-                android:textSize="12sp" />
+                android:layout_marginEnd="8dp"
+                android:text="@string/wake_word_locale"
+                android:textSize="12sp"
+                android:visibility="invisible" />
         </LinearLayout>
 
         <!-- Container for log filters -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
-            android:paddingTop="2dp"
-            android:paddingBottom="2dp"
+            android:background="@color/drawerSection"
+            android:orientation="vertical"
             android:paddingStart="8dp"
+            android:paddingTop="2dp"
             android:paddingEnd="8dp"
-            android:background="@color/drawerSection" >
+            android:paddingBottom="2dp">
 
             <!-- Header -->
             <TextView
@@ -363,11 +361,11 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:layout_marginTop="8dp"
+                android:background="@color/drawerSubsection"
+                android:orientation="vertical"
                 android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:background="@color/drawerSubsection">
+                android:paddingEnd="8dp">
 
                 <!-- Source Header -->
                 <TextView
@@ -389,17 +387,17 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:layout_marginTop="8dp"
-                android:background="@color/drawerSubsection" >
+                android:background="@color/drawerSubsection"
+                android:orientation="vertical">
                 <!-- Level Header -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/log_switch_level"
-                    android:textColor="@color/drawerHeader"
                     android:layout_marginStart="8dp"
                     android:layout_marginEnd="8dp"
+                    android:text="@string/log_switch_level"
+                    android:textColor="@color/drawerHeader"
                     android:textSize="18sp" />
                 <!-- Level selector -->
                 <Spinner
@@ -414,14 +412,15 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:layout_marginTop="8dp"
+                android:background="@color/drawerSubsection"
+                android:orientation="vertical"
                 android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:background="@color/drawerSubsection" >
+                android:paddingEnd="8dp">
+
                 <include
-                    layout="@layout/drawer_switch"
                     android:id="@+id/toggleCards"
+                    layout="@layout/drawer_switch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center|center_horizontal" />
@@ -431,14 +430,15 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:layout_marginTop="8dp"
+                android:background="@color/drawerSubsection"
+                android:orientation="vertical"
                 android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:background="@color/drawerSubsection" >
+                android:paddingEnd="8dp">
+
                 <include
-                    layout="@layout/drawer_switch"
                     android:id="@+id/toggleTemplates"
+                    layout="@layout/drawer_switch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center|center_horizontal" />
@@ -446,26 +446,26 @@
 
             <!-- Clear log button -->
             <TextView
-                style="@style/button"
                 android:id="@+id/clearLogButton"
-                android:text="@string/log_clear"
+                style="@style/button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center|center_horizontal"
                 android:layout_marginTop="16dp"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="8dp"
+                android:text="@string/log_clear" />
         </LinearLayout>
 
         <!-- Alerts -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
+            android:background="@color/drawerSection"
+            android:orientation="vertical"
             android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:background="@color/drawerSection" >
+            android:paddingEnd="8dp">
 
             <!-- Header -->
             <TextView
@@ -479,15 +479,17 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp" >
+                android:layout_marginTop="4dp">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
                     android:layout_alignParentStart="true"
-                    android:text="@string/alerts_state"
                     android:layout_gravity="start"
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/alerts_state"
                     android:textSize="12sp" />
+
                 <TextView
                     android:id="@+id/alertState"
                     android:layout_width="wrap_content"
@@ -500,38 +502,38 @@
 
             <!-- Stop alert button -->
             <TextView
-                style="@style/button"
                 android:id="@+id/stopAlertButton"
-                android:text="@string/alerts_stop"
+                style="@style/button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="8dp"
-                android:layout_marginBottom="4dp" />
+                android:layout_marginBottom="4dp"
+                android:text="@string/alerts_stop" />
 
             <!-- Remove all alerts button -->
             <TextView
-                style="@style/button"
                 android:id="@+id/removeAlertsButton"
-                android:text="@string/alerts_remove"
+                style="@style/button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="4dp"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="8dp"
+                android:text="@string/alerts_remove" />
         </LinearLayout>
 
         <!-- Notifications -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
+            android:background="@color/drawerSection"
+            android:orientation="vertical"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
-            android:paddingBottom="4dp"
-            android:background="@color/drawerSection" >
+            android:paddingBottom="4dp">
 
             <!-- Header -->
             <TextView
@@ -545,15 +547,17 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp" >
+                android:layout_marginTop="4dp">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
                     android:layout_alignParentStart="true"
-                    android:text="@string/indicator_state"
                     android:layout_gravity="start"
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/indicator_state"
                     android:textSize="12sp" />
+
                 <TextView
                     android:id="@+id/indicatorState"
                     android:layout_width="wrap_content"
@@ -569,13 +573,13 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
+            android:background="@color/drawerSection"
+            android:orientation="vertical"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
-            android:paddingBottom="4dp"
-            android:background="@color/drawerSection" >
+            android:paddingBottom="4dp">
 
             <!-- Header -->
             <TextView
@@ -589,15 +593,17 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp" >
+                android:layout_marginTop="4dp">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
                     android:layout_alignParentStart="true"
-                    android:text="@string/network_status"
                     android:layout_gravity="start"
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/network_status"
                     android:textSize="12sp" />
+
                 <TextView
                     android:id="@+id/networkStatus"
                     android:layout_width="wrap_content"
@@ -607,40 +613,128 @@
                     android:textColor="@color/drawerTextStatus"
                     android:textSize="12sp" />
             </RelativeLayout>
+            <!-- Interface Selection Switch -->
+            <include
+                layout="@layout/drawer_switch"
+                android:id="@+id/toggleNetworkInterface"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal"
+                android:text="@string/select_network_interface"/>
+
+            <!-- Interface entry -->
+            <LinearLayout
+                android:id="@+id/networkInterface"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="8dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:background="@color/drawerSection" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:background="@color/drawerSubsection"
+                    android:orientation="vertical"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp">
+                        <RadioGroup
+                            android:id="@+id/radioGroupNetworkInterface"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+                            <RadioButton android:id="@+id/radioWifi"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/wifi" />
+                            <RadioButton android:id="@+id/radioMobileData"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/mobile_data" />
+                            <RadioButton android:id="@+id/radioManualEntry"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/manual_entry" />
+                        </RadioGroup>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:background="@color/drawerSubsection"
+                    android:orientation="vertical"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp">
+
+                <EditText
+                    android:id="@+id/networkInterfaceText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:inputType="text" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/interface_name"
+                    android:textSize="12sp" />
+                <TextView
+                    style="@style/button"
+                    android:id="@+id/setNetworkInterfaceButton"
+                    android:text="@string/interface_set"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="4dp" />
+                </LinearLayout>
+            </LinearLayout>
+
         </LinearLayout>
 
         <!-- Location -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
+            android:background="@color/drawerSection"
+            android:orientation="vertical"
             android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:background="@color/drawerSection" >
+            android:paddingEnd="8dp">
 
             <!-- Header -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
                 android:text="@string/location"
                 android:textColor="@color/drawerHeader"
-                android:layout_marginBottom="4dp"
                 android:textSize="18sp" />
 
             <!-- Current location -->
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
+                android:layout_height="wrap_content">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
                     android:layout_alignParentStart="true"
                     android:layout_gravity="start"
+                    android:layout_marginEnd="8dp"
                     android:text="@string/loc_current"
                     android:textSize="12sp" />
+
                 <TextView
                     android:id="@+id/latLong"
                     android:layout_width="wrap_content"
@@ -653,8 +747,8 @@
 
             <!-- Switch -->
             <include
-                layout="@layout/drawer_switch"
                 android:id="@+id/toggleMockLocation"
+                layout="@layout/drawer_switch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center|center_horizontal" />
@@ -662,14 +756,14 @@
             <!-- Address entry -->
             <LinearLayout
                 android:id="@+id/addressEntry"
-                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:layout_marginBottom="8dp"
+                android:background="@color/drawerSubsection"
+                android:orientation="vertical"
                 android:paddingTop="2dp"
                 android:paddingBottom="2dp"
-                android:background="@color/drawerSubsection" >
+                android:visibility="gone">
 
                 <EditText
                     android:id="@+id/addressText"
@@ -678,6 +772,7 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginEnd="8dp"
                     android:inputType="text" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -686,17 +781,18 @@
                     android:layout_marginBottom="4dp"
                     android:text="@string/loc_address"
                     android:textSize="12sp" />
+
                 <TextView
-                    style="@style/button"
                     android:id="@+id/setAddressButton"
-                    android:text="@string/loc_set"
+                    style="@style/button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp"
                     android:layout_marginTop="8dp"
-                    android:layout_marginBottom="4dp" />
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/loc_set" />
             </LinearLayout>
 
         </LinearLayout>
@@ -705,31 +801,32 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
+            android:background="@color/drawerSection"
+            android:orientation="vertical"
             android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:background="@color/drawerSection" >
+            android:paddingEnd="8dp">
 
             <!-- Header -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
                 android:text="@string/volume"
                 android:textColor="@color/drawerHeader"
-                android:layout_marginBottom="8dp"
                 android:textSize="18sp" />
 
             <!-- LOCAL -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:layout_marginBottom="8dp"
+                android:background="@color/drawerSubsection"
+                android:orientation="vertical"
                 android:paddingTop="2dp"
-                android:paddingBottom="2dp"
-                android:background="@color/drawerSubsection" >
+                android:paddingBottom="2dp">
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -737,24 +834,26 @@
                     android:layout_marginEnd="8dp"
                     android:text="@string/volume_alerts"
                     android:textSize="12sp" />
+
                 <SeekBar
                     android:id="@+id/alertsVolume"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:progress="50"
                     android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp" />
+                    android:layout_marginEnd="8dp"
+                    android:progress="50" />
             </LinearLayout>
 
             <!-- AVS-SYNCED -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:layout_marginBottom="8dp"
+                android:background="@color/drawerSubsection"
+                android:orientation="vertical"
                 android:paddingTop="2dp"
-                android:paddingBottom="2dp"
-                android:background="@color/drawerSubsection" >
+                android:paddingBottom="2dp">
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -762,25 +861,103 @@
                     android:layout_marginEnd="16dp"
                     android:text="@string/volume_speaker"
                     android:textSize="12sp" />
+
                 <SeekBar
                     android:id="@+id/speakerVolume"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:progress="50"
                     android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp" />
+                    android:layout_marginEnd="8dp"
+                    android:progress="50" />
                 <!-- Mute button -->
                 <TextView
-                    style="@style/button"
                     android:id="@+id/muteSpeakerButton"
-                    android:text="@string/volume_mute"
+                    style="@style/button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp"
                     android:layout_marginTop="8dp"
-                    android:layout_marginBottom="4dp" />
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/volume_mute" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- EARCONS -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:background="@color/drawerSection"
+            android:orientation="vertical"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
+
+            <!-- Header -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/earcons"
+                android:textColor="@color/drawerHeader"
+                android:textSize="18sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:background="@color/drawerSubsection"
+                android:orientation="horizontal"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp">
+
+                <!-- Earcons Start of Request -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/earcons_start_of_request"
+                    android:textColor="@color/drawerHeader"
+                    android:textSize="18sp" />
+
+                <!-- Enable Start of Request Switch -->
+                <include
+                    android:id="@+id/toggleEarconsStartOfRequest"
+                    layout="@layout/drawer_switch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center|center_horizontal" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:background="@color/drawerSubsection"
+                android:orientation="horizontal"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp">
+
+                <!-- Earcons End of Request -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/earcons_end_of_request"
+                    android:textColor="@color/drawerHeader"
+                    android:textSize="18sp" />
+
+                <!-- Enable End of Request Switch -->
+                <include
+                    android:id="@+id/toggleEarconsEndOfRequest"
+                    layout="@layout/drawer_switch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center|center_horizontal" />
+
             </LinearLayout>
         </LinearLayout>
 
@@ -788,20 +965,20 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
-            android:background="@color/drawerSection">
+            android:background="@color/drawerSection"
+            android:orientation="vertical">
 
             <!-- Header -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="4dp"
                 android:text="@string/playback_controller"
                 android:textColor="@color/drawerHeader"
-                android:layout_marginEnd="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginBottom="4dp"
                 android:textSize="18sp" />
 
             <!-- Title -->
@@ -809,25 +986,27 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginTop="4dp" >
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="8dp">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
                     android:layout_alignParentStart="true"
+                    android:layout_marginEnd="8dp"
                     android:text="@string/playback_title"
                     android:textSize="12sp" />
+
                 <TextView
                     android:id="@+id/mediaTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_gravity="end"
-                    android:textAllCaps="true"
-                    android:singleLine="true"
-                    android:maxLength="25"
                     android:ellipsize="end"
+                    android:maxLength="25"
+                    android:singleLine="true"
+                    android:textAllCaps="true"
                     android:textColor="@color/drawerTextStatus"
                     android:textSize="12sp" />
             </RelativeLayout>
@@ -837,25 +1016,27 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginTop="4dp" >
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="8dp">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
                     android:layout_alignParentStart="true"
+                    android:layout_marginEnd="8dp"
                     android:text="@string/playback_artist"
                     android:textSize="12sp" />
+
                 <TextView
                     android:id="@+id/mediaArtist"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_gravity="end"
-                    android:textAllCaps="true"
-                    android:singleLine="true"
-                    android:maxLength="25"
                     android:ellipsize="end"
+                    android:maxLength="25"
+                    android:singleLine="true"
+                    android:textAllCaps="true"
                     android:textColor="@color/drawerTextStatus"
                     android:textSize="12sp" />
             </RelativeLayout>
@@ -865,25 +1046,27 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginTop="4dp" >
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="8dp">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
                     android:layout_alignParentStart="true"
+                    android:layout_marginEnd="8dp"
                     android:text="@string/playback_provider"
                     android:textSize="12sp" />
+
                 <TextView
                     android:id="@+id/mediaProvider"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_gravity="end"
-                    android:textAllCaps="true"
-                    android:singleLine="true"
-                    android:maxLength="25"
                     android:ellipsize="end"
+                    android:maxLength="25"
+                    android:singleLine="true"
+                    android:textAllCaps="true"
                     android:textColor="@color/drawerTextStatus"
                     android:textSize="12sp" />
             </RelativeLayout>
@@ -892,17 +1075,18 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
-                android:layout_marginTop="4dp"
+                android:background="@color/playbackControllerBackground"
+                android:orientation="vertical"
                 android:paddingTop="4dp"
-                android:paddingBottom="4dp"
-                android:background="@color/playbackControllerBackground" >
+                android:paddingBottom="4dp">
+
                 <include
-                    layout="@layout/playback_controller"
                     android:id="@+id/playbackController"
+                    layout="@layout/playback_controller"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
@@ -923,344 +1107,382 @@
             android:id="@+id/phone_call_controller"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="8dp"
+            android:background="@color/drawerSection"
+            android:orientation="vertical"
             android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:background="@color/drawerSection" >
+            android:paddingEnd="8dp">
 
             <!-- Header -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
                 android:text="@string/phone_call_controller"
                 android:textColor="@color/drawerHeader"
-                android:layout_marginBottom="4dp"
                 android:textSize="18sp" />
 
             <!-- Enable Phone Connection Switch -->
             <include
-                layout="@layout/drawer_switch"
                 android:id="@+id/togglePhoneCallConnection"
+                layout="@layout/drawer_switch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center|center_horizontal" />
 
-            <!--Configure Device Features Button-->
-            <TextView
-                style="@style/button"
-                android:text="@string/configure_device"
-                android:id="@+id/deviceConfiguration"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp" />
-
-            <!-- Phone Call Controller State Info -->
-            <RelativeLayout
-                android:id="@+id/callInfo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="8dp"
-                android:layout_marginBottom="4dp">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_alignParentStart="true"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginBottom="4dp" >
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
-                        android:text="@string/call_state_label"
-                        android:layout_gravity="start"
-                        android:textSize="12sp" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
-                        android:text="@string/current_number"
-                        android:layout_gravity="start"
-                        android:textSize="12sp" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
-                        android:text="@string/last_called_number"
-                        android:layout_gravity="start"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:orientation="vertical"
-                    android:layout_marginBottom="4dp" >
-
-                    <TextView
-                        android:id="@+id/currentCallState"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="end"
-                        android:textColor="@color/drawerTextStatus"
-                        android:textSize="12sp" />
-                    <TextView
-                        android:id="@+id/currentCallNumber"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="end"
-                        android:textColor="@color/drawerTextStatus"
-                        android:textSize="12sp" />
-                    <TextView
-                        android:id="@+id/lastCalledNumber"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="end"
-                        android:textColor="@color/drawerTextStatus"
-                        android:textSize="12sp" />
-                </LinearLayout>
-            </RelativeLayout>
-
-            <!-- Local Calling Device -->
+            <!-- Phone Call Controller UI config -->
             <LinearLayout
-                android:id="@+id/localCallingDevice"
+                android:id="@+id/phone_call_controller_config"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
+                android:layout_marginTop="4dp"
                 android:layout_marginBottom="8dp"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp"
-                android:background="@color/drawerSubsection" >
+                android:background="@color/drawerSection"
+                android:orientation="vertical"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp">
 
+                <!--Configure Device Features Button-->
                 <TextView
+                    android:id="@+id/deviceConfiguration"
+                    style="@style/button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:text="@string/local_calling_device"
-                    android:textSize="12sp" />
-                <EditText
-                    android:id="@+id/localCallingNumber"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="@string/configure_device" />
+
+                <!-- Phone Call Controller State Info -->
+                <RelativeLayout
+                    android:id="@+id/callInfo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:inputType="phone" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginEnd="12dp"
                     android:layout_marginBottom="4dp"
-                    android:text="@string/calling_number"
-                    android:textSize="12sp" />
-                <TextView
-                    style="@style/button"
-                    android:id="@+id/localInitiate"
-                    android:text="@string/call_initiate"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginEnd="12dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp" />
-                <TextView
-                    style="@style/button"
-                    android:id="@+id/localEnd"
-                    android:text="@string/call_end"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginEnd="12dp"
-                    android:layout_marginTop="8dp"
-                    android:visibility="gone"
-                    android:layout_marginBottom="8dp" />
+                    android:paddingTop="8dp">
 
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="4dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start"
+                            android:layout_marginEnd="8dp"
+                            android:text="@string/call_state_label"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start"
+                            android:layout_marginEnd="8dp"
+                            android:text="@string/current_number"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start"
+                            android:layout_marginEnd="8dp"
+                            android:text="@string/last_called_number"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginBottom="4dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/currentCallState"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end"
+                            android:textColor="@color/drawerTextStatus"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/currentCallNumber"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end"
+                            android:textColor="@color/drawerTextStatus"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/lastCalledNumber"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end"
+                            android:textColor="@color/drawerTextStatus"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </RelativeLayout>
+
+                <!-- Local Calling Device -->
                 <LinearLayout
-                    android:id="@+id/localAnswerDecline"
+                    android:id="@+id/localCallingDevice"
                     android:layout_width="match_parent"
-                    android:layout_height="58dp"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginEnd="12dp"
-                    android:orientation="horizontal">
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:background="@color/drawerSubsection"
+                    android:orientation="vertical"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp">
 
                     <TextView
-                        style="@style/button"
-                        android:text="@string/call_answer"
-                        android:id="@+id/localAnswer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:layout_weight="1"
-                        android:layout_marginBottom="8dp" />
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:text="@string/local_calling_device"
+                        android:textSize="12sp" />
+
+                    <EditText
+                        android:id="@+id/localCallingNumber"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:inputType="phone" />
+
                     <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="12dp"
+                        android:layout_marginBottom="4dp"
+                        android:text="@string/calling_number"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/localInitiate"
                         style="@style/button"
-                        android:text="@string/call_decline"
-                        android:id="@+id/localDecline"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="12dp"
                         android:layout_marginTop="8dp"
-                        android:layout_weight="1"
-                        android:layout_marginBottom="8dp" />
+                        android:layout_marginEnd="12dp"
+                        android:layout_marginBottom="8dp"
+                        android:text="@string/call_initiate" />
+
+                    <TextView
+                        android:id="@+id/localEnd"
+                        style="@style/button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="12dp"
+                        android:layout_marginBottom="8dp"
+                        android:text="@string/call_end"
+                        android:visibility="gone" />
+
+                    <LinearLayout
+                        android:id="@+id/localAnswerDecline"
+                        android:layout_width="match_parent"
+                        android:layout_height="58dp"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="12dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/localAnswer"
+                            style="@style/button"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginBottom="8dp"
+                            android:layout_weight="1"
+                            android:text="@string/call_answer" />
+
+                        <TextView
+                            android:id="@+id/localDecline"
+                            style="@style/button"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginBottom="8dp"
+                            android:layout_weight="1"
+                            android:text="@string/call_decline" />
+                    </LinearLayout>
                 </LinearLayout>
-            </LinearLayout>
 
-            <!-- Remote Party Device -->
-            <LinearLayout
-                android:id="@+id/remotePartyDevice"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginBottom="8dp"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp"
-                android:background="@color/drawerSubsection" >
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:text="@string/remote_device"
-                    android:textSize="12sp" />
-                <TextView
-                    style="@style/button"
-                    android:id="@+id/remoteInitiate"
-                    android:text="@string/call_initiate"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginEnd="12dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp" />
-                <TextView
-                    style="@style/button"
-                    android:id="@+id/remoteEnd"
-                    android:text="@string/call_end"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginEnd="12dp"
-                    android:layout_marginTop="8dp"
-                    android:visibility="gone"
-                    android:layout_marginBottom="8dp" />
-
-
+                <!-- Remote Party Device -->
                 <LinearLayout
-                    android:id="@+id/remoteAnswerDecline"
+                    android:id="@+id/remotePartyDevice"
                     android:layout_width="match_parent"
-                    android:layout_height="58dp"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginEnd="12dp"
-                    android:orientation="horizontal">
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:background="@color/drawerSubsection"
+                    android:orientation="vertical"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp">
 
                     <TextView
-                        style="@style/button"
-                        android:text="@string/call_answer"
-                        android:id="@+id/remoteAnswer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:layout_weight="1"
-                        android:layout_marginBottom="8dp" />
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:text="@string/remote_device"
+                        android:textSize="12sp" />
 
                     <TextView
+                        android:id="@+id/remoteInitiate"
                         style="@style/button"
-                        android:text="@string/call_decline"
-                        android:id="@+id/remoteDecline"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="12dp"
                         android:layout_marginTop="8dp"
-                        android:layout_weight="1"
-                        android:layout_marginBottom="8dp" />
+                        android:layout_marginEnd="12dp"
+                        android:layout_marginBottom="8dp"
+                        android:text="@string/call_initiate" />
+
+                    <TextView
+                        android:id="@+id/remoteEnd"
+                        style="@style/button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="12dp"
+                        android:layout_marginBottom="8dp"
+                        android:text="@string/call_end"
+                        android:visibility="gone" />
+
+
+                    <LinearLayout
+                        android:id="@+id/remoteAnswerDecline"
+                        android:layout_width="match_parent"
+                        android:layout_height="58dp"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="12dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/remoteAnswer"
+                            style="@style/button"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginBottom="8dp"
+                            android:layout_weight="1"
+                            android:text="@string/call_answer" />
+
+                        <TextView
+                            android:id="@+id/remoteDecline"
+                            style="@style/button"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginBottom="8dp"
+                            android:layout_weight="1"
+                            android:text="@string/call_decline" />
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
 
-    <!-- Contact Uploader -->
-    <LinearLayout
-        android:id="@+id/phone_contact_uploader"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="8dp"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:background="@color/drawerSection">
-
-        <!-- Header -->
-        <TextView
-            android:id="@+id/phone_contact_uploader_header"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/contact_uploader"
-            android:textColor="@color/drawerHeader"
-            android:layout_marginBottom="4dp"
-            android:textSize="18sp" />
-        <include
-            layout="@layout/drawer_switch"
-            android:id="@+id/togglePhoneConnection"
+        <!-- Contacts uploader -->
+        <LinearLayout
+            android:id="@+id/contacts_uploader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center|center_horizontal" />
-
-        <!-- Upload/Abort/Remove Button -->
-        <TextView
-            style="@style/button"
-            android:text="@string/upload_contacts"
-            android:id="@+id/upload_cancel_or_remove_contacts"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="4dp"
             android:layout_marginBottom="8dp"
-            android:visibility="gone" />
+            android:background="@color/drawerSection"
+            android:orientation="vertical"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
 
-        <!-- Upload/Abort/Remove in-Progress widget -->
-        <ProgressBar
-            android:id="@+id/contact_upload_progress_cyclic"
-            android:layout_width="wrap_content"
+            <!-- Header -->
+            <TextView
+                android:id="@+id/contacts_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="@string/contacts_uploader"
+                android:textColor="@color/drawerHeader"
+                android:textSize="18sp" />
+
+            <include
+                android:id="@+id/toggle_contacts_upload"
+                layout="@layout/drawer_switch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal"
+                android:text="@string/permit_upload" />
+
+            <!-- TextView to show user granted access to phone contacts -->
+            <TextView
+                android:id="@+id/access_to_contacts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="@string/no_permission_to_contacts"
+                android:textColor="@color/drawerHeader"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <!-- Navigation Favorites uploader -->
+        <LinearLayout
+            android:id="@+id/navigation_favorites_uploader"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:visibility="gone" />
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="8dp"
+            android:background="@color/drawerSection"
+            android:orientation="vertical"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
 
-        <!-- TextView to show user granted access to phone contacts -->
-        <TextView
-            android:id="@+id/access_to_contacts_status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/no_phone_is_connected"
-            android:textColor="@color/drawerHeader"
-            android:layout_marginBottom="4dp"
-            android:textSize="12sp" />
+            <!-- Header -->
+            <TextView
+                android:id="@+id/navigation_favorites_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="@string/navigation_favorites_uploader"
+                android:textColor="@color/drawerHeader"
+                android:textSize="18sp" />
 
-        <!-- Upload/Abort/Remove success or failure text -->
-        <TextView
-            android:id="@+id/status_of_contact_ingestion"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/drawerHeader"
-            android:layout_marginBottom="4dp"
-            android:textSize="12sp"
-            android:visibility="gone"/>
+            <include
+                android:id="@+id/toggle_navigation_favorites_upload"
+                layout="@layout/drawer_switch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal"
+                android:text="@string/permit_upload" />
 
-    </LinearLayout>
+            <!-- TextView to show user granted access to phone contacts -->
+            <TextView
+                android:id="@+id/access_to_navigation_favorites"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="@string/no_permission_to_navigation_favorites"
+                android:textColor="@color/drawerHeader"
+                android:textSize="12sp" />
 
-        <!-- Alexa Comms -->
-        <com.amazon.sampleapp.impl.Communication.AlexaCommsView
-            android:id="@+id/alexa_comms"
+        </LinearLayout>
+
+        <!-- Navigation Controller -->
+        <LinearLayout
+            android:id="@+id/navigation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -1269,7 +1491,35 @@
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
             android:background="@color/drawerSection">
-        </com.amazon.sampleapp.impl.Communication.AlexaCommsView>
+
+            <!-- Header -->
+            <TextView
+                android:id="@+id/navigation_state_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/navigation"
+                android:textColor="@color/drawerHeader"
+                android:layout_marginBottom="4dp"
+                android:textSize="18sp" />
+
+            <include
+                layout="@layout/drawer_switch"
+                android:id="@+id/toggle_load_nav_state_file"
+                android:text="@string/load_navigation_state_file"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal" />
+
+            <TextView
+                android:id="@+id/navigation_state_file_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/navigation_state_file_not_loaded"
+                android:textColor="@color/drawerHeader"
+                android:layout_marginBottom="4dp"
+                android:textSize="12sp" />
+
+        </LinearLayout>
     </LinearLayout>
 
 </ScrollView>

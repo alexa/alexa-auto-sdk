@@ -51,7 +51,7 @@ std::string getVehiclePropertyAttribute( VehiclePropertyType property )
     return "";
 }
 
-std::shared_ptr<aace::core::config::EngineConfiguration> VehicleConfiguration::createVehicleInfoConfig( std::initializer_list<VehicleProperty> propertyList )
+std::shared_ptr<aace::core::config::EngineConfiguration> VehicleConfiguration::createVehicleInfoConfig( const std::vector<VehicleProperty>& propertyList )
 {
     rapidjson::Document document;
 

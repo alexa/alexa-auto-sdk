@@ -1,21 +1,21 @@
 var searchData=
 [
+  ['seek',['seek',['../classaace_1_1alexa_1_1_local_media_source.html#af1bdc078c4702c3f8b7a864dd0095a47',1,'aace::alexa::LocalMediaSource']]],
   ['senddtmf',['sendDTMF',['../classaace_1_1phone_call_controller_1_1_phone_call_controller.html#af236ece858fd897886f7d62fc175665c',1,'aace::phoneCallController::PhoneCallController']]],
   ['senddtmffailed',['sendDTMFFailed',['../classaace_1_1phone_call_controller_1_1_phone_call_controller.html#a7711ff33033a10bb6ec080269ac30ba6',1,'aace::phoneCallController::PhoneCallController']]],
   ['senddtmfsucceeded',['sendDTMFSucceeded',['../classaace_1_1phone_call_controller_1_1_phone_call_controller.html#a4d89b0bc7309cd32a096641a45f559e5',1,'aace::phoneCallController::PhoneCallController']]],
   ['setbandlevels',['setBandLevels',['../classaace_1_1alexa_1_1_equalizer_controller.html#a9f0774201117c45bc87f68e571f2478e',1,'aace::alexa::EqualizerController']]],
   ['setdestination',['setDestination',['../classaace_1_1navigation_1_1_navigation.html#a8f818b03bb8adc3335140d4402ad5634',1,'aace::navigation::Navigation']]],
+  ['setfocus',['setFocus',['../classaace_1_1alexa_1_1_local_media_source.html#a4bd1345a78aa1d1ec6f730a5c8a0c790',1,'aace::alexa::LocalMediaSource']]],
   ['setindicator',['setIndicator',['../classaace_1_1alexa_1_1_notifications.html#ac88ce22736f266b4ef6d703b7e2fbc58',1,'aace::alexa::Notifications']]],
-  ['setmute',['setMute',['../classaace_1_1alexa_1_1_speaker.html#a10b28f30019cd594e369ade3f5cb4bb6',1,'aace::alexa::Speaker']]],
-  ['setposition',['setPosition',['../classaace_1_1alexa_1_1_media_player.html#a523708e56d55c105d29803db74d41759',1,'aace::alexa::MediaPlayer']]],
+  ['setposition',['setPosition',['../classaace_1_1audio_1_1_audio_output.html#a2d621811ac53c6128ad435546ba964e7',1,'aace::audio::AudioOutput']]],
   ['setproperty',['setProperty',['../classaace_1_1core_1_1_engine.html#a65f89859ff67cfaa56051785543ceae2',1,'aace::core::Engine']]],
   ['setrefreshtoken',['setRefreshToken',['../classaace_1_1cbl_1_1_c_b_l.html#aeb62feeb8cdaad65b1d8dea41f243d7b',1,'aace::cbl::CBL']]],
-  ['setvolume',['setVolume',['../classaace_1_1alexa_1_1_speaker.html#a06f376ab6028d0578faf2fe4be06b52b',1,'aace::alexa::Speaker']]],
+  ['setuserprofile',['setUserProfile',['../classaace_1_1cbl_1_1_c_b_l.html#a5ce90c8c986bdb7afa6ce7fcfb6a4be5',1,'aace::cbl::CBL']]],
   ['shutdown',['shutdown',['../classaace_1_1core_1_1_engine.html#a8d127cbe960a7e4e86fb404289011901',1,'aace::core::Engine']]],
+  ['speakersettingschanged',['speakerSettingsChanged',['../classaace_1_1alexa_1_1_alexa_speaker.html#a240488c50d82f556621a521635304dfa',1,'aace::alexa::AlexaSpeaker']]],
   ['start',['start',['../classaace_1_1cbl_1_1_c_b_l.html#a98ab22f22a9e395718c09730b35c9bdf',1,'aace::cbl::CBL::start()'],['../classaace_1_1core_1_1_engine.html#ace84ee80b94b7da5c7f38390d5a160d7',1,'aace::core::Engine::start()']]],
-  ['startaudioinput',['startAudioInput',['../classaace_1_1alexa_1_1_speech_recognizer.html#a0a075e7b0fa1934dda8b517c251480b9',1,'aace::alexa::SpeechRecognizer']]],
   ['startcapture',['startCapture',['../classaace_1_1alexa_1_1_speech_recognizer.html#ab2d1df9942a32ff6eb829211a1ebffba',1,'aace::alexa::SpeechRecognizer']]],
-  ['stop',['stop',['../classaace_1_1alexa_1_1_media_player.html#aefb6004d189de290533ec4e9083c95ef',1,'aace::alexa::MediaPlayer::stop()'],['../classaace_1_1core_1_1_engine.html#a456599306224a018b0c7b708594671f2',1,'aace::core::Engine::stop()'],['../classaace_1_1phone_call_controller_1_1_phone_call_controller.html#adbeb8a3a5c7f6e7bfd290ebe81770cae',1,'aace::phoneCallController::PhoneCallController::stop()']]],
-  ['stopaudioinput',['stopAudioInput',['../classaace_1_1alexa_1_1_speech_recognizer.html#a0115d141edf71dcf0f06599d9ace400f',1,'aace::alexa::SpeechRecognizer']]],
+  ['stop',['stop',['../classaace_1_1audio_1_1_audio_output.html#a80a92aeb055e394e6661c43f9217c670',1,'aace::audio::AudioOutput::stop()'],['../classaace_1_1core_1_1_engine.html#a456599306224a018b0c7b708594671f2',1,'aace::core::Engine::stop()'],['../classaace_1_1phone_call_controller_1_1_phone_call_controller.html#adbeb8a3a5c7f6e7bfd290ebe81770cae',1,'aace::phoneCallController::PhoneCallController::stop()']]],
   ['stopcapture',['stopCapture',['../classaace_1_1alexa_1_1_speech_recognizer.html#afbbd237e855308ed0d440c7f3d469a69',1,'aace::alexa::SpeechRecognizer']]]
 ];

@@ -14,21 +14,36 @@
  */
 
 #include "AACE/Alexa/LocalMediaSource.h"
+#include <iostream>
+#include <memory>
+
 
 namespace aace {
 namespace alexa {
 
-LocalMediaSource::LocalMediaSource( Source source, std::shared_ptr<aace::alexa::Speaker> speaker ) : m_source( source ), m_speaker( speaker ) {
-}
+LocalMediaSource::LocalMediaSource( Source source ) : m_source( source ) {}
 
 LocalMediaSource::~LocalMediaSource() = default;
 
+LocalMediaSource::LocalMediaSourceState::LocalMediaSourceState() {}
+
+// default session state
+LocalMediaSource::SessionState::SessionState() : 
+    endpointId(""), loggedIn(false), userName(""), isGuest(false), launched(false), active(false),
+    accessToken(""), tokenRefreshInterval(std::chrono::milliseconds(0)),
+    supportedContentSelectors({}), spiVersion("1.0") {}
+
+// default playback state
+LocalMediaSource::PlaybackState::PlaybackState() :
+    state("IDLE"), supportedOperations({}), trackOffset(0), 
+    shuffleEnabled(false), repeatEnabled(false), favorites(Favorites::NOT_RATED), type("ExternalMediaPlayerMusicItem"), playbackSource(""),
+    playbackSourceId(""), trackName(""), trackId(""), trackNumber(""), artistName(""),
+    artistId(""), albumName(""), albumId(""), tinyURL(""), smallURL(""),
+    mediumURL(""), largeURL(""), coverId(""), mediaProvider(""), mediaType(MediaType::OTHER), 
+    duration(std::chrono::milliseconds(0)) {}
+
 LocalMediaSource::Source LocalMediaSource::getSource() {
     return m_source;
-}
-
-std::shared_ptr<aace::alexa::Speaker> LocalMediaSource::LocalMediaSource::getSpeaker() {
-    return m_speaker;
 }
 
 //
@@ -36,20 +51,20 @@ std::shared_ptr<aace::alexa::Speaker> LocalMediaSource::LocalMediaSource::getSpe
 //
 
 void LocalMediaSource::playerEvent( const std::string& eventName ) {
-    if( m_localMediaSourceEngineInterface != nullptr ) {
-        m_localMediaSourceEngineInterface->onPlayerEvent( eventName );
+    if( auto m_localMediaSourceEngineInterface_lock = m_localMediaSourceEngineInterface.lock() ) {
+        m_localMediaSourceEngineInterface_lock->onPlayerEvent( eventName );
     }
 }
 
 void LocalMediaSource::playerError( const std::string& errorName, long code, const std::string& description, bool fatal ) {
-    if( m_localMediaSourceEngineInterface != nullptr ) {
-        m_localMediaSourceEngineInterface->onPlayerError( errorName, code, description, fatal );
+    if( auto m_localMediaSourceEngineInterface_lock = m_localMediaSourceEngineInterface.lock() ) {
+        m_localMediaSourceEngineInterface_lock->onPlayerError( errorName, code, description, fatal );
     }
 }
 
 void LocalMediaSource::setFocus() {
-    if( m_localMediaSourceEngineInterface != nullptr ) {
-        m_localMediaSourceEngineInterface->onSetFocus();
+    if( auto m_localMediaSourceEngineInterface_lock = m_localMediaSourceEngineInterface.lock() ) {
+        m_localMediaSourceEngineInterface_lock->onSetFocus();
     }
 }
 

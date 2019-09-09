@@ -1,42 +1,35 @@
 #!/bin/bash
+set -e
 
 THISDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 export BUILDER_HOME=${THISDIR}
 
 source ${BUILDER_HOME}/scripts/common.sh
-source ${BUILDER_HOME}/scripts/agreement.sh
 
 # SDK Info
 export SDK_HOME=${BUILDER_HOME}/..
 export SDK_BASE_VERSION="$(bash -c "${BUILDER_HOME}/scripts/gen-version.sh -b")"
 export SDK_VERSION="$(bash -c "${BUILDER_HOME}/scripts/gen-version.sh")"
 
-#
-# Option
-#
-
-usageExit() {
-	echo "Usage: $0 <command> [options]"
-	exit 1
-}
-
-COMMAND=${1}
-shift
-
 # Execute command
-case ${COMMAND} in
-	"help")
-		usageExit
-		;;
+case ${1} in
 	"oe")
-		agreement_check
+		error_and_exit "Command \"oe\" is deprecated, please use build.sh [<platform>|clean] [options]"
+		;;
+	"bitbake")
+		shift
 		${BUILDER_HOME}/scripts/run-bitbake.sh $@
 		;;
 	"docker")
+		shift
 		${BUILDER_HOME}/scripts/run-docker.sh $@
 		;;
+	"gradle")
+		shift
+		${BUILDER_HOME}/scripts/run-gradle.sh $@
+		;;
 	*)
-		error "Unknown command: ${COMMAND}"
+		${BUILDER_HOME}/scripts/run-builder.sh $@
 		;;
 esac

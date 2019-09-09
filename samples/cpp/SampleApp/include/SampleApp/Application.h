@@ -19,9 +19,6 @@
 // Sample Application
 #include "SampleApp/Activity.h"
 #include "SampleApp/ApplicationContext.h"
-#include "SampleApp/AudioFileReader.h"
-#include "SampleApp/AudioInputManager.h"
-#include "SampleApp/DefaultMediaPlayer.h"
 #include "SampleApp/Event.h"
 #include "SampleApp/Executor.h"
 #include "SampleApp/Status.h"
@@ -31,7 +28,6 @@
 // Sample Alexa Platform Interfaces
 #include "SampleApp/Alexa/AlertsHandler.h"
 #include "SampleApp/Alexa/AlexaClientHandler.h"
-#include "SampleApp/Alexa/AudioChannelHandler.h"
 #include "SampleApp/Alexa/AudioPlayerHandler.h"
 #include "SampleApp/Alexa/EqualizerControllerHandler.h"
 #include "SampleApp/Alexa/LocalMediaSourceHandler.h"
@@ -40,6 +36,12 @@
 #include "SampleApp/Alexa/SpeechRecognizerHandler.h"
 #include "SampleApp/Alexa/SpeechSynthesizerHandler.h"
 #include "SampleApp/Alexa/TemplateRuntimeHandler.h"
+#include "SampleApp/Alexa/AlexaSpeakerHandler.h"
+#include "SampleApp/Alexa/GlobalPresetHandler.h"
+
+// Default Audio Interfaces (File based audio support)
+#include "SampleApp/Audio/AudioInputProviderHandler.h"
+#include "SampleApp/Audio/AudioOutputProviderHandler.h"
 
 // Sample Code-Based Linking (CBL) Interfaces
 #include "SampleApp/CBL/CBLHandler.h"
@@ -64,9 +66,14 @@
 // Sample PhoneControl Platform Interfaces
 #include "SampleApp/PhoneControl/PhoneControlHandler.h"
 
-// Sample ClimateControl Platform Interfaces
+// Sample AddressBook Platform Interfaces
+#include "SampleApp/AddressBook/AddressBookHandler.h"
+
+// Sample CarControl Platform Interfaces
 #ifdef LOCALVOICECONTROL
-#include "SampleApp/CarControl/ClimateControlHandler.h"
+#include "SampleApp/CarControl/CarControlHandler.h"
+#include "SampleApp/CarControl/CarControlDataProvider.h"
+#include <AACE/CarControl/CarControlConfiguration.h>
 #endif // LOCALVOICECONTROL
 
 // Alexa Auto Core
@@ -74,9 +81,6 @@
 #include <AACE/Core/Engine.h>
 #include <AACE/Core/EngineConfiguration.h>
 #include <AACE/Core/PlatformInterface.h>
-
-// Alexa Auto Core - Audio Reference Implementation
-#include <AACE/Audio/AudioManager.h>
 
 namespace sampleApp {
 

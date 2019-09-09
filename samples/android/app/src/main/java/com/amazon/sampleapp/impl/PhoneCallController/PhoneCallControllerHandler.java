@@ -50,7 +50,7 @@ public class PhoneCallControllerHandler extends PhoneCallController {
     private TextView mDeviceConfigurationButton;
     private TextView mCurrentCallNumberView, mCallStateView, mLastCalledNumberView;
     private EditText mCallingNumberText;
-    private LinearLayout mLocalAnswerDecline, mRemoteAnswerDecline;
+    private LinearLayout mLocalAnswerDecline, mRemoteAnswerDecline, mControlsLayout;
     private TextView mLocalInitiateButton, mLocalEndButton, mLocalAnswerButton, mLocalDeclineButton;
     private TextView mRemoteInitiateButton, mRemoteEndButton, mRemoteAnswerButton, mRemoteDeclineButton;
     private String mCallId, mCurrentCallNumber, mLastCalledNumber;
@@ -97,6 +97,7 @@ public class PhoneCallControllerHandler extends PhoneCallController {
         mCallId = callId;
         mCurrentCallNumber = calleeNumber;
         mCallState = CallState.DIALING;
+        logCallInfo("dial()");
         callStateChanged( CallState.DIALING, callId );
 
         startDialingCallTimer( sDialingToRingingDelay );
@@ -127,6 +128,7 @@ public class PhoneCallControllerHandler extends PhoneCallController {
         mCallId = callId;
         mCurrentCallNumber = mLastCalledNumber;
         mCallState = CallState.DIALING;
+        logCallInfo("redial()");
         callStateChanged( CallState.DIALING, callId );
 
         startDialingCallTimer( sDialingToRingingDelay );
@@ -149,6 +151,8 @@ public class PhoneCallControllerHandler extends PhoneCallController {
             return;
         }
 
+        logCallInfo("answer()");
+
         if( !mCallId.equals( callId ) ) {
             callFailed( callId, CallError.OTHER, "Call ID does not match" );
         }
@@ -168,6 +172,8 @@ public class PhoneCallControllerHandler extends PhoneCallController {
                     + e.getMessage() );
             return;
         }
+
+        logCallInfo("stop()");
 
         if( !mCallId.equals( callId ) ) {
             callFailed( callId, CallError.OTHER, "Call ID does not match" );
@@ -193,6 +199,8 @@ public class PhoneCallControllerHandler extends PhoneCallController {
             return;
         }
 
+        logCallInfo("sendDTMF()");
+
         if( !mCallId.equals( callId ) ) {
             callFailed( callId, CallError.OTHER, "Call ID does not match" );
         }
@@ -211,8 +219,10 @@ public class PhoneCallControllerHandler extends PhoneCallController {
             if ( mCallId.equals( "" ) ) {
                 mCallId = createCallId();
             }
+
             mCallState = CallState.OUTBOUND_RINGING;
             callStateChanged( CallState.OUTBOUND_RINGING, mCallId);
+            logCallInfo("handleInitiateCall()");
             updateGUI();
         }
     };
@@ -226,19 +236,20 @@ public class PhoneCallControllerHandler extends PhoneCallController {
         mTimer.schedule( new TimerTask() {
             public void run() { handleCallReceived(); }
         }, delaySeconds * 1000 );
-
     }
 
     private void handleCallReceived() {
         mExecutor.submit( new CallReceivedTask() );
-
     }
 
     private class CallReceivedTask implements Runnable {
         @Override
         public void run() {
+            // Notify of call received and then set state to ringing
+            callStateChanged( CallState.CALL_RECEIVED, mCallId );
             mCallState = CallState.INBOUND_RINGING;
             callStateChanged( mCallState, mCallId );
+            logCallInfo("handleCallReceived()");
             updateGUI();
         }
     };
@@ -247,9 +258,9 @@ public class PhoneCallControllerHandler extends PhoneCallController {
         mRemoteCallStarted = true;
         String callId = createCallId();
         mCallId = callId;
-        mCallState = CallState.CALL_RECEIVED;
+        mCallState = CallState.INBOUND_RINGING;
         callStateChanged( mCallState, callId );
-        startCallReceivedTimer( (long)2 );
+        logCallInfo("handleRemoteInitiateCall()");
         updateGUI();
     }
 
@@ -257,6 +268,7 @@ public class PhoneCallControllerHandler extends PhoneCallController {
         mCallActivated = true;
         mCallState = CallState.ACTIVE;
         callStateChanged( CallState.ACTIVE, mCallId );
+        logCallInfo("handleAnswerCall()");
         updateGUI();
     }
 
@@ -267,6 +279,7 @@ public class PhoneCallControllerHandler extends PhoneCallController {
         mRemoteCallStarted = false;
         mLocalCallStarted = false;
         mCallState = CallState.IDLE;
+        logCallInfo("handleDeclineCall()");
         callStateChanged( CallState.IDLE, mCallId );
         mCurrentCallNumber = "";
         mCallId = "";
@@ -281,6 +294,7 @@ public class PhoneCallControllerHandler extends PhoneCallController {
         mLocalCallStarted = false;
         mCallActivated = false;
         mCallState = CallState.IDLE;
+        logCallInfo("handleEndCall()");
         callStateChanged( CallState.IDLE, mCallId );
         mCurrentCallNumber = "";
         mCallId = "";
@@ -289,10 +303,12 @@ public class PhoneCallControllerHandler extends PhoneCallController {
 
     private void togglePhoneConnectionState( boolean enable ) {
         if ( enable ) {
+            mControlsLayout.setVisibility(View.VISIBLE);
             mConnectionState = ConnectionState.CONNECTED;
             mLogger.postInfo( sTag, "ConnectionState: CONNECTED" );
             connectionStateChanged( mConnectionState );
         } else {
+            mControlsLayout.setVisibility(View.GONE);
             mConnectionState = ConnectionState.DISCONNECTED;
             mLogger.postInfo( sTag, "ConnectionState: DISCONNECTED" );
             connectionStateChanged( mConnectionState );
@@ -356,6 +372,7 @@ public class PhoneCallControllerHandler extends PhoneCallController {
         builder.setNegativeButton("Cancel", null);
         AlertDialog dialog = builder.create();
         dialog.show();
+        mLogger.postInfo(sTag, "onDeviceConfigurationUpdated() finished");
     }
 
     private void onLocalInitiate() {
@@ -409,6 +426,8 @@ public class PhoneCallControllerHandler extends PhoneCallController {
                 }
         );
 
+        mControlsLayout = mActivity.findViewById( R.id.phone_call_controller_config );
+        mControlsLayout.setVisibility(View.GONE);
         mDeviceConfigurationButton = mActivity.findViewById( R.id.deviceConfiguration );
         mCurrentCallNumberView = mActivity.findViewById( R.id.currentCallNumber );
         mCallStateView = mActivity.findViewById( R.id.currentCallState );
@@ -509,6 +528,10 @@ public class PhoneCallControllerHandler extends PhoneCallController {
                 }
             }
         });
+    }
+
+    private void logCallInfo(String msg) {
+        mLogger.postInfo( sTag, msg + " - Phone number: " + mCurrentCallNumber + " Call id: " + mCallId + " CallState: " + mCallState.toString() + " ConnectionState: " + mConnectionState );
     }
 }
 

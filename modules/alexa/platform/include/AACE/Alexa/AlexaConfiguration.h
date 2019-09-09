@@ -272,7 +272,7 @@ public:
      * @param [in] timeoutList A list of @c TemplateRuntimeTimeout type and value pairs
      *
      */
-    static std::shared_ptr<aace::core::config::EngineConfiguration> createTemplateRuntimeTimeoutConfig( std::initializer_list<TemplateRuntimeTimeout> timeoutList );
+    static std::shared_ptr<aace::core::config::EngineConfiguration> createTemplateRuntimeTimeoutConfig( const std::vector<TemplateRuntimeTimeout>& timeoutList );
 
     /**
      * Factory method used to programmatically generate external media player configuration data.
@@ -366,10 +366,10 @@ public:
      *        branch.
      */
     static std::shared_ptr<aace::core::config::EngineConfiguration> createEqualizerControllerConfig(
-        std::initializer_list<EqualizerBand> supportedBands = {},
+        const std::vector<EqualizerBand>& supportedBands = {},
         int minLevel = -6,
         int maxLevel = 6,
-        std::initializer_list<EqualizerBandLevel> defaultBandLevels = {} );
+        const std::vector<EqualizerBandLevel>& defaultBandLevels = {} );
 };
 
 } // aace::alexa::config

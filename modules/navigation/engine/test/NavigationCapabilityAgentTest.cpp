@@ -21,6 +21,7 @@
 #include <AVSCommon/SDKInterfaces/test/MockExceptionEncounteredSender.h>
 #include <AVSCommon/SDKInterfaces/test/MockDirectiveSequencer.h>
 #include <AVSCommon/SDKInterfaces/test/MockDirectiveHandlerResult.h>
+#include "AVSCommon/SDKInterfaces/test/MockContextManager.h"
 
 #include "AACE/Engine/Navigation/NavigationCapabilityAgent.h"
 
@@ -43,6 +44,7 @@ class TestNavigationObserver : public aace::engine::navigation::NavigationObserv
 public:
     MOCK_METHOD1(setDestination, void( const std::string& payload ));
     MOCK_METHOD0(cancelNavigation, void());
+    MOCK_METHOD0(getNavigationState, std::string());
 };
 
 class NavigationCapabilityAgentTest : public ::testing::Test {
@@ -51,7 +53,10 @@ public:
         m_mockExceptionSender = std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockExceptionEncounteredSender>>();
         m_mockDirectiveHandlerResult = std::unique_ptr<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockDirectiveHandlerResult>>();
         m_testNavigationObserver = std::make_shared<testing::StrictMock<TestNavigationObserver>>();
-        m_capAgent = aace::engine::navigation::NavigationCapabilityAgent::create( m_mockExceptionSender );
+        m_mockContextManager = std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockContextManager>>(); 
+        m_mockNavigationProviderName = "HERE";
+
+        m_capAgent = aace::engine::navigation::NavigationCapabilityAgent::create( m_mockExceptionSender, m_mockContextManager, m_mockNavigationProviderName );
         m_capAgent->addObserver( m_testNavigationObserver );
     }
     void TearDown() override {
@@ -81,6 +86,10 @@ public:
     std::shared_ptr<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockExceptionEncounteredSender>> m_mockExceptionSender;
     std::unique_ptr<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockDirectiveHandlerResult>> m_mockDirectiveHandlerResult;
     std::shared_ptr<testing::StrictMock<TestNavigationObserver>> m_testNavigationObserver;
+    // a context manager
+    std::shared_ptr<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockContextManager>> m_mockContextManager; 
+    // provider name
+    std::string m_mockNavigationProviderName;
 };
 
 
@@ -119,7 +128,13 @@ TEST_F(NavigationCapabilityAgentTest, create) {
 
 TEST_F(NavigationCapabilityAgentTest, createWithNullExceptionSender) {
     std::shared_ptr<aace::engine::navigation::NavigationCapabilityAgent> capAgent;
-    capAgent = aace::engine::navigation::NavigationCapabilityAgent::create(nullptr);
+    capAgent = aace::engine::navigation::NavigationCapabilityAgent::create(nullptr, m_mockContextManager, m_mockNavigationProviderName);
+    EXPECT_EQ(nullptr, capAgent);
+}
+
+TEST_F(NavigationCapabilityAgentTest, createWithNullContextManager) {
+    std::shared_ptr<aace::engine::navigation::NavigationCapabilityAgent> capAgent;
+    capAgent = aace::engine::navigation::NavigationCapabilityAgent::create(m_mockExceptionSender, nullptr, m_mockNavigationProviderName);
     EXPECT_EQ(nullptr, capAgent);
 }
 
@@ -132,6 +147,7 @@ TEST_F(NavigationCapabilityAgentTest, testUnknownDirective) {
     EXPECT_CALL(*m_mockExceptionSender, sendExceptionEncountered(testing::_,testing::_, testing::_)).Times(testing::Exactly(1));
     
     m_capAgent->CapabilityAgent::preHandleDirective(directive, std::move(m_mockDirectiveHandlerResult));
+    m_capAgent->CapabilityAgent::handleDirective(MESSAGE_ID);
     m_wakeSetCompletedFuture.wait_for(TIMEOUT);
 }
 
@@ -145,6 +161,7 @@ TEST_F(NavigationCapabilityAgentTest, testSetDestinationDirective) {
     EXPECT_CALL(*m_testNavigationObserver, setDestination( MockPayload )).Times(testing::Exactly(1));
     
     m_capAgent->CapabilityAgent::preHandleDirective(directive, std::move(m_mockDirectiveHandlerResult));
+    m_capAgent->CapabilityAgent::handleDirective(MESSAGE_ID);
     m_wakeSetCompletedFuture.wait_for(TIMEOUT);
 }
 
@@ -157,6 +174,7 @@ TEST_F(NavigationCapabilityAgentTest, testCancelNavigationDirective) {
     EXPECT_CALL(*m_testNavigationObserver, cancelNavigation()).Times(testing::Exactly(1));
 
     m_capAgent->CapabilityAgent::preHandleDirective(directive, std::move(m_mockDirectiveHandlerResult));
+    m_capAgent->CapabilityAgent::handleDirective(MESSAGE_ID);
     m_wakeSetCompletedFuture.wait_for(TIMEOUT);
 }
 

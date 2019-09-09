@@ -19,7 +19,7 @@
 
 #include <AACE/Navigation/Navigation.h>
 
-#include "DirectiveDispatcher.h"
+#include "ResponseDispatcher.h"
 #include "LoggerHandler.h"
 
 namespace aasb {
@@ -38,17 +38,18 @@ public:
      * Creates an instance of @c NavigationHandler.
      *
      * @param logger An instance of logger.
-     * @param directiveDispatcher An object through which the directives for navigation
+     * @param responseDispatcher An object through which the directives for navigation
      *      received from alexa cloud will be dispatched to AASB clients.
      */
     static std::shared_ptr<NavigationHandler> create(
         std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
-        std::weak_ptr<aasb::bridge::DirectiveDispatcher> directiveDispatcher);
+        std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher);
 
     /// @name aace::navigation::Navigation
     /// @{
     bool setDestination( const std::string& payload ) override;
     bool cancelNavigation() override;
+    std::string getNavigationState() override;
     /// @}
 
 private:
@@ -57,13 +58,21 @@ private:
      */
     NavigationHandler(
         std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
-        std::weak_ptr<aasb::bridge::DirectiveDispatcher> directiveDispatcher);
+        std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher);
+
+    /**
+     * Generate navigation state
+     */
+    std::string createNavigationState(std::string state);
 
     // aasb::core::logger::LoggerHandler
     std::shared_ptr<aasb::core::logger::LoggerHandler> m_logger;
 
     // To send directive to service
-    std::weak_ptr<aasb::bridge::DirectiveDispatcher> m_directiveDispatcher;
+    std::weak_ptr<aasb::bridge::ResponseDispatcher> m_responseDispatcher;
+
+    // Navigation state
+    std::string m_navigationState;
 };
 
 } // navigation

@@ -27,17 +27,20 @@ namespace aace {
 namespace engine {
 namespace alexa {
 
+static const uint8_t DEFAULT_SPEAKER_VOLUME = 50;
+
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.ExternalMediaAdapterHandler");
 
 // external media player agent constant
 static const std::string EXTERNAL_MEDIA_PLAYER_AGENT = "alexaAutoSDK";
 
-ExternalMediaAdapterHandler::ExternalMediaAdapterHandler( std::shared_ptr<aace::alexa::Speaker> speakerPlatformInterface, std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender, std::shared_ptr<FocusHandlerInterface> focusHandler ) : 
+ExternalMediaAdapterHandler::ExternalMediaAdapterHandler( std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender, std::shared_ptr<FocusHandlerInterface> focusHandler ) :
     alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
-    m_speakerPlatformInterface( speakerPlatformInterface ), 
     m_discoveredPlayerSender( discoveredPlayerSender ), 
-    m_focusHandler( focusHandler ) {
+    m_focusHandler( focusHandler ),
+    m_muted( false ),
+    m_volume( DEFAULT_SPEAKER_VOLUME ) {
 }
 
 bool ExternalMediaAdapterHandler::initializeAdapterHandler( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager )
@@ -45,15 +48,9 @@ bool ExternalMediaAdapterHandler::initializeAdapterHandler( std::shared_ptr<alex
     try
     {
         ThrowIfNull( speakerManager, "invalidSpeakerManager" );
-        m_speakerManager = speakerManager;
-
-        ThrowIfNull( m_speakerPlatformInterface, "invalidSpeakerInterface" );
 
         // add the speaker impl to the speaker manager
-        m_speakerManager->addSpeaker( shared_from_this() );
-
-        // set the speaker engine interface
-        m_speakerPlatformInterface->setEngineInterface( shared_from_this() );
+        speakerManager->addSpeaker( shared_from_this() );
 
         return true;
     }
@@ -75,7 +72,10 @@ bool ExternalMediaAdapterHandler::setFocus( const std::string& localPlayerId )
         ThrowIfNot( validatePlayer( localPlayerId ), "invalidPlayerInfo" );
         auto playerInfo = m_playerInfoMap[localPlayerId];
         
-        m_focusHandler->setFocus( playerInfo.playerId );
+        auto m_focusHandler_lock = m_focusHandler.lock();
+        ThrowIfNull( m_focusHandler_lock, "invalidFocusHandler" );
+        
+        m_focusHandler_lock->setFocus( playerInfo.playerId );
         
         return true;
     }
@@ -342,58 +342,92 @@ std::string ExternalMediaAdapterHandler::createExternalMediaPlayerEvent( const s
     }
 }
 
-//
-// aace::engine::SpeakerEngineInterface
-//
-
-void ExternalMediaAdapterHandler::onLocalVolumeSet( int8_t volume )
-{
-    if( m_speakerManager != nullptr ) {
-        m_speakerManager->setVolume( alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::Type::AVS_SPEAKER_VOLUME, volume );
-    }
-}
-
-void ExternalMediaAdapterHandler::onLocalMuteSet( bool mute )
-{
-    if( m_speakerManager != nullptr ) {
-        m_speakerManager->setMute( alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::Type::AVS_SPEAKER_VOLUME, mute );
-    }
-}
 
 //
 // alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface
 //
-bool ExternalMediaAdapterHandler::setVolume( int8_t volume ) {
-    return m_speakerPlatformInterface->setVolume( volume );
+
+bool ExternalMediaAdapterHandler::setVolume( int8_t volume )
+{
+    try
+    {
+        ThrowIfNot( handleSetVolume( volume ), "handleSetVolumeFailed" );
+        
+        m_volume = volume;
+    
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
 }
 
-bool ExternalMediaAdapterHandler::adjustVolume( int8_t delta ) {
-    return m_speakerPlatformInterface->adjustVolume( delta );
+bool ExternalMediaAdapterHandler::adjustVolume( int8_t delta )
+{
+    try
+    {
+        ThrowIfNot( setVolume( m_volume + delta ), "setVolumeFailed" );
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
 }
 
-bool ExternalMediaAdapterHandler::setMute( bool mute ) {
-    return m_speakerPlatformInterface->setMute( mute );
+bool ExternalMediaAdapterHandler::setMute( bool mute )
+{
+    try
+    {
+        m_muted = mute;
+
+        ThrowIfNot( handleSetMute( mute ), "handleSetMuteFailed" );
+        
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
 }
 
-bool ExternalMediaAdapterHandler::getSpeakerSettings( alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::SpeakerSettings* settings ) {
-    settings->volume = m_speakerPlatformInterface->getVolume();
-    settings->mute = m_speakerPlatformInterface->isMuted();
-    return true;
+bool ExternalMediaAdapterHandler::getSpeakerSettings( alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::SpeakerSettings* settings )
+{
+    try
+    {
+        settings->volume = m_volume;
+        settings->mute = m_muted;
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
 }
 
 alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::Type ExternalMediaAdapterHandler::getSpeakerType() {
-    return static_cast<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::Type>( alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::Type::AVS_SPEAKER_VOLUME );
+    return alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::Type::AVS_SPEAKER_VOLUME;
 }
 
 void ExternalMediaAdapterHandler::reportDiscoveredPlayers( const std::vector<aace::alexa::ExternalMediaAdapter::DiscoveredPlayerInfo>& discoveredPlayers )
 {
-    // add the player info to the registered player map
-    for( const auto& next : discoveredPlayers ) {
-        m_playerInfoMap[next.localPlayerId] = PlayerInfo( next.localPlayerId, next.spiVersion, next.validationMethod == VALIDATION_NONE );
-    }
+    try
+    {
+        auto m_discoveredPlayerSender_lock = m_discoveredPlayerSender.lock();
+        ThrowIfNull( m_discoveredPlayerSender_lock, "invalidDiscoveredPlayerSender" );
+    
+        // add the player info to the registered player map
+        for( const auto& next : discoveredPlayers ) {
+            m_playerInfoMap[next.localPlayerId] = PlayerInfo( next.localPlayerId, next.spiVersion );
+        }
 
-    // used the discovered player sender to report the players
-    m_discoveredPlayerSender->reportDiscoveredPlayers( discoveredPlayers );
+        // used the discovered player sender to report the players
+        m_discoveredPlayerSender_lock->reportDiscoveredPlayers( discoveredPlayers );
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"reportDiscoveredPlayers").d("reason", ex.what()));
+    }
 }
 
 bool ExternalMediaAdapterHandler::removeDiscoveredPlayer( const std::string& localPlayerId )
@@ -409,8 +443,11 @@ bool ExternalMediaAdapterHandler::removeDiscoveredPlayer( const std::string& loc
         // remove the player info map entry
         m_playerInfoMap.erase( it );
         
+        auto m_discoveredPlayerSender_lock = m_discoveredPlayerSender.lock();
+        ThrowIfNull( m_discoveredPlayerSender_lock, "invalidDiscoveredPlayerSender" );
+
         // notify the discovered player sender that the player has been removed
-        m_discoveredPlayerSender->removeDiscoveredPlayer( localPlayerId );
+        m_discoveredPlayerSender_lock->removeDiscoveredPlayer( localPlayerId );
         
         return true;
     }
@@ -424,7 +461,7 @@ bool ExternalMediaAdapterHandler::removeDiscoveredPlayer( const std::string& loc
 // PlayerInfo
 //
 
-PlayerInfo::PlayerInfo( const std::string& localId, const std::string& spi, bool auth ) : localPlayerId( localId ), spiVersion( spi ), authorized( auth ) {
+PlayerInfo::PlayerInfo( const std::string& localId, const std::string& spi, bool authorized ) : localPlayerId( localId ), spiVersion( spi ) {
 }
 
 

@@ -16,6 +16,7 @@
 #include "AACE/Engine/Storage/StorageEngineService.h"
 #include "AACE/Engine/Storage/SQLiteStorage.h"
 #include "AACE/Engine/Storage/JSONStorage.h"
+#include "AACE/Engine/Utils/JSON/JSON.h"
 #include "AACE/Engine/Core/EngineMacros.h"
 
 #include <rapidjson/document.h>
@@ -35,40 +36,14 @@ REGISTER_SERVICE(StorageEngineService)
 StorageEngineService::StorageEngineService( const aace::engine::core::ServiceDescription& description ) : aace::engine::core::EngineService( description ) {
 }
 
-bool StorageEngineService::configure( const std::vector<std::shared_ptr<std::istream>>& configuration )
-{
-    // attempt to configure each stream
-    for( auto next : configuration ) {
-        configure( next );
-    }
-    
-    if( m_localStorage != nullptr ) {
-        registerServiceInterface<LocalStorageInterface>( m_localStorage );
-    }
-    else {
-        AACE_WARN(LX(TAG,"configure").d("reason","localStorageNotConfigured"));
-    }
-    
-    return true;
-}
-
 bool StorageEngineService::configure( std::shared_ptr<std::istream> configuration )
 {
     try
     {
-        rapidjson::IStreamWrapper isw( *configuration );
-        rapidjson::Document document;
+        auto document = aace::engine::utils::json::parse( configuration );
+        ThrowIfNull( document, "parseConfigurationStreamFailed" );
         
-        document.ParseStream( isw );
-        
-        ThrowIf( document.HasParseError(), GetParseError_En( document.GetParseError() ) );
-        ThrowIfNot( document.IsObject(), "invalidConfigurationStream" );
-        
-        auto root = document.GetObject();
-        
-        ReturnIfNot( root.HasMember( "aace.storage" ) && root["aace.storage"].IsObject(), false );
-        
-        auto storageConfigRoot = root["aace.storage"].GetObject();
+        auto storageConfigRoot = document->GetObject();
 
         if( storageConfigRoot.HasMember( "localStoragePath" ) && storageConfigRoot["localStoragePath"].IsString() )
         {
@@ -91,10 +66,11 @@ bool StorageEngineService::configure( std::shared_ptr<std::istream> configuratio
             else {
                 Throw( "invalidStorageType:" + type );
             }
-        
-            // check if storage instance was created
-            ThrowIfNull( m_localStorage, "createLocalStorageFailed" );
         }
+
+        // register the local storage interface
+        ThrowIfNull( m_localStorage, "localStorageNotConfigured" );
+        registerServiceInterface<LocalStorageInterface>( m_localStorage );
 
         return true;
     }

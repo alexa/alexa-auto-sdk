@@ -54,16 +54,131 @@
     "operatingCountry": "US",
     "currentLocation": "36.1363,-115.1513"
   },
-  "aace.audio": {
-    "speechRecognizer": "hw:ep812ch",
-    "speechSynthesizer": "navigation",
-    "audioPlayer": "emergency"
+  "aace.audio.input": {
+    "voice": "hw:ep812ch"
+  },
+  "aace.audio.output": {
+    "tts": "multimedia",
+    "music": "emergency"
   },
   "aace.wakeword": {
     "enabled":true
   },
   "aace.cbl": {
     "enabled": true
+  },
+  "aace.localmediasource": {
+    "enabled":false,
+    "sources": {
+        "bluetooth":false,
+        "usb":false,
+        "fmRadio":false,
+        "amRadio":false,
+        "satelliteRadio":false,
+        "lineIn":false,
+        "compactDisc":false
+    }
+  },
+  "aace.localvoicecontrol": {
+    "enabled":true,
+    "socketRootDirectory":"/var/"
+  },
+  "aace.localskills": {
+    "aace.carcontrol": {
+        "enabled": true,
+        "cannedzones": [
+            {
+                "name" : "zone.all",
+                "enabled": true,
+                "climate": {
+                    "syncController": false,
+                    "recirculationController": false
+                },
+                "airconditioner" : {
+                    "modes": {
+                        "AUTO": true,
+                        "ECONOMY": false,
+                        "MANUAL": false,
+                        "MAXIMIUM": false
+                    }
+                },
+                "heater" : {
+                    "minimum": 60.0,
+                    "maximum": 80.0,
+                    "precision": 1.0,
+                    "unit":  "FAHRENHEIT"
+                },
+                "fan" : {
+                    "minimum": 0.0,
+                    "maximium": 10.0,
+                    "precision": 1.0
+                },
+                "vent": {
+                    "positions" : {
+                      "BODY": true,
+                      "MIX":  false,
+                      "FLOOR": false,
+                      "WINDSHIELD":  false
+                    }
+                },
+                "window" : {
+                    "defrost": true
+                },
+                "light" : {
+                    "type": "LIGHT",
+                    "colors" : {
+                        "WHITE": true,
+                        "RED": true,
+                        "ORANGE": true,
+                        "YELLOW": true,
+                        "GREEN": true,
+                        "BLUE": true,
+                        "INDIGO": true,
+                        "VIOLET": true
+                    }
+                }
+            },
+            {                  
+                "name" : "zone.back.driver",
+                "enabled": false
+            },
+            {                  
+                "name" : "zone.back.passenger",
+                "enabled": false
+            },
+            {                  
+                "name" : "zone.driver",
+                "enabled": false
+            },
+            {                  
+                "name" : "zone.first.row",
+                "enabled": false
+            },
+            {                  
+                "name" : "zone.fourth.row",
+                "enabled": false
+            },
+            {                  
+                "name" : "zone.front",
+                "enabled": false
+            },               
+            {                  
+                "name" : "zone.passenger",
+                "enabled": false
+            },               
+            {                  
+                "name" : "zone.rear",
+                "enabled": false
+            },               
+            {                  
+                "name" : "zone.second.row",
+                "enabled": false
+            },               
+            {                  
+                "name" : "zone.third.row",
+                "enabled": false
+            }
+        ]
+    }
   }
-
 }

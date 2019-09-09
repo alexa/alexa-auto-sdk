@@ -1,0 +1,630 @@
+From fe8050a0b6093972d774c0989acc6ac09fe16177 Mon Sep 17 00:00:00 2001
+From: Thierry Bultel <thierry.bultel@iot.bzh>
+Date: Wed, 12 Jun 2019 22:16:17 +0200
+Subject: [PATCH] removed afb-helpers & app-controller submodules
+
+Signed-off-by: Thierry Bultel <thierry.bultel@iot.bzh>
+---
+ .gitmodules                                        |  6 ------
+ .../conf.d/cmake/config.cmake                      |  2 ++
+ .../alexa-voiceagent-service/src/CMakeLists.txt    |  2 --
+ .../src/alexa-voiceagent-binding.c                 | 24 +++++++++++-----------
+ .../src/plugins/AlexaVoiceagentApi.cpp             | 14 ++++++-------
+ .../src/plugins/CMakeLists.txt                     |  2 --
+ .../aasb-client/config/AASBConfigProviderImpl.cpp  | 14 ++++++-------
+ .../aasb-client/config/AASBConfigProviderImpl.h    |  9 ++++----
+ .../src/plugins/afb/AFBApiImpl.cpp                 | 12 +++++------
+ .../src/plugins/afb/AFBApiImpl.h                   |  6 +++---
+ .../src/plugins/afb/AFBRequestImpl.cpp             |  8 ++------
+ .../src/plugins/afb/AFBRequestImpl.h               |  6 +++---
+ .../src/plugins/afb/include/AFBEventImpl.h         |  6 +++---
+ .../src/plugins/afb/src/AFBEventImpl.cpp           |  8 ++++----
+ .../data/config/AlexaAutoCoreEngineConfig.json     |  8 ++++----
+ .../src/plugins/utilities/logging/Logger.cpp       | 14 ++++++-------
+ .../src/plugins/utilities/logging/Logger.h         |  7 +++----
+ 17 files changed, 66 insertions(+), 82 deletions(-)
+ delete mode 100644 .gitmodules
+
+diff --git a/.gitmodules b/.gitmodules
+deleted file mode 100644
+index 39db3e4..0000000
+--- a/.gitmodules
++++ /dev/null
+@@ -1,6 +0,0 @@
+-[submodule "platforms/agl/alexa-voiceagent-service/afb-helpers"]
+-	path = platforms/agl/alexa-voiceagent-service/afb-helpers
+-	url = https://gerrit.automotivelinux.org/gerrit/apps/app-afb-helpers-submodule
+-[submodule "platforms/agl/alexa-voiceagent-service/app-controller"]
+-	path = platforms/agl/alexa-voiceagent-service/app-controller
+-	url = https://gerrit.automotivelinux.org/gerrit/apps/app-controller-submodule
+diff --git a/platforms/agl/alexa-voiceagent-service/conf.d/cmake/config.cmake b/platforms/agl/alexa-voiceagent-service/conf.d/cmake/config.cmake
+index 37890a2..9554290 100644
+--- a/platforms/agl/alexa-voiceagent-service/conf.d/cmake/config.cmake
++++ b/platforms/agl/alexa-voiceagent-service/conf.d/cmake/config.cmake
+@@ -68,6 +68,8 @@ set (gcc_minimal_version 4.9)
+ set (PKG_REQUIRED_LIST
+ 	json-c
+ 	afb-daemon
++	afb-helpers
++	ctl-utilities
+ )
+ 
+ # Check if the Alexa Auto SDK root exists
+diff --git a/platforms/agl/alexa-voiceagent-service/src/CMakeLists.txt b/platforms/agl/alexa-voiceagent-service/src/CMakeLists.txt
+index b071c7a..c0b741f 100644
+--- a/platforms/agl/alexa-voiceagent-service/src/CMakeLists.txt
++++ b/platforms/agl/alexa-voiceagent-service/src/CMakeLists.txt
+@@ -37,8 +37,6 @@ PROJECT_TARGET_ADD(alexa-voiceagent)
+ 
+     # Library dependencies (include updates automatically)
+     TARGET_LINK_LIBRARIES(${TARGET_NAME}
+-        afb-helpers
+-        ctl-utilities
+         ${link_libraries})
+ 
+ add_subdirectory("plugins")
+\ No newline at end of file
+diff --git a/platforms/agl/alexa-voiceagent-service/src/alexa-voiceagent-binding.c b/platforms/agl/alexa-voiceagent-service/src/alexa-voiceagent-binding.c
+index 674d9c9..bfcef22 100644
+--- a/platforms/agl/alexa-voiceagent-service/src/alexa-voiceagent-binding.c
++++ b/platforms/agl/alexa-voiceagent-service/src/alexa-voiceagent-binding.c
+@@ -26,11 +26,11 @@ static CtlSectionT ctrlSections[] = {{.key = "plugins", .loadCB = PluginConfig},
+                                      {.key = NULL}};
+ 
+ 
+-static AFB_ApiVerbs ctrlApiVerbs[] = {
++static afb_verb_t ctrlApiVerbs[] = {
+     {.verb = NULL} /* marker for end of the array */
+ };
+ 
+-static int ctrlLoadStaticVerbs(afb_dynapi* apiHandle, AFB_ApiVerbs* verbs) {
++static int ctrlLoadStaticVerbs(afb_dynapi* apiHandle, afb_verb_t* verbs) {
+     int errcount = 0;
+ 
+     for (int idx = 0; verbs[idx].verb; idx++) {
+@@ -50,19 +50,19 @@ static int ctrlLoadStaticVerbs(afb_dynapi* apiHandle, AFB_ApiVerbs* verbs) {
+ // next generation dynamic API-V3 mode
+ #include <signal.h>
+ 
+-static int CtrlInitOneApi(AFB_ApiT apiHandle) {
++static int CtrlInitOneApi(afb_api_t apiHandle) {
+     CtlConfigT* ctrlConfig;
+ 
+     if (!apiHandle) return -1;
+ 
+     // Retrieve section config from api handle
+-    ctrlConfig = (CtlConfigT*)AFB_ApiGetUserData(apiHandle);
++    ctrlConfig = (CtlConfigT*)afb_api_get_userdata(apiHandle);
+     if (!ctrlConfig) return -2;
+ 
+     return CtlConfigExec(apiHandle, ctrlConfig);
+ }
+ 
+-static int ctrlLoadOneApi(void* cbdata, AFB_ApiT apiHandle) {
++static int ctrlLoadOneApi(void* cbdata, afb_api_t apiHandle) {
+     CtlConfigT* ctrlConfig = (CtlConfigT*)cbdata;
+ 
+     // save closure as api's data context
+@@ -71,14 +71,14 @@ static int ctrlLoadOneApi(void* cbdata, AFB_ApiT apiHandle) {
+     // add static controls verbs
+     int err = ctrlLoadStaticVerbs(apiHandle, ctrlApiVerbs);
+     if (err) {
+-        AFB_ApiError(apiHandle, "ctrlLoadStaticVerbs fail to register static V2 verbs");
++    	AFB_API_ERROR(apiHandle, "ctrlLoadStaticVerbs fail to register static V2 verbs");
+         return ERROR;
+     }
+ 
+     // load section for corresponding API
+     err = CtlLoadSections(apiHandle, ctrlConfig, ctrlSections);
+     if (err) {
+-        AFB_ApiError(apiHandle, "CtlLoadSections fail to load the sections");
++    	AFB_API_ERROR(apiHandle, "CtlLoadSections fail to load the sections");
+         return ERROR;
+     }
+ 
+@@ -94,30 +94,30 @@ static int ctrlLoadOneApi(void* cbdata, AFB_ApiT apiHandle) {
+ 
+ int afbBindingEntry(afb_dynapi* apiHandle) {
+     AFB_default = apiHandle;
+-    AFB_ApiNotice(apiHandle, "Controller in afbBindingEntry");
++    AFB_API_NOTICE(apiHandle, "Controller in afbBindingEntry");
+ 
+     const char* dirList = getenv("CONTROL_CONFIG_PATH");
+     if (!dirList) dirList = CONTROL_CONFIG_PATH;
+ 
+     const char* configPath = CtlConfigSearch(apiHandle, dirList, "alexa");
+     if (!configPath) {
+-        AFB_ApiError(apiHandle, "CtlPreInit: No %s* config found in %s ", GetBinderName(), dirList);
++    	AFB_API_ERROR(apiHandle, "CtlPreInit: No %s* config found in %s ", GetBinderName(), dirList);
+         return ERROR;
+     }
+ 
+     // load config file and create API
+     CtlConfigT* ctrlConfig = CtlLoadMetaData(apiHandle, configPath);
+     if (!ctrlConfig) {
+-        AFB_ApiError(apiHandle, "CtrlBindingDyn No valid control config file in:\n-- %s", configPath);
++        AFB_API_ERROR(apiHandle, "CtrlBindingDyn No valid control config file in:\n-- %s", configPath);
+         return ERROR;
+     }
+ 
+     if (!ctrlConfig->api) {
+-        AFB_ApiError(apiHandle, "CtrlBindingDyn API Missing from metadata in:\n-- %s", configPath);
++        AFB_API_ERROR(apiHandle, "CtrlBindingDyn API Missing from metadata in:\n-- %s", configPath);
+         return ERROR;
+     }
+ 
+-    AFB_ApiNotice(apiHandle, "Controller API='%s' info='%s'", ctrlConfig->api, ctrlConfig->info);
++    AFB_API_NOTICE(apiHandle, "Controller API='%s' info='%s'", ctrlConfig->api, ctrlConfig->info);
+ 
+     // create one API per config file (Pre-V3 return code ToBeChanged)
+     int status = afb_dynapi_new_api(apiHandle, ctrlConfig->api, ctrlConfig->info, 1, ctrlLoadOneApi, ctrlConfig);
+diff --git a/platforms/agl/alexa-voiceagent-service/src/plugins/AlexaVoiceagentApi.cpp b/platforms/agl/alexa-voiceagent-service/src/plugins/AlexaVoiceagentApi.cpp
+index a01202c..2c08103 100644
+--- a/platforms/agl/alexa-voiceagent-service/src/plugins/AlexaVoiceagentApi.cpp
++++ b/platforms/agl/alexa-voiceagent-service/src/plugins/AlexaVoiceagentApi.cpp
+@@ -99,7 +99,7 @@ CTLP_ONLOAD(plugin, ret) {
+ CTLP_INIT(plugin, ret) {
+     sAFBLogger = agl::utilities::logging::Logger::create(plugin->api);
+     if (!sAFBLogger) {
+-        AFB_ApiError(plugin->api, "alexa-voiceagent-api: Failed to create AFB Logger.");
++        AFB_API_ERROR(plugin->api, "alexa-voiceagent-api: Failed to create AFB Logger.");
+         return -1;
+     }
+ 
+@@ -217,7 +217,7 @@ CTLP_CAPI(setVoiceAgentId, source, argsJ, eventJ) {
+     std::string voiceAgentId = document[agl::alexa::JSON_ATTR_VOICEAGENT_ID.c_str()].GetString();
+     sAlexaCapabilityRouter->setVoiceAgentId(voiceAgentId);
+ 
+-    AFB_ReqSuccess(source->request, NULL, NULL);
++    afb_req_success(source->request, NULL, NULL);
+     sAFBLogger->log(Level::INFO, TAG, "setVoiceAgentId completed");
+     return 0;
+ }
+@@ -254,7 +254,7 @@ CTLP_CAPI(setRefreshToken, source, argsJ, eventJ) {
+     // ACTION_CBL_GET_REFRESH_TOKEN directive is blocked waiting for this response.
+     sAlexaCapabilityRouter->didReceiveGetRefreshTokenResponse();
+ 
+-    AFB_ReqSuccess(source->request, NULL, NULL);
++    afb_req_success(source->request, NULL, NULL);
+     sAFBLogger->log(Level::DEBUG, TAG, "setRefreshToken completed");
+     return 0;
+ }
+@@ -287,7 +287,7 @@ CTLP_CAPI(setAuthToken, source, argsJ, eventJ) {
+     sAASBRequestHandler->onReceivedEvent(
+         aasb::bridge::TOPIC_AUTH_PROVIDER, aasb::bridge::ACTION_SET_AUTH_TOKEN, authToken);
+ 
+-    AFB_ReqSuccess(source->request, NULL, NULL);
++    afb_req_success(source->request, NULL, NULL);
+     sAFBLogger->log(Level::DEBUG, TAG, "setAuthToken completed");
+     return 0;
+ }
+@@ -317,7 +317,7 @@ CTLP_CAPI(subscribe, source, argsJ, eventJ) {
+     }
+ 
+     sAFBLogger->log(Level::DEBUG, TAG, "subscribed to all alexa-va events");
+-    AFB_ReqSuccess(source->request, NULL, NULL);
++    afb_req_success(source->request, NULL, NULL);
+     return 0;
+ }
+ 
+@@ -340,7 +340,7 @@ CTLP_CAPI(subscribeToCBLEvents, source, argsJ, eventJ) {
+         aasb::bridge::TOPIC_CBL, aasb::bridge::ACTION_CBL_START, "");    
+     
+     sAFBLogger->log(Level::DEBUG, TAG, "subscribed to all CBL events");
+-    AFB_ReqSuccess(source->request, NULL, NULL);
++    afb_req_success(source->request, NULL, NULL);
+     return 0;
+ }
+ 
+@@ -352,7 +352,7 @@ CTLP_CAPI(startListening, source, argsJ, eventJ) {
+     }
+ 
+     sAFBLogger->log(Level::DEBUG, TAG, "startListening initiated");
+-    AFB_ReqSuccess(source->request, NULL, NULL);
++    afb_req_success(source->request, NULL, NULL);
+     return 0;
+ }
+ 
+diff --git a/platforms/agl/alexa-voiceagent-service/src/plugins/CMakeLists.txt b/platforms/agl/alexa-voiceagent-service/src/plugins/CMakeLists.txt
+index 1fa9eb4..15252c1 100644
+--- a/platforms/agl/alexa-voiceagent-service/src/plugins/CMakeLists.txt
++++ b/platforms/agl/alexa-voiceagent-service/src/plugins/CMakeLists.txt
+@@ -67,7 +67,6 @@ PROJECT_TARGET_ADD(alexa-voiceagent-api)
+ 
+     # Library dependencies (include updates automatically)
+     TARGET_LINK_LIBRARIES(${TARGET_NAME}
+-        afb-helpers
+         AlexaAutoServicesBridgeLib
+         ${GLIB_PKG_LIBRARIES}
+         ${link_libraries}
+@@ -103,7 +102,6 @@ PROJECT_TARGET_ADD(alexa-voiceagent-api)
+         )
+ 
+         TARGET_LINK_LIBRARIES(${TARGET_NAME}_Test
+-            afb-helpers
+             libgtest
+             libgmock
+             ${GLIB_PKG_LIBRARIES}
+diff --git a/platforms/agl/alexa-voiceagent-service/src/plugins/aasb-client/config/AASBConfigProviderImpl.cpp b/platforms/agl/alexa-voiceagent-service/src/plugins/aasb-client/config/AASBConfigProviderImpl.cpp
+index 2496e34..8f71fd1 100644
+--- a/platforms/agl/alexa-voiceagent-service/src/plugins/aasb-client/config/AASBConfigProviderImpl.cpp
++++ b/platforms/agl/alexa-voiceagent-service/src/plugins/aasb-client/config/AASBConfigProviderImpl.cpp
+@@ -41,11 +41,11 @@ static std::string ALEXA_CONFIG_FILE_NAME = "AlexaAutoCoreEngineConfig.json";
+ 
+ std::shared_ptr<AASBConfigProviderImpl> AASBConfigProviderImpl::create(
+     std::shared_ptr<agl::common::interfaces::ILogger> logger,
+-    AFB_ApiT api) {
++    afb_api_t api) {
+     return std::shared_ptr<AASBConfigProviderImpl>(new AASBConfigProviderImpl(logger, api));
+ }
+ 
+-AASBConfigProviderImpl::AASBConfigProviderImpl(std::shared_ptr<agl::common::interfaces::ILogger> logger, AFB_ApiT api) :
++AASBConfigProviderImpl::AASBConfigProviderImpl(std::shared_ptr<agl::common::interfaces::ILogger> logger, afb_api_t api) :
+         m_logger(logger),
+         m_api(api),
+         m_enableWakewordByDefault(false),
+@@ -186,12 +186,12 @@ void AASBConfigProviderImpl::initConfigFromFile(const std::string& fileName) {
+ }
+ 
+ // GetBindingDirPath() method provided by AGL SDK crashes every single time.
+-// It turns out that on latest AGL platforms, GetBindingDirPath(AFB_ApiT) version
++// It turns out that on latest AGL platforms, GetBindingDirPath(afb_api_t) version
+ // is supposed to be the correct version. However when we include filescan-utils.h
+-// it compiles a version without "AFB_ApiT" parameter. For now, I have made a
+-// copy of this method here which accepts "AFB_ApiT" parameter.
++// it compiles a version without "afb_api_t" parameter. For now, I have made a
++// copy of this method here which accepts "afb_api_t" parameter.
+ // TODO: Fix it
+-std::string GetBindingDirectoryPath(AFB_ApiT api) {
++std::string GetBindingDirectoryPath(afb_api_t api) {
+     // A file description should not be greater than 999.999.999
+     char fd_link[CONTROL_MAXPATH_LEN];
+     char retdir[CONTROL_MAXPATH_LEN];
+@@ -239,4 +239,4 @@ void AASBConfigProviderImpl::logCurrentConfiguration() {
+ }
+ 
+ }  // namespace alexa
+-}  // namespace agl
+\ No newline at end of file
++}  // namespace agl
+diff --git a/platforms/agl/alexa-voiceagent-service/src/plugins/aasb-client/config/AASBConfigProviderImpl.h b/platforms/agl/alexa-voiceagent-service/src/plugins/aasb-client/config/AASBConfigProviderImpl.h
+index 20f78bd..82b304d 100644
+--- a/platforms/agl/alexa-voiceagent-service/src/plugins/aasb-client/config/AASBConfigProviderImpl.h
++++ b/platforms/agl/alexa-voiceagent-service/src/plugins/aasb-client/config/AASBConfigProviderImpl.h
+@@ -20,8 +20,7 @@
+ 
+ #include <memory>
+ #include <string>
+-
+-#include <afb-definitions.h>
++#include <ctl-plugin.h>
+ 
+ #include "interfaces/utilities/logging/ILogger.h"
+ 
+@@ -41,7 +40,7 @@ public:
+      */
+     static std::shared_ptr<AASBConfigProviderImpl> create(
+         std::shared_ptr<agl::common::interfaces::ILogger> logger,
+-        AFB_ApiT api);
++        afb_api_t api);
+ 
+     /// @name IConfigurationProvider Functions
+     /// @{
+@@ -62,7 +61,7 @@ public:
+     /// @}
+ 
+ private:
+-    AASBConfigProviderImpl(std::shared_ptr<agl::common::interfaces::ILogger> logger, AFB_ApiT api);
++    AASBConfigProviderImpl(std::shared_ptr<agl::common::interfaces::ILogger> logger, afb_api_t api);
+ 
+     /**
+      * Initialize the configuration object from given file path containing
+@@ -87,7 +86,7 @@ private:
+     std::shared_ptr<agl::common::interfaces::ILogger> m_logger;
+ 
+     /// AFB API object.
+-    AFB_ApiT m_api;
++    afb_api_t m_api;
+ 
+     /// Configuration Data
+     /// @{
+diff --git a/platforms/agl/alexa-voiceagent-service/src/plugins/afb/AFBApiImpl.cpp b/platforms/agl/alexa-voiceagent-service/src/plugins/afb/AFBApiImpl.cpp
+index a2e4939..9557778 100644
+--- a/platforms/agl/alexa-voiceagent-service/src/plugins/afb/AFBApiImpl.cpp
++++ b/platforms/agl/alexa-voiceagent-service/src/plugins/afb/AFBApiImpl.cpp
+@@ -29,8 +29,6 @@ extern "C" {
+         result = false; \
+         break;          \
+     }
+-
+-#include "afb-definitions.h"
+ }
+ 
+ static std::string TAG = "agl::afb::AFBApiImpl";
+@@ -45,11 +43,11 @@ using namespace agl::utilities::logging;
+ namespace agl {
+ namespace afb {
+ 
+-std::unique_ptr<AFBApiImpl> AFBApiImpl::create(AFB_ApiT api) {
++std::unique_ptr<AFBApiImpl> AFBApiImpl::create(afb_api_t api) {
+     return std::unique_ptr<AFBApiImpl>(new AFBApiImpl(api));
+ }
+ 
+-AFBApiImpl::AFBApiImpl(AFB_ApiT api) : mApi(api), mLogger(Logger::create(api)) {
++AFBApiImpl::AFBApiImpl(afb_api_t api) : mApi(api), mLogger(Logger::create(api)) {
+ }
+ 
+ AFBApiImpl::~AFBApiImpl() {
+@@ -68,7 +66,7 @@ int AFBApiImpl::callSync(
+     std::string& info) {
+     char* errorStr = NULL;
+     char* infoStr = NULL;
+-    int rc = AFB_ApiSync(mApi, api.c_str(), verb.c_str(), request, result, &errorStr, &infoStr);
++    int rc = afb_api_call_sync(mApi, api.c_str(), verb.c_str(), request, result, &errorStr, &infoStr);
+ 
+     if (errorStr) {
+         error = errorStr;
+@@ -93,7 +91,7 @@ static void asyncCallback(
+     struct json_object* object,
+     const char* error,
+     const char* info,
+-    AFB_ApiT api) {
++	afb_api_t api) {
+     CallbackShim* callbackShim = (CallbackShim*)closure;
+     auto callbackFn = callbackShim->callbackFn;
+     delete callbackShim;
+@@ -111,7 +109,7 @@ void AFBApiImpl::callAsync(
+     CallbackShim* callbackShim = new CallbackShim();
+     callbackShim->callbackFn = callbackFn;
+ 
+-    AFB_ApiCall(mApi, api.c_str(), verb.c_str(), request, asyncCallback, callbackShim);
++    afb_api_call(mApi, api.c_str(), verb.c_str(), request, asyncCallback, callbackShim);
+ }
+ 
+ }  // namespace afb
+diff --git a/platforms/agl/alexa-voiceagent-service/src/plugins/afb/AFBApiImpl.h b/platforms/agl/alexa-voiceagent-service/src/plugins/afb/AFBApiImpl.h
+index 30e175d..2b2aecf 100644
+--- a/platforms/agl/alexa-voiceagent-service/src/plugins/afb/AFBApiImpl.h
++++ b/platforms/agl/alexa-voiceagent-service/src/plugins/afb/AFBApiImpl.h
+@@ -31,7 +31,7 @@ namespace afb {
+ 
+ class AFBApiImpl : public agl::common::interfaces::IAFBApi {
+ public:
+-    static std::unique_ptr<AFBApiImpl> create(AFB_ApiT api);
++    static std::unique_ptr<AFBApiImpl> create(afb_api_t api);
+ 
+     ~AFBApiImpl();
+ 
+@@ -49,10 +49,10 @@ public:
+         override;
+ 
+ private:
+-    AFBApiImpl(AFB_ApiT api);
++    AFBApiImpl(afb_api_t api);
+ 
+     // AFB API Binding
+-    AFB_ApiT mApi;
++    afb_api_t mApi;
+ 
+     // Logger
+     std::shared_ptr<agl::common::interfaces::ILogger> mLogger;
+diff --git a/platforms/agl/alexa-voiceagent-service/src/plugins/afb/AFBRequestImpl.cpp b/platforms/agl/alexa-voiceagent-service/src/plugins/afb/AFBRequestImpl.cpp
+index c645073..85c1376 100644
+--- a/platforms/agl/alexa-voiceagent-service/src/plugins/afb/AFBRequestImpl.cpp
++++ b/platforms/agl/alexa-voiceagent-service/src/plugins/afb/AFBRequestImpl.cpp
+@@ -15,18 +15,14 @@
+ 
+ #include "afb/AFBRequestImpl.h"
+ 
+-extern "C" {
+-#include "afb-definitions.h"
+-}
+-
+ namespace agl {
+ namespace afb {
+ 
+-std::unique_ptr<AFBRequestImpl> AFBRequestImpl::create(AFB_ReqT afbRequest) {
++std::unique_ptr<AFBRequestImpl> AFBRequestImpl::create(afb_req_t afbRequest) {
+     return std::unique_ptr<AFBRequestImpl>(new AFBRequestImpl(afbRequest));
+ }
+ 
+-AFBRequestImpl::AFBRequestImpl(AFB_ReqT afbRequest) : mAfbRequest(afbRequest) {
++AFBRequestImpl::AFBRequestImpl(afb_req_t afbRequest) : mAfbRequest(afbRequest) {
+ }
+ 
+ void* AFBRequestImpl::getNativeRequest() {
+diff --git a/platforms/agl/alexa-voiceagent-service/src/plugins/afb/AFBRequestImpl.h b/platforms/agl/alexa-voiceagent-service/src/plugins/afb/AFBRequestImpl.h
+index 0dbe5af..1b87f6d 100644
+--- a/platforms/agl/alexa-voiceagent-service/src/plugins/afb/AFBRequestImpl.h
++++ b/platforms/agl/alexa-voiceagent-service/src/plugins/afb/AFBRequestImpl.h
+@@ -31,16 +31,16 @@ namespace afb {
+  */
+ class AFBRequestImpl : public agl::common::interfaces::IAFBRequest {
+ public:
+-    static std::unique_ptr<AFBRequestImpl> create(AFB_ReqT afbRequest);
++    static std::unique_ptr<AFBRequestImpl> create(afb_req_t afbRequest);
+ 
+     // {@c IAFBRequest Implementation
+     void* getNativeRequest() override;
+     // @c IAFBRequest Implementation }
+ 
+ private:
+-    AFBRequestImpl(AFB_ReqT afbRequest);
++    AFBRequestImpl(afb_req_t afbRequest);
+ 
+-    AFB_ReqT mAfbRequest;
++    afb_req_t mAfbRequest;
+ };
+ 
+ }  // namespace afb
+diff --git a/platforms/agl/alexa-voiceagent-service/src/plugins/afb/include/AFBEventImpl.h b/platforms/agl/alexa-voiceagent-service/src/plugins/afb/include/AFBEventImpl.h
+index ec68118..8759e74 100644
+--- a/platforms/agl/alexa-voiceagent-service/src/plugins/afb/include/AFBEventImpl.h
++++ b/platforms/agl/alexa-voiceagent-service/src/plugins/afb/include/AFBEventImpl.h
+@@ -37,7 +37,7 @@ class AFBEventImpl : public agl::common::interfaces::IAFBApi::IAFBEvent {
+ public:
+     static unique_ptr<AFBEventImpl> create(
+         shared_ptr<agl::common::interfaces::ILogger> logger,
+-        AFB_ApiT api,
++		afb_api_t api,
+         const string& eventName);
+ 
+     // Destructor
+@@ -52,14 +52,14 @@ public:
+     /// @c IAFBEvent implementation }
+ 
+ private:
+-    AFBEventImpl(shared_ptr<agl::common::interfaces::ILogger> logger, AFB_ApiT api, const string& eventName);
++    AFBEventImpl(shared_ptr<agl::common::interfaces::ILogger> logger, afb_api_t api, const string& eventName);
+ 
+     // Make the event. This is a lazy make that happens
+     // usually during the subscribe stage.
+     void makeEventIfNeccessary();
+ 
+     // Binding API reference
+-    AFB_ApiT mAfbApi;
++    afb_api_t mAfbApi;
+ 
+     // AFB Event
+     afb_event_t mAfbEvent;
+diff --git a/platforms/agl/alexa-voiceagent-service/src/plugins/afb/src/AFBEventImpl.cpp b/platforms/agl/alexa-voiceagent-service/src/plugins/afb/src/AFBEventImpl.cpp
+index 9f8eeff..487a452 100644
+--- a/platforms/agl/alexa-voiceagent-service/src/plugins/afb/src/AFBEventImpl.cpp
++++ b/platforms/agl/alexa-voiceagent-service/src/plugins/afb/src/AFBEventImpl.cpp
+@@ -24,12 +24,12 @@ namespace afb {
+ 
+ unique_ptr<AFBEventImpl> AFBEventImpl::create(
+     shared_ptr<agl::common::interfaces::ILogger> logger,
+-    AFB_ApiT api,
++    afb_api_t api,
+     const string& eventName) {
+     return unique_ptr<AFBEventImpl>(new AFBEventImpl(logger, api, eventName));
+ }
+ 
+-AFBEventImpl::AFBEventImpl(shared_ptr<agl::common::interfaces::ILogger> logger, AFB_ApiT api, const string& eventName) :
++AFBEventImpl::AFBEventImpl(shared_ptr<agl::common::interfaces::ILogger> logger, afb_api_t api, const string& eventName) :
+         mLogger(logger),
+         mAfbApi(api),
+         mEventName(eventName),
+@@ -50,7 +50,7 @@ bool AFBEventImpl::isValid() {
+ 
+ bool AFBEventImpl::subscribe(IAFBRequest& requestInterface) {
+     makeEventIfNeccessary();
+-    auto request = static_cast<AFB_ReqT>(requestInterface.getNativeRequest());
++    auto request = static_cast<afb_req_t>(requestInterface.getNativeRequest());
+     if (isValid() && afb_req_subscribe(request, mAfbEvent) == 0) {
+         return true;
+     }
+@@ -60,7 +60,7 @@ bool AFBEventImpl::subscribe(IAFBRequest& requestInterface) {
+ 
+ bool AFBEventImpl::unsubscribe(IAFBRequest& requestInterface) {
+     makeEventIfNeccessary();
+-    auto request = static_cast<AFB_ReqT>(requestInterface.getNativeRequest());
++    auto request = static_cast<afb_req_t>(requestInterface.getNativeRequest());
+     if (isValid() && afb_req_unsubscribe(request, mAfbEvent) == 0) {
+         return true;
+     }
+diff --git a/platforms/agl/alexa-voiceagent-service/src/plugins/data/config/AlexaAutoCoreEngineConfig.json b/platforms/agl/alexa-voiceagent-service/src/plugins/data/config/AlexaAutoCoreEngineConfig.json
+index 0ba0a67..93ee517 100644
+--- a/platforms/agl/alexa-voiceagent-service/src/plugins/data/config/AlexaAutoCoreEngineConfig.json
++++ b/platforms/agl/alexa-voiceagent-service/src/plugins/data/config/AlexaAutoCoreEngineConfig.json
+@@ -1,9 +1,9 @@
+ {
+   "deviceInfo":
+   {
+-    "clientId":"<YOUR_CLIENT_ID>",
+-    "deviceSerialNumber":"<YOUR_SERIAL_NUMBER>",
+-    "productId":"<YOUR_PRODUCT_ID>"
++    "clientId":"amzn1.application-oa2-client.7724d6dd35ab46d38cd11beae55c1245",
++    "deviceSerialNumber":"123456789",
++    "productId":"AGL_master"
+   },
+   "libcurlUtils":
+   {
+@@ -55,7 +55,7 @@
+     "currentLocation": "36.1363,-115.1513"
+   },
+   "aace.audio": {
+-    "speechRecognizer": "hw:ep812ch",
++    "speechRecognizer":"hw:HD",
+     "speechSynthesizer": "navigation",
+     "audioPlayer": "emergency"
+   },
+diff --git a/platforms/agl/alexa-voiceagent-service/src/plugins/utilities/logging/Logger.cpp b/platforms/agl/alexa-voiceagent-service/src/plugins/utilities/logging/Logger.cpp
+index d0b5722..b3a21ea 100644
+--- a/platforms/agl/alexa-voiceagent-service/src/plugins/utilities/logging/Logger.cpp
++++ b/platforms/agl/alexa-voiceagent-service/src/plugins/utilities/logging/Logger.cpp
+@@ -19,11 +19,11 @@ namespace utilities {
+ namespace logging {
+ 
+ // Constructor
+-Logger::Logger(AFB_ApiT api) {
++Logger::Logger(afb_api_t api) {
+     mApi = api;
+ }
+ 
+-unique_ptr<Logger> Logger::create(AFB_ApiT api) {
++unique_ptr<Logger> Logger::create(afb_api_t api) {
+     auto logger = std::unique_ptr<Logger>(new Logger(api));
+     return logger;
+ }
+@@ -32,19 +32,19 @@ void Logger::log(Level level, const std::string& tag, const std::string& message
+     string format_msg = "Tag: " + tag + ", message: " + message;
+     switch (level) {
+         case Level::NOTICE:
+-            AFB_ApiNotice(mApi, format_msg.c_str());
++            AFB_API_NOTICE(mApi, format_msg.c_str());
+             break;
+         case Level::WARNING:
+-            AFB_ApiWarning(mApi, format_msg.c_str());
++            AFB_API_WARNING(mApi, format_msg.c_str());
+             break;
+         case Level::DEBUG:
+-            AFB_ApiDebug(mApi, format_msg.c_str());
++            AFB_API_DEBUG(mApi, format_msg.c_str());
+             break;
+         case Level::ERROR:
+-            AFB_ApiError(mApi, format_msg.c_str());
++            AFB_API_ERROR(mApi, format_msg.c_str());
+             break;
+         case Level::INFO:
+-            AFB_ApiInfo(mApi, format_msg.c_str());
++            AFB_API_INFO(mApi, format_msg.c_str());
+             break;
+         default:
+             break;
+diff --git a/platforms/agl/alexa-voiceagent-service/src/plugins/utilities/logging/Logger.h b/platforms/agl/alexa-voiceagent-service/src/plugins/utilities/logging/Logger.h
+index c86c230..6f9f342 100644
+--- a/platforms/agl/alexa-voiceagent-service/src/plugins/utilities/logging/Logger.h
++++ b/platforms/agl/alexa-voiceagent-service/src/plugins/utilities/logging/Logger.h
+@@ -19,7 +19,6 @@
+ 
+ extern "C" {
+ #define AFB_BINDING_VERSION 3
+-#include "afb-definitions.h"
+ #include "ctl-plugin.h"
+ };
+ 
+@@ -33,16 +32,16 @@ namespace logging {
+ 
+ class Logger : public agl::common::interfaces::ILogger {
+ public:
+-    static std::unique_ptr<Logger> create(AFB_ApiT api);
++    static std::unique_ptr<Logger> create(afb_api_t api);
+ 
+     // ILogger interface
+     void log(Level level, const std::string& tag, const std::string& message) override;
+ 
+ private:
+-    Logger(AFB_ApiT api);
++    Logger(afb_api_t api);
+ 
+     // Binding API reference
+-    AFB_ApiT mApi;
++    afb_api_t mApi;
+ };
+ 
+ }  // namespace logging
+-- 
+2.7.4
+

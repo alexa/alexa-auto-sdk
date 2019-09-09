@@ -40,6 +40,9 @@ template <typename Event> class Subject {
     template <typename Observer> void registerObserver(Event &&event, Observer &&observer) {
         m_observers[std::move(event)].push_back(std::forward<Observer>(observer));
     }
+    auto clearObservers() -> void {
+        m_observers.clear();
+    }
     auto notify(const Event &event, const std::string &value = "") const -> bool {
         bool result = false;
         if (m_observers.count(event) > 0) {

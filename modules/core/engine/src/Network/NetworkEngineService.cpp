@@ -18,6 +18,8 @@
 #include "AACE/Engine/Network/NetworkEngineService.h"
 #include "AACE/Engine/Core/EngineMacros.h"
 
+#include "AACE/Network/NetworkProperties.h"
+
 namespace aace {
 namespace engine {
 namespace network {
@@ -70,6 +72,41 @@ bool NetworkEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::
         AACE_ERROR(LX(TAG,"registerPlatformInterfaceType<NetworkInfoProvider>").d("reason", ex.what()));
         return false;
     }
+}
+
+bool NetworkEngineService::setProperty( const std::string& key, const std::string& value )
+{
+    try
+    {
+        if( key.compare( aace::network::property::NETWORK_INTERFACE ) == 0 )
+        {
+            ThrowIfNot( m_networkInfoProviderEngineImpl->setNetworkInterface( value ), "setNetworkInterfaceFailed" );
+        }
+        else {
+            return false;
+        }
+
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"setProperty").d("reason", ex.what()).d("key",key).d("value",value));
+        return false;
+    }
+}
+
+std::string NetworkEngineService::getProperty( const std::string& key )
+{
+    try
+    {
+        if( key.compare( aace::network::property::NETWORK_INTERFACE ) == 0 ) {
+            return m_networkInfoProviderEngineImpl->getNetworkInterface();
+        }
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"getProperty").d("reason", ex.what()).d("key",key));
+    }
+    
+    return std::string();
 }
 
 } // aace::engine::network

@@ -16,7 +16,6 @@
 #ifndef AACE_ENGINE_ALEXA_AUDIO_PLAYER_ENGINE_IMPL_H
 #define AACE_ENGINE_ALEXA_AUDIO_PLAYER_ENGINE_IMPL_H
 
-#include <ACL/AVSConnectionManager.h>
 #include <AVSCommon/AVS/Attachment/AttachmentManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/DirectiveSequencerInterface.h>
@@ -27,11 +26,13 @@
 #include <AVSCommon/SDKInterfaces/PlaybackRouterInterface.h>
 #include <AVSCommon/SDKInterfaces/PlaybackHandlerInterface.h>
 #include <AVSCommon/SDKInterfaces/AudioPlayerObserverInterface.h>
+#include <AVSCommon/SDKInterfaces/AVSConnectionManagerInterface.h>
 
 #include <AudioPlayer/AudioPlayer.h>
 #include <ContextManager/ContextManager.h>
 
-#include "AACE/Alexa/AudioPlayer.h"
+#include <AACE/Alexa/AudioPlayer.h>
+#include <AACE/Engine/Audio/AudioManagerInterface.h>
 #include "AudioChannelEngineImpl.h"
 
 namespace aace {
@@ -49,8 +50,9 @@ private:
     AudioPlayerEngineImpl( std::shared_ptr<aace::alexa::AudioPlayer> audioPlayerPlatformInterface );
 
     bool initialize(
+        std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> audioOutputChannel,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
-        std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> connectionManager,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentManagerInterface> attachmentManager,
@@ -62,8 +64,9 @@ private:
 public:
     static std::shared_ptr<AudioPlayerEngineImpl> create(
         std::shared_ptr<aace::alexa::AudioPlayer> audioPlayerPlatformInterface,
+        std::shared_ptr<aace::engine::audio::AudioManagerInterface> audioManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
-        std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> connectionManager,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentManagerInterface> attachmentManager,
@@ -98,6 +101,7 @@ protected:
 private:
     std::shared_ptr<aace::alexa::AudioPlayer> m_audioPlayerPlatformInterface = nullptr;
     std::shared_ptr<alexaClientSDK::capabilityAgents::audioPlayer::AudioPlayer> m_audioPlayerCapabilityAgent;
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> m_directiveSequencer;
 };
 
 } // aace::engine::alexa

@@ -37,7 +37,7 @@ class AFBEventImpl : public agl::common::interfaces::IAFBApi::IAFBEvent {
 public:
     static unique_ptr<AFBEventImpl> create(
         shared_ptr<agl::common::interfaces::ILogger> logger,
-        AFB_ApiT api,
+        afb_api_t api,
         const string& eventName);
 
     // Destructor
@@ -52,14 +52,14 @@ public:
     /// @c IAFBEvent implementation }
 
 private:
-    AFBEventImpl(shared_ptr<agl::common::interfaces::ILogger> logger, AFB_ApiT api, const string& eventName);
+    AFBEventImpl(shared_ptr<agl::common::interfaces::ILogger> logger, afb_api_t api, const string& eventName);
 
     // Make the event. This is a lazy make that happens
     // usually during the subscribe stage.
     void makeEventIfNeccessary();
 
     // Binding API reference
-    AFB_ApiT mAfbApi;
+    afb_api_t mAfbApi;
 
     // AFB Event
     afb_event_t mAfbEvent;

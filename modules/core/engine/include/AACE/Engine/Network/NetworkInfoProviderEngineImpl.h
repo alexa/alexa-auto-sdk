@@ -34,7 +34,7 @@ class NetworkInfoProviderEngineImpl :
     public NetworkObservableInterface {
 
 private:
-    NetworkInfoProviderEngineImpl() = default;
+    NetworkInfoProviderEngineImpl();
 
 public:
     static std::shared_ptr<NetworkInfoProviderEngineImpl> create();
@@ -46,9 +46,13 @@ public:
     // NetworkInfoProviderEngineInterface
     virtual void networkInfoChanged( NetworkStatus status, int wifiSignalStrength ) override;
 
+    bool setNetworkInterface( const std::string& networkInterface );
+    std::string getNetworkInterface();
+
 private:
     std::unordered_set<std::shared_ptr<NetworkInfoObserver>> m_observers;
     std::mutex m_mutex;
+    std::string m_networkInterface;
 };
 
 } // aace::engine::network

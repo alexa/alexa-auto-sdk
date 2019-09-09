@@ -17,6 +17,10 @@
 
 #include <aasb/Consts.h>
 
+#include <rapidjson/document.h>
+#include <rapidjson/prettywriter.h>
+#include <rapidjson/stringbuffer.h>
+
 /**
  * Specifies the severity level of a log message
  * @sa @c aace::logger::LoggerEngineInterface::Level
@@ -34,42 +38,85 @@ namespace navigation {
 
 std::shared_ptr<NavigationHandler>NavigationHandler::create(
     std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
-    std::weak_ptr<aasb::bridge::DirectiveDispatcher> directiveDispatcher) {
-    return std::shared_ptr<NavigationHandler>(new NavigationHandler(logger, directiveDispatcher));
+    std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher) {
+    return std::shared_ptr<NavigationHandler>(new NavigationHandler(logger, responseDispatcher));
 }
 
 NavigationHandler::NavigationHandler(
     std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
-    std::weak_ptr<aasb::bridge::DirectiveDispatcher> directiveDispatcher) :
+    std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher) :
+        m_navigationState(""),
         m_logger(logger),
-        m_directiveDispatcher(directiveDispatcher) {
-
+        m_responseDispatcher(responseDispatcher) {
+    m_navigationState = createNavigationState("NOT_NAVIGATING");
 }
 
 bool NavigationHandler::setDestination( const std::string& payload ) {
-    m_logger->log(Level::VERBOSE, TAG, "setDestination payload " + payload);
+    m_logger->log(Level::VERBOSE, TAG, "setDestination");
 
-    auto directiveDispatcher = m_directiveDispatcher.lock();
-    if (!directiveDispatcher) {
+    auto responseDispatcher = m_responseDispatcher.lock();
+    if (!responseDispatcher) {
         m_logger->log(Level::WARN, TAG, "setDestination: Directive dispatcher is out of scope");
         return false;
     }
 
-    directiveDispatcher->sendDirective(TOPIC_NAVIGATION, ACTION_NAVIGATION_SET_DESTINATION, payload);
+    responseDispatcher->sendDirective(TOPIC_NAVIGATION, ACTION_NAVIGATION_SET_DESTINATION, payload);
+    m_navigationState = createNavigationState("NAVIGATING");
+
     return true;
 }
 
 bool NavigationHandler::cancelNavigation() {
     m_logger->log(Level::VERBOSE, TAG, "cancelNavigation");
 
-    auto directiveDispatcher = m_directiveDispatcher.lock();
-    if (!directiveDispatcher) {
+    auto responseDispatcher = m_responseDispatcher.lock();
+    if (!responseDispatcher) {
         m_logger->log(Level::WARN, TAG, "cancelNavigation: Directive dispatcher is out of scope");
         return false;
     }
 
-    directiveDispatcher->sendDirective(TOPIC_NAVIGATION, ACTION_NAVIGATION_CANCEL, "");
+    responseDispatcher->sendDirective(TOPIC_NAVIGATION, ACTION_NAVIGATION_CANCEL, "");
+    m_navigationState = createNavigationState("NOT_NAVIGATING");
+
     return true;
+}
+
+std::string NavigationHandler::getNavigationState() {
+    m_logger->log(Level::VERBOSE,TAG, "getNavigationState: " + m_navigationState);
+
+    return m_navigationState;
+}
+
+std::string NavigationHandler::createNavigationState(std::string state) {
+    rapidjson::Document document;
+    document.SetObject();
+
+    // Add state
+    document.AddMember(
+        "state",
+        rapidjson::Value().SetString(state.c_str(), state.length()),
+        document.GetAllocator());
+
+    // Add waypoints
+    rapidjson::Value wayPoints(rapidjson::kArrayType);
+    document.AddMember(
+        "waypoints",
+        wayPoints,
+        document.GetAllocator());
+
+    // Add shapes
+    rapidjson::Value shapes(rapidjson::kArrayType);
+    document.AddMember(
+        "shapes",
+        shapes,
+        document.GetAllocator());
+
+    // create event string
+    rapidjson::StringBuffer buffer;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+    document.Accept(writer);
+
+    return buffer.GetString();
 }
 
 }  // phoneCallController

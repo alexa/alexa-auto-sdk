@@ -6,12 +6,9 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/AlexaClient.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/AlexaConfiguration.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/AlexaEngineInterfaces.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/AudioChannel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/AudioPlayer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/EqualizerController.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/MediaPlayer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/PlaybackController.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/Speaker.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/SpeechRecognizer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/SpeechSynthesizer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/TemplateRuntime.h
@@ -19,6 +16,8 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/AlexaProperties.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/ExternalMediaAdapter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/LocalMediaSource.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/GlobalPreset.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/AlexaSpeaker.h
 )
 
 source_group("Header Files" FILES ${HEADERS})
@@ -28,11 +27,8 @@ add_library(AACEAlexaPlatform SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Alerts.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Notifications.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AlexaClient.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/AudioChannel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AudioPlayer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/EqualizerController.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/MediaPlayer.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/Speaker.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/PlaybackController.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/SpeechRecognizer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/SpeechSynthesizer.cpp
@@ -40,6 +36,8 @@ add_library(AACEAlexaPlatform SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/TemplateRuntime.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ExternalMediaAdapter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/LocalMediaSource.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/GlobalPreset.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/AlexaSpeaker.cpp
 )
 
 target_include_directories(AACEAlexaPlatform

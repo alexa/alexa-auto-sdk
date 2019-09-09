@@ -1,19 +1,22 @@
 #!/bin/bash
 set -e
-set -x
 
 THISDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source ${THISDIR}/common.sh
 
+if [ ! -z ${CI_BUILD} ]; then
+	set -x
+fi
+
+if [ -z "$(which docker)" ]; then
+	error_and_exit "Install Docker on your system first"
+fi
+
 VM_HOME="/home/builder"
-IMAGE_REVISION="20190128"
+IMAGE_REVISION="20190515"
 IMAGE_NAME="aac/ubuntu-base:${IMAGE_REVISION}"
 VOLUME_NAME="buildervolume"
 VOLUME_MOUNT_POINT="/workdir"
-
-if [[ "${NO_TTY}" != "1" ]]; then
-	TTY="-t"
-fi
 
 EXTRA_OPTIONS=""
 if [ ! -z ${QNX_BASE} ] && [ -d ${QNX_BASE} ]; then
@@ -21,7 +24,12 @@ if [ ! -z ${QNX_BASE} ] && [ -d ${QNX_BASE} ]; then
 fi
 
 execute_command() {
-	docker run -i ${TTY} --rm \
+	local tty="-t"
+	if [ ! -z ${CI_BUILD} ]; then
+		# Runs docker commands without TTY to support CI tools such as Jenkins.
+		tty=""
+	fi
+	docker run -i ${tty} --rm \
 	-v ${VOLUME_NAME}:${VOLUME_MOUNT_POINT} \
 	-v ${SDK_HOME}:${VM_HOME}/aac \
 	-e ANDROID_TOOLCHAIN=${VOLUME_MOUNT_POINT}/android \
@@ -45,4 +53,9 @@ if [[ "$(docker volume ls | grep ${VOLUME_NAME} 2> /dev/null)" == "" ]]; then
 fi
 
 note "Run Docker image..."
+echo ""
+echo "*******************"
+echo "*** Docker Mode ***"
+echo "*******************"
+echo ""
 execute_command $@

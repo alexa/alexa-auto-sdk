@@ -38,9 +38,6 @@ namespace contactUploader {
 class ContactUploaderRESTAgent {
 private:
     ContactUploaderRESTAgent(
-        std::shared_ptr<alexaClientSDK::avsCommon::utils::libcurlUtils::HttpGet> httpGet,
-        std::shared_ptr<alexaClientSDK::avsCommon::utils::libcurlUtils::HttpPost> httpPost,
-        std::shared_ptr<alexaClientSDK::avsCommon::utils::libcurlUtils::HttpDelete> httpDelete,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo
     );
@@ -102,13 +99,13 @@ private:
     std::vector<std::string> buildCommonHTTPHeader();
     bool parseCommonHTTPResponse( const HTTPResponse& response );
 
+    HTTPResponse doPost( const std::string& url, const std::vector<std::string> headerLines, const std::string& data, std::chrono::seconds timeout );
+    HTTPResponse doGet( const std::string& url, const std::vector<std::string>& headers );
+    HTTPResponse doDelete( const std::string& url, const std::vector<std::string>& headers );
+
     std::string buildCreateAddressBookDataJson( const std::string& sourceAddressBookId );
     std::string buildContactsJson( const std::vector<std::string>& contacts );
     std::string buildAutoAccountProvisionJson();
-
-    std::shared_ptr<alexaClientSDK::avsCommon::utils::libcurlUtils::HttpGet> m_httpGet;
-    std::shared_ptr<alexaClientSDK::avsCommon::utils::libcurlUtils::HttpPost> m_httpPost;
-    std::shared_ptr<alexaClientSDK::avsCommon::utils::libcurlUtils::HttpDelete> m_httpDelete;
 
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> m_authDelegate;
     std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> m_deviceInfo;

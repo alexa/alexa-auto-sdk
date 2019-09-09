@@ -52,7 +52,7 @@ private:
      * @param [in] threadMoniker Moniker of the thread that generated the event.
      * @param [in] text The text of the entry to log.
      */
-    void emit( const std::string& source, const std::string& tag, Level level, std::chrono::system_clock::time_point time, const char* threadMoniker, const char* text );
+    void emit( const std::string& source, const std::string& tag, Level level, std::chrono::system_clock::time_point time, const std::string& threadMoniker, const std::string& text );
 
 public:
     virtual ~EngineLogger() = default;
@@ -61,12 +61,13 @@ public:
     void removeObserver( std::shared_ptr<aace::engine::logger::LogEventObserver> observer );
     void log( Level level, const LogEntry& entry );
     void log( const std::string& source, Level level, const LogEntry& entry );
-    void log( const std::string& source, const std::string& tag, Level level, std::chrono::system_clock::time_point time, const char* threadMoniker, const char* text );
+    void log( const std::string& source, const std::string& tag, Level level, std::chrono::system_clock::time_point time, const std::string& threadMoniker, const std::string& text );
 
 private:
     bool addSink( std::shared_ptr<aace::engine::logger::sink::Sink> sink, bool replace = true );
+    bool removeSink( const std::string& id );
     std::shared_ptr<aace::engine::logger::sink::Sink> getSink( const std::string& id );
-    
+
     // allow the LoggerEngineService to configure the EngineLogger
     friend class LoggerEngineService;
 

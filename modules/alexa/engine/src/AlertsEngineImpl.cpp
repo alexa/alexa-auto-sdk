@@ -23,16 +23,17 @@ namespace alexa {
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.AlertsEngineImpl");
 
-AlertsEngineImpl::AlertsEngineImpl( std::shared_ptr<aace::alexa::Alerts> alertsPlatformInterface, std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> connectionManager ) :
-    AudioChannelEngineImpl( alertsPlatformInterface, TAG ),
+AlertsEngineImpl::AlertsEngineImpl( std::shared_ptr<aace::alexa::Alerts> alertsPlatformInterface, std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSConnectionManagerInterface> connectionManager ) :
+    AudioChannelEngineImpl( alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::Type::AVS_ALERTS_VOLUME ),
     m_alertsPlatformInterface( alertsPlatformInterface ),
     m_connectionManager( connectionManager ) {
 }
 
 bool AlertsEngineImpl::initialize(
+    std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> audioOutputChannel,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-    std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> connectionManager,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSConnectionManagerInterface> connectionManager,
     std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
@@ -44,10 +45,7 @@ bool AlertsEngineImpl::initialize(
 
     try
     {
-        ThrowIfNull( directiveSequencer, "invalidDirectiveSequencer" );
-        ThrowIfNull( capabilitiesDelegate, "invalidCapabilitiesDelegate" );
-
-        ThrowIfNot( initializeAudioChannel( speakerManager ), "initializeAudioChannelFailed" );
+        ThrowIfNot( initializeAudioChannel( audioOutputChannel, speakerManager ), "initializeAudioChannelFailed" );
 
         auto alertRenderer = alexaClientSDK::capabilityAgents::alerts::renderer::Renderer::create( std::static_pointer_cast<MediaPlayerInterface>( shared_from_this() ) );
         ThrowIfNull( alertRenderer, "couldNotCreateAlertsRenderer" );
@@ -83,9 +81,10 @@ bool AlertsEngineImpl::initialize(
 
 std::shared_ptr<AlertsEngineImpl> AlertsEngineImpl::create(
     std::shared_ptr<aace::alexa::Alerts> alertsPlatformInterface,
+    std::shared_ptr<aace::engine::audio::AudioManagerInterface> audioManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-    std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> connectionManager,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSConnectionManagerInterface> connectionManager,
     std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
@@ -101,10 +100,25 @@ std::shared_ptr<AlertsEngineImpl> AlertsEngineImpl::create(
     {
         ThrowIfNull( alertsPlatformInterface, "invalidAlertsPlatformInterface" );
         ThrowIfNull( connectionManager, "invalidConnectionManager" );
+        ThrowIfNull( audioManager, "invalidAudioManager" );
+        ThrowIfNull( directiveSequencer, "invalidDirectiveSequencer" );
+        ThrowIfNull( capabilitiesDelegate, "invalidCapabilitiesDelegate" );
+        ThrowIfNull( messageSender, "invalidMessageSender" );
+        ThrowIfNull( certifiedSender, "invalidCertifiedSender" );
+        ThrowIfNull( focusManager, "invalidFocusManager" );
+        ThrowIfNull( speakerManager, "invalidSpeakerManager" );
+        ThrowIfNull( contextManager, "invalidContextManager" );
+        ThrowIfNull( exceptionSender, "invalidExceptionSender" );
+        ThrowIfNull( dataManager, "invalidDataManager" );
+        ThrowIfNull( alertsAudioFactory, "invalidAlertsAudioFactory" );
+
+        // open the TTS audio channel
+        auto audioOutputChannel = audioManager->openAudioOutputChannel( "Alerts", aace::audio::AudioOutputProvider::AudioOutputType::ALARM );
+        ThrowIfNull( audioOutputChannel, "openAudioOutputChannelFailed" );
 
         alertsEngineImpl = std::shared_ptr<AlertsEngineImpl>( new AlertsEngineImpl( alertsPlatformInterface, connectionManager ) );
 
-        ThrowIfNot( alertsEngineImpl->initialize( directiveSequencer, messageSender, connectionManager, certifiedSender, focusManager, contextManager, capabilitiesDelegate, exceptionSender, alertsAudioFactory, speakerManager, dataManager ), "initializeAlertsEngineImplFailed" );
+        ThrowIfNot( alertsEngineImpl->initialize( audioOutputChannel, directiveSequencer, messageSender, connectionManager, certifiedSender, focusManager, contextManager, capabilitiesDelegate, exceptionSender, alertsAudioFactory, speakerManager, dataManager ), "initializeAlertsEngineImplFailed" );
 
         return alertsEngineImpl;
     }
@@ -127,7 +141,9 @@ void AlertsEngineImpl::doShutdown()
 
     if( m_alertsCapabilityAgent != nullptr )
     {
-        m_connectionManager->removeConnectionStatusObserver( m_alertsCapabilityAgent );
+        if( auto m_connectionManager_lock = m_connectionManager.lock() ) {
+            m_connectionManager_lock->removeConnectionStatusObserver( m_alertsCapabilityAgent );
+        }
         
         m_alertsCapabilityAgent->removeObserver( std::dynamic_pointer_cast<alexaClientSDK::capabilityAgents::alerts::AlertObserverInterface>( shared_from_this() ) );
         m_alertsCapabilityAgent->shutdown();
@@ -150,9 +166,10 @@ void AlertsEngineImpl::removeAllAlerts()
 }
 
 // AlertObserverInterface
-void AlertsEngineImpl::onAlertStateChange( const std::string& alertToken, alexaClientSDK::capabilityAgents::alerts::AlertObserverInterface::State state, const std::string& reason )
+void AlertsEngineImpl::onAlertStateChange( const std::string& alertToken, const std::string& alertType, alexaClientSDK::capabilityAgents::alerts::AlertObserverInterface::State state, const std::string& reason )
 {
     if( m_alertsPlatformInterface != nullptr ) {
+        // Note: Ignore alertType here since we've already expose this with detailedInfo
         m_alertsPlatformInterface->alertStateChanged( alertToken, static_cast<aace::alexa::Alerts::AlertState>( state ), reason );
     }
 }

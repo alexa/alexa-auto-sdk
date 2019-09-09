@@ -17,14 +17,14 @@
 #define SAMPLEAPP_ALEXA_SPEECHRECOGNIZERHANDLER_H
 
 #include "SampleApp/Activity.h"
-#include "SampleApp/AudioFileReader.h"
-#include "SampleApp/AudioInputManager.h"
+//#include "SampleApp/AudioFileReader.h"
+//#include "SampleApp/AudioInputManager.h"
 #include "SampleApp/Logger/LoggerHandler.h"
 
 #include <AACE/Alexa/SpeechRecognizer.h>
 
 // Alexa Auto Core - Audio Reference Implementation
-#include <AACE/Audio/AudioCapture.h>
+//#include <AACE/Audio/AudioCapture.h>
 
 // C++ Standard Library
 #include <atomic> // std::atomic
@@ -43,7 +43,7 @@ class SpeechRecognizerHandler : public aace::alexa::SpeechRecognizer /* isa Plat
   private:
     std::weak_ptr<Activity> m_activity{};
     std::weak_ptr<logger::LoggerHandler> m_loggerHandler{};
-    std::shared_ptr<sampleApp::AudioInputManager> m_platformAudioCapture{};
+    //std::shared_ptr<sampleApp::AudioInputManager> m_platformAudioCapture{};
 
     std::string m_audioFilePath{};
     std::atomic<bool> m_isStreamingAudioFile{false};
@@ -53,7 +53,7 @@ class SpeechRecognizerHandler : public aace::alexa::SpeechRecognizer /* isa Plat
   protected:
     SpeechRecognizerHandler(std::weak_ptr<Activity> activity,
                             std::weak_ptr<logger::LoggerHandler> loggerHandler,
-                            std::shared_ptr<sampleApp::AudioInputManager> platformAudioCapture,
+                            //std::shared_ptr<sampleApp::AudioInputManager> platformAudioCapture,
                             bool wakewordDetectionEnabled);
 
   public:
@@ -62,16 +62,16 @@ class SpeechRecognizerHandler : public aace::alexa::SpeechRecognizer /* isa Plat
     }
     auto getActivity() -> std::weak_ptr<Activity>;
     auto getLoggerHandler() -> std::weak_ptr<logger::LoggerHandler>;
-    auto startStreamingAudioFile(const std::string &audioFilePath) -> bool;
-    auto stopStreamingAudioFile() -> bool;
-    auto streamAudioFile(const std::string &audioFilePath) -> bool;
+//    auto startStreamingAudioFile(const std::string &audioFilePath) -> bool;
+//    auto stopStreamingAudioFile() -> bool;
+//    auto streamAudioFile(const std::string &audioFilePath) -> bool;
 
     // aace::alexa::SpeechRecognizer interface
 
     auto wakewordDetected(const std::string &wakeword) -> bool override;
     auto endOfSpeechDetected() -> void override;
-    auto startAudioInput() -> bool override;
-    auto stopAudioInput() -> bool override;
+    //auto startAudioInput() -> bool override;
+    //auto stopAudioInput() -> bool override;
 
   private:
     std::weak_ptr<View> m_console{};

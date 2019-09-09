@@ -23,12 +23,6 @@ namespace alexa {
 namespace property {
 
 /**
- * This property is used with Engine::setProperty() to change the AVS endpoint. The value must be
- * a valid AVS endpoint URL. See https://developer.amazon.com/docs/alexa-voice-service/api-overview.html#endpoints
- */
-static const std::string AVS_ENDPOINT = "aace.alexa.endpoint";
-
-/**
  * This read-only property is used with Engine::getProperty() to check if the Engine has wake word support.
  * If wake word is not supported in the Engine, attempts to enable wake word detection by
  * the @c SpeechRecognizer will fail.

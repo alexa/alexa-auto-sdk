@@ -18,6 +18,7 @@
 
 #include <AVSCommon/AVS/AudioInputStream.h>
 #include <AVSCommon/Utils/AudioFormat.h>
+#include <AVSCommon/SDKInterfaces/KeyWordObserverInterface.h>
 
 namespace aace {
 namespace engine {

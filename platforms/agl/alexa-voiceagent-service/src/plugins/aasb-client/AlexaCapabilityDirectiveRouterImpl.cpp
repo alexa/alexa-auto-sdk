@@ -51,15 +51,6 @@ static const std::string VOICE_SVC_CBL_CODEPAIR_RECEIVED_EVT = "voice_cbl_codepa
 /// Voice Service "CBL codepair expired" event name.
 static const std::string VOICE_SVC_CBL_CODEPAIR_EXPIRED_EVT = "voice_cbl_codepair_expired_event";
 
-/// Voice Service "CBL set refresh token" event name.
-static const std::string VOICE_SVC_CBL_SET_REFRESH_TOKEN_EVT = "voice_cbl_set_token_event";
-
-/// Voice Service "CBL clear refresh token" event name.
-static const std::string VOICE_SVC_CBL_CLEAR_REFRESH_TOKEN_EVT = "voice_cbl_clear_token_event";
-
-/// Voice Service "CBL get refresh token" event name.
-static const std::string VOICE_SVC_CBL_GET_REFRESH_TOKEN_EVT = "voice_cbl_get_token_event";
-
 /// vshl-capabilities verb for publishing GUI Metadata related actions.
 static const std::string VSHL_CAPABILITIES_VERB_GUIMETADATA_PUBLISH = "guiMetadata/publish";
 
@@ -136,24 +127,6 @@ bool AlexaCapabilityDirectiveRouterImpl::initialize() {
     m_cblCodePairExpiredEvent = m_api->createEvent(VOICE_SVC_CBL_CODEPAIR_EXPIRED_EVT);
     if (!m_cblCodePairExpiredEvent) {
         m_logger->log(Level::ERROR, TAG, "Failed to create cbl-codepair-expired evt");
-        return false;
-    }
-
-    m_cblSetRefreshTokenEvent = m_api->createEvent(VOICE_SVC_CBL_SET_REFRESH_TOKEN_EVT);
-    if (!m_cblSetRefreshTokenEvent) {
-        m_logger->log(Level::ERROR, TAG, "Failed to create cbl-set-refresh-token evt");
-        return false;
-    }
-
-    m_cblClearRefreshTokenEvent = m_api->createEvent(VOICE_SVC_CBL_CLEAR_REFRESH_TOKEN_EVT);
-    if (!m_cblClearRefreshTokenEvent) {
-        m_logger->log(Level::ERROR, TAG, "Failed to create cbl-clear-refresh-token evt");
-        return false;
-    }
-
-    m_cblGetRefreshTokenEvent = m_api->createEvent(VOICE_SVC_CBL_GET_REFRESH_TOKEN_EVT);
-    if (!m_cblGetRefreshTokenEvent) {
-        m_logger->log(Level::ERROR, TAG, "Failed to create cbl-set-refresh-token evt");
         return false;
     }
 
@@ -256,21 +229,6 @@ bool AlexaCapabilityDirectiveRouterImpl::subscribeToCBLEvents(agl::common::inter
 
     if (!m_cblCodePairExpiredEvent->subscribe(subscriber)) {
         m_logger->log(Level::WARNING, TAG, "Failed to subscribe to CBL codepair expired events.");
-        return false;
-    }
-
-    if (!m_cblSetRefreshTokenEvent->subscribe(subscriber)) {
-        m_logger->log(Level::WARNING, TAG, "Failed to subscribe to CBL set refresh token events.");
-        return false;
-    }
-
-    if (!m_cblClearRefreshTokenEvent->subscribe(subscriber)) {
-        m_logger->log(Level::WARNING, TAG, "Failed to subscribe to CBL clear refresh token events.");
-        return false;
-    }
-
-    if (!m_cblGetRefreshTokenEvent->subscribe(subscriber)) {
-        m_logger->log(Level::WARNING, TAG, "Failed to subscribe to CBL get refresh token events.");
         return false;
     }
 
@@ -401,32 +359,6 @@ void AlexaCapabilityDirectiveRouterImpl::processCBLAction(
         json_object* payloadJ = json_object_new_string(payload.c_str());
         json_object_object_add(eventDataJ, JSON_ATTR_PAYLOAD.c_str(), payloadJ);
         observers = m_cblCodePairExpiredEvent->publishEvent(eventDataJ);
-    } else if (action == aasb::bridge::ACTION_CBL_CLEAR_REFRESH_TOKEN) {
-        m_logger->log(Level::INFO, TAG, "Clear refresh token");
-        observers = m_cblClearRefreshTokenEvent->publishEvent(eventDataJ);
-    } else if (action == aasb::bridge::ACTION_CBL_SET_REFRESH_TOKEN) {
-        m_logger->log(Level::INFO, TAG, "Set refresh token");
-        json_object* refreshTokenJ = json_object_new_string(payload.c_str());
-        json_object_object_add(eventDataJ, agl::alexa::JSON_ATTR_REFRESH_TOKEN.c_str(), refreshTokenJ);
-        observers = m_cblSetRefreshTokenEvent->publishEvent(eventDataJ);
-    } else if (action == aasb::bridge::ACTION_CBL_GET_REFRESH_TOKEN) {
-        m_logger->log(Level::INFO, TAG, "Get refresh token");
-        observers = m_cblGetRefreshTokenEvent->publishEvent(eventDataJ);
-        if (observers > 0) {
-            // Waiting for refreshing token
-            std::unique_lock<std::mutex> lk(m_getRefreshTokenMutex);
-            std::chrono::seconds seconds = std::chrono::seconds(SYNC_CALL_TIMEOUT_IN_SECONDS);
-            if(m_getRefreshTokenCv.wait_for(lk, seconds, [this] { return m_didReceiveGetRefreshTokenResponse; })) {
-                // reset the state
-                m_logger->log(Level::INFO, TAG, "Finished waiting for refresh token: ");
-                m_didReceiveGetRefreshTokenResponse = false;
-            } else {
-                m_logger->log(Level::ERROR, TAG, "Timed out waiting for refresh token");
-            }
-        } else {
-            // There is no point in block the thread if there are no observers
-            m_logger->log(Level::INFO, TAG, "No observers, so not blocking the thread: " + action);
-        }
     } else {
         m_logger->log(Level::INFO, TAG, "Unhandled action: " + action);
     }
@@ -434,14 +366,6 @@ void AlexaCapabilityDirectiveRouterImpl::processCBLAction(
     std::stringstream logMsg;
     logMsg << "Number of observers received " << observers;
     m_logger->log(Level::DEBUG, TAG, logMsg.str().c_str());
-}
-
-void AlexaCapabilityDirectiveRouterImpl::didReceiveGetRefreshTokenResponse() {
-    {
-        std::lock_guard<std::mutex> lock(m_getRefreshTokenMutex);
-        m_didReceiveGetRefreshTokenResponse = true;
-    }
-    m_getRefreshTokenCv.notify_one();
 }
 
 }  // namespace alexa

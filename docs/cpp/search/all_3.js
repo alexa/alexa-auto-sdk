@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['dab',['DAB',['../classaace_1_1alexa_1_1_local_media_source.html#a193e995a51acffd671f2e9b93fe176b3ab30917aa48bf6125b9e85daf9c6eb5fc',1,'aace::alexa::LocalMediaSource']]],
   ['datapoint',['Datapoint',['../classaace_1_1metrics_1_1_metrics_uploader_1_1_datapoint.html',1,'aace::metrics::MetricsUploader']]],
   ['datapointtype',['DatapointType',['../classaace_1_1metrics_1_1_metrics_uploader.html#a67e6fa51b9ef4b8a9b293870363eb4b5',1,'aace::metrics::MetricsUploader']]],
   ['deviceconfigurationupdated',['deviceConfigurationUpdated',['../classaace_1_1phone_call_controller_1_1_phone_call_controller.html#a3d36c76efd0e96bd84196a8dcd5071de',1,'aace::phoneCallController::PhoneCallController']]],
@@ -18,5 +19,5 @@ var searchData=
   ['dtmf_5ffailed',['DTMF_FAILED',['../classaace_1_1phone_call_controller_1_1_phone_call_controller_engine_interface.html#a6a73274c0233185e56bf632c6b069893a5c6ec9e2720310fe33e2f3f1ad2f23f5',1,'aace::phoneCallController::PhoneCallControllerEngineInterface']]],
   ['dtmf_5fsupported',['DTMF_SUPPORTED',['../classaace_1_1phone_call_controller_1_1_phone_call_controller_engine_interface.html#a84647b3bad59bc01079e1addb1d3a2b6a01eb9816b3e3131b2e9584e4c0f999a4',1,'aace::phoneCallController::PhoneCallControllerEngineInterface']]],
   ['dtmferror',['DTMFError',['../classaace_1_1phone_call_controller_1_1_phone_call_controller_engine_interface.html#a6a73274c0233185e56bf632c6b069893',1,'aace::phoneCallController::PhoneCallControllerEngineInterface::DTMFError()'],['../classaace_1_1phone_call_controller_1_1_phone_call_controller.html#adb76ccaed091ba27062e1835e5727399',1,'aace::phoneCallController::PhoneCallController::DTMFError()']]],
-  ['duration',['duration',['../classaace_1_1alexa_1_1_external_media_adapter_1_1_playback_state.html#a031db9827daaf6d93e6a1624c2a97d0c',1,'aace::alexa::ExternalMediaAdapter::PlaybackState']]]
+  ['duration',['duration',['../classaace_1_1alexa_1_1_external_media_adapter_1_1_playback_state.html#a031db9827daaf6d93e6a1624c2a97d0c',1,'aace::alexa::ExternalMediaAdapter::PlaybackState::duration()'],['../classaace_1_1alexa_1_1_local_media_source_1_1_playback_state.html#a1899127344b0f4e5bab4ed6fe434d62e',1,'aace::alexa::LocalMediaSource::PlaybackState::duration()']]]
 ];

@@ -33,8 +33,9 @@
 #include <ContextManager/ContextManager.h>
 #include <RegistrationManager/CustomerDataHandler.h>
 
-#include "AACE/Alexa/AlexaEngineInterfaces.h"
-#include "AACE/Alexa/Notifications.h"
+#include <AACE/Alexa/AlexaEngineInterfaces.h>
+#include <AACE/Alexa/Notifications.h>
+#include <AACE/Engine/Audio/AudioManagerInterface.h>
 #include "AudioChannelEngineImpl.h"
 
 namespace aace {
@@ -49,6 +50,7 @@ private:
     NotificationsEngineImpl( std::shared_ptr<aace::alexa::Notifications> notificationsPlatformInterface );
 
     bool initialize(
+        std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> audioOutputChannel,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
@@ -60,6 +62,7 @@ private:
 public:
     static std::shared_ptr<NotificationsEngineImpl> create(
         std::shared_ptr<aace::alexa::Notifications> notificationsPlatformInterface,
+        std::shared_ptr<aace::engine::audio::AudioManagerInterface> audioManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
@@ -76,9 +79,7 @@ protected:
 
 private:
     std::shared_ptr<aace::alexa::Notifications> m_notificationsPlatformInterface;
-
     std::shared_ptr<alexaClientSDK::capabilityAgents::notifications::NotificationsCapabilityAgent> m_notificationsCapabilityAgent;
-
 };
 
 } // aace::engine::alexa

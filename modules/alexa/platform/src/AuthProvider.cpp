@@ -21,8 +21,8 @@ namespace alexa {
 AuthProvider::~AuthProvider() = default; // key function
 
 void AuthProvider::authStateChanged( AuthState authState, AuthError authError ) {
-    if( m_authProviderEngineInterface != nullptr ) {
-        m_authProviderEngineInterface->onAuthStateChanged( authState, authError );
+    if( auto m_authProviderEngineInterface_lock = m_authProviderEngineInterface.lock() ) {
+        m_authProviderEngineInterface_lock->onAuthStateChanged( authState, authError );
     }
 }
     

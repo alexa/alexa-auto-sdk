@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">1.6.0</span>
+   &#160;<span id="projectnumber">2.0.0</span>
    </div>
   </td>
  </tr>
@@ -114,10 +114,14 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aeb62feeb8cdaad65b1d8dea41f243d7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae957213803bd5ca4a6a19d4133160963"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#ae957213803bd5ca4a6a19d4133160963">getRefreshToken</a> ()=0</td></tr>
 <tr class="separator:ae957213803bd5ca4a6a19d4133160963"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ce90c8c986bdb7afa6ce7fcfb6a4be5"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#a5ce90c8c986bdb7afa6ce7fcfb6a4be5">setUserProfile</a> (const std::string &amp;name, const std::string &amp;email)=0</td></tr>
+<tr class="separator:a5ce90c8c986bdb7afa6ce7fcfb6a4be5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a98ab22f22a9e395718c09730b35c9bdf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#a98ab22f22a9e395718c09730b35c9bdf">start</a> ()</td></tr>
 <tr class="separator:a98ab22f22a9e395718c09730b35c9bdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a08eafdc469f9d7d282878c5caa016237"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#a08eafdc469f9d7d282878c5caa016237">cancel</a> ()</td></tr>
 <tr class="separator:a08eafdc469f9d7d282878c5caa016237"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6b9bf59fb1f4a358273851049b2a74b6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#a6b9bf59fb1f4a358273851049b2a74b6">reset</a> ()</td></tr>
+<tr class="separator:a6b9bf59fb1f4a358273851049b2a74b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classaace_1_1cbl_1_1_c_b_l.html">CBL</a> should be extended to perform <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html">CBL</a> authentication </p>
@@ -323,6 +327,43 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a5ce90c8c986bdb7afa6ce7fcfb6a4be5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5ce90c8c986bdb7afa6ce7fcfb6a4be5">&#9670;&nbsp;</a></span>setUserProfile()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void aace::cbl::CBL::setUserProfile </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>email</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Notifies the platform implementation to set the user profile requestUserProfile must be enabled in configuration </p>
+
+</div>
+</div>
 <a id="a98ab22f22a9e395718c09730b35c9bdf"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a98ab22f22a9e395718c09730b35c9bdf">&#9670;&nbsp;</a></span>start()</h2>
 
@@ -359,12 +400,30 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a6b9bf59fb1f4a358273851049b2a74b6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6b9bf59fb1f4a358273851049b2a74b6">&#9670;&nbsp;</a></span>reset()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void aace::cbl::CBL::reset </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Notifies the Engine to reset the authorization state </p>
+
+</div>
+</div>
 </div><!-- contents -->
 <html>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 1.6.0 - Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 2.0.0 - Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

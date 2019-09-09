@@ -29,14 +29,6 @@
 #endif  //__ANDROID_API__
 
 #ifdef AFB_BINDING_VERSION
-// #include <afb/afb-binding.h>
-// #define  AASB_LOG(...)  AFB_INFO(__VA_ARGS__)
-// #define  AASB_ERROR(...)  AFB_ERROR(__VA_ARGS__)
-// #define  AASB_INFO(...)  AFB_INFO(__VA_ARGS__)
-// #define  AASB_NOTICE(...)  AFB_NOTICE(__VA_ARGS__)
-// #define  AASB_WARNING(...)  AFB_WARNING(__VA_ARGS__)
-// #define  AASB_DEBUG(...)  AFB_DEBUG(__VA_ARGS__)
-
 #define AASB_LOG(...)
 #define AASB_ERROR(...)
 #define AASB_INFO(...)
@@ -44,5 +36,14 @@
 #define AASB_WARNING(...)
 #define AASB_DEBUG(...)
 #endif  // AFB_BINDING_VERSION
+
+#ifdef DISABLE_LOGGING
+#define AASB_LOG(...)
+#define AASB_ERROR(...)
+#define AASB_INFO(...)
+#define AASB_NOTICE(...)
+#define AASB_WARNING(...)
+#define AASB_DEBUG(...)
+#endif  // DISABLE_LOGGING
 
 #endif  // ALEXAAUTOSERVICESBRIDGE_LOG_MACROS_H

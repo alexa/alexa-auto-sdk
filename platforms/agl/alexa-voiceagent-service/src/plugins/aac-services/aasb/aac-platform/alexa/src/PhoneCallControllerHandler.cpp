@@ -19,8 +19,6 @@
 
 #include <aasb/Consts.h>
 
-#include <sstream>
-
 /**
  * Specifies the severity level of a log message
  * @sa @c aace::logger::LoggerEngineInterface::Level
@@ -38,81 +36,81 @@ namespace phoneCallController {
 
 std::shared_ptr<PhoneCallControllerHandler> PhoneCallControllerHandler::create(
     std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
-    std::weak_ptr<aasb::bridge::DirectiveDispatcher> directiveDispatcher) {
+    std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher) {
     auto phoneCallControllerHandler =
-        std::shared_ptr<PhoneCallControllerHandler>(new PhoneCallControllerHandler(logger, directiveDispatcher));
+        std::shared_ptr<PhoneCallControllerHandler>(new PhoneCallControllerHandler(logger, responseDispatcher));
 
     return phoneCallControllerHandler;
 }
 
 PhoneCallControllerHandler::PhoneCallControllerHandler(
     std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
-    std::weak_ptr<aasb::bridge::DirectiveDispatcher> directiveDispatcher) :
+    std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher) :
         m_logger(logger),
-        m_directiveDispatcher(directiveDispatcher) {
+        m_responseDispatcher(responseDispatcher) {
 
 }
 
 bool PhoneCallControllerHandler::dial(const std::string &payload) {
     m_logger->log(Level::VERBOSE, TAG, "dial");
 
-    auto directiveDispatcher = m_directiveDispatcher.lock();
-    if (!directiveDispatcher) {
+    auto responseDispatcher = m_responseDispatcher.lock();
+    if (!responseDispatcher) {
         m_logger->log(Level::WARN, TAG, "dial: Directive dispatcher is out of scope");
         return false;
     }
 
-    directiveDispatcher->sendDirective(TOPIC_PHONECALL_CONTROLLER, ACTION_PHONECALL_DIAL, payload);
+    responseDispatcher->sendDirective(TOPIC_PHONECALL_CONTROLLER, ACTION_PHONECALL_DIAL, payload);
     return true;
 }
 
 bool PhoneCallControllerHandler::redial(const std::string &payload) {
     m_logger->log(Level::VERBOSE, TAG, "redial");
 
-    auto directiveDispatcher = m_directiveDispatcher.lock();
-    if (!directiveDispatcher) {
+    auto responseDispatcher = m_responseDispatcher.lock();
+    if (!responseDispatcher) {
         m_logger->log(Level::WARN, TAG, "redial: Directive dispatcher is out of scope");
         return false;
     }
 
-    directiveDispatcher->sendDirective(TOPIC_PHONECALL_CONTROLLER, ACTION_PHONECALL_REDIAL, payload);
+    responseDispatcher->sendDirective(TOPIC_PHONECALL_CONTROLLER, ACTION_PHONECALL_REDIAL, payload);
     return true;
 }
 
 void PhoneCallControllerHandler::answer(const std::string &payload) {
     m_logger->log(Level::VERBOSE, TAG, "answer");
 
-    auto directiveDispatcher = m_directiveDispatcher.lock();
-    if (!directiveDispatcher) {
+    auto responseDispatcher = m_responseDispatcher.lock();
+    if (!responseDispatcher) {
         m_logger->log(Level::WARN, TAG, "answer: Directive dispatcher is out of scope");
         return;
     }
 
-    directiveDispatcher->sendDirective(TOPIC_PHONECALL_CONTROLLER, ACTION_PHONECALL_ANSWER, payload);
+    responseDispatcher->sendDirective(TOPIC_PHONECALL_CONTROLLER, ACTION_PHONECALL_ANSWER, payload);
 }
 
 void PhoneCallControllerHandler::stop(const std::string &payload) {
     m_logger->log(Level::VERBOSE, TAG, "stop");
 
-    auto directiveDispatcher = m_directiveDispatcher.lock();
-    if (!directiveDispatcher) {
+    auto responseDispatcher = m_responseDispatcher.lock();
+    if (!responseDispatcher) {
         m_logger->log(Level::WARN, TAG, "stop: Directive dispatcher is out of scope");
         return;
     }
 
-    directiveDispatcher->sendDirective(TOPIC_PHONECALL_CONTROLLER, ACTION_PHONECALL_STOP, payload);
+    responseDispatcher->sendDirective(TOPIC_PHONECALL_CONTROLLER, ACTION_PHONECALL_STOP, payload);
 }
 
 void PhoneCallControllerHandler::sendDTMF(const std::string &payload) {
     m_logger->log(Level::VERBOSE, TAG, "sendDTMF");
 
-    auto directiveDispatcher = m_directiveDispatcher.lock();
-    if (!directiveDispatcher) {
+    auto responseDispatcher = m_responseDispatcher.lock();
+    if (!responseDispatcher) {
         m_logger->log(Level::WARN, TAG, "sendDTMF: Directive dispatcher is out of scope");
         return;
     }
 
-    directiveDispatcher->sendDirective(TOPIC_PHONECALL_CONTROLLER, ACTION_PHONECALL_SEND_DTMF, payload);
+    responseDispatcher->sendDirective(TOPIC_PHONECALL_CONTROLLER, ACTION_PHONECALL_SEND_DTMF, payload);
 }
 
 void PhoneCallControllerHandler::onReceivedEvent(const std::string& action, const std::string& payload) {
@@ -138,8 +136,6 @@ void PhoneCallControllerHandler::onReceivedEvent(const std::string& action, cons
 }
 
 void PhoneCallControllerHandler::connectionStateChanged(const std::string& payload) {
-    m_logger->log(Level::VERBOSE, TAG, "connectionState payload " + payload);
-
     rapidjson::Document document;
     document.Parse(payload.c_str());
     auto root = document.GetObject();
@@ -164,8 +160,6 @@ void PhoneCallControllerHandler::connectionStateChanged(const std::string& paylo
 }
 
 void PhoneCallControllerHandler::callStateChanged(const std::string& payload) {
-    m_logger->log(Level::VERBOSE, TAG, "callStateChanged payload " + payload);
-
     rapidjson::Document document;
     document.Parse(payload.c_str());
     auto root = document.GetObject();
@@ -213,8 +207,6 @@ void PhoneCallControllerHandler::callStateChanged(const std::string& payload) {
 }
 
 void PhoneCallControllerHandler::callFailed(const std::string& payload) {
-    m_logger->log(Level::VERBOSE, TAG, "callFailed payload " + payload);
-
     rapidjson::Document document;
     document.Parse(payload.c_str());
     auto root = document.GetObject();
@@ -261,8 +253,6 @@ void PhoneCallControllerHandler::callFailed(const std::string& payload) {
 }
 
 void PhoneCallControllerHandler::callerIdReceived(const std::string& payload) {
-    m_logger->log(Level::VERBOSE, TAG, "callerIdReceived payload " + payload);
-
     rapidjson::Document document;
     document.Parse(payload.c_str());
     auto root = document.GetObject();
@@ -288,8 +278,6 @@ void PhoneCallControllerHandler::callerIdReceived(const std::string& payload) {
 }
 
 void PhoneCallControllerHandler::sendDTMFSucceeded(const std::string& payload) {
-    m_logger->log(Level::VERBOSE, TAG, "sendDTMFSucceeded payload " + payload);
-
     rapidjson::Document document;
     document.Parse(payload.c_str());
     auto root = document.GetObject();
@@ -307,8 +295,6 @@ void PhoneCallControllerHandler::sendDTMFSucceeded(const std::string& payload) {
 }
 
 void PhoneCallControllerHandler::sendDTMFFailed(const std::string& payload) {
-    m_logger->log(Level::VERBOSE, TAG, "sendDTMFFailed payload " + payload);
-
     rapidjson::Document document;
     document.Parse(payload.c_str());
     auto root = document.GetObject();

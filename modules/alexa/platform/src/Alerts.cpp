@@ -13,25 +13,22 @@
  * permissions and limitations under the License.
  */
 
-#include "AACE/Alexa/Alerts.h"
+#include <AACE/Alexa/Alerts.h>
 
 namespace aace {
 namespace alexa {
 
-Alerts::Alerts( std::shared_ptr<aace::alexa::MediaPlayer> mediaPlayer, std::shared_ptr<aace::alexa::Speaker> speaker ) : aace::alexa::AudioChannel( mediaPlayer, speaker, aace::alexa::Speaker::Type::AVS_ALERTS_VOLUME ) {
-}
-
 Alerts::~Alerts() = default; // key function
 
 void Alerts::localStop() {
-    if( m_alertsEngineInterface != nullptr ) {
-        m_alertsEngineInterface->onLocalStop();
+    if( auto m_alertsEngineInterface_lock = m_alertsEngineInterface.lock() ) {
+        m_alertsEngineInterface_lock->onLocalStop();
     }
 }
 
 void Alerts::removeAllAlerts() {
-    if( m_alertsEngineInterface != nullptr ) {
-        m_alertsEngineInterface->removeAllAlerts();
+    if( auto m_alertsEngineInterface_lock = m_alertsEngineInterface.lock() ) {
+        m_alertsEngineInterface_lock->removeAllAlerts();
     }
 }
 

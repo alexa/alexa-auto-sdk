@@ -30,18 +30,6 @@ REGISTER_SERVICE(PhoneCallControllerEngineService);
 PhoneCallControllerEngineService::PhoneCallControllerEngineService( const aace::engine::core::ServiceDescription& description ) : aace::engine::core::EngineService( description ) {
 }
 
-bool PhoneCallControllerEngineService::configure ( const std::vector< std::shared_ptr<std::istream>>& configuration) {
-    return true;
-}
-
-bool PhoneCallControllerEngineService::start() {
-    return true;
-}
-
-bool PhoneCallControllerEngineService::stop() {
-    return true;
-}
-
 bool PhoneCallControllerEngineService::shutdown() {
     if ( m_phoneCallControllerEngineImpl != nullptr ) {
         m_phoneCallControllerEngineImpl->shutdown();

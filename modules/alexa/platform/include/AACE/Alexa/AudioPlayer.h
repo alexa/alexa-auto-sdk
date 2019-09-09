@@ -16,7 +16,9 @@
 #ifndef AACE_ALEXA_AUDIO_PLAYER_H
 #define AACE_ALEXA_AUDIO_PLAYER_H
 
-#include "AudioChannel.h"
+#include <iostream>
+
+#include <AACE/Core/PlatformInterface.h>
 
 /** @file */
 
@@ -35,9 +37,9 @@ namespace alexa {
  * @sa PlaybackController
  * @sa TemplateRuntime::renderPlayerInfo()
  */
-class AudioPlayer : public AudioChannel {
+class AudioPlayer : public aace::core::PlatformInterface {
 protected:
-    AudioPlayer( std::shared_ptr<aace::alexa::MediaPlayer> mediaPlayer, std::shared_ptr<aace::alexa::Speaker> speaker );
+    AudioPlayer() = default;
 
 public:
     virtual ~AudioPlayer();

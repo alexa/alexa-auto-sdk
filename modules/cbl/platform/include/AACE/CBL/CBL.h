@@ -121,6 +121,12 @@ public:
     virtual std::string getRefreshToken() = 0;
 
     /**
+     * Notifies the platform implementation to set the user profile
+     * requestUserProfile must be enabled in configuration
+     */
+    virtual void setUserProfile( const std::string& name, const std::string& email ) = 0;
+
+    /**
      * Notifies the Engine to begin the authorization process
      */ 
     void start();
@@ -129,6 +135,11 @@ public:
      * Notifies the Engine to cancel the authorization process
      */
     void cancel();
+
+    /**
+     * Notifies the Engine to reset the authorization state
+     */
+    void reset();
 
     /**
      * @internal

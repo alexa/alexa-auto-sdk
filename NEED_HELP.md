@@ -9,7 +9,8 @@ The following functionality is available with help from your designated Amazon S
 * Phone Call Control
 * Alexa Communication
 * Local Voice Control
-* Metrics Uploading
+* Device Client Metrics
+* Voice Chrome for Android
 
 You will need to provide the Amazon ID of your development device or product on the [AVS Developer Portal](https://developer.amazon.com/avs/home.html#/avs/home).
 

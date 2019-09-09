@@ -19,7 +19,6 @@
 #include <memory>
 #include <string>
 
-#include <ACL/AVSConnectionManager.h>
 #include <Audio/AudioFactory.h>
 #include <AVSCommon/AVS/Attachment/AttachmentManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/Audio/AlertsAudioFactoryInterface.h>
@@ -32,13 +31,16 @@
 #include <AVSCommon/SDKInterfaces/FocusManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/MessageSenderInterface.h>
 #include <AVSCommon/SDKInterfaces/SpeakerManagerInterface.h>
+#include <AVSCommon/SDKInterfaces/AVSConnectionManagerInterface.h>
+
 #include <Alerts/AlertsCapabilityAgent.h>
 #include <Alerts/Storage/SQLiteAlertStorage.h>
 #include <ContextManager/ContextManager.h>
 #include <RegistrationManager/CustomerDataHandler.h>
 
-#include "AACE/Alexa/AlexaEngineInterfaces.h"
-#include "AACE/Alexa/Alerts.h"
+#include <AACE/Alexa/AlexaEngineInterfaces.h>
+#include <AACE/Alexa/Alerts.h>
+#include <AACE/Engine/Audio/AudioManagerInterface.h>
 #include "AudioChannelEngineImpl.h"
 
 namespace aace {
@@ -51,12 +53,13 @@ class AlertsEngineImpl :
     public alexaClientSDK::capabilityAgents::alerts::AlertObserverInterface {
     
 private:
-    AlertsEngineImpl( std::shared_ptr<aace::alexa::Alerts> alertsPlatformInterface, std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> connectionManager );
+    AlertsEngineImpl( std::shared_ptr<aace::alexa::Alerts> alertsPlatformInterface, std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSConnectionManagerInterface> connectionManager );
 
     bool initialize(
+        std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> audioOutputChannel,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-        std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> connectionManager,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSConnectionManagerInterface> connectionManager,
         std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
@@ -69,9 +72,10 @@ private:
 public:
     static std::shared_ptr<AlertsEngineImpl> create(
         std::shared_ptr<aace::alexa::Alerts> alertsPlatformInterface,
+        std::shared_ptr<aace::engine::audio::AudioManagerInterface> audioManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-        std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> connectionManager,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSConnectionManagerInterface> connectionManager,
         std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
@@ -86,7 +90,7 @@ public:
     void removeAllAlerts() override;
     
     // AlertObserverInterface
-    void onAlertStateChange( const std::string & alertToken, State state, const std::string & reason ) override;
+    void onAlertStateChange( const std::string & alertToken, const std::string& alertType, State state, const std::string & reason ) override;
 
     void onAlertCreated( const std::string & alertToken, const std::string & detailedInfo ) override;
 
@@ -97,10 +101,8 @@ protected:
 
 private:
     std::shared_ptr<aace::alexa::Alerts> m_alertsPlatformInterface;
-    
     std::shared_ptr<alexaClientSDK::capabilityAgents::alerts::AlertsCapabilityAgent> m_alertsCapabilityAgent;
-    std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> m_connectionManager;
-
+    std::weak_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSConnectionManagerInterface> m_connectionManager;
 };
 
 } // aace::engine::alexa

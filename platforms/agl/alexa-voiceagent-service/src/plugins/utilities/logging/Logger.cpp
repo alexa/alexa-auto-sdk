@@ -19,11 +19,11 @@ namespace utilities {
 namespace logging {
 
 // Constructor
-Logger::Logger(AFB_ApiT api) {
+Logger::Logger(afb_api_t api) {
     mApi = api;
 }
 
-unique_ptr<Logger> Logger::create(AFB_ApiT api) {
+unique_ptr<Logger> Logger::create(afb_api_t api) {
     auto logger = std::unique_ptr<Logger>(new Logger(api));
     return logger;
 }
@@ -32,19 +32,19 @@ void Logger::log(Level level, const std::string& tag, const std::string& message
     string format_msg = "Tag: " + tag + ", message: " + message;
     switch (level) {
         case Level::NOTICE:
-            AFB_ApiNotice(mApi, format_msg.c_str());
+            AFB_API_NOTICE(mApi, format_msg.c_str());
             break;
         case Level::WARNING:
-            AFB_ApiWarning(mApi, format_msg.c_str());
+            AFB_API_WARNING(mApi, format_msg.c_str());
             break;
         case Level::DEBUG:
-            AFB_ApiDebug(mApi, format_msg.c_str());
+            AFB_API_DEBUG(mApi, format_msg.c_str());
             break;
         case Level::ERROR:
-            AFB_ApiError(mApi, format_msg.c_str());
+            AFB_API_ERROR(mApi, format_msg.c_str());
             break;
         case Level::INFO:
-            AFB_ApiInfo(mApi, format_msg.c_str());
+            AFB_API_INFO(mApi, format_msg.c_str());
             break;
         default:
             break;

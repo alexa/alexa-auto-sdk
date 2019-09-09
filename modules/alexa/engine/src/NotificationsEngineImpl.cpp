@@ -26,11 +26,12 @@ namespace alexa {
 static const std::string TAG("aace.alexa.NotificationsEngineImpl");
 
 NotificationsEngineImpl::NotificationsEngineImpl( std::shared_ptr<aace::alexa::Notifications> notificationsPlatformInterface ) :
-    AudioChannelEngineImpl( notificationsPlatformInterface, TAG ),
+    AudioChannelEngineImpl( alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::Type::AVS_ALERTS_VOLUME ),
     m_notificationsPlatformInterface( notificationsPlatformInterface ) {
 }
 
 bool NotificationsEngineImpl::initialize(
+    std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> audioOutputChannel,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
@@ -41,10 +42,7 @@ bool NotificationsEngineImpl::initialize(
 
     try
     {
-        ThrowIfNull( directiveSequencer, "invalidDirectiveSequencer" );
-        ThrowIfNull( capabilitiesDelegate, "invalidCapabilitiesDelegate" );
-
-        ThrowIfNot( initializeAudioChannel( speakerManager ), "initializeAudioChannelFailed" );
+        ThrowIfNot( initializeAudioChannel( audioOutputChannel, speakerManager ), "initializeAudioChannelFailed" );
     
         //auto notificationRenderer = alexaClientSDK::capabilityAgents::notifications::NotificationRenderer::create( std::static_pointer_cast<MediaPlayerInterface>( shared_from_this() ) );
         auto notificationRenderer = alexaClientSDK::capabilityAgents::notifications::NotificationRenderer::create( shared_from_this() );
@@ -75,6 +73,7 @@ bool NotificationsEngineImpl::initialize(
 
 std::shared_ptr<NotificationsEngineImpl> NotificationsEngineImpl::create(
     std::shared_ptr<aace::alexa::Notifications> notificationsPlatformInterface,
+    std::shared_ptr<aace::engine::audio::AudioManagerInterface> audioManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
@@ -88,10 +87,22 @@ std::shared_ptr<NotificationsEngineImpl> NotificationsEngineImpl::create(
     try
     {
         ThrowIfNull( notificationsPlatformInterface, "invalidNotificationsPlatformInterface" );
+        ThrowIfNull( audioManager, "invalidAudioManager" );
+        ThrowIfNull( directiveSequencer, "invalidDirectiveSequencer" );
+        ThrowIfNull( capabilitiesDelegate, "invalidCapabilitiesDelegate" );
+        ThrowIfNull( speakerManager, "invalidSpeakerManager" );
+        ThrowIfNull( contextManager, "invalidContextManager" );
+        ThrowIfNull( exceptionSender, "invalidExceptionSender" );
+        ThrowIfNull( dataManager, "invalidDataManager" );
+        ThrowIfNull( notificationsAudioFactory, "invalidNotificationsAudioFactory" );
+
+        // open an audio channel
+        auto audioOutputChannel = audioManager->openAudioOutputChannel( "Notifications", aace::audio::AudioOutputProvider::AudioOutputType::NOTIFICATION );
+        ThrowIfNull( audioOutputChannel, "openAudioOutputChannelFailed" );
 
         notificationsEngineImpl = std::shared_ptr<NotificationsEngineImpl>( new NotificationsEngineImpl( notificationsPlatformInterface ) );
 
-        ThrowIfNot( notificationsEngineImpl->initialize( directiveSequencer, contextManager, capabilitiesDelegate, exceptionSender, notificationsAudioFactory, speakerManager, dataManager ), "initializeNotificationsEngineImplFailed" );
+        ThrowIfNot( notificationsEngineImpl->initialize( audioOutputChannel, directiveSequencer, contextManager, capabilitiesDelegate, exceptionSender, notificationsAudioFactory, speakerManager, dataManager ), "initializeNotificationsEngineImplFailed" );
 
         return notificationsEngineImpl;
     }

@@ -20,7 +20,9 @@
 #include <memory>
 #include <mutex>
 
-#include "AACE/Logger/Logger.h"
+#include <AACE/Engine/Utils/Threading/Executor.h>
+#include <AACE/Logger/Logger.h>
+
 #include "EngineLogger.h"
 #include "LogEntry.h"
 #include "LogEventObserver.h"
@@ -45,6 +47,9 @@ public:
 
 private:
     std::shared_ptr<aace::logger::Logger> m_platformLoggerInterface;
+
+    // executor
+    aace::engine::utils::threading::Executor m_executor;
 };
 
 }  // logger

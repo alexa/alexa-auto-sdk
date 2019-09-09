@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">1.6.0</span>
+   &#160;<span id="projectnumber">2.0.0</span>
    </div>
   </td>
  </tr>
@@ -91,6 +91,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ad320c677bafca842107daa2419bbc675"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa7a91ec3198415d309d3a5d061cb974f"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1cbl_1_1_c_b_l.html#aa7a91ec3198415d309d3a5d061cb974f">getRefreshToken</a> ()</td></tr>
 <tr class="separator:aa7a91ec3198415d309d3a5d061cb974f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a18753a6d6d002bc4188de1a00beba9e5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1cbl_1_1_c_b_l.html#a18753a6d6d002bc4188de1a00beba9e5">setUserProfile</a> (String name, String email)</td></tr>
+<tr class="separator:a18753a6d6d002bc4188de1a00beba9e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -98,6 +100,8 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:ae628b6fbb8421609b19f24e462b6a2aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a75298918ee94a5f4f5621824d0665ff7"><td class="memItemLeft" align="right" valign="top">final void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1cbl_1_1_c_b_l.html#a75298918ee94a5f4f5621824d0665ff7">cancel</a> ()</td></tr>
 <tr class="separator:a75298918ee94a5f4f5621824d0665ff7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a438e7b454cdfca08bf2b24795f73650b"><td class="memItemLeft" align="right" valign="top">final void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1cbl_1_1_c_b_l.html#a438e7b454cdfca08bf2b24795f73650b">reset</a> ()</td></tr>
+<tr class="separator:a438e7b454cdfca08bf2b24795f73650b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>PhoneCallController should be extended to perform <a class="el" href="classcom_1_1amazon_1_1aace_1_1cbl_1_1_c_b_l.html">CBL</a> authentication </p>
@@ -198,6 +202,35 @@ Protected Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a18753a6d6d002bc4188de1a00beba9e5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a18753a6d6d002bc4188de1a00beba9e5">&#9670;&nbsp;</a></span>setUserProfile()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void com.amazon.aace.cbl.CBL.setUserProfile </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>email</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Notifies the platform implementation to set the user profile, this is requested one time after authorization requestUserProfile must be enabled in configuration </p>
+
+</div>
+</div>
 <a id="ae628b6fbb8421609b19f24e462b6a2aa"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae628b6fbb8421609b19f24e462b6a2aa">&#9670;&nbsp;</a></span>start()</h2>
 
@@ -250,12 +283,38 @@ Protected Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a438e7b454cdfca08bf2b24795f73650b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a438e7b454cdfca08bf2b24795f73650b">&#9670;&nbsp;</a></span>reset()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">final void com.amazon.aace.cbl.CBL.reset </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Notifies the Engine to reset the authorization state </p>
+
+</div>
+</div>
 </div><!-- contents -->
 <html>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 1.6.0 - Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 2.0.0 - Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

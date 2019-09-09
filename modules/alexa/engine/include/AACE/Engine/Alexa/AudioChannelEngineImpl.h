@@ -25,54 +25,48 @@
 #include <AVSCommon/SDKInterfaces/SpeakerInterface.h>
 #include <AVSCommon/SDKInterfaces/SpeakerManagerInterface.h>
 
-#include "AACE/Alexa/AlexaEngineInterfaces.h"
-#include "AACE/Alexa/AudioChannel.h"
-#include "AACE/Alexa/MediaPlayer.h"
-#include "AACE/Alexa/Speaker.h"
+#include <AACE/Engine/Audio/AudioOutputChannelInterface.h>
+#include <AACE/Alexa/AlexaEngineInterfaces.h>
 
 namespace aace {
 namespace engine {
 namespace alexa {
 
 class AudioChannelEngineImpl :
-    public aace::alexa::MediaPlayerEngineInterface,
-    public aace::alexa::SpeakerEngineInterface,
+    public aace::audio::AudioOutputEngineInterface,
     public alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface,
     public alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface,
     public alexaClientSDK::avsCommon::utils::RequiresShutdown,
     public std::enable_shared_from_this<AudioChannelEngineImpl> {
 
-public:
-    AudioChannelEngineImpl( std::shared_ptr<aace::alexa::AudioChannel> audioChannelPlatformInterface, const std::string& name );
+private:
+    using MediaState = aace::audio::AudioOutputEngineInterface::MediaState;
+    using MediaError = aace::audio::AudioOutputEngineInterface::MediaError;
 
-    virtual bool initializeAudioChannel( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager );
+public:
+    AudioChannelEngineImpl( alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::Type speakerType );
+
+    virtual bool initializeAudioChannel(
+        std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> audioOutputChannel,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager );
     
     virtual void doShutdown() override;
     
     virtual ~AudioChannelEngineImpl() = default;
 
     //
-    // aace::engine::MediaPlayerEngineInterface
+    // aace::audio::AudioOutputEngineInterface
     //
-    void onMediaStateChanged( MediaState state ) override;
-    void onMediaError( MediaError error, const std::string& description = "" ) override;
-    ssize_t read( char* data, const size_t size ) override;
     
-    bool isRepeating() override;
-    bool isClosed() override;
-
-    //
-    // aace::engine::SpeakerEngineInterface
-    //
-    void onLocalVolumeSet( int8_t volume ) override;
-    void onLocalMuteSet( bool mute ) override;
+    void onMediaStateChanged( MediaState state ) override;
+    void onMediaError( MediaError error, const std::string& description ) override;
 
     //
     // alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface
     //
     alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId setSource( std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader> attachmentReader, const alexaClientSDK::avsCommon::utils::AudioFormat* format = nullptr ) override;
     alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId setSource( std::shared_ptr<std::istream> stream, bool repeat ) override;
-    alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId setSource( const std::string& url, std::chrono::milliseconds offset ) override;
+    alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId setSource( const std::string& url, std::chrono::milliseconds offset, bool repeat ) override;
     bool play( alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id ) override;
     bool stop( alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id ) override;
     bool pause( alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id ) override;
@@ -92,10 +86,6 @@ public:
     
 protected:
     using SourceId = alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId;
-
-    std::shared_ptr<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerObserverInterface> getObserver() {
-        return m_observer;
-    }
     
     alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId nextId() {
         return ++s_nextId;
@@ -138,21 +128,17 @@ private:
     friend std::ostream& operator<<(std::ostream& stream, const PendingEventState& state);
 
 private:
-    std::shared_ptr<aace::alexa::AudioChannel> m_audioChannelPlatformInterface;
-    std::shared_ptr<aace::alexa::MediaPlayer> m_mediaPlayerPlatformInterface;
-    std::shared_ptr<aace::alexa::Speaker> m_speakerPlatformInterface;
-    std::shared_ptr<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerObserverInterface> m_observer;
-    std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader> m_attachmentReader;
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> m_speakerManager;
+    std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> m_audioOutputChannel;
     
-    alexaClientSDK::avsCommon::avs::attachment::AttachmentReader::ReadStatus m_status;
-    std::shared_ptr<std::istream> m_stream;
+    std::weak_ptr<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerObserverInterface> m_mediaPlayerObserver;
+    std::weak_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> m_speakerManager;
+    
+    alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::Type m_speakerType;
     alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId m_currentId;
-    bool m_repeat;
-    bool m_closed;
     std::string m_url;
     std::chrono::milliseconds m_savedOffset;
-    std::string m_name;
+    bool m_muted;
+    int8_t m_volume;
     
     PendingEventState m_pendingEventState;
     MediaState m_currentMediaState;
@@ -191,6 +177,50 @@ inline std::ostream& operator<<(std::ostream& stream, const AudioChannelEngineIm
     }
     return stream;
 }
+
+//
+// AttachmentReaderAudioStream
+//
+
+class AttachmentReaderAudioStream : public aace::audio::AudioStream {
+private:
+    AttachmentReaderAudioStream( std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader> attachmentReader, Encoding encoding = Encoding::UNKNOWN );
+   
+public:
+    static std::shared_ptr<AttachmentReaderAudioStream> create( std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader> attachmentReader, const alexaClientSDK::avsCommon::utils::AudioFormat* format );
+    
+    // aace::audio::AudioStream
+    ssize_t read( char* data, const size_t size ) override;
+    bool isClosed() override;
+    Encoding getEncoding() override;
+    
+private:
+    std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader> m_attachmentReader;
+    alexaClientSDK::avsCommon::avs::attachment::AttachmentReader::ReadStatus m_status;
+    bool m_closed;
+    Encoding m_encoding;
+};
+
+//
+// IStreamAudioStream
+//
+
+class IStreamAudioStream : public aace::audio::AudioStream {
+private:
+    IStreamAudioStream( std::shared_ptr<std::istream> stream );
+   
+public:
+    static std::shared_ptr<IStreamAudioStream> create( std::shared_ptr<std::istream> stream );
+    
+    // aace::audio::AudioStream
+    ssize_t read( char* data, const size_t size ) override;
+    bool isClosed() override;
+    
+private:
+    std::shared_ptr<std::istream> m_stream;
+    bool m_closed;
+};
+
 
 } // aace::engine::alexa
 } // aace::engine

@@ -15,19 +15,7 @@
 
 package com.amazon.sampleapp.impl.SpeechSynthesizer;
 
-import com.amazon.aace.alexa.MediaPlayer;
-import com.amazon.aace.alexa.Speaker;
 import com.amazon.aace.alexa.SpeechSynthesizer;
-import com.amazon.sampleapp.impl.MediaPlayer.MediaPlayerHandler;
 
-public class SpeechSynthesizerHandler extends SpeechSynthesizer
-{
-
-    public SpeechSynthesizerHandler( MediaPlayer mediaPlayer, Speaker speaker ) {
-        super( mediaPlayer, speaker );
-    }
-
-    public SpeechSynthesizerHandler( MediaPlayerHandler mediaPlayer ) {
-        this( mediaPlayer, mediaPlayer.getSpeaker() );
-    }
+public class SpeechSynthesizerHandler extends SpeechSynthesizer {
 }

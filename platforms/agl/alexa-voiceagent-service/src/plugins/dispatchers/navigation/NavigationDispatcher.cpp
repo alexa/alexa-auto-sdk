@@ -43,18 +43,18 @@ static std::string VSHL_CAPABILITY_VERB_NAVIGATION_PUBLISH = VSHL_CAPABILITY_NAV
 
 std::shared_ptr<NavigationDispatcher> NavigationDispatcher::create(
     std::shared_ptr<ILogger> logger,
-    std::shared_ptr<RequestHandler> requestHandler,
+    std::shared_ptr<IAASBController> aasbController,
     std::shared_ptr<IAFBApi> api) {
 
-    return std::shared_ptr<NavigationDispatcher>(new NavigationDispatcher(logger, requestHandler, api));
+    return std::shared_ptr<NavigationDispatcher>(new NavigationDispatcher(logger, aasbController, api));
 }
 
 NavigationDispatcher::NavigationDispatcher(
     std::shared_ptr<ILogger> logger,
-    std::shared_ptr<RequestHandler> requestHandler,
+    std::shared_ptr<IAASBController> aasbController,
     std::shared_ptr<IAFBApi> api) :
         m_logger(logger),
-        m_requestHandler(requestHandler),
+        m_aasbController(aasbController),
         m_api(api) {
 }
 

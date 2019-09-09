@@ -13,13 +13,14 @@
  * permissions and limitations under the License.
  */
 #include "CBLHandler.h"
-
+#include <fstream>
+#include <iostream>
 #include <rapidjson/document.h>
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
 
 #include <aasb/Consts.h>
-#include "DirectiveDispatcher.h"
+#include "ResponseDispatcher.h"
 #include "PlatformSpecificLoggingMacros.h"
 
 /**
@@ -37,14 +38,29 @@ const std::string TAG = "aasb::alexa::CBLHandler";
 
 std::shared_ptr<CBLHandler> CBLHandler::create(
     std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
-    std::weak_ptr<aasb::bridge::DirectiveDispatcher> directiveDispatcher) {
-    auto cblHandler = std::shared_ptr<CBLHandler>(new CBLHandler(directiveDispatcher));
-    cblHandler->m_logger = logger;
+    std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher,
+    std::string refresh_token_file) {
+    auto cblHandler = std::shared_ptr<CBLHandler>(new CBLHandler(logger, responseDispatcher, refresh_token_file));
     return cblHandler;
 }
 
-CBLHandler::CBLHandler(std::weak_ptr<aasb::bridge::DirectiveDispatcher> directiveDispatcher) :
-        m_directiveDispatcher(directiveDispatcher) {
+CBLHandler::CBLHandler(std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
+                       std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher,
+                       std::string refresh_token_file) :
+        m_logger(logger), m_responseDispatcher(responseDispatcher), m_refresh_token_file(refresh_token_file) {
+    loadRefreshTokenFromFile();
+}
+
+void CBLHandler::loadRefreshTokenFromFile() {
+    std::ifstream file(m_refresh_token_file, std::ifstream::in);
+    if(file.is_open()) {
+        m_RefreshToken = std::string((std::istreambuf_iterator<char>(file)),
+                                     (std::istreambuf_iterator<char>()));
+        file.close();
+    } else {
+        m_RefreshToken = "";
+        m_logger->log(Level::WARN, TAG, "loadRefreshTokenFromFile: Error opening refresh token file");
+    }
 }
 
 void CBLHandler::cblStateChanged(CBLState state, CBLStateChangedReason reason, const std::string& url, const std::string& code) {
@@ -56,7 +72,7 @@ void CBLHandler::cblStateChanged(CBLState state, CBLStateChangedReason reason, c
 
     m_logger->log(Level::INFO, TAG, info);
 
-    if (auto directiveDispatcher = m_directiveDispatcher.lock()) {
+    if (auto responseDispatcher = m_responseDispatcher.lock()) {
         if (state == CBLState::CODE_PAIR_RECEIVED) {
             rapidjson::Document document;
             document.SetObject();
@@ -74,13 +90,13 @@ void CBLHandler::cblStateChanged(CBLState state, CBLStateChangedReason reason, c
 
             document.Accept( writer );
 
-            directiveDispatcher->sendDirective(
+            responseDispatcher->sendDirective(
                 aasb::bridge::TOPIC_CBL,
                 aasb::bridge::ACTION_CBL_CODEPAIR_RECEIVED,
                 buffer.GetString());
         } else if ((state == CBLState::STOPPING) && (reason == CBLStateChangedReason::CODE_PAIR_EXPIRED)) {
             m_logger->log(Level::WARN, TAG, "The code has expired. Retry to generate a new code.");
-            directiveDispatcher->sendDirective(
+            responseDispatcher->sendDirective(
                 aasb::bridge::TOPIC_CBL,
                 aasb::bridge::ACTION_CBL_CODEPAIR_EXPIRED,
                 "");
@@ -92,60 +108,37 @@ void CBLHandler::clearRefreshToken() {
     m_logger->log(Level::VERBOSE, TAG, "clearRefreshToken");
 
     clearRefreshTokenInternal();
-
-    auto directiveDispatcher = m_directiveDispatcher.lock();
-    if (!directiveDispatcher) {
-        m_logger->log(Level::WARN, TAG, "clearRefreshToken: Directive dispatcher is out of scope");
-        return;
-    }
-
-    directiveDispatcher->sendDirective(aasb::bridge::TOPIC_CBL, aasb::bridge::ACTION_CBL_CLEAR_REFRESH_TOKEN, "");
 }
 
 void CBLHandler::setRefreshToken(const std::string& refreshToken) {
     m_logger->log(Level::VERBOSE, TAG, "setRefreshToken");
 
     setRefreshTokenInternal(refreshToken);
-
-    auto directiveDispatcher = m_directiveDispatcher.lock();
-    if (!directiveDispatcher) {
-        m_logger->log(Level::WARN, TAG, "setRefreshToken: Directive dispatcher is out of scope");
-        return;
-    }
-
-    directiveDispatcher->sendDirective(aasb::bridge::TOPIC_CBL, aasb::bridge::ACTION_CBL_SET_REFRESH_TOKEN, refreshToken);
 }
 
 std::string CBLHandler::getRefreshToken() {
-    auto directiveDispatcher = m_directiveDispatcher.lock();
-
     m_logger->log(Level::VERBOSE, TAG, "getRefreshToken");
 
-    if (!getRefreshTokenInternal().empty()) {
-        m_logger->log(Level::VERBOSE, TAG, "getRefreshToken: Returning the in-memory refresh token");
-        return getRefreshTokenInternal();
-    }
-
-    if (!directiveDispatcher) {
-        m_logger->log(Level::WARN, TAG, "getRefreshToken: Directive dispatcher is out of scope");
-        // Return available refresh token
-        return getRefreshTokenInternal();
-    }
-
-    directiveDispatcher->sendDirective(aasb::bridge::TOPIC_CBL, aasb::bridge::ACTION_CBL_GET_REFRESH_TOKEN, "");
-
-    // This specific thread could have been unblocked either after retrieving the refresh token
-    // from the platform layer or we failed to get it from the platform layer, a timeout occurred
-    // and so we will provide refresh token that we already have stored in memory.
+    // Return available refresh token
     return getRefreshTokenInternal();
+}
+
+void CBLHandler::setUserProfile(const std::string& name, const std::string& email) {
+    m_logger->log(Level::VERBOSE, TAG, "setUserProfile" + name + "email" + email);
+    if (auto responseDispatcher = m_responseDispatcher.lock()) {
+        if (!name.empty()) {
+            responseDispatcher->sendDirective(
+                    aasb::bridge::TOPIC_CBL,
+                    aasb::bridge::ACTION_CBL_SET_PROFILE_NAME,
+                    name);
+        }
+    }
 }
 
 void CBLHandler::onReceivedEvent(const std::string& action, const std::string& payload) {
     m_logger->log(Level::INFO, TAG, "onReceivedEvent: " + action);
 
-    if (action == aasb::bridge::ACTION_CBL_GET_REFRESH_TOKEN_RESPONSE) {
-        setRefreshTokenInternal(payload);
-    } else if (action == aasb::bridge::ACTION_CBL_START) {
+    if (action == aasb::bridge::ACTION_CBL_START) {
         start();
     } else if (action == aasb::bridge::ACTION_CBL_CANCEL) {
         cancel();
@@ -194,7 +187,16 @@ std::string CBLHandler::convertCBLStateChangedReasonToString(CBLStateChangedReas
 
 void CBLHandler::setRefreshTokenInternal(const std::string& refreshToken) {
     std::lock_guard<std::mutex> lock(m_mutex);
+
     m_RefreshToken = refreshToken;
+
+    std::ofstream file(m_refresh_token_file, std::ofstream::trunc);
+    if(file.is_open()) {
+        file << refreshToken;
+        file.close();
+    } else {
+        m_logger->log(Level::ERROR, TAG, "setRefreshTokenInternal: Error opening refresh token file");
+    }
 }
 
 std::string CBLHandler::getRefreshTokenInternal() {
@@ -204,7 +206,13 @@ std::string CBLHandler::getRefreshTokenInternal() {
 
 void CBLHandler::clearRefreshTokenInternal() {
     std::lock_guard<std::mutex> lock(m_mutex);
+
     m_RefreshToken.clear();
+
+    // Remove refresh token file
+    if(remove(m_refresh_token_file.c_str()) != 0) {
+        m_logger->log(Level::ERROR, TAG, "clearRefreshTokenInternal: Error clearing refresh token file");
+    }
 }
 
 }  // namespace cbl

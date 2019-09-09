@@ -1,0 +1,156 @@
+{
+    "contacts": [
+        {
+            "id": "001",
+            "name": {
+                "firstName": "Alice",
+                "lastName": "Smith",
+                "nickName": "Ally"
+            },
+            "phoneNumbers": [
+                {
+                    "label": "Test",
+                    "number": "34985398457"
+                }
+            ]
+        },
+        {
+            "id": "002",
+            "name": {
+                "firstName": "Bob",
+                "lastName": "Smith",
+                "nickName": "Dude"
+            },
+            "phoneNumbers": [
+                {
+                    "label": "Home",
+                    "number": "1234"
+                },
+                {
+                    "label": "Work",
+                    "number": "54321"
+                }
+            ]
+        },
+        {
+            "id": "003",
+            "name": {
+                "firstName": "Calvin",
+                "lastName": "Smith",
+                "nickName": "Cal"
+            },
+            "phoneNumbers": [
+                {
+                    "label": "Toto",
+                    "number": "398457"
+                }
+            ]
+        },
+        {
+            "id": "004",
+            "name": {
+                "firstName": "David",
+                "lastName": "Smith",
+                "nickName": "Dave"
+            },
+            "phoneNumbers": [
+                {
+                    "label": "Home",
+                    "number": "121212"
+                }
+            ]
+        },
+        {
+            "id": "005",
+            "name": {
+                "firstName": "Ethan",
+                "lastName": "Smith",
+                "nickName": "Eath"
+            },
+            "phoneNumbers": [
+                {
+                    "label": "Home",
+                    "number": "131313"
+                }
+            ]
+        },
+        {
+            "id": "006",
+            "name": {
+                "firstName": "Jack",
+                "lastName": "Ryan",
+                "nickName": "Jar"
+            },
+            "phoneNumbers": [
+                {
+                    "label": "Home",
+                    "number": "746335"
+                }
+            ]
+        },
+        {
+            "id": "007",
+            "name": {
+                "firstName": "Hanna",
+                "lastName": "Wang",
+                "nickName": "Han"
+            },
+            "phoneNumbers": [
+                {
+                    "label": "Home",
+                    "number": "4556674"
+                }
+            ]
+        },
+        {
+            "id": "008",
+            "name": {
+                "firstName": "Jason",
+                "lastName": "Wang",
+                "nickName": "Jay"
+            },
+            "phoneNumbers": [
+                {
+                    "label": "Home",
+                    "number": "455643"
+                }
+            ]
+        },
+        {
+            "id": "009",
+            "name": {
+                "firstName": "Nathalie",
+                "lastName": "Black",
+                "nickName": "Nat"
+            },
+            "phoneNumbers": [
+                {
+                    "label": "Home",
+                    "number": "131313"
+                },
+                {
+                    "label": "Work",
+                    "number": "2349875"
+                }
+            ]
+        },
+        {
+            "id": "010",
+            "name": {
+                "firstName": "Albert",
+                "lastName": "Wong",
+                "nickName": "Big Al"
+            },
+            "phoneNumbers": [
+                {
+                    "label": "Home",
+                    "number": "1235512"
+                },
+                {
+                    "label": "Work",
+                    "number": "45633"
+                }
+            ]
+        }
+    ]
+}

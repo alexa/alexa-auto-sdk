@@ -30,16 +30,14 @@ namespace alexa {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class NotificationsHandler : public aace::alexa::Notifications /* isa AudioChannel */ {
+class NotificationsHandler : public aace::alexa::Notifications /* isa PlatformInterface */ {
   private:
     std::weak_ptr<Activity> m_activity{};
     std::weak_ptr<logger::LoggerHandler> m_loggerHandler{};
 
   protected:
     NotificationsHandler(std::weak_ptr<Activity> activity,
-                         std::weak_ptr<logger::LoggerHandler> loggerHandler,
-                         std::shared_ptr<aace::alexa::MediaPlayer> mediaPlayer,
-                         std::shared_ptr<aace::alexa::Speaker> speaker);
+                         std::weak_ptr<logger::LoggerHandler> loggerHandler);
 
   public:
     template <typename... Args> static auto create(Args &&... args) -> std::shared_ptr<NotificationsHandler> {

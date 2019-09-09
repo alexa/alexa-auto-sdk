@@ -35,6 +35,12 @@ public:
     static constexpr double UNDEFINED = std::numeric_limits<double>::min();
 
     /**
+     * Default constructor
+     *
+     */
+    Location();
+
+    /**
      * Location constructor
      *
      * @param [in] latitude A location latitude

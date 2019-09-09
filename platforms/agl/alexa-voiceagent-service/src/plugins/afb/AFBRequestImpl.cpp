@@ -15,18 +15,14 @@
 
 #include "afb/AFBRequestImpl.h"
 
-extern "C" {
-#include "afb-definitions.h"
-}
-
 namespace agl {
 namespace afb {
 
-std::unique_ptr<AFBRequestImpl> AFBRequestImpl::create(AFB_ReqT afbRequest) {
+std::unique_ptr<AFBRequestImpl> AFBRequestImpl::create(afb_req_t afbRequest) {
     return std::unique_ptr<AFBRequestImpl>(new AFBRequestImpl(afbRequest));
 }
 
-AFBRequestImpl::AFBRequestImpl(AFB_ReqT afbRequest) : mAfbRequest(afbRequest) {
+AFBRequestImpl::AFBRequestImpl(afb_req_t afbRequest) : mAfbRequest(afbRequest) {
 }
 
 void* AFBRequestImpl::getNativeRequest() {

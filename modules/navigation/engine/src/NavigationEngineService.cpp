@@ -19,6 +19,12 @@
 #include "AACE/Engine/Alexa/AlexaEngineService.h"
 #include "AACE/Engine/Core/EngineMacros.h"
 
+#include <rapidjson/document.h>
+#include <rapidjson/prettywriter.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/error/en.h>
+#include <rapidjson/istreamwrapper.h>
+
 namespace aace {
 namespace engine {
 namespace navigation {
@@ -32,16 +38,34 @@ REGISTER_SERVICE(NavigationEngineService);
 NavigationEngineService::NavigationEngineService( const aace::engine::core::ServiceDescription& description ) : aace::engine::core::EngineService( description ) {
 }
 
-bool NavigationEngineService::configure( const std::vector<std::shared_ptr<std::istream>>& configuration ) {
-    return true;
-}
-
-bool NavigationEngineService::start() {
-    return true;
-}
-
-bool NavigationEngineService::stop() {
-    return true;
+bool NavigationEngineService::configure( std::shared_ptr<std::istream> configuration )
+{
+    try
+    {
+        rapidjson::IStreamWrapper isw( *configuration );
+        rapidjson::Document document;
+        
+        document.ParseStream( isw );
+        
+        ThrowIf( document.HasParseError(), GetParseError_En( document.GetParseError() ) );
+        ThrowIfNot( document.IsObject(), "invalidConfigurationStream" );
+        
+        auto root = document.GetObject();
+        
+        if( root.HasMember( "aace.navigation" ) && root["aace.navigation"].IsObject() )
+        {
+            auto navigation = root["aace.navigation"].GetObject();
+            
+            if( navigation.HasMember( "providerName" ) && navigation["providerName"].IsString() ) {
+                m_navigationProviderName = navigation["providerName"].GetString();
+            }   
+        }
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"configure").d("reason", ex.what()));
+        return false;
+    }
 }
 
 bool NavigationEngineService::shutdown()
@@ -85,7 +109,10 @@ bool NavigationEngineService::registerPlatformInterfaceType( std::shared_ptr<aac
         auto exceptionSender = alexaComponents->getExceptionEncounteredSender();
         ThrowIfNull( exceptionSender, "exceptionSenderInvalid" );
 
-        m_navigationEngineImpl = aace::engine::navigation::NavigationEngineImpl::create( navigation, directiveSequencer, capabilitiesDelegate, exceptionSender );
+        auto contextManager = alexaComponents->getContextManager();
+        ThrowIfNull( contextManager, "contextManagerInvalid" );
+
+        m_navigationEngineImpl = aace::engine::navigation::NavigationEngineImpl::create( navigation, directiveSequencer, capabilitiesDelegate, exceptionSender, contextManager, m_navigationProviderName );
         ThrowIfNull( m_navigationEngineImpl, "createNavigationEngineImplFailed" );
 
         return true;

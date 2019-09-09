@@ -36,15 +36,13 @@ public:
     virtual ~CBLEngineService() = default;
 
 protected:
-    bool configure( const std::vector<std::shared_ptr<std::istream>>& configuration ) override;
+    bool configure( std::shared_ptr<std::istream> configuration ) override;
     bool start() override;
     bool stop() override;
     bool shutdown() override;
     bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) override;
 
 private:
-    bool configure( std::shared_ptr<std::istream> configuration );
-
     // platform interface registration
     template <class T>
     bool registerPlatformInterfaceType( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) {
@@ -58,6 +56,7 @@ private:
     std::shared_ptr<aace::engine::cbl::CBLEngineImpl> m_cblEngineImpl;
     std::chrono::seconds m_codePairRequestTimeout;
     std::string m_endpoint;
+    bool m_enableUserProfile;
 
 };
 

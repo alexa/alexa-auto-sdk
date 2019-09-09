@@ -28,6 +28,7 @@
 #include <AVSCommon/SDKInterfaces/AuthDelegateInterface.h>
 #include <AVSCommon/SDKInterfaces/AuthObserverInterface.h>
 #include <AVSCommon/Utils/LibcurlUtils/HttpPost.h>
+#include <AVSCommon/Utils/LibcurlUtils/HttpGet.h>
 #include <AVSCommon/Utils/DeviceInfo.h>
 #include <AVSCommon/Utils/RetryTimer.h>
 #include <RegistrationManager/CustomerDataHandler.h>
@@ -46,7 +47,8 @@ public:
     static std::shared_ptr<CBLAuthDelegate> create(
         std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> customerDataManager,
         std::shared_ptr<CBLAuthDelegateConfiguration> configuration,
-        std::shared_ptr<CBLAuthRequesterInterface> cblAuthRequester );
+        std::shared_ptr<CBLAuthRequesterInterface> cblAuthRequester,
+        bool enableUserProfile = false );
 
     ~CBLAuthDelegate();
 
@@ -61,6 +63,7 @@ public:
 
     void start( bool onStart );
     void cancel();
+    void reset();
 
 private:
     enum class FlowState {
@@ -75,12 +78,23 @@ private:
         std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> customerDataManager,
         std::shared_ptr<CBLAuthDelegateConfiguration> configuration,
         std::shared_ptr<CBLAuthRequesterInterface> cblAuthRequester,
-        std::shared_ptr<alexaClientSDK::avsCommon::utils::libcurlUtils::HttpPost> httpPost );
+        bool enableUserProfile );
 
 
     bool initialize();
-    void stop();
+    void stop( bool reset = false );
     void handleAuthorizationFlow();
+    void handleRequestingUserProfile();
+
+    alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse doPost(
+        const std::string& url,
+        const std::vector<std::string> headerLines,
+        const std::vector<std::pair<std::string, std::string>>& data,
+        std::chrono::seconds timeout);
+
+    alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse doGet(
+        const std::string& url,
+        const std::vector<std::string>& headers );
 
     FlowState handleStarting();
     FlowState handleRequestingCodePair();
@@ -91,6 +105,7 @@ private:
     alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse requestCodePair();
     alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse requestToken();
     alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse requestRefresh();
+    alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse requestUserProfile();
 
     alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error receiveCodePairResponse(
         const alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse& response );
@@ -107,7 +122,6 @@ private:
 
     bool isStopping();
 
-    std::shared_ptr<alexaClientSDK::avsCommon::utils::libcurlUtils::HttpPostInterface> m_httpPost;
     std::shared_ptr<CBLAuthRequesterInterface> m_cblAuthRequester;
     std::shared_ptr<CBLAuthDelegateConfiguration> m_configuration;
 
@@ -134,7 +148,10 @@ private:
     bool m_newRefreshToken;
     std::atomic<bool> m_threadActive;
 
+    FlowState m_flowState;
     aace::engine::cbl::CBLAuthRequesterInterface::CBLStateChangedReason m_stateChangeReason;
+    bool m_enableUserProfile;
+    std::string m_scope;
 };
 
 } // aace::engine::cbl

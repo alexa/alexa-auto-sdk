@@ -32,10 +32,8 @@ namespace alexa {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 NotificationsHandler::NotificationsHandler(std::weak_ptr<Activity> activity,
-                                           std::weak_ptr<logger::LoggerHandler> loggerHandler,
-                                           std::shared_ptr<aace::alexa::MediaPlayer> mediaPlayer,
-                                           std::shared_ptr<aace::alexa::Speaker> speaker)
-    : aace::alexa::Notifications{mediaPlayer, speaker}, m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
+                                           std::weak_ptr<logger::LoggerHandler> loggerHandler)
+    : m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
     // Expects((m_activity != nullptr) && (m_loggerHandler != nullptr));
     // Expects((mediaPlayer != nullptr) && (speaker != nullptr));
     setupUI();

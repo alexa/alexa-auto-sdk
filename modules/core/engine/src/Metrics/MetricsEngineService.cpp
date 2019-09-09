@@ -37,6 +37,21 @@ REGISTER_SERVICE(MetricsEngineService);
 MetricsEngineService::MetricsEngineService( const aace::engine::core::ServiceDescription& description ) : aace::engine::core::EngineService( description ) {
 }
 
+bool MetricsEngineService::shutdown()
+{
+    if( m_metricsUploaderEngineImpl != nullptr )
+    {
+        // get the logger service interface
+        auto loggerServiceInterface = getContext()->getServiceInterface<aace::engine::logger::LoggerServiceInterface>( "aace.logger" );
+        ThrowIfNull( loggerServiceInterface, "invalidLoggerServiceInterface" );
+
+        // remove the metrics uploader from the logger
+        loggerServiceInterface->removeSink( m_metricsUploaderEngineImpl->getId() );
+    }
+    
+    return true;
+}
+
 bool MetricsEngineService::registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface )
 {
     try
@@ -61,8 +76,11 @@ bool MetricsEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::
         ThrowIfNull( loggerServiceInterface, "invalidLoggerServiceInterface" );
         
         // create the metrics uploader engine implementation
-        m_metricsUploaderEngineImpl = aace::engine::metrics::MetricsUploaderEngineImpl::create( metricsUploader, loggerServiceInterface );
+        m_metricsUploaderEngineImpl = aace::engine::metrics::MetricsUploaderEngineImpl::create( metricsUploader );
         ThrowIfNull( m_metricsUploaderEngineImpl, "createMetricsUploaderEngineImplFailed" );
+
+        // add the uploader service impl to the logger service
+        loggerServiceInterface->addSink( m_metricsUploaderEngineImpl );
 
         return true;
     }

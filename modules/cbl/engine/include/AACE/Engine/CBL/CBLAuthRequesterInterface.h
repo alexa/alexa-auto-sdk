@@ -49,6 +49,7 @@ public:
     virtual void clearRefreshToken() = 0;
     virtual void setRefreshToken( const std::string& refreshToken ) = 0;
     virtual std::string getRefreshToken() = 0;
+    virtual void setUserProfile( const std::string& name, const std::string& email ) = 0;
 
     virtual ~CBLAuthRequesterInterface() = default;
 };

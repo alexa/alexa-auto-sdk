@@ -18,7 +18,7 @@
 #include <memory>
 
 #include <AACE/Alexa/TemplateRuntime.h>
-#include "DirectiveDispatcher.h"
+#include "ResponseDispatcher.h"
 #include "LoggerHandler.h"
 
 namespace aasb {
@@ -28,7 +28,7 @@ class TemplateRuntimeHandler : public aace::alexa::TemplateRuntime {
 public:
     static std::shared_ptr<TemplateRuntimeHandler> create(
         std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
-        std::weak_ptr<aasb::bridge::DirectiveDispatcher> directiveDispatcher);
+        std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher);
 
     /// @name aace::alexa::TemplateRuntime Functions
     /// @{
@@ -39,12 +39,12 @@ public:
     /// @}
 
 private:
-    TemplateRuntimeHandler(std::weak_ptr<aasb::bridge::DirectiveDispatcher> directiveDispatcher);
+    TemplateRuntimeHandler(std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher);
 
     // aasb::core::logger::LoggerHandler
     std::shared_ptr<aasb::core::logger::LoggerHandler> m_logger;
-    // DirectiveDispatcher to send status info
-    std::weak_ptr<aasb::bridge::DirectiveDispatcher> m_directiveDispatcher;
+    // ResponseDispatcher to send status info
+    std::weak_ptr<aasb::bridge::ResponseDispatcher> m_responseDispatcher;
 };
 
 }  // namespace alexa

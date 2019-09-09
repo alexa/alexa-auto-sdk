@@ -96,14 +96,8 @@ static const std::string GET_INDENTITYV2_QUERY = "/identities?includeUserName=fa
 static const std::string GET_ADDRESS_BOOK_QUERY = "?addressBookSourceIds=";
 
 ContactUploaderRESTAgent::ContactUploaderRESTAgent(
-        std::shared_ptr<alexaClientSDK::avsCommon::utils::libcurlUtils::HttpGet> httpGet,
-        std::shared_ptr<alexaClientSDK::avsCommon::utils::libcurlUtils::HttpPost> httpPost,
-        std::shared_ptr<alexaClientSDK::avsCommon::utils::libcurlUtils::HttpDelete> httpDelete,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo ):
-    m_httpGet( httpGet ),
-    m_httpPost( httpPost ),
-    m_httpDelete( httpDelete ),
     m_authDelegate( authDelegate ),
     m_deviceInfo( deviceInfo ) {
 }
@@ -111,24 +105,9 @@ ContactUploaderRESTAgent::ContactUploaderRESTAgent(
 std::shared_ptr<ContactUploaderRESTAgent> ContactUploaderRESTAgent::create(
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo ) {
-    std::shared_ptr<alexaClientSDK::avsCommon::utils::libcurlUtils::HttpGet> httpGet;
-    std::shared_ptr<alexaClientSDK::avsCommon::utils::libcurlUtils::HttpPost> httpPost;
-    std::shared_ptr<alexaClientSDK::avsCommon::utils::libcurlUtils::HttpDelete> httpDelete;
 
     try {
-        // Create HTTP Get handler
-        httpGet = alexaClientSDK::avsCommon::utils::libcurlUtils::HttpGet::create();
-        ThrowIfNull( httpGet, "nullHttpGet" );
-
-        // Create HTTP Post handler
-        httpPost = alexaClientSDK::avsCommon::utils::libcurlUtils::HttpPost::create();
-        ThrowIfNull( httpPost, "nullHttpPost" );
-
-        // Create HTTP Delete handler
-        httpDelete = alexaClientSDK::avsCommon::utils::libcurlUtils::HttpDelete::create();
-        ThrowIfNull( httpDelete, "nullHttpDelete" );
-
-        std::shared_ptr<ContactUploaderRESTAgent> contactUploaderRESTAgent = std::shared_ptr<ContactUploaderRESTAgent>( new ContactUploaderRESTAgent( httpGet, httpPost, httpDelete, authDelegate, deviceInfo ) );
+        std::shared_ptr<ContactUploaderRESTAgent> contactUploaderRESTAgent = std::shared_ptr<ContactUploaderRESTAgent>( new ContactUploaderRESTAgent( authDelegate, deviceInfo ) );
         return contactUploaderRESTAgent;
     } catch( std::exception& ex ) {
         AACE_ERROR( LX(TAG,"create").d("reason", ex.what() ) );
@@ -156,6 +135,48 @@ bool ContactUploaderRESTAgent::parseCommonHTTPResponse( const HTTPResponse& resp
         return true;
     }
     return false;
+}
+
+ContactUploaderRESTAgent::HTTPResponse ContactUploaderRESTAgent::doPost( const std::string& url, const std::vector<std::string> headerLines, const std::string& data, std::chrono::seconds timeout ) {
+    try {
+        // Creating the HttpPost on every doPost is by design to ensure that curl in libcurlUtils uses the
+        // latest provided curl options.
+        auto httpPost = alexaClientSDK::avsCommon::utils::libcurlUtils::HttpPost::create();
+        ThrowIfNull( httpPost, "nullHttpPost" );
+
+        return httpPost->doPost( url, headerLines, data, timeout );
+    } catch( std::exception& ex ) {
+        AACE_ERROR( LX(TAG,"doPost").d("reason", ex.what() ) );
+        return ContactUploaderRESTAgent::HTTPResponse();
+    }
+}
+
+ContactUploaderRESTAgent::HTTPResponse ContactUploaderRESTAgent::doGet( const std::string& url, const std::vector<std::string>& headers ) {
+    try {
+        // Creating the HttpGet on every doGet is by design to ensure that curl in libcurlUtils uses the
+        // latest provided curl options.
+        auto httpGet = alexaClientSDK::avsCommon::utils::libcurlUtils::HttpGet::create();
+        ThrowIfNull( httpGet, "nullHttpGet" );
+
+        return httpGet->doGet( url, headers );
+    } catch( std::exception& ex ) {
+        AACE_ERROR( LX(TAG,"doGet").d("reason", ex.what() ) );
+        return ContactUploaderRESTAgent::HTTPResponse();
+    }
+}
+
+ContactUploaderRESTAgent::HTTPResponse ContactUploaderRESTAgent::doDelete( const std::string& url, const std::vector<std::string>& headers ){
+    try {
+        // Creating the HttpDelete on every doDelete is by design to ensure that curl in libcurlUtils uses the
+        // latest provided curl options.
+        auto httpDelete = alexaClientSDK::avsCommon::utils::libcurlUtils::HttpDelete::create();
+        ThrowIfNull( httpDelete, "nullHttpDelete" );
+
+        return httpDelete->doDelete( url, headers );
+    } catch( std::exception& ex ) {
+        AACE_ERROR( LX(TAG,"doDelete").d("reason", ex.what() ) );
+        return ContactUploaderRESTAgent::HTTPResponse();
+    }
 }
 
 std::string ContactUploaderRESTAgent::getHTTPErrorString( const HTTPResponse& response ) {
@@ -187,7 +208,7 @@ ContactUploaderRESTAgent::AlexaAccountInfo ContactUploaderRESTAgent::getAlexaAcc
     bool validFlag = false;
     try { 
         for( int retry = 0; retry < HTTP_RETRY_COUNT; retry++ ) {
-            httpResponse = m_httpGet->doGet( 
+            httpResponse = doGet(
                 ACMS_ENDPOINT + FORWARD_SLASH + ACCOUNTS_PATH, 
                 httpHeaderData );
 
@@ -275,7 +296,7 @@ bool ContactUploaderRESTAgent::doAccountAutoProvision( const std::string& direct
     auto autoProvisionJson = buildAutoAccountProvisionJson();
     try {
         for( int retry = 0; retry < HTTP_RETRY_COUNT; retry++ ) {
-            httpResponse = m_httpPost->doPost(
+            httpResponse = doPost(
                 ACMS_ENDPOINT + FORWARD_SLASH + ACCOUNTS_PATH + FORWARD_SLASH + directedId + FORWARD_SLASH + USERS_PATH,
                 httpHeaderData, autoProvisionJson, DEFAULT_HTTP_TIMEOUT );
             if( parseCommonHTTPResponse( httpResponse ) ) {
@@ -315,7 +336,7 @@ std::string ContactUploaderRESTAgent::getPceId( const std::string& commsId ) {
 
     try { 
         for( int retry = 0; retry < HTTP_RETRY_COUNT; retry++ ) {
-            httpResponse = m_httpGet->doGet( 
+            httpResponse = doGet(
                 ACMS_ENDPOINT + FORWARD_SLASH + USERS_PATH + FORWARD_SLASH + commsId + GET_INDENTITYV2_QUERY, 
                 httpHeaderData );
 
@@ -368,7 +389,7 @@ std::string ContactUploaderRESTAgent::createAndGetAddressBookId( const std::stri
 
     try {
         for( int retry = 0; retry < HTTP_RETRY_COUNT; retry++ ) {
-        httpResponse = m_httpPost->doPost(
+        httpResponse = doPost(
             ACMS_ENDPOINT + FORWARD_SLASH + USERS_PATH + FORWARD_SLASH + pceId + FORWARD_SLASH + ADDRESSBOOK_PATH,
             httpHeaderData, addressDataJson, DEFAULT_HTTP_TIMEOUT );
 
@@ -435,7 +456,7 @@ std::string ContactUploaderRESTAgent::getAddressBookId( const std::string& sourc
     auto httpHeaderData = buildCommonHTTPHeader();
     try { 
         for( int retry = 0; retry < HTTP_RETRY_COUNT; retry++ ) {
-            httpResponse = m_httpGet->doGet(
+            httpResponse = doGet(
                 ACMS_ENDPOINT + FORWARD_SLASH + USERS_PATH + FORWARD_SLASH + pceId + FORWARD_SLASH + ADDRESSBOOK_PATH + GET_ADDRESS_BOOK_QUERY + sourceAddressBookId,
                 httpHeaderData );
 
@@ -492,7 +513,7 @@ ContactUploaderRESTAgent::HTTPResponse ContactUploaderRESTAgent::uploadContactTo
     auto contactsJson = buildContactsJson( poppedContacts );
 
     for( int retryCount = 0; retryCount < HTTP_RETRY_COUNT; retryCount++  ) {
-        httpResponse = m_httpPost->doPost(
+        httpResponse = doPost(
             ACMS_ENDPOINT + FORWARD_SLASH + USERS_PATH + FORWARD_SLASH + pceId + FORWARD_SLASH + ADDRESSBOOK_PATH + FORWARD_SLASH + addressBookId + FORWARD_SLASH + ENTRIES_PATH,
             httpHeaderData, contactsJson, DEFAULT_HTTP_TIMEOUT );
 
@@ -664,7 +685,7 @@ bool ContactUploaderRESTAgent::deleteAddressBookId( const std::string& addressBo
     auto httpHeaderData = buildCommonHTTPHeader();
     try { 
         for( int retry = 0; retry < HTTP_RETRY_COUNT; retry++ ) {
-            httpResponse = m_httpDelete->doDelete(
+            httpResponse = doDelete(
                 ACMS_ENDPOINT + FORWARD_SLASH + USERS_PATH + FORWARD_SLASH + pceId + FORWARD_SLASH + ADDRESSBOOK_PATH + FORWARD_SLASH + addressBookId,
                 httpHeaderData );
 

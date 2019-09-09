@@ -19,6 +19,8 @@
 #include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
 #include "AVSCommon/SDKInterfaces/test/MockExceptionEncounteredSender.h"
 #include "AVSCommon/SDKInterfaces/test/MockDirectiveSequencer.h"
+#include "AVSCommon/SDKInterfaces/test/MockContextManager.h"
+
 
 #include "AACE/Navigation/Navigation.h"
 #include "AACE/Engine/Navigation/NavigationEngineImpl.h"
@@ -42,6 +44,7 @@ class MockNavigationPlatformInterface : public aace::navigation::Navigation {
 public:
     MOCK_METHOD1( setDestination, bool(const std::string& payload) );
     MOCK_METHOD0( cancelNavigation, bool() );
+    MOCK_METHOD0( getNavigationState, std::string() );
 };
 
 
@@ -53,6 +56,8 @@ public:
         m_mockCapabilitiesDelegate = std::make_shared<testing::StrictMock<MockCapabilitiesDelegate>>();
         m_mockDirectiveSequencer = std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockDirectiveSequencer>>();
         m_mockExceptionEncounteredSender = std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockExceptionEncounteredSender>>();
+        m_mockContextManager = std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockContextManager>>(); 
+        m_mockNavigationProviderName = "HERE";
 
         EXPECT_CALL(*m_mockDirectiveSequencer, addDirectiveHandler(testing::_)).WillOnce(testing::Return(true));
         EXPECT_CALL(*m_mockCapabilitiesDelegate, registerCapability(testing::_)).WillOnce(testing::Return(true));
@@ -60,7 +65,9 @@ public:
             m_mockPlatformInterface,
             m_mockDirectiveSequencer,
             m_mockCapabilitiesDelegate,
-            m_mockExceptionEncounteredSender
+            m_mockExceptionEncounteredSender,
+            m_mockContextManager,
+            m_mockNavigationProviderName
         );
     }
     void TearDown() override{
@@ -81,6 +88,12 @@ public:
     // pass the interface
     std::shared_ptr<testing::StrictMock<MockCapabilitiesDelegate>> m_mockCapabilitiesDelegate;
 
+    // a context manager
+    std::shared_ptr<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockContextManager>> m_mockContextManager; 
+
+    // provider name
+    std::string m_mockNavigationProviderName;
+
 };
 
 /**
@@ -96,7 +109,9 @@ TEST_F( NavigationEngineImplTest, createWithNullPlatform ) {
         nullptr,
         m_mockDirectiveSequencer,
         m_mockCapabilitiesDelegate,
-        m_mockExceptionEncounteredSender);
+        m_mockExceptionEncounteredSender,
+        m_mockContextManager,
+        m_mockNavigationProviderName);
     EXPECT_EQ(nullptr, testNavigationEngineImpl);
 }
 
@@ -106,7 +121,9 @@ TEST_F( NavigationEngineImplTest, createWithNullDirectiveSequencer ) {
         m_mockPlatformInterface,
         nullptr,
         m_mockCapabilitiesDelegate,
-        m_mockExceptionEncounteredSender);
+        m_mockExceptionEncounteredSender,
+        m_mockContextManager,
+        m_mockNavigationProviderName);
     EXPECT_EQ(nullptr, testNavigationEngineImpl);
 }
 
@@ -116,7 +133,9 @@ TEST_F( NavigationEngineImplTest, createWithNullCapabilitiesDelegate ) {
         m_mockPlatformInterface,
         m_mockDirectiveSequencer,
         nullptr,
-        m_mockExceptionEncounteredSender);
+        m_mockExceptionEncounteredSender,
+        m_mockContextManager,
+        m_mockNavigationProviderName);
     EXPECT_EQ(nullptr, testNavigationEngineImpl);
 }
 
@@ -126,7 +145,21 @@ TEST_F( NavigationEngineImplTest, createWithNullExceptionEncounteredSender ) {
         m_mockPlatformInterface,
         m_mockDirectiveSequencer,
         m_mockCapabilitiesDelegate,
-        nullptr);
+        nullptr,
+        m_mockContextManager,
+        m_mockNavigationProviderName);
+    EXPECT_EQ(nullptr, testNavigationEngineImpl);
+}
+
+TEST_F( NavigationEngineImplTest, createWithNullContextManager ) {
+    std::shared_ptr<aace::engine::navigation::NavigationEngineImpl> testNavigationEngineImpl;
+    testNavigationEngineImpl = engine::navigation::NavigationEngineImpl::create(
+        m_mockPlatformInterface,
+        m_mockDirectiveSequencer,
+        m_mockCapabilitiesDelegate,
+        m_mockExceptionEncounteredSender,
+        nullptr,
+        m_mockNavigationProviderName);
     EXPECT_EQ(nullptr, testNavigationEngineImpl);
 }
 

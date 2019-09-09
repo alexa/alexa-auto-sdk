@@ -21,8 +21,7 @@
 #include <memory>
 #include <string>
 
-#include <afb-definitions.h>
-
+#include "audio/Audio.h"
 #include "interfaces/utilities/logging/ILogger.h"
 
 namespace agl {
@@ -41,20 +40,30 @@ public:
      */
     static std::shared_ptr<AASBConfigProviderImpl> create(
         std::shared_ptr<agl::common::interfaces::ILogger> logger,
-        AFB_ApiT api);
+        afb_api_t api,
+        std::shared_ptr<agl::audio::Audio> audio);
 
     /// @name IConfigurationProvider Functions
     /// @{
+    LocalMediaSourceConfiguration getLocalMediaSourceConfig() override;
     AudioIOConfiguration getAudioIOConfig() override;
+    LVCConfiguration getLocalVoiceControlConfig() override;
+    CarControlConfiguration getCarControlConfig() override;
     std::string getCertificatesDirectoryPath() override;
     std::string getAppsDataDirectory() override;
     std::string getProductDSN() override;
     std::string getClientId() override;
     std::string getProductId() override;
+    std::string getExternalStorageDirectory() override;
     bool shouldEnableWakeword() override;
     bool shouldEnablePhoneCallControl() override;
     bool shouldEnableNavigation() override;
     bool shouldEnableCBL() override;
+    bool shouldEnableLocalMediaSource() override;
+    bool shouldEnableGloriaCard() override;
+    bool shouldEnableGloriaList() override;
+    bool shouldEnableCarControl() override;
+    bool shouldEnableLocalVoiceControl() override;
     
     // TODO: Remove them once Location provider is properly implemented.
     std::pair<float, float> getCurrentLocation() override;
@@ -62,7 +71,7 @@ public:
     /// @}
 
 private:
-    AASBConfigProviderImpl(std::shared_ptr<agl::common::interfaces::ILogger> logger, AFB_ApiT api);
+    AASBConfigProviderImpl(std::shared_ptr<agl::common::interfaces::ILogger> logger, afb_api_t api, std::shared_ptr<agl::audio::Audio> audio);
 
     /**
      * Initialize the configuration object from given file path containing
@@ -86,23 +95,45 @@ private:
     /// Logger.
     std::shared_ptr<agl::common::interfaces::ILogger> m_logger;
 
+    // Audio
+    std::shared_ptr<agl::audio::Audio> m_audio;
+
     /// AFB API object.
-    AFB_ApiT m_api;
+    afb_api_t m_api;
 
     /// Configuration Data
     /// @{
     std::string m_token;
-    std::string m_inputDevice;
-    std::string m_speechSynthesizerDevice;
-    std::string m_audioPlayerDevice;
+    std::string m_voiceInputDevice;
+    std::string m_communicationInputDevice;
+    std::string m_loopbackInputDevice;
+    std::string m_ttsOutputDevice;
+    std::string m_musicOutputDevice;
+    std::string m_notificationOutputDevice;
+    std::string m_alarmOutputDevice;
+    std::string m_earconOutputDevice;
+    std::string m_communicationOutputDevice;
+    std::string m_ringtoneOutputDevice;
     std::string m_certificatePath;
     std::pair<float, float> m_currentLocation;
     std::string m_country;
     bool m_enableWakewordByDefault;
     bool m_enableCBL;
+    bool m_enableCarControl;
     std::string m_clientId;
     std::string m_productId;
     std::string m_deviceSerialNumber;
+    bool m_bluetooth;
+    bool m_usb;
+    bool m_fmRadio;
+    bool m_amRadio;
+    bool m_satelliteRadio;
+    bool m_LineIn;
+    bool m_compactDisc;
+    bool m_enableLocalMediaSource;
+    bool m_enableLocalVoiceControl;
+    std::unique_ptr<LVCConfiguration> m_LocalVoiceControlConfiguration;
+    std::unique_ptr<CarControlConfiguration> m_carControlConfiguration;
     /// @}
 };
 }  // namespace alexa

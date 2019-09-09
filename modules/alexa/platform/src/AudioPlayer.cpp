@@ -13,13 +13,10 @@
  * permissions and limitations under the License.
  */
 
-#include "AACE/Alexa/AudioPlayer.h"
+#include <AACE/Alexa/AudioPlayer.h>
 
 namespace aace {
 namespace alexa {
-
-AudioPlayer::AudioPlayer( std::shared_ptr<aace::alexa::MediaPlayer> mediaPlayer, std::shared_ptr<aace::alexa::Speaker> speaker ) : aace::alexa::AudioChannel( mediaPlayer, speaker, aace::alexa::Speaker::Type::AVS_SPEAKER_VOLUME ) {
-}
 
 AudioPlayer::~AudioPlayer() = default; // key function
 

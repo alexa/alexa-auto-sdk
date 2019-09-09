@@ -29,21 +29,35 @@ LoggerEngineImpl::LoggerEngineImpl( std::shared_ptr<aace::logger::Logger> platfo
 
 std::shared_ptr<LoggerEngineImpl> LoggerEngineImpl::create( std::shared_ptr<aace::logger::Logger> platformLoggerInterface, std::shared_ptr<aace::engine::logger::EngineLogger> logger )
 {
-    std::shared_ptr<LoggerEngineImpl> loggerEngineImpl = std::shared_ptr<LoggerEngineImpl>( new LoggerEngineImpl( platformLoggerInterface ) );
-    
-    if( logger != nullptr ) {
+    try
+    {
+        auto loggerEngineImpl = std::shared_ptr<LoggerEngineImpl>( new LoggerEngineImpl( platformLoggerInterface ) );
+        
+        ThrowIfNull( loggerEngineImpl, "createLoggerEngineImplFailed" );
+
+        // add ourself as an observer to the logger
         logger->addObserver( loggerEngineImpl );
+       
+        // set the platform engine interface reference
+        platformLoggerInterface->setEngineInterface( loggerEngineImpl );
+     
+        return loggerEngineImpl;
     }
-    
-    return loggerEngineImpl;
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"create").d("reason", ex.what()));
+        return nullptr;
+    }
 }
 
 bool LoggerEngineImpl::onLogEvent( LogEventObserver::Level level, std::chrono::system_clock::time_point time, const char* source, const char* text ) {
     return m_platformLoggerInterface != nullptr && m_platformLoggerInterface->logEvent( level, time, source, text );
 }
 
-void LoggerEngineImpl::log( aace::logger::Logger::Level level, const std::string& tag, const std::string& message ) {
-    aace::engine::logger::EngineLogger::getInstance()->log( "CLI", level, LX(tag,message) );
+void LoggerEngineImpl::log( aace::logger::Logger::Level level, const std::string& tag, const std::string& message )
+{
+    m_executor.submit( [this,level,tag,message] {
+        aace::engine::logger::EngineLogger::getInstance()->log( "CLI", level, LX(tag,message) );
+    });
 }
 
 } // aace::engine::logger

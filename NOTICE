@@ -7,6 +7,8 @@ ALEXA AUTO SDK COMPONENTS
 The following Alexa Auto SDK components are licensed under the Apache License, Version 2.0 (the "License"):
 
 builder
+extensions/experimental/gstreamer
+modules/address-book
 modules/alexa
 modules/cbl
 modules/contact-uploader
@@ -16,7 +18,6 @@ modules/phone-control
 platforms/agl
 platforms/android
 samples/android
-samples/audio
 samples/cpp
 
 You may not use this file except in compliance with the License. A copy of

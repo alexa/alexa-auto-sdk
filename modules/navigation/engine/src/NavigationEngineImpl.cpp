@@ -28,19 +28,21 @@ namespace navigation {
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.navigation.NavigationEngineImpl");
 
-NavigationEngineImpl::NavigationEngineImpl( std::shared_ptr<aace::navigation::Navigation> navigationPlatformInterface ) :
+NavigationEngineImpl::NavigationEngineImpl( std::shared_ptr<aace::navigation::Navigation> navigationPlatformInterface, const std::string& navigationProviderName ) :
     alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
-    m_navigationPlatformInterface( navigationPlatformInterface ) {
+    m_navigationPlatformInterface( navigationPlatformInterface ),
+    m_navigationProviderName{ navigationProviderName } {
 }
 
 bool NavigationEngineImpl::initialize(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender ) {
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager ) {
     
     try
     {
-        m_navigationCapabilityAgent = NavigationCapabilityAgent::create( exceptionSender );
+        m_navigationCapabilityAgent = NavigationCapabilityAgent::create( exceptionSender, contextManager, m_navigationProviderName );
         ThrowIfNull( m_navigationCapabilityAgent, "couldNotCreateCapabilityAgent" );
         
         // add navigation runtime observer
@@ -65,7 +67,9 @@ std::shared_ptr<NavigationEngineImpl> NavigationEngineImpl::create(
     std::shared_ptr<aace::navigation::Navigation> navigationPlatformInterface,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender ) {
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
+    const std::string& navigationProviderName ) {
     
     try
     {
@@ -73,10 +77,11 @@ std::shared_ptr<NavigationEngineImpl> NavigationEngineImpl::create(
         ThrowIfNull( capabilitiesDelegate, "couldNotCreateNavigationPlatformInterface" );
         ThrowIfNull( directiveSequencer, "couldNotCreateNavigationPlatformInterface" );
         ThrowIfNull( exceptionSender, "couldNotCreateNavigationPlatformInterface" );
+        ThrowIfNull( contextManager, "couldNotCreateNavigationContextManager" );
 
-        std::shared_ptr<NavigationEngineImpl> navigationEngineImpl = std::shared_ptr<NavigationEngineImpl>( new NavigationEngineImpl( navigationPlatformInterface ) );
+        std::shared_ptr<NavigationEngineImpl> navigationEngineImpl = std::shared_ptr<NavigationEngineImpl>( new NavigationEngineImpl( navigationPlatformInterface, navigationProviderName ) );
 
-        ThrowIfNot( navigationEngineImpl->initialize( directiveSequencer, capabilitiesDelegate, exceptionSender ), "initializeNavigationEngineImplFailed" );
+        ThrowIfNot( navigationEngineImpl->initialize( directiveSequencer, capabilitiesDelegate, exceptionSender, contextManager ), "initializeNavigationEngineImplFailed" );
 
         return navigationEngineImpl;
     }
@@ -103,6 +108,12 @@ void NavigationEngineImpl::cancelNavigation() {
     if( m_navigationPlatformInterface != nullptr ) {
         m_navigationPlatformInterface->cancelNavigation();
     }
+}
+
+std::string NavigationEngineImpl::getNavigationState() {
+    if( m_navigationPlatformInterface != nullptr ) {
+        return m_navigationPlatformInterface->getNavigationState();
+    } else return "";
 }
 
 

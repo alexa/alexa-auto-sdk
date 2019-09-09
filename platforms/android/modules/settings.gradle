@@ -1,0 +1,15 @@
+rootProject.name = 'aace'
+
+// Include all basic modules
+include ':alexa', ':cbl', ':contactuploader', ':core', ':maccandroid', ':navigation', ':phonecontrol', ':addressbook'
+
+// Include extra modules if any
+if (hasProperty('aace.extraModules')) {
+	for (String module : getProperty('aace.extraModules').split(',')) {
+		if (module.isEmpty()) {
+			continue
+		}
+		include module
+		project(":${module}").projectDir = new File(getProperty("aace.${module}.dir"))
+	}
+}

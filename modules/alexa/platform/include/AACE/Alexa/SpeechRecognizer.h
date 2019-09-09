@@ -16,7 +16,7 @@
 #ifndef AACE_ALEXA_SPEECH_RECOGNIZER_H
 #define AACE_ALEXA_SPEECH_RECOGNIZER_H
 
-#include "AACE/Core/PlatformInterface.h"
+#include <AACE/Core/PlatformInterface.h>
 #include "AlexaEngineInterfaces.h"
 
 /** @file */
@@ -106,22 +106,6 @@ public:
     bool stopCapture();
 
     /**
-     * Writes audio samples to the Engine for processing by the wake word engine or streaming to AVS.
-     *
-     * Audio samples should typically be streamed in 10ms, 320-byte chunks and should be encoded as
-     * @li 16bit LPCM
-     * @li 16kHz sample rate
-     * @li Single channel
-     * @li Little endian byte order
-     * 
-     * @param [in] data The audio sample buffer to write
-     * @param [in] size The number of samples in the buffer
-     * @return The number of samples successfully written to the Engine or a negative error code
-     * if data could not be written
-     */
-    ssize_t write( const int16_t* data, const size_t size );
-
-    /**
      * Notifies the Engine to enable the wake word engine. Wake word must be supported in the Engine to be enabled
      * by this call.
      *
@@ -159,22 +143,6 @@ public:
     virtual void endOfSpeechDetected();
 
     /**
-     * Notifies the platform implementation to start writing audio samples to the Engine via @c write().
-     * The platform should continue writing audio samples until the Engine calls
-     * @c stopAudioInput().
-     *
-     * @return @c true if the platform handled the call successfully, else @c false
-     */
-    virtual bool startAudioInput() = 0;
-
-    /**
-     * Notifies the platform implementation to stop writing audio samples to the Engine
-     *
-     * @return @c true if the platform handled the call successfully, else @c false
-     */
-    virtual bool stopAudioInput() = 0;
-
-    /**
      * @internal
      * Sets the Engine interface delegate
      *
@@ -183,8 +151,9 @@ public:
     void setEngineInterface( std::shared_ptr<aace::alexa::SpeechRecognizerEngineInterface> speechRecognizerEngineInterface );
 
 private:
+    std::weak_ptr<aace::alexa::SpeechRecognizerEngineInterface> m_speechRecognizerEngineInterface;
+
     bool m_wakewordDetectionEnabled;
-    std::shared_ptr<aace::alexa::SpeechRecognizerEngineInterface> m_speechRecognizerEngineInterface;
 };
 
 } // aace::alexa

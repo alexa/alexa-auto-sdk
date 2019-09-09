@@ -33,23 +33,27 @@ class NavigationEngineImpl :
     public std::enable_shared_from_this<NavigationEngineImpl> {
     
 private:
-    NavigationEngineImpl( std::shared_ptr<aace::navigation::Navigation> navigationPlatformInterface );
+    NavigationEngineImpl( std::shared_ptr<aace::navigation::Navigation> navigationPlatformInterface, const std::string& navigationProviderName );
     
     bool initialize(
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender );
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager);
     
 public:
     static std::shared_ptr<NavigationEngineImpl> create(
         std::shared_ptr<aace::navigation::Navigation> navigationPlatformInterface,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender );
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
+        const std::string& navigationProviderName);
 
     // NavigationObserverInterface
     void setDestination( const std::string& payload ) override;
     void cancelNavigation() override;
+    std::string getNavigationState() override;
     
 protected:
     void doShutdown() override;
@@ -57,6 +61,7 @@ protected:
 private:
     std::shared_ptr<aace::navigation::Navigation> m_navigationPlatformInterface;
     std::shared_ptr<NavigationCapabilityAgent> m_navigationCapabilityAgent;
+    const std::string& m_navigationProviderName;
 };
 
 } // aace::engine::navigation

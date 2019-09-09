@@ -1,6 +1,7 @@
 .repo
 .DS_Store
-/docs
 /extras
 .vscode
 /build
+
+*native-dependencies/

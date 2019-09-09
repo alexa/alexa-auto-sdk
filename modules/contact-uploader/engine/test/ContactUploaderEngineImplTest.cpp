@@ -84,6 +84,8 @@ public:
         m_deviceInfo = alexaClientSDK::avsCommon::utils::DeviceInfo::create( config );
 
         EXPECT_CALL( *m_mockAuthDelegate, addAuthObserver(testing::_)).WillOnce(testing::Return());
+        
+        EXPECT_CALL( *m_mockAuthDelegate, removeAuthObserver(testing::_)).WillOnce(testing::Return());
 
         m_engineImpl = aace::engine::contactUploader::ContactUploaderEngineImpl::create(
             m_mockPlatformInterface, m_mockAuthDelegate, m_deviceInfo );

@@ -26,7 +26,6 @@
 #include <AVSCommon/SDKInterfaces/ExternalMediaAdapterInterface.h>
 #include <AVSCommon/SDKInterfaces/ExternalMediaPlayerInterface.h>
 #include <AVSCommon/SDKInterfaces/MessageSenderInterface.h>
-#include <AVSCommon/SDKInterfaces/SpeakerInterface.h>
 #include <AVSCommon/SDKInterfaces/SpeakerManagerInterface.h>
 #include <AVSCommon/Utils/RequiresShutdown.h>
 
@@ -60,13 +59,12 @@ public:
 };
 
 class ExternalMediaAdapterHandler :
-    public aace::alexa::SpeakerEngineInterface,
     public alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface,
     public alexaClientSDK::avsCommon::utils::RequiresShutdown,
     public std::enable_shared_from_this<ExternalMediaAdapterHandler> {
     
 protected:
-    ExternalMediaAdapterHandler( std::shared_ptr<aace::alexa::Speaker> speakerPlatformInterface, std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender, std::shared_ptr<FocusHandlerInterface> focusHandler );
+    ExternalMediaAdapterHandler( std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender, std::shared_ptr<FocusHandlerInterface> focusHandler );
     
     bool initializeAdapterHandler( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager );
 
@@ -88,6 +86,9 @@ protected:
     virtual bool handleAdjustSeek( const std::string& playerId, std::chrono::milliseconds deltaOffset ) = 0;
     virtual bool handleGetAdapterState( const std::string& playerId, alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::AdapterState& state ) = 0;
 
+    virtual bool handleSetVolume( int8_t volume ) = 0;
+    virtual bool handleSetMute( bool mute ) = 0;
+
     // alexaClientSDK::avsCommon::utils::RequiresShutdown
     virtual void doShutdown() override = 0;
 
@@ -101,10 +102,6 @@ public:
     bool adjustSeek( const std::string& playerId, std::chrono::milliseconds deltaOffset );
     std::vector<alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::AdapterState> getAdapterStates();
 
-    // aace::engine::SpeakerEngineInterface
-    void onLocalVolumeSet( int8_t volume ) override;
-    void onLocalMuteSet( bool mute ) override;
-
     // alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface
     bool setVolume( int8_t volume ) override;
     bool adjustVolume( int8_t delta ) override;
@@ -113,13 +110,14 @@ public:
     alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::Type getSpeakerType() override;
 
 private:
-    std::shared_ptr<aace::alexa::Speaker> m_speakerPlatformInterface;
-    std::shared_ptr<DiscoveredPlayerSenderInterface> m_discoveredPlayerSender;
-    std::shared_ptr<FocusHandlerInterface> m_focusHandler;
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> m_speakerManager;
+    std::weak_ptr<DiscoveredPlayerSenderInterface> m_discoveredPlayerSender;
+    std::weak_ptr<FocusHandlerInterface> m_focusHandler;
     
     std::unordered_map<std::string,PlayerInfo> m_playerInfoMap;
     std::unordered_map<std::string,std::string> m_alexaToLocalPlayerIdMap;
+    
+    bool m_muted;
+    int8_t m_volume;
 };
 
 class DiscoveredPlayerSenderInterface {

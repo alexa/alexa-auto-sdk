@@ -113,30 +113,30 @@ void EngineLogger::removeObserver( std::shared_ptr<aace::engine::logger::LogEven
 }
 
 void EngineLogger::log( Level level, const LogEntry& entry ) {
-    emit( "AAC", entry.tag(), level, std::chrono::system_clock::now(), ThreadMoniker::getThisThreadMoniker().c_str(), entry.c_str() );
+    emit( "AAC", entry.tag(), level, std::chrono::system_clock::now(), ThreadMoniker::getThisThreadMoniker(), entry.c_str() );
 }
 
 void EngineLogger::log( const std::string& source, Level level, const LogEntry& entry ) {
-    emit( source, entry.tag(), level, std::chrono::system_clock::now(), ThreadMoniker::getThisThreadMoniker().c_str(), entry.c_str() );
+    emit( source, entry.tag(), level, std::chrono::system_clock::now(), ThreadMoniker::getThisThreadMoniker(), entry.c_str() );
 }
 
-void EngineLogger::log( const std::string& source, const std::string& tag, Level level, std::chrono::system_clock::time_point time, const char* threadMoniker, const char* text ) {
+void EngineLogger::log( const std::string& source, const std::string& tag, Level level, std::chrono::system_clock::time_point time, const std::string& threadMoniker, const std::string& text ) {
     emit( source, tag, level, time, threadMoniker, text );
 }
 
-void EngineLogger::emit( const std::string& source, const std::string& tag, Level level, std::chrono::system_clock::time_point time, const char* threadMoniker, const char* text )
+void EngineLogger::emit( const std::string& source, const std::string& tag, Level level, std::chrono::system_clock::time_point time, const std::string& threadMoniker, const std::string& text )
 {
     std::lock_guard<std::mutex> lock( m_mutex );
     
     // iterate through each register sink and emit the log entry
     for( auto it = m_sinkMap.begin(); it != m_sinkMap.end(); it++ ) {
-        it->second->emit( source, tag, level, time, threadMoniker, text );
+        it->second->emit( source, tag, level, time, threadMoniker.c_str(), text.c_str() );
     }
     
     // iterate through all of the log event observers and log the message
     // to each observer in the list
     for( auto next : m_observers ) {
-        next->onLogEvent( level, time, source.c_str(), text );
+        next->onLogEvent( level, time, source.c_str(), text.c_str() );
     }
 }
 
@@ -153,6 +153,17 @@ bool EngineLogger::addSink( std::shared_ptr<aace::engine::logger::sink::Sink> si
 
 std::shared_ptr<aace::engine::logger::sink::Sink> EngineLogger::getSink( const std::string& id ) {
     return m_sinkMap.find( id ) != m_sinkMap.end() ? m_sinkMap[id] : nullptr;
+}
+
+bool EngineLogger::removeSink( const std::string& id )
+{
+    auto it = m_sinkMap.find( id );
+
+    if( it != m_sinkMap.end() ) {
+        m_sinkMap.erase( it );
+    }
+
+    return true;
 }
 
 } // aace::engine::logger

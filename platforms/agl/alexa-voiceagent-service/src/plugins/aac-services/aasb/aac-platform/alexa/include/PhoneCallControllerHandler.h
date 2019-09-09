@@ -19,7 +19,7 @@
 
 #include <AACE/PhoneCallController/PhoneCallController.h>
 
-#include "DirectiveDispatcher.h"
+#include "ResponseDispatcher.h"
 #include "LoggerHandler.h"
 
 namespace aasb {
@@ -43,12 +43,12 @@ public:
      * Creates an instance of @c PhoneCallControllerHandler.
      *
      * @param logger An instance of logger.
-     * @param directiveDispatcher An object through which the directives for phone call control
+     * @param responseDispatcher An object through which the directives for phone call control
      *      received from alexa cloud will be dispatched to AASB clients.
      */
     static std::shared_ptr<PhoneCallControllerHandler> create(
         std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
-        std::weak_ptr<aasb::bridge::DirectiveDispatcher> directiveDispatcher);
+        std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher);
 
     /// @name aace::phoneCallController::PhoneCallController
     /// @{
@@ -74,7 +74,7 @@ private:
      */
     PhoneCallControllerHandler(
         std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
-        std::weak_ptr<aasb::bridge::DirectiveDispatcher> directiveDispatcher);
+        std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher);
 
     /**
      * Notifies the Engine of a change in connection to a calling device
@@ -129,7 +129,7 @@ private:
     std::shared_ptr<aasb::core::logger::LoggerHandler> m_logger;
 
     // To send directive to service
-    std::weak_ptr<aasb::bridge::DirectiveDispatcher> m_directiveDispatcher;
+    std::weak_ptr<aasb::bridge::ResponseDispatcher> m_responseDispatcher;
 };
 
 }  // phoneCallController

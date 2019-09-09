@@ -55,8 +55,6 @@ void PlaybackControllerHandler::onReceivedEvent(const std::string& action, const
 }
 
 void PlaybackControllerHandler::buttonPressed(const std::string& jsonPayload) {
-    m_logger->log(Level::VERBOSE, TAG, "buttonPressed payload " + jsonPayload);
-
     rapidjson::Document document;
     document.Parse(jsonPayload.c_str());
     auto root = document.GetObject();
@@ -86,8 +84,6 @@ void PlaybackControllerHandler::buttonPressed(const std::string& jsonPayload) {
 }
 
 void PlaybackControllerHandler::togglePressed(const std::string& payload) {
-    m_logger->log(Level::VERBOSE, TAG, "togglePressed payload " + payload);
-
     rapidjson::Document document;
     document.Parse(payload.c_str());
     auto root = document.GetObject();
@@ -119,8 +115,8 @@ void PlaybackControllerHandler::togglePressed(const std::string& payload) {
     }
 
     if (root.HasMember(JSON_ATTR_PLAYBACK_TOGGLE_SELECTED.c_str()) &&
-         root[JSON_ATTR_PLAYBACK_TOGGLE_TYPE.c_str()].IsBool()) {
-        selected = root[JSON_ATTR_PLAYBACK_TOGGLE_TYPE.c_str()].GetBool();
+         root[JSON_ATTR_PLAYBACK_TOGGLE_SELECTED.c_str()].IsBool()) {
+        selected = root[JSON_ATTR_PLAYBACK_TOGGLE_SELECTED.c_str()].GetBool();
     } else {
         m_logger->log(Level::WARN, TAG, "togglePressed: toggle selected attribute not found");
         return;

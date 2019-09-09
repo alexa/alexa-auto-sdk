@@ -18,12 +18,9 @@ package com.amazon.sampleapp.impl.Notifications;
 import android.app.Activity;
 import android.widget.TextView;
 
-import com.amazon.aace.alexa.MediaPlayer;
 import com.amazon.aace.alexa.Notifications;
-import com.amazon.aace.alexa.Speaker;
 import com.amazon.sampleapp.R;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
-import com.amazon.sampleapp.impl.MediaPlayer.MediaPlayerHandler;
 
 public class NotificationsHandler extends Notifications {
 
@@ -34,19 +31,10 @@ public class NotificationsHandler extends Notifications {
     private TextView mStateText;
 
     public NotificationsHandler( Activity activity,
-                                 LoggerHandler logger,
-                                 MediaPlayer mediaPlayer,
-                                 Speaker speaker ) {
-        super( mediaPlayer, speaker );
+                                 LoggerHandler logger ) {
         mActivity = activity;
         mLogger = logger;
         mStateText = mActivity.findViewById( R.id.indicatorState );
-    }
-
-    public NotificationsHandler( Activity activity,
-                                 LoggerHandler logger,
-                                 MediaPlayerHandler mediaPlayer ) {
-        this( activity, logger, mediaPlayer, mediaPlayer.getSpeaker() );
     }
 
     @Override

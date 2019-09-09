@@ -15,7 +15,6 @@ This document outlines the menu system that drives the C++ Sample App.
     - [Quit](#quit)
     - [Restart](#restart)
     - [Select](#select)
-    - [SetEndpoint](#setendpoint)
     - [SetLocale](#setlocale)
     - [SetLoggerLevel](#setloggerlevel)
     - [SetProperty](#setproperty)
@@ -141,6 +140,7 @@ A map of text items to print in the application. The main menu expects the follo
 | key       | `string`  | required  |
 | name      | `string`  | required  |
 | note      | `string`  | optional  |
+| test      | `string`  | optional  |
 | value     | `any`     | optional  |
 
 **do \<string>**
@@ -159,6 +159,10 @@ The name of the menu item to print.
 
 Optional note to print in the application console after the menu item has been selected.
 
+**test \<string>**
+
+Optional test to determine if the menu item should be included or not.
+
 **value \<any>**
 
 The value of the menu item. The value type is determined by the associated action.
@@ -168,6 +172,8 @@ The value of the menu item. The value type is determined by the associated actio
 ### AudioFile<a id="audiofile"></a>
 
 The **AudioFile** action sends the specified audio file to Alexa as if it were an utterance. The audio file path is relative to the menu file. To extend this menu, save your audio files under `assets/inputs/` and add menu items that point to those files.
+
+>**Note:** The AudioFile menu appears only on platforms such as QNX that do not already have an AudioInput registered.
 
 For example:
 
@@ -254,7 +260,7 @@ For example:
             {
                 // supported-locale-3
             },
-            
+
             ...
 
             {
@@ -286,7 +292,7 @@ For example:
 
 ### Login<a id="login"></a>
 
-The **Login** action sets the user config file path and restarts the application (without confirmation). The application will stop and shut down, then reload and configure, register platform interfaces, and start the Engine. The user config file path is added to the configuration files.
+***(Experimental)*** The **Login** action sets the user config file path and restarts the application (without confirmation). The application will stop and shut down, then reload and configure, register platform interfaces, and start the Engine. The user config file path is added to the configuration files.
 
 For example:
 
@@ -309,7 +315,7 @@ For example:
 
 ### Logout<a id="logout"></a>
 
-The **Logout** action logs out the current user and restarts the application (with confirmation). The application will stop and shut down, then reload and configure, register platform interfaces, and start the Engine. The user config file path and authentication refresh token are both cleared.
+***(Experimental)*** The **Logout** action logs out the current user and restarts the application (with confirmation). The application will stop and shut down, then reload and configure, register platform interfaces, and start the Engine. The user config file path and authentication refresh token are both cleared.
 
 For example:
 
@@ -364,21 +370,6 @@ For example:
         "latitude": 37.3790629,
         "longitude": -122.116578
     }
-}
-```
-
-### SetEndpoint<a id="setendpoint"></a>
-
-The **SetEndpoint** action sets the [AVS endpoint](https://developer.amazon.com/docs/alexa-voice-service/api-overview.html#endpoints) used by the application.
-
-For example:
-
-```json
-{
-    "do": "SetEndpoint",
-    "key": "1",
-    "name": "Asia",
-    "value": "https://avs-alexa-fe.amazon.com"
 }
 ```
 
@@ -438,7 +429,6 @@ For example:
 ```
 
 Supported properties:
-- `aace.alexa.endpoint`
 - `aace.alexa.setting.locale`
 
 ### notify/*<a id="notify"></a>
@@ -477,7 +467,7 @@ The **notify/*** action exercises the application platform interfaces with event
 | **Logger**                                  |
 | onLoggerLog                                 | `level/tag/message`
 | **NetworkInfoProvider**                     |
-| onNetworkInfoProviderNetworkStatusChanged   | `status/wifiSignalStrength`
+| onNetworkInfoProviderNetworkStatusChanged   | `status[/wifiSignalStrength]`
 | **PhoneCallController**                     |
 | onPhoneCallControllerConnectionStateChanged | `state`
 | onPhoneCallControllerCallStateChanged       | `state[/callId[/callerId]]`
@@ -502,4 +492,12 @@ For example:
     "name": "Stop Capture"
 }
 ```
+#### Values
 
+##### onAudioManagerSpeaker 
+
+| Field               | Values                           
+| ------------------- | ---------------------------------
+| identity            | Speaker, Alerts
+| name                | volume, mute
+| value               | true, false, +/-*number*, number

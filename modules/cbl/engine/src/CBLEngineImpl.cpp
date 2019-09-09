@@ -33,7 +33,8 @@ std::shared_ptr<CBLEngineImpl> CBLEngineImpl::create(
     std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> customerDataManager,
     std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
     std::chrono::seconds codePairRequestTimeout,
-    const std::string& endpoint) {
+    std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
+    bool enableUserProfile ) {
     
     std::shared_ptr<CBLEngineImpl> cblEngineImpl = nullptr;
 
@@ -43,7 +44,7 @@ std::shared_ptr<CBLEngineImpl> CBLEngineImpl::create(
 
         cblEngineImpl = std::shared_ptr<CBLEngineImpl>( new CBLEngineImpl( cblPlatformInterface ) );
 
-        ThrowIfNot( cblEngineImpl->initialize( customerDataManager, deviceInfo, codePairRequestTimeout, endpoint ), "initializeCBLEngineImplFailed" );
+        ThrowIfNot( cblEngineImpl->initialize( customerDataManager, deviceInfo, codePairRequestTimeout, alexaEndpoints, enableUserProfile ), "initializeCBLEngineImplFailed" );
 
         // set the cbb engine interface
         cblPlatformInterface->setEngineInterface( cblEngineImpl );
@@ -66,17 +67,18 @@ bool CBLEngineImpl::initialize (
     std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> customerDataManager,
     std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
     std::chrono::seconds codePairRequestTimeout,
-    const std::string& endpoint ) {
+    std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
+    bool enableUserProfile ) {
 
     try
     {
         ThrowIfNull( customerDataManager, "invalidCustomerDataManager" );
         ThrowIfNull( deviceInfo, "invalidDeviceInfo" );
 
-        std::shared_ptr<CBLAuthDelegateConfiguration> configuration = CBLAuthDelegateConfiguration::create( deviceInfo, codePairRequestTimeout, endpoint );
+        std::shared_ptr<CBLAuthDelegateConfiguration> configuration = CBLAuthDelegateConfiguration::create( deviceInfo, codePairRequestTimeout, alexaEndpoints );
         ThrowIfNull( configuration, "nullCBLAuthDelegateConfiguration");
 
-        m_cblAuthDelegate = CBLAuthDelegate::create( customerDataManager, configuration, shared_from_this() );
+        m_cblAuthDelegate = CBLAuthDelegate::create( customerDataManager, configuration, shared_from_this(), enableUserProfile );
         ThrowIfNull( m_cblAuthDelegate, "createCBLAuthDelegateFailed" );
         
         return true;
@@ -173,6 +175,12 @@ std::string CBLEngineImpl::getRefreshToken()
     return std::string();
 }
 
+void CBLEngineImpl::setUserProfile( const std::string& name, const std::string& email ) {
+    if( m_cblPlatformInterface != nullptr ) {
+        m_cblPlatformInterface->setUserProfile( name, email );
+    }
+}
+
 void CBLEngineImpl::engineStart()
 {
     if( m_cblAuthDelegate != nullptr ) {
@@ -190,6 +198,13 @@ void CBLEngineImpl::onCancel()
 {
     if( m_cblAuthDelegate != nullptr ) {
         m_cblAuthDelegate->cancel();
+    }
+}
+
+void CBLEngineImpl::onReset()
+{
+    if( m_cblAuthDelegate != nullptr ) {
+        m_cblAuthDelegate->reset();
     }
 }
 

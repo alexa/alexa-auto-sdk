@@ -97,7 +97,6 @@ public class LoginWithAmazonCBL implements AuthHandler, NetworkConnectionObserve
 
     private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
     private String mClientId;
-    private String mClientSecret;
     private String mProductID;
     private String mProductDSN;
 
@@ -113,7 +112,6 @@ public class LoginWithAmazonCBL implements AuthHandler, NetworkConnectionObserve
         mLogger = logger;
 
         mClientId = mPreferences.getString( mActivity.getString( R.string.preference_client_id ), "" );
-        mClientSecret = mPreferences.getString( mActivity.getString( R.string.preference_client_secret ), "" );
         mProductID = mPreferences.getString( mActivity.getString( R.string.preference_product_id ), "" );
         mProductDSN = mPreferences.getString( mActivity.getString( R.string.preference_product_dsn ), "" );
         mObservers = new HashSet<>(1);
@@ -392,12 +390,11 @@ public class LoginWithAmazonCBL implements AuthHandler, NetworkConnectionObserve
         @Override
         public void run() {
             if ( !mRefreshToken.equals( "" )
-                    && !mClientId.equals( "" ) && !mClientSecret.equals( "" ) ) {
+                    && !mClientId.equals( "" ) ) {
 
                 final String urlParameters = "grant_type=refresh_token"
                         + "&refresh_token=" + mRefreshToken
-                        + "&client_id=" + mClientId
-                        + "&client_secret=" + mClientSecret;
+                        + "&client_id=" + mClientId;
                     HttpsURLConnection con = null;
                     DataOutputStream os = null;
                     InputStream response = null;
@@ -433,6 +430,7 @@ public class LoginWithAmazonCBL implements AuthHandler, NetworkConnectionObserve
 
                 if ( responseJSON != null ) {
                     try {
+
                         String expiresInSeconds = responseJSON.getString( "expires_in" );
                         mCurrentAuthToken = responseJSON.getString( "access_token" );
 
@@ -460,8 +458,8 @@ public class LoginWithAmazonCBL implements AuthHandler, NetworkConnectionObserve
                 }
 
             } else mLogger.postWarn( sTag, String.format(
-                "Invalid Auth Parameters, clientID: %s, clientSecret: %s",
-                    mClientId, mClientSecret, mRefreshToken ) );
+                "Invalid Auth Parameters, clientID: %s",
+                    mClientId, mRefreshToken ) );
         }
     }
 
@@ -469,26 +467,11 @@ public class LoginWithAmazonCBL implements AuthHandler, NetworkConnectionObserve
         mTimer.schedule( mRefreshTimerTask = new TimerTask() {
             public void run() {
                 if ( !mConnected ) {
-                    mLogger.postInfo(sTag, "No Internet connection, cannot refresh connection for the logged in user. Please verify your network settings.");
-                    mActivity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
-                            builder.setTitle("No Internet Connection");
-                            builder.setIcon(android.R.drawable.ic_dialog_alert);
-                            builder.setMessage("Cannot refresh connection for the logged in user.\nPlease verify your network settings and restart the app to retry or click 'Logout' to log out.");
-                            builder.setCancelable(false);
-                            builder.setPositiveButton("OK", null);
-                            builder.setNegativeButton("Logout", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    deauthorize();
-                                }
-                            });
-                            AlertDialog alert = builder.create();
-                            alert.show();
-                        }
-                    });
+                    mLogger.postWarn(sTag, "No Internet connection, cannot refresh the expired access token. Logout or check internet connectivity.");
+                    mCurrentAuthState = AuthProvider.AuthState.EXPIRED;
+                    mCurrentAuthError = AuthProvider.AuthError.AUTHORIZATION_EXPIRED;
+                    mCurrentAuthToken = "";
+                    notifyAuthObservers();
                 } else refreshAuthToken( refreshToken );
 
             }

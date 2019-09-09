@@ -17,14 +17,9 @@
 #include <climits>
 #include <iostream>
 
-#include <rapidjson/document.h>
-#include <rapidjson/prettywriter.h>
-#include <rapidjson/stringbuffer.h>
-#include <rapidjson/error/en.h>
-#include <rapidjson/istreamwrapper.h>
-
 #include "AACE/Engine/CBL/CBLEngineService.h"
 #include "AACE/Engine/Alexa/AlexaEngineService.h"
+#include "AACE/Engine/Utils/JSON/JSON.h"
 #include "AACE/Engine/Core/EngineMacros.h"
 
 namespace aace {
@@ -37,69 +32,36 @@ static const std::string TAG("aace.cbl.CBLEngineService");
 // Default for code pair request timeout 
 static const std::chrono::minutes DEFAULT_REQUEST_TIMEOUT = std::chrono::minutes(1);
 
-// Default for configured base URL for LWA requests.
-static const std::string DEFAULT_CBL_ENDPOINT = "https://api.amazon.com/auth/O2/";
-
 // register the service
 REGISTER_SERVICE(CBLEngineService);
 
 CBLEngineService::CBLEngineService( const aace::engine::core::ServiceDescription& description ) : 
     aace::engine::core::EngineService( description ),
     m_codePairRequestTimeout( DEFAULT_REQUEST_TIMEOUT ),
-    m_endpoint( DEFAULT_CBL_ENDPOINT ) {
-}
-
-bool CBLEngineService::configure ( const std::vector< std::shared_ptr<std::istream>>& configuration )
-{
-    try
-    {
-        for( auto next : configuration ) {
-            configure( next );
-        }
-        return true;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"configure").d("reason", ex.what()));
-        return false;
-    }
+    m_enableUserProfile( false ) {
 }
 
 bool CBLEngineService::configure( std::shared_ptr<std::istream> configuration )
 {
     try
     {
-        bool handled = false;
+        auto document = aace::engine::utils::json::parse( configuration );
+        ThrowIfNull( document, "parseConfigurationStreamFailed" );
+        
+        auto cblConfigRoot = document->GetObject();
 
-        rapidjson::IStreamWrapper isw( *configuration );
-        rapidjson::Document document;
-        
-        document.ParseStream( isw );
-        
-        ThrowIf( document.HasParseError(), GetParseError_En( document.GetParseError() ) );
-        ThrowIfNot( document.IsObject(), "invalidConfigurationStream" );
-        
-        auto root = document.GetObject();
-        
-        if( root.HasMember( "aace.cbl" ) && root["aace.cbl"].IsObject() )
-        {
-            auto cblConfigRoot = root["aace.cbl"].GetObject();
-
-            if( cblConfigRoot.HasMember( "requestTimeout" ) && cblConfigRoot["requestTimeout"].IsUint() ) {
-                m_codePairRequestTimeout = std::chrono::seconds( cblConfigRoot["requestTimeout"].GetUint() );
-            }
-
-            if( cblConfigRoot.HasMember( "endpoint" ) && cblConfigRoot["endpoint"].IsString() ){
-                m_endpoint = cblConfigRoot["endpoint"].GetString();
-            }
-            handled = true;
+        if( cblConfigRoot.HasMember( "requestTimeout" ) && cblConfigRoot["requestTimeout"].IsUint() ) {
+            m_codePairRequestTimeout = std::chrono::seconds( cblConfigRoot["requestTimeout"].GetUint() );
         }
 
-        return handled;
+        if( cblConfigRoot.HasMember( "enableUserProfile" ) && cblConfigRoot["enableUserProfile"].IsBool() ) {
+            m_enableUserProfile = cblConfigRoot["enableUserProfile"].GetBool();
+        }
+
+        return true;
     }
     catch( std::exception& ex ) {
-        AACE_WARN(LX(TAG,"configure").d("reason", ex.what()));
-        configuration->clear();
-        configuration->seekg( 0 );
+        AACE_ERROR(LX(TAG,"configure").d("reason", ex.what()));
         return false;
     }
 }
@@ -159,7 +121,9 @@ bool CBLEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::cbl:
         auto deviceInfo = alexaComponents->getDeviceInfo();
         ThrowIfNull( deviceInfo, "invalidDeviceInfo" );
 
-        m_cblEngineImpl = aace::engine::cbl::CBLEngineImpl::create( cbl, customerDataManager, deviceInfo, m_codePairRequestTimeout, m_endpoint );
+        auto alexaEndpoints = getContext()->getServiceInterface<aace::engine::alexa::AlexaEndpointInterface>( "aace.alexa" );
+
+        m_cblEngineImpl = aace::engine::cbl::CBLEngineImpl::create( cbl, customerDataManager, deviceInfo, m_codePairRequestTimeout, alexaEndpoints, m_enableUserProfile );
         ThrowIfNull( m_cblEngineImpl, "createCBLEngineImplFailed" );
         
         auto alexaService = getContext()->getService<aace::engine::alexa::AlexaEngineService>();

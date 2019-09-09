@@ -14,16 +14,29 @@
  */
 
 #include "AACE/Engine/Alexa/AlexaClientEngineImpl.h"
+#include "AACE/Engine/Core/EngineMacros.h"
 
 namespace aace {
 namespace engine {
 namespace alexa {
-        
+    
+// String to identify log entries originating from this file.
+static const std::string TAG("aace.alexa.AlexaClientEngineImpl");
+    
 AlexaClientEngineImpl::AlexaClientEngineImpl( std::shared_ptr<aace::alexa::AlexaClient> alexaClientPlatformInterface ) : m_alexaClientPlatformInterface( alexaClientPlatformInterface ) {
 }
 
-std::shared_ptr<AlexaClientEngineImpl> AlexaClientEngineImpl::create( std::shared_ptr<aace::alexa::AlexaClient> alexaClientPlatformInterface ) {
-    return std::shared_ptr<AlexaClientEngineImpl>( new AlexaClientEngineImpl( alexaClientPlatformInterface ) );
+std::shared_ptr<AlexaClientEngineImpl> AlexaClientEngineImpl::create( std::shared_ptr<aace::alexa::AlexaClient> alexaClientPlatformInterface )
+{
+    try
+    {
+        ThrowIfNull( alexaClientPlatformInterface, "invalidAlexaClientPlatformInterface" );
+        return std::shared_ptr<AlexaClientEngineImpl>( new AlexaClientEngineImpl( alexaClientPlatformInterface ) );
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"create").d("reason", ex.what()));
+        return nullptr;
+    }
 }
 
 // AuthObserverInterface

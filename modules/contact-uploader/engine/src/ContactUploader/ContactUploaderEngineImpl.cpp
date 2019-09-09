@@ -16,6 +16,11 @@
 #include "AACE/Engine/ContactUploader/ContactUploaderEngineImpl.h"
 #include "AACE/Engine/Core/EngineMacros.h"
 
+#include <rapidjson/document.h>
+#include <rapidjson/error/en.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
+
 namespace aace {
 namespace engine {
 namespace contactUploader {
@@ -62,8 +67,6 @@ bool ContactUploaderEngineImpl::initialize(
         m_contactUploaderRESTAgent = ContactUploaderRESTAgent::create( m_authDelegate, m_deviceInfo );
         ThrowIfNull( m_contactUploaderRESTAgent, "nullContactUploaderRESTAgent" );
 
-        m_contactUploaderPlatformInterface->setEngineInterface( std::dynamic_pointer_cast<aace::contactUploader::ContactUploaderEngineInterface>( shared_from_this() ) );
-
         m_deleteAddressBookOnEngineStart = true;
         return true;
 
@@ -86,6 +89,9 @@ std::shared_ptr<ContactUploaderEngineImpl> ContactUploaderEngineImpl::create(
 
         ThrowIfNot( contactUploaderEngineImpl->initialize( authDelegate, deviceInfo ), "initializeContactUploaderEngineImplFailed" );
 
+        // set the platform engine interface reference
+        contactUploaderPlatformInterface->setEngineInterface( contactUploaderEngineImpl );
+
         return contactUploaderEngineImpl;
     }
     catch( std::exception& ex ) {
@@ -96,6 +102,10 @@ std::shared_ptr<ContactUploaderEngineImpl> ContactUploaderEngineImpl::create(
 
 void ContactUploaderEngineImpl::doShutdown() {
     m_executor.shutdown();
+    if ( m_authDelegate != nullptr ) {
+        m_authDelegate->removeAuthObserver( shared_from_this() );
+    }
+    
     if( m_contactUploaderPlatformInterface != nullptr ) {
         m_contactUploaderPlatformInterface->setEngineInterface( nullptr ); 
     }

@@ -3,3 +3,4 @@
 /build
 /deploy
 *.pyc
+/.extralocal.conf

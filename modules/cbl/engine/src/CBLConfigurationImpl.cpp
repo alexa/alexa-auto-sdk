@@ -14,11 +14,8 @@
 */
 
 #include "AACE/CBL/CBLConfiguration.h"
+#include "AACE/Engine/Utils/JSON/JSON.h"
 #include "AACE/Engine/Core/EngineMacros.h"
-
-#include <rapidjson/document.h>
-#include <rapidjson/prettywriter.h>
-#include <rapidjson/stringbuffer.h>
 
 namespace aace {
 namespace cbl {
@@ -29,23 +26,26 @@ static const std::string TAG("aace.cbl.config.CBLConfiguationImpl");
 
 std::shared_ptr<aace::core::config::EngineConfiguration> CBLConfiguration::createCBLConfig( const int seconds )
 {
-    rapidjson::Document document;
-
-    document.SetObject();
-
+    rapidjson::Document document( rapidjson::kObjectType );
     rapidjson::Value aaceCBLNode( rapidjson::kObjectType );
     
     aaceCBLNode.AddMember( "requestTimeout", rapidjson::Value().SetInt( seconds ), document.GetAllocator() );
 
     document.AddMember( "aace.cbl", aaceCBLNode, document.GetAllocator() );
 
-    // create event string
-    rapidjson::StringBuffer buffer;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer( buffer );
+    return aace::core::config::StreamConfiguration::create( aace::engine::utils::json::toStream( document ) );
+}
 
-    document.Accept( writer );
-    
-    return aace::core::config::StreamConfiguration::create( std::make_shared<std::stringstream>( buffer.GetString() ) );
+std::shared_ptr<aace::core::config::EngineConfiguration> CBLConfiguration::createCBLUserProfileConfig( bool enableUserProfile )
+{
+    rapidjson::Document document( rapidjson::kObjectType );
+    rapidjson::Value aaceCBLNode( rapidjson::kObjectType );
+
+    aaceCBLNode.AddMember( "enableUserProfile", rapidjson::Value().SetBool(enableUserProfile), document.GetAllocator() );
+
+    document.AddMember( "aace.cbl", aaceCBLNode, document.GetAllocator() );
+
+    return aace::core::config::StreamConfiguration::create( aace::engine::utils::json::toStream( document ) );
 }
 
 } // aace::engine::cbl

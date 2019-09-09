@@ -26,14 +26,13 @@
 #include <AVSCommon/SDKInterfaces/ExternalMediaAdapterInterface.h>
 #include <AVSCommon/SDKInterfaces/ExternalMediaPlayerInterface.h>
 #include <AVSCommon/SDKInterfaces/MessageSenderInterface.h>
+#include <AVSCommon/SDKInterfaces/SpeakerManagerInterface.h>
 #include <AVSCommon/Utils/RequiresShutdown.h>
 
 #include "AACE/Alexa/AlexaEngineInterfaces.h"
 #include "AACE/Alexa/ExternalMediaAdapter.h"
 
 #include "ExternalMediaAdapterHandler.h"
-
-#include <rapidjson/document.h>
 
 namespace aace {
 namespace engine {
@@ -71,11 +70,15 @@ protected:
     bool handleSeek( const std::string& localPlayerId, std::chrono::milliseconds offset ) override;
     bool handleAdjustSeek( const std::string& localPlayerId, std::chrono::milliseconds deltaOffset ) override;
     bool handleGetAdapterState( const std::string& localPlayerId, alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::AdapterState& state ) override;
+
+    bool handleSetVolume( int8_t volume ) override;
+    bool handleSetMute( bool mute ) override;
+
     void doShutdown() override;
 
 private:
     std::shared_ptr<aace::alexa::ExternalMediaAdapter> m_platformMediaAdapter;
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> m_messageSender;
+    std::weak_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> m_messageSender;
 };
 
 } // aace::engine::alexa

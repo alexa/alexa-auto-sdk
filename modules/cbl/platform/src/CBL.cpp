@@ -36,5 +36,11 @@ void CBL::cancel() {
     }
 }
 
+void CBL::reset() {
+    if( m_cblEngineInterface != nullptr ) {
+        m_cblEngineInterface->onReset();
+    }
+}
+
 } // aace::cbl
 } // aace

@@ -21,15 +21,17 @@ import android.widget.TextView;
 import com.amazon.aace.alexa.AlexaClient;
 import com.amazon.sampleapp.R;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
+// AutoVoiceChrome imports
 
 public class AlexaClientHandler extends AlexaClient {
 
-    private static final String sTag = "AlexaClient";
+    private static final String TAG = AlexaClientHandler.class.getSimpleName();
 
     private final Activity mActivity;
     private final LoggerHandler mLogger;
     private TextView mConnectionText, mAuthText, mDialogText;
     private ConnectionStatus mConnectionStatus = ConnectionStatus.DISCONNECTED;
+    // AutoVoiceChrome controller
 
     public AlexaClientHandler( Activity activity, LoggerHandler logger ) {
         mActivity = activity;
@@ -39,21 +41,23 @@ public class AlexaClientHandler extends AlexaClient {
 
     @Override
     public void dialogStateChanged( final DialogState state ) {
-        mLogger.postInfo( sTag, "Dialog State Changed. STATE: " + state );
+        mLogger.postInfo( TAG,  "Dialog State Changed. STATE: " + state );
         mActivity.runOnUiThread( new Runnable() {
             @Override
             public void run() {
                 mDialogText.setText( state != null ? state.toString() : "" );
             }
         });
+
+        // Notify dialog state change to AutoVoiceChrome
     }
 
     @Override
     public void authStateChanged( final AuthState state, final AuthError error ) {
         if ( error == AuthError.NO_ERROR ) {
-            mLogger.postInfo( sTag, "Auth State Changed. STATE: " + state );
+            mLogger.postInfo( TAG, "Auth State Changed. STATE: " + state );
         } else {
-            mLogger.postWarn( sTag, String.format( "Auth State Changed. STATE: %s, ERROR: %s",
+            mLogger.postWarn( TAG, String.format( "Auth State Changed. STATE: %s, ERROR: %s",
                     state, error ) );
         }
         mActivity.runOnUiThread( new Runnable() {
@@ -68,7 +72,7 @@ public class AlexaClientHandler extends AlexaClient {
     public void connectionStatusChanged( final ConnectionStatus status,
                                          final ConnectionChangedReason reason ) {
         mConnectionStatus = status;
-        mLogger.postInfo( sTag, String.format( "Connection Status Changed. STATUS: %s, REASON: %s",
+        mLogger.postInfo( TAG, String.format( "Connection Status Changed. STATUS: %s, REASON: %s",
                 status, reason ) );
         mActivity.runOnUiThread( new Runnable() {
             @Override
@@ -76,22 +80,21 @@ public class AlexaClientHandler extends AlexaClient {
                 mConnectionText.setText( status != null ? status.toString() : "" );
             }
         });
+
+        // Notify error state change to AutoVoiceChrome
     }
 
     public ConnectionStatus getConnectionStatus () { return mConnectionStatus; }
 
     private void setupGUI() {
-        mConnectionText = mActivity.findViewById( R.id.connectionState ) ;
+        mConnectionText = mActivity.findViewById( R.id.connectionState );
         mAuthText = mActivity.findViewById( R.id.authState );
         mDialogText = mActivity.findViewById( R.id.dialogState );
 
-        mActivity.runOnUiThread( new Runnable() {
-            @Override
-            public void run() {
-                mConnectionText.setText( AlexaClient.ConnectionStatus.DISCONNECTED.toString() );
-                mAuthText.setText( AlexaClient.AuthState.UNINITIALIZED.toString() );
-                mDialogText.setText( AlexaClient.DialogState.IDLE.toString() );
-            }
-        });
+        mConnectionText.setText( AlexaClient.ConnectionStatus.DISCONNECTED.toString() );
+        mAuthText.setText( AlexaClient.AuthState.UNINITIALIZED.toString() );
+        mDialogText.setText(AlexaClient.DialogState.IDLE.toString() );
     }
+
+    // AutoVoiceChrome related functions
 }

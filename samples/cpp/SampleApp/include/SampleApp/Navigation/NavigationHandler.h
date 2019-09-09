@@ -49,9 +49,17 @@ class NavigationHandler : public aace::navigation::Navigation /* isa PlatformInt
 
     auto setDestination(const std::string &payload) -> bool override;
     auto cancelNavigation() -> bool override;
+    auto getNavigationState() -> std::string override;
 
   private:
+
+   // Sample App Events
+
+    auto loadNavigationState(const std::string& filepath) -> bool;
+    auto clearNavigationState() -> bool;
+
     std::weak_ptr<View> m_console{};
+    std::string m_dummyNavigationState;
 
     auto log(logger::LoggerHandler::Level level, const std::string &message) -> void;
     auto setupUI() -> void;

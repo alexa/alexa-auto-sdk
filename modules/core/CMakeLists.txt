@@ -19,6 +19,12 @@ endif()
 set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -Wall -O2")
 set(CMAKE_CXX_FLAGS_DEBUG "-DDEBUG -DAACE_DEBUG_LOG_ENABLED -Wall -g")
 
+if(AAC_ENABLE_COVERAGE)
+    message(STATUS "Enabling coverage for Core module.")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fprofile-arcs -ftest-coverage")
+    set(CMAKE_CXX_OUTPUT_EXTENSION_REPLACE ON)
+endif()
+
 if (AAC_EMIT_SENSITIVE_LOGS)
     string(TOUPPER ${CMAKE_BUILD_TYPE} BUILD_TYPE_UPPER)
     if (BUILD_TYPE_UPPER STREQUAL DEBUG)

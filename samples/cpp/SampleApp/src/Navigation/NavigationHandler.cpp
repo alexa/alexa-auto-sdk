@@ -14,10 +14,17 @@
  */
 
 #include "SampleApp/Navigation/NavigationHandler.h"
+#include "SampleApp/ApplicationContext.h"
+
+#include <fstream>
 
 // Guidelines Support Library
 #define GSL_THROW_ON_CONTRACT_VIOLATION
 #include <gsl/contracts.h>
+
+// JSON for Modern C++
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 namespace sampleApp {
 namespace navigation {
@@ -31,6 +38,7 @@ namespace navigation {
 NavigationHandler::NavigationHandler(std::weak_ptr<Activity> activity, std::weak_ptr<logger::LoggerHandler> loggerHandler)
     : m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
     // Expects((m_activity != nullptr) && (m_loggerHandler != nullptr));
+    m_dummyNavigationState = "";
     setupUI();
 }
 
@@ -65,10 +73,44 @@ bool NavigationHandler::cancelNavigation() {
             card->clear(View::Type::Navigation);
         }
     });
-    return true;
+    return clearNavigationState();
 }
 
 // private
+
+std::string NavigationHandler::getNavigationState() {
+    log(logger::LoggerHandler::Level::INFO, "getNavigationState");
+    return m_dummyNavigationState;
+}
+
+// Sample App Events
+
+bool NavigationHandler::loadNavigationState(const std::string &filepath) {
+    std::ifstream i(filepath);
+    json j;
+    i >> j;
+
+    if (j.is_object()) {
+        auto waypoints = j.find("waypoints");
+        if(waypoints != j.end() && waypoints->is_array()) {
+            m_dummyNavigationState = j.dump(); // json > std::string
+            log(logger::LoggerHandler::Level::INFO, m_dummyNavigationState);
+            return true;
+        } else {
+            log(logger::LoggerHandler::Level::ERROR, "Cannot find json array with key of 'waypoints' ");
+            return false;
+        }
+    } else {
+        log(logger::LoggerHandler::Level::ERROR, "Navigation state data invalid");
+        return false;
+    }
+}
+
+bool NavigationHandler::clearNavigationState() {
+    m_dummyNavigationState = "";
+    log(logger::LoggerHandler::Level::INFO, "Navigation state data cleared");
+    return true;
+}
 
 void NavigationHandler::log(logger::LoggerHandler::Level level, const std::string &message) {
     auto loggerHandler = m_loggerHandler.lock();
@@ -84,6 +126,24 @@ void NavigationHandler::setupUI() {
         return;
     }
     m_console = activity->findViewById("id:console");
+
+    
+
+    activity->registerObserver(Event::onLoadNavigationState, [=](const std::string &value) {
+        log(logger::LoggerHandler::Level::VERBOSE, "onLoadNavigationState");
+        if (auto console = m_console.lock()) {
+            console->printLine("Loading from" + value);
+        }
+        return loadNavigationState(value);
+    });
+
+    activity->registerObserver(Event::onClearNavigationState, [=](const std::string &value) {
+        log(logger::LoggerHandler::Level::VERBOSE, "onClearNavigationState");
+        if (auto console = m_console.lock()) {
+            console->printLine("Clearing nav state");
+        }
+        return clearNavigationState();
+    });
 }
 
 } // namespace navigation

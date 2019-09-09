@@ -16,6 +16,8 @@
 #ifndef AACE_ENGINE_ALEXA_TEMPLATE_RUNTIME_ENGINE_IMPL_H
 #define AACE_ENGINE_ALEXA_TEMPLATE_RUNTIME_ENGINE_IMPL_H
 
+#include <list>
+
 #include <AVSCommon/SDKInterfaces/DirectiveSequencerInterface.h>
 #include <AVSCommon/SDKInterfaces/TemplateRuntimeObserverInterface.h>
 #include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
@@ -98,8 +100,10 @@ protected:
     virtual void doShutdown() override;
     
 private:
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerInterface> m_delegate;
-    std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface>> m_observers;
+    std::weak_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerInterface> m_delegate;
+    
+    std::list<std::weak_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface>> m_observers;
+    
     std::mutex m_mutex;
 };
 

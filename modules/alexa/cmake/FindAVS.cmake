@@ -9,7 +9,7 @@
 #    cp AutoCoreEngineSDK/cmake/FindAVS.cmake WakeWordEngines/cmake
 # 3. Update AVS_VERSION when upgrading to a new version
 
-set(AVS_VERSION 1.10)
+set(AVS_VERSION 1.13)
 
 find_path(AVS_COMMON_INCLUDE_DIR AVSCommon)
 
@@ -31,7 +31,6 @@ find_library(AVS_CBL_AUTH_DELEGATE_LIBRARY CBLAuthDelegate)
 find_library(AVS_CAPABILITIES_DELEGATE_LIBRARY CapabilitiesDelegate)
 find_library(AVS_CERTIFIED_SENDER_LIBRARY CertifiedSender)
 find_library(AVS_CONTEXT_MANAGER_LIBRARY ContextManager)
-find_library(AVS_DEFAULT_CLIENT_LIBRARY DefaultClient)
 find_library(AVS_ESP_LIBRARY ESP)
 find_library(AVS_EQUALIZER_LIBRARY Equalizer)
 find_library(AVS_EQUALIZER_IMPLEMENTATIONS_LIBRARY EqualizerImplementations)

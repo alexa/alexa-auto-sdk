@@ -81,7 +81,7 @@ public:
     void setEngineInterface( std::shared_ptr<AuthProviderEngineInterface> authProviderEngineInterface );
 
 private:
-    std::shared_ptr<AuthProviderEngineInterface> m_authProviderEngineInterface;
+    std::weak_ptr<AuthProviderEngineInterface> m_authProviderEngineInterface;
 };
     
 } // aace::alexa

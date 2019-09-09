@@ -1,11 +1,9 @@
 {
   "config": {
     "clientId": "<YOUR DEVICE'S CLIENT ID>",
-    "clientSecret": "<YOUR DEVICE'S CLIENT SECRET>",
     "productId" : "<YOUR DEVICE'S PRODUCT ID>"
   },
   "metrics" : {
-    "metricsEnabled" : false,
     "amazonId" : "<YOUR DEVICE'S AMAZON ID>",
     "stage" : "<YOUR STAGING ENVIRONMENT: Beta, Gamma, Prod>"
   }

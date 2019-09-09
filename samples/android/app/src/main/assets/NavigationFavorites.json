@@ -1,0 +1,224 @@
+{
+    "navigationFavorites": [
+        {
+            "id": "101",
+            "name": {
+                "firstName": "Home",
+                "lastName": "",
+                "nickName": ""
+            },
+            "postalAddress": {
+                "label": "Home",
+                "addressLine1": "123 Main Street",
+                "addressLine2": "",
+                "addressLine3": "",
+                "city": "Santa Clara",
+                "stateOrRegion": "California",
+                "districtOrCounty": "",
+                "postalCode": "95000",
+                "country": "US",
+                "latitudeInDegrees": 51.321,
+                "longitudeInDegrees": 5,
+                "accuracyInMeters": 1
+            }
+        },
+        {
+            "id": "102",
+            "name": {
+                "firstName": "Work",
+                "lastName": "",
+                "nickName": ""
+            },
+            "postalAddress": {
+                "label": "Work",
+                "addressLine1": "456 Enterprise Way",
+                "addressLine2": "Building 13",
+                "addressLine3": "",
+                "city": "Santa Clara",
+                "stateOrRegion": "California",
+                "districtOrCounty": "",
+                "postalCode": "95001",
+                "country": "US",
+                "latitudeInDegrees": 66.321,
+                "longitudeInDegrees": 5.1,
+                "accuracyInMeters": 4
+            }
+        },
+        {
+            "id": "103",
+            "name": {
+                "firstName": "Gym",
+                "lastName": "",
+                "nickName": ""
+            },
+            "postalAddress": {
+                "label": "Gym",
+                "addressLine1": "789 Enterprise Way",
+                "addressLine2": "Building 1",
+                "addressLine3": "",
+                "city": "Santa Clara",
+                "stateOrRegion": "California",
+                "districtOrCounty": "",
+                "postalCode": "95002",
+                "country": "US",
+                "latitudeInDegrees": 77.321,
+                "longitudeInDegrees": 25.1,
+                "accuracyInMeters": 3
+            }
+        },
+        {
+            "id": "104",
+            "name": {
+                "firstName": "Baby Daycare",
+                "lastName": "",
+                "nickName": ""
+            },
+            "postalAddress": {
+                "label": "Baby Daycare",
+                "addressLine1": "123 Enterprise Way",
+                "addressLine2": "Building 1",
+                "addressLine3": "",
+                "city": "Santa Clara",
+                "stateOrRegion": "California",
+                "districtOrCounty": "",
+                "postalCode": "95002",
+                "country": "US",
+                "latitudeInDegrees": 80.321,
+                "longitudeInDegrees": 20.1,
+                "accuracyInMeters": 9
+            }
+        },
+        {
+            "id": "105",
+            "name": {
+                "firstName": "Kids School",
+                "lastName": "",
+                "nickName": ""
+            },
+            "postalAddress": {
+                "label": "Kids School",
+                "addressLine1": "99 Enterprise Way",
+                "addressLine2": "Building 42",
+                "addressLine3": "",
+                "city": "Santa Clara",
+                "stateOrRegion": "California",
+                "districtOrCounty": "",
+                "postalCode": "95002",
+                "country": "US",
+                "latitudeInDegrees": 60.321,
+                "longitudeInDegrees": 50.1,
+                "accuracyInMeters": 2
+            }
+        },
+        {
+            "id": "106",
+            "name": {
+                "firstName": "SJC Airport",
+                "lastName": "",
+                "nickName": ""
+            },
+            "postalAddress": {
+                "label": "SJC Airport",
+                "addressLine1": "1701 Airport Blvd, San Jose",
+                "addressLine2": "",
+                "addressLine3": "",
+                "city": "San Jose",
+                "stateOrRegion": "California",
+                "districtOrCounty": "",
+                "postalCode": "95110",
+                "country": "US",
+                "latitudeInDegrees": 37.366550,
+                "longitudeInDegrees": 121.929142,
+                "accuracyInMeters": 9
+            }
+        },
+        {
+            "id": "107",
+            "name": {
+                "firstName": "Lab 126",
+                "lastName": "",
+                "nickName": ""
+            },
+            "postalAddress": {
+                "label": "Lab 126",
+                "addressLine1": "1100 Enterprise Way, Sunnyvale",
+                "addressLine2": "Building 14",
+                "addressLine3": "",
+                "city": "Sunnyvale",
+                "stateOrRegion": "California",
+                "districtOrCounty": "",
+                "postalCode": "94089",
+                "country": "US",
+                "latitudeInDegrees": 37.408489,
+                "longitudeInDegrees": 122.036422,
+                "accuracyInMeters": 9
+            }
+        },
+        {
+            "id": "108",
+            "name": {
+                "firstName": "CALTrain Station",
+                "lastName": "",
+                "nickName": ""
+            },
+            "postalAddress": {
+                "label": "CALTrain Station",
+                "addressLine1": "121 W Evelyn Ave, Sunnyvale",
+                "addressLine2": "",
+                "addressLine3": "",
+                "city": "Sunnyvale",
+                "stateOrRegion": "California",
+                "districtOrCounty": "",
+                "postalCode": "94086",
+                "country": "US",
+                "latitudeInDegrees": 37.378445,
+                "longitudeInDegrees": 122.030780,
+                "accuracyInMeters": 9
+            }
+        },
+        {
+            "id": "109",
+            "name": {
+                "firstName": "Library",
+                "lastName": "",
+                "nickName": ""
+            },
+            "postalAddress": {
+                "label": "Library",
+                "addressLine1": "2635 Homestead Rd",
+                "addressLine2": "",
+                "addressLine3": "",
+                "city": "Santa Clara",
+                "stateOrRegion": "CA",
+                "districtOrCounty": "",
+                "postalCode": "95051",
+                "country": "US",
+                "latitudeInDegrees": 37.378445,
+                "longitudeInDegrees": 122.030780,
+                "accuracyInMeters": 9
+            }
+        },
+        {
+            "id": "110",
+            "name": {
+                "firstName": "Airport",
+                "lastName": "",
+                "nickName": ""
+            },
+            "postalAddress": {
+                "label": "Airport",
+                "addressLine1": "Airport San Francisco",
+                "addressLine2": "",
+                "addressLine3": "",
+                "city": "San Francisco",
+                "stateOrRegion": "California",
+                "districtOrCounty": "",
+                "postalCode": "94128",
+                "country": "US",
+                "latitudeInDegrees": 37.621154,
+                "longitudeInDegrees": 122.378712,
+                "accuracyInMeters": 9
+            }
+        }
+    ]
+}

@@ -46,18 +46,18 @@ static std::string VSHL_CAPABILITY_PLAYBACK_BUTTON_PRESSED = "button_pressed";
 
 std::shared_ptr<PlaybackDispatcher> PlaybackDispatcher::create(
     std::shared_ptr<ILogger> logger,
-    std::shared_ptr<RequestHandler> requestHandler,
+    std::shared_ptr<IAASBController> aasbController,
     std::shared_ptr<IAFBApi> api) {
 
-    return std::shared_ptr<PlaybackDispatcher>(new PlaybackDispatcher(logger, requestHandler, api));
+    return std::shared_ptr<PlaybackDispatcher>(new PlaybackDispatcher(logger, aasbController, api));
 }
 
 PlaybackDispatcher::PlaybackDispatcher(
     std::shared_ptr<ILogger> logger,
-    std::shared_ptr<RequestHandler> requestHandler,
+    std::shared_ptr<IAASBController> aasbController,
     std::shared_ptr<IAFBApi> api) :
         m_logger(logger),
-        m_requestHandler(requestHandler),
+        m_aasbController(aasbController),
         m_api(api) {
 }
 
@@ -95,7 +95,7 @@ bool PlaybackDispatcher::subscribeToPlaybackControlEvents() {
 
 void PlaybackDispatcher::onButtonPressed(const std::string& payload) {
     m_logger->log(Level::DEBUG, TAG, "buttonPressed " + payload);
-    m_requestHandler->onReceivedEvent(
+    m_aasbController->onReceivedEvent(
         TOPIC_PLAYBACK_CONTROLLER,
         ACTION_PLAYBACK_BUTTON_PRESSED,
         payload);

@@ -19,10 +19,46 @@
 #include <chrono>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 
 // Guidelines Support Library
 #define GSL_THROW_ON_CONTRACT_VIOLATION
 #include <gsl/contracts.h>
+
+namespace {
+struct EnumHash
+{
+    template <typename T>
+    std::size_t operator()(T t) const {
+        return static_cast<std::size_t>(t);
+    }
+};
+
+const std::unordered_map<aace::alexa::LocalMediaSource::Source, std::string, EnumHash> LocalMediaSourceToString = {
+    { aace::alexa::LocalMediaSource::Source::BLUETOOTH, "Local BLUETOOTH" },
+    { aace::alexa::LocalMediaSource::Source::USB, "Local USB" },
+    { aace::alexa::LocalMediaSource::Source::FM_RADIO, "Local FM_RADIO" },
+    { aace::alexa::LocalMediaSource::Source::AM_RADIO, "Local AM_RADIO" },
+    { aace::alexa::LocalMediaSource::Source::SATELLITE_RADIO, "Local SATELLITE_RADIO" },
+    { aace::alexa::LocalMediaSource::Source::LINE_IN, "Local LINE_IN" },
+    { aace::alexa::LocalMediaSource::Source::COMPACT_DISC, "Local COMPACT_DISC" },
+    { aace::alexa::LocalMediaSource::Source::SIRIUS_XM, "Local SIRIUS_XM" },
+    { aace::alexa::LocalMediaSource::Source::DAB, "Local DAB" }
+};
+
+const std::unordered_map<aace::alexa::LocalMediaSource::Source, aace::alexa::LocalMediaSource::MediaType, EnumHash> LocalMediaSourceToType = {
+    { aace::alexa::LocalMediaSource::Source::BLUETOOTH, aace::alexa::LocalMediaSource::MediaType::OTHER },
+    { aace::alexa::LocalMediaSource::Source::USB, aace::alexa::LocalMediaSource::MediaType::OTHER },
+    { aace::alexa::LocalMediaSource::Source::FM_RADIO, aace::alexa::LocalMediaSource::MediaType::STATION },
+    { aace::alexa::LocalMediaSource::Source::AM_RADIO, aace::alexa::LocalMediaSource::MediaType::STATION },
+    { aace::alexa::LocalMediaSource::Source::SATELLITE_RADIO, aace::alexa::LocalMediaSource::MediaType::STATION },
+    { aace::alexa::LocalMediaSource::Source::LINE_IN, aace::alexa::LocalMediaSource::MediaType::OTHER },
+    { aace::alexa::LocalMediaSource::Source::COMPACT_DISC, aace::alexa::LocalMediaSource::MediaType::TRACK },
+    { aace::alexa::LocalMediaSource::Source::SIRIUS_XM, aace::alexa::LocalMediaSource::MediaType::STATION },
+    { aace::alexa::LocalMediaSource::Source::DAB, aace::alexa::LocalMediaSource::MediaType::STATION }
+};
+
+}
 
 namespace sampleApp {
 namespace alexa {
@@ -35,9 +71,18 @@ namespace alexa {
 
 LocalMediaSourceHandler::LocalMediaSourceHandler(std::weak_ptr<Activity> activity,
                                                  std::weak_ptr<logger::LoggerHandler> loggerHandler,
-                                                 Source source,
-                                                 std::shared_ptr<aace::alexa::Speaker> speaker)
-    : aace::alexa::LocalMediaSource{source, speaker}, m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
+                                                 Source source)
+    : aace::alexa::LocalMediaSource{source}, m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
+    m_source = source;
+    auto mediaSource = LocalMediaSourceToString.find(source);
+    if(mediaSource != LocalMediaSourceToString.end()) {
+        m_sourceMediaProvider = mediaSource->second;
+    }
+
+    auto mediaType = LocalMediaSourceToType.find(source);
+    if(mediaType != LocalMediaSourceToType.end()) {
+        m_sourceMediaType = mediaType->second;
+    }
     // Expects((m_activity != nullptr) && (m_loggerHandler != nullptr));
     // Expects(speaker != nullptr);
     setupUI();
@@ -47,122 +92,159 @@ std::weak_ptr<Activity> LocalMediaSourceHandler::getActivity() { return m_activi
 
 std::weak_ptr<logger::LoggerHandler> LocalMediaSourceHandler::getLoggerHandler() { return m_loggerHandler; }
 
-// aace::alexa::Alerts interface
-
-bool LocalMediaSourceHandler::authorize(bool authorized) {
-    log(logger::LoggerHandler::Level::INFO, "authorize:authorized=" + std::string(authorized ? "true" : "false"));
+bool LocalMediaSourceHandler::play(ContentSelector contentSelectorType, const std::string &payload) {
+    std::stringstream ss;
+    ss << "play::source=" << m_source << " play:contentSelectorType=" << contentSelectorType << " play:payload=" + payload;
+    log(logger::LoggerHandler::Level::INFO, ss.str());
+    setFocus();
     if (auto activity = m_activity.lock()) {
         activity->runOnUIThread([=]() {
             if (auto console = m_console.lock()) {
-                console->printLine("Local CD Player authorize:", authorized ? "true" : "false");
+                console->printRuler();
+                console->printLine(m_sourceMediaProvider, "play:", payload);
+                console->printRuler();
             }
         });
     }
-    return m_authorized = authorized;
-}
-
-bool LocalMediaSourceHandler::play(const std::string &payload) {
-    log(logger::LoggerHandler::Level::INFO, "play:payload=" + payload);
-    if (m_authorized) {
-        if (auto activity = m_activity.lock()) {
-            activity->runOnUIThread([=]() {
-                setFocus();
-                if (auto console = m_console.lock()) {
-                    console->printLine("Local CD Player play:", payload);
-                }
-            });
-        }
-        return true;
-    }
-    return false;
+    return true;
 }
 
 bool LocalMediaSourceHandler::playControl(PlayControlType controlType) {
     std::stringstream ss;
-    ss << controlType;
-    log(logger::LoggerHandler::Level::INFO, "playControl:controlType=" + ss.str());
-    if (m_authorized) {
-        if (auto activity = m_activity.lock()) {
-            auto text = ss.str();
-            activity->runOnUIThread([=]() {
-                if (auto console = m_console.lock()) {
-                    console->printLine("Local CD Player play control:", text);
-                }
-            });
-        }
-        return true;
+    ss << "source:" << m_source << " playControl:controlType=" << controlType;
+    setFocus();
+    log(logger::LoggerHandler::Level::INFO, ss.str());
+    if (auto activity = m_activity.lock()) {
+        std::stringstream s;
+        s << controlType;
+        auto text = s.str();
+        activity->runOnUIThread([=]() {
+            if (auto console = m_console.lock()) {
+                console->printRuler();
+                console->printLine(m_sourceMediaProvider, "play control:", text);
+                console->printRuler();
+            }
+        });
     }
-    return false;
+    return true;
 }
 
 bool LocalMediaSourceHandler::seek(std::chrono::milliseconds offset) {
     log(logger::LoggerHandler::Level::INFO, "seek:offset=" + std::to_string(offset.count()));
-    if (m_authorized) {
-        if (auto activity = m_activity.lock()) {
-            activity->runOnUIThread([=]() {
-                if (auto console = m_console.lock()) {
-                    console->printLine("Local CD Player seek:", offset.count());
-                }
-            });
-        }
-        return true;
+    if (auto activity = m_activity.lock()) {
+        activity->runOnUIThread([=]() {
+            if (auto console = m_console.lock()) {
+                console->printRuler();
+                console->printLine(m_sourceMediaProvider, "seek:", offset.count());
+                console->printRuler();
+            }
+        });
     }
-    return false;
+    return true;
 }
 
 bool LocalMediaSourceHandler::adjustSeek(std::chrono::milliseconds deltaOffset) {
     log(logger::LoggerHandler::Level::INFO, "adjustSeek:deltaOffset=" + std::to_string(deltaOffset.count()));
-    if (m_authorized) {
-        if (auto activity = m_activity.lock()) {
-            activity->runOnUIThread([=]() {
-                if (auto console = m_console.lock()) {
-                    console->printLine("Local CD Player adjust seek:", deltaOffset.count());
-                }
-            });
-        }
-        return true;
+    if (auto activity = m_activity.lock()) {
+        activity->runOnUIThread([=]() {
+            if (auto console = m_console.lock()) {
+                console->printRuler();
+                console->printLine(m_sourceMediaProvider, "adjust seek:", deltaOffset.count());
+                console->printRuler();
+            }
+        });
     }
-    return false;
+    return true;
 }
 
 LocalMediaSourceHandler::LocalMediaSourceState LocalMediaSourceHandler::getState() {
     auto state = LocalMediaSourceHandler::LocalMediaSourceState{};
-    std::vector<aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation> supportedOperations{
-        aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::PLAY, aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::PAUSE,
-        aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::STOP};
-    state.playbackState.state = "IDLE";
+
+    std::vector<aace::alexa::LocalMediaSource::SupportedPlaybackOperation> supportedOperations{};
+    std::vector<aace::alexa::LocalMediaSource::ContentSelector> supportedContentSelectors{};
+
+    if( m_source != LocalMediaSource::Source::DAB ) { // DAB no 
+        supportedOperations.insert(supportedOperations.begin(),{
+            LocalMediaSource::SupportedPlaybackOperation::PLAY,
+            LocalMediaSource::SupportedPlaybackOperation::PAUSE,
+            LocalMediaSource::SupportedPlaybackOperation::STOP
+        });
+    }
+    switch( m_source ) {
+        case LocalMediaSource::Source::DAB :
+        case LocalMediaSource::Source::SATELLITE_RADIO : 
+            break;
+        case LocalMediaSource::Source::AM_RADIO :
+        case LocalMediaSource::Source::FM_RADIO :
+            supportedContentSelectors.insert(supportedContentSelectors.begin(), {
+                LocalMediaSource::ContentSelector::FREQUENCY,
+                LocalMediaSource::ContentSelector::PRESET
+            });
+            break;
+        case LocalMediaSource::Source::SIRIUS_XM :
+            supportedContentSelectors.insert(supportedContentSelectors.begin(), {
+                LocalMediaSource::ContentSelector::PRESET,
+                LocalMediaSource::ContentSelector::CHANNEL
+            });
+            break;
+        case LocalMediaSource::Source::BLUETOOTH :
+        case LocalMediaSource::Source::USB :
+        case LocalMediaSource::Source::LINE_IN :
+            supportedOperations.insert(supportedOperations.end(),{
+                LocalMediaSource::SupportedPlaybackOperation::FAVORITE,
+                LocalMediaSource::SupportedPlaybackOperation::UNFAVORITE,
+                LocalMediaSource::SupportedPlaybackOperation::NEXT,
+                LocalMediaSource::SupportedPlaybackOperation::PREVIOUS,
+                LocalMediaSource::SupportedPlaybackOperation::ENABLE_SHUFFLE,
+                LocalMediaSource::SupportedPlaybackOperation::DISABLE_SHUFFLE,
+                LocalMediaSource::SupportedPlaybackOperation::ENABLE_REPEAT_ONE,
+                LocalMediaSource::SupportedPlaybackOperation::ENABLE_REPEAT,
+                LocalMediaSource::SupportedPlaybackOperation::SEEK,
+                LocalMediaSource::SupportedPlaybackOperation::ADJUST_SEEK,
+                LocalMediaSource::SupportedPlaybackOperation::START_OVER,
+                LocalMediaSource::SupportedPlaybackOperation::FAST_FORWARD,
+                LocalMediaSource::SupportedPlaybackOperation::REWIND
+            });
+            break;
+        case LocalMediaSource::Source::COMPACT_DISC :
+            supportedOperations.insert(supportedOperations.end(),{
+                LocalMediaSource::SupportedPlaybackOperation::NEXT,
+                LocalMediaSource::SupportedPlaybackOperation::PREVIOUS,
+                LocalMediaSource::SupportedPlaybackOperation::ENABLE_SHUFFLE,
+                LocalMediaSource::SupportedPlaybackOperation::DISABLE_SHUFFLE,
+                LocalMediaSource::SupportedPlaybackOperation::ENABLE_REPEAT_ONE,
+                LocalMediaSource::SupportedPlaybackOperation::ENABLE_REPEAT,
+                LocalMediaSource::SupportedPlaybackOperation::SEEK,
+                LocalMediaSource::SupportedPlaybackOperation::ADJUST_SEEK,
+                LocalMediaSource::SupportedPlaybackOperation::START_OVER,
+                LocalMediaSource::SupportedPlaybackOperation::FAST_FORWARD,
+                LocalMediaSource::SupportedPlaybackOperation::REWIND
+            });
+            break;
+    }
+
     state.playbackState.supportedOperations = supportedOperations;
-    state.playbackState.trackOffset = std::chrono::milliseconds(0);
-    state.playbackState.shuffleEnabled = false;
-    state.playbackState.repeatEnabled = false;
-    state.playbackState.favorites = aace::alexa::ExternalMediaAdapter::Favorites::NOT_RATED;
-    state.playbackState.type = "ExternalMediaPlayerMusicItem";
-    state.playbackState.playbackSource = "mock playbackSource";
-    state.playbackState.playbackSourceId = "mock playbackSourceId";
-    state.playbackState.trackName = "mock trackName";
-    state.playbackState.trackId = "";
-    state.playbackState.trackNumber = "mock trackNumber";
-    state.playbackState.artistName = "mock artistName";
-    state.playbackState.artistId = "";
-    state.playbackState.albumName = "mock albumName";
-    state.playbackState.albumId = "";
-    state.playbackState.mediaProvider = "Local CD Player";
-    state.playbackState.mediaType = aace::alexa::ExternalMediaAdapter::MediaType::TRACK;
-    state.playbackState.duration = std::chrono::milliseconds(60000);
-    state.sessionState.endpointId = "localId";
-    state.sessionState.loggedIn = false;
-    state.sessionState.userName = "";
-    state.sessionState.isGuest = false;
-    state.sessionState.launched = false;
-    state.sessionState.active = false;
-    state.sessionState.accessToken = "";
-    state.sessionState.tokenRefreshInterval = std::chrono::milliseconds(0);
-    state.sessionState.playerCookie = "mock playerCookie";
-    state.sessionState.spiVersion = "1.0";
+   
+    state.sessionState.supportedContentSelectors = supportedContentSelectors;
+
+    state.playbackState.state = m_localMediaSourceStateMap.find(m_source)->second;
+
     // if (auto console = m_console.lock()) {
     //     console->printLine("getState");
     // }
     return state;
+}
+
+bool LocalMediaSourceHandler::volumeChanged( float volume ) {
+    log(logger::LoggerHandler::Level::INFO, " volumeChanged:m_sourceMediaProvider=" + m_sourceMediaProvider + " volumeChanged:volume=" + std::to_string(volume));
+    return true;
+}
+
+bool LocalMediaSourceHandler::mutedStateChanged( MutedState mute ) {
+    std::string muted = "not muted";
+    if( mute == MutedState::MUTED ) muted = "muted";
+    log(logger::LoggerHandler::Level::INFO, " mutedStateChanged:m_sourceMediaProvider=" + m_sourceMediaProvider + " mutedStateChanged:mute=" + muted );
+    return true;
 }
 
 // private

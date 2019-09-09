@@ -16,7 +16,7 @@
 #ifndef AACE_ALEXA_ALERTS_H
 #define AACE_ALEXA_ALERTS_H
 
-#include "AudioChannel.h"
+#include <AACE/Core/PlatformInterface.h>
 #include "AlexaEngineInterfaces.h"
 
 /** @file */
@@ -32,9 +32,9 @@ namespace alexa {
  *
  * @sa AudioChannel
  */
-class Alerts : public AudioChannel {
+class Alerts : public aace::core::PlatformInterface {
 protected:
-    Alerts( std::shared_ptr<aace::alexa::MediaPlayer> mediaPlayer, std::shared_ptr<aace::alexa::Speaker> speaker );
+    Alerts() = default;
 
 public:
     virtual ~Alerts();
@@ -143,7 +143,7 @@ public:
     void setEngineInterface( std::shared_ptr<aace::alexa::AlertsEngineInterface> alertsEngineInterface );
 
 private:
-    std::shared_ptr<aace::alexa::AlertsEngineInterface> m_alertsEngineInterface;
+    std::weak_ptr<aace::alexa::AlertsEngineInterface> m_alertsEngineInterface;
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const Alerts::AlertState& state) {

@@ -20,6 +20,14 @@
 namespace aace {
 namespace location {
 
+Location::Location() :
+    m_latitude( UNDEFINED ),
+    m_longitude( UNDEFINED ),
+    m_altitude( UNDEFINED ),
+    m_accuracy( UNDEFINED ),
+    m_time( std::chrono::system_clock::now() ) {
+}
+
 Location::Location( double latitude, double longitude, double altitude, double accuracy, std::chrono::system_clock::time_point time ) {
     m_latitude = (latitude >= -90 && latitude <= 90) ? latitude : UNDEFINED;
     m_longitude = (longitude >= -180 && longitude <= 180) ? longitude : UNDEFINED;

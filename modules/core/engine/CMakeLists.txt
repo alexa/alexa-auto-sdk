@@ -127,6 +127,19 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Metrics/MetricsEngineService.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Metrics/MetricsUploaderEngineImpl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Metrics/MetricEvent.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Utils/JSON/JSON.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Utils/Threading/Executor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Utils/Threading/TaskQueue.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Utils/Threading/TaskThread.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Utils/UUID/UUID.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Audio/AudioEngineService.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Audio/AudioInputProviderEngineImpl.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Audio/AudioOutputProviderEngineImpl.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Audio/AudioInputEngineImpl.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Audio/AudioOutputEngineImpl.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Audio/AudioManagerInterface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Audio/AudioInputChannelInterface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Audio/AudioOutputChannelInterface.h
 )
  
 source_group("Header Files" FILES ${HEADERS})
@@ -166,6 +179,16 @@ add_library(AACECoreEngine SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Metrics/MetricsEngineService.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Metrics/MetricsUploaderEngineImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Metrics/MetricEvent.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/JSON/JSON.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/Threading/Executor.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/Threading/TaskQueue.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/Threading/TaskThread.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/UUID/UUID.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Audio/AudioEngineService.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Audio/AudioInputProviderEngineImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Audio/AudioOutputProviderEngineImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Audio/AudioInputEngineImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Audio/AudioOutputEngineImpl.cpp
 )
 
 find_path(RAPIDJSON_INCLUDE_DIR rapidjson/rapidjson.h

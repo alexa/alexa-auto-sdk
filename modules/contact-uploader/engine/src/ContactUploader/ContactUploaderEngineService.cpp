@@ -30,25 +30,6 @@ REGISTER_SERVICE(ContactUploaderEngineService);
 ContactUploaderEngineService::ContactUploaderEngineService( const aace::engine::core::ServiceDescription& description ) : aace::engine::core::EngineService( description ) {
 }
 
-bool ContactUploaderEngineService::configure( const std::vector< std::shared_ptr<std::istream>>& configuration) {
-    try {
-        //TBD Add Configure support.    
-        return true;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"configure").d("reason", ex.what() ) );
-        return false;
-    }
-}
-
-bool ContactUploaderEngineService::start() {
-    return true;
-}
-
-bool ContactUploaderEngineService::stop() {
-    return true;
-}
-
 bool ContactUploaderEngineService::shutdown() {
     if( m_contactUploaderEngineImpl != nullptr ) {
         m_contactUploaderEngineImpl->shutdown();
@@ -86,7 +67,7 @@ bool ContactUploaderEngineService::registerPlatformInterfaceType( std::shared_pt
         deviceInfo = alexaClientSDK::avsCommon::utils::DeviceInfo::create( config );
         ThrowIfNull( deviceInfo, "createDeviceInfoFailed" );
 
-        m_contactUploaderEngineImpl = aace::engine::contactUploader::ContactUploaderEngineImpl::create( contactUploader, authDelegate,  deviceInfo );
+        m_contactUploaderEngineImpl = aace::engine::contactUploader::ContactUploaderEngineImpl::create( std::move(contactUploader), authDelegate,  deviceInfo );
         ThrowIfNull( m_contactUploaderEngineImpl, "createContactUploaderEngineImplFailed" );
 
         return true;

@@ -1,6 +1,54 @@
-# ChangeLog
+# Change Log
 
 ___
+
+## v2.0.0 released on 2019-09-10:
+
+### Enhancements
+* Added **offline enhancements** to improve offline car control support and add support for:
+    * **offline car control enhancements** - to support generic controls that represent what can be controlled in a vehicle; for example: interior lighting, fans, temperature zone (driver and passenger), vent position, defroster, air conditioner, and recirculation.
+        >**Note**: The car control enhancements are not backward compatible with previous versions of car control. The configuration and platform interface have changed. 
+
+    * **offline entertainment** - to support tuning to a specific frequency or SiriusXM channel, tuning to radio presets, switching between car audio sources (bluetooth, radio, satellite radio, CD player, etc.), and controlling local audio sources (pause, shuffle, loop, etc.)
+    * **offline communications** - to support uploading contacts, calling a number or a contact, answering, declining, redialing, or ending a call, and dialing digits during a call
+    * **offline navigation** - to support navigating to favorite locations and canceling navigation  
+* Added **online entertainment enhancements** to support tuning to a specific frequency or SiriusXM channel and tuning to radio presets.
+* Added **online navigation enhancements** to support navigating to favorite locations and answering ETA and time to destination questions.
+* Introduced the **Address Book module**, which includes a common platform interface that you can implement to either upload user data to the Alexa cloud or allow the local communications and navigation capabilities to access user data for offline use cases (supported by the optional Local Voice Control (LVC) module). The Address Book module supersedes the Contacts Uploader module, which supports only phone contacts and only online use cases.
+* Introduced a **new core Audio service and API** to implement audio input and output providers, and deprecated the existing MediaPlayer and Speaker platform interfaces in the Alexa module. This redesign simplifies integration with platform-specific audio capabilities and enables implementation of new, advanced audio features.
+>**NOTE:** The new core Audio service and APIs are not backward compatible with previous versions of the Alexa Auto SDK (prior to version 2.0.0).
+
+* Added a library to support the **Device Client Metrics (DCM) extension for additional platforms** such as Linux and QNX in addition to Android, which was supported in release 1.5. This library is required to upload metrics and vehicle information to the Amazon cloud.
+* Added support for **Voice Chrome for Android**, an extension available through your Solutions Architect or Partner Manager that provides a Voice Chrome library for the Android platform. This library allows you to display voice chrome animations of different Alexa states to the user on screen.
+* Added an **integrated wake word enhancement to ignore Alexa waking itself up**. In order to implement this enhancement, you must provide audio loopback via the platform or application.
+* Added **local pause handling to the PlaybackController** to allow non-voice interactions to pause media playback from the AudioPlayer source immediately, without waiting for a response from the cloud.
+* Added **Geolocation support** to the Navigation module. Geolocation support enables location-based services (which are used to answer questions such as “where am I” or “what’s the weather”) to use the location information provided by the platform.
+
+    >**Note:** In order to make use of this functionality, you must register the Navigation platform interface for Geolocation support.
+* **Enhanced the builder scripts** to simplify the build process by removing unnecessary options and including the default components for different targets. For details see the [Builder README](builder/README.md).
+* **Refactored the Java Native Interface (JNI) code** used for Android platform interfaces for more modular deployment. In place of a single AAR including all Auto SDK native libraries, the Alexa Auto SDK now generates multiple AARs (one per module). Please see the [builder README](./builder/README.md) and the [Android Sample App README](./samples/android/README.md) for details. 
+
+### Resolved Issues
+* Fixed an issue where music streaming from online music service providers continued to play when the user switched to a local media source.
+* Fixed an issue where an MACC app (Spotify) could automatically play after the first utterance.
+* Fixed a race condition in the Navigation module that occasionally caused Cancel Navigation to fail.
+* Fixed broken links in the documentation.
+
+### Known Issues
+
+* Calling numbers such as 1800xxxxxxx using utterances such as "Alexa call one eight double oh..." may return unexpected results. Similarly, calling numbers using utterances that include "triple", "hundred" and "thousand" and pressing special characters such as # or &ast; using utterances such as "Alexa press &ast;#" may return unexpected results. Therefore, when requesting Alexa to call or press digits, we recommend that your client application ignore special characters, dots, and non-numeric characters if not relevant to the context.
+* The Engine may crash during shutdown due to a race condition in the Local Media Source Engine implementation. However, since shutdown is triggered when the car ignition is turned off, no direct customer impact is expected.
+* The Engine may hang during shutdown if it is shut down while TTS is being played or read. Therefore, you should avoid calling the shutdown method while loading or playing SpeechSynthesizer audio.
+* In online mode, Alexa does not recognize the utterance "Switch to line in."
+* A user interacting with multiturn skills such as Jeopardy cannot accept or reject incoming Alexa-to-Alexa calls using voice.
+* If the user rejects an incoming Alexa-to-Alexa call via voice, ringtones do not sound for subsequent incoming calls until the user either answers an incoming call via the VUI or makes an outbound call.
+* If you change your Car Control configuration or custom assets during development after Local Voice Control (LVC) was previously running, you should stop your application and LVC, change the configuration or custom assets, uninstall and reinstall LVC, and relaunch your application to ensure the changes are applied.
+* To ensure that the ID space used for contacts and navigation favorites does not collide, you must assign unique `entryId`s to contacts and navigation data. If you use the same `entryId`, re-uploading contacts may cause navigation favorites to become unavailable to Alexa, and re-uploading navigation favorites may cause contacts to become unavailable.
+* If the local timezone of your device differs from the timezone that was configured through the Alexa companion app, the user may experience unexpected behavior. For example, if your device shows 12pm PST, but the device on the Alexa companion app is configured with an EST timezone, then asking "Alexa set an alarm for 1pm today," will return, "Sorry I can't set alarms in the past."
+* Alexa uses different audio channels, such as dialog (user utterance or TTS) and content (music), and shuffles between them to respond to user requests. As a result of this shuffling, content (such as music playback) that gets paused to accommodate higher priority channels may regain foreground audio focus and resume content in bursts between the outputs of higher priority channels (such as Alexa TTS or ongoing alerts). To avoid this, platforms should maintain the audio focus for a few extra milliseconds.
+* The External Media Player (EMP) Engine implementation does not wait for a dialog channel focus change to complete, such as after TTS, before executing an EMP directive, such as playing the CD player. As a result, you may see an unexpected sequence of Local Media Source `playControl()` method invocations such as play, then pause, followed by play again in quick succession
+* When a timer sounds during an Alexa-to-Alexa call, uttering "stop" ends the call, not the timer.
+* Multiple automotive devices using the same account at the same time can access contacts from phones paired across those devices.
 
 ## v1.6.1 released on 2019-06-21:
  
@@ -83,6 +131,36 @@ No resolved issues.
 * When a timer sounds during an Alexa-to-Alexa call, uttering "stop" ends the call, not the timer.
 * Multiple automotive devices using the same account at the same time can access contacts from phones paired across those devices.
 
+## v1.3.1 released on 2019-06-21:
+
+### Enhancements
+
+This release of Alexa Auto SDK includes updates for music certification.
+
+### Resolved Issues
+
+Resolved issues are limited to music certification updates:
+
+* Migrated to AVS Device SDK v1.12.1 for music certification. As part of the migration there is a new dependency on `openssl`. Developers using their own build system may need to make changes in order to accommodate this new dependency when linking AVS Device SDK.
+* Fixed ExternalMediaPlayerAdapter getState() failure that triggered `INVALID_REQUEST_EXCEPTION/Bad Request` exceptions.
+* Fixed live radio offset for stations that use a dynamic window (`mime=audio/mp4a-latm`).
+* Updated the Android Sample App log view implementation for improved stability and performance.
+* Bug fixes and documentation updates:
+  - Additional test in `AuthProviderEngineImpl::doShutdown()` to avoid null pointer exception.
+  - Fixed an issue with `SQLiteStorage::removeKey()` where the `DELETE FROM` statement repeated the `FROM`.
+  - Fixed a race condition in `AudioChannelEngineImpl::setSource()` with back to back TTS.
+  - Internal calls to `AudioChannelEngineImpl::executePlaybackFinished()` now save the player offset.
+  - Internal calls to `AudioPlayerEngineImpl::removeObserver()` now remove an AudioPlayerObserverInterface observer instance instead of adding it.
+  - Use `static_cast<unsigned char>` for upper/lower character conversions.
+
+The platform interfaces have not changed, however the following C++ and Android enums are updated:
+* The enum class `DialogState` inserts the `EXPECTING` enum constant.
+* The enum class `ConnectionChangedReason` inserts `NONE`, `SUCCESS`, and `UNRECOVERABLE_ERROR` enum constants.
+
+### Known Issues
+
+All known issues from v1.3.0.
+
 ## v1.3.0 released on 2018-11-20:
 
 ### Enhancements
@@ -90,7 +168,7 @@ No resolved issues.
 * Android 8 and ARM v8a platform support.
 * Making calls to contacts from a locally-paired mobile phone as long as the Alexa Auto SDK has a valid auth token. Read more about [Contact Uploader API](./modules/contact-uploader/README.md).
 * Redial, answer, terminate, and decline calls using voice. End users can also send dual-tone multi-frequency (DTMF) via voice to interact with Interactive Voice Responders (IVRs). Read more here [Phone Call Controller](./modules/phone-control/README.md).
-* Switching to local media sources, generic controls and deep linking into 3rd party media applications compatible with the Amazon Media App Command and Control (MACC) specification using the External Media Player Interface 1.1. This allows customers to switch between a CD player, AM/FM player, and auxiliary input that is MACC-compliant. Read more here [Handling External Media Adapter with MACCAndroidClient](./platforms/android/ALEXA.md#handlingexternalmediaadapterwithmaccandroidclient).  
+* Switching to local media sources, generic controls and deep linking into 3rd party media applications compatible with the Amazon Media App Command and Control (MACC) specification using the External Media Player Interface 1.1. This allows customers to switch between a CD player, AM/FM player, and auxiliary input that is MACC-compliant. Read more here [Handling External Media Adapter with MACCAndroidClient](./platforms/android/modules/alexa/README.md).  
 * Enhancement for 3rd party wake word engine to enable cloud based verification.
 * Provides a way to override Template Runtime display card timeout values for RenderTemplate and RenderPlayerInfo by updating the [templateRuntimeCapabilityAgent Engine configuration](https://alexa.github.io/alexa-auto-sdk/modules/core/#configuring-the-engine) values.
 

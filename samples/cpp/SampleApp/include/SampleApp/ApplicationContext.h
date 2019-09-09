@@ -21,6 +21,7 @@
 
 // C++ Standard Library
 #include <deque>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -38,6 +39,7 @@ namespace sampleApp {
 
 class ApplicationContext {
   private:
+    bool m_audioFileSupported{false};
     bool m_logEnabled{false};
     bool m_singleThreadedUI{false};
     bool m_testAutomation{false};
@@ -64,6 +66,7 @@ class ApplicationContext {
     auto addAudioFilePath(const std::string &audioFilePath) -> void;
     auto addConfigFilePath(const std::string &configFilePath) -> void;
     auto addMenuFilePath(const std::string &menuFilePath) -> void;
+    auto checkDcmConfiguration(const std::vector<json>& configs) -> bool;
     auto clearLevel() -> void;
     auto clearRefreshToken() -> void;
     auto clearUserConfigFilePath() -> void;
@@ -90,6 +93,10 @@ class ApplicationContext {
     auto hasMenu(const std::string &id) -> bool;
     auto hasRefreshToken() -> bool;
     auto hasUserConfigFilePath() -> bool;
+    auto isAlexaCommsSupported() -> bool;
+    auto isAudioFileSupported() -> bool;
+    auto isDcmSupported() -> bool;
+    auto isLocalVoiceControlSupported() -> bool;
     auto isLogEnabled() -> bool;
     auto isSingleThreadedUI() -> bool;
     auto isTestAutomation() -> bool;
@@ -98,6 +105,7 @@ class ApplicationContext {
     auto popAudioFilePath() -> std::string;
     auto registerMenu(const std::string &id, const json &menu) -> std::size_t;
     auto saveContent(const std::string &path, const std::string &content) -> bool;
+    auto setAudioFileSupported(bool audioFileSupported) -> void;
     auto setAudioInputDevice(const std::string &audioInputDevice) -> void;
     auto setBrowserCommand(const std::string &browserCommand) -> void;
     auto setLevel(logger::LoggerHandler::Level level) -> void;
@@ -105,6 +113,8 @@ class ApplicationContext {
     auto setPayloadScriptCommand(const std::string &payloadScriptCommand) -> void;
     auto setSingleThreadedUI(bool singleThreadedUI) -> void;
     auto setUserConfigFilePath(const std::string &userConfigFilePath) -> void;
+    auto test(const std::string &value) -> bool;
+
 
   private:
     friend cbl::CBLHandler;

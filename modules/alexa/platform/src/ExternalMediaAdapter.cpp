@@ -18,64 +18,57 @@
 namespace aace {
 namespace alexa {
 
-ExternalMediaAdapter::ExternalMediaAdapter( std::shared_ptr<aace::alexa::Speaker> speaker ) : m_speaker( speaker ) {
-}
-
 ExternalMediaAdapter::~ExternalMediaAdapter() = default;
-
-std::shared_ptr<aace::alexa::Speaker> ExternalMediaAdapter::ExternalMediaAdapter::getSpeaker() {
-    return m_speaker;
-}
 
 //
 // Engine interface methods
 //
 
 void ExternalMediaAdapter::reportDiscoveredPlayers( const std::vector<DiscoveredPlayerInfo>& discoveredPlayers ) {
-    if( m_externalMediaAdapterEngineInterface != nullptr ) {
-        m_externalMediaAdapterEngineInterface->onReportDiscoveredPlayers( discoveredPlayers );
+    if( auto m_externalMediaAdapterEngineInterface_lock = m_externalMediaAdapterEngineInterface.lock() ) {
+        m_externalMediaAdapterEngineInterface_lock->onReportDiscoveredPlayers( discoveredPlayers );
     }
 }
 
 void ExternalMediaAdapter::requestToken( const std::string& localPlayerId ) {
-    if( m_externalMediaAdapterEngineInterface != nullptr ) {
-        m_externalMediaAdapterEngineInterface->onRequestToken( localPlayerId );
+    if( auto m_externalMediaAdapterEngineInterface_lock = m_externalMediaAdapterEngineInterface.lock() ) {
+        m_externalMediaAdapterEngineInterface_lock->onRequestToken( localPlayerId );
     }
 }
 
 void ExternalMediaAdapter::loginComplete( const std::string& localPlayerId ) {
-    if( m_externalMediaAdapterEngineInterface != nullptr ) {
-        m_externalMediaAdapterEngineInterface->onLoginComplete( localPlayerId );
+    if( auto m_externalMediaAdapterEngineInterface_lock = m_externalMediaAdapterEngineInterface.lock() ) {
+        m_externalMediaAdapterEngineInterface_lock->onLoginComplete( localPlayerId );
     }
 }
 
 void ExternalMediaAdapter::logoutComplete( const std::string& localPlayerId ) {
-    if( m_externalMediaAdapterEngineInterface != nullptr ) {
-        m_externalMediaAdapterEngineInterface->onLogoutComplete( localPlayerId );
+    if( auto m_externalMediaAdapterEngineInterface_lock = m_externalMediaAdapterEngineInterface.lock() ) {
+        m_externalMediaAdapterEngineInterface_lock->onLogoutComplete( localPlayerId );
     }
 }
 
 void ExternalMediaAdapter::playerEvent( const std::string& localPlayerId, const std::string& eventName ) {
-    if( m_externalMediaAdapterEngineInterface != nullptr ) {
-        m_externalMediaAdapterEngineInterface->onPlayerEvent( localPlayerId, eventName );
+    if( auto m_externalMediaAdapterEngineInterface_lock = m_externalMediaAdapterEngineInterface.lock() ) {
+        m_externalMediaAdapterEngineInterface_lock->onPlayerEvent( localPlayerId, eventName );
     }
 }
 
 void ExternalMediaAdapter::playerError( const std::string& localPlayerId, const std::string& errorName, long code, const std::string& description, bool fatal ) {
-    if( m_externalMediaAdapterEngineInterface != nullptr ) {
-        m_externalMediaAdapterEngineInterface->onPlayerError( localPlayerId, errorName, code, description, fatal );
+    if( auto m_externalMediaAdapterEngineInterface_lock = m_externalMediaAdapterEngineInterface.lock() ) {
+        m_externalMediaAdapterEngineInterface_lock->onPlayerError( localPlayerId, errorName, code, description, fatal );
     }
 }
 
 void ExternalMediaAdapter::setFocus( const std::string& localPlayerId ) {
-    if( m_externalMediaAdapterEngineInterface != nullptr ) {
-        m_externalMediaAdapterEngineInterface->onSetFocus( localPlayerId );
+    if( auto m_externalMediaAdapterEngineInterface_lock = m_externalMediaAdapterEngineInterface.lock() ) {
+        m_externalMediaAdapterEngineInterface_lock->onSetFocus( localPlayerId );
     }
 }
 
 void ExternalMediaAdapter::removeDiscoveredPlayer( const std::string& localPlayerId ) {
-    if( m_externalMediaAdapterEngineInterface != nullptr ) {
-        m_externalMediaAdapterEngineInterface->onRemoveDiscoveredPlayer( localPlayerId );
+    if( auto m_externalMediaAdapterEngineInterface_lock = m_externalMediaAdapterEngineInterface.lock() ) {
+        m_externalMediaAdapterEngineInterface_lock->onRemoveDiscoveredPlayer( localPlayerId );
     }
 }
 

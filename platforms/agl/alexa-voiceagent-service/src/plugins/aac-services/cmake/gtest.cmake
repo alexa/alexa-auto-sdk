@@ -27,7 +27,7 @@ TARGET_INCLUDE_DIRECTORIES(libgtest
 )
 TARGET_LINK_LIBRARIES(libgtest
     INTERFACE
-        ${binary_dir}/googlemock/gtest/libgtest.a
+        ${AAC_HOME}/lib/libgtest.a
         ${CMAKE_THREAD_LIBS_INIT}
 )
 
@@ -39,7 +39,7 @@ TARGET_INCLUDE_DIRECTORIES(libgmock
 )
 TARGET_LINK_LIBRARIES(libgmock
     INTERFACE
-        ${binary_dir}/googlemock/libgmock.a
+        ${AAC_HOME}/lib/libgmock.a
         ${CMAKE_THREAD_LIBS_INIT}
 )
 

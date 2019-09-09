@@ -20,10 +20,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.amazon.aace.alexa.Alerts;
-import com.amazon.aace.alexa.MediaPlayer;
-import com.amazon.aace.alexa.Speaker;
 import com.amazon.sampleapp.R;
-import com.amazon.sampleapp.impl.MediaPlayer.MediaPlayerHandler;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 
 public class AlertsHandler extends Alerts {
@@ -35,19 +32,10 @@ public class AlertsHandler extends Alerts {
     private TextView mStateText;
 
     public AlertsHandler( Activity activity,
-                          LoggerHandler logger,
-                          MediaPlayer mediaPlayer,
-                          Speaker speaker ) {
-        super( mediaPlayer, speaker );
+                          LoggerHandler logger ) {
         mActivity = activity;
         mLogger = logger;
         setupGUI();
-    }
-
-    public AlertsHandler( Activity activity,
-                          LoggerHandler logger,
-                          MediaPlayerHandler mediaPlayer ) {
-        this( activity, logger, mediaPlayer, mediaPlayer.getSpeaker() );
     }
 
     @Override

@@ -17,6 +17,7 @@
 #define AACE_LOGGER_LOGGER_ENGINE_INTERFACES_H
 
 #include <string>
+#include <iostream>
 
 /** @file */
 
@@ -67,6 +68,30 @@ public:
 
     virtual void log( Level level, const std::string& tag, const std::string& message ) = 0;
 };
+
+inline std::ostream& operator<<(std::ostream& stream, const LoggerEngineInterface::Level& level) {
+    switch (level) {
+        case LoggerEngineInterface::Level::VERBOSE:
+            stream << "VERBOSE";
+            break;
+        case LoggerEngineInterface::Level::INFO:
+            stream << "INFO";
+            break;
+        case LoggerEngineInterface::Level::METRIC:
+            stream << "METRIC";
+            break;
+        case LoggerEngineInterface::Level::WARN:
+            stream << "WARN";
+            break;
+        case LoggerEngineInterface::Level::ERROR:
+            stream << "ERROR";
+            break;
+        case LoggerEngineInterface::Level::CRITICAL:
+            stream << "CRITICAL";
+            break;
+    }
+    return stream;
+}
 
 } // aace::logger
 } // aace

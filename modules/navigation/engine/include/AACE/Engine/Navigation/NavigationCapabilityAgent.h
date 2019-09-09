@@ -24,6 +24,7 @@
 #include <AVSCommon/Utils/Threading/Executor.h>
 #include <AVSCommon/SDKInterfaces/CapabilityConfigurationInterface.h>
 #include <AVSCommon/AVS/CapabilityConfiguration.h>
+#include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
 
 
 #include "NavigationObserverInterface.h"
@@ -39,7 +40,8 @@ class NavigationCapabilityAgent :
     public std::enable_shared_from_this<NavigationCapabilityAgent> {
     
 public:
-    static std::shared_ptr<NavigationCapabilityAgent> create( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender );
+    static std::shared_ptr<NavigationCapabilityAgent> create( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager, const std::string& navigationProviderName );
 
     /**
      * Destructor.
@@ -73,8 +75,12 @@ public:
 
     std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>> getCapabilityConfigurations() override;
 
+    // StateProviderInterface
+    void provideState( const alexaClientSDK::avsCommon::avs::NamespaceAndName& stateProviderName, const unsigned int stateRequestToken ) override;
+
 private:
-    NavigationCapabilityAgent( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender );
+    NavigationCapabilityAgent( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender, 
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager, const std::string& navigationProviderName );
 
     // @name RequiresShutdown Functions
     /// @{
@@ -129,6 +135,16 @@ private:
     void handleUnknownDirective(std::shared_ptr<DirectiveInfo> info);
 
     /**
+     * Exectuor function for provideState
+     */
+    void executeProvideState( const alexaClientSDK::avsCommon::avs::NamespaceAndName& stateProviderName, const unsigned int stateRequestToken );
+
+    /**
+     * Check Navigation State for validity
+     */
+    bool isNavigationStateValid( std::string payload );
+
+    /**
      * @name Executor Thread Variables
      *
      * These member variables are only accessed by functions in the @c m_executor worker thread, and do not require any
@@ -144,6 +160,12 @@ private:
 
     /// This is the worker thread for the @c Navigation CA.
     alexaClientSDK::avsCommon::utils::threading::Executor m_executor;
+
+    /// The @c ContextManager that needs to be updated of the state.
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> m_contextManager;
+
+    /// The last known NavigationState payload
+    std::string m_navigationStatePayload;
 };
 
 } // aace::engine::navigation

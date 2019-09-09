@@ -24,13 +24,16 @@ namespace aace {
 namespace engine {
 namespace metrics {
 
-static const std::string METRIC_RECORD_KEYWORD = "MetricEvent";
-static const std::string PRIORITY_KEY = "Priority";
-static const std::string PROGRAM_KEY = "Program";
-static const std::string SOURCE_KEY = "Source";
-static const std::string TIMER_KEY = "TI";
-static const std::string STRING_KEY = "DV";
-static const std::string COUNTER_KEY = "CT";
+const std::string MetricsUploaderEngineImpl::METRIC_RECORD_KEYWORD = "MetricEvent";
+const std::string MetricsUploaderEngineImpl::PRIORITY_KEY = "Priority";
+const std::string MetricsUploaderEngineImpl::PROGRAM_KEY = "Program";
+const std::string MetricsUploaderEngineImpl::SOURCE_KEY = "Source";
+const std::string MetricsUploaderEngineImpl::TIMER_KEY = "TI";
+const std::string MetricsUploaderEngineImpl::STRING_KEY = "DV";
+const std::string MetricsUploaderEngineImpl::COUNTER_KEY = "CT";
+
+const std::string MetricsUploaderEngineImpl::NORMAL_PRIORITY = "NR";
+const std::string MetricsUploaderEngineImpl::HIGH_PRIORITY = "HI";
 
 static const std::regex metricRegex("^([^:]+):([^:]+):([^:]+):(.+):(NR|HI)");
 static const std::regex dataRegex("([^;=,:]+)=([^;=,:]+);([^;=,:]+);([0-9]+),");
@@ -40,19 +43,14 @@ MetricsUploaderEngineImpl::MetricsUploaderEngineImpl( std::shared_ptr<aace::metr
     m_platformMetricsUploaderInterface( platformMetricsUploaderInterface ) {
 }
 
-std::shared_ptr<MetricsUploaderEngineImpl> MetricsUploaderEngineImpl::create( std::shared_ptr<aace::metrics::MetricsUploader> platformMetricsUploaderInterface, std::shared_ptr<aace::engine::logger::LoggerServiceInterface> loggerService )
+std::shared_ptr<MetricsUploaderEngineImpl> MetricsUploaderEngineImpl::create( std::shared_ptr<aace::metrics::MetricsUploader> platformMetricsUploaderInterface )
 {
     try
     {
         ThrowIfNull( platformMetricsUploaderInterface, "invalidMetricsUploaderPlatformInterface" );
-        ThrowIfNull( loggerService, "invalidLoggerService" );
-
         std::shared_ptr<MetricsUploaderEngineImpl> metricsUploaderEngineImpl = std::shared_ptr<MetricsUploaderEngineImpl>( new MetricsUploaderEngineImpl( platformMetricsUploaderInterface ) );
         
         ThrowIfNot( metricsUploaderEngineImpl->initialize(), "inializeMetricsUploaderEngineImplFailed" );
-        
-        // add the uploader service impl to the logger service
-        loggerService->addSink( metricsUploaderEngineImpl );
         
         return metricsUploaderEngineImpl;
     }

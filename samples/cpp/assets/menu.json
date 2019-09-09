@@ -4,22 +4,26 @@
         {
             "do": "notify/onCBLStart",
             "key": "A",
-            "name": "Authenticate with CBL"
+            "name": "Authenticate with CBL",
+            "test": "!RefreshToken"
         },
         {
             "do": "notify/onCBLCancel",
             "key": "C",
-            "name": "Cancel Authentication"
+            "name": "Cancel Authentication",
+            "test": "!RefreshToken"
         },
         {
-            "do": "Logout",
-            "key": "O",
-            "name": "Logout"
+            "do": "notify/onCBLReset",
+            "key": "K",
+            "name": "Reset Authentication",
+            "test": "RefreshToken"
         },
         {
             "do": "GoTo",
             "key": "F",
             "name": "Audio File Input",
+            "test": "AudioFileSupported",
             "value": {
                 "id": "audio-file",
                 "item": [
@@ -44,12 +48,14 @@
                     {
                         "do": "notify/onSpeechRecognizerDisableWakewordDetection",
                         "key": "D",
-                        "name": "Disable wake word detection"
+                        "name": "Disable wake word detection",
+                        "test": "WakeWordSupported"
                     },
                     {
                         "do": "notify/onSpeechRecognizerEnableWakewordDetection",
                         "key": "E",
-                        "name": "Enable wake word detection"
+                        "name": "Enable wake word detection",
+                        "test": "WakeWordSupported"
                     },
                     {
                         "do": "GoBack",
@@ -143,6 +149,7 @@
             "do": "GoTo",
             "key": "M",
             "name": "Communications",
+            "test": "AlexaCommsSupported",
             "value": {
                 "id": "comms",
                 "item": [
@@ -168,6 +175,33 @@
                     }
                 ],
                 "name": "Alexa Communications Menu"
+            }
+        },
+        {
+            "do": "GoTo",
+            "key": "N",
+            "name": "Navigation",
+            "value": {
+                "id": "navigation",
+                "item": [
+                    {
+                        "do": "notify/onLoadNavigationState",
+                        "key": "1",
+                        "name": "Load Sample Navigation Context",
+                        "value": "./sampledata/navigationstate.json"
+                    },
+                    {
+                        "do": "notify/onClearNavigationState",
+                        "key": "2",
+                        "name": "Clear Navigation Context"
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Navigation State Menu"
             }
         },
         {
@@ -324,26 +358,44 @@
                     {
                         "do": "notify/onAudioManagerSpeaker",
                         "key": "1",
-                        "name": "Volume up",
+                        "name": "Speaker volume up",
                         "value": "Speaker/volume/+10"
                     },
                     {
                         "do": "notify/onAudioManagerSpeaker",
                         "key": "2",
-                        "name": "Volume down",
+                        "name": "Speaker volume down",
                         "value": "Speaker/volume/-10"
                     },
                     {
                         "do": "notify/onAudioManagerSpeaker",
                         "key": "3",
-                        "name": "Mute",
+                        "name": "Speaker mute",
                         "value": "Speaker/mute/true"
                     },
                     {
                         "do": "notify/onAudioManagerSpeaker",
                         "key": "4",
-                        "name": "Unmute",
+                        "name": "Speaker unmute",
                         "value": "Speaker/mute/false"
+                    },
+                    {
+                        "do": "notify/onAudioManagerSpeaker",
+                        "key": "5",
+                        "name": "Speaker mid volume",
+                        "value": "Speaker/volume/50"
+                    },
+                    {
+                        "do": "notify/onAudioManagerSpeaker",
+                        "key": "6",
+                        "name": "Alerts mute",
+                        "value": "Alerts/mute/true"
+                    },
+                    {
+                        "do": "notify/onAudioManagerSpeaker",
+                        "key": "7",
+                        "name": "Alerts unmute",
+                        "value": "Alerts/mute/false"
                     },
                     {
                         "do": "GoBack",
@@ -352,6 +404,119 @@
                     }
                 ],
                 "name": "Volume Menu"
+            }
+        },
+        {
+            "do": "GoTo",
+            "key": "D",
+            "name": "Address Book",
+            "value": {
+                "id": "address-book",
+                "item": [
+                    {
+                        "do": "notify/onAddAddressBookPhone",
+                        "key": "1",
+                        "name": "Add Phone Book",
+                        "value": "./sampledata/Contacts.json"
+                    },
+                    {
+                        "do": "notify/onRemoveAddressBookPhone",
+                        "key": "2",
+                        "name": "Remove Phone Book"
+                    },
+                    {
+                        "do": "notify/onAddAddressBookAuto",
+                        "key": "3",
+                        "name": "Add Navigation(Labelled Address) Book",
+                        "value": "./sampledata/NavigationFavorites.json"
+                    },
+                    {
+                        "do": "notify/onRemoveAddressBookAuto",
+                        "key": "4",
+                        "name": "Remove Navigation(Labelled Address) Book"
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Address Book Menu"
+            }
+        },
+        {
+            "do": "GoTo",
+            "key": "I",
+            "name": "Network Info Provider",
+            "value": {
+                "id": "network-info-provider",
+                "item": [
+                    {
+                        "do": "notify/onNetworkInfoProviderNetworkStatusChanged",
+                        "key": "1",
+                        "name": "Connected network status",
+                        "value": "CONNECTED"
+                    },
+                    {
+                        "do": "notify/onNetworkInfoProviderNetworkStatusChanged",
+                        "key": "2",
+                        "name": "Connecting network status",
+                        "value": "CONNECTING"
+                    },
+                    {
+                        "do": "notify/onNetworkInfoProviderNetworkStatusChanged",
+                        "key": "3",
+                        "name": "Disconnected network status",
+                        "value": "DISCONNECTED"
+                    },
+                    {
+                        "do": "notify/onNetworkInfoProviderNetworkStatusChanged",
+                        "key": "4",
+                        "name": "Disconnecting network status",
+                        "value": "DISCONNECTING"
+                    },
+                    {
+                        "do": "notify/onNetworkInfoProviderNetworkStatusChanged",
+                        "key": "5",
+                        "name": "Unknown network status",
+                        "value": "UNKNOWN"
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Network Info Provider Menu"
+            }
+        },
+        {
+            "do": "GoTo",
+            "key": "W",
+            "name": "Wake Word Detection",
+            "test": "WakeWordSupported",
+            "value": {
+                "id": "wake-word",
+                "item": [
+                    {
+                        "do": "notify/onSpeechRecognizerDisableWakewordDetection",
+                        "key": "D",
+                        "name": "Disable wake word detection",
+                        "test": "WakeWordSupported"
+                    },
+                    {
+                        "do": "notify/onSpeechRecognizerEnableWakewordDetection",
+                        "key": "E",
+                        "name": "Enable wake word detection",
+                        "test": "WakeWordSupported"
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Wake Word Detection Menu"
             }
         },
         {

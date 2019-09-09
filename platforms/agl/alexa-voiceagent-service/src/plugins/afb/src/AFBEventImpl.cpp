@@ -24,12 +24,12 @@ namespace afb {
 
 unique_ptr<AFBEventImpl> AFBEventImpl::create(
     shared_ptr<agl::common::interfaces::ILogger> logger,
-    AFB_ApiT api,
+    afb_api_t api,
     const string& eventName) {
     return unique_ptr<AFBEventImpl>(new AFBEventImpl(logger, api, eventName));
 }
 
-AFBEventImpl::AFBEventImpl(shared_ptr<agl::common::interfaces::ILogger> logger, AFB_ApiT api, const string& eventName) :
+AFBEventImpl::AFBEventImpl(shared_ptr<agl::common::interfaces::ILogger> logger, afb_api_t api, const string& eventName) :
         mLogger(logger),
         mAfbApi(api),
         mEventName(eventName),
@@ -50,7 +50,7 @@ bool AFBEventImpl::isValid() {
 
 bool AFBEventImpl::subscribe(IAFBRequest& requestInterface) {
     makeEventIfNeccessary();
-    auto request = static_cast<AFB_ReqT>(requestInterface.getNativeRequest());
+    auto request = static_cast<afb_req_t>(requestInterface.getNativeRequest());
     if (isValid() && afb_req_subscribe(request, mAfbEvent) == 0) {
         return true;
     }
@@ -60,7 +60,7 @@ bool AFBEventImpl::subscribe(IAFBRequest& requestInterface) {
 
 bool AFBEventImpl::unsubscribe(IAFBRequest& requestInterface) {
     makeEventIfNeccessary();
-    auto request = static_cast<AFB_ReqT>(requestInterface.getNativeRequest());
+    auto request = static_cast<afb_req_t>(requestInterface.getNativeRequest());
     if (isValid() && afb_req_unsubscribe(request, mAfbEvent) == 0) {
         return true;
     }

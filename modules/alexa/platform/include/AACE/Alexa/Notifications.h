@@ -16,7 +16,7 @@
 #ifndef AACE_ALEXA_NOTIFICATIONS_H
 #define AACE_ALEXA_NOTIFICATIONS_H
 
-#include "AudioChannel.h"
+#include <AACE/Core/PlatformInterface.h>
 #include "AlexaEngineInterfaces.h"
 
 /** @file */
@@ -35,9 +35,9 @@ namespace alexa {
  *
  * @sa AudioChannel
  */
-class Notifications : public AudioChannel {
+class Notifications : public aace::core::PlatformInterface {
 protected:
-    Notifications( std::shared_ptr<aace::alexa::MediaPlayer> mediaPlayer, std::shared_ptr<aace::alexa::Speaker> speaker );
+    Notifications() = default;
 
 public:
     virtual ~Notifications();

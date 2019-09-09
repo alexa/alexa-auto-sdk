@@ -19,7 +19,6 @@
 
 extern "C" {
 #define AFB_BINDING_VERSION 3
-#include "afb-definitions.h"
 #include "ctl-plugin.h"
 };
 
@@ -33,16 +32,16 @@ namespace logging {
 
 class Logger : public agl::common::interfaces::ILogger {
 public:
-    static std::unique_ptr<Logger> create(AFB_ApiT api);
+    static std::unique_ptr<Logger> create(afb_api_t api);
 
     // ILogger interface
     void log(Level level, const std::string& tag, const std::string& message) override;
 
 private:
-    Logger(AFB_ApiT api);
+    Logger(afb_api_t api);
 
     // Binding API reference
-    AFB_ApiT mApi;
+    afb_api_t mApi;
 };
 
 }  // namespace logging

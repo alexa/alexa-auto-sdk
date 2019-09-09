@@ -10,7 +10,7 @@ DEPENDS = ""
 IMAGE_LINGUAS = ""
 PACKAGE_INSTALL = "${IMAGE_INSTALL} ${FEATURE_INSTALL}"
 
-IMAGE_PREPROCESS_COMMAND = "cleanup_rootfs ; prepare_release ;"
+IMAGE_PREPROCESS_COMMAND = "cleanup_rootfs ; generate_data_dir ;"
 
 cleanup_rootfs() {
 	rm -rf ${IMAGE_ROOTFS}${sysconfdir}
@@ -18,9 +18,6 @@ cleanup_rootfs() {
 	rm -rf ${IMAGE_ROOTFS}/run
 }
 
-prepare_release() {
-	if [ -d ${IMAGE_ROOTFS}${releasedir} ]; then
-		cp -R ${IMAGE_ROOTFS}${releasedir}/* ${IMAGE_ROOTFS}${exec_prefix}
-		rm -rf ${IMAGE_ROOTFS}${releasedir}
-	fi
+generate_data_dir() {
+	install -m 777 -d ${IMAGE_ROOTFS}${exec_prefix}/data
 }

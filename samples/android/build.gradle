@@ -1,14 +1,12 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-
     repositories {
         google()
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.1'
-
+        classpath 'com.android.tools.build:gradle:3.3.2'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -18,27 +16,7 @@ allprojects {
     repositories {
         google()
         jcenter()
-        flatDir {
-            dirs 'src/main/libs'
-        }
     }
-}
-
-ext.generateWrappedMessage = { message ->
-    StringBuilder sb = new StringBuilder()
-    String line = ext.generateLine(message.length())
-    sb.append(line).append(message).append(line)
-    return sb.toString()
-}
-
-ext.generateLine = { length ->
-    StringBuilder sb = new StringBuilder()
-    sb.append('\n')
-    for (int x = 0; x < length; x++) {
-        sb.append("-")
-    }
-    sb.append('\n')
-    return sb.toString()
 }
 
 task clean(type: Delete) {

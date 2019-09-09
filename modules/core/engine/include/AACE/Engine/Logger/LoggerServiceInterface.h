@@ -30,6 +30,7 @@ public:
 
 public:
     virtual bool addSink( std::shared_ptr<aace::engine::logger::sink::Sink> sink ) = 0;
+    virtual bool removeSink( const std::string& id ) = 0;
 };
 
 }  // aace::engine:logger

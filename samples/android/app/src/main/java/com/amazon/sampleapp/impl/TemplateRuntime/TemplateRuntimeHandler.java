@@ -88,18 +88,21 @@ public class TemplateRuntimeHandler extends TemplateRuntime {
             if ( mPlaybackController != null ) {
                 //reset visual state
                 mPlaybackController.hidePlayerInfoControls();
-                JSONArray controls = playerInfo.getJSONArray("controls" );
-                for ( int j = 0; j < controls.length(); j++ ) {
-                    JSONObject control = controls.getJSONObject( j );
-                    if ( control.getString( "type" ).equals( "BUTTON" ) ) {
-                        final boolean enabled = control.getBoolean( "enabled" );
-                        final String name = control.getString( "name" );
-                        mPlaybackController.updateControlButton( name, enabled );
-                    } else if ( control.getString( "type" ).equals( "TOGGLE" ) ) {
-                        final boolean selected = control.getBoolean( "selected" );
-                        final boolean enabled = control.getBoolean( "enabled" );
-                        final String name = control.getString( "name" );
-                        mPlaybackController.updateControlToggle( name, enabled, selected );
+
+                if (playerInfo.has("controls")) {
+                    JSONArray controls = playerInfo.getJSONArray("controls" );
+                    for ( int j = 0; j < controls.length(); j++ ) {
+                        JSONObject control = controls.getJSONObject( j );
+                        if ( control.getString( "type" ).equals( "BUTTON" ) ) {
+                            final boolean enabled = control.getBoolean( "enabled" );
+                            final String name = control.getString( "name" );
+                            mPlaybackController.updateControlButton( name, enabled );
+                        } else if ( control.getString( "type" ).equals( "TOGGLE" ) ) {
+                            final boolean selected = control.getBoolean( "selected" );
+                            final boolean enabled = control.getBoolean( "enabled" );
+                            final String name = control.getString( "name" );
+                            mPlaybackController.updateControlToggle( name, enabled, selected );
+                        }
                     }
                 }
 

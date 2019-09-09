@@ -114,6 +114,8 @@ std::shared_ptr<EqualizerControllerEngineImpl> EqualizerControllerEngineImpl::cr
                 contextManager, 
                 messageSender ), 
             "initializeEqualizerControllerEngineImplFailed" );
+        // set the platform engine interface reference
+        equalizerPlatformInterface->setEngineInterface( equalizerEngineImpl );
         return equalizerEngineImpl;
     }
     catch( std::exception& ex ) {
@@ -199,6 +201,7 @@ void EqualizerControllerEngineImpl::doShutdown() {
     }
     if( m_equalizerController != nullptr ) {
         m_equalizerController->unregisterEqualizer( shared_from_this() );
+        m_equalizerController.reset();
     }
     if( m_equalizerCapabilityAgent != nullptr ) {        
         m_equalizerCapabilityAgent->shutdown();

@@ -18,7 +18,7 @@
 #include <memory>
 
 #include <AACE/Alexa/AlexaClient.h>
-#include "DirectiveDispatcher.h"
+#include "ResponseDispatcher.h"
 #include "LoggerHandler.h"
 
 namespace aasb {
@@ -28,7 +28,7 @@ class AlexaClientHandler : public aace::alexa::AlexaClient {
 public:
     static std::shared_ptr<AlexaClientHandler> create(
         std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
-        std::weak_ptr<aasb::bridge::DirectiveDispatcher> directiveDispatcher);
+        std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher);
 
     /// @name aace::alexa::AlexaClient Functions
     /// @{
@@ -42,7 +42,7 @@ public:
     std::string getConnectionStatus() const;
 
 private:
-    AlexaClientHandler(std::weak_ptr<aasb::bridge::DirectiveDispatcher> directiveDispatcher);
+    AlexaClientHandler(std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher);
 
     static std::string convertDialogStateToString(DialogState state);
     static std::string convertConnectionStatusToString(ConnectionStatus status);
@@ -54,7 +54,7 @@ private:
     std::shared_ptr<aasb::core::logger::LoggerHandler> m_logger;
 
     // To send directive to service
-    std::weak_ptr<aasb::bridge::DirectiveDispatcher> m_directiveDispatcher;
+    std::weak_ptr<aasb::bridge::ResponseDispatcher> m_responseDispatcher;
 
     AuthState m_authState;
     ConnectionStatus m_connectionStatus;

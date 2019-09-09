@@ -68,6 +68,8 @@ set (gcc_minimal_version 4.9)
 set (PKG_REQUIRED_LIST
 	json-c
 	afb-daemon
+	afb-helpers
+	ctl-utilities
 )
 
 # Check if the Alexa Auto SDK root exists
@@ -81,11 +83,25 @@ include(${AAC_HOME}/share/cmake/AACECBL.cmake)
 include(${AAC_HOME}/share/cmake/AACEContactUploader.cmake)
 include(${AAC_HOME}/share/cmake/AACENavigation.cmake)
 include(${AAC_HOME}/share/cmake/AACEPhoneControl.cmake)
-include(${AAC_HOME}/share/cmake/AACEAudio.cmake)
 
 if(EXISTS ${AAC_HOME}/share/cmake/AACEAmazonLite.cmake)
   include(${AAC_HOME}/share/cmake/AACEAmazonLite.cmake)
 endif()
+
+if(EXISTS ${AAC_HOME}/share/cmake/AACEGStreamer.cmake)
+  include(${AAC_HOME}/share/cmake/AACEGStreamer.cmake)
+endif()
+
+if(EXISTS ${AAC_HOME}/share/cmake/AACELocalVoiceControl.cmake)
+  include(${AAC_HOME}/share/cmake/AACELocalVoiceControl.cmake)
+  if(EXISTS ${AAC_HOME}/share/cmake/AACELocalSkillService.cmake)
+    include(${AAC_HOME}/share/cmake/AACELocalSkillService.cmake)
+    if(EXISTS ${AAC_HOME}/share/cmake/AACECarControl.cmake)
+      include(${AAC_HOME}/share/cmake/AACECarControl.cmake)
+    endif()
+  endif()
+endif()
+
 
 # Prefix path where will be installed the files
 # Default: /usr/local (need root permission to write in)

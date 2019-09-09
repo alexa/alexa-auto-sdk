@@ -35,9 +35,6 @@ public:
     virtual ~PhoneCallControllerEngineService() = default;
 
 protected:
-    bool configure( const std::vector<std::shared_ptr<std::istream>>& configuration ) override;
-    bool start() override;
-    bool stop() override;
     bool shutdown() override;
     bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) override;
 

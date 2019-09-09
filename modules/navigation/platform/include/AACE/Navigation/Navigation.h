@@ -101,6 +101,67 @@ public:
      * else @c false
      */
     virtual bool cancelNavigation() = 0;
+
+    /**
+     * Retrieve the navigation state from the platform. 
+     * NOTE: You may return an empty string to default the payload to NOT_NAVIGATING
+     *  
+     * @return the current NavigationState JSON payload
+     * @code{.json}) 
+     * "state": "{{STRING}}", //NAVIGATING or NOT_NAVIGATING
+     * "waypoints": [
+     *   {
+     *       "type": "{{STRING}}", //Type of the waypoint - SOURCE, DESTINATION or INTERIM  
+     *       "estimatedTimeOfArrival": {
+     *           "ideal": {{STRING}}, //Expected clock time ETA based on the ideal conditions. ISO 8601 UTC format
+     *           "predicted": {{STRING}} //predicted clock time ETA based on traffic conditions. ISO 8601 UTC format
+     *        },
+     *       "address": "{{STRING}}",
+     *       "coordinate": [{{LATITUDE_DOUBLE}},{{LONGITUDE_DOUBLE}}],
+     *   },
+     *   {
+     *       "type": "{{STRING}}", //Type of the waypoint - SOURCE, DESTINATION or INTERIM
+     *       "estimatedTimeOfArrival": {
+     *           "ideal": {{STRING}}, //Expected clock time ETA based on the ideal conditions. ISO 8601 UTC format
+     *           "predicted": {{STRING}} //predicted clock time ETA based on traffic conditions. ISO 8601 UTC format
+     *        },
+     *       "address": "{{STRING}}",
+     *       "coordinate": [{{LATITUDE_DOUBLE}},{{LONGITUDE_DOUBLE}}],
+     *       "poiOfInterest": {
+     *           "id": "{{STRING}}", //POI lookup Id vended from Alexa
+     *           "name": "{{STRING}}", // POI Name  
+     *           "hoursOfOperation": [
+     *            {
+     *                "dayOfWeek": "{{STRING}}",
+     *                "hours": [
+     *                 {
+     *                    "open": "{{STRING}}", // ISO-8601 time with timezone format
+     *                    "close": "{{STRING}}" // ISO-8601 time with timezone format
+     *                 }
+     *               ],
+     *               "type": "{{STRING}}" // Can be: OPEN_DURING_HOURS, OPEN_24_HOURS, etc.
+     *           }
+     *           ],
+     *           "phoneNumber": "{{STRING}}"
+     *        }
+     *      
+     *   },
+     *   ...
+     * ],
+     * "shapes": [
+     *   [
+     *       {{LATITUDE_DOUBLE}},
+     *       {{LONGITUDE_DOUBLE}}
+     *   ],
+     *   ...
+     * ]
+     * @endcode
+     * @li state (required) : current navigation state
+     * @li waypoints (required) : list of waypoints, which can be empty
+     * @li shapes (required) : list of route shapes, which can be empty or limited to 100 entries
+     */
+    virtual std::string getNavigationState() = 0;
+
 };
 
 } // aace::navigation

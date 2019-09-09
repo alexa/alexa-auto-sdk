@@ -1,5 +1,20 @@
 var searchData=
 [
-  ['taptotalk',['tapToTalk',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#af27a23f6989b8a9fcee97d1decd70291',1,'com::amazon::aace::alexa::SpeechRecognizer']]],
-  ['togglepressed',['togglePressed',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_playback_controller.html#a3fc401102b40b184d743ff41e168cff8',1,'com::amazon::aace::alexa::PlaybackController']]]
+  ['seek',['seek',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter.html#a6c511f6d0967158f9512d5359e4a4a10',1,'com.amazon.aace.alexa.ExternalMediaAdapter.seek()'],['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source.html#a0f65d94b6aa9a24a7d896939adc8d4a4',1,'com.amazon.aace.alexa.LocalMediaSource.seek()']]],
+  ['senddtmf',['sendDTMF',['../classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a84929af8429fa585444691eb965da31a',1,'com::amazon::aace::phonecontrol::PhoneCallController']]],
+  ['senddtmffailed',['sendDTMFFailed',['../classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#aaa339310c1f1f0c29b99308677572a47',1,'com.amazon.aace.phonecontrol.PhoneCallController.sendDTMFFailed(String callId, DTMFError code)'],['../classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a6deac75764abd61feefcff05756ed367',1,'com.amazon.aace.phonecontrol.PhoneCallController.sendDTMFFailed(String callId, DTMFError code, String message)']]],
+  ['senddtmfsucceeded',['sendDTMFSucceeded',['../classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#abbef49449a17271bc67e885054c50416',1,'com::amazon::aace::phonecontrol::PhoneCallController']]],
+  ['setbandlevels',['setBandLevels',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_equalizer_controller.html#a3acad44f203be8b5a06f426d0c9db7fd',1,'com::amazon::aace::alexa::EqualizerController']]],
+  ['setdestination',['setDestination',['../classcom_1_1amazon_1_1aace_1_1navigation_1_1_navigation.html#a2024335dacfc051daf860328780f302b',1,'com::amazon::aace::navigation::Navigation']]],
+  ['setfocus',['setFocus',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter.html#adcf544d90c89515cd2de3af216ee53cf',1,'com.amazon.aace.alexa.ExternalMediaAdapter.setFocus()'],['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source.html#a41d4aad196e6ea9eb5e41287426fb7de',1,'com.amazon.aace.alexa.LocalMediaSource.setFocus()']]],
+  ['setindicator',['setIndicator',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_notifications.html#ab83e0f63cbd01de0c1fb2cf0b331b9cf',1,'com::amazon::aace::alexa::Notifications']]],
+  ['setposition',['setPosition',['../classcom_1_1amazon_1_1aace_1_1audio_1_1_audio_output.html#a228c6e8079d5782e1e7d9b21a925638d',1,'com::amazon::aace::audio::AudioOutput']]],
+  ['setproperty',['setProperty',['../classcom_1_1amazon_1_1aace_1_1core_1_1_engine.html#a2739fa7b37aa1c292d5a55c6e0127189',1,'com::amazon::aace::core::Engine']]],
+  ['setrefreshtoken',['setRefreshToken',['../classcom_1_1amazon_1_1aace_1_1cbl_1_1_c_b_l.html#ad320c677bafca842107daa2419bbc675',1,'com::amazon::aace::cbl::CBL']]],
+  ['setuserprofile',['setUserProfile',['../classcom_1_1amazon_1_1aace_1_1cbl_1_1_c_b_l.html#a18753a6d6d002bc4188de1a00beba9e5',1,'com::amazon::aace::cbl::CBL']]],
+  ['speakersettingschanged',['speakerSettingsChanged',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_speaker.html#a96ea668a0bd4f4f8f266b1a84e2f3e2d',1,'com::amazon::aace::alexa::AlexaSpeaker']]],
+  ['start',['start',['../classcom_1_1amazon_1_1aace_1_1cbl_1_1_c_b_l.html#ae628b6fbb8421609b19f24e462b6a2aa',1,'com.amazon.aace.cbl.CBL.start()'],['../classcom_1_1amazon_1_1aace_1_1core_1_1_engine.html#a363681ccf0a37aa487dd32a0b1d3ce15',1,'com.amazon.aace.core.Engine.start()']]],
+  ['startcapture',['startCapture',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a5c85bfc150b64cc2389c4a036fa6c367',1,'com::amazon::aace::alexa::SpeechRecognizer']]],
+  ['stop',['stop',['../classcom_1_1amazon_1_1aace_1_1audio_1_1_audio_output.html#a93328cd0e726f19b596a18343418082c',1,'com.amazon.aace.audio.AudioOutput.stop()'],['../classcom_1_1amazon_1_1aace_1_1core_1_1_engine.html#af3f1799a40b40389cdb3c03a4b518c28',1,'com.amazon.aace.core.Engine.stop()'],['../classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a6b16e1f163c1ba5732cca98e507f0220',1,'com.amazon.aace.phonecontrol.PhoneCallController.stop()']]],
+  ['stopcapture',['stopCapture',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a9c043bac65f630eed854a2e48182144c',1,'com::amazon::aace::alexa::SpeechRecognizer']]]
 ];

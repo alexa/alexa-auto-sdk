@@ -17,11 +17,12 @@ var searchData=
   ['createalertsconfig',['createAlertsConfig',['../classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#af7a3007198c8d8e47ce33edbf5c902a7',1,'aace::alexa::config::AlexaConfiguration']]],
   ['createcallid',['createCallId',['../classaace_1_1phone_call_controller_1_1_phone_call_controller.html#a24de2d5e0fc97b239d8b9881341e6790',1,'aace::phoneCallController::PhoneCallController']]],
   ['createcblconfig',['createCBLConfig',['../classaace_1_1cbl_1_1config_1_1_c_b_l_configuration.html#ae3b3ea15f8a31592dbbea3ad7201b196',1,'aace::cbl::config::CBLConfiguration']]],
+  ['createcbluserprofileconfig',['createCBLUserProfileConfig',['../classaace_1_1cbl_1_1config_1_1_c_b_l_configuration.html#a5a70191fa2181583b169248fa94dcecb',1,'aace::cbl::config::CBLConfiguration']]],
   ['createcertifiedsenderconfig',['createCertifiedSenderConfig',['../classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a5d38a056525d20aad2114677d8d461ae',1,'aace::alexa::config::AlexaConfiguration']]],
   ['createconsolesinkconfig',['createConsoleSinkConfig',['../classaace_1_1logger_1_1config_1_1_logger_configuration.html#ae6aa1d5ddd52e173073d501861e6835a',1,'aace::logger::config::LoggerConfiguration']]],
   ['createcurlconfig',['createCurlConfig',['../classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a2012a3f45f54d16f5d8f260bb16c49c1',1,'aace::alexa::config::AlexaConfiguration']]],
   ['createdeviceinfoconfig',['createDeviceInfoConfig',['../classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a6d122fd791d0e9a5bb54b940c84ffd98',1,'aace::alexa::config::AlexaConfiguration']]],
-  ['createequalizercontrollerconfig',['createEqualizerControllerConfig',['../classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a7aeaa30b4d3a97439228a5ec9d15de74',1,'aace::alexa::config::AlexaConfiguration']]],
+  ['createequalizercontrollerconfig',['createEqualizerControllerConfig',['../classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#abe7962c53c63c808d2c4ebaf2056c855',1,'aace::alexa::config::AlexaConfiguration']]],
   ['createexternalmediaplayerconfig',['createExternalMediaPlayerConfig',['../classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a4753ff7cfd440ba505e0508c2c77c07a',1,'aace::alexa::config::AlexaConfiguration']]],
   ['createfilesinkconfig',['createFileSinkConfig',['../classaace_1_1logger_1_1config_1_1_logger_configuration.html#ab58d322f01f350cf87c89c41e8257037',1,'aace::logger::config::LoggerConfiguration']]],
   ['createlocalstorageconfig',['createLocalStorageConfig',['../classaace_1_1storage_1_1config_1_1_storage_configuration.html#a1619cb1c7be8fcb913454e16ceb49a1d',1,'aace::storage::config::StorageConfiguration']]],
@@ -33,6 +34,6 @@ var searchData=
   ['createspeechrecognizerconfig',['createSpeechRecognizerConfig',['../classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#aacb872514a75a1fdc3d54d17b64a2ec6',1,'aace::alexa::config::AlexaConfiguration']]],
   ['createsyslogsinkconfig',['createSyslogSinkConfig',['../classaace_1_1logger_1_1config_1_1_logger_configuration.html#a60f4bbc3559e3d9900cfed5bef4fa86a',1,'aace::logger::config::LoggerConfiguration']]],
   ['createsystemconfig',['createSystemConfig',['../classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a1a918b6c9d057360a64ace0ba68df93a',1,'aace::alexa::config::AlexaConfiguration']]],
-  ['createtemplateruntimetimeoutconfig',['createTemplateRuntimeTimeoutConfig',['../classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a9988d9ebfde9e2c74a7f814de7ab8189',1,'aace::alexa::config::AlexaConfiguration']]],
-  ['createvehicleinfoconfig',['createVehicleInfoConfig',['../classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a005af7e87bf5685d662023ee0d237463',1,'aace::vehicle::config::VehicleConfiguration']]]
+  ['createtemplateruntimetimeoutconfig',['createTemplateRuntimeTimeoutConfig',['../classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a89e139921c42c3078c70cd40cdeb0881',1,'aace::alexa::config::AlexaConfiguration']]],
+  ['createvehicleinfoconfig',['createVehicleInfoConfig',['../classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ad67c9d173ea737eb9d737db84b2d0ec1',1,'aace::vehicle::config::VehicleConfiguration']]]
 ];

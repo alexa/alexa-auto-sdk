@@ -16,8 +16,6 @@
 package com.amazon.sampleapp.impl.PlaybackController;
 
 import android.app.Activity;
-import android.os.Handler;
-import android.os.Message;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
@@ -25,36 +23,31 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.amazon.aace.alexa.PlaybackController;
+import com.amazon.aace.audio.AudioOutput;
 import com.amazon.sampleapp.R;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
-import com.amazon.sampleapp.impl.MediaPlayer.MediaPlayerHandler;
 
-import java.lang.ref.WeakReference;
 import java.util.Formatter;
 import java.util.Locale;
-import java.util.TimerTask;
 
 public class PlaybackControllerHandler extends PlaybackController {
 
-    private static final String sTag = "PlaybackController";
-    private static final int SHOW_PROGRESS = 0;
+    private static final String sTag = PlaybackControllerHandler.class.getSimpleName();
 
     private final Activity mActivity;
     private final LoggerHandler mLogger;
-    private final ProgressHandler mProgressHandler;
     private final StringBuilder mStringBuilder;
     private final Formatter mFormatter;
-    private MediaPlayerHandler mMediaPlayer;
     private ImageButton mControlPrev, mControlNext, mControlSkipForward, mControlSkipBackward;
     private ToggleButton mControlPlayPause, mShuffleToggle, mLoopToggle, mRepeatToggle, mThumbsUpToggle, mThumbsDownToggle;
     private TextView mProgressTime, mEndTime, mTitle, mArtist, mProvider;
     private ProgressBar mProgress;
     private String mCurrentProvider = "";
+    private long mCurrentDuration = AudioOutput.TIME_UNKNOWN;
 
     public PlaybackControllerHandler( Activity activity, LoggerHandler logger ) {
         mActivity = activity;
         mLogger = logger;
-        mProgressHandler = new ProgressHandler( this );
         mStringBuilder = new StringBuilder();
         mFormatter = new Formatter( mStringBuilder, Locale.US );
         setupGUI();
@@ -115,10 +108,6 @@ public class PlaybackControllerHandler extends PlaybackController {
         togglePressed( PlaybackToggle.THUMBS_DOWN, action );
     }
 
-    public void setMediaPlayer( MediaPlayerHandler mediaPlayer ) { mMediaPlayer = mediaPlayer; }
-
-    MediaPlayerHandler getMediaPlayer() { return mMediaPlayer; }
-
     //
     // GUI updates
     //
@@ -152,14 +141,11 @@ public class PlaybackControllerHandler extends PlaybackController {
         mControlPlayPause.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick( View v ) {
-//                if ( mMediaPlayer.isPlaying() ) pauseButtonPressed();
-//                else playButtonPressed();
                 if ( mControlPlayPause.isChecked() ){
                     playButtonPressed();
                 } else {
                     pauseButtonPressed();
                 }
-
             }
         });
 
@@ -292,6 +278,8 @@ public class PlaybackControllerHandler extends PlaybackController {
                 mThumbsDownToggle.setVisibility( View.GONE );
             }
         });
+
+        resetProgress();
     }
 
     public void setPlayerInfo( final String title, final String artist, final String provider ) {
@@ -311,44 +299,35 @@ public class PlaybackControllerHandler extends PlaybackController {
     }
 
     public void start() {
-        if ( mMediaPlayer == null ) { return; }
         mActivity.runOnUiThread( new Runnable() {
             @Override
             public void run() {
-                //mControlPlayPause.setImageResource( R.drawable.control_selector_pause );
                 mControlPrev.setEnabled( true );
                 mControlPlayPause.setEnabled( true );
                 mControlPlayPause.setChecked(true);
                 mControlNext.setEnabled( true );
                 mProgress.setMax( 1000 );
-                mProgressHandler.sendEmptyMessage( SHOW_PROGRESS );
             }
         });
     }
 
     public void stop() {
-        if ( mMediaPlayer == null ) { return; }
         mActivity.runOnUiThread( new Runnable() {
             @Override
             public void run() {
-                //mControlPlayPause.setImageResource( R.drawable.control_selector_play );
-                mProgressHandler.removeMessages( SHOW_PROGRESS );
                 mControlPlayPause.setChecked(false);
             }
         });
     }
 
     public void reset() {
-        if ( mMediaPlayer == null ) { return; }
         mActivity.runOnUiThread( new Runnable() {
             @Override
             public void run() {
-                //mControlPlayPause.setImageResource( R.drawable.control_selector_play );
                 mControlPlayPause.setChecked(false);
                 mControlPrev.setEnabled( false );
                 mControlPlayPause.setEnabled( false );
                 mControlNext.setEnabled( false );
-                mProgressHandler.removeMessages( SHOW_PROGRESS );
                 resetProgress();
                 setPlayerInfo( "", "", "" );
             }
@@ -357,7 +336,6 @@ public class PlaybackControllerHandler extends PlaybackController {
 
     // Updates Control Button's states
     public void updateControlButton( final String name, final boolean enabled ) {
-        if ( mMediaPlayer == null ) { return; }
         mActivity.runOnUiThread( new Runnable() {
             @Override
             public void run() {
@@ -387,7 +365,6 @@ public class PlaybackControllerHandler extends PlaybackController {
     // Updates Toggle's display states
     // NOTE: Disabled controls not hidden here for development visibility.
     public void updateControlToggle( final String name, final boolean enabled, final boolean selected ) {
-        if ( mMediaPlayer == null ) { return; }
         mActivity.runOnUiThread( new Runnable() {
             @Override
             public void run() {
@@ -443,32 +420,34 @@ public class PlaybackControllerHandler extends PlaybackController {
             @Override
             public void run() {
                 mProgress.setProgress( 0 );
-                mProgressTime.setText( "0:00" );
-                mEndTime.setText( "0:00" );
+                mProgressTime.setText( stringForTime( AudioOutput.TIME_UNKNOWN )  );
+                mEndTime.setText( stringForTime( AudioOutput.TIME_UNKNOWN ) );
             }
         });
     }
 
-    private long setProgress() {
-        if ( mMediaPlayer == null ) return 0;
-
-        long position = mMediaPlayer.getPosition();
-        long duration = mMediaPlayer.getDuration();
-        if ( mProgress != null ) {
-            if ( duration > 0 ) {
-                long pos = 1000L * position / duration;
-                mProgress.setProgress( ( int ) pos);
-            }
+    public void setTime( long position, long duration )
+    {
+        if( mCurrentDuration != duration )
+        {
+            mEndTime.setText( stringForTime( duration ) );
+            mCurrentDuration = duration;
+        }
+        else
+        {
+            mProgress.setProgress( (int) (1000L * position / duration) );
         }
 
-        mEndTime.setText( stringForTime( ( int ) duration ) );
-        mProgressTime.setText( stringForTime( ( int ) position ) );
-
-        return position;
+        mProgressTime.setText( stringForTime( position ) );
     }
 
-    private String stringForTime( int timeMs ) {
-        int totalSeconds = timeMs / 1000;
+    private String stringForTime( long timeMs )
+    {
+        if( timeMs == AudioOutput.TIME_UNKNOWN ) {
+            return "-:--";
+        }
+
+        int totalSeconds = (int) timeMs / 1000;
         int seconds = totalSeconds % 60;
         int minutes = ( totalSeconds / 60 ) % 60;
         int hours   = totalSeconds / 3600;
@@ -478,31 +457,6 @@ public class PlaybackControllerHandler extends PlaybackController {
             return mFormatter.format( "%d:%02d:%02d", hours, minutes, seconds ).toString();
         } else {
             return mFormatter.format( "%02d:%02d", minutes, seconds ).toString();
-        }
-    }
-
-    private static class ProgressHandler extends Handler {
-
-        private final WeakReference<PlaybackControllerHandler> mController;
-
-        ProgressHandler( PlaybackControllerHandler controller ) {
-            mController = new WeakReference<>( controller );
-        }
-
-        @Override
-        public void handleMessage( Message msg ) {
-            PlaybackControllerHandler controller = mController.get();
-
-            long pos;
-            switch ( msg.what ) {
-                case SHOW_PROGRESS:
-                    pos = controller.setProgress();
-                    if ( controller.getMediaPlayer().isPlaying() ) {
-                        msg = obtainMessage( SHOW_PROGRESS );
-                        sendMessageDelayed( msg, 1000 - ( pos % 1000 ) );
-                    }
-                    break;
-            }
         }
     }
 }

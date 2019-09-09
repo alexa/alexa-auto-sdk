@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">1.6.0</span>
+   &#160;<span id="projectnumber">2.0.0</span>
    </div>
   </td>
  </tr>
@@ -88,7 +88,7 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a4ea5e27e8b76ce7066a9878af02ae9f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p><a class="el" href="classaace_1_1alexa_1_1_playback_controller.html">PlaybackController</a> should be extended to handle playback control operations such as on-platform button presses for the <code><a class="el" href="classaace_1_1alexa_1_1_audio_player.html">AudioPlayer</a></code>. The Engine will respond to <a class="el" href="classaace_1_1alexa_1_1_playback_controller.html">PlaybackController</a> events with playback control directives on the <code><a class="el" href="classaace_1_1alexa_1_1_audio_player.html">AudioPlayer</a></code> <code><a class="el" href="classaace_1_1alexa_1_1_media_player.html">MediaPlayer</a></code>.</p>
+<div class="textblock"><p><a class="el" href="classaace_1_1alexa_1_1_playback_controller.html">PlaybackController</a> should be extended to handle playback control operations such as on-platform button presses for the <code><a class="el" href="classaace_1_1alexa_1_1_audio_player.html">AudioPlayer</a></code>. The Engine will respond to <a class="el" href="classaace_1_1alexa_1_1_playback_controller.html">PlaybackController</a> events with playback control directives on the <code><a class="el" href="classaace_1_1alexa_1_1_audio_player.html">AudioPlayer</a></code> <code>MediaPlayer</code>.</p>
 <dl class="section note"><dt>Note</dt><dd>The <a class="el" href="classaace_1_1alexa_1_1_template_runtime.html#a71852ea84caa81de6cd633006c76ad51">TemplateRuntime::renderPlayerInfo()</a> payload includes information about what playback control buttons should be enabled on screen with a player info display card.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classaace_1_1alexa_1_1_audio_player.html">AudioPlayer</a> </dd></dl>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
@@ -138,7 +138,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Notifies the Engine of a platform button request (i.e. Play/Pause/Next/Previous/Skip Forward/Skip Backward) For certain playback types, the Engine will issue playback directives to the <code><a class="el" href="classaace_1_1alexa_1_1_audio_player.html">AudioPlayer</a></code> <code><a class="el" href="classaace_1_1alexa_1_1_media_player.html">MediaPlayer</a></code> to control playback on the platform. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Notifies the Engine of a platform button request (i.e. Play/Pause/Next/Previous/Skip Forward/Skip Backward) For certain playback types, the Engine will issue playback directives to the <code><a class="el" href="classaace_1_1alexa_1_1_audio_player.html">AudioPlayer</a></code> <code>MediaPlayer</code> to control playback on the platform. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">button</td><td>The playback button type </td></tr>
   </table>
@@ -172,7 +172,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Notifies the Engine of a platform toggle request (i.e. Shuffle/Loop/Repeat/Thumbs Up/Thumbs Down) For certain playback types, the Engine will issue playback directives to the <code><a class="el" href="classaace_1_1alexa_1_1_audio_player.html">AudioPlayer</a></code> <code><a class="el" href="classaace_1_1alexa_1_1_media_player.html">MediaPlayer</a></code> to control playback on the platform. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Notifies the Engine of a platform toggle request (i.e. Shuffle/Loop/Repeat/Thumbs Up/Thumbs Down) For certain playback types, the Engine will issue playback directives to the <code><a class="el" href="classaace_1_1alexa_1_1_audio_player.html">AudioPlayer</a></code> <code>MediaPlayer</code> to control playback on the platform. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">toggle</td><td>The playback toggle type </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">action</td><td>The toggle action ( selected/deselected ) </td></tr>
@@ -187,7 +187,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 1.6.0 - Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 2.0.0 - Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

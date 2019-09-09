@@ -45,9 +45,14 @@ enum class Event {
     onCommunicationStopCall,
     onCommunicationShowState,
 
+    //Navigation
+    onLoadNavigationState,
+    onClearNavigationState,
+
     // CBL
     onCBLStart,
     onCBLCancel,
+    onCBLReset,
 
     // EqualizerController
     onEqualizerControllerLocalSetBandLevels,
@@ -92,6 +97,12 @@ enum class Event {
     onPhoneCallControllerShowPayload,
     // onPhoneCallControllerDeviceConfigurationUpdated,
 
+    // AddressBook
+    onAddAddressBookPhone,
+    onRemoveAddressBookPhone,
+    onAddAddressBookAuto,
+    onRemoveAddressBookAuto,
+
 };
 
 static const std::map<std::string, Event> EventEnumerator{
@@ -111,9 +122,14 @@ static const std::map<std::string, Event> EventEnumerator{
     {"onCommunicationStopCall", Event::onCommunicationStopCall},
     {"onCommunicationShowState", Event::onCommunicationShowState},
 
+    // Navigation
+    {"onLoadNavigationState", Event::onLoadNavigationState},
+    {"onClearNavigationState", Event::onClearNavigationState},
+
     // CBL
     {"onCBLStart", Event::onCBLStart},
     {"onCBLCancel", Event::onCBLCancel},
+    {"onCBLReset", Event::onCBLReset},
 
     // EqualizerController
     {"onEqualizerControllerLocalSetBandLevels", Event::onEqualizerControllerLocalSetBandLevels},
@@ -158,6 +174,11 @@ static const std::map<std::string, Event> EventEnumerator{
     {"onPhoneCallControllerShowPayload", Event::onPhoneCallControllerShowPayload},
     // {"onPhoneCallControllerDeviceConfigurationUpdated", Event::onPhoneCallControllerDeviceConfigurationUpdated},
 
+    // AddressBook
+    {"onAddAddressBookPhone", Event::onAddAddressBookPhone},
+    {"onRemoveAddressBookPhone", Event::onRemoveAddressBookPhone},
+    {"onAddAddressBookAuto", Event::onAddAddressBookAuto},
+    {"onRemoveAddressBookAuto", Event::onRemoveAddressBookAuto}
 };
 
 } // namespace sampleApp

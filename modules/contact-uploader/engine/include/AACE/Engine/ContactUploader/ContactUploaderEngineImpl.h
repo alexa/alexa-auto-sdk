@@ -16,10 +16,6 @@
 #ifndef AACE_ENGINE_CONTACTUPLOADER_CONTACTUPLOADER_ENGINE_IMPL_H
 #define AACE_ENGINE_CONTACTUPLOADER_CONTACTUPLOADER_ENGINE_IMPL_H
 
-#include <rapidjson/document.h>
-#include <rapidjson/error/en.h>
-#include <rapidjson/stringbuffer.h>
-#include <rapidjson/writer.h>
 #include <queue>
 #include <chrono>
 

@@ -32,17 +32,10 @@ namespace communication {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 CommunicationHandler::CommunicationHandler(std::weak_ptr<Activity> activity,
-                                           std::weak_ptr<logger::LoggerHandler> loggerHandler,
-                                           std::shared_ptr<sampleApp::AudioInputManager> audioInputChannel,
-                                           std::shared_ptr<aace::alexa::MediaPlayer> ringtoneMediaPlayer,
-                                           std::shared_ptr<aace::alexa::Speaker> ringtoneSpeaker,
-                                           std::shared_ptr<aace::alexa::MediaPlayer> callAudioMediaPlayer,
-                                           std::shared_ptr<aace::alexa::Speaker> callAudioSpeaker)
-    : aace::communication::AlexaComms{ringtoneMediaPlayer, ringtoneSpeaker, callAudioMediaPlayer, callAudioSpeaker}
-    , m_activity{std::move(activity)}
+                                           std::weak_ptr<logger::LoggerHandler> loggerHandler)
+    : m_activity{std::move(activity)}
     , m_loggerHandler{std::move(loggerHandler)}
-    , m_callState{CallState::NONE}
-    , m_audioInputChannel{std::move(audioInputChannel)} {
+    , m_callState{CallState::NONE} {
     setupUI();
 }
 
@@ -60,13 +53,6 @@ void CommunicationHandler::callStateChanged(CallState state) {
         console->printRuler();
     }
     m_callState = state;
-
-    // Hook in the microphone
-    if (state == CallState::CALL_CONNECTED) {
-        startAudioInput();
-    } else {
-        stopAudioInput();
-    }
 }
 
 void CommunicationHandler::setupUI() {
@@ -108,20 +94,11 @@ void CommunicationHandler::setupUI() {
     activity->registerObserver(Event::onCommunicationStopCall, [=](const std::string &value) {
         log(logger::LoggerHandler::Level::VERBOSE, "onCommunicationStopCall");
 
-        if (m_callState == CallState::CALL_CONNECTED || m_callState == CallState::INBOUND_RINGING) {
-            stopCall();
-            stopAudioInput();
-            if (auto console = m_console.lock()) {
-                console->printRuler();
-                console->printLine("Communication call stopped");
-                console->printRuler();
-            }
-        } else {
-            if (auto console = m_console.lock()) {
-                console->printRuler();
-                console->printLine("There is no current call to stop");
-                console->printRuler();
-            }
+        stopCall();
+        if (auto console = m_console.lock()) {
+            console->printRuler();
+            console->printLine("Communication call stopped");
+            console->printRuler();
         }
 
         return true;
@@ -152,19 +129,6 @@ void CommunicationHandler::showState() {
     }
 }
 
-bool CommunicationHandler::startAudioInput() {
-    log(logger::LoggerHandler::Level::INFO, "startAudioInput");
-    return m_audioInputChannel->startAudioInput("Comms", [this](const int16_t *data, const size_t size) {
-        int16_t *nc_data = const_cast<int16_t *>(data);
-        return writeMicrophoneAudioData(nc_data, size);
-    });
-}
-
-bool CommunicationHandler::stopAudioInput() {
-    log(logger::LoggerHandler::Level::INFO, "stopAudioInput");
-    return m_audioInputChannel->stopAudioInput("Comms");
-}
-
 std::string CommunicationHandler::callStateToString(CallState state) {
     static const std::map<CallState, std::string> callStateMap{{CallState::CONNECTING, "CONNECTING"},
                                                                {CallState::INBOUND_RINGING, "INBOUND_RINGING"},
@@ -173,6 +137,21 @@ std::string CommunicationHandler::callStateToString(CallState state) {
                                                                {CallState::NONE, "NONE"}};
 
     return callStateMap.at(state);
+}
+
+bool CommunicationHandler::checkConfiguration(const std::vector<json>& configs) {
+    // Look for comms config
+    for(auto const& j: configs) {
+        try {
+            auto obj = j.at("aace.alexa").at("avsDeviceSDK").at("communications");
+            if (obj.is_object()) {
+                return true;
+            }
+        } catch (json::exception &e) {
+        }
+    }
+
+    return false;
 }
 
 } // namespace communication

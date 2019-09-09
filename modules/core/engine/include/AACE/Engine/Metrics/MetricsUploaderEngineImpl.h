@@ -26,7 +26,18 @@ namespace metrics {
 
 class MetricsUploaderEngineImpl : public aace::engine::logger::sink::Sink {
 public:
-    static std::shared_ptr<MetricsUploaderEngineImpl> create( std::shared_ptr<aace::metrics::MetricsUploader> platformMetricsUploaderInterface, std::shared_ptr<aace::engine::logger::LoggerServiceInterface> loggerService );
+	static const std::string METRIC_RECORD_KEYWORD;
+	static const std::string PRIORITY_KEY;
+	static const std::string PROGRAM_KEY;
+	static const std::string SOURCE_KEY;
+	static const std::string TIMER_KEY;
+	static const std::string STRING_KEY;
+	static const std::string COUNTER_KEY;
+	
+	static const std::string NORMAL_PRIORITY;
+	static const std::string HIGH_PRIORITY;
+    
+    static std::shared_ptr<MetricsUploaderEngineImpl> create( std::shared_ptr<aace::metrics::MetricsUploader> platformMetricsUploaderInterface );
 
 private:
     MetricsUploaderEngineImpl( std::shared_ptr<aace::metrics::MetricsUploader> platformMetricsUploaderInterface );

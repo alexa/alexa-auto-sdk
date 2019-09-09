@@ -43,8 +43,6 @@ bool PhoneCallControllerEngineImpl::initialize (
         // add capability agent to the directive sequencer 
         ThrowIfNot( directiveSequencer->addDirectiveHandler( m_phoneCallControllerCapabilityAgent ), "addDirectiveHandlerFailed" );
 
-        m_phoneCallControllerPlatformInterface->setEngineInterface( std::dynamic_pointer_cast<aace::phoneCallController::PhoneCallControllerEngineInterface>( shared_from_this() ) );
-
         // register capability with delegate
         ThrowIfNot( capabilitiesDelegate->registerCapability( m_phoneCallControllerCapabilityAgent ), "registerCapabilityFailed");
 
@@ -74,9 +72,12 @@ std::shared_ptr<PhoneCallControllerEngineImpl> PhoneCallControllerEngineImpl::cr
         ThrowIfNull( messageSender, "nullMessageSender" );
         ThrowIfNull( focusManager, "nullFocusManager" );
 
-        std::shared_ptr<PhoneCallControllerEngineImpl> phoneCallControllerEngineImpl = std::shared_ptr<PhoneCallControllerEngineImpl>( new PhoneCallControllerEngineImpl( phoneCallControllerPlatformInterface ) );
+        auto phoneCallControllerEngineImpl = std::shared_ptr<PhoneCallControllerEngineImpl>( new PhoneCallControllerEngineImpl( phoneCallControllerPlatformInterface ) );
 
         ThrowIfNot( phoneCallControllerEngineImpl->initialize( capabilitiesDelegate, contextManager, directiveSequencer, exceptionSender, messageSender, focusManager ), "initializePhoneCallControllerEngineImplFailed" );
+
+        // set the platform engine interface reference
+        phoneCallControllerPlatformInterface->setEngineInterface( phoneCallControllerEngineImpl );
 
         return phoneCallControllerEngineImpl;
     }

@@ -21,20 +21,20 @@ namespace alexa {
 EqualizerController::~EqualizerController() = default;
 
 void EqualizerController::localSetBandLevels( const std::vector<EqualizerBandLevel>& bandLevels ) {
-    if( m_equalizerControllerEngineInterface != nullptr ) {
-        m_equalizerControllerEngineInterface->onLocalSetBandLevels( bandLevels );
+    if( auto m_equalizerControllerEngineInterface_lock = m_equalizerControllerEngineInterface.lock() ) {
+        m_equalizerControllerEngineInterface_lock->onLocalSetBandLevels( bandLevels );
     }
 }
 
 void EqualizerController::localAdjustBandLevels( const std::vector<EqualizerBandLevel>& bandAdjustments ) {
-    if( m_equalizerControllerEngineInterface != nullptr ) {
-        m_equalizerControllerEngineInterface->onLocalAdjustBandLevels( bandAdjustments );
+    if( auto m_equalizerControllerEngineInterface_lock = m_equalizerControllerEngineInterface.lock() ) {
+        m_equalizerControllerEngineInterface_lock->onLocalAdjustBandLevels( bandAdjustments );
     }
 }
 
 void EqualizerController::localResetBands( const std::vector<EqualizerBand>& bands ) {
-    if( m_equalizerControllerEngineInterface != nullptr ) {
-        m_equalizerControllerEngineInterface->onLocalResetBands( bands );
+    if( auto m_equalizerControllerEngineInterface_lock = m_equalizerControllerEngineInterface.lock() ) {
+        m_equalizerControllerEngineInterface_lock->onLocalResetBands( bands );
     }
 }
 

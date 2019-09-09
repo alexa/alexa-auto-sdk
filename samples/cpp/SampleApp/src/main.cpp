@@ -64,6 +64,10 @@ static void usageExit(std::string &name) {
                  "\n"
                  "Options: (may appear before or after arguments)\n"
                  "\n"
+                 "  -b\n"
+                 "  --cbreak\n"
+                 "      Put the terminal into cbreak mode (enter/return key is not required for input).\n"
+                 "\n"
                  "  -c CONFIG\n"
                  "  --config CONFIG\n"
                  "      (Required) Configuration file.\n"
@@ -82,6 +86,7 @@ static void usageExit(std::string &name) {
                  "  --menu MENU\n"
                  "      (Required) Menu file.\n"
                  "\n"
+                 "  -i DEVICE\n"
                  "  --audio-input-device DEVICE\n"
                  "      Specify the audio input device.\n"
                  "\n"
@@ -95,7 +100,6 @@ static void usageExit(std::string &name) {
                  "      Parse a JSON payload to print in the console.\n"
                  "      Supported payloads include PlayerInfo and Template.\n"
                  "\n"
-                 "  -s\n"
                  "  --single-threaded-ui\n"
                  "      Application UI runs on the main thread (default is async).\n"
                  "\n"
@@ -127,7 +131,7 @@ int main(int argc, const char *argv[]) {
             if (options && c1(arg)) {
                 if (c2(arg)) {
                     options = false;
-                } else if (c2(arg, ' ', "cbreak")) {
+                } else if (c2(arg, 'b', "cbreak")) {
                     cbreak = true;
                 } else if (c2(arg, 'c', "config")) {
                     if (++i == size) {
@@ -180,7 +184,7 @@ int main(int argc, const char *argv[]) {
                     }
                     arg = list[i];
                     applicationContext->setBrowserCommand(arg);
-                } else if (c2(arg, ' ', "audio-input-device")) {
+                } else if (c2(arg, 'i', "audio-input-device")) {
                     if (++i == size) {
                         missingArgumentExit(name, arg);
                     }
@@ -202,7 +206,7 @@ int main(int argc, const char *argv[]) {
                     std::cerr << "--render-player-info option is deprecated (replaced with generic --payload-script)\n";
                 } else if (c2(arg, ' ', "render-template")) {
                     std::cerr << "--render-template option is deprecated (replaced with generic --payload-script)\n";
-                } else if (c2(arg, 's', "single-threaded-ui")) {
+                } else if (c2(arg, ' ', "single-threaded-ui")) {
                     applicationContext->setSingleThreadedUI(true);
                 } else if (c2(arg, 'w', "wake-word")) {
                     auto support = applicationContext->isWakeWordSupported() ? "wake word supported" : "wake word not supported";

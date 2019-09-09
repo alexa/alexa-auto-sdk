@@ -67,3 +67,6 @@ gradle/
 
 # macOS
 .DS_Store
+
+# AAC sysroots
+/native-build

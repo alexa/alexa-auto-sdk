@@ -30,12 +30,12 @@ const std::string TOPIC = "SpeechRecognizer";
 std::shared_ptr<SpeechRecognizerHandler> SpeechRecognizerHandler::create(
     bool wakeworkDetectionEnabled,
     std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
-    std::weak_ptr<aasb::bridge::DirectiveDispatcher> directiveDispatcher) {
+    std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher) {
     auto speechRecognizerHandler =
         std::shared_ptr<SpeechRecognizerHandler>(new SpeechRecognizerHandler(wakeworkDetectionEnabled));
 
     speechRecognizerHandler->m_logger = logger;
-    speechRecognizerHandler->m_directiveDispatcher = directiveDispatcher;
+    speechRecognizerHandler->m_responseDispatcher = responseDispatcher;
 
     return speechRecognizerHandler;
 }
@@ -48,42 +48,21 @@ SpeechRecognizerHandler::SpeechRecognizerHandler(bool wakeworkDetectionEnabled) 
 bool SpeechRecognizerHandler::wakewordDetected(const std::string& wakeword) {
     m_logger->log(Level::INFO, TAG, __FUNCTION__);
 
-    if (auto directiveDispatcher = m_directiveDispatcher.lock()) {
-        directiveDispatcher->sendDirective(TOPIC, __FUNCTION__, "");
+    if (auto responseDispatcher = m_responseDispatcher.lock()) {
+        responseDispatcher->sendDirective(TOPIC, __FUNCTION__, "");
     } else {
-        m_logger->log(Level::ERROR, TAG, "directiveDispatcher doesn't exist.");
+        m_logger->log(Level::ERROR, TAG, "responseDispatcher doesn't exist.");
     }
     return true;
 }
 
 void SpeechRecognizerHandler::endOfSpeechDetected() {
     m_logger->log(Level::INFO, TAG, __FUNCTION__);
-    if (auto directiveDispatcher = m_directiveDispatcher.lock()) {
-        directiveDispatcher->sendDirective(TOPIC, __FUNCTION__, "");
+    if (auto responseDispatcher = m_responseDispatcher.lock()) {
+        responseDispatcher->sendDirective(TOPIC, __FUNCTION__, "");
     } else {
-        m_logger->log(Level::ERROR, TAG, "directiveDispatcher doesn't exist.");
+        m_logger->log(Level::ERROR, TAG, "responseDispatcher doesn't exist.");
     }
-}
-
-bool SpeechRecognizerHandler::startAudioInput() {
-    m_logger->log(Level::INFO, TAG, __FUNCTION__);
-    if (auto directiveDispatcher = m_directiveDispatcher.lock()) {
-        directiveDispatcher->sendDirective(TOPIC, __FUNCTION__, "");
-    } else {
-        m_logger->log(Level::ERROR, TAG, "directiveDispatcher doesn't exist.");
-    }
-    return true;
-}
-
-bool SpeechRecognizerHandler::stopAudioInput() {
-    m_logger->log(Level::INFO, TAG, __FUNCTION__);
-    if (auto directiveDispatcher = m_directiveDispatcher.lock()) {
-        directiveDispatcher->sendDirective(TOPIC, __FUNCTION__, "");
-    } else {
-        m_logger->log(Level::ERROR, TAG, "directiveDispatcher doesn't exist.");
-    }
-    m_shouldStopStreamingFile = true;
-    return true;
 }
 
 }  // namespace alexa

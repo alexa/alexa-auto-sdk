@@ -34,10 +34,7 @@ public:
     virtual ~StorageEngineService() = default;
 
 protected:
-    bool configure( const std::vector<std::shared_ptr<std::istream>>& configuration ) override;
-
-private:
-    bool configure( std::shared_ptr<std::istream> configuration );
+    bool configure( std::shared_ptr<std::istream> configuration ) override;
 
 private:
     std::shared_ptr<LocalStorageInterface> m_localStorage;

@@ -24,33 +24,30 @@ import android.widget.TextView;
 import com.amazon.aace.alexa.SpeechRecognizer;
 import com.amazon.sampleapp.R;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
-import com.amazon.sampleapp.impl.Common.AudioInputManager;
 
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+// AutoVoiceChrome imports
 
-public class SpeechRecognizerHandler extends SpeechRecognizer
-        implements AudioInputManager.AudioInputConsumer {
+public class SpeechRecognizerHandler extends SpeechRecognizer {
 
-    private static final String sTag = "SpeechRecognizer";
+    private static final String TAG = SpeechRecognizerHandler.class.getSimpleName();
 
-    private final AudioInputManager mAudioInputManager;
     private final Activity mActivity;
     private final LoggerHandler mLogger;
     private AudioCueObservable mAudioCueObservable = new AudioCueObservable();
     private final ExecutorService mExecutor = Executors.newFixedThreadPool( 1 );
     private boolean mWakeWordEnabled;
     private boolean mAllowStopCapture = false; // Only true if holdToTalk() returned true
+    // AutoVoiceChrome controller
 
-    public SpeechRecognizerHandler( AudioInputManager audioInputManager,
-                                    Activity activity,
+    public SpeechRecognizerHandler( Activity activity,
                                     LoggerHandler logger,
                                     boolean wakeWordSupported,
                                     boolean wakeWordEnabled ) {
         super( wakeWordSupported && wakeWordEnabled );
-        mAudioInputManager = audioInputManager;
         mActivity = activity;
         mLogger = logger;
         mWakeWordEnabled = wakeWordEnabled;
@@ -59,18 +56,11 @@ public class SpeechRecognizerHandler extends SpeechRecognizer
     }
 
     @Override
-    public boolean startAudioInput() {
-        return mAudioInputManager.startAudioInput(this);
-    }
-
-    @Override
-    public boolean stopAudioInput() {
-        return mAudioInputManager.stopAudioInput(this);
-    }
-
-    @Override
     public boolean wakewordDetected( String wakeWord ) {
         mAudioCueObservable.playAudioCue( AudioCueState.START_VOICE );
+
+        // Notify Error state to AutoVoiceChrome if disconnected with Alexa
+
         return true;
     }
 
@@ -96,16 +86,6 @@ public class SpeechRecognizerHandler extends SpeechRecognizer
         mAllowStopCapture = false;
     }
 
-    @Override
-    public String getAudioInputConsumerName() {
-        return "SpeechRecognizer";
-    }
-
-    @Override
-    public void onAudioInputAvailable(byte[] buffer, int size) {
-        write(buffer, size); // Write audio samples to engine
-    }
-
     private void setupGUI( boolean wakeWordSupported ) {
         // Toggle Wake Word switch
         final View toggleItem = mActivity.findViewById( R.id.toggleWakeWord );
@@ -122,63 +102,46 @@ public class SpeechRecognizerHandler extends SpeechRecognizer
 
             final SwitchCompat wakeWordSwitch = toggleItem.findViewById( R.id.drawerSwitch );
 
-            mActivity.runOnUiThread( new Runnable() {
-                @Override
-                public void run() {
-                    toggleItem.setVisibility( View.VISIBLE );
-                    message.setVisibility( View.GONE );
-                    wakeWordSwitch.setChecked( mWakeWordEnabled );
-                    if ( mWakeWordEnabled ) {
-                        localeMessage.setVisibility( View.VISIBLE );
-                    }
-                }
-            } );
+            toggleItem.setVisibility( View.VISIBLE );
+            message.setVisibility( View.GONE );
+            wakeWordSwitch.setChecked( mWakeWordEnabled );
+            if ( mWakeWordEnabled ) {
+                localeMessage.setVisibility( View.VISIBLE );
+            }
 
             wakeWordSwitch.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener
                     () {
                 @Override
                 public void onCheckedChanged( CompoundButton buttonView, boolean isChecked ) {
                     if ( isChecked ) {
-                        mLogger.postInfo( sTag, "Enabling Wake Word" );
+                        mLogger.postInfo( TAG, "Enabling Wake Word" );
                         mExecutor.submit( new Runnable() {
                             @Override
                             public void run() {
                                 enableWakewordDetection();
                             }
                         } );
-                        mActivity.runOnUiThread( new Runnable() {
-                            @Override
-                            public void run() {
-                                localeMessage.setVisibility( View.VISIBLE );
-                            }
-                        });
+
+                        localeMessage.setVisibility( View.VISIBLE );
                     } else {
-                        mLogger.postInfo( sTag, "Disabling Wake Word" );
+                        mLogger.postInfo( TAG, "Disabling Wake Word" );
                         mExecutor.submit( new Runnable() {
                             @Override
                             public void run() {
                                 disableWakewordDetection();
                             }
                         } );
-                        mActivity.runOnUiThread( new Runnable() {
-                            @Override
-                            public void run() {
-                                localeMessage.setVisibility( View.GONE );
-                            }
-                        });
+                        localeMessage.setVisibility( View.GONE );
                     }
+                    // Notify wake word changes to AutoVoiceChrome
+
                     mWakeWordEnabled = isChecked;
                 }
             } );
         } else {
-            mActivity.runOnUiThread( new Runnable() {
-                @Override
-                public void run() {
-                    toggleItem.setVisibility( View.GONE );
-                    message.setVisibility( View.VISIBLE );
-                    localeMessage.setVisibility( View.GONE );
-                }
-            } );
+            toggleItem.setVisibility( View.GONE );
+            message.setVisibility( View.VISIBLE );
+            localeMessage.setVisibility( View.GONE );
         }
     }
 
@@ -198,4 +161,6 @@ public class SpeechRecognizerHandler extends SpeechRecognizer
         if ( mAudioCueObservable == null ) mAudioCueObservable = new AudioCueObservable();
         mAudioCueObservable.addObserver( observer );
     }
+
+    // AutoVoiceChrome related functions
 }

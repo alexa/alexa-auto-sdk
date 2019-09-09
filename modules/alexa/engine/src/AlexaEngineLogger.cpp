@@ -57,21 +57,13 @@ void AlexaEngineLogger::doShutdown() {
 }
 
 void AlexaEngineLogger::emit( alexaClientSDK::avsCommon::utils::logger::Level level, std::chrono::system_clock::time_point time, const char *threadMoniker, const char *text ) {
-    if( threadMoniker == NULL ) {
-        emit( level, time, "", text );
-        return;
-    }
-    if( text == NULL ) {
-        emit( level, time, threadMoniker, "" );
-        return;
-    }
     aace::logger::Logger::Level aaceLevel = map( level );
     if( aaceLevel == aace::logger::Logger::Level::CRITICAL ) {
         if( strstr(text, alexaClientSDK::avsCommon::utils::METRICS_TAG.c_str()) != nullptr ) {
             aaceLevel = aace::logger::Logger::Level::METRIC;
         }
     }
-    AACE_LOGGER->log( "AVS", TAG, aaceLevel, time, threadMoniker, text );
+    AACE_LOGGER->log( "AVS", TAG, aaceLevel, time, threadMoniker ? threadMoniker : "", text ? text : "" );
 }
 
 aace::logger::Logger::Level AlexaEngineLogger::map( alexaClientSDK::avsCommon::utils::logger::Level level )

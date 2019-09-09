@@ -17,9 +17,8 @@
 #include <rapidjson/document.h>
 
 #include <aasb/Consts.h>
-#include "MediaPlayerHandler.h"
 #include "PlatformSpecificLoggingMacros.h"
-
+using Level = aace::logger::LoggerEngineInterface::Level;
 namespace aasb {
 namespace alexa {
 
@@ -28,61 +27,51 @@ using namespace aasb::bridge;
 const std::string TAG = "aasb::alexa::AudioPlayerHandler";
 
 std::shared_ptr<aasb::alexa::AudioPlayerHandler> AudioPlayerHandler::create(
-    bool aacePlatformMediaPlayer,
-    std::shared_ptr<aace::alexa::MediaPlayer> mediaPlayer,
-    std::shared_ptr<aace::alexa::Speaker> speaker) {
+    std::shared_ptr<aasb::core::logger::LoggerHandler> logger) {
     auto audioPlayerHandler = std::shared_ptr<aasb::alexa::AudioPlayerHandler>(
-        new AudioPlayerHandler(aacePlatformMediaPlayer, mediaPlayer, speaker));
+        new AudioPlayerHandler(logger));
 
     return audioPlayerHandler;
 }
 
 AudioPlayerHandler::AudioPlayerHandler(
-    bool aacePlatformMediaPlayer,
-    std::shared_ptr<aace::alexa::MediaPlayer> mediaPlayer,
-    std::shared_ptr<aace::alexa::Speaker> speaker) :
-        aace::alexa::AudioPlayer(mediaPlayer, speaker),
-        m_aacePlatformMediaPlayer(aacePlatformMediaPlayer),
-        m_mediaPlayer(mediaPlayer),
-        m_speaker(speaker) {
+    std::shared_ptr<aasb::core::logger::LoggerHandler> logger) :
+        aace::alexa::AudioPlayer(),
+        m_logger(logger) {
 }
 
 void AudioPlayerHandler::onReceivedEvent(const std::string& action, const std::string& payload) {
-    if (m_aacePlatformMediaPlayer) {
-        AASB_ERROR("%s: action %s cant be executed on AACE Platform media player.", TAG.c_str(), action.c_str());
-        return;
-    }
-
-    auto mediaPlayer = std::static_pointer_cast<MediaPlayerHandler>(m_mediaPlayer);
-
-    if (action == ACTION_MEDIA_STATE_CHANGED) {
-        mediaPlayer->onMediaStateChangedEvent(payload);
-        return;
-    }
-
-    if (action == ACTION_MEDIA_ERROR) {
+    if (action == ACTION_PLAYER_ACTIVITY) {
+        m_logger->log(Level::INFO, TAG, "Received event: Player Activity Changed ");
         rapidjson::Document document;
         document.Parse(payload.c_str());
         auto root = document.GetObject();
 
-        std::string mediaError = "";
-        if (root.HasMember("mediaError") && root["mediaError"].IsString()) mediaError = root["mediaError"].GetString();
+        std::string playerActivityStr = "";
+        if (root.HasMember("playerActivity") && root["playerActivity"].IsString()) {
+            std::string playerActivityStr = root["playerActivity"].GetString();
+            if (playerActivityStr == VALUE_PLAYERACTIVITY_IDLE) {
+                playerActivityChanged(PlayerActivity::IDLE);
+            } else if (playerActivityStr == VALUE_PLAYERACTIVITY_PLAYING) {
+                playerActivityChanged(PlayerActivity::PLAYING);
+            } else if (playerActivityStr == VALUE_PLAYERACTIVITY_STOPPED) {
+                playerActivityChanged(PlayerActivity::STOPPED);
+            } else if (playerActivityStr == VALUE_PLAYERACTIVITY_PAUSED) {
+                playerActivityChanged(PlayerActivity::PAUSED);
+            } else if (playerActivityStr == VALUE_PLAYERACTIVITY_BUFFER_UNDERRUN) {
+                playerActivityChanged(PlayerActivity::BUFFER_UNDERRUN);
+            } else if (playerActivityStr == VALUE_PLAYERACTIVITY_FINISHED) {
+                playerActivityChanged(PlayerActivity::FINISHED);
+            } else {
+                m_logger->log(Level::WARN, TAG, "playerActivity: Invalid args " + payload);
+            }
+        }
 
-        std::string description = "";
-        if (root.HasMember("description") && root["description"].IsString())
-            description = root["description"].GetString();
-
-        if (!mediaError.empty()) mediaPlayer->onMediaErrorEvent(mediaError, description);
-        return;
     }
 
-    if (action == ACTION_MEDIA_PLAYER_POSITION) {
-        mediaPlayer->onMediaPlayerPositionReceived(std::stoi(payload));
-        return;
-    }
-
-    AASB_ERROR("%s: action %s is unknown.", TAG.c_str(), action.c_str());
+   m_logger->log(Level::WARN, TAG, "onReceivedEvent: Unknown action " + action);
 }
 
+ 
 }  // namespace alexa
 }  // namespace aasb

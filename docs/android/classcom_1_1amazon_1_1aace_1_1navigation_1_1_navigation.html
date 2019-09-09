@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">1.6.0</span>
+   &#160;<span id="projectnumber">2.0.0</span>
    </div>
   </td>
  </tr>
@@ -78,6 +78,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a2024335dacfc051daf860328780f302b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab8bfcea62eb634ece636a1264b5b5a89"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1navigation_1_1_navigation.html#ab8bfcea62eb634ece636a1264b5b5a89">cancelNavigation</a> ()</td></tr>
 <tr class="separator:ab8bfcea62eb634ece636a1264b5b5a89"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab9c911a083f6b927749106f3e3763dde"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1navigation_1_1_navigation.html#ab9c911a083f6b927749106f3e3763dde">getNavigationState</a> ()</td></tr>
+<tr class="separator:ab9c911a083f6b927749106f3e3763dde"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classcom_1_1amazon_1_1aace_1_1navigation_1_1_navigation.html">Navigation</a> should be extended to handle navigation directives from the Engine. </p>
@@ -144,12 +146,36 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="ab9c911a083f6b927749106f3e3763dde"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab9c911a083f6b927749106f3e3763dde">&#9670;&nbsp;</a></span>getNavigationState()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String com.amazon.aace.navigation.Navigation.getNavigationState </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Retrieve the navigation state from the platform. NOTE: You may return an empty string to default the payload to NOT_NAVIGATING</p>
+<dl class="section return"><dt>Returns</dt><dd>the current NavigationState JSON payload <div class="fragment"><div class="line">) </div><div class="line">&quot;state&quot;: &quot;{{STRING}}&quot;, //NAVIGATING or NOT_NAVIGATING</div><div class="line">&quot;waypoints&quot;: [</div><div class="line">  {</div><div class="line">      &quot;type&quot;: &quot;{{STRING}}&quot;, //Type of the waypoint - SOURCE, DESTINATION or INTERIM  </div><div class="line">      &quot;estimatedTimeOfArrival&quot;: {</div><div class="line">          &quot;ideal&quot;: {{STRING}}, //Expected clock time ETA based on the ideal conditions. ISO 8601 UTC format</div><div class="line">          &quot;predicted&quot;: {{STRING}} //predicted clock time ETA based on traffic conditions. ISO 8601 UTC format</div><div class="line">       },</div><div class="line">      &quot;address&quot;: &quot;{{STRING}}&quot;,</div><div class="line">      &quot;coordinate&quot;: [{{LATITUDE_DOUBLE}},{{LONGITUDE_DOUBLE}}],</div><div class="line">  },</div><div class="line">  {</div><div class="line">      &quot;type&quot;: &quot;{{STRING}}&quot;, //Type of the waypoint - SOURCE, DESTINATION or INTERIM</div><div class="line">      &quot;estimatedTimeOfArrival&quot;: {</div><div class="line">          &quot;ideal&quot;: {{STRING}}, //Expected clock time ETA based on the ideal conditions. ISO 8601 UTC format</div><div class="line">          &quot;predicted&quot;: {{STRING}} //predicted clock time ETA based on traffic conditions. ISO 8601 UTC format</div><div class="line">       },</div><div class="line">      &quot;address&quot;: &quot;{{STRING}}&quot;,</div><div class="line">      &quot;coordinate&quot;: [{{LATITUDE_DOUBLE}},{{LONGITUDE_DOUBLE}}],</div><div class="line">      &quot;poiOfInterest&quot;: {</div><div class="line">          &quot;id&quot;: &quot;{{STRING}}&quot;, //POI lookup Id vended from Alexa</div><div class="line">          &quot;name&quot;: &quot;{{STRING}}&quot;, // POI Name  </div><div class="line">          &quot;hoursOfOperation&quot;: [</div><div class="line">           {</div><div class="line">               &quot;dayOfWeek&quot;: &quot;{{STRING}}&quot;,</div><div class="line">               &quot;hours&quot;: [</div><div class="line">                {</div><div class="line">                   &quot;open&quot;: &quot;{{STRING}}&quot;, // ISO-8601 time with timezone format</div><div class="line">                   &quot;close&quot;: &quot;{{STRING}}&quot; // ISO-8601 time with timezone format</div><div class="line">                }</div><div class="line">              ],</div><div class="line">              &quot;type&quot;: &quot;{{STRING}}&quot; // Can be: OPEN_DURING_HOURS, OPEN_24_HOURS, etc.</div><div class="line">          }</div><div class="line">          ],</div><div class="line">          &quot;phoneNumber&quot;: &quot;{{STRING}}&quot;</div><div class="line">       }</div><div class="line">     </div><div class="line">  },</div><div class="line">  ...</div><div class="line">],</div><div class="line">&quot;shapes&quot;: [</div><div class="line">  [</div><div class="line">      {{LATITUDE_DOUBLE}},</div><div class="line">      {{LONGITUDE_DOUBLE}}</div><div class="line">  ],</div><div class="line">  ...</div><div class="line">]</div></div><!-- fragment --> <ul>
+<li>state (required) : current navigation state </li>
+<li>waypoints (required) : list of waypoints, which can be empty </li>
+<li>shapes (required) : list of route shapes, which can be empty or limited to 100 entries </li>
+</ul>
+</dd></dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <html>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 1.6.0 - Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 2.0.0 - Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

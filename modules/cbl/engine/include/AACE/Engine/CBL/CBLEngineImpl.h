@@ -52,7 +52,8 @@ private:
         std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> customerDataManager,
         std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
         std::chrono::seconds codePairRequestTimeout,
-        const std::string& endpoint );
+        std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
+        bool enableUserProfile );
 
 public:
     static std::shared_ptr<CBLEngineImpl> create(
@@ -60,7 +61,8 @@ public:
         std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> customerDataManager,
         std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
         std::chrono::seconds codePairRequestTimeout,
-        const std::string& endpoint );
+        std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
+        bool enableUserProfile );
 
     void engineStart();
 
@@ -75,10 +77,12 @@ public:
     void clearRefreshToken() override;
     void setRefreshToken( const std::string& refreshToken ) override;
     std::string getRefreshToken() override;
+    void setUserProfile( const std::string& name, const std::string& email ) override;
 
     // CBLEngineInterface
     void onStart() override;
     void onCancel() override;
+    void onReset() override;
 
 protected:
     virtual void doShutdown() override;

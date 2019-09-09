@@ -15,7 +15,8 @@ inherit pkgconfig cmake devlibsonly unittests
 
 EXTRA_OECMAKE += "-DCMAKE_BUILD_TYPE=${AAC_BUILD_TYPE} \
                   -DACSDK_EMIT_SENSITIVE_LOGS=${AAC_SENSITIVE_LOGS} \
-                  -DACSDK_LATENCY_LOG=${AAC_LATENCY_LOGS}"
+                  -DACSDK_LATENCY_LOG=${AAC_LATENCY_LOGS} \
+                  -DBUILD_TESTING=${AVS_ENABLE_TESTS}"
 
 # Install AVS artifacts explicitly into AAC_PREFIX dir
 EXTRA_OECMAKE_append = " -DCMAKE_INSTALL_PREFIX:PATH=${AAC_PREFIX}"
@@ -57,11 +58,18 @@ PACKAGECONFIG[sensory] = "${SENSORY_CMAKE_OPTIONS},,truly-handsfree"
 PACKAGECONFIG[opus] = "-DOPUS=ON,,libopus"
 
 do_install_append() {
+	# Copy SampleApp if avaiable
+	if [ -e ${B}/SampleApp/src/SampleApp ]; then
+		mkdir -p ${D}${bindir}
+		cp -R ${B}/SampleApp/src/SampleApp ${D}${bindir}/AVSSampleApp
+	fi
+	# Copy all test executables
 	mkdir -p ${D}${testbindir}/${PN}
 	find ./ -name "*Test" -exec cp {} ${D}${testbindir}/${PN} \;
 	if [ -f ${B}/Integration/src/libIntegration${SOLIBS} ]; then
 		cp -R ${B}/Integration/src/libIntegration${SOLIBS} ${D}${AAC_PREFIX}/lib
 	fi
+	# Copy RapidJSON headers
 	mkdir -p ${D}${AAC_PREFIX}/include
 	cp -R ${S}/ThirdParty/rapidjson/rapidjson-1.1.0/include/* ${D}${AAC_PREFIX}/include
 	# Copy the Mock headers from AVS SDK

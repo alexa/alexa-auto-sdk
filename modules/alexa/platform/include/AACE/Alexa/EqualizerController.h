@@ -120,7 +120,7 @@ private:
      * @internal
      * The associated Engine implementation
      */
-    std::shared_ptr<aace::alexa::EqualizerControllerEngineInterface> m_equalizerControllerEngineInterface;
+    std::weak_ptr<aace::alexa::EqualizerControllerEngineInterface> m_equalizerControllerEngineInterface;
 };
 
 } // aace::alexa

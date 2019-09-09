@@ -38,10 +38,6 @@ bool TemplateRuntimeEngineImpl::initialize(
     
     try
     {
-        ThrowIfNull( directiveSequencer, "invalidDirectiveSequencer" );
-        ThrowIfNull( capabilitiesDelegate, "invalidCapabilitiesDelegate" );
-        ThrowIfNull( dialogUXStateAggregator, "invalidDialogUXStateAggregator" );
-
         m_audioPlayerInterfaceDelegate = AudioPlayerInterfaceDelegate::create( audioPlayerInterface );
         ThrowIfNull( m_audioPlayerInterfaceDelegate, "couldNotCreateAudioPlayerInterfaceDelegate" );
 
@@ -82,6 +78,12 @@ std::shared_ptr<TemplateRuntimeEngineImpl> TemplateRuntimeEngineImpl::create(
     try
     {
         ThrowIfNull( templateRuntimePlatformInterface, "invalidTemplateRuntimePlatformInterface" );
+        ThrowIfNull( directiveSequencer, "invalidDirectiveSequencer" );
+        ThrowIfNull( audioPlayerInterface, "invalidAudioPlayerInterface" );
+        ThrowIfNull( focusManager, "invalidFocusManager" );
+        ThrowIfNull( capabilitiesDelegate, "invalidCapabilitiesDelegate" );
+        ThrowIfNull( dialogUXStateAggregator, "invalidDialogUXStateAggregator" );
+        ThrowIfNull( exceptionSender, "invalidExceptionEncounteredSenderInterface" );
 
         templateRuntimeEngineImpl = std::shared_ptr<TemplateRuntimeEngineImpl>( new TemplateRuntimeEngineImpl( templateRuntimePlatformInterface ) );
         
@@ -102,6 +104,7 @@ void TemplateRuntimeEngineImpl::doShutdown()
 {
     if( m_templateRuntimeCapabilityAgent != nullptr ) {
         m_templateRuntimeCapabilityAgent->shutdown();
+        m_templateRuntimeCapabilityAgent.reset();
     }
     
     if( m_audioPlayerInterfaceDelegate != nullptr ) {
@@ -143,8 +146,7 @@ std::shared_ptr<AudioPlayerInterfaceDelegate> AudioPlayerInterfaceDelegate::crea
     return std::shared_ptr<AudioPlayerInterfaceDelegate>( new AudioPlayerInterfaceDelegate( audioPlayerInterface ) );
 }
 
-void AudioPlayerInterfaceDelegate::doShutdown()
-{
+void AudioPlayerInterfaceDelegate::doShutdown() {
     m_delegate.reset();
     m_observers.clear();
 }
@@ -153,16 +155,15 @@ void AudioPlayerInterfaceDelegate::setDelegate( std::shared_ptr<alexaClientSDK::
 {
     try
     {
-        ThrowIfNotNull( m_delegate, "audioPlayerInterfaceDelegateAlreadySet" );
+        ThrowIfNotNull( m_delegate.lock(), "audioPlayerInterfaceDelegateAlreadySet" );
         ThrowIfNull( delegate, "invalidAudioPlayerInterfaceDelegate" );
         std::lock_guard<std::mutex> lock( m_mutex ) ;
         
-        m_delegate = delegate;
-        
         for( const auto& next : m_observers ) {
-            m_delegate->addObserver( next );
+            delegate->addObserver( next.lock() );
         }
         
+        m_delegate = delegate;
         m_observers.clear();
     }
     catch( std::exception& ex ) {
@@ -172,35 +173,44 @@ void AudioPlayerInterfaceDelegate::setDelegate( std::shared_ptr<alexaClientSDK::
 
 void AudioPlayerInterfaceDelegate::addObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface> observer )
 {
-    if( m_delegate != nullptr ) {
-        m_delegate->addObserver( observer );
+    if( auto m_delegate_lock = m_delegate.lock() ) {
+        m_delegate_lock->addObserver( observer );
     }
     else
     {
         std::lock_guard<std::mutex> lock( m_mutex ) ;
-
-        m_observers.insert( observer );
+        m_observers.push_back( observer );
     }
 }
 
 void AudioPlayerInterfaceDelegate::removeObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface> observer )
 {
-    if( m_delegate != nullptr ) {
-        m_delegate->removeObserver( observer );
+    if( auto m_delegate_lock = m_delegate.lock() ) {
+        m_delegate_lock->removeObserver( observer );
     }
     else
     {
         std::lock_guard<std::mutex> lock( m_mutex ) ;
 
-        m_observers.erase( observer );
+        for( auto it = m_observers.begin(); it != m_observers.end(); it++ )
+        {
+            if( it->lock() == observer ) {
+                m_observers.erase( it );
+                break;
+            }
+        }
     }
 }
 
-std::chrono::milliseconds AudioPlayerInterfaceDelegate::getAudioItemOffset() {
-    return m_delegate != nullptr ? m_delegate->getAudioItemOffset() : std::chrono::milliseconds( 0 );
+std::chrono::milliseconds AudioPlayerInterfaceDelegate::getAudioItemOffset()
+{
+    if( auto m_delegate_lock = m_delegate.lock() ) {
+        return m_delegate_lock->getAudioItemOffset();
+    }
+    else {
+        return std::chrono::milliseconds( 0 );
+    }
 }
-
-
 
 } // aace::engine::alexa
 } // aace::engine

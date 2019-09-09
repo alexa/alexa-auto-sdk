@@ -26,6 +26,7 @@
 #include "AACE/Engine/Logger/Sinks/ConsoleSink.h"
 #include "AACE/Engine/Logger/Sinks/FileSink.h"
 #include "AACE/Engine/Logger/Sinks/SyslogSink.h"
+#include "AACE/Engine/Utils/JSON/JSON.h"
 #include "AACE/Engine/Core/EngineMacros.h"
 
 namespace aace {
@@ -46,36 +47,31 @@ bool LoggerEngineService::addSink( std::shared_ptr<aace::engine::logger::sink::S
     return EngineLogger::getInstance()->addSink( sink );
 }
 
-bool LoggerEngineService::configure( const std::vector<std::shared_ptr<std::istream>>& configuration )
+bool LoggerEngineService::removeSink( const std::string& id ) {
+    return EngineLogger::getInstance()->removeSink( id );
+}
+
+bool LoggerEngineService::initialize()
 {
-    // attempt to configure each stream
-    for( auto next : configuration ) {
-        configure( next );
+    try
+    {
+        ThrowIfNot( registerServiceInterface<LoggerServiceInterface>( shared_from_this() ), "registerLoggerServiceInterfaceFailed" );
+        return true;
     }
-    
-    // register the AlexaComponentInterface
-    ThrowIfNot( registerServiceInterface<LoggerServiceInterface>( shared_from_this() ), "registerLoggerServiceInterfaceFailed" );
-    
-    return true;
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"initialize").d("reason", ex.what()));
+        return false;
+    }
 }
 
 bool LoggerEngineService::configure( std::shared_ptr<std::istream> configuration )
 {
     try
     {
-        rapidjson::IStreamWrapper isw( *configuration );
-        rapidjson::Document document;
+        auto document = aace::engine::utils::json::parse( configuration );
+        ThrowIfNull( document, "parseConfigurationStreamFailed" );
         
-        document.ParseStream( isw );
-        
-        ThrowIf( document.HasParseError(), GetParseError_En( document.GetParseError() ) );
-        ThrowIfNot( document.IsObject(), "invalidConfigurationStream" );
-        
-        auto root = document.GetObject();
-        
-        ReturnIfNot( root.HasMember( "aace.logger" ) && root["aace.logger"].IsObject(), false );
-        
-        auto loggerConfigRoot = root["aace.logger"].GetObject();
+        auto loggerConfigRoot = document->GetObject();
         
         if( loggerConfigRoot.HasMember( "sinks" ) && loggerConfigRoot["sinks"].IsArray() )
         {
@@ -119,7 +115,7 @@ bool LoggerEngineService::configure( std::shared_ptr<std::istream> configuration
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_WARN(LX(TAG,"configure").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG,"configure").d("reason", ex.what()));
         return false;
     }
 }
@@ -232,11 +228,9 @@ bool LoggerEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::l
         ThrowIfNotNull( m_loggerEngineImpl, "platformInterfaceAlreadyRegistered" );
         
         // create the logger engine implementation
+        m_logger = logger;
         m_loggerEngineImpl = aace::engine::logger::LoggerEngineImpl::create( logger, EngineLogger::getInstance() );
         ThrowIfNull( m_loggerEngineImpl, "createLoggerEngineImplFailed" );
-        
-        // set the directive handler engine interface reference
-        logger->setEngineInterface( m_loggerEngineImpl );
 
         return true;
     }
@@ -244,6 +238,20 @@ bool LoggerEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::l
         AACE_ERROR(LX(TAG,"registerPlatformInterfaceType<Logger>").d("reason", ex.what()));
         return false;
     }
+}
+    
+bool LoggerEngineService::shutdown() {
+    if ( m_logger != nullptr ) {
+        m_logger->setEngineInterface( nullptr );
+        m_logger.reset();
+        m_logger = nullptr;
+    }
+    if ( m_loggerEngineImpl != nullptr ) {
+        EngineLogger::getInstance()->removeObserver( m_loggerEngineImpl );
+        m_loggerEngineImpl.reset();
+        m_loggerEngineImpl = nullptr;
+    }
+    return true;
 }
 
 } // aace::engine::logger

@@ -16,6 +16,7 @@
 #include "AACE/Engine/Vehicle/VehicleEngineService.h"
 #include "AACE/Engine/Vehicle/VehiclePropertyInterface.h"
 #include "AACE/Engine/Storage/LocalStorageInterface.h"
+#include "AACE/Engine/Utils/JSON/JSON.h"
 #include "AACE/Engine/Core/EngineMacros.h"
 
 #include "AACE/Vehicle/VehicleProperties.h"
@@ -69,36 +70,28 @@ bool VehicleEngineService::initialize() {
     return true;
 }
 
-bool VehicleEngineService::configure( const std::vector<std::shared_ptr<std::istream>>& configuration )
-{
-    // attempt to configure each stream
-    for( auto next : configuration ) {
-        configure( next );
-    }
-    
-    // warn if the vehicle property map has not been configured
-    if( m_vehiclePropertyMap.empty() ) {
-        AACE_WARN(LX(TAG,"configure").m("vehicleInfoNotConfigured"));
-    } else {
-        m_vehiclePropertiesMetric = generateVehiclePropertiesMetric();
-    }
-    
-    // get the operating country from the settings
-    auto localStorage = getContext()->getServiceInterface<aace::engine::storage::LocalStorageInterface>( "aace.storage" );
-    
-    if( localStorage != nullptr && localStorage->containsKey( VEHICLE_SERVICE_LOCAL_STORAGE_TABLE, "operatingCountry" ) ) {
-        m_operatingCountry = localStorage->get( VEHICLE_SERVICE_LOCAL_STORAGE_TABLE, "operatingCountry", m_operatingCountry );
-    }
-    
-    return true;
-}
-
 bool VehicleEngineService::setup()
 {
     try
     {
-        if ( m_vehiclePropertiesMetric != nullptr ) {
-            m_vehiclePropertiesMetric->record();
+        // get the operating country from the settings
+        auto localStorage = getContext()->getServiceInterface<aace::engine::storage::LocalStorageInterface>( "aace.storage" );
+        
+        if( localStorage != nullptr && localStorage->containsKey( VEHICLE_SERVICE_LOCAL_STORAGE_TABLE, "operatingCountry" ) ) {
+            m_operatingCountry = localStorage->get( VEHICLE_SERVICE_LOCAL_STORAGE_TABLE, "operatingCountry", m_operatingCountry );
+        }
+
+        // warn if the vehicle property map has not been configured
+        if( m_vehiclePropertyMap.empty() ) {
+            AACE_WARN(LX(TAG,"setup").m("vehicleInfoNotConfigured"));
+        }
+        else
+        {
+            m_vehiclePropertiesMetric = generateVehiclePropertiesMetric();
+            
+            if( m_vehiclePropertiesMetric != nullptr ) {
+                m_vehiclePropertiesMetric->record();
+            }
         }
     }
     catch( std::exception& ex ) {
@@ -136,19 +129,10 @@ bool VehicleEngineService::configure( std::shared_ptr<std::istream> configuratio
 {
     try
     {
-        rapidjson::IStreamWrapper isw( *configuration );
-        rapidjson::Document document;
+        auto document = aace::engine::utils::json::parse( configuration );
+        ThrowIfNull( document, "parseConfigurationStreamFailed" );
         
-        document.ParseStream( isw );
-        
-        ThrowIf( document.HasParseError(), GetParseError_En( document.GetParseError() ) );
-        ThrowIfNot( document.IsObject(), "invalidConfigurationStream" );
-        
-        auto root = document.GetObject();
-        
-        ReturnIfNot( root.HasMember( "aace.vehicle" ) && root["aace.vehicle"].IsObject(), false );
-        
-        auto vehicleConfigRoot = root["aace.vehicle"].GetObject();
+        auto vehicleConfigRoot = document->GetObject();
 
         if( vehicleConfigRoot.HasMember( "info" ) && vehicleConfigRoot["info"].IsObject() )
         {

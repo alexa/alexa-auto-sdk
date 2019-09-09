@@ -46,6 +46,7 @@
 #include <AVSCommon/SDKInterfaces/GlobalSettingsObserverInterface.h>
 #include <AVSCommon/SDKInterfaces/SoftwareInfoSenderObserverInterface.h>
 #include <AVSCommon/SDKInterfaces/AuthDelegateInterface.h>
+#include <AVSCommon/SDKInterfaces/FocusManagerInterface.h>
 #include <AVSCommon/Utils/Threading/Executor.h>
 #include <AVSCommon/Utils/DeviceInfo.h>
 #include <InteractionModel/InteractionModelCapabilityAgent.h>
@@ -75,6 +76,7 @@
 #include "AACE/Engine/Vehicle/VehicleEngineService.h"
 #include "AACE/Engine/Storage/StorageEngineService.h"
 #include "AACE/Engine/Logger/LoggerEngineService.h"
+#include "AACE/Engine/Audio/AudioEngineService.h"
 
 #include "AlexaEngineLogger.h"
 #include "AlexaEngineClientObserver.h"
@@ -90,7 +92,10 @@
 #include "AlexaComponentInterface.h"
 #include "ExternalMediaPlayerEngineImpl.h"
 #include "WakewordEngineAdapterProperty.h"
+#include "WakewordEngineManager.h"
 #include "EqualizerControllerEngineImpl.h"
+#include "AlexaSpeakerEngineImpl.h"
+#include "AlexaEndpointInterface.h"
 
 namespace aace {
 namespace engine {
@@ -101,6 +106,7 @@ class AlexaEngineSoftwareInfoSenderObserver;
 class AlexaEngineGlobalSettingsObserver;
 class AuthDelegateRouter;
 class PlaybackRouterDelegate;
+class HttpPutDelegate;
 
 class AlexaEngineService :
     public aace::engine::core::EngineService,
@@ -108,10 +114,17 @@ class AlexaEngineService :
     public alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesObserverInterface,
     public aace::engine::network::NetworkInfoObserver,
     public AlexaComponentInterface,
+    public AlexaEndpointInterface,
     public std::enable_shared_from_this<AlexaEngineService> {
 
 public:
-    DESCRIBE("aace.alexa",VERSION("1.0"),DEPENDS(aace::engine::location::LocationEngineService),DEPENDS(aace::engine::network::NetworkEngineService),DEPENDS(aace::engine::vehicle::VehicleEngineService),DEPENDS(aace::engine::storage::StorageEngineService),DEPENDS(aace::engine::logger::LoggerEngineService))
+    DESCRIBE("aace.alexa", VERSION("1.0"),
+        DEPENDS(aace::engine::location::LocationEngineService),
+        DEPENDS(aace::engine::network::NetworkEngineService),
+        DEPENDS(aace::engine::vehicle::VehicleEngineService),
+        DEPENDS(aace::engine::storage::StorageEngineService),
+        DEPENDS(aace::engine::logger::LoggerEngineService),
+        DEPENDS(aace::engine::audio::AudioEngineService))
 
 private:
     AlexaEngineService( const aace::engine::core::ServiceDescription& description );
@@ -127,6 +140,7 @@ public:
 
     // aace::engine::network::NetworkInfoObserver
     void onNetworkInfoChanged( NetworkInfoObserver::NetworkStatus status, int wifiSignalStrength ) override;
+    void onNetworkInterfaceChangeStatusChanged( const std::string& networkInterface, NetworkInterfaceChangeStatus status ) override;
 
     // AlexaComponentInterface
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> getAuthDelegate() override;
@@ -147,8 +161,14 @@ public:
     std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> getDeviceInfo() override;
     std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> getCustomerDataManager() override;
 
+    // AlexaEndpointInterface
+    std::string getAVSEndpoint() override;
+    std::string getAlexaApiEndpoint() override;
+    std::string getLWAEndpoint() override;
+
 protected:
-    bool configure( const std::vector<std::shared_ptr<std::istream>>& configuration ) override;
+    bool initialize() override;
+    bool configure( std::shared_ptr<std::istream> configuration ) override;
     bool setup() override;
     bool start() override;
     bool stop() override;
@@ -158,27 +178,7 @@ protected:
     std::string getProperty( const std::string& key ) override;
 
 private:
-    /**
-     * @code{.json}
-     * {
-     *   "aace.alexa":
-     *   {
-     *      "system": {
-     *          "firmwareVersion": <FIRMWARE_VERSION>
-     *      },
-     *      "speechRecognizer": {
-     *          "encoder": {
-     *              "name": "<ENCODER>" // OPUS
-     *          }
-     *      },
-     *      "externalMediaPlayer": {
-     *          "agent": "<AGENT>"
-     *      }
-     *   }
-     * }
-     * @endcode
-     */
-    bool configure( std::shared_ptr<std::istream> configuration );
+    bool configureDeviceSDK( std::shared_ptr<std::istream> configuration );
 
     bool connect();
     bool disconnect();
@@ -207,6 +207,8 @@ private:
     bool registerPlatformInterfaceType( std::shared_ptr<aace::alexa::ExternalMediaAdapter> externalMediaAdapter );
     bool registerPlatformInterfaceType( std::shared_ptr<aace::alexa::LocalMediaSource> localMediaSource );
     bool registerPlatformInterfaceType( std::shared_ptr<aace::alexa::EqualizerController> equalizerController );
+    bool registerPlatformInterfaceType( std::shared_ptr<aace::alexa::GlobalPreset> globalPreset );
+    bool registerPlatformInterfaceType( std::shared_ptr<aace::alexa::AlexaSpeaker> alexaSpeaker );
 
     bool createExternalMediaPlayerImpl();
 
@@ -230,7 +232,6 @@ private:
     std::shared_ptr<alexaClientSDK::capabilityAgents::speakerManager::SpeakerManager> m_speakerManager;
     std::shared_ptr<AlexaEngineGlobalSettingsObserver> m_globalSettingsObserver;
     std::shared_ptr<alexaClientSDK::capabilityAgents::settings::Settings> m_settings;
-    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> m_dataManager;
     std::shared_ptr<alexaClientSDK::acl::PostConnectFactoryInterface> m_postConnectSynchronizerFactory;
     std::shared_ptr<alexaClientSDK::avsCommon::utils::http2::HTTP2ConnectionFactoryInterface> m_connectionFactory;
     std::shared_ptr<alexaClientSDK::acl::TransportFactoryInterface> m_transportFactory;
@@ -241,12 +242,14 @@ private:
     std::shared_ptr<alexaClientSDK::capabilityAgents::interactionModel::InteractionModelCapabilityAgent> m_interactionModelCapabilityAgent;
     std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> m_deviceInfo;
     std::shared_ptr<PlaybackRouterDelegate> m_playbackRouterDelegate;
+    std::shared_ptr<HttpPutDelegate> m_httpPutDelegate;
 
     std::shared_ptr<aace::engine::storage::LocalStorageInterface> m_localStorage;
     std::shared_ptr<aace::alexa::AuthProvider> m_authProviderPlatformInterface;
 
-    std::string m_endpoint = "https://avs-alexa-na.amazon.com";
-    std::string m_capabilitiesEndpoint = "https://api.amazonalexa.com";
+    std::string m_avsEndpoint;
+    std::string m_alexaApiEndpoint;
+    std::string m_lwaEndpoint;
     alexaClientSDK::avsCommon::sdkInterfaces::softwareInfo::FirmwareVersion m_firmwareVersion = 1;
     alexaClientSDK::avsCommon::utils::AudioFormat m_audioFormat;
     std::string m_externalMediaPlayerAgent;
@@ -259,6 +262,9 @@ private:
     bool m_connecting = false;
 
     std::mutex m_connectionMutex;
+
+    // Holds the connection state to AVS before changing the network interface.
+    bool m_previousAVSConnectionState = false;
 
     std::string m_encoderName;
     bool m_encoderEnabled;
@@ -276,6 +282,7 @@ private:
     std::shared_ptr<aace::engine::alexa::TemplateRuntimeEngineImpl> m_templateRuntimeEngineImpl;
     std::shared_ptr<aace::engine::alexa::ExternalMediaPlayerEngineImpl> m_externalMediaPlayerEngineImpl;
     std::shared_ptr<aace::engine::alexa::EqualizerControllerEngineImpl> m_equalizerControllerEngineImpl;
+    std::shared_ptr<aace::engine::alexa::AlexaSpeakerEngineImpl> m_alexaSpeakerEngineImpl;
 
     // logger
     std::shared_ptr<AlexaEngineLogger> m_logger;
@@ -285,7 +292,10 @@ private:
 
     // location service
     std::shared_ptr<AlexaEngineLocationStateProvider> m_locationStateProvider;
-    
+
+    std::shared_ptr<WakewordEngineManager> m_wakewordEngineManager;
+    std::string m_wakewordEngineName;
+
     // executer
     alexaClientSDK::avsCommon::utils::threading::Executor m_executor;
 };
@@ -376,6 +386,17 @@ public:
 private:
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> m_delegate;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackHandlerInterface> m_handler;
+};
+
+//
+// HttpPutDelegate
+//
+// AVS CapabilitiesDelegate HttpPut reference cannot be updated when the network interface changes, and to avoid
+// changing to the AVS module, the HttpPutDelete shall help in delegating the HTTP calls which then ensure that 
+// curl (inside the libcurlUtils ) uses latest configured curl options.
+class HttpPutDelegate : public alexaClientSDK::avsCommon::utils::libcurlUtils::HttpPutInterface {
+public:
+    alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse doPut(const std::string& url, const std::vector<std::string>& headers, const std::string& data) override;
 };
 
 

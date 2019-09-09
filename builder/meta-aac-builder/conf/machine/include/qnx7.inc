@@ -12,7 +12,7 @@ TARGET_OS = "nto-qnx7.0.0${ABIEXTENSION}"
 TARGET_VENDOR = "${@bb.utils.contains_any('TARGET_ARCH', 'arm aarch64', '-unknown', '-pc', d)}"
 
 # CMake
-OECMAKE_EXTRA_ROOT_PATH += "${QNX_TARGET}"
+OECMAKE_EXTRA_ROOT_PATH += "${QNX_TARGET} ${QNX_TARGET}/${QNX_ARCH}"
 AAC_CMAKE_SYSTEM_NAME = "QNX"
 
 # No toolchain options
@@ -61,10 +61,3 @@ def qnx7_get_machine_dict(machdata, d):
     return machdata
 
 PACKAGEQA_EXTRA_MACHDEFFUNCS = "qnx7_get_machine_dict"
-
-##################################################################
-# Amazon Build Info
-##################################################################
-
-KALDI_TARGET = "${TARGET_SYS}"
-PRYON_LITE_BUILD_TYPE = "production"

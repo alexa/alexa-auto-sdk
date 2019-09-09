@@ -24,6 +24,7 @@
 #include "AACE/Engine/Core/EngineMacros.h"
 #include "AACE/Engine/Core/EngineVersion.h"
 #include "AACE/Engine/Core/CoreMetrics.h"
+#include "AACE/Engine/Utils/JSON/JSON.h"
 #include "AACE/Core/CoreProperties.h"
 
 // default Engine constructor
@@ -137,8 +138,17 @@ bool EngineImpl::shutdown()
     }
 }
 
-bool EngineImpl::configure( std::shared_ptr<aace::core::config::EngineConfiguration> configuration ) {
-    return configure( { configuration } );
+bool EngineImpl::configure( std::shared_ptr<aace::core::config::EngineConfiguration> configuration )
+{
+    try
+    {
+        ThrowIfNull( configuration, "invalidConfiguration" );
+        return configure( { configuration } );
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"configure").d("reason", ex.what()));
+        return false;
+    }
 }
 
 bool EngineImpl::configure( std::initializer_list<std::shared_ptr<aace::core::config::EngineConfiguration>> configurationList ) {
@@ -154,28 +164,47 @@ bool EngineImpl::configure( std::vector<std::shared_ptr<aace::core::config::Engi
         ThrowIfNot( m_initialized, "engineNotInitialized" );
         ThrowIf( m_running, "engineRunning" );
         ThrowIf( m_configured, "engineAlreadyConfigured" );
+        ThrowIf( configurationList.empty(), "invalidConfigurationList" );
 
-        // get the configuration streams
-        std::vector<std::shared_ptr<std::istream>> configurationStreams;
-        
-        // iterate through configuration objects and get streams for sdk initialization
-        for( auto next : configurationList ) {
+        // iterate through configuration objects and get streams for sdk initialization and
+        // merge all configuration stream together before calling service config methods
+        rapidjson::Document configuration( rapidjson::kObjectType );
+        auto root = configuration.GetObject();
+
+        for( auto next : configurationList )
+        {
             ThrowIfNull( next, "invalidConfiguration" );
-            configurationStreams.push_back( next->getStream() );
+            
+            // parse the next configuration stream
+            auto document = aace::engine::utils::json::parse( next->getStream() );
+            ThrowIfNull( document, "parseConfigurationStreamFailed" );
+            
+            // merge the document with the main configuration
+            ThrowIfNot( document->IsObject(), "invalidConfigurationStream" );
+            ThrowIfNot( aace::engine::utils::json::merge( root, document->GetObject(), configuration.GetAllocator() ), "mergeConfigurationFailed" );
         }
-
+        
         // iterate through registered engine services and call configure() for each module
         for( auto nextService : m_orderedServiceList )
         {
-            ThrowIfNot( nextService->handleConfigureEngineEvent( configurationStreams ), "handleConfigureEngineEventFailed" );
+            auto config = root.FindMember( nextService->getDescription().getType().c_str() );
+        
+            if( config != root.end() )
+            {
+                rapidjson::Document subDocument;
+                
+                subDocument.CopyFrom( config->value, subDocument.GetAllocator() );
             
-            for( auto nextStream : configurationStreams ) {
-                nextStream->clear();
-                nextStream->seekg( 0 );
+                nextService->handleConfigureEngineEvent( aace::engine::utils::json::toStream( subDocument ) );
             }
         }
-        
+
         m_configured = true;
+        
+        // iterate through registered engine modules and call handlePreRegisterEngineEvent() for each module
+        for( auto next : m_orderedServiceList ) {
+            ThrowIfNot( next->handlePreRegisterEngineEvent(), "handlePreRegisterEngineEvent" );
+        }
         
         return true;
     }
@@ -322,9 +351,14 @@ bool EngineImpl::start()
         ThrowIfNot( m_initialized, "engineNotInitialized" );
         ThrowIfNot( m_configured, "engineNotConfigured" );
         
-        // setup is called for each service the first time the engine is started
+        // postRegister and setup are called for each service the first time the engine is started
         if( m_setup == false )
         {
+            // iterate through registered engine modules and call handlePostRegisterEngineEvent() for each module
+            for( auto next : m_orderedServiceList ) {
+                ThrowIfNot( next->handlePostRegisterEngineEvent(), "handlePostRegisterEngineEvent" );
+            }
+
             // iterate through registered engine modules and call handleSetupEngineEvent() for each module
             for( auto next : m_orderedServiceList ) {
                 ThrowIfNot( next->handleSetupEngineEvent(), "handleSetupEngineEventFailed" );
@@ -405,6 +439,8 @@ bool EngineImpl::setProperty( const std::string& key, const std::string& value )
 {
     try
     {
+        ThrowIf( key.empty(), "invalidPropertyKey" );
+    
         auto service = getServiceFromPropertyKey( key );
         
         // if the property starts with a service id then delegate the setProperty() call to
@@ -426,7 +462,7 @@ bool EngineImpl::setProperty( const std::string& key, const std::string& value )
             }
         }
         
-        return false;
+        Throw( "unhandledProperty" );
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"setProperty").d("reason", ex.what()).d("key",key).d("value",value));
@@ -438,6 +474,8 @@ std::string EngineImpl::getProperty( const std::string& key )
 {
     try
     {
+        ThrowIf( key.empty(), "invalidPropertyKey" );
+
         auto service = getServiceFromPropertyKey( key );
         
         // if the property starts with a service id then delegate the getProperty() call to
@@ -461,11 +499,11 @@ std::string EngineImpl::getProperty( const std::string& key )
                 ReturnIfNot( result.empty(), result );
             }
 
-            return result;
+            Throw( "unhandledProperty" );
         }
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"getProperty").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG,"getProperty").d("reason", ex.what()).d("key",key));
         return std::string();
     }
 }
@@ -474,12 +512,16 @@ bool EngineImpl::registerPlatformInterface( std::shared_ptr<aace::core::Platform
 {
     try
     {
+        ThrowIfNot( m_configured, "engineNotConfigured" );
+        ThrowIf( m_setup, "engineHasAlreadyBeenStarted" );
+        ThrowIfNull( platformInterface, "invalidPlatformInterface" );
+    
         // iterate through registered engine modules and call registerPlatformInterface() for each module
         for( auto next : m_orderedServiceList ) {
             ReturnIf( next->handleRegisterPlatformInterfaceEngineEvent( platformInterface ), true );
         }
 
-        return false;
+        Throw( "platformInterfaceNotRegistered" );
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"registerPlatformInterface").d("reason", ex.what()));
@@ -491,6 +533,8 @@ bool EngineImpl::registerPlatformInterface( std::initializer_list<std::shared_pt
 {
     try
     {
+        ThrowIf( platformInterfaceList.size() == 0, "invalidPlatformInterfaceList" );
+    
         for( auto next : platformInterfaceList ) {
             ThrowIfNot( registerPlatformInterface( next ), "registerPlatformInterfaceFailed" );
         }

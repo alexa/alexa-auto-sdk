@@ -31,19 +31,20 @@
 #include <ContextManager/ContextManager.h>
 #include <SpeechSynthesizer/SpeechSynthesizer.h>
 
-#include "AACE/Alexa/SpeechSynthesizer.h"
+#include <AACE/Alexa/SpeechSynthesizer.h>
+#include <AACE/Engine/Audio/AudioManagerInterface.h>
 #include "AudioChannelEngineImpl.h"
 
 namespace aace {
 namespace engine {
 namespace alexa {
 
-class SpeechSynthesizerEngineImpl : 
-    public AudioChannelEngineImpl {
+class SpeechSynthesizerEngineImpl : public AudioChannelEngineImpl {
 private:
     SpeechSynthesizerEngineImpl( std::shared_ptr<aace::alexa::SpeechSynthesizer> speechSynthesizerPlatformInterface );
 
     bool initialize(
+        std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> audioOutputChannel,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
@@ -57,6 +58,7 @@ private:
 public:
     static std::shared_ptr<SpeechSynthesizerEngineImpl> create(
         std::shared_ptr<aace::alexa::SpeechSynthesizer> speechSynthesizerPlatformInterface,
+        std::shared_ptr<aace::engine::audio::AudioManagerInterface> audioManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
@@ -74,8 +76,9 @@ protected:
     void handlePrePlaybackFinished( SourceId id ) override;
 
 private:
+    std::shared_ptr<aace::alexa::SpeechSynthesizer> m_speechSynthesizerPlatformInterface;
     std::shared_ptr<alexaClientSDK::capabilityAgents::speechSynthesizer::SpeechSynthesizer> m_speechSynthesizerCapabilityAgent;
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> m_directiveSequencer;
+    std::weak_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> m_directiveSequencer;
 };
 
 } // aace::engine::alexa

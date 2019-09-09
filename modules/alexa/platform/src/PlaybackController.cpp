@@ -21,14 +21,14 @@ namespace alexa {
 PlaybackController::~PlaybackController() = default; // key function
 
 void PlaybackController::buttonPressed(PlaybackButton button) {
-    if( m_playbackControllerEngineInterface != nullptr ) {
-        m_playbackControllerEngineInterface->onButtonPressed(button);
+    if( auto m_playbackControllerEngineInterface_lock = m_playbackControllerEngineInterface.lock() ) {
+        m_playbackControllerEngineInterface_lock->onButtonPressed(button);
     }
 }
 
 void PlaybackController::togglePressed(PlaybackToggle toggle, bool action) {
-    if( m_playbackControllerEngineInterface != nullptr ) {
-        m_playbackControllerEngineInterface->onTogglePressed(toggle, action);
+    if( auto m_playbackControllerEngineInterface_lock = m_playbackControllerEngineInterface.lock() ) {
+        m_playbackControllerEngineInterface_lock->onTogglePressed(toggle, action);
     }
 }
 

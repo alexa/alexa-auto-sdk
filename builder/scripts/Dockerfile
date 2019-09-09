@@ -3,7 +3,7 @@ FROM ubuntu:xenial
 RUN apt-get update && apt-get install -y \
     chrpath diffstat gawk texinfo doxygen graphviz \
     python python3 wget unzip build-essential cpio \
-    git-core libssl-dev \
+    git-core libssl-dev default-jdk ninja-build \
     sudo locales
 
 # Locale settings

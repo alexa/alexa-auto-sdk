@@ -17,11 +17,13 @@
 #define SAMPLEAPP_COMMUNICATIONS_COMMUNICATIONS_HANDLER_H
 
 #include "SampleApp/Activity.h"
-#include "SampleApp/AudioInputManager.h"
 #include "SampleApp/Logger/LoggerHandler.h"
 
-#include <AACE/Audio/AudioCapture.h>
 #include <AACE/Communication/AlexaComms.h>
+
+// JSON for Modern C++
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 namespace sampleApp {
 namespace communication {
@@ -39,12 +41,7 @@ class CommunicationHandler : public aace::communication::AlexaComms /* isa Platf
 
   protected:
     CommunicationHandler(std::weak_ptr<Activity> activity,
-                         std::weak_ptr<logger::LoggerHandler> loggerHandler,
-                         std::shared_ptr<sampleApp::AudioInputManager> audioInputChannel,
-                         std::shared_ptr<aace::alexa::MediaPlayer> ringtoneMediaPlayer,
-                         std::shared_ptr<aace::alexa::Speaker> ringtoneSpeaker,
-                         std::shared_ptr<aace::alexa::MediaPlayer> callAudioMediaPlayer,
-                         std::shared_ptr<aace::alexa::Speaker> callAudioSpeaker);
+                         std::weak_ptr<logger::LoggerHandler> loggerHandler);
 
   public:
     template <typename... Args> static auto create(Args &&... args) -> std::shared_ptr<CommunicationHandler> {
@@ -57,14 +54,14 @@ class CommunicationHandler : public aace::communication::AlexaComms /* isa Platf
 
     auto callStateChanged(CallState state) -> void override;
 
+    static bool checkConfiguration(const std::vector<json>& jsons);
+
   protected:
     /**
      * Helper method to display the state.
      */
     auto showState() -> void;
     auto callStateToString(CallState state) -> std::string;
-    auto startAudioInput() -> bool;
-    auto stopAudioInput() -> bool;
 
   private:
     std::weak_ptr<View> m_console{};
@@ -74,9 +71,6 @@ class CommunicationHandler : public aace::communication::AlexaComms /* isa Platf
 
     /// Call state
     CallState m_callState;
-
-    /// Microphone
-    std::shared_ptr<sampleApp::AudioInputManager> m_audioInputChannel;
 };
 
 } // namespace communication

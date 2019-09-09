@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['dab',['DAB',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source_1_1_source.html#ad79d251e0f05790ed49c38296e4604a3',1,'com::amazon::aace::alexa::LocalMediaSource::Source']]],
   ['default',['DEFAULT',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter_1_1_navigation.html#a341b202427ebbd1a72b09440e1faae51',1,'com::amazon::aace::alexa::ExternalMediaAdapter::Navigation']]],
   ['dialing',['DIALING',['../enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_call_state.html#a219ecfbc86e942f09ab6762b9d04e7bd',1,'com::amazon::aace::phonecontrol::PhoneCallController::CallState']]],
   ['disable_5frepeat',['DISABLE_REPEAT',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter_1_1_play_control_type.html#aff4cf547e98771825fc89613325225c1',1,'com.amazon.aace.alexa.ExternalMediaAdapter.PlayControlType.DISABLE_REPEAT()'],['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source_1_1_play_control_type.html#a9ab2ede3ef1d0cf9000328adf5f7b33a',1,'com.amazon.aace.alexa.LocalMediaSource.PlayControlType.DISABLE_REPEAT()']]],
@@ -8,6 +9,5 @@ var searchData=
   ['disconnecting',['DISCONNECTING',['../enumcom_1_1amazon_1_1aace_1_1network_1_1_network_info_provider_1_1_network_status.html#ae2986a50a60397d2a3b325c924c807f3',1,'com::amazon::aace::network::NetworkInfoProvider::NetworkStatus']]],
   ['dns_5ftimedout',['DNS_TIMEDOUT',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_connection_changed_reason.html#acbe9865f13dcd3e988c8904c315df486',1,'com::amazon::aace::alexa::AlexaClient::ConnectionChangedReason']]],
   ['dtmf_5ffailed',['DTMF_FAILED',['../enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_d_t_m_f_error.html#ab88088edb4bf67479cca64715ca74af5',1,'com::amazon::aace::phonecontrol::PhoneCallController::DTMFError']]],
-  ['dtmf_5fsupported',['DTMF_SUPPORTED',['../enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_calling_device_configuration_property.html#aee40d256df727148c0b49dbc712cc1f9',1,'com::amazon::aace::phonecontrol::PhoneCallController::CallingDeviceConfigurationProperty']]],
-  ['duration',['duration',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter_1_1_playback_state.html#a73f5ce915ae7abf1c54bdc80ca082686',1,'com.amazon.aace.alexa.ExternalMediaAdapter.PlaybackState.duration()'],['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source_1_1_playback_state.html#aae95a45f2420743db54c5cb8723ef27d',1,'com.amazon.aace.alexa.LocalMediaSource.PlaybackState.duration()']]]
+  ['dtmf_5fsupported',['DTMF_SUPPORTED',['../enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_calling_device_configuration_property.html#aee40d256df727148c0b49dbc712cc1f9',1,'com::amazon::aace::phonecontrol::PhoneCallController::CallingDeviceConfigurationProperty']]]
 ];

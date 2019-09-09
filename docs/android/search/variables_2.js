@@ -2,6 +2,7 @@ var searchData=
 [
   ['call_5fnot_5fin_5fprogress',['CALL_NOT_IN_PROGRESS',['../enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_d_t_m_f_error.html#aa8c8a58ea28b1198fe0123532db854d2',1,'com::amazon::aace::phonecontrol::PhoneCallController::DTMFError']]],
   ['call_5freceived',['CALL_RECEIVED',['../enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_call_state.html#ac64f764a5a9ab1ec83cc35eace0f6af2',1,'com::amazon::aace::phonecontrol::PhoneCallController::CallState']]],
+  ['channel',['CHANNEL',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source_1_1_content_selector.html#aa5746e9aa630d7fd67ae69ad0020eaf9',1,'com::amazon::aace::alexa::LocalMediaSource::ContentSelector']]],
   ['code_5fpair_5fexpired',['CODE_PAIR_EXPIRED',['../enumcom_1_1amazon_1_1aace_1_1cbl_1_1_c_b_l_1_1_c_b_l_state_changed_reason.html#a86a569b7c1f83016602b6185828272df',1,'com::amazon::aace::cbl::CBL::CBLStateChangedReason']]],
   ['code_5fpair_5freceived',['CODE_PAIR_RECEIVED',['../enumcom_1_1amazon_1_1aace_1_1cbl_1_1_c_b_l_1_1_c_b_l_state.html#aa540173127387714f08eb7b73791ffe7',1,'com::amazon::aace::cbl::CBL::CBLState']]],
   ['compact_5fdisc',['COMPACT_DISC',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source_1_1_source.html#ae6297528fb7dfa6bc6694f459a14603e',1,'com::amazon::aace::alexa::LocalMediaSource::Source']]],
@@ -10,7 +11,7 @@ var searchData=
   ['connecting',['CONNECTING',['../enumcom_1_1amazon_1_1aace_1_1network_1_1_network_info_provider_1_1_network_status.html#a4de3bfe4ee56fb043c20859fb8edd140',1,'com::amazon::aace::network::NetworkInfoProvider::NetworkStatus']]],
   ['connection_5fthrottled',['CONNECTION_THROTTLED',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_connection_changed_reason.html#a88e15eeebfd05bec30d111763e573278',1,'com::amazon::aace::alexa::AlexaClient::ConnectionChangedReason']]],
   ['connection_5ftimedout',['CONNECTION_TIMEDOUT',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_connection_changed_reason.html#ae8864e9473452f4cde574e103827afa1',1,'com::amazon::aace::alexa::AlexaClient::ConnectionChangedReason']]],
+  ['contact',['CONTACT',['../enumcom_1_1amazon_1_1aace_1_1addressbook_1_1_address_book_1_1_address_book_type.html#a89a2f19b935235def607476414e00651',1,'com::amazon::aace::addressbook::AddressBook::AddressBookType']]],
   ['country_5flist',['COUNTRY_LIST',['../enumcom_1_1amazon_1_1aace_1_1vehicle_1_1config_1_1_vehicle_configuration_1_1_vehicle_property_type.html#a45b9831ae7b51b1a63766c85dc8b41df',1,'com::amazon::aace::vehicle::config::VehicleConfiguration::VehiclePropertyType']]],
-  ['coverid',['coverId',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter_1_1_playback_state.html#a04fde35506cc4ab5acf07d3db245d5c8',1,'com.amazon.aace.alexa.ExternalMediaAdapter.PlaybackState.coverId()'],['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source_1_1_playback_state.html#a56d63e6185aa4c93cdc616431b9fcc3f',1,'com.amazon.aace.alexa.LocalMediaSource.PlaybackState.coverId()']]],
   ['critical',['CRITICAL',['../enumcom_1_1amazon_1_1aace_1_1logger_1_1_logger_1_1_level.html#aca8f08c4026fa7df9a9ef4f05c4cae23',1,'com::amazon::aace::logger::Logger::Level']]]
 ];

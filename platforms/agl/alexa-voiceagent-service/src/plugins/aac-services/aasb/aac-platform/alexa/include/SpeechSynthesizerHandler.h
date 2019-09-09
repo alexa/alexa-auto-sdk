@@ -17,8 +17,6 @@
 
 #include <memory>
 
-#include <AACE/Alexa/Speaker.h>
-#include <AACE/Alexa/MediaPlayer.h>
 #include <AACE/Alexa/SpeechSynthesizer.h>
 
 namespace aasb {
@@ -38,22 +36,10 @@ public:
      *      received from alexa.
      * @param speaker Speaker to control the volume of @c mediaPlayer.
      */
-    static std::shared_ptr<SpeechSynthesizerHandler> create(
-        bool aacePlatformMediaPlayer,
-        std::shared_ptr<aace::alexa::MediaPlayer> mediaPlayer,
-        std::shared_ptr<aace::alexa::Speaker> speaker);
-
-    void onReceivedEvent(const std::string& action, const std::string& payload);
+    static std::shared_ptr<SpeechSynthesizerHandler> create();
 
 private:
-    SpeechSynthesizerHandler(
-        bool aacePlatformMediaPlayer,
-        std::shared_ptr<aace::alexa::MediaPlayer> mediaPlayer,
-        std::shared_ptr<aace::alexa::Speaker> speaker);
-
-    bool m_aacePlatformMediaPlayer;
-    std::shared_ptr<aace::alexa::MediaPlayer> m_mediaPlayer;
-    std::shared_ptr<aace::alexa::Speaker> m_speaker;
+    SpeechSynthesizerHandler();
 };
 
 }  // namespace alexa

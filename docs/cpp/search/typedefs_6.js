@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['mediaerror',['MediaError',['../classaace_1_1alexa_1_1_media_player.html#a8c2e45cde8efacf837f7688cbc08f425',1,'aace::alexa::MediaPlayer']]],
-  ['mediastate',['MediaState',['../classaace_1_1alexa_1_1_media_player.html#aa173fb6a0acf0a0530307e5dddb9086f',1,'aace::alexa::MediaPlayer']]]
+  ['mediaerror',['MediaError',['../classaace_1_1audio_1_1_audio_output.html#a3259653b849b84a183de95091860dd21',1,'aace::audio::AudioOutput']]],
+  ['mediastate',['MediaState',['../classaace_1_1audio_1_1_audio_output.html#ab1be1bc2a34898eba12b799787d908c5',1,'aace::audio::AudioOutput']]]
 ];

@@ -27,6 +27,8 @@ namespace aace {
 namespace engine {
 namespace alexa {
 
+static const uint8_t MAX_SPEAKER_VOLUME = 100;
+
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.ExternalMediaAdapterEngineImpl");
 
@@ -34,7 +36,7 @@ static const std::string TAG("aace.alexa.ExternalMediaAdapterEngineImpl");
 static const std::string EXTERNAL_MEDIA_PLAYER_AGENT = "Alexa Auto SDK";
 
 ExternalMediaAdapterEngineImpl::ExternalMediaAdapterEngineImpl( std::shared_ptr<aace::alexa::ExternalMediaAdapter> platformMediaAdapter, std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender, std::shared_ptr<FocusHandlerInterface> focusHandler ) :
-    aace::engine::alexa::ExternalMediaAdapterHandler( platformMediaAdapter->getSpeaker(), discoveredPlayerSender, focusHandler ),
+    aace::engine::alexa::ExternalMediaAdapterHandler( discoveredPlayerSender, focusHandler ),
     m_platformMediaAdapter( platformMediaAdapter ) {
 }
 
@@ -243,6 +245,35 @@ bool ExternalMediaAdapterEngineImpl::handleGetAdapterState( const std::string& l
     }
 }
 
+bool ExternalMediaAdapterEngineImpl::handleSetVolume( int8_t volume )
+{
+    try
+    {
+        ThrowIfNot( m_platformMediaAdapter->volumeChanged( (float) volume / MAX_SPEAKER_VOLUME ), "platformMediaAdapterVolumeChangedFailed" );
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
+}
+
+bool ExternalMediaAdapterEngineImpl::handleSetMute( bool mute )
+{
+    try
+    {
+        ThrowIfNot( m_platformMediaAdapter->mutedStateChanged( mute ?
+            aace::alexa::ExternalMediaAdapter::MutedState::MUTED :
+            aace::alexa::ExternalMediaAdapter::MutedState::UNMUTED ), "platformMediaAdapterMutedStateChangedFailed" );
+
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
+}
+
 //
 // aace::alexa::ExternalMediaAdapterEngineInterface
 //
@@ -267,7 +298,10 @@ void ExternalMediaAdapterEngineImpl::onRequestToken( const std::string& localPla
         auto event = createExternalMediaPlayerEvent( localPlayerId, "RequestToken" );
         auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>( event );
         
-        m_messageSender->sendMessage( request );
+        auto m_messageSender_lock = m_messageSender.lock();
+        ThrowIfNull( m_messageSender_lock, "invalidMessageSender" );
+        
+        m_messageSender_lock->sendMessage( request );
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"onRequestToken").d("reason", ex.what()).d("localPlayerId",localPlayerId));
@@ -283,7 +317,10 @@ void ExternalMediaAdapterEngineImpl::onLoginComplete( const std::string& localPl
         auto event = createExternalMediaPlayerEvent( localPlayerId, "Login" );
         auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>( event );
 
-        m_messageSender->sendMessage( request );
+        auto m_messageSender_lock = m_messageSender.lock();
+        ThrowIfNull( m_messageSender_lock, "invalidMessageSender" );
+        
+        m_messageSender_lock->sendMessage( request );
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"onLoginComplete").d("reason", ex.what()).d("localPlayerId",localPlayerId));
@@ -299,7 +336,10 @@ void ExternalMediaAdapterEngineImpl::onLogoutComplete( const std::string& localP
         auto event = createExternalMediaPlayerEvent( localPlayerId, "Logout" );
         auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>( event );
         
-        m_messageSender->sendMessage( request );
+        auto m_messageSender_lock = m_messageSender.lock();
+        ThrowIfNull( m_messageSender_lock, "invalidMessageSender" );
+        
+        m_messageSender_lock->sendMessage( request );
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"onLogoutComplete").d("reason", ex.what()).d("localPlayerId",localPlayerId));
@@ -317,7 +357,10 @@ void ExternalMediaAdapterEngineImpl::onPlayerEvent( const std::string& localPlay
         });
         auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>( event );
 
-        m_messageSender->sendMessage( request );
+        auto m_messageSender_lock = m_messageSender.lock();
+        ThrowIfNull( m_messageSender_lock, "invalidMessageSender" );
+        
+        m_messageSender_lock->sendMessage( request );
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"onPlayerEvent").d("reason", ex.what()).d("localPlayerId",localPlayerId));
@@ -338,7 +381,10 @@ void ExternalMediaAdapterEngineImpl::onPlayerError( const std::string& localPlay
         });
         auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>( event );
 
-        m_messageSender->sendMessage( request );
+        auto m_messageSender_lock = m_messageSender.lock();
+        ThrowIfNull( m_messageSender_lock, "invalidMessageSender" );
+        
+        m_messageSender_lock->sendMessage( request );
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"onPlayerError").d("reason", ex.what()).d("localPlayerId",localPlayerId));
@@ -360,15 +406,17 @@ void ExternalMediaAdapterEngineImpl::onRemoveDiscoveredPlayer( const std::string
 {
     try
     {
-        ThrowIfNot( removeDiscoveredPlayer( localPlayerId ), "removeDiscoveredPlayer" );
+        ThrowIfNot( removeDiscoveredPlayer( localPlayerId ), "removeDiscoveredPlayerFailed" );
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"onRemoveDiscoveredPlayer").d("reason", ex.what()).d("localPlayerId",localPlayerId));
     }
 }
 
-
+//
 // alexaClientSDK::avsCommon::utils::RequiresShutdown
+//
+
 void ExternalMediaAdapterEngineImpl::doShutdown()
 {
     if( m_platformMediaAdapter != nullptr ) {

@@ -35,6 +35,8 @@ public:
     virtual ~MetricsEngineService() = default;
 
 protected:
+    bool shutdown() override;
+
     bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) override;
 
 private:

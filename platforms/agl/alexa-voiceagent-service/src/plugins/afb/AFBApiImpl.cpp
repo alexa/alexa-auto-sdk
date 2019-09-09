@@ -29,8 +29,6 @@ extern "C" {
         result = false; \
         break;          \
     }
-
-#include "afb-definitions.h"
 }
 
 static std::string TAG = "agl::afb::AFBApiImpl";
@@ -45,11 +43,11 @@ using namespace agl::utilities::logging;
 namespace agl {
 namespace afb {
 
-std::unique_ptr<AFBApiImpl> AFBApiImpl::create(AFB_ApiT api) {
+std::unique_ptr<AFBApiImpl> AFBApiImpl::create(afb_api_t api) {
     return std::unique_ptr<AFBApiImpl>(new AFBApiImpl(api));
 }
 
-AFBApiImpl::AFBApiImpl(AFB_ApiT api) : mApi(api), mLogger(Logger::create(api)) {
+AFBApiImpl::AFBApiImpl(afb_api_t api) : mApi(api), mLogger(Logger::create(api)) {
 }
 
 AFBApiImpl::~AFBApiImpl() {
@@ -68,7 +66,7 @@ int AFBApiImpl::callSync(
     std::string& info) {
     char* errorStr = NULL;
     char* infoStr = NULL;
-    int rc = AFB_ApiSync(mApi, api.c_str(), verb.c_str(), request, result, &errorStr, &infoStr);
+    int rc = afb_api_call_sync(mApi, api.c_str(), verb.c_str(), request, result, &errorStr, &infoStr);
 
     if (errorStr) {
         error = errorStr;
@@ -79,8 +77,6 @@ int AFBApiImpl::callSync(
         info = infoStr;
         free(infoStr);
     }
-
-    return rc;
 }
 
 /// Shim to transfer C++ function to C callback using void*
@@ -93,7 +89,7 @@ static void asyncCallback(
     struct json_object* object,
     const char* error,
     const char* info,
-    AFB_ApiT api) {
+    afb_api_t api) {
     CallbackShim* callbackShim = (CallbackShim*)closure;
     auto callbackFn = callbackShim->callbackFn;
     delete callbackShim;
@@ -111,7 +107,7 @@ void AFBApiImpl::callAsync(
     CallbackShim* callbackShim = new CallbackShim();
     callbackShim->callbackFn = callbackFn;
 
-    AFB_ApiCall(mApi, api.c_str(), verb.c_str(), request, asyncCallback, callbackShim);
+    afb_api_call(mApi, api.c_str(), verb.c_str(), request, asyncCallback, callbackShim);
 }
 
 }  // namespace afb

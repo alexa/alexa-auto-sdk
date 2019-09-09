@@ -1,20 +1,16 @@
 package com.amazon.sampleapp.impl.ExternalMediaPlayer;
 
+import android.app.Activity;
 import android.content.Context;
-import android.media.AudioManager;
 import android.os.Handler;
 
-import android.support.annotation.Nullable;
-import android.util.Base64;
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.amazon.aace.alexa.ExternalMediaAdapter;
 import com.amazon.aace.alexa.PlaybackController;
-import com.amazon.aace.alexa.Speaker;
+import com.amazon.aace.audio.AudioOutput.MutedState;
 import com.amazon.maccandroid.MACCAndroidClient;
 import com.amazon.maccandroid.MACCAndroidClientCallback;
 import com.amazon.maccandroid.model.Directive.AdjustSeekDirective;
@@ -31,12 +27,15 @@ import com.amazon.maccandroid.model.state.ExternalMediaPlayerState;
 import com.amazon.maccandroid.model.state.MediaAppMetaData;
 import com.amazon.maccandroid.model.state.MediaAppPlaybackState;
 
+import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 import com.amazon.sampleapp.impl.PlaybackController.PlaybackControllerHandler;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import static com.amazon.maccandroid.model.APIConstants.Directives.PlayControl.PLAY_CONTROL_DISABLE_REPEAT;
 import static com.amazon.maccandroid.model.APIConstants.Directives.PlayControl.PLAY_CONTROL_DISABLE_SHUFFLE;
@@ -57,12 +56,28 @@ import static com.amazon.maccandroid.model.APIConstants.Directives.PlayControl.S
 
 public class MACCPlayer extends ExternalMediaAdapter {
     private static final String TAG = MACCPlayer.class.getSimpleName();
+    private final Activity mActivity;
+    public static final int LAST_SCAN_COOLOFF = 15;
     private final Context mContext;
+    private final LoggerHandler mLogger;
     private final PlaybackControllerHandler mPlaybackController;
     private final MACCAndroidClient mClient;
     public static final String SPOTIFY_PROVIDER_NAME = "Spotify";
 
-    private boolean mSessionStarted = false;
+    private long mLastScanTimeInMillis;
+
+    private Runnable mRunDiscoveryRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (mClient != null) {
+                mClient.initAndRunDiscovery();
+            }
+            mLastScanTimeInMillis = Calendar.getInstance().getTimeInMillis();
+        }
+    };
+
+    private float mVolume = 0.5f;
+    private MutedState mMutedState = MutedState.UNMUTED;
 
     private final MACCAndroidClientCallback mMACCAndroidClientCallback = new MACCAndroidClientCallback() {
         @Override
@@ -98,44 +113,35 @@ public class MACCPlayer extends ExternalMediaAdapter {
 
             Log.i(TAG, "onPlayerEvent | events: " + playerEvents);
 
+            MediaAppPlaybackState state = mClient.getState(playerId).getMediaAppPlaybackState();
+            MediaAppMetaData metaData = state.getMediaAppMetaData();
+
             for (PlayerEvents event : playerEvents) {
 
                 playerEvent(playerId, event.getName());
 
-
-                MediaAppPlaybackState state = mClient.getState(playerId).getMediaAppPlaybackState();
-                MediaAppMetaData metaData = state.getMediaAppMetaData();
-
-                //Log.i(TAG, "Supported Operations : " + state.getSupportedOperations());
-
                 switch( event ) {
                     case PlaybackStopped:
-                        mPlaybackController.hidePlayerInfoControls(); // reset control view
-                        updateControls(state);
-                        mPlaybackController.stop();
-                        mPlaybackController.setPlayerInfo( metaData.getTrackName(), metaData.getArtist(), SPOTIFY_PROVIDER_NAME );
+                    case PlaybackSessionEnded:
                         break;
                     case TrackChanged:
                     case PlaybackStarted:
-                        mPlaybackController.hidePlayerInfoControls(); // reset control view
-                        updateControls(state);
-                        mPlaybackController.start();
+                        setFocus(playerId);
                         mPlaybackController.setPlayerInfo( metaData.getTrackName(), metaData.getArtist(), SPOTIFY_PROVIDER_NAME );
                         break;
                     case PlaybackSessionStarted:
-                        break;
-                    case PlaybackSessionEnded:
-                        break;
-                    case PlayModeChanged:
-                        // if playmode changes via Spotify controls, update our controls
-                        // Log.i(TAG, "Repeat Mode : " + state.getRepeatMode());
-                        if ( mPlaybackController.getProvider().equals( SPOTIFY_PROVIDER_NAME) ) {
-                            updateControls(state);
+                        if( state.getPlaybackState() == PlayBackStateFields.State.PLAYING ) { // already playing at startup
+                            setFocus(playerId);
                             mPlaybackController.setPlayerInfo( metaData.getTrackName(), metaData.getArtist(), SPOTIFY_PROVIDER_NAME );
                         }
                         break;
+                    case PlayModeChanged:
+                        if ( mPlaybackController.getProvider().equals( SPOTIFY_PROVIDER_NAME) ) {
+                            mPlaybackController.hidePlayerInfoControls(); // reset control view
+                            updateControls(state);
+                        }
+                        break;
                 }
-
             }
         }
 
@@ -149,14 +155,24 @@ public class MACCPlayer extends ExternalMediaAdapter {
         public void onRemovedPlayer(String localPlayerId) {
             Log.i(TAG, "onRemovedPlayer: " + localPlayerId);
             removeDiscoveredPlayer(localPlayerId);
+            scheduleScan();
         }
 
     };
     private void updateControls( MediaAppPlaybackState state ){
         PlayBackStateFields.repeat repeat = state.getRepeatMode();
         // Set playback controller states on player event
+
         for( String operation : state.getSupportedOperations() ) {
+            Log.i(TAG, operation );
             switch( operation ) {
+                case "RESUME" :
+                    mPlaybackController.stop(); // If resume is currently supported, UI must be in stopped state
+                    break;
+                case "PAUSE" :
+                case "STOP" :
+                    mPlaybackController.start(); // If pause/stop is currently supported, UI must be in started state
+                    break;
                 case "ENABLE_REPEAT" :
                     //if not set to repeat once
                     if( repeat != PlayBackStateFields.repeat.ONE_REPEATED ) {
@@ -179,10 +195,11 @@ public class MACCPlayer extends ExternalMediaAdapter {
 
     private final Handler mHandler;
 
-    public MACCPlayer(Context context, PlaybackControllerHandler playbackControllerHandler) {
+    public MACCPlayer(Activity activity, LoggerHandler logger, PlaybackControllerHandler playbackControllerHandler) {
 
-        super(new MACCSpeaker());
-        mContext = context;
+        mActivity = activity;
+        mContext = activity.getApplicationContext();
+        mLogger = logger;
         mPlaybackController = playbackControllerHandler;
         mClient = new MACCAndroidClient(mContext);
         mClient.registerCallback(mMACCAndroidClientCallback);
@@ -197,7 +214,26 @@ public class MACCPlayer extends ExternalMediaAdapter {
                 mClient.initAndRunDiscovery();
             }
         }, 100);
+        mLastScanTimeInMillis = Calendar.getInstance().getTimeInMillis();
 
+    }
+
+    public void scheduleScan() {
+        long minutesSinceLastScan = TimeUnit.MILLISECONDS.toMinutes(Calendar
+                .getInstance().getTimeInMillis() - mLastScanTimeInMillis);
+        Log.i(TAG, "scheduleScan | rescheduling scan as last scan was " +
+                minutesSinceLastScan + " minutes ago");
+        mHandler.removeCallbacks(mRunDiscoveryRunnable);
+        if (minutesSinceLastScan > LAST_SCAN_COOLOFF) {
+            Log.i(TAG, "scheduleScan | running scan now as it has surpassed cooloff time");
+            mHandler.post(mRunDiscoveryRunnable);
+        } else {
+            long millisecondDelay = TimeUnit.MINUTES.toMillis(LAST_SCAN_COOLOFF -
+                    minutesSinceLastScan);
+            Log.i(TAG, "scheduleScan | running scan after " + millisecondDelay +
+                    " millisecond delay");
+            mHandler.postDelayed(mRunDiscoveryRunnable, millisecondDelay);
+        }
     }
 
     @Override
@@ -214,16 +250,13 @@ public class MACCPlayer extends ExternalMediaAdapter {
 
     @Override
     public boolean play(String localPlayerId, String playContextToken, long index, long offset, boolean preload, Navigation navigation) {
-        setFocus(localPlayerId);
         mClient.handleDirective(new PlayDirective(localPlayerId, playContextToken, index, offset, preload, navigation.toString()));
         return true;
     }
 
     @Override
     public boolean playControl(String localPlayerId, PlayControlType playControlType) {
-        setFocus(localPlayerId);
         mClient.handleDirective(new PlayControlDirective(localPlayerId, playControlType.toString()));
-
         Log.i(TAG, "PLAYCONTROL: " + playControlType.toString());
         // enforce correct playback controller GUI states
         switch( playControlType ) {
@@ -265,7 +298,7 @@ public class MACCPlayer extends ExternalMediaAdapter {
 
     @Override
     public boolean authorize(AuthorizedPlayerInfo[] authorizedPlayers) {
-        Log.i(TAG, "authorizedPlayers: " + authorizedPlayers);
+        Log.i(TAG, "authorized");
         List<AuthorizedPlayer> mAuthorizedPlayers = new ArrayList<>();
         for (AuthorizedPlayerInfo playerInfo : authorizedPlayers) {
             mAuthorizedPlayers.add(new AuthorizedPlayer(playerInfo.localPlayerId, playerInfo.authorized));
@@ -275,15 +308,15 @@ public class MACCPlayer extends ExternalMediaAdapter {
     }
 
     @Override
-    public ExternalMediaAdapter.ExternalMediaAdapterState getState(String localPlayerId) {
+    public boolean getState(String localPlayerId,ExternalMediaAdapter.ExternalMediaAdapterState stateToReturn) {
         ExternalMediaPlayerState state = mClient.getState(localPlayerId);
         if (state == null) {
             Log.i(TAG, "Something went wrong");
-            return null;
+            return false;
         }
         MediaAppMetaData metaData = state.getMediaAppPlaybackState().getMediaAppMetaData();
         //Log.i(TAG, "Provider?" + metaData.getMediaProvider() + "source?" + metaData.getPlaybackSource()); //both null
-        ExternalMediaAdapter.ExternalMediaAdapterState stateToReturn = new ExternalMediaAdapterState();
+        //ExternalMediaAdapter.ExternalMediaAdapterState stateToReturn = new ExternalMediaAdapterState();
         stateToReturn.playbackState = new PlaybackState();
         stateToReturn.playbackState.state = state.getMediaAppPlaybackState().getPlaybackState() == null ? PlayBackStateFields.State.IDLE.toString() : state.getMediaAppPlaybackState().getPlaybackState().toString();
         stateToReturn.playbackState.supportedOperations = getSupportedOperations(state.getMediaAppPlaybackState().getSupportedOperations());
@@ -315,7 +348,7 @@ public class MACCPlayer extends ExternalMediaAdapter {
         stateToReturn.sessionState.tokenRefreshInterval = 0;
         stateToReturn.sessionState.playerCookie = state.getMediaAppSessionState().getPlayerCookie();
         stateToReturn.sessionState.spiVersion = state.getMediaAppSessionState().getSpiVersion();
-        return stateToReturn;
+        return true;
     }
 
     private MediaType getMediaType(String mediaType) {
@@ -330,18 +363,18 @@ public class MACCPlayer extends ExternalMediaAdapter {
     }
 
     private Favorites getFavorites(PlayBackStateFields.favorite favourite) {
-        if (favourite == null) {
-            return null;
-        }
+        //Log.w(TAG,"Favorite="+favourite);
+        if (favourite == null) return Favorites.NOT_RATED;
+
         switch(favourite) {
-            case NOT_RATED:
-                return Favorites.NOT_RATED;
             case FAVORITED:
                 return Favorites.FAVORITED;
             case UNFAVORITED:
                 return Favorites.UNFAVORITED;
+            case NOT_RATED:
+            default:
+                return Favorites.NOT_RATED;
         }
-        return null;
     }
 
     private SupportedPlaybackOperation[] getSupportedOperations(Set<String> supportedOperations) {
@@ -407,67 +440,27 @@ public class MACCPlayer extends ExternalMediaAdapter {
         return suppArr;
     }
 
-    // Speaker
-
-    private static class MACCSpeaker extends Speaker {
-        private SeekBar mVolumeControl;
-        private TextView mMuteButton;
-        private byte mVolume = 50;
-        private boolean mIsMuted = false;
-        private String mName = "MACC Speaker";
-
-        MACCSpeaker() {
-            super();
-        }
-
-        @Override
-        public boolean setVolume( byte volume ) {
-            if(mVolume == volume)
-                return true;
-            Log.d( TAG, String.format( "(%s) Handling setVolume(%s)", mName, volume ) );
+    @Override
+    public boolean volumeChanged( float volume ) {
+        if( mVolume != volume ) {
+            mLogger.postInfo( TAG, String.format( "(%s) Handling volumeChanged(%s)", "MACC", volume ) );
             mVolume = volume;
-            if ( mIsMuted ) {
-                // set muted
+            if ( mMutedState == MutedState.MUTED ) {
+                // mPlayer.setVolume( 0 );
             } else {
-                float channelVolume = volume / 100f;
-                // set volume
+                // mPlayer.setVolume( volume );
             }
-            return true;
         }
+        return true;
+    }
 
-        @Override
-        public boolean adjustVolume( byte value ) {
-            return setVolume( ( byte ) ( mVolume + value ) );
+    @Override
+    public boolean mutedStateChanged( MutedState state ) {
+        if( state != mMutedState ) {
+            mLogger.postInfo( TAG, String.format( "Muted state changed (%s) to %s.", "MACC", state ) );
+            //mPlayer.setVolume( state == MutedState.MUTED ? 0 : mVolume );
+            mMutedState = state;
         }
-
-        @Override
-        public byte getVolume() {
-            if ( mIsMuted ) return 0;
-            else return mVolume;
-        }
-
-        @Override
-        public boolean setMute( boolean mute ) {
-            if ( mute && !mIsMuted ) {
-                Log.d( TAG, String.format( "Handling mute (%s)", mName ) );
-                //updateMuteButton( mute );
-            } else if ( !mute && mIsMuted ) {
-                Log.d( TAG, String.format( "Handling unmute (%s)", mName ) );
-                //updateMuteButton( mute );
-            }
-
-            mIsMuted = mute;
-            if ( mute ) {
-                //mute macc player
-            } else {
-                //unmute macc player
-            }
-            return true;
-        }
-
-        @Override
-        public boolean isMuted() {
-            return mIsMuted;
-        }
+        return true;
     }
 }

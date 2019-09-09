@@ -38,8 +38,7 @@ class LocalMediaSourceHandler : public aace::alexa::LocalMediaSource /* isa Plat
   protected:
     LocalMediaSourceHandler(std::weak_ptr<Activity> activity,
                             std::weak_ptr<logger::LoggerHandler> loggerHandler,
-                            Source source,
-                            std::shared_ptr<aace::alexa::Speaker> speaker);
+                            Source source);
 
   public:
     template <typename... Args> static auto create(Args &&... args) -> std::shared_ptr<LocalMediaSourceHandler> {
@@ -50,16 +49,33 @@ class LocalMediaSourceHandler : public aace::alexa::LocalMediaSource /* isa Plat
 
     // aace::alexa::LocalMediaSource interface
 
-    auto authorize(bool authorized) -> bool override;
-    auto play(const std::string &payload) -> bool override;
+    auto play(ContentSelector contentSelectorType, const std::string& payload) -> bool override;
     auto playControl(PlayControlType controlType) -> bool override;
     auto seek(std::chrono::milliseconds offset) -> bool override;
     auto adjustSeek(std::chrono::milliseconds deltaOffset) -> bool override;
     auto getState() -> LocalMediaSourceState override;
 
+    auto volumeChanged( float volume ) -> bool override;
+    auto mutedStateChanged( MutedState state ) -> bool override;
+
   private:
-    bool m_authorized{false};
     std::weak_ptr<View> m_console{};
+
+    std::string m_sourceMediaProvider = "UNDEFINED";
+    aace::alexa::LocalMediaSource::MediaType m_sourceMediaType = aace::alexa::LocalMediaSource::MediaType::OTHER;
+    aace::alexa::LocalMediaSource::Source m_source;
+
+    std::map<aace::alexa::LocalMediaSource::Source, std::string> m_localMediaSourceStateMap = {
+      { aace::alexa::LocalMediaSource::Source::BLUETOOTH, "IDLE" },
+      { aace::alexa::LocalMediaSource::Source::USB, "IDLE" },
+      { aace::alexa::LocalMediaSource::Source::FM_RADIO, "IDLE" },
+      { aace::alexa::LocalMediaSource::Source::AM_RADIO, "IDLE" },
+      { aace::alexa::LocalMediaSource::Source::SATELLITE_RADIO, "IDLE" },
+      { aace::alexa::LocalMediaSource::Source::LINE_IN, "IDLE" },
+      { aace::alexa::LocalMediaSource::Source::COMPACT_DISC, "IDLE" },
+      { aace::alexa::LocalMediaSource::Source::SIRIUS_XM, "IDLE" },
+      { aace::alexa::LocalMediaSource::Source::DAB, "IDLE" }
+    };
 
     auto log(logger::LoggerHandler::Level level, const std::string &message) -> void;
     auto setupUI() -> void;

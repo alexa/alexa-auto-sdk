@@ -19,7 +19,7 @@
 #include <memory>
 
 #include <AACE/Alexa/SpeechRecognizer.h>
-#include "DirectiveDispatcher.h"
+#include "ResponseDispatcher.h"
 #include "LoggerHandler.h"
 
 namespace aasb {
@@ -33,7 +33,7 @@ namespace alexa {
  * 2) Platform microphone input channel doesn't implement @c SpeechRecognizer interface.
  * 3) All Speech Recognizer calls such as @c startAudioInput, @c stopAudioInput etc. are
  *    converted into messages for the platform microphone input channel. These messages are
- *    delivered through @c DirectiveDispatcher instance.
+ *    delivered through @c ResponseDispatcher instance.
  * 4) When platform microphone input channel has anything to notify the engine they encode the
  *    information in a message and send it back to the @c SpeechRecognizerHandler.
  */
@@ -42,14 +42,12 @@ public:
     static std::shared_ptr<SpeechRecognizerHandler> create(
         bool wakeworkDetectionEnabled,
         std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
-        std::weak_ptr<aasb::bridge::DirectiveDispatcher> directiveDispatcher);
+        std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher);
 
     /// @name aace::alexa::SpeechRecognizer Functions
     /// @{
     bool wakewordDetected(const std::string& wakeword) override;
     void endOfSpeechDetected() override;
-    bool startAudioInput() override;
-    bool stopAudioInput() override;
     /// @}
 
 private:
@@ -61,8 +59,8 @@ private:
     // State to store if audio sample streaming to the file should continue or stop.
     std::atomic<bool> m_shouldStopStreamingFile;
 
-    // DirectiveDispatcher to send status info.
-    std::weak_ptr<aasb::bridge::DirectiveDispatcher> m_directiveDispatcher;
+    // ResponseDispatcher to send status info.
+    std::weak_ptr<aasb::bridge::ResponseDispatcher> m_responseDispatcher;
 };
 
 }  // namespace alexa

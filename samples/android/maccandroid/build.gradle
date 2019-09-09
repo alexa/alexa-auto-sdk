@@ -1,3 +1,0 @@
-configurations.maybeCreate("default")
-artifacts.add("default", file('maccandroid-debug.aar'))
-artifacts.add("default", file('maccandroid-release.aar'))

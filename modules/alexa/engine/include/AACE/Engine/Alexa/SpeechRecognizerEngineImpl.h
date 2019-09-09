@@ -30,12 +30,16 @@
 #include <AVSCommon/SDKInterfaces/FocusManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/KeyWordObserverInterface.h>
 #include <AVSCommon/SDKInterfaces/MessageSenderInterface.h>
+#include <AVSCommon/Utils/Threading/Executor.h>
 #include <ContextManager/ContextManager.h>
 #include <KWD/AbstractKeywordDetector.h>
 #include <SpeechEncoder/SpeechEncoder.h>
 
-#include "AACE/Alexa/SpeechRecognizer.h"
+#include <AACE/Alexa/SpeechRecognizer.h>
+#include <AACE/Engine/Audio/AudioManagerInterface.h>
+
 #include "WakewordEngineAdapter.h"
+#include "WakewordVerifier.h"
 
 namespace aace {
 namespace engine {
@@ -52,6 +56,7 @@ private:
     SpeechRecognizerEngineImpl( std::shared_ptr<aace::alexa::SpeechRecognizer> speechRecognizerPlatformInterface, const alexaClientSDK::avsCommon::utils::AudioFormat& audioFormat );
 
     bool initialize(
+        std::shared_ptr<aace::engine::audio::AudioManagerInterface> audioManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
@@ -61,12 +66,14 @@ private:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::UserInactivityMonitorInterface> userInactivityMonitor,
         std::shared_ptr<alexaClientSDK::speechencoder::SpeechEncoder> speechEncoder,
-        std::shared_ptr<aace::engine::alexa::WakewordEngineAdapter> wakewordEngineAdapter );
+        std::shared_ptr<aace::engine::alexa::WakewordEngineAdapter> wakewordEngineAdapter,
+        std::shared_ptr<aace::engine::alexa::WakewordVerifier> wakewordVerifier );
 
 public:
     static std::shared_ptr<SpeechRecognizerEngineImpl> create(
         std::shared_ptr<aace::alexa::SpeechRecognizer> speechRecognizerPlatformInterface,
         const alexaClientSDK::avsCommon::utils::AudioFormat& audioFormat,
+        std::shared_ptr<aace::engine::audio::AudioManagerInterface> audioManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
@@ -76,13 +83,12 @@ public:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::UserInactivityMonitorInterface> userInactivityMonitor,
         std::shared_ptr<alexaClientSDK::speechencoder::SpeechEncoder> speechEncoder = nullptr,
-        std::shared_ptr<aace::engine::alexa::WakewordEngineAdapter> wakewordEngineAdapter = nullptr );
+        std::shared_ptr<aace::engine::alexa::WakewordEngineAdapter> wakewordEngineAdapter = nullptr,
+        std::shared_ptr<aace::engine::alexa::WakewordVerifier> wakewordVerifier = nullptr );
 
     // SpeechRecognizerEngineInterface
     bool onStartCapture( Initiator initiator, uint64_t keywordBegin, uint64_t keywordEnd, const std::string& keyword ) override;
     bool onStopCapture() override;
-
-    ssize_t write( const int16_t* data, const size_t size ) override;
 
     // keyword detection
     bool isWakewordEnabled();
@@ -114,8 +120,13 @@ private:
     
     bool initializeAudioInputStream();
 
-    void setExpectingAudioState( bool state );
+    //void setExpectingAudioState( bool state );
     bool waitForExpectingAudioState( bool state, const std::chrono::seconds duration = std::chrono::seconds( 3 ) );
+
+    bool startAudioInput();
+    bool stopAudioInput();
+    bool isExpectingAudio();
+    ssize_t write( const int16_t* data, const size_t size );
 
 private:
     std::shared_ptr<aace::alexa::SpeechRecognizer> m_speechRecognizerPlatformInterface;
@@ -125,12 +136,18 @@ private:
     std::shared_ptr<alexaClientSDK::avsCommon::avs::AudioInputStream> m_audioInputStream;
     std::unique_ptr<alexaClientSDK::avsCommon::avs::AudioInputStream::Writer> m_audioInputWriter;
     
+    std::shared_ptr<aace::engine::audio::AudioInputChannelInterface> m_audioInputChannel;
+    aace::engine::audio::AudioInputChannelInterface::ChannelId m_currentChannelId = aace::engine::audio::AudioInputChannelInterface::INVALID_CHANNEL;
+
     unsigned int m_wordSize;
     
     std::shared_ptr<aace::engine::alexa::WakewordEngineAdapter> m_wakewordEngineAdapter;
-    bool m_expectingAudio = false;
+    //bool m_expectingAudio = false;
     bool m_wakewordEnabled = false;
-    
+
+    std::shared_ptr<aace::engine::alexa::WakewordVerifier> m_wakewordVerifier;
+    alexaClientSDK::avsCommon::utils::threading::Executor m_executor;
+
     // the aip state
     AudioInputProcessorObserverInterface::State m_state;
     

@@ -20,9 +20,9 @@
 #include <string>
 
 #include "AACE/Core/PlatformInterface.h"
+#include "AACE/Audio/AudioOutput.h"
 
 #include "AlexaEngineInterfaces.h"
-#include "Speaker.h"
 
 /** @file */
 
@@ -32,6 +32,7 @@ namespace alexa {
 class ExternalMediaAdapter : public aace::core::PlatformInterface {
 public:
     using DiscoveredPlayerInfo = ExternalMediaAdapterEngineInterface::DiscoveredPlayerInfo;
+    using MutedState = aace::audio::AudioOutput::MutedState;
 
     /**
      * Describes the playback control type
@@ -401,7 +402,7 @@ public:
     };
 
 protected:
-    ExternalMediaAdapter( std::shared_ptr<aace::alexa::Speaker> speaker );
+    ExternalMediaAdapter() = default;
 
 public:
     virtual ~ExternalMediaAdapter();
@@ -493,9 +494,15 @@ public:
     virtual bool adjustSeek( const std::string& localPlayerId, std::chrono::milliseconds deltaOffset ) = 0;
 
     /**
-     * Called after discovered media have been reported. Returns list of players AVS has authorized.
+     * Called after discovered media players have been reported. Returns a list of reported players and whether they
+     * have been authorized for use with Alexa.
+     * 
+     * @note It is not guaranteed that every player reported in a call to @c reportDiscoveredPlayers() will be 
+     * included in the next call to @c authorize(). If a player is excluded from a call to @c authorize() after it is
+     * included in the preceding @c reportDiscoveredPlayers(), this does not necessarily imply it was deauthorized by 
+     * Alexa. It is possible that a player may be included in more than one call to @c authorize().
      *
-     * @param [in] authorizedPlayers List of discovered players, which AVS has authorized
+     * @param [in] authorizedPlayers A list of discovered players with their status of authorization for use with Alexa
      * 
      * @return @c true if the platform implementation successfully handled the call, 
      * else @c false
@@ -514,10 +521,27 @@ public:
     virtual bool getState( const std::string& localPlayerId, ExternalMediaAdapterState& state ) = 0;
     
     /**
-     * Returns the @c Speaker instance associated with the ExternalMediaAdapter
+     * Notifies the platform implementation to set the volume of the output channel. The
+     * @c volume value should be scaled to fit the needs of the platform.
+     *
+     * @param [in] volume The volume to set on the output channel. @c volume
+     * is in the range [0,1].
+     * @return @c true if the platform implementation successfully handled the call, 
+     * else @c false
      */
-    std::shared_ptr<aace::alexa::Speaker> getSpeaker();
+    virtual bool volumeChanged( float volume ) = 0;
 
+    /**
+     * Notifies the platform implementation to apply a mute state change to
+     * the output channel
+     *
+     * @param [in] state The muted state to apply to the output channel. @c MutedState::MUTED when
+     * the output channel be muted, @c MutedState::UNMUTED when unmuted
+     * @return @c true if the platform implementation successfully handled the call, 
+     * else @c false
+     */
+    virtual bool mutedStateChanged( MutedState state ) = 0;
+    
     // ExternalMediaAdapterEngineInterface
 
     /**
@@ -578,6 +602,7 @@ public:
      * @param [in] localPlayerId The opaque token that uniquely identifies the local external player app
      */
     void setFocus( const std::string& localPlayerId );
+
     void removeDiscoveredPlayer( const std::string& localPlayerId );
 
     /**
@@ -589,8 +614,7 @@ public:
     void setEngineInterface( std::shared_ptr<aace::alexa::ExternalMediaAdapterEngineInterface> externalMediaAdapterEngineInterface );
 
 private:
-    std::shared_ptr<aace::alexa::ExternalMediaAdapterEngineInterface> m_externalMediaAdapterEngineInterface;
-    std::shared_ptr<aace::alexa::Speaker> m_speaker;
+    std::weak_ptr<aace::alexa::ExternalMediaAdapterEngineInterface> m_externalMediaAdapterEngineInterface;
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const ExternalMediaAdapter::PlayControlType& requestType) {
@@ -735,6 +759,21 @@ inline std::ostream& operator<<(std::ostream& stream, const ExternalMediaAdapter
             break;
         case ExternalMediaAdapter::MediaType::OTHER:
             stream << "OTHER";
+            break;
+    }
+    return stream;
+}
+
+inline std::ostream& operator<<(std::ostream& stream, const ExternalMediaAdapter::Navigation& navigation) {
+    switch (navigation) {
+        case ExternalMediaAdapter::Navigation::DEFAULT:
+            stream << "DEFAULT";
+            break;
+        case ExternalMediaAdapter::Navigation::NONE:
+            stream << "NONE";
+            break;
+        case ExternalMediaAdapter::Navigation::FOREGROUND:
+            stream << "FOREGROUND";
             break;
     }
     return stream;

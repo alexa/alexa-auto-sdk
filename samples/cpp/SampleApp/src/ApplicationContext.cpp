@@ -22,6 +22,7 @@
 #include <array>   // std::array
 #include <cstddef> // std::size_t
 #include <fstream> // std::ofstream
+#include <stdio.h> // std::stdio
 
 // Guidelines Support Library
 #define GSL_THROW_ON_CONTRACT_VIOLATION
@@ -60,9 +61,26 @@ void ApplicationContext::addConfigFilePath(const std::string &configFilePath) { 
 
 void ApplicationContext::addMenuFilePath(const std::string &menuFilePath) { m_menuFilePaths.push_back(menuFilePath); }
 
+bool ApplicationContext::checkDcmConfiguration(const std::vector<json>& configs) {
+    for(auto const& j: configs) {
+        try {
+            auto obj = j.at("aace.dcm");
+            if (obj.is_object()) {
+            return true;
+           }
+        }
+        catch (json::exception &e) {
+        }
+    }
+    return false;
+}
+
 void ApplicationContext::clearLevel() { m_logEnabled = false; }
 
-void ApplicationContext::clearRefreshToken() { return m_refreshToken.clear(); }
+void ApplicationContext::clearRefreshToken() {
+    std::remove((m_applicationDirPath + "/token").c_str());
+    return m_refreshToken.clear();
+}
 
 void ApplicationContext::clearUserConfigFilePath() { m_userConfigFilePath.clear(); }
 
@@ -70,7 +88,7 @@ std::string ApplicationContext::executeCommand(const char *command) {
     std::array<char, 4096> buffer;
     std::string result;
     std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(command, "r"), pclose);
-    if (!pipe) {
+    if (!pipe || !pipe.get()) {
         return "Error: popen() failed";
     }
     while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
@@ -162,6 +180,32 @@ bool ApplicationContext::hasRefreshToken() { return !m_refreshToken.empty(); }
 
 bool ApplicationContext::hasUserConfigFilePath() { return !m_userConfigFilePath.empty(); }
 
+bool ApplicationContext::isAlexaCommsSupported() {
+#ifdef ALEXACOMMS
+    return true;
+#else
+    return false;
+#endif // ALEXACOMMS
+}
+
+bool ApplicationContext::isAudioFileSupported() { return m_audioFileSupported; }
+
+bool ApplicationContext::isDcmSupported() {
+#ifdef DCM
+    return true;
+#else
+    return false;
+#endif // DCM
+}
+
+bool ApplicationContext::isLocalVoiceControlSupported() {
+#ifdef LOCALVOICECONTROL
+    return true;
+#else
+    return false;
+#endif // LOCALVOICECONTROL
+}
+
 bool ApplicationContext::isLogEnabled() { return m_logEnabled; }
 
 bool ApplicationContext::isSingleThreadedUI() { return m_singleThreadedUI; }
@@ -212,6 +256,8 @@ bool ApplicationContext::saveContent(const std::string &path, const std::string 
     return true;
 }
 
+void ApplicationContext::setAudioFileSupported(bool audioFileSupported) { m_audioFileSupported = audioFileSupported; }
+
 void ApplicationContext::setAudioInputDevice(const std::string &audioInputDevice) { m_audioInputDevice = audioInputDevice; }
 
 void ApplicationContext::setBrowserCommand(const std::string &browserCommand) { m_browserCommand = browserCommand; }
@@ -237,6 +283,39 @@ void ApplicationContext::setRefreshToken(const std::string &refreshToken) {
     // IMPORTANT: YOUR PRODUCT IS RESPONSIBLE FOR STORING THE REFRESH TOKEN SECURELY.
     // FOR SECURITY REASONS, AUTHENTICATION IS NOT PRESERVED IN THE C++ SAMPLE APP.
     m_refreshToken = refreshToken;
+}
+
+bool ApplicationContext::test(const std::string &value) {
+    std::string fn;
+    bool negate = false;
+    bool result = false;
+
+    if (value.find('!') == 0) {
+        fn = value.substr(1);
+        negate = true;
+    }
+    else {
+        fn = value;
+    }
+    // clang-format off
+    static std::map<std::string, std::function<bool()>> DispatchTable{
+        // has
+        {"RefreshToken", std::bind(&ApplicationContext::hasRefreshToken, this)},
+        {"UserConfigFilePath", std::bind(&ApplicationContext::hasUserConfigFilePath, this)},
+        // is
+        {"AlexaCommsSupported", std::bind(&ApplicationContext::isAlexaCommsSupported, this)},
+        {"AudioFileSupported", std::bind(&ApplicationContext::isAudioFileSupported, this)},
+        {"LocalVoiceControlSupported", std::bind(&ApplicationContext::isLocalVoiceControlSupported, this)},
+        {"LogEnabled", std::bind(&ApplicationContext::isLogEnabled, this)},
+        {"SingleThreadedUI", std::bind(&ApplicationContext::isSingleThreadedUI, this)},
+        {"TestAutomation", std::bind(&ApplicationContext::isTestAutomation, this)},
+        {"WakeWordSupported", std::bind(&ApplicationContext::isWakeWordSupported, this)}
+    };
+    // clang-format on
+    if (DispatchTable.count(fn) != 0) {
+        result = DispatchTable[fn]();
+    }
+    return negate ? !result : result;
 }
 
 } // namespace sampleApp

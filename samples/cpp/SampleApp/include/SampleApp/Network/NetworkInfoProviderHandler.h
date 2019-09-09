@@ -55,6 +55,12 @@ class NetworkInfoProviderHandler : public aace::network::NetworkInfoProvider /* 
 
     auto log(logger::LoggerHandler::Level level, const std::string &message) -> void;
     auto setupUI() -> void;
+
+    /// Current network status
+    aace::network::NetworkInfoProvider::NetworkStatus m_networkStatus;
+
+    /// Current WiFi signal strengh
+    int m_wifiSignalStrength;
 };
 
 } // namespace network

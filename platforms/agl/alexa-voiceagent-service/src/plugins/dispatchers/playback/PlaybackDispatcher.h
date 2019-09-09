@@ -19,7 +19,7 @@
 #include <memory>
 #include <string>
 
-#include <aasb/RequestHandler.h>
+#include <aasb/interfaces/IAASBController.h>
 
 #include "interfaces/afb/IAFBApi.h"
 #include "interfaces/capability/ICapabilityMessageDispatcher.h"
@@ -45,7 +45,7 @@ public:
      */
     static std::shared_ptr<PlaybackDispatcher> create(
         std::shared_ptr<agl::common::interfaces::ILogger> logger,
-        std::shared_ptr<aasb::bridge::RequestHandler> requestHandler,
+        std::shared_ptr<aasb::bridge::IAASBController> aasbController,
         std::shared_ptr<agl::common::interfaces::IAFBApi> api);
 
     /// @name ICapabilityMessageDispatcher Functions
@@ -74,14 +74,14 @@ private:
      */
     PlaybackDispatcher(
         std::shared_ptr<agl::common::interfaces::ILogger> logger,
-        std::shared_ptr<aasb::bridge::RequestHandler> requestHandler,
+        std::shared_ptr<aasb::bridge::IAASBController> m_aasbController,
         std::shared_ptr<agl::common::interfaces::IAFBApi> api);
 
     // Logger.
     std::shared_ptr<agl::common::interfaces::ILogger> m_logger;
 
     // AASB Request handler to dispatch events to AASB.
-    std::shared_ptr<aasb::bridge::RequestHandler> m_requestHandler;
+    std::shared_ptr<aasb::bridge::IAASBController> m_aasbController;
 
     // AFB API object for events pub/sub, and for calling other AGL services.
     std::shared_ptr<agl::common::interfaces::IAFBApi> m_api;

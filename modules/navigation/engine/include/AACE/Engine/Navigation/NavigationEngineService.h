@@ -34,14 +34,12 @@ public:
     virtual ~NavigationEngineService() = default;
 
 protected:
-    bool configure( const std::vector<std::shared_ptr<std::istream>>& configuration ) override;
-    bool start() override;
-    bool stop() override;
+    bool configure( std::shared_ptr<std::istream> configuration ) override;
+    
     bool shutdown() override;
     bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) override;
     
 private:
-
     // platform interface registration
     template <class T>
     bool registerPlatformInterfaceType( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) {
@@ -53,6 +51,9 @@ private:
 
     // engine implementation object references
     std::shared_ptr<aace::engine::navigation::NavigationEngineImpl> m_navigationEngineImpl;
+
+    // Capability meta data for provider name passed by platform config
+    std::string m_navigationProviderName;
 };
 
 } // aace::engine::navigation

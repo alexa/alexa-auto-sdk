@@ -1,30 +1,44 @@
-# Automotive Grade Linux Alexa Voice Agent Binding
+# Automotive Grade Linux Alexa Voice Agent
 
-## Overview
-AGL Alexa Voice Agent is an Alexa client software that gets plugged into the AGL speech framework to voice enable applications as described in the speech [architecture](https://confluence.automotivelinux.org/display/SPE/Speech+EG+Architecture). It is implemented as a standard AGL [binding](https://docs.automotivelinux.org/docs/en/master/apis_services/reference/af-main/1-afm-daemons.html) that exposes API for
-* Speech recognition start and cancel.
-* Subscription to events containing Alexa's dialog, authentication, and connection states.
-* Subscription to events containing Alexa's capability messages or directives.
-* User authentication and authorization using Amazon's [Login with Amazon (LWA) Code-Based Linking](https://developer.amazon.com/docs/login-with-amazon/minitoc-lwa-other-devices.html).
+The AGL Alexa Voice Agent is Alexa client software that is plugged into the AGL speech framework to voice-enable applications, as described in the speech [architecture](https://confluence.automotivelinux.org/display/SPE/Speech+EG+Architecture).
+
+**Table of Contents**
+
+* [Overview](#overview)
+* [Architecture](#architecture)
+* [Setup](#setup)
+* [Building the AGL Alexa Voice Agent](#building)
+* [Installing and Running the AGL Alexa Voice Agent](#installandrun)
+* [Authorization with AVS](#authorization)
+* [Release Notes](#releasenotes)
+
+## Overview <a id ="overview"></a>
+
+The AGL Alexa Voice Agent is implemented as a standard AGL [binding](https://docs.automotivelinux.org/docs/en/master/apis_services/reference/af-main/1-afm-daemons.html) that exposes APIs for:
+
+* Speech recognition start and cancel
+* Subscription to events containing Alexa's dialog, authentication, and connection states
+* Subscription to events containing Alexa's capability messages or directives
+* User authentication and authorization using Amazon's [Login with Amazon (LWA) Code-Based Linking](https://developer.amazon.com/docs/login-with-amazon/minitoc-lwa-other-devices.html)
 
 [Alexa Auto SDK](https://github.com/alexa/alexa-auto-sdk) is the underlying technology that powers the speech recognition capabilities of this binding.
 
-## Architecture
+>**License Information:** The [Google Test v1.8.0](https://github.com/google/googletest) dependencies are fetched and run by the build system when the AGL Alexa Voice Agent is compiled with the `ENABLE_AASB_UNIT_TESTS` option.
+
+
+## Architecture<a id = "architecture"></a>
 ![architecture](./assets/architecture.png)
+
 ### Binding Controller
-The [Binding controller](./src/plugins/AlexaVoiceAgentApi.cpp) is the entry point of the binding. It does initialization and dependency injection and also handles the requests for methods/verbs exposed by the binding.
+The [Binding controller](./src/plugins/AlexaVoiceagentApi.cpp) is the entry point of the binding. It does initialization and dependency injection and also handles the requests for methods/verbs exposed by the binding.
 
 ### Auto SDK Platform Handlers
-This component hosts the C++ platform API implementation handlers of Alexa Auto SDK. Audio related APIs like SpeechRecognizer, MediaPlayer and Speaker are implemented by our [reference audio implementation library](../../../samples/audio/README.md). For other platform APIs like Navigation, PhoneControl etc., the implementation converts the C++ methods into JSON response messages with payloads that it passes back to the Controller.
+The Auto SDK platform handlers host the C++ platform API implementation handlers of the Alexa Auto SDK. Audio related APIs such as SpeechRecognizer, MediaPlayer and Speaker are implemented by the [Alexa Auto GStreamer Extension](../../../extensions/experimental/gstreamer/README.md). For other platform APIs such as Navigation, PhoneControl etc., the implementation converts the C++ methods into JSON response messages with payloads that it passes back to the Controller.
 
 ### Reference Audio I/O Implementation
-This component is hosted in the ${AAC_SDK_HOME}/samples/audio folder. It is a GStreamer based audio reference implementation of the MediaPlayer and Speaker platform APIs. It also provides an interface for reading audio input from the microphone. Please refer to [its document](../../../samples/audio/README.md) for supported platforms and known issues.
+The Auto SDK uses a GStreamer extension, hosted in the `${AAC_SDK_HOME}/extensions/experimental` folder, as its reference I/O audio implementation. This extension is a GStreamer based audio reference implementation of the MediaPlayer and Speaker platform APIs. It also provides an interface for reading audio input from the microphone. Please refer to the [GStreamer Extension readme](../../../extensions/experimental/gstreamer/README.md) for supported platforms and known issues.
 
-## License Information
-During the build time, the following dependencies are fetched and run by the build system.
-1. [Google Test v1.8.0](https://github.com/google/googletest) when compiled with ENABLE_AASB_UNIT_TESTS option.
-
-## Setup
+## Setup<a id ="setup"></a>
 ### Register a Product
 After registering for an Amazon developer account, you'll need to create an Alexa device and security profile. Make note of the following parameters as you go through setup: Product ID, Client ID, and Client Secret.
 
@@ -41,60 +55,81 @@ After registering for an Amazon developer account, you'll need to create an Alex
 9. Agree to the license terms in the Developer Portal and click **Finished**.
 
 ### Alexa Auto SDK Build Dependencies
-Alexa Voice Agent depends on Auto SDK. See the [Alexa Auto SDK Builder](../../../builder/README.md) instructions to build the Alexa Auto SDK binaries for your AGL target. Currently, only the *ARM64* target is supported, and the binding is tested on the [R-CAR M3 board](https://www.renesas.com/us/en/solutions/automotive/soc/r-car-m3.html)
+The Alexa Voice Agent depends on Auto SDK. You must install the AGL SDK toolchain prior to building the Alexa Auto SDK. See the [Alexa Auto SDK Builder](../../../builder/README.md) instructions to build the Alexa Auto SDK binaries for your [AGL target](../../../builder/meta-aac-builder/conf/machine/aglarm64.conf). Currently, only the [ARM64](../../../builder/meta-aac-builder/conf/machine/aglarm64.conf) target is supported, and the binding is tested on the [R-CAR M3 board](https://www.renesas.com/us/en/solutions/automotive/soc/r-car-m3.html).
 
-For example, to build Alexa Auto SDK modules and needed dependencies for an *AGL ARM64* target, run the following commands:
+For example, if you have installed the following toolchain:
+
 ```
-$ git clone https://github.com/alexa/alexa-auto-sdk.git
-$ ${AAC_SDK_HOME}/builder/build.sh oe -t aglarm64 ${AAC_SDK_HOME}/samples/audio
+https://iot.bzh/download/public/2019/AGL_Images/m3ulcb/latest/sdk/poky-agl-glibc-x86_64-agl-demo-platform-crosssdk-aarch64-toolchain-7.99.1.sh
+```
+
+which is installed by default under `/opt/agl-sdk/7.99.1-aarch64`, then you would need to provide the `AGL_SDK` path by passing: `-DAGL_SDK=/opt/agl-sdk/7.99.1-aarch64`
+
+from the command line when you run the build command.
+
+Then to build the Alexa Auto SDK modules and needed dependencies for an `AGL ARM64` target, run the following commands:
+
+```
+$ git clone https://github.com/alexa/aac-sdk.git
+$ ${AAC_SDK_HOME}/builder/build.sh agl -t aglarm64
 $ pushd ${AAC_SDK_HOME}/builder/deploy/aglarm64/
-$ tar -xvf aac-image-minimal-aglarm64.tar.gz
+$ tar -xvf aac-sdk-build-aglarm64.tar.gz
 $ export AAC_INSTALL_ROOT=${AAC_SDK_HOME}/builder/deploy/aglarm64/opt/AAC
-
+$ popd
 ```
-**Note**: Always compile Auto SDK with [samples/audio](../../../samples/audio/README.md). It is a reference implementation of audio input and playback using GStreamer.
-
 ### Enabling Device Capabilities
-In order to use the certain Alexa Auto SDK functionality, your product needs to be whitelisted by Amazon. Copy the product's **Amazon ID** from the Developer Console and follow the whitelisting directions on the [Need Help?](../../../NEED_HELP.md) page.
+In order to use the certain Alexa Auto SDK functionality, you must whitelist your product with Amazon. Copy the product's Amazon ID from the Developer Console and follow the whitelisting directions on the [Need Help?](../../../NEED_HELP.md) page.
 
 ## Configuration
-Alexa Voice Agent binding supports configuration JSON that needs to be populated before compiling the software.
-Open `${AAC_SDK_HOME}/platforms/agl/alexa-voiceagent-service/src/plugins/data/config/AlexaAutoCoreConfig.json` and
+The Alexa Voice Agent binding supports a JSON configuration file that you must populate before compiling the software.
+Open `${AAC_SDK_HOME}/platforms/agl/alexa-voiceagent-service/src/plugins/data/config/AlexaAutoCoreConfig.json` and:
+
 1. Populate the **deviceInfo** section. This information will be used for authorizing the device with AVS during the LWA Code-Based Linking process.
 2. Update the **aace.vehicle** section with your vehicle information if necessary.
-3. Update the **aace.audio** section's **speechRecognizer** with Audio4a input role, **speechSynthesizer** and **audioPlayer** with Audio4a output roles if necessary. Otherwise use the default values in the config file. The **speechRecognizer** role *hw:ep812ch* maps to Microchip's mic array.
+3. Update the **aace.audio.input** section:
+  * **voice**: update to **Audio4a** input role. The hw:ep812ch role maps to Microchip's mic array.
+  * Otherwise use the default values in the config file.
+4. Update the **aace.audio.output** section:
+  * **tts**: update to Audio4a TTS role
+  * **music**: update to Audio4a Music role
+  * **notification**: update to Audio4a Notification role
+  * **alarm**: update to Audio4a Alarm role
+  * **earcon**: update to Audio4a Earcon role
+  * **communication**: update to Audio4a Communication role
+  * **ringtone**: update to Audio4a Ringtone role
+5. Update the aace.localvoicecontrol configuration if you are compiling the Auto SDK with the optional Local Voice Control (LVC) module
 
-## Build Instructions
-**Prerequisite**: Install the AGL SDK, preferably the latest stable release from [AGL artifacts](https://iot.bzh/download/public/2019/AGL_Images/). The AGL SDK contains [application framework libraries](https://docs.automotivelinux.org/docs/en/master/apis_services/reference/af-binder/reference-v3/func-api.html) that we depend on for making inter-binding calls and publishing AGL events.
-1. Go to the ${AAC_SDK_HOME}/platform/agl/alexa-voiceagent-service directory
-2. git submodule add https://gerrit.automotivelinux.org/gerrit/apps/app-afb-helpers-submodule afb-helpers
-3. git submodule add https://gerrit.automotivelinux.org/gerrit/apps/app-controller-submodule app-controller
-4. mkdir build
-5. pushd build
-6. source /opt/agl-sdk/\<sdk-version>/environment-setup-aarch64-agl-linux
-7. cmake .. -DAAC_HOME=${AAC_INSTALL_ROOT}
-8. make autobuild
-9. popd
-10. ./autobuild/agl/autobuild package
+## Building the AGL Alexa Voice Agent<a id="building"></a>
+>**Prerequisite**: Install the AGL SDK, preferably the latest stable release from [IOT.bzh AGL artifacts](https://iot.bzh/download/public/2019/AGL_Images/m3ulcb/latest/). The AGL SDK contains [application framework libraries](http://docs.automotivelinux.org/docs/en/master/apis_services/reference/af-binder/reference-v3/func-api.html) that are required to make inter-binding calls and publish AGL events.
 
-This should generate the **alexa-voiceagent-service.wgt** in the build folder successfully.
+Go to the `${AAC_SDK_HOME}/platform/agl/alexa-voiceagent-service` directory and enter the following commands to generate the **alexa-voiceagent-service-debug.wgt** in the build folder:
 
-## Install and Run
-1. Copy the **alexa-voiceagent-service.wgt** into the target device.
-2. In the shell of the target device, **afm-util install alexa-voiceagent-service.wgt** for installing.
+1. `mkdir build`
+2. `pushd build`
+3. `source /opt/agl-sdk/\<sdk-version>/environment-setup-aarch64-agl-linux`
+4. `cmake .. -DAAC_HOME=${AAC_INSTALL_ROOT} -DCMAKE_BUILD_TYPE=Debug`
+5. `make widget`
+
+## Installing and Running the AGL Alexa Voice Agent<a id = "installandrun"></a>
+1. Copy the **alexa-voiceagent-service-debug.wgt** into the target device.
+2. In the shell of the target device, run the following command:
+
+ `afm-util install alexa-voiceagent-service-debug.wgt`
 3. Reboot the target device.
 
-## Authorization with AVS
-To access the Alexa Voice Service (AVS) it is required to acquire [Login with Amazon (LWA)](https://developer.amazon.com/login-with-amazon) access tokens. The Alexa Voice Agent binding has an implentation of **Code-Based Linking (CBL)** that can be used to acquire such tokens and authorize.
+## Authorization with the Alexa Voice Service<a id = "authorization"></a>
+To access the Alexa Voice Service (AVS) you must acquire [Login with Amazon (LWA)](https://developer.amazon.com/login-with-amazon) access tokens. The Alexa Voice Agent binding has an implentation of **Code-Based Linking (CBL)** that you can use to acquire such tokens and authorize with AVS.
 
 **Code-Based Linking (CBL)**: The user is provided with a short alphanumeric code and a URL in which to enter the code on any web browser-enabled device. [Read more about CBL](https://developer.amazon.com/docs/alexa-voice-service/code-based-linking-other-platforms.html), if desired.
 
-1. On your desktop browser, load *${AAC_SDK_HOME}/platform/agl/alexa-voiceagent-service/htdocs/index.html*
-2. In the input text field, enter the socket address of the Alexa Voice Agent binding running on the target device. For example: **\<IP Address>:\<Port>**
-3. Click the "Subscribe to CBL Events" button, upon which you will see an event with a URL and code displayed in the event box of the page.
-4. Load the aforementioned URL, enter the code, and agree to authorize your product. This will move the Alexa Voice Agent binding to the CONNECTED and AUTHORIZED state, and it will be ready to accept user utterances.
+1. On your desktop browser, load `${AAC_SDK_HOME}/platform/agl/alexa-voiceagent-service/htdocs/index.html`
+2. In the input text field, enter the socket address of the Alexa Voice Agent binding running on the target device. For example: `\<IP Address>:\<Port>`
+3. Click the **Subscribe to CBL Events** button to display a URL and code in the event box of the page.
+4. Navigate to the URL, enter the code, and agree to authorize your product. This will move the Alexa Voice Agent binding to the CONNECTED and AUTHORIZED state, and it will be ready to accept user utterances.
 
-## Supported Features
+## v2.0.0 Release Notes<a id="releasenotes"></a>
+
+#### Supported Features
 
 * TTS Responses
 * Alexa cards
@@ -103,6 +138,9 @@ To access the Alexa Voice Service (AVS) it is required to acquire [Login with Am
 * Online Music Playback
 * Playback Controller
 
-## Known Issues
+#### Resolved Issues
+* Fixed an issue where the Alexa Voice Agent binding did not start on the latest AGL image.
+
+#### Known Issues
 
 * There is no way to log out after authorizing with AVS. Restart the Alexa Voice Agent to authorize again.

@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-#include "AACE/Alexa/SpeechRecognizer.h"
+#include <AACE/Alexa/SpeechRecognizer.h>
 
 namespace aace {
 namespace alexa {
@@ -32,29 +32,45 @@ bool SpeechRecognizer::tapToTalk() {
 }
 
 bool SpeechRecognizer::startCapture( Initiator initiator, uint64_t keywordBegin, uint64_t keywordEnd, const std::string& keyword ) {
-    return m_speechRecognizerEngineInterface != nullptr && m_speechRecognizerEngineInterface->onStartCapture( initiator, keywordBegin, keywordEnd, keyword );
+    if( auto m_speechRecognizerEngineInterface_lock = m_speechRecognizerEngineInterface.lock() ) {
+        return m_speechRecognizerEngineInterface_lock->onStartCapture( initiator, keywordBegin, keywordEnd, keyword );
+    }
+    else {
+        return false;
+    }
 }
 
 bool SpeechRecognizer::stopCapture() {
-    return m_speechRecognizerEngineInterface != nullptr && m_speechRecognizerEngineInterface->onStopCapture();
-}
-
-ssize_t SpeechRecognizer::write( const int16_t* data, const size_t size ) {
-    return m_speechRecognizerEngineInterface != nullptr ? m_speechRecognizerEngineInterface->write( data, size ) : 0;
+    if( auto m_speechRecognizerEngineInterface_lock = m_speechRecognizerEngineInterface.lock() ) {
+        return m_speechRecognizerEngineInterface_lock->onStopCapture();
+    }
+    else {
+        return false;
+    }
 }
 
 bool SpeechRecognizer::enableWakewordDetection() 
 {
     m_wakewordDetectionEnabled = true;
 
-    return m_speechRecognizerEngineInterface != nullptr && m_speechRecognizerEngineInterface->enableWakewordDetection();
+    if( auto m_speechRecognizerEngineInterface_lock = m_speechRecognizerEngineInterface.lock() ) {
+        return m_speechRecognizerEngineInterface_lock->enableWakewordDetection();
+    }
+    else {
+        return false;
+    }
 }
 
 bool SpeechRecognizer::disableWakewordDetection() 
 {
     m_wakewordDetectionEnabled = false;
-
-    return m_speechRecognizerEngineInterface != nullptr && m_speechRecognizerEngineInterface->disableWakewordDetection();
+    
+    if( auto m_speechRecognizerEngineInterface_lock = m_speechRecognizerEngineInterface.lock() ) {
+        return m_speechRecognizerEngineInterface_lock->disableWakewordDetection();
+    }
+    else {
+        return false;
+    }
 }
 
 bool SpeechRecognizer::isWakewordDetectionEnabled() {

@@ -15,8 +15,6 @@
 
 #include "SampleApp/Application.h"
 
-#include <AACE/Alexa/Speaker.h>
-
 // C++ Standard Library
 #ifdef __linux__
 #include <linux/limits.h> // PATH_MAX
@@ -26,6 +24,7 @@
 #include <cstdlib>   // EXIT_SUCCESS and EXIT_FAILURE macros, std::atexit
 // https://llvm.org/docs/CodingStandards.html#include-iostream-is-forbidden
 #include <iostream> // std::clog and std::cout
+#include <fstream>
 //
 #include <iomanip> // std::setw
 #include <regex>   // std::regex
@@ -53,6 +52,56 @@ using Level = logger::LoggerHandler::Level;
 
 Application::Application() = default;
 
+#ifdef MONITORAIRPLANEMODEEVENTS
+// Monitors airplane mode events and sends a network status changed event when the airplane mode changes
+void monitorAirplaneModeEvents(std::shared_ptr<Activity> activity, std::shared_ptr<logger::LoggerHandler> loggerHandler) {
+    // # Tested on Linux Ubuntu 16.04 LTS
+    // $ rfkill event
+    // 1567307554.400006: idx 1 type 1 op 0 soft 0 hard 0
+    // 1567307554.400183: idx 2 type 2 op 0 soft 0 hard 0
+    // 1567307558.915117: idx 1 type 1 op 2 soft 1 hard 0
+    // 1567307558.924296: idx 2 type 2 op 2 soft 1 hard 0
+    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen("/usr/sbin/rfkill event", "r"), pclose);
+    if (!pipe || !pipe.get()) {
+        loggerHandler->log(Level::ERROR, "monitorAirplaneModeEvents", "popen() failed");
+        if (auto console = activity->findViewById("id:console").lock()) {
+            console->printLine("popen() failed");
+        }
+        return;
+    }
+    auto currentNetworkStatus = network::NetworkInfoProviderHandler::NetworkStatus::UNKNOWN;
+    std::array<char, 1024> buffer{};
+    while (fgets(buffer.data(), buffer.size(), pipe.get()) != NULL) {
+        std::string value = buffer.data();
+        auto hard = (std::string::npos != value.find("hard 1"));
+        auto soft = (std::string::npos != value.find("soft 1"));
+        auto nextworkStatus = (soft || hard) ? network::NetworkInfoProviderHandler::NetworkStatus::DISCONNECTED
+                                             : network::NetworkInfoProviderHandler::NetworkStatus::CONNECTED;
+        // Send a network status changed event if the airplane mode changed
+        if (currentNetworkStatus != nextworkStatus) {
+            currentNetworkStatus = nextworkStatus;
+            std::stringstream stream;
+            stream << nextworkStatus;
+            value = stream.str();
+            loggerHandler->log(Level::VERBOSE, "monitorAirplaneModeEvents", value);
+            activity->notify(Event::onNetworkInfoProviderNetworkStatusChanged, value);
+        }
+    }
+}
+#endif // MONITORAIRPLANEMODEEVENTS
+
+// Parses config files so that handlers can check that required config is passed in
+void parseConfigurations(const std::vector<std::string>& configFilePaths, std::vector<json>& configs) {
+    for(auto const& path: configFilePaths) {
+        try {
+            std::ifstream ifs(path);
+            json j = json::parse(ifs);
+            configs.push_back(j);
+        } catch (std::exception &e) {
+        }
+    }
+}
+
 void Application::printMenu(std::shared_ptr<ApplicationContext> applicationContext,
                             std::shared_ptr<aace::core::Engine> engine,
                             std::shared_ptr<View> console,
@@ -67,7 +116,6 @@ void Application::printMenu(std::shared_ptr<ApplicationContext> applicationConte
     //   Quit
     //   Restart
     //   Select
-    //   SetEndpoint
     //   SetLocale
     //   SetLoggerLevel
     //   SetProperty
@@ -105,6 +153,12 @@ void Application::printMenu(std::shared_ptr<ApplicationContext> applicationConte
     if (menu.count("item")) {
         unsigned keyMax = 0;
         for (auto &item : menu.at("item")) {
+            if (item.count("test")) { // optional item.test
+                auto value = item.at("test").get<std::string>();
+                if (!applicationContext->test(value)) {
+                    continue;
+                }
+            }
             auto key = item.at("key").get<std::string>(); // required item.key
             auto keyLength = key.length();
             if (keyMax < keyLength) {
@@ -113,34 +167,19 @@ void Application::printMenu(std::shared_ptr<ApplicationContext> applicationConte
         }
         unsigned index = 0;
         for (auto &item : menu.at("item")) {
+            if (item.count("test")) { // optional item.test
+                auto value = item.at("test").get<std::string>();
+                if (!applicationContext->test(value)) {
+                    continue;
+                }
+            }
             auto action = item.at("do").get<std::string>(); // required item.do
             auto key = item.at("key").get<std::string>();   // required item.key
             auto name = item.at("name").get<std::string>(); // required item.name
             auto keyLength = key.length();
-            auto printable = true;
             auto underline = false;
-            if (action == "AudioFile") {
-                // nothing to do
-            } else if (action == "GoTo") {
-                auto menuId = std::string{};
-                auto value = item.at("value"); // required item.value
-                if (value.is_object()) {
-                    menuId = value.at("id").get<std::string>(); // required item.id
-                } else {
-                    menuId = value.get<std::string>();
-                }
-                if (menuId == "comms") {
-#ifndef ALEXACOMMS
-                    printable = false;
-#endif // ALEXACOMMS
-                }
-                //
-            } else if (action == "Select") {
+            if (action == "Select") {
                 underline = (menu.count("index") && menu.at("index").get<unsigned>() == index);
-            } else if (action == "SetEndpoint") {
-                auto endpoint = engine->getProperty("aace.alexa.endpoint");
-                underline = (item.count("value") && item.at("value").get<std::string>() == endpoint);
-
             } else if (action == "SetLocale") {
                 auto locale = engine->getProperty("aace.alexa.setting.locale");
                 underline = (item.count("value") && item.at("value").get<std::string>() == locale);
@@ -180,23 +219,14 @@ void Application::printMenu(std::shared_ptr<ApplicationContext> applicationConte
                 if (std::regex_match(value, sm, r) || ((sm.size() - 1) == 2)) {
                     underline = (engine->getProperty(sm[1]) == sm[2]);
                 }
-            } else if (!applicationContext->hasRefreshToken() && (action == "Logout")) {
-                printable = false;
-            } else if (applicationContext->hasRefreshToken() && ((action == "notify/onCBLStart") || (action == "notify/onCBLCancel"))) {
-                printable = false;
-            } else if (!applicationContext->isWakeWordSupported() &&
-                       ((action == "notify/onSpeechRecognizerEnableWakewordDetection") || (action == "notify/onSpeechRecognizerDisableWakewordDetection"))) {
-                printable = false;
             }
-            if (printable) {
-                if (underline) {
-                    stream << " [ " + key + " ]  " << std::string(keyMax - keyLength, ' ') << "\e[4m" << name << "\e[0m" << std::endl;
-                } else {
-                    stream << " [ " + key + " ]  " << std::string(keyMax - keyLength, ' ') << name << std::endl;
-                }
-                stream << std::endl;
-                index++;
+            if (underline) {
+                stream << " [ " + key + " ]  " << std::string(keyMax - keyLength, ' ') << "\e[4m" << name << "\e[0m" << std::endl;
+            } else {
+                stream << " [ " + key + " ]  " << std::string(keyMax - keyLength, ' ') << name << std::endl;
             }
+            stream << std::endl;
+            index++;
         }
     }
     stream << titleRuler << std::endl;
@@ -290,7 +320,10 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
                 auto audioFilePath = applicationContext->popAudioFilePath();
                 if (!audioFilePath.empty()) {
                     console->printLine("Process:", audioFilePath);
-                    return activity->notify(Event::onSpeechRecognizerStartStreamingAudioFile, audioFilePath);
+                    if (activity->notify(Event::onSpeechRecognizerStartStreamingAudioFile, audioFilePath)) {
+                        return activity->notify(Event::onSpeechRecognizerTapToTalk);
+                    }
+                    return false;
                 }
                 processed = true;
                 conditionVariable.notify_one();
@@ -302,6 +335,16 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     // Create the engine object
     auto engine = aace::core::Engine::create();
     Ensures(engine != nullptr);
+
+    // Logger (Important: Logger must be created before the other handlers)
+    auto loggerHandler = logger::LoggerHandler::create(activity);
+    Ensures(loggerHandler != nullptr);
+
+#ifdef LOCALVOICECONTROL
+    // Create car control handler
+    auto carControlHandler = carControl::CarControlHandler::create(activity, loggerHandler);
+    Ensures(carControlHandler != nullptr);
+#endif
 
     // Create configuration files for --config files path passed from the command line
     std::vector<std::shared_ptr<aace::core::config::EngineConfiguration>> configurationFiles;
@@ -320,6 +363,69 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
         configurationFiles.push_back(configurationFile);
     }
 
+    // Validate that configuration files are passed in
+    if (applicationContext->isAlexaCommsSupported() || applicationContext->isLocalVoiceControlSupported() || applicationContext->isDcmSupported()) {
+        std::vector<json> jsonConfigs;
+        bool configError = false;
+        parseConfigurations(configFilePaths, jsonConfigs);
+#ifdef ALEXACOMMS
+        // Config file must be specified
+        if (!communication::CommunicationHandler::checkConfiguration(jsonConfigs)) {
+            console->printRuler();
+            console->printLine("Alexa Communications is enabled but no configuration was found.");
+            console->printRuler();
+            configError = true; 
+        }
+#endif
+#ifdef LOCALVOICECONTROL
+        // Config file must be specified
+        if (!carControl::CarControlHandler::checkConfiguration(jsonConfigs, carControl::CarControlHandler::ConfigType::LVC)) {
+            console->printRuler();
+            console->printLine("Local Voice Control is enabled but no configuration was found.");
+            console->printRuler();
+            configError = true; 
+        }
+#endif
+#ifdef DCM
+        if(!applicationContext->checkDcmConfiguration(jsonConfigs)) {
+            console->printRuler();
+            console->printLine("DCM is enabled but no configuration was found.");
+            console->printRuler();
+            configError = true; 
+        }
+#endif
+
+        if (configError) {
+            if (!engine->shutdown()) {
+                console->printLine("Error: Engine could not be shutdown");
+            }
+             
+            return Status::Failure;
+        }
+
+#ifdef LOCALVOICECONTROL
+        // ------------------------------------------------------------------------
+        // In a production environment we recommend that the application builds
+        // the car control configuration programatically. However, the configuration
+        // can also be passed in to the application. This example builds a
+        // configuration programatically if one is not passed in to the application.
+        // ------------------------------------------------------------------------
+        if (!carControl::CarControlHandler::checkConfiguration(jsonConfigs, carControl::CarControlHandler::ConfigType::CAR)) {
+            console->printRuler();
+            console->printLine("Car control configuration was created");
+            console->printRuler();
+            auto carControlConfig = carControl::CarControlDataProvider::generateCarControlConfig();
+            configurationFiles.push_back(carControlConfig);
+        } else {
+            console->printRuler();
+            console->printLine("Car control configuration found");
+            console->printRuler();
+        }
+        // Initialize values for car control configuration controllers
+        carControl::CarControlDataProvider::initialize(configurationFiles);
+#endif
+    }
+
     // Configure the engine
     auto configured = engine->configure(configurationFiles);
     if (!configured) {
@@ -331,93 +437,39 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
         return Status::Failure;
     }
 
-    // Logger (Important: Logger must be created before the other handlers)
-    auto loggerHandler = logger::LoggerHandler::create(activity);
-    Ensures(loggerHandler != nullptr);
+    // Register logger handler
     Ensures(engine->registerPlatformInterface(loggerHandler));
 
-    // Audio I/O
-    auto audioManager = aace::audio::AudioManager::create();
-    Ensures(audioManager != nullptr);
-    auto alertsChannel = audioManager->openOutputChannel("Alerts");
-    Ensures(alertsChannel.mediaPlayer != nullptr && alertsChannel.speaker != nullptr);
-    auto audioPlayerChannel = audioManager->openOutputChannel("AudioPlayer");
-    Ensures(audioPlayerChannel.mediaPlayer != nullptr && audioPlayerChannel.speaker != nullptr);
-#ifdef ALEXACOMMS
-    auto commsRingtoneChannel = audioManager->openOutputChannel("CommunicationRingtone");
-    Ensures(commsRingtoneChannel.mediaPlayer != nullptr && commsRingtoneChannel.speaker != nullptr);
-    auto commsCallAudioChannel = audioManager->openOutputChannel("CommunicationCallAudio", "", "raw");
-    Ensures(commsCallAudioChannel.mediaPlayer != nullptr && commsCallAudioChannel.speaker != nullptr);
-#endif
-    auto localMediaSourceChannel = audioManager->openOutputChannel("LocalMediaSource");
-    Ensures(localMediaSourceChannel.mediaPlayer != nullptr && localMediaSourceChannel.speaker != nullptr);
-    auto notificationsChannel = audioManager->openOutputChannel("Notifications");
-    Ensures(notificationsChannel.mediaPlayer != nullptr && notificationsChannel.speaker != nullptr);
-    auto speechSynthesizerChannel = audioManager->openOutputChannel("SpeechSynthesizer");
-    Ensures(speechSynthesizerChannel.mediaPlayer != nullptr && speechSynthesizerChannel.speaker != nullptr);
-    auto inputChannel = audioManager->openInputChannel("SharedChannel", applicationContext->getAudioInputDevice());
-    auto audioInputManager = std::make_shared<AudioInputManager>(activity, loggerHandler, inputChannel.audioCapture);
+    // Default Audio (Important: Audio implementation must be created before the other handlers)
+    auto defaultAudioInputProvider = audio::AudioInputProviderHandler::create(activity, loggerHandler, false);
+    Ensures(defaultAudioInputProvider != nullptr);
+    // registering the default audio input provider can fail if another implementation
+    // has already been registered by the engine...
+    if(!engine->registerPlatformInterface(defaultAudioInputProvider)){
+        defaultAudioInputProvider.reset();
+        console->printLine("Default audio input provider will not be registered because audio support is available.");
+    }
+    else {
+        // defer setup until after successful registration
+        defaultAudioInputProvider->setupUI();
+        applicationContext->setAudioFileSupported(true);
+    }
 
-    // Special case for Audio I/O Speaker support
-    activity->registerObserver(Event::onAudioManagerSpeaker, [=](const std::string &value) {
-        loggerHandler->log(logger::LoggerHandler::Level::VERBOSE, "Application", "onAudioManagerSpeaker:" + value);
-        static std::regex value_regex("(.+)/(.+)/(.+)", std::regex::optimize);
-        std::smatch value_match{};
-        if (std::regex_match(value, value_match, value_regex)) {
-            if ((value_match.size() - 1) == 3) {
-                auto identity = std::string(value_match[1]);
-                auto paramName = std::string(value_match[2]);
-                auto paramValue = std::string(value_match[3]);
-                // clang-format off
-                static const std::map<std::string, std::shared_ptr<aace::alexa::Speaker>> SpeakerEnumerator{
-                    {"AlertsSpeaker", alertsChannel.speaker},
-                    {"AudioPlayerSpeaker", audioPlayerChannel.speaker},
-                    #ifdef ALEXACOMMS
-                    {"CallAudioSpeaker", commsCallAudioChannel.speaker},
-                    {"RingtoneSpeaker", commsRingtoneChannel.speaker},
-                    #endif
-                    {"LocalMediaSourceSpeaker", localMediaSourceChannel.speaker},
-                    {"NotificationsSpeaker", notificationsChannel.speaker},
-                    {"SpeechSynthesizerSpeaker", speechSynthesizerChannel.speaker}
-                };
-                // clang-format on
-                console->printLine(identity, paramName, paramValue);
-                std::map<std::string, std::shared_ptr<aace::alexa::Speaker>> speakers{};
-                if (identity == "Speaker") {
-                    for (auto &speaker : SpeakerEnumerator) {
-                        speakers[speaker.first] = speaker.second;
-                    }
-                } else if (SpeakerEnumerator.count(identity)) {
-                    speakers[identity] = SpeakerEnumerator.at(identity);
-                }
-                if (!speakers.empty()) {
-                    int min = applicationContext->getMinimumAVSVolume();
-                    int max = applicationContext->getMaximumAVSVolume();
-                    for (auto &speaker : speakers) {
-                        if (paramName == "mute") {
-                            speaker.second->localMuteSet(paramValue == "true" || paramValue == "1");
-                        } else if (paramName == "volume") {
-                            int value = std::stoi(paramValue);
-                            if ((paramValue[0] == '+') || (paramValue[0] == '-')) {
-                                value = speaker.second->getVolume() + value;
-                            }
-                            if (value > max || value < min) {
-                                value = std::min(std::max(value, min), max);
-                            }
-                            if (speaker.second->getVolume() != value) {
-                                speaker.second->localVolumeSet(value);
-                            }
-                        }
-                    }
-                    return true;
-                }
-            }
-        }
-        return false;
-    });
+    auto defaultAudioOutputProvider = audio::AudioOutputProviderHandler::create(activity, loggerHandler, false);
+    Ensures(defaultAudioOutputProvider != nullptr);
+    // registering the default audio output provider can fail if another implementation
+    // has already been registered by the engine...
+    if(!engine->registerPlatformInterface(defaultAudioOutputProvider)){
+        defaultAudioOutputProvider.reset();
+        console->printLine("Default audio output provider will not be registered because audio support is available.");
+    }
+    else {
+        // defer setup until after successful registration
+        defaultAudioOutputProvider->setupUI();
+    }
 
     // Alerts
-    auto alertsHandler = alexa::AlertsHandler::create(activity, loggerHandler, alertsChannel.mediaPlayer, alertsChannel.speaker);
+    auto alertsHandler = alexa::AlertsHandler::create(activity, loggerHandler);
     Ensures(alertsHandler != nullptr);
     Ensures(engine->registerPlatformInterface(alertsHandler));
 
@@ -427,7 +479,7 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     Ensures(engine->registerPlatformInterface(alexaClientHandler));
 
     // Audio Player
-    auto audioPlayerHandler = alexa::AudioPlayerHandler::create(activity, loggerHandler, audioPlayerChannel.mediaPlayer, audioPlayerChannel.speaker);
+    auto audioPlayerHandler = alexa::AudioPlayerHandler::create(activity, loggerHandler);
     Ensures(audioPlayerHandler != nullptr);
     Ensures(engine->registerPlatformInterface(audioPlayerHandler));
 
@@ -439,8 +491,7 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
 #ifdef ALEXACOMMS
     // Communications
     auto communicationHandler =
-        communication::CommunicationHandler::create(activity, loggerHandler, audioInputManager, commsRingtoneChannel.mediaPlayer, commsRingtoneChannel.speaker,
-                                                    commsCallAudioChannel.mediaPlayer, commsCallAudioChannel.speaker);
+        communication::CommunicationHandler::create(activity, loggerHandler);
     Ensures(communicationHandler != nullptr);
     if (!engine->registerPlatformInterface(communicationHandler)) {
         loggerHandler->log(Level::INFO, "Application:Engine", "failed to register communication handler");
@@ -457,11 +508,29 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     Ensures(equalizerControllerHandler != nullptr);
     Ensures(engine->registerPlatformInterface(equalizerControllerHandler));
 
-    // Local Media Source for COMPACT_DISC
-    auto localMediaSourceHandler =
-        alexa::LocalMediaSourceHandler::create(activity, loggerHandler, aace::alexa::LocalMediaSource::Source::COMPACT_DISC, localMediaSourceChannel.speaker);
-    Ensures(localMediaSourceHandler != nullptr);
-    Ensures(engine->registerPlatformInterface(localMediaSourceHandler));
+    std::vector<std::pair<aace::alexa::LocalMediaSource::Source, std::shared_ptr<alexa::LocalMediaSourceHandler>>> LocalMediaSources = {
+        { aace::alexa::LocalMediaSource::Source::BLUETOOTH, nullptr },
+        { aace::alexa::LocalMediaSource::Source::USB, nullptr },
+        { aace::alexa::LocalMediaSource::Source::FM_RADIO, nullptr },
+        { aace::alexa::LocalMediaSource::Source::AM_RADIO, nullptr },
+        { aace::alexa::LocalMediaSource::Source::SATELLITE_RADIO, nullptr },
+        { aace::alexa::LocalMediaSource::Source::LINE_IN, nullptr },
+        { aace::alexa::LocalMediaSource::Source::COMPACT_DISC, nullptr },
+        { aace::alexa::LocalMediaSource::Source::SIRIUS_XM, nullptr },
+        { aace::alexa::LocalMediaSource::Source::DAB, nullptr }
+    };
+
+    for(auto& source : LocalMediaSources) {
+        source.second =
+            alexa::LocalMediaSourceHandler::create(activity, loggerHandler, source.first);
+        Ensures(source.second != nullptr);
+        Ensures(engine->registerPlatformInterface(source.second));
+    }
+
+    // Global Preset Handler
+    auto globalPresetHandler = alexa::GlobalPresetHandler::create(activity, loggerHandler);
+    Ensures(globalPresetHandler != nullptr);
+    Ensures(engine->registerPlatformInterface(globalPresetHandler));
 
     // Location Provider
     auto locationProviderHandler = location::LocationProviderHandler::create(activity, loggerHandler);
@@ -479,7 +548,7 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     Ensures(engine->registerPlatformInterface(networkInfoProviderHandler));
 
     // Notifications
-    auto notificationsHandler = alexa::NotificationsHandler::create(activity, loggerHandler, notificationsChannel.mediaPlayer, notificationsChannel.speaker);
+    auto notificationsHandler = alexa::NotificationsHandler::create(activity, loggerHandler);
     Ensures(notificationsHandler != nullptr);
     Ensures(engine->registerPlatformInterface(notificationsHandler));
 
@@ -495,25 +564,12 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
 
     // Speech Recognizer
     auto speechRecognizerHandler =
-        alexa::SpeechRecognizerHandler::create(activity, loggerHandler, audioInputManager, applicationContext->isWakeWordSupported());
+        alexa::SpeechRecognizerHandler::create(activity, loggerHandler, applicationContext->isWakeWordSupported());
     Ensures(speechRecognizerHandler != nullptr);
     Ensures(engine->registerPlatformInterface(speechRecognizerHandler));
 
-    // Speech Synthesizer (with optional support for test automation)
-    std::shared_ptr<DefaultMediaPlayer> defaultMediaPlayer{};
-    std::shared_ptr<aace::alexa::MediaPlayer> mediaPlayer = speechSynthesizerChannel.mediaPlayer;
-    std::shared_ptr<aace::alexa::Speaker> speaker = speechSynthesizerChannel.speaker;
-    if (applicationContext->isTestAutomation()) {
-        auto command = applicationContext->getMediaPlayerCommand();
-        if (!command.empty()) {
-            // Special case for test automation
-            defaultMediaPlayer = DefaultMediaPlayer::create(activity, loggerHandler);
-            Ensures(defaultMediaPlayer != nullptr);
-            mediaPlayer = defaultMediaPlayer;
-            speaker = defaultMediaPlayer;
-        }
-    }
-    auto speechSynthesizerHandler = alexa::SpeechSynthesizerHandler::create(activity, loggerHandler, mediaPlayer, speaker);
+    // Speech Synthesizer
+    auto speechSynthesizerHandler = alexa::SpeechSynthesizerHandler::create(activity, loggerHandler);
     Ensures(speechSynthesizerHandler != nullptr);
     Ensures(engine->registerPlatformInterface(speechSynthesizerHandler));
 
@@ -522,26 +578,32 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     Ensures(templateRuntimeHandler != nullptr);
     Ensures(engine->registerPlatformInterface(templateRuntimeHandler));
 
-#ifdef LOCALVOICECONTROL
-    // Climate Control
-    auto climateControlHandler = carControl::ClimateControlHandler::create(activity, loggerHandler);
-    Ensures(climateControlHandler != nullptr);
-    if (!engine->registerPlatformInterface(climateControlHandler)) {
-        loggerHandler->log(Level::INFO, "Application:Engine", "failed to register climate control handler");
-        console->printLine("Error: could not register climate control handler (check config)");
+    auto addressBookHandler = addressBook::AddressBookHandler::create(activity, loggerHandler);
+    Ensures(addressBookHandler != nullptr);
+    if (!engine->registerPlatformInterface(addressBookHandler)) {
+        loggerHandler->log(Level::INFO, "Application:Engine", "failed to register address book handler");
+        console->printLine("Error: could not register address book handler (check config)");
         if (!engine->shutdown()) {
             console->printLine("Error: could not be shutdown");
         }
         return Status::Failure;
     }
-    Ensures(climateControlHandler->addClimateControlSwitch());
-    Ensures(climateControlHandler->addAirConditioningSwitch());
-    Ensures(climateControlHandler->addAirConditioningModeSelector(
-        {aace::carControl::ClimateControlInterface::AirConditioningMode::MANUAL, aace::carControl::ClimateControlInterface::AirConditioningMode::AUTO}));
-    Ensures(climateControlHandler->addFanSwitch(aace::carControl::ClimateControlInterface::FanZone::ALL));
-    Ensures(climateControlHandler->addFanSpeedControl(aace::carControl::ClimateControlInterface::FanZone::ALL, 0, 100, 1));
-    Ensures(climateControlHandler->addTemperatureControl(aace::carControl::ClimateControlInterface::TemperatureZone::ALL, 60, 80, 1,
-                                                         aace::carControl::ClimateControlInterface::TemperatureUnit::FAHRENHEIT));
+
+    // Alexa Speaker
+    auto alexaSpeakerHandler = alexa::AlexaSpeakerHandler::create(activity, loggerHandler);
+    Ensures(alexaSpeakerHandler != nullptr);
+    Ensures(engine->registerPlatformInterface(alexaSpeakerHandler));
+
+#ifdef LOCALVOICECONTROL
+    // Car Control Handler
+    if (!engine->registerPlatformInterface(carControlHandler)) {
+        loggerHandler->log(Level::INFO, "Application:Engine", "failed to register car control handler");
+        console->printLine("Error: could not register car control handler (check config)");
+        if (!engine->shutdown()) {
+            console->printLine("Error: could not be shutdown");
+        }
+        return Status::Failure;
+    }
 #endif // LOCALVOICECONTROL
 
     // Start the engine
@@ -558,6 +620,18 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
         }
         return Status::Failure;
     }
+
+#ifdef MONITORAIRPLANEMODEEVENTS
+    // Start a thread to monitor airplane mode events
+    std::thread monitorAirplaneModeEventsThread(monitorAirplaneModeEvents, activity, loggerHandler);
+    monitorAirplaneModeEventsThread.detach();
+#endif // MONITORAIRPLANEMODEEVENTS
+
+#ifdef ALEXACOMMS
+    // Workaround: Enable Phone Connection since it is needed by Alexa Comms. This limitation will go away in the future. Refer to
+    // Alexa Comms README for more information.
+    phoneCallControllerHandler->connectionStateChanged(phoneControl::PhoneCallControllerHandler::ConnectionState::CONNECTED);
+#endif // ALEXACOMMS
 
     // Setup the interactive text based menu system
     setupMenu(applicationContext, engine, console);
@@ -590,6 +664,9 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
         status = runMenu(applicationContext, engine, activity, console, id);
     }
 
+    // Stop notifications
+    activity->clearObservers();
+
     // Stop the engine
     if (engine->stop()) {
         loggerHandler->log(Level::INFO, "Application:Engine", "stopped successfully");
@@ -607,76 +684,9 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     }
 
     // Releases the ownership of the managed objects
-    console.reset();
-    activity.reset();
     for (auto &configurationFile : configurationFiles) {
         configurationFile.reset();
     }
-    engine.reset();
-
-    // Logger
-    loggerHandler.reset();
-
-    // Audio I/O
-    audioManager.reset();
-
-    // Alerts
-    alertsHandler.reset();
-
-    // Alexa Client
-    alexaClientHandler.reset();
-
-    // Audio Player
-    audioPlayerHandler.reset();
-
-    // CBL
-    cblHandler.reset();
-
-#ifdef ALEXACOMMS
-    // Communications
-    communicationHandler.reset();
-#endif
-
-    // Equalizer Controller
-    equalizerControllerHandler.reset();
-
-    // Local Media Source
-    localMediaSourceHandler.reset();
-
-    // Location Provider
-    locationProviderHandler.reset();
-
-    // Navigation
-    navigationHandler.reset();
-
-    // Network Info Provider
-    networkInfoProviderHandler.reset();
-
-    // Notifications
-    notificationsHandler.reset();
-
-    // Phone Call Controller
-    phoneCallControllerHandler.reset();
-
-    // Playback Controller
-    playbackControllerHandler.reset();
-
-    // Speech Recognizer
-    speechRecognizerHandler.reset();
-
-    // Speech Synthesizer
-    speechSynthesizerHandler.reset();
-    defaultMediaPlayer.reset();
-    mediaPlayer.reset();
-    speaker.reset();
-
-    // Template Runtime
-    templateRuntimeHandler.reset();
-
-#ifdef LOCALVOICECONTROL
-    // Climate Control
-    climateControlHandler.reset();
-#endif // LOCALVOICECONTROL
 
     // Print and return the application status
     console->printLine(status);
@@ -767,6 +777,12 @@ Status Application::runMenu(std::shared_ptr<ApplicationContext> applicationConte
             unsigned index = 0;
             // break range-based for loop
             for (auto &item : menuPtr->at("item")) {
+                if (item.count("test")) { // optional item.test
+                    auto value = item.at("test").get<std::string>();
+                    if (!applicationContext->test(value)) {
+                        continue;
+                    }
+                }
                 auto key = item.at("key").get<std::string>(); // required item.key
                 if (key == "esc" || key == "ESC") {
                     k = ESC;
@@ -786,6 +802,9 @@ Status Application::runMenu(std::shared_ptr<ApplicationContext> applicationConte
                             if (item.count("value")) { // optional item.value
                                 value = item.at("value").get<std::string>();
                             }
+                            if(event == Event::onAddAddressBookPhone || event == Event::onAddAddressBookAuto || event == Event::onLoadNavigationState ) {
+                                value = menuDirPath + '/' + value;
+                            }
                             activity->notify(event, value);
                         } else {
                             console->printLine("Unknown eventId:", eventId);
@@ -799,7 +818,9 @@ Status Application::runMenu(std::shared_ptr<ApplicationContext> applicationConte
                         auto value = item.at("value").get<std::string>();
                         console->printLine(name);
                         auto audioFilePath = menuDirPath + '/' + value;
-                        activity->notify(Event::onSpeechRecognizerStartStreamingAudioFile, audioFilePath);
+                        if (activity->notify(Event::onSpeechRecognizerStartStreamingAudioFile, audioFilePath)) {
+                            activity->notify(Event::onSpeechRecognizerTapToTalk);
+                        }
                         break;
                     } else if (action == "GoBack") {
                         c = ESC; // go back
@@ -857,12 +878,6 @@ Status Application::runMenu(std::shared_ptr<ApplicationContext> applicationConte
                         break;
                     } else if (action == "Select") {
                         menuPtr->at("index") = index;
-                        c = ESC; // go back
-                        break;
-                    } else if (action == "SetEndpoint") {
-                        auto value = item.at("value").get<std::string>(); // required item.value
-                        engine->setProperty("aace.alexa.endpoint", value);
-                        console->printLine("aace.alexa.endpoint =", value);
                         c = ESC; // go back
                         break;
                     } else if (action == "SetLocale") {

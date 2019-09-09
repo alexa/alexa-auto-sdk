@@ -1,0 +1,33 @@
+{
+  "state": "NAVIGATING",
+  "waypoints": [
+    {
+      "type": "SOURCE",
+      "estimatedTimeOfArrival": {
+        "predicted": "2019-07-02T11:39:57-08:00"
+      },
+      "address": "2795 Augustine drive, santa clara, CA 95054",
+      "coordinate": [37.380946, -121.9794846]
+    },
+    {
+      "type": "DESTINATION",
+      "estimatedTimeOfArrival": {
+        "ideal": "2019-05-30T17:00:00-08:00",
+        "predicted": "2019-07-02T12:10:00-08:00"
+      },
+      "address": "750 Castro St, Mountain View, CA 94041",
+      "coordinate": [37.380946, -121.9794846],
+      "pointOfInterest": {
+        "id": "POI Lookup Id",
+        "name": "Starbucks",
+        "phoneNumber": "+12064968523"
+      }
+    }
+  ],
+  "shapes": [
+    [
+      "37.380946",
+      "-121.9794846"
+    ]
+  ]
+}

@@ -19,7 +19,7 @@
 #include <mutex>
 
 #include <AACE/CBL/CBL.h>
-#include "DirectiveDispatcher.h"
+#include "ResponseDispatcher.h"
 #include "LoggerHandler.h"
 
 namespace aasb {
@@ -29,7 +29,8 @@ class CBLHandler : public aace::cbl::CBL {
 public:
     static std::shared_ptr<CBLHandler> create(
         std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
-        std::weak_ptr<aasb::bridge::DirectiveDispatcher> directiveDispatcher);
+        std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher,
+        std::string refresh_token_file);
 
     /// @name aace::cbl::CBL Functions
     /// @{
@@ -37,12 +38,15 @@ public:
     void clearRefreshToken() override;
     void setRefreshToken(const std::string& refreshToken) override;
     std::string getRefreshToken() override;
+    void setUserProfile(const std::string& name, const std::string& email) override;
     /// @}
 
     void onReceivedEvent(const std::string& action, const std::string& payload);
 
 private:
-    CBLHandler(std::weak_ptr<aasb::bridge::DirectiveDispatcher> directiveDispatcher);
+    CBLHandler(std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
+               std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher,
+               std::string refresh_token_file);
 
     std::string convertCBLStateToString(CBLState state);
     std::string convertCBLStateChangedReasonToString(CBLStateChangedReason reason);
@@ -50,6 +54,7 @@ private:
     void setRefreshTokenInternal(const std::string& refreshToken);
     std::string getRefreshTokenInternal();
     void clearRefreshTokenInternal();
+    void loadRefreshTokenFromFile();
 
     // Mutex that protects updates to in memory refresh token
     std::mutex m_mutex;
@@ -57,11 +62,14 @@ private:
     // In memory refresh token
     std::string m_RefreshToken;
 
+    // Filename in which we store refresh token
+    std::string m_refresh_token_file;
+
     // aasb::core::logger::LoggerHandler
     std::shared_ptr<aasb::core::logger::LoggerHandler> m_logger;
 
     // To send directive to service
-    std::weak_ptr<aasb::bridge::DirectiveDispatcher> m_directiveDispatcher;
+    std::weak_ptr<aasb::bridge::ResponseDispatcher> m_responseDispatcher;
 };
 
 }  // namespace cbl

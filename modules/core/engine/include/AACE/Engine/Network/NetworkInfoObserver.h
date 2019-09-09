@@ -26,8 +26,50 @@ class NetworkInfoObserver {
 public:
     using NetworkStatus = aace::network::NetworkInfoProviderEngineInterface::NetworkStatus;
 
+    /**
+     * Describes the status of network interface change
+     */
+    enum class NetworkInterfaceChangeStatus {
+
+        /**
+         * The network interface change has begun.
+         */
+        BEGIN,
+        /**
+         * Change the network to new provided network interface.
+         */
+        CHANGE,
+        /**
+         * The network interface change is completed.
+         */
+        COMPLETED
+    };
+
+    /**
+     * Notifies the observer for a change in network status.
+     */
     virtual void onNetworkInfoChanged( NetworkStatus status, int wifiSignalStrength ) = 0;
+
+    /**
+     * Notifies the observer about status of network inteface change.
+     */
+    virtual void onNetworkInterfaceChangeStatusChanged( const std::string& networkInterface, NetworkInterfaceChangeStatus status ) = 0;
 };
+
+inline std::ostream& operator<<(std::ostream& stream, const NetworkInfoObserver::NetworkInterfaceChangeStatus& status) {
+    switch (status) {
+        case NetworkInfoObserver::NetworkInterfaceChangeStatus::BEGIN:
+            stream << "BEGIN";
+            break;
+        case NetworkInfoObserver::NetworkInterfaceChangeStatus::CHANGE:
+            stream << "CHANGE";
+            break;
+        case NetworkInfoObserver::NetworkInterfaceChangeStatus::COMPLETED:
+            stream << "COMPLETED";
+            break;
+    }
+    return stream;
+}
 
 } // aace::engine::network
 } // aace::engine

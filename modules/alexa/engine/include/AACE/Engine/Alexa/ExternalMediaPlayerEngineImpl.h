@@ -51,6 +51,7 @@
 #include "AACE/Alexa/AlexaEngineInterfaces.h"
 #include "AACE/Alexa/ExternalMediaAdapter.h"
 #include "AACE/Alexa/LocalMediaSource.h"
+#include "AACE/Alexa/GlobalPreset.h"
 
 #include <rapidjson/document.h>
 
@@ -67,7 +68,11 @@ class ExternalMediaPlayerEngineImpl :
     public std::enable_shared_from_this<ExternalMediaPlayerEngineImpl> {
     
 private:
+    using DiscoveredPlayerMap = std::unordered_map<std::string,aace::alexa::ExternalMediaAdapter::DiscoveredPlayerInfo>;
+
     ExternalMediaPlayerEngineImpl( const std::string& agent );
+
+    // functions without the "Locked" suffix must not be called when the calling thread already holds @c m_playersMutex
 
     bool initialize(
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
@@ -78,12 +83,15 @@ private:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter );
-    
+
     std::shared_ptr<ExternalMediaAdapterHandler> getAdapter( const std::string& playerId );
-    std::string createReportDiscoveredPlayersEvent();
-    std::string createAuthorizationCompleteEvent();
-    void updatePendingDiscoveredPlayers();
-    std::string getLocalPlayerId( aace::alexa::LocalMediaSource::Source source );
+    std::string getLocalPlayerIdForSource( aace::alexa::LocalMediaSource::Source source );
+
+    // functions with the "Locked" suffix must only be called if the calling thread holds @c m_playersMutex
+
+    void sendDiscoveredPlayersIfReadyLocked( const DiscoveredPlayerMap& discoveredPlayers );
+    std::string createReportDiscoveredPlayersEventLocked( const DiscoveredPlayerMap& discoveredPlayers );
+    std::string createAuthorizationCompleteEventLocked();
 
 public:
     static std::shared_ptr<ExternalMediaPlayerEngineImpl> create(
@@ -99,6 +107,7 @@ public:
 
     bool registerPlatformMediaAdapter( std::shared_ptr<aace::alexa::ExternalMediaAdapter> platformMediaAdapter );
     bool registerPlatformMediaAdapter( std::shared_ptr<aace::alexa::LocalMediaSource> platformMediaAdapter );
+    bool registerPlatformGlobalPresetHandler( std::shared_ptr<aace::alexa::GlobalPreset> platformGlobalPreset );
     
     // alexaClientSDK::avsCommon::sdkInterfaces::ExternalMediaAdapterHandlerInterface
     void authorizeDiscoveredPlayers( const std::string& payload ) override;
@@ -126,17 +135,67 @@ protected:
 
 private:
     std::string m_agent;
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> m_messageSender;
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> m_speakerManager;
-    std::shared_ptr<alexaClientSDK::capabilityAgents::externalMediaPlayer::ExternalMediaPlayer> m_externalMediaPlayerCapabilityAgent;
-    std::vector<std::shared_ptr<ExternalMediaAdapterHandler>> m_externalMediaAdapterList;
-    std::unordered_map<std::string,std::shared_ptr<ExternalMediaAdapterHandler>> m_externalMediaAdapterMap;
-    std::set<aace::alexa::LocalMediaSource::Source> m_registeredLocalMediaSourceAdapters;
-    std::unordered_map<std::string,aace::alexa::ExternalMediaAdapter::DiscoveredPlayerInfo> m_pendingDiscoveredPlayerMap;
-    std::unordered_map<std::string,PlayerInfo> m_authorizationStateMap;
-    Status m_connectionStatus = Status::DISCONNECTED;
     
-    std::mutex m_discoveredPlayersMutex;
+    std::weak_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> m_messageSender;
+    std::weak_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> m_speakerManager;
+    
+    std::shared_ptr<alexaClientSDK::capabilityAgents::externalMediaPlayer::ExternalMediaPlayer> m_externalMediaPlayerCapabilityAgent;
+    /**
+     * A list of every registered @c ExternalMediaAdapterHandler.
+     */
+    std::vector<std::shared_ptr<ExternalMediaAdapterHandler>> m_externalMediaAdapterList;
+    /**
+     * A map of playerIds to their corresponding @c ExternalMediaAdapterHandler handlers. A playerId in this map
+     * was authorized by an AuthorizeDiscoveredPlayers directive and the ExternalMediaAdapterHandler that is responsible
+     * for it.
+     */
+    std::unordered_map<std::string,std::shared_ptr<ExternalMediaAdapterHandler>> m_externalMediaAdapterMap;
+    /**
+     * A set of @c LocalMediaSource sources corresponding to registered adapters.
+     */
+    std::set<aace::alexa::LocalMediaSource::Source> m_registeredLocalMediaSources;
+    /**
+     * A map of discovered players not yet acknowledged by an AuthorizeDiscoveredPlayers directive. Key is the player's 
+     * localPlayerId and value is its @c DiscoveredPlayerInfo discovery metadata. Access is serialized by 
+     * @c m_playersMutex.
+     */
+    DiscoveredPlayerMap m_pendingDiscoveredPlayerMap;
+    /**
+     * A map of players reported and acknowledged by an AuthorizeDiscoveredPlayers directive. Key is the player's 
+     * localPlayerId and value is @c PlayerInfo metadata including its authorization status. Access is serialized by 
+     * @c m_playersMutex.
+     */
+    std::unordered_map<std::string,PlayerInfo> m_authorizationStateMap;
+    /**
+     * The current state of connection to an Alexa endpoint. Access is serialized by @c m_connectionMutex
+     */
+    Status m_connectionStatus = Status::DISCONNECTED;
+    /**
+     * Serializes access to @c m_pendingDiscoveredPlayerMap and @c m_authorizationStateMap
+     */
+    std::mutex m_playersMutex;
+    /**
+     * Serializes access to @c m_connectionStatus
+     */
+    std::mutex m_connectionMutex;
+
+    /**
+     * Global presets platform interface
+     */
+    std::shared_ptr<aace::alexa::GlobalPreset> m_globalPresetHandler;
+
+    /**
+     * Only blocking operations, such as those requiring @c m_playersMutex, performed from asynchronous API calls not 
+     * meant to block must be queued in this @c Executor. For instance, async handling of @c 
+     * DiscoveredPlayerSenderInterface or @c ConnectionStatusObserverInterface calls may be done on this thread, but 
+     * synchronous @c ExternalMediaAdapterHandlerInterface calls should not, as the capability agent already handles
+     * synchronization there.
+     * 
+     * @c note: failing to submit to this executor async calls from the platform interface implementation that require 
+     * @c m_playersMutex may result in deadlock.
+     */
+    alexaClientSDK::avsCommon::utils::threading::Executor m_executor;
+
 };
 
 } // aace::engine::alexa

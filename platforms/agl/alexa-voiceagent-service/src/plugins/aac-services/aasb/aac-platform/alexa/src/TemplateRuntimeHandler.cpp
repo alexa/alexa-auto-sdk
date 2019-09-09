@@ -15,7 +15,7 @@
 #include "TemplateRuntimeHandler.h"
 
 #include <aasb/Consts.h>
-#include "DirectiveDispatcher.h"
+#include "ResponseDispatcher.h"
 
 /**
  * Specifies the severity level of a log message
@@ -30,52 +30,52 @@ const std::string TAG = "aasb::alexa::TemplateRuntimeHandler";
 
 std::shared_ptr<TemplateRuntimeHandler> TemplateRuntimeHandler::create(
     std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
-    std::weak_ptr<aasb::bridge::DirectiveDispatcher> directiveDispatcher) {
+    std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher) {
     auto templateRuntimeHandler =
-        std::shared_ptr<TemplateRuntimeHandler>(new TemplateRuntimeHandler(directiveDispatcher));
+        std::shared_ptr<TemplateRuntimeHandler>(new TemplateRuntimeHandler(responseDispatcher));
 
     templateRuntimeHandler->m_logger = logger;
     return templateRuntimeHandler;
 }
 
-TemplateRuntimeHandler::TemplateRuntimeHandler(std::weak_ptr<aasb::bridge::DirectiveDispatcher> directiveDispatcher) :
-        m_directiveDispatcher(directiveDispatcher) {
+TemplateRuntimeHandler::TemplateRuntimeHandler(std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher) :
+        m_responseDispatcher(responseDispatcher) {
 }
 
 void TemplateRuntimeHandler::renderTemplate(const std::string& payload) {
     m_logger->log(Level::INFO, TAG, __FUNCTION__ + payload);
-    if (auto directiveDispatcher = m_directiveDispatcher.lock()) {
-        directiveDispatcher->sendDirective(
+    if (auto responseDispatcher = m_responseDispatcher.lock()) {
+        responseDispatcher->sendDirective(
             aasb::bridge::TOPIC_TEMPLATE_RUNTIME, aasb::bridge::ACTION_RENDER_TEMPLATE, payload);
     } else {
-        m_logger->log(Level::ERROR, TAG, "directiveDispatcher doesn't exist.");
+        m_logger->log(Level::ERROR, TAG, "responseDispatcher doesn't exist.");
     }
 }
 
 void TemplateRuntimeHandler::clearTemplate() {
-    if (auto directiveDispatcher = m_directiveDispatcher.lock()) {
-        directiveDispatcher->sendDirective(
+    if (auto responseDispatcher = m_responseDispatcher.lock()) {
+        responseDispatcher->sendDirective(
             aasb::bridge::TOPIC_TEMPLATE_RUNTIME, aasb::bridge::ACTION_CLEAR_TEMPLATE, "");
     } else {
-        m_logger->log(Level::ERROR, TAG, "directiveDispatcher doesn't exist.");
+        m_logger->log(Level::ERROR, TAG, "responseDispatcher doesn't exist.");
     }
 }
 
 void TemplateRuntimeHandler::renderPlayerInfo(const std::string& payload) {
-    if (auto directiveDispatcher = m_directiveDispatcher.lock()) {
-        directiveDispatcher->sendDirective(
+    if (auto responseDispatcher = m_responseDispatcher.lock()) {
+        responseDispatcher->sendDirective(
             aasb::bridge::TOPIC_TEMPLATE_RUNTIME, aasb::bridge::ACTION_RENDER_PLAYERINFO, payload);
     } else {
-        m_logger->log(Level::ERROR, TAG, "directiveDispatcher doesn't exist.");
+        m_logger->log(Level::ERROR, TAG, "responseDispatcher doesn't exist.");
     }
 }
 
 void TemplateRuntimeHandler::clearPlayerInfo() {
-    if (auto directiveDispatcher = m_directiveDispatcher.lock()) {
-        directiveDispatcher->sendDirective(
+    if (auto responseDispatcher = m_responseDispatcher.lock()) {
+        responseDispatcher->sendDirective(
             aasb::bridge::TOPIC_TEMPLATE_RUNTIME, aasb::bridge::ACTION_CLEAR_PLAYERINFO, "");
     } else {
-        m_logger->log(Level::ERROR, TAG, "directiveDispatcher doesn't exist.");
+        m_logger->log(Level::ERROR, TAG, "responseDispatcher doesn't exist.");
     }
 }
 

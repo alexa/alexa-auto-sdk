@@ -5,8 +5,8 @@ THISDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source ${THISDIR}/common.sh
 
 # Default external values
-: ${NDK_PACKAGE:="android-ndk-r16b"}
-: ${NDK_SHA1SUM:="42aa43aae89a50d1c66c3f9fdecd676936da6128"}
+: ${NDK_PACKAGE:="android-ndk-r20"}
+: ${NDK_SHA1SUM:="8665fc84a1b1f0d6ab3b5fdd1e30200cc7b9adff"}
 
 # Extra options
 ANDROID_ABI=${1}
@@ -20,13 +20,10 @@ if [ -z ${ANDROID_TOOLCHAIN} ]; then
 	error "ANDROID_TOOLCHAIN is not set"
 fi
 
-if [ -z ${ANDROID_ABI} ] || [ -z ${API_LEVEL} ]; then
-	error "Please specify ABI/API"
-fi
-
 # Android toolchain path
 ANDROID_NDK="${ANDROID_TOOLCHAIN}/ndk"
 ANDROID_SDK="${ANDROID_TOOLCHAIN}/sdk"
+ANDROID_SDK_LICENSES="${ANDROID_TOOLCHAIN}/sdk/licenses"
 
 # Standard Android path
 ANDROID_NDK_HOME="${ANDROID_NDK}/ndk-bundle/${NDK_PACKAGE}"
@@ -49,7 +46,7 @@ install() {
 		warn "SHA1 checksum is wrong, re-download NDK package..."
 		rm ${tmpfile}
 	fi
-	if [ ! -e ${dest} ]; then
+	if [ ! -e ${tmpfile} ]; then
 		note "Downloading file ${filename}"
 		wget https://dl.google.com/android/repository/${filename} -P ${tmpdir}
 		sha1sum ${tmpfile}
@@ -100,7 +97,12 @@ if [ ! -d ${ANDROID_NDK_HOME} ]; then
 fi
 if [ ! -d ${ANDROID_SDK} ]; then
 	note "Installing SDK Tools..."
-	install sdk-tools-${HOST}-3859397.zip "7eab0ada7ff28487e1b340cc3d866e70bcb4286e" ${ANDROID_SDK}
+	install sdk-tools-${HOST}-4333796.zip "8c7c28554a32318461802c1291d76fccfafde054" ${ANDROID_SDK}
 fi
 
-generate_toolchain
+if [ ${ANDROID_ABI} ] && [ ${API_LEVEL} ]; then
+	generate_toolchain
+
+else
+	note "Skip standalone toolchain generation"
+fi

@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">1.6.0</span>
+   &#160;<span id="projectnumber">2.0.0</span>
    </div>
   </td>
  </tr>
@@ -69,7 +69,7 @@ $(function() {
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classaace_1_1alexa_1_1_speech_recognizer-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">aace::alexa::SpeechRecognizer Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div>  </div>
+<div class="title">aace::alexa::SpeechRecognizer Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
@@ -88,8 +88,6 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ab2d1df9942a32ff6eb829211a1ebffba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afbbd237e855308ed0d440c7f3d469a69"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#afbbd237e855308ed0d440c7f3d469a69">stopCapture</a> ()</td></tr>
 <tr class="separator:afbbd237e855308ed0d440c7f3d469a69"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeb12098569630da4863cc5458e346dd9"><td class="memItemLeft" align="right" valign="top">ssize_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#aeb12098569630da4863cc5458e346dd9">write</a> (const int16_t *data, const size_t size)</td></tr>
-<tr class="separator:aeb12098569630da4863cc5458e346dd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac8aa31ea0dcceddf5c7628a72cf58475"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#ac8aa31ea0dcceddf5c7628a72cf58475">enableWakewordDetection</a> ()</td></tr>
 <tr class="separator:ac8aa31ea0dcceddf5c7628a72cf58475"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae8655a4ecaab90892d240d5f21602e86"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#ae8655a4ecaab90892d240d5f21602e86">disableWakewordDetection</a> ()</td></tr>
@@ -100,10 +98,6 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:adb2ff621353bb47de5e4d1d41662b278"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7e4d179fd39031d3a898466841905748"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#a7e4d179fd39031d3a898466841905748">endOfSpeechDetected</a> ()</td></tr>
 <tr class="separator:a7e4d179fd39031d3a898466841905748"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0a075e7b0fa1934dda8b517c251480b9"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#a0a075e7b0fa1934dda8b517c251480b9">startAudioInput</a> ()=0</td></tr>
-<tr class="separator:a0a075e7b0fa1934dda8b517c251480b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0115d141edf71dcf0f06599d9ace400f"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#a0115d141edf71dcf0f06599d9ace400f">stopAudioInput</a> ()=0</td></tr>
-<tr class="separator:a0115d141edf71dcf0f06599d9ace400f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html">SpeechRecognizer</a> should be extended to initiate voice interactions with Alexa and provide audio input to AVS.</p>
@@ -145,7 +139,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Notifies the Engine of a speech recognition event initiated by a press-and-hold action on the platform. The Engine will call <code><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#a0a075e7b0fa1934dda8b517c251480b9">startAudioInput()</a></code> to notify the platform implementation when to start writing audio samples.</p>
+<p>Notifies the Engine of a speech recognition event initiated by a press-and-hold action on the platform. The Engine will call <code>startAudioInput()</code> to notify the platform implementation when to start writing audio samples.</p>
 <p>The platform implementation should call <code><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#afbbd237e855308ed0d440c7f3d469a69">stopCapture()</a></code> to terminate speech recognition on release of the press-and-hold action.</p>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if the Engine successfully initiated a recognize event, else <code>false</code> </dd></dl>
 
@@ -165,7 +159,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Notifies the Engine of a speech recognition event initiated by a press-and-release action on the platform. The Engine will call <code><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#a0a075e7b0fa1934dda8b517c251480b9">startAudioInput()</a></code> to notify the platform implementation when to start writing audio samples.</p>
+<p>Notifies the Engine of a speech recognition event initiated by a press-and-release action on the platform. The Engine will call <code>startAudioInput()</code> to notify the platform implementation when to start writing audio samples.</p>
 <p>The Engine will terminate the recognize event initiated by the press-and-release action when end of speech is detected.</p>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if the Engine successfully started a recognize event, else <code>false</code> </dd></dl>
 
@@ -208,7 +202,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Notifies the Engine of a speech recognition event. The Engine will call <code><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#a0a075e7b0fa1934dda8b517c251480b9">startAudioInput()</a></code> to notify the platform implementation when to start writing audio samples.</p>
+<p>Notifies the Engine of a speech recognition event. The Engine will call <code>startAudioInput()</code> to notify the platform implementation when to start writing audio samples.</p>
 <p>If the initator type is <code>HOLD_TO_TALK</code>, then the platform implementation should call <code><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#afbbd237e855308ed0d440c7f3d469a69">stopCapture()</a></code> to terminate speech recognition on release of the press-and-hold action. Otherwise, the Engine will terminate the recognize event when end of speech is detected.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -237,51 +231,8 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Notifies the Engine to terminate the current recognize event. The Engine will call <code><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#a0115d141edf71dcf0f06599d9ace400f">stopAudioInput()</a></code> to notify the platform implementation when to stop writing audio samples.</p>
+<p>Notifies the Engine to terminate the current recognize event. The Engine will call <code>stopAudioInput()</code> to notify the platform implementation when to stop writing audio samples.</p>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if the Engine successfully terminated the current recognize event, else <code>false</code> </dd></dl>
-
-</div>
-</div>
-<a id="aeb12098569630da4863cc5458e346dd9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeb12098569630da4863cc5458e346dd9">&#9670;&nbsp;</a></span>write()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">ssize_t aace::alexa::SpeechRecognizer::write </td>
-          <td>(</td>
-          <td class="paramtype">const int16_t *&#160;</td>
-          <td class="paramname"><em>data</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const size_t&#160;</td>
-          <td class="paramname"><em>size</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Writes audio samples to the Engine for processing by the wake word engine or streaming to AVS.</p>
-<p>Audio samples should typically be streamed in 10ms, 320-byte chunks and should be encoded as </p><ul>
-<li>16bit LPCM </li>
-<li>16kHz sample rate </li>
-<li>Single channel </li>
-<li>Little endian byte order</li>
-</ul>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The audio sample buffer to write </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">size</td><td>The number of samples in the buffer </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The number of samples successfully written to the Engine or a negative error code if data could not be written </dd></dl>
 
 </div>
 </div>
@@ -402,66 +353,12 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a0a075e7b0fa1934dda8b517c251480b9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0a075e7b0fa1934dda8b517c251480b9">&#9670;&nbsp;</a></span>startAudioInput()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual bool aace::alexa::SpeechRecognizer::startAudioInput </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Notifies the platform implementation to start writing audio samples to the Engine via <code><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#aeb12098569630da4863cc5458e346dd9">write()</a></code>. The platform should continue writing audio samples until the Engine calls <code><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#a0115d141edf71dcf0f06599d9ace400f">stopAudioInput()</a></code>.</p>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform handled the call successfully, else <code>false</code> </dd></dl>
-
-</div>
-</div>
-<a id="a0115d141edf71dcf0f06599d9ace400f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0115d141edf71dcf0f06599d9ace400f">&#9670;&nbsp;</a></span>stopAudioInput()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual bool aace::alexa::SpeechRecognizer::stopAudioInput </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Notifies the platform implementation to stop writing audio samples to the Engine</p>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform handled the call successfully, else <code>false</code> </dd></dl>
-
-</div>
-</div>
 </div><!-- contents -->
 <html>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 1.6.0 - Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 2.0.0 - Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

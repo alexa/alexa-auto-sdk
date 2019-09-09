@@ -58,11 +58,6 @@ fastlane/screenshots
 fastlane/test_output
 fastlane/readme.md
 
-# Local Gradle
-gradlew
-gradlew.bat
-gradle/
-
 # Extra LWA files
 app/src/main/assets/api_key.txt
 login-with-amazon-sdk.jar

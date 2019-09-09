@@ -10,10 +10,13 @@ project(AAC VERSION ${SDK_BASE_VERSION})
 
 message(STATUS "Alexa Auto SDK - ${SDK_VERSION}")
 
-enable_testing()
-set(AAC_ENABLE_TESTS ON)
+option(AAC_ENABLE_TESTS "Enable building test packages for AAC modules" ON)
+if(AAC_ENABLE_TESTS)
+    enable_testing()
+endif()
 
 if(AAC_ENABLE_COVERAGE)
+    message(STATUS "Enabling coverage for all modules.")
     set(CMAKE_CXX_FLAGS "-g -O0 -Wall -fprofile-arcs -ftest-coverage")
     set(CMAKE_CXX_OUTPUT_EXTENSION_REPLACE ON)
 endif()
@@ -31,6 +34,7 @@ else()
     add_subdirectory(modules/phone-control)
     add_subdirectory(modules/contact-uploader)
     add_subdirectory(modules/cbl)
+    add_subdirectory(modules/address-book)
 endif()
 
 if(EXTRA_MODULES)

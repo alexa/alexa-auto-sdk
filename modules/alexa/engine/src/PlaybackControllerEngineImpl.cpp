@@ -29,13 +29,12 @@ PlaybackControllerEngineImpl::PlaybackControllerEngineImpl( std::shared_ptr<aace
 bool PlaybackControllerEngineImpl::initialize(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate ) {
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager ) {
     
     try
     {
-        ThrowIfNull( capabilitiesDelegate, "invalidCapabilitiesDelegate" );
-
-        m_playbackControllerCapabilityAgent = alexaClientSDK::capabilityAgents::playbackController::PlaybackController::create( contextManager, messageSender );
+        m_playbackControllerCapabilityAgent = alexaClientSDK::capabilityAgents::playbackController::PlaybackController::create( contextManager, messageSender, focusManager );
         ThrowIfNull( m_playbackControllerCapabilityAgent, "couldNotCreateCapabilityAgent" );
 
         m_playbackRouter = alexaClientSDK::capabilityAgents::playbackController::PlaybackRouter::create( m_playbackControllerCapabilityAgent );
@@ -56,17 +55,25 @@ std::shared_ptr<PlaybackControllerEngineImpl> PlaybackControllerEngineImpl::crea
     std::shared_ptr<aace::alexa::PlaybackController> playbackControllerPlatformInterface,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate ) {
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager ) {
 
     std::shared_ptr<PlaybackControllerEngineImpl> playbackControllerEngineImpl = nullptr;
 
     try
     {
         ThrowIfNull( playbackControllerPlatformInterface, "invalidPlaybackControllerPlatformInterface" );
+        ThrowIfNull( messageSender, "invalidMessageSender" );
+        ThrowIfNull( contextManager, "invalidContextManager" );
+        ThrowIfNull( capabilitiesDelegate, "invalidCapabilitiesDelegate" );
+        ThrowIfNull( focusManager, "invalidFocusManager" );
 
         playbackControllerEngineImpl = std::shared_ptr<PlaybackControllerEngineImpl>( new PlaybackControllerEngineImpl( playbackControllerPlatformInterface ) );
 
-        ThrowIfNot( playbackControllerEngineImpl->initialize( messageSender, contextManager, capabilitiesDelegate ), "initializePlaybackControllerEngineImplFailed" );
+        ThrowIfNot( playbackControllerEngineImpl->initialize( messageSender, contextManager, capabilitiesDelegate, focusManager ), "initializePlaybackControllerEngineImplFailed" );
+
+        // set the platform engine interface reference
+        playbackControllerPlatformInterface->setEngineInterface( playbackControllerEngineImpl );
 
         return playbackControllerEngineImpl;
     }

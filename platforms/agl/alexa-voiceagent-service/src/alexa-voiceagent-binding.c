@@ -26,11 +26,11 @@ static CtlSectionT ctrlSections[] = {{.key = "plugins", .loadCB = PluginConfig},
                                      {.key = NULL}};
 
 
-static AFB_ApiVerbs ctrlApiVerbs[] = {
+static afb_verb_t ctrlApiVerbs[] = {
     {.verb = NULL} /* marker for end of the array */
 };
 
-static int ctrlLoadStaticVerbs(afb_dynapi* apiHandle, AFB_ApiVerbs* verbs) {
+static int ctrlLoadStaticVerbs(afb_dynapi* apiHandle, afb_verb_t* verbs) {
     int errcount = 0;
 
     for (int idx = 0; verbs[idx].verb; idx++) {
@@ -50,19 +50,19 @@ static int ctrlLoadStaticVerbs(afb_dynapi* apiHandle, AFB_ApiVerbs* verbs) {
 // next generation dynamic API-V3 mode
 #include <signal.h>
 
-static int CtrlInitOneApi(AFB_ApiT apiHandle) {
+static int CtrlInitOneApi(afb_api_t apiHandle) {
     CtlConfigT* ctrlConfig;
 
     if (!apiHandle) return -1;
 
     // Retrieve section config from api handle
-    ctrlConfig = (CtlConfigT*)AFB_ApiGetUserData(apiHandle);
+    ctrlConfig = (CtlConfigT*)afb_api_get_userdata(apiHandle);
     if (!ctrlConfig) return -2;
 
     return CtlConfigExec(apiHandle, ctrlConfig);
 }
 
-static int ctrlLoadOneApi(void* cbdata, AFB_ApiT apiHandle) {
+static int ctrlLoadOneApi(void* cbdata, afb_api_t apiHandle) {
     CtlConfigT* ctrlConfig = (CtlConfigT*)cbdata;
 
     // save closure as api's data context
@@ -71,14 +71,14 @@ static int ctrlLoadOneApi(void* cbdata, AFB_ApiT apiHandle) {
     // add static controls verbs
     int err = ctrlLoadStaticVerbs(apiHandle, ctrlApiVerbs);
     if (err) {
-        AFB_ApiError(apiHandle, "ctrlLoadStaticVerbs fail to register static V2 verbs");
+        AFB_API_ERROR(apiHandle, "ctrlLoadStaticVerbs fail to register static V2 verbs");
         return ERROR;
     }
 
     // load section for corresponding API
     err = CtlLoadSections(apiHandle, ctrlConfig, ctrlSections);
     if (err) {
-        AFB_ApiError(apiHandle, "CtlLoadSections fail to load the sections");
+        AFB_API_ERROR(apiHandle, "CtlLoadSections fail to load the sections");
         return ERROR;
     }
 
@@ -94,30 +94,30 @@ static int ctrlLoadOneApi(void* cbdata, AFB_ApiT apiHandle) {
 
 int afbBindingEntry(afb_dynapi* apiHandle) {
     AFB_default = apiHandle;
-    AFB_ApiNotice(apiHandle, "Controller in afbBindingEntry");
+    AFB_API_NOTICE(apiHandle, "Controller in afbBindingEntry");
 
     const char* dirList = getenv("CONTROL_CONFIG_PATH");
     if (!dirList) dirList = CONTROL_CONFIG_PATH;
 
-    const char* configPath = CtlConfigSearch(apiHandle, dirList, "");
+    const char* configPath = CtlConfigSearch(apiHandle, dirList, "alexa");
     if (!configPath) {
-        AFB_ApiError(apiHandle, "CtlPreInit: No %s* config found in %s ", GetBinderName(), dirList);
+        AFB_API_ERROR(apiHandle, "CtlPreInit: No %s* config found in %s ", GetBinderName(), dirList);
         return ERROR;
     }
 
     // load config file and create API
     CtlConfigT* ctrlConfig = CtlLoadMetaData(apiHandle, configPath);
     if (!ctrlConfig) {
-        AFB_ApiError(apiHandle, "CtrlBindingDyn No valid control config file in:\n-- %s", configPath);
+        AFB_API_ERROR(apiHandle, "CtrlBindingDyn No valid control config file in:\n-- %s", configPath);
         return ERROR;
     }
 
     if (!ctrlConfig->api) {
-        AFB_ApiError(apiHandle, "CtrlBindingDyn API Missing from metadata in:\n-- %s", configPath);
+        AFB_API_ERROR(apiHandle, "CtrlBindingDyn API Missing from metadata in:\n-- %s", configPath);
         return ERROR;
     }
 
-    AFB_ApiNotice(apiHandle, "Controller API='%s' info='%s'", ctrlConfig->api, ctrlConfig->info);
+    AFB_API_NOTICE(apiHandle, "Controller API='%s' info='%s'", ctrlConfig->api, ctrlConfig->info);
 
     // create one API per config file (Pre-V3 return code ToBeChanged)
     int status = afb_dynapi_new_api(apiHandle, ctrlConfig->api, ctrlConfig->info, 1, ctrlLoadOneApi, ctrlConfig);

@@ -79,7 +79,7 @@ public:
     void setEngineInterface( std::shared_ptr<aace::alexa::PlaybackControllerEngineInterface> playbackControllerEngineInterface );
 
 private:
-    std::shared_ptr<aace::alexa::PlaybackControllerEngineInterface> m_playbackControllerEngineInterface;
+    std::weak_ptr<aace::alexa::PlaybackControllerEngineInterface> m_playbackControllerEngineInterface;
 };
 
 } // aace::alexa

@@ -16,6 +16,12 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Vehicle/VehicleProperties.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Storage/StorageConfiguration.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Metrics/MetricsUploader.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Audio/AudioEngineInterfaces.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Audio/AudioInputProvider.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Audio/AudioInput.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Audio/AudioOutputProvider.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Audio/AudioOutput.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Audio/AudioStream.h
 )
 
 source_group("Header Files" FILES ${HEADERS})
@@ -29,6 +35,11 @@ add_library(AACECorePlatform SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Location/Location.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Network/NetworkInfoProvider.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Metrics/MetricsUploader.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Audio/AudioInputProvider.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Audio/AudioInput.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Audio/AudioOutputProvider.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Audio/AudioOutput.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Audio/AudioStream.cpp
 )
 
 target_include_directories(AACECorePlatform

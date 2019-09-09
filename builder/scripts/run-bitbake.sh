@@ -2,37 +2,23 @@
 
 THISDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source ${THISDIR}/common.sh
+source ${THISDIR}/agreement.sh
 
 #
 # Option
 #
 
-usageExit() {
-	echo "Usage: oe [options] [<module-path>|<meta-layer>|<extra-bb-file>|<extra-conf-file>]"
+exit_with_usage() {
+	echo "Usage: bitbake [options] [<module-path>|<meta-layer>|<extra-bb-file>|<extra-conf-file> ...]"
 	echo ""
 	echo " -h,--help                  = Print usage information and exit."
 	echo ""
-	echo " -t,--target <target-name>  = Specify the target. (Default: native)"
+	echo " -t,--target <target-name>  = Specify the target; use comma-separated list for multiple targets. (Default: native)"
 	echo " -b,--build-dir <directory> = Specify a build directory."
-	echo " -g,--debug                 = Build with debugging options."
-	echo " -c,--clean                 = Clean eveything."
+	echo " -c,--clean                 = Clean everything."
 	echo ""
-	echo " --android-api <integer>    = Specify Android API Level. (Default: 22)"
-	echo " --qnx7sdp-path <path>      = Specify QNX7 installation directory. (Default: ~/qnx700)"
 	echo " --package <recipe-name>    = Specify OE recipe name explicitly."
-	echo " --enable-sensitive-logs    = Enable sensitive logs only when building with debugging options."
-	echo " --enable-latency-logs      = Enable user perceived latency logs only when building with debugging options."
-	echo " --enable-tests             = Enable bulding test packages for AAC modules."
-	echo ""
-	echo "Additional options:"
-	echo " --default-logger-enabled <enabled> = Enable/disable the default engine logger: On, Off. (Default: On)"
-	echo "                              If enabled, there must be logger level and sink, either explicitly set or default."
-	echo " --default-logger-level <level> = Set the logger level for the default engine logger: Verbose, Info, Metric, Warn, Error, Critical."
-	echo "                              Default: Info for release builds, Verbose for debug builds."
-	echo " --default-logger-sink <sink> = Set the logger sink for the default engine logger: Console, Syslog."
-	echo "                              Default: Syslog for Android build targets, Console for all other build targets."
-	echo " --force-docker             = Force builds to happen inside an ubuntu docker container."
-	echo " --no-tty                   = Runs docker commands without TTY to support CI tools such as Jenkins."
+	echo " --force-docker             = Force builds to happen inside an Ubuntu docker container."
 	echo ""
 	exit 1
 }
@@ -44,7 +30,7 @@ while [[ $# -gt 0 ]]; do
 	key="$1"
 	case $key in
 		-h|--help)
-		usageExit
+		exit_with_usage
 		shift
 		;;
 		-t|--target)
@@ -57,22 +43,8 @@ while [[ $# -gt 0 ]]; do
 		shift
 		shift
 		;;
-		-g|--debug)
-		DEBUG_BUILD="1"
-		shift
-		;;
 		-c|--clean)
 		CLEAN="1"
-		shift
-		;;
-		--android-api)
-		ANDROID_API_LEVEL="$2"
-		shift
-		shift
-		;;
-		--qnx7sdp-path)
-		QNX_BASE="$2"
-		shift
 		shift
 		;;
 		--package)
@@ -80,39 +52,8 @@ while [[ $# -gt 0 ]]; do
 		shift
 		shift
 		;;
-		--enable-sensitive-logs)
-		SENSITIVE_LOGS="1"
-		shift
-		;;
-		--enable-latency-logs)
-		LATENCY_LOGS="1"
-		shift
-		;;
-		--enable-tests)
-		ENABLE_TESTS="1"
-		shift
-		;;
 		--force-docker)
 		FORCE_DOCKER="1"
-		shift
-		;;
-		--default-logger-enabled)
-		DEFAULT_LOGGER_ENABLED="$2"
-		shift
-		shift
-		;;
-		--default-logger-level)
-		DEFAULT_LOGGER_LEVEL="$2"
-		shift
-		shift
-		;;
-		--default-logger-sink)
-		DEFAULT_LOGGER_SINK="$2"
-		shift
-		shift
-		;;
-		--no-tty)
-		NO_TTY="1"
 		shift
 		;;
 		-D*=*)
@@ -120,8 +61,8 @@ while [[ $# -gt 0 ]]; do
 		shift
 		;;
 		-*|--*)
-		echo "ERROR: Unknown option '$1'"
-		usageExit
+		error "Unknown option '$1'"
+		exit_with_usage
 		shift
 		;;
 		*) # Any other additional arguments
@@ -135,19 +76,14 @@ set -- "${POSITIONAL[@]}"
 # Default values
 TARGET=${TARGET:-native}
 CLEAN=${CLEAN:-0}
-DEBUG_BUILD=${DEBUG_BUILD:-0}
 BUILD_DIR=${BUILD_DIR:-"${BUILDER_HOME}/build"}
-ANDROID_API_LEVEL=${ANDROID_API_LEVEL:-22}
-QNX_BASE=${QNX_BASE:-"${HOME}/qnx700"}
-SENSITIVE_LOGS=${SENSITIVE_LOGS:-0}
-LATENCY_LOGS=${LATENCY_LOGS:-0}
-ENABLE_TESTS=${ENABLE_TESTS:-0}
 
 EXTRA_MODULES=$@
 
 # Default external values
 : ${MODULES_PATH:="${SDK_HOME}/modules"}
 : ${ANDROID_TOOLCHAIN:="${BUILDER_HOME}/android-toolchain"}
+: ${QNX_BASE:="${HOME}/qnx700"}
 
 #
 # Param Checks
@@ -166,13 +102,8 @@ if [ $(uname) = "Darwin" ] || ([ ! -f /.dockerenv ] && [ "${FORCE_DOCKER}" = "1"
 		export QNX_BASE
 	fi
 	note "Switching to Docker mode..."
-	echo ""
-	echo "*******************"
-	echo "*** Docker Mode ***"
-	echo "*******************"
-	echo ""
-	NO_TTY=${NO_TTY} ${THISDIR}/run-docker.sh "aac/builder/build.sh oe" ${PARAMS}
-	exit 0
+	${THISDIR}/run-docker.sh "aac/builder/build.sh bitbake" ${PARAMS}
+	exit $?
 elif [[ $(uname -a) == *"Ubuntu"* ]]; then
 	note "Ubuntu host is detected, optimizing for Ubuntu machine"
 	HOST_SUPPORT_LAYER="${BUILDER_HOME}/meta-aac-ubuntu"
@@ -182,16 +113,15 @@ fi
 IFS=',' read -ra TARGETS <<< "${TARGET}"
 
 if [ -z ${OE_CORE_PATH} ] || [ ! -d ${OE_CORE_PATH} ]; then
-	error "Invalid OE_CORE_PATH: ${OE_CORE_PATH}"
+	error_and_exit "Invalid OE_CORE_PATH: ${OE_CORE_PATH}"
 fi
 
 # Use absolute path
 OE_CORE_PATH=$(realpath ${OE_CORE_PATH})
 BUILD_DIR=$(realpath ${BUILD_DIR})
 
-# Clean deploy dir
+# Deploy dir
 DEPLOY_DIR="${BUILDER_HOME}/deploy"
-mkdir -p ${DEPLOY_DIR} && rm -rf ${DEPLOY_DIR}/*
 
 # Download repository
 DL_DIR="${BUILDER_HOME}/downloads"
@@ -237,27 +167,11 @@ fi
 
 android_checks() {
 	note "Android toolchains will be installed: ${ANDROID_TOOLCHAIN}"
-	case ${TARGET} in
-		androidx86)
-			ANDROID_ABI="x86"
-			;;
-		androidx86-64)
-			ANDROID_ABI="x86_64"
-			;;
-		androidarm)
-			ANDROID_ABI="armeabi-v7a"
-			;;
-		androidarm64)
-			ANDROID_ABI="arm64-v8a"
-			;;
-		*)
-			error "Unsupported Android target: ${TARGET}"
-	esac
 	# Export into Bitbake and setup script
 	export ANDROID_TOOLCHAIN
 	# Always run setup script
-	${BUILDER_HOME}/scripts/setup-android-toolchain.sh ${ANDROID_ABI} ${ANDROID_API_LEVEL} || \
-		error "Android toolchain setup failed"
+	${BUILDER_HOME}/scripts/setup-android-toolchain.sh || \
+		error_and_exit "Android toolchain setup failed"
 }
 
 #
@@ -266,7 +180,7 @@ android_checks() {
 
 qnx_checks() {
 	if [ ! -d ${QNX_BASE}/host/linux ]; then
-		error "Check your QNX 7.0.0 SDP installation and make sure Linux host tools are installed."
+		error_and_exit "Check your QNX 7.0.0 SDP installation and make sure Linux host tools are installed."
 	fi
 	# Export into Bitbake
 	export QNX_BASE
@@ -290,12 +204,14 @@ add_extra_module() {
 			EXTRA_BBLAYERS="${EXTRA_BBLAYERS} ${module}"
 		elif [[ ! ${sub_module} ]]; then
 			note "Search for modules & meta layers: ${module}"
-			for sub_module in $(find ${module} -mindepth 1 -maxdepth 1 -type d) ; do
-				add_extra_module ${sub_module} 1
+			for content in $(find ${module} -mindepth 1 -maxdepth 1) ; do
+				add_extra_module ${content} 1
 			done
 		elif [[ ${sub_module} && ${module_name} == "modules" ]]; then
-			note "Adding modules: ${module}"
-			EXTRA_BBFILES="${EXTRA_BBFILES} ${module}/*/*.bb"
+			note "Search for modules: ${module}"
+			for bbfile in $(find ${module}/*/*.bb) ; do
+				add_extra_module ${bbfile} 1
+			done
 		fi
 	elif [[ -e ${module} ]]; then
 		if [[ ${module} == *".conf" ]]; then
@@ -308,7 +224,7 @@ add_extra_module() {
 			note "Adding single module: ${module}"
 			EXTRA_BBFILES="${EXTRA_BBFILES} ${module}"
 			EXTRA_INSTALLS="${EXTRA_INSTALLS} ${module_name%".bb"}"
-		else
+		elif [[ ! ${sub_module} ]]; then
 			warn "Unknown file: ${module}"
 		fi
 	else
@@ -325,7 +241,7 @@ clean_lockfile() {
 			note "Removing ${BUILD_DIR}/bitbake.lock..."
 			rm -rf ${BUILD_DIR}/bitbake.lock
 		else
-			exit 0
+			exit 1
 		fi
 	fi
 }
@@ -375,40 +291,9 @@ EOF
 	# Avoid rebuilding sstate
 	echo "BB_HASHBASE_WHITELIST += \"AWS_CONTAINER_CREDENTIALS_RELATIVE_URI AWS_DEFAULT_REGION AWS_REGION ANDROID_TOOLCHAIN QNX_BASE\"" >> ${LOCAL_CONF}
 
-	# Additional properties
-	echo "ANDROID_PLATFORM = \"android-${ANDROID_API_LEVEL}\"" >> ${LOCAL_CONF}
-	if [ ${DEBUG_BUILD} = "1" ]; then
-		note "Enable debug build"
-		echo "DEBUG_BUILD = \"1\"" >> ${LOCAL_CONF}
-		if [ ${SENSITIVE_LOGS} = "1" ]; then
-			note "Enable sensitive logs"
-			echo "AAC_SENSITIVE_LOGS = \"1\"" >> ${LOCAL_CONF}
-		fi
-	fi
-	if [ ${LATENCY_LOGS} = "1" ]; then
-		note "Enable user perceived latency logs"
-		echo "AAC_LATENCY_LOGS = \"1\"" >> ${LOCAL_CONF}
-	fi
-	if [ ${ENABLE_TESTS} = "1" ]; then
-		note "Enable tests to build"
-		echo "AAC_ENABLE_TESTS = \"ON\"" >> ${LOCAL_CONF}
-	fi
-
 	# Extra image installation
-	if [ ! -z ${EXTRA_INSTALLS} ]; then
+	if [ ! -z "${EXTRA_INSTALLS}" ]; then
 		echo "IMAGE_INSTALL_append = \"${EXTRA_INSTALLS}\"" >> ${LOCAL_CONF}
-	fi
-	if [ "${DEFAULT_LOGGER_ENABLED}" ]; then
-		note "Set default logger enabled: ${DEFAULT_LOGGER_ENABLED}"
-		echo "AAC_DEFAULT_LOGGER_ENABLED = \"${DEFAULT_LOGGER_ENABLED}\"" >> ${LOCAL_CONF}
-	fi
-	if [ "${DEFAULT_LOGGER_LEVEL}" ]; then
-		note "Set default logger level: ${DEFAULT_LOGGER_LEVEL}"
-		echo "AAC_DEFAULT_LOGGER_LEVEL = \"${DEFAULT_LOGGER_LEVEL}\"" >> ${LOCAL_CONF}
-	fi
-	if [ "${DEFAULT_LOGGER_SINK}" ]; then
-		note "Set default logger sink: ${DEFAULT_LOGGER_SINK}"
-		echo "AAC_DEFAULT_LOGGER_SINK = \"${DEFAULT_LOGGER_SINK}\"" >> ${LOCAL_CONF}
 	fi
 
 	# Extra properties from CLI
@@ -437,8 +322,7 @@ execute_bitbake() {
 
 copy_images() {
 	mkdir -p ${DEPLOY_DIR}/${TARGET}
-	cp -P ${BUILD_DIR}/tmp*/deploy/images/${TARGET}/${PACKAGE}* ${DEPLOY_DIR}/${TARGET}
-	echo "SDK Version: ${SDK_VERSION}" > ${DEPLOY_DIR}/buildinfo.txt
+	cp -P ${BUILD_DIR}/tmp*/deploy/images/${TARGET}/${PACKAGE}* ${DEPLOY_DIR}/${TARGET} 2>/dev/null || :
 }
 
 build() {
@@ -462,16 +346,20 @@ build() {
 			note "Cleaning cache files for ${PACKAGE}"
 			execute_bitbake -c cleansstate
 		fi
-		exit 0
+		exit $?
 	fi
 
 	if [ -z ${PACKAGE} ]; then
-		PACKAGE=aac-image-minimal
+		PACKAGE=aac-sdk-build
 	fi
-	execute_bitbake && copy_images
+	execute_bitbake
+	exit_if_failure
+
+	copy_images
 }
 
 note "SDK Version: ${SDK_VERSION}"
+agreement_check
 
 clean_lockfile
 

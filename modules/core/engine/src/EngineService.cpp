@@ -62,11 +62,12 @@ bool EngineService::handleInitializeEngineEvent( std::shared_ptr<aace::engine::c
     }
 }
 
-bool EngineService::handleConfigureEngineEvent( const std::vector<std::shared_ptr<std::istream>>& configuration )
+bool EngineService::handleConfigureEngineEvent( std::shared_ptr<std::istream> configuration )
 {
     try
     {
         ThrowIfNot( m_initialized, "serviceNotInitialized" );
+        ThrowIfNull( configuration, "invalidConfiguration" );
         ThrowIfNot( configure( configuration ), "configureServiceFailed" );
 
         return true;
@@ -103,6 +104,36 @@ bool EngineService::handleShutdownEngineEvent()
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"handleShutdownEngineEvent").d("reason", ex.what()));
+        return false;
+    }
+}
+
+bool EngineService::handlePreRegisterEngineEvent()
+{
+    try
+    {
+        ThrowIfNot( m_initialized, "serviceNotInitialized" );
+        ThrowIfNot( preRegister(), "preRegisterFailed" );
+
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"handlePreRegisterEngineEvent").d("reason", ex.what()));
+        return false;
+    }
+}
+
+bool EngineService::handlePostRegisterEngineEvent()
+{
+    try
+    {
+        ThrowIfNot( m_initialized, "serviceNotInitialized" );
+        ThrowIfNot( postRegister(), "postRegisterFailed" );
+
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"handlePostRegisterEngineEvent").d("reason", ex.what()));
         return false;
     }
 }
@@ -177,11 +208,15 @@ bool EngineService::initialize() {
     return true;
 }
 
-bool EngineService::configure( const std::vector<std::shared_ptr<std::istream>>& configuration ) {
+bool EngineService::configure( std::shared_ptr<std::istream> configuration ) {
+    return false;
+}
+
+bool EngineService::preRegister() {
     return true;
 }
 
-bool EngineService::shutdown() {
+bool EngineService::postRegister() {
     return true;
 }
 
@@ -194,6 +229,10 @@ bool EngineService::start() {
 }
 
 bool EngineService::stop() {
+    return true;
+}
+
+bool EngineService::shutdown() {
     return true;
 }
 

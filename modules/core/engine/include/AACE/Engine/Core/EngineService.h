@@ -73,11 +73,13 @@ public:
 
 protected:
     virtual bool initialize();
-    virtual bool configure( const std::vector<std::shared_ptr<std::istream>>& configuration );
-    virtual bool shutdown();
+    virtual bool configure( std::shared_ptr<std::istream> configuration );
+    virtual bool preRegister();
+    virtual bool postRegister();
     virtual bool setup();
     virtual bool start();
     virtual bool stop();
+    virtual bool shutdown();
     virtual bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface );
     virtual bool setProperty( const std::string& key, const std::string& value );
     virtual std::string getProperty( const std::string& key );
@@ -110,11 +112,13 @@ protected:
 
 private:
     bool handleInitializeEngineEvent( std::shared_ptr<aace::engine::core::EngineContext> context );
-    bool handleConfigureEngineEvent( const std::vector<std::shared_ptr<std::istream>>& configuration );
-    bool handleShutdownEngineEvent();
+    bool handleConfigureEngineEvent( std::shared_ptr<std::istream> configuration );
+    bool handlePreRegisterEngineEvent();
+    bool handlePostRegisterEngineEvent();
     bool handleSetupEngineEvent();
     bool handleStartEngineEvent();
     bool handleStopEngineEvent();
+    bool handleShutdownEngineEvent();
     bool handleRegisterPlatformInterfaceEngineEvent( std::shared_ptr<aace::core::PlatformInterface> platformInterface );
 
 private:
@@ -167,6 +171,8 @@ public:
     virtual std::string getProperty( const std::string& key ) = 0;
     
     virtual bool setProperty( const std::string& key, const std::string& value ) = 0;
+    
+    virtual bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) = 0;
     
     template <class T>
     std::shared_ptr<EngineServiceContext> getService() {

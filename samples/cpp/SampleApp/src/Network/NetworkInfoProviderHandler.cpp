@@ -32,7 +32,7 @@ namespace network {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 NetworkInfoProviderHandler::NetworkInfoProviderHandler(std::weak_ptr<Activity> activity, std::weak_ptr<logger::LoggerHandler> loggerHandler)
-    : m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
+    : m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)}, m_networkStatus{NetworkStatus::CONNECTED}, m_wifiSignalStrength{100} {
     // Expects((m_activity != nullptr) && (m_loggerHandler != nullptr));
     setupUI();
 }
@@ -43,11 +43,9 @@ std::weak_ptr<logger::LoggerHandler> NetworkInfoProviderHandler::getLoggerHandle
 
 // aace::network::NetworkInfoProvider interface
 
-aace::network::NetworkInfoProvider::NetworkStatus NetworkInfoProviderHandler::getNetworkStatus() { return NetworkInfoProvider::NetworkStatus::CONNECTED; }
+aace::network::NetworkInfoProvider::NetworkStatus NetworkInfoProviderHandler::getNetworkStatus() { return m_networkStatus; }
 
-int NetworkInfoProviderHandler::getWifiSignalStrength() {
-    return 100; // excellent, good, fair, weak, none?
-}
+int NetworkInfoProviderHandler::getWifiSignalStrength() { return m_wifiSignalStrength; }
 
 // private
 
@@ -69,7 +67,7 @@ void NetworkInfoProviderHandler::setupUI() {
     // networkStatusChanged
     activity->registerObserver(Event::onNetworkInfoProviderNetworkStatusChanged, [=](const std::string &value) {
         log(logger::LoggerHandler::Level::VERBOSE, "onNetworkInfoProviderNetworkStatusChanged:" + value);
-        static std::regex r("(.+)/(\\d+)", std::regex::optimize);
+        static std::regex r("([^/]+)(?:/([-+]?\\d+))?", std::regex::optimize);
         std::smatch sm{};
         if (!std::regex_match(value, sm, r) || ((sm.size() - 1) < 2)) {
             return false;
@@ -86,7 +84,14 @@ void NetworkInfoProviderHandler::setupUI() {
         if (NetworkStatusEnumerator.count(sm[1]) == 0) {
             return false;
         }
-        networkStatusChanged(NetworkStatusEnumerator.at(sm[1]), std::stoi(sm[2]));
+        // Notify the Engine of a WiFi network status change on the platform
+        // Store the current network status for accessor functions
+        m_networkStatus = NetworkStatusEnumerator.at(sm[1]);
+        if (sm[2].matched) {
+            // Optional WiFi signal strengh
+            m_wifiSignalStrength = std::stoi(sm[2]);
+        }
+        networkStatusChanged(m_networkStatus, m_wifiSignalStrength);
         return true;
     });
 }

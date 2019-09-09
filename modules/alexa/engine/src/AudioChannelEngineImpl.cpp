@@ -21,51 +21,50 @@ namespace aace {
 namespace engine {
 namespace alexa {
 
+static const uint8_t MAX_SPEAKER_VOLUME = 100;
+static const uint8_t MIN_SPEAKER_VOLUME = 0;
+static const uint8_t DEFAULT_SPEAKER_VOLUME = 50;
+
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.AudioChannelEngineImpl");
 
 alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId AudioChannelEngineImpl::s_nextId =
     alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::ERROR;
 
-AudioChannelEngineImpl::AudioChannelEngineImpl( std::shared_ptr<aace::alexa::AudioChannel> audioChannelPlatformInterface, const std::string& name ) :
-    alexaClientSDK::avsCommon::utils::RequiresShutdown(name),
-    m_audioChannelPlatformInterface( audioChannelPlatformInterface ),
-    m_status( alexaClientSDK::avsCommon::avs::attachment::AttachmentReader::ReadStatus::OK ),
-    m_stream( nullptr ),
+AudioChannelEngineImpl::AudioChannelEngineImpl( alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::Type speakerType ) :
+    alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
+    m_speakerType(speakerType),
     m_currentId( ERROR ),
     m_savedOffset( std::chrono::milliseconds( 0 ) ),
-    m_name( name ),
+    m_muted( false ),
+    m_volume( DEFAULT_SPEAKER_VOLUME ),
     m_pendingEventState( PendingEventState::NONE ),
     m_currentMediaState( MediaState::STOPPED ),
     m_mediaStateChangeInitiator( MediaStateChangeInitiator::NONE ) {
 }
 
-bool AudioChannelEngineImpl::initializeAudioChannel( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager )
-{
+bool AudioChannelEngineImpl::initializeAudioChannel(
+    std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> audioOutputChannel,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager ) {
+    
     try
     {
-        ThrowIfNull(speakerManager, "invalidSpeakerManager");
-        m_speakerManager = speakerManager;
+        ThrowIfNull( audioOutputChannel, "invalidAudioOutputChannel" );
+        ThrowIfNull( speakerManager, "invalidSpeakerManager");
+
+        // save the audio channel reference
+        m_audioOutputChannel = audioOutputChannel;
     
-        m_mediaPlayerPlatformInterface = m_audioChannelPlatformInterface->getMediaPlayer();
-        ThrowIfNull( m_mediaPlayerPlatformInterface, "invalidMediaPlayerInterface" );
-
-        m_speakerPlatformInterface = m_audioChannelPlatformInterface->getSpeaker();
-        ThrowIfNull( m_speakerPlatformInterface, "invalidSpeakerInterface" );
-
+        // set the audio output channel engine interface
+        audioOutputChannel->setEngineInterface( shared_from_this() );
+    
         // add the speaker impl to the speaker manager
-        m_speakerManager->addSpeaker( shared_from_this() );
-
-        // set the media player engine interface
-        m_mediaPlayerPlatformInterface->setEngineInterface( shared_from_this() );
-
-        // set the speaker engine interface
-        m_speakerPlatformInterface->setEngineInterface( shared_from_this() );
+        speakerManager->addSpeaker( shared_from_this() );
 
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"initialize").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
 }
@@ -74,20 +73,15 @@ void AudioChannelEngineImpl::doShutdown()
 {
     m_executor.shutdown();
 
-    // reset the media player engine interface
-    if( m_mediaPlayerPlatformInterface != nullptr ) {
-        m_mediaPlayerPlatformInterface->setEngineInterface(nullptr);
-    }
-
-    // reset the speaker engine interface
-    if( m_speakerPlatformInterface != nullptr ) {
-        m_speakerPlatformInterface->setEngineInterface(nullptr);
+    // reset the audio output channel engine interface
+    if( m_audioOutputChannel != nullptr ) {
+        m_audioOutputChannel->setEngineInterface( nullptr );
+        m_audioOutputChannel.reset();
     }
 
     // reset the media observer reference
-    m_observer.reset();
-    
-    // reset speaker manager reference
+    m_mediaPlayerObserver.reset();
+    // reset the speaker manager
     m_speakerManager.reset();
 }
 
@@ -124,7 +118,7 @@ void AudioChannelEngineImpl::sendEvent( PendingEventState state )
         });
     }
     else {
-        AACE_WARN(LX(TAG,"sendEvent").d("reason","unhandledEventState").d("state",state));
+        AACE_WARN(LX(TAG).d("reason","unhandledEventState").d("state",state));
     }
 }
 
@@ -146,7 +140,7 @@ void AudioChannelEngineImpl::executeMediaStateChanged( SourceId id, MediaState s
 
     try
     {
-        AACE_VERBOSE(LX(TAG,"executeMediaStateChanged").d("currentState",m_currentMediaState).d("newState",state).d("pendingEvent",m_pendingEventState).d("id",id));
+        AACE_VERBOSE(LX(TAG).d("currentState",m_currentMediaState).d("newState",state).d("pendingEvent",m_pendingEventState).d("id",id));
 
         // return if the current media state is the same as the new state and no pending event
         if( m_currentMediaState == state && m_pendingEventState == PendingEventState::NONE ) {
@@ -292,7 +286,7 @@ void AudioChannelEngineImpl::executeMediaStateChanged( SourceId id, MediaState s
         m_currentMediaState = state;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"executeMediaStateChanged").d("reason", ex.what()).d("currentState",m_currentMediaState).d("newState",state).d("pendingEvent",m_pendingEventState));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("currentState",m_currentMediaState).d("newState",state).d("pendingEvent",m_pendingEventState));
     }
 }
 
@@ -311,35 +305,31 @@ void AudioChannelEngineImpl::executeMediaError( SourceId id, MediaError error, c
     {
         ThrowIf( id == ERROR, "invalidSource" );
         
-        if( m_observer != nullptr ) {
-            m_observer->onPlaybackError( id, static_cast<alexaClientSDK::avsCommon::utils::mediaPlayer::ErrorType>( error ), description );
+        if( auto m_mediaPlayerObserver_lock = m_mediaPlayerObserver.lock() ) {
+            m_mediaPlayerObserver_lock->onPlaybackError( id, static_cast<alexaClientSDK::avsCommon::utils::mediaPlayer::ErrorType>( error ), description );
         }
         
         m_currentId = ERROR;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"executeMediaError").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
     }
 }
 
-void AudioChannelEngineImpl::handlePrePlaybackStarted( SourceId id )
-{
-    AACE_DEBUG(LX(TAG,"handlePrePlaybackStarted").d("Event","Handling pre-playback started"));
+void AudioChannelEngineImpl::handlePrePlaybackStarted( SourceId id ){
+    AACE_DEBUG(LX(TAG).d("Event","Handling pre-playback started"));
 }
 
-void AudioChannelEngineImpl::handlePostPlaybackStarted( SourceId id )
-{
-    AACE_DEBUG(LX(TAG,"handlePostPlaybackStarted").d("Event","Handling post-playback started"));
+void AudioChannelEngineImpl::handlePostPlaybackStarted( SourceId id ){
+    AACE_DEBUG(LX(TAG).d("Event","Handling post-playback started"));
 }
 
-void AudioChannelEngineImpl::handlePrePlaybackFinished( SourceId id )
-{
-    AACE_DEBUG(LX(TAG,"handlePrePlaybackFinished").d("Event","Handling pre-playback finished"));
+void AudioChannelEngineImpl::handlePrePlaybackFinished( SourceId id ){
+    AACE_DEBUG(LX(TAG).d("Event","Handling pre-playback finished"));
 }
 
-void AudioChannelEngineImpl::handlePostPlaybackFinished( SourceId id ) 
-{
-    AACE_DEBUG(LX(TAG,"handlePostPlaybackFinished").d("Event","Handling post-playback finished"));
+void AudioChannelEngineImpl::handlePostPlaybackFinished( SourceId id ) {
+    AACE_DEBUG(LX(TAG).d("Event","Handling post-playback finished"));
 }
 
 void AudioChannelEngineImpl::executePlaybackStarted( SourceId id )
@@ -349,13 +339,14 @@ void AudioChannelEngineImpl::executePlaybackStarted( SourceId id )
         handlePrePlaybackStarted( id );
         ThrowIf( id == ERROR, "invalidSource" );
         
-        if( m_observer != nullptr ) {
-            m_observer->onPlaybackStarted( id );
+        if( auto m_mediaPlayerObserver_lock = m_mediaPlayerObserver.lock() ) {
+            m_mediaPlayerObserver_lock->onPlaybackStarted( id );
         }
+        
         handlePostPlaybackStarted( id );
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"executePlaybackStarted").d("reason", ex.what()).d("expectedState",m_pendingEventState));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState",m_pendingEventState));
     }
 }
 
@@ -366,18 +357,19 @@ void AudioChannelEngineImpl::executePlaybackFinished( SourceId id )
         handlePrePlaybackFinished( id );
         ThrowIf( id == ERROR, "invalidSource" );
         
-        if( m_observer != nullptr ) {
-            m_observer->onPlaybackFinished( id );
+        if( auto m_mediaPlayerObserver_lock = m_mediaPlayerObserver.lock() ) {
+            m_mediaPlayerObserver_lock->onPlaybackFinished( id );
         }
         
         // save the player offset
-        m_savedOffset = std::chrono::milliseconds( m_mediaPlayerPlatformInterface->getPosition() );
+        m_savedOffset = std::chrono::milliseconds( m_audioOutputChannel->getPosition() );
 
         m_currentId = ERROR;
+        
         handlePostPlaybackFinished( id );
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"executePlaybackFinished").d("reason", ex.what()).d("expectedState",m_pendingEventState));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState",m_pendingEventState));
     }
 }
 
@@ -388,14 +380,14 @@ void AudioChannelEngineImpl::executePlaybackPaused( SourceId id )
         ThrowIf( id == ERROR, "invalidSource" );
         
         // save the player offset
-        m_savedOffset = std::chrono::milliseconds( m_mediaPlayerPlatformInterface->getPosition() );
+        m_savedOffset = std::chrono::milliseconds( m_audioOutputChannel->getPosition() );
 
-        if( m_observer != nullptr ) {
-            m_observer->onPlaybackPaused( id );
+        if( auto m_mediaPlayerObserver_lock = m_mediaPlayerObserver.lock() ) {
+            m_mediaPlayerObserver_lock->onPlaybackPaused( id );
         }
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"executePlaybackPaused").d("reason", ex.what()).d("expectedState",m_pendingEventState));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState",m_pendingEventState));
     }
 }
 
@@ -403,15 +395,14 @@ void AudioChannelEngineImpl::executePlaybackResumed( SourceId id )
 {
     try
     {
-        ALEXA_METRIC(LX(TAG, "executePlaybackResumed").d("channelName", m_name), aace::engine::alexa::AlexaMetrics::Location::PLAYBACK_RESUMED);
         ThrowIf( id == ERROR, "invalidSource" );
         
-        if( m_observer != nullptr ) {
-            m_observer->onPlaybackResumed( id );
+        if( auto m_mediaPlayerObserver_lock = m_mediaPlayerObserver.lock() ) {
+            m_mediaPlayerObserver_lock->onPlaybackResumed( id );
         }
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"executePlaybackResumed").d("reason", ex.what()).d("expectedState",m_pendingEventState));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState",m_pendingEventState));
     }
 }
 
@@ -422,14 +413,14 @@ void AudioChannelEngineImpl::executePlaybackStopped( SourceId id )
         ThrowIf( id == ERROR, "invalidSource" );
 
         // save the player offset
-        m_savedOffset = std::chrono::milliseconds( m_mediaPlayerPlatformInterface->getPosition() );
+        m_savedOffset = std::chrono::milliseconds( m_audioOutputChannel->getPosition() );
 
-        if( m_observer != nullptr ) {
-            m_observer->onPlaybackStopped( id );
+        if( auto m_mediaPlayerObserver_lock = m_mediaPlayerObserver.lock() ) {
+            m_mediaPlayerObserver_lock->onPlaybackStopped( id );
         }
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"executePlaybackStopped").d("reason", ex.what()).d("expectedState",m_pendingEventState));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState",m_pendingEventState));
     }
 }
 
@@ -439,14 +430,14 @@ void AudioChannelEngineImpl::executePlaybackError( SourceId id, MediaError error
     {
         ThrowIf( id == ERROR, "invalidSource" );
         
-        if( m_observer != nullptr ) {
-            m_observer->onPlaybackError( id, static_cast<alexaClientSDK::avsCommon::utils::mediaPlayer::ErrorType>( error ), description );
+        if( auto m_mediaPlayerObserver_lock = m_mediaPlayerObserver.lock() ) {
+            m_mediaPlayerObserver_lock->onPlaybackError( id, static_cast<alexaClientSDK::avsCommon::utils::mediaPlayer::ErrorType>( error ), description );
         }
         
         m_currentId = ERROR;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"executePlaybackError").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
     }
 }
 
@@ -456,12 +447,12 @@ void AudioChannelEngineImpl::executeBufferUnderrun( SourceId id )
     {
         ThrowIf( id == ERROR, "invalidSource" );
         
-        if( m_observer != nullptr ) {
-            m_observer->onBufferUnderrun( id );
+        if( auto m_mediaPlayerObserver_lock = m_mediaPlayerObserver.lock() ) {
+            m_mediaPlayerObserver_lock->onBufferUnderrun( id );
         }
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"executeBufferUnderrun").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
     }
 }
 
@@ -471,73 +462,17 @@ void AudioChannelEngineImpl::executeBufferRefilled( SourceId id )
     {
         ThrowIf( id == ERROR, "invalidSource" );
         
-        if( m_observer != nullptr ) {
-            m_observer->onBufferRefilled( id );
+        if( auto m_mediaPlayerObserver_lock = m_mediaPlayerObserver.lock() ) {
+            m_mediaPlayerObserver_lock->onBufferRefilled( id );
         }
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"executeBufferRefilled").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
     }
-}
-
-ssize_t AudioChannelEngineImpl::read( char* data, const size_t size )
-{
-    try
-    {
-        if( m_attachmentReader != nullptr )
-        {
-            ssize_t count = m_attachmentReader->read( static_cast<void*>( data ), size, &m_status, std::chrono::milliseconds(100) );
-            
-            if( m_status >= alexaClientSDK::avsCommon::avs::attachment::AttachmentReader::ReadStatus::CLOSED ) {
-                m_closed = true;
-            }
-            
-            return count;
-        }
-        else if( m_stream != nullptr )
-        {
-            if( m_stream->eof() ) {
-                m_closed = true;
-                return 0;
-            }
-        
-            // read the data from the stream
-            m_stream->read( data, size );
-            ThrowIf( m_stream->bad(), "readFailed" );
-            
-            // get the number of bytes read
-            ssize_t count = m_stream->gcount();
-            
-            m_stream->tellg(); // Don't remove otherwise the ReseourceStream used for Alerts/Timers won't work as expected.
-
-            return count;
-        }
-        else {
-            Throw( "invalidReadSource" );
-        }
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"read").d("reason", ex.what()));
-        m_closed = true;
-        return 0;
-    }
-}
-
-bool AudioChannelEngineImpl::isRepeating() {
-    return m_repeat;
-}
-
-bool AudioChannelEngineImpl::isClosed() {
-    return m_closed;
 }
 
 void AudioChannelEngineImpl::resetSource()
 {
-    m_attachmentReader.reset();
-    m_stream.reset();
-    m_status = alexaClientSDK::avsCommon::avs::attachment::AttachmentReader::ReadStatus::OK;
-    m_repeat = false;
-    m_closed = false;
     m_currentId = ERROR;
     m_pendingEventState = PendingEventState::NONE;
     m_currentMediaState = MediaState::STOPPED;
@@ -547,42 +482,25 @@ void AudioChannelEngineImpl::resetSource()
 }
 
 //
-// aace::engine::SpeakerEngineInterface
-//
-
-void AudioChannelEngineImpl::onLocalVolumeSet( int8_t volume )
-{
-    if( m_speakerManager != nullptr ) {
-        m_speakerManager->setVolume( getSpeakerType(), volume );
-    }
-}
-
-void AudioChannelEngineImpl::onLocalMuteSet( bool mute )
-{
-    if( m_speakerManager != nullptr ) {
-        m_speakerManager->setMute( getSpeakerType(), mute );
-    }
-}
-
-//
 // alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface
 //
 
 alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId AudioChannelEngineImpl::setSource( std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader> attachmentReader, const alexaClientSDK::avsCommon::utils::AudioFormat* format )
 {
+    std::unique_lock<std::mutex> lock( m_mutex );
+
     try
     {
-        AACE_DEBUG(LX(TAG,"setSource").d("type","attachment"));
+        AACE_DEBUG(LX(TAG).d("type","attachment"));
 
         resetSource();
     
-        m_attachmentReader = std::move( attachmentReader );
         m_currentId = nextId();
 
-        ThrowIfNot( m_mediaPlayerPlatformInterface->prepare(), "platformMediaPlayerPrepareFailed" );
+        ThrowIfNot( m_audioOutputChannel->prepare( AttachmentReaderAudioStream::create( attachmentReader, format ), false ), "audioOutputChannelSetStreamFailed" );
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"setSource").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
         resetSource();
     }
     
@@ -591,46 +509,46 @@ alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId Au
 
 alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId AudioChannelEngineImpl::setSource( std::shared_ptr<std::istream> stream, bool repeat )
 {
+    std::unique_lock<std::mutex> lock( m_mutex );
+
     try
     {
-        AACE_DEBUG(LX(TAG,"setSource").d("type","stream"));
+        AACE_DEBUG(LX(TAG).d("type","stream"));
 
         resetSource();
 
         ThrowIfNot( stream->good(), "invalidStream" );
         
-        m_stream = std::move( stream );
-        m_repeat = repeat;
         m_currentId = nextId();
 
-        ThrowIfNot( m_mediaPlayerPlatformInterface->prepare(), "platformMediaPlayerPrepareFailed" );
+        ThrowIfNot( m_audioOutputChannel->prepare( IStreamAudioStream::create( stream ), repeat ), "audioOutputChannelSetStreamFailed" );
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"setSource").d("reason", ex.what()).d("expectedState",m_pendingEventState));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState",m_pendingEventState));
         resetSource();
     }
 
     return m_currentId;
 }
 
-alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId AudioChannelEngineImpl::setSource( const std::string& url, std::chrono::milliseconds offset )
+alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId AudioChannelEngineImpl::setSource( const std::string& url, std::chrono::milliseconds offset, bool repeat )
 {
     std::unique_lock<std::mutex> lock( m_mutex );
 
     try
     {
-        AACE_DEBUG(LX(TAG,"setSource").d("type","url").sensitive("url", url));
+        AACE_DEBUG(LX(TAG).d("type","url").sensitive("url", url));
 
         resetSource();
         
         m_url = url;
         m_currentId = nextId();
 
-        ThrowIfNot( m_mediaPlayerPlatformInterface->prepare( m_url ), "platformMediaPlayerPrepareFailed" );
-        ThrowIfNot( m_mediaPlayerPlatformInterface->setPosition( offset.count() ), "platformMediaPlayerSetPositionFailed" );
+        ThrowIfNot( m_audioOutputChannel->prepare( m_url, repeat ), "platformMediaPlayerPrepareFailed" );
+        ThrowIfNot( m_audioOutputChannel->setPosition( offset.count() ), "platformMediaPlayerSetPositionFailed" );
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"setSource").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
         resetSource();
     }
 
@@ -643,7 +561,7 @@ bool AudioChannelEngineImpl::play( alexaClientSDK::avsCommon::utils::mediaPlayer
 
     try
     {
-        AACE_VERBOSE(LX(TAG,"play").d("id",id));
+        AACE_VERBOSE(LX(TAG).d("id",id));
 
         ThrowIfNot( validateSource( id ), "invalidSource" );
 
@@ -657,8 +575,7 @@ bool AudioChannelEngineImpl::play( alexaClientSDK::avsCommon::utils::mediaPlayer
         sendPendingEvent();
 
         //invoke the platform interface play method
-        ALEXA_METRIC(LX(TAG, "play").d("channelName", m_name), aace::engine::alexa::AlexaMetrics::Location::PLAYBACK_REQUEST_START);
-        ThrowIfNot( m_mediaPlayerPlatformInterface->play(), "platformMediaPlayerPlayFailed" );
+        ThrowIfNot( m_audioOutputChannel->play(), "platformMediaPlayerPlayFailed" );
 
         // set the expected pending event state
         m_pendingEventState = PendingEventState::PLAYBACK_STARTED;
@@ -666,7 +583,7 @@ bool AudioChannelEngineImpl::play( alexaClientSDK::avsCommon::utils::mediaPlayer
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"play").d("reason", ex.what()).d("expectedState",m_pendingEventState));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState",m_pendingEventState));
         return false;
     }
 }
@@ -677,7 +594,7 @@ bool AudioChannelEngineImpl::stop( alexaClientSDK::avsCommon::utils::mediaPlayer
 
     try
     {
-        AACE_VERBOSE(LX(TAG,"stop").d("id",id));
+        AACE_VERBOSE(LX(TAG).d("id",id));
 
         ThrowIfNot( validateSource( id ), "invalidSource" );
 
@@ -688,15 +605,17 @@ bool AudioChannelEngineImpl::stop( alexaClientSDK::avsCommon::utils::mediaPlayer
         sendPendingEvent();
 
         // invoke the platform interface stop method
-        ThrowIfNot( m_mediaPlayerPlatformInterface->stop(), "platformMediaPlayerStopFailed" );
-        
+        if ( m_audioOutputChannel != nullptr ) {
+            ThrowIfNot( m_audioOutputChannel->stop(), "platformMediaPlayerStopFailed" );
+        }
+
         // set the expected pending event state and media offset
         m_pendingEventState = PendingEventState::PLAYBACK_STOPPED;
 
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"stop").d("reason", ex.what()).d("expectedState",m_pendingEventState));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState",m_pendingEventState));
         return false;
     }
 }
@@ -707,7 +626,7 @@ bool AudioChannelEngineImpl::pause( alexaClientSDK::avsCommon::utils::mediaPlaye
 
     try
     {
-        AACE_VERBOSE(LX(TAG,"pause").d("id",id));
+        AACE_VERBOSE(LX(TAG).d("id",id));
 
         ThrowIfNot( validateSource( id ), "invalidSource" );
         ReturnIf( id == ERROR, true );
@@ -721,7 +640,7 @@ bool AudioChannelEngineImpl::pause( alexaClientSDK::avsCommon::utils::mediaPlaye
         sendPendingEvent();
         
         // invoke the platform interface pause method
-        ThrowIfNot( m_mediaPlayerPlatformInterface->pause(), "platformMediaPlayerPauseFailed" );
+        ThrowIfNot( m_audioOutputChannel->pause(), "platformMediaPlayerPauseFailed" );
         
         // set the expected pending event state and media offset
         m_pendingEventState = PendingEventState::PLAYBACK_PAUSED;
@@ -734,7 +653,7 @@ bool AudioChannelEngineImpl::pause( alexaClientSDK::avsCommon::utils::mediaPlaye
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"pause").d("reason", ex.what()).d("expectedState",m_pendingEventState));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState",m_pendingEventState));
         return false;
     }
 }
@@ -745,7 +664,7 @@ bool AudioChannelEngineImpl::resume( alexaClientSDK::avsCommon::utils::mediaPlay
 
     try
     {
-        AACE_VERBOSE(LX(TAG,"resume").d("id",id));
+        AACE_VERBOSE(LX(TAG).d("id",id));
 
         ThrowIfNot( validateSource( id ), "invalidSource" );
 
@@ -762,8 +681,7 @@ bool AudioChannelEngineImpl::resume( alexaClientSDK::avsCommon::utils::mediaPlay
         sendPendingEvent();
 
         // invoke the platform interface resume method
-        ALEXA_METRIC(LX(TAG, "resume").d("channelName", m_name), aace::engine::alexa::AlexaMetrics::Location::PLAYBACK_REQUEST_RESUME);
-        ThrowIfNot( m_mediaPlayerPlatformInterface->resume(), "platformMediaPlayerResumeFailed" );
+        ThrowIfNot( m_audioOutputChannel->resume(), "platformMediaPlayerResumeFailed" );
         
         // set the expected pending event state
         m_pendingEventState = PendingEventState::PLAYBACK_RESUMED;
@@ -771,7 +689,7 @@ bool AudioChannelEngineImpl::resume( alexaClientSDK::avsCommon::utils::mediaPlay
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"resume").d("reason", ex.what()).d("expectedState",m_pendingEventState));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState",m_pendingEventState));
         return false;
     }
 }
@@ -782,13 +700,13 @@ std::chrono::milliseconds AudioChannelEngineImpl::getOffset( alexaClientSDK::avs
     {
         ReturnIf( m_currentId == ERROR || m_currentId != id, m_savedOffset );
         
-        std::chrono::milliseconds offset = std::chrono::milliseconds( m_mediaPlayerPlatformInterface->getPosition() );
+        std::chrono::milliseconds offset = std::chrono::milliseconds( m_audioOutputChannel->getPosition() );
         ThrowIf( offset.count() < 0, "invalidMediaTime" );
 
         return offset;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"getOffset").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return std::chrono::milliseconds( 0 );
     }
 }
@@ -797,33 +715,94 @@ uint64_t AudioChannelEngineImpl::getNumBytesBuffered() {
     return 0;
 }
 
-void AudioChannelEngineImpl::setObserver(std::shared_ptr<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerObserverInterface> observer) {
-    m_observer = observer;
+void AudioChannelEngineImpl::setObserver( std::shared_ptr<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerObserverInterface> observer )
+{
+    try
+    {
+        if( observer != nullptr )
+        {
+            ThrowIfNotNull( m_mediaPlayerObserver.lock(), "mediaPlayerObserverAlreadySet" );
+            m_mediaPlayerObserver = observer;
+        }
+        else {
+            m_mediaPlayerObserver.reset();
+        }
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+    }
 }
 
 //
 // alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface
 //
-bool AudioChannelEngineImpl::setVolume( int8_t volume ) {
-    return m_speakerPlatformInterface->setVolume( volume );
+
+bool AudioChannelEngineImpl::setVolume( int8_t volume )
+{
+    try
+    {
+        if (volume < MIN_SPEAKER_VOLUME || MAX_SPEAKER_VOLUME < volume) {
+            Throw("Volume is out of range");
+        }
+        ThrowIfNot( m_audioOutputChannel->volumeChanged( (float) volume / MAX_SPEAKER_VOLUME ), "audioOutputChannelSetVolumeFailed" );
+        
+        m_volume = volume;
+    
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
 }
 
-bool AudioChannelEngineImpl::adjustVolume( int8_t delta ) {
-    return m_speakerPlatformInterface->adjustVolume( delta );
+bool AudioChannelEngineImpl::adjustVolume( int8_t delta )
+{
+    try
+    {
+        ThrowIfNot( setVolume( m_volume + delta ), "setVolumeFailed" );
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
 }
 
-bool AudioChannelEngineImpl::setMute( bool mute ) {
-    return m_speakerPlatformInterface->setMute( mute );
+bool AudioChannelEngineImpl::setMute( bool mute )
+{
+    try
+    {
+        m_muted = mute;
+
+        ThrowIfNot( m_audioOutputChannel->mutedStateChanged( mute ?
+            aace::engine::audio::AudioOutputChannelInterface::MutedState::MUTED :
+            aace::engine::audio::AudioOutputChannelInterface::MutedState::UNMUTED ), "audioOutputChannelSetMuteFailed" );
+        
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
 }
 
-bool AudioChannelEngineImpl::getSpeakerSettings( alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::SpeakerSettings* settings ) {
-    settings->volume = m_speakerPlatformInterface->getVolume();
-    settings->mute = m_speakerPlatformInterface->isMuted();
-    return true;
+bool AudioChannelEngineImpl::getSpeakerSettings( alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::SpeakerSettings* settings )
+{
+    try
+    {
+        settings->volume = m_volume;
+        settings->mute = m_muted;
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
 }
 
 alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::Type AudioChannelEngineImpl::getSpeakerType() {
-    return static_cast<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::Type>( m_audioChannelPlatformInterface->getSpeakerType() );
+    return m_speakerType;
 }
 
 bool AudioChannelEngineImpl::validateSource( alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id )
@@ -834,9 +813,113 @@ bool AudioChannelEngineImpl::validateSource( alexaClientSDK::avsCommon::utils::m
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"validateSource").d("reason", ex.what()).d("id",id).d("currentId",m_currentId));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("id",id).d("currentId",m_currentId));
         return false;
     }
+}
+
+//
+// AttachmentReaderStream
+//
+
+AttachmentReaderAudioStream::AttachmentReaderAudioStream(
+    std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader> attachmentReader,
+    Encoding encoding ) :
+        m_attachmentReader( attachmentReader ),
+        m_status( alexaClientSDK::avsCommon::avs::attachment::AttachmentReader::ReadStatus::OK ),
+        m_closed( false ),
+        m_encoding( encoding ) {
+}
+
+std::shared_ptr<AttachmentReaderAudioStream> AttachmentReaderAudioStream::create(
+    std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader> attachmentReader,
+    const alexaClientSDK::avsCommon::utils::AudioFormat* format ) {
+
+    Encoding encoding = Encoding::MP3;
+    
+    if( format != nullptr )
+    {
+        switch( format->encoding )
+        {
+            case alexaClientSDK::avsCommon::utils::AudioFormat::Encoding::LPCM:
+                encoding = Encoding::LPCM;
+                break;
+            case alexaClientSDK::avsCommon::utils::AudioFormat::Encoding::OPUS:
+                encoding = Encoding::OPUS;
+                break;
+        }
+    }
+
+    return std::shared_ptr<AttachmentReaderAudioStream>( new AttachmentReaderAudioStream( attachmentReader, encoding ) );
+}
+
+ssize_t AttachmentReaderAudioStream::read( char* data, const size_t size )
+{
+    try
+    {
+        ssize_t count = m_attachmentReader->read( static_cast<void*>( data ), size, &m_status, std::chrono::milliseconds(100) );
+        
+        if( m_status >= alexaClientSDK::avsCommon::avs::attachment::AttachmentReader::ReadStatus::CLOSED ) {
+            m_closed = true;
+        }
+        
+        return count;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG+".AttachmentReaderAudioStream").d("reason", ex.what()));
+        m_closed = true;
+        return 0;
+    }
+}
+
+bool AttachmentReaderAudioStream::isClosed() {
+    return m_closed;
+}
+
+AttachmentReaderAudioStream::Encoding AttachmentReaderAudioStream::getEncoding() {
+    return m_encoding;
+}
+
+//
+// IStreamAudioStream
+//
+
+IStreamAudioStream::IStreamAudioStream( std::shared_ptr<std::istream> stream ) : m_stream( stream ), m_closed( false ) {
+}
+
+std::shared_ptr<IStreamAudioStream> IStreamAudioStream::create( std::shared_ptr<std::istream> stream ) {
+    return std::shared_ptr<IStreamAudioStream>( new IStreamAudioStream( stream ) );
+}
+
+ssize_t IStreamAudioStream::read( char* data, const size_t size )
+{
+    try
+    {
+        if( m_stream->eof() ) {
+            m_closed = true;
+            return 0;
+        }
+    
+        // read the data from the stream
+        m_stream->read( data, size );
+        ThrowIf( m_stream->bad(), "readFailed" );
+        
+        // get the number of bytes read
+        ssize_t count = m_stream->gcount();
+        
+        m_stream->tellg(); // Don't remove otherwise the ReseourceStream used for Alerts/Timers won't work as expected.
+
+        return count;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG+".IStreamAudioStream").d("reason", ex.what()));
+        m_closed = true;
+        return 0;
+    }
+}
+
+bool IStreamAudioStream::isClosed() {
+    return m_closed;
 }
 
 } // aace::engine::alexa

@@ -52,6 +52,7 @@ class CBLHandler : public aace::cbl::CBL /* isa PlatformInterface */ {
 
     auto cblStateChanged(CBLState state, CBLStateChangedReason reason, const std::string &url, const std::string &code) -> void override;
     auto clearRefreshToken() -> void override;
+    auto setUserProfile( const std::string& name, const std::string& email ) -> void override;
 
   private:
     auto getRefreshToken() -> std::string override;
@@ -63,6 +64,7 @@ class CBLHandler : public aace::cbl::CBL /* isa PlatformInterface */ {
     bool m_busy{};
 
     auto log(logger::LoggerHandler::Level level, const std::string &message) -> void;
+    auto showMessage(const std::string &message) -> void;
     auto setupUI() -> void;
 };
 

@@ -18,7 +18,7 @@
 #include <memory>
 
 #include <AACE/Alexa/AudioPlayer.h>
-#include <AACE/Alexa/Speaker.h>
+#include "LoggerHandler.h"
 
 namespace aasb {
 namespace alexa {
@@ -38,21 +38,15 @@ public:
      * @param speaker Speaker to control the volume of @c mediaPlayer.
      */
     static std::shared_ptr<AudioPlayerHandler> create(
-        bool aacePlatformMediaPlayer,
-        std::shared_ptr<aace::alexa::MediaPlayer> mediaPlayer,
-        std::shared_ptr<aace::alexa::Speaker> speaker);
+        std::shared_ptr<aasb::core::logger::LoggerHandler> logger);
 
     void onReceivedEvent(const std::string& action, const std::string& payload);
 
 private:
     AudioPlayerHandler(
-        bool aacePlatformMediaPlayer,
-        std::shared_ptr<aace::alexa::MediaPlayer> mediaPlayer,
-        std::shared_ptr<aace::alexa::Speaker> speaker);
+        std::shared_ptr<aasb::core::logger::LoggerHandler> logger);
 
-    bool m_aacePlatformMediaPlayer;
-    std::shared_ptr<aace::alexa::MediaPlayer> m_mediaPlayer;
-    std::shared_ptr<aace::alexa::Speaker> m_speaker;
+    std::shared_ptr<aasb::core::logger::LoggerHandler> m_logger;
 };
 
 }  // namespace alexa

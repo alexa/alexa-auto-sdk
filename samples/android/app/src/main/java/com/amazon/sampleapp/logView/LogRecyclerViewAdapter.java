@@ -308,7 +308,7 @@ public class LogRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         else return;
 
         if ( mFilteredItems.size() < MAX_NUM_FILTERED_LOGS ) {
-            notifyItemInserted( getItemCount() - 1 );
+            notifyDataSetChanged();
         } else {
             // Note: mFiltered items is a limited size array list that removes the first
             // item and inserts a new item at the end when the max size is reached.

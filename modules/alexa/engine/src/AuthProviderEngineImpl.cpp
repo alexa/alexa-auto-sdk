@@ -23,8 +23,27 @@ namespace alexa {
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.AuthProviderEngineImpl");
 
-std::shared_ptr<AuthProviderEngineImpl> AuthProviderEngineImpl::create( std::shared_ptr<aace::alexa::AuthProvider> authProvider ) {
-    return std::shared_ptr<AuthProviderEngineImpl>( new AuthProviderEngineImpl( authProvider ) );
+std::shared_ptr<AuthProviderEngineImpl> AuthProviderEngineImpl::create( std::shared_ptr<aace::alexa::AuthProvider> authProvider )
+{
+    std::shared_ptr<AuthProviderEngineImpl> authProviderEngineImpl = nullptr;
+
+    try
+    {
+        ThrowIfNull( authProvider, "invalidAuthProviderPlatformInterface" );
+        authProviderEngineImpl = std::shared_ptr<AuthProviderEngineImpl>( new AuthProviderEngineImpl( authProvider ) );
+        
+        // set the platform engine interface reference
+        authProvider->setEngineInterface( authProviderEngineImpl );
+
+        return authProviderEngineImpl;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"create").d("reason", ex.what()));
+        if( authProviderEngineImpl != nullptr ) {
+            authProviderEngineImpl->shutdown();
+        }
+        return nullptr;
+    }
 }
 
 AuthProviderEngineImpl::AuthProviderEngineImpl( std::shared_ptr<aace::alexa::AuthProvider> authProvider ) :
@@ -60,8 +79,7 @@ std::string AuthProviderEngineImpl::getAuthToken()
     }
 }
 
-void AuthProviderEngineImpl::onAuthFailure( const std::string& token )
-{
+void AuthProviderEngineImpl::onAuthFailure( const std::string& token ) {
     AACE_DEBUG(LX(TAG,"onAuthFailure").sensitive("token",token));
 }
 

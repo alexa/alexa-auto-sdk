@@ -20,6 +20,8 @@
 #include <memory>
 #include <string>
 
+#include "AACE/Engine/Alexa/AlexaEndpointInterface.h"
+
 namespace aace {
 namespace engine {
 namespace cbl {
@@ -30,7 +32,7 @@ public:
     static std::shared_ptr<CBLAuthDelegateConfiguration> create(
         std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
         std::chrono::seconds codePairRequestTimeout,
-        const std::string& lwaUrl );
+        std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints );
 
     std::string getClientId() const;
     std::string getProductId() const;
@@ -47,17 +49,16 @@ private:
 
     bool initialize( std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
         std::chrono::seconds codePairRequestTimeout,
-        const std::string& lwaUrl );
+        std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints );
+
     bool initScopeData();
 
     std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> m_deviceInfo;
     std::chrono::seconds m_requestTimeout;
     std::chrono::seconds m_codePairRequestTimeout;
     std::chrono::seconds m_accessTokenRefreshHeadStart;
-    std::string m_requestCodePairUrl;
-    std::string m_requestTokenUrl;
-    std::string m_refreshTokenUrl;
     std::string m_scopeData;
+    std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> m_alexaEndpoints;
 };
 
 } // aace::engine::cbl

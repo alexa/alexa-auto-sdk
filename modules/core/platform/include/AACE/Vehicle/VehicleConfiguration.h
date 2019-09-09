@@ -38,52 +38,52 @@ public:
     enum class VehiclePropertyType {
 
         /**
-         * Vehicle make
+         * Vehicle's make
          */
         MAKE,
 
         /**
-         * Vehicle model
+         * Vehicle's model
          */
         MODEL,
 
         /**
-         * Vehicle year
+         * Vehicle model year, example: 2018, 2019, 2020
          */
         YEAR,
 
         /**
-         * Vehicle trim package
+         * Variations of a model with different set of features, example: Standard, Sport, Limited
          */
         TRIM,
 
         /**
-         * Vehicle region
+         * Current location (country/region/state) of the vehicle, example: US, US-North, WA
          */
         GEOGRAPHY,
 
         /**
-         * Software version
+         * OEM client software version
          */
         VERSION,
 
         /**
-         * Operating system
+         * Operating system for vehicle's infotainment system, example: Android 8.1 Oreo API Level 26
          */
         OPERATING_SYSTEM,
 
         /**
-         * Hardware architecture
+         * Supporting hardware architecture, example: x86_64
          */
         HARDWARE_ARCH,
 
         /**
-         * Language
+         * Language or locale selected for Alexa by the vehicle owner, example: en-UA, fr-CA
          */
         LANGUAGE,
 
         /**
-         * Microphone
+         * Type and arrangement of microphone in the car, example: 7 mic array, centrally mounted
          */
         MICROPHONE,
         
@@ -93,7 +93,7 @@ public:
         COUNTRY_LIST,
 
         /**
-         * Vehicle identifier
+         * Automaker's internal identifier for the vehicle
          */
         VEHICLE_IDENTIFIER
     };
@@ -132,7 +132,7 @@ public:
      *
      * @param [in] propertyList A list of @c VehicleProperty type and value pairs
      */
-    static std::shared_ptr<aace::core::config::EngineConfiguration> createVehicleInfoConfig( std::initializer_list<VehicleProperty> propertyList );
+    static std::shared_ptr<aace::core::config::EngineConfiguration> createVehicleInfoConfig( const std::vector<VehicleProperty>& propertyList );
     
     /**
      * Factory method used to programmatically generate vehicle operating country configuration data.

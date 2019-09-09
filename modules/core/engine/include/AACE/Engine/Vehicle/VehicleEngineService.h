@@ -21,6 +21,7 @@
 #include "AACE/Engine/Core/EngineService.h"
 #include "AACE/Engine/Vehicle/VehiclePropertyInterface.h"
 #include "AACE/Engine/Metrics/MetricEvent.h"
+#include "AACE/Engine/Storage/StorageEngineService.h"
 
 #include "AACE/Vehicle/VehicleConfiguration.h"
 
@@ -44,7 +45,7 @@ class VehicleEngineService :
     public std::enable_shared_from_this<VehicleEngineService> {
     
 public:
-    DESCRIBE("aace.vehicle",VERSION("1.0"))
+    DESCRIBE("aace.vehicle",VERSION("1.0"),DEPENDS(aace::engine::storage::StorageEngineService))
 
 public:
     using VehiclePropertyType = aace::vehicle::config::VehicleConfiguration::VehiclePropertyType;
@@ -61,11 +62,9 @@ public:
 protected:
     bool initialize() override;
     bool setup() override;
-    bool configure( const std::vector<std::shared_ptr<std::istream>>& configuration ) override;
+    bool configure( std::shared_ptr<std::istream> configuration ) override;
     bool setProperty( const std::string& key, const std::string& value ) override;
     std::string getProperty( const std::string& key ) override;
-private:
-    bool configure( std::shared_ptr<std::istream> configuration );
 
     bool checkVehicleConfigProperty( rapidjson::Value& root, const char* key, bool warnIfMissing = true );
     std::string getVehicleConfigProperty( rapidjson::Value& root, const char* key, const char* defaultValue = "", bool warnIfMissing = true );

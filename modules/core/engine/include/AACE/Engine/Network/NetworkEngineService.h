@@ -37,7 +37,9 @@ public:
     
 protected:
     bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) override;
-    
+    bool setProperty( const std::string& key, const std::string& value ) override;
+    std::string getProperty( const std::string& key ) override;
+
 private:
 
     // platform interface registration

@@ -107,6 +107,17 @@ void CBLHandler::setRefreshToken(const std::string &refreshToken) {
     m_applicationContext->setRefreshToken(refreshToken);
 }
 
+void CBLHandler::setUserProfile(const std::string &name, const std::string& email) {
+    std::stringstream ss;
+    ss << "setUserProfile:name=" << name << ",email=" << email;
+    log(logger::LoggerHandler::Level::INFO, ss.str());
+
+    auto activity = m_activity.lock();
+    activity->runOnUIThread([=]() {
+        showMessage("Welcome " + name + ", " + email);
+    });
+}
+
 // private
 
 void CBLHandler::log(logger::LoggerHandler::Level level, const std::string &message) {
@@ -115,6 +126,14 @@ void CBLHandler::log(logger::LoggerHandler::Level level, const std::string &mess
         return;
     }
     loggerHandler->log(level, "CBLHandler", message);
+}
+
+void CBLHandler::showMessage(const std::string &message) {
+    if (auto console = m_console.lock()) {
+        console->printRuler();
+        console->printLine(message);
+        console->printRuler();
+    }
 }
 
 void CBLHandler::setupUI() {
@@ -129,20 +148,14 @@ void CBLHandler::setupUI() {
     activity->registerObserver(Event::onCBLStart, [=](const std::string &) {
         log(logger::LoggerHandler::Level::VERBOSE, "onCBLStart");
         if (m_applicationContext->hasRefreshToken()) {
-            if (auto console = m_console.lock()) {
-                console->printLine("You already have your refresh token");
-            }
+            showMessage("You already have your refresh token");
             return false;
         }
         if (m_busy) {
-            if (auto console = m_console.lock()) {
-                console->printLine("You already started CBL login flow");
-            }
+            showMessage("You already started CBL login flow");
             return false;
         }
-        if (auto console = m_console.lock()) {
-            console->printLine("Starting CBL login flow...");
-        }
+        showMessage("Starting CBL login flow...");
         start();
         return true;
     });
@@ -151,21 +164,31 @@ void CBLHandler::setupUI() {
     activity->registerObserver(Event::onCBLCancel, [=](const std::string &) {
         log(logger::LoggerHandler::Level::VERBOSE, "onCBLCancel");
         if (m_applicationContext->hasRefreshToken()) {
-            if (auto console = m_console.lock()) {
-                console->printLine("You already have your refresh token");
-            }
+            showMessage("You already have your refresh token");
             return false;
         }
         if (!m_busy) {
-            if (auto console = m_console.lock()) {
-                console->printLine("You have not started CBL login flow");
-            }
+            showMessage("You have not started CBL login flow");
             return false;
         }
-        if (auto console = m_console.lock()) {
-            console->printLine("Canceling CBL login flow...");
-        }
+        showMessage("Canceling CBL login flow...");
         cancel();
+        return true;
+    });
+
+    // reset
+    activity->registerObserver(Event::onCBLReset, [=](const std::string &) {
+        log(logger::LoggerHandler::Level::VERBOSE, "onCBLReset");
+        if (!m_applicationContext->hasRefreshToken()) {
+            showMessage("You do not have a refresh token");
+            return false;
+        }
+        if (!m_busy) {
+            showMessage("You have not started CBL login flow");
+            return false;
+        }
+        showMessage("Resetting CBL...");
+        reset();
         return true;
     });
 }

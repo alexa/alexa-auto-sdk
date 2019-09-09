@@ -19,7 +19,7 @@
 #include <memory>
 #include <string>
 
-#include <aasb/RequestHandler.h>
+#include <aasb/interfaces/IAASBController.h>
 
 #include "interfaces/afb/IAFBApi.h"
 #include "interfaces/capability/ICapabilityMessageDispatcher.h"
@@ -40,12 +40,12 @@ public:
      * Creates a new instance of @c PhoneCallDispatcher.
      *
      * @param logger An instance of logger.
-     * @param requestHandler AASB Request handler to dispatch events to AASB.
+     * @param IAASBController interface to dispatch events to AASB.
      * @param api AFB API instance to communicate with other AGL services (like vshl-capabilities)
      */
     static std::shared_ptr<PhoneCallDispatcher> create(
         std::shared_ptr<agl::common::interfaces::ILogger> logger,
-        std::shared_ptr<aasb::bridge::RequestHandler> requestHandler,
+        std::shared_ptr<aasb::bridge::IAASBController> aasbController,
         std::shared_ptr<agl::common::interfaces::IAFBApi> api);
 
     /// @name ICapabilityMessageDispatcher Functions
@@ -101,14 +101,14 @@ private:
      */
     PhoneCallDispatcher(
         std::shared_ptr<agl::common::interfaces::ILogger> logger,
-        std::shared_ptr<aasb::bridge::RequestHandler> requestHandler,
+        std::shared_ptr<aasb::bridge::IAASBController> m_aasbController,
         std::shared_ptr<agl::common::interfaces::IAFBApi> api);
 
     // Logger.
     std::shared_ptr<agl::common::interfaces::ILogger> m_logger;
 
-    // AASB Request handler to dispatch events to AASB.
-    std::shared_ptr<aasb::bridge::RequestHandler> m_requestHandler;
+    // AASB controller to dispatch events to AASB.
+    std::shared_ptr<aasb::bridge::IAASBController> m_aasbController;
 
     // AFB API object for events pub/sub, and for calling other AGL services.
     std::shared_ptr<agl::common::interfaces::IAFBApi> m_api;

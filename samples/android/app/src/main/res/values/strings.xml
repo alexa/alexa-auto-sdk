@@ -29,17 +29,22 @@
     <string name="remote_device">REMOTE DEVICE</string>
 
     <!-- Contact Uploader -->
-    <string name="contact_uploader">CONTACT UPLOADER</string>
-    <string name="contact_upload_switch">PHONE CONNECTION</string>
+    <string name="contacts_uploader">CONTACTS</string>
+    <string name="navigation_favorites_uploader">NAVIGATION FAVORITES</string>
+    <string name="permit_upload">PERMIT UPLOAD</string>
     <string name="upload_contacts">UPLOAD</string>
     <string name="cancel_contacts">CANCEL</string>
     <string name="remove_contacts">REMOVE</string>
-    <string name="seek_access_to_contacts">To use Alexa to call contacts in your phone, please allow your phone contacts to be stored temporarily in the Alexa cloud. </string>
+    <string name="seek_access_to_contacts">Grant Alexa permission to use your phone contacts in order to make calls?</string>
+    <string name="seek_access_to_navigation_favorites">Grant Alexa permission to use your navigation favorites?</string>
     <string name="confirm">YES</string>
     <string name="deny">NO</string>
     <string name="granted_access_to_contacts">User granted access to sync contacts.</string>
-    <string name="no_phone_is_connected">No phone connected.</string>
+    <string name="no_permission_to_contacts">No permission granted to sync contacts.</string>
     <string name="denied_access_to_contacts">User denied access to sync contacts.</string>
+    <string name="granted_access_to_navigation_favorites">User granted access to sync navigation favorites.</string>
+    <string name="no_permission_to_navigation_favorites">No permission granted to sync navigation favorites.</string>
+    <string name="denied_access_to_navigation_favorites">User denied access to sync navigation favorites.</string>
     <string name="uploading_contacts">UPLOADING...</string>
     <string name="cancelling_contacts">CANCELLING...</string>
     <string name="removing_contacts">REMOVING...</string>
@@ -51,6 +56,14 @@
     <string name="remove_contacts_failure">FAILED TO REMOVE CONTACTs.</string>
     <string name="failed_with_unknown_error">FAILED.</string>
     <string name="empty_string"></string>
+
+    <!-- Navigation -->
+    <string name="navigation">NAVIGATION</string>
+    <string name="load_navigation_state_file">LOAD NAV STATE</string>
+    <string name="navigation_state_file_not_loaded">Navigation state file not loaded</string>
+    <string name="navigation_state_file_loaded">Navigation state file loaded</string>
+    <string name="navigation_state_file_error">Error reading navigation state file</string>
+
 
     <!-- Config -->
     <string name="config">CONFIGURATION SETTINGS</string>
@@ -93,6 +106,14 @@
     <!-- Network info -->
     <string name="network_info">NETWORK INFO</string>
     <string name="network_status">NETWORK STATUS:</string>
+    <string name="select_network_interface">SELECT NETWORK INTERFACE</string>
+    <string name="interface_name">NETWORK INTERFACE (IP Address or Interface Name)</string>
+    <string name="interface_set">CHANGE INTERFACE</string>
+    <string name="wifi">Wifi</string>
+    <string name="mobile_data">Mobile Data</string>
+    <string name="manual_entry">Manual Entry/IP Entry</string>
+    <string name="wlan0_message">Generally Wifi network interface is \'wlan0\', if not, edit manually</string>
+    <string name="rmnet0_message">Generally Mobile Data network interface is \'rmnet0\', if not, edit manually</string>
 
     <!-- Speaker Volume -->
     <string name="volume">VOLUME</string>
@@ -100,6 +121,11 @@
     <string name="volume_alerts">ALERTS ( Alerts, Notifications )</string>
     <string name="volume_mute">MUTE</string>
     <string name="volume_unmute">UNMUTE</string>
+
+    <!-- Earcons -->
+    <string name="earcons">EARCONS</string>
+    <string name="earcons_start_of_request">START OF REQUEST</string>
+    <string name="earcons_end_of_request">END Of REQUEST</string>
 
     <!-- Location -->
     <string name="location">LOCATION</string>
@@ -140,14 +166,4 @@
     <string name="preference_product_id">Product ID Key</string>
     <string name="preference_product_dsn">Product DSN Key</string>
     <string name="preference_refresh_token">Refresh Token Key</string>
-
-    <!-- Alexa Comms -->
-    <string name="alexa_comms_view_title">ALEXA COMMUNICATIONS</string>
-    <string name="alexa_comms_control_accept">Accept Call</string>
-    <string name="alexa_comms_control_stop">Stop Call</string>
-    <string name="alexa_comms_status_connecting">Connecting ...</string>
-    <string name="alexa_comms_status_connected">Call Connected</string>
-    <string name="alexa_comms_status_disconnected">Call Disconnected</string>
-    <string name="alexa_comms_status_inbound_ringing">Inbound Ringing</string>
-    <string name="alexa_comms_status_noactive_call">No Active Call</string>
 </resources>

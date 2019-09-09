@@ -1,12 +1,32 @@
-# CBL API
+# Code-Based Linking (CBL) Module
 
-## Overview
 
-The Alexa Auto SDK CBL API provides the features required by a platform implementation to fully handle the authentication flow with Alexa. The platform implementation is responsible for storing and supplying the refresh token to the SDK.
+The Alexa Auto SDK CBL module provides the features required by a platform implementation to fully handle the authentication flow with Alexa. The platform implementation is responsible for storing and supplying the refresh token to the SDK.
 
-## Using CBL
+**Table of Contents**
 
-To implement a custom CBL handler, the `aace::cbl::CBL` class should be extended:
+* [Sequence Diagrams](#sequence-diagrams)
+* [Using CBL](#using-cbl)
+
+
+
+## Sequence Diagrams <a id = "sequence-diagrams"></a>
+
+The following sequence diagrams provide an overview of the authentication flow and the process of refreshing the authentication when the application provides a valid refresh token.
+
+### Initial authentication flow
+
+This diagram provides an overview of the initial authenticaion flow.
+![Login Flow](./assets/aac-cbl-login.png)
+
+### Refreshing token
+
+This diagram provides an overview of how CBL refreshes your authentication on startup.
+![Refresh Token](./assets/aac-cbl-refresh.png)
+
+## Using CBL<a id="using-cbl"></a>
+
+To implement a custom CBL handler, extend the `CBL` class:
 
     #include <AACE/CBL/CBL.h>
 
@@ -31,6 +51,11 @@ To implement a custom CBL handler, the `aace::cbl::CBL` class should be extended
             // Return refresh token, if available, otherwise empty string
         }
 
+        void setUserProfile( const std::string& name, const std::string& email ) {
+            // Set name and email
+            // The platform application will be notified during login
+        }
+
         // Begin authorization flow
         start();
         ...
@@ -38,8 +63,21 @@ To implement a custom CBL handler, the `aace::cbl::CBL` class should be extended
         // Cancel authorization flow
         cancel();
         ...
+
+        // Reset authorization state
+        reset();
+        ...
     };
 
     // Register a CBL handler with the Engine
     std::shared_ptr<CBL> cbl = std::make_shared<MyCBLHandler>();
     engine->registerPlatformInterface( cbl );
+
+Use this configuration to enable a user profile:
+```json
+{
+    "aace.cbl": {
+        "enableUserProfile": true
+    }
+}
+```

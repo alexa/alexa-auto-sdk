@@ -21,12 +21,17 @@
 
 /// AASB Headers
 #include <aasb/Consts.h>
-#include <aasb/RequestHandler.h>
+#include <aasb/AASBControllerFactory.h>
+#include <aasb/interfaces/IAASBController.h>
+
 
 /// Plugin headers
 #include "AlexaConsts.h"
 #include "afb/AFBApiImpl.h"
 #include "afb/AFBRequestImpl.h"
+#include "dispatchers/local-voice-control/car-control/CarControlDispatcher.h"
+#include "dispatchers/locationprovider/LocationProviderDispatcher.h"
+#include "dispatchers/localmediasource/LocalMediaSourceDispatcher.h"
 #include "dispatchers/navigation/NavigationDispatcher.h"
 #include "dispatchers/phonecall/PhoneCallDispatcher.h"
 #include "dispatchers/playback/PlaybackDispatcher.h"
@@ -42,13 +47,17 @@ CTLP_CAPI_REGISTER("alexa-voiceagent-api");
 static std::string TAG = "alexa::plugins::AlexaVAApi";
 
 static std::shared_ptr<agl::utilities::logging::Logger> sAFBLogger;
-static std::shared_ptr<aasb::bridge::RequestHandler> sAASBRequestHandler;
 static std::shared_ptr<agl::alexa::AASBConfigProviderImpl> sAASBConfigProvider;
 static std::shared_ptr<agl::alexa::AlexaCapabilityDirectiveRouterImpl> sAlexaCapabilityRouter;
 static std::shared_ptr<agl::dispatcher::phonecall::PhoneCallDispatcher> sAlexaPhoneCallDispatcher;
 static std::shared_ptr<agl::dispatcher::playback::PlaybackDispatcher> sAlexaPlaybackDispatcher;
 static std::shared_ptr<agl::dispatcher::navigation::NavigationDispatcher> sAlexaNavigationDispatcher;
+static std::shared_ptr<agl::dispatcher::localVoiceControl::carControl::CarControlDispatcher> sAlexaCarControlDispatcher;
+static std::shared_ptr<agl::dispatcher::localmediasource::LocalMediaSourceDispatcher> sAlexaLocalMediaSourceDispatcher;
+static std::shared_ptr<agl::dispatcher::locationprovider::LocationProviderDispatcher> sAlexaLocationProviderDispatcher;
 static std::shared_ptr<agl::common::interfaces::IAFBApi> sAFBApi;
+static std::shared_ptr<agl::audio::Audio> sAudio;
+static std::shared_ptr<aasb::bridge::IAASBController> sAASBController;
 
 using Level = agl::common::interfaces::ILogger::Level;
 
@@ -99,20 +108,27 @@ CTLP_ONLOAD(plugin, ret) {
 CTLP_INIT(plugin, ret) {
     sAFBLogger = agl::utilities::logging::Logger::create(plugin->api);
     if (!sAFBLogger) {
-        AFB_ApiError(plugin->api, "alexa-voiceagent-api: Failed to create AFB Logger.");
+        AFB_API_ERROR(plugin->api, "alexa-voiceagent-api: Failed to create AFB Logger.");
         return -1;
     }
 
     sAFBLogger->log(Level::INFO, TAG, "initializing");
-    sAASBConfigProvider = agl::alexa::AASBConfigProviderImpl::create(sAFBLogger, plugin->api);
-    if (!sAASBConfigProvider) {
-        sAFBLogger->log(Level::ERROR, TAG, "AASBConfigProviderImpl::create failed");
-        return -1;
-    }
 
     sAFBApi = agl::afb::AFBApiImpl::create(plugin->api);
     if (!sAFBApi) {
         sAFBLogger->log(Level::ERROR, TAG, "AFBApiImpl::create failed");
+        return -1;
+    }
+
+    sAudio = agl::audio::Audio::create(sAFBLogger, sAFBApi);
+    if (!sAudio) {
+        sAFBLogger->log(Level::ERROR, TAG, "Audio::create failed");
+        return -1;
+    }
+
+    sAASBConfigProvider = agl::alexa::AASBConfigProviderImpl::create(sAFBLogger, plugin->api, sAudio);
+    if (!sAASBConfigProvider) {
+        sAFBLogger->log(Level::ERROR, TAG, "AASBConfigProviderImpl::create failed");
         return -1;
     }
 
@@ -122,20 +138,20 @@ CTLP_INIT(plugin, ret) {
         return -1;
     }
 
-    sAASBRequestHandler = std::make_shared<aasb::bridge::RequestHandler>();
-    bool initResult = sAASBRequestHandler->init(sAASBConfigProvider);
+    sAASBController = aasb::bridge::AASBControllerFactory::createAASBController();
+    bool initResult = sAASBController->init(sAASBConfigProvider);
     if (!initResult) {
-        sAFBLogger->log(Level::ERROR, TAG, "AASBRequestHandler::init failed");
+        sAFBLogger->log(Level::ERROR, TAG, "AASBController::init failed");
         return -1;
     }
 
-    if (!sAASBRequestHandler->registerCapabilityDirectiveListener(sAlexaCapabilityRouter)) {
-        sAFBLogger->log(Level::ERROR, TAG, "AASBRequestHandler::registerAlexaCapabilityDirectiveRouter failed");
+    if (!sAASBController->registerCapabilityDirectiveListener(sAlexaCapabilityRouter)) {
+        sAFBLogger->log(Level::ERROR, TAG, "AASBController::registerAlexaCapabilityDirectiveRouter failed");
         return -1;
     }
 
     sAlexaPlaybackDispatcher = agl::dispatcher::playback::PlaybackDispatcher::create(
-        sAFBLogger, sAASBRequestHandler, sAFBApi);
+        sAFBLogger, sAASBController, sAFBApi);
     if (!sAlexaPlaybackDispatcher) {
         sAFBLogger->log(Level::ERROR, TAG, "PlaybackDispatcher::create failed");
         return -1;
@@ -150,7 +166,7 @@ CTLP_INIT(plugin, ret) {
 
     if (sAASBConfigProvider->shouldEnableNavigation()) {
         sAlexaNavigationDispatcher = agl::dispatcher::navigation::NavigationDispatcher::create(
-            sAFBLogger, sAASBRequestHandler, sAFBApi);
+            sAFBLogger, sAASBController, sAFBApi);
         if (!sAlexaNavigationDispatcher) {
             sAFBLogger->log(Level::ERROR, TAG, "NavigationDispatcher::create failed");
             return -1;
@@ -163,7 +179,7 @@ CTLP_INIT(plugin, ret) {
 
     if (sAASBConfigProvider->shouldEnablePhoneCallControl()) {
         sAlexaPhoneCallDispatcher = agl::dispatcher::phonecall::PhoneCallDispatcher::create(
-            sAFBLogger, sAASBRequestHandler, sAFBApi);
+            sAFBLogger, sAASBController, sAFBApi);
         if (!sAlexaPhoneCallDispatcher) {
             sAFBLogger->log(Level::ERROR, TAG, "PhoneCallDispatcher::create failed");
             return -1;
@@ -178,9 +194,57 @@ CTLP_INIT(plugin, ret) {
             aasb::bridge::TOPIC_PHONECALL_CONTROLLER, sAlexaPhoneCallDispatcher);
     }
 
-    bool startResult = sAASBRequestHandler->start();
+    if (sAASBConfigProvider->shouldEnableLocalMediaSource()) {
+        sAlexaLocalMediaSourceDispatcher = agl::dispatcher::localmediasource::LocalMediaSourceDispatcher::create(
+            sAFBLogger, sAASBController, sAFBApi);
+        if (!sAlexaLocalMediaSourceDispatcher) {
+            sAFBLogger->log(Level::ERROR, TAG, "LocalMediaSourceDispatcher::create failed");
+            return -1;
+        }
+
+        if (!sAlexaLocalMediaSourceDispatcher->subscribeToLocalMediaSourceEvents()) {
+            sAFBLogger->log(Level::WARNING, TAG, "LocalMediaSourceDispatcher::subscribeToLocalMediaSourceEvents failed");
+        }
+
+        // To process localmediasource directives coming from Alexa
+        sAlexaCapabilityRouter->registerCapabilityDispatcher(
+            aasb::bridge::TOPIC_LOCAL_MEDIA_SOURCE, sAlexaLocalMediaSourceDispatcher);
+    }
+
+    if (sAASBConfigProvider->shouldEnableCarControl()) {
+        sAlexaCarControlDispatcher = agl::dispatcher::localVoiceControl::carControl::CarControlDispatcher::create(
+            sAFBLogger, sAASBController, sAFBApi);
+        if (!sAlexaCarControlDispatcher) {
+            sAFBLogger->log(Level::ERROR, TAG, "CarControlDispatcher::create failed");
+            return -1;
+        }
+
+        if (!sAlexaCarControlDispatcher->subscribeToCarControlEvents()) {
+            sAFBLogger->log(Level::WARNING, TAG, "CarControlDispatcher::subscribeToCarControlEvents failed");
+        }
+
+        // To process carcontrol directives coming from Alexa
+        sAlexaCapabilityRouter->registerCapabilityDispatcher(
+            aasb::bridge::TOPIC_CARCONTROL, sAlexaCarControlDispatcher);
+    }
+
+    // Location Provider dispatcher
+    if (sAASBConfigProvider->shouldEnableNavigation()) {
+        sAlexaLocationProviderDispatcher = agl::dispatcher::locationprovider::LocationProviderDispatcher::create(
+            sAFBLogger, sAASBController, sAASBConfigProvider);
+        if (!sAlexaLocationProviderDispatcher) {
+            sAFBLogger->log(Level::ERROR, TAG, "LocationProviderDispatcher::create failed");
+            return -1;
+        }
+
+        // To process location provider directives coming from Alexa
+        sAlexaCapabilityRouter->registerCapabilityDispatcher(
+            aasb::bridge::TOPIC_LOCATIONPROVIDER, sAlexaLocationProviderDispatcher);
+    }
+
+    bool startResult = sAASBController->start();
     if (!startResult) {
-        sAFBLogger->log(Level::ERROR, TAG, "AASBRequestHandler::start failed");
+        sAFBLogger->log(Level::ERROR, TAG, "AASBController::start failed");
         return -1;
     }
 
@@ -217,45 +281,8 @@ CTLP_CAPI(setVoiceAgentId, source, argsJ, eventJ) {
     std::string voiceAgentId = document[agl::alexa::JSON_ATTR_VOICEAGENT_ID.c_str()].GetString();
     sAlexaCapabilityRouter->setVoiceAgentId(voiceAgentId);
 
-    AFB_ReqSuccess(source->request, NULL, NULL);
+    afb_req_success(source->request, NULL, NULL);
     sAFBLogger->log(Level::INFO, TAG, "setVoiceAgentId completed");
-    return 0;
-}
-
-CTLP_CAPI(setRefreshToken, source, argsJ, eventJ) {
-    sAFBLogger->log(Level::DEBUG, TAG, "setRefreshToken");
-    rapidjson::Document document;
-
-    if (eventJ == nullptr) {
-        sAFBLogger->log(Level::ERROR, TAG, "setRefreshToken: No arguments supplied.");
-        return -1;
-    }
-
-    document.Parse(json_object_to_json_string(eventJ));
-
-    if (!document.HasMember(agl::alexa::JSON_ATTR_REFRESH_TOKEN.c_str())) {
-        sAFBLogger->log(Level::ERROR, TAG, "setRefreshToken: args json missing: " + agl::alexa::JSON_ATTR_REFRESH_TOKEN);
-        return -1;
-    }
-
-    if (!document[agl::alexa::JSON_ATTR_REFRESH_TOKEN.c_str()].IsString()) {
-        sAFBLogger->log(
-            Level::ERROR,
-            TAG,
-            "setRefreshToken: args json attribute must be of string type: " + agl::alexa::JSON_ATTR_REFRESH_TOKEN);
-        return -1;
-    }
-
-    std::string refreshToken = document[agl::alexa::JSON_ATTR_REFRESH_TOKEN.c_str()].GetString();
-    sAASBRequestHandler->onReceivedEvent(
-        aasb::bridge::TOPIC_CBL, aasb::bridge::ACTION_CBL_GET_REFRESH_TOKEN_RESPONSE, refreshToken);
-
-    // Need to update the directive router because probably the thread handling the
-    // ACTION_CBL_GET_REFRESH_TOKEN directive is blocked waiting for this response.
-    sAlexaCapabilityRouter->didReceiveGetRefreshTokenResponse();
-
-    AFB_ReqSuccess(source->request, NULL, NULL);
-    sAFBLogger->log(Level::DEBUG, TAG, "setRefreshToken completed");
     return 0;
 }
 
@@ -284,10 +311,10 @@ CTLP_CAPI(setAuthToken, source, argsJ, eventJ) {
     }
 
     std::string authToken = document[agl::alexa::JSON_ATTR_AUTH_TOKEN.c_str()].GetString();
-    sAASBRequestHandler->onReceivedEvent(
+    sAASBController->onReceivedEvent(
         aasb::bridge::TOPIC_AUTH_PROVIDER, aasb::bridge::ACTION_SET_AUTH_TOKEN, authToken);
 
-    AFB_ReqSuccess(source->request, NULL, NULL);
+    afb_req_success(source->request, NULL, NULL);
     sAFBLogger->log(Level::DEBUG, TAG, "setAuthToken completed");
     return 0;
 }
@@ -317,7 +344,7 @@ CTLP_CAPI(subscribe, source, argsJ, eventJ) {
     }
 
     sAFBLogger->log(Level::DEBUG, TAG, "subscribed to all alexa-va events");
-    AFB_ReqSuccess(source->request, NULL, NULL);
+    afb_req_success(source->request, NULL, NULL);
     return 0;
 }
 
@@ -336,23 +363,23 @@ CTLP_CAPI(subscribeToCBLEvents, source, argsJ, eventJ) {
     }
 
     // Start the CBL process.
-    sAASBRequestHandler->onReceivedEvent(
+    sAASBController->onReceivedEvent(
         aasb::bridge::TOPIC_CBL, aasb::bridge::ACTION_CBL_START, "");    
     
     sAFBLogger->log(Level::DEBUG, TAG, "subscribed to all CBL events");
-    AFB_ReqSuccess(source->request, NULL, NULL);
+    afb_req_success(source->request, NULL, NULL);
     return 0;
 }
 
 CTLP_CAPI(startListening, source, argsJ, eventJ) {
     sAFBLogger->log(Level::DEBUG, TAG, "startListening");
-    if (!sAASBRequestHandler->startListening(aasb::bridge::LISTENING_MODE_TAP_TO_TALK)) {
+    if (!sAASBController->startListening(aasb::bridge::LISTENING_MODE_TAP_TO_TALK)) {
         sAFBLogger->log(Level::WARNING, TAG, "startListening failed.");
         return -1;
     }
 
     sAFBLogger->log(Level::DEBUG, TAG, "startListening initiated");
-    AFB_ReqSuccess(source->request, NULL, NULL);
+    afb_req_success(source->request, NULL, NULL);
     return 0;
 }
 
@@ -436,6 +463,329 @@ CTLP_CAPI(onPhoneSendDTMFSucceded, source, argsJ, eventJ) {
 
     std::string payload(json_object_to_json_string(eventJ));
     sAlexaPhoneCallDispatcher->onSendDTMFSucceeded(payload);
+
+    return 0;
+}
+
+CTLP_CAPI(onLocalMediaSourceGetStateResponse, source, argsJ, eventJ) {
+    sAFBLogger->log(Level::DEBUG, TAG, "onLocalMediaSourceGetStateResponse");
+
+    if (eventJ == nullptr) {
+        sAFBLogger->log(Level::ERROR, TAG, "onLocalMediaSourceGetStateResponse: No arguments supplied.");
+        return -1;
+    }
+
+    if (!sAlexaLocalMediaSourceDispatcher) {
+        sAFBLogger->log(Level::ERROR, TAG, "LocalMediaSourceDispatcher doesn't exist.");
+        return -1;
+    }
+
+    std::string payload(json_object_to_json_string(eventJ));
+    sAlexaLocalMediaSourceDispatcher->onGetStateResponse(payload);
+
+    return 0;
+}
+
+CTLP_CAPI(onLocalMediaSourcePlayerEvent, source, argsJ, eventJ) {
+    sAFBLogger->log(Level::DEBUG, TAG, "onLocalMediaSourcePlayerEvent");
+
+    if (eventJ == nullptr) {
+        sAFBLogger->log(Level::ERROR, TAG, "onLocalMediaSourcePlayerEvent: No arguments supplied.");
+        return -1;
+    }
+
+    if (!sAlexaLocalMediaSourceDispatcher) {
+        sAFBLogger->log(Level::ERROR, TAG, "LocalMediaSourceDispatcher doesn't exist.");
+        return -1;
+    }
+
+    std::string payload(json_object_to_json_string(eventJ));
+    sAlexaLocalMediaSourceDispatcher->onPlayerEvent(payload);
+
+    return 0;
+}
+
+CTLP_CAPI(onLocalMediaSourcePlayerError, source, argsJ, eventJ) {
+    sAFBLogger->log(Level::DEBUG, TAG, "onLocalMediaSourcePlayerError");
+
+    if (eventJ == nullptr) {
+        sAFBLogger->log(Level::ERROR, TAG, "onLocalMediaSourcePlayerError: No arguments supplied.");
+        return -1;
+    }
+
+    if (!sAlexaLocalMediaSourceDispatcher) {
+        sAFBLogger->log(Level::ERROR, TAG, "LocalMediaSourceDispatcher doesn't exist.");
+        return -1;
+    }
+
+    std::string payload(json_object_to_json_string(eventJ));
+    sAlexaLocalMediaSourceDispatcher->onPlayerError(payload);
+
+    return 0;
+}
+
+CTLP_CAPI(onCarControlClimateIsOnResponse, source, argsJ, eventJ) {
+    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlClimateIsOn");
+
+    if (eventJ == nullptr) {
+        sAFBLogger->log(Level::ERROR, TAG, "onCarControlClimateIsOn: No arguments supplied.");
+        return -1;
+    }
+
+    if (!sAlexaCarControlDispatcher) {
+        sAFBLogger->log(Level::ERROR, TAG, "CarControlDispatcher doesn't exist.");
+        return -1;
+    }
+
+    std::string payload(json_object_to_json_string(eventJ));
+    sAlexaCarControlDispatcher->onIsClimateOnResponse(payload);
+
+    return 0;
+}
+
+CTLP_CAPI(onCarControlClimateSyncIsOnResponse, source, argsJ, eventJ) {
+    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlClimateSyncIsOn");
+
+    if (eventJ == nullptr) {
+        sAFBLogger->log(Level::ERROR, TAG, "onCarControlClimateSyncIsOn: No arguments supplied.");
+        return -1;
+    }
+
+    if (!sAlexaCarControlDispatcher) {
+        sAFBLogger->log(Level::ERROR, TAG, "CarControlDispatcher doesn't exist.");
+        return -1;
+    }
+
+    std::string payload(json_object_to_json_string(eventJ));
+    sAlexaCarControlDispatcher->onIsClimateSyncOnResponse(payload);
+
+    return 0;
+}
+
+CTLP_CAPI(onCarControlAirRecirculationIsOnResponse, source, argsJ, eventJ) {
+    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlAirRecirculationIsOn");
+
+    if (eventJ == nullptr) {
+        sAFBLogger->log(Level::ERROR, TAG, "onCarControlAirRecirculationIsOn: No arguments supplied.");
+        return -1;
+    }
+
+    if (!sAlexaCarControlDispatcher) {
+        sAFBLogger->log(Level::ERROR, TAG, "CarControlDispatcher doesn't exist.");
+        return -1;
+    }
+
+    std::string payload(json_object_to_json_string(eventJ));
+    sAlexaCarControlDispatcher->onIsAirRecirculationOnResponse(payload);
+
+    return 0;
+}
+
+CTLP_CAPI(onCarControlAirConditionerIsOnResponse, source, argsJ, eventJ) {
+    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlAirConditionerIsOn");
+
+    if (eventJ == nullptr) {
+        sAFBLogger->log(Level::ERROR, TAG, "onCarControlAirConditionerIsOn: No arguments supplied.");
+        return -1;
+    }
+
+    if (!sAlexaCarControlDispatcher) {
+        sAFBLogger->log(Level::ERROR, TAG, "CarControlDispatcher doesn't exist.");
+        return -1;
+    }
+
+    std::string payload(json_object_to_json_string(eventJ));
+    sAlexaCarControlDispatcher->onIsAirConditionerOnResponse(payload);
+
+    return 0;
+}
+
+CTLP_CAPI(onCarControlGetAirConditionerModeResponse, source, argsJ, eventJ) {
+    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlGetAirConditionerMode");
+
+    if (eventJ == nullptr) {
+        sAFBLogger->log(Level::ERROR, TAG, "onCarControlGetAirConditionerMode: No arguments supplied.");
+        return -1;
+    }
+
+    if (!sAlexaCarControlDispatcher) {
+        sAFBLogger->log(Level::ERROR, TAG, "CarControlDispatcher doesn't exist.");
+        return -1;
+    }
+
+    std::string payload(json_object_to_json_string(eventJ));
+    sAlexaCarControlDispatcher->onGetAirConditionerModeResponse(payload);
+
+    return 0;
+}
+
+CTLP_CAPI(onCarControlHeaterIsOnResponse, source, argsJ, eventJ) {
+    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlHeaterIsOn");
+
+    if (eventJ == nullptr) {
+        sAFBLogger->log(Level::ERROR, TAG, "onCarControlHeaterIsOn: No arguments supplied.");
+        return -1;
+    }
+
+    if (!sAlexaCarControlDispatcher) {
+        sAFBLogger->log(Level::ERROR, TAG, "CarControlDispatcher doesn't exist.");
+        return -1;
+    }
+
+    std::string payload(json_object_to_json_string(eventJ));
+    sAlexaCarControlDispatcher->onIsHeaterOnResponse(payload);
+
+    return 0;
+}
+
+CTLP_CAPI(onCarControlGetHeaterTemperatureResponse, source, argsJ, eventJ) {
+    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlGetHeaterTemperature");
+
+    if (eventJ == nullptr) {
+        sAFBLogger->log(Level::ERROR, TAG, "onCarControlGetHeaterTemperature: No arguments supplied.");
+        return -1;
+    }
+
+    if (!sAlexaCarControlDispatcher) {
+        sAFBLogger->log(Level::ERROR, TAG, "CarControlDispatcher doesn't exist.");
+        return -1;
+    }
+
+    std::string payload(json_object_to_json_string(eventJ));
+    sAlexaCarControlDispatcher->onGetHeaterTemperatureResponse(payload);
+
+    return 0;
+}
+
+CTLP_CAPI(onCarControlFanIsOnResponse, source, argsJ, eventJ) {
+    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlFanIsOn");
+
+    if (eventJ == nullptr) {
+        sAFBLogger->log(Level::ERROR, TAG, "onCarControlFanIsOn: No arguments supplied.");
+        return -1;
+    }
+
+    if (!sAlexaCarControlDispatcher) {
+        sAFBLogger->log(Level::ERROR, TAG, "CarControlDispatcher doesn't exist.");
+        return -1;
+    }
+
+    std::string payload(json_object_to_json_string(eventJ));
+    sAlexaCarControlDispatcher->onIsFanOnResponse(payload);
+
+    return 0;
+}
+
+CTLP_CAPI(onCarControlGetFanSpeedResponse, source, argsJ, eventJ) {
+    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlGetFanSpeed");
+
+    if (eventJ == nullptr) {
+        sAFBLogger->log(Level::ERROR, TAG, "onCarControlGetFanSpeed: No arguments supplied.");
+        return -1;
+    }
+
+    if (!sAlexaCarControlDispatcher) {
+        sAFBLogger->log(Level::ERROR, TAG, "CarControlDispatcher doesn't exist.");
+        return -1;
+    }
+
+    std::string payload(json_object_to_json_string(eventJ));
+    sAlexaCarControlDispatcher->onGetFanSpeedResponse(payload);
+
+    return 0;
+}
+
+CTLP_CAPI(onCarControlVentIsOnResponse, source, argsJ, eventJ) {
+    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlVentIsOn");
+
+    if (eventJ == nullptr) {
+        sAFBLogger->log(Level::ERROR, TAG, "onCarControlVentIsOn: No arguments supplied.");
+        return -1;
+    }
+
+    if (!sAlexaCarControlDispatcher) {
+        sAFBLogger->log(Level::ERROR, TAG, "CarControlDispatcher doesn't exist.");
+        return -1;
+    }
+
+    std::string payload(json_object_to_json_string(eventJ));
+    sAlexaCarControlDispatcher->onIsVentOnResponse(payload);
+
+    return 0;
+}
+
+CTLP_CAPI(onCarControlGetVentPositionResponse, source, argsJ, eventJ) {
+    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlGetVentPosition");
+
+    if (eventJ == nullptr) {
+        sAFBLogger->log(Level::ERROR, TAG, "onCarControlGetVentPosition: No arguments supplied.");
+        return -1;
+    }
+
+    if (!sAlexaCarControlDispatcher) {
+        sAFBLogger->log(Level::ERROR, TAG, "CarControlDispatcher doesn't exist.");
+        return -1;
+    }
+
+    std::string payload(json_object_to_json_string(eventJ));
+    sAlexaCarControlDispatcher->onGetVentPositionResponse(payload);
+
+    return 0;
+}
+
+CTLP_CAPI(onCarControlWindowDefrosterIsOnResponse, source, argsJ, eventJ) {
+    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlWindowDefrosterIsOn");
+
+    if (eventJ == nullptr) {
+        sAFBLogger->log(Level::ERROR, TAG, "onCarControlWindowDefrosterIsOn: No arguments supplied.");
+        return -1;
+    }
+
+    if (!sAlexaCarControlDispatcher) {
+        sAFBLogger->log(Level::ERROR, TAG, "CarControlDispatcher doesn't exist.");
+        return -1;
+    }
+
+    std::string payload(json_object_to_json_string(eventJ));
+    sAlexaCarControlDispatcher->onIsWindowDefrosterOnResponse(payload);
+
+    return 0;
+}
+
+CTLP_CAPI(onCarControlLightIsOnResponse, source, argsJ, eventJ) {
+    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlLightIsOn");
+
+    if (eventJ == nullptr) {
+        sAFBLogger->log(Level::ERROR, TAG, "onCarControlLightIsOn: No arguments supplied.");
+        return -1;
+    }
+
+    if (!sAlexaCarControlDispatcher) {
+        sAFBLogger->log(Level::ERROR, TAG, "CarControlDispatcher doesn't exist.");
+        return -1;
+    }
+
+    std::string payload(json_object_to_json_string(eventJ));
+    sAlexaCarControlDispatcher->onIsLightOnResponse(payload);
+
+    return 0;
+}
+
+CTLP_CAPI(onCarControlGetLightColorResponse, source, argsJ, eventJ) {
+    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlGetLightColor");
+
+    if (eventJ == nullptr) {
+        sAFBLogger->log(Level::ERROR, TAG, "onCarControlGetLightColor: No arguments supplied.");
+        return -1;
+    }
+
+    if (!sAlexaCarControlDispatcher) {
+        sAFBLogger->log(Level::ERROR, TAG, "CarControlDispatcher doesn't exist.");
+        return -1;
+    }
+
+    std::string payload(json_object_to_json_string(eventJ));
+    sAlexaCarControlDispatcher->onGetLightColorResponse(payload);
 
     return 0;
 }

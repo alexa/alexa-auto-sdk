@@ -77,7 +77,6 @@ public:
      */
     virtual void dialogStateChanged( DialogState state ) {}
 
-
     using AuthState = aace::alexa::AuthProviderEngineInterface::AuthState;
     using AuthError = aace::alexa::AuthProviderEngineInterface::AuthError;
 

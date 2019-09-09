@@ -15,9 +15,6 @@
 
 #include "SampleApp/Views.h"
 
-// C++ Standard Library
-#include <sstream>
-
 // Guidelines Support Library
 #define GSL_THROW_ON_CONTRACT_VIOLATION
 #include <gsl/contracts.h>

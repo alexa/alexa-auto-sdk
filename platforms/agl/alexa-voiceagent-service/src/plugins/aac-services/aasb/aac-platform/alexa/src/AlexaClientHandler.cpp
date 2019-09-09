@@ -15,7 +15,7 @@
 #include "AlexaClientHandler.h"
 
 #include <aasb/Consts.h>
-#include "DirectiveDispatcher.h"
+#include "ResponseDispatcher.h"
 #include "PlatformSpecificLoggingMacros.h"
 
 /**
@@ -31,14 +31,14 @@ const std::string TAG = "aasb::alexa::AlexaClientHandler";
 
 std::shared_ptr<AlexaClientHandler> AlexaClientHandler::create(
     std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
-    std::weak_ptr<aasb::bridge::DirectiveDispatcher> directiveDispatcher) {
-    auto alexaClientHandler = std::shared_ptr<AlexaClientHandler>(new AlexaClientHandler(directiveDispatcher));
+    std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher) {
+    auto alexaClientHandler = std::shared_ptr<AlexaClientHandler>(new AlexaClientHandler(responseDispatcher));
     alexaClientHandler->m_logger = logger;
     return alexaClientHandler;
 }
 
-AlexaClientHandler::AlexaClientHandler(std::weak_ptr<aasb::bridge::DirectiveDispatcher> directiveDispatcher) :
-        m_directiveDispatcher(directiveDispatcher) {
+AlexaClientHandler::AlexaClientHandler(std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher) :
+        m_responseDispatcher(responseDispatcher) {
 }
 
 void AlexaClientHandler::dialogStateChanged(DialogState state) {
@@ -46,8 +46,8 @@ void AlexaClientHandler::dialogStateChanged(DialogState state) {
     std::string info = std::string(": DialogState: ") + std::string(convertDialogStateToString(state));
     m_logger->log(Level::INFO, TAG, info);
 
-    if (auto directiveDispatcher = m_directiveDispatcher.lock()) {
-        directiveDispatcher->sendDirective(
+    if (auto responseDispatcher = m_responseDispatcher.lock()) {
+        responseDispatcher->sendDirective(
             aasb::bridge::TOPIC_ALEXA_CLIENT,
             aasb::bridge::ACTION_DIALOG_STATE_CHANGED,
             convertDialogStateToString(state));
@@ -62,8 +62,8 @@ void AlexaClientHandler::connectionStatusChanged(ConnectionStatus status, Connec
 
     m_logger->log(Level::INFO, TAG, info);
 
-    if (auto directiveDispatcher = m_directiveDispatcher.lock()) {
-        directiveDispatcher->sendDirective(
+    if (auto responseDispatcher = m_responseDispatcher.lock()) {
+        responseDispatcher->sendDirective(
             aasb::bridge::TOPIC_ALEXA_CLIENT,
             aasb::bridge::ACTION_CONNECTION_STATUS_CHANGED,
             convertConnectionStatusToString(status));
@@ -76,8 +76,8 @@ void AlexaClientHandler::authStateChanged(AuthState state, AuthError error) {
                        std::string(": AuthError: ") + std::string(convertAuthErrorToString(error));
     m_logger->log(Level::INFO, TAG, info);
 
-    if (auto directiveDispatcher = m_directiveDispatcher.lock()) {
-        directiveDispatcher->sendDirective(
+    if (auto responseDispatcher = m_responseDispatcher.lock()) {
+        responseDispatcher->sendDirective(
             aasb::bridge::TOPIC_ALEXA_CLIENT, aasb::bridge::ACTION_AUTH_STATE_CHANGED, convertAuthStateToString(state));
     }
 }

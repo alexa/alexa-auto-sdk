@@ -37,8 +37,6 @@ PROJECT_TARGET_ADD(alexa-voiceagent)
 
     # Library dependencies (include updates automatically)
     TARGET_LINK_LIBRARIES(${TARGET_NAME}
-        afb-helpers
-        ctl-utilities
         ${link_libraries})
 
 add_subdirectory("plugins")

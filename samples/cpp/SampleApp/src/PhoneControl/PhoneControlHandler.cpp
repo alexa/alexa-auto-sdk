@@ -257,11 +257,11 @@ void PhoneCallControllerHandler::setupUI() {
             {"CALL_RECEIVED", CallState::CALL_RECEIVED},
             {"INBOUND_RINGING", CallState::INBOUND_RINGING}
         };
-        
+        // clang-format on
+
         // Call state to set to
         std::string callStateStr = sm[1];
 
-        // clang-format on
         if (CallStateEnumerator.count(callStateStr) == 0) {
             log(logger::LoggerHandler::Level::ERROR, "onPhoneCallControllerCallStateChanged invalid call state passed: " + callStateStr);
             return false;
@@ -326,6 +326,7 @@ void PhoneCallControllerHandler::setupUI() {
             {"NO_NUMBER_FOR_REDIAL", CallError::NO_NUMBER_FOR_REDIAL},
             {"OTHER", CallError::OTHER}
         };
+        // clang-format on
 
         static std::regex r("(.+)/(.+)/(.+)", std::regex::optimize);
         std::smatch sm{};
@@ -344,7 +345,6 @@ void PhoneCallControllerHandler::setupUI() {
         }
 
         if (auto console = m_console.lock()) {
-            // clang-format on
             if (CallErrorEnumerator.count(sm[2]) == 0) {
                 console->printRuler();
                 console->printLine("Invalid call code: ", sm[2]);

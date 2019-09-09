@@ -61,18 +61,18 @@ static std::string VSHL_CAPABILITY_PHONE_SEND_DTMF_SUCCEEDED = "send_dtmf_succee
 
 std::shared_ptr<PhoneCallDispatcher> PhoneCallDispatcher::create(
     std::shared_ptr<ILogger> logger,
-    std::shared_ptr<RequestHandler> requestHandler,
+    std::shared_ptr<IAASBController> aasbController,
     std::shared_ptr<IAFBApi> api) {
 
-    return std::shared_ptr<PhoneCallDispatcher>(new PhoneCallDispatcher(logger, requestHandler, api));
+    return std::shared_ptr<PhoneCallDispatcher>(new PhoneCallDispatcher(logger, aasbController, api));
 }
 
 PhoneCallDispatcher::PhoneCallDispatcher(
     std::shared_ptr<ILogger> logger,
-    std::shared_ptr<RequestHandler> requestHandler,
+    std::shared_ptr<IAASBController> aasbController,
     std::shared_ptr<IAFBApi> api) :
         m_logger(logger),
-        m_requestHandler(requestHandler),
+        m_aasbController(aasbController),
         m_api(api) {
 }
 
@@ -137,35 +137,35 @@ bool PhoneCallDispatcher::subscribeToPhoneCallControlEvents() {
 }
 
 void PhoneCallDispatcher::onConnectionStateChanged(const std::string& payload) {
-    m_requestHandler->onReceivedEvent(
+    m_aasbController->onReceivedEvent(
         TOPIC_PHONECALL_CONTROLLER,
         ACTION_PHONECALL_CONNECTION_STATE_CHANGED,
         payload);
 }
 
 void PhoneCallDispatcher::onCallStateChanged(const std::string& payload) {
-    m_requestHandler->onReceivedEvent(
+    m_aasbController->onReceivedEvent(
         TOPIC_PHONECALL_CONTROLLER,
         ACTION_PHONECALL_CALL_STATE_CHANGED,
         payload);
 }
 
 void PhoneCallDispatcher::onCallFailed(const std::string& payload) {
-    m_requestHandler->onReceivedEvent(
+    m_aasbController->onReceivedEvent(
         TOPIC_PHONECALL_CONTROLLER,
         ACTION_PHONECALL_CALL_FAILED,
         payload);
 }
 
 void PhoneCallDispatcher::onCallerIdReceived(const std::string& payload) {
-    m_requestHandler->onReceivedEvent(
+    m_aasbController->onReceivedEvent(
         TOPIC_PHONECALL_CONTROLLER,
         ACTION_PHONECALL_CALLER_ID_RECEIVED,
         payload);
 }
 
 void PhoneCallDispatcher::onSendDTMFSucceeded(const std::string& payload) {
-    m_requestHandler->onReceivedEvent(
+    m_aasbController->onReceivedEvent(
         TOPIC_PHONECALL_CONTROLLER,
         ACTION_PHONECALL_SEND_DTMF_SUCCEEDED,
         payload);

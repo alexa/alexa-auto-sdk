@@ -1,0 +1,88 @@
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
+ext.generateAbiFiltersDeploy = { return generateAbiFiltersDeploy() }
+ext.generateAbiAndAndroidPlatformMap = { return generateAbiAndAndroidPlatformMap() }
+ext.generateLine = this.&generateLine
+
+//visit abi directories in native-build folder, extract abis, and add to abiFilters
+List<String> generateAbiFiltersDeploy() {
+    List<String> abiFilters = new ArrayList<>()
+    File deployDir = new File("${project.rootDir}/../native-build")
+    File[] directories = deployDir.listFiles(new FileFilter() {
+        @Override
+        public boolean accept(File pathname) {
+            return pathname.isDirectory()
+        }
+    })
+    for (File dir : directories) {
+        String abi = extractAbiFromString(dir.getName())
+        if (abi != null) {
+            abiFilters.add(abi)
+        }
+    }
+    return abiFilters
+}
+
+String extractAbiFromString(String filename) {
+    Pattern pattern = Pattern.compile("(armeabi-v7a|x86|x86_64|arm64-v8a)-android-[0-9]+")
+    Matcher matcher = pattern.matcher(filename)
+    if(matcher.find()) {
+        String abi = matcher.group(1)
+        String abiLogMsg = generateAbiLogMsg(abi, filename)
+        logger.lifecycle(abiLogMsg)
+        return abi
+    } else {
+        return null
+    }
+}
+
+String generateAbiLogMsg(String abi, String filename) {
+    StringBuilder sb = new StringBuilder()
+    String logMsg = String.format("Extracting the abi '%s' from '%s'", abi, filename)
+    String line = generateLine(logMsg.length())
+    sb.append(line).append(logMsg).append(line)
+    return sb.toString()
+}
+
+String generateLine(int length) {
+    StringBuilder sb = new StringBuilder()
+    sb.append('\n')
+    for (int x = 0; x < length; x++) {
+        sb.append("-")
+    }
+    sb.append('\n')
+    return sb.toString()
+}
+
+List<Map<String,String>> generateAbiAndAndroidPlatformMap() {
+    List<Map<String,String>> abiPlfList = new ArrayList<>()
+    File deployDir = new File("${project.rootDir}/../native-build")
+    File[] directories = deployDir.listFiles(new FileFilter() {
+        @Override
+        public boolean accept(File pathname) {
+            return pathname.isDirectory()
+        }
+    })
+    for (File dir : directories) {
+        Map<String,String> abiPlatformMap = extractAbiPlatformMap(dir.getName())
+        if (abiPlatformMap != null) {
+            abiPlfList.add(abiPlatformMap)
+        }
+    }
+    return abiPlfList
+}
+
+Map<String,String> extractAbiPlatformMap(String filename) {
+    Map<String,String> map = new HashMap<String,String>();
+    Pattern pattern = Pattern.compile("(armeabi-v7a|x86|x86_64|arm64-v8a)-(android-[0-9]+)")
+    Matcher matcher = pattern.matcher(filename)
+    if(matcher.find()) {
+        String abi = matcher.group(1)
+        String platform = matcher.group(2)
+        map.put(abi,platform)
+        return map
+    } else {
+        return null
+    }
+}

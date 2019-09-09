@@ -1,0 +1,16 @@
+BasedOnStyle: Google
+Language: Cpp
+AccessModifierOffset: -4
+AlignAfterOpenBracket: AlwaysBreak
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortFunctionsOnASingleLine: None
+BinPackArguments: false
+BinPackParameters: false
+BreakBeforeInheritanceComma: true
+BreakConstructorInitializers: AfterColon
+ColumnLimit: 120
+ConstructorInitializerIndentWidth: 8
+DerivePointerAlignment: false
+IndentWidth: 4
+PenaltyReturnTypeOnItsOwnLine: 20000
+SortIncludes: false

@@ -37,9 +37,15 @@ PROJECT_TARGET_ADD(alexa-voiceagent-api)
         ${CMAKE_CURRENT_SOURCE_DIR}/aasb-client/config/AASBConfigProviderImpl.cpp
 
         # Dispatchers
+        ${CMAKE_CURRENT_SOURCE_DIR}/dispatchers/local-voice-control/car-control/CarControlDispatcher.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/dispatchers/locationprovider/LocationProviderDispatcher.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/dispatchers/localmediasource/LocalMediaSourceDispatcher.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/dispatchers/navigation/NavigationDispatcher.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/dispatchers/phonecall/PhoneCallDispatcher.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/dispatchers/playback/PlaybackDispatcher.cpp
+
+        #audio
+        ${CMAKE_CURRENT_SOURCE_DIR}/audio/Audio.cpp
 
         # Utilities
         ${CMAKE_CURRENT_SOURCE_DIR}/utilities/logging/Logger.cpp
@@ -67,7 +73,6 @@ PROJECT_TARGET_ADD(alexa-voiceagent-api)
 
     # Library dependencies (include updates automatically)
     TARGET_LINK_LIBRARIES(${TARGET_NAME}
-        afb-helpers
         AlexaAutoServicesBridgeLib
         ${GLIB_PKG_LIBRARIES}
         ${link_libraries}
@@ -103,7 +108,6 @@ PROJECT_TARGET_ADD(alexa-voiceagent-api)
         )
 
         TARGET_LINK_LIBRARIES(${TARGET_NAME}_Test
-            afb-helpers
             libgtest
             libgmock
             ${GLIB_PKG_LIBRARIES}

@@ -33,6 +33,8 @@ namespace alexa {
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.ExternalMediaPlayerEngineImpl");
 
+static const std::string GLOBAL_PRESET_KEY = "preset";
+
 ExternalMediaPlayerEngineImpl::ExternalMediaPlayerEngineImpl( const std::string& agent ) :
     alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
     m_agent( agent ) {
@@ -163,6 +165,21 @@ bool ExternalMediaPlayerEngineImpl::registerPlatformMediaAdapter( std::shared_pt
     }
 }
 
+bool ExternalMediaPlayerEngineImpl::registerPlatformGlobalPresetHandler( std::shared_ptr<aace::alexa::GlobalPreset> globalPresetHandler )
+{
+    try
+    {
+        ThrowIfNull( globalPresetHandler, "invalidGlobalPresetHandler" );
+        
+        m_globalPresetHandler = globalPresetHandler;
+    
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"registerPlatformGlobalPresetHandlerFailed").d("reason", ex.what()));
+        return false;
+    }
+}
 
 std::shared_ptr<ExternalMediaAdapterHandler> ExternalMediaPlayerEngineImpl::getAdapter( const std::string& playerId ) {
     auto it = m_externalMediaAdapterMap.find( playerId );
@@ -382,12 +399,23 @@ void ExternalMediaPlayerEngineImpl::play( const std::string& payload )
         ThrowIfNot( root.HasMember( "navigation" ) && root["navigation"].IsString(), "invalidPayload" );
         auto navigation = root["navigation"].GetString();
         
-        // get the platform adapter
-        auto adapter = getAdapter( playerId );
-        ThrowIfNull( adapter, "invalidMediaPlayerAdapter" );
-        
-        // call the adapter method
-        ThrowIfNot( adapter->play( playerId, playbackContextToken, index, std::chrono::milliseconds( offsetInMilliseconds ), skillToken, playbackSessionId, preload, getNavigationEnum( navigation ) ), "adapterPlayFailed" );
+        if ( ( playerId != NULL ) && ( playerId[0] == '\0' ) ) {// empty playerId == global preset case
+            std::string token = playbackContextToken;
+            size_t gpindex = token.find(GLOBAL_PRESET_KEY);
+            ThrowIfNot( gpindex != std::string::npos , "invalidPayloadwithGlobalPreset" );
+            std::string presetString = token.substr(gpindex + GLOBAL_PRESET_KEY.length() + 1); //  from "preset:" to end
+            int preset = std::stoi( presetString );
+            ThrowIfNull( m_globalPresetHandler, "platformGlobalPresetHandlerNull" );
+            // send global preset to platform
+            m_globalPresetHandler->setGlobalPreset( preset );
+        } else {
+            // get the platform adapter
+            auto adapter = getAdapter( playerId );
+            ThrowIfNull( adapter, "invalidMediaPlayerAdapter" );
+            
+            // call the adapter method
+            ThrowIfNot( adapter->play( playerId, playbackContextToken, index, std::chrono::milliseconds( offsetInMilliseconds ), skillToken, playbackSessionId, preload, getNavigationEnum( navigation ) ), "adapterPlayFailed" );
+        }
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"play").d("reason", ex.what()));
@@ -711,6 +739,12 @@ std::string ExternalMediaPlayerEngineImpl::getLocalPlayerId( aace::alexa::LocalM
         
             case aace::alexa::LocalMediaSource::Source::USB:
                 return "com.amazon.alexa.auto.players.USB";
+            
+            case aace::alexa::LocalMediaSource::Source::SIRIUS_XM:
+                return "com.amazon.alexa.auto.players.SIRIUS_XM";
+
+            case aace::alexa::LocalMediaSource::Source::DAB:
+                return "com.amazon.alexa.auto.players.DAB";
         
             default:
                 throw( "invalidLocalMediaSource" );

@@ -5,7 +5,7 @@ if(EXTERNALMEDIAPLAYER_1_1)
 endif()
 
 # Find AVS
-find_package(AVS 1.10)
+find_package(AVS 1.11)
 
 set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AlertsEngineImpl.h

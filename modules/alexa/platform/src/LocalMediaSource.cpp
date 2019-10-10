@@ -14,14 +14,34 @@
  */
 
 #include "AACE/Alexa/LocalMediaSource.h"
+#include <iostream>
+#include <memory>
+
 
 namespace aace {
 namespace alexa {
 
-LocalMediaSource::LocalMediaSource( Source source, std::shared_ptr<aace::alexa::Speaker> speaker ) : m_source( source ), m_speaker( speaker ) {
+LocalMediaSource::LocalMediaSource( Source source, std::shared_ptr<aace::alexa::Speaker> speaker ) : m_source( source ), m_speaker( speaker ){
 }
 
 LocalMediaSource::~LocalMediaSource() = default;
+
+LocalMediaSource::LocalMediaSourceState::LocalMediaSourceState(){}
+
+// default session state
+LocalMediaSource::SessionState::SessionState() : 
+    endpointId(""), loggedIn(false), userName(""), isGuest(false), launched(false), active(false),
+    accessToken(""), tokenRefreshInterval(std::chrono::milliseconds(0)),
+    supportedContentSelectors({}), spiVersion("1.0") {}
+
+// default playback state
+LocalMediaSource::PlaybackState::PlaybackState() :
+    state("IDLE"), supportedOperations({}), trackOffset(0), 
+    shuffleEnabled(false), repeatEnabled(false), favorites(Favorites::NOT_RATED), type("ExternalMediaPlayerMusicItem"), playbackSource(""),
+    playbackSourceId(""), trackName(""), trackId(""), trackNumber(""), artistName(""),
+    artistId(""), albumName(""), albumId(""), tinyURL(""), smallURL(""),
+    mediumURL(""), largeURL(""), coverId(""), mediaProvider(""), mediaType(MediaType::OTHER), 
+    duration(std::chrono::milliseconds(0)) {}
 
 LocalMediaSource::Source LocalMediaSource::getSource() {
     return m_source;

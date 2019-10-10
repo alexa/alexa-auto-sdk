@@ -51,6 +51,7 @@
 #include "AACE/Alexa/AlexaEngineInterfaces.h"
 #include "AACE/Alexa/ExternalMediaAdapter.h"
 #include "AACE/Alexa/LocalMediaSource.h"
+#include "AACE/Alexa/GlobalPreset.h"
 
 #include <rapidjson/document.h>
 
@@ -99,6 +100,7 @@ public:
 
     bool registerPlatformMediaAdapter( std::shared_ptr<aace::alexa::ExternalMediaAdapter> platformMediaAdapter );
     bool registerPlatformMediaAdapter( std::shared_ptr<aace::alexa::LocalMediaSource> platformMediaAdapter );
+    bool registerPlatformGlobalPresetHandler( std::shared_ptr<aace::alexa::GlobalPreset> platformGlobalPreset );
     
     // alexaClientSDK::avsCommon::sdkInterfaces::ExternalMediaAdapterHandlerInterface
     void authorizeDiscoveredPlayers( const std::string& payload ) override;
@@ -135,6 +137,9 @@ private:
     std::unordered_map<std::string,aace::alexa::ExternalMediaAdapter::DiscoveredPlayerInfo> m_pendingDiscoveredPlayerMap;
     std::unordered_map<std::string,PlayerInfo> m_authorizationStateMap;
     Status m_connectionStatus = Status::DISCONNECTED;
+
+    /// Global presets platform interface
+    std::shared_ptr<aace::alexa::GlobalPreset> m_globalPresetHandler;
     
     std::mutex m_discoveredPlayersMutex;
 };

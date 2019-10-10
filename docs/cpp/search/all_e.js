@@ -13,7 +13,7 @@ var searchData=
   ['renderplayerinfo',['renderPlayerInfo',['../classaace_1_1alexa_1_1_template_runtime.html#a71852ea84caa81de6cd633006c76ad51',1,'aace::alexa::TemplateRuntime']]],
   ['rendertemplate',['renderTemplate',['../classaace_1_1alexa_1_1_template_runtime.html#a8bac9d4c6a49d5f7e3ae64fbc477b325',1,'aace::alexa::TemplateRuntime']]],
   ['repeat',['REPEAT',['../classaace_1_1alexa_1_1_playback_controller_engine_interface.html#a990f517d423450b712fcfd0488403e8ca5be68175be14dfaa080165456c2e9555',1,'aace::alexa::PlaybackControllerEngineInterface']]],
-  ['repeatenabled',['repeatEnabled',['../classaace_1_1alexa_1_1_external_media_adapter_1_1_playback_state.html#ad18c03b18fc5fd59d4502cb5902841c9',1,'aace::alexa::ExternalMediaAdapter::PlaybackState']]],
+  ['repeatenabled',['repeatEnabled',['../classaace_1_1alexa_1_1_external_media_adapter_1_1_playback_state.html#ad18c03b18fc5fd59d4502cb5902841c9',1,'aace::alexa::ExternalMediaAdapter::PlaybackState::repeatEnabled()'],['../classaace_1_1alexa_1_1_local_media_source_1_1_playback_state.html#ac7d32d117f01f4e07020b68eb3d7a329',1,'aace::alexa::LocalMediaSource::PlaybackState::repeatEnabled()']]],
   ['requesting_5fcode_5fpair',['REQUESTING_CODE_PAIR',['../classaace_1_1cbl_1_1_c_b_l.html#a9d56e447b5e1fa27a79e9c0932af2baba699a1731760b4edc72e1528fde0e839f',1,'aace::cbl::CBL']]],
   ['requesting_5ftoken',['REQUESTING_TOKEN',['../classaace_1_1cbl_1_1_c_b_l.html#a9d56e447b5e1fa27a79e9c0932af2babaefb6f44f1ec98c410a023954cf0270b9',1,'aace::cbl::CBL']]],
   ['resume',['resume',['../classaace_1_1alexa_1_1_media_player.html#a834b03b41e8792cb97968524edf97c80',1,'aace::alexa::MediaPlayer']]]

@@ -143,7 +143,15 @@ abstract public class LocalMediaSource extends PlatformInterface
         /**
          * CD player source
          */
-        COMPACT_DISC("COMPACT_DISC");
+        COMPACT_DISC("COMPACT_DISC"),
+        /**
+         * Sirius XM player source
+         */
+        SIRIUS_XM("SIRIUS_XM"),
+        /**
+         * DAB player source
+         */
+        DAB("DAB");
 
         /**
          * @internal
@@ -154,6 +162,44 @@ abstract public class LocalMediaSource extends PlatformInterface
          * @internal
          */
         private Source( String name ) {
+            m_name = name;
+        }
+
+        /**
+         * @internal
+         */
+        public String toString() {
+            return m_name;
+        }
+    }
+
+    /**
+     * The play content selection type
+     */
+    public enum ContentSelector
+    {
+        /**
+         * preset selection
+         */
+        PRESET("PRESET"),
+        /**
+         * channel selection
+         */
+        CHANNEL("CHANNEL"),
+        /**
+         * frequency selection
+         */
+        FREQUENCY("FREQUENCY");
+
+        /**
+         * @internal
+         */
+        private String m_name;
+
+        /**
+         * @internal
+         */
+        private ContentSelector( String name ) {
             m_name = name;
         }
 
@@ -357,40 +403,40 @@ abstract public class LocalMediaSource extends PlatformInterface
     public class SessionState
     {
         /// The unique device endpoint.
-        public String endpointId;
+        public String endpointId = "";
 
         /// Flag that identifies if a user is currently logged in or not.
-        public boolean loggedIn;
+        public boolean loggedIn = false;
 
         /// The userName of the user currently logged in via a Login directive from the AVS.
-        public String userName;
+        public String userName = "";
 
         /// Flag that identifies if the user currently logged in is a guest or not.
-        public boolean isGuest;
+        public boolean isGuest = false;
 
         /// Flag that identifies if an application has been launched or not.
-        public boolean launched;
+        public boolean launched = false;
 
         /**
          * Flag that identifies if the application is currently active or not. This could mean different things
          * for different applications.
          */
-        public boolean active;
+        public boolean active = false;
 
         /**
          * The accessToken used to login a user. The access token may also be used as a bearer token if the adapter
          * makes an authenticated Web API to the music provider.
          */
-        public String accessToken;
+        public String accessToken = "";
 
         /// The validity period of the token in milliseconds.
-        public long tokenRefreshInterval;
+        public long tokenRefreshInterval = 0;
 
-        // A player may declare arbitrary information for itself.
-        public String playerCookie;
+        // A local player declares its supported content selectors
+        public ContentSelector[] supportedContentSelectors = {};
 
         // The only spiVersion that currently exists is "1.0"
-        public String spiVersion;
+        public String spiVersion = "1.0";
     }
 
     /**
@@ -399,82 +445,82 @@ abstract public class LocalMediaSource extends PlatformInterface
     public class PlaybackState
     {
         /// The state of the default player - IDLE/STOPPED/PLAYING...
-        public String state;
+        public String state = "IDLE";
 
         /// The set of states the default player can move into from its current state.
-        public SupportedPlaybackOperation[] supportedOperations;
+        public SupportedPlaybackOperation[] supportedOperations = {};
 
         /// The offset of the track in milliseconds.
-        public long trackOffset;
+        public long trackOffset = 0;
 
         /// Bool to identify if shuffling is enabled or not.
-        public boolean shuffleEnabled;
+        public boolean shuffleEnabled = false;
 
         ///  Bool to identify if looping of songs is enabled or not.
-        public boolean repeatEnabled;
+        public boolean repeatEnabled = false;
 
         /// The favorite status {"FAVORITED"/"UNFAVORITED"/"NOT_RATED"}.
-        public Favorites favorites;
+        public Favorites favorites = Favorites.NOT_RATED;
 
         /// The type of the media item. For now hard-coded to "ExternalMediaAdapterMusicItem".
-        public String type;
+        public String type = "ExternalMediaPlayerMusicItem";
 
         /// The display name for current playback context, e.g. playlist name.
-        public String playbackSource;
+        public String playbackSource = "";
 
         /// An arbitrary identifier for current playback context as per the music provider, e.g. a URI that can be saved as
         /// a preset or queried to Music Service Provider services for additional info.
-        public String playbackSourceId;
+        public String playbackSourceId = "";
 
         /// The display name for the currently playing trackname of the track.
-        public String trackName;
+        public String trackName = "";
 
         /// The arbitrary identifier for currently playing trackid of the track as per the music provider.
-        public String trackId;
+        public String trackId = "";
 
         /// The display value for the number or abstract position of the currently playing track in the album or context
         /// trackNumber of the track.
-        public String trackNumber;
+        public String trackNumber = "";
 
         /// The display name for the currently playing artist.
-        public String artistName;
+        public String artistName = "";
 
         /// An arbitrary identifier for currently playing artist as per the music provider, e.g. a URI that can be queried
         /// to MSP services for additional info.
-        public String artistId;
+        public String artistId = "";
 
         /// The display name of the currently playing album.
-        public String albumName;
+        public String albumName = "";
 
         /// Arbitrary identifier for currently playing album specific to the music provider, e.g. a URI that can be queried
         /// to MSP services for additional info.
-        public String albumId;
+        public String albumId = "";
 
         /// The URL for tiny cover art image resource} .
-        public String tinyURL;
+        public String tinyURL = "";
 
         /// The URL for small cover art image resource} .
-        public String smallURL;
+        public String smallURL = "";
 
         /// The URL for medium cover art image resource} .
-        public String mediumURL;
+        public String mediumURL = "";
 
         /// The URL for large cover art image resource} .
-        public String largeURL;
+        public String largeURL = "";
 
         /// The Arbitrary identifier for cover art image resource specific to the music provider, for retrieval from an MSP
         /// API.
-        public String coverId;
+        public String coverId = "";
 
         /// Music Service Provider name for the currently playing media item; distinct from the application identity
         /// although the two may be the same.
-        public String mediaProvider;
+        public String mediaProvider = "";
 
         /// The Media type enum value from {TRACK, PODCAST, STATION, AD, SAMPLE, OTHER} type of the media.
-        public MediaType mediaType;
+        public MediaType mediaType = MediaType.OTHER;
 
         /// Media item duration in milliseconds.
-        public long duration;
+        public long duration = 0;
     }
 
 
@@ -496,24 +542,12 @@ abstract public class LocalMediaSource extends PlatformInterface
     }
 
     /**
-     * Called after the discovered local media source have been registered.
-     *
-     * @param authorized As long as the registered platform interface includes a supported Source type, AVS will return true.
-     *
-     * @return @c true if the platform implementation successfully handled the call,
-     * else @c false
-     */
-    public boolean authorize( boolean authorized ) {
-        return true;
-    }
-
-    /**
      * Called when the user first calls play for the local media via voice control. ( Currently this is not used in LocalMediaSource)
      *
      * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
-    public boolean play( String payload ) {
+    public boolean play( ContentSelector selector, String payload ) {
         return false;
     }
 

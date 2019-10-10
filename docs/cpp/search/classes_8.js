@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['sessionstate',['SessionState',['../classaace_1_1alexa_1_1_external_media_adapter_1_1_session_state.html',1,'aace::alexa::ExternalMediaAdapter']]],
+  ['sessionstate',['SessionState',['../classaace_1_1alexa_1_1_local_media_source_1_1_session_state.html',1,'aace::alexa::LocalMediaSource::SessionState'],['../classaace_1_1alexa_1_1_external_media_adapter_1_1_session_state.html',1,'aace::alexa::ExternalMediaAdapter::SessionState']]],
   ['speaker',['Speaker',['../classaace_1_1alexa_1_1_speaker.html',1,'aace::alexa']]],
   ['speakerengineinterface',['SpeakerEngineInterface',['../classaace_1_1alexa_1_1_speaker_engine_interface.html',1,'aace::alexa']]],
   ['speechrecognizer',['SpeechRecognizer',['../classaace_1_1alexa_1_1_speech_recognizer.html',1,'aace::alexa']]],

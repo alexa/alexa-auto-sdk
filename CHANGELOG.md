@@ -1,6 +1,20 @@
-# ChangeLog
+# Change Log
 
 ___
+
+## v1.6.2 released on 2019-10-11:
+ 
+### Enhancements
+
+Added online entertainment enhancements to support tuning to a specific frequency or SiriusXM channel and tuning to radio presets.
+
+### Resolved Issues
+
+n/a
+
+### Known Issues
+
+All known issues from v1.6.0. 
 
 ## v1.6.1 released on 2019-06-21:
  

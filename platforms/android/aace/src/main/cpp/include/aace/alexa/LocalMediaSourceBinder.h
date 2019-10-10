@@ -34,8 +34,7 @@ protected:
     void initialize( JNIEnv* env ) override;
 
 public:
-    bool authorize( bool authorized ) override;
-    bool play( const std::string & payload ) override;
+    bool play( ContentSelector selector, const std::string& payload ) override;
     bool playControl( aace::alexa::LocalMediaSource::PlayControlType controlType ) override;
     bool seek( std::chrono::milliseconds offset ) override;
     bool adjustSeek( std::chrono::milliseconds deltaOffset ) override;
@@ -45,16 +44,17 @@ public:
 public:
     //aace::alexa::ExternalMediaAdapter::PlayControlType convertPlayControlType( JNIEnv* env, jobject obj );
     aace::alexa::LocalMediaSource::Source convertSource( JNIEnv* env, jobject obj );
+    aace::alexa::LocalMediaSource::ContentSelector convertContentSelector( JNIEnv* env, jobject obj );
     aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation convertSupportedPlaybackOperation( JNIEnv* env, jobject obj );
     aace::alexa::ExternalMediaAdapter::Favorites convertFavorites( JNIEnv* env, jobject obj );
     aace::alexa::ExternalMediaAdapter::MediaType convertMediaType( JNIEnv* env, jobject obj );
     jobject convert( aace::alexa::ExternalMediaAdapter::PlayControlType type );
     jobject convert( aace::alexa::LocalMediaSource::Source source );
+    jobject convert( aace::alexa::LocalMediaSource::ContentSelector selector );
 
 
 private:
-    jmethodID m_javaMethod_authorize_authorized = nullptr;
-    jmethodID m_javaMethod_play_payload = nullptr;
+    jmethodID m_javaMethod_play_selector_payload = nullptr;
     jmethodID m_javaMethod_playControl_controlType = nullptr;
     jmethodID m_javaMethod_seek_offset = nullptr;
     jmethodID m_javaMethod_adjustSeek_deltaOffset = nullptr;
@@ -84,6 +84,8 @@ private:
     ObjectRef m_enum_Source_SATELLITE_RADIO;
     ObjectRef m_enum_Source_LINE_IN;
     ObjectRef m_enum_Source_COMPACT_DISC;
+    ObjectRef m_enum_Source_SIRIUS_XM;
+    ObjectRef m_enum_Source_DAB;
 
     // LocalMediaSourceState == ExternalMediaAdapterState
     ClassRef m_javaClass_LocalMediaSourceState;
@@ -100,7 +102,7 @@ private:
     jfieldID m_javaField_SessionState_active;
     jfieldID m_javaField_SessionState_accessToken;
     jfieldID m_javaField_SessionState_tokenRefreshInterval;
-    jfieldID m_javaField_SessionState_playerCookie;
+    jfieldID m_javaField_SessionState_supportedContentSelectors;
     jfieldID m_javaField_SessionState_spiVersion;
 
     // PlaybackState
@@ -129,6 +131,11 @@ private:
     jfieldID m_javaField_PlaybackState_mediaProvider;
     jfieldID m_javaField_PlaybackState_mediaType;
     jfieldID m_javaField_PlaybackState_duration;
+
+    // ContentSelector
+    ObjectRef m_enum_ContentSelector_FREQUENCY;
+    ObjectRef m_enum_ContentSelector_CHANNEL;
+    ObjectRef m_enum_ContentSelector_PRESET;
 
     // SupportedPlaybackOperation
     ObjectRef m_enum_SupportedPlaybackOperation_PLAY;

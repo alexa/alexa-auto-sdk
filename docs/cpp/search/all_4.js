@@ -2,7 +2,7 @@ var searchData=
 [
   ['enablewakeworddetection',['enableWakewordDetection',['../classaace_1_1alexa_1_1_speech_recognizer.html#ac8aa31ea0dcceddf5c7628a72cf58475',1,'aace::alexa::SpeechRecognizer']]],
   ['endofspeechdetected',['endOfSpeechDetected',['../classaace_1_1alexa_1_1_speech_recognizer.html#a7e4d179fd39031d3a898466841905748',1,'aace::alexa::SpeechRecognizer']]],
-  ['endpointid',['endpointId',['../classaace_1_1alexa_1_1_external_media_adapter_1_1_session_state.html#ada43dff94ace3219b86960616e22558f',1,'aace::alexa::ExternalMediaAdapter::SessionState']]],
+  ['endpointid',['endpointId',['../classaace_1_1alexa_1_1_external_media_adapter_1_1_session_state.html#ada43dff94ace3219b86960616e22558f',1,'aace::alexa::ExternalMediaAdapter::SessionState::endpointId()'],['../classaace_1_1alexa_1_1_local_media_source_1_1_session_state.html#a8e331ee5d60fd3d034acddccfd73f87c',1,'aace::alexa::LocalMediaSource::SessionState::endpointId()']]],
   ['engine',['Engine',['../classaace_1_1core_1_1_engine.html',1,'aace::core']]],
   ['engineconfiguration',['EngineConfiguration',['../classaace_1_1core_1_1config_1_1_engine_configuration.html',1,'aace::core::config']]],
   ['equalizerband',['EqualizerBand',['../classaace_1_1alexa_1_1_equalizer_controller_engine_interface.html#a733a5c62b16ef4f62b5c94d16f314cb3',1,'aace::alexa::EqualizerControllerEngineInterface::EqualizerBand()'],['../classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#aabb71d98c3dd763d0522a5e688a0eab1',1,'aace::alexa::config::AlexaConfiguration::EqualizerBand()'],['../classaace_1_1alexa_1_1_equalizer_controller.html#ac79148250b90df9f0ce22b223d3db2c4',1,'aace::alexa::EqualizerController::EqualizerBand()']]],

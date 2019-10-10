@@ -48,6 +48,7 @@ set(aace_lib_src
     src/main/cpp/src/aace/alexa/AudioPlayerBinder.cpp
     src/main/cpp/src/aace/alexa/AuthProviderBinder.cpp
     src/main/cpp/src/aace/alexa/EqualizerControllerBinder.cpp
+    src/main/cpp/src/aace/alexa/GlobalPresetBinder.cpp
     src/main/cpp/src/aace/alexa/MediaPlayerBinder.cpp
     src/main/cpp/src/aace/alexa/NotificationsBinder.cpp
     src/main/cpp/src/aace/alexa/PlaybackControllerBinder.cpp

@@ -61,7 +61,6 @@ import com.amazon.aace.core.config.EngineConfiguration;
 import com.amazon.aace.localSkillService.config.LocalSkillServiceConfiguration;
 import com.amazon.aace.localVoiceControl.config.LocalVoiceControlConfiguration;
 import com.amazon.aace.logger.Logger;
-import com.amazon.aace.logger.config.LoggerConfiguration;
 import com.amazon.aace.modules.ExtraModules;
 import com.amazon.aace.storage.config.StorageConfiguration;
 import com.amazon.aace.vehicle.config.VehicleConfiguration;
@@ -79,7 +78,13 @@ import com.amazon.sampleapp.impl.Communication.AlexaCommsView;
 import com.amazon.sampleapp.impl.ContactIngestion.ContactUploader.ContactUploaderHandler;
 import com.amazon.sampleapp.impl.EqualizerController.EqualizerConfiguration;
 import com.amazon.sampleapp.impl.ExternalMediaPlayer.MACCPlayer;
+import com.amazon.sampleapp.impl.GlobalPreset.GlobalPresetHandler;
+import com.amazon.sampleapp.impl.LocalMediaSource.AMLocalMediaSource;
 import com.amazon.sampleapp.impl.LocalMediaSource.CDLocalMediaSource;
+import com.amazon.sampleapp.impl.LocalMediaSource.SiriusXMLocalMediaSource;
+import com.amazon.sampleapp.impl.LocalMediaSource.FMLocalMediaSource;
+import com.amazon.sampleapp.impl.LocalMediaSource.USBLocalMediaSource;
+
 import com.amazon.sampleapp.impl.EqualizerController.EqualizerControllerHandler;
 import com.amazon.sampleapp.impl.LocationProvider.LocationProviderHandler;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
@@ -175,6 +180,15 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private MACCPlayer mMACCPlayer;
 
     private CDLocalMediaSource mCDLocalMediaSource;
+    private SiriusXMLocalMediaSource mSIRUSXMLocalMediaSource;
+    private AMLocalMediaSource mAMLocalMediaSource;
+    private FMLocalMediaSource mFMLocalMediaSource;
+    private USBLocalMediaSource mUSBLocalMediaSource;
+
+    private GlobalPresetHandler mGlobalPresetHandler;
+
+
+
     private LVEConfigReceiver mLVEConfigReceiver;
     private MenuItem mTapToTalkIcon;
 
@@ -561,8 +575,33 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
         // Mock CD platform handler
         if ( !mEngine.registerPlatformInterface(
-                mCDLocalMediaSource = new CDLocalMediaSource(this, mLogger, CDLocalMediaSource.Source.COMPACT_DISC )
+                mCDLocalMediaSource = new CDLocalMediaSource(this, mLogger )
         ) ) throw new RuntimeException( "Could not register Mock CD player Local Media Source platform interface" );
+
+        // Mock SIRIUSXM platform handler
+        if ( !mEngine.registerPlatformInterface(
+                mSIRUSXMLocalMediaSource = new SiriusXMLocalMediaSource(this, mLogger )
+        ) ) throw new RuntimeException( "Could not register Mock SIRIUSXM player Local Media Source platform interface" );
+
+        // Mock AM platform handler
+        if ( !mEngine.registerPlatformInterface(
+                mAMLocalMediaSource = new AMLocalMediaSource(this, mLogger )
+        ) ) throw new RuntimeException( "Could not register Mock AM radio player Local Media Source platform interface" );
+
+        // Mock FM platform handler
+        if ( !mEngine.registerPlatformInterface(
+                mFMLocalMediaSource = new FMLocalMediaSource(this, mLogger )
+        ) ) throw new RuntimeException( "Could not register Mock FM radio player Local Media Source platform interface" );
+
+        // Mock USB platform handler
+        if ( !mEngine.registerPlatformInterface(
+                mUSBLocalMediaSource = new USBLocalMediaSource(this, mLogger)
+        ) ) throw new RuntimeException( "Could not register Mock USB player Local Media Source platform interface" );
+
+        // Mock global preset
+        if ( !mEngine.registerPlatformInterface(
+                mGlobalPresetHandler = new GlobalPresetHandler(this, mLogger )
+        ) ) throw new RuntimeException( "Could not register Mock Global Preset platform interface" );
 
         /* Sample Metrics Code */
 //        // Create and configure MetricsUploadService
@@ -571,6 +610,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
 //        if ( !mEngine.registerPlatformInterface( mMetricsUploadService) ) {
 //            throw new RuntimeException( "Could not register MetricsUploader platform interface" );
 //        }
+
         // Alexa Locale
         final String supportedLocales = mEngine.getProperty(AlexaProperties.SUPPORTED_LOCALES);
         final String[] localesArray = supportedLocales.split(",");

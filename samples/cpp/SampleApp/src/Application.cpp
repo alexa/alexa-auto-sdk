@@ -457,11 +457,24 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     Ensures(equalizerControllerHandler != nullptr);
     Ensures(engine->registerPlatformInterface(equalizerControllerHandler));
 
-    // Local Media Source for COMPACT_DISC
-    auto localMediaSourceHandler =
-        alexa::LocalMediaSourceHandler::create(activity, loggerHandler, aace::alexa::LocalMediaSource::Source::COMPACT_DISC, localMediaSourceChannel.speaker);
-    Ensures(localMediaSourceHandler != nullptr);
-    Ensures(engine->registerPlatformInterface(localMediaSourceHandler));
+    std::vector<std::pair<aace::alexa::LocalMediaSource::Source, std::shared_ptr<alexa::LocalMediaSourceHandler>>> LocalMediaSources = {
+        { aace::alexa::LocalMediaSource::Source::BLUETOOTH, nullptr },
+        { aace::alexa::LocalMediaSource::Source::USB, nullptr },
+        { aace::alexa::LocalMediaSource::Source::FM_RADIO, nullptr },
+        { aace::alexa::LocalMediaSource::Source::AM_RADIO, nullptr },
+        { aace::alexa::LocalMediaSource::Source::SATELLITE_RADIO, nullptr },
+        { aace::alexa::LocalMediaSource::Source::LINE_IN, nullptr },
+        { aace::alexa::LocalMediaSource::Source::COMPACT_DISC, nullptr },
+        { aace::alexa::LocalMediaSource::Source::SIRIUS_XM, nullptr },
+        { aace::alexa::LocalMediaSource::Source::DAB, nullptr }
+    };
+
+    for(auto& source : LocalMediaSources) {
+        source.second =
+            alexa::LocalMediaSourceHandler::create(activity, loggerHandler, source.first, localMediaSourceChannel.speaker);
+        Ensures(source.second != nullptr);
+        Ensures(engine->registerPlatformInterface(source.second));
+    }
 
     // Location Provider
     auto locationProviderHandler = location::LocationProviderHandler::create(activity, loggerHandler);
@@ -641,7 +654,9 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     equalizerControllerHandler.reset();
 
     // Local Media Source
-    localMediaSourceHandler.reset();
+    for(auto& source : LocalMediaSources) {
+        source.second.reset();
+    }
 
     // Location Provider
     locationProviderHandler.reset();

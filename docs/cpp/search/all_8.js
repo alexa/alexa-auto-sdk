@@ -12,7 +12,7 @@ var searchData=
   ['invalid_5frequest',['INVALID_REQUEST',['../classaace_1_1alexa_1_1_auth_provider_engine_interface.html#a006d3fd3bee07feafa325968054abc37ab8c9d7ce4c399c56136475f36309020f',1,'aace::alexa::AuthProviderEngineInterface']]],
   ['invalid_5fvalue',['INVALID_VALUE',['../classaace_1_1alexa_1_1_auth_provider_engine_interface.html#a006d3fd3bee07feafa325968054abc37ad8f24f388e990b9ccf8905b7993b99ae',1,'aace::alexa::AuthProviderEngineInterface']]],
   ['isclosed',['isClosed',['../classaace_1_1alexa_1_1_media_player.html#a55cdec70c0897042970cc5c262384856',1,'aace::alexa::MediaPlayer']]],
-  ['isguest',['isGuest',['../classaace_1_1alexa_1_1_external_media_adapter_1_1_session_state.html#a1ca861f8fc670ade16dbcfc3209d504e',1,'aace::alexa::ExternalMediaAdapter::SessionState']]],
+  ['isguest',['isGuest',['../classaace_1_1alexa_1_1_external_media_adapter_1_1_session_state.html#a1ca861f8fc670ade16dbcfc3209d504e',1,'aace::alexa::ExternalMediaAdapter::SessionState::isGuest()'],['../classaace_1_1alexa_1_1_local_media_source_1_1_session_state.html#acf3bb6f9c5201741392a1387fbe774bb',1,'aace::alexa::LocalMediaSource::SessionState::isGuest()']]],
   ['ismuted',['isMuted',['../classaace_1_1alexa_1_1_speaker.html#a639e217b770a55a91462bd502ce24ee2',1,'aace::alexa::Speaker']]],
   ['isrepeating',['isRepeating',['../classaace_1_1alexa_1_1_media_player.html#a9ba1c477d087af85f0a03820755c21ee',1,'aace::alexa::MediaPlayer']]],
   ['isvalid',['isValid',['../classaace_1_1location_1_1_location.html#a2dd9abb6c2c005ca822c29d14fefada4',1,'aace::location::Location']]],

@@ -37,7 +37,7 @@ ExternalMediaAdapterHandler::ExternalMediaAdapterHandler( std::shared_ptr<aace::
     alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
     m_speakerPlatformInterface( speakerPlatformInterface ), 
     m_discoveredPlayerSender( discoveredPlayerSender ), 
-    m_focusHandler( focusHandler ) {
+    m_focusHandler( focusHandler ){
 }
 
 bool ExternalMediaAdapterHandler::initializeAdapterHandler( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager )

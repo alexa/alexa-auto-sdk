@@ -411,51 +411,88 @@ m_equalizerController->localResetBands( bands );
     
 ### Handling Local Media Sources 
 
-The Local Media Source allows the platform to declare and use local media sources such as radio, bluetooth, compact disc, or line in.
-Each local media source should be registered using the corresponding local Media source type. This will allow AVS to excercise playback control over that source type. The cloud will authorize a registered Local Media Source, and if successful that source will be controllable via Alexa voice interaction. Currently, the interactions are sent to the `playControl` method. Below is an example of a CD player local media source implementation. 
+The `LocalMediaSource` interface allows the platform to register a local media source by type(`BLUETOOTH`, `USB`, `LINE_IN`, `AM_RADIO` etc.). Registering a local media source allows playback control of a source via Alexa (e.g. "Alexa, play the CD player") or via button press through the PlaybackController APIs. It will also enable playback initiation via Alexa by frequency, channel, or preset for relevant source types (e.g. "Alexa, play 98.7 FM")
+
+**NOTE: Local media source control with Alexa is currently supported in the US region only**
+
+The following is an example of registering a CD player local media source using type `Source.COMPACT_DISC`:
 
 ```
-	#include <AACE/Alexa/LocalMediaSource.h>
-    class MyCDLocalMediaSource : public aace::alexa:: LocalMediaSource {	
-    public:
-		MyCDLocalMediaSource( LocalMedidaSource::Source source, std::shared_ptr<MyCDSpeaker> speaker){
-	 		m_source = source;
-			m_speaker = speaker;
-		}; 
-		...
-		  
-		bool authorize( boolean authorized ) override {
-			// if true, CD playersource was authorized by cloud
-			m_authorized = authorized; // save auth state
-		...
-		bool play( std::string payload ) override {
-		// currently not used. may be used in future to handle play initiation
-		...
-      		
-  		bool playControl( PlayControlType controlType ) override {
-  			if ( m_authorized ) {
-				setFocus();
-				// handle the control type appropriately for CD player
-				return true;
-		...
-		bool seek( long offset ) override {
-			if ( m_authorized ) {
-				// handle seeking CD player
-		...
-		LocalMediaSourceState getState() override {
-			LocalMediaSourceState stateToReturn = std::make_shared<LocalMediaSourceState>();
-			stateToReturn.playbackState.albumName = "mock albumName";
-			... // fill in all required state information (see below)
-			return stateToReturn;
- 
-// Configure the Engine
-	auto myCDSpeaker = std::make_shared<MyCDSpeaker>(...);
-    engine->registerPlatformInterface( std::make_shared<MyLocalMediaSource>(LocalMedidaSource::Source::COMPACT_DISC, myCDSpeaker) );
+auto m_CDLocalMediaSource = std::make_shared<MyCDLocalMediaSource>( Source.COMPACT_DISC );
+engine->registerPlatformInterface( m_CDLocalMediaSource );
 ```
 
-The platform implementation should create it's own speaker, and can be used to listen to volume control directives. It need not specify an AVS Speaker type. 
+To implement a custom handler for a CD player local media source the `aace::alexa::LocalMediaSource` class should be extended:
 
-The following table describes the possible values for `LocalMediaSourceState`, and additional details. 
+```
+#include <AACE/Alexa/LocalMediaSource.h>
+class MyCDLocalMediaSource : public aace::alexa::LocalMediaSource {
+  public:
+    MyCDLocalMediaSource( LocalMedidaSource::Source source, Speaker::Speaker speaker );
+... 
+```
+
+The `play()` method is called when Alexa invokes play by `ContentSelector` type for a radio local media source (e.g. `AM_RADIO`, `FM_RADIO`, `SIRIUS_XM`). The `payload` is a string that depends on the `ContentSelector` type and local media `Source` type.
+
+```	
+    bool play( ContentSelector type, std::string payload ) override {
+        setFocus();
+        // play initiation for frequency, channel, or presets
+``` 
+
+This method will not be invoked if a source cannot handle the specified content selection type.
+
+The implementation depends on the local media source; however if the call is handled successfully, `setFocus()` should always be called. This informs the engine that the local player is in focus. 
+
+Content selector type details are as shown below:
+
+| type | example supported payload | supported range | increment |
+|------|---------|---|---|
+| FREQUENCY(FM) | "98.7" | 88.1 - 107.9 | 0.2 |
+| FREQUENCY(AM) | "1050" | 540 - 1700 | 10 |
+| FREQUENCY(FM) | "93.7 HD 2" | 88.1 - 107.9, HD 1-3 | 0.2, 1 |
+| CHANNEL(SXM) | "1" | 1-999 | 1 |
+| PRESET | "2" | 1-99 | 1 | 
+
+The `playControl()` method is called with a `PlayControlType`(e.g. `RESUME`, `PAUSE`, `NEXT`, `SHUFFLE`, `REPEAT` etc.) when either Alexa or the GUI (using the `PlaybackController` APIs) invokes a playback control on the local media source.
+
+```	
+    bool playControl( PlayControlType controlType ) override {
+        setFocus();
+        // handle the control type appropriately for CD player
+        return true;
+```
+
+The implementation depends on the local media source; however if the call is handled successfully, `setFocus()` should always be called. This informs the engine that the local player is in focus. 
+
+**NOTE: The `play()` method is used to initiate playback with specified content selection, whereas `playControl(RESUME)` is used to play or resume whatever is already playing.**
+
+The `seek()` and `adjustSeek()` methods will be invoked to seek the currently focused `LocalMediaSource`. These methods will only be used by sources that are capable of seeking. `seek()` is for specifying an absolute offset, whereas `adjustSeek()` if for specifying a relative offset. 
+
+```	
+    bool seek( long offset ) override {
+        // handle seeking CD player
+    ...
+    bool adjustSeek( long offset ) override {
+        // handle adjusting seek for CD player
+```	
+
+The Local Media Source handler should also create its own Speaker implementation. It should handle adjusting volume, and setting mute for the source. It does not need to specify a type. For more information on the `Speaker` class, see [**handling media and volume here**](#handling-media-and-volume).
+
+
+The `getState()` method is called to synchronize the local player's state with the cloud. This method is used to maintain correct state during startup and after every Alexa request. All relevant information should be added to the `LocalMediaSourceState` and returned. 
+
+Many fields of the `LocalMediaSourceState` are not required for local media source players. These may be omitted as noted below.
+
+```
+    LocalMediaSourceState getState() override {
+        LocalMediaSourceState stateToReturn = std::make_shared<LocalMediaSourceState>();
+        stateToReturn.playbackState.albumName = "mock albumName";
+        // fill in all required state information (see below)
+        return stateToReturn;
+```
+
+The following table describes the fields comprising a `LocalMediaSourceState`, which includes two sub-components `PlaybackState`, and `SessionState`.
 
 | State        | Type           | Notes  |
 | ------------- |:-------------:| -----:|
@@ -496,9 +533,55 @@ The following table describes the possible values for `LocalMediaSourceState`, a
 | playerCookie      | String  |   A player may declare arbitrary information for itself. optional |
 | spiVersion      | String  |   "1.0" required  |
 
+`supportedOperations` should list the operations which the local media source supports. Below is a list of every `supportedOperations`:
 
-> **Note**: Local Media Source Switching currently works only in US region.
+```
+LocalMediaSource::SupportedPlaybackOperation::PLAY,
+LocalMediaSource::SupportedPlaybackOperation::PAUSE,
+LocalMediaSource::SupportedPlaybackOperation::STOP,
+LocalMediaSource::SupportedPlaybackOperation::RESUME,
+LocalMediaSource::SupportedPlaybackOperation::PREVIOUS,
+LocalMediaSource::SupportedPlaybackOperation::NEXT,
+LocalMediaSource::SupportedPlaybackOperation::ENABLE_SHUFFLE,
+LocalMediaSource::SupportedPlaybackOperation::DISABLE_SHUFFLE,
+LocalMediaSource::SupportedPlaybackOperation::ENABLE_REPEAT_ONE,
+LocalMediaSource::SupportedPlaybackOperation::ENABLE_REPEAT,
+LocalMediaSource::SupportedPlaybackOperation::DISABLE_REPEAT,
+LocalMediaSource::SupportedPlaybackOperation::SEEK,
+LocalMediaSource::SupportedPlaybackOperation::ADJUST_SEEK,
+LocalMediaSource::SupportedPlaybackOperation::FAVORITE,
+LocalMediaSource::SupportedPlaybackOperation::UNFAVORITE,
+LocalMediaSource::SupportedPlaybackOperation::FAST_FORWARD,
+LocalMediaSource::SupportedPlaybackOperation::REWIND,
+LocalMediaSource::SupportedPlaybackOperation::START_OVER
+```
 
+**Note: For local media sources, do not use LocalMediaSource::SupportedPlaybackOperation::RESUME**
+
+`supportedContentSelectors` should list the content selection types the local source can supports. Below is a table of valid pairs.
+
+| Source | supportable `ContentSelector`'s |
+|---|---|
+| `AM_RADIO` |  `PRESET`, `FREQUENCY` |
+| `FM_RADIO` |  `PRESET`, `FREQUENCY` |
+| `SIRIUS_XM` |  `PRESET`, `CHANNEL` |
+
+### Handling Global Presets
+
+The Global Preset interface is used to handle "Alexa, play preset \<number>\" utterances. The meaning of the preset `number` passed through `setGlobalPreset()` is determined by the `GlobalPreset` platform implementation registered with the Engine, and the implementation should suit the needs of the vehicle's infotainment system. 
+
+Registering a `GlobalPreset` implementation with the engine is required for Alexa to set presets for any local media `Source` type that may use them (e.g. `AM_RADIO`, `FM_RADIO`, `SIRIUS_XM`). 
+
+```
+#include <AACE/Alexa/GlobalPreset.h>
+    ...
+    class MyGlobalPresetHandler : public aace::alexa::GlobalPreset {	
+    public:
+    void setGlobalPreset( int number ) override {
+        // handle the preset, via routing to local media source
+    }
+...
+```    
 
 ### Using External Media Adapter to handle external media apps
 

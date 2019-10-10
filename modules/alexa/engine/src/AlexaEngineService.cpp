@@ -997,6 +997,7 @@ bool AlexaEngineService::registerPlatformInterface( std::shared_ptr<aace::core::
         ReturnIf( registerPlatformInterfaceType<aace::alexa::ExternalMediaAdapter>( platformInterface ), true );
         ReturnIf( registerPlatformInterfaceType<aace::alexa::LocalMediaSource>( platformInterface ), true );
         ReturnIf( registerPlatformInterfaceType<aace::alexa::EqualizerController>( platformInterface ), true );
+        ReturnIf( registerPlatformInterfaceType<aace::alexa::GlobalPreset>( platformInterface ), true );
 
         return false;
     }
@@ -1241,6 +1242,24 @@ bool AlexaEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::al
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"registerPlatformInterfaceType<LocalMediaSourceAdapter>").d("reason", ex.what()));
+        return false;
+    }
+}
+
+bool AlexaEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::alexa::GlobalPreset> globalPreset )
+{
+    try
+    {
+        // create the external media player impl if needed
+        ThrowIfNot( createExternalMediaPlayerImpl(), "invalidExternalMediaPlayerImpl" );
+        
+        // register the platform media adapter
+        ThrowIfNot( m_externalMediaPlayerEngineImpl->registerPlatformGlobalPresetHandler( globalPreset ), "registerPlatformGlobalPresetFailed" );
+    
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"registerPlatformInterfaceType<GlobalPreset>").d("reason", ex.what()));
         return false;
     }
 }

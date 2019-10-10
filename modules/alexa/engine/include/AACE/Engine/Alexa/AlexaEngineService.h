@@ -207,6 +207,7 @@ private:
     bool registerPlatformInterfaceType( std::shared_ptr<aace::alexa::ExternalMediaAdapter> externalMediaAdapter );
     bool registerPlatformInterfaceType( std::shared_ptr<aace::alexa::LocalMediaSource> localMediaSource );
     bool registerPlatformInterfaceType( std::shared_ptr<aace::alexa::EqualizerController> equalizerController );
+    bool registerPlatformInterfaceType( std::shared_ptr<aace::alexa::GlobalPreset> globalPreset );
 
     bool createExternalMediaPlayerImpl();
 

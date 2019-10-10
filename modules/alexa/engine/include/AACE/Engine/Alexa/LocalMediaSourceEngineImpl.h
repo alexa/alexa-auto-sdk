@@ -21,6 +21,7 @@
 
 #include "AACE/Alexa/AlexaEngineInterfaces.h"
 #include "AACE/Alexa/LocalMediaSource.h"
+#include "AACE/Alexa/GlobalPreset.h"
 
 #include "ExternalMediaAdapterHandler.h"
 
@@ -37,6 +38,12 @@ private:
     
     bool initialize( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender, std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager );
     
+    using ContentSelector = aace::alexa::LocalMediaSource::ContentSelector;
+
+    using Source = aace::alexa::LocalMediaSource::Source;
+
+    std::string getPlayerId( Source source );
+
 public:
     static std::shared_ptr<LocalMediaSourceEngineImpl> create( std::shared_ptr<aace::alexa::LocalMediaSource> platformLocalMediaSource, const std::string& localPlayerId, std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender, std::shared_ptr<FocusHandlerInterface> focusHandler, std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender, std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager );
     
@@ -61,6 +68,8 @@ private:
     std::shared_ptr<aace::alexa::LocalMediaSource> m_platformLocalMediaSource;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> m_messageSender;
     std::string m_localPlayerId;
+    std::unordered_map<std::string,ContentSelector> m_contentSelectorNameMap;
+
 };
 
 } // aace::engine::alexa

@@ -44,6 +44,8 @@
 #include "aace/alexa/ExternalMediaAdapterBinder.h"
 #include "aace/alexa/LocalMediaSourceBinder.h"
 #include "aace/alexa/EqualizerControllerBinder.h"
+#include "aace/alexa/GlobalPresetBinder.h"
+
 
 #ifdef INCLUDE_ALEXA_COMMS_MODULE
 #include "aace/communication/AlexaCommsBinder.h"
@@ -102,6 +104,7 @@ private:
     std::shared_ptr<TemplateRuntimeBinder> createTemplateRuntimeBinder( JNIEnv* env, jobject platformInterface );
     std::shared_ptr<PlaybackControllerBinder> createPlaybackControllerBinder( JNIEnv* env, jobject platformInterface );
     std::shared_ptr<EqualizerControllerBinder> createEqualizerControllerBinder( JNIEnv* env, jobject platformInterface );
+    std::shared_ptr<GlobalPresetBinder> createGlobalPresetBinder( JNIEnv* env, jobject platformInterface );
 
     std::shared_ptr<LocationProviderBinder> createLocationProviderBinder( JNIEnv* env, jobject platformInterface );
     std::shared_ptr<NetworkInfoProviderBinder> createNetworkInfoProviderBinder( JNIEnv* env, jobject platformInterface );
@@ -135,6 +138,7 @@ private:
     std::shared_ptr<aace::alexa::AudioPlayer> m_audioPlayer;
     std::shared_ptr<aace::alexa::ExternalMediaAdapter> m_externalMediaAdapter;
     std::shared_ptr<aace::alexa::LocalMediaSource> m_localMediaSource;
+    std::shared_ptr<aace::alexa::GlobalPreset> m_globalPreset;
     std::shared_ptr<aace::alexa::EqualizerController> m_equalizerController;
     std::shared_ptr<aace::alexa::Notifications> m_notifications;
     std::shared_ptr<aace::alexa::PlaybackController> m_playbackController;
@@ -146,6 +150,7 @@ private:
     ClassRef m_javaClass_AudioPlayer;
     ClassRef m_javaClass_AuthProvider;
     ClassRef m_javaClass_ExternalMediaAdapter;
+    ClassRef m_javaClass_GlobalPreset;
     ClassRef m_javaClass_LocalMediaSource;
     ClassRef m_javaClass_EqualizerController;
     ClassRef m_javaClass_Notifications;

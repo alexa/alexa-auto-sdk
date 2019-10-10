@@ -29,8 +29,7 @@ LocalMediaSourceBinder::~LocalMediaSourceBinder() {}
 
 void LocalMediaSourceBinder::initialize( JNIEnv* env )
 {
-    m_javaMethod_authorize_authorized = env->GetMethodID( getJavaClass(), "authorize", "(Z)Z" );
-    m_javaMethod_play_payload = env->GetMethodID( getJavaClass(), "play", "(Ljava/lang/String;)Z" );
+    m_javaMethod_play_selector_payload = env->GetMethodID( getJavaClass(), "play", "(Lcom/amazon/aace/alexa/LocalMediaSource$ContentSelector;Ljava/lang/String;)Z" );
     m_javaMethod_playControl_controlType = env->GetMethodID( getJavaClass(), "playControl", "(Lcom/amazon/aace/alexa/LocalMediaSource$PlayControlType;)Z" );
     m_javaMethod_seek_offset = env->GetMethodID( getJavaClass(), "seek", "(J)Z" );
     m_javaMethod_adjustSeek_deltaOffset = env->GetMethodID( getJavaClass(), "adjustSeek", "(J)Z" );
@@ -62,6 +61,8 @@ void LocalMediaSourceBinder::initialize( JNIEnv* env )
     m_enum_Source_SATELLITE_RADIO = NativeLib::FindEnum( env, sourceEnumClass, "SATELLITE_RADIO", "Lcom/amazon/aace/alexa/LocalMediaSource$Source;" );
     m_enum_Source_LINE_IN = NativeLib::FindEnum( env, sourceEnumClass, "LINE_IN", "Lcom/amazon/aace/alexa/LocalMediaSource$Source;" );
     m_enum_Source_COMPACT_DISC = NativeLib::FindEnum( env, sourceEnumClass, "COMPACT_DISC", "Lcom/amazon/aace/alexa/LocalMediaSource$Source;" );
+    m_enum_Source_SIRIUS_XM = NativeLib::FindEnum( env, sourceEnumClass, "SIRIUS_XM", "Lcom/amazon/aace/alexa/LocalMediaSource$Source;" );
+    m_enum_Source_DAB = NativeLib::FindEnum( env, sourceEnumClass, "DAB", "Lcom/amazon/aace/alexa/LocalMediaSource$Source;" );
 
     // AdapterState
     m_javaClass_LocalMediaSourceState = NativeLib::FindClass( env, "com/amazon/aace/alexa/LocalMediaSource$LocalMediaSourceState" );
@@ -78,7 +79,7 @@ void LocalMediaSourceBinder::initialize( JNIEnv* env )
     m_javaField_SessionState_active = env->GetFieldID( m_javaClass_SessionState.get(), "active", "Z");
     m_javaField_SessionState_accessToken = env->GetFieldID( m_javaClass_SessionState.get(), "accessToken", "Ljava/lang/String;");
     m_javaField_SessionState_tokenRefreshInterval = env->GetFieldID( m_javaClass_SessionState.get(), "tokenRefreshInterval", "J");
-    m_javaField_SessionState_playerCookie = env->GetFieldID( m_javaClass_SessionState.get(), "playerCookie", "Ljava/lang/String;");
+    m_javaField_SessionState_supportedContentSelectors = env->GetFieldID( m_javaClass_SessionState.get(), "supportedContentSelectors", "[Lcom/amazon/aace/alexa/LocalMediaSource$ContentSelector;");
     m_javaField_SessionState_spiVersion = env->GetFieldID( m_javaClass_SessionState.get(), "spiVersion", "Ljava/lang/String;");
 
     // PlaybackState
@@ -107,6 +108,12 @@ void LocalMediaSourceBinder::initialize( JNIEnv* env )
     m_javaField_PlaybackState_mediaProvider = env->GetFieldID( m_javaClass_PlaybackState.get(), "mediaProvider", "Ljava/lang/String;");
     m_javaField_PlaybackState_mediaType = env->GetFieldID( m_javaClass_PlaybackState.get(), "mediaType", "Lcom/amazon/aace/alexa/LocalMediaSource$MediaType;");
     m_javaField_PlaybackState_duration = env->GetFieldID( m_javaClass_PlaybackState.get(), "duration", "J");
+
+    // ContentSelector
+    jclass contentSelectorEnumClass = env->FindClass( "com/amazon/aace/alexa/LocalMediaSource$ContentSelector" );
+    m_enum_ContentSelector_FREQUENCY = NativeLib::FindEnum( env, contentSelectorEnumClass, "FREQUENCY", "Lcom/amazon/aace/alexa/LocalMediaSource$ContentSelector;" );
+    m_enum_ContentSelector_CHANNEL = NativeLib::FindEnum( env, contentSelectorEnumClass, "CHANNEL", "Lcom/amazon/aace/alexa/LocalMediaSource$ContentSelector;" );
+    m_enum_ContentSelector_PRESET = NativeLib::FindEnum( env, contentSelectorEnumClass, "PRESET", "Lcom/amazon/aace/alexa/LocalMediaSource$ContentSelector;" );
 
     // SupportedPlaybackOperation
     jclass supportedPlaybackOperationEnumClass = env->FindClass( "com/amazon/aace/alexa/LocalMediaSource$SupportedPlaybackOperation" );
@@ -145,32 +152,17 @@ void LocalMediaSourceBinder::initialize( JNIEnv* env )
     m_enum_MediaType_OTHER = NativeLib::FindEnum( env, mediaTypeEnumClass, "OTHER", "Lcom/amazon/aace/alexa/LocalMediaSource$MediaType;" );
 }
 
-bool LocalMediaSourceBinder::authorize( bool authorized )
+bool LocalMediaSourceBinder::play( ContentSelector selector, const std::string& payload )
 {
     bool result = false;
-    if( getJavaObject() != nullptr && m_javaMethod_authorize_authorized != nullptr )
-    {
-        ThreadContext context;
-
-        if( context.isValid() )
-        {
-            result = context.getEnv()->CallBooleanMethod( getJavaObject(), m_javaMethod_authorize_authorized, authorized );
-        }
-    }
-    return result;
-}
-
-bool LocalMediaSourceBinder::play( const std::string & payload )
-{
-    bool result = false;
-    if( getJavaObject() != nullptr && m_javaMethod_play_payload != nullptr )
+    if( getJavaObject() != nullptr && m_javaMethod_play_selector_payload != nullptr )
     {
         ThreadContext context;
 
         if( context.isValid() )
         {
             jstring payloadStr = context.getEnv()->NewStringUTF( payload.c_str() );
-            result = context.getEnv()->CallBooleanMethod( getJavaObject(), m_javaMethod_play_payload, payloadStr );
+            result = context.getEnv()->CallBooleanMethod( getJavaObject(), m_javaMethod_play_selector_payload, convert( selector ), payloadStr );
             context.getEnv()->DeleteLocalRef( payloadStr );
         }
     }
@@ -271,9 +263,15 @@ aace::alexa::LocalMediaSource::LocalMediaSourceState LocalMediaSourceBinder::get
                 state.sessionState.spiVersion = NativeLib::convert(env, spiVersion);
                 env->DeleteLocalRef(spiVersion);
 
-                jstring playerCookie = (jstring) env->GetObjectField(localSessionState, m_javaField_SessionState_playerCookie);
-                state.sessionState.playerCookie = NativeLib::convert(env, playerCookie);
-                env->DeleteLocalRef(playerCookie);
+                jobjectArray localSupportedContentSelectors = ( jobjectArray ) env->GetObjectField( localSessionState, m_javaField_SessionState_supportedContentSelectors);
+                int localSupportedContentSelectorsLength = env->GetArrayLength( localSupportedContentSelectors );
+                std::vector<LocalMediaSourceBinder::ContentSelector> supportedContentSelectors;
+                for ( int i = 0; i < localSupportedContentSelectorsLength; i++ ) {
+                    supportedContentSelectors.push_back( convertContentSelector(env, env->GetObjectArrayElement(localSupportedContentSelectors, i)) );
+                }
+                state.sessionState.supportedContentSelectors = supportedContentSelectors;
+                env->DeleteLocalRef(localSupportedContentSelectors);
+                supportedContentSelectors.clear();
 
                 env->DeleteLocalRef(localSessionState);
 
@@ -487,6 +485,36 @@ jobject LocalMediaSourceBinder::convert( aace::alexa::LocalMediaSource::Source s
             return m_enum_Source_LINE_IN.get();
         case aace::alexa::LocalMediaSource::Source::COMPACT_DISC:
             return m_enum_Source_COMPACT_DISC.get();
+        case aace::alexa::LocalMediaSource::Source::SIRIUS_XM:
+            return m_enum_Source_SIRIUS_XM.get();
+        case aace::alexa::LocalMediaSource::Source::DAB:
+            return m_enum_Source_DAB.get();
+    }
+}
+
+jobject LocalMediaSourceBinder::convert( aace::alexa::LocalMediaSource::ContentSelector selector )
+{
+    switch( selector )
+    {
+        case aace::alexa::LocalMediaSource::ContentSelector::FREQUENCY:
+            return m_enum_ContentSelector_FREQUENCY.get();
+        case aace::alexa::LocalMediaSource::ContentSelector::CHANNEL:
+            return m_enum_ContentSelector_CHANNEL.get();
+        case aace::alexa::LocalMediaSource::ContentSelector::PRESET:
+            return m_enum_ContentSelector_PRESET.get();
+    }
+}
+
+aace::alexa::LocalMediaSource::ContentSelector LocalMediaSourceBinder::convertContentSelector( JNIEnv* env, jobject obj )
+{
+    if( m_enum_ContentSelector_FREQUENCY.isSameObject( env, obj ) ) {
+        return aace::alexa::LocalMediaSource::ContentSelector::FREQUENCY;
+    }
+    else if( m_enum_ContentSelector_CHANNEL.isSameObject( env, obj ) ) {
+        return aace::alexa::LocalMediaSource::ContentSelector::CHANNEL;
+    }
+    else if( m_enum_ContentSelector_PRESET.isSameObject( env, obj ) ) {
+        return aace::alexa::LocalMediaSource::ContentSelector::PRESET;
     }
 }
 
@@ -573,6 +601,12 @@ aace::alexa::LocalMediaSource::Source LocalMediaSourceBinder::convertSource( JNI
     }
     else if( m_enum_Source_COMPACT_DISC.isSameObject( env, obj ) ) {
         return aace::alexa::LocalMediaSource::Source::COMPACT_DISC;
+    }
+    else if( m_enum_Source_SIRIUS_XM.isSameObject( env, obj ) ) {
+        return aace::alexa::LocalMediaSource::Source::SIRIUS_XM;
+    }
+    else if( m_enum_Source_DAB.isSameObject( env, obj ) ) {
+        return aace::alexa::LocalMediaSource::Source::DAB;
     }
     else {
         return aace::alexa::LocalMediaSource::Source::COMPACT_DISC;

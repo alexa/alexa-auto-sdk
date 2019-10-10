@@ -20,6 +20,7 @@
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/error/en.h>
+#include <sstream>
 
 namespace aace {
 namespace engine {
@@ -28,10 +29,20 @@ namespace alexa {
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.LocalMediaSourceEngineImpl");
 
+static const std::string CONTENT_SELECTOR_SEPARATOR = ":";
+
+static const std::string DEFAULT_PLAYERCOOKIE_PAYLOAD = R"(
+    {
+        "cookieVersion": "1.0",
+        "capabilities": {}
+    }
+)";
+
 LocalMediaSourceEngineImpl::LocalMediaSourceEngineImpl( std::shared_ptr<aace::alexa::LocalMediaSource> platformLocalMediaSource, const std::string& localPlayerId, std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender, std::shared_ptr<FocusHandlerInterface> focusHandler ) :
     aace::engine::alexa::ExternalMediaAdapterHandler( platformLocalMediaSource->getSpeaker(), discoveredPlayerSender, focusHandler ),
     m_platformLocalMediaSource( platformLocalMediaSource ),
-    m_localPlayerId( localPlayerId ) {
+    m_localPlayerId( localPlayerId ),
+    m_contentSelectorNameMap{{"frequency", ContentSelector::FREQUENCY}, {"channel", ContentSelector::CHANNEL}, {"preset", ContentSelector::PRESET}} {
 }
 
 std::shared_ptr<LocalMediaSourceEngineImpl> LocalMediaSourceEngineImpl::create( std::shared_ptr<aace::alexa::LocalMediaSource> platformLocalMediaSource, const std::string& localPlayerId, std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender, std::shared_ptr<FocusHandlerInterface> focusHandler, std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender, std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager )
@@ -98,9 +109,7 @@ bool LocalMediaSourceEngineImpl::handleAuthorization( const std::vector<aace::al
         // validate the authorized player list has exactly one player
         ThrowIf( authorizedPlayerList.size() != 1, "invalidAuthorizedPlayerList" );
         
-        // call the authorize method in the platform implementation
-        ThrowIfNot( m_platformLocalMediaSource->authorize( authorizedPlayerList[0].authorized ), "platformMediaAdapterAuthorizeFailed" );
-        
+        // assume authorization will always return true for a registered local media source
         return true;
     }
     catch( std::exception& ex ) {
@@ -137,8 +146,20 @@ bool LocalMediaSourceEngineImpl::handlePlay( const std::string& localPlayerId, c
 {
     try
     {
-        ThrowIfNot( m_platformLocalMediaSource->play( "" ), "platformMediaAdapterPlayFailed" );
-    
+        // For Local Media sources localPlayerId, index, offset, preload, and navigation are currently unused
+
+        size_t separatorIndex = playContextToken.find(CONTENT_SELECTOR_SEPARATOR); // ":"
+        
+        std::string contentSelectorName = playContextToken.substr(0,separatorIndex); //  i.e."frequency"
+        std::transform(contentSelectorName.begin(), contentSelectorName.end(), contentSelectorName.begin(), ::tolower); // enforce lower case
+
+        std::unordered_map<std::string,ContentSelector>::const_iterator foundIt = m_contentSelectorNameMap.find ( contentSelectorName );
+        ThrowIfNot(foundIt != m_contentSelectorNameMap.end(), "getContentSelectorFromNameFailed"  );
+        ContentSelector contentSelector = foundIt->second;
+        
+        std::string selectionPayload = playContextToken.substr(separatorIndex + 1); //  i.e."98.7"
+
+        ThrowIfNot( m_platformLocalMediaSource->play( contentSelector, selectionPayload ), "platformMediaAdapterPlayFailed" );
         return true;
     }
     catch( std::exception& ex ) {
@@ -194,12 +215,13 @@ bool LocalMediaSourceEngineImpl::handleGetAdapterState( const std::string& local
     try
     {
         auto platformState = m_platformLocalMediaSource->getState();
+        auto platformSource = m_platformLocalMediaSource->getSource();
         
         // session state
         if( platformState.sessionState.spiVersion.empty() == false ) {
             state.sessionState.spiVersion = platformState.sessionState.spiVersion;
         }
-
+        state.sessionState.playerId = getPlayerId( platformSource );
         state.sessionState.endpointId = platformState.sessionState.endpointId;
         state.sessionState.loggedIn = platformState.sessionState.loggedIn;
         state.sessionState.userName = platformState.sessionState.userName;
@@ -208,9 +230,31 @@ bool LocalMediaSourceEngineImpl::handleGetAdapterState( const std::string& local
         state.sessionState.active = platformState.sessionState.active;
         state.sessionState.accessToken = platformState.sessionState.accessToken;
         state.sessionState.tokenRefreshInterval = platformState.sessionState.tokenRefreshInterval;
-        state.sessionState.playerCookie = platformState.sessionState.playerCookie;
-    
+
+        // construct playercookie payload
+        rapidjson::Document document;
+        document.Parse<0>(DEFAULT_PLAYERCOOKIE_PAYLOAD.c_str());
+        rapidjson::Document::AllocatorType& allocator = document.GetAllocator();
+        for( auto next : platformState.sessionState.supportedContentSelectors ) {
+            switch( next ) {
+                case aace::alexa::LocalMediaSource::ContentSelector::FREQUENCY:
+                    document["capabilities"].AddMember("playFrequency", "1.0", allocator);
+                    break;
+                case aace::alexa::LocalMediaSource::ContentSelector::CHANNEL:
+                    document["capabilities"].AddMember("playChannel", "1.0", allocator);
+                    break;
+                case aace::alexa::LocalMediaSource::ContentSelector::PRESET:
+                    document["capabilities"].AddMember("playPreset", "1.0", allocator);
+                    break;
+            }
+        }
+        rapidjson::StringBuffer strbuf;
+        rapidjson::Writer<rapidjson::StringBuffer> writer(strbuf);
+        document.Accept(writer);
+        state.sessionState.playerCookie = strbuf.GetString();
+
         // playback state
+        state.playbackState.playerId = getPlayerId( platformSource );
         state.playbackState.state = platformState.playbackState.state;
         state.playbackState.trackOffset = platformState.playbackState.trackOffset;
         state.playbackState.shuffleEnabled = platformState.playbackState.shuffleEnabled;
@@ -245,6 +289,12 @@ bool LocalMediaSourceEngineImpl::handleGetAdapterState( const std::string& local
         AACE_ERROR(LX(TAG,"handleGetAdapterState").d("reason", ex.what()));
         return false;
     }
+}
+
+std::string LocalMediaSourceEngineImpl::getPlayerId( Source source) {
+    std::stringstream ss;
+    ss << source;
+    return ss.str();
 }
 
 // aace::alexa::LocalMediaSourceEngineInterface

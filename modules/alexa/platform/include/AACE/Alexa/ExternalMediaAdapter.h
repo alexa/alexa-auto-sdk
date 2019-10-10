@@ -578,6 +578,7 @@ public:
      * @param [in] localPlayerId The opaque token that uniquely identifies the local external player app
      */
     void setFocus( const std::string& localPlayerId );
+
     void removeDiscoveredPlayer( const std::string& localPlayerId );
 
     /**

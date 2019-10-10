@@ -43,6 +43,7 @@ void EngineBinder::initialize( JNIEnv* env )
     m_javaClass_AuthProvider = NativeLib::FindClass( env, "com/amazon/aace/alexa/AuthProvider" );
     m_javaClass_ExternalMediaAdapter = NativeLib::FindClass( env, "com/amazon/aace/alexa/ExternalMediaAdapter" );
     m_javaClass_LocalMediaSource = NativeLib::FindClass( env, "com/amazon/aace/alexa/LocalMediaSource" );
+    m_javaClass_GlobalPreset = NativeLib::FindClass( env, "com/amazon/aace/alexa/GlobalPreset" );
     m_javaClass_EqualizerController = NativeLib::FindClass( env, "com/amazon/aace/alexa/EqualizerController" );
     m_javaClass_Notifications = NativeLib::FindClass( env, "com/amazon/aace/alexa/Notifications" );
     m_javaClass_PlaybackController = NativeLib::FindClass( env, "com/amazon/aace/alexa/PlaybackController" );
@@ -568,6 +569,8 @@ std::shared_ptr<LocalMediaSourceBinder> EngineBinder::createLocalMediaSourceBind
     ObjectRef enum_Source_SATELLITE_RADIO = NativeLib::FindEnum( env, sourceEnumClass, "SATELLITE_RADIO", "Lcom/amazon/aace/alexa/LocalMediaSource$Source;" );
     ObjectRef enum_Source_LINE_IN = NativeLib::FindEnum( env, sourceEnumClass, "LINE_IN", "Lcom/amazon/aace/alexa/LocalMediaSource$Source;" );
     ObjectRef enum_Source_COMPACT_DISC = NativeLib::FindEnum( env, sourceEnumClass, "COMPACT_DISC", "Lcom/amazon/aace/alexa/LocalMediaSource$Source;" );
+    ObjectRef enum_Source_SIRIUS_XM = NativeLib::FindEnum( env, sourceEnumClass, "SIRIUS_XM", "Lcom/amazon/aace/alexa/LocalMediaSource$Source;" );
+    ObjectRef enum_Source_DAB = NativeLib::FindEnum( env, sourceEnumClass, "DAB", "Lcom/amazon/aace/alexa/LocalMediaSource$Source;" );
 
     if( enum_Source_BLUETOOTH.isSameObject( env, source ) ) {
         sourceEnum = aace::alexa::LocalMediaSource::Source::BLUETOOTH;
@@ -590,6 +593,12 @@ std::shared_ptr<LocalMediaSourceBinder> EngineBinder::createLocalMediaSourceBind
     else if( enum_Source_COMPACT_DISC.isSameObject( env, source ) ) {
         sourceEnum = aace::alexa::LocalMediaSource::Source::COMPACT_DISC;
     }
+    else if( enum_Source_SIRIUS_XM.isSameObject( env, source ) ) {
+        sourceEnum = aace::alexa::LocalMediaSource::Source::SIRIUS_XM;
+    }
+    else if( enum_Source_DAB.isSameObject( env, source ) ) {
+        sourceEnum = aace::alexa::LocalMediaSource::Source::DAB;
+    }
 
     std::shared_ptr<SpeakerBinder> speakerBinder = createSpeakerBinder( env, platformInterface );
     std::shared_ptr<LocalMediaSourceBinder> localMediaSourceBinder = std::make_shared<LocalMediaSourceBinder>( sourceEnum, speakerBinder );
@@ -604,6 +613,27 @@ std::shared_ptr<LocalMediaSourceBinder> EngineBinder::createLocalMediaSourceBind
     env->CallVoidMethod( platformInterface, javaMethod_setNativeObject, (jlong) localMediaSourceBinder.get() );
 
     return localMediaSourceBinder;
+}
+
+
+std::shared_ptr<GlobalPresetBinder> EngineBinder::createGlobalPresetBinder( JNIEnv* env, jobject platformInterface )
+{
+
+    // create the platform interface native binder
+    std::shared_ptr<GlobalPresetBinder> globalPresetBinder = std::make_shared<GlobalPresetBinder>();
+
+    // register the platform interface with the engine
+    m_engine->registerPlatformInterface( globalPresetBinder );
+
+    // bind the platform java interface to the native interface
+    jclass platformInterfaceClass = env->GetObjectClass( platformInterface );
+    jmethodID javaMethod_setNativeObject = env->GetMethodID( platformInterfaceClass, "setNativeObject", "(J)V" );
+
+    globalPresetBinder->bind( env, platformInterface );
+
+    env->CallVoidMethod( platformInterface, javaMethod_setNativeObject, (jlong) globalPresetBinder.get() );
+
+    return globalPresetBinder;
 }
 
 bool EngineBinder::registerPlatformInterface( JNIEnv* env, jobject platformInterface )
@@ -678,6 +708,10 @@ bool EngineBinder::registerPlatformInterface( JNIEnv* env, jobject platformInter
     }
     else if( env->IsInstanceOf( platformInterface, m_javaClass_LocalMediaSource.get() ) ) {
         m_localMediaSource = createLocalMediaSourceBinder( env, platformInterface );
+        return true;
+    }
+    else if( env->IsInstanceOf( platformInterface, m_javaClass_GlobalPreset.get() ) ) {
+        m_globalPreset = createGlobalPresetBinder( env, platformInterface );
         return true;
     }
     else if( env->IsInstanceOf( platformInterface, m_javaClass_EqualizerController.get() ) ) {

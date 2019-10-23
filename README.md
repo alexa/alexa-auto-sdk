@@ -1,6 +1,6 @@
 # Alexa Auto SDK
 
-The Alexa Auto SDK contains essential client-side software required to integrate Alexa into the automobile. The Alexa Auto SDK provides a runtime engine for communicating with the Alexa service. It also provides interfaces that allow you to implement platform specific behavior such as audio input, media playback, template and state rendering, phone control, and car control. It also includes two sample applications that demonstrate how to use the Alexa Auto SDK interfaces.
+The Alexa Auto SDK contains essential client-side software required to integrate Alexa into the automobile. It provides a runtime engine for communicating with the Alexa service and also provides interfaces that allow you to implement platform-specific behavior such as audio input, media playback, template and state rendering, phone control, and car control. The Auto SDK also includes two sample applications that demonstrate how to use the Auto SDK interfaces.
 
 **Table of Contents**:
 
@@ -36,13 +36,7 @@ The following components are included with the Alexa Auto SDK:
 
 * [C++ Sample App](./samples/cpp/README.md): This directory contains the C++ sample application that uses the Alexa Auto SDK to demonstrate end-to-end functionality.
 
-Additional functionality is available with help from your Amazon Solutions Architect (SA) or Partner Manager:
-
-* [Wake Word support](#wake-word-extension)
-* [Alexa Communications](#alexa-communication-extension)
-* [Local Voice Control (LVC)](#local-voice-control-extension)
-* [Device Client Metrics (DCM)](#metrics-uploading-extension)
-* [Voice Chrome for Android](#voice-chrome-extension)
+[Additional functionality](#additional-functionality) (for example, AmazonLite Wake Word, Alexa Communications, Local Voice Control (LVC), Device Client Metrics (DCM), and Voice Chrome for Android) is available with help from your Amazon Solutions Architect (SA) or Partner Manager.
 
 Alexa Auto SDK API Reference documentation is available for Android and C++. Access the Alexa Auto SDK API reference documentation from the links below.
 
@@ -149,24 +143,35 @@ The Phone Control Module includes Platform Interfaces and runtime Engine support
 
 Click [here](./modules/phone-control/README.md) for more information.
 
-## Additional Functionality
-The following extensions to the Alexa Auto SDK are available by request. Please contact your Amazon Solutions Architect (SA) or Partner Manager for more information.
+## Additional Functionality <a id ="additional-functionality"> </a>
+The following extensions to the Alexa Auto SDK are available by request. Please contact your Amazon Solutions Architect (SA) or Partner Manager for more information. 
 
-### Wake Word extension<a id="wake-word-extension"></a>
+>**Important!** The optional extensions are provided as archives. In order to install an optional extension, you must first download the archive. The version of the optional extension archive must match the version of the Auto SDK that you are using. For example, if you are using Auto SDK 2.0 and want to install the Local Voice Control extension, you must download version 2.0 of the Local Voice Control extension archive from the link provided below.
+
+### AmazonLite Wake Word extension<a id="wake-word-extension"></a>
 Wake Word enables hands-free, voice-initiated interactions with Alexa. The Wake Word extension enables AmazonLite Wake Word support in the Alexa Auto SDK.
 
-### Alexa Communication extension<a id="alexa-communication-extension"></a>
-The Alexa Communication extension enables integration with Alexa-to-Alexa calling, Alexa-to-PSTN calling, and messaging capabilities.
+To install the optional AmazonLite Wake Word extension, you must download the appropriate archive version from the [Auto SDK AmazonLite Extension resources directory](https://developer.amazon.com/alexa/console/avs/preview/resources/details/Auto%20SDK%20Amazonlite%20Extension).
+
+### Alexa Communications extension<a id="alexa-communication-extension"></a>
+The Alexa Communications extension enables integration with Alexa-to-Alexa calling, Alexa-to-PSTN calling, and messaging capabilities.
+
+To install the optional Alexa Communications extension, you must download the appropriate archive version from the [Auto SDK Alexa Comms Extension resources directory](https://developer.amazon.com/alexa/console/avs/preview/resources/details/Auto%20SDK%20Alexa%20Comms%20Extension).
 
 ### Local Voice Control (LVC) extension<a id="local-voice-control-extension"></a>
 The Local Voice Control (LVC) extension provides car control, communication, navigation, and entertainment functionality, with and without an internet connection. It includes components that run an Alexa endpoint inside the vehicle's head unit. Local Voice Control is currently supported on Linux x86 64-bit, Linux ARM 32/64-bit, Android x86 32/64-bit, and Android ARM 32/64-bit platforms.
 
+To install the optional LVC extension, you must download the appropriate archive version from the [Auto SDK Local Voice Control Extension resources directory](https://developer.amazon.com/alexa/console/avs/preview/resources/details/Auto%20SDK%20Local%20Voice%20Control%20Extension).
+
 ### Device Client Metrics (DCM) extension<a id="metrics-uploading-extension"></a>
 The Device Client Metrics (DCM) extension enables logging and uploading Alexa Auto SDK metrics to the Amazon cloud. Voice request metrics, for example, include start and end timestamps of user and Alexa speech and user perceived latency (UPL) between the request and Alexa’s response. Metrics may be tagged Beta, Gamma, or Prod depending on the vehicle lifecycle. The DCM extension is available for all Linux and Android platforms.
 
-### Voice Chrome extension<a id="voice-chrome-extension"></a>
+To install the optional DCM extension, you must download the appropriate archive version from the [Auto SDK Device Metric Upload Service Extension resources directory](https://developer.amazon.com/alexa/console/avs/preview/resources/details/Auto%20SDK%20Metric%20Upload%20Service%20Extension).
+
+### Voice Chrome for Android extension<a id="voice-chrome-extension"></a>
 The Voice Chrome extension adds Voice Chrome support to the Auto SDK for Android x86 32/64-bit and Android ARM 32/64-bit platforms. Voice Chrome provides a consistent set of visual cues representing Alexa attention state across a range of Alexa-enabled devices. The Voice Chrome extension includes a prebuilt Android AAR library for easy integration with your applications, as well as a patch to the Android Sample App that adds the Voice Chrome functionality.
 
+To install the optional Voice Chrome for Android extension, you must download the appropriate archive version from the [Auto SDK Voice Chrome Extension resources directory](https://developer.amazon.com/alexa/console/avs/preview/resources/details/Auto%20SDK%20Voice%20Chrome%20Extension).
 
 ## Getting Started With a Sample App
 

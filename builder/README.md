@@ -74,7 +74,7 @@ To use Builder on macOS hosts, you must install [Docker Community Edition (CE) f
 
 Upon first run, Builder builds the Docker image `aac/ubuntu-base:<revision>` and creates a dedicated Docker volume `buildervolume` to run the Alexa Auto SDK Builder in your Docker environment. This might take up to an hour to complete.
 
->**IMPORTANT NOTE on macOS:** If you are trying to build for QNX targets with macOS host, you must install QNX 7.0.0 SDP within a **case-sensitive** file system, using additional Linux installation tools. You may need to use an external drive for installation since your system file system is NOT case-sensitive by default.
+>**IMPORTANT NOTE for macOS:** If you are trying to build for QNX targets on a macOS host, you must install QNX 7.0.0 SDP within a **case-sensitive** file system, using additional Linux installation tools. You may need to use an external drive for installation since your system file system is NOT case-sensitive by default.
 
 #### Additional Setup for Android Targets
 
@@ -82,8 +82,10 @@ Make sure to install the following prerequisites on your host.
 
 * Android Studio 3.4.1+
 * Gradle 4.10.1+
-* *(macOS host only)* `gsed` & `gfind`
-  * May be installed through Homebrew: `brew install gnu-sed findutils`
+* *(macOS host only)* `gsed`, `gfind`, and `coreutils`
+  * You can use Homebrew to install the required macOS prerequisites:
+  
+      `brew install gnu-sed findutils coreutils`
 
 Set the `ANDROID_HOME`to Android SDK Path. For example:
 
@@ -137,7 +139,7 @@ The following build targets are available:
 | QNX AArch64                | `qnx7arm64`     |
 | QNX x86-64                 | `qnx7x86-64`    |
 
->**Note**: Using The Alexa Auto SDK Builder to build the Alexa Auto SDK for macOS targets is not currently supported.
+>**Note**: Using the Alexa Auto SDK Builder to build the Alexa Auto SDK for macOS targets is not currently supported.
 
 For all other targets/toolchains, please refer to the files `meta-aac-builder/conf/machine/*.conf`. Those targets are provided by default for Poky-based Linux systems:
 

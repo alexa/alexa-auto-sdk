@@ -1,23 +1,23 @@
 # Alexa Auto SDK
 
-Alexa Auto SDK contains essential client-side software required to integrate Alexa into the automobile. The Alexa Auto SDK provides a runtime engine for communicating with the Alexa service. It also provides interfaces that allow the developer to implement platform specific behavior such as audio input, media playback, template and state rendering, and phone control. It also includes two sample applications that demonstrates how to use the Alexa Auto SDK interfaces.
+The Alexa Auto SDK contains essential client-side software required to integrate Alexa into the automobile. It provides a runtime engine for communicating with the Alexa service and also provides interfaces that allow you to implement platform-specific behavior such as audio input, media playback, template and state rendering, and phone control. It also includes two sample applications that demonstrate how to use the Alexa Auto SDK interfaces.
 
 **Table of Contents**:
 
-* [What is Included](#whatsincluded)
+* [What's Included](#whatsincluded)
 * [General Build Requirements](#generalbuildreqs)
 * [Build the Alexa Auto SDK](#buildthesdk)
 * [Alexa Auto SDK Architecture](#architecture)
 * [Vehicle Configuration Information](#vehicleconfigurationdatarequirements)
 * [Release Notes and Known Issues](#relnotesknownissues)
 
-> **Tip**: Try looking at [Need Help?](./NEED_HELP.md) if you don't see the topic you are looking for.
+> **Note:**: For UX design requirements, recommendations, and best practices, please see the [Alexa Automotive design documentation](https://developer.amazon.com/docs/alexa-auto/about-this-guide.html). For information on topics not covered in the list above, please see [Need Help?](./NEED_HELP.md).
 
 ## What is Included<a id="whatsincluded"></a>
 
 The following components are included with the Alexa Auto SDK:
 
-* [Builder](./builder/README.md): This directory contains the scripts that allow developers to build modules for a variety of hardware targets.
+* [Builder](./builder/README.md): This directory contains the scripts that allow you to build modules for a variety of hardware targets.
 
 * Modules: This directory contains the Alexa Auto SDK interfaces and source code in the following modules:
      * [Alexa](./modules/alexa/README.md)
@@ -31,11 +31,7 @@ The following components are included with the Alexa Auto SDK:
 
 * [C++ Sample App](./samples/cpp/README.md): This directory contains the C++ sample application that uses the Alexa Auto SDK to demonstrate end-to-end functionality.
 
-Additional functionality is available with help from your Amazon Solutions Architect (SA) or Partner Manager:
-* [Wake Word support](#wake-word-extension)
-* [Alexa Communications](#alexa-communication-extension)
-* [Local Voice Control](#local-voice-control-extension)
-* [Metrics Uploading](#metrics-uploading-extension)
+[Additional functionality](#additional-functionality) (for example, AmazonLite Wake Word, Alexa Communications, Local Voice Control (LVC), and Metrics Uploading) is available with help from your Amazon Solutions Architect (SA) or Partner Manager.
 
 Alexa Auto SDK API Reference documentation is available for Android and C++. Access the Alexa Auto SDK API reference documentation from the links below.
 
@@ -57,7 +53,7 @@ However, we recommend and support running a Docker environment with the followin
 
 ### Build Dependencies and License Information
 
-During the build time, the following dependencies are fetched and built for the target platform by [Alexa Auto SDK Builder](./builder/README.md). Please refer to each of the individual entities for the particular licenses.
+During the build time, the following dependencies are fetched and built for the target platform by the [Alexa Auto SDK Builder](./builder/README.md). Please refer to each of the individual entities for the particular licenses.
 
 * [AVS Device SDK v1.11](https://github.com/alexa/avs-device-sdk/)
   * [cURL 7.58.0](https://curl.haxx.se/)
@@ -100,7 +96,7 @@ Alexa Auto SDK is supported on the following platforms:
     * ARMv7a (+NEON)
     * AArch64
 
-> **Note**: For Android targets, Alexa Auto SDK is available as a prebuilt library on GitHub. Read the instructions about accessing and using the library in the [samples/android/ directory](./samples/android/README.md).
+> **Note**: For Android targets, the Alexa Auto SDK is available as a prebuilt library on GitHub. Read the instructions about accessing and using the library in the [samples/android/ directory](./samples/android/README.md).
 
 ## Alexa Auto SDK Architecture<a id="architecture"></a> Overview
 
@@ -142,20 +138,30 @@ The Phone Control Module includes Platform Interfaces and runtime Engine support
 
 Click [here](./modules/phone-control/README.md) for more information.
 
-## Additional Functionality
+## Additional Functionality <a id ="additional-functionality"> </a>
 The following extensions to the Alexa Auto SDK are available by request. Please contact your Amazon Solutions Architect (SA) or Partner Manager for more information.
 
-### Wake Word Extension
+>**Important!** The optional extensions are provided as archives. In order to install an optional extension, you must first download the archive. The version of the optional extension archive must match the version of the Auto SDK that you are using. For example, if you are using Auto SDK 1.6 and want to install the Local Voice Control extension, you must download version 1.6 of the Local Voice Control extension archive from the link provided below.
+
+### AmazonLite Wake Word extension
 Wake Word enables hands-free, voice-initiated interactions with Alexa. The Wake Word extension enables AmazonLite Wake Word support in the Alexa Auto SDK.
 
-### Alexa Communication Extension
-The Alexa Communication extension enables integration with Alexa-to-Alexa calling, Alexa-to-PSTN calling, and messaging capabilities.
+To install the optional AmazonLite Wake Word extension, you must download the appropriate archive version from the [Auto SDK AmazonLite Extension resources directory](https://developer.amazon.com/alexa/console/avs/preview/resources/details/Auto%20SDK%20Amazonlite%20Extension).
+
+### Alexa Communications extension
+The Alexa Communications extension enables integration with Alexa-to-Alexa calling, Alexa-to-PSTN calling, and messaging capabilities.
+
+To install the optional Alexa Communications extension, you must download the appropriate archive version from the [Auto SDK Alexa Comms Extension resources directory](https://developer.amazon.com/alexa/console/avs/preview/resources/details/Auto%20SDK%20Alexa%20Comms%20Extension).
 
 ### Local Voice Control Extension
-The Local Voice Control extension provides car control functionality like climate control with and without an internet connection. It includes components that run an Alexa endpoint inside the vehicle's head unit. Local Voice Control is currently supported on Linux x86 64-bit, Linux ARM 32/64-bit, Android x86 32/64-bit, and Android ARM 32/64-bit.
+The Local Voice Control extension provides car control functionality such as climate control with and without an internet connection. It includes components that run an Alexa endpoint inside the vehicle's head unit. Local Voice Control is currently supported on Linux x86 64-bit, Linux ARM 32/64-bit, Android x86 32/64-bit, and Android ARM 32/64-bit.
+
+To install the optional LVC extension, you must download the appropriate archive version from the [Auto SDK Local Voice Control Extension resources directory](https://developer.amazon.com/alexa/console/avs/preview/resources/details/Auto%20SDK%20Local%20Voice%20Control%20Extension).
 
 ### Metrics Uploading Extension
 The Metrics Uploading extension enables logging and uploading Alexa Auto SDK metrics to the Amazon cloud. Voice request metrics, for example, include start and end timestamps of user and Alexa speech and UPL between the request and Alexa’s response. Metrics may be tagged Beta, Gamma, or Prod depending on the vehicle lifecycle. The Metrics Uploading extension is currently available for Android platforms.
+
+To install the optional Metrics Uploading extension, you must download the appropriate archive version from the [Auto SDK Device Metric Upload Service Extension resources directory](https://developer.amazon.com/alexa/console/avs/preview/resources/details/Auto%20SDK%20Metric%20Upload%20Service%20Extension).
 
 ## Getting Started With a Sample App
 
@@ -167,6 +173,6 @@ Vehicle information must be supplied to the Alexa Auto SDK in order to pass the 
 
 ## Release Notes and Known Issues<a id="relnotesknownissues"></a>
 
-Feature enhancements, updates, and resolved issues are available to view in [CHANGELOG.md](./CHANGELOG.md)
+Feature enhancements, updates, and resolved issues are available to view in the [CHANGELOG.md](./CHANGELOG.md)
 
 [Android Sample App](./samples/android/README.md#releasenotes), [C++ Sample App](./samples/cpp/README.md#releasenotes), and [AGL](./platforms/agl/alexa-voiceagent-service/README.md) known issues are documented in their respective READMEs.

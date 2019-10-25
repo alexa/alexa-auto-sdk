@@ -1,23 +1,27 @@
 SUMMARY = "An SDK for commercial device makers to integrate Alexa directly into connected products."
 HOMEPAGE = "https://developer.amazon.com/avs/sdk"
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://${WORKDIR}/git/LICENSE.txt;md5=d92e60ee98664c54f68aa515a6169708"
+
+AVS_SDK_HOME = "/home/messi/Projects/dev5-aivi-nissan/serviceagent/avs-sdk"
+
+LIC_FILES_CHKSUM = "file://${AVS_SDK_HOME}/LICENSE.txt;md5=d92e60ee98664c54f68aa515a6169708"
 
 DEPENDS = "curl nghttp2 googletest sqlite3 openssl"
 
 # SRC_URI = "https://github.com/alexa/avs-device-sdk/archive/v${PV}.tar.gz"
 #BRANCH = "obigo/mvpa"
-BRANCH = "obigo/avs-v1.13-patched"
-SRC_URI = "git://git@github.com/OBIGOGIT/avs-device-sdk.git;protocol=ssh;branch=${BRANCH}"
-SRCREV="${AUTOREV}"
+#BRANCH = "obigo/avs-v1.13-patched"
+#SRC_URI = "git://git@github.com/OBIGOGIT/avs-device-sdk.git;protocol=ssh;branch=${BRANCH}"
+#SRCREV="${AUTOREV}"
 
 #SRC_URI += "file://0001-Fix-SIGBUS-due-to-unaligned-access.patch"
 
 # Skip checksum verification
 BB_STRICT_CHECKSUM = "0"
 
+SRC_URI = "file://${AVS_SDK_HOME}"
 
-S = "${WORKDIR}/git"
+S = "${WORKDIR}${AVS_SDK_HOME}"
 
 inherit pkgconfig cmake devlibsonly unittests
 

@@ -12,6 +12,8 @@ export SDK_HOME=${BUILDER_HOME}/..
 export SDK_BASE_VERSION="$(bash -c "${BUILDER_HOME}/scripts/gen-version.sh -b")"
 export SDK_VERSION="$(bash -c "${BUILDER_HOME}/scripts/gen-version.sh")"
 
+echo "AVS_SDK_HOME=${AVS_SDK_HOME}"
+
 # Execute command
 case ${1} in
 	"oe")

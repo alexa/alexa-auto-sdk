@@ -76,6 +76,9 @@
 #include <AACE/CarControl/CarControlConfiguration.h>
 #endif // LOCALVOICECONTROL
 
+// VPA Directive Platform Interfaces
+#include "SampleApp/VPA/VPADirectiveHandler.h"
+
 // Alexa Auto Core
 #include <AACE/Core/CoreProperties.h>
 #include <AACE/Core/Engine.h>

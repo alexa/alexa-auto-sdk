@@ -39,6 +39,7 @@ if(AAC_HOME)
     include(${AAC_HOME}/share/cmake/AACEPhoneControl.cmake)
     include(${AAC_HOME}/share/cmake/AACECBL.cmake)
     include(${AAC_HOME}/share/cmake/AACEAddressBook.cmake)
+    include(${AAC_HOME}/share/cmake/AACEVPA.cmake)
     if(AMAZONLITE)
         include(${AAC_HOME}/share/cmake/AACEAmazonLite.cmake)
         add_definitions(-DAMAZONLITE)
@@ -115,6 +116,7 @@ set(CXX_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Location/LocationProviderHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Logger/LoggerHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Navigation/NavigationHandler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/VPA/VPADirectiveHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Network/NetworkInfoProviderHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/PhoneControl/PhoneControlHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Status.h
@@ -165,6 +167,7 @@ set(CXX_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Location/LocationProviderHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Logger/LoggerHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Navigation/NavigationHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/VPA/VPADirectiveHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Network/NetworkInfoProviderHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/PhoneControl/PhoneControlHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/TaskQueue.cpp
@@ -213,6 +216,8 @@ target_link_libraries(SampleApp
     AACECBLEngine
     AACEAddressBookPlatform
     AACEAddressBookEngine
+    AACEVPAPlatform
+    AACEVPAEngine
     ${CURL_LIBRARIES}
     ${SQLITE3_LIBRARIES}
 )

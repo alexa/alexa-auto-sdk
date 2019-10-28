@@ -81,7 +81,7 @@ static const std::string GEOLOCATION_CAPABILITY_INTERFACE_VERSION = "1.1";
  *
  * @return The Geolocation capability configuration.
  */
-static std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration> getGeolocationCapabilityConfiguration();
+//static std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration> getGeolocationCapabilityConfiguration();
 
 /**
  * Creates the Navigation capability configuration.
@@ -199,10 +199,11 @@ NavigationCapabilityAgent::NavigationCapabilityAgent( std::shared_ptr<alexaClien
     alexaClientSDK::avsCommon::avs::CapabilityAgent{NAMESPACE, exceptionSender},
     alexaClientSDK::avsCommon::utils::RequiresShutdown{"NavigationCapabilityAgent"},
     m_contextManager{ contextManager } {
-    m_capabilityConfigurations.insert( getGeolocationCapabilityConfiguration() );
+    // m_capabilityConfigurations.insert( getGeolocationCapabilityConfiguration() );
     m_capabilityConfigurations.insert( getNavigationCapabilityConfiguration( navigationProviderName ) );
 }
 
+/*
 std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration> getGeolocationCapabilityConfiguration() {
     std::unordered_map<std::string, std::string> configMap;
     configMap.insert({alexaClientSDK::avsCommon::avs::CAPABILITY_INTERFACE_TYPE_KEY, GEOLOCATION_CAPABILITY_INTERFACE_TYPE});
@@ -211,6 +212,7 @@ std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration> getGeol
 
     return std::make_shared<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>(configMap);
 }
+*/
 
 std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration> getNavigationCapabilityConfiguration(const std::string& navigationProviderName) {
     std::unordered_map<std::string, std::string> configMap;

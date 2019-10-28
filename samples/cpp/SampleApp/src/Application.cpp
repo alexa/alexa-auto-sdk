@@ -527,6 +527,11 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
         Ensures(engine->registerPlatformInterface(source.second));
     }
 
+    // vpa Driective Handler
+    auto vpaDirectiveHandler = vpa::VPADirectiveHandler::create(activity, loggerHandler);
+    Ensures(vpaDirectiveHandler != nullptr);
+    Ensures(engine->registerPlatformInterface(vpaDirectiveHandler));    
+
     // Global Preset Handler
     auto globalPresetHandler = alexa::GlobalPresetHandler::create(activity, loggerHandler);
     Ensures(globalPresetHandler != nullptr);

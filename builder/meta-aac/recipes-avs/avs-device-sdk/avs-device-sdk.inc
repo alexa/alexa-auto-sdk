@@ -2,7 +2,7 @@ SUMMARY = "An SDK for commercial device makers to integrate Alexa directly into 
 HOMEPAGE = "https://developer.amazon.com/avs/sdk"
 LICENSE = "Apache-2.0"
 
-AVS_SDK_HOME = "/home/messi/Projects/dev5-aivi-nissan/serviceagent/avs-sdk"
+AVS_SDK_HOME ?= "/home/messi/Projects/dev5-aivi-nissan/serviceagent/avs-sdk"
 
 LIC_FILES_CHKSUM = "file://${AVS_SDK_HOME}/LICENSE.txt;md5=d92e60ee98664c54f68aa515a6169708"
 

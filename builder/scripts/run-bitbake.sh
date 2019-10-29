@@ -283,6 +283,8 @@ EOF
 		echo "DL_DIR = \"${DL_DIR}\"" >> ${LOCAL_CONF}
 	fi
 
+	# Set AVS_SDK_HOME
+	echo "AVS_SDK_HOME = \"$(realpath ${AVS_SDK_HOME})\"" >> ${LOCAL_CONF}
 	# Export white list for ECS
 	echo "export AWS_CONTAINER_CREDENTIALS_RELATIVE_URI" >> ${LOCAL_CONF}
 	echo "export AWS_DEFAULT_REGION" >> ${LOCAL_CONF}

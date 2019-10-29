@@ -8,7 +8,7 @@
 #  include "config.h"
 #endif
 
-#include "AIDaemon-dbus-generated.h"
+#include "SampleApp/VPA/AIDaemon-dbus-generated.h"
 
 #include <string.h>
 #ifdef G_OS_UNIX

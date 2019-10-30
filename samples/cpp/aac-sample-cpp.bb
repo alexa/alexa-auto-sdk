@@ -2,7 +2,11 @@ SUMMARY = "Alexa Auto SDK C++ Sample App"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://SampleApp/src/main.cpp;beginline=4;endline=13;md5=527e9938f0eaf4dbc8d3b17563870ae7"
 
-DEPENDS = "aac-module-core aac-module-alexa aac-module-navigation aac-module-phone-control aac-module-cbl aac-module-address-book aac-module-vpa"
+DEPENDS = "aac-module-core aac-module-alexa aac-module-navigation aac-module-phone-control aac-module-cbl aac-module-address-book"
+# OBIGO VPA AAC Module
+DEPENDS_append = " aac-module-vpa"
+# GLIB
+DEPENDS_append = " glib-2.0 gio-2.0 gobject-2.0 gio-unix-2.0 pkgconfig-native"
 
 PACKAGECONFIG[alexacomms] = "-DALEXACOMMS=ON,,aac-module-communication"
 PACKAGECONFIG[amazonlite] = "-DAMAZONLITE=ON,,aac-module-amazonlite"

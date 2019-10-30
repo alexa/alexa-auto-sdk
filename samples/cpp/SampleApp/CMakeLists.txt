@@ -2,7 +2,11 @@
 
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
-project(SampleApp LANGUAGES CXX)
+project(SampleApp LANGUAGES C CXX)
+
+if(OBIGO_AIDAEMON)
+    include(${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists_AIDaemon.txt)
+endif()
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -89,6 +93,12 @@ find_package(CURL REQUIRED)
 
 # Find SQLite3 package for the sample app.
 find_package(SQLite3 REQUIRED)
+
+if(OBIGO_AIDAEMON)
+    find_package(GLIB REQUIRED glib-2.0 gio-unix-2.0)
+    message("= GLIB_INCLUDE_DIRS" : "${GLIB_INCLUDE_DIRS}")
+    message("= GLIB_LIBRARIES" : "${GLIB_LIBRARIES}")
+endif()
 
 set(CXX_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Activity.h
@@ -194,6 +204,7 @@ source_group("Header Files" FILES ${CXX_HEADER_FILES})
 add_executable(SampleApp
     ${CXX_HEADER_FILES}
     ${CXX_SOURCE_FILES}
+    ${AIDAEMON_SOURCES}
 )
 
 target_include_directories(SampleApp PUBLIC
@@ -201,6 +212,7 @@ target_include_directories(SampleApp PUBLIC
     $<INSTALL_INTERFACE:include> # <prefix>/include
     ${CURL_INCLUDE_DIRS}
     ${SQLITE3_INCLUDE_DIRS}
+    ${AIDAEMON_INCLUDES}
 )
 
 target_link_libraries(SampleApp
@@ -220,6 +232,7 @@ target_link_libraries(SampleApp
     AACEVPAEngine
     ${CURL_LIBRARIES}
     ${SQLITE3_LIBRARIES}
+    ${AIDAEMON_LIBRARIES}
 )
 
 if(AMAZONLITE)

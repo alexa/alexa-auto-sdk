@@ -19,6 +19,9 @@
 #include "SampleApp/Status.h"
 #include "SampleApp/TTY.h"
 
+#include "SampleApp/VPA/IPCHandler.h"
+#include "SampleApp/VPA/AIDaemon-IPC.h"
+
 using Application = sampleApp::Application;
 using Status = sampleApp::Status;
 
@@ -237,6 +240,15 @@ int main(int argc, const char *argv[]) {
             // NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
             Ensures(std::signal(SIGTERM, cbreakSigCatch) != SIG_ERR);
         }
+
+        AIDAEMON::IPCHandler *ipc = AIDAEMON::IPCHandler::GetInstance();
+        ipc->makeDBusServer();
+        /* TODO 
+        ConsolePrinter::simplePrint("Waiting for Configuration");
+        ipc->waitForConfiguration();
+        ConsolePrinter::simplePrint("Starting AIDaemon");
+        */
+
         std::unique_ptr<Application> application{};
         auto status = Status::Failure;
         do {

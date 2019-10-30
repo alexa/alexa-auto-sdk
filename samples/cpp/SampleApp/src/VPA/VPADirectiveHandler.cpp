@@ -26,6 +26,9 @@
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
+#include "SampleApp/VPA/AIDaemon-IPC.h"
+#include "SampleApp/VPA/IPCHandler.h"
+
 namespace sampleApp {
 namespace vpa {
 
@@ -48,6 +51,8 @@ std::weak_ptr<logger::LoggerHandler> VPADirectiveHandler::getLoggerHandler() { r
 
 bool VPADirectiveHandler::sendDirective(const std::string &payload) {
     log(logger::LoggerHandler::Level::INFO, "sendDirective:payload=" + payload);
+
+    AIDAEMON::IPCHandler::GetInstance()->sendMessage(AIDAEMON::METHODID_NOTI_DIRECTIVE, payload);    
     return true;
 }
 

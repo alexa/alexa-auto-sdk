@@ -1,0 +1,545 @@
+/*
+Copyright (C)2013. OBIGO Inc. All rights reserved.
+This software is covered by the license agreement between
+the end user and OBIGO Inc. and may be
+used and copied only in accordance with the terms of the
+said agreement.
+OBIGO Inc. assumes no responsibility or
+liability for any errors or inaccuracies in this software,
+or any consequential, incidental or indirect damage arising
+out of the use of the software.
+ */
+
+#include "SampleApp/VPA/IPCHandler.h"
+#include "SampleApp/VPA/base64.h"
+#include "SampleApp/VPA/AIDaemon-IPC.h"
+
+/* TODO
+#include "SampleApp/ConsolePrinter.h"
+
+#include <AVSCommon/AVS/NamespaceAndName.h>
+#include <ContextManager/ContextManager.h>
+*/
+
+#include <rapidjson/document.h>
+#include <rapidjson/error/en.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
+
+#include <algorithm>
+#include <fstream>
+#include <iostream>
+#include <libgen.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sstream>
+
+namespace AIDAEMON {
+
+/* TODO
+using namespace alexaClientSDK::sampleApp;
+*/
+
+IPCHandler* IPCHandler::instance = nullptr;
+
+IPCHandler::IPCHandler() {
+    m_pServerThread = nullptr;
+    m_idBus = 0;
+    m_pLoop = nullptr;
+    m_pDBusInterface = nullptr;
+    m_pskeleton = nullptr;
+
+    m_aiStatus = "";
+    m_aiStatusReason = "";
+    m_authcode = "";
+    m_configured = false;
+}
+
+/* TODO
+void IPCHandler::setInteractionManager(std::shared_ptr<InteractionManager> manager) {
+    m_interactionManager = manager;
+}
+*/
+
+IPCHandler* IPCHandler::GetInstance() {
+    //ConsolePrinter::simplePrint(__PRETTY_FUNCTION__);
+
+    if (instance == nullptr) {
+        //ConsolePrinter::simplePrint("Create IPCHandler");
+        instance = new IPCHandler();
+    }
+    
+    return instance;
+}
+
+void IPCHandler::OnBusAcquired(GDBusConnection * connection, const gchar * name, gpointer user_data) {
+    //ConsolePrinter::simplePrint(__PRETTY_FUNCTION__);
+
+    IPCHandler* handler = IPCHandler::GetInstance();
+
+    std::stringstream logbuffer;
+    logbuffer << "DBus Connection : " << connection;
+    //ConsolePrinter::simplePrint(logbuffer.str());
+    logbuffer.str("");
+
+    logbuffer << "DBus Name : " << name;
+    //ConsolePrinter::simplePrint(logbuffer.str());
+    logbuffer.str("");
+
+    if (handler->m_pDBusInterface != nullptr) {
+        //ConsolePrinter::simplePrint("DBus Interface is not NULL");
+        return;
+    }
+
+    if (handler->m_pskeleton != nullptr) {
+        //ConsolePrinter::simplePrint("Skeleton is not Null");
+        return;
+    }
+
+    handler->m_pDBusInterface = aidaemon__skeleton_new() ;
+    logbuffer << "DBus skeleton : " << handler->m_pDBusInterface;
+    //ConsolePrinter::simplePrint(logbuffer.str());
+    logbuffer.str("");
+
+    gulong handlerID = g_signal_connect (
+        handler->m_pDBusInterface, 
+        "handle-send-messages", 
+        G_CALLBACK (IPCHandler::on_handle_send_messages), 
+        nullptr);
+    logbuffer << "DBus HandlerID : " << handlerID;
+    //ConsolePrinter::simplePrint(logbuffer.str());
+    logbuffer.str("");
+
+    handler->m_pskeleton = AIDAEMON__SKELETON (handler->m_pDBusInterface);
+    logbuffer << "AIDaemon skeleton : " << handler->m_pskeleton;
+    //ConsolePrinter::simplePrint(logbuffer.str());
+    logbuffer.str("");
+
+    gboolean result = g_dbus_interface_skeleton_export(
+        G_DBUS_INTERFACE_SKELETON(handler->m_pskeleton),
+        connection,
+        AIDAEMON::SERVER_OBJECT.c_str(),
+        nullptr);
+    logbuffer << "Export Result : " << result;
+    //ConsolePrinter::simplePrint(logbuffer.str());
+    logbuffer.str("");
+
+    /* TODO
+    handler->sendAIStatus(AIDAEMON::AI_STATUS_READY);
+    */
+}
+
+bool IPCHandler::makeDBusServer() {
+    //ConsolePrinter::simplePrint(__PRETTY_FUNCTION__);
+
+    if (m_pServerThread != nullptr) {
+        //ConsolePrinter::simplePrint("DBus Server Thread has already created");
+        return false;
+    }
+
+    m_pServerThread = new std::thread([&] {
+          m_idBus = g_bus_own_name(G_BUS_TYPE_SESSION, AIDAEMON::SERVER_INTERFACE.c_str(),
+                                  G_BUS_NAME_OWNER_FLAGS_NONE, IPCHandler::OnBusAcquired,
+                                  nullptr, nullptr, nullptr, nullptr);
+          if (! m_idBus) {
+              //ConsolePrinter::simplePrint("Fail to get bus");
+          } else {
+              //ConsolePrinter::simplePrint("Success to get bus");
+              m_pLoop = g_main_loop_new(nullptr, false);
+            if (m_pLoop) {
+                //ConsolePrinter::simplePrint("Success to create a new GMainLoop");
+    			g_main_loop_run(m_pLoop);
+    		} else {
+                //ConsolePrinter::simplePrint("Fail to create a new GMainLoop");
+    		}
+          }
+        });
+    return true;
+}
+
+void IPCHandler::sendMessage(std::string MethodID, rapidjson::Document *data) {
+
+    rapidjson::Document ipcdata(rapidjson::kObjectType);
+
+    ipcdata.AddMember(IPC_METHODID, 
+        rapidjson::Value().SetString(MethodID.c_str(), MethodID.length(), ipcdata.GetAllocator()), 
+        ipcdata.GetAllocator());
+    ipcdata.AddMember(IPC_METHODID, *data, ipcdata.GetAllocator());
+
+    sendData(&ipcdata);
+}
+/* TODO  
+void IPCHandler::sendMessage(std::string MethodID, int data) {
+
+    rapidjson::Document ipcdata(rapidjson::kObjectType);
+    rapidjson::Document::AllocatorType& allocator = ipcdata.GetAllocator();
+
+    ipcdata.AddMember(rapidjson::StringRef(AIDAEMON::IPC_METHODID), MethodID, allocator);
+    if (data == AIDAEMON::NULL_DATA) {
+        rapidjson::Document nulldata;
+        ipcdata.AddMember(rapidjson::StringRef(AIDAEMON::IPC_DATA), nulldata, allocator);
+    } else {
+        ipcdata.AddMember(rapidjson::StringRef(AIDAEMON::IPC_DATA), data, allocator);
+    }
+    
+    sendData(&ipcdata);
+}
+*/
+void IPCHandler::sendMessage(std::string MethodID, std::string data) {
+
+    rapidjson::Document ipcdata(rapidjson::kObjectType);
+
+    ipcdata.AddMember(IPC_METHODID, 
+        rapidjson::Value().SetString(MethodID.c_str(), MethodID.length(), ipcdata.GetAllocator()), 
+        ipcdata.GetAllocator());
+    ipcdata.AddMember(IPC_METHODID, 
+        rapidjson::Value().SetString(data.c_str(), data.length(), ipcdata.GetAllocator()),
+        ipcdata.GetAllocator());
+
+    sendData(&ipcdata);
+}
+
+void IPCHandler::sendData(rapidjson::Document *ipcdata) {
+
+    rapidjson::StringBuffer ipcdataBuf;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(ipcdataBuf);
+    if (!ipcdata->Accept(writer)) {
+        //ConsolePrinter::simplePrint("ERROR: Build json");
+        return;
+    }
+
+    std::string tempipcdata = ipcdataBuf.GetString();
+    std::string encoded = base64_encode(reinterpret_cast<const unsigned char*>(tempipcdata.c_str()), tempipcdata.length());
+    //ConsolePrinter::simplePrint(encoded.c_str());
+
+    aidaemon__emit_send_messages(m_pDBusInterface, encoded.c_str());   
+}
+
+gboolean IPCHandler::on_handle_send_messages(
+    AIDaemon *object,
+    GDBusMethodInvocation *invocation,
+    const gchar *arg_Data,
+    gpointer user_data ) {
+/* TODO    
+    IPCHandler* handler = IPCHandler::GetInstance();
+
+    //ConsolePrinter::simplePrint(__PRETTY_FUNCTION__);
+
+    using namespace alexaClientSDK::avsCommon::utils::json;
+
+    std::stringstream logbuffer;
+
+    std::string decoded = base64_decode((char*)(arg_Data));
+    //ConsolePrinter::simplePrint(decoded);
+
+    rapidjson::Document payload;
+    rapidjson::ParseResult result = payload.Parse(decoded);
+    if (!result) {
+        //ConsolePrinter::simplePrint("ERROR: IPC data not parseable");
+        return false;
+    }
+
+    std::string Method;
+    if (!jsonUtils::retrieveValue(payload, AIDAEMON::IPC_METHODID, &Method)) {
+        //ConsolePrinter::simplePrint("ERROR: Cannot get IPC methodid");
+        return false;
+    } 
+
+    std::string IPCData;
+    if (!jsonUtils::retrieveValue(payload, AIDAEMON::IPC_DATA, &IPCData)) {
+        //ConsolePrinter::simplePrint("There is not IPC data");
+    } 
+
+    aidaemon__complete_send_messages(object, invocation);
+
+    if (Method == AIDAEMON::METHODID_VPA_AI_STATUS) {
+        // TODO get AI Status and send
+        handler->sendAIStatus();
+    } else if (Method == AIDAEMON::METHODID_VPA_SET_RECOGNIZE) {
+        handler->m_interactionManager->getDefaultClient()->setSpeechRecognize(IPCData);
+    } else if (Method == AIDAEMON::METHODID_VPA_VR_START) {
+        handler->setAudioError(false);
+        handler->m_interactionManager->microphoneToggle(AIDAEMON::MIC_ON);
+        handler->m_interactionManager->getDefaultClient()->startSpeechRecognize(
+            handler->m_interactionManager->getAudioProvider());
+    } else if (Method == AIDAEMON::METHODID_VPA_VR_STOP) {
+        handler->setAudioError(false);
+        handler->m_interactionManager->microphoneToggle(AIDAEMON::MIC_OFF);
+        handler->m_interactionManager->getDefaultClient()->notifyOfTapToTalkEnd();            
+    } else if (Method == AIDAEMON::METHODID_VPA_EVENT) {
+        //ConsolePrinter::simplePrint(Method);
+        handler->m_interactionManager->sendEvent(IPCData);
+    } else if (Method == AIDAEMON::METHODID_VPA_EVENT_CANCEL) {
+        //ConsolePrinter::simplePrint(Method);
+    }else if (Method == AIDAEMON::METHODID_VPA_AUDIO_REQUEST) {
+        handler->handleAudioControl(IPCData);
+    } else if (Method == AIDAEMON::METHODID_REQ_SET_CONTEXT ) {
+        handler->updateConext(IPCData);
+    } else if (Method == AIDAEMON::METHODID_REQ_MIC ) {
+        handler->m_interactionManager->microphoneToggle(IPCData);                  
+    } else if (Method == AIDAEMON::METHODID_VPA_TTS_START) {
+        handler->handleStartTTS(IPCData);
+    } else if (Method == AIDAEMON::METHODID_VPA_TTS_STOP) {
+        handler->handleStopTTS(IPCData);
+    } else if (Method == AIDAEMON::METHODID_VPA_AUTH_START) {
+        handler->sendAIStatus(AIDAEMON::AI_STATUS_UNAUTH, AIDAEMON::AI_CHANGED_REASON_UNAUTH_PENDING);                  
+    } else if (Method == AIDAEMON::METHODID_VPA_SET_CONF) {
+        handler->setConfigured(IPCData);
+    } else {
+        //ConsolePrinter::simplePrint("ERROR: Cannot Handle this Method");
+    }
+*/
+    return true;
+}
+/* TODO
+void IPCHandler::handleAudioControl(std::string data) {
+    //ConsolePrinter::simplePrint(__PRETTY_FUNCTION__);
+
+    std::string action = getValueFromJson(data, AIDAEMON::AUDIO_ACTION);
+    action.erase(std::remove(action.begin(), action.end(), '"'), action.end());
+
+    if (action == AIDAEMON::AUDIO_PLAY) {
+        m_interactionManager->getDefaultClient()->playMVPAAduio();
+    } else if (action == AIDAEMON::AUDIO_PAUSE) {
+        m_interactionManager->playbackPause();
+    } else if (action == AIDAEMON::AUDIO_NEXT) {
+        m_interactionManager->playbackNext();
+    } else if (action == AIDAEMON::AUDIO_PREVIOUS) {
+        m_interactionManager->playbackPrevious();         
+    } else if (action == AIDAEMON::AUDIO_SKIP_FORWARD) {
+        m_interactionManager->playbackSkipForward();        
+    } else if (action == AIDAEMON::AUDIO_SKIP_BACKWARD) {
+        m_interactionManager->playbackSkipBackward();        
+    } else if (action == AIDAEMON::AUDIO_SHUFFLE) {
+        m_interactionManager->playbackShuffle();        
+    } else if (action == AIDAEMON::AUDIO_LOOP) {
+        m_interactionManager->playbackLoop();        
+    } else if (action == AIDAEMON::AUDIO_REPEAT) {
+        m_interactionManager->playbackRepeat();        
+    } else if (action == AIDAEMON::AUDIO_THUMBS_UP) {
+        m_interactionManager->playbackThumbsUp();        
+    } else if (action == AIDAEMON::AUDIO_THUMBS_DOWN) {
+        m_interactionManager->playbackThumbsDown();        
+    } else {
+        //ConsolePrinter::simplePrint("ERROR: Cannot Handle Audio Request " + action);
+    } 
+}
+
+void IPCHandler::handleStartTTS(std::string data) {
+    m_interactionManager->getDefaultClient()->startTTS(
+        getValueFromJson(data, AIDAEMON::TTS_START_EVENT),
+        getValueFromJson(data, AIDAEMON::TTS_FINISH_EVENT));
+}
+
+void IPCHandler::handleStopTTS(std::string data) {
+    m_interactionManager->getDefaultClient()->stopTTS(std::string(""));
+}
+
+void IPCHandler::updateConext(std::string data) {
+    using namespace alexaClientSDK::contextManager;
+
+    //ConsolePrinter::simplePrint(__PRETTY_FUNCTION__);
+
+    rapidjson::Document payload;
+    rapidjson::ParseResult result = payload.Parse(data);
+    if (!result) {
+        //ConsolePrinter::simplePrint("ERROR: Context JSON not parseable");
+        return;
+    } 
+
+    if (payload.HasMember(AIDAEMON::CONTEXT) && 
+        payload[AIDAEMON::CONTEXT].IsArray()) {            
+        rapidjson::Value& context = payload[AIDAEMON::CONTEXT];    
+        for (rapidjson::SizeType i = 0; i < context.Size(); i++) {
+            rapidjson::StringBuffer contextdataBuf;
+            rapidjson::Writer<rapidjson::StringBuffer> writer(contextdataBuf);
+            if (!context[i][CONTEXT_PAYLOAD].Accept(writer)) {
+                //ConsolePrinter::simplePrint("ERROR: Build json string");
+            } else {
+                alexaClientSDK::avsCommon::avs::NamespaceAndName CONTEXT_MANAGER_PHONE_CONTROL_STATE{"PhoneCallController", "PhoneCallControllerState"};
+                auto setStateSuccess = ContextManager::create()->setState(
+                    alexaClientSDK::avsCommon::avs::NamespaceAndName(
+                        context[i][AIDAEMON::CONTEXT_HEADER][AIDAEMON::CONTEXT_HNAMESPACE].GetString(),
+                        context[i][AIDAEMON::CONTEXT_HEADER][AIDAEMON::CONTEXT_HNAME].GetString()),               
+                    contextdataBuf.GetString(), 
+                    alexaClientSDK::avsCommon::avs::StateRefreshPolicy::NEVER );
+                if ( setStateSuccess != alexaClientSDK::avsCommon::sdkInterfaces::SetStateResult::SUCCESS ) {
+                    //ConsolePrinter::simplePrint("ERROR: Update Context=> " + std::string(contextdataBuf.GetString()));
+                } else {
+                    //ConsolePrinter::simplePrint("Success: Update Context=> " + std::string(contextdataBuf.GetString()));   
+                }
+            }
+        }
+    } else {
+        //ConsolePrinter::simplePrint("ERROR: There is not " + AIDAEMON::CONTEXT);
+        return;        
+    }
+}
+
+void IPCHandler::sendAIStatus(std::string status, std::string reason) {
+    //ConsolePrinter::simplePrint(__PRETTY_FUNCTION__);
+
+    if (status.empty()) {
+        status =  m_aiStatus;
+        reason = m_aiStatusReason;
+    } else {
+        m_aiStatus = status;
+        m_aiStatusReason = reason;
+    }
+
+    rapidjson::Document aistatus(rapidjson::kObjectType);
+    rapidjson::Document::AllocatorType& allocator = aistatus.GetAllocator();
+
+    aistatus.AddMember(rapidjson::StringRef(AIDAEMON::AI_STATUS), status, allocator);
+    if (status == AIDAEMON::AI_STATUS_READY) {
+        aistatus.AddMember(rapidjson::StringRef(AIDAEMON::AI_STATUS_VERSION), std::string(OBIGO_AIDAEMON_VERSION), allocator);        
+    } else if (status == AIDAEMON::AI_STATUS_NOTREADY) {
+        //ConsolePrinter::simplePrint("AI Status : " + AIDAEMON::AI_STATUS_NOTREADY);
+    } else if (status == AIDAEMON::AI_STATUS_UNAUTH) {
+        aistatus.AddMember(rapidjson::StringRef(AIDAEMON::AI_CHANGED_REASON), reason, allocator);
+        if (reason == AIDAEMON::AI_CHANGED_REASON_UNAUTH_PENDING) {
+            aistatus.AddMember(rapidjson::StringRef(AIDAEMON::AI_AUTH_CODE), m_authcode, allocator);
+        }
+    } else {
+        aistatus.AddMember(rapidjson::StringRef(AIDAEMON::AI_CHANGED_REASON), reason, allocator);
+    }
+
+    AIDAEMON::IPCHandler::GetInstance()->sendMessage(AIDAEMON::METHODID_AI_STATUS, &aistatus);
+}
+
+void IPCHandler::setAuthCode(std::string code) {
+    m_authcode = code;
+}
+
+void IPCHandler::setConfigured(std::string data) {
+    //ConsolePrinter::simplePrint(__PRETTY_FUNCTION__);
+
+    m_configured = true;
+
+    std::string configure = getValueFromJson(data, AIDAEMON::SET_CONF_CONFIGURATION);
+    std::string configPath = "AIDaemon.json";
+
+    std::ofstream writeFile(configPath.data());
+    if (writeFile.is_open()) {
+        writeFile << configure;
+        writeFile.close();
+    } else {
+        //ConsolePrinter::simplePrint("ERROR: Can't make AIDaemon.json");
+    }
+
+    std::string db = getValueFromJson(
+        getValueFromJson(configure, AIDAEMON::SET_CONF_AUTH_DELEGATE), 
+        AIDAEMON::SET_CONF_DB);
+
+    db.erase(std::remove(db.begin(), db.end(), '"'), db.end());
+    db = db.substr(0, db.find_last_of("\\/"));
+
+    if (db.length() > 0) {
+        //ConsolePrinter::simplePrint("DB Path : " + db);
+        recursive_mkdir(db.c_str(), S_IRWXU);
+        if (access(db.c_str(), F_OK) != 0) {
+            //ConsolePrinter::simplePrint("ERROR: Can't create DB Path");
+            return;
+        } else {
+            //ConsolePrinter::simplePrint("Success to create DB Path : " + db);
+        }
+    } else {
+        //ConsolePrinter::simplePrint("ERROR: Can't fine DB Path");
+        return;
+    }
+
+    m_waitForConfigure.notify_one();
+}
+
+void IPCHandler::waitForConfiguration() {
+    //ConsolePrinter::simplePrint(__PRETTY_FUNCTION__);
+    
+    std::unique_lock<std::mutex> lck(m_configureMtx);
+
+    while ( (m_waitForConfigure.wait_for(lck,std::chrono::seconds(1)) == std::cv_status::timeout) &&
+             !m_configured ) {
+        //ConsolePrinter::simplePrint("waitForConfiguration is timeout");
+        sendAIStatus();
+    }
+}
+*/
+/* TODO    
+std::string IPCHandler::getValueFromJson(std::string jsonData, std::string key) {
+    //ConsolePrinter::simplePrint(__PRETTY_FUNCTION__);
+
+    std::string data("");
+
+    rapidjson::Value value;
+    rapidjson::StringBuffer szBuf;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(szBuf);
+    rapidjson::Document jsoObj;
+
+    if (jsonData.empty() || key.empty()) {
+        //ConsolePrinter::simplePrint("ERROR: getValueFromJson => jsonData or key is empty");
+        return data;
+    } else {
+        if (jsoObj.Parse(jsonData).HasParseError()) {
+            //ConsolePrinter::simplePrint("ERROR: getValueFromJson => jsonData is invalid json");
+            return data;
+        }
+    }
+    
+    auto it = jsoObj.FindMember(key);
+    if (it == jsoObj.MemberEnd()) {
+        //ConsolePrinter::simplePrint("ERROR: getValueFromJson => Can't find " + key);
+        return data;
+    } else {
+        value = it->value;
+    }
+
+    if (!value.Accept(writer)) {
+        //ConsolePrinter::simplePrint("ERROR: getValueFromJson => Can't conver start json to string");
+    } else {
+        const char* bufferData = szBuf.GetString();
+        if (!bufferData) {
+            //ConsolePrinter::simplePrint("ERROR: getValueFromJson => nullptrJsonBufferString");
+        } else {
+            data = std::string(bufferData);
+        }
+    }
+    return data;
+}
+*/
+void IPCHandler::recursive_mkdir(const char *path, mode_t mode) {
+    //ConsolePrinter::simplePrint(__PRETTY_FUNCTION__);
+
+    char *spath = NULL;
+    const char *next_dir = NULL;
+
+    /* dirname() modifies input! */
+    spath = strdup(path);
+    if (spath == NULL) {
+        /* Report error, no memory left for string duplicate. */
+        goto done;
+    }
+
+    /* Get next path component: */
+    next_dir = dirname(spath);
+
+    if (access(path, F_OK) == 0) {
+        /* The directory in question already exists! */
+        goto done;
+    }
+
+    if (strcmp(next_dir, ".") == 0 || strcmp(next_dir, "/") == 0) {
+        /* We reached the end of recursion! */
+        goto done;
+    }
+
+    recursive_mkdir(next_dir, mode);
+    if (mkdir(path, mode) != 0) {
+       /* Report error on creating directory */
+       //ConsolePrinter::simplePrint("ERROR: Failed to create directory : " + std::string(path));
+    }
+
+done:
+    free(spath);
+    return;
+}
+
+}  // namespace AIDAEMON

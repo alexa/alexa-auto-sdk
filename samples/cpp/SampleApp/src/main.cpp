@@ -241,6 +241,7 @@ int main(int argc, const char *argv[]) {
             Ensures(std::signal(SIGTERM, cbreakSigCatch) != SIG_ERR);
         }
 
+#ifdef OBIGO_AIDAEMON
         AIDAEMON::IPCHandler *ipc = AIDAEMON::IPCHandler::GetInstance();
         ipc->makeDBusServer();
         /* TODO 
@@ -248,6 +249,7 @@ int main(int argc, const char *argv[]) {
         ipc->waitForConfiguration();
         ConsolePrinter::simplePrint("Starting AIDaemon");
         */
+#endif // OBIGO_AIDAEMON
 
         std::unique_ptr<Application> application{};
         auto status = Status::Failure;

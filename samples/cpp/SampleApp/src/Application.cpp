@@ -40,6 +40,10 @@
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
+#ifdef OBIGO_AIDAEMON
+#include "SampleApp/VPA/IPCHandler.h"
+#endif // OBIGO_AIDAEMON
+
 namespace sampleApp {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -340,6 +344,11 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     auto loggerHandler = logger::LoggerHandler::create(activity);
     Ensures(loggerHandler != nullptr);
 
+#ifdef OBIGO_AIDAEMON
+    AIDAEMON::IPCHandler *ipc = AIDAEMON::IPCHandler::GetInstance();
+    ipc->setLogger(loggerHandler);
+#endif // OBIGO_AIDAEMON
+
 #ifdef LOCALVOICECONTROL
     // Create car control handler
     auto carControlHandler = carControl::CarControlHandler::create(activity, loggerHandler);
@@ -527,10 +536,12 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
         Ensures(engine->registerPlatformInterface(source.second));
     }
 
+#ifdef OBIGO_AIDAEMON
     // vpa Driective Handler
     auto vpaDirectiveHandler = vpa::VPADirectiveHandler::create(activity, loggerHandler);
     Ensures(vpaDirectiveHandler != nullptr);
     Ensures(engine->registerPlatformInterface(vpaDirectiveHandler));    
+#endif // OBIGO_AIDAEMON
 
     // Global Preset Handler
     auto globalPresetHandler = alexa::GlobalPresetHandler::create(activity, loggerHandler);

@@ -14,20 +14,21 @@ namespace AIDAEMON {
 
     static const std::string    DIALOGID("dialogRequestId");
 
-    static const std::string    METHODID_VPA_AI_STATUS("VPA_AI_STATUS");
-    static const std::string    METHODID_AI_STATUS("AI_STATUS");
-        static const std::string        AI_STATUS("Status");
-            static const std::string    AI_STATUS_NOTREADY("NOTREADY");
-            static const std::string    AI_STATUS_READY("READY");
-            static const std::string    AI_STATUS_DISCONNECTED("DISCONNECTED");
-            static const std::string    AI_STATUS_PENDING("PENDING");
-            static const std::string    AI_STATUS_CONNECTED("CONNECTED");
-            static const std::string    AI_STATUS_UNAUTH("UNAUTH");                        
-        static const std::string        AI_CHANGED_REASON("Reason");
-        static const std::string        AI_STATUS_VERSION("Version");
-        static const std::string        AI_AUTH_CODE("Code");
-        static const std::string        AI_CHANGED_REASON_UNAUTH_CLIENT("UNAUTH_CLIENT");
-        static const std::string        AI_CHANGED_REASON_UNAUTH_PENDING("UNAUTH_PENDING");       
+// AI_STATUS
+    static const std::string            METHODID_VPA_AI_STATUS("VPA_AI_STATUS");
+    static const char                   METHODID_AI_STATUS[] = "AI_STATUS";
+        static const char                   AI_STATUS[] = "Status";
+            static const std::string            AI_STATUS_NOTREADY("NOTREADY");
+            static const std::string            AI_STATUS_READY("READY");
+            static const std::string            AI_STATUS_DISCONNECTED("DISCONNECTED");
+            static const std::string            AI_STATUS_PENDING("PENDING");
+            static const std::string            AI_STATUS_CONNECTED("CONNECTED");
+            static const std::string            AI_STATUS_UNAUTH("UNAUTH");                        
+        static const char                   AI_CHANGED_REASON[] = "Reason";
+        static const char                   AI_STATUS_VERSION[] = "Version";
+        static const char                   AI_AUTH_CODE[] = "Code";
+            static const std::string        AI_CHANGED_REASON_UNAUTH_CLIENT("UNAUTH_CLIENT");
+            static const std::string        AI_CHANGED_REASON_UNAUTH_PENDING("UNAUTH_PENDING");       
 
     static const std::string    METHODID_NOTI_DIRECTIVE("AI_DIRECTIVE");
     static const std::string    METHODID_NOTI_VR_STATE("AI_VR_STATE");

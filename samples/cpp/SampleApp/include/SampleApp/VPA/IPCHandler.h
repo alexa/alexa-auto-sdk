@@ -73,11 +73,11 @@ public:
     void sendMessage(std::string MethodID, std::string data);
 
     void sendAIStatus(std::string status = std::string(), std::string reason = std::string());
+    void setAuthCode(std::string code);
     /* TODO    
     void sendMessage(std::string MethodID, int data);
     void setAudioError(bool bError) {m_bAudioError = bError;};
     bool getAudioerror() {return m_bAudioError;};
-    void setAuthCode(std::string code);
     void setConfigured(std::string data);
     void waitForConfiguration();
 

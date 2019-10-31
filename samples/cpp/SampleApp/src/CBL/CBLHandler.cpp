@@ -24,6 +24,11 @@
 #define GSL_THROW_ON_CONTRACT_VIOLATION
 #include <gsl/contracts.h>
 
+#ifdef OBIGO_AIDAEMON
+#include "SampleApp/VPA/IPCHandler.h"
+#include "SampleApp/VPA/AIDaemon-IPC.h"
+#endif // OBIGO_AIDAEMON
+
 namespace sampleApp {
 namespace cbl {
 
@@ -64,6 +69,13 @@ void CBLHandler::cblStateChanged(CBLState state, CBLStateChangedReason reason, c
             auto command = m_applicationContext->getBrowserCommand();
             if (!command.empty()) {
                 m_applicationContext->executeCommand((command + ' ' + url + "?cbl-code=" + code).c_str());
+
+                #ifdef OBIGO_AIDAEMON
+                        // TODO send url to vpa to generate QR Code
+                        AIDAEMON::IPCHandler::GetInstance()->setAuthCode(code);
+                        AIDAEMON::IPCHandler::GetInstance()->sendAIStatus(
+                            AIDAEMON::AI_STATUS_UNAUTH, AIDAEMON::AI_CHANGED_REASON_UNAUTH_CLIENT);
+                #endif                      
             }
             break;
         }

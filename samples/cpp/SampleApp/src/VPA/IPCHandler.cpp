@@ -250,6 +250,10 @@ gboolean IPCHandler::on_handle_send_messages(
 
     if (Method == AIDAEMON::METHODID_VPA_AI_STATUS) {
         handler->sendAIStatus();
+    } else if (Method == AIDAEMON::METHODID_VPA_AUTH_START) {
+        handler->sendAIStatus(AIDAEMON::AI_STATUS_UNAUTH, AIDAEMON::AI_CHANGED_REASON_UNAUTH_PENDING);
+    } else {
+        handler->log(Level::ERROR, __PRETTY_FUNCTION__, "Cannot handle this Method : " + Method);
     }
     /* TODO
     } else if (Method == AIDAEMON::METHODID_VPA_SET_RECOGNIZE) {
@@ -277,9 +281,7 @@ gboolean IPCHandler::on_handle_send_messages(
     } else if (Method == AIDAEMON::METHODID_VPA_TTS_START) {
         handler->handleStartTTS(IPCData);
     } else if (Method == AIDAEMON::METHODID_VPA_TTS_STOP) {
-        handler->handleStopTTS(IPCData);
-    } else if (Method == AIDAEMON::METHODID_VPA_AUTH_START) {
-        handler->sendAIStatus(AIDAEMON::AI_STATUS_UNAUTH, AIDAEMON::AI_CHANGED_REASON_UNAUTH_PENDING);                  
+        handler->handleStopTTS(IPCData);          
     } else if (Method == AIDAEMON::METHODID_VPA_SET_CONF) {
         handler->setConfigured(IPCData);
     } else {
@@ -413,11 +415,11 @@ void IPCHandler::sendAIStatus(std::string status, std::string reason) {
 
     AIDAEMON::IPCHandler::GetInstance()->sendMessage(AIDAEMON::METHODID_AI_STATUS, &aistatus);
 }
-/* TODO
+
 void IPCHandler::setAuthCode(std::string code) {
     m_authcode = code;
 }
-
+/* TODO
 void IPCHandler::setConfigured(std::string data) {
     //ConsolePrinter::simplePrint(__PRETTY_FUNCTION__);
 

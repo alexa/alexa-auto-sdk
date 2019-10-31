@@ -22,6 +22,11 @@
 #define GSL_THROW_ON_CONTRACT_VIOLATION
 #include <gsl/contracts.h>
 
+#ifdef OBIGO_AIDAEMON
+#include "SampleApp/VPA/IPCHandler.h"
+#include "SampleApp/VPA/AIDaemon-IPC.h"
+#endif // OBIGO_AIDAEMON
+
 namespace sampleApp {
 namespace alexa {
 
@@ -84,6 +89,18 @@ void AlexaClientHandler::authStateChanged(AlexaClient::AuthState state, AlexaCli
         if (auto console = m_console.lock()) {
             console->printLine("Auth state changed:", state, "(", error, ")");
         }
+
+#ifdef OBIGO_AIDAEMON
+        if (error == AlexaClient::AuthError::AUTHORIZATION_PENDING) {
+            std::ostringstream stream;
+            std::string aireason;
+
+            stream << error;
+            aireason =  stream.str();
+
+            AIDAEMON::IPCHandler::GetInstance()->sendAIStatus(AIDAEMON::AI_STATUS_UNAUTH, aireason);
+        }
+#endif
     });
 }
 
@@ -103,6 +120,21 @@ void AlexaClientHandler::connectionStatusChanged(AlexaClient::ConnectionStatus s
         if (auto console = m_console.lock()) {
             console->printLine("Connection status changed:", status, "(", reason, ")");
         }
+
+#ifdef OBIGO_AIDAEMON
+            std::ostringstream stream;
+            std::string aistatus;
+            std::string aireason;
+
+            stream << status;
+            aistatus =  stream.str();
+
+            stream << reason;
+            aireason =  stream.str();
+
+            AIDAEMON::IPCHandler::GetInstance()->sendAIStatus(aistatus, aireason);
+#endif
+
     });
     // Special case for test automation
     if (status == AlexaClient::ConnectionStatus::CONNECTED) {

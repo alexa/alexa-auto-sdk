@@ -483,15 +483,16 @@ void IPCHandler::waitForConfiguration() {
 
 std::string IPCHandler::getValueFromJson(json &data, std::string key) {
     std::string result("");
+    IPCHandler* handler = IPCHandler::GetInstance();
     try {
         auto obj = data.at(key);
         if (obj.is_string()) {
             result = obj.get<std::string>();
         } else {
-            log(Level::ERROR, __PRETTY_FUNCTION__, key + " is not in data");
+            handler->log(Level::ERROR, __PRETTY_FUNCTION__, key + " is not in data");
         }
     } catch (json::exception &e) {
-        log(Level::ERROR, __PRETTY_FUNCTION__, key + " cannot be parsed");
+        handler->log(Level::ERROR, __PRETTY_FUNCTION__, key + " cannot be parsed");
         return result;
     }
     return result;

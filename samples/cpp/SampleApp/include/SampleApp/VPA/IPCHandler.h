@@ -52,7 +52,6 @@ private:
     void updateConext(std::string data);
     */
 
-    std::string getValueFromJson(json &data, std::string key);
     void recursive_mkdir(const char *path, mode_t mode);
  
 public:
@@ -66,6 +65,7 @@ public:
             GDBusMethodInvocation *invocation,
             const gchar *arg_Data,
             gpointer user_data );
+    static std::string getValueFromJson(json &data, std::string key);
     bool makeDBusServer();
 
     void setLogger(std::weak_ptr<sampleApp::logger::LoggerHandler> loggerHandler) {m_loggerHandler = std::move(loggerHandler);}

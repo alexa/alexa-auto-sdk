@@ -25,6 +25,10 @@ if(AAC_ENABLE_COVERAGE)
     set(CMAKE_CXX_OUTPUT_EXTENSION_REPLACE ON)
 endif()
 
+if (OBIGO_AIDAEMON)
+	add_definitions("-DOBIGO_AIDAEMON")
+endif()
+
 #if(AAC_ENABLE_TESTS)
 #    enable_testing()
 #endif()

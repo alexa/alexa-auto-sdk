@@ -24,7 +24,8 @@ EXTRA_OECMAKE += "-DAAC_HOME=${STAGING_DIR_HOST}${AAC_PREFIX} \
                   -DCMAKE_BUILD_TYPE=${AAC_BUILD_TYPE} \
                   -DAAC_EMIT_SENSITIVE_LOGS=${AAC_SENSITIVE_LOGS} \
                   -DAAC_EMIT_LATENCY_LOGS=${AAC_LATENCY_LOGS} \
-                  -DAAC_VERSION=${PV}"
+                  -DAAC_VERSION=${PV} \
+                  -DOBIGO_AIDAEMON=ON"
 
 # Install AAC artifacts explicitly into AAC_PREFIX dir
 EXTRA_OECMAKE_append = " -DCMAKE_INSTALL_PREFIX:PATH=${AAC_PREFIX}"

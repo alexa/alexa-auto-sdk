@@ -14,6 +14,10 @@
  */
 
 #include "SampleApp/Alexa/SpeechSynthesizerHandler.h"
+#ifdef OBIGO_AIDAEMON
+#include "SampleApp/VPA/AIDaemon-IPC.h"
+#include "SampleApp/VPA/IPCHandler.h"
+#endif
 
 // Guidelines Support Library
 #define GSL_THROW_ON_CONTRACT_VIOLATION
@@ -31,9 +35,9 @@ namespace alexa {
 SpeechSynthesizerHandler::SpeechSynthesizerHandler(std::weak_ptr<Activity> activity,
                                                    std::weak_ptr<logger::LoggerHandler> loggerHandler)
     : m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
-    // Expects((m_activity != nullptr) && (m_loggerHandler != nullptr));
-    // Expects((mediaPlayer != nullptr) && (speaker != nullptr));
-    setupUI();
+  // Expects((m_activity != nullptr) && (m_loggerHandler != nullptr));
+  // Expects((mediaPlayer != nullptr) && (speaker != nullptr));
+  setupUI();
 }
 
 std::weak_ptr<Activity> SpeechSynthesizerHandler::getActivity() { return m_activity; }
@@ -43,19 +47,33 @@ std::weak_ptr<logger::LoggerHandler> SpeechSynthesizerHandler::getLoggerHandler(
 // private
 
 void SpeechSynthesizerHandler::log(logger::LoggerHandler::Level level, const std::string &message) {
-    auto loggerHandler = m_loggerHandler.lock();
-    if (!loggerHandler) {
-        return;
-    }
-    loggerHandler->log(level, "SpeechSynthesizerHandler", message);
+  auto loggerHandler = m_loggerHandler.lock();
+  if (!loggerHandler) {
+    return;
+  }
+  loggerHandler->log(level, "SpeechSynthesizerHandler", message);
 }
 
 void SpeechSynthesizerHandler::setupUI() {
-    auto activity = m_activity.lock();
-    if (!activity) {
-        return;
+  auto activity = m_activity.lock();
+  if (!activity) {
+    return;
+  }
+#ifdef OBIGO_AIDAEMON
+  activity->registerObserver(Event::onStartTTS, [=](const std::string &value) {
+    json vpaData;
+    try {
+      vpaData = json::parse(value);
+    } catch (std::exception &e) {
+      log(logger::LoggerHandler::Level::ERROR, "IPC data not parseable");
+      return false;
     }
+    log(logger::LoggerHandler::Level::VERBOSE, "onStartTTS:" + value);
+    return startTTS(AIDAEMON::IPCHandler::getValueFromJson(vpaData, std::string(AIDAEMON::TTS_START_EVENT)),
+                    AIDAEMON::IPCHandler::getValueFromJson(vpaData, std::string(AIDAEMON::TTS_FINISH_EVENT)));
+  });
+#endif
 }
 
-} // namespace alexa
-} // namespace sampleApp
+}  // namespace alexa
+}  // namespace sampleApp

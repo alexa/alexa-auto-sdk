@@ -94,12 +94,6 @@ find_package(CURL REQUIRED)
 # Find SQLite3 package for the sample app.
 find_package(SQLite3 REQUIRED)
 
-if(OBIGO_AIDAEMON)
-    find_package(GLIB REQUIRED glib-2.0 gio-unix-2.0)
-    message("= GLIB_INCLUDE_DIRS" : "${GLIB_INCLUDE_DIRS}")
-    message("= GLIB_LIBRARIES" : "${GLIB_LIBRARIES}")
-endif()
-
 set(CXX_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Activity.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/AddressBook/AddressBookHandler.h

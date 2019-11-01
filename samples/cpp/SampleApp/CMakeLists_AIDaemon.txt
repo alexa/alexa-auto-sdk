@@ -1,3 +1,7 @@
+# Find GLIB 2.0 package for the sample app.
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GLIB REQUIRED glib-2.0)
+pkg_check_modules(GIOUNIX REQUIRED gio-unix-2.0)
 
 set(AIDAEMON_SOURCES)
 if (OBIGO_AIDAEMON)
@@ -10,18 +14,16 @@ endif()
 set(AIDAEMON_INCLUDES)
 if (OBIGO_AIDAEMON)
     list(APPEND AIDAEMON_INCLUDES
-        "/usr/include/glib-2.0"
-        "/usr/lib/x86_64-linux-gnu/glib-2.0/include"
-        "/usr/include/gio-unix-2.0"
+        ${GLIB_INCLUDE_DIRS}
+        ${GIOUNIX_INCLUDE_DIRS}
         "${CMAKE_CURRENT_SOURCE_DIR}/include/VPA")
 endif()
 
 set(AIDAEMON_LIBRARIES)
 if (OBIGO_AIDAEMON)
     list(APPEND AIDAEMON_LIBRARIES
-        "glib-2.0"
-        "gio-2.0"
-        "gobject-2.0")
+        ${GLIB_LIBRARIES}
+        ${GIOUNIX_LIBRARIES})
 endif()
 
 if (OBIGO_AIDAEMON)

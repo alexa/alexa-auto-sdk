@@ -20,6 +20,7 @@
 #include "SampleApp/Logger/LoggerHandler.h"
 
 #include <AACE/VPA/DirectiveHandler.h>
+#include "AACE/Engine/Storage/LocalStorageInterface.h"
 
 namespace sampleApp {
 namespace vpa {
@@ -44,14 +45,19 @@ class VPADirectiveHandler : public aace::vpa::VpaDirective /* isa PlatformInterf
     }
 
     auto getActivity() -> std::weak_ptr<Activity>;
+    std::shared_ptr<aace::engine::storage::LocalStorageInterface> getStorage() {return m_storage;}
     auto getLoggerHandler() -> std::weak_ptr<logger::LoggerHandler>;
 
     // aace::vpa::VpaDirective interface
 
     auto sendDirective(const std::string &payload) -> bool override;
+    void setLocalStorage (std::shared_ptr<aace::engine::storage::LocalStorageInterface> storage);
 
   private:
     auto log(logger::LoggerHandler::Level level, const std::string &message) -> void;
+
+  private:
+    std::shared_ptr<aace::engine::storage::LocalStorageInterface> m_storage;
 };
 
 } // namespace vpa

@@ -50,10 +50,15 @@ std::weak_ptr<logger::LoggerHandler> VPADirectiveHandler::getLoggerHandler() { r
 // aace::vpa::Navigation interface
 
 bool VPADirectiveHandler::sendDirective(const std::string &payload) {
-    log(logger::LoggerHandler::Level::INFO, "sendDirective:payload=" + payload);
+    log(logger::LoggerHandler::Level::INFO, "sendDirective");
 
     AIDAEMON::IPCHandler::GetInstance()->sendMessage(AIDAEMON::METHODID_NOTI_DIRECTIVE, payload);    
     return true;
+}
+
+void VPADirectiveHandler::setLocalStorage (std::shared_ptr<aace::engine::storage::LocalStorageInterface> storage) {
+    log(logger::LoggerHandler::Level::INFO, "setLocalStorage");
+    m_storage = storage;
 }
 
 // private

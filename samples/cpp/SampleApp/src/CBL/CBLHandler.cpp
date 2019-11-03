@@ -117,7 +117,26 @@ void CBLHandler::setRefreshToken(const std::string &refreshToken) {
     // FOR SECURITY REASONS, AUTHENTICATION IS NOT PRESERVED IN THE C++ SAMPLE APP.
     Ensures(m_applicationContext != nullptr);
     m_applicationContext->setRefreshToken(refreshToken);
+
+#ifdef OBIGO_AIDAEMON
+    log(logger::LoggerHandler::Level::INFO, "setRefreshToken : " + refreshToken);
+    AIDAEMON::IPCHandler::GetInstance()->getVPAHandler()->getStorage()->put(
+        AIDAEMON::VPA_LOCAL_STORAGE_TABLE, AIDAEMON::KEY_AUTH_STORAGE, refreshToken);
+#endif       
 }
+
+#ifdef OBIGO_AIDAEMON
+void CBLHandler::setToken(const std::string &refreshToken) {
+    log(logger::LoggerHandler::Level::INFO, "setToken : " + refreshToken);
+
+    Ensures(m_applicationContext != nullptr);
+    m_applicationContext->setRefreshToken(refreshToken);
+}
+
+void CBLHandler::startCBL() {
+    start();
+}
+#endif // OBIGO_AIDAEMON
 
 void CBLHandler::setUserProfile(const std::string &name, const std::string& email) {
     std::stringstream ss;

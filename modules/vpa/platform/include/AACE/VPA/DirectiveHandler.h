@@ -19,6 +19,7 @@
 #include <string>
 
 #include "AACE/Core/PlatformInterface.h"
+#include "AACE/Engine/Storage/LocalStorageInterface.h"
 
 /** @file */
 
@@ -36,6 +37,7 @@ public:
     virtual ~VpaDirective();
 
     virtual bool sendDirective( const std::string& payload ) = 0;
+    virtual void setLocalStorage (std::shared_ptr<aace::engine::storage::LocalStorageInterface> storage) = 0;
 };
 
 } // aace::vpa

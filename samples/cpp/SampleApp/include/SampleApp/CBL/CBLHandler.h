@@ -54,6 +54,11 @@ class CBLHandler : public aace::cbl::CBL /* isa PlatformInterface */ {
     auto clearRefreshToken() -> void override;
     auto setUserProfile( const std::string& name, const std::string& email ) -> void override;
 
+#ifdef OBIGO_AIDAEMON
+    void setToken(const std::string &refreshToken);
+    void startCBL();
+#endif // OBIGO_AIDAEMON
+
   private:
     auto getRefreshToken() -> std::string override;
     auto setRefreshToken(const std::string &refreshToken) -> void override;

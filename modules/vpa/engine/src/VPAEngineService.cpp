@@ -91,6 +91,8 @@ bool VPAEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::vpa:
         m_vpaEngineImpl = aace::engine::vpa::VPAEngineImpl::create( vpa, directiveSequencer, capabilitiesDelegate, exceptionSender, contextManager);
         ThrowIfNull( m_vpaEngineImpl, "createVPAEngineImplFailed" );
 
+        vpa->setLocalStorage(getContext()->getServiceInterface<aace::engine::storage::LocalStorageInterface>( "aace.storage" ));
+
         return true;
     }
     catch( std::exception& ex ) {

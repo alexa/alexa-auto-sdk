@@ -14,6 +14,8 @@ CA_PATH=${DIR}/opt/AAC/etc/certs
 TARGET_APP_NAME=${DIR}/opt/AAC/bin/SampleApp
 
 pkill ${TARGET_APP_NAME}
+# TODO Remove
+pkill AIDaemon
 
 if [ ! -e "${AI_DAEMON_CONFIG_JSON}" ]; then
   cp "${ALEXA_CONFIG_JSON}" "${AI_DAEMON_CONFIG_JSON}"

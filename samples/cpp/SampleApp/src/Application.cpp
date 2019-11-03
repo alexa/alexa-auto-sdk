@@ -42,6 +42,7 @@ using json = nlohmann::json;
 
 #ifdef OBIGO_AIDAEMON
 #include "SampleApp/VPA/IPCHandler.h"
+#include "SampleApp/VPA/AIDaemon-IPC.h"
 #endif // OBIGO_AIDAEMON
 
 namespace sampleApp {
@@ -496,6 +497,9 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     auto cblHandler = cbl::CBLHandler::create(activity, loggerHandler);
     Ensures(cblHandler != nullptr);
     Ensures(engine->registerPlatformInterface(cblHandler));
+#ifdef OBIGO_AIDAEMON    
+    ipc->setCBLHandler(cblHandler);
+#endif // OBIGO_AIDAEMON
 
 #ifdef ALEXACOMMS
     // Communications
@@ -540,7 +544,10 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     // vpa Driective Handler
     auto vpaDirectiveHandler = vpa::VPADirectiveHandler::create(activity, loggerHandler);
     Ensures(vpaDirectiveHandler != nullptr);
-    Ensures(engine->registerPlatformInterface(vpaDirectiveHandler));    
+    Ensures(engine->registerPlatformInterface(vpaDirectiveHandler));
+    ipc->setVPAHandler(vpaDirectiveHandler);
+    cblHandler->setToken(
+        vpaDirectiveHandler->getStorage()->get( AIDAEMON::VPA_LOCAL_STORAGE_TABLE, AIDAEMON::KEY_AUTH_STORAGE, "" ));
 #endif // OBIGO_AIDAEMON
 
     // Global Preset Handler

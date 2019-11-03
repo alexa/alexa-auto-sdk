@@ -128,6 +128,15 @@ int main(int argc, const char *argv[]) {
         Ensures(applicationContext != nullptr);
         auto cbreak = false;
         auto options = true;
+
+#ifdef OBIGO_AIDAEMON
+        AIDAEMON::IPCHandler *ipc = AIDAEMON::IPCHandler::GetInstance();
+        ipc->makeDBusServer();
+        std::cerr << "Waiting for Configuration \n";
+        ipc->waitForConfiguration();
+        std::cerr << "Starting AIDaemon \n";
+#endif // OBIGO_AIDAEMON
+
         for (unsigned i = 0; i < size; ++i) {
             auto arg = list[i];
             Ensures(!arg.empty());
@@ -240,17 +249,6 @@ int main(int argc, const char *argv[]) {
             // NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
             Ensures(std::signal(SIGTERM, cbreakSigCatch) != SIG_ERR);
         }
-
-#ifdef OBIGO_AIDAEMON
-        AIDAEMON::IPCHandler *ipc = AIDAEMON::IPCHandler::GetInstance();
-        ipc->makeDBusServer();
-        /* TODO 
-        ConsolePrinter::simplePrint("Waiting for Configuration");
-        ipc->waitForConfiguration();
-        ConsolePrinter::simplePrint("Starting AIDaemon");
-        */
-#endif // OBIGO_AIDAEMON
-
         std::unique_ptr<Application> application{};
         auto status = Status::Failure;
         do {

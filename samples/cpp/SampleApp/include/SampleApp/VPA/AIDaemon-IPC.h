@@ -93,6 +93,10 @@ namespace AIDAEMON {
         static const std::string    SET_CONF_DB("databaseFilePath");
         static const std::string    SET_CONF_AUTH_DELEGATE("cblAuthDelegate");
 
+// Auth Storage
+    static const std::string        VPA_LOCAL_STORAGE_TABLE = "aace.vpa";
+    static const std::string        KEY_AUTH_STORAGE("VPA_AI_STATUS");
+
 #ifdef OBIGO_SPEECH_SENDER    
     static const std::string    METHODID_AI_SPEECH("AI_SPEECH");
         static const std::string        AI_SPEECH_DIALOGID("DialogID");

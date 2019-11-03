@@ -14,6 +14,8 @@ out of the use of the software.
 #include "SampleApp/VPA/base64.h"
 #include "SampleApp/VPA/AIDaemon-IPC.h"
 
+#include "SampleApp/Event.h"
+
 /* TODO
 #include "SampleApp/ConsolePrinter.h"
 
@@ -67,8 +69,6 @@ void IPCHandler::setInteractionManager(std::shared_ptr<InteractionManager> manag
 */
 
 IPCHandler* IPCHandler::GetInstance() {
-    //ConsolePrinter::simplePrint(__PRETTY_FUNCTION__);
-
     if (instance == nullptr) {
         //ConsolePrinter::simplePrint("Create IPCHandler");
         instance = new IPCHandler();
@@ -167,7 +167,7 @@ void IPCHandler::sendMessage(std::string MethodID, rapidjson::Document *data) {
     ipcdata.AddMember(IPC_METHODID, 
         rapidjson::Value().SetString(MethodID.c_str(), MethodID.length(), ipcdata.GetAllocator()), 
         ipcdata.GetAllocator());
-    ipcdata.AddMember(IPC_METHODID, *data, ipcdata.GetAllocator());
+    ipcdata.AddMember(IPC_DATA, *data, ipcdata.GetAllocator());
 
     sendData(&ipcdata);
 }
@@ -195,7 +195,7 @@ void IPCHandler::sendMessage(std::string MethodID, std::string data) {
     ipcdata.AddMember(IPC_METHODID, 
         rapidjson::Value().SetString(MethodID.c_str(), MethodID.length(), ipcdata.GetAllocator()), 
         ipcdata.GetAllocator());
-    ipcdata.AddMember(IPC_METHODID, 
+    ipcdata.AddMember(IPC_DATA, 
         rapidjson::Value().SetString(data.c_str(), data.length(), ipcdata.GetAllocator()),
         ipcdata.GetAllocator());
 
@@ -251,7 +251,9 @@ gboolean IPCHandler::on_handle_send_messages(
     if (Method == AIDAEMON::METHODID_VPA_AI_STATUS) {
         handler->sendAIStatus();
     } else if (Method == AIDAEMON::METHODID_VPA_AUTH_START) {
-        handler->sendAIStatus(AIDAEMON::AI_STATUS_UNAUTH, AIDAEMON::AI_CHANGED_REASON_UNAUTH_PENDING);
+        handler->getCBLHandler()->startCBL();
+    } else if (Method == AIDAEMON::METHODID_VPA_SET_CONF) {
+        handler->setConfigured(IPCData);        
     } else {
         handler->log(Level::ERROR, __PRETTY_FUNCTION__, "Cannot handle this Method : " + Method);
     }
@@ -282,8 +284,6 @@ gboolean IPCHandler::on_handle_send_messages(
         handler->handleStartTTS(IPCData);
     } else if (Method == AIDAEMON::METHODID_VPA_TTS_STOP) {
         handler->handleStopTTS(IPCData);          
-    } else if (Method == AIDAEMON::METHODID_VPA_SET_CONF) {
-        handler->setConfigured(IPCData);
     } else {
         //ConsolePrinter::simplePrint("ERROR: Cannot Handle this Method");
     }
@@ -386,6 +386,13 @@ void IPCHandler::sendAIStatus(std::string status, std::string reason) {
 
     log(Level::INFO, __PRETTY_FUNCTION__, "status : " + status + " reason : " + reason);
 
+    // TODO : 
+    if (status == "DISCONNECTED" && reason == "DISCONNECTEDACL_CLIENT_REQUEST") {
+        status = AIDAEMON::AI_STATUS_UNAUTH;
+        reason = AIDAEMON::AI_CHANGED_REASON_UNAUTH_CLIENT;
+        log(Level::INFO, __PRETTY_FUNCTION__, "TO DO: check UnAuth");
+    }
+
     rapidjson::Document aistatus(rapidjson::kObjectType);
 
     aistatus.AddMember(AIDAEMON::AI_STATUS, 
@@ -394,7 +401,7 @@ void IPCHandler::sendAIStatus(std::string status, std::string reason) {
 
     if (status == AIDAEMON::AI_STATUS_READY) {
         aistatus.AddMember(AIDAEMON::AI_STATUS_VERSION, 
-        rapidjson::Value().SetString(std::string(OBIGO_AIDAEMON_VERSION).c_str(), std::string(OBIGO_AIDAEMON_VERSION).length(), aistatus.GetAllocator()),
+        rapidjson::Value().SetString(std::string("AAC Test Version").c_str(), std::string("AAC Test Version").length(), aistatus.GetAllocator()),
         aistatus.GetAllocator());        
     } else if (status == AIDAEMON::AI_STATUS_NOTREADY) {
         //ConsolePrinter::simplePrint("AI Status : " + AIDAEMON::AI_STATUS_NOTREADY);
@@ -419,12 +426,13 @@ void IPCHandler::sendAIStatus(std::string status, std::string reason) {
 void IPCHandler::setAuthCode(std::string code) {
     m_authcode = code;
 }
-/* TODO
+
 void IPCHandler::setConfigured(std::string data) {
-    //ConsolePrinter::simplePrint(__PRETTY_FUNCTION__);
+    log(Level::INFO, __PRETTY_FUNCTION__, " ");
 
     m_configured = true;
 
+/* TODO
     std::string configure = getValueFromJson(data, AIDAEMON::SET_CONF_CONFIGURATION);
     std::string configPath = "AIDaemon.json";
 
@@ -456,22 +464,22 @@ void IPCHandler::setConfigured(std::string data) {
         //ConsolePrinter::simplePrint("ERROR: Can't fine DB Path");
         return;
     }
-
+*/
     m_waitForConfigure.notify_one();
 }
 
+
 void IPCHandler::waitForConfiguration() {
-    //ConsolePrinter::simplePrint(__PRETTY_FUNCTION__);
+    log(Level::INFO, __PRETTY_FUNCTION__, " ");
     
     std::unique_lock<std::mutex> lck(m_configureMtx);
 
     while ( (m_waitForConfigure.wait_for(lck,std::chrono::seconds(1)) == std::cv_status::timeout) &&
              !m_configured ) {
-        //ConsolePrinter::simplePrint("waitForConfiguration is timeout");
-        sendAIStatus();
+        log(Level::INFO, __PRETTY_FUNCTION__, "timeout");
+        sendAIStatus(AIDAEMON::AI_STATUS_READY);
     }
 }
-*/
 
 std::string IPCHandler::getValueFromJson(json &data, std::string key) {
     std::string result("");
@@ -529,6 +537,7 @@ done:
 void IPCHandler::log(sampleApp::logger::LoggerHandler::Level level, const std::string tag, const std::string &message) {
     auto loggerHandler = m_loggerHandler.lock();
     if (!loggerHandler) {
+        std::cerr << tag << " " << message << "\n";
         return;
     }
     loggerHandler->log(level, tag, message);

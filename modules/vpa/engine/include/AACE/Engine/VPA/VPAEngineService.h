@@ -32,6 +32,7 @@ private:
 
 public:
     virtual ~VPAEngineService() = default;
+    void sendEvent(std::string event);    
 
 protected:
     bool configure( std::shared_ptr<std::istream> configuration ) override;

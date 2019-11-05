@@ -29,6 +29,7 @@ using json = nlohmann::json;
 #include "SampleApp/Logger/LoggerHandler.h"
 #include "SampleApp/VPA/VPADirectiveHandler.h"
 #include "SampleApp/CBL/CBLHandler.h"
+#include "SampleApp/Activity.h"
 
 #include "SampleApp/VPA/AIDaemon-dbus-generated.h"
 /* TODO

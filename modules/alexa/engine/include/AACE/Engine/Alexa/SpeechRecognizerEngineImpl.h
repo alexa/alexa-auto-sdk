@@ -89,6 +89,9 @@ public:
     // SpeechRecognizerEngineInterface
     bool onStartCapture( Initiator initiator, uint64_t keywordBegin, uint64_t keywordEnd, const std::string& keyword ) override;
     bool onStopCapture() override;
+#ifdef OBIGO_AIDAEMON
+    bool onSetRecognizeEvent(const std::string& event) override;
+#endif
 
     // keyword detection
     bool isWakewordEnabled();

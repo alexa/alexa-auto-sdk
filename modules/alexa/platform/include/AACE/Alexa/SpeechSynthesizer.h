@@ -41,6 +41,7 @@ public:
     virtual ~SpeechSynthesizer();
 #ifdef OBIGO_AIDAEMON
     bool startTTS(std::string startEvent, std::string finishEvent);
+    bool stopTTS();
     /**
      * @internal
      * Sets the Engine interface delegate

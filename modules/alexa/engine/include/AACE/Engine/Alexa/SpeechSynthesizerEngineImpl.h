@@ -74,6 +74,7 @@ class SpeechSynthesizerEngineImpl :
       std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender);
 #ifdef OBIGO_AIDAEMON
   bool onstartTTS(std::string startEvent, std::string finishEvent) override;
+  bool onstopTTS() override;
 #endif
  protected:
   virtual void doShutdown() override;

@@ -179,6 +179,18 @@ bool SpeechSynthesizerEngineImpl::onstartTTS(std::string startEvent, std::string
         return false;
     }
 }
+
+bool SpeechSynthesizerEngineImpl::onstopTTS() {
+    try
+    {
+        ThrowIfNot( m_speechSynthesizerCapabilityAgent->stopTTS().get(), "stopTTS" );
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"onstartTTS").d("reason", ex.what()));
+        return false;
+    }
+}
 #endif
 
 } // aace::engine::alexa

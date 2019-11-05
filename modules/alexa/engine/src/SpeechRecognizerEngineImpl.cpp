@@ -323,6 +323,21 @@ bool SpeechRecognizerEngineImpl::onStopCapture()
     }
 }
 
+#ifdef OBIGO_AIDAEMON
+bool SpeechRecognizerEngineImpl::onSetRecognizeEvent(const std::string& event)
+{
+    try
+    {
+        ThrowIfNot( m_audioInputProcessor->setRecognizeEvent().get(), "setRecognizeEventFailed" );
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"onSetRecognizeEvent").d("reason", ex.what()));
+        return false;
+    }
+}
+#endif
+
 ssize_t SpeechRecognizerEngineImpl::write( const int16_t* data, const size_t size )
 {
     try

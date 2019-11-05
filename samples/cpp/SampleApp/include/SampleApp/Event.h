@@ -74,6 +74,9 @@ enum class Event {
     // SpeechRecognizer
     onSpeechRecognizerHoldToTalk,
     onSpeechRecognizerTapToTalk,
+#ifdef OBIGO_AIDAEMON
+    onSpeechRecognizerSetRecognize,
+#endif
     onSpeechRecognizerStartCapture,
     onSpeechRecognizerStopCapture,
     onSpeechRecognizerEnableWakewordDetection,

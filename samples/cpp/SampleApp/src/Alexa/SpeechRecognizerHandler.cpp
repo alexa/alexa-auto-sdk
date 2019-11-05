@@ -106,6 +106,13 @@ void SpeechRecognizerHandler::setupUI() {
         return tapToTalk();
     });
 
+#ifdef OBIGO_AIDAEMON
+    // Set Recognize
+    activity->registerObserver(Event::onSpeechRecognizerSetRecognize, [=](const std::string &event) {
+        log(logger::LoggerHandler::Level::VERBOSE, "onSpeechRecognizerSetRecognize:" + event);
+        return setRecognizeEvent();
+    });
+#endif
     // startCapture
     activity->registerObserver(Event::onSpeechRecognizerStartCapture, [=](const std::string &value) {
         log(logger::LoggerHandler::Level::VERBOSE, "onSpeechRecognizerStartCapture:" + value);

@@ -99,6 +99,9 @@ public:
     virtual bool onStopCapture() = 0;
     virtual bool enableWakewordDetection() = 0;
     virtual bool disableWakewordDetection() = 0;
+#ifdef OBIGO_AIDAEMON
+    virtual bool onSetRecognizeEvent(const std::string& event) = 0;
+#endif
 };
 
 #ifdef OBIGO_AIDAEMON

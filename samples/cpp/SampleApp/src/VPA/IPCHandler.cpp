@@ -255,13 +255,13 @@ gboolean IPCHandler::on_handle_send_messages(
     } else if (Method == AIDAEMON::METHODID_VPA_VR_START) {
         handler->sendEvent(sampleApp::Event::onStartTTS, IPCData);
     } else if (Method == AIDAEMON::METHODID_VPA_EVENT) {
-        handler->getVPAHandler()->getVPAEngine()->sendEvent(IPCData);  
+        handler->getVPAHandler()->getVPAEngine()->sendEvent(IPCData);   
+    } else if (Method == AIDAEMON::METHODID_VPA_SET_RECOGNIZE) {
+        handler->sendEvent(sampleApp::Event::onSpeechRecognizerSetRecognize, IPCData);
     } else {
         handler->log(Level::ERROR, __PRETTY_FUNCTION__, "Cannot handle this Method : " + Method);
     }
     /* TODO
-    } else if (Method == AIDAEMON::METHODID_VPA_SET_RECOGNIZE) {
-        handler->m_interactionManager->getDefaultClient()->setSpeechRecognize(IPCData);
     } else if (Method == AIDAEMON::METHODID_VPA_VR_STOP) {
         handler->setAudioError(false);
         handler->m_interactionManager->microphoneToggle(AIDAEMON::MIC_OFF);

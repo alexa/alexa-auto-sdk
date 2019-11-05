@@ -74,9 +74,6 @@ enum class Event {
     // SpeechRecognizer
     onSpeechRecognizerHoldToTalk,
     onSpeechRecognizerTapToTalk,
-#ifdef OBIGO_AIDAEMON
-    onSpeechRecognizerSetRecognize,
-#endif
     onSpeechRecognizerStartCapture,
     onSpeechRecognizerStopCapture,
     onSpeechRecognizerEnableWakewordDetection,
@@ -109,6 +106,8 @@ enum class Event {
     // SpeechSynthesizer
     onStartTTS,
     onStopTTS,
+    // Expect Speech
+    onSpeechRecognizerSetRecognize,
 #endif
 };
 
@@ -188,8 +187,10 @@ static const std::map<std::string, Event> EventEnumerator{
     {"onRemoveAddressBookAuto", Event::onRemoveAddressBookAuto},
 #ifdef OBIGO_AIDAEMON
     // SpeechSynthesizer
-    {"onStartTTS", Event::onStartTTS}
-    {"onStopTTS", Event::onStopTTS}
+    {"onStartTTS", Event::onStartTTS},
+    {"onStopTTS", Event::onStopTTS},
+    // Expect Speech
+    {"onSpeechRecognizerSetRecognize", Event::onSpeechRecognizerSetRecognize}
 #endif
 };
 

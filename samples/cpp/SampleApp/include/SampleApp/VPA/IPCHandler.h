@@ -27,12 +27,9 @@ using json = nlohmann::json;
 #include <rapidjson/writer.h>
 
 #include "SampleApp/Logger/LoggerHandler.h"
-<<<<<<< HEAD
 #include "SampleApp/VPA/VPADirectiveHandler.h"
 #include "SampleApp/CBL/CBLHandler.h"
-=======
 #include "SampleApp/Activity.h"
->>>>>>> implementing expect speech
 
 #include "SampleApp/VPA/AIDaemon-dbus-generated.h"
 /* TODO

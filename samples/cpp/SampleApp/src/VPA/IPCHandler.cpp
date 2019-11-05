@@ -263,6 +263,10 @@ gboolean IPCHandler::on_handle_send_messages(
         handler->getVPAHandler()->getVPAEngine()->sendEvent(IPCData);   
     } else if (Method == AIDAEMON::METHODID_VPA_SET_RECOGNIZE) {
         handler->sendEvent(sampleApp::Event::onSpeechRecognizerSetRecognize, IPCData);
+    } else if (Method == AIDAEMON::METHODID_VPA_VR_START) {
+        handler->sendEvent(sampleApp::Event::onSpeechRecognizerStartCapture, std::string("TAP_TO_TALK"));
+    } else if (Method == AIDAEMON::METHODID_VPA_VR_STOP) {
+        handler->sendEvent(sampleApp::Event::onSpeechRecognizerStopCapture);
     } else {
         handler->log(Level::ERROR, __PRETTY_FUNCTION__, "Cannot handle this Method : " + Method);
     }

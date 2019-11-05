@@ -254,17 +254,14 @@ gboolean IPCHandler::on_handle_send_messages(
         handler->getCBLHandler()->startCBL();
     } else if (Method == AIDAEMON::METHODID_VPA_SET_CONF) {
         handler->setConfigured(IPCData);        
+    } else if (Method == AIDAEMON::METHODID_VPA_VR_START) {
+        handler->sendEvent(sampleApp::Event::onStartTTS, IPCData);
     } else {
         handler->log(Level::ERROR, __PRETTY_FUNCTION__, "Cannot handle this Method : " + Method);
     }
     /* TODO
     } else if (Method == AIDAEMON::METHODID_VPA_SET_RECOGNIZE) {
         handler->m_interactionManager->getDefaultClient()->setSpeechRecognize(IPCData);
-    } else if (Method == AIDAEMON::METHODID_VPA_VR_START) {
-        handler->setAudioError(false);
-        handler->m_interactionManager->microphoneToggle(AIDAEMON::MIC_ON);
-        handler->m_interactionManager->getDefaultClient()->startSpeechRecognize(
-            handler->m_interactionManager->getAudioProvider());
     } else if (Method == AIDAEMON::METHODID_VPA_VR_STOP) {
         handler->setAudioError(false);
         handler->m_interactionManager->microphoneToggle(AIDAEMON::MIC_OFF);
@@ -542,6 +539,12 @@ void IPCHandler::log(sampleApp::logger::LoggerHandler::Level level, const std::s
         return;
     }
     loggerHandler->log(level, tag, message);
+}
+
+bool IPCHandler::sendEvent(const sampleApp::Event &event, const std::string &value) {
+    auto activityHandler = m_activity.lock();
+    activityHandler->notify(event, value);
+    return true;
 }
 
 }  // namespace AIDAEMON

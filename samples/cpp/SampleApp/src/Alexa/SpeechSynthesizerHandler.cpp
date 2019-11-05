@@ -72,6 +72,11 @@ void SpeechSynthesizerHandler::setupUI() {
     return startTTS(AIDAEMON::IPCHandler::getValueFromJson(vpaData, std::string(AIDAEMON::TTS_START_EVENT)),
                     AIDAEMON::IPCHandler::getValueFromJson(vpaData, std::string(AIDAEMON::TTS_FINISH_EVENT)));
   });
+
+  activity->registerObserver(Event::onStopTTS, [=](const std::string &) {
+    log(logger::LoggerHandler::Level::VERBOSE, "onStopTTS:");
+    return stopTTS();
+  });
 #endif
 }
 

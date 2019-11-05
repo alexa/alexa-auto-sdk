@@ -257,6 +257,8 @@ gboolean IPCHandler::on_handle_send_messages(
         handler->setConfigured(IPCData);        
     } else if (Method == AIDAEMON::METHODID_VPA_TTS_START) {
         handler->sendEvent(sampleApp::Event::onStartTTS, IPCData);
+    } else if (Method == AIDAEMON::METHODID_VPA_TTS_STOP) {
+        handler->sendEvent(sampleApp::Event::onStopTTS);  
     } else if (Method == AIDAEMON::METHODID_VPA_EVENT) {
         handler->getVPAHandler()->getVPAEngine()->sendEvent(IPCData);   
     } else if (Method == AIDAEMON::METHODID_VPA_SET_RECOGNIZE) {
@@ -276,11 +278,7 @@ gboolean IPCHandler::on_handle_send_messages(
     } else if (Method == AIDAEMON::METHODID_REQ_SET_CONTEXT ) {
         handler->updateConext(IPCData);
     } else if (Method == AIDAEMON::METHODID_REQ_MIC ) {
-        handler->m_interactionManager->microphoneToggle(IPCData);                  
-    } else if (Method == AIDAEMON::METHODID_VPA_TTS_START) {
-        handler->handleStartTTS(IPCData);
-    } else if (Method == AIDAEMON::METHODID_VPA_TTS_STOP) {
-        handler->handleStopTTS(IPCData);          
+        handler->m_interactionManager->microphoneToggle(IPCData);                       
     } else {
         //ConsolePrinter::simplePrint("ERROR: Cannot Handle this Method");
     }

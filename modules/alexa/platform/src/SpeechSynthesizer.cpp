@@ -28,6 +28,14 @@ bool SpeechSynthesizer::startTTS(std::string startEvent, std::string finishEvent
   }
 }
 
+bool SpeechSynthesizer::stopTTS() {
+  if (auto m_speechSynthesizerEngineInterface_lock = m_speechSynthesizerEngineInterface.lock()) {
+    return m_speechSynthesizerEngineInterface_lock->onstopTTS();
+  } else {
+    return false;
+  }
+}
+
 void SpeechSynthesizer::setEngineInterface(
     std::shared_ptr<aace::alexa::SpeechSynthesizerEngineInterface> speechSynthesizerEngineInterface) {
   m_speechSynthesizerEngineInterface = speechSynthesizerEngineInterface;

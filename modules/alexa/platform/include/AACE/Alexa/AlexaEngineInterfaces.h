@@ -109,6 +109,7 @@ class SpeechSynthesizerEngineInterface {
 public:
     
     virtual bool onstartTTS(std::string startEvent, std::string finishEvent) = 0;
+    virtual bool onstopTTS() = 0;
 };
 #endif
 

@@ -487,6 +487,8 @@ std::string IPCHandler::getValueFromJson(json &data, std::string key) {
         auto obj = data.at(key);
         if (obj.is_string()) {
             result = obj.get<std::string>();
+        } else if (obj.is_object()) {
+            result = obj.dump();
         } else {
             handler->log(Level::ERROR, __PRETTY_FUNCTION__, key + " is not in data");
         }

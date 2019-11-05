@@ -110,7 +110,7 @@ void SpeechRecognizerHandler::setupUI() {
     // Set Recognize
     activity->registerObserver(Event::onSpeechRecognizerSetRecognize, [=](const std::string &event) {
         log(logger::LoggerHandler::Level::VERBOSE, "onSpeechRecognizerSetRecognize:" + event);
-        return setRecognizeEvent();
+        return setRecognizeEvent(event);
     });
 #endif
     // startCapture

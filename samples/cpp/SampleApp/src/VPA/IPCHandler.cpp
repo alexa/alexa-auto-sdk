@@ -10,6 +10,7 @@ or any consequential, incidental or indirect damage arising
 out of the use of the software.
  */
 
+#include "SampleApp/Event.h"
 #include "SampleApp/VPA/IPCHandler.h"
 #include "SampleApp/VPA/base64.h"
 #include "SampleApp/VPA/AIDaemon-IPC.h"

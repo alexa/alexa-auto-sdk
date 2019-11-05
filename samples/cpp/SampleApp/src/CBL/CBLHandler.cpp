@@ -66,16 +66,16 @@ void CBLHandler::cblStateChanged(CBLState state, CBLStateChangedReason reason, c
                     card->set(string, View::Type::CBLCode);
                 }
             });
+
+#ifdef OBIGO_AIDAEMON
+            // TODO send url to vpa to generate QR Code
+            AIDAEMON::IPCHandler::GetInstance()->setAuthCode(code);
+            AIDAEMON::IPCHandler::GetInstance()->sendAIStatus(
+                AIDAEMON::AI_STATUS_UNAUTH, AIDAEMON::AI_CHANGED_REASON_UNAUTH_PENDING);
+#endif                
             auto command = m_applicationContext->getBrowserCommand();
             if (!command.empty()) {
-                m_applicationContext->executeCommand((command + ' ' + url + "?cbl-code=" + code).c_str());
-
-                #ifdef OBIGO_AIDAEMON
-                        // TODO send url to vpa to generate QR Code
-                        AIDAEMON::IPCHandler::GetInstance()->setAuthCode(code);
-                        AIDAEMON::IPCHandler::GetInstance()->sendAIStatus(
-                            AIDAEMON::AI_STATUS_UNAUTH, AIDAEMON::AI_CHANGED_REASON_UNAUTH_CLIENT);
-                #endif                      
+                m_applicationContext->executeCommand((command + ' ' + url + "?cbl-code=" + code).c_str());                  
             }
             break;
         }

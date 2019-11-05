@@ -18,8 +18,20 @@
 namespace aace {
 namespace alexa {
 
-SpeechSynthesizer::~SpeechSynthesizer() = default; // key function
+SpeechSynthesizer::~SpeechSynthesizer() = default;  // key function
+#ifdef OBIGO_AIDAEMON
+bool SpeechSynthesizer::startTTS(std::string startEvent, std::string finishEvent) {
+  if (auto m_speechSynthesizerEngineInterface_lock = m_speechSynthesizerEngineInterface.lock()) {
+    return m_speechSynthesizerEngineInterface_lock->onstartTTS(startEvent, finishEvent);
+  } else {
+    return false;
+  }
+}
 
-} // aace::alexa
-} // aac
-
+void SpeechSynthesizer::setEngineInterface(
+    std::shared_ptr<aace::alexa::SpeechSynthesizerEngineInterface> speechSynthesizerEngineInterface) {
+  m_speechSynthesizerEngineInterface = speechSynthesizerEngineInterface;
+}
+#endif
+}  // namespace alexa
+}  // namespace aace

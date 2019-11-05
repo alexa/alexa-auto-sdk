@@ -107,6 +107,9 @@ std::shared_ptr<SpeechSynthesizerEngineImpl> SpeechSynthesizerEngineImpl::create
         // initialize the speech synthesizer
         ThrowIfNot( speechSynthesizerEngineImpl->initialize( audioOutputChannel, directiveSequencer, messageSender, focusManager, contextManager, attachmentManager, dialogUXStateAggregator, capabilitiesDelegate, speakerManager, exceptionSender ), "initializeSpeechSynthesizerEngineImplFailed" );
 
+#ifdef OBIGO_AIDAEMON
+        speechSynthesizerPlatformInterface->setEngineInterface( speechSynthesizerEngineImpl );
+#endif
         return speechSynthesizerEngineImpl;
     }
     catch( std::exception& ex ) {
@@ -163,6 +166,20 @@ void SpeechSynthesizerEngineImpl::handlePrePlaybackFinished( SourceId id )
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
     }
 }
+
+#ifdef OBIGO_AIDAEMON
+bool SpeechSynthesizerEngineImpl::onstartTTS(std::string startEvent, std::string finishEvent) {
+    try
+    {
+        ThrowIfNot( m_speechSynthesizerCapabilityAgent->startTTS(startEvent, finishEvent).get(), "startTTS" );
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"onstartTTS").d("reason", ex.what()));
+        return false;
+    }
+}
+#endif
 
 } // aace::engine::alexa
 } // aace::engine

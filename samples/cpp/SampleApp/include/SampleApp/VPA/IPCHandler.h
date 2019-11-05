@@ -52,7 +52,6 @@ private:
     void updateConext(std::string data);
     */
 
-    std::string getValueFromJson(json &data, std::string key);
     void recursive_mkdir(const char *path, mode_t mode);
  
 public:
@@ -66,10 +65,13 @@ public:
             GDBusMethodInvocation *invocation,
             const gchar *arg_Data,
             gpointer user_data );
+    static std::string getValueFromJson(json &data, std::string key);
     bool makeDBusServer();
 
     void setLogger(std::weak_ptr<sampleApp::logger::LoggerHandler> loggerHandler) {m_loggerHandler = std::move(loggerHandler);}
+    void setActivity(std::weak_ptr<sampleApp::Activity> activity) {m_activity = std::move(activity);}
     void log(sampleApp::logger::LoggerHandler::Level level, const std::string tag, const std::string &message);
+    bool sendEvent(const sampleApp::Event &event, const std::string &value = "");
     void setVPAHandler(std::shared_ptr<sampleApp::vpa::VPADirectiveHandler> vpaHandler) { m_vpaHandler = vpaHandler; }
     std::shared_ptr<sampleApp::vpa::VPADirectiveHandler> getVPAHandler() {return m_vpaHandler;}
     void setCBLHandler(std::shared_ptr<sampleApp::cbl::CBLHandler> cblHandler) { m_cblHandler = cblHandler;}
@@ -112,6 +114,7 @@ public:
     bool                                m_bAudioError = false;
 
     std::weak_ptr<sampleApp::logger::LoggerHandler>         m_loggerHandler{};
+    std::weak_ptr<sampleApp::Activity>                      m_activity{};
     std::shared_ptr<sampleApp::vpa::VPADirectiveHandler>    m_vpaHandler;
     std::shared_ptr<sampleApp::cbl::CBLHandler>             m_cblHandler;
 };

@@ -102,7 +102,10 @@ enum class Event {
     onRemoveAddressBookPhone,
     onAddAddressBookAuto,
     onRemoveAddressBookAuto,
-
+#ifdef OBIGO_AIDAEMON
+    // SpeechSynthesizer
+    onStartTTS,
+#endif
 };
 
 static const std::map<std::string, Event> EventEnumerator{
@@ -178,7 +181,11 @@ static const std::map<std::string, Event> EventEnumerator{
     {"onAddAddressBookPhone", Event::onAddAddressBookPhone},
     {"onRemoveAddressBookPhone", Event::onRemoveAddressBookPhone},
     {"onAddAddressBookAuto", Event::onAddAddressBookAuto},
-    {"onRemoveAddressBookAuto", Event::onRemoveAddressBookAuto}
+    {"onRemoveAddressBookAuto", Event::onRemoveAddressBookAuto},
+#ifdef OBIGO_AIDAEMON
+    // SpeechSynthesizer
+    {"onStartTTS", Event::onStartTTS}
+#endif
 };
 
 } // namespace sampleApp

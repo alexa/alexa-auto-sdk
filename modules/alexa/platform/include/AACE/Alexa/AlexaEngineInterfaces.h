@@ -101,6 +101,14 @@ public:
     virtual bool disableWakewordDetection() = 0;
 };
 
+#ifdef OBIGO_AIDAEMON
+class SpeechSynthesizerEngineInterface {
+public:
+    
+    virtual bool onstartTTS(std::string startEvent, std::string finishEvent) = 0;
+};
+#endif
+
 inline std::ostream& operator<<(std::ostream& stream, const SpeechRecognizerEngineInterface::Initiator& initiator) {
     switch (initiator) {
         case SpeechRecognizerEngineInterface::Initiator::HOLD_TO_TALK:

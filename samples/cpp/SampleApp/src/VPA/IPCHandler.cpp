@@ -253,7 +253,7 @@ gboolean IPCHandler::on_handle_send_messages(
         handler->getCBLHandler()->startCBL();
     } else if (Method == AIDAEMON::METHODID_VPA_SET_CONF) {
         handler->setConfigured(IPCData);        
-    } else if (Method == AIDAEMON::METHODID_VPA_VR_START) {
+    } else if (Method == AIDAEMON::METHODID_VPA_TTS_START) {
         handler->sendEvent(sampleApp::Event::onStartTTS, IPCData);
     } else if (Method == AIDAEMON::METHODID_VPA_EVENT) {
         handler->getVPAHandler()->getVPAEngine()->sendEvent(IPCData);   

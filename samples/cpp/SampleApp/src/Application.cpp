@@ -348,6 +348,7 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
 #ifdef OBIGO_AIDAEMON
     AIDAEMON::IPCHandler *ipc = AIDAEMON::IPCHandler::GetInstance();
     ipc->setLogger(loggerHandler);
+    ipc->setActivity(activity);
 #endif // OBIGO_AIDAEMON
 
 #ifdef LOCALVOICECONTROL

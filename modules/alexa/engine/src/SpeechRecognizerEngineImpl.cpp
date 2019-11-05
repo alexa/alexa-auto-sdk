@@ -328,7 +328,7 @@ bool SpeechRecognizerEngineImpl::onSetRecognizeEvent(const std::string& event)
 {
     try
     {
-        ThrowIfNot( m_audioInputProcessor->setRecognizeEvent().get(), "setRecognizeEventFailed" );
+        ThrowIfNot( m_audioInputProcessor->setRecognizeEvent(event).get(), "setRecognizeEventFailed" );
         return true;
     }
     catch( std::exception& ex ) {

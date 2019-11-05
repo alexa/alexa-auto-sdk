@@ -38,6 +38,8 @@ public:
 
     virtual bool sendDirective( const std::string& payload ) = 0;
     virtual void setLocalStorage (std::shared_ptr<aace::engine::storage::LocalStorageInterface> storage) = 0;
+    // TODO Not use void *
+    virtual void setVPAEngine(void *vpaEngine) = 0;
 };
 
 } // aace::vpa

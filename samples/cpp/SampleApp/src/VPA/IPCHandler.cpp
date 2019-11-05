@@ -17,8 +17,6 @@ out of the use of the software.
 #include "SampleApp/Event.h"
 
 /* TODO
-#include "SampleApp/ConsolePrinter.h"
-
 #include <AVSCommon/AVS/NamespaceAndName.h>
 #include <ContextManager/ContextManager.h>
 */
@@ -256,6 +254,8 @@ gboolean IPCHandler::on_handle_send_messages(
         handler->setConfigured(IPCData);        
     } else if (Method == AIDAEMON::METHODID_VPA_VR_START) {
         handler->sendEvent(sampleApp::Event::onStartTTS, IPCData);
+    } else if (Method == AIDAEMON::METHODID_VPA_EVENT) {
+        handler->getVPAHandler()->getVPAEngine()->sendEvent(IPCData);  
     } else {
         handler->log(Level::ERROR, __PRETTY_FUNCTION__, "Cannot handle this Method : " + Method);
     }
@@ -266,9 +266,6 @@ gboolean IPCHandler::on_handle_send_messages(
         handler->setAudioError(false);
         handler->m_interactionManager->microphoneToggle(AIDAEMON::MIC_OFF);
         handler->m_interactionManager->getDefaultClient()->notifyOfTapToTalkEnd();            
-    } else if (Method == AIDAEMON::METHODID_VPA_EVENT) {
-        //ConsolePrinter::simplePrint(Method);
-        handler->m_interactionManager->sendEvent(IPCData);
     } else if (Method == AIDAEMON::METHODID_VPA_EVENT_CANCEL) {
         //ConsolePrinter::simplePrint(Method);
     }else if (Method == AIDAEMON::METHODID_VPA_AUDIO_REQUEST) {

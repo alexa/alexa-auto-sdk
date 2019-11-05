@@ -92,6 +92,7 @@ bool VPAEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::vpa:
         ThrowIfNull( m_vpaEngineImpl, "createVPAEngineImplFailed" );
 
         vpa->setLocalStorage(getContext()->getServiceInterface<aace::engine::storage::LocalStorageInterface>( "aace.storage" ));
+        vpa->setVPAEngine(static_cast<void*>( this ));
 
         return true;
     }
@@ -99,6 +100,14 @@ bool VPAEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::vpa:
         AACE_ERROR(LX(TAG,"registerPlatformInterfaceType<Navigation>").d("reason", ex.what()));
         return false;
     }
+}
+
+void VPAEngineService::sendEvent(std::string event) {
+    auto alexaComponents = getContext()->getServiceInterface<aace::engine::alexa::AlexaComponentInterface>( "aace.alexa" );
+    auto messageSender = alexaComponents->getMessageSender();
+
+    auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>( event );
+    messageSender->sendMessage(request);
 }
 
 } // aace::engine::vpa

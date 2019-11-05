@@ -67,6 +67,9 @@ void AlexaClientHandler::dialogStateChanged(AlexaClient::DialogState state) {
     });
     // Special case for test automation
     if (state == AlexaClient::DialogState::IDLE) {
+#ifdef OBIGO_AIDAEMON
+        AIDAEMON::IPCHandler::GetInstance()->sendMessage(AIDAEMON::METHODID_NOTI_VR_STATE, AIDAEMON::AI_VR_STATE_IDLE);
+#endif // OBIGO_AIDAEMON 
         if (auto executor = activity->getExecutor()) {
             executor->submit([=]() { activity->notify(Event::onTestAutomationProcess); });
         }
@@ -100,7 +103,7 @@ void AlexaClientHandler::authStateChanged(AlexaClient::AuthState state, AlexaCli
 
             AIDAEMON::IPCHandler::GetInstance()->sendAIStatus(AIDAEMON::AI_STATUS_UNAUTH, aireason);
         }
-#endif
+#endif // OBIGO_AIDAEMON 
     });
 }
 

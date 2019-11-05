@@ -160,6 +160,7 @@ bool IPCHandler::makeDBusServer() {
 }
 
 void IPCHandler::sendMessage(std::string MethodID, rapidjson::Document *data) {
+    log(Level::INFO, __PRETTY_FUNCTION__, "methodId : " + MethodID);
 
     rapidjson::Document ipcdata(rapidjson::kObjectType);
 
@@ -188,7 +189,8 @@ void IPCHandler::sendMessage(std::string MethodID, int data) {
 }
 */
 void IPCHandler::sendMessage(std::string MethodID, std::string data) {
-
+    log(Level::INFO, __PRETTY_FUNCTION__, "methodId : " + MethodID);
+    
     rapidjson::Document ipcdata(rapidjson::kObjectType);
 
     ipcdata.AddMember(IPC_METHODID, 

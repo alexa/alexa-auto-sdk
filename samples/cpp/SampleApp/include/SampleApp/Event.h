@@ -188,6 +188,7 @@ static const std::map<std::string, Event> EventEnumerator{
     {"onRemoveAddressBookAuto", Event::onRemoveAddressBookAuto},
 #ifdef OBIGO_AIDAEMON
     // SpeechSynthesizer
+    {"onStartTTS", Event::onStartTTS}
     {"onStopTTS", Event::onStopTTS}
 #endif
 };

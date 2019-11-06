@@ -68,11 +68,20 @@ void AlexaClientHandler::dialogStateChanged(AlexaClient::DialogState state) {
     // Special case for test automation
     if (state == AlexaClient::DialogState::IDLE) {
 #ifdef OBIGO_AIDAEMON
+        log(logger::LoggerHandler::Level::INFO, "Idle...");
         AIDAEMON::IPCHandler::GetInstance()->sendMessage(AIDAEMON::METHODID_NOTI_VR_STATE, AIDAEMON::AI_VR_STATE_IDLE);
-#endif // OBIGO_AIDAEMON 
         if (auto executor = activity->getExecutor()) {
             executor->submit([=]() { activity->notify(Event::onTestAutomationProcess); });
         }
+    } else if (state == AlexaClient::DialogState::LISTENING) {
+        log(logger::LoggerHandler::Level::INFO, "Listening...");
+        AIDAEMON::IPCHandler::GetInstance()->sendMessage(AIDAEMON::METHODID_NOTI_VR_STATE, AIDAEMON::AI_VR_STATE_LISTENING);
+    } else if (state == AlexaClient::DialogState::THINKING) {
+        log(logger::LoggerHandler::Level::INFO, "Thinking...");
+        AIDAEMON::IPCHandler::GetInstance()->sendMessage(AIDAEMON::METHODID_NOTI_VR_STATE, AIDAEMON::AI_VR_STATE_THINKING);
+    } else if (state == AlexaClient::DialogState::SPEAKING) {
+        log(logger::LoggerHandler::Level::INFO, "Speaking...");
+#endif // OBIGO_AIDAEMON
     }
 }
 

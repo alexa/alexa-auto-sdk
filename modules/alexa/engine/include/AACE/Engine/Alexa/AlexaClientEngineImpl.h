@@ -48,6 +48,15 @@ public:
     // DialogUXStateObserverInterface
     void onDialogUXStateChanged( alexaClientSDK::avsCommon::sdkInterfaces::DialogUXStateObserverInterface::DialogUXState state ) override;
 
+#ifdef OBIGO_AIDAEMON
+    void readyTTS(std::string dialogRequestId) override;
+    void startedTTS(std::string dialogRequestId) override;
+    void finishedTTS(std::string dialogRequestId) override;
+#ifdef OBIGO_SPEECH_SENDER
+    void sendDataToMVPA(From from, void* data) override;
+#endif
+#endif
+
 private:
     std::shared_ptr<aace::alexa::AlexaClient> m_alexaClientPlatformInterface = nullptr;
 };

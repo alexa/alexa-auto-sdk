@@ -54,6 +54,26 @@ void AlexaClientEngineImpl::onDialogUXStateChanged( alexaClientSDK::avsCommon::s
     m_alexaClientPlatformInterface->dialogStateChanged( static_cast<aace::alexa::AlexaClient::DialogState>( state ) );
 }
 
+#ifdef OBIGO_AIDAEMON
+void AlexaClientEngineImpl::readyTTS(std::string dialogRequestId) {
+    m_alexaClientPlatformInterface->readyTTS( dialogRequestId );
+}
+
+void AlexaClientEngineImpl::startedTTS(std::string dialogRequestId) {
+    m_alexaClientPlatformInterface->startedTTS( dialogRequestId );
+}
+
+void AlexaClientEngineImpl::finishedTTS(std::string dialogRequestId) {
+    m_alexaClientPlatformInterface->finishedTTS( dialogRequestId );
+}
+
+#ifdef OBIGO_SPEECH_SENDER
+void AlexaClientEngineImpl::sendDataToMVPA(From from, void* data) {
+    m_alexaClientPlatformInterface->finishedTTS( from, data);
+}
+#endif
+#endif
+
 } // aace::engine::alexa
 } // aace::engine
 } // aace

@@ -207,6 +207,15 @@ public:
      * @param [in] reason The reason for the status change
      */
     virtual void connectionStatusChanged( ConnectionStatus status, ConnectionChangedReason reason ) {}
+
+#ifdef OBIGO_AIDAEMON
+    virtual void  readyTTS(std::string dialogRequestId) {}
+    virtual void  startedTTS(std::string dialogRequestId) {}
+    virtual void  finishedTTS(std::string dialogRequestId) {}
+#ifdef OBIGO_SPEECH_SENDER
+    virtual void  sendDataToMVPA(From from, void* data) {}
+#endif
+#endif
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const AlexaClient::DialogState& state) {

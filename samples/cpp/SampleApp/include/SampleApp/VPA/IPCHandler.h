@@ -17,6 +17,7 @@ out of the use of the software.
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include <chrono>
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
@@ -83,6 +84,7 @@ public:
 
     void sendAIStatus(std::string status = std::string(), std::string reason = std::string());
     void setAuthCode(std::string code);
+    void sendAudioState( std::string audioItemID, std::string state, std::chrono::milliseconds offset, int64_t lenght = -1 );
 
     void waitForConfiguration();
     void setConfigured(std::string data);

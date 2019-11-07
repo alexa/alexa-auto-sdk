@@ -77,13 +77,12 @@ namespace AIDAEMON {
     static const std::string    METHODID_NOTI_TTS_START("AI_TTS_START");
     static const std::string    METHODID_NOTI_TTS_FINISH("AI_TTS_FINISHED");
 
-   static const std::string    METHODID_AI_AUDIO_STATE("AI_AUDIO_STATE");       
-        static const std::string        AUDIO_ITEMID("AudioItemId");
-        static const std::string        AUDIO_STATE("AudioState");
-        static const std::string        AUDIO_STATE_IDLE("IDLE");
-        static const std::string        AUDIO_OFFSET("Offset");
-        static const std::string        AUDIO_LENGTH("MediaLengthInMilliseconds");
-        static const std::string        AUDIO_ERROR("Error");        
+   static const char                    METHODID_AI_AUDIO_STATE[] = "AI_AUDIO_STATE";       
+        static const char                   AUDIO_ITEMID[] = "AudioItemId";
+        static const char                   AUDIO_STATE[] = "AudioState";
+        static const char                   AUDIO_OFFSET[] = "Offset";
+        static const char                   AUDIO_LENGTH[] = "MediaLengthInMilliseconds";
+        static const char                   AUDIO_ERROR[] = "Error";        
 
    static const std::string    METHODID_VPA_AUTH_START("VPA_AUTH_START");
 

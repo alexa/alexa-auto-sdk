@@ -47,8 +47,11 @@ class AudioPlayerHandler : public aace::alexa::AudioPlayer /* isa PlatformInterf
     auto getLoggerHandler() -> std::weak_ptr<logger::LoggerHandler>;
 
     // aace::alexa::AudioPlayer interface
-
+#ifdef OBIGO_AIDAEMON    
+    auto playerActivityChanged(AudioPlayer::PlayerActivity state, const std::string audioItemId, std::chrono::milliseconds offset) -> void override;
+#else 
     auto playerActivityChanged(AudioPlayer::PlayerActivity state) -> void override;
+#endif // OBIGO_AIDAEMON
 
   private:
     std::weak_ptr<View> m_console{};

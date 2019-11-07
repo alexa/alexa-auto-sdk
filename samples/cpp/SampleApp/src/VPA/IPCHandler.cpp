@@ -422,6 +422,32 @@ void IPCHandler::sendAIStatus(std::string status, std::string reason) {
     AIDAEMON::IPCHandler::GetInstance()->sendMessage(AIDAEMON::METHODID_AI_STATUS, &aistatus);
 }
 
+void IPCHandler::sendAudioState( std::string audioItemID, std::string state, std::chrono::milliseconds offset, int64_t lenght) {
+    log(Level::INFO, __PRETTY_FUNCTION__, "audioItemID : " + audioItemID + ", state : " + state);
+
+    rapidjson::Document audiostatus(rapidjson::kObjectType);
+
+    audiostatus.AddMember(AIDAEMON::AUDIO_ITEMID, 
+        rapidjson::Value().SetString(audioItemID.c_str(), audioItemID.length(), audiostatus.GetAllocator()),  
+        audiostatus.GetAllocator());
+
+    audiostatus.AddMember(AIDAEMON::AUDIO_STATE, 
+        rapidjson::Value().SetString(state.c_str(), state.length(), audiostatus.GetAllocator()),  
+        audiostatus.GetAllocator());
+
+    audiostatus.AddMember(AIDAEMON::AUDIO_OFFSET, 
+        rapidjson::Value().SetInt64(offset.count()), audiostatus.GetAllocator());
+
+    if (lenght != -1) {
+        audiostatus.AddMember(AIDAEMON::AUDIO_LENGTH, 
+            rapidjson::Value().SetInt64(lenght), audiostatus.GetAllocator());       
+    }
+
+    //TODO :  add error property
+
+    AIDAEMON::IPCHandler::GetInstance()->sendMessage(AIDAEMON::METHODID_AI_AUDIO_STATE, &audiostatus);
+}
+
 void IPCHandler::setAuthCode(std::string code) {
     m_authcode = code;
 }

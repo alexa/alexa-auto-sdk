@@ -17,6 +17,8 @@
 #define AACE_ALEXA_AUDIO_PLAYER_H
 
 #include <iostream>
+#include <algorithm>
+#include <chrono>
 
 #include <AACE/Core/PlatformInterface.h>
 
@@ -85,7 +87,11 @@ public:
      *
      * @param [in] state The new playback state
      */
+#ifdef OBIGO_AIDAEMON    
+    virtual void playerActivityChanged(PlayerActivity state, const std::string audioItemId, std::chrono::milliseconds offset) {}
+#else 
     virtual void playerActivityChanged( PlayerActivity state ) {}
+#endif // OBIGO_AIDAEMON
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const AudioPlayer::PlayerActivity& state) {

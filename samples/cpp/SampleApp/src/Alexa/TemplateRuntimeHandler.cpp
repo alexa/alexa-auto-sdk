@@ -24,6 +24,16 @@
 #define GSL_THROW_ON_CONTRACT_VIOLATION
 #include <gsl/contracts.h>
 
+#ifdef OBIGO_AIDAEMON
+#include <AACE/Alexa/AudioPlayer.h>
+#include "SampleApp/VPA/IPCHandler.h"
+#include "SampleApp/VPA/AIDaemon-IPC.h"
+
+// JSON for Modern C++
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+#endif // OBIGO_AIDAEMON
+
 namespace sampleApp {
 namespace alexa {
 
@@ -97,6 +107,33 @@ void TemplateRuntimeHandler::renderPlayerInfo(const std::string &payload) {
     if (!activity) {
         return;
     }
+
+#ifdef OBIGO_AIDAEMON
+    std::string audioItemID("");
+    int64_t mediaLength = -1;
+    try {
+        auto object = json::parse(payload);
+        Ensures(object.is_object());
+
+        if (object.count("audioItemId")) {
+            audioItemID = object.at("audioItemId").get<std::string>();
+        }
+
+        if (object.count("content")) {
+            auto content = object.at("content");
+            if (content.count("mediaLengthInMilliseconds")) {
+                mediaLength = content.at("mediaLengthInMilliseconds").get<int64_t>();
+            }
+        }
+    } catch (std::exception &e) {
+        log(logger::LoggerHandler::Level::ERROR, "renderPlayerInfo parsing error");
+    }
+    
+    std::stringstream ss;
+    ss << aace::alexa::AudioPlayer::PlayerActivity::IDLE;
+    AIDAEMON::IPCHandler::GetInstance()->sendAudioState( audioItemID, ss.str(), std::chrono::milliseconds(0), mediaLength);
+#endif // OBIGO_AIDAEMON
+
     m_startPlayerInfo = std::chrono::system_clock::now();
     activity->runOnUIThread([=]() {
         auto applicationContext = activity->getApplicationContext();

@@ -131,7 +131,12 @@ void AudioPlayerEngineImpl::doShutdown()
 // AudioPlayerObserverInterface
 //
 void AudioPlayerEngineImpl::onPlayerActivityChanged( alexaClientSDK::avsCommon::avs::PlayerActivity state, const Context& context ) {
+#ifdef OBIGO_AIDAEMON
+    m_audioPlayerPlatformInterface->playerActivityChanged( static_cast<aace::alexa::AudioPlayer::PlayerActivity>( state ), 
+        context.audioItemId, context.offset );
+#else
     m_audioPlayerPlatformInterface->playerActivityChanged( static_cast<aace::alexa::AudioPlayer::PlayerActivity>( state ) );
+#endif // OBIGO_AIDAEMON
 }
 
 } // aace::engine::alexa

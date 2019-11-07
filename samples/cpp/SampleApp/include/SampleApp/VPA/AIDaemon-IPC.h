@@ -12,7 +12,7 @@ namespace AIDAEMON {
     static const char IPC_METHODID[] = "methodId";
     static const char IPC_DATA[] = "data";
 
-    static const std::string    DIALOGID("dialogRequestId");
+    static const char DIALOGID[] = "dialogRequestId";
 
 // AI_STATUS
     static const std::string            METHODID_VPA_AI_STATUS("VPA_AI_STATUS");

@@ -50,7 +50,14 @@ class AlexaClientHandler : public aace::alexa::AlexaClient /* isa PlatformInterf
     auto dialogStateChanged(AlexaClient::DialogState state) -> void override;
     auto authStateChanged(AlexaClient::AuthState state, AlexaClient::AuthError error) -> void override;
     auto connectionStatusChanged(AlexaClient::ConnectionStatus status, AlexaClient::ConnectionChangedReason reason) -> void override;
-
+#ifdef OBIGO_AIDAEMON
+    auto readyTTS(std::string dialogRequestId) -> void override;
+    auto startedTTS(std::string dialogRequestId) -> void override;
+    auto finishedTTS(std::string dialogRequestId) -> void override;
+#ifdef OBIGO_SPEECH_SENDER
+    auto sendDataToMVPA(From from, void* data) -> void override;
+#endif
+#endif
   private:
     std::weak_ptr<View> m_console{};
     std::weak_ptr<View> m_authStateView{};

@@ -286,13 +286,15 @@ gboolean IPCHandler::on_handle_send_messages(
 }
 
 void IPCHandler::handleAudioControl(std::string data) {
-    std::string action = getValueFromJson(data, AIDAEMON::AUDIO_ACTION);
+    json aiData = json::parse(data);
+    std::string action = getValueFromJson(aiData, AIDAEMON::AUDIO_ACTION);
     action.erase(std::remove(action.begin(), action.end(), '"'), action.end());
     
     log(Level::INFO, __PRETTY_FUNCTION__, "Audio Action : " + action);
 
     if (action == AIDAEMON::AUDIO_PLAY) {
-        m_interactionManager->getDefaultClient()->playMVPAAduio();
+        // TODO
+        sendEvent(sampleApp::Event::onSetMVPAAudioPlayer);
     } else if (action == AIDAEMON::AUDIO_PAUSE) {
         sendEvent(sampleApp::Event::onPlaybackControllerButtonPressed, std::string("PAUSE"));
     } else if (action == AIDAEMON::AUDIO_NEXT) {
@@ -423,19 +425,19 @@ void IPCHandler::sendAudioState( std::string audioItemID, std::string state, std
 
     rapidjson::Document audiostatus(rapidjson::kObjectType);
 
-    audiostatus.AddMember(AIDAEMON::AUDIO_ITEMID, 
+    audiostatus.AddMember(AIDAEMON::AUDIO_ITEMID,
         rapidjson::Value().SetString(audioItemID.c_str(), audioItemID.length(), audiostatus.GetAllocator()),  
         audiostatus.GetAllocator());
 
-    audiostatus.AddMember(AIDAEMON::AUDIO_STATE, 
+    audiostatus.AddMember(AIDAEMON::AUDIO_STATE,
         rapidjson::Value().SetString(state.c_str(), state.length(), audiostatus.GetAllocator()),  
         audiostatus.GetAllocator());
 
-    audiostatus.AddMember(AIDAEMON::AUDIO_OFFSET, 
+    audiostatus.AddMember(AIDAEMON::AUDIO_OFFSET,
         rapidjson::Value().SetInt64(offset.count()), audiostatus.GetAllocator());
 
     if (lenght != -1) {
-        audiostatus.AddMember(AIDAEMON::AUDIO_LENGTH, 
+        audiostatus.AddMember(AIDAEMON::AUDIO_LENGTH,
             rapidjson::Value().SetInt64(lenght), audiostatus.GetAllocator());       
     }
 

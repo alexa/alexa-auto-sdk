@@ -103,6 +103,9 @@ std::shared_ptr<AudioPlayerEngineImpl> AudioPlayerEngineImpl::create(
         
         ThrowIfNot( audioPlayerEngineImpl->initialize( audioOutputChannel, directiveSequencer, messageSender, focusManager, contextManager, attachmentManager, capabilitiesDelegate, speakerManager, exceptionSender, playbackRouter ), "initializeAudioPlayerEngineImplFailed" );
 
+#ifdef OBIGO_AIDAEMON
+        audioPlayerPlatformInterface->setEngineInterface( audioPlayerEngineImpl );
+#endif
         return audioPlayerEngineImpl;
     }
     catch( std::exception& ex ) {
@@ -127,6 +130,18 @@ void AudioPlayerEngineImpl::doShutdown()
     AudioChannelEngineImpl::doShutdown();
 }
 
+#ifdef OBIGO_AIDAEMON
+bool AudioPlayerEngineImpl::onSetMVPAAudioPlayer() {
+    try {
+        ThrowIfNot (m_audioPlayerCapabilityAgent->setMVPAAudioPlayer().get(), "setMVPAAudioPlayerFailed");
+        return true;
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "onSetMVPAAudioPlayer").d("reason", ex.what()));
+        return false;
+    }
+}
+#endif
+
 //
 // AudioPlayerObserverInterface
 //
@@ -138,6 +153,12 @@ void AudioPlayerEngineImpl::onPlayerActivityChanged( alexaClientSDK::avsCommon::
     m_audioPlayerPlatformInterface->playerActivityChanged( static_cast<aace::alexa::AudioPlayer::PlayerActivity>( state ) );
 #endif // OBIGO_AIDAEMON
 }
+
+#ifdef OBIGO_AIDAEMON
+void AudioPlayerEngineImpl::onReadyMVPAAudioPlayer(std::string audioItemId) {
+    m_audioPlayerPlatformInterface->readyMVPAAudioPlayer(audioItemId);
+}
+#endif
 
 } // aace::engine::alexa
 } // aace::engine

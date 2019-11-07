@@ -42,6 +42,9 @@ namespace alexa {
 class PlaybackRouterDelegate;
 
 class AudioPlayerEngineImpl :
+#ifdef OBIGO_AIDAEMON
+    public aace::alexa::AudioPlayerEngineInterface,
+#endif
     public AudioChannelEngineImpl,
     public alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerInterface,
     public alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface {
@@ -94,6 +97,10 @@ public:
     // AudioPlayerObserverInterface
     //
     void onPlayerActivityChanged( alexaClientSDK::avsCommon::avs::PlayerActivity state, const Context& context ) override;
+#ifdef OBIGO_AIDAEMON
+    bool onSetMVPAAudioPlayer() override;
+    void onReadyMVPAAudioPlayer(std::string audioItemId) override;
+#endif
 
 protected:
     virtual void doShutdown() override;

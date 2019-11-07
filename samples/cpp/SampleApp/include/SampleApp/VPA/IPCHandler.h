@@ -92,7 +92,7 @@ public:
     void setAudioError(bool bError) {m_bAudioError = bError;};
     bool getAudioerror() {return m_bAudioError;};
 
-    /* TODO    
+    /* TODO
     void sendMessage(std::string MethodID, int data);
     void setInteractionManager(std::shared_ptr<InteractionManager> manager);
     std::shared_ptr<InteractionManager> getInteractionManager() {return m_interactionManager;};

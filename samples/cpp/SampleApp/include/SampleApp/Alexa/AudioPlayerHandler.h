@@ -49,6 +49,7 @@ class AudioPlayerHandler : public aace::alexa::AudioPlayer /* isa PlatformInterf
     // aace::alexa::AudioPlayer interface
 #ifdef OBIGO_AIDAEMON    
     auto playerActivityChanged(AudioPlayer::PlayerActivity state, const std::string audioItemId, std::chrono::milliseconds offset) -> void override;
+    auto readyMVPAAudioPlayer(std::string audioItemId) -> void override;
 #else 
     auto playerActivityChanged(AudioPlayer::PlayerActivity state) -> void override;
 #endif // OBIGO_AIDAEMON

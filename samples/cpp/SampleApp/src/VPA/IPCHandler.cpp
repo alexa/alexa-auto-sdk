@@ -196,9 +196,9 @@ void IPCHandler::sendMessage(std::string MethodID, std::string data) {
     ipcdata.AddMember(IPC_METHODID, 
         rapidjson::Value().SetString(MethodID.c_str(), MethodID.length(), ipcdata.GetAllocator()), 
         ipcdata.GetAllocator());
-    rapidjson::Document payload;
-    payload.Parse(data.c_str());
-    ipcdata.AddMember(IPC_DATA, payload, ipcdata.GetAllocator());
+    ipcdata.AddMember(IPC_DATA, 
+        rapidjson::Value().SetString(data.c_str(), data.length(), ipcdata.GetAllocator()),
+        ipcdata.GetAllocator());
 
     sendData(&ipcdata);
 }

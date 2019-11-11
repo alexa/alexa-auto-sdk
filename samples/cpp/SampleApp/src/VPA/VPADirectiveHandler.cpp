@@ -51,8 +51,9 @@ std::weak_ptr<logger::LoggerHandler> VPADirectiveHandler::getLoggerHandler() { r
 
 bool VPADirectiveHandler::sendDirective(const std::string &payload) {
     log(logger::LoggerHandler::Level::INFO, "sendDirective");
-
-    AIDAEMON::IPCHandler::GetInstance()->sendMessage(AIDAEMON::METHODID_NOTI_DIRECTIVE, payload);    
+    rapidjson::Document data;
+    data.Parse(payload.c_str());
+    AIDAEMON::IPCHandler::GetInstance()->sendMessage(AIDAEMON::METHODID_NOTI_DIRECTIVE, &data);    
     return true;
 }
 

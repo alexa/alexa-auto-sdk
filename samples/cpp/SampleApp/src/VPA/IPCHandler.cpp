@@ -196,9 +196,9 @@ void IPCHandler::sendMessage(std::string MethodID, std::string data) {
     ipcdata.AddMember(IPC_METHODID, 
         rapidjson::Value().SetString(MethodID.c_str(), MethodID.length(), ipcdata.GetAllocator()), 
         ipcdata.GetAllocator());
-    ipcdata.AddMember(IPC_DATA, 
-        rapidjson::Value().SetString(data.c_str(), data.length(), ipcdata.GetAllocator()),
-        ipcdata.GetAllocator());
+    rapidjson::Document payload;
+    payload.Parse(data.c_str());
+    ipcdata.AddMember(IPC_DATA, payload, ipcdata.GetAllocator());
 
     sendData(&ipcdata);
 }
@@ -215,7 +215,6 @@ void IPCHandler::sendData(rapidjson::Document *ipcdata) {
     std::string tempipcdata = ipcdataBuf.GetString();
     std::string encoded = base64_encode(reinterpret_cast<const unsigned char*>(tempipcdata.c_str()), tempipcdata.length());
     //ConsolePrinter::simplePrint(encoded.c_str());
-
     aidaemon__emit_send_messages(m_pDBusInterface, encoded.c_str());   
 }
 

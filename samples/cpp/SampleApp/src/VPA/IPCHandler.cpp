@@ -450,44 +450,47 @@ void IPCHandler::setAuthCode(std::string code) {
     m_authcode = code;
 }
 
+void IPCHandler::setConfigPath(std::string config) {
+    m_configPath = config;
+}
+
 void IPCHandler::setConfigured(std::string data) {
     log(Level::INFO, __PRETTY_FUNCTION__, " ");
 
     m_configured = true;
+    json dataObj = json::parse(data);
+    std::string configure = getValueFromJson(dataObj, AIDAEMON::SET_CONF_CONFIGURATION);
 
-/* TODO
-    std::string configure = getValueFromJson(data, AIDAEMON::SET_CONF_CONFIGURATION);
-    std::string configPath = "AIDaemon.json";
-
-    std::ofstream writeFile(configPath.data());
+    recursive_mkdir(m_configPath.substr(0, m_configPath.rfind('/')).c_str(), S_IRWXU);
+    std::ofstream writeFile(m_configPath.data());
     if (writeFile.is_open()) {
         writeFile << configure;
         writeFile.close();
     } else {
-        //ConsolePrinter::simplePrint("ERROR: Can't make AIDaemon.json");
+        log(Level::ERROR, __PRETTY_FUNCTION__, "ERROR: Can't make AIDaemon.json");
     }
 
-    std::string db = getValueFromJson(
-        getValueFromJson(configure, AIDAEMON::SET_CONF_AUTH_DELEGATE), 
-        AIDAEMON::SET_CONF_DB);
+    json configObj = json::parse(configure);
+    std::string authDelegate = getValueFromJson(configObj, AIDAEMON::SET_CONF_AUTH_DELEGATE);
+    json authDelegateObj = json::parse(authDelegate);
+    std::string db = getValueFromJson(authDelegateObj, AIDAEMON::SET_CONF_DB);
 
     db.erase(std::remove(db.begin(), db.end(), '"'), db.end());
     db = db.substr(0, db.find_last_of("\\/"));
 
     if (db.length() > 0) {
-        //ConsolePrinter::simplePrint("DB Path : " + db);
+        log(Level::INFO, __PRETTY_FUNCTION__, "DB Path : " + db);
         recursive_mkdir(db.c_str(), S_IRWXU);
         if (access(db.c_str(), F_OK) != 0) {
-            //ConsolePrinter::simplePrint("ERROR: Can't create DB Path");
+            log(Level::ERROR, __PRETTY_FUNCTION__, "ERROR: Can't create DB Path");
             return;
         } else {
-            //ConsolePrinter::simplePrint("Success to create DB Path : " + db);
+            log(Level::INFO, __PRETTY_FUNCTION__, "Success to create DB Path : " + db);
         }
     } else {
-        //ConsolePrinter::simplePrint("ERROR: Can't fine DB Path");
+        log(Level::ERROR, __PRETTY_FUNCTION__, "ERROR: Can't fine DB Path");
         return;
     }
-*/
     m_waitForConfigure.notify_one();
 }
 

@@ -47,8 +47,8 @@ private:
     IPCHandler(const IPCHandler& other);
     ~IPCHandler() {};
     void sendData(rapidjson::Document *ipcdataa);
-    /* TODO
     void handleAudioControl(std::string data);
+    /* TODO
     void handleStartTTS(std::string data);
     void handleStopTTS(std::string data);    
     void updateConext(std::string data);
@@ -89,12 +89,11 @@ public:
     void waitForConfiguration();
     void setConfigured(std::string data);
 
-    /* TODO    
-    void sendMessage(std::string MethodID, int data);
     void setAudioError(bool bError) {m_bAudioError = bError;};
     bool getAudioerror() {return m_bAudioError;};
-    
-    
+
+    /* TODO
+    void sendMessage(std::string MethodID, int data);
     void setInteractionManager(std::shared_ptr<InteractionManager> manager);
     std::shared_ptr<InteractionManager> getInteractionManager() {return m_interactionManager;};
     */

@@ -266,18 +266,14 @@ gboolean IPCHandler::on_handle_send_messages(
         handler->sendEvent(sampleApp::Event::onSpeechRecognizerStartCapture, std::string("TAP_TO_TALK"));
     } else if (Method == AIDAEMON::METHODID_VPA_VR_STOP) {
         handler->sendEvent(sampleApp::Event::onSpeechRecognizerStopCapture);
+    } else if (Method == AIDAEMON::METHODID_VPA_AUDIO_REQUEST) {
+        handler->handleAudioControl(IPCData);
     } else {
         handler->log(Level::ERROR, __PRETTY_FUNCTION__, "Cannot handle this Method : " + Method);
     }
     /* TODO
-    } else if (Method == AIDAEMON::METHODID_VPA_VR_STOP) {
-        handler->setAudioError(false);
-        handler->m_interactionManager->microphoneToggle(AIDAEMON::MIC_OFF);
-        handler->m_interactionManager->getDefaultClient()->notifyOfTapToTalkEnd();            
     } else if (Method == AIDAEMON::METHODID_VPA_EVENT_CANCEL) {
         //ConsolePrinter::simplePrint(Method);
-    }else if (Method == AIDAEMON::METHODID_VPA_AUDIO_REQUEST) {
-        handler->handleAudioControl(IPCData);
     } else if (Method == AIDAEMON::METHODID_REQ_SET_CONTEXT ) {
         handler->updateConext(IPCData);
     } else if (Method == AIDAEMON::METHODID_REQ_MIC ) {
@@ -288,40 +284,43 @@ gboolean IPCHandler::on_handle_send_messages(
     */
     return true;
 }
-/* TODO
-void IPCHandler::handleAudioControl(std::string data) {
-    //ConsolePrinter::simplePrint(__PRETTY_FUNCTION__);
 
-    std::string action = getValueFromJson(data, AIDAEMON::AUDIO_ACTION);
+void IPCHandler::handleAudioControl(std::string data) {
+    json aiData = json::parse(data);
+    std::string action = getValueFromJson(aiData, AIDAEMON::AUDIO_ACTION);
     action.erase(std::remove(action.begin(), action.end(), '"'), action.end());
+    
+    log(Level::INFO, __PRETTY_FUNCTION__, "Audio Action : " + action);
 
     if (action == AIDAEMON::AUDIO_PLAY) {
-        m_interactionManager->getDefaultClient()->playMVPAAduio();
+        // TODO
+        sendEvent(sampleApp::Event::onSetMVPAAudioPlayer);
     } else if (action == AIDAEMON::AUDIO_PAUSE) {
-        m_interactionManager->playbackPause();
+        sendEvent(sampleApp::Event::onPlaybackControllerButtonPressed, std::string("PAUSE"));
     } else if (action == AIDAEMON::AUDIO_NEXT) {
-        m_interactionManager->playbackNext();
+        sendEvent(sampleApp::Event::onPlaybackControllerButtonPressed, std::string("NEXT"));
     } else if (action == AIDAEMON::AUDIO_PREVIOUS) {
-        m_interactionManager->playbackPrevious();         
-    } else if (action == AIDAEMON::AUDIO_SKIP_FORWARD) {s
-        m_interactionManager->playbackSkipForward();        
+        sendEvent(sampleApp::Event::onPlaybackControllerButtonPressed, std::string("PREVIOUS"));
+    } else if (action == AIDAEMON::AUDIO_SKIP_FORWARD) {
+        sendEvent(sampleApp::Event::onPlaybackControllerButtonPressed, std::string("SKIP_FORWARD"));
     } else if (action == AIDAEMON::AUDIO_SKIP_BACKWARD) {
-        m_interactionManager->playbackSkipBackward();        
+        sendEvent(sampleApp::Event::onPlaybackControllerButtonPressed, std::string("SKIP_BACKWARD"));
     } else if (action == AIDAEMON::AUDIO_SHUFFLE) {
-        m_interactionManager->playbackShuffle();        
+        sendEvent(sampleApp::Event::onPlaybackControllerTogglePressed, std::string("SHUFFLE"));
     } else if (action == AIDAEMON::AUDIO_LOOP) {
-        m_interactionManager->playbackLoop();        
+        sendEvent(sampleApp::Event::onPlaybackControllerTogglePressed, std::string("LOOP"));
     } else if (action == AIDAEMON::AUDIO_REPEAT) {
-        m_interactionManager->playbackRepeat();        
+        sendEvent(sampleApp::Event::onPlaybackControllerTogglePressed, std::string("REPEAT"));
     } else if (action == AIDAEMON::AUDIO_THUMBS_UP) {
-        m_interactionManager->playbackThumbsUp();        
+        sendEvent(sampleApp::Event::onPlaybackControllerTogglePressed, std::string("THUMBS_UP"));
     } else if (action == AIDAEMON::AUDIO_THUMBS_DOWN) {
-        m_interactionManager->playbackThumbsDown();        
+        sendEvent(sampleApp::Event::onPlaybackControllerTogglePressed, std::string("THUMBS_DOWN"));
     } else {
-        //ConsolePrinter::simplePrint("ERROR: Cannot Handle Audio Request " + action);
+        log(Level::ERROR, __PRETTY_FUNCTION__, "Cannot Handle Audio Request : " + action);
     } 
 }
 
+/* TODO
 void IPCHandler::handleStartTTS(std::string data) {
     m_interactionManager->getDefaultClient()->startTTS(
         getValueFromJson(data, AIDAEMON::TTS_START_EVENT),
@@ -426,19 +425,19 @@ void IPCHandler::sendAudioState( std::string audioItemID, std::string state, std
 
     rapidjson::Document audiostatus(rapidjson::kObjectType);
 
-    audiostatus.AddMember(AIDAEMON::AUDIO_ITEMID, 
+    audiostatus.AddMember(AIDAEMON::AUDIO_ITEMID,
         rapidjson::Value().SetString(audioItemID.c_str(), audioItemID.length(), audiostatus.GetAllocator()),  
         audiostatus.GetAllocator());
 
-    audiostatus.AddMember(AIDAEMON::AUDIO_STATE, 
+    audiostatus.AddMember(AIDAEMON::AUDIO_STATE,
         rapidjson::Value().SetString(state.c_str(), state.length(), audiostatus.GetAllocator()),  
         audiostatus.GetAllocator());
 
-    audiostatus.AddMember(AIDAEMON::AUDIO_OFFSET, 
+    audiostatus.AddMember(AIDAEMON::AUDIO_OFFSET,
         rapidjson::Value().SetInt64(offset.count()), audiostatus.GetAllocator());
 
     if (lenght != -1) {
-        audiostatus.AddMember(AIDAEMON::AUDIO_LENGTH, 
+        audiostatus.AddMember(AIDAEMON::AUDIO_LENGTH,
             rapidjson::Value().SetInt64(lenght), audiostatus.GetAllocator());       
     }
 

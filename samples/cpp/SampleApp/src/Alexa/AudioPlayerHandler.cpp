@@ -74,6 +74,12 @@ void AudioPlayerHandler::playerActivityChanged(AudioPlayer::PlayerActivity state
     return;
 }
 
+#ifdef OBIGO_AIDAEMON
+void AudioPlayerHandler::readyMVPAAudioPlayer(std::string audioItemId) {
+  AIDAEMON::IPCHandler::GetInstance()->sendAudioState(audioItemId, std::string(AIDAEMON::AUDIO_STATE_IDLE), std::chrono::milliseconds(0), 0);
+}
+#endif
+
 // private
 
 void AudioPlayerHandler::log(logger::LoggerHandler::Level level, const std::string &message) {
@@ -90,6 +96,12 @@ void AudioPlayerHandler::setupUI() {
         return;
     }
     m_console = activity->findViewById("id:console");
+#ifdef OBIGO_AIDAEMON
+    activity->registerObserver(Event::onSetMVPAAudioPlayer, [=](const std::string&) {
+        log(logger::LoggerHandler::Level::VERBOSE, "onSetMVPAAudioPlayer");
+        return setMVPAAudioPlayer();
+    });
+#endif
 }
 
 } // namespace alexa

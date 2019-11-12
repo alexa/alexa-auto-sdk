@@ -20,5 +20,19 @@ namespace alexa {
 
 AudioPlayer::~AudioPlayer() = default; // key function
 
+#ifdef OBIGO_AIDAEMON
+bool AudioPlayer::setMVPAAudioPlayer() {
+  if (auto m_audioPlayerEngineInterface_lock = m_audioPlayerEngineInterface.lock()) {
+      return m_audioPlayerEngineInterface_lock->onSetMVPAAudioPlayer();
+  } else {
+      return false;
+  }
+}
+
+void AudioPlayer::setEngineInterface(
+    std::shared_ptr<aace::alexa::AudioPlayerEngineInterface> audioPlayerEngineInterface) {
+  m_audioPlayerEngineInterface = audioPlayerEngineInterface;
+}
+#endif
 } // aace::alexa
 } // aac

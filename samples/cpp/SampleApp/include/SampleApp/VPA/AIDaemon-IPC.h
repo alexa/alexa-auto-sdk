@@ -80,6 +80,7 @@ namespace AIDAEMON {
    static const char                    METHODID_AI_AUDIO_STATE[] = "AI_AUDIO_STATE";       
         static const char                   AUDIO_ITEMID[] = "AudioItemId";
         static const char                   AUDIO_STATE[] = "AudioState";
+        static const char                   AUDIO_STATE_IDLE[] = "IDLE";
         static const char                   AUDIO_OFFSET[] = "Offset";
         static const char                   AUDIO_LENGTH[] = "MediaLengthInMilliseconds";
         static const char                   AUDIO_ERROR[] = "Error";        

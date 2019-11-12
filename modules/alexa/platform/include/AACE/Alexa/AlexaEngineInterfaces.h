@@ -111,6 +111,11 @@ public:
     virtual bool onstartTTS(std::string startEvent, std::string finishEvent) = 0;
     virtual bool onstopTTS() = 0;
 };
+
+class AudioPlayerEngineInterface {
+ public:
+    virtual bool onSetMVPAAudioPlayer() = 0;
+};
 #endif
 
 inline std::ostream& operator<<(std::ostream& stream, const SpeechRecognizerEngineInterface::Initiator& initiator) {

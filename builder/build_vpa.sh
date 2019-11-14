@@ -23,7 +23,12 @@ export VPA_USE_GSTREAMER=${VPA_USE_GSTREAMER:-0}
 export VPA_USE_PORTAUDIO=${VPA_USE_PORTAUDIO:-0}
 export VPA_USE_WAKEWORD_KTTI=${VPA_USE_WAKEWORD_KTTI:-0}
 export VPA_USE_WAKEWORD_SENSORY=${VPA_USE_WAKEWORD_SENSORY:-0}
-
+export VPA_USE_ALEXACOMMS=${VPA_USE_ALEXACOMMS:-0}
+export VPA_USE_AMAZONLITE=${VPA_USE_AMAZONLITE:-0}
+export VPA_USE_LVC=${VPA_USE_LVC:-0}
+export VPA_USE_DCM=${VPA_USE_DCM:-0}
+export VPA_USE_LOOPBACK_DETECTOR=${VPA_USE_LOOPBACK_DETECTOR:-0}
+export NCORES=1
 ## Dependency Libraries
 export VPA_DEPS_LIB_LIST="openssl nghttp2 curl opus"
 
@@ -79,6 +84,9 @@ vpa_build_avs_sdk() {
 			-DSENSORY_KEY_WORD_DETECTOR_INCLUDE_DIR=${VPA_TARGET_SYSROOT_DIR}/usr/include"
 	fi
 
+	echo "###############################################"
+	echo "# Start build AVS SDK"
+	echo "###############################################"
 	# generate Makefile
 	cmake ${avs_cmake_options} ${AVS_SDK_DIR}/CMakeLists.txt -B${avs_build_dir}
 	do_error_check
@@ -90,15 +98,71 @@ vpa_build_avs_sdk() {
 	popdir
 }
 
-vpa_build_aac() {
+vpa_build_aac_modules() {
+	local aac_build_dir=${VPA_BUILD_DIR}/aac/${TARGET_PLATFORM}_${CMAKE_BUILD_TYPE}
 	local aac_cmake_options="${CMAKE_OPTIONS} \
-		-DAAC_EMIT_SENSITIVE_LOGS=ON \
+		-DAAC_EMIT_SENSITIVE_LOGS=OFF \
 		-DAAC_EMIT_LATENCY_LOGS=ON \
 		-DAAC_DEFAULT_LOGGER_ENABLED=ON \
 		-DAAC_DEFAULT_LOGGER_LEVEL=Verbose \
 		-DAAC_DEFAULT_LOGGER_SINK=Console \
 		-DAAC_VERSION=2.0.0 \
+		-DAAC_HOME=${CMAKE_INSTALL_PREFIX} \
 		"
+	local aac_build_target=(core alexa navigation phone-control contact-uploader cbl address-book vpa)
+	for target in "${aac_build_target[@]}"
+	do
+		echo "###############################################"
+		echo "# Start build AAC Module - ${target}"
+		echo "###############################################"
+		cmake ${aac_cmake_options} ${AAC_SDK_DIR}/modules/${target}/CMakeLists.txt -B${aac_build_dir}/modules/${target}
+		do_error_check
+		pushdir ${aac_build_dir}/modules/${target}
+		make -j${NCORES} install
+		do_error_check
+		popdir
+	done
+}
+
+vpa_build_aac_extension() {
+	echo "extension"
+}
+
+vpa_build_aidaemon() {
+	local aidaemon_build_dir=${VPA_BUILD_DIR}/aac/${TARGET_PLATFORM}_${CMAKE_BUILD_TYPE}/sampleapp
+	local aidaemon_cmake_options="${CMAKE_OPTIONS} \
+		-DAAC_ENABLE_ADDRESS_SANITIZER=OFF \
+		-DAAC_HOME=${CMAKE_INSTALL_PREFIX} \
+		"
+
+	if [ ${VPA_USE_ALEXACOMMS} -eq 1 ]; then
+		aidaemon_cmake_options="${aidaemon_cmake_options} -DALEXACOMMS=ON"
+	fi
+	if [ ${VPA_USE_AMAZONLITE} -eq 1 ]; then
+		aidaemon_cmake_options="${aidaemon_cmake_options} -DAMAZONLITE=ON"
+	fi
+	if [ ${VPA_USE_LVC} -eq 1 ]; then
+		aidaemon_cmake_options="${aidaemon_cmake_options} -DLOCALVOICECONTROL=ON"
+	fi
+	if [ ${VPA_USE_GSTREAMER} -eq 1 ]; then
+		aidaemon_cmake_options="${aidaemon_cmake_options} -DGSTREAMER=ON"
+	fi
+	if [ ${VPA_USE_DCM} -eq 1 ]; then
+		aidaemon_cmake_options="${aidaemon_cmake_options} -DDCM=ON"
+	fi
+	if [ ${VPA_USE_LOOPBACK_DETECTOR} -eq 1 ]; then
+		aidaemon_cmake_options="${aidaemon_cmake_options} -DLOOPBACK_DETECTOR=ON"
+	fi
+
+	echo "###############################################"
+	echo "# Start build AIDaemon"
+	echo "###############################################"
+	cmake ${aidaemon_cmake_options} ${AAC_SDK_DIR}/samples/cpp/SampleApp/CMakeLists.txt -B${aidaemon_build_dir}
+	do_error_check
+	pushdir ${aidaemon_build_dir}
+	make -j${NCORES} install
+	do_error_check
+	popdir
 }
 
 vpa_set_cmake_environments() {
@@ -127,16 +191,19 @@ vpa_main() {
 	# export
 	export VPA_TARGET_SYSROOT_DIR=${VPA_OUTPUT_DIR}/${TARGET_PLATFORM}/sysroot
 	export PKG_CONFIG_PATH=${VPA_TARGET_SYSROOT_DIR}/usr/lib/pkgconfig:${PKG_CONFIG_PATH}
-	export PKG_CONFIG_SYSROOT_DIR=${VPA_TARGET_SYSROOT_DIR}
+	#export PKG_CONFIG_SYSROOT_DIR=${VPA_TARGET_SYSROOT_DIR}
 
 	vpa_set_cmake_environments
 	vpa_build_dependency_libraries
 	vpa_build_avs_sdk
+	vpa_build_aac_modules
+	vpa_build_aac_extension
+	vpa_build_aidaemon
 	kill -SIGINT $$
 
 	# recovery
 	export PKG_CONFIG_PATH=${pkg_config_path}
-	export PKG_CONFIG_SYSROOT_DIR=${pkg_config_sysroot_dir}
+	#export PKG_CONFIG_SYSROOT_DIR=${pkg_config_sysroot_dir}
 }
 
 # wrapper

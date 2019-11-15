@@ -132,9 +132,6 @@ int main(int argc, const char *argv[]) {
 #ifdef OBIGO_AIDAEMON
         AIDAEMON::IPCHandler *ipc = AIDAEMON::IPCHandler::GetInstance();
         ipc->makeDBusServer();
-        std::cerr << "Waiting for Configuration \n";
-        ipc->waitForConfiguration();
-        std::cerr << "Starting AIDaemon \n";
 #endif // OBIGO_AIDAEMON
 
         for (unsigned i = 0; i < size; ++i) {
@@ -155,6 +152,12 @@ int main(int argc, const char *argv[]) {
                         errorExit(name, "file not found " + arg);
                     }
                     input.close();
+#ifdef OBIGO_AIDAEMON
+                    std::cerr << "Waiting for Configuration \n";
+                    ipc->setConfigPath(arg);
+                    ipc->waitForConfiguration();
+                    std::cerr << "Starting AIDaemon \n";
+#endif // OBIGO_AIDAEMON
                     applicationContext->addConfigFilePath(arg);
                 } else if (c2(arg, 'l', "level")) {
                     if (++i == size) {

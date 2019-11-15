@@ -88,6 +88,7 @@ public:
 
     void waitForConfiguration();
     void setConfigured(std::string data);
+    void setConfigPath(std::string config);
 
     void setAudioError(bool bError) {m_bAudioError = bError;};
     bool getAudioerror() {return m_bAudioError;};
@@ -103,6 +104,7 @@ private:
     std::string m_aiStatusReason;
     std::string m_authcode;
     bool        m_configured;
+    std::string m_configPath;
     std::condition_variable m_waitForConfigure;
     std::mutex  m_configureMtx;
 public:

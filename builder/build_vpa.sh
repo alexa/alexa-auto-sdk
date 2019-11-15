@@ -28,7 +28,6 @@ export VPA_USE_AMAZONLITE=${VPA_USE_AMAZONLITE:-0}
 export VPA_USE_LVC=${VPA_USE_LVC:-0}
 export VPA_USE_DCM=${VPA_USE_DCM:-0}
 export VPA_USE_LOOPBACK_DETECTOR=${VPA_USE_LOOPBACK_DETECTOR:-0}
-export NCORES=1
 ## Dependency Libraries
 export VPA_DEPS_LIB_LIST="openssl nghttp2 curl opus"
 
@@ -36,12 +35,20 @@ export VPA_DEPS_LIB_LIST="openssl nghttp2 curl opus"
 # Functions
 #################################################################
 vpa_build_dependency_libraries() {
+	local sysroot_exist=1
 	local target_sysroot_dir=${TARGET_SYSROOT_DIR}
 	export TARGET_SYSROOT_DIR=${VPA_TARGET_SYSROOT_DIR}
 
-	if [ ! -d ${VPA_TARGET_SYSROOT_DIR} ]; then mkdir -p ${VPA_TARGET_SYSROOT_DIR}; fi
+	if [ ! -d ${VPA_TARGET_SYSROOT_DIR} ]; then sysroot_exist=0; mkdir -p ${VPA_TARGET_SYSROOT_DIR}; fi
 	for lib in ${VPA_DEPS_LIB_LIST}
 	do
+		export LIBS_CONFIGURED_FILE_NAME=.${lib%/*}-configured
+		export LIBS_COMPILED_FILE_NAME=.${lib%/*}-compiled
+		export LIBS_INSTALLED_FILE_NAME=.${lib%/*}-installed
+		echo "#####################################################"
+		echo "${lib}"
+		echo "#####################################################"
+		if [ ${sysroot_exist} -eq 0 ]; then rm -f ${SYSLIBS_DEST_DIR}/${lib}*/${LIBS_INSTALLED_FILE_NAME}; fi
 		. ${SYSLIBS_BUILD_SCRIPT_DIR}/${lib}.sh
 		do_build_${lib}
 	done
@@ -191,7 +198,6 @@ vpa_main() {
 	# export
 	export VPA_TARGET_SYSROOT_DIR=${VPA_OUTPUT_DIR}/${TARGET_PLATFORM}/sysroot
 	export PKG_CONFIG_PATH=${VPA_TARGET_SYSROOT_DIR}/usr/lib/pkgconfig:${PKG_CONFIG_PATH}
-	#export PKG_CONFIG_SYSROOT_DIR=${VPA_TARGET_SYSROOT_DIR}
 
 	vpa_set_cmake_environments
 	vpa_build_dependency_libraries
@@ -199,11 +205,9 @@ vpa_main() {
 	vpa_build_aac_modules
 	vpa_build_aac_extension
 	vpa_build_aidaemon
-	kill -SIGINT $$
 
 	# recovery
 	export PKG_CONFIG_PATH=${pkg_config_path}
-	#export PKG_CONFIG_SYSROOT_DIR=${pkg_config_sysroot_dir}
 }
 
 # wrapper

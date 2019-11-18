@@ -195,7 +195,7 @@ find_path(RAPIDJSON_INCLUDE_DIR rapidjson/rapidjson.h
     CMAKE_FIND_ROOT_PATH_BOTH
 )
 
-if (${OBIGO_AIDAEMON})
+if (${USE_OBIGO_BUILD_SYSTEM})
 find_package(PkgConfig)
 pkg_check_modules(SQLite3 REQUIRED sqlite3)
 else ()

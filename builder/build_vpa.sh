@@ -58,7 +58,7 @@ vpa_build_dependency_libraries() {
 
 vpa_build_avs_sdk() {
 	local avs_build_dir=${VPA_BUILD_DIR}/avs/${TARGET_PLATFORM}_${CMAKE_BUILD_TYPE}
-	local avs_cmake_options="${CMAKE_OPTIONS} \
+	local avs_cmake_options="${VPA_CMAKE_OPTIONS} \
 		-DOPUS=ON \
 		-DACSDK_DEBUG_LOG_ENABLED=ON \
 		-DBUILD_TESTING=${VPA_ENABLE_TESTS} \
@@ -107,7 +107,7 @@ vpa_build_avs_sdk() {
 
 vpa_build_aac_modules() {
 	local aac_build_dir=${VPA_BUILD_DIR}/aac/${TARGET_PLATFORM}_${CMAKE_BUILD_TYPE}
-	local aac_cmake_options="${CMAKE_OPTIONS} \
+	local aac_cmake_options="${VPA_CMAKE_OPTIONS} \
 		-DAAC_EMIT_SENSITIVE_LOGS=OFF \
 		-DAAC_EMIT_LATENCY_LOGS=ON \
 		-DAAC_DEFAULT_LOGGER_ENABLED=ON \
@@ -137,7 +137,7 @@ vpa_build_aac_extension() {
 
 vpa_build_aidaemon() {
 	local aidaemon_build_dir=${VPA_BUILD_DIR}/aac/${TARGET_PLATFORM}_${CMAKE_BUILD_TYPE}/sampleapp
-	local aidaemon_cmake_options="${CMAKE_OPTIONS} \
+	local aidaemon_cmake_options="${VPA_CMAKE_OPTIONS} \
 		-DAAC_ENABLE_ADDRESS_SANITIZER=OFF \
 		-DAAC_HOME=${CMAKE_INSTALL_PREFIX} \
 		"
@@ -172,6 +172,88 @@ vpa_build_aidaemon() {
 	popdir
 }
 
+vpa_install_run_script() {
+	local vpa_dir=
+	local rw_dir=
+	local output_dir=${VPA_OUTPUT_DIR}/${TARGET_PLATFORM}
+	# pclinux
+	if [ -z ${CROSS_COMPILE} ]; then
+		sed "3i VPA_TOP_DIR=\${PWD}" < ${AAC_SDK_DIR}/VPA/Host/run_vpa.sh.in > ${output_dir}/run_vpa.sh
+		do_error_check
+		vpa_dir="\${VPA_TOP_DIR}"
+		rw_dir=${vpa_dir}
+	else # AIVI
+		cp -f ${AAC_SDK_DIR}/VPA/Host/run_vpa.sh.in ${output_dir}/run_vpa.sh
+		vpa_dir=/var/opt/obigo/obigo_bin/SA
+		rw_dir=/var/opt/bosch/dynweb/obigo/obigo_apps/SA/resource
+	fi
+
+	sed -e "s#@vpa_dir@#${vpa_dir}#g;
+			s#@rw_dir@#${rw_dir}#g" -i ${output_dir}/run_vpa.sh
+	do_error_check
+	chmod a+x ${output_dir}/run_vpa.sh
+	do_error_check
+}
+
+vpa_populate_assets() {
+	local output_dir=${VPA_OUTPUT_DIR}/${TARGET_PLATFORM}
+	local dest_dir=${BUILD_OUTPUT_DIR}/target-${TARGET_PLATFORM}/SA
+	local asset_dir=${dest_dir}/opt/AAC/etc
+
+	mkdir -p ${asset_dir}
+
+	if [ -d ${output_dir}/etc/certs ]; then
+		cp -rpa ${output_dir}/etc/certs ${asset_dir}
+		do_error_check
+	fi
+
+	if [ -f ${output_dir}/etc/config.json ]; then
+		cp -rpa ${output_dir}/etc/config.json ${dest_dir}/configAIDaemon.json
+		do_error_check
+	fi
+	
+	if [ -f ${output_dir}/etc/menu.json ]; then
+		cp -rpa ${output_dir}/etc/menu.json ${dest_dir}
+		do_error_check
+	fi
+}
+
+vpa_populate_output() {
+	local output_dir=${VPA_OUTPUT_DIR}/${TARGET_PLATFORM}
+	local dest_dir=${BUILD_OUTPUT_DIR}/target-${TARGET_PLATFORM}/SA
+	local dest_syslib_dir=${dest_dir}/syslib
+	local dest_lib_dir=${dest_dir}/lib
+	local dest_bin_dir=${dest_dir}/bin
+
+	mkdir -p ${dest_lib_dir}
+	mkdir -p ${dest_syslib_dir}
+	mkdir -p ${dest_bin_dir}
+
+	if [ -f ${output_dir}/run_vpa.sh ]; then
+		cp -rpa ${output_dir}/run_vpa.sh ${dest_dir}
+		do_error_check
+	fi
+
+	if [ -f ${output_dir}/bin/SampleApp ]; then
+		cp -rpa ${output_dir}/bin/SampleApp ${dest_bin_dir}
+		do_error_check
+	fi
+
+	if [ -d ${output_dir}/lib ]; then
+		if [ $(ls ${output_dir}/lib | wc -l) -gt 0 ]; then
+			cp -rpa ${output_dir}/lib/lib*.so* ${dest_lib_dir}
+			do_error_check
+		fi
+	fi
+
+	if [ -d ${VPA_TARGET_SYSROOT_DIR}/usr/lib ]; then
+		if [ $(ls ${VPA_TARGET_SYSROOT_DIR}/usr/lib | wc -l) -gt 0 ]; then
+			cp -rpa ${VPA_TARGET_SYSROOT_DIR}/usr/lib/lib*.so* ${dest_syslib_dir}
+			do_error_check
+		fi
+	fi
+}
+
 vpa_set_cmake_environments() {
 	if [ "${SET_DEBUG}" = "${YES}" ]; then
 		export CMAKE_BUILD_TYPE="DEBUG"
@@ -180,7 +262,7 @@ vpa_set_cmake_environments() {
 	fi
 
 	export CMAKE_INSTALL_PREFIX=${VPA_OUTPUT_DIR}/${TARGET_PLATFORM}
-	export CMAKE_OPTIONS="${COMMON_CMAKE_TOOLCHAIN_OPTIONS} \
+	export VPA_CMAKE_OPTIONS="${COMMON_CMAKE_TOOLCHAIN_OPTIONS} \
 		-DCMAKE_VERBOSE_MAKEFILE=ON \
 		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
 		-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} \
@@ -206,6 +288,11 @@ vpa_main() {
 	vpa_build_aac_modules
 	vpa_build_aac_extension
 	vpa_build_aidaemon
+
+	vpa_install_run_script
+
+	vpa_populate_output
+	vpa_populate_assets
 
 	# recovery
 	export PKG_CONFIG_PATH=${pkg_config_path}

@@ -89,10 +89,16 @@ else()
 endif()
 
 # Find cURL library for the sample app.
+if (${USE_OBIGO_BUILD_SYSTEM})
+find_package(PkgConfig)
+pkg_check_modules(CURL REQUIRED libcurl)
+pkg_check_modules(SQLite3 REQUIRED sqlite3)
+else ()
 find_package(CURL REQUIRED)
-
 # Find SQLite3 package for the sample app.
 find_package(SQLite3 REQUIRED)
+endif ()
+
 
 set(CXX_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Activity.h

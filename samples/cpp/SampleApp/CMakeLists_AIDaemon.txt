@@ -31,7 +31,7 @@ if (OBIGO_AIDAEMON)
 endif()
 
 execute_process(
-    COMMAND /home/builder/aac/Version.py AI_DAEMON_VERSION
+    COMMAND python $ENV{AAC_SDK_DIR}/VPA/Version.py AI_DAEMON_VERSION
 )
 
 add_definitions(-DOBIGO_AIDAEMON_VERSION=${AI_DAEMON_VERSION})

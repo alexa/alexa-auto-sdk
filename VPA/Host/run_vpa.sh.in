@@ -1,0 +1,12 @@
+#!/bin/sh
+
+ALEXA_MENU_JSON=@vpa_dir@/menu.json
+ALEXA_DB_DIR=@rw_dir@/AAC-DB
+
+if [ ! -d @rw_dir@/AAC-DB ]; then
+	mkdir -p @rw_dir@/AAC-DB
+fi
+
+export LD_LIBRARY_PATH=@vpa_dir@/lib:@vpa_dir@/syslibs
+
+@vpa_dir@/bin/SampleApp --config @vpa_dir@/configAIDaemon.json --level VERBOSE --menu @vpa_dir@/menu.json

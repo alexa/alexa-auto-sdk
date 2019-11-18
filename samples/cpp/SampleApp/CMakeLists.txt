@@ -89,7 +89,7 @@ else()
 endif()
 
 # Find cURL library for the sample app.
-if (${OBIGO_AIDAEMON})
+if (${USE_OBIGO_BUILD_SYSTEM})
 find_package(PkgConfig)
 pkg_check_modules(CURL REQUIRED libcurl)
 pkg_check_modules(SQLite3 REQUIRED sqlite3)

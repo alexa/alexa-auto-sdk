@@ -19,7 +19,7 @@ export VPA_LOGGER_ENABLED=${VPA_LOGGER_ENABLED:-1}
 export VPA_ENABLE_TESTS=${VPA_ENABLE_TESTS:-0}
 export VPA_USE_SENSITIVE_LOGS=${VPA_USE_SENSITIVE_LOGS:-0}
 export VPA_USE_LATENCY_LOGS=${VPA_USE_LATENCY_LOGS:-1}
-export VPA_USE_GSTREAMER=${VPA_USE_GSTREAMER:-0}
+export VPA_USE_GSTREAMER=${VPA_USE_GSTREAMER:-1}
 export VPA_USE_PORTAUDIO=${VPA_USE_PORTAUDIO:-0}
 export VPA_USE_WAKEWORD_KTTI=${VPA_USE_WAKEWORD_KTTI:-0}
 export VPA_USE_WAKEWORD_SENSORY=${VPA_USE_WAKEWORD_SENSORY:-0}
@@ -51,6 +51,10 @@ vpa_build_dependency_libraries() {
 		if [ ${sysroot_exist} -eq 0 ]; then rm -f ${SYSLIBS_DEST_DIR}/${lib}*/${LIBS_INSTALLED_FILE_NAME}; fi
 		. ${SYSLIBS_BUILD_SCRIPT_DIR}/${lib}.sh
 		do_build_${lib}
+		if [ ! -z $(which chrpath) -a "${lib}" = "curl" ]; then
+			chrpath -d ${TARGET_SYSROOT_DIR}/usr/lib/libcurl.so
+			do_error_check
+		fi
 	done
 
 	export TARGET_SYSROOT_DIR=${target_sysroot_dir}
@@ -116,6 +120,7 @@ vpa_build_aac_modules() {
 		-DAAC_VERSION=2.0.0 \
 		-DAAC_HOME=${CMAKE_INSTALL_PREFIX} \
 		"
+	# modules
 	local aac_build_target=(core alexa navigation phone-control contact-uploader cbl address-book vpa)
 	for target in "${aac_build_target[@]}"
 	do
@@ -125,6 +130,20 @@ vpa_build_aac_modules() {
 		cmake ${aac_cmake_options} ${AAC_SDK_DIR}/modules/${target}/CMakeLists.txt -B${aac_build_dir}/modules/${target}
 		do_error_check
 		pushdir ${aac_build_dir}/modules/${target}
+		make -j${NCORES} install
+		do_error_check
+		popdir
+	done
+	# extensions
+	local aac_build_ext_target=(gstreamer)
+	for target in "${aac_build_ext_target[@]}"
+	do
+		echo "###############################################"
+		echo "# Start build AAC Module - ${target}"
+		echo "###############################################"
+		cmake ${aac_cmake_options} ${AAC_SDK_DIR}/extensions/experimental/${target}/modules/${target}/CMakeLists.txt -B${aac_build_dir}/extensions/modules/${target}
+		do_error_check
+		pushdir ${aac_build_dir}/extensions/modules/${target}
 		make -j${NCORES} install
 		do_error_check
 		popdir
@@ -221,7 +240,7 @@ vpa_populate_assets() {
 vpa_populate_output() {
 	local output_dir=${VPA_OUTPUT_DIR}/${TARGET_PLATFORM}
 	local dest_dir=${BUILD_OUTPUT_DIR}/target-${TARGET_PLATFORM}/SA
-	local dest_syslib_dir=${dest_dir}/syslib
+	local dest_syslib_dir=${dest_dir}/syslibs
 	local dest_lib_dir=${dest_dir}/lib
 	local dest_bin_dir=${dest_dir}/bin
 

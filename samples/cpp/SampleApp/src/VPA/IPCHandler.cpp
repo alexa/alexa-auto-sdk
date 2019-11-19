@@ -456,7 +456,7 @@ void IPCHandler::setConfigPath(std::string config) {
 
 void IPCHandler::setConfigured(std::string data) {
     log(Level::INFO, __PRETTY_FUNCTION__, " ");
-
+#if 1
     m_configured = true;
     json dataObj = json::parse(data);
     std::string configure = getValueFromJson(dataObj, AIDAEMON::SET_CONF_CONFIGURATION);
@@ -469,28 +469,7 @@ void IPCHandler::setConfigured(std::string data) {
     } else {
         log(Level::ERROR, __PRETTY_FUNCTION__, "ERROR: Can't make AIDaemon.json");
     }
-
-    json configObj = json::parse(configure);
-    std::string authDelegate = getValueFromJson(configObj, AIDAEMON::SET_CONF_AUTH_DELEGATE);
-    json authDelegateObj = json::parse(authDelegate);
-    std::string db = getValueFromJson(authDelegateObj, AIDAEMON::SET_CONF_DB);
-
-    db.erase(std::remove(db.begin(), db.end(), '"'), db.end());
-    db = db.substr(0, db.find_last_of("\\/"));
-
-    if (db.length() > 0) {
-        log(Level::INFO, __PRETTY_FUNCTION__, "DB Path : " + db);
-        recursive_mkdir(db.c_str(), S_IRWXU);
-        if (access(db.c_str(), F_OK) != 0) {
-            log(Level::ERROR, __PRETTY_FUNCTION__, "ERROR: Can't create DB Path");
-            return;
-        } else {
-            log(Level::INFO, __PRETTY_FUNCTION__, "Success to create DB Path : " + db);
-        }
-    } else {
-        log(Level::ERROR, __PRETTY_FUNCTION__, "ERROR: Can't fine DB Path");
-        return;
-    }
+#endif
     m_waitForConfigure.notify_one();
 }
 

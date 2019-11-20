@@ -2,35 +2,35 @@
     "aace.alexa": {
         "avsDeviceSDK": {
             "deviceInfo": {
-                "clientId": "",
-                "deviceSerialNumber": "",
-                "productId": ""
+                "clientId": "@client_id@",
+                "deviceSerialNumber": "@device_id@",
+                "productId": "@product_id@"
             },
             "libcurlUtils": {
-                "CURLOPT_CAPATH": ""
+                "CURLOPT_CAPATH": "@aac_dir@/opt/AAC/etc/cert"
             },
             "miscDatabase": {
-                "databaseFilePath1": ""
+                "databaseFilePath": "@db_dir@/miscDatabase.db"
             },
             "certifiedSender": {
-                "databaseFilePath2": ""
+                "databaseFilePath": "@db_dir@/certifiedSender.db"
             },
             "alertsCapabilityAgent": {
-                "databaseFilePath3": ""
+                "databaseFilePath": "@db_dir@/alertsCapabilityAgent.db"
             },
             "notifications": {
-                "databaseFilePath4": ""
+                "databaseFilePath": "@db_dir@/notifications.db"
             },
             "settings": {
-                "databaseFilePath5": "",
+                "databaseFilePath": "@db_dir@/settings.db",
                 "defaultAVSClientSettings": {
-                    "locale": ""
+                    "locale": "@locale@"
                 }
             }
         }
     },
     "aace.storage": {
-        "localStoragePath": "",
+        "localStoragePath": "@db_dir@/storage.db",
         "storageType": "sqlite"
     },
     "aace.vehicle": {

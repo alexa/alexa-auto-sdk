@@ -1,11 +1,24 @@
 #!/bin/sh
 
+VPA_DIR=@vpa_dir@
 ALEXA_MENU_JSON=@vpa_dir@/menu.json
 ALEXA_DB_DIR=@rw_dir@/AAC-DB
+DEVICE_ID=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1)
+CLIENT_ID="amzn1.application-oa2-client.0b485e8c035d4c64ae67bab79777ebec"
+PRODUCT_ID="Nissan_VPA"
 
-if [ ! -d @rw_dir@/AAC-DB ]; then
-	mkdir -p @rw_dir@/AAC-DB
+# Initialize configuration file
+if [ ! -f ${VPA_DIR}/configAIDaemon.json ]; then
+	sed -e "s#@client_id@#${CLIENT_ID}#g;
+			s#@device_id@#${DEVICE_ID}#g;
+			s#@product_id@#${PRODUCT_ID}#g;
+			s#@aac_dir@#${VPA_DIR}#g;
+			s#@db_dir@#${ALEXA_DB_DIR}#g;
+			s#@locale@#en-US#g" < ${VPA_DIR}/opt/AAC/etc/config.json.in > ${VPA_DIR}/configAIDaemon.json
 fi
+
+# Create a directory for DB
+if [ ! -d ${ALEXA_DB_DIR} ]; then mkdir -p ${ALEXA_DB_DIR}; fi
 
 export LD_LIBRARY_PATH=@vpa_dir@/lib:@vpa_dir@/syslibs
 

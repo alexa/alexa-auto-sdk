@@ -110,7 +110,7 @@ vpa_build_avs_sdk() {
 }
 
 vpa_build_aac_modules() {
-	local aac_build_dir=${VPA_BUILD_DIR}/aac/${TARGET_PLATFORM}_${CMAKE_BUILD_TYPE}
+	local aac_build_dir=${VPA_BUILD_DIR}/aac/${TARGET_PLATFORM}_${CMAKE_BUILD_TYPE}/modules
 	local aac_cmake_options="${VPA_CMAKE_OPTIONS} \
 		-DAAC_EMIT_SENSITIVE_LOGS=OFF \
 		-DAAC_EMIT_LATENCY_LOGS=ON \
@@ -120,30 +120,16 @@ vpa_build_aac_modules() {
 		-DAAC_VERSION=2.0.0 \
 		-DAAC_HOME=${CMAKE_INSTALL_PREFIX} \
 		"
-	# modules
+
 	local aac_build_target=(core alexa navigation phone-control contact-uploader cbl address-book vpa)
 	for target in "${aac_build_target[@]}"
 	do
 		echo "###############################################"
 		echo "# Start build AAC Module - ${target}"
 		echo "###############################################"
-		cmake ${aac_cmake_options} ${AAC_SDK_DIR}/modules/${target}/CMakeLists.txt -B${aac_build_dir}/modules/${target}
+		cmake ${aac_cmake_options} ${AAC_SDK_DIR}/modules/${target}/CMakeLists.txt -B${aac_build_dir}/${target}
 		do_error_check
-		pushdir ${aac_build_dir}/modules/${target}
-		make -j${NCORES} install
-		do_error_check
-		popdir
-	done
-	# extensions
-	local aac_build_ext_target=(gstreamer)
-	for target in "${aac_build_ext_target[@]}"
-	do
-		echo "###############################################"
-		echo "# Start build AAC Module - ${target}"
-		echo "###############################################"
-		cmake ${aac_cmake_options} ${AAC_SDK_DIR}/extensions/experimental/${target}/modules/${target}/CMakeLists.txt -B${aac_build_dir}/extensions/modules/${target}
-		do_error_check
-		pushdir ${aac_build_dir}/extensions/modules/${target}
+		pushdir ${aac_build_dir}/${target}
 		make -j${NCORES} install
 		do_error_check
 		popdir
@@ -151,7 +137,31 @@ vpa_build_aac_modules() {
 }
 
 vpa_build_aac_extension() {
-	echo "extension"
+	local aac_ext_src_dir=${AAC_SDK_DIR}/extensions/experimental
+	local aac_ext_build_dir=${VPA_BUILD_DIR}/aac/${TARGET_PLATFORM}_${CMAKE_BUILD_TYPE}/extensions/modules
+	local aac_cmake_options="${VPA_CMAKE_OPTIONS} \
+		-DAAC_EMIT_SENSITIVE_LOGS=OFF \
+		-DAAC_EMIT_LATENCY_LOGS=ON \
+		-DAAC_DEFAULT_LOGGER_ENABLED=ON \
+		-DAAC_DEFAULT_LOGGER_LEVEL=Verbose \
+		-DAAC_DEFAULT_LOGGER_SINK=Console \
+		-DAAC_VERSION=2.0.0 \
+		-DAAC_HOME=${CMAKE_INSTALL_PREFIX} \
+		"
+
+	local aac_build_ext_target=(gstreamer)
+	for target in "${aac_build_ext_target[@]}"
+	do
+		echo "###############################################"
+		echo "# Start build AAC Extension - ${target}"
+		echo "###############################################"
+		cmake ${aac_cmake_options} ${aac_ext_src_dir}/${target}/modules/${target}/CMakeLists.txt -B${aac_ext_build_dir}/${target}
+		do_error_check
+		pushdir ${aac_ext_build_dir}/${target}
+		make -j${NCORES} install
+		do_error_check
+		popdir
+	done
 }
 
 vpa_build_aidaemon() {
@@ -219,15 +229,15 @@ vpa_populate_assets() {
 	local dest_dir=${BUILD_OUTPUT_DIR}/target-${TARGET_PLATFORM}/SA
 	local asset_dir=${dest_dir}/opt/AAC/etc
 
-	mkdir -p ${asset_dir}
+	if [ ! -d ${asset_dir} ]; then mkdir -p ${asset_dir}; fi
 
 	if [ -d ${output_dir}/etc/certs ]; then
 		cp -rpa ${output_dir}/etc/certs ${asset_dir}
 		do_error_check
 	fi
 
-	if [ -f ${output_dir}/etc/config.json ]; then
-		cp -rpa ${output_dir}/etc/config.json ${dest_dir}/configAIDaemon.json
+	if [ -f ${AAC_SDK_DIR}/VPA/Host/config.json.in ]; then
+		cp -rpa ${AAC_SDK_DIR}/VPA/Host/config.json.in ${asset_dir}
 		do_error_check
 	fi
 	
@@ -267,6 +277,18 @@ vpa_populate_output() {
 
 	if [ -d ${VPA_TARGET_SYSROOT_DIR}/usr/lib ]; then
 		if [ $(ls ${VPA_TARGET_SYSROOT_DIR}/usr/lib | wc -l) -gt 0 ]; then
+			# TODO. temporary fix
+			# libAVSCommon.so links libcurl-gnutls.so.4 instead of libcurl.so in SDK not target(AIVI)
+			# It is difficult to fix link issue. I should be fixed later
+			if [ "${TARGET_PLATFORM}" = "${TARGET_PCLINUX_NAME}" ]; then
+				pushdir ${VPA_TARGET_SYSROOT_DIR}/usr/lib
+				find . -xtype -l -delete
+				if [ ! -e libcurl-gnutls.so.4 ]; then
+					ln -s libcurl.so libcurl-gnutls.so.4
+					do_error_check
+				fi
+				popdir
+			fi
 			cp -rpa ${VPA_TARGET_SYSROOT_DIR}/usr/lib/lib*.so* ${dest_syslib_dir}
 			do_error_check
 		fi
@@ -279,6 +301,9 @@ vpa_set_cmake_environments() {
 	else
 		export CMAKE_BUILD_TYPE="RELEASE"
 	fi
+
+	# TODO. AIVI_1 is not use GStreamer-1.0.So we need to port GStreamer-0.10 to AAC
+	if [ ! -z "${CROSS_COMPILE}" ]; then export VPA_USE_GSTREAMER=0; fi
 
 	export CMAKE_INSTALL_PREFIX=${VPA_OUTPUT_DIR}/${TARGET_PLATFORM}
 	export VPA_CMAKE_OPTIONS="${COMMON_CMAKE_TOOLCHAIN_OPTIONS} \
@@ -310,8 +335,8 @@ vpa_main() {
 
 	vpa_install_run_script
 
-	vpa_populate_output
 	vpa_populate_assets
+	vpa_populate_output
 
 	# recovery
 	export PKG_CONFIG_PATH=${pkg_config_path}

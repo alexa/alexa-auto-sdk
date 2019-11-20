@@ -152,6 +152,7 @@ vpa_build_aac_extension() {
 	local aac_build_ext_target=(gstreamer)
 	for target in "${aac_build_ext_target[@]}"
 	do
+		if [ "${target}" = "gstreamer" -a ${VPA_USE_GSTREAMER} -eq 0 ]; then continue; fi
 		echo "###############################################"
 		echo "# Start build AAC Extension - ${target}"
 		echo "###############################################"

@@ -1,0 +1,55 @@
+{
+  "aace.amazonLite": {
+    "rootPath": "${PATH_TO_WW_LOCALE_MODELS}",
+    "models": [
+      {
+        "locale": "en-US",
+        "path": "D.en-US.alexa.bin"
+      },
+      {
+        "locale": "de-DE",
+        "path": "D.de-DE.alexa.bin"
+      },
+      {
+        "locale": "en-IN",
+        "path": "D.en-IN.alexa.bin"
+      },
+      {
+        "locale": "es-ES",
+        "path": "D.es-ES.alexa.bin"
+      },
+      {
+        "locale": "fr-FR",
+        "path": "D.fr-FR.alexa.bin"
+      },
+      {
+        "locale": "it-IT",
+        "path": "D.it-IT.alexa.bin"
+      },
+      {
+        "locale": "ja-JP",
+        "path": "D.ja-JP.alexa.bin"
+      },
+      {
+        "locale": "en-GB",
+        "path": "U_250k.en-GB.alexa.bin"
+      },
+      {
+        "locale": "en-AU",
+        "path": "D.en-US.alexa.bin"
+      },
+      {
+        "locale": "en-CA",
+        "path": "D.en-US.alexa.bin"
+      },
+      {
+        "locale": "fr-CA",
+        "path": "D.fr-FR.alexa.bin"
+      },
+      {
+        "locale": "es-MX",
+        "path": "D.es-ES.alexa.bin"
+      }
+    ]
+  }
+}

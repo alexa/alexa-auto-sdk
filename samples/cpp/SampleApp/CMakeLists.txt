@@ -88,11 +88,14 @@ else()
     endif()
 endif()
 
-# Find cURL library for the sample app.
+# Find libraries for the sample app.
 if (${USE_OBIGO_BUILD_SYSTEM})
 find_package(PkgConfig)
 pkg_check_modules(CURL REQUIRED libcurl)
 pkg_check_modules(SQLite3 REQUIRED sqlite3)
+if (${AMAZONLITE})
+find_library(PRYON_LIBRARIES pryon_lite PATHS "${VPA_SYSROOT_PATH}/usr/lib")
+endif ()
 else ()
 find_package(CURL REQUIRED)
 # Find SQLite3 package for the sample app.
@@ -233,6 +236,7 @@ target_link_libraries(SampleApp
     ${CURL_LIBRARIES}
     ${SQLITE3_LIBRARIES}
     ${AIDAEMON_LIBRARIES}
+    ${PRYON_LIBRARIES}
 )
 
 if(AMAZONLITE)

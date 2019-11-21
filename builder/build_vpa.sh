@@ -192,6 +192,7 @@ vpa_build_aidaemon() {
 	local aidaemon_cmake_options="${VPA_CMAKE_OPTIONS} \
 		-DAAC_ENABLE_ADDRESS_SANITIZER=OFF \
 		-DAAC_HOME=${CMAKE_INSTALL_PREFIX} \
+		-DVPA_SYSROOT_PATH=${VPA_TARGET_SYSROOT_DIR} \
 		"
 
 	if [ ${VPA_USE_ALEXACOMMS} -eq 1 ]; then
@@ -205,6 +206,9 @@ vpa_build_aidaemon() {
 	fi
 	if [ ${VPA_USE_DCM} -eq 1 ]; then
 		aidaemon_cmake_options="${aidaemon_cmake_options} -DDCM=ON"
+	fi
+	if [ ${VPA_USE_AMAZONLITE} -eq 1 ]; then
+		aidaemon_cmake_options="${aidaemon_cmake_options} -DAMAZONLITE=ON"
 	fi
 	if [ ${VPA_USE_LOOPBACK_DETECTOR} -eq 1 ]; then
 		aidaemon_cmake_options="${aidaemon_cmake_options} -DLOOPBACK_DETECTOR=ON"

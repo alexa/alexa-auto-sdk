@@ -24,7 +24,7 @@ export VPA_USE_PORTAUDIO=${VPA_USE_PORTAUDIO:-0}
 export VPA_USE_WAKEWORD_KTTI=${VPA_USE_WAKEWORD_KTTI:-0}
 export VPA_USE_WAKEWORD_SENSORY=${VPA_USE_WAKEWORD_SENSORY:-0}
 export VPA_USE_ALEXACOMMS=${VPA_USE_ALEXACOMMS:-0}
-export VPA_USE_AMAZONLITE=${VPA_USE_AMAZONLITE:-0}
+export VPA_USE_AMAZONLITE=${VPA_USE_AMAZONLITE:-1}
 export VPA_USE_LVC=${VPA_USE_LVC:-0}
 export VPA_USE_DCM=${VPA_USE_DCM:-0}
 export VPA_USE_LOOPBACK_DETECTOR=${VPA_USE_LOOPBACK_DETECTOR:-0}
@@ -94,6 +94,18 @@ vpa_build_avs_sdk() {
 			-DSENSORY_KEY_WORD_DETECTOR_LIB_PATH=${VPA_TARGET_SYSROOT_DIR}/usr/lib/libsnsr.a \
 			-DSENSORY_KEY_WORD_DETECTOR_INCLUDE_DIR=${VPA_TARGET_SYSROOT_DIR}/usr/include"
 	fi
+	if [ ${VPA_USE_AMAZONLITE} -eq 1 ]; then
+		export VPA_DEPS_LIB_LIST="${VPA_DEPS_LIB_LIST} pryon-lite"
+		local model_name="D.en-US.alexa.cpp"
+		local model_path=${VPA_TARGET_SYSROOT_DIR}/usr/share/pyron-lite/models
+		avs_cmake_options="${avs_cmake_options} \
+			-DAMAZONLITE_KEY_WORD_DETECTOR=ON \
+			-DAMAZONLITE_KEY_WORD_DETECTOR_LIB_PATH=${VPA_TARGET_SYSROOT_DIR}/usr/lib/libpryon_lite.so \
+			-DAMAZONLITE_KEY_WORD_DETECTOR_INCLUDE_DIR=${VPA_TARGET_SYSROOT_DIR}/usr/include \
+			-DAMAZONLITE_KEY_WORD_DETECTOR_EMBEDDED_MODEL_CPP_PATH=${model_path}/${model_name}"
+	fi
+
+	vpa_build_dependency_libraries
 
 	echo "###############################################"
 	echo "# Start build AVS SDK"
@@ -122,11 +134,21 @@ vpa_build_aac_modules() {
 		"
 
 	local aac_build_target=(core alexa navigation phone-control contact-uploader cbl address-book vpa)
+
+	if [ ${VPA_USE_AMAZONLITE} -eq 1 ]; then
+		aac_build_target+=( 'amazonlite' )
+	fi
+
 	for target in "${aac_build_target[@]}"
 	do
 		echo "###############################################"
 		echo "# Start build AAC Module - ${target}"
 		echo "###############################################"
+		if [ "${target}" = "amazonlite" ]; then
+			aac_cmake_options="${aac_cmake_options} \
+				-DPATH_TO_WW_LOCALE_MODELS=${VPA_TARGET_SYSROOT_DIR}/usr/share/pryon-lite/models \
+				-DVPA_SYSROOT_PATH=${VPA_TARGET_SYSROOT_DIR}"
+		fi
 		cmake ${aac_cmake_options} ${AAC_SDK_DIR}/modules/${target}/CMakeLists.txt -B${aac_build_dir}/${target}
 		do_error_check
 		pushdir ${aac_build_dir}/${target}
@@ -174,9 +196,6 @@ vpa_build_aidaemon() {
 
 	if [ ${VPA_USE_ALEXACOMMS} -eq 1 ]; then
 		aidaemon_cmake_options="${aidaemon_cmake_options} -DALEXACOMMS=ON"
-	fi
-	if [ ${VPA_USE_AMAZONLITE} -eq 1 ]; then
-		aidaemon_cmake_options="${aidaemon_cmake_options} -DAMAZONLITE=ON"
 	fi
 	if [ ${VPA_USE_LVC} -eq 1 ]; then
 		aidaemon_cmake_options="${aidaemon_cmake_options} -DLOCALVOICECONTROL=ON"
@@ -283,7 +302,7 @@ vpa_populate_output() {
 			# It is difficult to fix link issue. I should be fixed later
 			if [ "${TARGET_PLATFORM}" = "${TARGET_PCLINUX_NAME}" ]; then
 				pushdir ${VPA_TARGET_SYSROOT_DIR}/usr/lib
-				find . -xtype -l -delete
+				find . -xtype l -delete
 				if [ ! -e libcurl-gnutls.so.4 ]; then
 					ln -s libcurl.so libcurl-gnutls.so.4
 					do_error_check
@@ -328,7 +347,6 @@ vpa_main() {
 	export PKG_CONFIG_PATH=${VPA_TARGET_SYSROOT_DIR}/usr/lib/pkgconfig:${PKG_CONFIG_PATH}
 
 	vpa_set_cmake_environments
-	vpa_build_dependency_libraries
 	vpa_build_avs_sdk
 	vpa_build_aac_modules
 	vpa_build_aac_extension

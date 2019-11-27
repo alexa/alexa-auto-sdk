@@ -102,7 +102,11 @@ aal_handle_t aal_player_create(const aal_attributes_t *attr)
 	GstElement *sink = NULL;
 	GstElement *volume = NULL;
 
+#if defined(GSTREAMER_VERSION_V0)
+	ctx = create_context("playbin2", attr);
+#else
 	ctx = create_context("playbin", attr);
+#endif
 	if (!ctx)
 		goto exit;
 
@@ -219,7 +223,9 @@ bool aal_player_set_mute(aal_handle_t handle, bool mute)
 ssize_t aal_player_write(aal_handle_t handle, const char *data, const size_t size)
 {
 	GstBuffer *buffer = NULL;
+#if !defined(GSTREAMER_VERSION_V0)
 	GstMapInfo info;
+#endif
 	GstFlowReturn ret;
 	ssize_t r = -1;
 	GstElement *source = NULL;
@@ -232,14 +238,21 @@ ssize_t aal_player_write(aal_handle_t handle, const char *data, const size_t siz
 		return r;
 	}
 
+#if defined(GSTREAMER_VERSION_V0)
+	buffer = gst_buffer_new_and_alloc(size);
+	g_warning("write size=%lu current=%llu\n", size, gst_app_src_get_max_bytes(GST_APP_SRC(source)));
+#else
 	g_debug("write size=%lu current=%llu\n", size, gst_app_src_get_current_level_bytes(GST_APP_SRC(source)));
-
 	buffer = gst_buffer_new_allocate(NULL, size, NULL);
+#endif
 	if (!buffer) {
 		g_warning("Couldn't allocate buffer\n");
 		goto exit;
 	}
 
+#if defined(GSTREAMER_VERSION_V0)
+  gst_buffer_make_writable(buffer);
+#else
 	if (!gst_buffer_map(buffer, &info, GST_MAP_WRITE)) {
 		g_warning("Couldn't map buffer\n");
 		goto exit;
@@ -248,6 +261,7 @@ ssize_t aal_player_write(aal_handle_t handle, const char *data, const size_t siz
 	memcpy(info.data, data, size);
 
 	gst_buffer_unmap(buffer, &info);
+#endif
 
 #ifdef USE_APPSRC_PUSH
 	ret = gst_app_src_push_buffer(GST_APP_SRC(source), buffer);

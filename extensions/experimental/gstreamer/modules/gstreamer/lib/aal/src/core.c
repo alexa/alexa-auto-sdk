@@ -122,7 +122,12 @@ int64_t aal_get_position(aal_handle_t handle)
 	gint64 pos;
 	aal_gst_context_t *ctx = (aal_gst_context_t *) handle;
 
+#if defined(GSTREAMER_VERSION_V0)
+  GstFormat fmt = GST_FORMAT_TIME;
+	if (!gst_element_query_position(ctx->pipeline, &fmt, &pos))
+#else
 	if (!gst_element_query_position(ctx->pipeline, GST_FORMAT_TIME, &pos))
+#endif
 		return 0;
 
 	return pos / GST_MSECOND;
@@ -133,7 +138,12 @@ int64_t aal_get_duration(aal_handle_t handle)
 	gint64 duration;
 	aal_gst_context_t *ctx = (aal_gst_context_t *) handle;
 
+#if defined(GSTREAMER_VERSION_V0)
+  GstFormat fmt = GST_FORMAT_TIME;
+	if (!gst_element_query_position(ctx->pipeline, &fmt, &duration))
+#else
 	if (!gst_element_query_duration(ctx->pipeline, GST_FORMAT_TIME, &duration))
+#endif
 		return -1;
 
 	return duration / GST_MSECOND;
@@ -149,7 +159,11 @@ void aal_seek(aal_handle_t handle, int64_t position)
 
 		// Note: Seeking may fail when the pipeline is not in PLAYING state
 		// We will save the value and seek again when it plays
+#if defined(GSTREAMER_VERSION_V0)
+		g_debug("seek failed %lld\n", (long long int)position);
+#else
 		g_debug("seek failed %lld\n", position);
+#endif
 		ctx->pending_position = position;
 	}
 }
@@ -182,10 +196,12 @@ static gboolean bus_message_callback(GstBus *bus, GstMessage *msg, gpointer poin
 		ctx->state = AAL_STATE_EOS;
 		gst_element_set_state(ctx->pipeline, GST_STATE_READY);
 		break;
+#if !defined(GSTREAMER_VERSION_V0)
 	case GST_MESSAGE_STREAM_START:
 		g_debug("Stream Start\n");
 		ctx->state = AAL_STATE_SS;
 		break;
+#endif
 	case GST_MESSAGE_STATE_CHANGED:
 		if (GST_MESSAGE_SRC(msg) == GST_OBJECT_CAST(ctx->pipeline)) {
 			GstState old_state, new_state;
@@ -232,6 +248,10 @@ static gboolean bus_message_callback(GstBus *bus, GstMessage *msg, gpointer poin
 					ctx->pending_position = 0;
 				}
 				if (ctx->listener && ctx->listener->on_start) {
+#if defined(GSTREAMER_VERSION_V0)
+		      ctx->state = AAL_STATE_SS;
+					ctx->listener->on_start(ctx->user_data);
+#else
 					switch (ctx->state) {
 					case AAL_STATE_SS:
 						ctx->listener->on_start(ctx->user_data);
@@ -239,6 +259,7 @@ static gboolean bus_message_callback(GstBus *bus, GstMessage *msg, gpointer poin
 					default:
 						g_warning("Gst state changed to PLAYING but not handled (aal_state=%d)\n", ctx->state);
 					}
+#endif
 				}
 				break;
 			case GST_STATE_VOID_PENDING:

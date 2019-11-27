@@ -24,7 +24,11 @@
 /// Caps for MP3 stream
 #define CAPS_MP3 "audio/mpeg,mpegversion=(int)1,mpegaudioversion=(int)1,layer=(int)3"
 /// Caps for Raw audio stream
+#if defined(GSTREAMER_VERSION_V0)
+#define CAPS_RAW "audio/x-raw-int,channels=1,rate=16000,signed=(boolean)true,width=16,depth=16,endianness=1234"
+#else
 #define CAPS_RAW "audio/x-raw,format=(string)S16LE,channels=(int)1,rate=(int)16000,layout=(string)interleaved"
+#endif
 
 typedef enum {
 	AAL_STATE_NULL = 0,

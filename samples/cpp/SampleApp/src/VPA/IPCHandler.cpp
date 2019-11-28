@@ -456,7 +456,7 @@ void IPCHandler::setConfigPath(std::string config) {
 
 void IPCHandler::setConfigured(std::string data) {
     log(Level::INFO, __PRETTY_FUNCTION__, " ");
-#if 1
+#if !defined(__arm__)
     m_configured = true;
     json dataObj = json::parse(data);
     std::string configure = getValueFromJson(dataObj, AIDAEMON::SET_CONF_CONFIGURATION);

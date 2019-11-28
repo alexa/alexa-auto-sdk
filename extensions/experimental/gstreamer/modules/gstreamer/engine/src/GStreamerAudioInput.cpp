@@ -72,7 +72,11 @@ bool GStreamerAudioInput::initialize( const audio::AudioInputProvider::AudioInpu
         // create the gstreamer recorder
         const aal_attributes_t attr = {
             .name = m_name.c_str(),
+#if defined(__arm__)
+            .device = "AdevVPAMicIn",
+#else
             .device = device.c_str(),
+#endif
             .listener = &aalListener,
             .user_data = this
         };

@@ -239,7 +239,12 @@ vpa_install_run_script() {
 		vpa_dir="\${VPA_TOP_DIR}"
 		rw_dir=${vpa_dir}
 	else # AIVI
-		cp -f ${AAC_SDK_DIR}/VPA/Host/run_vpa.sh.in ${output_dir}/run_vpa.sh
+		if [ -f ${AAC_SDK_DIR}/VPA/Host/configAIDaemon.json ]; then
+			cp -rpa ${AAC_SDK_DIR}/VPA/Host/configAIDaemon.json ${output_dir}
+			do_error_check
+		fi
+		sed "6,18d;23i export DBUS_SESSION_BUS_ADDRESS=\"unix:path=/tmp/shared/iddbus/lxcdbus\"" \
+			< ${AAC_SDK_DIR}/VPA/Host/run_vpa.sh.in > ${output_dir}/run_vpa.sh
 		vpa_dir=/var/opt/obigo/obigo_bin/SA
 		rw_dir=/var/opt/bosch/dynweb/obigo/obigo_apps/SA/resource
 	fi
@@ -263,11 +268,10 @@ vpa_populate_assets() {
 		do_error_check
 	fi
 
-	if [ -f ${AAC_SDK_DIR}/VPA/Host/config.json.in ]; then
+	if [ -f ${AAC_SDK_DIR}/VPA/Host/config.json.in -a -z ${CROSS_COMPILE} ]; then
 		cp -rpa ${AAC_SDK_DIR}/VPA/Host/config.json.in ${asset_dir}
 		do_error_check
 	fi
-	
 	if [ -f ${output_dir}/etc/menu.json ]; then
 		cp -rpa ${output_dir}/etc/menu.json ${dest_dir}
 		do_error_check
@@ -287,6 +291,11 @@ vpa_populate_output() {
 
 	if [ -f ${output_dir}/run_vpa.sh ]; then
 		cp -rpa ${output_dir}/run_vpa.sh ${dest_dir}
+		do_error_check
+	fi
+
+	if [ -f ${output_dir}/configAIDaemon.json ]; then
+		cp -rpa ${output_dir}/configAIDaemon.json ${dest_dir}
 		do_error_check
 	fi
 

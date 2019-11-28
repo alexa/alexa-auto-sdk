@@ -19,7 +19,7 @@
 #include <string.h>
 
 #define USE_APPSRC_CALLBACK 1
-//#define USE_APPSRC_PUSH 1
+#define USE_APPSRC_PUSH 1
 
 #ifdef USE_FAKEMUTE
 /* Represents the zero volume to avoid the actual 0.0 value.

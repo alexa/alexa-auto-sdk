@@ -231,6 +231,7 @@ vpa_build_aidaemon() {
 vpa_install_run_script() {
 	local vpa_dir=
 	local rw_dir=
+	local config_dir=
 	local output_dir=${VPA_OUTPUT_DIR}/${TARGET_PLATFORM}
 	# pclinux
 	if [ -z ${CROSS_COMPILE} ]; then
@@ -238,19 +239,22 @@ vpa_install_run_script() {
 		do_error_check
 		vpa_dir="\${VPA_TOP_DIR}"
 		rw_dir=${vpa_dir}
+		config_dir=${vpa_dir}
 	else # AIVI
 		if [ -f ${AAC_SDK_DIR}/VPA/Host/configAIDaemon.json ]; then
 			cp -rpa ${AAC_SDK_DIR}/VPA/Host/configAIDaemon.json ${output_dir}
 			do_error_check
 		fi
-		sed "6,18d;23i export DBUS_SESSION_BUS_ADDRESS=\"unix:path=/tmp/shared/iddbus/lxcdbus\"" \
-			< ${AAC_SDK_DIR}/VPA/Host/run_vpa.sh.in > ${output_dir}/run_vpa.sh
 		vpa_dir=/var/opt/obigo/obigo_bin/SA
 		rw_dir=/var/opt/bosch/dynweb/obigo/obigo_apps/SA/resource
+		config_dir=${rw_dir}
+		sed "6,18d;23i export DBUS_SESSION_BUS_ADDRESS=\"unix:path=/tmp/shared/iddbus/lxcdbus\"" \
+			< ${AAC_SDK_DIR}/VPA/Host/run_vpa.sh.in > ${output_dir}/run_vpa.sh
 	fi
 
 	sed -e "s#@vpa_dir@#${vpa_dir}#g;
-			s#@rw_dir@#${rw_dir}#g" -i ${output_dir}/run_vpa.sh
+			s#@rw_dir@#${rw_dir}#g;
+			s#@config_dir@#${config_dir}#g" -i ${output_dir}/run_vpa.sh
 	do_error_check
 	chmod a+x ${output_dir}/run_vpa.sh
 	do_error_check
@@ -268,7 +272,7 @@ vpa_populate_assets() {
 		do_error_check
 	fi
 
-	if [ -f ${AAC_SDK_DIR}/VPA/Host/config.json.in -a -z ${CROSS_COMPILE} ]; then
+	if [ -f ${AAC_SDK_DIR}/VPA/Host/config.json.in -a -z "${CROSS_COMPILE}" ]; then
 		cp -rpa ${AAC_SDK_DIR}/VPA/Host/config.json.in ${asset_dir}
 		do_error_check
 	fi

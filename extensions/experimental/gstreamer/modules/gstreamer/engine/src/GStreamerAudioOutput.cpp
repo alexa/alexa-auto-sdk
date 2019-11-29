@@ -90,7 +90,7 @@ bool GStreamerAudioOutput::initialize( const std::string& device )
         const aal_attributes_t attr = {
             .name = m_name.c_str(),
 #if defined(__arm__)
-            .device = "AdevVPAMicOut",
+            .device = "AdevVPAVoiceOut",
 #else
             .device = device.c_str(),
 #endif

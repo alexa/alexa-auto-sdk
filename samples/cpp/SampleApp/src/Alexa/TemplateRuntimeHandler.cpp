@@ -130,7 +130,7 @@ void TemplateRuntimeHandler::renderPlayerInfo(const std::string &payload) {
     }
     
     std::stringstream ss;
-    ss << aace::alexa::AudioPlayer::PlayerActivity::IDLE;
+    ss << "PLAY_INFO";
     AIDAEMON::IPCHandler::GetInstance()->sendAudioState( audioItemID, ss.str(), std::chrono::milliseconds(0), mediaLength);
 #endif // OBIGO_AIDAEMON
 

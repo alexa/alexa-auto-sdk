@@ -89,7 +89,11 @@ bool GStreamerAudioOutput::initialize( const std::string& device )
         // create the gstreamer player
         const aal_attributes_t attr = {
             .name = m_name.c_str(),
+#if defined(__arm__)
+            .device = "AdevVPAVoiceOut",
+#else
             .device = device.c_str(),
+#endif
             .listener = &aalListener,
             .user_data = this
         };

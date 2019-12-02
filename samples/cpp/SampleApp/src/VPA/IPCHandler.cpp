@@ -456,7 +456,7 @@ void IPCHandler::setConfigPath(std::string config) {
 
 void IPCHandler::setConfigured(std::string data) {
     log(Level::INFO, __PRETTY_FUNCTION__, " ");
-#if 1
+#if 1//!defined(__arm__)
     m_configured = true;
     json dataObj = json::parse(data);
     std::string configure = getValueFromJson(dataObj, AIDAEMON::SET_CONF_CONFIGURATION);
@@ -467,7 +467,7 @@ void IPCHandler::setConfigured(std::string data) {
         writeFile << configure;
         writeFile.close();
     } else {
-        log(Level::ERROR, __PRETTY_FUNCTION__, "ERROR: Can't make AIDaemon.json");
+        log(Level::ERROR, __PRETTY_FUNCTION__, "ERROR: Can't make configAIDaemon.json");
     }
 #endif
     m_waitForConfigure.notify_one();

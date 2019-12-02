@@ -20,6 +20,7 @@ export VPA_ENABLE_TESTS=${VPA_ENABLE_TESTS:-0}
 export VPA_USE_SENSITIVE_LOGS=${VPA_USE_SENSITIVE_LOGS:-0}
 export VPA_USE_LATENCY_LOGS=${VPA_USE_LATENCY_LOGS:-1}
 export VPA_USE_GSTREAMER=${VPA_USE_GSTREAMER:-1}
+export VPA_USE_GSTREAMER_V0=${VPA_USE_GSTREAMER_V0:-0}
 export VPA_USE_PORTAUDIO=${VPA_USE_PORTAUDIO:-0}
 export VPA_USE_WAKEWORD_KTTI=${VPA_USE_WAKEWORD_KTTI:-0}
 export VPA_USE_WAKEWORD_SENSORY=${VPA_USE_WAKEWORD_SENSORY:-0}
@@ -71,6 +72,7 @@ vpa_build_avs_sdk() {
 		-DACSDK_EMIT_SENSITIVE_LOGS=${VPA_USE_SENSITIVE_LOGS} \
 		-DACSDK_LATENCY_LOG=${VPA_USE_LATENCY_LOGS}
 		-DGSTREAMER_MEDIA_PLAYER=${VPA_USE_GSTREAMER} \
+		-DGSTREAMER_VERSION_V0=${VPA_USE_GSTREAMER_V0} \
 		-DVPA_SYSROOT_PATH=${VPA_TARGET_SYSROOT_DIR}"
 
 	if [ ${VPA_USE_PORTAUDIO} -eq 1 ]; then
@@ -169,6 +171,7 @@ vpa_build_aac_extension() {
 		-DAAC_DEFAULT_LOGGER_SINK=Console \
 		-DAAC_VERSION=2.0.0 \
 		-DAAC_HOME=${CMAKE_INSTALL_PREFIX} \
+		-DGSTREAMER_VERSION_V0=${VPA_USE_GSTREAMER_V0} \
 		"
 
 	local aac_build_ext_target=(gstreamer)
@@ -228,6 +231,7 @@ vpa_build_aidaemon() {
 vpa_install_run_script() {
 	local vpa_dir=
 	local rw_dir=
+	local config_dir=
 	local output_dir=${VPA_OUTPUT_DIR}/${TARGET_PLATFORM}
 	# pclinux
 	if [ -z ${CROSS_COMPILE} ]; then
@@ -235,14 +239,22 @@ vpa_install_run_script() {
 		do_error_check
 		vpa_dir="\${VPA_TOP_DIR}"
 		rw_dir=${vpa_dir}
+		config_dir=${vpa_dir}
 	else # AIVI
-		cp -f ${AAC_SDK_DIR}/VPA/Host/run_vpa.sh.in ${output_dir}/run_vpa.sh
+		if [ -f ${AAC_SDK_DIR}/VPA/Host/configAIDaemon.json ]; then
+			cp -rpa ${AAC_SDK_DIR}/VPA/Host/configAIDaemon.json ${output_dir}
+			do_error_check
+		fi
 		vpa_dir=/var/opt/obigo/obigo_bin/SA
 		rw_dir=/var/opt/bosch/dynweb/obigo/obigo_apps/SA/resource
+		config_dir=${rw_dir}
+		sed "6,18d;23i export DBUS_SESSION_BUS_ADDRESS=\"unix:path=/tmp/shared/iddbus/lxcdbus\"" \
+			< ${AAC_SDK_DIR}/VPA/Host/run_vpa.sh.in > ${output_dir}/run_vpa.sh
 	fi
 
 	sed -e "s#@vpa_dir@#${vpa_dir}#g;
-			s#@rw_dir@#${rw_dir}#g" -i ${output_dir}/run_vpa.sh
+			s#@rw_dir@#${rw_dir}#g;
+			s#@config_dir@#${config_dir}#g" -i ${output_dir}/run_vpa.sh
 	do_error_check
 	chmod a+x ${output_dir}/run_vpa.sh
 	do_error_check
@@ -260,11 +272,10 @@ vpa_populate_assets() {
 		do_error_check
 	fi
 
-	if [ -f ${AAC_SDK_DIR}/VPA/Host/config.json.in ]; then
+	if [ -f ${AAC_SDK_DIR}/VPA/Host/config.json.in -a -z "${CROSS_COMPILE}" ]; then
 		cp -rpa ${AAC_SDK_DIR}/VPA/Host/config.json.in ${asset_dir}
 		do_error_check
 	fi
-	
 	if [ -f ${output_dir}/etc/menu.json ]; then
 		cp -rpa ${output_dir}/etc/menu.json ${dest_dir}
 		do_error_check
@@ -284,6 +295,11 @@ vpa_populate_output() {
 
 	if [ -f ${output_dir}/run_vpa.sh ]; then
 		cp -rpa ${output_dir}/run_vpa.sh ${dest_dir}
+		do_error_check
+	fi
+
+	if [ -f ${output_dir}/configAIDaemon.json ]; then
+		cp -rpa ${output_dir}/configAIDaemon.json ${dest_dir}
 		do_error_check
 	fi
 
@@ -326,8 +342,9 @@ vpa_set_cmake_environments() {
 		export CMAKE_BUILD_TYPE="RELEASE"
 	fi
 
-	# TODO. AIVI_1 is not use GStreamer-1.0.So we need to port GStreamer-0.10 to AAC
-	if [ ! -z "${CROSS_COMPILE}" ]; then export VPA_USE_GSTREAMER=0; fi
+	if [ ${VPA_USE_GSTREAMER} -eq 1 ]; then
+		if [ "${GSTREAMER_VERSION}" = "0.10" ]; then VPA_USE_GSTREAMER_V0=1; fi
+	fi
 
 	export CMAKE_INSTALL_PREFIX=${VPA_OUTPUT_DIR}/${TARGET_PLATFORM}
 	export VPA_CMAKE_OPTIONS="${COMMON_CMAKE_TOOLCHAIN_OPTIONS} \

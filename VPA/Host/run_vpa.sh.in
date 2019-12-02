@@ -22,4 +22,4 @@ if [ ! -d ${ALEXA_DB_DIR} ]; then mkdir -p ${ALEXA_DB_DIR}; fi
 
 export LD_LIBRARY_PATH=@vpa_dir@/lib:@vpa_dir@/syslibs
 
-@vpa_dir@/bin/SampleApp --config @vpa_dir@/configAIDaemon.json --level VERBOSE --menu @vpa_dir@/menu.json
+@vpa_dir@/bin/SampleApp --config @config_dir@/configAIDaemon.json --level VERBOSE --menu @vpa_dir@/menu.json

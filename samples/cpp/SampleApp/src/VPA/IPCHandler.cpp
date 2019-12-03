@@ -461,6 +461,18 @@ void IPCHandler::setConfigured(std::string data) {
     json dataObj = json::parse(data);
     std::string configure = getValueFromJson(dataObj, AIDAEMON::SET_CONF_CONFIGURATION);
 
+    // Database
+    try {
+        auto storage = dataObj.at(AIDAEMON::SET_CONF_CONFIGURATION).at("aace.storage").at("localStoragePath");
+        std::string dbPath = storage.get<std::string>();
+        if (!dbPath.empty()) {
+          recursive_mkdir(dbPath.substr(0, dbPath.rfind('/')).c_str(), S_IRWXU);
+        }
+    } catch (json::exception &e) {
+        log(Level::ERROR, __PRETTY_FUNCTION__, "localStoragePath cannot be parsed");
+    }
+
+    // Config
     recursive_mkdir(m_configPath.substr(0, m_configPath.rfind('/')).c_str(), S_IRWXU);
     std::ofstream writeFile(m_configPath.data());
     if (writeFile.is_open()) {
@@ -536,7 +548,6 @@ void IPCHandler::recursive_mkdir(const char *path, mode_t mode) {
        /* Report error on creating directory */
        //ConsolePrinter::simplePrint("ERROR: Failed to create directory : " + std::string(path));
     }
-
 done:
     free(spath);
     return;

@@ -2,6 +2,20 @@
 
 ___
 
+## v1.6.3 released on 2019-12-02:
+
+### Enhancements
+
+This release is for bug fixes only. There are no new features or enhancements.
+
+### Resolved Issues
+
+* Fixed a race condition that could cause follow-ons to a TTS request (for example asking for movies nearby) not to play while Alexa is speaking or playing something.
+
+### Known Issues
+
+All known issues from v1.6.0.
+
 ## v1.6.2 released on 2019-10-11:
  
 ### Enhancements

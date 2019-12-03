@@ -365,16 +365,15 @@ void AudioChannelEngineImpl::executePlaybackFinished( SourceId id )
     {
         handlePrePlaybackFinished( id );
         ThrowIf( id == ERROR, "invalidSource" );
-        
+        m_currentId = ERROR;
+
+        // save the player offset
+        m_savedOffset = std::chrono::milliseconds( m_mediaPlayerPlatformInterface->getPosition() );
+        handlePostPlaybackFinished( id );
+
         if( m_observer != nullptr ) {
             m_observer->onPlaybackFinished( id );
         }
-        
-        // save the player offset
-        m_savedOffset = std::chrono::milliseconds( m_mediaPlayerPlatformInterface->getPosition() );
-
-        m_currentId = ERROR;
-        handlePostPlaybackFinished( id );
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"executePlaybackFinished").d("reason", ex.what()).d("expectedState",m_pendingEventState));

@@ -81,6 +81,7 @@ void AlexaClientHandler::dialogStateChanged(AlexaClient::DialogState state) {
         AIDAEMON::IPCHandler::GetInstance()->sendMessage(AIDAEMON::METHODID_NOTI_VR_STATE, AIDAEMON::AI_VR_STATE_THINKING);
     } else if (state == AlexaClient::DialogState::SPEAKING) {
         log(logger::LoggerHandler::Level::INFO, "Speaking...");
+        AIDAEMON::IPCHandler::GetInstance()->sendMessage(AIDAEMON::METHODID_NOTI_VR_STATE, AIDAEMON::AI_VR_STATE_SPEAKING);
 #endif // OBIGO_AIDAEMON
     }
 }

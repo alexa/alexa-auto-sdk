@@ -35,7 +35,8 @@ namespace AIDAEMON {
         static const std::string        AI_VR_STATE_IDLE("IDLE");
         static const std::string        AI_VR_STATE_LISTENING("LISTENING");
         static const std::string        AI_VR_STATE_THINKING("THINKING");  
-
+        static const std::string        AI_VR_STATE_SPEAKING("SPEAKING");  
+        
     static const std::string    METHODID_VPA_SET_RECOGNIZE("VPA_SET_RECOGNIZE");                                                          
     static const std::string    METHODID_VPA_VR_START("VPA_VR_START");
     static const std::string    METHODID_VPA_VR_STOP("VPA_VR_STOP");

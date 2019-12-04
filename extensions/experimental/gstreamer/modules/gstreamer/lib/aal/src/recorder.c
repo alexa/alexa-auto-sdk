@@ -30,6 +30,27 @@ static GstFlowReturn new_preroll_callback(GstAppSink *sink, gpointer pointer)
 	return GST_FLOW_OK;
 }
 
+#if defined(GSTREAMER_VERSION_V0)
+static GstFlowReturn new_buffer_callback(GstAppSink *sink, gpointer pointer)
+{
+  aal_gst_context_t *ctx = (aal_gst_context_t *) pointer;
+  GstBuffer *buffer = NULL;
+
+  buffer = gst_app_sink_pull_buffer(GST_APP_SINK(sink));
+  if (!buffer) {
+    g_warning("No buffer\n");
+    goto exit;
+  }
+
+  if (ctx->listener && ctx->listener->on_data)
+    ctx->listener->on_data((int16_t *)GST_BUFFER_DATA(buffer), (gsize)(GST_BUFFER_SIZE(buffer) / 2), ctx->user_data);
+
+exit:
+  gst_buffer_unref(buffer);
+
+  return GST_FLOW_OK;
+}
+#else
 static GstFlowReturn new_sample_callback(GstAppSink *sink, gpointer pointer)
 {
 	aal_gst_context_t *ctx = (aal_gst_context_t *) pointer;
@@ -64,12 +85,18 @@ exit:
 
 	return GST_FLOW_OK;
 }
+#endif
 
 #ifdef USE_APPSINK_CALLBACK
 GstAppSinkCallbacks app_sink_callbacks = {
 	.eos = eos_callback,
 	.new_preroll = new_preroll_callback,
+#if defined(GSTREAMER_VERSION_V0)
+  .new_buffer = new_buffer_callback,
+  .new_buffer_list = 0
+#else
 	.new_sample = new_sample_callback
+#endif
 };
 #endif
 
@@ -113,7 +140,11 @@ aal_handle_t aal_recorder_create(const aal_attributes_t *attr)
 #ifdef USE_APPSINK_CALLBACK
 	gst_app_sink_set_callbacks(GST_APP_SINK(sink), &app_sink_callbacks, ctx, NULL);
 #else
+#if defined(GSTREAMER_VERSION_V0)
+	g_signal_connect(sink, "new-buffer", G_CALLBACK(new_buffer_callback), ctx);
+#else
 	g_signal_connect(sink, "new-sample", G_CALLBACK(new_sample_callback), ctx);
+#endif
 #endif
 
 	// Setup appsink caps

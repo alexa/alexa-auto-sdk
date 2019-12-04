@@ -309,9 +309,9 @@ if(NOT CMAKE_SYSTEM_NAME MATCHES "(Darwin)")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--no-as-needed")
 endif()
 
-if(CMAKE_SYSTEM_NAME STREQUAL Linux)
-    add_definitions(-DMONITORAIRPLANEMODEEVENTS)
-endif()
+#if(CMAKE_SYSTEM_NAME STREQUAL Linux)
+#    add_definitions(-DMONITORAIRPLANEMODEEVENTS)
+#endif()
 
 install(
     TARGETS SampleApp

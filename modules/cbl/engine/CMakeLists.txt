@@ -6,6 +6,11 @@ find_path(AVS_INCLUDE_DIRS AVSCommon)
 find_library(AVS_AVS_COMMON_LIBRARY AVSCommon)
 find_library(AVS_REGISTRATION_MANAGER_LIBRARY RegistrationManager)
 
+if (${USE_OBIGO_BUILD_SYSTEM})
+find_path(CURL_INCLUDE_DIRS NAMES curl/curl.h PATHS "${VPA_SYSROOT_PATH}/usr/include")
+set (AVS_INCLUDE_DIRS ${AVS_INCLUDE_DIRS} ${CURL_INCLUDE_DIRS})
+endif ()
+
 set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/CBL/CBLAuthDelegate.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/CBL/CBLAuthDelegateConfiguration.h

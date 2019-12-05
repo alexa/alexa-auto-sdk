@@ -7,6 +7,11 @@ endif()
 # Find AVS
 find_package(AVS 1.10)
 
+if (${USE_OBIGO_BUILD_SYSTEM})
+find_path(CURL_INCLUDE_DIRS NAMES curl/curl.h PATHS "${VPA_SYSROOT_PATH}/usr/include")
+set (AVS_INCLUDE_DIRS ${AVS_INCLUDE_DIRS} ${CURL_INCLUDE_DIRS})
+endif ()
+
 set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AlertsEngineImpl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/NotificationsEngineImpl.h

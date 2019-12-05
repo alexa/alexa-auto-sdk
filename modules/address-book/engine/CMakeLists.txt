@@ -6,6 +6,11 @@ find_path(RAPIDJSON_INCLUDE_DIR rapidjson/rapidjson.h
 find_path(AVS_INCLUDE_DIRS AVSCommon)
 find_library(AVS_AVS_COMMON_LIBRARY AVSCommon)
 
+if (${USE_OBIGO_BUILD_SYSTEM})
+find_path(CURL_INCLUDE_DIRS NAMES curl/curl.h PATHS "${VPA_SYSROOT_PATH}/usr/include")
+find_library(CURL_LIBRARIES NAMES curl libcurl PATHS "${VPA_SYSROOT_PATH}/usr/lib")
+endif ()
+
 add_definitions(-DRAPIDJSON_HAS_STDSTRING)
 
 set(HEADERS

@@ -133,6 +133,7 @@ vpa_build_aac_modules() {
 		-DAAC_DEFAULT_LOGGER_SINK=Console \
 		-DAAC_VERSION=2.0.0 \
 		-DAAC_HOME=${CMAKE_INSTALL_PREFIX} \
+		-DVPA_SYSROOT_PATH=${VPA_TARGET_SYSROOT_DIR}
 		"
 
 	local aac_build_target=(core alexa navigation phone-control contact-uploader cbl address-book vpa)
@@ -148,8 +149,7 @@ vpa_build_aac_modules() {
 		echo "###############################################"
 		if [ "${target}" = "amazonlite" ]; then
 			aac_cmake_options="${aac_cmake_options} \
-				-DPATH_TO_WW_LOCALE_MODELS=${VPA_TARGET_SYSROOT_DIR}/usr/share/pryon-lite/models \
-				-DVPA_SYSROOT_PATH=${VPA_TARGET_SYSROOT_DIR}"
+				-DPATH_TO_WW_LOCALE_MODELS=${VPA_TARGET_SYSROOT_DIR}/usr/share/pryon-lite/models"
 		fi
 		cmake ${aac_cmake_options} ${AAC_SDK_DIR}/modules/${target}/CMakeLists.txt -B${aac_build_dir}/${target}
 		do_error_check

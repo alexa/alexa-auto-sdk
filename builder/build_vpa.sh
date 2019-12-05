@@ -233,6 +233,12 @@ vpa_install_run_script() {
 	local rw_dir=
 	local config_dir=
 	local output_dir=${VPA_OUTPUT_DIR}/${TARGET_PLATFORM}
+
+	if [ -f ${AAC_SDK_DIR}/VPA/Host/configAIDaemon.json ]; then
+		cp -rpa ${AAC_SDK_DIR}/VPA/Host/configAIDaemon.json ${output_dir}
+		do_error_check
+	fi
+
 	# pclinux
 	if [ -z ${CROSS_COMPILE} ]; then
 		sed "3i VPA_TOP_DIR=\${PWD}" < ${AAC_SDK_DIR}/VPA/Host/run_vpa.sh.in > ${output_dir}/run_vpa.sh
@@ -241,10 +247,6 @@ vpa_install_run_script() {
 		rw_dir=${vpa_dir}
 		config_dir=${vpa_dir}
 	else # AIVI
-		if [ -f ${AAC_SDK_DIR}/VPA/Host/configAIDaemon.json ]; then
-			cp -rpa ${AAC_SDK_DIR}/VPA/Host/configAIDaemon.json ${output_dir}
-			do_error_check
-		fi
 		vpa_dir=/var/opt/obigo/obigo_bin/SA
 		rw_dir=/var/opt/bosch/dynweb/obigo/obigo_apps/SA/resource
 		config_dir=${rw_dir}

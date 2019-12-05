@@ -142,8 +142,12 @@ void AddressBookHandler::setupUI() {
 bool AddressBookHandler::LoadContactData(const std::string& filepath) {
     m_contacts.clear();
 
+#ifdef OBIGO_AIDAEMON
+    try {
+        json j;
+        j = json::parse(filepath);
+#else
     std::ifstream i(filepath);
-
     if(!i) {
         log(logger::LoggerHandler::Level::ERROR, "Cannot find file when loading contact data: " + filepath);
         return false;
@@ -152,7 +156,7 @@ bool AddressBookHandler::LoadContactData(const std::string& filepath) {
     try {
         json j;
         i >> j;
-
+#endif
         if (j.is_object()) {
             auto contacts = j.find("contacts");
             if (contacts != j.end() && contacts->is_array()) {

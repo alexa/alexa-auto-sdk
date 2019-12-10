@@ -44,6 +44,10 @@
 #include "AACE/Core/CoreProperties.h"
 #include "AACE/Alexa/AlexaProperties.h"
 #include "AACE/Vehicle/VehicleProperties.h"
+#ifdef OBIGO_AIDAEMON
+#include <Settings/SettingEventSenderInterface.h>
+#include <Settings/Storage/SQLiteDeviceSettingStorage.h>
+#endif
 
 namespace aace {
 namespace engine {
@@ -272,6 +276,22 @@ bool AlexaEngineService::configureDeviceSDK( std::shared_ptr<std::istream> confi
         // create the playback router delegate
         m_playbackRouterDelegate = std::shared_ptr<PlaybackRouterDelegate>( new PlaybackRouterDelegate() );
         ThrowIfNull( m_playbackRouterDelegate, "couldNotCreatePlaybackRouterDelegate" );
+
+#ifdef OBIGO_AIDAEMON
+        m_deviceSettingsManager = std::make_shared<alexaClientSDK::settings::DeviceSettingsManager>();
+
+        std::shared_ptr<alexaClientSDK::settings::storage::SQLiteDeviceSettingStorage> deviceSettingsStorage = 
+                alexaClientSDK::settings::storage::SQLiteDeviceSettingStorage::create(config);
+        ThrowIfNull( deviceSettingsStorage, "createDeviceSettingsStorageFailed" );
+        if (!deviceSettingsStorage->open()) {
+            AACE_ERROR(LX("initializeFailed").d("reason", "deviceSettingStorageOpenFailed"));
+            return false;
+        }
+
+        m_dndCapabilityAgent = alexaClientSDK::capabilityAgents::doNotDisturb::DoNotDisturbCapabilityAgent::create(
+        m_customerDataManager, m_exceptionSender, m_connectionManager, m_deviceSettingsManager, deviceSettingsStorage);
+        ThrowIfNot( m_directiveSequencer->addDirectiveHandler( m_dndCapabilityAgent ), "addDirectiveHandlerFailed" );
+#endif
 
         return true;
     }
@@ -672,7 +692,15 @@ bool AlexaEngineService::shutdown()
             m_capabilitiesDelegate->shutdown();
             m_capabilitiesDelegate.reset();
         }
-        
+
+#ifdef OBIGO_AIDAEMON
+        if( m_dndCapabilityAgent != nullptr ) {
+            AACE_DEBUG(LX(TAG,"shutdown").m("dndCapabilityAgent"));
+            m_dndCapabilityAgent->shutdown();
+            m_dndCapabilityAgent.reset();
+        }    
+#endif
+
         if( m_logger != nullptr ) {
             AACE_DEBUG(LX(TAG,"shutdown").m("AlexaEngineLogger"));
             m_logger->shutdown();

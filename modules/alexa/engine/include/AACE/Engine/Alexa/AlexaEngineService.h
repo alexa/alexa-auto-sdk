@@ -97,6 +97,12 @@
 #include "AlexaSpeakerEngineImpl.h"
 #include "AlexaEndpointInterface.h"
 
+#ifdef OBIGO_AIDAEMON
+#include <Settings/DeviceSettingsManager.h>
+#include <Settings/Storage/DeviceSettingStorageInterface.h>
+#include <DoNotDisturbCA/DoNotDisturbCapabilityAgent.h>
+#endif
+
 namespace aace {
 namespace engine {
 namespace alexa {
@@ -243,6 +249,12 @@ private:
     std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> m_deviceInfo;
     std::shared_ptr<PlaybackRouterDelegate> m_playbackRouterDelegate;
     std::shared_ptr<HttpPutDelegate> m_httpPutDelegate;
+
+#ifdef OBIGO_AIDAEMON
+    std::shared_ptr<alexaClientSDK::capabilityAgents::doNotDisturb::DoNotDisturbCapabilityAgent> m_dndCapabilityAgent;
+    std::shared_ptr<alexaClientSDK::settings::DeviceSettingsManager> m_deviceSettingsManager;
+    //std::shared_ptr<alexaClientSDK::settings::storage::SQLiteDeviceSettingStorage> m_deviceSettingsStorage;
+#endif
 
     std::shared_ptr<aace::engine::storage::LocalStorageInterface> m_localStorage;
     std::shared_ptr<aace::alexa::AuthProvider> m_authProviderPlatformInterface;

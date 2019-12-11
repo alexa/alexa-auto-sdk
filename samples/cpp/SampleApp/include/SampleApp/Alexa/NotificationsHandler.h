@@ -49,7 +49,9 @@ class NotificationsHandler : public aace::alexa::Notifications /* isa PlatformIn
     // aace::alexa::Notifications interface
 
     auto setIndicator(Notifications::IndicatorState state) -> void override;
-
+#ifdef OBIGO_AIDAEMON
+    auto onDoNotDisturb(const std::string &status) -> bool override;
+#endif
   private:
     std::weak_ptr<View> m_console{};
     std::weak_ptr<View> m_indicatorStateView{};

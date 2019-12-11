@@ -46,7 +46,6 @@
 #include "AACE/Vehicle/VehicleProperties.h"
 #ifdef OBIGO_AIDAEMON
 #include <Settings/SettingEventSenderInterface.h>
-#include <Settings/Storage/SQLiteDeviceSettingStorage.h>
 #endif
 
 namespace aace {
@@ -280,16 +279,15 @@ bool AlexaEngineService::configureDeviceSDK( std::shared_ptr<std::istream> confi
 #ifdef OBIGO_AIDAEMON
         m_deviceSettingsManager = std::make_shared<alexaClientSDK::settings::DeviceSettingsManager>();
 
-        std::shared_ptr<alexaClientSDK::settings::storage::SQLiteDeviceSettingStorage> deviceSettingsStorage = 
-                alexaClientSDK::settings::storage::SQLiteDeviceSettingStorage::create(config);
-        ThrowIfNull( deviceSettingsStorage, "createDeviceSettingsStorageFailed" );
-        if (!deviceSettingsStorage->open()) {
+        m_deviceSettingsStorage = alexaClientSDK::settings::storage::SQLiteDeviceSettingStorage::create(config);
+        ThrowIfNull( m_deviceSettingsStorage, "createDeviceSettingsStorageFailed" );
+        if (!m_deviceSettingsStorage->open()) {
             AACE_ERROR(LX("initializeFailed").d("reason", "deviceSettingStorageOpenFailed"));
             return false;
         }
 
         m_dndCapabilityAgent = alexaClientSDK::capabilityAgents::doNotDisturb::DoNotDisturbCapabilityAgent::create(
-        m_customerDataManager, m_exceptionSender, m_connectionManager, m_deviceSettingsManager, deviceSettingsStorage);
+        m_customerDataManager, m_exceptionSender, m_connectionManager, m_deviceSettingsManager, m_deviceSettingsStorage);
         ThrowIfNot( m_directiveSequencer->addDirectiveHandler( m_dndCapabilityAgent ), "addDirectiveHandlerFailed" );
 #endif
 
@@ -694,11 +692,14 @@ bool AlexaEngineService::shutdown()
         }
 
 #ifdef OBIGO_AIDAEMON
+        if( m_deviceSettingsStorage != nullptr ) {
+            m_deviceSettingsStorage.reset();
+        }
         if( m_dndCapabilityAgent != nullptr ) {
             AACE_DEBUG(LX(TAG,"shutdown").m("dndCapabilityAgent"));
             m_dndCapabilityAgent->shutdown();
             m_dndCapabilityAgent.reset();
-        }    
+        }
 #endif
 
         if( m_logger != nullptr ) {
@@ -1281,7 +1282,7 @@ bool AlexaEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::al
         ThrowIfNull( audioManager, "invalidAudioManager" );
 
         // create the notifications engine implementation
-        m_notificationsEngineImpl = aace::engine::alexa::NotificationsEngineImpl::create( notifications, audioManager, m_directiveSequencer, m_contextManager, m_capabilitiesDelegate, m_exceptionSender, std::make_shared<alexaClientSDK::applicationUtilities::resources::audio::NotificationsAudioFactory>(), m_speakerManager, m_customerDataManager );
+        m_notificationsEngineImpl = aace::engine::alexa::NotificationsEngineImpl::create( notifications, audioManager, m_directiveSequencer, m_contextManager, m_capabilitiesDelegate, m_exceptionSender, std::make_shared<alexaClientSDK::applicationUtilities::resources::audio::NotificationsAudioFactory>(), m_speakerManager, m_customerDataManager, m_deviceSettingsStorage);
         ThrowIfNull( m_notificationsEngineImpl, "createNotificationsEngineImplFailed" );
 
         return true;

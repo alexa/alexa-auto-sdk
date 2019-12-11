@@ -20,5 +20,20 @@ namespace alexa {
 
 Notifications::~Notifications() = default; // key function
 
+#ifdef OBIGO_AIDAEMON
+bool Notifications::StateDoNotDisturb() {
+    if( auto m_notificationsEngineInterface_lock = m_notificationsEngineInterface.lock() ) {
+        return m_notificationsEngineInterface_lock->onStateDoNotDisturb();
+    }
+    else {
+        return false;
+    }
+}
+
+void Notifications::setEngineInterface( std::shared_ptr<aace::alexa::NotificationsEngineInterface> notificationsEngineInterface ) {
+    m_notificationsEngineInterface = notificationsEngineInterface;
+}
+#endif
+
 } // aace::alexa
 } // aac

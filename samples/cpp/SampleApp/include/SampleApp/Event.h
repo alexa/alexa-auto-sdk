@@ -110,6 +110,8 @@ enum class Event {
     onSpeechRecognizerSetRecognize,
     // MVPA AudioPlayer
     onSetMVPAAudioPlayer,
+    // DoNotDisturb
+    onStateDoNotDisturb
 #endif
 };
 
@@ -194,7 +196,9 @@ static const std::map<std::string, Event> EventEnumerator{
     // Expect Speech
     {"onSpeechRecognizerSetRecognize", Event::onSpeechRecognizerSetRecognize},
     // MVPA AudioPlayer
-    {"onSetMVPAAudioPlayer", Event::onSetMVPAAudioPlayer}
+    {"onSetMVPAAudioPlayer", Event::onSetMVPAAudioPlayer},
+    // DoNotDisturb
+    {"onStateDoNotDisturb", Event::onStateDoNotDisturb},
 #endif
 };
 

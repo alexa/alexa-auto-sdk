@@ -116,6 +116,11 @@ class AudioPlayerEngineInterface {
  public:
     virtual bool onSetMVPAAudioPlayer() = 0;
 };
+
+class NotificationsEngineInterface {
+ public:
+    virtual bool onStateDoNotDisturb() = 0;
+};
 #endif
 
 inline std::ostream& operator<<(std::ostream& stream, const SpeechRecognizerEngineInterface::Initiator& initiator) {

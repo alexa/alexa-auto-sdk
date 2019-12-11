@@ -100,6 +100,7 @@
 #ifdef OBIGO_AIDAEMON
 #include <Settings/DeviceSettingsManager.h>
 #include <Settings/Storage/DeviceSettingStorageInterface.h>
+#include <Settings/Storage/SQLiteDeviceSettingStorage.h>
 #include <DoNotDisturbCA/DoNotDisturbCapabilityAgent.h>
 #endif
 
@@ -253,7 +254,7 @@ private:
 #ifdef OBIGO_AIDAEMON
     std::shared_ptr<alexaClientSDK::capabilityAgents::doNotDisturb::DoNotDisturbCapabilityAgent> m_dndCapabilityAgent;
     std::shared_ptr<alexaClientSDK::settings::DeviceSettingsManager> m_deviceSettingsManager;
-    //std::shared_ptr<alexaClientSDK::settings::storage::SQLiteDeviceSettingStorage> m_deviceSettingsStorage;
+    std::shared_ptr<alexaClientSDK::settings::storage::SQLiteDeviceSettingStorage> m_deviceSettingsStorage;
 #endif
 
     std::shared_ptr<aace::engine::storage::LocalStorageInterface> m_localStorage;

@@ -69,6 +69,21 @@ public:
      * @param [in] state The new notification indicator state
      */
     virtual void setIndicator( IndicatorState state ) = 0;
+
+#ifdef OBIGO_AIDAEMON
+    bool StateDoNotDisturb();
+    /**
+     * @internal
+     * Sets the Engine interface delegate
+     *
+     * Should *never* be called by the platform implementation
+     */
+    void setEngineInterface( std::shared_ptr<aace::alexa::NotificationsEngineInterface> notificationsEngineInterface );
+
+    virtual bool onDoNotDisturb( const std::string &status ) = 0;
+private:
+    std::weak_ptr<aace::alexa::NotificationsEngineInterface> m_notificationsEngineInterface;
+#endif
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const Notifications::IndicatorState& state) {

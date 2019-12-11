@@ -37,6 +37,9 @@
 #include <AACE/Alexa/Notifications.h>
 #include <AACE/Engine/Audio/AudioManagerInterface.h>
 #include "AudioChannelEngineImpl.h"
+#ifdef OBIGO_AIDAEMON
+#include <Settings/Storage/DeviceSettingStorageInterface.h>
+#endif
 
 namespace aace {
 namespace engine {
@@ -44,10 +47,17 @@ namespace alexa {
 
 class NotificationsEngineImpl :
     public AudioChannelEngineImpl,
+#ifdef OBIGO_AIDAEMON
+    public aace::alexa::NotificationsEngineInterface,
+#endif
     public alexaClientSDK::avsCommon::sdkInterfaces::NotificationsObserverInterface {
 
 private:
-    NotificationsEngineImpl( std::shared_ptr<aace::alexa::Notifications> notificationsPlatformInterface );
+    NotificationsEngineImpl( std::shared_ptr<aace::alexa::Notifications> notificationsPlatformInterface 
+#ifdef OBIGO_AIDAEMON
+        ,std::shared_ptr<alexaClientSDK::settings::storage::DeviceSettingStorageInterface> deviceSettingsStorage
+#endif
+    );
 
     bool initialize(
         std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> audioOutputChannel,
@@ -69,10 +79,18 @@ public:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::NotificationsAudioFactoryInterface> notificationsAudioFactory,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
-        std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager );
+        std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager
+#ifdef OBIGO_AIDAEMON
+        ,std::shared_ptr<alexaClientSDK::settings::storage::DeviceSettingStorageInterface> deviceSettingsStorage
+#endif
+     );
 
     // NotificationObserverInterface
     void onSetIndicator(alexaClientSDK::avsCommon::avs::IndicatorState state) override;
+
+#ifdef OBIGO_AIDAEMON
+    bool onStateDoNotDisturb() override;
+#endif
 
 protected:
     virtual void doShutdown() override;
@@ -80,6 +98,9 @@ protected:
 private:
     std::shared_ptr<aace::alexa::Notifications> m_notificationsPlatformInterface;
     std::shared_ptr<alexaClientSDK::capabilityAgents::notifications::NotificationsCapabilityAgent> m_notificationsCapabilityAgent;
+#ifdef OBIGO_AIDAEMON
+    std::shared_ptr<alexaClientSDK::settings::storage::DeviceSettingStorageInterface> m_deviceSettingsStorage;
+#endif
 };
 
 } // aace::engine::alexa

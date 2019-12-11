@@ -283,6 +283,9 @@ gboolean IPCHandler::on_handle_send_messages(AIDaemon *object, GDBusMethodInvoca
         getValueFromJson(json_data, std::string(AIDAEMON::CONTACT_UPLOAD_STATE)));
   } else if (Method == AIDAEMON::METHODID_SET_CONTACT_UPLOAD) {
     handler->sendEvent(sampleApp::Event::onAddAddressBookPhone, IPCData);
+  } else if (Method == AIDAEMON::METHODID_VPA_DND_STATE) {
+    handler->log(Level::INFO, __PRETTY_FUNCTION__, "1111111111 : ");
+    handler->sendEvent(sampleApp::Event::onStateDoNotDisturb);
   } else {
     handler->log(Level::ERROR, __PRETTY_FUNCTION__, "Cannot handle this Method : " + Method);
   }

@@ -115,6 +115,9 @@ namespace AIDAEMON {
         static const std::string        AI_SPEECH_SPEECH("Speech");   
 #endif // OBIGO_SPEECH_SENDER
 
+    static const std::string        METHODID_VPA_DND_STATE("VPA_DND_STATE");
+    static const std::string        METHODID_AI_DND_STATE("AI_DND_STATE");
+
 }
 
 

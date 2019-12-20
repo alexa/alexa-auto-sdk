@@ -36,6 +36,8 @@ public:
     MOCK_METHOD1(sendMessage, void(std::shared_ptr<alexaClientSDK::avsCommon::avs::MessageRequest> request));
     MOCK_METHOD1(setAVSEndpoint, void(const std::string& avsEndpoint));
     MOCK_METHOD1(setObserver, void(std::shared_ptr<alexaClientSDK::acl::MessageRouterObserverInterface> observer));
+    MOCK_METHOD1(setAVSGateway, void(const std::string& avsGateway));
+    MOCK_METHOD0(getAVSGateway, std::string());
 };
 
 } // aace::test::avs

@@ -58,6 +58,7 @@ EXTRA_MODULES=$@
 
 DEPLOY_DIR="${BUILDER_HOME}/deploy"
 ANDROID_PLATFORM_DIR="${SDK_HOME}/platforms/android"
+ANDROID_SAMPLE_DIR="${SDK_HOME}/samples/android"
 SYSROOTS_DIR="${ANDROID_PLATFORM_DIR}/native-build"
 AAR_DEPLOY_DIR="${DEPLOY_DIR}/aar"
 
@@ -119,10 +120,6 @@ run_gradle() {
 	popd
 }
 
-clean_aar() {
-	mkdir -p ${AAR_DEPLOY_DIR} && rm -rf ${AAR_DEPLOY_DIR}/*
-}
-
 copy_aar() {
 	local src="${1}/modules/*/build/outputs/aar/*-release.aar"
 	if [ ${DEBUG_BUILD} = "1" ]; then
@@ -134,6 +131,47 @@ copy_aar() {
 	fi
 	for aar in $(${FIND} ${src} 2> /dev/null) ; do
 		cp ${aar} ${AAR_DEPLOY_DIR}
+	done
+}
+
+clean_aar() {
+	mkdir -p ${AAR_DEPLOY_DIR} && rm -rf ${AAR_DEPLOY_DIR}/*
+}
+
+run_sample_gradle() {
+        local gradle_command="assembleRelease"
+	if [ ${DEBUG_BUILD} = "1" ]; then
+		gradle_command="assembleDebug"
+	fi
+        pushd ${ANDROID_SAMPLE_DIR}/modules/sample-core
+	if [ ${CLEAN} = "1" ]; then
+		gradle clean
+	fi
+        gradle ${gradle_command}
+        popd
+	if [ -f ${ANDROID_SAMPLE_DIR}/app/src/main/libs/aplRelease.aar ] || [ -f ${ANDROID_SAMPLE_DIR}/modules/sample-apl/src/main/libs/aplRelease.aar ]; then
+		note "Running Sample APL Build"
+		pushd ${ANDROID_SAMPLE_DIR}/modules/sample-apl
+		if [ ${CLEAN} = "1" ]; then
+			gradle clean
+		fi
+		gradle ${gradle_command}
+		popd
+	fi
+	copy_aar ${ANDROID_SAMPLE_DIR}
+	for module in ${EXTRA_MODULES} ; do
+		if [ -d "${module}/samples/android" ]; then
+			local module_path=$(${FIND} ${module}/samples/android/modules -mindepth 1 -maxdepth 1 -type d 2> /dev/null)
+			local module_name=$(basename ${module_path})
+			note "Running ${module_name} build"
+			pushd ${module}/samples/android
+			if [ ${CLEAN} = "1" ]; then
+				gradle clean
+			fi
+			gradle -PaarDir=${AAR_DEPLOY_DIR} ${gradle_command}
+			popd
+			copy_aar "$(realpath ${module})/samples/android"
+		fi
 	done
 }
 
@@ -150,3 +188,7 @@ copy_aar ${ANDROID_PLATFORM_DIR}
 for module in ${EXTRA_MODULES} ; do
 	copy_aar "$(realpath ${module})/platforms/android"
 done
+
+note "Running Sample Core Build"
+run_sample_gradle
+

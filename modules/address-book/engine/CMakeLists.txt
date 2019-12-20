@@ -32,6 +32,7 @@ target_include_directories(AACEAddressBookEngine
     PRIVATE
         ${RAPIDJSON_INCLUDE_DIR}
         ${AVS_INCLUDE_DIRS}
+        ${AVS_INCLUDE_DIRS}/../avs_shared
         ${CURL_INCLUDE_DIRS}
 )
 

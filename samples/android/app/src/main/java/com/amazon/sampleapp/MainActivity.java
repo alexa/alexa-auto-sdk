@@ -34,6 +34,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -53,10 +58,10 @@ import com.amazon.aace.alexa.AlexaProperties;
 import com.amazon.aace.alexa.config.AlexaConfiguration;
 import com.amazon.aace.core.CoreProperties;
 import com.amazon.aace.core.Engine;
+import com.amazon.aace.core.PlatformInterface;
 import com.amazon.aace.core.config.ConfigurationFile;
 import com.amazon.aace.core.config.EngineConfiguration;
 import com.amazon.aace.logger.Logger;
-import com.amazon.aace.navigation.NavigationProperties;
 import com.amazon.aace.storage.config.StorageConfiguration;
 import com.amazon.aace.vehicle.config.VehicleConfiguration;
 import com.amazon.aace.navigation.Navigation;
@@ -66,10 +71,9 @@ import com.amazon.sampleapp.impl.AlexaSpeaker.AlexaSpeakerHandler;
 import com.amazon.sampleapp.impl.Audio.AudioInputProviderHandler;
 import com.amazon.sampleapp.impl.Audio.AudioOutputProviderHandler;
 import com.amazon.sampleapp.impl.AudioPlayer.AudioPlayerHandler;
-import com.amazon.sampleapp.impl.AuthProvider.AuthProviderHandler;
-import com.amazon.sampleapp.impl.AuthProvider.LoginWithAmazonCBL;
-
+import com.amazon.sampleapp.impl.CBL.CBLHandler;
 import com.amazon.sampleapp.impl.AddressBook.AddressBookHandler;
+import com.amazon.sampleapp.impl.DoNotDisturb.DoNotDisturbHandler;
 import com.amazon.sampleapp.impl.EqualizerController.EqualizerConfiguration;
 import com.amazon.sampleapp.impl.ExternalMediaPlayer.MACCPlayer;
 import com.amazon.sampleapp.impl.GlobalPreset.GlobalPresetHandler;
@@ -83,9 +87,15 @@ import com.amazon.sampleapp.impl.LocalMediaSource.FMLocalMediaSource;
 import com.amazon.sampleapp.impl.LocalMediaSource.SatelliteLocalMediaSource;
 import com.amazon.sampleapp.impl.LocalMediaSource.USBLocalMediaSource;
 
+import com.amazon.sampleapp.impl.CarControl.CarControlHandler;
+import com.amazon.sampleapp.impl.CarControl.CarControlDataProvider;
 import com.amazon.sampleapp.impl.EqualizerController.EqualizerControllerHandler;
 import com.amazon.sampleapp.impl.LocationProvider.LocationProviderHandler;
+import com.amazon.sampleapp.logView.LogRecyclerViewAdapter;
+import com.amazon.sampleapp.core.ModuleFactoryInterface;
+import com.amazon.sampleapp.core.FileUtils;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
+import com.amazon.sampleapp.impl.Logger.LoggerFragment;
 import com.amazon.sampleapp.impl.Navigation.NavigationHandler;
 import com.amazon.sampleapp.impl.NetworkInfoProvider.NetworkInfoProviderHandler;
 import com.amazon.sampleapp.impl.Notifications.NotificationsHandler;
@@ -94,29 +104,22 @@ import com.amazon.sampleapp.impl.PlaybackController.PlaybackControllerHandler;
 import com.amazon.sampleapp.impl.SpeechRecognizer.SpeechRecognizerHandler;
 import com.amazon.sampleapp.impl.SpeechSynthesizer.SpeechSynthesizerHandler;
 import com.amazon.sampleapp.impl.TemplateRuntime.TemplateRuntimeHandler;
+import com.amazon.sampleapp.core.SampleAppContext;
 import com.amazon.sampleapp.logView.LogEntry;
-import com.amazon.sampleapp.logView.LogRecyclerViewAdapter;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.UUID;
-
-// AlexaComms Imports
-
-// AmazonLite Imports
-
-// LVC Imports
-
-// AutoVoiceChrome Imports
-
-// DCM Imports
 
 public class MainActivity extends AppCompatActivity implements Observer {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -132,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private AlertsHandler mAlerts;
     private AlexaClientHandler mAlexaClient;
     private AudioPlayerHandler mAudioPlayer;
-    private AuthProviderHandler mAuthProvider;
+    private CBLHandler mCBLHandler;
     private EqualizerControllerHandler mEqualizerControllerHandler;
     private NotificationsHandler mNotifications;
     private PhoneCallControllerHandler mPhoneCallController;
@@ -142,10 +145,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private SpeechSynthesizerHandler mSpeechSynthesizer;
     private TemplateRuntimeHandler mTemplateRuntime;
     private AlexaSpeakerHandler mAlexaSpeaker;
-
-    // Alexa Comms Handler
-
-    // LVC Handlers
+    private DoNotDisturbHandler mDoNotDisturb;
 
     // Core
     private Engine mEngine;
@@ -154,6 +154,9 @@ public class MainActivity extends AppCompatActivity implements Observer {
     // Audio
     private AudioInputProviderHandler mAudioInputProvider;
     private AudioOutputProviderHandler mAudioOutputProvider;
+
+    // Car Control
+    private CarControlHandler mCarControlHandler;
 
     // Location
     private LocationProviderHandler mLocationProvider;
@@ -167,12 +170,17 @@ public class MainActivity extends AppCompatActivity implements Observer {
     // Network
     private NetworkInfoProviderHandler mNetworkInfoProvider;
 
+    /* Tab Fragment Adapter */
+    private TabFragmentAdapter mAdapter;
+
     /* Log View Components */
-    private RecyclerView mRecyclerView;
-    private LogRecyclerViewAdapter mRecyclerAdapter;
+    private LoggerFragment mLoggerFragment;
 
     /* Shared Preferences */
     private SharedPreferences mPreferences;
+
+    /* View Pager */
+    private ViewPager mViewPager;
 
     /* Speech Recognition Components */
     private boolean mIsTalkButtonLongPressed = false;
@@ -249,6 +257,29 @@ public class MainActivity extends AppCompatActivity implements Observer {
         }
     }
 
+    public static class TabFragmentAdapter extends FragmentPagerAdapter {
+        ArrayList<Fragment> mFragments;
+
+        public TabFragmentAdapter(FragmentManager fm) {
+            super(fm);
+            mFragments = new ArrayList<Fragment>();
+        }
+
+        @Override
+        public int getCount() {
+            return mFragments.size();
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return mFragments.get(position);
+        }
+
+        public void addFragment(Fragment fragment) {
+            mFragments.add(fragment);
+        }
+    }
+
     private void create() {
 
         // Set the main view content
@@ -260,13 +291,17 @@ public class MainActivity extends AppCompatActivity implements Observer {
         // Add support action toolbar for action buttons
         setSupportActionBar( ( Toolbar ) findViewById( R.id.actionToolbar ) );
 
-        // Initialize RecyclerView list for log view
-        mRecyclerView = findViewById( R.id.rvLog );
-        mRecyclerView.setHasFixedSize( true );
-        mRecyclerView.setLayoutManager( new LinearLayoutManager( this ) );
-        mRecyclerAdapter = new LogRecyclerViewAdapter( getApplicationContext() );
-        mRecyclerView.setAdapter( mRecyclerAdapter );
-        setUpLogViewOptions();
+        // Set up the ViewPager with the sections adapter.
+        mViewPager = (ViewPager) findViewById(R.id.viewpager);
+
+        mAdapter = new TabFragmentAdapter(getSupportFragmentManager());
+        mLoggerFragment = new LoggerFragment(this);
+
+        mAdapter.addFragment(mLoggerFragment);
+        mViewPager.setAdapter(mAdapter);
+
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tablayout);
+        tabLayout.setupWithViewPager(mViewPager);
 
         // Initialize sound effects for speech recognition
         mAudioCueStartVoice = MediaPlayer.create( this, R.raw.med_ui_wakesound );
@@ -373,6 +408,17 @@ public class MainActivity extends AppCompatActivity implements Observer {
         mEngine = Engine.create(this);
         ArrayList<EngineConfiguration> configuration = getEngineConfigurations( json, appDataDir, certsDir, modelsDir );
 
+        // Get extra module factories and add configurations
+        Map<String, String> data = new HashMap<String, String>();
+        data.put( SampleAppContext.CERTS_DIR, certsDir.getPath() );
+        data.put( SampleAppContext.MODEL_DIR, modelsDir.getPath() );
+        data.put( SampleAppContext.PRODUCT_DSN, mPreferences.getString( getString( R.string.preference_product_dsn ), "" ) );
+        data.put( SampleAppContext.APPDATA_DIR, appDataDir.getPath() );
+        data.put( SampleAppContext.JSON, json );
+        SampleAppContext sampleAppContext = new SampleAppContext( this, mViewPager, data );
+        List<ModuleFactoryInterface> extraFactories = getExtraModuleFactory();
+        configExtraModules( sampleAppContext, extraFactories, configuration );
+
         EngineConfiguration[] configurationArray = configuration.toArray( new EngineConfiguration[configuration.size()] );
         boolean configureSucceeded = mEngine.configure( configurationArray );
         if ( !configureSucceeded ) throw new RuntimeException( "Engine configuration failed" );
@@ -384,29 +430,32 @@ public class MainActivity extends AppCompatActivity implements Observer {
             )
         ) throw new RuntimeException( "Could not register Logger platform interface" );
 
+        // AlexaClient
+        if ( !mEngine.registerPlatformInterface(
+                mAlexaClient = new AlexaClientHandler( this, mLogger )
+            )
+        ) throw new RuntimeException( "Could not register AlexaClient platform interface" );
+
         // AudioInputProvider
         if ( !mEngine.registerPlatformInterface(
                 mAudioInputProvider = new AudioInputProviderHandler( this, mLogger )
             )
         ) throw new RuntimeException( "Could not register AudioInputProvider platform interface" );
 
-        // AudioInputProvider
+        // AudioOutputProvider
         if ( !mEngine.registerPlatformInterface(
-                mAudioOutputProvider = new AudioOutputProviderHandler( this, mLogger )
+                mAudioOutputProvider = new AudioOutputProviderHandler( this, mLogger , mAlexaClient )
             )
         ) throw new RuntimeException( "Could not register AudioOutputProvider platform interface" );
+
+        // Set Output Audio provider now that it is registered
+        sampleAppContext.setAudioOutputProvider(mAudioOutputProvider);
 
         // LocationProvider
         if ( !mEngine.registerPlatformInterface(
                 mLocationProvider = new LocationProviderHandler( this, mLogger )
             )
         ) throw new RuntimeException( "Could not register LocationProvider platform interface" );
-
-        // AlexaClient
-        if ( !mEngine.registerPlatformInterface(
-                mAlexaClient = new AlexaClientHandler( this, mLogger )
-            )
-        ) throw new RuntimeException( "Could not register AlexaClient platform interface" );
 
         // PhoneCallController
         if ( !mEngine.registerPlatformInterface(
@@ -421,12 +470,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
         ) throw new RuntimeException( "Could not register PlaybackController platform interface" );
 
         // SpeechRecognizer
-        boolean wakeWordSupported = false;
         if ( !mEngine.registerPlatformInterface(
                 mSpeechRecognizer = new SpeechRecognizerHandler(
                         this,
                         mLogger,
-                        wakeWordSupported,
                         true
                 )
             )
@@ -470,24 +517,19 @@ public class MainActivity extends AppCompatActivity implements Observer {
             )
         ) throw new RuntimeException( "Could not register NetworkInfoProvider platform interface" );
 
-        // CBL Auth Handler
-        LoginWithAmazonCBL LoginHandler = new LoginWithAmazonCBL( this, mLogger );
-
-        // AuthProvider
+        // CBL
         if ( !mEngine.registerPlatformInterface(
-                mAuthProvider = new AuthProviderHandler( this, mLogger, LoginHandler)
+                mCBLHandler = new CBLHandler( this, mLogger )
             )
-        ) throw new RuntimeException( "Could not register AuthProvider platform interface" );
+        ) throw new RuntimeException( "Could not register CBL platform interface" );
 
-        // Set auth handler as connection observer
-        mNetworkInfoProvider.registerNetworkConnectionObserver( LoginHandler );
+        mAlexaClient.registerAuthStateObserver( mCBLHandler );
 
         // Navigation
         if ( !mEngine.registerPlatformInterface(
                 mNavigation = new NavigationHandler( this, mLogger )
             )
         ) throw new RuntimeException( "Could not register Navigation platform interface" );
-        else mEngine.setProperty( NavigationProperties.NAVIGATION_PROVIDER_NAME, "HERE" ); //set default provider name
 
         // Notifications
         if ( !mEngine.registerPlatformInterface(
@@ -499,6 +541,13 @@ public class MainActivity extends AppCompatActivity implements Observer {
         ) {
             throw new RuntimeException( "Could not register Notifications platform interface" );
         }
+
+        // DoNotDisturb
+        if ( !mEngine.registerPlatformInterface(
+                mDoNotDisturb = new DoNotDisturbHandler( this, mLogger )
+        )
+        ) throw new RuntimeException( "Could not register DoNotDisturb platform interface" );
+        else mAlexaClient.registerAuthStateObserver( mDoNotDisturb );
 
         // Contacts/NavigationFavorites
         String sampleContactsDataPath = sampleDataDir.getPath() + "/Contacts.json";;
@@ -530,6 +579,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
         // AlexaComms Handler
 
         // LVC Handlers
+        if ( !mEngine.registerPlatformInterface(
+                mCarControlHandler = new CarControlHandler( this, mLogger )) ) {
+            throw new RuntimeException( "Could not register Car Control platform interface" );
+        }
 
         mMACCPlayer = new MACCPlayer(this,  mLogger, mPlaybackController);
         if ( !mEngine.registerPlatformInterface( mMACCPlayer ) )  {
@@ -556,9 +609,9 @@ public class MainActivity extends AppCompatActivity implements Observer {
         ) ) throw new RuntimeException( "Could not register Mock AM radio player Local Media Source platform interface" );
 
         // Mock SIRIUSXM platform handler
-        if ( !mEngine.registerPlatformInterface(
+        /*if ( !mEngine.registerPlatformInterface(
                 mSIRUSXMLocalMediaSource = new SiriusXMLocalMediaSource(this, mLogger)
-        ) ) throw new RuntimeException( "Could not register Mock SIRIUSXM player Local Media Source platform interface" );
+        ) ) throw new RuntimeException( "Could not register Mock SIRIUSXM player Local Media Source platform interface" );*/
 
         // Mock FM platform handler
         if ( !mEngine.registerPlatformInterface(
@@ -589,6 +642,9 @@ public class MainActivity extends AppCompatActivity implements Observer {
         if ( !mEngine.registerPlatformInterface(
                 mGlobalPresetHandler = new GlobalPresetHandler(this, mLogger )
         ) ) throw new RuntimeException( "Could not register Mock Global Preset platform interface" );
+
+        // Register extra modules
+        loadPlatformInterfacesAndLoadUI( mEngine, extraFactories, sampleAppContext );
 
         // Alexa Locale
         final String supportedLocales = mEngine.getProperty(AlexaProperties.SUPPORTED_LOCALES);
@@ -632,13 +688,19 @@ public class MainActivity extends AppCompatActivity implements Observer {
         // Start the engine
         if ( !mEngine.start() ) throw new RuntimeException( "Could not start engine" );
         mEngineStarted = true;
+
+        // Check if Amazonlite is supported
+        if ( mEngine.getProperty( AlexaProperties.WAKEWORD_SUPPORTED ).equals( "true" )){
+            mSpeechRecognizer.enableWakeWordUI();
+        }
+        mLogger.postInfo("Wakeword supported: ", mEngine.getProperty( AlexaProperties.WAKEWORD_SUPPORTED ));
+
         //log whether LocationProvider gave a supported country
         mLogger.postInfo( "Country Supported: ",  mEngine.getProperty( AlexaProperties.COUNTRY_SUPPORTED ));
 
         // Initialize AutoVoiceChrome
 
         mAddressBook.onInitialize();
-        mAuthProvider.onInitialize();
         initTapToTalk();
         initEarconsSettings();
     }
@@ -666,12 +728,13 @@ public class MainActivity extends AppCompatActivity implements Observer {
         ArrayList<EngineConfiguration> configuration = new ArrayList<EngineConfiguration>(Arrays.asList(
                 //AlexaConfiguration.createCurlConfig( certsDir.getPath(), "wlan0" ), Uncomment this line to specify the interface name to use by AVS.
                 AlexaConfiguration.createCurlConfig(certsDir.getPath()),
-                AlexaConfiguration.createDeviceInfoConfig(productDsn, clientId, productId),
+                AlexaConfiguration.createDeviceInfoConfig(productDsn, clientId, productId, "Alexa Auto SDK", "Android Sample App"),
                 AlexaConfiguration.createMiscStorageConfig(appDataDir.getPath() + "/miscStorage.sqlite"),
                 AlexaConfiguration.createCertifiedSenderConfig(appDataDir.getPath() + "/certifiedSender.sqlite"),
+                AlexaConfiguration.createCapabilitiesDelegateConfig(appDataDir.getPath() + "/capabilitiesDelegate.sqlite"),
                 AlexaConfiguration.createAlertsConfig(appDataDir.getPath() + "/alerts.sqlite"),
-                AlexaConfiguration.createSettingsConfig(appDataDir.getPath() + "/settings.sqlite"),
                 AlexaConfiguration.createNotificationsConfig(appDataDir.getPath() + "/notifications.sqlite"),
+                AlexaConfiguration.createDeviceSettingsConfig(appDataDir.getPath() + "/deviceSettings.sqlite"),
                 AlexaConfiguration.createEqualizerControllerConfig(
                         EqualizerConfiguration.getSupportedBands(),
                         EqualizerConfiguration.getMinBandLevel(),
@@ -707,13 +770,42 @@ public class MainActivity extends AppCompatActivity implements Observer {
             Log.i("getEngineConfigurations", "Overriding endpoints");
         }
 
-        // AlexaComms Config
+        // Provide a car control configuration to the Engine.
+        //
+        // We check if a car control configuration file (CarControlConfig.json) is on the SD
+        // card to override the default configuration generated by
+        // CarControlDataProvider.generateCarControlConfig(), else use the default. This logic to
+        // conditionally generate a config or use a file would not ordinarily be required in a
+        // typical application since the config that an application uses will be known and stable.
+        // However, since this sample application allows facilitating testing by overriding the
+        // default car control configuration generated by the application itself, we check if such
+        // an override is being used.
+        String sdCardPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+        String externalCarControlConfigPath = sdCardPath + "/CarControlConfig.json";
+        File carControlConfigFile = new File(externalCarControlConfigPath);
+        if (carControlConfigFile.exists()) {
+            Log.i(TAG, "Using car control config from file on SD card");
+            EngineConfiguration carControlConfig = ConfigurationFile.create(carControlConfigFile.getPath());
+            configuration.add(carControlConfig);
 
-        // AmazonLite Config
-
-        // LVC Config
-
-        // DCM Config
+            // If application is using an external car control configuration file, then the CarControlDataProvider
+            // needs to generate initial values by scanning the file and building a model of the power, toggle, range and mode
+            // controllers defined.
+            try {
+                CarControlDataProvider.initialize(carControlConfigFile.getPath());
+            } catch (Exception e) {
+                Context context = getApplicationContext();
+                int duration = Toast.LENGTH_LONG;
+                Toast toast = Toast.makeText(context, e.getMessage(), duration);
+                toast.show();
+            }
+        } else {
+            // Use programmatic generation of car control configuration. The corresponding custom
+            // assets file that complements the default generated car control config is in the
+            // assets directory, and LVCInteractionService will take care of ensuring it is used.
+            EngineConfiguration ccConfig = CarControlDataProvider.generateCarControlConfig();
+            configuration.add(ccConfig);
+        }
 
         return configuration;
     }
@@ -742,6 +834,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
         if ( mNetworkInfoProvider != null ) { mNetworkInfoProvider.unregister(); }
 
+        if ( mAlexaClient != null && mCBLHandler != null ) { mAlexaClient.removeAuthStateObserver( mCBLHandler ); }
+
         if ( mEngine != null ) { mEngine.dispose(); }
 
         // AutoVoiceChrome cleanup
@@ -768,17 +862,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
             mTapToTalkIcon.getActionView().setOnClickListener( new View.OnClickListener() {
                 @Override
                 public void onClick( View v ) {
-                    if ( mAlexaClient.getConnectionStatus()
-                            == AlexaClient.ConnectionStatus.CONNECTED ) {
-                        mSpeechRecognizer.onTapToTalk();
-                    } else {
-                        // Notify Error state to AutoVoiceChrome
-
-                        String message = "AlexaClient not connected. ConnectionStatus: "
-                                + mAlexaClient.getConnectionStatus();
-                        if ( mLogger != null )  mLogger.postWarn( TAG, message );
-                        else Log.w( TAG, message );
-                    }
+                    mSpeechRecognizer.onTapToTalk();
                 }
             });
 
@@ -786,18 +870,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
             mTapToTalkIcon.getActionView().setOnLongClickListener( new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick( View v ) {
-                    if ( mAlexaClient.getConnectionStatus()
-                            == AlexaClient.ConnectionStatus.CONNECTED ) {
-                        mIsTalkButtonLongPressed = true;
-                        mSpeechRecognizer.onHoldToTalk();
-                    } else {
-                        // Notify Error state to AutoVoiceChrome
-
-                        if ( mLogger != null ) {
-                            mLogger.postWarn( TAG,
-                                    "ConnectionStatus: DISCONNECTED" );
-                        } else Log.w( TAG, "ConnectionStatus: DISCONNECTED" );
-                    }
+                    mIsTalkButtonLongPressed = true;
+                    mSpeechRecognizer.onHoldToTalk();
                     return true;
                 }
             });
@@ -896,11 +970,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 runOnUiThread( new Runnable() {
                     public void run() {
                         // Insert log entry into log view
-                        mRecyclerAdapter.insertItem( entry );
-                        // Scroll to bottom of log view
-                        int count = mRecyclerAdapter.getItemCount();
-                        int position = count > 0 ? count - 1 : 0;
-                        mRecyclerView.scrollToPosition( position );
+                        mLoggerFragment.insertItem(entry);
                     }
                 } );
             }
@@ -959,79 +1029,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
     // Auto Voice Chrome initialize function
 
-    // Set up log view filtering options
-    private void setUpLogViewOptions() {
-        LayoutInflater inf = getLayoutInflater();
-
-        // Add switch for each log source type
-        String[] sources = { "CLI", "AAC", "AVS" };
-        LinearLayout sourceContainer = findViewById( R.id.sourceSwitchContainer );
-        for ( final String source : sources ) {
-            View switchItem = ( inf.inflate( R.layout.drawer_switch, sourceContainer, false ) );
-            ( (TextView) switchItem.findViewById( R.id.text ) ).setText( source );
-            SwitchCompat drawerSwitch = switchItem.findViewById( R.id.drawerSwitch );
-            drawerSwitch.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
-                public void onCheckedChanged( CompoundButton buttonView, boolean isChecked ) {
-                    mRecyclerAdapter.setSourceDisplayMode( source, isChecked );
-                }
-            });
-            sourceContainer.addView( switchItem );
-        }
-
-        // Add option in dropdown selector for each log level
-        Spinner spinner = findViewById( R.id.levelSpinner );
-        ArrayAdapter<Logger.Level> adapter = new ArrayAdapter<>( this, android.R.layout.simple_spinner_item );
-        adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
-
-        for ( Logger.Level level : Logger.Level.values() ) {
-            if ( level == Logger.Level.METRIC ) {
-                continue;
-            }
-            adapter.add( level );
-        }
-
-        spinner.setAdapter( adapter );
-        spinner.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
-            public void onItemSelected( AdapterView<?> parent, View view, int position, long id ) {
-                Logger.Level level = ( Logger.Level ) parent.getItemAtPosition(position);
-                mRecyclerAdapter.setDisplayLevel( level );
-                mRecyclerView.scrollToPosition( mRecyclerAdapter.getItemCount() - 1 );
-            }
-            public void onNothingSelected( AdapterView<?> parent ) {}
-        });
-
-        // Add switch to display or hide card logs
-        View cardItem = findViewById( R.id.toggleCards );
-        ( ( TextView ) cardItem.findViewById( R.id.text ) ).setText( R.string.log_switch_cards );
-        SwitchCompat cardSwitch = cardItem.findViewById( R.id.drawerSwitch );
-        cardSwitch.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged( CompoundButton buttonView, boolean isChecked ) {
-                mRecyclerAdapter.setCardDisplayMode( isChecked );
-            }
-        });
-
-        // Add switch to display or hide pretty-printed JSON template logs
-        View tempItem = findViewById( R.id.toggleTemplates );
-        ( ( TextView ) tempItem.findViewById( R.id.text ) ).setText( R.string.log_switch_template );
-        SwitchCompat tempSwitch = tempItem.findViewById( R.id.drawerSwitch );
-        tempSwitch.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged( CompoundButton buttonView, boolean isChecked ) {
-                mRecyclerAdapter.setJsonDisplayMode( isChecked );
-            }
-        });
-
-        // Clear log button
-        findViewById( R.id.clearLogButton ).setOnClickListener(
-            new View.OnClickListener() {
-                public void onClick( View v ) { mRecyclerAdapter.clear(); }
-            }
-        );
-
-        // Set initial level selection to INFO
-        spinner.setSelection( Logger.Level.INFO.ordinal() );
-        mRecyclerAdapter.setDisplayLevel( Logger.Level.INFO );
-    }
-
     /**
      * Broadcast receiver to receive configuration from LVC provided through the
      * {@link LVCInteractionService}
@@ -1051,6 +1048,71 @@ public class MainActivity extends AppCompatActivity implements Observer {
                     String config = intent.getStringExtra(LVCInteractionService.LVC_RECEIVER_CONFIGURATION);
                     onLVCConfigReceived(config);
                 }
+            }
+        }
+    }
+
+    //Retrieve Factories of extra modules
+    private List<ModuleFactoryInterface> getExtraModuleFactory() {
+        List<ModuleFactoryInterface> extraModuleFactories = new ArrayList<>();
+        try {
+            String folderName = "sample-app";
+            String factoryKey = "factory";
+            String category = "name";
+            String[] fileList = getAssets().list( folderName );
+            Log.e( "loadPlatformInterfaces", "begin loading" );
+            for ( String f : fileList ) {
+                InputStream is = getAssets().open( folderName + "/" + f );
+                byte[] buffer = new byte[is.available()];
+                is.read(buffer);
+                String json = new String( buffer, "UTF-8" );
+                JSONObject obj = new JSONObject( json );
+                if ( obj != null ) {
+                    String factoryName = obj.getJSONObject( factoryKey ).getString( category );
+                    ModuleFactoryInterface instance = ( ModuleFactoryInterface ) Class.forName( factoryName ).newInstance();
+                    extraModuleFactories.add( instance );
+                    Log.i( TAG, "load extra module:" + factoryName );
+                }
+                is.close();
+            }
+        } catch ( Exception e ) {
+            Log.e( "loadPlatformInterfaces", e.getMessage() );
+        }
+        return extraModuleFactories;
+    }
+
+
+    //     Add configuration of extra modules
+    private void configExtraModules( SampleAppContext sampleAppContext, List<ModuleFactoryInterface> extraModuleFactories, List<EngineConfiguration> configuration ) {
+        for ( ModuleFactoryInterface moduleFactory : extraModuleFactories ) {
+            List<EngineConfiguration> moduleConfigs = moduleFactory.getConfiguration( sampleAppContext );
+            for ( EngineConfiguration moduleConfig : moduleConfigs ){
+                Log.e( TAG, moduleConfig.toString() );
+                configuration.add( moduleConfig );
+            }
+        }
+    }
+
+    //     Register platform interfaces and load UI of extra modules
+    private void loadPlatformInterfacesAndLoadUI( Engine engine, List<ModuleFactoryInterface> extraModuleFactories, SampleAppContext sampleAppContext ) {
+        for ( ModuleFactoryInterface moduleFactory : extraModuleFactories ) {
+            //     Inflate any drawer view UIs. Must inflate UI before registering platform interfaces
+            LinearLayout llDisplayData = findViewById( R.id.drawer_linear_layout );
+            LayoutInflater linflater = ( LayoutInflater ) getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+            for ( int layoutResourceNumber : moduleFactory.getLayoutResourceNums() ) {
+                View tempView = linflater.inflate( layoutResourceNumber, null );
+                llDisplayData.addView( tempView );
+            }
+            //     Add adapter fragments
+            List<Fragment> fragments = moduleFactory.getFragments( sampleAppContext );
+            for( Fragment fragment : fragments ) {
+                mAdapter.addFragment( fragment );
+                mAdapter.notifyDataSetChanged();
+            }
+            //     Register platform interfaces
+            List<PlatformInterface> platformInterfaces = moduleFactory.getModulePlatformInterfaces( sampleAppContext );
+            for( PlatformInterface platformInterface : platformInterfaces ) {
+                if ( !engine.registerPlatformInterface( platformInterface ) ) throw new RuntimeException( "Could not register extra module interface" );
             }
         }
     }

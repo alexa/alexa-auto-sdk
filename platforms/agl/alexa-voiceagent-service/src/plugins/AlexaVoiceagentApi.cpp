@@ -524,11 +524,11 @@ CTLP_CAPI(onLocalMediaSourcePlayerError, source, argsJ, eventJ) {
     return 0;
 }
 
-CTLP_CAPI(onCarControlClimateIsOnResponse, source, argsJ, eventJ) {
-    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlClimateIsOn");
+CTLP_CAPI(onCarControlIsPowerControllerOnResponse, source, argsJ, eventJ) {
+    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlIsPowerControllerOnResponse");
 
     if (eventJ == nullptr) {
-        sAFBLogger->log(Level::ERROR, TAG, "onCarControlClimateIsOn: No arguments supplied.");
+        sAFBLogger->log(Level::ERROR, TAG, "onCarControlIsPowerControllerOnResponse: No arguments supplied.");
         return -1;
     }
 
@@ -538,16 +538,16 @@ CTLP_CAPI(onCarControlClimateIsOnResponse, source, argsJ, eventJ) {
     }
 
     std::string payload(json_object_to_json_string(eventJ));
-    sAlexaCarControlDispatcher->onIsClimateOnResponse(payload);
+    sAlexaCarControlDispatcher->onIsPowerControllerOnResponse(payload);
 
     return 0;
 }
 
-CTLP_CAPI(onCarControlClimateSyncIsOnResponse, source, argsJ, eventJ) {
-    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlClimateSyncIsOn");
+CTLP_CAPI(onCarControlIsToggleControllerOnResponse, source, argsJ, eventJ) {
+    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlIsToggleControllerOnResponse");
 
     if (eventJ == nullptr) {
-        sAFBLogger->log(Level::ERROR, TAG, "onCarControlClimateSyncIsOn: No arguments supplied.");
+        sAFBLogger->log(Level::ERROR, TAG, "onCarControlIsToggleControllerOnResponse: No arguments supplied.");
         return -1;
     }
 
@@ -557,16 +557,16 @@ CTLP_CAPI(onCarControlClimateSyncIsOnResponse, source, argsJ, eventJ) {
     }
 
     std::string payload(json_object_to_json_string(eventJ));
-    sAlexaCarControlDispatcher->onIsClimateSyncOnResponse(payload);
+    sAlexaCarControlDispatcher->onIsToggleControllerOnResponse(payload);
 
     return 0;
 }
 
-CTLP_CAPI(onCarControlAirRecirculationIsOnResponse, source, argsJ, eventJ) {
-    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlAirRecirculationIsOn");
+CTLP_CAPI(onCarControlGetModeControllerValueResponse, source, argsJ, eventJ) {
+    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlGetModeControllerValueResponse");
 
     if (eventJ == nullptr) {
-        sAFBLogger->log(Level::ERROR, TAG, "onCarControlAirRecirculationIsOn: No arguments supplied.");
+        sAFBLogger->log(Level::ERROR, TAG, "onCarControlGetModeControllerValueResponse: No arguments supplied.");
         return -1;
     }
 
@@ -576,16 +576,16 @@ CTLP_CAPI(onCarControlAirRecirculationIsOnResponse, source, argsJ, eventJ) {
     }
 
     std::string payload(json_object_to_json_string(eventJ));
-    sAlexaCarControlDispatcher->onIsAirRecirculationOnResponse(payload);
+    sAlexaCarControlDispatcher->onGetModeControllerValueResponse(payload);
 
     return 0;
 }
 
-CTLP_CAPI(onCarControlAirConditionerIsOnResponse, source, argsJ, eventJ) {
-    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlAirConditionerIsOn");
+CTLP_CAPI(onCarControlGetRangeControllerValueResponse, source, argsJ, eventJ) {
+    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlGetRangeControllerValueResponse");
 
     if (eventJ == nullptr) {
-        sAFBLogger->log(Level::ERROR, TAG, "onCarControlAirConditionerIsOn: No arguments supplied.");
+        sAFBLogger->log(Level::ERROR, TAG, "onCarControlGetRangeControllerValueResponse: No arguments supplied.");
         return -1;
     }
 
@@ -595,197 +595,7 @@ CTLP_CAPI(onCarControlAirConditionerIsOnResponse, source, argsJ, eventJ) {
     }
 
     std::string payload(json_object_to_json_string(eventJ));
-    sAlexaCarControlDispatcher->onIsAirConditionerOnResponse(payload);
-
-    return 0;
-}
-
-CTLP_CAPI(onCarControlGetAirConditionerModeResponse, source, argsJ, eventJ) {
-    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlGetAirConditionerMode");
-
-    if (eventJ == nullptr) {
-        sAFBLogger->log(Level::ERROR, TAG, "onCarControlGetAirConditionerMode: No arguments supplied.");
-        return -1;
-    }
-
-    if (!sAlexaCarControlDispatcher) {
-        sAFBLogger->log(Level::ERROR, TAG, "CarControlDispatcher doesn't exist.");
-        return -1;
-    }
-
-    std::string payload(json_object_to_json_string(eventJ));
-    sAlexaCarControlDispatcher->onGetAirConditionerModeResponse(payload);
-
-    return 0;
-}
-
-CTLP_CAPI(onCarControlHeaterIsOnResponse, source, argsJ, eventJ) {
-    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlHeaterIsOn");
-
-    if (eventJ == nullptr) {
-        sAFBLogger->log(Level::ERROR, TAG, "onCarControlHeaterIsOn: No arguments supplied.");
-        return -1;
-    }
-
-    if (!sAlexaCarControlDispatcher) {
-        sAFBLogger->log(Level::ERROR, TAG, "CarControlDispatcher doesn't exist.");
-        return -1;
-    }
-
-    std::string payload(json_object_to_json_string(eventJ));
-    sAlexaCarControlDispatcher->onIsHeaterOnResponse(payload);
-
-    return 0;
-}
-
-CTLP_CAPI(onCarControlGetHeaterTemperatureResponse, source, argsJ, eventJ) {
-    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlGetHeaterTemperature");
-
-    if (eventJ == nullptr) {
-        sAFBLogger->log(Level::ERROR, TAG, "onCarControlGetHeaterTemperature: No arguments supplied.");
-        return -1;
-    }
-
-    if (!sAlexaCarControlDispatcher) {
-        sAFBLogger->log(Level::ERROR, TAG, "CarControlDispatcher doesn't exist.");
-        return -1;
-    }
-
-    std::string payload(json_object_to_json_string(eventJ));
-    sAlexaCarControlDispatcher->onGetHeaterTemperatureResponse(payload);
-
-    return 0;
-}
-
-CTLP_CAPI(onCarControlFanIsOnResponse, source, argsJ, eventJ) {
-    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlFanIsOn");
-
-    if (eventJ == nullptr) {
-        sAFBLogger->log(Level::ERROR, TAG, "onCarControlFanIsOn: No arguments supplied.");
-        return -1;
-    }
-
-    if (!sAlexaCarControlDispatcher) {
-        sAFBLogger->log(Level::ERROR, TAG, "CarControlDispatcher doesn't exist.");
-        return -1;
-    }
-
-    std::string payload(json_object_to_json_string(eventJ));
-    sAlexaCarControlDispatcher->onIsFanOnResponse(payload);
-
-    return 0;
-}
-
-CTLP_CAPI(onCarControlGetFanSpeedResponse, source, argsJ, eventJ) {
-    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlGetFanSpeed");
-
-    if (eventJ == nullptr) {
-        sAFBLogger->log(Level::ERROR, TAG, "onCarControlGetFanSpeed: No arguments supplied.");
-        return -1;
-    }
-
-    if (!sAlexaCarControlDispatcher) {
-        sAFBLogger->log(Level::ERROR, TAG, "CarControlDispatcher doesn't exist.");
-        return -1;
-    }
-
-    std::string payload(json_object_to_json_string(eventJ));
-    sAlexaCarControlDispatcher->onGetFanSpeedResponse(payload);
-
-    return 0;
-}
-
-CTLP_CAPI(onCarControlVentIsOnResponse, source, argsJ, eventJ) {
-    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlVentIsOn");
-
-    if (eventJ == nullptr) {
-        sAFBLogger->log(Level::ERROR, TAG, "onCarControlVentIsOn: No arguments supplied.");
-        return -1;
-    }
-
-    if (!sAlexaCarControlDispatcher) {
-        sAFBLogger->log(Level::ERROR, TAG, "CarControlDispatcher doesn't exist.");
-        return -1;
-    }
-
-    std::string payload(json_object_to_json_string(eventJ));
-    sAlexaCarControlDispatcher->onIsVentOnResponse(payload);
-
-    return 0;
-}
-
-CTLP_CAPI(onCarControlGetVentPositionResponse, source, argsJ, eventJ) {
-    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlGetVentPosition");
-
-    if (eventJ == nullptr) {
-        sAFBLogger->log(Level::ERROR, TAG, "onCarControlGetVentPosition: No arguments supplied.");
-        return -1;
-    }
-
-    if (!sAlexaCarControlDispatcher) {
-        sAFBLogger->log(Level::ERROR, TAG, "CarControlDispatcher doesn't exist.");
-        return -1;
-    }
-
-    std::string payload(json_object_to_json_string(eventJ));
-    sAlexaCarControlDispatcher->onGetVentPositionResponse(payload);
-
-    return 0;
-}
-
-CTLP_CAPI(onCarControlWindowDefrosterIsOnResponse, source, argsJ, eventJ) {
-    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlWindowDefrosterIsOn");
-
-    if (eventJ == nullptr) {
-        sAFBLogger->log(Level::ERROR, TAG, "onCarControlWindowDefrosterIsOn: No arguments supplied.");
-        return -1;
-    }
-
-    if (!sAlexaCarControlDispatcher) {
-        sAFBLogger->log(Level::ERROR, TAG, "CarControlDispatcher doesn't exist.");
-        return -1;
-    }
-
-    std::string payload(json_object_to_json_string(eventJ));
-    sAlexaCarControlDispatcher->onIsWindowDefrosterOnResponse(payload);
-
-    return 0;
-}
-
-CTLP_CAPI(onCarControlLightIsOnResponse, source, argsJ, eventJ) {
-    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlLightIsOn");
-
-    if (eventJ == nullptr) {
-        sAFBLogger->log(Level::ERROR, TAG, "onCarControlLightIsOn: No arguments supplied.");
-        return -1;
-    }
-
-    if (!sAlexaCarControlDispatcher) {
-        sAFBLogger->log(Level::ERROR, TAG, "CarControlDispatcher doesn't exist.");
-        return -1;
-    }
-
-    std::string payload(json_object_to_json_string(eventJ));
-    sAlexaCarControlDispatcher->onIsLightOnResponse(payload);
-
-    return 0;
-}
-
-CTLP_CAPI(onCarControlGetLightColorResponse, source, argsJ, eventJ) {
-    sAFBLogger->log(Level::DEBUG, TAG, "onCarControlGetLightColor");
-
-    if (eventJ == nullptr) {
-        sAFBLogger->log(Level::ERROR, TAG, "onCarControlGetLightColor: No arguments supplied.");
-        return -1;
-    }
-
-    if (!sAlexaCarControlDispatcher) {
-        sAFBLogger->log(Level::ERROR, TAG, "CarControlDispatcher doesn't exist.");
-        return -1;
-    }
-
-    std::string payload(json_object_to_json_string(eventJ));
-    sAlexaCarControlDispatcher->onGetLightColorResponse(payload);
+    sAlexaCarControlDispatcher->onGetRangeControllerValueResponse(payload);
 
     return 0;
 }

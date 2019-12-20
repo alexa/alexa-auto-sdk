@@ -16,11 +16,11 @@
 #ifndef AACE_ENGINE_ALEXA_ALEXA_CLIENT_ENGINE_IMPL_H
 #define AACE_ENGINE_ALEXA_ALEXA_CLIENT_ENGINE_IMPL_H
 
+#include <ACL/AVSConnectionManager.h>
 #include <AVSCommon/SDKInterfaces/AuthObserverInterface.h>
 #include <AVSCommon/SDKInterfaces/ConnectionStatusObserverInterface.h>
-#include <AVSCommon/SDKInterfaces/DialogUXStateObserverInterface.h>
 #include <AVSCommon/AVS/DialogUXStateAggregator.h>
-#include <ACL/AVSConnectionManager.h>
+#include <AVSCommon/SDKInterfaces/DialogUXStateObserverInterface.h>
 
 #include "AACE/Alexa/AlexaClient.h"
 

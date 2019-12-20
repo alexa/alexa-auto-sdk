@@ -9,7 +9,8 @@
         android:background="@color/drawerBackground"
         android:orientation="vertical"
         android:paddingStart="8dp"
-        android:paddingEnd="8dp">
+        android:paddingEnd="8dp"
+        android:id="@+id/drawer_linear_layout">
 
         <!-- Container for login -->
         <LinearLayout
@@ -34,6 +35,31 @@
                 android:layout_marginBottom="8dp"
                 android:background="@null"
                 android:src="@drawable/lwa_btn_src" />
+        </LinearLayout>
+
+        <!-- Container for cancel -->
+        <LinearLayout
+            android:id="@+id/cancel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:background="@color/drawerSection"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!-- Log out button -->
+            <TextView
+                android:id="@+id/cancelButton"
+                style="@style/button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/auth_cancel" />
         </LinearLayout>
 
         <!-- Container for logout -->
@@ -511,16 +537,6 @@
                 android:layout_marginBottom="4dp"
                 android:text="@string/alerts_stop" />
 
-            <!-- Remove all alerts button -->
-            <TextView
-                android:id="@+id/removeAlertsButton"
-                style="@style/button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="8dp"
-                android:text="@string/alerts_remove" />
         </LinearLayout>
 
         <!-- Notifications -->
@@ -1519,6 +1535,37 @@
                 android:layout_marginBottom="4dp"
                 android:textSize="12sp" />
 
+        </LinearLayout>
+
+        <!-- DoNotDisturb Status -->
+        <LinearLayout
+            android:id="@+id/doNotDisturb"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="8dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:background="@color/drawerSection">
+
+            <!-- Header -->
+            <TextView
+                android:id="@+id/do_not_disturb_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/doNotDisturb"
+                android:textColor="@color/drawerHeader"
+                android:layout_marginBottom="4dp"
+                android:textSize="18sp" />
+
+            <include
+                layout="@layout/drawer_switch"
+                android:id="@+id/toggle_do_not_disturb"
+                android:text="@string/do_not_disturb_switch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal" />
         </LinearLayout>
     </LinearLayout>
 

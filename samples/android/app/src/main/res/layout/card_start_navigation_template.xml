@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/setDestinationTemplate"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/cardBackground"
+    tools:context="com.amazon.sampleapp.MainActivity">
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guidelineLeftMargin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.055" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guidelineRightMargin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.945" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guidelineTopMargin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.044" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guidelineBottomMargin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.956" />
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif"
+        android:lines="1"
+        android:ellipsize="end"
+        android:textColor="@color/cardMainTitle"
+        android:textSize="32sp"
+        app:layout_constraintStart_toStartOf="@id/guidelineLeftMargin"
+        app:layout_constraintEnd_toStartOf="@+id/guidelineRightMargin"
+        app:layout_constraintTop_toBottomOf="@id/guidelineTopMargin"
+        app:layout_constraintHorizontal_bias="0.0" />
+
+    <TextView
+        android:id="@+id/address"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-light"
+        android:lines="1"
+        android:textColor="@color/cardSubTitle"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toStartOf="@+id/guidelineRightMargin"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@id/guidelineLeftMargin"
+        app:layout_constraintTop_toBottomOf="@+id/name" />
+
+    <com.google.android.gms.maps.MapView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:map="http://schemas.android.com/apk/res-auto"
+        android:name="com.google.android.gms.maps.MapFragment"
+        android:id="@+id/mapContainer"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        map:cameraZoom="13"
+        map:mapType="normal"
+        map:liteMode="true"
+        android:layout_marginTop="8dp"
+        android:scaleType="centerInside"
+        app:layout_constraintEnd_toStartOf="@id/guidelineRightMargin"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@id/guidelineLeftMargin"
+        app:layout_constraintTop_toBottomOf="@+id/address"
+        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintBottom_toTopOf="@+id/waypoints"/>
+
+    <TextView
+        android:id="@+id/waypoints"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-light"
+        android:lines="5"
+        android:textColor="@color/cardSubTitle"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/guidelineBottomMargin"
+        app:layout_constraintEnd_toStartOf="@+id/guidelineRightMargin"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/guidelineLeftMargin"/>
+
+</android.support.constraint.ConstraintLayout>

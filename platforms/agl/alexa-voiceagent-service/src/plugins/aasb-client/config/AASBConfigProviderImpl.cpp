@@ -22,6 +22,7 @@
 
 #include <rapidjson/document.h>
 #include <rapidjson/istreamwrapper.h>
+#include <rapidjson/prettywriter.h>
 
 #include <filescan-utils.h>
 
@@ -59,6 +60,8 @@ AASBConfigProviderImpl::AASBConfigProviderImpl(std::shared_ptr<agl::common::inte
         m_satelliteRadio(false),
         m_LineIn(false),
         m_compactDisc(false),
+        m_siriusXM(false),
+        m_dab(false),
         m_enableLocalMediaSource(false),
         m_enableCarControl(false),
         m_enableLocalVoiceControl(false) {
@@ -78,6 +81,8 @@ AASBConfigProviderImpl::LocalMediaSourceConfiguration AASBConfigProviderImpl::ge
     localMediaSourceConfig.hasSatelliteRadio = m_satelliteRadio;
     localMediaSourceConfig.hasLineIn = m_LineIn;
     localMediaSourceConfig.hasCompactDisc = m_compactDisc;
+    localMediaSourceConfig.hasSiriusXM = m_siriusXM;
+    localMediaSourceConfig.hasDAB = m_dab;
     return localMediaSourceConfig;
 }
 
@@ -120,6 +125,10 @@ AASBConfigProviderImpl::AudioIOConfiguration AASBConfigProviderImpl::getAudioIOC
     return audioConfig;
 }
 
+AASBConfigProviderImpl::DeviceSettingsConfiguration AASBConfigProviderImpl::getDeviceSettingsConfig() {
+    return m_deviceSettingsConfiguration;
+}
+
 AASBConfigProviderImpl::LVCConfiguration AASBConfigProviderImpl::getLocalVoiceControlConfig() {
     LVCConfiguration lvcConfig;
     lvcConfig.socketRootDirectory = m_LocalVoiceControlConfiguration->socketRootDirectory;
@@ -129,7 +138,7 @@ AASBConfigProviderImpl::LVCConfiguration AASBConfigProviderImpl::getLocalVoiceCo
 AASBConfigProviderImpl::CarControlConfiguration AASBConfigProviderImpl::getCarControlConfig() {
     CarControlConfiguration  carControlConfig;
     carControlConfig.enabled = m_carControlConfiguration->enabled;
-    carControlConfig.zones = m_carControlConfiguration->zones;
+    carControlConfig.endpoints = m_carControlConfiguration->endpoints;
     return carControlConfig;
 }
 
@@ -151,6 +160,14 @@ std::string AASBConfigProviderImpl::getClientId() {
 
 std::string AASBConfigProviderImpl::getProductId() {
     return m_productId;
+}
+
+std::string AASBConfigProviderImpl::getManufacturerName() {
+    return m_manufacturerName;
+}
+
+std::string AASBConfigProviderImpl::getDescription() {
+    return m_description;
 }
 
 std::string AASBConfigProviderImpl::getExternalStorageDirectory() {
@@ -201,6 +218,10 @@ std::string AASBConfigProviderImpl::getCountry() {
     return m_country;
 }
 
+std::shared_ptr<std::istream> AASBConfigProviderImpl::getVehicleConfig() {
+    return m_vehicleConfig;
+}
+
 void AASBConfigProviderImpl::initConfigFromFile(const std::string& fileName) {
     m_logger->log(Level::INFO, TAG, "Initializing configuration from: " + fileName);
 
@@ -220,6 +241,35 @@ void AASBConfigProviderImpl::initConfigFromFile(const std::string& fileName) {
             }
             if (deviceInfo.HasMember("productId") && deviceInfo["productId"].IsString()) {
                 m_productId = deviceInfo["productId"].GetString();
+            }
+            if (deviceInfo.HasMember("manufacturerName") && deviceInfo["manufacturerName"].IsString()) {
+                m_manufacturerName = deviceInfo["manufacturerName"].GetString();
+            }
+            if (deviceInfo.HasMember("description") && deviceInfo["description"].IsString()) {
+                m_description = deviceInfo["description"].GetString();
+            }
+        }
+        if (root.HasMember("libcurlUtils") && root["libcurlUtils"].IsObject()) {
+            auto curlConfig = root["libcurlUtils"].GetObject();
+            if (curlConfig.HasMember("CURLOPT_CAPATH") && curlConfig["CURLOPT_CAPATH"].IsString()) {
+                m_certificatePath = curlConfig["CURLOPT_CAPATH"].GetString();
+            }
+        }
+        if (root.HasMember("deviceSettings") && root["deviceSettings"].IsObject()) {
+            auto deviceConfig = root["deviceSettings"].GetObject();
+            if (deviceConfig.HasMember("defaultLocale") && deviceConfig["defaultLocale"].IsString()) {
+                m_deviceSettingsConfiguration.defaultLocale = deviceConfig["defaultLocale"].GetString();
+            }
+            if (deviceConfig.HasMember("defaultTimezone") && deviceConfig["defaultTimezone"].IsString()) {
+                m_deviceSettingsConfiguration.defaultTimezone = deviceConfig["defaultTimezone"].GetString();
+            }
+            if (deviceConfig.HasMember("locales") && deviceConfig["locales"].IsArray()) {
+                auto locales = deviceConfig["locales"].GetArray();
+                for (auto& locale : locales) {
+                    if (locale.IsString()) {
+                        m_deviceSettingsConfiguration.locales.push_back(locale.GetString());
+                    }
+                }
             }
         }
         if (root.HasMember("auth") && root["auth"].IsObject()) {
@@ -277,173 +327,248 @@ void AASBConfigProviderImpl::initConfigFromFile(const std::string& fileName) {
                 if (carControlConfig.HasMember("enabled") && carControlConfig["enabled"].IsBool()) {
                     m_enableCarControl = carControlConfig["enabled"].GetBool();
                 }
-                if (carControlConfig.HasMember("cannedzones") && carControlConfig["cannedzones"].IsArray()) {
-                    auto zonesConfig = carControlConfig["cannedzones"].GetArray();
-                    for (auto& zone : zonesConfig) {
-                        if (zone.IsObject()) {
-                            auto zoneValue = zone.GetObject();
-                            CarControlConfiguration::Zone zoneMember;
-                            if (zoneValue.HasMember("enabled") && zoneValue["enabled"].IsBool()) {
-                                if (!zoneValue["enabled"].GetBool())
+                if (carControlConfig.HasMember("endpoints") && carControlConfig["endpoints"].IsArray()) {
+                    auto endpointsConfig = carControlConfig["endpoints"].GetArray();
+                    for (auto& endpoint : endpointsConfig) {
+                        if (endpoint.IsObject()) {
+                            auto endpointValue = endpoint.GetObject();
+                            CarControlConfiguration::Endpoint endpointMember;
+                            if (endpointValue.HasMember("enabled") && endpointValue["enabled"].IsBool()) {
+                                if (!endpointValue["enabled"].GetBool())
                                     continue;
-                            }                            
-                            if (zoneValue.HasMember("name") && zoneValue["name"].IsString()) {
-                                zoneMember.name = zoneValue["name"].GetString();
                             }
-                            if (zoneValue.HasMember("climate") && zoneValue["climate"].IsObject()) {
-                                auto climate = zoneValue["climate"].GetObject();
-                                zoneMember.climate.enabled = true;
-                                if (climate.HasMember("syncController") && climate["syncController"].IsBool()) {
-                                   zoneMember.climate.addSyncController = climate["syncController"].GetBool();
+                            if (endpointValue.HasMember("zone") && endpointValue["zone"].IsString()) {
+                                endpointMember.zone = endpointValue["zone"].GetString();
+                            }
+                            if (endpointValue.HasMember("climate") && endpointValue["climate"].IsObject()) {
+                                auto climate = endpointValue["climate"].GetObject();
+                                endpointMember.climate.enabled = true;
+                                if (climate.HasMember("controlId") && climate["controlId"].IsString()) {
+                                   endpointMember.climate.controlId = climate["controlId"].GetString();
                                 }
-                                if (climate.HasMember("recirculationController") && climate["recirculationController"].IsBool()) {
-                                    zoneMember.climate.addRecirculationController = climate["recirculationController"].GetBool();
+                                if (climate.HasMember("sync") && climate["sync"].IsObject()) {
+                                    auto sync = climate["sync"].GetObject();
+                                    if (sync.HasMember("controllerId") && sync["controllerId"].IsString()) {
+                                        endpointMember.climate.syncControllerId = sync["controllerId"].GetString();
+                                    }
+                                }
+                                if (climate.HasMember("recirculate") && climate["recirculate"].IsObject()) {
+                                    auto recirculate = climate["recirculate"].GetObject();
+                                    if (recirculate.HasMember("controllerId") && recirculate["controllerId"].IsString()) {
+                                        endpointMember.climate.recirculationControllerId = recirculate["controllerId"].GetString();
+                                    }
                                 }
                             }
-                            if (zoneValue.HasMember("airconditioner") && zoneValue["airconditioner"].IsObject()) {
-                                auto airConditioner = zoneValue["airconditioner"].GetObject();
-                                zoneMember.airConditioner.enabled = true;
-                                if (airConditioner.HasMember("modes") && airConditioner["modes"].IsObject()) {
-                                    auto modesConfig = airConditioner["modes"].GetObject();
-                                    if (modesConfig.HasMember("AUTO") && modesConfig["AUTO"].IsBool()) { 
-                                        if (modesConfig["AUTO"].GetBool()) {
-                                            zoneMember.airConditioner.modes.push_back("AUTO");
+                            if (endpointValue.HasMember("airconditioner") && endpointValue["airconditioner"].IsObject()) {
+                                auto airConditioner = endpointValue["airconditioner"].GetObject();
+                                endpointMember.airConditioner.enabled = true;
+                                if (airConditioner.HasMember("controlId") && airConditioner["controlId"].IsString()) {
+                                    endpointMember.airConditioner.controlId = airConditioner["controlId"].GetString();
+                                }
+                                if (airConditioner.HasMember("mode") && airConditioner["mode"].IsObject()) {
+                                    auto modeConfig = airConditioner["mode"].GetObject();
+                                    if (modeConfig.HasMember("controllerId") && modeConfig["controllerId"].IsString()) {
+                                        endpointMember.airConditioner.modeControllerId = modeConfig["controllerId"].GetString();
+                                    }
+                                    if (modeConfig.HasMember("values") && modeConfig["values"].IsObject()) {
+                                        auto valuesConfig = modeConfig["values"].GetObject();
+                                        if (valuesConfig.HasMember("AUTO") && valuesConfig["AUTO"].IsBool()) {
+                                            if (valuesConfig["AUTO"].GetBool()) {
+                                                endpointMember.airConditioner.modeValues.push_back("AUTO");
+                                            }
+                                        }
+                                        if (valuesConfig.HasMember("ECONOMY") && valuesConfig["ECONOMY"].IsBool()) {
+                                            if (valuesConfig["ECONOMY"].GetBool()) {
+                                                endpointMember.airConditioner.modeValues.push_back("ECONOMY");
+                                            }
+                                        }
+                                        if (valuesConfig.HasMember("MANUAL") && valuesConfig["MANUAL"].IsBool()) {
+                                            if (valuesConfig["MANUAL"].GetBool()) {
+                                                endpointMember.airConditioner.modeValues.push_back("MANUAL");
+                                            }
                                         }
                                     }
-                                    if (modesConfig.HasMember("ECONOMY") && modesConfig["ECONOMY"].IsBool()) { 
-                                        if (modesConfig["ECONOMY"].GetBool()) {
-                                            zoneMember.airConditioner.modes.push_back("ECONOMY");
+                                }
+                                if (airConditioner.HasMember("intensity") && airConditioner["intensity"].IsObject()) {
+                                    auto intensityConfig = airConditioner["intensity"].GetObject();
+                                    if (intensityConfig.HasMember("controllerId") && intensityConfig["controllerId"].IsString()) {
+                                        endpointMember.airConditioner.intensityControllerId = intensityConfig["controllerId"].GetString();
+                                    }
+                                    if (intensityConfig.HasMember("values") && intensityConfig["values"].IsObject()) {
+                                        auto valuesConfig = intensityConfig["values"].GetObject();
+                                        if (valuesConfig.HasMember("LOW") && valuesConfig["LOW"].IsBool()) {
+                                            if (valuesConfig["LOW"].GetBool()) {
+                                                endpointMember.airConditioner.intensityValues.push_back("LOW");
+                                            }
+                                        }
+                                        if (valuesConfig.HasMember("MEDIUM") && valuesConfig["MEDIUM"].IsBool()) {
+                                            if (valuesConfig["MEDIUM"].GetBool()) {
+                                                endpointMember.airConditioner.intensityValues.push_back("MEDIUM");
+                                            }
+                                        }
+                                        if (valuesConfig.HasMember("HIGH") && valuesConfig["HIGH"].IsBool()) {
+                                            if (valuesConfig["HIGH"].GetBool()) {
+                                                endpointMember.airConditioner.intensityValues.push_back("HIGH");
+                                            }
                                         }
                                     }
-                                    if (modesConfig.HasMember("MANUAL") && modesConfig["MANUAL"].IsBool()) { 
-                                        if (modesConfig["MANUAL"].GetBool()) {
-                                            zoneMember.airConditioner.modes.push_back("MANUAL");
-                                        }
-                                    }
-                                    if (modesConfig.HasMember("MAXIMUM") && modesConfig["MAXIMUM"].IsBool()) { 
-                                        if (modesConfig["MAXIMUM"].GetBool()) {
-                                            zoneMember.airConditioner.modes.push_back("MAXIMUM");
-                                        }
-                                    }
-                                }                                
+                                }
                             }
-                            if (zoneValue.HasMember("heater") && zoneValue["heater"].IsObject()) {
-                                auto heater = zoneValue["heater"].GetObject();
-                                zoneMember.heater.enabled = true;
-                                if (heater.HasMember("minimum") && heater["minimum"].IsDouble()) {
-                                    zoneMember.heater.minimum = heater["minimum"].GetDouble();
+                            if (endpointValue.HasMember("heater") && endpointValue["heater"].IsObject()) {
+                                auto heater = endpointValue["heater"].GetObject();
+                                endpointMember.heater.enabled = true;
+                                if (heater.HasMember("controlId") && heater["controlId"].IsString()) {
+                                    endpointMember.heater.controlId = heater["controlId"].GetString();
                                 }
-                                if (heater.HasMember("maximum") && heater["maximum"].IsDouble()) {
-                                    zoneMember.heater.maximum = heater["maximum"].GetDouble();
+                                if (heater.HasMember("controllerId") && heater["controllerId"].IsString()) {
+                                    endpointMember.heater.controllerId = heater["controllerId"].GetString();
                                 }
-                                if (heater.HasMember("precision") && heater["precision"].IsDouble()) {
-                                    zoneMember.heater.precision = heater["precision"].GetDouble();
+                                if (heater.HasMember("minimum") && heater["minimum"].IsNumber()) {
+                                    endpointMember.heater.minimum = heater["minimum"].GetDouble();
+                                }
+                                if (heater.HasMember("maximum") && heater["maximum"].IsNumber()) {
+                                    endpointMember.heater.maximum = heater["maximum"].GetDouble();
+                                }
+                                if (heater.HasMember("precision") && heater["precision"].IsNumber()) {
+                                    endpointMember.heater.precision = heater["precision"].GetDouble();
                                 }
                                 if (heater.HasMember("unit") && heater["unit"].IsString()) {
-                                    zoneMember.heater.unit = heater["unit"].GetString();
-                                }                                
-                            }
-                            if (zoneValue.HasMember("fan") && zoneValue["fan"].IsObject()) {
-                                auto fan = zoneValue["fan"].GetObject();
-                                zoneMember.fan.enabled = true;
-                                if (fan.HasMember("minimum") && fan["minimum"].IsDouble()) {
-                                    zoneMember.fan.minimum = fan["minimum"].GetDouble();
-                                }
-                                if (fan.HasMember("maximum") && fan["maximum"].IsDouble()) {
-                                    zoneMember.fan.maximum = fan["maximum"].GetDouble();
-                                }
-                                if (fan.HasMember("precision") && fan["precision"].IsDouble()) {
-                                    zoneMember.fan.precision = fan["precision"].GetDouble();
+                                    endpointMember.heater.unit = heater["unit"].GetString();
                                 }
                             }
-                            if (zoneValue.HasMember("vent") && zoneValue["vent"].IsObject()) {
-                                auto ventsConfig = zoneValue["vent"].GetObject();
-                                zoneMember.vent.enabled = true;
-                                if (ventsConfig.HasMember("positions") && ventsConfig["positions"].IsObject()) {
-                                    auto positions = ventsConfig["positions"].GetObject();
-                                    if (positions.HasMember("BODY") && positions["BODY"].IsBool()) { 
-                                        if (positions["BODY"].GetBool()) {
-                                            zoneMember.vent.positions.push_back("BODY");
-                                        }
+                            if (endpointValue.HasMember("fan") && endpointValue["fan"].IsObject()) {
+                                auto fan = endpointValue["fan"].GetObject();
+                                endpointMember.fan.enabled = true;
+                                if (fan.HasMember("controlId") && fan["controlId"].IsString()) {
+                                    endpointMember.fan.controlId = fan["controlId"].GetString();
+                                }
+                                if (fan.HasMember("controllerId") && fan["controllerId"].IsString()) {
+                                    endpointMember.fan.controllerId = fan["controllerId"].GetString();
+                                }
+                                if (fan.HasMember("minimum") && fan["minimum"].IsNumber()) {
+                                    endpointMember.fan.minimum = fan["minimum"].GetDouble();
+                                }
+                                if (fan.HasMember("maximum") && fan["maximum"].IsNumber()) {
+                                    endpointMember.fan.maximum = fan["maximum"].GetDouble();
+                                }
+                                if (fan.HasMember("precision") && fan["precision"].IsNumber()) {
+                                    endpointMember.fan.precision = fan["precision"].GetDouble();
+                                }
+                            }
+                            if (endpointValue.HasMember("vent") && endpointValue["vent"].IsObject()) {
+                                auto ventConfig = endpointValue["vent"].GetObject();
+                                endpointMember.vent.enabled = true;
+                                if (ventConfig.HasMember("controlId") && ventConfig["controlId"].IsString()) {
+                                    endpointMember.vent.controlId = ventConfig["controlId"].GetString();
+                                }
+                                if (ventConfig.HasMember("positions") && ventConfig["positions"].IsObject()) {
+                                    auto positionsConfig = ventConfig["positions"].GetObject();
+                                    if (positionsConfig.HasMember("controllerId") && positionsConfig["controllerId"].IsString()) {
+                                        endpointMember.vent.positionsControllerId = positionsConfig["controllerId"].GetString();
                                     }
-                                    if (positions.HasMember("MIX") && positions["MIX"].IsBool()) { 
-                                        if (positions["MIX"].GetBool()) {
-                                            zoneMember.vent.positions.push_back("MIX");
+                                    if (positionsConfig.HasMember("values") && positionsConfig["values"].IsObject()) {
+                                        auto valuesConfig = positionsConfig["values"].GetObject();
+                                        if (valuesConfig.HasMember("BODY") && valuesConfig["BODY"].IsBool()) {
+                                            if (valuesConfig["BODY"].GetBool()) {
+                                                endpointMember.vent.positions.push_back("BODY");
+                                            }
                                         }
-                                    }
-                                    if (positions.HasMember("FLOOR") && positions["FLOOR"].IsBool()) { 
-                                        if (positions["FLOOR"].GetBool()) {
-                                            zoneMember.vent.positions.push_back("FLOOR");
+                                        if (valuesConfig.HasMember("MIX") && valuesConfig["MIX"].IsBool()) {
+                                            if (valuesConfig["MIX"].GetBool()) {
+                                                endpointMember.vent.positions.push_back("MIX");
+                                            }
                                         }
-                                    }
-                                    if (positions.HasMember("WINDSHIELD") && positions["WINDSHIELD"].IsBool()) { 
-                                        if (positions["WINDSHIELD"].GetBool()) {
-                                            zoneMember.vent.positions.push_back("WINDSHIELD");
+                                        if (valuesConfig.HasMember("FLOOR") && valuesConfig["FLOOR"].IsBool()) {
+                                            if (valuesConfig["FLOOR"].GetBool()) {
+                                                endpointMember.vent.positions.push_back("FLOOR");
+                                            }
+                                        }
+                                        if (valuesConfig.HasMember("WINDSHIELD") && valuesConfig["WINDSHIELD"].IsBool()) {
+                                            if (valuesConfig["WINDSHIELD"].GetBool()) {
+                                                endpointMember.vent.positions.push_back("WINDSHIELD");
+                                            }
                                         }
                                     }
                                 }
                             }
-                            if (zoneValue.HasMember("window") && zoneValue["window"].IsObject()) {
-                                auto window = zoneValue["window"].GetObject();
-                                zoneMember.window.enabled = true;
+                            if (endpointValue.HasMember("window") && endpointValue["window"].IsObject()) {
+                                auto window = endpointValue["window"].GetObject();
+                                endpointMember.window.enabled = true;
+                                if (window.HasMember("controlId") && window["controlId"].IsString()) {
+                                    endpointMember.window.controlId = window["controlId"].GetString();
+                                }
+                                if (window.HasMember("controllerId") && window["controllerId"].IsString()) {
+                                    endpointMember.window.controllerId = window["controllerId"].GetString();
+                                }
                                 if (window.HasMember("defrost") && window["defrost"].IsBool()) {
-                                    zoneMember.window.defrost = window["defrost"].GetBool();
+                                    endpointMember.window.defrost = window["defrost"].GetBool();
                                 }
                             }
-                            if (zoneValue.HasMember("light") && zoneValue["light"].IsObject()) {
-                                auto light = zoneValue["light"].GetObject();
-                                zoneMember.light.enabled = true;
-
-                                if (light.HasMember("type") && light["type"].IsString()) {
-                                    zoneMember.light.type = light["type"].GetString();
+                            if (endpointValue.HasMember("lights") && endpointValue["lights"].IsArray()) {
+                                auto lightConfig = endpointValue["lights"].GetArray();
+                                for (auto& light : lightConfig) {
+                                    CarControlConfiguration::Endpoint::Light lightMember;
+                                    if (light.HasMember("controlId") && light["controlId"].IsString()) {
+                                        lightMember.controlId = light["controlId"].GetString();
+                                    }
+                                    if (light.HasMember("type") && light["type"].IsString()) {
+                                        lightMember.type = light["type"].GetString();
+                                    }
+                                    if (light.HasMember("color") && light["color"].IsObject()) {
+                                        auto colorConfig = light["color"].GetObject();
+                                        if (colorConfig.HasMember("controllerId") && colorConfig["controllerId"].IsString()) {
+                                            lightMember.colorControllerId = colorConfig["controllerId"].GetString();
+                                        }
+                                        if (colorConfig.HasMember("values") && colorConfig["values"].IsObject()) {
+                                            auto valuesConfig = colorConfig["values"].GetObject();
+                                            if (valuesConfig.HasMember("WHITE") && valuesConfig["WHITE"].IsBool()) {
+                                                if (valuesConfig["WHITE"].GetBool()) {
+                                                    lightMember.colors.push_back("WHITE");
+                                                }
+                                            }
+                                            if (valuesConfig.HasMember("RED") && valuesConfig["RED"].IsBool()) {
+                                                if (valuesConfig["RED"].GetBool()) {
+                                                    lightMember.colors.push_back("RED");
+                                                }
+                                            }
+                                            if (valuesConfig.HasMember("ORANGE") && valuesConfig["ORANGE"].IsBool()) {
+                                                if (valuesConfig["ORANGE"].GetBool()) {
+                                                    lightMember.colors.push_back("ORANGE");
+                                                }
+                                            }
+                                            if (valuesConfig.HasMember("YELLOW") && valuesConfig["YELLOW"].IsBool()) {
+                                                if (valuesConfig["YELLOW"].GetBool()) {
+                                                    lightMember.colors.push_back("YELLOW");
+                                                }
+                                            }
+                                            if (valuesConfig.HasMember("GREEN") && valuesConfig["GREEN"].IsBool()) {
+                                                if (valuesConfig["GREEN"].GetBool()) {
+                                                    lightMember.colors.push_back("GREEN");
+                                                }
+                                            }
+                                            if (valuesConfig.HasMember("BLUE") && valuesConfig["BLUE"].IsBool()) {
+                                                if (valuesConfig["BLUE"].GetBool()) {
+                                                    lightMember.colors.push_back("BLUE");
+                                                }
+                                            }
+                                            if (valuesConfig.HasMember("INDIGO") && valuesConfig["INDIGO"].IsBool()) {
+                                                if (valuesConfig["INDIGO"].GetBool()) {
+                                                    lightMember.colors.push_back("INDIGO");
+                                                }
+                                            }
+                                            if (valuesConfig.HasMember("VIOLET") && valuesConfig["VIOLET"].IsBool()) {
+                                                if (valuesConfig["VIOLET"].GetBool()) {
+                                                    lightMember.colors.push_back("VIOLET");
+                                                }
+                                            }
+                                        }
+                                    }
+                                    // Add light
+                                    endpointMember.lights.push_back(lightMember);
                                 }
-
-                                if (light.HasMember("colors") && light["colors"].IsObject()) {
-                                    auto colorsConfig = light["colors"].GetObject();
-                                    if (colorsConfig.HasMember("WHITE") && colorsConfig["WHITE"].IsBool()) { 
-                                        if (colorsConfig["WHITE"].GetBool()) {
-                                            zoneMember.light.colors.push_back("WHITE");
-                                        }
-                                    }
-                                    if (colorsConfig.HasMember("RED") && colorsConfig["RED"].IsBool()) { 
-                                        if (colorsConfig["RED"].GetBool()) {
-                                            zoneMember.light.colors.push_back("RED");
-                                        }
-                                    }
-                                    if (colorsConfig.HasMember("ORANGE") && colorsConfig["ORANGE"].IsBool()) { 
-                                        if (colorsConfig["ORANGE"].GetBool()) {
-                                            zoneMember.light.colors.push_back("ORANGE");
-                                        }
-                                    }
-                                    if (colorsConfig.HasMember("YELLOW") && colorsConfig["YELLOW"].IsBool()) { 
-                                        if (colorsConfig["YELLOW"].GetBool()) {
-                                            zoneMember.light.colors.push_back("YELLOW");
-                                        }
-                                    }
-                                    if (colorsConfig.HasMember("GREEN") && colorsConfig["GREEN"].IsBool()) { 
-                                        if (colorsConfig["GREEN"].GetBool()) {
-                                            zoneMember.light.colors.push_back("GREEN");
-                                        }
-                                    }
-                                    if (colorsConfig.HasMember("BLUE") && colorsConfig["BLUE"].IsBool()) { 
-                                        if (colorsConfig["BLUE"].GetBool()) {
-                                            zoneMember.light.colors.push_back("BLUE");
-                                        }
-                                    }
-                                    if (colorsConfig.HasMember("INDIGO") && colorsConfig["INDIGO"].IsBool()) { 
-                                        if (colorsConfig["INDIGO"].GetBool()) {
-                                            zoneMember.light.colors.push_back("INDIGO");
-                                        }
-                                    }
-                                    if (colorsConfig.HasMember("VIOLET") && colorsConfig["VIOLET"].IsBool()) { 
-                                        if (colorsConfig["VIOLET"].GetBool()) {
-                                            zoneMember.light.colors.push_back("VIOLET");
-                                        }
-                                    }
-                                }                                
-                            }                            
-                            // Add this zone to the configuration
-                            m_carControlConfiguration->zones.push_back(zoneMember);
+                            }
+                            // Add this endpoint to the configuration
+                            m_carControlConfiguration->endpoints.push_back(endpointMember);
                         }
                     }
                 }
@@ -478,18 +603,18 @@ void AASBConfigProviderImpl::initConfigFromFile(const std::string& fileName) {
                 if (sources.HasMember("compactDisc") && sources["compactDisc"].IsBool()) {
                     m_compactDisc = sources["compactDisc"].GetBool();
                 }
+                if (sources.HasMember("siriusXM") && sources["siriusXM"].IsBool()) {
+                    m_siriusXM = sources["siriusXM"].GetBool();
+                }
+                if (sources.HasMember("dab") && sources["dab"].IsBool()) {
+                    m_dab = sources["dab"].GetBool();
+                }
             }
-        }        
+        }
         if (root.HasMember("aace.wakeword") && root["aace.wakeword"].IsObject()) {
             auto wakewordConfig = root["aace.wakeword"].GetObject();
             if (wakewordConfig.HasMember("enabled") && wakewordConfig["enabled"].IsBool()) {
                 m_enableWakewordByDefault = wakewordConfig["enabled"].GetBool();
-            }
-        }
-        if (root.HasMember("libcurlUtils") && root["libcurlUtils"].IsObject()) {
-            auto curlConfig = root["libcurlUtils"].GetObject();
-            if (curlConfig.HasMember("CURLOPT_CAPATH") && curlConfig["CURLOPT_CAPATH"].IsString()) {
-                m_certificatePath = curlConfig["CURLOPT_CAPATH"].GetString();
             }
         }
         if (root.HasMember("aace.vehicle") && root["aace.vehicle"].IsObject()) {
@@ -507,6 +632,19 @@ void AASBConfigProviderImpl::initConfigFromFile(const std::string& fileName) {
                     m_currentLocation.second = std::stof(latStr);
                 }
             }
+
+            // Create stream with only vehicle configuration
+            rapidjson::Document vehicleDoc;
+            vehicleDoc.SetObject();
+            rapidjson::Value aaceVehicleNode( rapidjson::kObjectType );
+            vehicleDoc.AddMember( "aace.vehicle", vehicleConfig, vehicleDoc.GetAllocator() );
+
+            // Create string to pass to string stream
+            rapidjson::StringBuffer buffer;
+            rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+            vehicleDoc.Accept(writer);
+
+            m_vehicleConfig = std::make_shared<std::istringstream>(buffer.GetString());
         }
         if (root.HasMember("aace.localvoicecontrol") && root["aace.localvoicecontrol"].IsObject()) {
             auto lvcConfig = root["aace.localvoicecontrol"].GetObject();
@@ -556,6 +694,8 @@ void AASBConfigProviderImpl::logCurrentConfiguration() {
     m_logger->log(Level::DEBUG, TAG, std::string("Product Id ") + m_productId);
     m_logger->log(Level::DEBUG, TAG, std::string("Client Id ") + m_clientId);
     m_logger->log(Level::DEBUG, TAG, std::string("Device SerialNumber ") + m_deviceSerialNumber);
+    m_logger->log(Level::DEBUG, TAG, std::string("Manufacturer Name ") + m_manufacturerName);
+    m_logger->log(Level::DEBUG, TAG, std::string("Description") + m_description);
     m_logger->log(Level::DEBUG, TAG, std::string("Certificate(s) root ") + m_certificatePath);
     m_logger->log(Level::DEBUG, TAG, std::string("Country ") + m_country);
     m_logger->log(Level::DEBUG, TAG, std::string("Current location ") + locationStr.str());
@@ -580,7 +720,11 @@ void AASBConfigProviderImpl::logCurrentConfiguration() {
     m_logger->log(Level::DEBUG, TAG, std::string("Line In: ") +
         (m_LineIn ? "enabled" : "disabled"));
     m_logger->log(Level::DEBUG, TAG, std::string("Compact Disc: ") +
-        (m_compactDisc ? "enabled" : "disabled"));    
+        (m_compactDisc ? "enabled" : "disabled"));
+    m_logger->log(Level::DEBUG, TAG, std::string("Sirius XM: ") +
+        (m_siriusXM ? "enabled" : "disabled"));
+    m_logger->log(Level::DEBUG, TAG, std::string("DAB: ") +
+        (m_dab ? "enabled" : "disabled"));
     m_logger->log(Level::DEBUG, TAG, "**********Alexa-VoiceAgent configuration***********");
 }
 

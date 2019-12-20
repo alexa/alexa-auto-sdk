@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/LocalSearchListTemplate2"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/cardBackground"
+    tools:context="com.amazon.sampleapp.MainActivity" >
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guidelineLeftMargin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.055" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guidelineRightMargin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.945" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guidelineTopMargin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.044" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guidelineBottomMargin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.95" />
+
+    <TextView
+        android:id="@+id/Title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif"
+        android:textColor="@color/cardMainTitle"
+        android:textSize="28sp"
+        app:layout_constraintStart_toStartOf="@id/guidelineLeftMargin"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/localSearchListlistContainer2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="@id/guidelineRightMargin"
+        app:layout_constraintStart_toStartOf="@id/guidelineLeftMargin"
+        app:layout_constraintTop_toBottomOf="@id/Title" />
+
+</android.support.constraint.ConstraintLayout>

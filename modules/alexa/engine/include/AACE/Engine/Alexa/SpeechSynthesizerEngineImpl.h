@@ -21,18 +21,20 @@
 
 #include <AVSCommon/AVS/Attachment/AttachmentManagerInterface.h>
 #include <AVSCommon/AVS/DialogUXStateAggregator.h>
+#include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
 #include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/DirectiveSequencerInterface.h>
-#include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
 #include <AVSCommon/SDKInterfaces/ExceptionEncounteredSenderInterface.h>
 #include <AVSCommon/SDKInterfaces/FocusManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/MessageSenderInterface.h>
 #include <AVSCommon/SDKInterfaces/SpeechSynthesizerObserverInterface.h>
 #include <ContextManager/ContextManager.h>
+#include <Endpoints/EndpointBuilder.h>
 #include <SpeechSynthesizer/SpeechSynthesizer.h>
 
 #include <AACE/Alexa/SpeechSynthesizer.h>
 #include <AACE/Engine/Audio/AudioManagerInterface.h>
+
 #include "AudioChannelEngineImpl.h"
 
 namespace aace {
@@ -45,6 +47,7 @@ private:
 
     bool initialize(
         std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> audioOutputChannel,
+        std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
@@ -58,6 +61,7 @@ private:
 public:
     static std::shared_ptr<SpeechSynthesizerEngineImpl> create(
         std::shared_ptr<aace::alexa::SpeechSynthesizer> speechSynthesizerPlatformInterface,
+        std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
         std::shared_ptr<aace::engine::audio::AudioManagerInterface> audioManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,

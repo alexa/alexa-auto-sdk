@@ -2,12 +2,12 @@ SUMMARY = "Alexa Auto SDK C++ Sample App"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://SampleApp/src/main.cpp;beginline=4;endline=13;md5=527e9938f0eaf4dbc8d3b17563870ae7"
 
-DEPENDS = "aac-module-core aac-module-alexa aac-module-navigation aac-module-phone-control aac-module-cbl aac-module-address-book"
+DEPENDS = "aac-module-core aac-module-alexa aac-module-navigation aac-module-phone-control aac-module-cbl aac-module-address-book aac-module-car-control"
 
 PACKAGECONFIG[alexacomms] = "-DALEXACOMMS=ON,,aac-module-communication"
 PACKAGECONFIG[amazonlite] = "-DAMAZONLITE=ON,,aac-module-amazonlite"
-PACKAGECONFIG[lvc] = "-DLOCALVOICECONTROL=ON,,aac-module-car-control aac-module-local-skill-service aac-module-local-voice-control aac-module-address-book-local-service"
-PACKAGECONFIG[gstreamer] = "-DGSTREAMER=ON,,aac-module-gstreamer"
+PACKAGECONFIG[lvc] = "-DLOCALVOICECONTROL=ON,,aac-module-local-skill-service aac-module-local-voice-control aac-module-address-book-local-service aac-module-car-control-local-service"
+PACKAGECONFIG[system-audio] = "-DSYSTEMAUDIO=ON,,aac-module-system-audio"
 PACKAGECONFIG[dcm] = "-DDCM=ON,,aac-module-dcm-native-metrics"
 PACKAGECONFIG[loopback-detector] = "-DLOOPBACK_DETECTOR=ON,,aac-module-loopback-detector"
 

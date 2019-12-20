@@ -38,7 +38,10 @@ static const std::string VEHICLE_SERVICE_LOCAL_STORAGE_TABLE = "aace.vehicle";
 // register the service
 REGISTER_SERVICE(VehicleEngineService)
 
-VehicleEngineService::VehicleEngineService( const aace::engine::core::ServiceDescription& description ) : aace::engine::core::EngineService( description ) {
+VehicleEngineService::VehicleEngineService( const aace::engine::core::ServiceDescription& description ) :
+    m_recordEmpty(true),
+    m_recordFull(true),
+    aace::engine::core::EngineService( description ) {
 }
 
 std::string VehicleEngineService::getVehicleProperty( VehiclePropertyType type ) {
@@ -84,14 +87,6 @@ bool VehicleEngineService::setup()
         // warn if the vehicle property map has not been configured
         if( m_vehiclePropertyMap.empty() ) {
             AACE_WARN(LX(TAG,"setup").m("vehicleInfoNotConfigured"));
-        }
-        else
-        {
-            m_vehiclePropertiesMetric = generateVehiclePropertiesMetric();
-            
-            if( m_vehiclePropertiesMetric != nullptr ) {
-                m_vehiclePropertiesMetric->record();
-            }
         }
     }
     catch( std::exception& ex ) {
@@ -156,6 +151,8 @@ bool VehicleEngineService::configure( std::shared_ptr<std::istream> configuratio
             m_operatingCountry = vehicleConfigRoot["operatingCountry"].GetString();
         }
 
+        ThrowIfNot( registerServiceInterface<VehicleEngineService>( shared_from_this() ), "registerVehicleEngineServiceFailed" );
+
         return true;
     }
     catch( std::exception& ex ) {
@@ -204,30 +201,58 @@ std::string VehicleEngineService::getProperty( const std::string& key )
     return std::string();
 }
 
-std::shared_ptr<aace::engine::metrics::MetricEvent> VehicleEngineService::generateVehiclePropertiesMetric() {
+std::shared_ptr<aace::engine::metrics::MetricEvent> VehicleEngineService::generateVehiclePropertiesMetric(bool full) {
     std::string program = "AlexaAuto_Vehicle";
     std::string source = "VehicleConfiguration";
     std::shared_ptr<aace::engine::metrics::MetricEvent> currentMetric = 
         std::shared_ptr<aace::engine::metrics::MetricEvent>(new aace::engine::metrics::MetricEvent(program, source));
 
-    for( auto itr : m_vehiclePropertyMap ) {
-        VehiclePropertyType property = itr.first;
-        std::string dataPointName = getVehiclePropertyAttribute(property);
-        std::string dataPointValue = itr.second;
+    if (full) {
+        AACE_INFO(LX(TAG,"generateMetric").m("Added vehicle properties"));
+        for( auto itr : m_vehiclePropertyMap ) {
+            VehiclePropertyType property = itr.first;
+            std::string dataPointName = getVehiclePropertyAttribute(property);
+            std::string dataPointValue = itr.second;
 
-        // sanitize any delimiter characters from dataPointValue to maintain metric formatting
-        char delimiters[] = ";=,:";
-        for (char delimiter : delimiters)
-        {
-            std::replace( dataPointValue.begin(), dataPointValue.end(), delimiter, '-');
+            // sanitize any delimiter characters from dataPointValue to maintain metric formatting
+            char delimiters[] = ";=,:";
+            for (char delimiter : delimiters)
+            {
+                std::replace( dataPointValue.begin(), dataPointValue.end(), delimiter, '-');
+            }
+
+            currentMetric->addString(dataPointName, dataPointValue);
         }
-
-        currentMetric->addString(dataPointName, dataPointValue);
+    } else {
+        AACE_INFO(LX(TAG,"generateMetric").m("Omitting vehicle properties"));
+        currentMetric->addString("vehicle_metadata_not_included", "Device is not authenticated");
     }
+
     return currentMetric;
+}
+
+/**
+ * Record vehicle metric with no data points (empty) or with all data points (full).
+ * Only necessary to emit the metric once for empty or full.
+ */
+void VehicleEngineService::record(bool full) {
+
+    // Only need record each metric once
+    if (!full && m_recordEmpty) {
+        auto metric = generateVehiclePropertiesMetric(full);
+        AACE_INFO(LX(TAG,"record").m("Recording metric without vehicle information"));
+        metric->record();
+        m_recordEmpty = false;
+    } 
+
+    if (full && m_recordFull) {
+        auto metric = generateVehiclePropertiesMetric(full);
+        AACE_INFO(LX(TAG,"record").m("Recording metric with vehicle information"));
+        metric->record();
+        m_recordFull = false;
+    }
 }
 
 } // aace::engine::vehicle
 } // aace::engine
 } // aace
-

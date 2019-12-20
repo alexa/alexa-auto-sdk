@@ -217,11 +217,15 @@ public class MediaApp extends MediaBrowserCompat.ConnectionCallback {
     }
 
     public void onDestroy() {
-        if ( mMediaController != null ) {
-            mMediaController.unregisterCallback( mMediaControllerCallback );
-        }
-        if (mMediaBrowser != null) {
-            mMediaBrowser.disconnect();
+        try {
+            if ( mMediaController != null && mMediaControllerCallback != null) {
+                mMediaController.unregisterCallback( mMediaControllerCallback );
+            }
+            if (mMediaBrowser != null) {
+                mMediaBrowser.disconnect();
+            }
+        } catch( Exception e ) {
+            Log.e( TAG, "Error onDestroy: " + e.getMessage());
         }
     }
 
@@ -300,4 +304,6 @@ public class MediaApp extends MediaBrowserCompat.ConnectionCallback {
     public String getPlayerCookie() {
         return mPlayerCookie;
     }
+
+    public void resetUnauthorizedReported() { if( mMediaControllerCallback != null ) mMediaControllerCallback.resetUnauthorizedReported(); }
 }

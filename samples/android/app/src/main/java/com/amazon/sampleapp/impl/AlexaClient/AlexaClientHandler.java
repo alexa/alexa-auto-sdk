@@ -16,11 +16,15 @@
 package com.amazon.sampleapp.impl.AlexaClient;
 
 import android.app.Activity;
+import android.view.View;
 import android.widget.TextView;
 
 import com.amazon.aace.alexa.AlexaClient;
 import com.amazon.sampleapp.R;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
+
+import java.util.HashSet;
+import java.util.Set;
 // AutoVoiceChrome imports
 
 public class AlexaClientHandler extends AlexaClient {
@@ -31,11 +35,21 @@ public class AlexaClientHandler extends AlexaClient {
     private final LoggerHandler mLogger;
     private TextView mConnectionText, mAuthText, mDialogText;
     private ConnectionStatus mConnectionStatus = ConnectionStatus.DISCONNECTED;
+    private View mLoginView, mLogoutView;
+
+    // List of Authentication observers
+    private Set<AuthStateObserver> mObservers;
+
+    // Current AuthState and AuthError
+    private AuthState mAuthState;
+    private AuthError mAuthError;
+
     // AutoVoiceChrome controller
 
     public AlexaClientHandler( Activity activity, LoggerHandler logger ) {
         mActivity = activity;
         mLogger = logger;
+        mObservers = new HashSet<>();
         setupGUI();
     }
 
@@ -66,6 +80,10 @@ public class AlexaClientHandler extends AlexaClient {
                 mAuthText.setText( state != null ? state.toString() : "" );
             }
         });
+
+        notifyAuthStateObservers( state, error );
+        mAuthState = state;
+        mAuthError = error;
     }
 
     @Override
@@ -85,6 +103,31 @@ public class AlexaClientHandler extends AlexaClient {
     }
 
     public ConnectionStatus getConnectionStatus () { return mConnectionStatus; }
+
+    public void registerAuthStateObserver( AuthStateObserver observer ) {
+        synchronized ( mObservers ) {
+            if ( observer == null ) return;
+            mObservers.add( observer );
+
+            // notify newly registered observer with the current state
+            observer.onAuthStateChanged( mAuthState, mAuthError );
+        }
+    }
+
+    public void removeAuthStateObserver( AuthStateObserver observer ) {
+        synchronized ( mObservers ) {
+            if ( observer == null ) return;
+            mObservers.remove( observer );
+        }
+    }
+
+    private void notifyAuthStateObservers( AuthState authState, AuthError authError ) {
+        synchronized ( mObservers ) {
+            for ( AuthStateObserver observer : mObservers ) {
+                observer.onAuthStateChanged( authState, authError );
+            }
+        }
+    }
 
     private void setupGUI() {
         mConnectionText = mActivity.findViewById( R.id.connectionState );

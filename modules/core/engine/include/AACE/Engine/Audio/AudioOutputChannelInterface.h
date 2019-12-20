@@ -24,6 +24,8 @@ namespace audio {
 
 class AudioOutputChannelInterface {
 public:
+    virtual ~AudioOutputChannelInterface() = default;
+
     using MutedState = aace::audio::AudioOutput::MutedState;
 
     virtual bool prepare( std::shared_ptr<aace::audio::AudioStream> stream, bool repeating ) = 0;

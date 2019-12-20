@@ -27,8 +27,7 @@ public:
     virtual ~AlexaEndpointInterface();
 
 public:
-    virtual std::string getAVSEndpoint() = 0;
-    virtual std::string getAlexaApiEndpoint() = 0;
+    virtual std::string getAVSGateway() = 0;
     virtual std::string getLWAEndpoint() = 0;
 };
 

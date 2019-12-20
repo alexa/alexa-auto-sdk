@@ -100,6 +100,7 @@ void MetricsUploaderEngineImpl::log( Level level, std::chrono::system_clock::tim
             
             //Validate values are not empty/null
             if( programName.empty() || sourceName.empty() || datapoints.empty() || priority.empty() ) {
+                AACE_INFO(LX(TAG,"Ignoring metric").m("Missing data"));
                 return;
             }
 

@@ -77,6 +77,8 @@ int AFBApiImpl::callSync(
         info = infoStr;
         free(infoStr);
     }
+
+    return rc;
 }
 
 /// Shim to transfer C++ function to C callback using void*

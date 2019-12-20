@@ -37,20 +37,6 @@ namespace navigation {
     NavigationHandler::NavigationHandler( jobject obj ) : m_obj( obj, "com/amazon/aace/navigation/Navigation" ) {
     }
 
-    bool NavigationHandler::setDestination( const std::string& payload )
-    {
-        try_with_context
-        {
-            jboolean result;
-            ThrowIfNot( m_obj.invoke( "setDestination", "(Ljava/lang/String;)Z", &result, JString(payload).get() ), "invokeFailed" );
-            return result;
-        }
-        catch_with_ex {
-            AACE_JNI_ERROR(TAG,"setDestination",ex.what());
-            return false;
-        }
-    }
-
     bool NavigationHandler::cancelNavigation()
     {
         try_with_context
@@ -79,6 +65,91 @@ namespace navigation {
         }
     }
 
+    void NavigationHandler::startNavigation( const std::string& payload )
+    {
+        try_with_context
+        {
+            ThrowIfNot( m_obj.invoke<void>( "startNavigation", "(Ljava/lang/String;)V", nullptr, JString(payload).get() ), "invokeFailed" );
+        }
+        catch_with_ex {
+            AACE_JNI_ERROR(TAG,"startNavigation",ex.what());
+        }
+    }
+
+    void NavigationHandler::showPreviousWaypoints() {
+        try_with_context
+        {
+            ThrowIfNot( m_obj.invoke<void>( "showPreviousWaypoints", "()V", nullptr ), "invokeMethodFailed" );
+        }
+        catch_with_ex {
+            AACE_JNI_ERROR(TAG,"showPreviousWaypoints",ex.what());
+        }
+    }
+
+    void NavigationHandler::navigateToPreviousWaypoint() {
+        try_with_context
+        {
+            ThrowIfNot( m_obj.invoke<void>( "navigateToPreviousWaypoint", "()V", nullptr ), "invokeMethodFailed" );
+        }
+        catch_with_ex {
+            AACE_JNI_ERROR(TAG,"navigateToPreviousWaypoint",ex.what());
+        }
+    }
+
+    void NavigationHandler::showAlternativeRoutes( AlternateRouteType routeType ) {
+        try_with_context
+        {
+            jobject routeTypeObj;
+            ThrowIfNot( JAlternateRouteType::checkType( routeType, &routeTypeObj ), "invalidAlternateRouteType" );
+
+            ThrowIfNot( m_obj.invoke<void>( "showAlternativeRoutes", "(Lcom/amazon/aace/navigation/Navigation$AlternateRouteType;)V", nullptr, routeTypeObj ), "invokeMethodFailed" );
+        }
+        catch_with_ex {
+            AACE_JNI_ERROR(TAG,"showAlternativeRoutes",ex.what());
+        }
+    }
+
+    void NavigationHandler::controlDisplay( ControlDisplay controlDisplay ) {
+        try_with_context
+        {
+            jobject controlDisplayObj;
+            ThrowIfNot( JControlDisplay::checkType( controlDisplay, &controlDisplayObj ), "invalidControlDisplay" );
+
+            ThrowIfNot( m_obj.invoke<void>( "controlDisplay", "(Lcom/amazon/aace/navigation/Navigation$ControlDisplay;)V", nullptr, controlDisplayObj ), "invokeMethodFailed" );
+        }
+        catch_with_ex {
+            AACE_JNI_ERROR(TAG,"controlDisplay",ex.what());
+        }
+    }
+
+    void NavigationHandler::announceManeuver( const std::string& payload ) {
+        try_with_context
+        {
+            ThrowIfNot( m_obj.invoke<void>( "announceManeuver", "(Ljava/lang/String;)V", nullptr, JString(payload).get() ), "invokeMethodFailed" );
+        }
+        catch_with_ex {
+            AACE_JNI_ERROR(TAG,"announceManeuver",ex.what());
+        }
+    }
+
+    void NavigationHandler::announceRoadRegulation( RoadRegulation roadRegulation ) {
+        try_with_context
+        {
+            jobject roadRegulationObj;
+            ThrowIfNot( JRoadRegulation::checkType( roadRegulation, &roadRegulationObj ), "invalidRoadRegulation" );
+
+            ThrowIfNot( m_obj.invoke<void>( "announceRoadRegulation", "(Lcom/amazon/aace/navigation/Navigation$RoadRegulation;)V", nullptr, roadRegulationObj ), "invokeMethodFailed" );
+        }
+        catch_with_ex {
+            AACE_JNI_ERROR(TAG,"announceRoadRegulation",ex.what());
+        }
+    }
+
+
+
+
+
+
 } // aace::jni::navigation
 } // aace::jni
 } // aace
@@ -106,4 +177,60 @@ extern "C"
             AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_navigation_Navigation_disposeBinder",ex.what());
         }
     }
+
+    JNIEXPORT void JNICALL
+    Java_com_amazon_aace_navigation_Navigation_navigationEvent( JNIEnv* env , jobject, jlong ref, jobject event )
+    {
+        try
+        {
+            auto navigationBinder = NAVIGATION_BINDER(ref);
+            ThrowIfNull( navigationBinder, "invalidNavigationBinder" );
+
+            aace::navigation::NavigationEngineInterface::EventName eventName;
+            ThrowIfNot( aace::jni::navigation::JEventName::checkType( event, &eventName ), "invalidEventName" );
+
+            navigationBinder->getNavigation()->navigationEvent( eventName );
+        }
+        catch( const std::exception& ex ) {
+            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_navigation_Navigation_navigationEvent",ex.what());
+        }
+    }
+
+
+    JNIEXPORT void JNICALL
+    Java_com_amazon_aace_navigation_Navigation_navigationError( JNIEnv* env , jobject, jlong ref, jobject type, jobject code, jstring description )
+    {
+        try
+        {
+            auto navigationBinder = NAVIGATION_BINDER(ref);
+            ThrowIfNull( navigationBinder, "invalidNavigationBinder" );
+
+            aace::navigation::NavigationEngineInterface::ErrorType errorType;
+            ThrowIfNot( aace::jni::navigation::JErrorType::checkType( type, &errorType ), "invalidErrorType" );
+
+            aace::navigation::NavigationEngineInterface::ErrorCode errorCode;
+            ThrowIfNot( aace::jni::navigation::JErrorCode::checkType( code, &errorCode ), "invalidErrorCode" );
+
+            navigationBinder->getNavigation()->navigationError( errorType, errorCode, JString(description).toStdStr() );
+        }
+        catch( const std::exception& ex ) {
+            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_navigation_Navigation_navigationError",ex.what());
+        }
+    }
+
+    JNIEXPORT void JNICALL
+    Java_com_amazon_aace_navigation_Navigation_showAlternativeRoutesSucceeded( JNIEnv* env , jobject, jlong ref, jstring payload )
+    {
+        try
+        {
+            auto navigationBinder = NAVIGATION_BINDER(ref);
+            ThrowIfNull( navigationBinder, "invalidNavigationBinder" );
+
+            navigationBinder->getNavigation()->showAlternativeRoutesSucceeded( JString(payload).toStdStr() );
+        }
+        catch( const std::exception& ex ) {
+            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_navigation_Navigation_showAlternativeRoutesSucceeded",ex.what());
+        }
+    }
+
 }

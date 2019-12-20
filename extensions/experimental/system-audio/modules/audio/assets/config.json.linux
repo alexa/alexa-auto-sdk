@@ -1,0 +1,18 @@
+{
+  "aace.systemAudio": {
+    "AudioInputProvider": {
+      "devices": {
+        "default": {
+          "module": "GStreamer"
+        }
+      }
+    },
+    "AudioOutputProvider": {
+      "devices": {
+        "default": {
+          "module": "GStreamer"
+        }
+      }
+    }
+  }
+}

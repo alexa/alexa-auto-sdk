@@ -2,49 +2,39 @@
 
 The Alexa Auto SDK Alexa module provides interfaces for standard Alexa features. The Engine handles some extra setup and steps to sequence events and handle directives so you can focus on using the provided API to interact with Alexa. You do this by registering platform interface implementations via the Engine object.
 
+>**Note:** If you want to enable wake word support, [contact your Amazon Solutions Architect (SA)](../../NEED_HELP.md#requesting-additional-functionality-whitelisting)
+
 **Table of Contents**
 
-* [Alexa Module Sequence Diagrams](#sequencediagrams)
-* [Requesting Wake Word Support](#requesting-wake-word-support)
+* [Alexa Module Sequence Diagrams](#alexa-module-sequence-diagrams)
 * [Handling Speech Input](#handling-speech-input)
 * [Handling Speech Output](#handling-speech-output)
+* [Handling Authentication](#handling-authentication)
 * [Handling Audio Output](#handling-audio-output)
 * [Handling Alexa Speaker](#handling-alexa-speaker)
 * [Handling Audio Player](#handling-audio-player)
 * [Handling Playback Controller Events](#handling-playback-controller-events)
 * [Handling Equalizer Control](#handling-equalizer-control)
-* [Handling Display Card Templates](#handling-gui-templates)
+* [Handling Display Card Templates](#handling-display-card-templates)
 * [Handling Global Presets](#handling-global-presets)
-* [Handling External Media Apps](#external-media-adapter)
+* [Handling External Media Apps](#handling-external-media-apps)
 * [Handling Local Media Sources](#handling-local-media-sources)
 * [Handling Notifications](#handling-notifications)
 * [Handling Alerts](#handling-alerts)
 * [Handling Alexa State Changes](#handling-alexa-state-changes)
-* [Alexa Engine Properties](#alexa-engine-properties)
+* [Handling Do Not Disturb](#handling-do-not-disturb)
+* [Getting and Setting Alexa Engine Properties](#getting-and-setting-alexa-engine-properties)
 
+## Alexa Module Sequence Diagrams <a id="alexa-module-sequence-diagrams"> </a>
 
-## Alexa Module Sequence Diagrams<a id="sequencediagrams"> </a>
+For a view of how the Alexa Auto SDK flow works in selected use cases, see these sequence diagrams:
 
-For a view of how the Alexa Auto SDK flow works in selected use cases, see these sequence diagrams.
+* [Tap to Talk Sequence Diagram](../../SEQUENCE_DIAGRAMS.md#tap-to-talk-sequence-diagram)
+* [Wake Word Enabled Sequence Diagram](../../SEQUENCE_DIAGRAMS.md#wake-word-enabled-sequence-diagram)
 
-* [Login/Logout Sequence Diagram](../../SEQUENCE_DIAGRAMS.md#loginlogout)
-* [Tap to Talk Sequence Diagram](../../SEQUENCE_DIAGRAMS.md#taptotalk)
-* [Wake Word Enabled Sequence Diagram](../../SEQUENCE_DIAGRAMS.md#wakewordenabled)
+## Handling Speech Input <a id="handling-speech-input"></a>
 
-## Requesting Wake Word Support<a id = "requesting-wake-word-support"></a>
-
-If you want to enable wake word support for your Alexa Auto integration, you need to make a request with your Alexa Auto Solution Architect (SA).
-
-There are 3 steps to this process:
-
-1. Let your SA know you want to enable wake word support.
-2. Your SA processes your request with the appropriate Alexa teams.
-3. You'll receive a single zip file containing the necessary packages, instructions, and scripts.
-4. Follow the instructions in the README file to install and build the AmazonLite Wake Word extension.
-
-## Handling Speech Input<a id="handling-speech-input"></a>
-
-It is the responsibility of the `AudioInputProvider` platform implementation to supply audio data to the Engine so that Alexa can process voice input. Since the Engine does not know how audio is managed on a specific platform, the specific audio capture implementation is up to you. An audio playback noise (earcon) is played whenever speech input is invoked. The playback is handled by whichever audio channel is assigned to the EARCON type [Read more about handling media and volume here](#handling-media-and-volume).
+It is the responsibility of the `AudioInputProvider` platform implementation to supply audio data to the Engine so that Alexa can process voice input. Since the Engine does not know how audio is managed on a specific platform, the specific audio capture implementation is up to you. An audio playback sound (earcon) is played whenever speech input is invoked. The playback is handled by whichever audio channel is assigned to the EARCON type. [Read more about handling media and volume here](#handling-audio-output).
 
 To implement a custom handler for speech input, extend the `SpeechRecognizer` class:
 
@@ -63,7 +53,7 @@ class MySpeechRecognizer : public aace::alexa::SpeechRecognizer {
         }
         ...
         
-        // To notify the Engine of speech recognize event via press-and-hold initiiation.
+        // To notify the Engine of speech recognize event via press-and-hold initialization.
         // startCapture( Initiator::HOLD_TO_TALK ) is equivalent.
         holdToTalk();
         ...
@@ -73,8 +63,8 @@ class MySpeechRecognizer : public aace::alexa::SpeechRecognizer {
         tapToTalk(); 
         ... 
         
-        // Notify the engine that the wakeword engine has detected the wakeword. 
-        // Currenlty the only keyword value supported is "ALEXA".
+        // Notify the engine that the wake word engine has detected the wake word. 
+        // Currently the only keyword value supported is "ALEXA".
         startCapture( Initiator::WAKWORD, 0, 1000, "ALEXA" );
         ...
         
@@ -83,15 +73,15 @@ class MySpeechRecognizer : public aace::alexa::SpeechRecognizer {
         stopCapture();
         ...
         
-        // If the implmenetation has configured a wakeword engine, this call enables it. 
+        // If the implementation has configured a wake word engine, this call enables it. 
         enableWakewordDetection(); 
         ... 
         
-        // If the implmenetation has configured a wakeword engine, this call disables it.
+        // If the implementation has configured a wake word engine, this call disables it.
         disableWakewordDetection();
         ...
         
-        // To check whether the wakeword engine is enabled
+        // To check whether the wake word engine is enabled
         isWakewordDetectionEnabled(); 
         ... 
 };
@@ -103,7 +93,7 @@ engine->registerPlatformInterface( std::make_shared<MySpeechRecognizer>() );
 
 ## Handling Speech Output <a id="handling-speech-output"></a>
 
-The `SpeechSynthesizer` is responsible for handling Alexa's speech. In v2.0.0 and later of the Alexa Auto SDK this interface no longer has any platform-dependent implementation. You still must register it to enable the feature, however. The playback is handled by whichever audio channel is assigned to the TTS type. [Read more about handling media and volume here](#handling-media-and-volume).
+The `SpeechSynthesizer` is responsible for handling Alexa's speech. In v2.0.0 and later of the Alexa Auto SDK this interface no longer has any platform-dependent implementation. You still must register it to enable the feature, however. The playback is handled by whichever audio channel is assigned to the TTS type. [Read more about handling media and volume here](#handling-audio-output).
 
 To implement a custom handler for speech output extend the `SpeechSynthesizer` class:
 
@@ -118,8 +108,68 @@ class MySpeechSynthesizer : public aace::alexa::SpeechSynthesizer {
 auto mySpeechSynthesizer = std::make_shared<MySpeechSynthesizer>();
 engine->registerPlatformInterface( mySpeechSynthesizer );
 ```   
+
+## Handling Authentication <a id="handling-authentication"></a>
+
+Every request to Alexa Voice Service (AVS) requires an access token from Logon with Amazon (LWA). The `AuthProvider` platform interface is responsible for acquiring and refreshing access tokens.  You can obtain a token from LWA as described in the [LWA documentation](https://developer.amazon.com/docs/login-with-amazon/documentation-overview.html) and create a custom implementation of the `AuthProvider` platform interface to acquire access tokens. If you don't want to acquire access tokens yourself, you can use the [Alexa Auto SDK Code-Based-Linking (CBL) module](../cbl/README.md), which implements the CBL mechanism of acquiring access tokens.
+
+>**Note:** It is the responsibility of the platform implementation to provide an authorization method for establishing a connection to AVS. The Alexa Auto SDK provides an interface to handle authorization state changes and storing context. In addition, the access and refresh tokens must be cleared when the user logs out, and any time the access and refresh tokens are cleared, users must go through the authentication and authorization process again.
+
+To implement a custom handler for authentication, extend the `AuthProvider` class:
+
+```
+#include <AACE/Alexa/AuthProvider.h>
+class MyAuthProvider : public aace::alexa::AuthProvider {
+    public:
+        std::string getAuthToken() override {
+            // provide current access token
+        }
+        
+        AuthState getAuthState() override {
+            // provide current authentication status
+        }
+        
+        void authFailure(std::string token) override {
+            // The access token most recently provided through AuthProvider::getAuthToken() is invalid and was used in an unauthorized request to AVS. AVS responded to this request with a 403 code indicating the token was not valid. Get a new token!
+        }
+              
+};
+...
+        
+// Register the platform interface with the Engine
+auto m_authProvider = std::make_shared<MyAuthProvider>();
+engine->registerPlatformInterface( m_authProvider );
+
+...
+
+// To notify the Engine of a change in authentication state (such as when the user logs in):
+AuthState currentAuthState = AuthState::REFRESHED;
+AuthError currentAuthError = AuthError::NO_ERROR;
+
+m_authProvider->authStateChanged(currentAuthState, currentAuthError);
+
+```
+
+### AuthProvider Login/Logout Sequence Diagrams<a id="loginlogout"></a>
+
+The following diagram illustrates the login sequence when using the AuthProvider platform interface to obtain access and refresh tokens.
+
+![AuthProvider_login](./assets/AuthProvider_login.png)
+
+The following diagram illustrates the logout sequence when using the AuthProvider platform interface to clear access and refresh tokens.
+
+![AuthProvider_logout](./assets/AuthProvider_logout.png)
+
+### Additional Authorization Resources
+
+See the following for additional information on Authorization:
+
+* [Customer Experience in Android/Fire apps](https://developer.amazon.com/docs/login-with-amazon/customer-experience-android.html#login-flows)
+* [Implement Authorization for AVS Using Login With Amazon](https://developer.amazon.com/alexa-voice-service/auth)
+* [Understanding Login Authentication with the AVS Sample App and the Node.js Server](https://developer.amazon.com/blogs/alexa/post/bb4a34ad-f805-43d9-bbe0-c113105dd8fd/understanding-login-authentication-with-the-avs-sample-app-and-the-node-js-server)
+
  
-## Handling Audio Output<a id ="handling-audio-output"></a>
+## Handling Audio Output <a id ="handling-audio-output"></a>
 
 When audio data is received from Alexa it is the responsibility of the platform implementation to read the data from the Engine and play it using a platform-specific audio output channel. It is also the responsibility of the platform implementation to define how each `AudioOutput` channel is handled. Each `AudioOutput` implementation will handle one or more of the following media types depending on the behavior defined in the `AudioOutputProvider`:
 
@@ -130,7 +180,7 @@ When audio data is received from Alexa it is the responsibility of the platform 
 * EARCON
 * COMMUNICATION
 
-`AudioOutput` also has methods to control the volume of the audio channel. These methods allow the Engine to set the volume, either when the user asks Alexa to adjust it or if the Engine internally needs to adjust it during audio focus management. All local volume changes (initiated via button press or system-generated, for example) must be reported to the Engine through the `AlexaSpeaker`platform interface. For further details about the `AudioOutput` and `AudioOutputProvider` platform interfaces, please refer to the [Core module README](../core/README.md).
+`AudioOutput` also has methods to control the volume of the audio channel. These methods allow the Engine to set the volume, either when the user asks Alexa to adjust it or if the Engine internally needs to adjust it during audio focus management. All local volume changes (initiated via button press or system-generated, for example) must be reported to the Engine through the `AlexaSpeaker` platform interface. For further details about the `AudioOutput` and `AudioOutputProvider` platform interfaces, please refer to the [Core module README](../core/README.md#implementing-audio).
 
 ### Custom Volume Control for Alexa Devices
 
@@ -144,12 +194,14 @@ Contact your Alexa Auto Solution Architect (SA) for help with whitelisting. Whit
 
 This does not impact the range used in the directives to the device. You must continue to use the SDK 0-100 volume range used by `AudioOutput` and `AlexaSpeaker` and map these values to the correct range in your implementation.
 
+>**Note:** Currently, specifying a custom volume range for voice interactions is supported by default in online only mode and not in implementations that use the optional Local Voice Control (LVC) extension. If your implementation uses LVC and you would like to configure a custom volume range, please contact your SA for guidance.
+
 ## Handling Alexa Speaker <a id="handling-alexa-speaker"></a>
 
 The Alexa service keeps track of two device volume types: `ALEXA_VOLUME` and `ALERTS_VOLUME`. The `aace::alexa::AlexaSpeaker` class should be implemented by the platform to both set the volume and mute state of these two speaker types and allow the user to set the volume and mute state of these two speaker types locally via GUI as applicable. 
 
 
-## Handling Audio Player<a id ="handling-audio-player"></a>
+## Handling Audio Player <a id ="handling-audio-player"></a>
 
 When an audio media stream is received from Alexa it is the responsibility of the platform implementation to play the stream in a platform-specific media player. The `aace::alexa::AudioPlayer` class informs the platform of the changes in player state being tracked by the Engine. This can be used to update the platform GUI, for example.
 
@@ -170,7 +222,7 @@ auto myAudioPlayer = std::make_shared<MyAudioPlayer>();
 engine->registerPlatformInterface( myAudioPlayer );
 ```
  
-## Handling Playback Controller Events<a id="handling-playback-controller-events"></a>
+## Handling Playback Controller Events <a id="handling-playback-controller-events"></a>
 
 The Engine provides methods to notify it of media playback control events that happen without voice interaction; for example, a "pause" button press. The platform implementation must inform the Engine of these events using the `PlaybackController` interface any time the user uses on-screen or physical button presses to control media provided by the Engine, such as AudioPlayer source music or `ExternalMediaPlayer` sources, if applicable.
 
@@ -190,12 +242,12 @@ class MyPlaybackController : public aace::alexa::PlaybackController {
     }          
     ...
       
-    void platformScrubFordGUIButtonPressed(){ //called by the platform on an avaiable GUI button event
+    void platformScrubFordGUIButtonPressed(){ //called by the platform on an available GUI button event
         buttonPressed(PlaybackButton::SKIP_FORWARD);
     }
     ...
     
-    void platformShuffleGUIButtonPressed(){ //called by the platform on an avaiable GUI toggle event
+    void platformShuffleGUIButtonPressed(){ //called by the platform on an available GUI toggle event
         togglePressed(PlaybackToggle::SHUFFLE, true); //the action should send the value opposing the last playerinfo state for that toggle control
     }
     ...  
@@ -220,7 +272,7 @@ The Template Runtime's PlayerInfo template specifies the display of some additio
 	- Thumbs Down ( toggle thumbs down state )
 
 
-## Handling Equalizer Control<a id="handling-equalizer-control"></a>
+## Handling Equalizer Control <a id="handling-equalizer-control"></a>
 
 The Equalizer Controller enables Alexa voice control of the device's audio equalizer settings, which includes making gain level adjustments to any of the supported frequency bands ("BASS", "MIDRANGE", and/or "TREBLE") using the device's onboard audio processing. 
 
@@ -290,7 +342,7 @@ m_equalizerController->localAdjustBandLevels( adjustments );
 std::vector<EqualizerBand> bands{EqualizerBand::BASS, EqualizerBand::TREBLE}; // Resets bass and treble bands
 m_equalizerController->localResetBands( bands );
 ```
-## Handling Display Card Templates<a id ="handling-gui-templates"></a>
+## Handling Display Card Templates <a id ="handling-display-card-templates"></a>
 
 Alexa sends visual metadata (display card templates) for your device to display. When template information is received from Alexa, it is the responsibility of the platform implementation to handle the rendering of any UI with the information that is received from Alexa. There are two display card template types:
 
@@ -318,7 +370,7 @@ engine->registerPlatformInterface( std::make_shared<MyTemplateRuntime>() );
 ```
 >**Note:** In the case of lists, it is the responsibility of the platform implementation to handle pagination. Alexa sends down the entire list as a JSON response and starts reading out the first five elements of the list. At the end of the first five elements, Alexa prompts the user whether or not to read the remaining elements from the list. If the user chooses to proceed with the remaining elements, Alexa sends down the entire list as a JSON response but starts reading from the sixth element onwards.
 
-## Handling Global Presets<a id ="handling-global-presets"></a>
+## Handling Global Presets <a id ="handling-global-presets"></a>
 
 The Global Preset interface is used to handle "Alexa, play preset \<number>\" utterances. The meaning of the preset `number` passed through `setGlobalPreset()` is determined by the `GlobalPreset` platform implementation registered with the Engine, and the implementation should suit the needs of the vehicle's infotainment system. 
 
@@ -335,15 +387,15 @@ void setGlobalPreset( int number ) override {
 ...
 ```    
 
-## Handling External Media Apps<a id="external-media-adapter"></a>
+## Handling External Media Apps <a id="handling-external-media-apps"></a>
 
-The External Media Adapter allows the platform to declare and use external media application sources such as Spotify. You must register and implement each External Media Adapter along with its associated external client. On startup, you must run discovery in order to validate each external media application. This allows AVS to excercise playback control over that source type. Currently this feature is only officially supported on the Android platform. 
+The External Media Adapter allows the platform to declare and use external media application sources such as Spotify. You must register and implement each External Media Adapter along with its associated external client. On startup, you must run discovery in order to validate each external media application. This allows AVS to exercise playback control over that source type. Currently this feature is only officially supported on the Android platform. 
 
-## Handling Local Media Sources<a id ="handling-local-media-sources"></a>
+## Handling Local Media Sources <a id ="handling-local-media-sources"></a>
 
 The `LocalMediaSource` interface allows the platform to register a local media source by type(`BLUETOOTH`, `USB`, `LINE_IN`, `AM_RADIO` etc.). Registering a local media source allows playback control of a source via Alexa (e.g. "Alexa, play the CD player") or via button press through the `PlaybackController` interface, if desired. It also enables playback initiation via Alexa by frequency, channel, or preset for relevant source types (e.g. "Alexa, play 98.7 FM")
 
->**NOTE:** Local media source control with Alexa is currently supported in the US region only.
+>**Note:** Local media source control with Alexa is currently supported in the US region only.
 
 The following is an example of registering a CD player local media source using type `Source.COMPACT_DISC`:
 
@@ -358,7 +410,7 @@ To implement a custom handler for a CD player local media source extend the `Loc
 #include <AACE/Alexa/LocalMediaSource.h>
 class MyCDLocalMediaSource : public aace::alexa::LocalMediaSource {
   public:
-    MyCDLocalMediaSource( LocalMedidaSource::Source source ) {
+    MyCDLocalMediaSource( LocalMediaSource::Source source ) {
         m_source = source;	
         ...
     }
@@ -401,7 +453,7 @@ bool playControl( PlayControlType controlType ) override {
 }
 ```
 
->**NOTE:** The `play()` method is used to initiate playback with specified content selection, whereas `playControl(RESUME)` is used to play or resume whatever is already playing.
+>**Note:** The `play()` method is used to initiate playback with specified content selection, whereas `playControl(RESUME)` is used to play or resume whatever is already playing.
 
 The `seek()` and `adjustSeek()` methods are invoked to seek the currently focused `LocalMediaSource`. These methods are only used by sources that are capable of seeking. `seek()` is for specifying an absolute offset, whereas `adjustSeek()` if for specifying a relative offset. 
 
@@ -492,7 +544,6 @@ The following table describes the fields comprising a `LocalMediaSourceState`, w
 LocalMediaSource::SupportedPlaybackOperation::PLAY,
 LocalMediaSource::SupportedPlaybackOperation::PAUSE,
 LocalMediaSource::SupportedPlaybackOperation::STOP,
-LocalMediaSource::SupportedPlaybackOperation::RESUME,
 LocalMediaSource::SupportedPlaybackOperation::PREVIOUS,
 LocalMediaSource::SupportedPlaybackOperation::NEXT,
 LocalMediaSource::SupportedPlaybackOperation::ENABLE_SHUFFLE,
@@ -509,8 +560,6 @@ LocalMediaSource::SupportedPlaybackOperation::REWIND,
 LocalMediaSource::SupportedPlaybackOperation::START_OVER
 ```
 
->**Note:** For local media sources, do not use `LocalMediaSource::SupportedPlaybackOperation::RESUME`
-
 `supportedContentSelectors` should list the content selection types the local source can support. Below is a table of valid pairs.
 
 | Source | supportable `ContentSelector`'s |
@@ -519,9 +568,9 @@ LocalMediaSource::SupportedPlaybackOperation::START_OVER
 | `FM_RADIO` |  `PRESET`, `FREQUENCY` |
 | `SIRIUS_XM` |  `PRESET`, `CHANNEL` |
 
-## Handling Notifications<a id ="handling-notifications"></a>
+## Handling Notifications <a id ="handling-notifications"></a>
 
-It is the responsibility of the platform implementation to provide a visual indication to the user when notifications (for example, package shipment notifications, notifications from skills, etc.) are available from Alexa. [Read more about Notifications here](https://alexa.design/AVSDevNotifications). The Engine uses the registered Notifications implementation to notify you when a notification indicator should be displayed or removed. It does not give any information about the notifications. Audio playback for the notification is handled by whichever audio channel is assigned to the NOTIFICATION type [Read more about handling media and volume here](#handling-media-and-volume).
+It is the responsibility of the platform implementation to provide a visual indication to the user when notifications (for example, package shipment notifications, notifications from skills, etc.) are available from Alexa. See the [AVS Notifications interface documentation](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/notifications.html) for more information about notifications. The Engine uses the registered Notifications implementation to notify you when a notification indicator should be displayed or removed. It does not give any information about the notifications. Audio playback for the notification is handled by whichever audio channel is assigned to the `NOTIFICATION` type.
 
 To implement a custom handler for Notifications extend the `Notifications` class:
 
@@ -532,7 +581,7 @@ class MyNotificationsHandler : public aace::alexa::Notifications {
 
   public:
     void setIndicator( IndicatorState state ) override {
-        // set your notifcations indicator!
+        // set your notifications indicator!
     }
 
 };
@@ -544,9 +593,9 @@ engine->registerPlatformInterface(m_notificationsHandler);
 
 ```
 
-## Handling Alerts<a id = "handling-alerts"></a>
+## Handling Alerts <a id = "handling-alerts"></a>
 
-When an alert is received from Alexa, it is the responsibility of the platform implementation to play the alert sounds in a platform-specific media player. The state of the alert is also made available for the platform to react to. The playback is handled by whichever audio channel is assigned to the ALERT type [Read more about handling media and volume here](#handling-media-and-volume).
+When an alert is received from Alexa, it is the responsibility of the platform implementation to play the alert sounds in a platform-specific media player. See the [AVS Alerts interface documentation](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/alerts.html) for more information about alerts. The state of the alert is also made available for the platform to react to. The playback is handled by whichever audio channel is assigned to the `ALERT` type.
 
 To implement a custom handler for alerts, extend the `Alerts` class:
 
@@ -582,6 +631,36 @@ auto myAlertsSpeaker = std::make_shared<MySpeaker>(...);
 auto myAlerts = std::make_shared<MyAlerts>(myAudioPlayerMediaPlayer, myAudioPlayerSpeaker);
 engine->registerPlatformInterface( myAlerts );
 ```
+
+## Handling Do Not Disturb <a id ="handling-do-not-disturb"></a>
+
+The DoNotDisturb (DND) interface allows users to block all incoming notifications, announcements, and calls to their devices, and to set daily recurring schedules that turn DND off and on.  For details, see the [DND Interface documentation](https://developer.amazon.com/docs/alexa-voice-service/donotdisturb.html). The Engine uses the registered DND implementation to notify the client when DND has been set or unset. A user's voice request to change the DND state triggers audio playback, but no audio playback occurs when a user sets the DND state using the touch screen.
+
+To implement a custom handler for DND extend the `DoNotDisturb` class:
+
+```
+#include <AACE/Alexa/DoNotDisturb>
+
+class MyDoNotDisturbHandler : public aace::alexa::DoNotDisturb {
+
+  public:
+    void setDoNotDisturb( bool doNotDisturb ) override {
+        // set your DoNotDisturb indicator
+    }
+    // on user GUI setting change
+    ...
+        bool doNotDisturb = userSetState;
+        doNotDisturbChanged(doNotDisturb);
+    ...
+
+};
+...
+
+// Register the platform interface with the Engine
+auto m_doNotDisturbHandler = std::make_shared<MyDoNotDisturbHandler>();
+engine->registerPlatformInterface(m_doNotDisturbHandler);
+
+```
     
 ## Handling Alexa State Changes <a id="handling-alexa-state-changes"></a>
 
@@ -607,9 +686,9 @@ class MyAlexaClient : public aace::alexa::AlexaClient {
 engine->registerPlatformInterface( std::make_shared<MyAlexaClient>() );
 ```
 
-## Alexa Engine Properties<a id="alexa-engine-properties"></a>
+## Getting and Setting Alexa Engine Properties <a id="getting-and-setting-alexa-engine-properties"></a>
 
-The Alexa module defines several constants that are used to get and set runtime properties in the Engine. To use these properties call the Engine's `getProperty()` and `setProperty()` methods.
+The Alexa module defines several constants (for example `FIRMWARE_VERSION` and `LOCALE`) that are used to get and set runtime properties in the Engine. To use these properties, include the `AlexaProperties.h` header in your source code and call the Engine's `getProperty()` and `setProperty()` methods.
 
 ```
 // get the current locale setting from the Engine
@@ -619,52 +698,6 @@ String locale = m_engine->getProperty( com.amazon.aace.alexa.AlexaProperties.LOC
 m_engine->setProperty( com.amazon.aace.alexa.AlexaProperties.LOCALE, "en-US" );
 ```
 
-The following constants are defined in the Alexa module:
+>**Note:** The `setProperty()` method returns `true` if the the property value was successfully updated and `false` if the update failed.
 
-<table>
-<tr>
-<th>Property</th>
-<th>Description</th>
-</tr>
-<tr>
-<td>
-<code>com.amazon.aace.alexa.AlexaProperties.AVS_ENDPOINT</code>
-</td>
-<td>The value must be a valid AVS endpoint URL.
-</td>
-</tr>
-<tr>
-<td>
-<code>com.amazon.aace.alexa.AlexaProperties.WAKEWORD_SUPPORTED</code>
-</td>
-<td><p>Describes if wake word support is enabled. If wake word is not supported in the Engine, attempts to enable wake word detection by
-the <code>SpeechRecognizer</code> will fail.</p>
-<p><strong>Note</strong>: This is a read-only property.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>com.amazon.aace.alexa.AlexaProperties.FIRMWARE_VERSION</code>
-</td>
-<td>The firmware version that is reported to AVS. The value must be a positive, signed 32-bit integer represented as a string.
-</td>
-</tr>
-<tr>
-<td>
-<code>com.amazon.aace.alexa.AlexaProperties.LOCALE</code>
-</td>
-<td>The current locale setting for AVS. The value should be a valid locale accepted by AVS. Calling <code>Engine::getProperty()</code> with the <code>SUPPORTED_LOCALES</code> property provides the list of supported locales.
-</td>
-</tr>
-<tr>
-<td>
-<code>com.amazon.aace.alexa.AlexaProperties.SUPPORTED_LOCALES</code></li>
-</td>
-<td><p>AVS supported locales. The value is a comma-separated list, e.g. "de-DE,en-AU,..."</p>
-<p><strong>Note</strong>: This is a read-only property.</p>
-
-</td>
-</tr>
-</table>
-
- See the API reference documentation for  [AlexaProperties](./platform/include/AACE/Alexa/AlexaProperties.h) for more information.
+The [AlexaProperties](./platform/include/AACE/Alexa/AlexaProperties.h) class includes details about the Engine properties defined in the Alexa module. For a list of the Alexa Voice Service (AVS) supported locales for the `LOCALE` property, see the [Alexa Voice Service (AVS) documentation](https://developer.amazon.com/docs/alexa-voice-service/system.html#locales).

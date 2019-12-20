@@ -5,9 +5,8 @@ The Alexa Auto SDK Phone Call Controller module provides the features required b
 **Table of Contents**
 
 * [Overview](#overview)
-* [Sequence Diagrams](#sequence-diagrams)
-* [Using the Phone Call Controller Module](#using-the-pcc-module)
-* [Whitelisting](#whitelisting)
+* [Phone Call Controller Sequence Diagrams](#phone-call-controller-sequence-diagrams)
+* [Using the Phone Call Controller Module](#using-the-phone-call-controller-module)
 
 ## Overview<a id="overview"></a>
 
@@ -151,6 +150,3 @@ public class PhoneCallControllerHandler extends PhoneCallController {
 
 ```
 
-## Whitelisting<a id="whitelisting"></a>
-
-Please see the [Need Help?](../../../../NEED_HELP.md) page for how to whitelist your device for using PhoneCallController APIs.

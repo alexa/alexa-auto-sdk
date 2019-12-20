@@ -135,7 +135,10 @@ public class PlaybackControllerHandler extends PlaybackController {
         // playback button listeners
         mControlPrev.setOnClickListener( new View.OnClickListener() {
             @Override
-            public void onClick( View v ) { previousButtonPressed(); }
+            public void onClick( View v ) {
+                previousButtonPressed();
+                disableButtons();
+            }
         });
 
         mControlPlayPause.setOnClickListener( new View.OnClickListener() {
@@ -146,12 +149,17 @@ public class PlaybackControllerHandler extends PlaybackController {
                 } else {
                     pauseButtonPressed();
                 }
+
+                disableButtons();
             }
         });
 
         mControlNext.setOnClickListener( new View.OnClickListener() {
             @Override
-            public void onClick( View v ) { nextButtonPressed(); }
+            public void onClick( View v ) {
+                nextButtonPressed();
+                disableButtons();
+            }
         });
 
         mControlSkipForward.setOnClickListener( new View.OnClickListener() {
@@ -160,12 +168,7 @@ public class PlaybackControllerHandler extends PlaybackController {
                 skipForwardButtonPressed();
 
                 // block UI input until state is synced by callback
-                mActivity.runOnUiThread( new Runnable() {
-                    @Override
-                    public void run() {
-                        mControlSkipForward.setEnabled( false );
-                    }
-                });
+                mControlSkipForward.setEnabled( false );
             }
         });
 
@@ -173,13 +176,7 @@ public class PlaybackControllerHandler extends PlaybackController {
             @Override
             public void onClick( View v ) {
                 skipBackwardButtonPressed();
-
-                mActivity.runOnUiThread( new Runnable() {
-                    @Override
-                    public void run() {
-                        mControlSkipBackward.setEnabled( false );
-                    }
-                });
+                mControlSkipBackward.setEnabled( false );
             }
         });
 
@@ -188,13 +185,7 @@ public class PlaybackControllerHandler extends PlaybackController {
             public void onClick( View v ) {
                 // Send UI toggle state
                 shuffleTogglePressed( mShuffleToggle.isChecked() );
-
-                mActivity.runOnUiThread( new Runnable() {
-                    @Override
-                    public void run() {
-                        mShuffleToggle.setEnabled( false );
-                    }
-                });
+                mShuffleToggle.setEnabled( false );
             }
         });
 
@@ -202,13 +193,7 @@ public class PlaybackControllerHandler extends PlaybackController {
             @Override
             public void onClick( View v ) {
                 loopTogglePressed( mLoopToggle.isChecked() );
-
-                mActivity.runOnUiThread( new Runnable() {
-                    @Override
-                    public void run() {
-                        mLoopToggle.setEnabled( false );
-                    }
-                });
+                mLoopToggle.setEnabled( false );
             }
         });
 
@@ -216,13 +201,7 @@ public class PlaybackControllerHandler extends PlaybackController {
             @Override
             public void onClick( View v ) {
                 repeatTogglePressed( mRepeatToggle.isChecked() );
-
-                mActivity.runOnUiThread( new Runnable() {
-                    @Override
-                    public void run() {
-                        mRepeatToggle.setEnabled( false );
-                    }
-                });
+                mRepeatToggle.setEnabled( false );
             }
         });
 
@@ -232,12 +211,7 @@ public class PlaybackControllerHandler extends PlaybackController {
                 // ignore un-checking thumbs_up, cloud behavior does not support it
                 if ( mThumbsUpToggle.isChecked() ) {
                     thumbsUpTogglePressed( true );
-                    mActivity.runOnUiThread( new Runnable() {
-                        @Override
-                        public void run() {
-                            mThumbsUpToggle.setEnabled( false );
-                        }
-                    });
+                    mThumbsUpToggle.setEnabled( false );
                 } else mThumbsUpToggle.setChecked( true );
             }
         });
@@ -248,13 +222,7 @@ public class PlaybackControllerHandler extends PlaybackController {
                 // ignore un-checking thumbs_down, cloud behavior does not support it
                 if ( mThumbsDownToggle.isChecked() ) {
                     thumbsDownTogglePressed(mThumbsDownToggle.isChecked());
-
-                    mActivity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mThumbsDownToggle.setEnabled(false);
-                        }
-                    });
+                    mThumbsDownToggle.setEnabled( false );
                 } else mThumbsDownToggle.setChecked(true);
             }
         });
@@ -302,10 +270,8 @@ public class PlaybackControllerHandler extends PlaybackController {
         mActivity.runOnUiThread( new Runnable() {
             @Override
             public void run() {
-                mControlPrev.setEnabled( true );
-                mControlPlayPause.setEnabled( true );
+                enableButtons();
                 mControlPlayPause.setChecked(true);
-                mControlNext.setEnabled( true );
                 mProgress.setMax( 1000 );
             }
         });
@@ -315,6 +281,7 @@ public class PlaybackControllerHandler extends PlaybackController {
         mActivity.runOnUiThread( new Runnable() {
             @Override
             public void run() {
+                enableButtons();
                 mControlPlayPause.setChecked(false);
             }
         });
@@ -458,5 +425,35 @@ public class PlaybackControllerHandler extends PlaybackController {
         } else {
             return mFormatter.format( "%02d:%02d", minutes, seconds ).toString();
         }
+    }
+
+    private void enableButtons() {
+        mControlPrev.setEnabled( true );
+        mControlPlayPause.setEnabled( true );
+        mControlNext.setEnabled( true );
+
+        mControlSkipForward.setEnabled( true );
+        mControlSkipBackward.setEnabled( true );
+
+        mShuffleToggle.setEnabled( true );
+        mLoopToggle.setEnabled( true );
+        mRepeatToggle.setEnabled( true );
+        mThumbsUpToggle.setEnabled( true );
+        mThumbsDownToggle.setEnabled( true );
+    }
+
+    private void disableButtons() {
+        mControlPrev.setEnabled( false );
+        mControlPlayPause.setEnabled( false );
+        mControlNext.setEnabled( false );
+
+        mControlSkipForward.setEnabled( false );
+        mControlSkipBackward.setEnabled( false );
+
+        mShuffleToggle.setEnabled( false );
+        mLoopToggle.setEnabled( false );
+        mRepeatToggle.setEnabled( false );
+        mThumbsUpToggle.setEnabled( false );
+        mThumbsDownToggle.setEnabled( false );
     }
 }

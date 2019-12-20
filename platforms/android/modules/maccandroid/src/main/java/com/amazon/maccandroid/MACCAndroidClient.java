@@ -75,6 +75,7 @@ public class MACCAndroidClient {
                                     componentName.getPackageName(), error);
                             MediaAppsRepository.getInstance().removeMediaApp(
                                     componentName.getPackageName());
+                            runDiscovery();
                         }
                     });
                 }

@@ -6,6 +6,7 @@ The Alexa Auto SDK Address Book module provides the features required by a platf
 **Table of Contents**
 
 * [Overview](#overview)
+* [Address Book Sequence Diagrams](#sequence-diagrams)
 * [Using the Address Book Module](#using-the-address-book-module)
 
 ## Overview<a id="overview"></a>
@@ -16,18 +17,51 @@ The Contact and Navigation address books are not available for use with any othe
 
 > **Note**: The Address Book module supersedes the [Contact Uploader module](../contactuploader/README.md), which supports only phone contacts and only online (cloud) use cases. The Contact Uploader module is on the deprecation path beginning with Alexa Auto SDK release 2.0.0, and all new implementations should use the Address Book module instead of the Contact Uploader module.
 
-The platform implementation is responsible for managing the life cycle of an address book, including:
+Your platform implementation is responsible for managing the life cycle of an address book, including:
 
 * obtaining consent from end users to allow Alexa to use their data.
 * notifying the Alexa Auto SDK Engine when end users revoke permission for Alexa to use their data (this notification ensures that the Alexa Auto SDK Engine will remove the user data from the Alexa cloud).
 
-> **Important!** Each time an address book becomes unavailable (for example, the phone is disconnected), the platform implementation must notify the Alexa Auto SDK Engine to trigger the deletion of the corresponding address book from the Alexa cloud.
+> **Important!** Each time an address book becomes unavailable (when the phone is disconnected, for example), your platform implementation must notify the Alexa Auto SDK Engine to trigger the deletion of the corresponding address book from the Alexa cloud and upload it when phone connects again.
 
-See the C++ [Address Book module README](../../../../modules/address-book/README.md) for further details.
+### AddressBookType
+The AddressBook API defines the type `aace.addressbook.AddressBook.AddressBookType`, which specifies the type of address book to add. The currently supported address book types are:
+
+* `aace.addressbook.AddressBook.AddressBookType.CONTACT` for phone contacts
+* `aace.addressbook.AddressBook.AddressBookType.NAVIGATION` for navigation favorites
+
+## Sequence Diagrams<a id ="sequence-diagrams"></a>
+
+The following sequence diagrams provide an overview of how the Address Book module handles uploading and removing contacts and navigation favorites.
+
+### Upload Contacts
+
+This diagram illustrates the sequence for uploading contacts and calling one of the uploaded contacts using voice.
+
+![Contacts Upload](./assets/upload_contacts.png)
+
+### Remove Contacts
+
+This diagram illustrates the sequence for removing uploaded contacts.
+
+![Contacts Remove](./assets/remove_contacts.png)
+
+### Upload Navigation Favorites
+
+This diagram illustrates the sequence for uploading navigation favorites and navigating to one of the uploaded destinations using voice.
+
+![Navigation Upload](./assets/upload_nav_favorites.png)
+
+### Remove Navigation Favorites
+
+This diagram illustrates the sequence for removing uploaded navigation favorites.
+
+![Navigation Remove](./assets/remove_nav_favorites.png)
+
 
 ## Using the Address Book Module<a id="using-the-address-book-module"></a>
 
-Extend the `AddressBook` class to implement a custom address book handler:
+To implement a custom Address Book handler, extend the `AddressBook` class:
 
 ```java
 public class AddressBookHandler extends AddressBook {

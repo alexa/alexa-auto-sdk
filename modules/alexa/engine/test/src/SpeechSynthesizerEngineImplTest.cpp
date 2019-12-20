@@ -67,7 +67,6 @@ protected:
             EXPECT_CALL(*m_alexaMockFactory->getAudioOutputChannelMock(),setEngineInterface(testing::_)).Times(testing::Exactly(2));
             EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),addDirectiveHandler(testing::_)).WillOnce(testing::Return(true));
             EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),doShutdown());
-            EXPECT_CALL(*m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),registerCapability(testing::_)).WillOnce(testing::Return(true));
             EXPECT_CALL(*m_alexaMockFactory->getContextManagerInterfaceMock(),setStateProvider(testing::_, testing::_)).Times(testing::AtLeast(1));
             EXPECT_CALL(*m_alexaMockFactory->getSpeakerManagerInterfaceMock(), addSpeaker(testing::_)).Times(testing::AtLeast(1));
             EXPECT_CALL(*m_alexaMockFactory->getSpeakerManagerInterfaceMock(), getSpeakerSettings(testing::_,testing::_))
@@ -89,6 +88,7 @@ protected:
         
         auto speechSynthesizerEngineImpl = aace::engine::alexa::SpeechSynthesizerEngineImpl::create(
             m_alexaMockFactory->getSpeechSynthesizerMock(),
+            m_alexaMockFactory->getEndpointBuilderMock(),
             m_alexaMockFactory->getAudioManagerMock(),
             m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
             m_alexaMockFactory->getMessageSenderInterfaceMock(),
@@ -125,6 +125,7 @@ TEST_F(SpeechSynthesizerEngineImplTest,createWithPlatformInterfaceAsNull)
 
     auto speechSynthesizerEngineImpl = aace::engine::alexa::SpeechSynthesizerEngineImpl::create(
         nullptr,
+        m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getAudioManagerMock(),
         m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
@@ -145,6 +146,7 @@ TEST_F(SpeechSynthesizerEngineImplTest, createWithAudioManagerInterfaceAsNull)
 
     auto speechSynthesizerEngineImpl = aace::engine::alexa::SpeechSynthesizerEngineImpl::create(
         m_alexaMockFactory->getSpeechSynthesizerMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
         nullptr,
         m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
@@ -163,6 +165,7 @@ TEST_F(SpeechSynthesizerEngineImplTest,createWithDirectiveSequencerAsNull)
 {
     auto speechSynthesizerEngineImpl = aace::engine::alexa::SpeechSynthesizerEngineImpl::create(
         m_alexaMockFactory->getSpeechSynthesizerMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getAudioManagerMock(),
         nullptr,
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
@@ -183,6 +186,7 @@ TEST_F(SpeechSynthesizerEngineImplTest,createWithMessageSenderAsNull)
 
     auto speechSynthesizerEngineImpl = aace::engine::alexa::SpeechSynthesizerEngineImpl::create(
         m_alexaMockFactory->getSpeechSynthesizerMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getAudioManagerMock(),
         m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
         nullptr,
@@ -203,6 +207,7 @@ TEST_F(SpeechSynthesizerEngineImplTest,createWithFocusManagerAsNull)
 
     auto speechSynthesizerEngineImpl = aace::engine::alexa::SpeechSynthesizerEngineImpl::create(
         m_alexaMockFactory->getSpeechSynthesizerMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getAudioManagerMock(),
         m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
@@ -223,6 +228,7 @@ TEST_F(SpeechSynthesizerEngineImplTest,createWithContextManagerAsNull)
 
     auto speechSynthesizerEngineImpl = aace::engine::alexa::SpeechSynthesizerEngineImpl::create(
         m_alexaMockFactory->getSpeechSynthesizerMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getAudioManagerMock(),
         m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
@@ -243,6 +249,7 @@ TEST_F(SpeechSynthesizerEngineImplTest,createWithAttachmentManagerAsNull)
 
     auto speechSynthesizerEngineImpl = aace::engine::alexa::SpeechSynthesizerEngineImpl::create(
         m_alexaMockFactory->getSpeechSynthesizerMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getAudioManagerMock(),
         m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
@@ -263,6 +270,7 @@ TEST_F(SpeechSynthesizerEngineImplTest,createWithDialogUXStateAggregatorAsNull)
 
     auto speechSynthesizerEngineImpl = aace::engine::alexa::SpeechSynthesizerEngineImpl::create(
         m_alexaMockFactory->getSpeechSynthesizerMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getAudioManagerMock(),
         m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
@@ -283,6 +291,7 @@ TEST_F(SpeechSynthesizerEngineImplTest, createWithCapabilitiesDelegateAsNull)
 
     auto speechSynthesizerEngineImpl = aace::engine::alexa::SpeechSynthesizerEngineImpl::create(
         m_alexaMockFactory->getSpeechSynthesizerMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getAudioManagerMock(),
         m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
@@ -303,6 +312,7 @@ TEST_F(SpeechSynthesizerEngineImplTest,createWithSpeakerManagerAsNull)
 
     auto speechSynthesizerEngineImpl = aace::engine::alexa::SpeechSynthesizerEngineImpl::create(
         m_alexaMockFactory->getSpeechSynthesizerMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getAudioManagerMock(),
         m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
@@ -323,6 +333,7 @@ TEST_F(SpeechSynthesizerEngineImplTest,createWithExceptionSenderAsNull)
 
     auto speechSynthesizerEngineImpl = aace::engine::alexa::SpeechSynthesizerEngineImpl::create(
         m_alexaMockFactory->getSpeechSynthesizerMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getAudioManagerMock(),
         m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),

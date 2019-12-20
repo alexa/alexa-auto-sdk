@@ -5,11 +5,10 @@ The Alexa Auto SDK Phone Call Controller module provides the features required b
 **Table of Contents**
 
 * [Overview](#overview)
-* [Sequence Diagrams](#sequence-diagrams)
-* [Using the Phone Call Controller Module](#using-the-pcc-module)
-* [Whitelisting](#whitelisting)
+* [Phone Call Controller Sequence Diagrams](#phone-call-controller-sequence-diagrams)
+* [Using the Phone Call Controller Module](#using-the-phone-call-controller-module)
 
-## Overview<a id="overview"></a>
+## Overview <a id="overview"></a>
 
 By registering a Phone Call Controller in your implementation, you allow the end user to interact with new or ongoing calls using Alexa, and you provide Alexa with the state of the calling device on the platform.
 
@@ -18,7 +17,7 @@ The platform implementation is responsible for managing the lifecycle of the cal
 * Preventing Alexa TTS from being fed back into the microphone when the user triggers Alexa during a call. To accomplish this, the platform implementation should stop feeding the microphone input into the call channel until Alexa returns to the idle state, and it should also specify strong echo cancellation.
 * Lowering the audio level of previous media in response to an incoming call until the call is answered or declined (if ducking is supported on the platform) and pausing the media if the call is answered.
 
-## Sequence Diagrams<a id="sequence-diagrams"></a>
+## Phone Call Controller Sequence Diagrams <a id="phone-call-controller-sequence-diagrams"></a>
 
 The following sequence diagrams provide an overview of how the Alexa Auto SDK handles inbound and outbound phone call control.
 
@@ -34,9 +33,10 @@ This diagram illustrates the sequence of outbound phone call control using voice
 
 ![Outbound Calling](./assets/aac-pcc-outbound-call.png)
 
-## Using the Phone Call Controller Module <a id = "using-the-pcc-module"></a>
+## Using the Phone Call Controller Module <a id = "using-the-phone-call-controller-module"></a>
 
 To implement a custom `PhoneCallController` handler, extend the `PhoneCallController` class:
+
 ```
 #include <AACE/PhoneCallController/PhoneCallController.h>
 
@@ -147,6 +147,4 @@ std::shared_ptr<PhoneCallController> phoneCallController = std::make_shared<MyPh
 engine->registerPlatformInterface( phoneCallController );
 ```
 
-## Whitelisting<a id="whitelisting"></a>
 
-Please see the [Need Help?](../../NEED_HELP.md) page for how to whitelist your device for using Phone Call Control APIs.

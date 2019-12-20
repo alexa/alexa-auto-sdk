@@ -188,6 +188,15 @@ abstract public class AuthProvider extends PlatformInterface
     }
 
     /**
+    * Notifies the platform implementation that the specified access token was used in an 
+    * unauthorized request to AVS. AVS responded to this request with a 403 code 
+    * indicating the token was not valid.
+    *
+    * @param token The access token used in an unauthorized request to AVS
+    */
+    public void authFailure( String token ) {}
+
+    /**
      * Notifies the Engine of a change in AVS authorization state in the platform implementation
      *
      * @param  authState The new authorization state

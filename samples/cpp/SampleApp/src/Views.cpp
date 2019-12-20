@@ -106,17 +106,52 @@ void ContentView::set(const std::string &string, const Type type) {
                 stream << "CBLCodeExpired parser error" << e.what() << std::endl;
             }
             break;
+        case Type::CBLAuthorizationExpired:
+            try {
+                auto object = json::parse(string);
+                Ensures(object.is_object());
+                if (object.count("message")) {
+                    stream << object.at("message").get<std::string>() << std::endl;
+                }
+            } catch (std::exception &e) {
+                stream << "CBLAuthorizationExpired parser error" << e.what() << std::endl;
+            }
+            break;
+        case Type::CommunicationCallDisplayInfo:
+            try {
+                auto object = json::parse(string);
+                Ensures(object.is_object());
+                stream << "Communication call display info" << std::endl << std::endl;
+                if (object.count("displayName")) {
+                    stream << "Display Name: " << object.at("displayName").get<std::string>() << std::endl;
+                }
+            } catch (std::exception &e) {
+                stream << "CommunicationCallDisplayInfo parser error" << e.what() << std::endl;
+            }
+            break;
         case Type::Navigation:
             try {
                 auto object = json::parse(string);
                 Ensures(object.is_object());
                 if (object.count("destination")) {
                     auto destination = object.at("destination");
-                    stream << "Address:   " << destination.at("singleLineDisplayAddress").get<std::string>() << std::endl;
+                    stream << "Address:   " << destination.at("address").get<std::string>() << std::endl;
                     if (destination.count("coordinate")) {
                         auto coordinate = destination.at("coordinate");
                         stream << "Latitude:  " << coordinate.at("latitudeInDegrees").get<double>() << std::endl;
                         stream << "Longitude: " << coordinate.at("longitudeInDegrees").get<double>() << std::endl;
+                    }
+                }
+                if (object.count("waypoints")) {
+                    auto waypoints = object.at("waypoints"); {
+                        for (json waypoint : waypoints) {
+                            stream << "Address:   " << waypoint.at("address").get<std::string>() << std::endl;
+                            if (waypoint.count("coordinate")) {
+                                auto coordinate = waypoint.at("coordinate");
+                                stream << "Latitude:  " << coordinate.at("latitudeInDegrees").get<double>() << std::endl;
+                                stream << "Longitude: " << coordinate.at("longitudeInDegrees").get<double>() << std::endl;
+                            }
+                        }
                     }
                 }
             } catch (std::exception &e) {
@@ -135,15 +170,22 @@ void ContentView::set(const std::string &string, const Type type) {
                     if (title.count("subTitle")) {
                         stream << title.at("subTitle").get<std::string>() << std::endl;
                     }
+                    if (object.at("title").is_string()) {
+                        stream << object.at("title").get<std::string>() << std::endl;
+                    }
                     stream << std::endl;
-                }
+                } 
+
                 // clang-format off
                 static const std::map<std::string, Type> TemplateTypeEnumerator{
                     {"BodyTemplate1", Type::BodyTemplate1},
                     {"BodyTemplate2", Type::BodyTemplate2},
                     {"ListTemplate1", Type::ListTemplate1},
                     {"WeatherTemplate", Type::WeatherTemplate},
-                    {"LocalSearchListTemplate1", Type::LocalSearchListTemplate1}
+                    {"LocalSearchListTemplate1", Type::LocalSearchListTemplate1},
+                    {"LocalSearchListTemplate2", Type::LocalSearchListTemplate2},
+                    {"LocalSearchDetailTemplate1", Type::LocalSearchDetailTemplate1},
+                    {"TrafficDetailsTemplate", Type::TrafficDetailsTemplate}
                 };
                 // clang-format on
                 switch (TemplateTypeEnumerator.at(object["type"])) {
@@ -213,6 +255,70 @@ void ContentView::set(const std::string &string, const Type type) {
                                 stream << std::endl;
                             }
                         }
+                        break;
+                    case Type::LocalSearchListTemplate2:
+                        if (object.count("pointOfInterests") && object.at("pointOfInterests").is_array()) {
+                            for (auto &poi : object.at("pointOfInterests")) {
+                                if (poi.count("title")) {
+                                    auto title = poi.at("title");
+                                    if (title.count("mainTitle")) {
+                                        stream << title.at("mainTitle").get<std::string>() << std::endl;
+                                    }
+                                    if (title.count("subTitle")) {
+                                        stream << title.at("subTitle").get<std::string>() << std::endl;
+                                    }
+                                }
+                                if (poi.count("address")) {
+                                    stream << poi.at("address").get<std::string>() << " ";
+                                }
+                                if (poi.count("phoneNumber")) {
+                                    stream << poi.at("phoneNumber").get<std::string>() << std::endl;
+                                }
+                                stream << std::endl;
+                            }
+                        }
+                        break;
+                    case Type::LocalSearchDetailTemplate1:
+                        if (object.count("address")) {
+                            stream << object.at("address").get<std::string>() << " ";
+                        }
+                        if (object.count("phoneNumber")) {
+                            stream << object.at("phoneNumber").get<std::string>() << std::endl;
+                        }
+                        if (object.count("travelDistance")) {
+                            stream << object.at("travelDistance").get<std::string>() << " ";
+                        }
+                        if (object.count("travelTime")) {
+                            stream << object.at("travelTime").get<std::string>() << std::endl;
+                        }
+                        if (object.count("rating")) {
+                            auto rating = object.at("rating");
+                            if (rating.count("value")) {
+                                stream << "rating:" << rating.at("value").get<std::string>() << " ";
+                            }
+                            if (rating.count("reviewCount")) {
+                                stream << "reviewCount:" << rating.at("reviewCount").get<std::string>();
+                            }
+                        }
+                        stream << std::endl;
+                        break;
+                    case Type::TrafficDetailsTemplate:
+                        if (object.count("destinationInfo")) {
+                            auto destinationInfo = object.at("destinationInfo");
+                            if (destinationInfo.count("label")) {
+                                stream << destinationInfo.at("label").get<std::string>() << std::endl;
+                            }
+                            if (destinationInfo.count("address")) {
+                                stream << destinationInfo.at("address").get<std::string>() << std::endl;
+                            }
+                        }
+                        if (object.count("travelDistance")) {
+                            stream << object.at("travelDistance").get<std::string>() << " ";
+                        }
+                        if (object.count("travelTime")) {
+                            stream << object.at("travelTime").get<std::string>();
+                        }
+                        stream << std::endl;
                         break;
                     default:
                         break;

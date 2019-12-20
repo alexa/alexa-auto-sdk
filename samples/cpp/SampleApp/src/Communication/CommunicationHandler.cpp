@@ -35,6 +35,7 @@ CommunicationHandler::CommunicationHandler(std::weak_ptr<Activity> activity,
                                            std::weak_ptr<logger::LoggerHandler> loggerHandler)
     : m_activity{std::move(activity)}
     , m_loggerHandler{std::move(loggerHandler)}
+    , m_callDisplayInfo{""}
     , m_callState{CallState::NONE} {
     setupUI();
 }
@@ -44,8 +45,23 @@ std::weak_ptr<Activity> CommunicationHandler::getActivity() { return m_activity;
 std::weak_ptr<logger::LoggerHandler> CommunicationHandler::getLoggerHandler() { return m_loggerHandler; }
 
 // aace::communication::AlexaComms interface
+
+void CommunicationHandler::callDisplayInfo(const std::string &displayInfo) {
+    log(logger::LoggerHandler::Level::VERBOSE, "callDisplayInfo:" + displayInfo);
+    // Update call display info
+    if (auto activity = m_activity.lock()) {
+        activity->runOnUIThread([=]() {
+            if (auto card = activity->findViewById("id:card").lock()) {
+                card->set(displayInfo, View::Type::CommunicationCallDisplayInfo);
+            }
+        });
+    }
+    m_callDisplayInfo = displayInfo;
+}
+
 void CommunicationHandler::callStateChanged(CallState state) {
     log(logger::LoggerHandler::Level::VERBOSE, "callStateChanged:" + callStateToString(state));
+
     // Update call state
     if (auto console = m_console.lock()) {
         console->printRuler();
@@ -104,6 +120,13 @@ void CommunicationHandler::setupUI() {
         return true;
     });
 
+    // onCommunicationShowDisplayInfo
+    activity->registerObserver(Event::onCommunicationShowDisplayInfo, [=](const std::string &value) {
+        log(logger::LoggerHandler::Level::VERBOSE, "onCommunicationShowDisplayInfo");
+        showDisplayInfo();
+        return true;
+    });
+
     // onCommunicationShowState
     activity->registerObserver(Event::onCommunicationShowState, [=](const std::string &value) {
         log(logger::LoggerHandler::Level::VERBOSE, "onCommunicationShowState");
@@ -118,6 +141,15 @@ void CommunicationHandler::log(logger::LoggerHandler::Level level, const std::st
         return;
     }
     loggerHandler->log(level, "CommunicationHandler", message);
+}
+
+void CommunicationHandler::showDisplayInfo() {
+    log(logger::LoggerHandler::Level::VERBOSE, "Showing communications display info");
+    if (auto console = m_console.lock()) {
+        console->printRuler();
+        console->printLine("Communication call display info: " + m_callDisplayInfo);
+        console->printRuler();
+    }
 }
 
 void CommunicationHandler::showState() {

@@ -54,7 +54,6 @@ public:
     virtual ~AddressBookCloudUploaderRESTAgent() = default;
 
     bool isAccountProvisioned();
-    bool autoProvisionAccount();
 
     std::string createAndGetCloudAddressBook( const std::string& addressBookSourceId, const std::string& addressBookType );
     bool getCloudAddressBookId( const std::string& addressBookSourceId, const std::string& addressBookType, std::string& cloudAddressBookId );
@@ -92,7 +91,6 @@ private:
 
     struct AlexaAccountInfo {
         std::string commsId;
-        std::string directedId;
         CommsProvisionStatus provisionStatus;
     };
 
@@ -101,8 +99,7 @@ private:
     void setPceId( const std::string& pceId );
 
     AlexaAccountInfo getAlexaAccountInfo();
-    std::string getPceIdFromIndentity( const std::string& commsId );
-    bool doAccountAutoProvision( const std::string& directedId );
+    std::string getPceIdFromIdentity( const std::string& commsId );
 
     std::vector<std::string> buildCommonHTTPHeader();
     bool parseCommonHTTPResponse( const HTTPResponse& response );
@@ -111,10 +108,8 @@ private:
     HTTPResponse doGet( const std::string& url, const std::vector<std::string>& headers );
     HTTPResponse doDelete( const std::string& url, const std::vector<std::string>& headers );
 
-
     std::string buildCreateAddressBookDataJson( const std::string& addressBookSourceId, const std::string& addressBookType );
     std::string buildEntriesJsonString( std::shared_ptr<rapidjson::Document> document );
-    std::string buildAutoAccountProvisionJson();
 
 private:
     std::string m_pceId;

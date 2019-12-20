@@ -20,5 +20,9 @@ var searchData=
   ['trackoffset',['trackOffset',['../classaace_1_1alexa_1_1_external_media_adapter_1_1_playback_state.html#a20733d0a377adf547315367bf6efeecf',1,'aace::alexa::ExternalMediaAdapter::PlaybackState::trackOffset()'],['../classaace_1_1alexa_1_1_local_media_source_1_1_playback_state.html#a03ddbda405c7381c38382f7f21e04635',1,'aace::alexa::LocalMediaSource::PlaybackState::trackOffset()']]],
   ['treble',['TREBLE',['../classaace_1_1alexa_1_1_equalizer_controller_engine_interface.html#a733a5c62b16ef4f62b5c94d16f314cb3a6481bb83f7c61a109bd727e3fa30917b',1,'aace::alexa::EqualizerControllerEngineInterface']]],
   ['trim',['TRIM',['../classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a6aa7ee80198586f3a51d0c0f8fb542cfaa32049f307ffa78cf7b4586ac7d98e06',1,'aace::vehicle::config::VehicleConfiguration']]],
+  ['turnpowercontrolleroff',['turnPowerControllerOff',['../classaace_1_1car_control_1_1_car_control.html#a213c71cb12f115e5c826fca82ef62905',1,'aace::carControl::CarControl']]],
+  ['turnpowercontrolleron',['turnPowerControllerOn',['../classaace_1_1car_control_1_1_car_control.html#ae9386e89c038f9d215611f34eaeb7de4',1,'aace::carControl::CarControl']]],
+  ['turntogglecontrolleroff',['turnToggleControllerOff',['../classaace_1_1car_control_1_1_car_control.html#a817fe2332c70813506adae57188cc63a',1,'aace::carControl::CarControl']]],
+  ['turntogglecontrolleron',['turnToggleControllerOn',['../classaace_1_1car_control_1_1_car_control.html#a2fe461687d626b4530e2d25022851723',1,'aace::carControl::CarControl']]],
   ['type',['type',['../classaace_1_1alexa_1_1_external_media_adapter_1_1_playback_state.html#a8efae92e933eb314931ca275833cf5c7',1,'aace::alexa::ExternalMediaAdapter::PlaybackState::type()'],['../classaace_1_1alexa_1_1_local_media_source_1_1_playback_state.html#a934dcf2adab877ac18d865ce00b5b9c9',1,'aace::alexa::LocalMediaSource::PlaybackState::type()']]]
 ];

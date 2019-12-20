@@ -13,6 +13,8 @@
  * permissions and limitations under the License.
  */
 
+#include "AVSCommon/SDKInterfaces/RenderPlayerInfoCardsProviderInterface.h"
+
 #include "AACE/Engine/Alexa/TemplateRuntimeEngineImpl.h"
 #include "AACE/Engine/Core/EngineMacros.h"
 
@@ -29,8 +31,8 @@ TemplateRuntimeEngineImpl::TemplateRuntimeEngineImpl( std::shared_ptr<aace::alex
 }
 
 bool TemplateRuntimeEngineImpl::initialize(
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerInterface> audioPlayerInterface,
+	std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
+    std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>> renderPlayerInfoCardsProviderInterfaces,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
     std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
@@ -38,23 +40,20 @@ bool TemplateRuntimeEngineImpl::initialize(
     
     try
     {
-        m_audioPlayerInterfaceDelegate = AudioPlayerInterfaceDelegate::create( audioPlayerInterface );
-        ThrowIfNull( m_audioPlayerInterfaceDelegate, "couldNotCreateAudioPlayerInterfaceDelegate" );
-
-        m_templateRuntimeCapabilityAgent = alexaClientSDK::capabilityAgents::templateRuntime::TemplateRuntime::create( m_audioPlayerInterfaceDelegate, focusManager, exceptionSender );
+        m_renderPlayerInfoCardsProviderInterfaceDelegate = RenderPlayerInfoCardsProviderInterfaceDelegate::create( renderPlayerInfoCardsProviderInterfaces );
+        ThrowIfNull( m_renderPlayerInfoCardsProviderInterfaceDelegate, "couldNotCreateAudioPlayerInterfaceDelegate" );
+                
+        m_templateRuntimeCapabilityAgent = alexaClientSDK::capabilityAgents::templateRuntime::TemplateRuntime::create( renderPlayerInfoCardsProviderInterfaces, focusManager, exceptionSender );
         ThrowIfNull( m_templateRuntimeCapabilityAgent, "couldNotCreateCapabilityAgent" );
-        
+
         // add template runtime observer
         m_templateRuntimeCapabilityAgent->addObserver( shared_from_this() );
         
-        // add capability agent to dialog ux aggregator
+        // add capability agent as dialog ux state observer
         dialogUXStateAggregator->addObserver( m_templateRuntimeCapabilityAgent );
         
-        // add capability agent to the directive sequencer
-        ThrowIfNot( directiveSequencer->addDirectiveHandler( m_templateRuntimeCapabilityAgent ), "addDirectiveHandlerFailed" );
-
-        // register capability with delegate
-        ThrowIfNot( capabilitiesDelegate->registerCapability( m_templateRuntimeCapabilityAgent ), "registerCapabilityFailed");
+        // register capability with the default endpoint
+        defaultEndpointBuilder->withCapability( m_templateRuntimeCapabilityAgent, m_templateRuntimeCapabilityAgent );
 
         return true;
     }
@@ -66,8 +65,8 @@ bool TemplateRuntimeEngineImpl::initialize(
 
 std::shared_ptr<TemplateRuntimeEngineImpl> TemplateRuntimeEngineImpl::create(
     std::shared_ptr<aace::alexa::TemplateRuntime> templateRuntimePlatformInterface,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerInterface> audioPlayerInterface,
+	std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
+    std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>> renderPlayerInfoCardsProviderInterfaces,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
     std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
@@ -78,8 +77,7 @@ std::shared_ptr<TemplateRuntimeEngineImpl> TemplateRuntimeEngineImpl::create(
     try
     {
         ThrowIfNull( templateRuntimePlatformInterface, "invalidTemplateRuntimePlatformInterface" );
-        ThrowIfNull( directiveSequencer, "invalidDirectiveSequencer" );
-        ThrowIfNull( audioPlayerInterface, "invalidAudioPlayerInterface" );
+        ThrowIfNull( defaultEndpointBuilder, "invalidDefaultEndpointBuilder" );
         ThrowIfNull( focusManager, "invalidFocusManager" );
         ThrowIfNull( capabilitiesDelegate, "invalidCapabilitiesDelegate" );
         ThrowIfNull( dialogUXStateAggregator, "invalidDialogUXStateAggregator" );
@@ -87,7 +85,7 @@ std::shared_ptr<TemplateRuntimeEngineImpl> TemplateRuntimeEngineImpl::create(
 
         templateRuntimeEngineImpl = std::shared_ptr<TemplateRuntimeEngineImpl>( new TemplateRuntimeEngineImpl( templateRuntimePlatformInterface ) );
         
-        ThrowIfNot( templateRuntimeEngineImpl->initialize( directiveSequencer, audioPlayerInterface, focusManager, capabilitiesDelegate, dialogUXStateAggregator, exceptionSender ), "initializeTemplateRuntimeEngineImplFailed" );
+        ThrowIfNot( templateRuntimeEngineImpl->initialize( defaultEndpointBuilder, renderPlayerInfoCardsProviderInterfaces, focusManager, capabilitiesDelegate, dialogUXStateAggregator, exceptionSender ), "initializeTemplateRuntimeEngineImplFailed" );
 
         return templateRuntimeEngineImpl;
     }
@@ -107,9 +105,9 @@ void TemplateRuntimeEngineImpl::doShutdown()
         m_templateRuntimeCapabilityAgent.reset();
     }
     
-    if( m_audioPlayerInterfaceDelegate != nullptr ) {
-        m_audioPlayerInterfaceDelegate->shutdown();
-        m_audioPlayerInterfaceDelegate.reset();
+    if( m_renderPlayerInfoCardsProviderInterfaceDelegate != nullptr ) {
+        m_renderPlayerInfoCardsProviderInterfaceDelegate->shutdown();
+        m_renderPlayerInfoCardsProviderInterfaceDelegate.reset();
     }
 }
 
@@ -129,88 +127,62 @@ void TemplateRuntimeEngineImpl::clearPlayerInfoCard() {
     m_templateRuntimePlatformInterface->clearPlayerInfo();
 }
 
-void TemplateRuntimeEngineImpl::setAudioPlayerInterface( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerInterface> audioPlayerInterface ) {
-    m_audioPlayerInterfaceDelegate->setDelegate( audioPlayerInterface );
+void TemplateRuntimeEngineImpl::setRenderPlayerInfoCardsProviderInterface( std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>> renderPlayerInfoCardsProviderInterface  ) {
+    m_renderPlayerInfoCardsProviderInterfaceDelegate->setDelegate( renderPlayerInfoCardsProviderInterface );
 }
+    
 
 //
-// AudioPlayerInterfaceDelegate
+// RenderPlayerInfoCardsInterfaceDelegate
 //
 
-AudioPlayerInterfaceDelegate::AudioPlayerInterfaceDelegate( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerInterface> audioPlayerInterface ) :
-    alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG + ".AudioPlayerInterfaceDelegate"),
-    m_delegate( audioPlayerInterface ) {
+RenderPlayerInfoCardsProviderInterfaceDelegate::RenderPlayerInfoCardsProviderInterfaceDelegate( std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>> renderPlayerInfoCardsProviderInterfaces ) :
+    alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG + ".RenderPlayerInfoCardsInterfaceDelegate"),
+    m_delegates( renderPlayerInfoCardsProviderInterfaces ) {
 }
 
-std::shared_ptr<AudioPlayerInterfaceDelegate> AudioPlayerInterfaceDelegate::create( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerInterface> audioPlayerInterface ) {
-    return std::shared_ptr<AudioPlayerInterfaceDelegate>( new AudioPlayerInterfaceDelegate( audioPlayerInterface ) );
+std::shared_ptr<RenderPlayerInfoCardsProviderInterfaceDelegate> RenderPlayerInfoCardsProviderInterfaceDelegate::create( std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>> renderPlayerInfoCardsProviderInterfaces ) {
+    return std::shared_ptr<RenderPlayerInfoCardsProviderInterfaceDelegate>( new RenderPlayerInfoCardsProviderInterfaceDelegate( renderPlayerInfoCardsProviderInterfaces ) );
 }
 
-void AudioPlayerInterfaceDelegate::doShutdown() {
-    m_delegate.reset();
-    m_observers.clear();
+void RenderPlayerInfoCardsProviderInterfaceDelegate::doShutdown() {
+    m_delegates.clear();
+    m_observer.reset();
 }
 
-void AudioPlayerInterfaceDelegate::setDelegate( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerInterface> delegate )
+void RenderPlayerInfoCardsProviderInterfaceDelegate::setDelegate( std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>> delegates )
 {
     try
     {
-        ThrowIfNotNull( m_delegate.lock(), "audioPlayerInterfaceDelegateAlreadySet" );
-        ThrowIfNull( delegate, "invalidAudioPlayerInterfaceDelegate" );
         std::lock_guard<std::mutex> lock( m_mutex ) ;
-        
-        for( const auto& next : m_observers ) {
-            delegate->addObserver( next.lock() );
+        for ( const auto& delegate : delegates ) {
+            ThrowIfNull( delegate, "invalidRenderPlayerInfoCardsInterfaceDelegate" );
+            delegate->setObserver( m_observer );
+            m_delegates.insert( delegate );
         }
         
-        m_delegate = delegate;
-        m_observers.clear();
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX("AudioPlayerInterfaceDelegate","setDelegate").d("reason", ex.what()));
+        AACE_ERROR(LX("RenderPlayerInfoCardsInterfaceDelegate","setDelegate").d("reason", ex.what()));
     }
 }
 
-void AudioPlayerInterfaceDelegate::addObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface> observer )
+void RenderPlayerInfoCardsProviderInterfaceDelegate::setObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsObserverInterface>  observer )
 {
-    if( auto m_delegate_lock = m_delegate.lock() ) {
-        m_delegate_lock->addObserver( observer );
-    }
-    else
-    {
-        std::lock_guard<std::mutex> lock( m_mutex ) ;
-        m_observers.push_back( observer );
-    }
-}
-
-void AudioPlayerInterfaceDelegate::removeObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface> observer )
-{
-    if( auto m_delegate_lock = m_delegate.lock() ) {
-        m_delegate_lock->removeObserver( observer );
-    }
-    else
-    {
-        std::lock_guard<std::mutex> lock( m_mutex ) ;
-
-        for( auto it = m_observers.begin(); it != m_observers.end(); it++ )
-        {
-            if( it->lock() == observer ) {
-                m_observers.erase( it );
-                break;
-            }
+    if (m_delegates.size() != 0) {
+        for ( const auto& delegate : m_delegates ) {
+            delegate->setObserver( observer );
         }
     }
+    else
+    {
+        std::lock_guard<std::mutex> lock( m_mutex ) ;
+        m_observer = observer ;
+    }
+    
+    
 }
 
-std::chrono::milliseconds AudioPlayerInterfaceDelegate::getAudioItemOffset()
-{
-    if( auto m_delegate_lock = m_delegate.lock() ) {
-        return m_delegate_lock->getAudioItemOffset();
-    }
-    else {
-        return std::chrono::milliseconds( 0 );
-    }
-}
 
 } // aace::engine::alexa
 } // aace::engine

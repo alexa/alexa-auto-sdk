@@ -81,6 +81,12 @@ public class AddressBookHandler extends AddressBook {
         });
     }
 
+    private void setToggleToUnchecked(int resNum){
+        View switchItem = mActivity.findViewById( resNum );
+        SwitchCompat contactUploadSwitch = switchItem.findViewById( R.id.drawerSwitch );
+        contactUploadSwitch.setChecked( false );
+    }
+
     private void showPermissionDialogToAccessContacts() {
         final DialogInterface.OnClickListener clickListener = new DialogInterface.OnClickListener() {
             @Override
@@ -94,11 +100,16 @@ public class AddressBookHandler extends AddressBook {
                     case DialogInterface.BUTTON_NEGATIVE:
                         mContactsUploadAccessStatus.setText(R.string.denied_access_to_contacts);
 
-                        View switchItem = mActivity.findViewById( R.id.toggle_contacts_upload );
-                        SwitchCompat contactUploadSwitch = switchItem.findViewById( R.id.drawerSwitch );
-                        contactUploadSwitch.setChecked( false );
+                        setToggleToUnchecked( R.id.toggle_contacts_upload );
                         break;
                 }
+            }
+        };
+
+        final DialogInterface.OnCancelListener cancelListener = new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                setToggleToUnchecked( R.id.toggle_contacts_upload );
             }
         };
 
@@ -106,6 +117,7 @@ public class AddressBookHandler extends AddressBook {
                 .setMessage(R.string.seek_access_to_contacts)
                 .setPositiveButton(R.string.confirm, clickListener)
                 .setNegativeButton(R.string.deny, clickListener)
+                .setOnCancelListener(cancelListener)
                 .create()
                 .show();
     }
@@ -147,11 +159,16 @@ public class AddressBookHandler extends AddressBook {
                     case DialogInterface.BUTTON_NEGATIVE:
                         mNavigationFavoritesUploadAccessStatus.setText(R.string.denied_access_to_navigation_favorites);
 
-                        View switchItem = mActivity.findViewById( R.id.toggle_navigation_favorites_upload );
-                        SwitchCompat contactUploadSwitch = switchItem.findViewById( R.id.drawerSwitch );
-                        contactUploadSwitch.setChecked( false );
+                        setToggleToUnchecked(R.id.toggle_navigation_favorites_upload);
                         break;
                 }
+            }
+        };
+
+        final DialogInterface.OnCancelListener cancelListener = new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                setToggleToUnchecked( R.id.toggle_navigation_favorites_upload );
             }
         };
 
@@ -159,6 +176,7 @@ public class AddressBookHandler extends AddressBook {
                 .setMessage(R.string.seek_access_to_navigation_favorites)
                 .setPositiveButton(R.string.confirm, clickListener)
                 .setNegativeButton(R.string.deny, clickListener)
+                .setOnCancelListener(cancelListener)
                 .create()
                 .show();
     }

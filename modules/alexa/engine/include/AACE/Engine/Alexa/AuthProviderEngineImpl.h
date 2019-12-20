@@ -18,7 +18,6 @@
 
 #include <unordered_set>
 
-//#include <AuthDelegate/AuthDelegate.h>
 #include <AVSCommon/SDKInterfaces/AuthDelegateInterface.h>
 #include <AVSCommon/Utils/RequiresShutdown.h>
 

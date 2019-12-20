@@ -42,13 +42,19 @@ class View {
     View(const std::string &id);
 
   public:
+    virtual ~View() = default;
+
     enum class Type {
         // CBL
         CBLCode,
         CBLCodeExpired,
+        CBLAuthorizationExpired,
+
+        // Communication
+        CommunicationCallDisplayInfo,
 
         // Navigation/CancelNavigation
-        // Navigation/SetDestination
+        // Navigation/StartNavigation
         Navigation,
 
         // TemplateRuntime/RenderTemplate
@@ -58,6 +64,9 @@ class View {
         /*3*/ ListTemplate1,
         /*4*/ WeatherTemplate,
         /*5*/ LocalSearchListTemplate1,
+        /*6*/ LocalSearchListTemplate2,
+        /*7*/ LocalSearchDetailTemplate1,
+        /*8*/ TrafficDetailsTemplate,
 
         // TemplateRuntime/RenderPlayerInfo
         PlayerInfo

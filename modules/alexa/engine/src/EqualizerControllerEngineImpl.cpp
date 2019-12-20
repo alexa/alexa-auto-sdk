@@ -35,7 +35,7 @@ EqualizerControllerEngineImpl::EqualizerControllerEngineImpl(
 }
 
 bool EqualizerControllerEngineImpl::initialize(
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+	std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
     std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> customerDataManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> 
@@ -44,7 +44,7 @@ bool EqualizerControllerEngineImpl::initialize(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender ) {
 
     try {
-        ThrowIfNull( directiveSequencer, "invalidDirectiveSequencer" );
+        ThrowIfNull( defaultEndpointBuilder, "invalidDefaultEndpointBuilder" );
         ThrowIfNull( capabilitiesDelegate, "invalidCapabilitiesDelegate" );
 
         // Create the equalizer configuration component
@@ -71,12 +71,8 @@ bool EqualizerControllerEngineImpl::initialize(
             messageSender );
         ThrowIfNull( m_equalizerCapabilityAgent, "couldNotCreateCapabilityAgent" );
 
-        // Add capability agent to the directive sequencer
-        ThrowIfNot( 
-            directiveSequencer->addDirectiveHandler( m_equalizerCapabilityAgent ), "addDirectiveHandlerFailed" );
-
-        // Register capability with delegate
-        ThrowIfNot( capabilitiesDelegate->registerCapability( m_equalizerCapabilityAgent ), "registerCapabilityFailed");
+        // register capability with the default endpoint
+        defaultEndpointBuilder->withCapability( m_equalizerCapabilityAgent, m_equalizerCapabilityAgent );
 
         // Register this EqualizerInterface to the EqualizerController
         m_equalizerController->registerEqualizer( shared_from_this() );
@@ -91,7 +87,7 @@ bool EqualizerControllerEngineImpl::initialize(
 
 std::shared_ptr<EqualizerControllerEngineImpl> EqualizerControllerEngineImpl::create(
     std::shared_ptr<aace::alexa::EqualizerController> equalizerPlatformInterface,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+	std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
     std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> customerDataManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> 
@@ -107,7 +103,7 @@ std::shared_ptr<EqualizerControllerEngineImpl> EqualizerControllerEngineImpl::cr
             new EqualizerControllerEngineImpl( equalizerPlatformInterface ) );
         ThrowIfNot( 
             equalizerEngineImpl->initialize( 
-                directiveSequencer, 
+                defaultEndpointBuilder, 
                 capabilitiesDelegate, 
                 customerDataManager, 
                 exceptionEncounteredSender, 

@@ -149,7 +149,7 @@ void CBLEngineImpl::onAuthFailure( const std::string& token )
 void CBLEngineImpl::cblStateChanged( CBLAuthRequesterInterface::CBLState state, CBLAuthRequesterInterface::CBLStateChangedReason reason, const std::string& url, const std::string& code )
 {
     if( m_cblPlatformInterface != nullptr ) {
-        m_cblPlatformInterface->cblStateChanged( static_cast<aace::cbl::CBL::CBLState>( state ) , static_cast<aace::cbl::CBL::CBLStateChangedReason>( reason ), url, code );
+        m_cblPlatformInterface->cblStateChanged( state, reason, url, code );
     }
 }
 
@@ -181,16 +181,24 @@ void CBLEngineImpl::setUserProfile( const std::string& name, const std::string& 
     }
 }
 
-void CBLEngineImpl::engineStart()
+void CBLEngineImpl::enable()
 {
     if( m_cblAuthDelegate != nullptr ) {
-        m_cblAuthDelegate->start( true );
+        m_cblAuthDelegate->enable();
     }
 }
+
+void CBLEngineImpl::disable()
+{
+    if( m_cblAuthDelegate != nullptr ) {
+        m_cblAuthDelegate->disable();
+    }
+}
+
 void CBLEngineImpl::onStart()
 {
     if( m_cblAuthDelegate != nullptr ) {
-        m_cblAuthDelegate->start( false );
+        m_cblAuthDelegate->start();
     }
 }
 

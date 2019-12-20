@@ -6,12 +6,22 @@ find_library(GMOCK_MAIN_LIBRARY NAMES gmock_main)
 
 set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockAlertsAudioFactoryInterface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockAlexaInterfaceMessageSenderInternalInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockNotificationsAudioFactoryInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockAttachmentManager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockAudioPlayerInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockCapabilitiesDelegateInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockConnectionStatusObserver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockCustomerDataManager.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockDeviceSettingsManager.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockEndpointRegistrationManagerInterface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockInternetConnectionMonitorInterface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockWakeWordConfirmationSetting.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockSpeechConfirmationSetting.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockSystemSoundPlayerInterface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockWakeWordsSetting.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockSpeechEncoder.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockRenderPlayerInfoCardsProviderInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockMessageObserver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockMessageRouter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockMessageStorage.h
@@ -27,6 +37,8 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Alexa/MockTemplateRuntime.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Alexa/MockAuthProvider.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Alexa/MockAlexaClient.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Alexa/MockWakewordEngineAdapter.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Alexa/MockWakewordVerifier.h
 )
 source_group("Header Files" FILES ${HEADERS})
 
@@ -40,21 +52,47 @@ add_library(AACEAlexaTestsLib STATIC
 )
 
 target_include_directories(AACEAlexaTestsLib
-    PUBLIC
+        PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
         ${GTEST_INCLUDE_DIRS}
+        PRIVATE
+        ${AVS_INCLUDE_DIRS}
+)
+
+set(UNIT_TEST_SRCS
+    AlexaClientEngineImplTest.cpp
+    AlertsEngineImplTest.cpp
+    AlexaConfigurationImplTest.cpp
+    AlexaEngineLoggerTest.cpp
+    TemplateRuntimeEngineImplTest.cpp
+    AudioPlayerEngineImplTest.cpp
+    AuthProviderEngineImplTest.cpp
+    NotificationsEngineImplTest.cpp
+    PlaybackControllerEngineImplTest.cpp
+    SpeechSynthesizerEngineImplTest.cpp
+    SpeechRecognizerEngineImplTest.cpp
+    AlexaEngineClientObserverTest.cpp
+    DoNotDisturbEngineImplTest.cpp
 )
 
 target_link_libraries(AACEAlexaTestsLib
     AACECoreEngine
     AACEAlexaPlatform
+    AACEAlexaEngine
     AACECoreTestsLib
+    ${AVS_SPEECH_ENCODER_LIBRARY}
+    ${AVS_ENDPOINTS_LIBRARY}
+    ${AVS_ACL_LIBRARY}
+    ${AVS_CERTIFIED_SENDER_LIBRARY}
+    ${AVS_REGISTRATION_MANAGER_LIBRARY}
+    ${AVS_AVS_COMMON_LIBRARY}
 )
 
 install(
     TARGETS AACEAlexaTestsLib
     DESTINATION lib
+    EXPORT AACEAlexa
 )
 
 install(
@@ -97,8 +135,8 @@ target_link_libraries(AACEAlexaTests
     AACECoreEngine
     AACEAlexaPlatform
     AACEAlexaEngine
-    AACEAlexaTestsLib
     ${AVS_AVS_COMMON_LIBRARY}
+    AACEAlexaTestsLib
     ${AVS_CERTIFIED_SENDER_LIBRARY}
     ${AVS_REGISTRATION_MANAGER_LIBRARY}
     AACECoreTestsLib

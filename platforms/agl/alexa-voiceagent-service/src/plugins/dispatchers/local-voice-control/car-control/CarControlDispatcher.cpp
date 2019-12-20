@@ -93,20 +93,10 @@ bool CarControlDispatcher::subscribeToCarControlEvents() {
 
     json_object *argsJ = json_object_new_object();
     json_object *actionsJ = json_object_new_array();
-    json_object_array_add(actionsJ, json_object_new_string(aasb::bridge::ACTION_CARCONTROL_CLIMATE_IS_ON_RESPONSE.c_str()));
-    json_object_array_add(actionsJ, json_object_new_string(aasb::bridge::ACTION_CARCONTROL_CLIMATE_SYNC_IS_ON_RESPONSE.c_str()));
-    json_object_array_add(actionsJ, json_object_new_string(aasb::bridge::ACTION_CARCONTROL_AIR_RECIRCULATION_IS_ON_RESPONSE.c_str()));
-    json_object_array_add(actionsJ, json_object_new_string(aasb::bridge::ACTION_CARCONTROL_AC_IS_ON_RESPONSE.c_str()));
-    json_object_array_add(actionsJ, json_object_new_string(aasb::bridge::ACTION_CARCONTROL_AC_GET_MODE_RESPONSE.c_str()));
-    json_object_array_add(actionsJ, json_object_new_string(aasb::bridge::ACTION_CARCONTROL_HEATER_IS_ON_RESPONSE.c_str()));
-    json_object_array_add(actionsJ, json_object_new_string(aasb::bridge::ACTION_CARCONTROL_HEATER_GET_TEMPERATURE_RESPONSE.c_str()));
-    json_object_array_add(actionsJ, json_object_new_string(aasb::bridge::ACTION_CARCONTROL_FAN_IS_ON_RESPONSE.c_str()));
-    json_object_array_add(actionsJ, json_object_new_string(aasb::bridge::ACTION_CARCONTROL_FAN_GET_SPEED_RESPONSE.c_str()));
-    json_object_array_add(actionsJ, json_object_new_string(aasb::bridge::ACTION_CARCONTROL_VENT_IS_ON_RESPONSE.c_str()));
-    json_object_array_add(actionsJ, json_object_new_string(aasb::bridge::ACTION_CARCONTROL_VENT_GET_POSITION_RESPONSE.c_str()));
-    json_object_array_add(actionsJ, json_object_new_string(aasb::bridge::ACTION_CARCONTROL_WINDOW_DEFROSTER_IS_ON_RESPONSE.c_str()));
-    json_object_array_add(actionsJ, json_object_new_string(aasb::bridge::ACTION_CARCONTROL_LIGHT_IS_ON_RESPONSE.c_str()));
-    json_object_array_add(actionsJ, json_object_new_string(aasb::bridge::ACTION_CARCONTROL_LIGHT_GET_COLOR_RESPONSE.c_str()));
+    json_object_array_add(actionsJ, json_object_new_string(aasb::bridge::ACTION_CARCONTROL_IS_POWER_CONTROLLER_ON_RESPONSE.c_str()));
+    json_object_array_add(actionsJ, json_object_new_string(aasb::bridge::ACTION_CARCONTROL_IS_TOGGLE_CONTROLLER_ON_RESPONSE.c_str()));
+    json_object_array_add(actionsJ, json_object_new_string(aasb::bridge::ACTION_CARCONTROL_GET_MODE_CONTROLLER_VALUE_RESPONSE.c_str()));
+    json_object_array_add(actionsJ, json_object_new_string(aasb::bridge::ACTION_CARCONTROL_GET_RANGE_CONTROLLER_VALUE_RESPONSE.c_str()));
 
     json_object_object_add(argsJ, agl::alexa::JSON_ATTR_ACTIONS.c_str(), actionsJ);
 
@@ -130,101 +120,31 @@ bool CarControlDispatcher::subscribeToCarControlEvents() {
     return result == 0;
 }
 
-void CarControlDispatcher::onIsClimateOnResponse(const std::string& payload) {
+void CarControlDispatcher::onIsPowerControllerOnResponse(const std::string& payload) {
     m_aasbController->onReceivedEvent(
         TOPIC_CARCONTROL,
-        ACTION_CARCONTROL_CLIMATE_IS_ON_RESPONSE,
+        ACTION_CARCONTROL_IS_POWER_CONTROLLER_ON_RESPONSE,
         payload);
 }
 
-void CarControlDispatcher::onIsClimateSyncOnResponse(const std::string& payload) {
+void CarControlDispatcher::onIsToggleControllerOnResponse(const std::string& payload) {
     m_aasbController->onReceivedEvent(
         TOPIC_CARCONTROL,
-        ACTION_CARCONTROL_CLIMATE_SYNC_IS_ON_RESPONSE,
+        ACTION_CARCONTROL_IS_TOGGLE_CONTROLLER_ON_RESPONSE,
         payload);
 }
 
-void CarControlDispatcher::onIsAirRecirculationOnResponse(const std::string& payload) {
+void CarControlDispatcher::onGetModeControllerValueResponse(const std::string& payload) {
     m_aasbController->onReceivedEvent(
         TOPIC_CARCONTROL,
-        ACTION_CARCONTROL_AIR_RECIRCULATION_IS_ON_RESPONSE,
+        ACTION_CARCONTROL_GET_MODE_CONTROLLER_VALUE_RESPONSE,
         payload);
 }
 
-void CarControlDispatcher::onIsAirConditionerOnResponse(const std::string& payload) {
+void CarControlDispatcher::onGetRangeControllerValueResponse(const std::string& payload) {
     m_aasbController->onReceivedEvent(
         TOPIC_CARCONTROL,
-        ACTION_CARCONTROL_AC_IS_ON_RESPONSE,
-        payload);
-}
-
-void CarControlDispatcher::onGetAirConditionerModeResponse(const std::string& payload) {
-    m_aasbController->onReceivedEvent(
-        TOPIC_CARCONTROL,
-        ACTION_CARCONTROL_AC_GET_MODE_RESPONSE,
-        payload);
-}
-
-void CarControlDispatcher::onIsHeaterOnResponse(const std::string& payload) {
-    m_aasbController->onReceivedEvent(
-        TOPIC_CARCONTROL,
-        ACTION_CARCONTROL_HEATER_IS_ON_RESPONSE,
-        payload);
-}
-
-void CarControlDispatcher::onGetHeaterTemperatureResponse(const std::string& payload) {
-    m_aasbController->onReceivedEvent(
-        TOPIC_CARCONTROL,
-        ACTION_CARCONTROL_HEATER_GET_TEMPERATURE_RESPONSE,
-        payload);
-}
-
-void CarControlDispatcher::onIsFanOnResponse(const std::string& payload) {
-    m_aasbController->onReceivedEvent(
-        TOPIC_CARCONTROL,
-        ACTION_CARCONTROL_FAN_IS_ON_RESPONSE,
-        payload);
-}
-
-void CarControlDispatcher::onGetFanSpeedResponse(const std::string& payload) {
-    m_aasbController->onReceivedEvent(
-        TOPIC_CARCONTROL,
-        ACTION_CARCONTROL_FAN_GET_SPEED_RESPONSE,
-        payload);
-}
-
-void CarControlDispatcher::onIsVentOnResponse(const std::string& payload) {
-    m_aasbController->onReceivedEvent(
-        TOPIC_CARCONTROL,
-        ACTION_CARCONTROL_VENT_IS_ON_RESPONSE,
-        payload);
-}
-
-void CarControlDispatcher::onGetVentPositionResponse(const std::string& payload) {
-    m_aasbController->onReceivedEvent(
-        TOPIC_CARCONTROL,
-        ACTION_CARCONTROL_VENT_GET_POSITION_RESPONSE,
-        payload);
-}
-
-void CarControlDispatcher::onIsWindowDefrosterOnResponse(const std::string& payload) {
-    m_aasbController->onReceivedEvent(
-        TOPIC_CARCONTROL,
-        ACTION_CARCONTROL_WINDOW_DEFROSTER_IS_ON_RESPONSE,
-        payload);
-}
-
-void CarControlDispatcher::onIsLightOnResponse(const std::string& payload) {
-    m_aasbController->onReceivedEvent(
-        TOPIC_CARCONTROL,
-        ACTION_CARCONTROL_LIGHT_IS_ON_RESPONSE,
-        payload);
-}
-
-void CarControlDispatcher::onGetLightColorResponse(const std::string& payload) {
-    m_aasbController->onReceivedEvent(
-        TOPIC_CARCONTROL,
-        ACTION_CARCONTROL_LIGHT_GET_COLOR_RESPONSE,
+        ACTION_CARCONTROL_GET_RANGE_CONTROLLER_VALUE_RESPONSE,
         payload);
 }
 

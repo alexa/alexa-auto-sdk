@@ -1,7 +1,11 @@
-.repo
 .DS_Store
-/extras
-.vscode
+/*native-dependencies
+/.clangd
+/.idea
+/.repo
+/.vscode
 /build
-
-*native-dependencies/
+/cmake-build-debug
+/extras
+compile_commands.json
+tools/builder

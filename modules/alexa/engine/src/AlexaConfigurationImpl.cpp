@@ -14,8 +14,11 @@
  */
 
 #include "AACE/Alexa/AlexaConfiguration.h"
-#include "AACE/Engine/Utils/JSON/JSON.h"
 #include "AACE/Engine/Core/EngineMacros.h"
+#include "AACE/Engine/Utils/JSON/JSON.h"
+#include <rapidjson/pointer.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
 
 namespace aace {
 namespace alexa {
@@ -24,7 +27,7 @@ namespace config {
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.config.AlexaConfiguationImpl");
 
-std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createDeviceInfoConfig( const std::string& deviceSerialNumber, const std::string& clientId, const std::string& productId )
+std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createDeviceInfoConfig( const std::string& deviceSerialNumber, const std::string& clientId, const std::string& productId, const std::string& manufacturerName, const std::string& description )
 {
     rapidjson::Document document( rapidjson::kObjectType );
     rapidjson::Value aaceAlexaElement( rapidjson::kObjectType );
@@ -34,6 +37,8 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
     deviceInfoElement.AddMember( "deviceSerialNumber", rapidjson::Value().SetString( deviceSerialNumber.c_str(), deviceSerialNumber.length() ), document.GetAllocator() );
     deviceInfoElement.AddMember( "clientId", rapidjson::Value().SetString( clientId.c_str(), clientId.length() ), document.GetAllocator() );
     deviceInfoElement.AddMember( "productId", rapidjson::Value().SetString( productId.c_str(), productId.length() ), document.GetAllocator() );
+    deviceInfoElement.AddMember( "manufacturerName", rapidjson::Value().SetString( manufacturerName.c_str(), manufacturerName.length() ), document.GetAllocator() );
+    deviceInfoElement.AddMember( "description", rapidjson::Value().SetString( description.c_str(), description.length() ), document.GetAllocator() );
     
     avsDeviceSDKElement.AddMember( "deviceInfo", deviceInfoElement, document.GetAllocator() );
     aaceAlexaElement.AddMember( "avsDeviceSDK", avsDeviceSDKElement, document.GetAllocator() );
@@ -89,6 +94,23 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
     return aace::core::config::StreamConfiguration::create( aace::engine::utils::json::toStream( document ) );
 }
 
+std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createCapabilitiesDelegateConfig( const std::string& databaseFilePath )
+{
+    rapidjson::Document document( rapidjson::kObjectType );
+    rapidjson::Value aaceAlexaElement( rapidjson::kObjectType );
+    rapidjson::Value avsDeviceSDKElement( rapidjson::kObjectType );
+    rapidjson::Value capabilitiesDelegateElement( rapidjson::kObjectType );
+
+    capabilitiesDelegateElement.AddMember( "databaseFilePath", rapidjson::Value().SetString( databaseFilePath.c_str(), databaseFilePath.length() ), document.GetAllocator() );
+    
+    avsDeviceSDKElement.AddMember( "capabilitiesDelegate", capabilitiesDelegateElement, document.GetAllocator() );
+
+    aaceAlexaElement.AddMember( "avsDeviceSDK", avsDeviceSDKElement, document.GetAllocator() );
+    document.AddMember( "aace.alexa", aaceAlexaElement, document.GetAllocator() );
+
+    return aace::core::config::StreamConfiguration::create( aace::engine::utils::json::toStream( document ) );
+}
+
 std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createCurlConfig( const std::string &certsPath, const std::string &iface )
 {
     rapidjson::Document document( rapidjson::kObjectType );
@@ -111,23 +133,39 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
 
 std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createSettingsConfig( const std::string& databaseFilePath, const std::string& locale )
 {
+    AACE_WARN(LX(TAG,"AlexaConfiguration::createSettingsConfig is deprecated.  Use AlexaConfiguration::createDeviceSettingsConfig instead."));
+
+    std::vector<std::string> locales = {locale};
+    std::string defaultLocale = locale;
+    
+    return createDeviceSettingsConfig(databaseFilePath, locales, defaultLocale);
+}
+
+std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createDeviceSettingsConfig( const std::string& databaseFilePath,
+        const std::vector<std::string>& locales, const std::string& defaultLocale,
+        const std::string& defaultTimezone)
+{
     rapidjson::Document document( rapidjson::kObjectType );
-    rapidjson::Value aaceAlexaElement( rapidjson::kObjectType );
-    rapidjson::Value avsDeviceSDKElement( rapidjson::kObjectType );
-    rapidjson::Value settingsElement( rapidjson::kObjectType );
 
-    settingsElement.AddMember( "databaseFilePath", rapidjson::Value().SetString( databaseFilePath.c_str(), databaseFilePath.length() ), document.GetAllocator() );
-    
-    rapidjson::Value defaultAVSClientSettingsElement( rapidjson::kObjectType );
+    rapidjson::Pointer("/aace.alexa/avsDeviceSDK/deviceSettings/databaseFilePath").Set(document, databaseFilePath.c_str());
 
-    defaultAVSClientSettingsElement.AddMember( "locale", rapidjson::Value().SetString( locale.c_str(), locale.length() ), document.GetAllocator() );
+    // "0" creates null array [ null ]
+    rapidjson::Pointer("/aace.alexa/avsDeviceSDK/deviceSettings/locales/0").Create(document);
+
+    for (auto it = locales.begin(); it != locales.end(); ++it) {
+        int index = it - locales.begin();
+        std::string pointerPath = "/aace.alexa/avsDeviceSDK/deviceSettings/locales/" + std::to_string(index);
+        SetValueByPointer(document, rapidjson::Pointer(pointerPath.c_str()), (*it).c_str());
+    }
     
-    settingsElement.AddMember( "defaultAVSClientSettings", defaultAVSClientSettingsElement, document.GetAllocator() );
-    
-    avsDeviceSDKElement.AddMember( "settings", settingsElement, document.GetAllocator() );
-    
-    aaceAlexaElement.AddMember( "avsDeviceSDK", avsDeviceSDKElement, document.GetAllocator() );
-    document.AddMember( "aace.alexa", aaceAlexaElement, document.GetAllocator() );
+    rapidjson::Pointer("/aace.alexa/avsDeviceSDK/deviceSettings/defaultLocale").Set(document, defaultLocale.c_str());
+
+    rapidjson::Pointer("/aace.alexa/avsDeviceSDK/deviceSettings/defaultTimezone").Set(document, defaultTimezone.c_str());
+
+    rapidjson::StringBuffer buffer;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    document.Accept(writer);
+    AACE_DEBUG(LX(TAG,"createDeviceSettingsConfig").m(buffer.GetString()));
 
     return aace::core::config::StreamConfiguration::create( aace::engine::utils::json::toStream( document ) );
 }

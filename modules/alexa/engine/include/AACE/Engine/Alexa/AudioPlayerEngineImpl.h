@@ -16,23 +16,24 @@
 #ifndef AACE_ENGINE_ALEXA_AUDIO_PLAYER_ENGINE_IMPL_H
 #define AACE_ENGINE_ALEXA_AUDIO_PLAYER_ENGINE_IMPL_H
 
+#include <AudioPlayer/AudioPlayer.h>
 #include <AVSCommon/AVS/Attachment/AttachmentManagerInterface.h>
-#include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
-#include <AVSCommon/SDKInterfaces/DirectiveSequencerInterface.h>
+#include <AVSCommon/SDKInterfaces/AudioPlayerObserverInterface.h>
+#include <AVSCommon/SDKInterfaces/AVSConnectionManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
+#include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/ExceptionEncounteredSenderInterface.h>
 #include <AVSCommon/SDKInterfaces/FocusManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/MessageSenderInterface.h>
-#include <AVSCommon/SDKInterfaces/PlaybackRouterInterface.h>
 #include <AVSCommon/SDKInterfaces/PlaybackHandlerInterface.h>
-#include <AVSCommon/SDKInterfaces/AudioPlayerObserverInterface.h>
-#include <AVSCommon/SDKInterfaces/AVSConnectionManagerInterface.h>
-
-#include <AudioPlayer/AudioPlayer.h>
+#include <AVSCommon/SDKInterfaces/PlaybackRouterInterface.h>
 #include <ContextManager/ContextManager.h>
+#include <Endpoints/EndpointBuilder.h>
+#include <CertifiedSender/CertifiedSender.h>
 
 #include <AACE/Alexa/AudioPlayer.h>
 #include <AACE/Engine/Audio/AudioManagerInterface.h>
+
 #include "AudioChannelEngineImpl.h"
 
 namespace aace {
@@ -43,15 +44,15 @@ class PlaybackRouterDelegate;
 
 class AudioPlayerEngineImpl :
     public AudioChannelEngineImpl,
-    public alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerInterface,
-    public alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface {
+    public alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface,
+    public alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface{
     
 private:
     AudioPlayerEngineImpl( std::shared_ptr<aace::alexa::AudioPlayer> audioPlayerPlatformInterface );
 
     bool initialize(
         std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> audioOutputChannel,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+        std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
@@ -59,13 +60,14 @@ private:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter );
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter,
+        std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedSender );
 
 public:
     static std::shared_ptr<AudioPlayerEngineImpl> create(
         std::shared_ptr<aace::alexa::AudioPlayer> audioPlayerPlatformInterface,
         std::shared_ptr<aace::engine::audio::AudioManagerInterface> audioManager,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+        std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
@@ -73,27 +75,19 @@ public:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter );
-    
-    //
-    // AudioPlayerInterface
-    //
-    void addObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface> observer ) override {
-        m_audioPlayerCapabilityAgent->addObserver( observer );
-    }
-    
-    void removeObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface> observer ) override {
-        m_audioPlayerCapabilityAgent->removeObserver( observer );
-    }
-    
-    std::chrono::milliseconds getAudioItemOffset() override {
-        return m_audioPlayerCapabilityAgent->getAudioItemOffset();
-    }
-    
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter,
+        std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedSender );
+        
     //
     // AudioPlayerObserverInterface
     //
     void onPlayerActivityChanged( alexaClientSDK::avsCommon::avs::PlayerActivity state, const Context& context ) override;
+    
+    /// @name RenderPlayerInfoCardsProviderInterface Functions
+    /// @{
+    void setObserver(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsObserverInterface> observer) override;
+    /// @}
+
 
 protected:
     virtual void doShutdown() override;
@@ -101,7 +95,13 @@ protected:
 private:
     std::shared_ptr<aace::alexa::AudioPlayer> m_audioPlayerPlatformInterface = nullptr;
     std::shared_ptr<alexaClientSDK::capabilityAgents::audioPlayer::AudioPlayer> m_audioPlayerCapabilityAgent;
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> m_directiveSequencer;
+        
+    /// Observer for changes related to RenderPlayerInfoCards.
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsObserverInterface> m_renderPlayerObserver;
+        
+    /// Mutex to serialize access to the observers.
+    std::mutex m_observersMutex;
+
 };
 
 } // aace::engine::alexa

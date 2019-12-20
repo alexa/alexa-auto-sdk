@@ -17,8 +17,9 @@ foreach(TEST_SRC ${UNIT_TEST_SRCS})
             $<INSTALL_INTERFACE:include>
         PRIVATE
             ${AVS_INCLUDE_DIRS}
+            ${CMAKE_SOURCE_DIR}/modules/alexa/engine/test/include
      )
-    target_link_libraries(${TEST_NAME} AACEPhoneControlEngine
+target_link_libraries(${TEST_NAME} AACEPhoneControlEngine AACEAlexaTestsLib
         GTest::GTest GTest::Main ${GMOCK_LIBRARY} ${GMOCK_MAIN_LIBRARY} ${AVS_AVS_COMMON_LIBRARY})
     add_test(NAME ${TEST_NAME}
         COMMAND ${CMAKE_COMMAND} -E env GTEST_OUTPUT=xml:${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TEST_NAME}.xml ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TEST_NAME})

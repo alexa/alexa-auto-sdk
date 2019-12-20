@@ -69,6 +69,11 @@ public:
      * @param [in] state The new notification indicator state
      */
     virtual void setIndicator( IndicatorState state ) = 0;
+
+    /**
+     * Notifies the platform implementation of notification received
+     */
+    virtual void onNotificationReceived() {};
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const Notifications::IndicatorState& state) {

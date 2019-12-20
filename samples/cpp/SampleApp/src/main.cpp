@@ -113,8 +113,8 @@ static void usageExit(std::string &name) {
 int main(int argc, const char *argv[]) {
     try {
         auto args = sampleApp::Args(argc, argv);
-        auto c1 = [](std::string &arg, unsigned char chr = '-') { return arg[0] == chr; };
-        auto c2 = [](std::string &arg, unsigned char chr = '-', std::string str = "") {
+        auto c1 = [](const std::string &arg, unsigned char chr = '-') { return arg[0] == chr; };
+        auto c2 = [](const std::string &arg, unsigned char chr = '-', const std::string &str = "") {
             return ((arg[1] == chr) && (arg[2] == '\0')) || ((arg[1] == '-') && (arg.compare(2, std::string::npos, str) == 0));
         };
         auto list = args.list();
@@ -125,7 +125,7 @@ int main(int argc, const char *argv[]) {
         Ensures(applicationContext != nullptr);
         auto cbreak = false;
         auto options = true;
-        for (unsigned i = 0; i < size; ++i) {
+        for (size_t i = 0; i < size; ++i) {
             auto arg = list[i];
             Ensures(!arg.empty());
             if (options && c1(arg)) {
@@ -238,7 +238,7 @@ int main(int argc, const char *argv[]) {
             Ensures(std::signal(SIGTERM, cbreakSigCatch) != SIG_ERR);
         }
         std::unique_ptr<Application> application{};
-        auto status = Status::Failure;
+        Status status;
         do {
             Ensures((application = Application::create()) != nullptr);
             status = application->run(applicationContext);

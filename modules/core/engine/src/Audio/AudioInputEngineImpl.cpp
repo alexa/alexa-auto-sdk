@@ -54,11 +54,15 @@ AudioInputChannelInterface::ChannelId AudioInputEngineImpl::start( AudioWriteCal
 {
     try
     {
-        std::lock_guard<std::mutex> lock( m_mutex );
+        std::lock_guard<std::mutex> clientLock( m_mutex );
+        std::unique_lock<std::mutex> callbackLock( m_callbackMutex );
         
         // call the platform startAudioInput() if there are no observers
         if( m_callbackMap.empty() ) {
+            // Release the lock temporarily so that audio data callback can acquire it and prevent deadlock
+            callbackLock.unlock();
             ThrowIfNot( m_platformAudioInput->startAudioInput(), "startPlatformAudioInputFailed" );
+            callbackLock.lock();
         }
         
         // get the next channel id
@@ -79,7 +83,8 @@ bool AudioInputEngineImpl::stop( ChannelId id )
 {
     try
     {
-        std::lock_guard<std::mutex> lock( m_mutex );
+        std::lock_guard<std::mutex> clientLock( m_mutex );
+        std::unique_lock<std::mutex> callbackLock( m_callbackMutex );
         
         auto it = m_callbackMap.find( id );
         ThrowIf( it == m_callbackMap.end(), "invalidChannelId" );
@@ -87,7 +92,10 @@ bool AudioInputEngineImpl::stop( ChannelId id )
         // call the platform stopAudioInput() if the channel is the only channel
         // requesting audio from the audio provider
         if( m_callbackMap.size() == 1 ) {
+            // Release the lock temporarily so that audio data callback can acquire it and prevent deadlock
+            callbackLock.unlock();
             ThrowIfNot( m_platformAudioInput->stopAudioInput(), "stopPlatformAudioInputFailed" );
+            callbackLock.lock();
         }
         
         // we successfully stopped the platform audio, so we need to remove
@@ -103,6 +111,7 @@ bool AudioInputEngineImpl::stop( ChannelId id )
 }
     
 void AudioInputEngineImpl::doShutdown() {
+    std::lock_guard<std::mutex> clientLock( m_mutex );
     m_platformAudioInput->setEngineInterface( nullptr );
 }
 
@@ -112,7 +121,7 @@ ssize_t AudioInputEngineImpl::write( const int16_t* data, const size_t size )
 {
     try
     {
-        std::lock_guard<std::mutex> lock( m_mutex );
+        std::lock_guard<std::mutex> callbackLock( m_callbackMutex );
         
         // execute the register callbacks
         for( auto& next : m_callbackMap ) {

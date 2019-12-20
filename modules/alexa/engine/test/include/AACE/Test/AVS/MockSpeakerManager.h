@@ -27,23 +27,23 @@ namespace test {
 
 class MockSpeakerManager : public SpeakerManagerInterface {
 public:
-    MOCK_METHOD3(
+    MOCK_METHOD4(
         setVolume,
         std::future<bool>(
             avsCommon::sdkInterfaces::SpeakerInterface::Type type,
             int8_t volume,
-            bool forceNoNotifications));
+            bool forceNoNotifications, SpeakerManagerObserverInterface::Source source));
 
-    MOCK_METHOD3(
+    MOCK_METHOD4(
         adjustVolume,
         std::future<bool>(
             avsCommon::sdkInterfaces::SpeakerInterface::Type type,
             int8_t delta,
-            bool forceNoNotifications));
+            bool forceNoNotifications, SpeakerManagerObserverInterface::Source source));
 
-    MOCK_METHOD3(
+    MOCK_METHOD4(
         setMute,
-        std::future<bool>(avsCommon::sdkInterfaces::SpeakerInterface::Type type, bool mute, bool forceNoNotifications));
+        std::future<bool>(avsCommon::sdkInterfaces::SpeakerInterface::Type type, bool mute, bool forceNoNotifications, SpeakerManagerObserverInterface::Source source));
 
     MOCK_METHOD2(
         getSpeakerSettings,

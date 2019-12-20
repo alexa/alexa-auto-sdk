@@ -25,10 +25,11 @@ namespace avs {
 
 class MockCapabilitiesDelegateInterface : public alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface {
 public:
-    MOCK_METHOD1(registerCapability,
-        bool(const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilityConfigurationInterface>& capabilitiesProvider));
-    MOCK_METHOD0(publishCapabilities,
-        CapabilitiesPublishReturnCode());
+    MOCK_METHOD2(registerEndpoint,
+         bool(const alexaClientSDK::avsCommon::avs::AVSDiscoveryEndpointAttributes& endpointAttributes,
+              const std::vector<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>& capabilities));
+    MOCK_METHOD1(onAlexaEventProcessedReceived,
+                 void(const std::string& eventCorrelationToken));
     MOCK_METHOD0(publishCapabilitiesAsyncWithRetries,
         void());
     MOCK_METHOD0(invalidateCapabilities,

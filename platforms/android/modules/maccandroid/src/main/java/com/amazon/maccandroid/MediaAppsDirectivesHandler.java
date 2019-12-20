@@ -56,6 +56,8 @@ public class MediaAppsDirectivesHandler implements MediaAppsConnectionListener {
     private static final String QUERY_ASSIGNER = "=";
     private static final String QUERY_SEPARATOR = "&";
 
+    private static final String SPOTIFY_SPECIFIC_URI = "spotify";
+
     private final Context mContext;
     private final Handler mMainThreadDirectivesHandler;
 
@@ -112,6 +114,8 @@ public class MediaAppsDirectivesHandler implements MediaAppsConnectionListener {
 
         final MediaControllerCompat finalMediaController = mediaController;
 
+        final MediaApp finalMediaApp = MediaAppsRepository.getInstance().getAuthorizedMediaApps().get( directive.getPlayerId() );
+
         if (directive instanceof LoginDirective) {
             LoginDirective loginDirective = (LoginDirective) directive;
             Bundle extras  = new Bundle();
@@ -127,6 +131,9 @@ public class MediaAppsDirectivesHandler implements MediaAppsConnectionListener {
             Log.i(TAG, "handleDirectiveForSession| in play directive : " + playDirective);
             final Uri playUri = constructPlayUri(playDirective);
 
+            // if user tries to play with unauthorized Spotify, allow error to be sent again
+            finalMediaApp.resetUnauthorizedReported();
+            
             if (playDirective.isPreload()) {
                 Log.i(TAG, "handleDirectiveForSession | is preload |  media controller | here is the URI: " + playUri);
                 mMainThreadDirectivesHandler.post(new Runnable() {
@@ -307,27 +314,31 @@ public class MediaAppsDirectivesHandler implements MediaAppsConnectionListener {
     private Uri constructPlayUri(PlayDirective playDirective) {
 
         StringBuilder uriBuilder = new StringBuilder();
-
-        uriBuilder
-                .append(ALEXA_SCHEMA)
+        // Spotify has a different way of building the URI. The others are as per the MACC requirements.
+        if (playDirective.getToken().startsWith(SPOTIFY_SPECIFIC_URI)) {
+            uriBuilder.append(ALEXA_SCHEMA)
                 .append(SCHEMA_SEPARATOR)
                 .append(playDirective.getToken())
                 .append(QUERY_INITIATOR);
 
-        constructQuery(INDEX_KEY,
-                String.valueOf(playDirective.getIndex()),
-                uriBuilder)
+                constructQuery(INDEX_KEY, String.valueOf(playDirective.getIndex()), uriBuilder)
                 .append(QUERY_SEPARATOR);
 
-        constructQuery(
-                OFFSET_MILLISECONDS_KEY,
-                String.valueOf(playDirective.getOffest()),
-                uriBuilder)
+        constructQuery(OFFSET_MILLISECONDS_KEY, String.valueOf(playDirective.getOffest()), uriBuilder)
                 .append(QUERY_SEPARATOR);
 
-        constructQuery(NAVIGATION_KEY, playDirective.getNavigation(), uriBuilder);
+                constructQuery(NAVIGATION_KEY, playDirective.getNavigation(), uriBuilder);
 
-        return Uri.parse(uriBuilder.toString());
+                return Uri.parse(uriBuilder.toString());
+        } else {
+            Uri.Builder builder = new Uri.Builder();
+            builder.scheme(ALEXA_SCHEMA)
+                    .path(playDirective.getToken())
+                    .appendQueryParameter(INDEX_KEY, String.valueOf(playDirective.getIndex()))
+                    .appendQueryParameter(OFFSET_MILLISECONDS_KEY, String.valueOf(playDirective.getOffest()))
+                    .appendQueryParameter(NAVIGATION_KEY, playDirective.getNavigation());
+            return builder.build();
+        }
     }
 
     private StringBuilder constructQuery(final String key, final String value, final StringBuilder uriBuilder) {

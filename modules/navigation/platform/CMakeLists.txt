@@ -2,7 +2,7 @@
 
 set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Navigation/Navigation.h
-)
+        include/AACE/Navigation/NavigationEngineInterfaces.h)
 
 source_group("Header Files" FILES ${HEADERS})
 

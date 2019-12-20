@@ -131,7 +131,6 @@ std::vector<std::string> ContactUploaderRESTAgent::buildCommonHTTPHeader() {
 
 bool ContactUploaderRESTAgent::parseCommonHTTPResponse( const HTTPResponse& response ) {
     if( HTTPResponseCode::SUCCESS_OK == response.code ) {
-        //TBD Check the content-type in Response Header
         return true;
     }
     return false;
@@ -226,24 +225,8 @@ ContactUploaderRESTAgent::AlexaAccountInfo ContactUploaderRESTAgent::getAlexaAcc
             Throw( "jsonResponseNotValidArray" );
         }
 
-        // Example Response: Array of Alexa Accounts.
-        // [
-        //   {
-        //     "commsId": "string",
-        //     "directedId": "string",
-        //     "phoneCountryCode": "string",
-        //     "phoneNumber": "string",
-        //     "firstName": "string",
-        //     "lastName": "string",
-        //     "signedInUser": false,
-        //     "commsProvisioned": false,
-        //     "commsProvisionStatus":Enum String,
-        //     "isChild": boolean
-        //     "speakerProvisioned": false
-        //   }
-        // ]
         for( rapidjson::Value::ConstValueIterator itr = document.Begin(); itr != document.End(); itr++ ) {
-            if( (*itr)[ "signedInUser" ].IsBool() && (*itr)[ "signedInUser" ].GetBool() ) { // Check if signedInUser is true
+            if( (*itr)[ "signedInUser" ].IsBool() && (*itr)[ "signedInUser" ].GetBool() ) {
                 if( (*itr).HasMember( "commsId" ) ) {
                     if( (*itr)[ "commsId" ].IsString() ) {
                         alexaAccount.commsId = (*itr)[ "commsId" ].GetString();
@@ -276,7 +259,7 @@ ContactUploaderRESTAgent::AlexaAccountInfo ContactUploaderRESTAgent::getAlexaAcc
                 } else {
                     Throw( "commsProvisionStatusNotValid" );
                 }
-                break; // Found the singedInUser, so break.
+                break; // Found the signed in user, so break.
             }
         }
         return alexaAccount;
@@ -348,18 +331,6 @@ std::string ContactUploaderRESTAgent::getPceId( const std::string& commsId ) {
 
         ThrowIfNot( validFlag, "httpDoGetFailed" + getHTTPErrorString( httpResponse ) );
 
-        // Example Response
-        // getIdentityV2 Response.
-        // {
-        //     "commsId": "string",
-        //     "pceId": "string",
-        //     "homeGroupId": "string",
-        //     "aor": "string",
-        //     "hashedCommsId": "string",
-        //     "name": null,
-        //     "commsProvisionStatus": "AUTO_PROVISIONED"
-        // }
-
         if( document.Parse(httpResponse.body.c_str()).HasParseError() ) {
             Throw( "jsonParseError" );
         }
@@ -406,10 +377,6 @@ std::string ContactUploaderRESTAgent::createAndGetAddressBookId( const std::stri
             Throw( "jsonParseError" );
         }
 
-        // Example Response
-        // {
-        //     addressBookId : "id"
-        // }
         auto it = document.FindMember( "addressBookId" );
         if( it != document.MemberEnd() && it->value.IsString() ) {
             addressBookId = it->value.GetString();
@@ -424,13 +391,6 @@ std::string ContactUploaderRESTAgent::createAndGetAddressBookId( const std::stri
     }
 }
 
-// Sample JSON Request Format
-// POST /users/{pceId}/addressbooks
-// {
-//     addressBookSourceId : "srcId",
-//     addressBookName : "Test",
-//     addressBookType : "phone"
-// }
 std::string ContactUploaderRESTAgent::buildCreateAddressBookDataJson( const std::string& sourceAddressBookId ) {
     rapidjson::Document document;
     document.SetObject();
@@ -471,17 +431,6 @@ std::string ContactUploaderRESTAgent::getAddressBookId( const std::string& sourc
             Throw( "jsonParseError" );
         }
 
-        // Example Response
-        // {
-        //     "addressBooks": [
-        //         {
-        //             "addressBookId": "string",
-        //             "addressBookType": "automotive",
-        //             "addressBookSourceId": "string",
-        //             "addressBookName": "string"
-        //         }
-        //     ]
-        // }
         auto addressBooks = document.FindMember( "addressBooks" );
         if( addressBooks != document.MemberEnd() && addressBooks->value.IsArray() ) {
             if( addressBooks->value.Size() == 1 ) {
@@ -534,20 +483,6 @@ ContactUploaderRESTAgent::HTTPResponse ContactUploaderRESTAgent::uploadContactTo
     return httpResponse;
 }
 
-// {
-//         "id" : "string",
-//         "firstName" : "string",
-//         "lastName" : "string",
-//         "nickName" : "string",
-//         "company" : "string",
-//         "addresses" : [
-//              {
-//                  "type" : "string",
-//                  "value" : "string",
-//                  "label" : "string"
-//              }
-//         ]
-// }
 std::string ContactUploaderRESTAgent::buildContactsJson( const std::vector<std::string>& contacts ) {
     rapidjson::Document srcDocument, destDocument;
     rapidjson::Value entries;
@@ -648,16 +583,6 @@ bool ContactUploaderRESTAgent::parseCreateAddressBookEntryForFailedStatus( const
             Throw( "jsonParseError" );
         }
 
-        // {
-        //     "references": [
-        //         {
-        //             "entryId": "string",
-        //             "entrySourceId": "srcId",
-        //             "status": "SUCCESS",
-        //             "reason": null
-        //         }
-        //     ]
-        // }
         auto references = document.FindMember( "references" );
         if( references != document.MemberEnd() && references->value.IsArray() && references->value.Size() > 0 ) {
             for( rapidjson::Value::ConstValueIterator itr = references->value.Begin(); itr != references->value.End(); itr++ ){

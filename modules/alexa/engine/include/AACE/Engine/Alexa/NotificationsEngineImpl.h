@@ -23,19 +23,20 @@
 #include <AVSCommon/AVS/Attachment/AttachmentManagerInterface.h>
 #include <AVSCommon/AVS/IndicatorState.h>
 #include <AVSCommon/SDKInterfaces/Audio/NotificationsAudioFactoryInterface.h>
-#include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
-#include <AVSCommon/SDKInterfaces/DirectiveSequencerInterface.h>
 #include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
+#include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/ExceptionEncounteredSenderInterface.h>
+#include <ContextManager/ContextManager.h>
+#include <Endpoints/EndpointBuilder.h>
 #include <Notifications/NotificationsCapabilityAgent.h>
 #include <Notifications/NotificationRenderer.h>
 #include <Notifications/SQLiteNotificationsStorage.h>
-#include <ContextManager/ContextManager.h>
 #include <RegistrationManager/CustomerDataHandler.h>
 
 #include <AACE/Alexa/AlexaEngineInterfaces.h>
 #include <AACE/Alexa/Notifications.h>
 #include <AACE/Engine/Audio/AudioManagerInterface.h>
+
 #include "AudioChannelEngineImpl.h"
 
 namespace aace {
@@ -51,7 +52,7 @@ private:
 
     bool initialize(
         std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> audioOutputChannel,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+        std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
@@ -63,7 +64,7 @@ public:
     static std::shared_ptr<NotificationsEngineImpl> create(
         std::shared_ptr<aace::alexa::Notifications> notificationsPlatformInterface,
         std::shared_ptr<aace::engine::audio::AudioManagerInterface> audioManager,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+        std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
@@ -73,6 +74,7 @@ public:
 
     // NotificationObserverInterface
     void onSetIndicator(alexaClientSDK::avsCommon::avs::IndicatorState state) override;
+    void onNotificationReceived() override;
 
 protected:
     virtual void doShutdown() override;

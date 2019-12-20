@@ -115,6 +115,12 @@ abstract public class CBL extends PlatformInterface
         CODE_PAIR_EXPIRED("CODE_PAIR_EXPIRED"),
 
         /**
+         * Authorization token is invalid, expired, revoked, or was issued to a different client
+         * @hideinitializer
+         */
+        AUTHORIZATION_EXPIRED("AUTHORIZATION_EXPIRED"),
+
+        /**
          * No reason specified
          * @hideinitializer
          */
@@ -165,7 +171,7 @@ abstract public class CBL extends PlatformInterface
      * Returns the refresh token stored by the platform implementation, otherwise return an empty string
      */
     public String getRefreshToken() {
-        return null;
+        return "";
     }
 
     /**

@@ -13,12 +13,14 @@ exit_with_usage() {
 	echo ""
 	echo " -h,--help                  = Print usage information and exit."
 	echo ""
-	echo " -t,--target <target-name>  = Specify the target; use comma-separated list for multiple targets. (Default: All targets)"
-	echo "                              If not specified, then all possible targets will be attempted to built."
+	echo " -t,--target <target-name>  = Specify the target; use comma-separated list for multiple targets."
 	echo " -g,--debug                 = Build with debugging options."
 	echo ""
 	echo " --android-api <integer>    = Specify Android API Level. (Default: 22)"
 	echo " --qnx7sdp-path <path>      = Specify QNX7 installation directory. (Default: ~/qnx700)"
+	echo " --pokysdk-path <path>      = Specify custom Poky installation directory. (Default: /opt/poky/2.6.1)"
+	echo " --linaro-prefix <prefix>   = Specify Linaro toolchain path prefix. See the README for the details. (Default: ~/gcc-linaro-7.4.1-2019.02-)"
+	echo " --linaro-sysroots <path>   = Specify the directory where the cross sysroots are located. (Default: ~/sysroots)"
 	echo " --enable-sensitive-logs    = Enable sensitive logs only when building with debugging options."
 	echo " --enable-latency-logs      = Enable user perceived latency logs only when building with debugging options."
 	echo " --enable-tests             = Enable building test packages for AAC and AVS modules."
@@ -69,6 +71,21 @@ while [[ $# -gt 0 ]]; do
 		;;
 		--qnx7sdp-path)
 		QNX_BASE="$2"
+		shift
+		shift
+		;;
+		--linaro-prefix)
+		LINARO_TOOLCHAIN_PREFIX="$2"
+		shift
+		shift
+		;;
+		--linaro-sysroots)
+		LINARO_SYSROOTS="$2"
+		shift
+		shift
+		;;
+		--pokysdk-path)
+		POKY_SDK="$2"
 		shift
 		shift
 		;;
@@ -186,35 +203,40 @@ init_extra_local_conf() {
 		note "Force using mbedTLS for libCURL"
 		echo "PACKAGECONFIG_pn-curl = \"mbedtls nghttp2\"" >> ${extra_local_conf}
 	fi
+	if [ "${LINARO_TOOLCHAIN_PREFIX}" ]; then
+		echo "LINARO_TOOLCHAIN_PREFIX = \"${LINARO_TOOLCHAIN_PREFIX}\"" >> ${extra_local_conf}
+	fi
+	if [ "${LINARO_SYSROOTS}" ]; then
+		echo "LINARO_SYSROOTS = \"${LINARO_SYSROOTS}\"" >> ${extra_local_conf}
+	fi
+	if [ "${POKY_SDK}" ]; then
+		echo "POKY_SDK = \"${POKY_SDK}\"" >> ${extra_local_conf}
+	fi
 }
 
 build_sdk() {
-	local oe_target=""
+	local available_targets=()
 	local extra_local_conf="${BUILDER_HOME}/.extralocal.conf"
-	local gstreamer_extension="${SDK_HOME}/extensions/experimental/gstreamer"
+	local audio_extension="${SDK_HOME}/extensions/experimental/system-audio"
 	local sample_app="${SDK_HOME}/samples/cpp/aac-sample-cpp.bb"
 	local platform=$1
 
 	case ${platform} in
 	"android")
-		oe_target="androidarm,androidarm64,androidx86,androidx86-64"
+		available_targets=("androidarm" "androidarm64" "androidx86" "androidx86-64")
 		;;
 	"qnx7")
-		oe_target="qnx7arm64,qnx7x86-64"
-		extensions="${sample_app}"
+		available_targets=("qnx7arm64" "qnx7x86-64")
+		extensions="${sample_app} ${audio_extension}"
 		export QNX_BASE
 		;;
-	"native")
-		oe_target="native"
-		extensions="${sample_app} ${gstreamer_extension}"
-		;;
-	"poky")
-		oe_target="pokyarm,pokyarm64"
-		extensions="${sample_app} ${gstreamer_extension}"
+	"linux")
+		available_targets=("native" "pokyarm" "pokyarm64" "linaroarmel" "linaroarmhf" "linaroarm64")
+		extensions="${sample_app} ${audio_extension}"
 		;;
 	"agl")
-		oe_target="aglarm64"
-		extensions="${gstreamer_extension}"
+		available_targets=("aglarm64")
+		extensions="${audio_extension}"
 		;;
 	*)
 		error "Unknown platform: ${platform}"
@@ -224,20 +246,26 @@ build_sdk() {
 	# Check if the targets from the command line is valid
 	IFS=',' read -ra cmd_targets <<< "${TARGET}"
 	for cmd_target in "${cmd_targets[@]}"; do
-		if [[ ${cmd_target} != ${platform}* ]]; then
-			error "Invalid target: ${cmd_target}"
-		fi
+		local invalid="1"
+		for valid_target in "${available_targets[@]}"; do
+			if [[ ${cmd_target} == ${valid_target} ]]; then
+				note "Valid target: ${cmd_target}"
+				invalid="0"
+				break
+			fi
+		done
+		[ ${invalid} = "1" ] && error_and_exit "Invalid target: ${cmd_target}"
 	done
 
-	# Use all targets by default
-	oe_target=${TARGET:-"${oe_target}"}
-	note "Targets: ${oe_target}"
+	[ -z "${TARGET}" ] && error_and_exit "Please specify target. Possible targets are: ${available_targets[*]}"
+
+	note "Targets: ${TARGET}"
 
 	# Prepare extra bitbake variables
 	init_extra_local_conf ${extra_local_conf}
 
 	# Run BitBake
-	${THISDIR}/run-bitbake.sh ${SCRIPT_OPTIONS} -t ${oe_target} ${extensions} ${extra_local_conf} ${DEFINES[@]} ${EXTRA_MODULES}
+	${THISDIR}/run-bitbake.sh ${SCRIPT_OPTIONS} -t ${TARGET} ${extensions} ${extra_local_conf} ${DEFINES[@]} ${EXTRA_MODULES}
 }
 
 if [ ${PLATFORM} = "clean" ]; then

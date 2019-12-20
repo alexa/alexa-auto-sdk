@@ -33,6 +33,8 @@ namespace logger {
 
 class LoggerEngineImpl : public aace::logger::LoggerEngineInterface, public LogEventObserver {
 public:
+    virtual ~LoggerEngineImpl() = default;
+
     static std::shared_ptr<LoggerEngineImpl> create( std::shared_ptr<aace::logger::Logger> platformLoggerInterface, std::shared_ptr<aace::engine::logger::EngineLogger> logger );
 
 private:

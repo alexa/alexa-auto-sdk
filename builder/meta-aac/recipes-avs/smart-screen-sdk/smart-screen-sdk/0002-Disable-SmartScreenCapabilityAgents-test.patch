@@ -1,0 +1,44 @@
+From 03d8eab620133e64b38be910e58a7c3643d6a4f4 Mon Sep 17 00:00:00 2001
+From: Mark Wharton <marwha@amazon.com>
+Date: Mon, 18 Nov 2019 07:14:59 -0800
+Subject: [PATCH 2/2] Disable SmartScreenCapabilityAgents test
+
+---
+ .../AlexaPresentation/CMakeLists.txt                            | 2 +-
+ .../SmartScreenCapabilityAgents/TemplateRuntime/CMakeLists.txt  | 2 +-
+ .../VisualCharacteristics/CMakeLists.txt                        | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/CMakeLists.txt b/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/CMakeLists.txt
+index fa90501..5d80dde 100644
+--- a/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/CMakeLists.txt
++++ b/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/CMakeLists.txt
+@@ -2,4 +2,4 @@ cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+ project(AlexaPresentation LANGUAGES CXX)
+ 
+ add_subdirectory("src")
+-add_subdirectory("test")
++# add_subdirectory("test")
+diff --git a/modules/Alexa/SmartScreenCapabilityAgents/TemplateRuntime/CMakeLists.txt b/modules/Alexa/SmartScreenCapabilityAgents/TemplateRuntime/CMakeLists.txt
+index d9b4c98..32024e6 100644
+--- a/modules/Alexa/SmartScreenCapabilityAgents/TemplateRuntime/CMakeLists.txt
++++ b/modules/Alexa/SmartScreenCapabilityAgents/TemplateRuntime/CMakeLists.txt
+@@ -2,4 +2,4 @@ cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+ project(SmartScreenTemplateRunTime LANGUAGES CXX)
+ 
+ add_subdirectory("src")
+-add_subdirectory("test")
++# add_subdirectory("test")
+diff --git a/modules/Alexa/SmartScreenCapabilityAgents/VisualCharacteristics/CMakeLists.txt b/modules/Alexa/SmartScreenCapabilityAgents/VisualCharacteristics/CMakeLists.txt
+index 610b1b4..5dcd2ab 100644
+--- a/modules/Alexa/SmartScreenCapabilityAgents/VisualCharacteristics/CMakeLists.txt
++++ b/modules/Alexa/SmartScreenCapabilityAgents/VisualCharacteristics/CMakeLists.txt
+@@ -2,4 +2,4 @@ cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+ project(VisualCharacteristics LANGUAGES CXX)
+ 
+ add_subdirectory("src")
+-add_subdirectory("test")
++# add_subdirectory("test")
+-- 
+2.20.1
+

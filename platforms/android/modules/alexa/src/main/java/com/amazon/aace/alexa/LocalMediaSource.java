@@ -222,10 +222,6 @@ abstract public class LocalMediaSource extends PlatformInterface
          */
         PLAY("PLAY"),
         /*
-         * Resume is supported
-         */
-        RESUME("RESUME"),
-        /*
          * Pause is supported
          */
         PAUSE("PAUSE"),

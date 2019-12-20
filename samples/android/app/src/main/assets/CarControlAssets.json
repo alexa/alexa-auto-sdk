@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "assetId": "My.Camera",
+      "values": [
+        {
+          "locales": [
+            "en-US",
+            "en-CA"
+          ],
+          "defaultValue": "camera",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "es-MX"
+          ],
+          "defaultValue": "cámara",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "fr-CA"
+          ],
+          "defaultValue": "caméra",
+          "synonyms": []
+        }
+      ]
+    }
+  ]
+}

@@ -4,6 +4,7 @@ import android.app.Activity;
 
 import com.amazon.aace.audio.AudioOutput;
 import com.amazon.aace.audio.AudioOutputProvider;
+import com.amazon.sampleapp.impl.AlexaClient.AlexaClientHandler;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 
 import java.util.HashMap;
@@ -14,12 +15,14 @@ public class AudioOutputProviderHandler extends AudioOutputProvider
 
     private final Activity mActivity;
     private final LoggerHandler mLogger;
+    private final AlexaClientHandler mAlexaClientHandler;
 
     private HashMap<String,AudioOutput> mAudioOutputMap;
 
-    public AudioOutputProviderHandler(  Activity activity, LoggerHandler logger ) {
+    public AudioOutputProviderHandler(  Activity activity, LoggerHandler logger, AlexaClientHandler alexaClientHandler ) {
         mActivity = activity;
         mLogger = logger;
+        mAlexaClientHandler = alexaClientHandler;
         mAudioOutputMap = new HashMap<>();
     }
 
@@ -41,7 +44,9 @@ public class AudioOutputProviderHandler extends AudioOutputProvider
                 break;
 
             default:
-                audioOutputChannel = new AudioOutputHandler( mActivity, mLogger, name );
+                AudioOutputHandler audioOutputHandler = new AudioOutputHandler( mActivity, mLogger, name );
+                audioOutputChannel = audioOutputHandler;
+                mAlexaClientHandler.registerAuthStateObserver( audioOutputHandler );
                 break;
         }
 

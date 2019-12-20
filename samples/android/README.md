@@ -1,43 +1,80 @@
-# Android Sample App
+# Alexa Auto SDK Android Sample App
 
-The purpose of the Android Sample App is to provide useful example code to help you integrate your platform implementation with the Alexa Auto SDK. The Android Sample App provides an example of creating and configuring an instance of the Engine, overriding the default implementation of each Alexa Auto Platform Interface, and registering those custom interface handlers with the Engine. It includes one default example implementation of authorizing with AVS via Code Based Linking (CBL). The Android Sample App also includes detailed logs for interactions with the Alexa Auto SDK and convenience features for viewing those logs in the application, as well as UI elements relevant to each Platform Interface implementation. 
+The purpose of the Android Sample App is to provide useful example code to help you integrate your platform implementation with the Alexa Auto SDK. The Android Sample App provides an example of creating and configuring an instance of the Engine, overriding the default implementation of each Alexa Auto Platform Interface, and registering those custom interface handlers with the Engine. It includes one default example implementation of authorizing with Alexa Voice Service (AVS) via Code Based Linking (CBL). The Android Sample App also includes detailed logs for interactions with the Alexa Auto SDK and convenience features for viewing those logs in the application, as well as UI elements relevant to each Platform Interface implementation. 
 
 **Table of Contents**:
 
-* [Setting up the Sample App](#setup)
-* [Running the Sample App](#run)
-* [Authorization with AVS in the Sample App](#authorization)
-* [Enabling Google Maps for Navigation View (optional)](#enablegooglemaps)
-* [Debugging Notes](#debuggingnotes)
-* [Release Notes](#releasenotes)
+* [Prerequisites](#prerequisites)
+* [Enabling Optional Device Capabilities](#enabling-optional-device-capabilities)
+* [Setting up the Android Sample App](#setting-up-the-android-sample-app)
+* [Running the Android Sample App](#running-the-android-sample-app)
+* [Using the Android Sample App](#using-the-android-sample-app)
+* [Debugging Notes](#debugging-notes)
+* [Release Notes](#v210-release-notes)
 
-## Setting up the Sample App<a id="setup"></a>
+## Prerequisites<a id="prerequisites"></a>
 
-### Register a Product
+### Amazon Developer Account <a id="amazon-developer-account"></a>
 
-After registering for an Amazon developer account, you'll need to create an Alexa device and security profile. Make note of the following parameters as you go through setup: Product ID and  Client ID.
+To use the Android Sample App, you need an [Amazon Developer](https://developer.amazon.com/docs/app-submission/manage-account-and-permissions.html#create-a-developer-account/) account.
 
-1. Log in to the [Amazon Developer portal](https://developer.amazon.com) and navigate to the [My Products](https://developer.amazon.com/avs/home.html#/avs/home) view of the AVS Console.
-2. Click **Create Product** and fill in the registration form for your application. (The device registration details can be useful in certain development workflows but will not actually be used for this example.)
-3. Make note of the **Product ID**.
-4. Click **Next**.
-5. Click **Create New Profile**.
-6. Enter a name and description for your security profile.
-7. Click **Next**.
-8. Click **Other devices and platforms**.
-9. Enter a client ID name and click **Generate ID**.
-10. Make note of the **Client ID**.
-11. Agree to the license terms in the Developer Portal and click **Finished**.
+### Registered Product and Security Profile
 
-### Include Alexa Auto SDK Build Dependencies (AAR files)<a id="include-build-dependencies"></a>
+After creating an Amazon developer account, you'll need to [register a product and create a security profile](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/register-a-product.html) on the AVS developer portal.
+
+When you follow the instructions to [fill in the product information](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/register-a-product.html#fill-in-product-information):
+
+* Use your own custom information, taking note of the **Product ID**, as this information is required for your [configuration file](#configuration-file) .
+* Be sure to select **Automotive** from the **Product category** pull-down.
+
+When you follow the instructions to [set up your security profile](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/register-a-product.html#set-up-your-security-profile), generate a **Client ID** and take note of it, as this information is required for your [configuration file](#configuration-file).
+
+### Configuration File <a id="configuration-file"></a>
+
+The Android Sample App requires a [configuration file](#editing-the-configuration-file) that contains information device client information required for authorization with AVS. 
+
+## Enabling Optional Device Capabilities <a id ="enabling-optional-device-capabilities"></a>
+
+In order to use certain optional Alexa Auto SDK functionality (for example, AmazonLite Wake Word, Alexa Communications, Local Voice Control (LVC), Device Client Metrics (DCM), or Voice Chrome for Android) with the Sample App, your product must be whitelisted by Amazon. Copy the product's **Amazon ID** from the Developer Console and follow the whitelisting directions on the [Need Help?](../../NEED_HELP.md#requesting-additional-functionality-whitelisting) page.
+
+## Setting up the Android Sample App<a id="setting-up-the-android-sample-app"></a>
+
+Create your project directory (if you do not already have one):
+
+```shell
+$ mkdir ~/Projects
+$ cd ~/Projects
+```
+
+Clone the `alexa-auto-sdk` repository into your project directory:
+
+```shell
+$ git clone https://github.com/alexa/alexa-auto-sdk.git
+$ cd alexa-auto-sdk
+$ export AAC_SDK_HOME=$(pwd)
+```
+### Editing the Configuration File
+
+You must populate the [`app_config.json`](./app/src/main/assets/app_config.json) file with the configuration information required to authorize your device profile with AVS:
+
+1. Open the [`app_config.json`](./app/src/main/assets/app_config.json) file in your favorite editor.
+
+2. For the the `"clientId"` parameter, replace `"<YOUR DEVICE'S CLIENT ID>"` with the Client ID that you generated when you [set up your security profile](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/register-a-product.html#set-up-your-security-profile) for your development device.
+3. For the `"productId"` parameter, replace `"<YOUR DEVICE'S PRODUCT ID>"` with the Product ID that you entered when you [filled in the product information](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/register-a-product.html#fill-in-product-information) for your development device.
+
+    >**Note:** The `"clientId"` and `"productId"` must correspond to a development device profile that you created as an **automotive** product by selecting the `Automotive` product category when you [filled in the product information](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/register-a-product.html#fill-in-product-information).  
+    
+>**Note:**You can leave `"amazonId"` set to its placeholder value. This parameter is not required unless you are using the optional Device Client Metrics (DCM) extension.
+
+### Including Alexa Auto SDK Build Dependencies (AAR files)<a id="include-build-dependencies"></a>
 
 Choose one of the following two options to include the Alexa Auto SDK build dependencies. These options correspond to two build flavors: remote and local.
 
-> **Note:** If you want to implement any optional modules (such as wake word support, Alexa Communications, Local Voice Control (LVC), or Device Client Metrics (DCM)), you must choose option 2 and build the AARs using the Auto SDK Builder. The prebuilt AARs available in JCenter are the default Auto SDK modules only.
+> **Note:** If you want to implement any optional modules (such as wake word support, Alexa Communications, Local Voice Control (LVC), Device Client Metrics (DCM), or Voice Chrome for Android), you must choose option 2 and build the platform AARs and the core-sample AAR using the Auto SDK Builder. The prebuilt AARs available in JCenter are for the default Auto SDK modules only.
 
 #### Option 1: Use the pre-built platform AARs (remote build flavor)
 
-The pre-built platform AARs for the default Auto SDK modules are available in the [JCenter repo](https://jcenter.bintray.com/com/amazon/alexa/aace/).
+The pre-built platform AARs for the default Auto SDK modules and the core-sample AAR required to run the Android Sample App are available in the [JCenter repo](https://jcenter.bintray.com/com/amazon/alexa/aace/).
 
 The Sample App builder scripts are configured to use JCenter to always pull the latest release artifacts during compilation. To run the builder scripts, issue the following command:
 
@@ -45,66 +82,75 @@ The Sample App builder scripts are configured to use JCenter to always pull the 
 $ gradle assembleRemoteRelease
 ```
 
-Alternatively, you can manually download the platform AARs from the [JCenter repo](https://jcenter.bintray.com/com/amazon/alexa/aace/) to
+Alternatively, you can manually download the platform AARs and core-sample AAR from the [JCenter repo](https://jcenter.bintray.com/com/amazon/alexa/aace/) to
 
  `${AAC_SDK_HOME}/samples/android/app/src/main/libs` 
 
-> **Important!** If you choose to download the AAR files manually, you may need to create a libs directory, and you must make sure to download the platform AARs corresponding to the version of Alexa Auto SDK that you are using.
+> **Important!** If you choose to download the AAR files manually, you may need to create a libs directory, and you must make sure to download the platform AARs and core-sample AAR corresponding to the version of Alexa Auto SDK that you are using.
 
 
-Once you have downloaded the AARs, follow the steps to [configure the project in Android Studio](#configprojectinAS).
+Once you have downloaded the AARs, follow the steps to [configure the project in Android Studio](#configure-the-project-in-android-studio).
 
 #### Option 2: Use the Alexa Auto SDK Builder to generate the AARs (local build flavor)
 
-If you do not use the pre-built platform AARs, you must build the Android-specific binaries for the Alexa Auto SDK library project to link to and build the Android platform AARs. See the [Alexa Auto SDK Builder](../../builder/README.md) instructions for details about how to build the Alexa Auto SDK dependencies for Android.
+If you do not use the pre-built platform AARs and core-sample AAR, you must build the Android-specific binaries for the Alexa Auto SDK library project to link to and build the Android platform AARs and the core-sample AAR. See the [Alexa Auto SDK Builder](../../builder/README.md#for-android-targets) instructions for details about how to build the Alexa Auto SDK dependencies for Android.
 
-> **Important!** The Android Sample App always compiles the platform AARs from `${AAC_SDK_HOME}/samples/android/app/src/main/libs` and `${AAC_SDK_HOME}/builder/deploy/aar` when available.
-> 
-> If you decide to use the Alexa Auto SDK Builder to generate the platform AARs, make sure to remove all Alexa Auto SDK platform AARs from `${AAC_SDK_HOME}/samples/android/app/src/main/libs`. You can keep any third party libraries.
+> **Important!** The Android Sample App always compiles the platform AARs and core-sample AAR from `${AAC_SDK_HOME}/samples/android/app/src/main/libs` and `${AAC_SDK_HOME}/builder/deploy/aar` when available.
 
-Once you have generated the platform AARs, issue the following command to run the builder scripts:
+> If you decide to use the Alexa Auto SDK Builder to generate the platform AARs and the core-sample AAR, make sure to remove all Alexa Auto SDK platform AARs from `${AAC_SDK_HOME}/samples/android/app/src/main/libs`. You can keep any third party libraries.
 
-```
+Once you have generated the platform AARs and the core-sample AAR, issue the following command to run the builder scripts:
+
+``` 
 $ gradle assembleLocalRelease
 ```
-Alternatively, you can follow the steps to [configure the project in Android Studio](#configprojectinAS).
+Alternatively, you can follow the steps to [configure the project in Android Studio](#configure-the-project-in-android-studio).
 
-### Enable Device Capabilities<a id ="enable-device-capabilities"></a>
+>**Note:** If you get gradle-related errors (such as `Could not open settings remapped class cache...`, `Could not open settings generic class cache...`, or `BUG! exception in phase 'semantic analysis' in source unit 'BuildScript' Unsupported class file major version 57`) when attempting to build the Android Sample App using the Alexa Auto SDK Builder, install Java 8 and point the java_home directory to 1.8:
+`export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)`
+This issue should be resolved with the release of Gradle 6.0.
 
-In order to use the certain Alexa Auto SDK functionality, your product needs to be whitelisted by Amazon. Copy the product's **Amazon ID** from the Developer Console and follow the whitelisting directions on the [Need Help?](../../NEED_HELP.md) page.
+### Configure the Project in Android Studio<a id="configure-the-project-in-android-studio"></a> (optional)
 
-### Configure the Project in Android Studio<a id="configprojectinAS"></a> (optional)
-
-> **Note:** These instructions assume that you have [included the Alexa Auto SDK build dependencies (AAR files)](#include-build-dependencies).
+> **Note:** These instructions assume that you have [populated the `app/assets/app_config.json` file](#editing-the-configuration-file) with information specific to your device and [included the Alexa Auto SDK build dependencies (AAR files)](#including-alexa-auto-sdk-build-dependencies-aar-files).
 
 1. Launch <a href=https://developer.android.com/studio/index.html>Android Studio</a> and select Open an existing Android Studio project.
-1. Open the `${AAC_SDK_HOME}/samples/android` folder and click the <strong>Open</strong> button. (Tested with Android Studio version 3.x)
-1. Read about [authorization with AVS in the Sample App](#authorization-with-avs-in-the-sample-app) and follow further setup instructions, if necessary.
-1. Populate the `app\_config.json` file in the assets directory with the Client ID and Product ID for your product. The Product DSN may be any unique identifier, and you can add it with the key "productDsn". By default this is the device specific  ANDROID\_ID. The contents of this file are required for authorization.
-2. Under **Build Variants**, select the appropriate build flavor (**localRelease** or **remoteRelease**).
+2. Open the `${AAC_SDK_HOME}/samples/android` folder and click the <strong>Open</strong> button. (Tested with Android Studio version 3.x)
+3. Under **Build Variants**, select the appropriate build flavor (**localRelease** or **remoteRelease**).
 
 > **Note**: Android Studio builds and signs the Android Package File.
 
-## Running the Sample App<a id="run"></a>
+## Running the Android Sample App<a id="running-the-android-sample-app"></a>
 
 Use Android Studio to install and run the Sample App on your target device.
 
 * Minimum tested Android API level 22
 * Minimum tested and recommended Android NDK Revision 16b
 
-### Understanding the Sample App
+### Authenticating with AVS using Code-Based Linking (CBL)
+
+When the Sample App launches, it displays a code and a URL in a box. Follow the on-screen prompt to authenticate with AVS using CBL:
+
+1. Open a browser and navigate to the URL displayed in the Sample App.
+2. In the browser, enter the code displayed in the Sample App.
+3. Click **Continue** and follow the onscreen instructions in the browser to complete the authentication.
+
+## Using the Android Sample App <a id ="using-the-android-sample-app"></a>
 The Sample App provides an example of how to create and configure an instance of the Engine, extend the Alexa Auto SDK Platform Interfaces, and register the interface implementations with the Engine. The Platform Interface implementations are located in the `impl/` folder of the `com.amazon.sampleapp` directory with the `Handler` postfix. These classes extend the JNI wrapper classes, which mirror the Alexa Auto C++ API. You can read more about these interfaces in the following documentation:
  
- * [Core module README](./modules/core/README.md)
- * [Alexa module README](./modules/alexa/README.md)
- * [Navigation module README](./modules/navigation/README.md)
- * [Phone Call Controller module README](./modules/phone-control/README.md)
-
->**Note:** The Android Sample App includes a simulated local phone that leverages the Phone Call Controller module. However, it cannot currently use cellular voice connections paired with or installed in the host device. This simulator can be used as an example of how to implement the Phone Control interface on the host platform to perform actions such as dialing, hanging up, etc.
+ * [Core module README](../../platforms/android/modules/core/README.md)
+ * [Alexa module README](../../platforms/android/modules/alexa/README.md)
+ * [Navigation module README](../../platforms/android/modules/navigation/README.md)
+ * [Phone Call Controller module README](../../platforms/android/modules/phonecontrol/README.md)
+ 
+    >**Note:** The Android Sample App includes a simulated local phone that leverages the Phone Call Controller module. However, it cannot currently use cellular voice connections paired with or installed in the host device. You can use this simulator as an example of how to implement the Phone Control interface on the host platform to perform actions such as dialing, hanging up, etc.
+ * [Code-based Linking (CBL) module README](../../platforms/android/modules/cbl/README.md)
+ * [Alexa Presentation (APL) module README](../../platforms/android/modules/apl/README.md)
+    >**Note:** APL rendering on the Android Sample App requires a component that is available by [request from your Amazon Solutions Architect (SA) or Partner Manager](../../NEED_HELP.md#requesting-additional-functionality-whitelisting).
 
 The Sample App GUI consists of a menu bar and a log console. The expandable menu icon in the menu bar opens an options menu to the right of the screen that contains GUI elements relevant to the Platform Interface implementations as well as the authentication UI. Interacting with Alexa and the Engine requires successful authentication with AVS. You can log out using the **Log Out** button in the options menu, which will clear the saved refresh token.
 
-You can use the microphone icon on the menu bar to initiate a speech interaction with Alexa, either via tap-to-talk (press and release) or hold-to-talk (press and hold). You may also initiate an interaction with the Alexa wake word, and the Sample App provides a switch in the options menu to enable or disable wake word when supported.
+You can use the microphone icon on the menu bar to initiate a speech interaction with Alexa, either via tap-to-talk (press and release) or hold-to-talk (press and hold). You can also initiate an interaction with the Alexa wake word.
 
 Initiate various interactions with Alexa and explore the options menu features and the log console to better understand the Alexa Auto SDK functionality. The logger implementation tags log messages in the following way:
 
@@ -115,23 +161,26 @@ Initiate various interactions with Alexa and explore the options menu features a
 > **Note**:
 Some Alexa interactions will return data for rendering a [Display Card](https://alexa.design/dev-display-cards) for visual feedback. Card rendering in the Sample App is an example of parsing the payload of rendering calls to the TemplateRuntime Platform Interface. The Sample App implementation of these cards is not meant as a UI design guideline or requirement.
 
-## Authorization with AVS in the Sample App<a id="authorization"></a>
+### Authorization with AVS in the Sample App <a id="authorization-with-avs-in-the-sample-app"></a>
 
-To access the Alexa Voice Service (AVS) your product must acquire valid access tokens. Code-Based Linking (CBL) is the recommended method to acquire such tokens and is demonstrated by the Android Sample App.
+Every request to Amazon Voice Service (AVS) requires an Login with Amazon (LWA) access token. Code-Based Linking (CBL) is the recommended method to acquire access tokens and is demonstrated by the Android Sample App. See the [CBL module README](../../platforms/android/modules/cbl/README.md) for details about the Auto SDK's implementation of CBL.
 
-### Register Security Profile with Login With Amazon
+### Handling Unknown Locations in Navigation Use Cases
+Your platform implementation should handle cases where a GPS location cannot be obtained by returning the `UNDEFINED` value provided by the Auto SDK. In these cases, the Auto SDK does not report the location in the context, and your platform implementation should return a localization object initialized with `UNDEFINED` values for latitude and longitude ((latitude,longitude) = (`UNDEFINED`,`UNDEFINED`)) in the context object of every SpeechRecognizer event.
 
-In the [Amazon Developer portal](https://developer.amazon.com), go to **Login With Amazon**.
-Here you will be able to register the security profile you associated with your product. You will need to provide your company privacy policy URL and a logo image.
-
-## Enabling Google Maps for Navigation view (optional)<a id = "enablegooglemaps"></a>
+### Enabling Google Maps for Navigation view (optional) <a id = "enablegooglemaps"></a>
 
 In order to view Google Map locations on navigation requests via the Sample App, you must input your own Google Maps API key.
 
-1. Read about how to get the API key in the [Google Maps Documentation](https://developers.google.com/maps/documentation/android-sdk/signup).
-2. Put the API key into the `AndroidManifest.xml` under the **value** section of the meta data tag `com.google.android.geo.API_KEY`.
+1. For details about how to get the API key, see the [Google Maps Documentation](https://developers.google.com/maps/documentation/android-sdk/signup).
+2. Put the API key into the `AndroidManifest.xml` file under the **value** section of the meta data tag `com.google.android.geo.API_KEY`.
 
-## Debugging notes<a id = "debuggingnotes"></a>
+### Enabling SiriusXM as a Local Media Source
+The Sample App does not configure SiriusXM as a local media source by default. If you need the SiriusXM local media source, you must enable and build it. To do this, uncomment the Mock SIRIUSXM platform handler registration in the [`MainActivity.java`](./app/src/main/java/com/amazon/sampleapp/MainActivity.java) class, then rebuild the Sample App.
+
+>**Note:** When SiriusXM is present as a local media source, the cloud defaults to local SiriusXM only and blocks any use of the cloud SiriusXM service even if the local implementation/service is unavailable or not enabled.  
+
+## Debugging notes<a id = "debugging-notes"></a>
 
 ### Debugging the Sample App
 Use Android Studio and press the **Debug 'app'** button on toolbar. This will launch the app on target device and attach the app with Android Studio debugger.
@@ -144,13 +193,13 @@ Debugging instructions for the Alexa Auto SDK C++ library are same as the instru
 
 ### Debugging External Libraries
 
-To debug all external libraries which are not built by Android Studio, follow these instructions (At present, All the modules except the platform/android and sample/android are built outside Android Studio.)
+To debug all external libraries which are not built by Android Studio, follow these instructions (at present, all the modules except the platform/android and sample/android are built outside Android Studio.)
 
 Prerequisite: Install the Low Level Debugger (LLDB) package in Android Studio. You can find the LLDB component on the **SDK Manager** -> **SDK Tools** tab.
 
-1. Use the builder script to generate a build with debug symbols. See "Running Builder" in the [Builder README](../../builder/README.md) for documentation of builder options. For example, to build an Android x86 build with debugging symbols use:
+1. Use the builder script to generate a build with debug symbols. See the [Builder README](../../builder/README.md#running-builder) for documentation of builder options. For example, to build an Android x86 build with debugging symbols use:
 
-	`builder/build.sh oe -t androidx86 -g`
+	`builder/build.sh android -t androidx86 -g`
 2. Debug symbols are located at:
 
 	`builder/deploy/android<arch>/aac-sdk-build-<arch>-android-<apilevel>-dbg.tar.gz`
@@ -164,7 +213,7 @@ Prerequisite: Install the Low Level Debugger (LLDB) package in Android Studio. Y
 
 	`(lldb) add-dsym ${AAC_SDK_HOME}/builder/deploy/androidx86/opt/AAC/lib/.debug/libAACECoreEngine.so`
 10. Use LLDB `image lookup` to locate the function to debug. For example: `image lookup -vn EngineImpl::start`
-11. If you are debugging on MacOS, then the `CompileUnit` (source file) output of LLDB `image lookup` points to the file system in the docker image. Use LLDB `settings set target.source-map` to direct LLDB to locate the source on the local file system instead. For example:
+11. If you are debugging on macOS, then the `CompileUnit` (source file) output of LLDB `image lookup` points to the file system in the docker image. Use LLDB `settings set target.source-map` to direct LLDB to locate the source on the local file system instead. For example:
 
  ```
  (lldb) settings set target.source-map /workdir/build/tmp-android-22/work/core2-32-linux-android/
@@ -180,24 +229,23 @@ aac-module-core/0.99.0-r0/src/engine/src/ ${AAC_SDK_HOME}/modules/core/engine/sr
 
 > **Note**: If the LLDB window isn't visible in the debug tab, select **Run** -> **Edit Configurations** -> **Debugger** and change the `Debug Type` to `Native`.
 
-## v2.0.0 Release Notes<a id="releasenotes"></a>
+## v2.1.0 Release Notes<a id="v210-release-notes"></a>
 
-#### Resolved Issues
+### Resolved Issues
 
-* Fixed an issue where music playback continued after logging out from the Sample App. 
-* Fixed an issue where the display card and book title were not displayed for Kindle content.
-* Fixed some broken links in the documentation.
-* Fixed an issue where the MACCAndroidClient did not rediscover Media App Command and Control (MACC) compliant apps if they were unresponsive after being idle for a long period (around 30 minutes).
+* Fixed an issue where pressing the **Pause** button immediately after pressing the **Next** button did not advance or pause the music.
+* Fixed an issue that required you to start the Sample App after enabling location services in order to use the location services.
   
-#### Known Issues
-* Pressing the Pause button immediately after pressing the Next button does not advance or pause the music. Instead the currently-playing song continues playing. In addition, the play controller dialog advances to the next song details but then jumps back to the current song details.
-* If the microphone is in use, the Android Sample App does not disable Alexa triggers such as tap-to-talk.
-* The Android Sample App goes into listening mode when calling 911, as Alexa prompts users to say "Alexa, Cancel" to stop. This is due to the fact that the Android platform does not provide audio loopback to cancel out self triggers. See the [Loopback Detector README](../../extensions/loopback-detector/README.md) for an example of how to use the Auto SDK with the AmazonLite wakeword to cancel out self references.
-* The `AudioOutput.prepare` method implementation in `AudioOutputHandler` blocks returning until it reads the full audio attachment from the Engine on the caller's thread. It should not do this and instead should return quickly and read the attachment on a separate thread.
-* When authenticated with CBL, if network connectivity is lost while refreshing the access token, the Sample App does not automatically attempt to refresh the token when connectivity is restored, and the GUI incorrectly displays the "log in" button even though a refresh token is present. Restoring an authorized state requires either restarting the app or following the log in steps again with network connectivity.
+### Known Issues
+* When you click the **Cancel Login** button to cancel login in the Android Sample App, the Sample App returns a “Cancelling CBL flow” message, but CBL authentication is not cancelled. To cancel the login, you must restart the Sample App.
+* The GUI display of the **Navigation Favorites** setting is not consistent after you relaunch the Sample App. For example, if you set **Navigation Favorites** to **ON** then relaunch the Sample App, the **Navigation Favorites** setting displays as **OFF** upon relaunch. This is a GUI issue only; the navigation favorites setting itself persists after you relaunch the Sample App.
+* Alexa Presentation Language (APL) rendering does not support ssmlToSpeech and ssmlToText transformers. Therefore, some skills, like Jeopardy, will not provide the expected user experience.
+* If the microphone is in use, the Android Sample App does not disable Alexa triggers such as PTT.
+* The Android Sample App goes into listening mode when calling 911, as Alexa prompts users to say "Alexa, Cancel" to stop. This is due to the fact that the Android platform does not provide audio loopback to cancel out self triggers. See the [Loopback Detector README](../../extensions/loopback-detector/README.md) for an example of how to use the Auto SDK with the AmazonLite wake word to cancel out self references.
+* The `AudioOutput.prepare()` method implementation in `AudioOutputHandler` blocks returning until it reads the full audio attachment from the Engine on the caller's thread. It should not do this and instead should return quickly and read the attachment on a separate thread.
+* A generic error TTS is returned when the user initiates offline contact calling before uploading contacts to the cloud on the Android Sample App with the optional Local Voice Control extension.
 * Display card rendering is not adaptable to a variety of screen sizes.
-* Particular sections of the Flash Briefing do not resume from a paused state properly. Attempting to play after pause in some cases may restart the media playback.
-* The app does not implement managing inter-app audio focus, so other apps will not recognize its audio playback appropriately.
+* Particular sections of the Flash Briefing do not resume properly from a paused state. Attempting to play after pause in some cases may restart the media playback.
+* The Sample App does not implement managing inter-app audio focus, so other apps will not recognize its audio playback appropriately.
 * Alexa dialog playback may stop abruptly when switching between Wi-Fi and mobile data.
-* The app disconnects from AVS after remaining idle for some time and takes a while to reconnect.
-* After enabling location services, you must restart the Sample App in order to use the location services.
+* The Sample App disconnects from AVS after remaining idle for some time and takes a while to reconnect.

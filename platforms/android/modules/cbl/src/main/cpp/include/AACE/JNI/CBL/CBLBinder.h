@@ -106,6 +106,7 @@ namespace cbl {
                 {T::ERROR,"ERROR"},
                 {T::TIMEOUT,"TIMEOUT"},
                 {T::CODE_PAIR_EXPIRED,"CODE_PAIR_EXPIRED"},
+                {T::AUTHORIZATION_EXPIRED,"AUTHORIZATION_EXPIRED"},
                 {T::NONE,"NONE"}
             };
         }

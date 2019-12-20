@@ -173,7 +173,7 @@ The value of the menu item. The value type is determined by the associated actio
 
 The **AudioFile** action sends the specified audio file to Alexa as if it were an utterance. The audio file path is relative to the menu file. To extend this menu, save your audio files under `assets/inputs/` and add menu items that point to those files.
 
->**Note:** The AudioFile menu appears only on platforms such as QNX that do not already have an AudioInput registered.
+>**Note:** The AudioFile menu appears only on platforms that do not provide built-in audio support (such as platforms that are under development). On platforms that provide built-in audio support, the AudioFile menu does not appear.
 
 For example:
 
@@ -451,7 +451,10 @@ The **notify/*** action exercises the application platform interfaces with event
 | **Communications**                          |
 | onCommunicationAcceptCall                   | -
 | onCommunicationStopCall                     | -
+| onCommunicationShowDisplayInfo              | -
 | onCommunicationShowState                    | -
+| **DoNotDisturb**                            | 
+| onDoNotDisturbChanged                       | -
 | **PlaybackController**                      |
 | onPlaybackControllerButtonPressed           | `button`
 | onPlaybackControllerTogglePressed           | `toggle/action`

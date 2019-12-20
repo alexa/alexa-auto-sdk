@@ -68,7 +68,6 @@ protected:
             EXPECT_CALL(*m_alexaMockFactory->getAudioOutputChannelMock(),setEngineInterface(testing::_)).Times(testing::Exactly(2));;
             EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),addDirectiveHandler(testing::_)).WillOnce(testing::Return(true));
             EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),doShutdown());
-            EXPECT_CALL(*m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),registerCapability(testing::_)).WillOnce(testing::Return(true));
             EXPECT_CALL(*m_alexaMockFactory->getContextManagerInterfaceMock(),setState(testing::_, testing::_,testing::_,testing::_));
             EXPECT_CALL(*m_alexaMockFactory->getContextManagerInterfaceMock(),setStateProvider(testing::_, testing::_)).Times(testing::AtLeast(1));
             EXPECT_CALL(*m_alexaMockFactory->getSpeakerManagerInterfaceMock(), addSpeaker(testing::_)).Times(testing::AtLeast(1));
@@ -92,7 +91,7 @@ protected:
         auto notificationsEngineImpl = aace::engine::alexa::NotificationsEngineImpl::create(
             m_alexaMockFactory->getNotificationsMock(),
             m_alexaMockFactory->getAudioManagerMock(),
-            m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
+            m_alexaMockFactory->getEndpointBuilderMock(),
             m_alexaMockFactory->getContextManagerInterfaceMock(),
             m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
             m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
@@ -126,7 +125,7 @@ TEST_F(NotificationsEngineImplTest,createWithPlatformInterfaceAsNull)
     auto notificationsEngineImpl = aace::engine::alexa::NotificationsEngineImpl::create(
         nullptr,
         m_alexaMockFactory->getAudioManagerMock(),
-        m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
@@ -144,7 +143,7 @@ TEST_F(NotificationsEngineImplTest, createWithAudioManagerInterfaceAsNull)
     auto notificationsEngineImpl = aace::engine::alexa::NotificationsEngineImpl::create(
         m_alexaMockFactory->getNotificationsMock(),
         nullptr,
-        m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
@@ -180,7 +179,7 @@ TEST_F(NotificationsEngineImplTest,createWithContextManagerAsNull)
     auto notificationsEngineImpl = aace::engine::alexa::NotificationsEngineImpl::create(
         m_alexaMockFactory->getNotificationsMock(),
         m_alexaMockFactory->getAudioManagerMock(),
-        m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
         nullptr,
         m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
@@ -198,7 +197,7 @@ TEST_F(NotificationsEngineImplTest, createWithCapabilitiesDelegateAsNull)
     auto notificationsEngineImpl = aace::engine::alexa::NotificationsEngineImpl::create(
         m_alexaMockFactory->getNotificationsMock(),
         m_alexaMockFactory->getAudioManagerMock(),
-        m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         nullptr,
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
@@ -216,7 +215,7 @@ TEST_F(NotificationsEngineImplTest,createWithExceptionSenderAsNull)
     auto notificationsEngineImpl = aace::engine::alexa::NotificationsEngineImpl::create(
         m_alexaMockFactory->getNotificationsMock(),
         m_alexaMockFactory->getAudioManagerMock(),
-        m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         nullptr,
@@ -234,7 +233,7 @@ TEST_F(NotificationsEngineImplTest,createWithAudioFactoryAsNull)
     auto notificationsEngineImpl = aace::engine::alexa::NotificationsEngineImpl::create(
         m_alexaMockFactory->getNotificationsMock(),
         m_alexaMockFactory->getAudioManagerMock(),
-        m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
@@ -252,7 +251,7 @@ TEST_F(NotificationsEngineImplTest,createWithSpeakerManagerAsNull)
     auto notificationsEngineImpl = aace::engine::alexa::NotificationsEngineImpl::create(
         m_alexaMockFactory->getNotificationsMock(),
         m_alexaMockFactory->getAudioManagerMock(),
-        m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
@@ -270,7 +269,7 @@ TEST_F(NotificationsEngineImplTest,createWithCustomerDataManagerAsNull)
     auto notificationsEngineImpl = aace::engine::alexa::NotificationsEngineImpl::create(
         m_alexaMockFactory->getNotificationsMock(),
         m_alexaMockFactory->getAudioManagerMock(),
-        m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),

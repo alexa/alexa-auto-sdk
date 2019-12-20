@@ -31,6 +31,7 @@ import android.util.Log;
 
 import com.amazon.alexalve.ILVCClient;
 import com.amazon.alexalve.ILVCService;
+import com.amazon.sampleapp.core.FileUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;

@@ -73,6 +73,7 @@ namespace alexa {
             return {};
         }
     }
+
 } // aace::jni::alexa
 } // aace::jni
 } // aace
@@ -81,11 +82,11 @@ namespace alexa {
 extern "C"
 {
     JNIEXPORT jlong JNICALL
-    Java_com_amazon_aace_alexa_config_AlexaConfiguration_createDeviceInfoConfigBinder( JNIEnv* env, jobject obj, jstring deviceSerialNumber, jstring clientId, jstring productId )
+    Java_com_amazon_aace_alexa_config_AlexaConfiguration_createDeviceInfoConfigBinder( JNIEnv* env, jobject obj, jstring deviceSerialNumber, jstring clientId, jstring productId, jstring manufacturerName, jstring description )
     {
         try
         {
-            auto config = aace::alexa::config::AlexaConfiguration::createDeviceInfoConfig( JString(deviceSerialNumber).toStdStr(), JString(clientId).toStdStr(), JString(productId).toStdStr() );
+            auto config = aace::alexa::config::AlexaConfiguration::createDeviceInfoConfig( JString(deviceSerialNumber).toStdStr(), JString(clientId).toStdStr(), JString(productId).toStdStr(), JString(manufacturerName).toStdStr(), JString(description).toStdStr() );
             ThrowIfNull( config, "createDeviceInfoConfigFailed" );
 
             return reinterpret_cast<long>( new aace::jni::core::config::EngineConfigurationBinder( config ) );
@@ -145,6 +146,22 @@ extern "C"
     }
 
     JNIEXPORT jlong JNICALL
+    Java_com_amazon_aace_alexa_config_AlexaConfiguration_createCapabilitiesDelegateConfigBinder( JNIEnv* env, jobject obj, jstring databaseFilePath )
+    {
+        try
+        {
+            auto config = aace::alexa::config::AlexaConfiguration::createCapabilitiesDelegateConfig( JString(databaseFilePath).toStdStr() );
+            ThrowIfNull( config, "createCapabilitiesDelegateConfigFailed" );
+
+            return reinterpret_cast<long>( new aace::jni::core::config::EngineConfigurationBinder( config ) );
+        }
+        catch( const std::exception& ex ) {
+            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_alexa_config_AlexaConfiguration_createCapabilitiesDelegateConfigBinder",ex.what());
+            return 0;
+        }
+    }
+
+    JNIEXPORT jlong JNICALL
     Java_com_amazon_aace_alexa_config_AlexaConfiguration_createCurlConfigBinder( JNIEnv* env, jobject obj, jstring certsPath, jstring iface )
     {
         try
@@ -164,22 +181,6 @@ extern "C"
     }
 
     JNIEXPORT jlong JNICALL
-    Java_com_amazon_aace_alexa_config_AlexaConfiguration_createSettingsConfigBinder( JNIEnv* env, jobject obj, jstring databaseFilePath, jstring locale )
-    {
-        try
-        {
-            auto config = aace::alexa::config::AlexaConfiguration::createSettingsConfig( JString(databaseFilePath).toStdStr(), JString(locale).toStdStr() );
-            ThrowIfNull( config, "createSettingsConfigFailed" );
-
-            return reinterpret_cast<long>( new aace::jni::core::config::EngineConfigurationBinder( config ) );
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_alexa_config_AlexaConfiguration_createSettingsConfigBinder",ex.what());
-            return 0;
-        }
-    }
-
-    JNIEXPORT jlong JNICALL
     Java_com_amazon_aace_alexa_config_AlexaConfiguration_createMiscStorageConfigBinder( JNIEnv* env, jobject obj, jstring databaseFilePath )
     {
         try
@@ -191,6 +192,34 @@ extern "C"
         }
         catch( const std::exception& ex ) {
             AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_alexa_config_AlexaConfiguration_createMiscStorageConfigBinder",ex.what());
+            return 0;
+        }
+    }
+
+    JNIEXPORT jlong JNICALL
+    Java_com_amazon_aace_alexa_config_AlexaConfiguration_createDeviceSettingsConfigBinder( JNIEnv* env, jobject obj, jstring databaseFilePath,
+        jobjectArray locales, jstring defaultLocale, jstring defaultTimezone )
+    {
+        try
+        {
+            std::vector<std::string> localesVector;
+            int localesSize = env->GetArrayLength(locales);
+            jstring locale;
+
+            for( int j = 0; j < localesSize; j++ )
+            {
+                locale = (jstring) env->GetObjectArrayElement(locales, j);
+                localesVector.push_back(JString(locale).toStdStr());
+            }
+            
+            auto config = aace::alexa::config::AlexaConfiguration::createDeviceSettingsConfig( JString(databaseFilePath).toStdStr(), 
+                localesVector, JString(defaultLocale).toStdStr(), JString(defaultTimezone).toStdStr() );
+            ThrowIfNull( config, "createDeviceSettingsConfigConfigFailed" );
+
+            return reinterpret_cast<long>( new aace::jni::core::config::EngineConfigurationBinder( config ) );
+        }
+        catch( const std::exception& ex ) {
+            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_alexa_config_AlexaConfiguration_createDeviceSettingsConfigBinder",ex.what());
             return 0;
         }
     }

@@ -18,22 +18,22 @@
 
 #include <string>
 
-#include "AACE/Alexa/AlexaEngineInterfaces.h"
-#include "AACE/Alexa/EqualizerController.h"
-#include "AACE/Engine/Core/EngineMacros.h"
-
-#include <AVSCommon/SDKInterfaces/Audio/EqualizerInterface.h>
 #include <AVSCommon/SDKInterfaces/Audio/EqualizerConfigurationInterface.h>
+#include <AVSCommon/SDKInterfaces/Audio/EqualizerInterface.h>
 #include <AVSCommon/SDKInterfaces/Audio/EqualizerStorageInterface.h>
 #include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
 #include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
-#include <AVSCommon/SDKInterfaces/DirectiveSequencerInterface.h>
 #include <AVSCommon/SDKInterfaces/ExceptionEncounteredSenderInterface.h>
 #include <AVSCommon/SDKInterfaces/MessageSenderInterface.h>
 #include <AVSCommon/Utils/Error/SuccessResult.h>
+#include <Endpoints/EndpointBuilder.h>
 #include <Equalizer/EqualizerCapabilityAgent.h>
 #include <EqualizerImplementations/EqualizerController.h>
 #include <RegistrationManager/CustomerDataManager.h>
+
+#include "AACE/Alexa/AlexaEngineInterfaces.h"
+#include "AACE/Alexa/EqualizerController.h"
+#include "AACE/Engine/Core/EngineMacros.h"
 
 namespace aace {
 namespace engine {
@@ -52,7 +52,7 @@ public:
      * Factory method to create an EqualizerControllerEngineImpl instance
      * 
      * @param equalizerPlatformInterface The associated EqualizerController platform interface instance
-     * @param directiveSequencer Component to sequence and handle the stream of AVS directives
+     * @param defaultEndpointBuilder The EndpointBuilder for the root endpoint hosting this device's AVS capabilities
      * @param capabilitiesDelegate Interface to control DCF configuration
      * @param customerDataManager Component to register the capability agent as a customer data container
      * @param exceptionEncounteredSender Interface to report exceptions to AVS
@@ -63,7 +63,7 @@ public:
      */
     static std::shared_ptr<EqualizerControllerEngineImpl> create(
         std::shared_ptr<aace::alexa::EqualizerController> equalizerPlatformInterface,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+        std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> customerDataManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> 
@@ -103,7 +103,7 @@ private:
     /**
      * Initialize the @c EqualizerControllerEngineImpl instance
      * 
-     * @param directiveSequencer Component to sequence and handle the stream of AVS directives
+     * @param defaultEndpointBuilder The EndpointBuilder for the root endpoint hosting this device's AVS capabilities
      * @param capabilitiesDelegate Interface to control DCF configuration
      * @param customerDataManager Component to register the capability agent as a customer data container
      * @param exceptionEncounteredSender Interface to report exceptions to AVS
@@ -113,7 +113,7 @@ private:
      * @return @c true on successful initialization, @c false otherwise
      */
     bool initialize(
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+        std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> customerDataManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> 

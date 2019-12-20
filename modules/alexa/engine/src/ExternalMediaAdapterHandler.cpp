@@ -19,9 +19,9 @@
 #include "AACE/Engine/Core/EngineMacros.h"
 
 #include <rapidjson/document.h>
+#include <rapidjson/error/en.h>
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
-#include <rapidjson/error/en.h>
 
 namespace aace {
 namespace engine {

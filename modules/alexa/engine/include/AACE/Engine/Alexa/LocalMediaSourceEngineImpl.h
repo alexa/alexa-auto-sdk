@@ -20,8 +20,8 @@
 #include <string>
 
 #include "AACE/Alexa/AlexaEngineInterfaces.h"
-#include "AACE/Alexa/LocalMediaSource.h"
 #include "AACE/Alexa/GlobalPreset.h"
+#include "AACE/Alexa/LocalMediaSource.h"
 #include <AVSCommon/SDKInterfaces/SpeakerInterface.h>
 #include <AVSCommon/SDKInterfaces/SpeakerManagerInterface.h>
 

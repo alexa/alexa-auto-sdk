@@ -31,65 +31,33 @@ public:
             std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
             std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher);
 
-    // Climate Control
-    bool turnClimateControlOn(const std::string& zoneId) override;
-    bool turnClimateControlOff(const std::string& zoneId) override;
-    bool isClimateControlOn(const std::string& zoneId, bool& isOn) override;
+    /**
+     * PowerController
+     */
+    bool turnPowerControllerOn(const std::string& controlId) override;
+    bool turnPowerControllerOff(const std::string& controlId) override;
+    bool isPowerControllerOn(const std::string& controlId, bool& isOn) override;
 
-    bool turnClimateSyncOn(const std::string& zoneId) override;
-    bool turnClimateSyncOff(const std::string& zoneId) override;
-    bool isClimateSyncOn(const std::string& zoneId, bool& isOn) override;
+    /**
+     * ToggleController
+     */
+    bool turnToggleControllerOn(const std::string& controlId, const std::string& controllerId) override;
+    bool turnToggleControllerOff(const std::string& controlId, const std::string& controllerId) override;
+    bool isToggleControllerOn(const std::string& controlId, const std::string& controllerId, bool& isOn) override;
 
-    bool turnAirRecirculationOn(const std::string& zoneId);
-    bool turnAirRecirculationOff(const std::string& zoneId);
-    bool isAirRecirculationOn(const std::string& zoneId, bool& isOn);
+    /**
+     * RangeController
+     */
+    bool setRangeControllerValue(const std::string& controlId, const std::string& controllerId, double value) override;
+    bool adjustRangeControllerValue(const std::string& controlId, const std::string& controllerId, double delta) override;
+    bool getRangeControllerValue(const std::string& controlId, const std::string& controllerId, double& value) override;
 
-    // AirConditioner
-    bool turnAirConditionerOn(const std::string& zoneId) override;
-    bool turnAirConditionerOff(const std::string& zoneId) override;
-    bool isAirConditionerOn(const std::string& zoneId, bool& isOn) override;
-
-    bool setAirConditionerMode(const std::string& zoneId, AirConditionerMode mode);
-    bool getAirConditionerMode(const std::string& zoneId, AirConditionerMode& mode);
-
-    // Heater
-    bool turnHeaterOn(const std::string& zoneId) override;
-    bool turnHeaterOff(const std::string& zoneId) override;
-    bool isHeaterOn(const std::string& zoneId, bool& isOn) override;
-
-    bool setHeaterTemperature(const std::string& zoneId, double value) override;
-    bool adjustHeaterTemperature(const std::string& zoneId, double delta) override;
-    bool getHeaterTemperature(const std::string& zoneId, double& value) override;
-
-    // Fan
-    bool turnFanOn(const std::string& zoneId) override;
-    bool turnFanOff(const std::string& zoneId) override;
-    bool isFanOn(const std::string& zoneId, bool& isOn) override;
-
-    bool setFanSpeed(const std::string& zoneId, double value) override;
-    bool adjustFanSpeed(const std::string& zoneId, double delta) override;
-    bool getFanSpeed(const std::string& zoneId, double& value) override;
-
-    // Vent
-    bool turnVentOn(const std::string& zoneId);
-    bool turnVentOff(const std::string& zoneId);
-    bool isVentOn(const std::string& zoneId, bool& isOn);
-
-    bool setVentPosition(const std::string& zoneId, VentPosition value);
-    bool getVentPosition(const std::string& zoneId, VentPosition& vent);
-
-    // Defroster
-    bool turnWindowDefrosterOn(const std::string& zoneId) override;
-    bool turnWindowDefrosterOff(const std::string& zoneId) override;
-    bool isWindowDefrosterOn(const std::string& zoneId, bool& isOn) override;
-
-    // Lights
-    bool turnLightOn(const std::string& zoneId, LightType type) override;
-    bool turnLightOff(const std::string& zoneId, LightType type) override;
-    bool isLightOn(const std::string& zoneId, LightType type, bool& isOn) override;
-
-    bool setLightColor(const std::string& zoneId, LightType type, LightColor color) override;
-    bool getLightColor(const std::string& zoneId, LightType type, LightColor& color) override;
+    /**
+     * ModeController
+     */
+    bool setModeControllerValue(const std::string& controlId, const std::string& controllerId, const std::string& value) override;
+    bool adjustModeControllerValue(const std::string& controlId, const std::string& controllerId, int delta) override;
+    bool getModeControllerValue(const std::string& controlId, const std::string& controllerId, std::string& value) override;
 
     /**
      * Process incoming events from AASB client meant for topic @c TOPIC_CARCONTROL
@@ -106,43 +74,19 @@ private:
             std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
             std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher);
 
-    std::string ventPositionToString(const aace::carControl::CarControl::VentPosition& vent);
-    aace::carControl::CarControl::VentPosition ventPositionFromString(const std::string& positionString);
-    std::string lightTypeToString(const aace::carControl::CarControl::LightType& type);
-    std::string airConditionerModeToString(const aace::carControl::CarControl::AirConditionerMode& mode);
-    aace::carControl::CarControl::AirConditionerMode airConditionerModeFromString(const std::string& modeString);
-    std::string lightColorToString(const aace::carControl::CarControl::LightColor& color);
-    aace::carControl::CarControl::LightColor lightColorFromString(const std::string& colorString);
-
     // Helper methods
-    bool turnOnOffEndPoint(const std::string& zoneId, const std::string& action, const std::string& type);
-    bool isEndPointTurnedOn(const std::string& zoneId,
+    bool turnOnOffEndPoint(const std::string& controlId, const std::string& action, const std::string& controllerId = "");
+    bool isEndPointTurnedOn(const std::string& controlId,
                             bool& isOn,
                             const std::string& action,
                             bridge::SyncOverAsync& syncOverAsyncHelper,
-                            const std::string& type);
-    bool setValue(const std::string& zoneId, double value, const std::string& action);
-    bool adjustValue(const std::string& zoneId, double delta, const std::string& action);
-    bool getValue(const std::string& zoneId,
-                  double& value,
-                  const std::string& action,
-                  bridge::SyncOverAsync& syncOverAsyncHelper);
+                            const std::string& controllerId = "");
 
     // Sync over async calls
-    bridge::SyncOverAsync m_callIsClimateControlOn;
-    bridge::SyncOverAsync m_callIsClimateControlSyncOn;
-    bridge::SyncOverAsync m_callIsAirRecirculationOn;
-    bridge::SyncOverAsync m_callIsAirConditionerOn;
-    bridge::SyncOverAsync m_callGetAirConditionerMode;
-    bridge::SyncOverAsync m_callIsHeaterOn;
-    bridge::SyncOverAsync m_callGetHeaterTemperature;
-    bridge::SyncOverAsync m_callIsFanOn;
-    bridge::SyncOverAsync m_callGetFanSpeed;
-    bridge::SyncOverAsync m_callIsVentOn;
-    bridge::SyncOverAsync m_callGetVentPosition;
-    bridge::SyncOverAsync m_callIsWindowDefrosterOn;
-    bridge::SyncOverAsync m_callIsLightOn;
-    bridge::SyncOverAsync m_callGetLightColor;
+    bridge::SyncOverAsync m_callIsPowerControllerOn;
+    bridge::SyncOverAsync m_callIsToggleControllerOn;
+    bridge::SyncOverAsync m_callGetModeControllerValue;
+    bridge::SyncOverAsync m_callGetRangeControllerValue;
 
     // aasb::core::logger::LoggerHandler
     std::shared_ptr<aasb::core::logger::LoggerHandler> m_logger;

@@ -39,14 +39,15 @@ if(AAC_HOME)
     include(${AAC_HOME}/share/cmake/AACEPhoneControl.cmake)
     include(${AAC_HOME}/share/cmake/AACECBL.cmake)
     include(${AAC_HOME}/share/cmake/AACEAddressBook.cmake)
+    include(${AAC_HOME}/share/cmake/AACECarControl.cmake)
     if(AMAZONLITE)
         include(${AAC_HOME}/share/cmake/AACEAmazonLite.cmake)
         add_definitions(-DAMAZONLITE)
     endif()
     if(LOCALVOICECONTROL)
+        include(${AAC_HOME}/share/cmake/AACECarControlLocalService.cmake)
         include(${AAC_HOME}/share/cmake/AACELocalVoiceControl.cmake)
         include(${AAC_HOME}/share/cmake/AACELocalSkillService.cmake)
-        include(${AAC_HOME}/share/cmake/AACECarControl.cmake)
         include(${AAC_HOME}/share/cmake/AACEAddressBookLocalService.cmake)
         add_definitions(-DLOCALVOICECONTROL)
     endif()
@@ -54,9 +55,9 @@ if(AAC_HOME)
         include(${AAC_HOME}/share/cmake/AACECommunication.cmake)
         add_definitions(-DALEXACOMMS)
     endif()
-    if(GSTREAMER)
-        include(${AAC_HOME}/share/cmake/AACEGStreamer.cmake)
-        add_definitions(-DGSTREAMER)
+    if(SYSTEMAUDIO)
+        include(${AAC_HOME}/share/cmake/AACESystemAudio.cmake)
+        add_definitions(-DSYSTEMAUDIO)
     endif()
     if(DCM)
         include(${AAC_HOME}/share/cmake/AACEDcmNativeMetrics.cmake)
@@ -75,8 +76,8 @@ else()
     if(ALEXACOMMS)
         add_definitions(-DALEXACOMMS)
     endif()
-    if(GSTREAMER)
-        add_definitions(-DGSTREAMER)
+    if(SYSTEMAUDIO)
+        add_definitions(-DSYSTEMAUDIO)
     endif()
     if(DCM)
         add_definitions(-DDCM)
@@ -104,11 +105,17 @@ set(CXX_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Alexa/TemplateRuntimeHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Alexa/AlexaSpeakerHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Alexa/GlobalPresetHandler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Alexa/DoNotDisturbHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Audio/AudioInputProviderHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Audio/AudioOutputProviderHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Application.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/ApplicationContext.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Args.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/CarControl/BoolController.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/CarControl/CarControlDataProvider.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/CarControl/CarControlHandler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/CarControl/ModeController.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/CarControl/RangeController.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/CBL/CBLHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Event.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Executor.h
@@ -122,18 +129,8 @@ set(CXX_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/TaskQueue.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/TaskThread.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/TTY.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Views.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Views.h    
 )
-
-if(LOCALVOICECONTROL)
-    set(CXX_HEADER_FILES ${CXX_HEADER_FILES}
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/CarControl/CarControlHandler.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/CarControl/CarControlDataProvider.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/CarControl/BoolController.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/CarControl/RangeController.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/CarControl/ModeController.h
-    )
-endif()
 
 if(ALEXACOMMS)
     set(CXX_HEADER_FILES ${CXX_HEADER_FILES}
@@ -147,6 +144,7 @@ set(CXX_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/AlertsHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/AlexaClientHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/AudioPlayerHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/DoNotDisturbHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/EqualizerControllerHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/LocalMediaSourceHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/NotificationsHandler.cpp
@@ -156,10 +154,13 @@ set(CXX_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/TemplateRuntimeHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/AlexaSpeakerHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/GlobalPresetHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/DoNotDisturbHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Audio/AudioInputProviderHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Audio/AudioOutputProviderHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Application.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ApplicationContext.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/CarControl/CarControlDataProvider.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/CarControl/CarControlHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/CBL/CBLHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Executor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Location/LocationProviderHandler.cpp
@@ -172,13 +173,6 @@ set(CXX_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Views.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
 )
-
-if(LOCALVOICECONTROL)
-    set(CXX_SOURCE_FILES ${CXX_SOURCE_FILES}
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/CarControl/CarControlHandler.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/CarControl/CarControlDataProvider.cpp
-    )
-endif()
 
 if(ALEXACOMMS)
     set(CXX_SOURCE_FILES ${CXX_SOURCE_FILES}
@@ -205,6 +199,8 @@ target_link_libraries(SampleApp
     AACECoreEngine
     AACEAlexaPlatform
     AACEAlexaEngine
+    AACECarControlEngine
+    AACECarControlPlatform
     AACENavigationPlatform
     AACENavigationEngine
     AACEPhoneControlPlatform
@@ -230,9 +226,9 @@ if(FILEAUDIO)
     )
 endif()
 
-if(GSTREAMER)
+if(SYSTEMAUDIO)
     target_link_libraries(SampleApp
-        AACEGStreamerEngine
+        AACESystemAudioEngine
     )
 endif()
 
@@ -247,11 +243,10 @@ if(LOCALVOICECONTROL)
     target_link_libraries(SampleApp
         AACELocalSkillServicePlatform
         AACELocalSkillServiceEngine
-        AACECarControlPlatform
-        AACECarControlEngine
         AACELocalVoiceControlPlatform
         AACELocalVoiceControlEngine
         AACEAddressBookLocalServiceEngine
+        AACECarControlLocalServiceEngine
     )
 endif()
 

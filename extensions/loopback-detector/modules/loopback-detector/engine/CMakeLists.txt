@@ -12,6 +12,10 @@ target_include_directories(AACELoopbackDetectorEngine
         $<INSTALL_INTERFACE:include>
     PRIVATE
         ${AVS_INCLUDE_DIRS}
+        # Somehow some AVS Captions headers are now in avs_shared/ folder rather than include/. If you
+        # include any AVS headers that also include Captions headers, you need to add avs_shared/ to
+        # the include paths.
+        ${AVS_INCLUDE_DIRS}/../avs_shared
 )
 
 target_link_libraries(AACELoopbackDetectorEngine
@@ -28,8 +32,3 @@ install(
     EXPORT AACELoopbackDetector
 )
 
-#install(
-#    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE
-#    DESTINATION include
-#    FILES_MATCHING PATTERN "*.h"
-#)

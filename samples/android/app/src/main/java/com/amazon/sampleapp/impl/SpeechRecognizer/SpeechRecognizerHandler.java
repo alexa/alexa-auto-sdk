@@ -41,18 +41,30 @@ public class SpeechRecognizerHandler extends SpeechRecognizer {
     private final ExecutorService mExecutor = Executors.newFixedThreadPool( 1 );
     private boolean mWakeWordEnabled;
     private boolean mAllowStopCapture = false; // Only true if holdToTalk() returned true
+    private final View mToggleItem;
+    private final View mMessage;
+    private final TextView mLocaleMessage;
     // AutoVoiceChrome controller
 
     public SpeechRecognizerHandler( Activity activity,
                                     LoggerHandler logger,
-                                    boolean wakeWordSupported,
                                     boolean wakeWordEnabled ) {
-        super( wakeWordSupported && wakeWordEnabled );
+        super( wakeWordEnabled );
         mActivity = activity;
         mLogger = logger;
         mWakeWordEnabled = wakeWordEnabled;
 
-        setupGUI( wakeWordSupported );
+        // Toggle Wake Word switch
+        mToggleItem = mActivity.findViewById( R.id.toggleWakeWord );
+        ( ( TextView ) mToggleItem.findViewById( R.id.text ) ).setText( R.string.wake_word_enabled );
+
+        // Wake Word not supported message
+        mMessage = mActivity.findViewById( R.id.wakeWordNotSupportedMessage );
+
+        // Wakeword locale switching Message
+        mLocaleMessage = mActivity.findViewById( R.id.wakeWordLocaleChangeMessage );
+
+        disableWakeWordUI();
     }
 
     @Override
@@ -86,63 +98,49 @@ public class SpeechRecognizerHandler extends SpeechRecognizer {
         mAllowStopCapture = false;
     }
 
-    private void setupGUI( boolean wakeWordSupported ) {
-        // Toggle Wake Word switch
-        final View toggleItem = mActivity.findViewById( R.id.toggleWakeWord );
-        ( ( TextView ) toggleItem.findViewById( R.id.text ) ).setText( R.string.wake_word_enabled );
+    private void disableWakeWordUI() {
+        mToggleItem.setVisibility( View.GONE );
+        mMessage.setVisibility( View.VISIBLE );
+        mLocaleMessage.setVisibility( View.GONE );
+    }
 
-        // Wake Word not supported message
-        final View message = mActivity.findViewById( R.id.wakeWordNotSupportedMessage );
-
-        // Wakeword locale switching Message
-        final TextView localeMessage = mActivity.findViewById(R.id.wakeWordLocaleChangeMessage);
-
+    public void enableWakeWordUI() {
         // Show toggle Wake Word option only if Wake Word supported
-        if ( wakeWordSupported ) {
+        final SwitchCompat wakeWordSwitch = mToggleItem.findViewById( R.id.drawerSwitch );
+        mToggleItem.setVisibility( View.VISIBLE );
+        mMessage.setVisibility( View.GONE );
+        wakeWordSwitch.setChecked( mWakeWordEnabled );
+        mLocaleMessage.setVisibility( View.VISIBLE );
 
-            final SwitchCompat wakeWordSwitch = toggleItem.findViewById( R.id.drawerSwitch );
+        wakeWordSwitch.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener
+                () {
+            @Override
+            public void onCheckedChanged( CompoundButton buttonView, boolean isChecked ) {
+                if ( isChecked ) {
+                    mLogger.postInfo( TAG, "Enabling Wake Word" );
+                    mExecutor.submit( new Runnable() {
+                        @Override
+                        public void run() {
+                            enableWakewordDetection();
+                        }
+                    } );
 
-            toggleItem.setVisibility( View.VISIBLE );
-            message.setVisibility( View.GONE );
-            wakeWordSwitch.setChecked( mWakeWordEnabled );
-            if ( mWakeWordEnabled ) {
-                localeMessage.setVisibility( View.VISIBLE );
-            }
-
-            wakeWordSwitch.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener
-                    () {
-                @Override
-                public void onCheckedChanged( CompoundButton buttonView, boolean isChecked ) {
-                    if ( isChecked ) {
-                        mLogger.postInfo( TAG, "Enabling Wake Word" );
-                        mExecutor.submit( new Runnable() {
-                            @Override
-                            public void run() {
-                                enableWakewordDetection();
-                            }
-                        } );
-
-                        localeMessage.setVisibility( View.VISIBLE );
-                    } else {
-                        mLogger.postInfo( TAG, "Disabling Wake Word" );
-                        mExecutor.submit( new Runnable() {
-                            @Override
-                            public void run() {
-                                disableWakewordDetection();
-                            }
-                        } );
-                        localeMessage.setVisibility( View.GONE );
-                    }
-                    // Notify wake word changes to AutoVoiceChrome
-
-                    mWakeWordEnabled = isChecked;
+                    mLocaleMessage.setVisibility( View.VISIBLE );
+                } else {
+                    mLogger.postInfo( TAG, "Disabling Wake Word" );
+                    mExecutor.submit( new Runnable() {
+                        @Override
+                        public void run() {
+                            disableWakewordDetection();
+                        }
+                    } );
+                    mLocaleMessage.setVisibility( View.GONE );
                 }
-            } );
-        } else {
-            toggleItem.setVisibility( View.GONE );
-            message.setVisibility( View.VISIBLE );
-            localeMessage.setVisibility( View.GONE );
-        }
+                // Notify wake word changes to AutoVoiceChrome
+
+                mWakeWordEnabled = isChecked;
+            }
+        } );
     }
 
     /* For playing speech recognition audio cues */

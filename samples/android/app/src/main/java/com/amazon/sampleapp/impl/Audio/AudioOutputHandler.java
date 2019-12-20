@@ -19,12 +19,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 
-import com.amazon.aace.alexa.AuthProvider.AuthState;
-import com.amazon.aace.alexa.AuthProvider.AuthError;
+import com.amazon.aace.alexa.AlexaClient.AuthState;
+import com.amazon.aace.alexa.AlexaClient.AuthError;
 
 import com.amazon.aace.audio.AudioOutput;
 import com.amazon.aace.audio.AudioStream;
-import com.amazon.sampleapp.impl.AuthProvider.AuthStateObserver;
+import com.amazon.sampleapp.impl.AlexaClient.AuthStateObserver;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -42,6 +42,7 @@ public class AudioOutputHandler extends AudioOutput implements AuthStateObserver
 {
     private static final String sTag = AudioOutputHandler.class.getSimpleName();
     private static final String sFileName = "alexa_media"; // Note: not thread safe
+    private static final long sSkipThresholdInMS = 1500; // 1500 ms
 
     private final Activity mActivity;
     private final Context mContext;
@@ -55,9 +56,13 @@ public class AudioOutputHandler extends AudioOutput implements AuthStateObserver
     private MutedState mMutedState = MutedState.UNMUTED;
 
     private Timeline.Period mPeriod;
+    private Timeline.Window mWindow;
     private long mPosition;
+    private long mLastLivePosition;
+
     private long mLivePausedPosition;
     private int mSavedPeriodIndex;
+    private int mSavedWindowIndex;
     private long mLivePausedOffset;
     private long mLiveResumedOffset;
     private boolean mNewPlayReceieved;
@@ -72,6 +77,7 @@ public class AudioOutputHandler extends AudioOutput implements AuthStateObserver
         mMediaSourceFactory = new MediaSourceFactory( mContext, mLogger, mName );
         mRepeating = false;
         mPeriod = new Timeline.Period();
+        mWindow = new Timeline.Window();
 
         initializePlayer();
     }
@@ -212,16 +218,29 @@ public class AudioOutputHandler extends AudioOutput implements AuthStateObserver
     public long getPosition() {
         Timeline currentTimeline = mPlayer.getCurrentTimeline();
         mPosition = Math.abs( mPlayer.getCurrentPosition() );
+
         if ( !currentTimeline.isEmpty() && mPlayer.isCurrentWindowDynamic() ) {
             if ( mLivePausedPosition == 0 ) { // not during pause
                 mPosition -= currentTimeline.getPeriod(mSavedPeriodIndex, mPeriod).getPositionInWindowMs(); // Adjust position to be relative to start of period rather than window.
                 mPosition -= mLiveResumedOffset; // Offset saved for live station stopped / played
                 mPosition -= mLivePausedOffset; // Offset saved for live station paused / resumed
+                mLogger.postVerbose( sTag, String.format( "DEBUG, mPosition (%s), mSavedPeriodIndex (%s), mPeriod (%s), mLiveResumedOffset (%s),  mLivePausedOffset (%s)",
+                        mPosition, mSavedPeriodIndex, mPeriod, mLiveResumedOffset, mLivePausedOffset ) );
             } else{
                 mLogger.postVerbose( sTag, String.format( "(%s) Handling livePaused getPosition(%s)", mName, mLivePausedPosition ) );
                 return mLivePausedPosition; // the saved position during a live station paused state
             }
+
+            long skipDifference = mPosition - mLastLivePosition;
+            // difference in position normally 1000ms +/- 10ms
+            if ( skipDifference > sSkipThresholdInMS){ // skips 10 - 20s while resuming live radio sometimes, if significant skip: update live resumed offset
+                mLogger.postVerbose( sTag, String.format( "getPosition live position skipped: (%s)", skipDifference ) );
+                mLiveResumedOffset += skipDifference;
+                mPosition -= skipDifference;
+            }
+            mLastLivePosition = mPosition;
         }
+
         mLogger.postVerbose( sTag, String.format( "(%s) Handling getPosition(%s)", mName, mPosition ) );
         return mPosition;
     }
@@ -264,6 +283,13 @@ public class AudioOutputHandler extends AudioOutput implements AuthStateObserver
         mLogger.postVerbose( sTag, String.format( "(%s) Media State Changed. STATE: PLAYING", mName ) );
         mediaStateChanged( MediaState.PLAYING );
 
+        mSavedWindowIndex = mPlayer.getCurrentWindowIndex(); // remember window index
+        mPlayer.getCurrentTimeline().getWindow(mSavedWindowIndex, mWindow); // set window
+        mSavedPeriodIndex = mPlayer.getCurrentPeriodIndex(); // remember period index
+        mPlayer.getCurrentTimeline().getPeriod(mSavedWindowIndex, mPeriod); // set period
+        /*mLogger.postVerbose( sTag, String.format( "(%s) Media State Changed. STATE: PLAYING, mSavedWindowIndex (%s), fPI (%s), LPI (%s), winduration(%s)",
+                mName, mSavedWindowIndex, mWindow.firstPeriodIndex, mWindow.lastPeriodIndex, mWindow.durationUs ) );*/
+
         if ( mNewPlayReceieved && mPlayer.isCurrentWindowDynamic() ) { // remember offset if new play for live station
             mPlayer.seekToDefaultPosition();
             mLiveResumedOffset += Math.abs( mPlayer.getCurrentPosition() );
@@ -273,6 +299,7 @@ public class AudioOutputHandler extends AudioOutput implements AuthStateObserver
 
     private void onPlaybackStopped () {
         mLogger.postVerbose( sTag, String.format( "(%s) Media State Changed. STATE: STOPPED", mName ) );
+
         mediaStateChanged( MediaState.STOPPED );
     }
 
@@ -293,11 +320,14 @@ public class AudioOutputHandler extends AudioOutput implements AuthStateObserver
     }
 
     @Override
-    public void onAuthStateChanged(AuthState state, AuthError error, String token) {
+    public void onAuthStateChanged( AuthState state, AuthError error ) {
         if ( state == AuthState.UNINITIALIZED ) {
-            mLogger.postInfo( sTag, String.format( "(%s) Auth state is uninitialized. Stopping media player", mName ) );
             // Stop playing media if user logs out
-            stop();
+            if ( mPlayer.getPlayWhenReady() ) {
+                // Ensure media is playing before stopping
+                mLogger.postInfo( sTag, String.format( "(%s) Auth state is uninitialized. Stopping media player", mName ) );
+                mPlayer.setPlayWhenReady( false );
+            }
         }
     }
 

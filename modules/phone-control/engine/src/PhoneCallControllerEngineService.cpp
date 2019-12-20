@@ -58,11 +58,8 @@ bool PhoneCallControllerEngineService::registerPlatformInterfaceType( std::share
         auto alexaComponents = getContext()->getServiceInterface<aace::engine::alexa::AlexaComponentInterface>( "aace.alexa" );
         ThrowIfNull( alexaComponents, "invalidAlexaComponentInterface" );
 
-        auto directiveSequencer = alexaComponents->getDirectiveSequencer();
-        ThrowIfNull( directiveSequencer, "directiveSequencerInvalid" );
-
-        auto capabilitiesDelegate = alexaComponents->getCapabilitiesDelegate();
-        ThrowIfNull( capabilitiesDelegate, "capabilitiesDelegateInvalid" );
+        auto defaultEndpointBuilder = alexaComponents->getDefaultEndpointBuilder();
+        ThrowIfNull( defaultEndpointBuilder, "defaultEndpointBuilderInvalid" );
 
         auto exceptionSender = alexaComponents->getExceptionEncounteredSender();
         ThrowIfNull( exceptionSender, "exceptionSenderInvalid" );
@@ -76,7 +73,13 @@ bool PhoneCallControllerEngineService::registerPlatformInterfaceType( std::share
         auto focusManager = alexaComponents->getAudioFocusManager();
         ThrowIfNull( focusManager, "focusManagerInvalid" );
 
-        m_phoneCallControllerEngineImpl = aace::engine::phoneCallController::PhoneCallControllerEngineImpl::create( phoneCallController, capabilitiesDelegate, contextManager, directiveSequencer, exceptionSender, messageSender, focusManager );
+        auto authDelegate = alexaComponents->getAuthDelegate();
+        ThrowIfNull( authDelegate, "authDelegateInvalid" );
+
+        auto deviceInfo = alexaComponents->getDeviceInfo();
+        ThrowIfNull( deviceInfo, "deviceInfoInvalid" );
+
+        m_phoneCallControllerEngineImpl = aace::engine::phoneCallController::PhoneCallControllerEngineImpl::create( phoneCallController, defaultEndpointBuilder, contextManager, exceptionSender, messageSender, focusManager, authDelegate, deviceInfo );
         ThrowIfNull( m_phoneCallControllerEngineImpl, "createPhoneCallControllerEngineImplFailed" );
 
         return true;

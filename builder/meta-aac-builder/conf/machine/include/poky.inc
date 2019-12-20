@@ -26,11 +26,8 @@ MODIFYTOS = "0"
 
 # Assuming GStreamer is provided from host
 AAC_PKG_CONFIG_PROVIDED_append = " gstreamer-1.0 gstreamer-app-1.0"
-AAC_ASSUME_PROVIDED_append = " gstreamer1.0"
+AAC_ASSUME_PROVIDED_append = " ^gstreamer1.0$"
 
 # pkg-config
 export AAC_PKG_CONFIG_SYSROOT_DIR = "${TARGET_SYSROOT}"
 export AAC_PKG_CONFIG_LIBDIR = "${TARGET_SYSROOT}/usr/lib/pkgconfig"
-
-# Adding Poky universal override
-MACHINEOVERRIDES = "${MACHINE}:poky"

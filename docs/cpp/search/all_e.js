@@ -9,6 +9,8 @@ var searchData=
   ['registerplatforminterface',['registerPlatformInterface',['../classaace_1_1core_1_1_engine.html#abab09ff31a4c13f8841bc124d87c24eb',1,'aace::core::Engine::registerPlatformInterface(std::shared_ptr&lt; aace::core::PlatformInterface &gt; platformInterface)=0'],['../classaace_1_1core_1_1_engine.html#a5b1e5999b008bee74249d162c95be7c7',1,'aace::core::Engine::registerPlatformInterface(std::initializer_list&lt; std::shared_ptr&lt; aace::core::PlatformInterface &gt;&gt; platformInterfaceList)=0']]],
   ['removeallalerts',['removeAllAlerts',['../classaace_1_1alexa_1_1_alerts.html#a48eea8459c5a5c42819fb4fcd155ff89',1,'aace::alexa::Alerts']]],
   ['removeuploadedcontacts',['removeUploadedContacts',['../classaace_1_1contact_uploader_1_1_contact_uploader.html#a3fa5b4ad76872e3f3aa39d5c54dbf7f6',1,'aace::contactUploader::ContactUploader']]],
+  ['renderdocument',['renderDocument',['../classaace_1_1apl_1_1_a_p_l.html#a605da3ae66ca91baa83f71442e0c4273',1,'aace::apl::APL']]],
+  ['renderdocumentresult',['renderDocumentResult',['../classaace_1_1apl_1_1_a_p_l.html#a42ad9effa8cb1ae3ca95fa65c3378993',1,'aace::apl::APL']]],
   ['renderplayerinfo',['renderPlayerInfo',['../classaace_1_1alexa_1_1_template_runtime.html#a71852ea84caa81de6cd633006c76ad51',1,'aace::alexa::TemplateRuntime']]],
   ['rendertemplate',['renderTemplate',['../classaace_1_1alexa_1_1_template_runtime.html#a8bac9d4c6a49d5f7e3ae64fbc477b325',1,'aace::alexa::TemplateRuntime']]],
   ['repeat',['REPEAT',['../classaace_1_1alexa_1_1_playback_controller_engine_interface.html#a990f517d423450b712fcfd0488403e8ca5be68175be14dfaa080165456c2e9555',1,'aace::alexa::PlaybackControllerEngineInterface']]],

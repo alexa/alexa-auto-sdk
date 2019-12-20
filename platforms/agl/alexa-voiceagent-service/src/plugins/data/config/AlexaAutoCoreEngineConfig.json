@@ -1,55 +1,34 @@
 {
   "deviceInfo":
   {
-    "clientId":"<YOUR_CLIENT_ID>",
-    "deviceSerialNumber":"<YOUR_SERIAL_NUMBER>",
-    "productId":"<YOUR_PRODUCT_ID>"
+    "clientId": "${YOUR_CLIENT_ID}",
+    "deviceSerialNumber": "${YOUR_DEVICE_SERIAL_NUMBER}",
+    "productId": "${YOUR_PRODUCT_ID}",
+    "manufacturerName": "${YOUR_MANUFACTURER_NAME}",
+    "description": "${YOUR_DESCRIPTION}"
   },
   "libcurlUtils":
   {
     "CURLOPT_CAPATH":"/etc/ssl/certs"
   },
-  "miscDatabase":
-  {
-    "databaseFilePath":"./miscDatabase.db"
-  },
-  "certifiedSender":
-  {
-    "databaseFilePath":"./certifiedSender.db"
-  },
-  "alertsCapabilityAgent":
-  {
-    "databaseFilePath":"./alertsCapabilityAgent.db"
-  },
-  "notifications":
-  {
-    "databaseFilePath":"./notifications.db"
-  },
-  "settings":
-  {
-    "databaseFilePath":"./settings.db",
-    "defaultAVSClientSettings":
-    {
-      "locale":"en-US"
-    }
-  },
-  "aace.storage": {
-    "localStoragePath": "./sample-aace.db",
-    "storageType": "sqlite"
+  "deviceSettings": {
+    "defaultLocale":"en-US",
+    "defaultTimezone":"America/Vancouver"
   },
   "aace.vehicle": {
     "info": {
       "make": "Amazon",
-      "model": "AACE",
-      "year": "2018",
+      "model": "AutoSDK",
+      "year": "2019",
       "trim": "aac",
       "geography": "US",
       "version": "1.2.3",
-      "os": "sample-aace",
-      "arch": "sample-aace",
+      "os": "AGL",
+      "arch": "aarch64",
       "language": "en_US",
       "microphone": "SingleArray",
-      "countries": "US,GB,IE,CA,DE,AT,IN,JP,AU,NZ,FR"
+      "countries": "US,GB,IE,CA,DE,AT,IN,JP,AU,NZ,FR",
+      "vehicleIdentifier": "Sample Identifier ABC"
     },
     "operatingCountry": "US",
     "currentLocation": "36.1363,-115.1513"
@@ -59,7 +38,8 @@
   },
   "aace.audio.output": {
     "tts": "multimedia",
-    "music": "emergency"
+    "music": "emergency",
+    "alarm": "navigation"
   },
   "aace.wakeword": {
     "enabled":true
@@ -70,63 +50,95 @@
   "aace.localmediasource": {
     "enabled":false,
     "sources": {
-        "bluetooth":false,
-        "usb":false,
-        "fmRadio":false,
-        "amRadio":false,
+        "bluetooth":true,
+        "usb":true,
+        "fmRadio":true,
+        "amRadio":true,
         "satelliteRadio":false,
         "lineIn":false,
-        "compactDisc":false
+        "compactDisc":true,
+        "siriusXM":false,
+        "dab":false
     }
   },
   "aace.localvoicecontrol": {
     "enabled":true,
-    "socketRootDirectory":"/var/"
+    "socketRootDirectory":"/opt/"
   },
   "aace.localskills": {
     "aace.carcontrol": {
         "enabled": true,
-        "cannedzones": [
+        "endpoints": [
             {
-                "name" : "zone.all",
+                "zone" : "zone.all",
                 "enabled": true,
                 "climate": {
-                    "syncController": false,
-                    "recirculationController": false
+                    "controlId": "all.climate",
+                    "sync": {
+                      "controllerId": "climate.sync"
+                    },
+                    "recirculate": {
+                      "controllerId": "climate.recirculate"
+                    }
                 },
                 "airconditioner" : {
-                    "modes": {
-                        "AUTO": true,
-                        "ECONOMY": false,
-                        "MANUAL": false,
-                        "MAXIMIUM": false
+                    "controlId": "all.ac",
+                    "mode": {
+                       "controllerId": "mode",
+                       "values" : {
+                          "AUTO": true,
+                          "ECONOMY": true,
+                          "MANUAL": true
+                       }
+                    },
+                    "intensity" : { 
+                       "controllerId": "intensity",
+                       "values" : {
+                         "LOW": true,
+                         "MEDIUM": true,
+                         "HIGH": true
+                       }
                     }
                 },
                 "heater" : {
-                    "minimum": 60.0,
-                    "maximum": 80.0,
-                    "precision": 1.0,
+                    "controlId": "all.heater",
+                    "controllerId": "temperature",
+                    "minimum": 60,
+                    "maximum": 90,
+                    "precision": 1,
                     "unit":  "FAHRENHEIT"
                 },
                 "fan" : {
-                    "minimum": 0.0,
-                    "maximium": 10.0,
-                    "precision": 1.0
+                    "controlId": "all.fan",
+                    "controllerId": "speed",
+                    "minimum": 1,
+                    "maximum": 10,
+                    "precision": 1
                 },
                 "vent": {
+                    "controlId": "all.vent",
                     "positions" : {
-                      "BODY": true,
-                      "MIX":  false,
-                      "FLOOR": false,
-                      "WINDSHIELD":  false
+                      "controllerId": "position",
+                      "values" : {
+                        "BODY": true,
+                        "MIX":  true,
+                        "FLOOR": true,
+                        "WINDSHIELD": true
+                      }
                     }
                 },
                 "window" : {
+                    "controlId": "all.window",
+                    "controllerId": "defroster",
                     "defrost": true
                 },
-                "light" : {
-                    "type": "LIGHT",
-                    "colors" : {
+                "lights" : [ 
+                 {
+                    "controlId": "all.ambient.light",
+                    "type": "AMBIENT_LIGHT",
+                    "color" : {
+                      "controllerId": "color",
+                      "values" : {
                         "WHITE": true,
                         "RED": true,
                         "ORANGE": true,
@@ -135,47 +147,65 @@
                         "BLUE": true,
                         "INDIGO": true,
                         "VIOLET": true
+                      }
                     }
-                }
+                  }, 
+                  {
+                    "controlId": "dome.light",
+                    "type": "DOME_LIGHT"
+                  },
+                  {
+                    "controlId": "light",
+                    "type": "LIGHT"
+                  },
+                  {
+                    "controlId": "reading.light",
+                    "type": "READING_LIGHT"
+                  },
+                  {
+                    "controlId": "trunk.light",
+                    "type": "TRUNK_LIGHT"
+                  }
+                ]
             },
             {                  
-                "name" : "zone.back.driver",
+                "zone" : "zone.back.driver",
                 "enabled": false
             },
             {                  
-                "name" : "zone.back.passenger",
+                "zone" : "zone.back.passenger",
                 "enabled": false
             },
             {                  
-                "name" : "zone.driver",
+                "zone" : "zone.driver",
                 "enabled": false
             },
             {                  
-                "name" : "zone.first.row",
+                "zone" : "zone.first.row",
                 "enabled": false
             },
             {                  
-                "name" : "zone.fourth.row",
+                "zone" : "zone.fourth.row",
                 "enabled": false
             },
             {                  
-                "name" : "zone.front",
+                "zone" : "zone.front",
                 "enabled": false
             },               
             {                  
-                "name" : "zone.passenger",
+                "zone" : "zone.passenger",
                 "enabled": false
             },               
             {                  
-                "name" : "zone.rear",
+                "zone" : "zone.rear",
                 "enabled": false
             },               
             {                  
-                "name" : "zone.second.row",
+                "zone" : "zone.second.row",
                 "enabled": false
             },               
             {                  
-                "name" : "zone.third.row",
+                "zone" : "zone.third.row",
                 "enabled": false
             }
         ]

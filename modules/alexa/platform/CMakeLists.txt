@@ -18,6 +18,7 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/LocalMediaSource.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/GlobalPreset.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/AlexaSpeaker.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/DoNotDisturb.h
 )
 
 source_group("Header Files" FILES ${HEADERS})
@@ -38,6 +39,7 @@ add_library(AACEAlexaPlatform SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/LocalMediaSource.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/GlobalPreset.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AlexaSpeaker.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/DoNotDisturb.cpp
 )
 
 target_include_directories(AACEAlexaPlatform

@@ -98,10 +98,13 @@ std::shared_ptr<LoopbackDetector> LoopbackDetector::create(
 void LoopbackDetector::doShutdown() {
     if (m_audioInputWriter != nullptr) {
         m_audioInputWriter->close();
+        m_audioInputWriter.reset();
     }
 
     if (m_wakewordEngineAdapter != nullptr) {
-        m_wakewordEngineAdapter->removeKeyWordObserver(shared_from_this());
+        m_wakewordEngineAdapter->disable();
+        m_wakewordEngineAdapter->removeKeyWordObserver( shared_from_this() );
+        m_wakewordEngineAdapter.reset();
     }
 }
 
@@ -174,7 +177,7 @@ bool LoopbackDetector::stopAudioInput() {
 
 ssize_t LoopbackDetector::write(const int16_t* data, const size_t size) {
     try {
-        ThrowIfNull(m_audioInputWriter, "nullAudioInputWriter");
+        ThrowIfNull( m_audioInputWriter, "nullAudioInputWriter" );
 
         ssize_t result = m_audioInputWriter->write(data, size);
         ThrowIf(result < 0, "errorWritingData");

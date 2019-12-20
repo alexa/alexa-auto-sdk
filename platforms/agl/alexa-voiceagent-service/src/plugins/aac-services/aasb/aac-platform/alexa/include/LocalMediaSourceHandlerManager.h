@@ -54,6 +54,12 @@ public:
     // Create Compact Disc Source
     std::shared_ptr<aasb::alexa::LocalMediaSourceHandler> getCompactDiscSource();
 
+    // Create SiriusXM Source
+    std::shared_ptr<aasb::alexa::LocalMediaSourceHandler> getSiriusXMSource();
+
+    // Create DAB Source
+    std::shared_ptr<aasb::alexa::LocalMediaSourceHandler> getDABSource();
+
     // Received event from application
     void onReceivedEvent(const std::string& action, const std::string& payload);
 
@@ -86,6 +92,12 @@ private:
 
     // Compact Disc Source
     std::shared_ptr<aasb::alexa::LocalMediaSourceHandler> m_compactDiscSource;
+
+    // Sirius XM Source
+    std::shared_ptr<aasb::alexa::LocalMediaSourceHandler> m_siriusXMSource;
+
+    // DAB Source
+    std::shared_ptr<aasb::alexa::LocalMediaSourceHandler> m_dabSource;
 };
 
 }  // namespace alexa

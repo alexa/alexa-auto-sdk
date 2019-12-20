@@ -4,21 +4,26 @@
 # Reason: Navigation engine has direct dependency on AVSCommon
 find_path(AVS_INCLUDE_DIRS AVSCommon)
 find_library(AVS_AVS_COMMON_LIBRARY AVSCommon)
+find_library(AVS_ENDPOINTS_LIBRARY Endpoints)
 
 set(HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Navigation/NavigationEngineService.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Navigation/DisplayManagerCapabilityAgent.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Navigation/NavigationAssistanceCapabilityAgent.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Navigation/NavigationCapabilityAgent.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Navigation/NavigationObserverInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Navigation/NavigationEngineImpl.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Navigation/NavigationEngineService.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Navigation/NavigationHandlerInterface.h
 )
 
 source_group("Header Files" FILES ${HEADERS})
 
 add_library(AACENavigationEngine SHARED
     ${HEADERS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/NavigationEngineService.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/DisplayManagerCapabilityAgent.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/NavigationAssistanceCapabilityAgent.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/NavigationCapabilityAgent.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/NavigationEngineImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/NavigationEngineService.cpp
 )
 
 target_include_directories(AACENavigationEngine
@@ -27,6 +32,7 @@ target_include_directories(AACENavigationEngine
         $<INSTALL_INTERFACE:include>
     PRIVATE
         ${AVS_INCLUDE_DIRS}
+        ${AVS_INCLUDE_DIRS}/../avs_shared
 )
 
 target_link_libraries(AACENavigationEngine
@@ -36,6 +42,7 @@ target_link_libraries(AACENavigationEngine
         AACECoreEngine
     PRIVATE
         ${AVS_AVS_COMMON_LIBRARY}
+        ${AVS_ENDPOINTS_LIBRARY}
 )
 
 install(

@@ -65,6 +65,15 @@ public:
     virtual AuthState getAuthState() = 0;
     
     /**
+     * Notifies the platform implementation that the specified access token was used in an
+     * unauthorized request to AVS. AVS responded to this request with a 403 code
+     * indicating the token was not valid.
+     *
+     * @param [in] token The access token used in an unauthorized request to AVS
+     */
+    virtual void authFailure(const std::string& token ) {};
+    
+    /**
      * Notifies the Engine of a change in AVS authorization state in the platform implementation
      *
      * @param [in] authState The new authorization state

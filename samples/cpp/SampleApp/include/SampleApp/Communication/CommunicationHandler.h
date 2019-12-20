@@ -51,15 +51,16 @@ class CommunicationHandler : public aace::communication::AlexaComms /* isa Platf
     auto getLoggerHandler() -> std::weak_ptr<logger::LoggerHandler>;
 
     // aace::communication::AlexaComms interface
-
+    auto callDisplayInfo(const std::string &displayInfo) -> void override;
     auto callStateChanged(CallState state) -> void override;
 
     static bool checkConfiguration(const std::vector<json>& jsons);
 
   protected:
     /**
-     * Helper method to display the state.
+     * Helper method to display the state and display info.
      */
+    auto showDisplayInfo() -> void;
     auto showState() -> void;
     auto callStateToString(CallState state) -> std::string;
 
@@ -68,6 +69,9 @@ class CommunicationHandler : public aace::communication::AlexaComms /* isa Platf
 
     auto log(logger::LoggerHandler::Level level, const std::string &message) -> void;
     auto setupUI() -> void;
+
+    /// Call display info
+    std::string m_callDisplayInfo;
 
     /// Call state
     CallState m_callState;

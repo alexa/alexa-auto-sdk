@@ -16,7 +16,9 @@ inherit pkgconfig cmake devlibsonly unittests
 EXTRA_OECMAKE += "-DCMAKE_BUILD_TYPE=${AAC_BUILD_TYPE} \
                   -DACSDK_EMIT_SENSITIVE_LOGS=${AAC_SENSITIVE_LOGS} \
                   -DACSDK_LATENCY_LOG=${AAC_LATENCY_LOGS} \
-                  -DBUILD_TESTING=${AVS_ENABLE_TESTS}"
+                  -DBUILD_TESTING=${AVS_ENABLE_TESTS} \
+				  -DENABLE_ALL_ENDPOINT_CONTROLLERS=ON"
+
 
 # Install AVS artifacts explicitly into AAC_PREFIX dir
 EXTRA_OECMAKE_append = " -DCMAKE_INSTALL_PREFIX:PATH=${AAC_PREFIX}"

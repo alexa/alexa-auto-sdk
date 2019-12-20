@@ -56,20 +56,10 @@ public:
     bool subscribeToCarControlEvents();
 
     // Responses from VSHL Capabilities.
-    void onIsClimateOnResponse(const std::string& payload);
-    void onIsClimateSyncOnResponse(const std::string& payload);
-    void onIsAirRecirculationOnResponse(const std::string& payload);
-    void onIsAirConditionerOnResponse(const std::string& payload);
-    void onGetAirConditionerModeResponse(const std::string& payload);
-    void onIsHeaterOnResponse(const std::string& payload);
-    void onGetHeaterTemperatureResponse(const std::string& payload);
-    void onIsFanOnResponse(const std::string& payload);
-    void onGetFanSpeedResponse(const std::string& payload);
-    void onIsVentOnResponse(const std::string& payload);
-    void onGetVentPositionResponse(const std::string& payload);
-    void onIsWindowDefrosterOnResponse(const std::string& payload);
-    void onIsLightOnResponse(const std::string& payload);
-    void onGetLightColorResponse(const std::string& payload);
+    void onIsPowerControllerOnResponse(const std::string& payload);
+    void onIsToggleControllerOnResponse(const std::string& payload);
+    void onGetModeControllerValueResponse(const std::string& payload);
+    void onGetRangeControllerValueResponse(const std::string& payload);
 
     /// @name ICapabilityMessageDispatcher Functions
     /// @{

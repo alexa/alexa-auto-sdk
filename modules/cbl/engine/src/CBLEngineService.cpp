@@ -69,7 +69,7 @@ bool CBLEngineService::configure( std::shared_ptr<std::istream> configuration )
 bool CBLEngineService::start()
 {
     if( m_cblEngineImpl != nullptr ) {
-        m_cblEngineImpl->engineStart();
+        m_cblEngineImpl->enable();
     }
     
     return true;
@@ -78,7 +78,7 @@ bool CBLEngineService::start()
 bool CBLEngineService::stop()
 {
     if( m_cblEngineImpl != nullptr ) {
-        m_cblEngineImpl->onCancel();
+        m_cblEngineImpl->disable();
     }
     
     return true;

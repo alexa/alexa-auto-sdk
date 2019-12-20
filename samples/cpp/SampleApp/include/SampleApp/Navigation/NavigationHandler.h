@@ -21,6 +21,9 @@
 
 #include <AACE/Navigation/Navigation.h>
 
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
 namespace sampleApp {
 namespace navigation {
 
@@ -46,23 +49,46 @@ class NavigationHandler : public aace::navigation::Navigation /* isa PlatformInt
     auto getLoggerHandler() -> std::weak_ptr<logger::LoggerHandler>;
 
     // aace::navigation::Navigation interface
-
-    auto setDestination(const std::string &payload) -> bool override;
+    auto startNavigation( const std::string& payload  ) -> void override;
     auto cancelNavigation() -> bool override;
     auto getNavigationState() -> std::string override;
+    auto showPreviousWaypoints() -> void override;
+    auto navigateToPreviousWaypoint() -> void override;
+    auto showAlternativeRoutes( aace::navigation::Navigation::AlternateRouteType alternateRouteType ) -> void override;
+    auto controlDisplay( aace::navigation::Navigation::ControlDisplay controlDisplay ) -> void override;
+    auto announceManeuver(const std::string &payload) -> void override;
+    auto announceRoadRegulation( aace::navigation::Navigation::RoadRegulation roadRegulation) -> void override;
+    std::string m_currentNavigationState;
 
   private:
-
-   // Sample App Events
-
+    /* Loads navigation state from the file specified by the file path.
+     * If this function is not called, the navigation state is maintained internally and updated everytime a startNavigation() is called.
+     * @param [in] The filepath to the navigation state file.
+     */
     auto loadNavigationState(const std::string& filepath) -> bool;
+    
+    /*
+     * Clears the current navigation state.
+     */
     auto clearNavigationState() -> bool;
-
-    std::weak_ptr<View> m_console{};
-    std::string m_dummyNavigationState;
-
     auto log(logger::LoggerHandler::Level level, const std::string &message) -> void;
     auto setupUI() -> void;
+
+    void updatePreviousDestinations(const std::string& payload);
+    auto getStartNavigationPayloadString( const std::string& payload ) -> std::string;
+    auto getPreviousWaypointsString() -> std::string;
+    auto parseWaypoint( json point ) -> json;
+    auto constructAddressString( json address ) -> std::string;
+    auto getRoadRegulationString(aace::navigation::Navigation::RoadRegulation roadRegulation) -> std::string;;
+    auto getControlDisplayString(aace::navigation::Navigation::ControlDisplay controlDisplay) -> std::string;
+    auto getAlternateRouteTypeString(aace::navigation::Navigation::AlternateRouteType alternateRouteType) -> std::string;
+
+    std::weak_ptr<View> m_console{};
+    std::vector<std::string> previousDestinations;
+    bool isOverrideActive;
+    
+    
+    
 };
 
 } // namespace navigation

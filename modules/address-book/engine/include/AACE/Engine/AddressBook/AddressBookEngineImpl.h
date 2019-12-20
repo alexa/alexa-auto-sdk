@@ -49,7 +49,7 @@ protected:
     void doShutdown() override;
 
 private:
-    std::shared_ptr<aace::addressBook::AddressBook> m_platfromInterface;
+    std::shared_ptr<aace::addressBook::AddressBook> m_platformInterface;
 
 public:
     //AddressBookServiceInterface

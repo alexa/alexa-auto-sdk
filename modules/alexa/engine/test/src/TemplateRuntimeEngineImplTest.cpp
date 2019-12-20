@@ -64,7 +64,6 @@ protected:
         {
             EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),addDirectiveHandler(testing::_)).WillOnce(testing::Return(true));
             EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),doShutdown());
-            EXPECT_CALL(*m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),registerCapability(testing::_)).WillOnce(testing::Return(true));
             EXPECT_CALL(*m_alexaMockFactory->getAudioPlayerInterfaceMock(),addObserver(testing::_));
             EXPECT_CALL(*m_alexaMockFactory->getAudioPlayerInterfaceMock(),removeObserver(testing::_));
             
@@ -80,8 +79,8 @@ protected:
         
         auto templateRuntimeEngineImpl = aace::engine::alexa::TemplateRuntimeEngineImpl::create(
             m_alexaMockFactory->getTemplateRuntimeMock(),
-            m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
-            m_alexaMockFactory->getAudioPlayerInterfaceMock(),
+            m_alexaMockFactory->getEndpointBuilderMock(),
+            m_playerInfoInterfaceMock,
             m_alexaMockFactory->getFocusManagerInterfaceMock(),
             m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
             m_alexaMockFactory->getDialogUXStateAggregatorMock(),
@@ -90,12 +89,15 @@ protected:
         return templateRuntimeEngineImpl;
     }
     
+    std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>> m_playerInfoInterfaceMock;
+    
 protected:
     std::shared_ptr<AlexaMockComponentFactory> m_alexaMockFactory;
 
 private:
     bool m_initialized = false;
     bool m_configured = false;
+    
 };
 
 TEST_F(TemplateRuntimeEngineImplTest, create)
@@ -112,8 +114,8 @@ TEST_F(TemplateRuntimeEngineImplTest,createWithPlatformInterfaceAsNull)
 
     auto templateRuntimeEngineImpl = aace::engine::alexa::TemplateRuntimeEngineImpl::create(
         nullptr,
-        m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
-        m_alexaMockFactory->getAudioPlayerInterfaceMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
+        m_playerInfoInterfaceMock,
         m_alexaMockFactory->getFocusManagerInterfaceMock(),
         m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getDialogUXStateAggregatorMock(),
@@ -127,23 +129,7 @@ TEST_F(TemplateRuntimeEngineImplTest,createWithDirectiveSequencerAsNull)
     auto templateRuntimeEngineImpl = aace::engine::alexa::TemplateRuntimeEngineImpl::create(
         m_alexaMockFactory->getTemplateRuntimeMock(),
         nullptr,
-        m_alexaMockFactory->getAudioPlayerInterfaceMock(),
-        m_alexaMockFactory->getFocusManagerInterfaceMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
-        m_alexaMockFactory->getDialogUXStateAggregatorMock(),
-        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock() );
-    
-    ASSERT_EQ(templateRuntimeEngineImpl,nullptr) << "TemplateRuntimeEngineImpl pointer expected to be null";
-}
-
-TEST_F(TemplateRuntimeEngineImplTest,createWithAudioPlayerAsNull)
-{
-    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),doShutdown());
-
-    auto templateRuntimeEngineImpl = aace::engine::alexa::TemplateRuntimeEngineImpl::create(
-        m_alexaMockFactory->getTemplateRuntimeMock(),
-        m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
-        nullptr,
+        m_playerInfoInterfaceMock,
         m_alexaMockFactory->getFocusManagerInterfaceMock(),
         m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getDialogUXStateAggregatorMock(),
@@ -158,8 +144,8 @@ TEST_F(TemplateRuntimeEngineImplTest,createWithFocusManagerAsNull)
 
     auto templateRuntimeEngineImpl = aace::engine::alexa::TemplateRuntimeEngineImpl::create(
         m_alexaMockFactory->getTemplateRuntimeMock(),
-        m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
-        m_alexaMockFactory->getAudioPlayerInterfaceMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
+        m_playerInfoInterfaceMock,
         nullptr,
         m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getDialogUXStateAggregatorMock(),
@@ -174,8 +160,8 @@ TEST_F(TemplateRuntimeEngineImplTest, createWithCapabilitiesDelegateAsNull)
 
     auto templateRuntimeEngineImpl = aace::engine::alexa::TemplateRuntimeEngineImpl::create(
         m_alexaMockFactory->getTemplateRuntimeMock(),
-        m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
-        m_alexaMockFactory->getAudioPlayerInterfaceMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
+        m_playerInfoInterfaceMock,
         m_alexaMockFactory->getFocusManagerInterfaceMock(),
         nullptr,
         m_alexaMockFactory->getDialogUXStateAggregatorMock(),
@@ -190,8 +176,8 @@ TEST_F(TemplateRuntimeEngineImplTest,createWithDialogUXStateAggregatorAsNull)
 
     auto templateRuntimeEngineImpl = aace::engine::alexa::TemplateRuntimeEngineImpl::create(
         m_alexaMockFactory->getTemplateRuntimeMock(),
-        m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
-        m_alexaMockFactory->getAudioPlayerInterfaceMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
+        m_playerInfoInterfaceMock,
         m_alexaMockFactory->getFocusManagerInterfaceMock(),
         m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         nullptr,
@@ -206,8 +192,8 @@ TEST_F(TemplateRuntimeEngineImplTest,createWithExceptionSenderAsNull)
 
     auto templateRuntimeEngineImpl = aace::engine::alexa::TemplateRuntimeEngineImpl::create(
         m_alexaMockFactory->getTemplateRuntimeMock(),
-        m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
-        m_alexaMockFactory->getAudioPlayerInterfaceMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
+        m_playerInfoInterfaceMock,
         m_alexaMockFactory->getFocusManagerInterfaceMock(),
         m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getDialogUXStateAggregatorMock(),

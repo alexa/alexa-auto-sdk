@@ -43,7 +43,12 @@ enum class Event {
     // Communication
     onCommunicationAcceptCall,
     onCommunicationStopCall,
+    onCommunicationShowDisplayInfo,
     onCommunicationShowState,
+
+    // DoNotDisturb
+    onDoNotDisturbOn,
+    onDoNotDisturbOff,
 
     //Navigation
     onLoadNavigationState,
@@ -120,7 +125,12 @@ static const std::map<std::string, Event> EventEnumerator{
     // Communications
     {"onCommunicationAcceptCall", Event::onCommunicationAcceptCall},
     {"onCommunicationStopCall", Event::onCommunicationStopCall},
+    {"onCommunicationShowDisplayInfo", Event::onCommunicationShowDisplayInfo},
     {"onCommunicationShowState", Event::onCommunicationShowState},
+
+    // DoNotDisturb
+    {"onDoNotDisturbOn", Event::onDoNotDisturbOn},
+    {"onDoNotDisturbOff", Event::onDoNotDisturbOff},
 
     // Navigation
     {"onLoadNavigationState", Event::onLoadNavigationState},

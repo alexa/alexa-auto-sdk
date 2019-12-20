@@ -1,6 +1,52 @@
 # Change Log
 
 ___
+## v2.1.0 released on 2019-12-19:
+
+### Enhancements
+* Added Navigation enhancements to support the following features:
+    * *Add a waypoint* - Enables users to search and add waypoints to their current route along the way or start a new route with a given set of waypoints.
+    * *Cancel a waypoint* - Enables users to cancel a waypoint with voice. 
+    * *Show/Navigate to previous destinations* - Enables users to view previous destinations and navigate to any of their previous destinations..
+    * *Turn and Lane Guidance* - Enables users to ask Alexa for details about their next navigation instruction.
+    * *Control Display* - Enables users to interact with their onscreen map applications. 
+        
+    >**Note:** The Navigation enhancements are not backward-compatible with previous versions of the Auto SDK. The `startNavigation()` method supersedes the `setDestination()` method, and many new methods have been implemented. See the [Migration Guide](./MIGRATION.md) for details.
+
+* Added support for Alexa Presentation Language (APL) rendering to present visual information and manage user interactions with Alexa.
+
+    >**Note:** In order to use APL rendering with the Android Sample App, you must install an extra component in the Auto SDK. [Contact your Amazon Solutions Architect (SA) or Partner Manager](./NEED_HELP.md#requesting-additional-functionality-whitelisting) for details.
+* Added support for the Alexa DoNotDisturb (DND) interface, which allows users to block all incoming notifications, announcements, and calls to their devices, and to set daily recurring schedules that turn DND off and on. For details, see the [DND Interface documentation](https://developer.amazon.com/docs/alexa-voice-service/donotdisturb.html).
+    >**Note:** Alexa does not notify the user of the DND state.
+* Added a System Audio extension to provide the default audio capturing and playback functionality for various platforms, including audio input/output on QNX platforms. The Alexa Auto SDK Builder automatically includes the System Audio extension when you build the Auto SDK.
+* Added local media sources (LMS) and hybrid car control support to the Automotive Grade Linux (AGL) Alexa Voice Agent.
+* Added `onAuthFailure()` to the `AuthProvider` platform interface and an `AUTHORIZATION_EXPIRED` argument to the `cblStateChanged()` method of the CBL platform interface to expose 403 unauthorized request exceptions from Alexa Voice Service (AVS). These may be invoked, for example, when your product makes a request to AVS using an access token obtained for a device which has been deregistered from the Alexa companion app.
+* Added support for call display information change notifications (caller ID) to the optional Alexa Communication extension.
+
+### Resolved Issues
+
+* Fixed an issue where contact uploading failed for contacts without addresses.
+* Fixed an issue where if the user rejected an incoming Alexa-to-Alexa call via voice, ringtones did not sound for subsequent incoming calls until the user either answered an incoming call via voice or made an outbound call.
+* Fixed an issue that required you to assign unique entry IDs to contacts and navigation favorites to ensure that the ID space used for contacts and navigation favorites did not collide.
+* Fixed an issue where multiple automotive devices using the same account at the same time could access contacts from phones paired across those devices.
+* Fixed an issue where uttering "stop" when a timer sounded during an Alexa-to-Alexa call ended the call, not the timer.
+* Added enhancements to the maccandroid module (Spotify) to simplify the `MACCPlayer` handler implementation. Rediscovery now occurs automatically, and the authorization TTS error events no longer occur repeatedly.
+
+### Known Issues
+* The Alexa cloud currently returns an `INVALID_REQUEST_EXCEPTION` or `INTERNAL_SERVICE_EXCEPTION` in response to any navigation event sent by the Auto SDK. You may see a harmless error/exception in the logs.
+* The CBL module uses a backoff when refreshing the access token after expiry. If internet is disconnected when the refresh is attempted, it could take up to a minute for the token to refresh when the internet connection is restored.
+* If the user deregisters from the companion app, Alexa does not prompt or notify the clients and does not reject the ping packet.
+* If you log out and log in, the Do Not Disturb (DND) state is not synchronized with Alexa.
+* When you cancel login with `CBL::cancel()`, the CBL state does not change to stopped.
+* Calling numbers such as 1800xxxxxxx using utterances such as “Alexa call one eight double oh...” may return unexpected results. Similarly, calling numbers using utterances that include "triple", "hundred" and "thousand" and pressing special characters such as # or* using utterances such as "Alexa press *#" may return unexpected results. Therefore we recommend that your client application ignore special characters, dots, and non-numeric characters when requesting Alexa to call or press digits.
+* The Engine may sometimes stop abruptly on shutdown due to a race condition. However, since shutdown is triggered when the car ignition is turned off, no direct customer impact is expected.
+* The Engine may hang during shutdown if it is shut down while TTS is being played or read. Therefore, you should avoid calling the shutdown method while loading or playing SpeechSynthesizer audio.
+* When online, Alexa does not recognize the utterance “Switch to line In.”
+* A user playing Jeopardy or Skyrim cannot accept or reject incoming Alexa-to-Alexa calls using voice.
+* If the local timezone of your device differs from the timezone that was configured through the Alexa companion app, the user may experience unexpected behavior. For example, if your device shows 12pm PST, but the device on the Alexa companion app is configured with an EST timezone, then asking "Alexa set an alarm for 1pm today," will return, "Sorry I can't set alarms in the past".
+* When pausing and resuming music, volume adjustments are lost.
+* A user playing notifications while music is playing will hear the music for a split second between the end of one notification and the start of the next.
+* The External Media Player (EMP) Engine implementation does not wait for a dialog channel focus change to complete, such as after TTS, before executing an EMP directive, such as playing the CD player. As a result, you may see an unexpected sequence of Local Media Source playControl() method invocations such as play, then pause, followed by play again in quick succession.
 
 ## v2.0.0 released on 2019-09-10:
 

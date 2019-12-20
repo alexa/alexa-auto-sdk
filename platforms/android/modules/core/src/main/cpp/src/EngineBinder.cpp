@@ -168,7 +168,7 @@ extern "C"
             return true;
         }
         catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_core_Engine_stop",ex.what());
+            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_core_Engine_setProperty",ex.what());
             return false;
         }
     }

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/trafficDetailsTemplate"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/cardBackground"
+    tools:context="com.amazon.sampleapp.MainActivity">
+
+    <ImageView
+        android:id="@+id/backgroundImage"
+        android:contentDescription="@string/card_traffic_details_background_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guidelineLeftMargin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.055" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guidelineRightMargin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.945" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guidelineTopMargin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.044" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guidelineMiddleMargin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.4" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guidelineBottomMargin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.956" />
+
+    <TextView
+        android:id="@+id/mainTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif"
+        android:lines="1"
+        android:textAlignment="viewStart"
+        android:textColor="@color/cardMainTitle"
+        android:textSize="32sp"
+        app:layout_constraintEnd_toStartOf="@+id/guidelineRightMargin"
+        app:layout_constraintStart_toStartOf="@id/guidelineLeftMargin"
+        app:layout_constraintTop_toBottomOf="@id/guidelineTopMargin" />
+
+    <TextView
+        android:id="@+id/subTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-light"
+        android:lines="1"
+        android:textColor="@color/cardSubTitle"
+        android:textSize="32sp"
+        app:layout_constraintEnd_toStartOf="@+id/guidelineRightMargin"
+        app:layout_constraintStart_toStartOf="@id/guidelineLeftMargin"
+        app:layout_constraintTop_toBottomOf="@id/mainTitle" />
+
+    <ImageView
+        android:id="@+id/currentTrafficConditionsIcon"
+        android:contentDescription="@string/card_current_traffic_conditions_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/guidelineLeftMargin"
+        app:layout_constraintTop_toBottomOf="@id/guidelineMiddleMargin" />
+
+    <TextView
+        android:id="@+id/travelTime"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-light"
+        android:maxLines="6"
+        android:scrollbars="vertical"
+        android:textColor="@color/cardTextField"
+        android:textSize="54sp"
+        app:layout_constraintTop_toBottomOf="@id/guidelineMiddleMargin"
+        app:layout_constraintStart_toEndOf="@id/currentTrafficConditionsIcon" />
+
+    <TextView
+        android:id="@+id/travelDistance"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-light"
+        android:maxLines="6"
+        android:scrollbars="vertical"
+        android:textColor="@color/cardTextField"
+        android:textSize="54sp"
+        app:layout_constraintTop_toBottomOf="@id/guidelineMiddleMargin"
+        app:layout_constraintStart_toEndOf="@id/travelTime" />
+
+    <TextView
+        android:id="@+id/label"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-light"
+        android:maxLines="6"
+        android:scrollbars="vertical"
+        android:textColor="@color/cardTextField"
+        android:textSize="32sp"
+        app:layout_constraintTop_toBottomOf="@id/travelDistance"
+        app:layout_constraintStart_toEndOf="@id/currentTrafficConditionsIcon" />
+
+    <TextView
+        android:id="@+id/address"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-light"
+        android:maxLines="6"
+        android:scrollbars="vertical"
+        android:textColor="@color/cardTextField"
+        android:textSize="32sp"
+        app:layout_constraintTop_toBottomOf="@id/label"
+        app:layout_constraintStart_toEndOf="@id/currentTrafficConditionsIcon" />
+
+</android.support.constraint.ConstraintLayout>

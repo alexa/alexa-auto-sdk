@@ -195,7 +195,7 @@ bool EngineImpl::configure( std::vector<std::shared_ptr<aace::core::config::Engi
                 
                 subDocument.CopyFrom( config->value, subDocument.GetAllocator() );
             
-                nextService->handleConfigureEngineEvent( aace::engine::utils::json::toStream( subDocument ) );
+                ThrowIfNot( nextService->handleConfigureEngineEvent( aace::engine::utils::json::toStream( subDocument ) ), "Service failed to configure: " + nextService->getDescription().getType() );
             }
         }
 

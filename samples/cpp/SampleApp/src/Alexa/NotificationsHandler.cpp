@@ -64,6 +64,12 @@ void NotificationsHandler::setIndicator(Notifications::IndicatorState state) {
     });
 }
 
+void NotificationsHandler::onNotificationReceived() {
+    std::stringstream ss;
+    ss << "onNotificationsReceived";
+    log(logger::LoggerHandler::Level::INFO, ss.str());
+}
+
 // private
 
 void NotificationsHandler::log(logger::LoggerHandler::Level level, const std::string &message) {

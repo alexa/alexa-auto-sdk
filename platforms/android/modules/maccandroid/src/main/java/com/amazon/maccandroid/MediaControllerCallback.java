@@ -40,6 +40,7 @@ public class MediaControllerCallback extends MediaControllerCompat.Callback {
     private PlaybackStateCompat mPrevState;
     private MediaApp mMediaApp;
     private Set<PlayerEvents> mEventsToSendQueue;
+    private boolean mUnauthorizedReported = false;
 
     MediaControllerCallback(String packageName, MediaApp mediaApp) {
         mMediaAppPackageName = packageName;
@@ -56,7 +57,7 @@ public class MediaControllerCallback extends MediaControllerCompat.Callback {
     @Override
     public void onSessionDestroyed( ) {
         super.onSessionDestroyed( );
-        MediaAppsRepository.getInstance( ).removeMediaApp(mMediaAppPackageName);
+        MediaAppsRepository.getInstance().removeMediaApp(mMediaAppPackageName);
     }
 
     @Override
@@ -69,11 +70,11 @@ public class MediaControllerCallback extends MediaControllerCompat.Callback {
 
     @Override
     public void onPlaybackStateChanged(PlaybackStateCompat state) {
-        Log.i(TAG, "onPlaybackStateChanged : " + state);
-
         if (state == null) {
             return;
         }
+        Log.i(TAG, "onPlaybackStateChanged : " + state);
+        int playbackState = state.getState();
 
         mMediaApp.setPlayerPlaybackInfo(new PlayerPlaybackInfo.Builder()
                 .playerPlaybackState(mMediaApp.getPlayerPlaybackInfo())
@@ -88,34 +89,36 @@ public class MediaControllerCallback extends MediaControllerCompat.Callback {
         }
 
         // if only current state is differrent from previous state or there is an error
-        if (mPrevState == null || mPrevState.getState() != state.getState() ||
+        if (mPrevState == null || mPrevState.getState() != playbackState ||
                 state.getState() == PlaybackStateCompat.STATE_ERROR) {
             // State changed from STATE_NONE to anything else
             if ((mPrevState == null || mPrevState.getState() == PlaybackStateCompat.STATE_NONE) &&
-                    state.getState() != PlaybackStateCompat.STATE_NONE) {
+                    playbackState != PlaybackStateCompat.STATE_NONE) {
                 mEventsToSendQueue.add(PlayerEvents.PlaybackSessionStarted);
             }
 
             // State changed from STATE_PLAYING to anything else
             if ((mPrevState != null && mPrevState.getState() == PlaybackStateCompat.STATE_PLAYING) &&
-                    state.getState() != PlaybackStateCompat.STATE_PLAYING) {
+                    playbackState != PlaybackStateCompat.STATE_PLAYING) {
                 mEventsToSendQueue.add(PlayerEvents.PlaybackStopped);
             }
 
             // If previous state is None and current state is not none then we need to create a
             // new playbacksesisonid
             if (mPrevState != null && (mPrevState.getState() == (PlaybackStateCompat.STATE_NONE)) &&
-                    !(PlaybackStateCompat.STATE_NONE == state.getState())) {
+                    !(PlaybackStateCompat.STATE_NONE == playbackState)) {
                 if (mMediaApp.getPlaybackSessionId() == null) {
                     mMediaApp.setPlaybackSessionId(UUID.randomUUID());
                 }
             }
 
+            // send error if either state had error code, or if there was an error message
+            // for case where state is temporary error
+            if ( state.getErrorMessage() != null || playbackState == PlaybackStateCompat.STATE_ERROR ){
+                handlePlaybackError( state.getErrorCode() );
+            }
 
-            switch (state.getState()) {
-                case PlaybackStateCompat.STATE_ERROR:
-                    handlePlaybackError(state.getErrorCode());
-                    break;
+            switch ( playbackState ) {
                 case PlaybackStateCompat.STATE_NONE:
                     // Don't count this as the playback session ending if there was no previous
                     // state
@@ -163,7 +166,11 @@ public class MediaControllerCallback extends MediaControllerCompat.Callback {
                 break;
 
             case PlaybackStateCompat.ERROR_CODE_AUTHENTICATION_EXPIRED:
-                reportErrorEvent( MediaAppPlayerError.UNPLAYABLE_BY_AUTHORIZATION );
+                // block multiple extra calls for unauthorized
+                if ( mUnauthorizedReported == false ) {
+                    reportErrorEvent( MediaAppPlayerError.UNPLAYABLE_BY_AUTHORIZATION );
+                    mUnauthorizedReported = true;
+                }
                 break;
 
             case PlaybackStateCompat.ERROR_CODE_CONCURRENT_STREAM_LIMIT:
@@ -242,15 +249,15 @@ public class MediaControllerCallback extends MediaControllerCompat.Callback {
             eventsToSend.add(PlayerEvents.TrackChanged);
         }
 
-        if (!eventsToSend.isEmpty()) {
-            MediaAppsStateReporter.getInstance().
-                    reportPlayerEvent(mMediaApp.getLocalPlayerId(), eventsToSend);
-        }
-
         mMediaApp.setPlayerPlaybackInfo(new PlayerPlaybackInfo.Builder()
                 .playerPlaybackState(mMediaApp.getPlayerPlaybackInfo())
                 .metadata(metadata)
                 .build());
+
+        if (!eventsToSend.isEmpty()) {
+            MediaAppsStateReporter.getInstance().
+                    reportPlayerEvent(mMediaApp.getLocalPlayerId(), eventsToSend);
+        }
     }
 
     @Override
@@ -292,5 +299,11 @@ public class MediaControllerCallback extends MediaControllerCompat.Callback {
         eventsToSend.add(PlayerEvents.PlayModeChanged);
         MediaAppsStateReporter.getInstance().
                 reportPlayerEvent(mMediaApp.getLocalPlayerId(), eventsToSend);
+    }
+
+    // allow unauthorized to be reported again.
+    public void resetUnauthorizedReported(){
+        Log.i(TAG, "resetUnauthorizedReported for: " + mMediaAppPackageName);
+        mUnauthorizedReported = false;
     }
 }

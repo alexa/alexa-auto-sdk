@@ -164,8 +164,13 @@
                         "name": "Stop call"
                     },
                     {
-                        "do": "notify/onCommunicationShowState",
+                        "do": "notify/onCommunicationShowDisplayInfo",
                         "key": "3",
+                        "name": "Show display info"
+                    },
+                    {
+                        "do": "notify/onCommunicationShowState",
+                        "key": "4",
                         "name": "Show state"
                     },
                     {
@@ -188,7 +193,7 @@
                         "do": "notify/onLoadNavigationState",
                         "key": "1",
                         "name": "Load Sample Navigation Context",
-                        "value": "./sampledata/navigationstate.json"
+                        "value": "./sampledata/NavigationState.json"
                     },
                     {
                         "do": "notify/onClearNavigationState",
@@ -202,40 +207,6 @@
                     }
                 ],
                 "name": "Navigation State Menu"
-            }
-        },
-        {
-            "do": "GoTo",
-            "key": "E",
-            "name": "Endpoint",
-            "value": {
-                "id": "endpoint",
-                "item": [
-                    {
-                        "do": "SetEndpoint",
-                        "key": "1",
-                        "name": "Asia",
-                        "value": "https://avs-alexa-fe.amazon.com"
-                    },
-                    {
-                        "do": "SetEndpoint",
-                        "key": "2",
-                        "name": "Europe",
-                        "value": "https://avs-alexa-eu.amazon.com"
-                    },
-                    {
-                        "do": "SetEndpoint",
-                        "key": "3",
-                        "name": "North America",
-                        "value": "https://avs-alexa-na.amazon.com"
-                    },
-                    {
-                        "do": "GoBack",
-                        "key": "esc",
-                        "name": "Go back"
-                    }
-                ],
-                "name": "Endpoint Menu"
             }
         },
         {
@@ -518,6 +489,16 @@
                 ],
                 "name": "Wake Word Detection Menu"
             }
+        },
+        {
+            "do": "notify/onDoNotDisturbOn",
+            "key": "1",
+            "name": "Set DoNotDisturb On"
+        },
+        {
+            "do": "notify/onDoNotDisturbOff",
+            "key": "2",
+            "name": "Set DoNotDisturb Off"
         },
         {
             "do": "Help",

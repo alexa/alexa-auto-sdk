@@ -49,12 +49,18 @@ public:
     AudioIOConfiguration getAudioIOConfig() override;
     LVCConfiguration getLocalVoiceControlConfig() override;
     CarControlConfiguration getCarControlConfig() override;
+    DeviceSettingsConfiguration getDeviceSettingsConfig() override; 
+
     std::string getCertificatesDirectoryPath() override;
     std::string getAppsDataDirectory() override;
     std::string getProductDSN() override;
     std::string getClientId() override;
     std::string getProductId() override;
+    std::string getManufacturerName() override;
+    std::string getDescription() override;
     std::string getExternalStorageDirectory() override;
+    std::shared_ptr<std::istream> getVehicleConfig() override;
+
     bool shouldEnableWakeword() override;
     bool shouldEnablePhoneCallControl() override;
     bool shouldEnableNavigation() override;
@@ -123,6 +129,8 @@ private:
     std::string m_clientId;
     std::string m_productId;
     std::string m_deviceSerialNumber;
+    std::string m_manufacturerName;
+    std::string m_description;
     bool m_bluetooth;
     bool m_usb;
     bool m_fmRadio;
@@ -130,10 +138,14 @@ private:
     bool m_satelliteRadio;
     bool m_LineIn;
     bool m_compactDisc;
+    bool m_siriusXM;
+    bool m_dab;
     bool m_enableLocalMediaSource;
     bool m_enableLocalVoiceControl;
     std::unique_ptr<LVCConfiguration> m_LocalVoiceControlConfiguration;
     std::unique_ptr<CarControlConfiguration> m_carControlConfiguration;
+    DeviceSettingsConfiguration m_deviceSettingsConfiguration;
+    std::shared_ptr<std::istream> m_vehicleConfig;
     /// @}
 };
 }  // namespace alexa

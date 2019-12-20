@@ -17,6 +17,7 @@
 #define AACE_ENGINE_CBL_CBL_AUTH_REQUESTER_INTERFACE_H
 
 #include <string>
+#include <AACE/CBL/CBL.h>
 
 namespace aace {
 namespace engine {
@@ -28,23 +29,9 @@ namespace cbl {
 class CBLAuthRequesterInterface {
 public:
 
-    enum class CBLState {
-        STARTING,
-        REQUESTING_CODE_PAIR,
-        CODE_PAIR_RECEIVED,
-        REFRESHING_TOKEN,
-        REQUESTING_TOKEN,
-        STOPPING
-    };
-
-    enum class CBLStateChangedReason {
-        SUCCESS,
-        ERROR,
-        TIMEOUT,
-        CODE_PAIR_EXPIRED,
-        NONE
-    };
-
+    using CBLStateChangedReason = aace::cbl::CBL::CBLStateChangedReason;
+    using CBLState = aace::cbl::CBL::CBLState;
+    
     virtual void cblStateChanged( CBLState state, CBLStateChangedReason reason, const std::string& url = "", const std::string& code = "" ) = 0;
     virtual void clearRefreshToken() = 0;
     virtual void setRefreshToken( const std::string& refreshToken ) = 0;

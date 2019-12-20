@@ -42,8 +42,9 @@ public class LogRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     // Integers to identify LogEntry types for view recycling
     public static final int TEXT_LOG = 0, BODY_TEMPLATE1 = 1, BODY_TEMPLATE2 = 2, LIST_TEMPLATE1 = 3,
-            WEATHER_TEMPLATE = 4, SET_DESTINATION_TEMPLATE = 5, LOCAL_SEARCH_LIST_TEMPLATE1 = 6,
-            RENDER_PLAYER_INFO = 7, CBL_CODE = 8, CBL_CODE_EXPIRED = 9, JSON_TEXT = 10;
+            WEATHER_TEMPLATE = 4, START_NAVIGATION_TEMPLATE = 5, LOCAL_SEARCH_LIST_TEMPLATE1 = 6,
+            RENDER_PLAYER_INFO = 7, CBL_CODE = 8, CBL_CODE_EXPIRED = 9, JSON_TEXT = 10, PREVIOUS_WAYPOINTS_TEMPLATE = 11,
+            LOCAL_SEARCH_LIST_TEMPLATE2 = 12, LOCAL_SEARCH_DETAIL_TEMPLATE1 = 13, TRAFFIC_DETAILS_TEMPLATE = 14;
 
     /// Max number of logs to be kept in memory
     private static final int MAX_NUM_LOGS = 2000;
@@ -156,11 +157,17 @@ public class LogRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                 inflater.inflate( R.layout.card_weather_template, cardContainer, true );
                 viewHolder = new ViewHolderWeatherTemplate( view );
                 break;
-            case SET_DESTINATION_TEMPLATE:
+            case START_NAVIGATION_TEMPLATE:
                 view = inflater.inflate( R.layout.log_card_container, viewGroup, false );
                 cardContainer = view.findViewById( R.id.container );
-                inflater.inflate( R.layout.card_set_destination_template, cardContainer, true );
-                viewHolder = new ViewHolderSetDestinationTemplate( view, mHideMapView );
+                inflater.inflate( R.layout.card_start_navigation_template, cardContainer, true );
+                viewHolder = new ViewHolderStartNavigationTemplate( view, mHideMapView );
+                break;
+            case PREVIOUS_WAYPOINTS_TEMPLATE:
+                view = inflater.inflate( R.layout.log_card_container, viewGroup, false );
+                cardContainer = view.findViewById( R.id.container );
+                inflater.inflate( R.layout.card_previous_waypoints_template, cardContainer, true );
+                viewHolder = new ViewHolderPreviousWaypointsTemplate( view );
                 break;
             case LOCAL_SEARCH_LIST_TEMPLATE1:
                 view = inflater.inflate( R.layout.log_card_container, viewGroup, false );
@@ -189,6 +196,24 @@ public class LogRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             case JSON_TEXT:
                 view = inflater.inflate( R.layout.log_item, viewGroup, false );
                 viewHolder = new ViewHolderTextLog( view );
+                break;
+            case LOCAL_SEARCH_LIST_TEMPLATE2:
+                view = inflater.inflate( R.layout.log_card_container, viewGroup, false );
+                cardContainer = view.findViewById( R.id.container );
+                inflater.inflate( R.layout.card_local_search_list_template2, cardContainer, true );
+                viewHolder = new ViewHolderLocalSearchListTemplate2( view, inflater );
+                break;
+            case LOCAL_SEARCH_DETAIL_TEMPLATE1:
+                view = inflater.inflate( R.layout.log_card_container, viewGroup, false );
+                cardContainer = view.findViewById( R.id.container );
+                inflater.inflate( R.layout.card_local_search_detail_template1, cardContainer, true );
+                viewHolder = new ViewHolderLocalSearchDetailTemplate1( view );
+                break;
+            case TRAFFIC_DETAILS_TEMPLATE:
+                view = inflater.inflate( R.layout.log_card_container, viewGroup, false );
+                cardContainer = view.findViewById( R.id.container );
+                inflater.inflate( R.layout.card_traffic_details_template, cardContainer, true );
+                viewHolder = new ViewHolderTrafficDetailsTemplate( view );
                 break;
             default:
                 view = inflater.inflate( R.layout.log_item, viewGroup, false );
@@ -236,9 +261,13 @@ public class LogRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                 ConfigureViewHolder.configureWeatherTemplate(
                         ( ViewHolderWeatherTemplate ) viewHolder, json );
                 break;
-            case SET_DESTINATION_TEMPLATE:
-                ConfigureViewHolder.configureSetDestinationTemplate(
-                        ( ViewHolderSetDestinationTemplate ) viewHolder, json );
+            case START_NAVIGATION_TEMPLATE:
+                ConfigureViewHolder.configureStartNavigationTemplate(
+                        ( ViewHolderStartNavigationTemplate ) viewHolder, json );
+                break;
+            case PREVIOUS_WAYPOINTS_TEMPLATE:
+                ConfigureViewHolder.configurePreviousWaypointsTemplate(
+                        ( ViewHolderPreviousWaypointsTemplate ) viewHolder, json );
                 break;
             case LOCAL_SEARCH_LIST_TEMPLATE1:
                 ConfigureViewHolder.configureLocalSearchListTemplate1(
@@ -257,6 +286,18 @@ public class LogRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                 break;
             case JSON_TEXT:
                 ConfigureViewHolder.configureTextLog( ( ViewHolderTextLog ) viewHolder, json );
+                break;
+            case LOCAL_SEARCH_LIST_TEMPLATE2:
+                ConfigureViewHolder.configureLocalSearchListTemplate2(
+                        ( ViewHolderLocalSearchListTemplate2 ) viewHolder, json );
+                break;
+            case LOCAL_SEARCH_DETAIL_TEMPLATE1:
+                ConfigureViewHolder.configureLocalSearchDetailTemplate1(
+                        ( ViewHolderLocalSearchDetailTemplate1 ) viewHolder, json );
+                break;
+            case TRAFFIC_DETAILS_TEMPLATE:
+                ConfigureViewHolder.configureTrafficDetailsTemplate(
+                        ( ViewHolderTrafficDetailsTemplate ) viewHolder, json );
                 break;
             default:
                 ConfigureViewHolder.configureDefaultLog( ( ViewHolderTextLog ) viewHolder );

@@ -52,15 +52,17 @@ public class SupportedOperations {
             return operations;
         }
         long actions = playbackState.getActions( );
+        int currentPlaybackState = playbackState.getState();
         Log.i(TAG , "supportedOperations: " + actions);
         if (((actions & PlaybackStateCompat.ACTION_PLAY) != 0)) {
-            operations.add( PLAY_CONTROL_PLAY );
+            if( currentPlaybackState != PlaybackStateCompat.STATE_PLAYING ) operations.add( PLAY_CONTROL_PLAY );
         }  if (((actions & PlaybackStateCompat.ACTION_PAUSE) != 0)) {
-            operations.add( PLAY_CONTROL_PAUSE );
+            if( currentPlaybackState == PlaybackStateCompat.STATE_PLAYING ) operations.add( PLAY_CONTROL_PAUSE );
         }  if ( ( actions & PlaybackStateCompat.ACTION_STOP ) != 0 ) {
-            operations.add( PLAY_CONTROL_STOP );
+            if( currentPlaybackState == PlaybackStateCompat.STATE_PLAYING ) operations.add( PLAY_CONTROL_STOP );
         }  if ( ( actions & PlaybackStateCompat.ACTION_SEEK_TO ) != 0 ) {
             operations.add( PLAY_CONTROL_STARTOVER );
+            operations.add( SEEK_CONTROL_SET_SEEK_POSITION );
         }  if ( ( actions & PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS ) != 0 ) {
             operations.add( PLAY_CONTROL_PREVIOUS );
         }  if ( ( actions & PlaybackStateCompat.ACTION_SKIP_TO_NEXT ) != 0 ) {
@@ -69,12 +71,11 @@ public class SupportedOperations {
             operations.add( PLAY_CONTROL_REWIND );
         }  if ( ( actions & PlaybackStateCompat.ACTION_FAST_FORWARD ) != 0 ) {
             operations.add( PLAY_CONTROL_FASTFORWARD );
-        }  if ( ( actions & PlaybackStateCompat.ACTION_SEEK_TO ) != 0 ) {
-            operations.add( SEEK_CONTROL_SET_SEEK_POSITION );
         }  if ( ( actions & PlaybackStateCompat.ACTION_SET_RATING ) != 0 && app.getMediaController().getRatingType() == Rating.RATING_THUMB_UP_DOWN ) {
             operations.add( PLAY_CONTROL_FAVORITE );
             operations.add( PLAY_CONTROL_UNFAVORITE );
-        }  if ( ( actions & PlaybackStateCompat.ACTION_SET_SHUFFLE_MODE_ENABLED ) != 0 ) {
+        }  if ( ( actions & PlaybackStateCompat.ACTION_SET_SHUFFLE_MODE ) != 0 ||
+            ( actions & PlaybackStateCompat.ACTION_SET_SHUFFLE_MODE_ENABLED ) != 0 ) {
             operations.add( PLAY_CONTROL_ENABLE_SHUFFLE );
             operations.add( PLAY_CONTROL_DISABLE_SHUFFLE );
         }  if ( ( actions & PlaybackStateCompat.ACTION_SET_REPEAT_MODE ) != 0 ) {

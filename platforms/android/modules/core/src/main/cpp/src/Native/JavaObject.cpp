@@ -54,6 +54,9 @@ namespace native {
 
             // assign the global object ref
             m_globalObjRef = obj;
+            
+            // delete local object ref
+            env->DeleteLocalRef( obj );
         }
         catch_with_ex {
             AACE_JNI_ERROR(TAG,"JavaObject",ex.what());

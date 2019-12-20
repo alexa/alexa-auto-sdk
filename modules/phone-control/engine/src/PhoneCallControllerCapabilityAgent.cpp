@@ -158,6 +158,8 @@ void PhoneCallControllerCapabilityAgent::doShutdown() {
     m_phoneCallController.reset();
     m_messageSender.reset();
     m_contextManager.reset();
+    m_focusManager->releaseChannel( CHANNEL_NAME, shared_from_this() );
+    m_focusManager.reset();
 }
 
 void PhoneCallControllerCapabilityAgent::sendExceptionEncounteredAndReportFailed( std::shared_ptr<DirectiveInfo> info, const std::string& message, alexaClientSDK::avsCommon::avs::ExceptionErrorType type ) {

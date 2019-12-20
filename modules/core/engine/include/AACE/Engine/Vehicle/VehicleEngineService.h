@@ -59,6 +59,9 @@ public:
     // VehiclePropertyInterface
     std::string getVehicleProperty( VehiclePropertyType type ) override;
     
+    // Emit vehicle metric
+    void record(bool full);
+
 protected:
     bool initialize() override;
     bool setup() override;
@@ -69,12 +72,16 @@ protected:
     bool checkVehicleConfigProperty( rapidjson::Value& root, const char* key, bool warnIfMissing = true );
     std::string getVehicleConfigProperty( rapidjson::Value& root, const char* key, const char* defaultValue = "", bool warnIfMissing = true );
     std::string getVehiclePropertyAttribute( VehiclePropertyType property);
-    std::shared_ptr<aace::engine::metrics::MetricEvent> generateVehiclePropertiesMetric();
+    std::shared_ptr<aace::engine::metrics::MetricEvent> generateVehiclePropertiesMetric(bool empty);
 
 private:
     std::unordered_map<VehiclePropertyType,std::string,EnumHash> m_vehiclePropertyMap;
     std::string m_operatingCountry;
-    std::shared_ptr<aace::engine::metrics::MetricEvent> m_vehiclePropertiesMetric;
+
+    // Record empty metric flag
+    bool m_recordEmpty;
+    // Record full metric flag
+    bool m_recordFull;
 };
 
 } // aace::engine::vehicle

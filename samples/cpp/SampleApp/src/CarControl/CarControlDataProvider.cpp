@@ -140,10 +140,10 @@ std::shared_ptr<aace::core::config::EngineConfiguration> CarControlDataProvider:
     auto config = CarControlConfiguration::create();
     config
         //---------------------------------------------------------------------
-        // Create a Fan controls for the specified zones. Also add a fan speed
+        // Create a Fan controls for the all zones. Also add a fan speed
         // range controller defined SPEED_MIN and SPEED_MAX. Add some
         // presets to set the fan speed to preset values. Note that preset
-        // values must be exact increments of the SPEED_PRECISION, otherwise
+        // values must be exact increments of the SPEED_PRECISION, otherwise 
         // it will not work. Lastly, add a power control.
         // Alexa utterances:
         //    Alexa turn on the <zone> fan 
@@ -152,62 +152,10 @@ std::shared_ptr<aace::core::config::EngineConfiguration> CarControlDataProvider:
         //    Alexa set the <zone> fan to <value between SPEED_MIN and SPEED_MAX > 
         //    Alexa increase/decrease <zone> fan speed 
         //---------------------------------------------------------------------
-        ->createControl("driver.fan", zone::DRIVER)
+        ->createControl("all.fan", zone::ALL)
             .addAssetId(alexa::device::FAN)
-            .addPowerController(true)
-            .addRangeController("speed", true, SPEED_MIN, SPEED_MAX, SPEED_PRECISION)
-                .addAssetId(alexa::setting::FAN_SPEED)
-                .addPreset(SPEED_MIN)
-                    .addAssetId(alexa::value::LOW)
-                    .addAssetId(alexa::value::MINIMUM)
-                .addPreset(SPEED_MEDIUM)
-                    .addAssetId(alexa::value::MEDIUM)
-                .addPreset(SPEED_MAX)
-                    .addAssetId(alexa::value::HIGH)
-                    .addAssetId(alexa::value::MAXIMUM)
-        .createControl("passenger.fan", zone::PASSENGER)
-            .addAssetId(alexa::device::FAN)
-            .addPowerController(true)
-            .addRangeController("speed", true, SPEED_MIN, SPEED_MAX, SPEED_PRECISION)
-                .addAssetId(alexa::setting::FAN_SPEED)
-                .addPreset(SPEED_MIN)
-                    .addAssetId(alexa::value::LOW)
-                    .addAssetId(alexa::value::MINIMUM)
-                .addPreset(SPEED_MEDIUM)
-                    .addAssetId(alexa::value::MEDIUM)
-                .addPreset(SPEED_MAX)
-                    .addAssetId(alexa::value::HIGH)
-                    .addAssetId(alexa::value::MAXIMUM)
-        .createControl("rear.fan", zone::REAR)
-            .addAssetId(alexa::device::FAN)
-            .addPowerController(true)
-            .addRangeController("speed", true, SPEED_MIN, SPEED_MAX, SPEED_PRECISION)
-                .addAssetId(alexa::setting::FAN_SPEED)
-                .addPreset(SPEED_MIN)
-                    .addAssetId(alexa::value::LOW)
-                    .addAssetId(alexa::value::MINIMUM)
-                .addPreset(SPEED_MEDIUM)
-                    .addAssetId(alexa::value::MEDIUM)
-                .addPreset(SPEED_MAX)
-                    .addAssetId(alexa::value::HIGH)
-                    .addAssetId(alexa::value::MAXIMUM)
-        .createControl("front.fan", zone::FRONT)
-            .addAssetId(alexa::device::FAN)
-            .addPowerController(true)
-            .addRangeController("speed", true, SPEED_MIN, SPEED_MAX, SPEED_PRECISION)
-                .addAssetId(alexa::setting::FAN_SPEED)
-                .addPreset(SPEED_MIN)
-                    .addAssetId(alexa::value::LOW)
-                    .addAssetId(alexa::value::MINIMUM)
-                .addPreset(SPEED_MEDIUM)
-                    .addAssetId(alexa::value::MEDIUM)
-                .addPreset(SPEED_MAX)
-                    .addAssetId(alexa::value::HIGH)
-                    .addAssetId(alexa::value::MAXIMUM)
-        .createControl("all.fan", zone::ALL)
-            .addAssetId(alexa::device::FAN)
-            .addPowerController(true)
-            .addRangeController("speed", true, SPEED_MIN, SPEED_MAX, SPEED_PRECISION)
+            .addPowerController(false)
+            .addRangeController("speed", false, SPEED_MIN, SPEED_MAX, SPEED_PRECISION)
                 .addAssetId(alexa::setting::FAN_SPEED)
                 .addPreset(SPEED_MIN)
                     .addAssetId(alexa::value::LOW)
@@ -218,7 +166,7 @@ std::shared_ptr<aace::core::config::EngineConfiguration> CarControlDataProvider:
                     .addAssetId(alexa::value::HIGH)
                     .addAssetId(alexa::value::MAXIMUM)
         //---------------------------------------------------------------------
-        // Create a Heater controls for the specified zones. Add a temperature 
+        // Create a Heater controls for the all zones. Add a temperature 
         // range controller defined TEMPERATURE_MIN and TEMPERATURE_MAX. Add some
         // presets to set the temperature to preset values. Note that preset
         // values must be exact increments of the TEMPERATURE_PRECISION, otherwise
@@ -230,71 +178,11 @@ std::shared_ptr<aace::core::config::EngineConfiguration> CarControlDataProvider:
         //    Alexa set the <zone> heater to <value between SPEED_MIN and SPEED_MAX > 
         //    Alexa increase/decrease <zone> heater temperature 
         //---------------------------------------------------------------------
-        .createControl("driver.heater", zone::DRIVER)
-            .addAssetId(alexa::device::HEATER)
-            .addAssetId(alexa::device::COOLER)
-            .addPowerController(true)
-            .addRangeController("temperature", true, TEMPERATURE_MIN, TEMPERATURE_MAX, TEMPERATURE_PRECISION, alexa::unit::FAHRENHEIT)
-                .addAssetId(alexa::setting::TEMPERATURE)
-                .addAssetId(alexa::setting::HEAT)
-                .addPreset(TEMPERATURE_MIN)
-                    .addAssetId(alexa::value::LOW)
-                    .addAssetId(alexa::value::MINIMUM)
-                .addPreset(TEMPERATURE_MEDIUM)
-                    .addAssetId(alexa::value::MEDIUM)
-                .addPreset(TEMPERATURE_MAX)
-                    .addAssetId(alexa::value::HIGH)
-                    .addAssetId(alexa::value::MAXIMUM)
-        .createControl("passenger.heater", zone::PASSENGER)
-            .addAssetId(alexa::device::HEATER)
-            .addAssetId(alexa::device::COOLER)
-            .addPowerController(true)
-            .addRangeController("temperature", true, TEMPERATURE_MIN, TEMPERATURE_MAX, TEMPERATURE_PRECISION, alexa::unit::FAHRENHEIT)
-                .addAssetId(alexa::setting::TEMPERATURE)
-                .addAssetId(alexa::setting::HEAT)
-                .addPreset(TEMPERATURE_MIN)
-                    .addAssetId(alexa::value::LOW)
-                    .addAssetId(alexa::value::MINIMUM)
-                .addPreset(TEMPERATURE_MEDIUM)
-                    .addAssetId(alexa::value::MEDIUM)
-                .addPreset(TEMPERATURE_MAX)
-                    .addAssetId(alexa::value::HIGH)
-                    .addAssetId(alexa::value::MAXIMUM)
         .createControl("all.heater", zone::ALL)
             .addAssetId(alexa::device::HEATER)
             .addAssetId(alexa::device::COOLER)
-            .addPowerController(true)
-            .addRangeController("temperature", true, TEMPERATURE_MIN, TEMPERATURE_MAX, TEMPERATURE_PRECISION, alexa::unit::FAHRENHEIT)
-                .addAssetId(alexa::setting::TEMPERATURE)
-                .addAssetId(alexa::setting::HEAT)
-                .addPreset(TEMPERATURE_MIN)
-                    .addAssetId(alexa::value::LOW)
-                    .addAssetId(alexa::value::MINIMUM)
-                .addPreset(TEMPERATURE_MEDIUM)
-                    .addAssetId(alexa::value::MEDIUM)
-                .addPreset(TEMPERATURE_MAX)
-                    .addAssetId(alexa::value::HIGH)
-                    .addAssetId(alexa::value::MAXIMUM)
-        .createControl("secondRow.heater", zone::SECOND_ROW)
-            .addAssetId(alexa::device::HEATER)
-            .addAssetId(alexa::device::COOLER)
-            .addPowerController(true)
-            .addRangeController("temperature", true, TEMPERATURE_MIN, TEMPERATURE_MAX, TEMPERATURE_PRECISION, alexa::unit::FAHRENHEIT)
-                .addAssetId(alexa::setting::TEMPERATURE)
-                .addAssetId(alexa::setting::HEAT)
-                .addPreset(TEMPERATURE_MIN)
-                    .addAssetId(alexa::value::LOW)
-                    .addAssetId(alexa::value::MINIMUM)
-                .addPreset(TEMPERATURE_MEDIUM)
-                    .addAssetId(alexa::value::MEDIUM)
-                .addPreset(TEMPERATURE_MAX)
-                    .addAssetId(alexa::value::HIGH)
-                    .addAssetId(alexa::value::MAXIMUM)
-        .createControl("thirdRow.heater", zone::THIRD_ROW)
-            .addAssetId(alexa::device::HEATER)
-            .addAssetId(alexa::device::COOLER)
-            .addPowerController(true)
-            .addRangeController("temperature", true, TEMPERATURE_MIN, TEMPERATURE_MAX, TEMPERATURE_PRECISION, alexa::unit::FAHRENHEIT)
+            .addPowerController(false)
+            .addRangeController("temperature", false, TEMPERATURE_MIN, TEMPERATURE_MAX, TEMPERATURE_PRECISION, alexa::unit::FAHRENHEIT)
                 .addAssetId(alexa::setting::TEMPERATURE)
                 .addAssetId(alexa::setting::HEAT)
                 .addPreset(TEMPERATURE_MIN)
@@ -306,23 +194,14 @@ std::shared_ptr<aace::core::config::EngineConfiguration> CarControlDataProvider:
                     .addAssetId(alexa::value::HIGH)
                     .addAssetId(alexa::value::MAXIMUM)
         //---------------------------------------------------------------------
-        // Create light controls for specified zones. Add a power controller. 
+        // Create light controls for all zones. Add a power controller. 
         // Alexa utterances:
         //    Alexa turn on the <zone> light 
         //    Alexa turn off the <zone> light 
         //---------------------------------------------------------------------
-        .createControl("driver.light", zone::DRIVER)
+        .createControl("all.light", zone::ALL)
             .addAssetId(alexa::device::LIGHT)
-            .addPowerController(true)
-        .createControl("passenger.light", zone::PASSENGER)
-            .addAssetId(alexa::device::LIGHT)
-            .addPowerController(true)
-        .createControl("front.light", zone::FRONT)
-            .addAssetId(alexa::device::LIGHT)
-            .addPowerController(true)
-        .createControl("secondRow.light", zone::SECOND_ROW)
-            .addAssetId(alexa::device::LIGHT)
-            .addPowerController(true)
+            .addPowerController(false)
         //---------------------------------------------------------------------
         // Create air conditioner controller for specified zones. Add a power 
         // controller and a mode controller with user defined mode values.
@@ -336,7 +215,7 @@ std::shared_ptr<aace::core::config::EngineConfiguration> CarControlDataProvider:
         //---------------------------------------------------------------------
         .createControl("ac", zone::ALL)
             .addAssetId(alexa::device::AIR_CONDITIONER)
-            .addModeController("mode", true, false)
+            .addModeController("mode", false, false)
                 .addAssetId(alexa::setting::MODE)
                 .addValue(mode::ECONOMY)
                     .addAssetId(alexa::setting::ECONOMY)
@@ -344,7 +223,7 @@ std::shared_ptr<aace::core::config::EngineConfiguration> CarControlDataProvider:
                     .addAssetId(alexa::setting::AUTO)
                 .addValue(mode::MANUAL)
                     .addAssetId(alexa::setting::MANUAL)
-            .addModeController("intensity", true, true)
+            .addModeController("intensity", false, true)
                 .addAssetId(alexa::setting::INTENSITY)
                 .addValue(intensity::LOW)
                     .addAssetId(alexa::value::LOW)
@@ -354,7 +233,7 @@ std::shared_ptr<aace::core::config::EngineConfiguration> CarControlDataProvider:
                 .addValue(intensity::HIGH)
                     .addAssetId(alexa::value::HIGH)
                     .addAssetId(alexa::value::MAXIMUM)
-            .addPowerController(true)
+            .addPowerController(false)
         //---------------------------------------------------------------------
         // Create window controller for specified zone. Add a toggle 
         // controller 
@@ -362,10 +241,10 @@ std::shared_ptr<aace::core::config::EngineConfiguration> CarControlDataProvider:
         //    Alexa turn on the window defroster 
         //    Alexa turn off the window defroster 
         //---------------------------------------------------------------------
-        .createControl("rear.windshield", zone::REAR)
+        .createControl("all.windshield", zone::ALL)
             .addAssetId(alexa::device::WINDSHIELD)
             .addAssetId(alexa::device::WINDOW)
-            .addToggleController("defroster", true)
+            .addToggleController("defroster", false)
                 .addAssetId(alexa::setting::DEFROST)
                 .addAssetId(alexa::setting::DEFOG)
         //---------------------------------------------------------------------
@@ -379,14 +258,14 @@ std::shared_ptr<aace::core::config::EngineConfiguration> CarControlDataProvider:
         .createControl("dome.light", zone::ALL)
             .addAssetId(alexa::device::DOME_LIGHT)
             .addAssetId(alexa::device::CABIN_LIGHT)
-            .addPowerController(true)
+            .addPowerController(false)
         .createControl("reading.light", zone::ALL)
             .addAssetId(alexa::device::READING_LIGHT)
-            .addPowerController(true)
+            .addPowerController(false)
         .createControl("ambient.light", zone::ALL)
             .addAssetId(alexa::device::AMBIENT_LIGHT)
-            .addPowerController(true)
-            .addModeController("color", true, true)
+            .addPowerController(false)
+            .addModeController("color", false, true)
                 .addAssetId(alexa::setting::COLOR)
                 .addValue(color::RED)
                     .addAssetId(alexa::color::RED)
@@ -414,8 +293,8 @@ std::shared_ptr<aace::core::config::EngineConfiguration> CarControlDataProvider:
         //---------------------------------------------------------------------
         .createControl("vent", zone::ALL)
             .addAssetId(alexa::device::VENT)
-            .addPowerController(true)
-            .addModeController("position", true, true)
+            .addPowerController(false)
+            .addModeController("position", false, true)
                 .addAssetId(alexa::setting::POSITION)
                 .addValue(ventPosition::BODY)
                     .addAssetId(alexa::setting::BODY_VENTS)
@@ -435,12 +314,10 @@ std::shared_ptr<aace::core::config::EngineConfiguration> CarControlDataProvider:
         //---------------------------------------------------------------------
         .createControl("car", zone::ALL)
             .addAssetId(alexa::device::CAR)
-            .addToggleController("recirculate", true)
+            .addToggleController("recirculate", false)
                 .addAssetId(alexa::setting::AIR_RECIRCULATION)
-            .addToggleController("climate.sync", true)
-                .addAssetId(alexa::setting::CLIMATE_SYNC)
-            .addToggleController("stabilitrak", true)
-                .addAssetId("My.Stabilitrak");
+            .addToggleController("climate.sync", false)
+                .addAssetId(alexa::setting::CLIMATE_SYNC);
 
     return config;
 }

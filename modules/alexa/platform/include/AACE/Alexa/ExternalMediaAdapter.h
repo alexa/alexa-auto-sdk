@@ -106,10 +106,6 @@ public:
          */
         PLAY,
         /*
-         * Resume is supported
-         */
-        RESUME,
-        /*
          * Pause is supported
          */
         PAUSE,
@@ -669,9 +665,6 @@ inline std::ostream& operator<<(std::ostream& stream, const ExternalMediaAdapter
     switch (supportedPlaybackOperation) {
         case ExternalMediaAdapter::SupportedPlaybackOperation::PLAY:
             stream << "PLAY";
-            break;
-        case ExternalMediaAdapter::SupportedPlaybackOperation::RESUME:
-            stream << "RESUME";
             break;
         case ExternalMediaAdapter::SupportedPlaybackOperation::PAUSE:
             stream << "PAUSE";

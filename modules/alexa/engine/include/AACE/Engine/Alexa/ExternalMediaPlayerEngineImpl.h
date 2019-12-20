@@ -16,42 +16,42 @@
 #ifndef AACE_ENGINE_ALEXA_EXTERNAL_MEDIA_PLAYER_ENGINE_IMPL_H
 #define AACE_ENGINE_ALEXA_EXTERNAL_MEDIA_PLAYER_ENGINE_IMPL_H
 
+#include <functional>
 #include <memory>
+#include <mutex>
+#include <set>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <set>
-#include <functional>
-#include <mutex>
 
-#include <AVSCommon/AVS/CapabilityConfiguration.h>
-#include <AVSCommon/SDKInterfaces/CapabilityConfigurationInterface.h>
-#include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
-#include <AVSCommon/SDKInterfaces/ConnectionStatusObserverInterface.h>
 #include <AVSCommon/AVS/CapabilityAgent.h>
+#include <AVSCommon/AVS/CapabilityConfiguration.h>
 #include <AVSCommon/AVS/DirectiveHandlerConfiguration.h>
+#include <AVSCommon/AVS/NamespaceAndName.h>
+#include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
+#include <AVSCommon/SDKInterfaces/CapabilityConfigurationInterface.h>
+#include <AVSCommon/SDKInterfaces/ConnectionStatusObserverInterface.h>
 #include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
-#include <AVSCommon/SDKInterfaces/DirectiveSequencerInterface.h>
 #include <AVSCommon/SDKInterfaces/ExceptionEncounteredSenderInterface.h>
 #include <AVSCommon/SDKInterfaces/ExternalMediaAdapterInterface.h>
-#include <AVSCommon/SDKInterfaces/ExternalMediaPlayerInterface.h>
 #include <AVSCommon/SDKInterfaces/ExternalMediaAdapterHandlerInterface.h>
+#include <AVSCommon/SDKInterfaces/ExternalMediaPlayerInterface.h>
 #include <AVSCommon/SDKInterfaces/FocusManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/MessageSenderInterface.h>
 #include <AVSCommon/SDKInterfaces/PlaybackHandlerInterface.h>
 #include <AVSCommon/SDKInterfaces/PlaybackRouterInterface.h>
-#include <AVSCommon/AVS/NamespaceAndName.h>
 #include <AVSCommon/Utils/MediaPlayer/MediaPlayerInterface.h>
 #include <AVSCommon/Utils/RequiresShutdown.h>
 #include <AVSCommon/Utils/Threading/Executor.h>
+#include <Endpoints/EndpointBuilder.h>
 #include <ExternalMediaPlayer/ExternalMediaPlayer.h>
-
-#include "ExternalMediaAdapterHandler.h"
 
 #include "AACE/Alexa/AlexaEngineInterfaces.h"
 #include "AACE/Alexa/ExternalMediaAdapter.h"
-#include "AACE/Alexa/LocalMediaSource.h"
 #include "AACE/Alexa/GlobalPreset.h"
+#include "AACE/Alexa/LocalMediaSource.h"
+
+#include "ExternalMediaAdapterHandler.h"
 
 #include <rapidjson/document.h>
 
@@ -75,7 +75,7 @@ private:
     // functions without the "Locked" suffix must not be called when the calling thread already holds @c m_playersMutex
 
     bool initialize(
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+        std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
@@ -96,7 +96,7 @@ private:
 public:
     static std::shared_ptr<ExternalMediaPlayerEngineImpl> create(
         const std::string& agent,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+        std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,

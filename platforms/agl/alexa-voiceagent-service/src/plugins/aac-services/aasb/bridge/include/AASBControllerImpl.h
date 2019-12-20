@@ -21,17 +21,17 @@
 #include <AACE/Core/EngineConfiguration.h>
 #include <AACE/Alexa/AlexaProperties.h>
 #include <AACE/Alexa/SpeechRecognizer.h>
+#include <AACE/Core/EngineConfiguration.h>
 
 #include <aasb/interfaces/IAlexaCapabilityDirectiveListener.h>
 #include <aasb/interfaces/IConfigurationProvider.h>
 #include <aasb/interfaces/IAASBController.h>
 
+#include "AlertsHandler.h"
 #include "AlexaClientHandler.h"
 #include "AudioPlayerHandler.h"
 #include "AuthProviderHandler.h"
-#ifdef ENABLE_AAC_CAR_CONTROL
 #include "CarControlHandler.h"
-#endif // ENABLE_AAC_GLORIA
 #include "CBLHandler.h"
 #include "LocalMediaSourceHandlerManager.h"
 #ifdef ENABLE_AAC_GLORIA
@@ -177,6 +177,9 @@ private:
     // Alexa client handler
     std::shared_ptr<aasb::alexa::AlexaClientHandler> m_alexaClientHandler;
 
+    // Alerts handler
+    std::shared_ptr<aasb::alexa::AlertsHandler> m_alertsHandler;
+
     // Audio player handler
     std::shared_ptr<aasb::alexa::AudioPlayerHandler> m_audioPlayerHandler;
 
@@ -215,10 +218,8 @@ private:
     std::shared_ptr<aasb::gloria::ListRendererHandler> m_gloriaListHandler;
 #endif //ENABLE_AAC_GLORIA
 
-#ifdef ENABLE_AAC_CAR_CONTROL
     // Car Control Handler
     std::shared_ptr<aasb::carControl::CarControlHandler> m_carControlHandler;
-#endif // ENABLE_AAC_CAR_CONTROL
 
     // Handler for Location provider
     std::shared_ptr<aasb::location::LocationProviderHandler> m_locationProviderHandler;

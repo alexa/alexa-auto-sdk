@@ -59,6 +59,7 @@ public class DiscoverAndReportMediaAppsHandler extends Handler {
         super( looper );
         mContext = context;
         mPackageManager = context.getPackageManager();
+        Log.d(TAG, "DiscoverAndReportMediaAppsHandler constructor called");
     }
 
     @Override
@@ -107,7 +108,7 @@ public class DiscoverAndReportMediaAppsHandler extends Handler {
     }
 
     /**
-     * Discovers MACC comliant media apps on the system.
+     * Discovers MACC compliant media apps on the system.
      */
     public void discoverMediaApps() {
         //Clear discovered apps so we don't keep apps that could have been uninstalled or changed
@@ -144,20 +145,26 @@ public class DiscoverAndReportMediaAppsHandler extends Handler {
                 Log.e(TAG, "Something wen't wrong when parsing meta data");
                 continue;
             }
-            MediaApp mediaApp = MediaApp.create(mContext, packageName, className,
-                    appMetaData.getSpiVersion(), appMetaData.getPlayerCookie());
-            MediaAppsRepository.getInstance().addDiscoveredMediaApp(mediaApp);
-            mediaApp.connect(new MediaAppsConnectionListener() {
-                @Override
-                public void onConnectionSuccessful() {
+            // if authorized mediaApp already exists, use it. don't create another new one
+            MediaAppsRepository appsRepository = MediaAppsRepository.getInstance();
+            if( appsRepository.isAuthorizedApp(packageName) ) {
+                appsRepository.addDiscoveredMediaApp( appsRepository.getAuthorizedMediaApp( packageName ) );
+            } else {
+                MediaApp mediaApp = MediaApp.create(mContext, packageName, className,
+                        appMetaData.getSpiVersion(), appMetaData.getPlayerCookie());
+                    appsRepository.addDiscoveredMediaApp(mediaApp);
+                mediaApp.connect(new MediaAppsConnectionListener() {
+                    @Override
+                    public void onConnectionSuccessful() {
+                        Log.i(TAG, "onConnectionSuccessful" );
+                    }
 
-                }
-
-                @Override
-                public void onConnectionFailure(CapabilityAgentError error) {
-
-                }
-            });
+                    @Override
+                    public void onConnectionFailure(CapabilityAgentError error) {
+                        Log.e(TAG, "onConnectionFailure | " + error.toString());
+                    }
+                });
+            }
         }
     }
 

@@ -64,7 +64,6 @@
     <string name="navigation_state_file_loaded">Navigation state file loaded</string>
     <string name="navigation_state_file_error">Error reading navigation state file</string>
 
-
     <!-- Config -->
     <string name="config">CONFIGURATION SETTINGS</string>
     <string name="client_id">CLIENT ID:</string>
@@ -73,6 +72,7 @@
     <string name="product_dsn">PRODUCT DSN:</string>
 
     <!-- Auth -->
+    <string name="auth_cancel">CANCEL LOGIN</string>
     <string name="auth_logout">LOG OUT</string>
     <string name="auth_product_id">PRODUCT ID</string>
     <string name="auth_product_dsn">PRODUCT DSN</string>
@@ -97,7 +97,6 @@
     <string name="alerts">ALERTS</string>
     <string name="alerts_state">ALERT STATE:</string>
     <string name="alerts_stop">STOP ALERT</string>
-    <string name="alerts_remove">REMOVE ALL ALERTS</string>
 
     <!-- Notifications -->
     <string name="notifications">NOTIFICATIONS</string>
@@ -141,6 +140,7 @@
     <string name="playback_artist">ARTIST:</string>
     <string name="playback_provider">PROVIDER:</string>
     <string name="playback_default_time">00:00</string>
+
     <!-- Playback Controller Toggle Names-->
     <string name="playback_shuffle">SHUFFLE</string>
     <string name="playback_loop">LOOP</string>
@@ -158,12 +158,24 @@
     <string name="card_down_arrow">Down Arrow</string>
     <string name="card_up_arrow">Up Arrow</string>
     <string name="card_current_weather_icon">Current Weather Icon</string>
+    <string name="card_traffic_details_background_image">Traffic Details Background Image</string>
+    <string name="card_current_traffic_conditions_icon">Current Traffic Conditions Icon</string>
+    <string name="card_local_search_detail_template1_image">Location Detail Image</string>
+    <string name="card_local_search_detail_template1_rating_image">Location Rating Image</string>
+    <string name="card_local_search_detail_template1_rating_provider_image">Location Rating Provider Image</string>
+
+
 
     <!-- Preferences -->
     <string name="preference_file_key">com.amazon.sampleapp.SampleAppSharedPreferences</string>
     <string name="preference_client_id">Client ID Key</string>
     <string name="preference_client_secret">Client Secret Key</string>
-    <string name="preference_product_id">Product ID Key</string>
+    <string name="preference_product_id">Product ID Key</string>q
     <string name="preference_product_dsn">Product DSN Key</string>
     <string name="preference_refresh_token">Refresh Token Key</string>
+
+    <!-- DoNotDisturb -->
+    <string name="doNotDisturb">DO NOT DISTURB</string>
+    <string name="do_not_disturb_switch">DND ACTIVE</string>
+    <string name="preference_do_not_disturb">DO NOT DISTURB KEY</string>
 </resources>

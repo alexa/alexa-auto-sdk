@@ -5,7 +5,7 @@ The Alexa Auto SDK Contact Uploader module provides a platform interface that yo
 **Table of Contents**
 
 * [Overview](#overview)
-* [Implementing a Contact Uploader Handler](#using-the-contact-uploader)
+* [Implementing a Contact Uploader Handler](#implementing-a-contact-uploader-handler)
 
 ## Overview <a id ="overview"></a>
 
@@ -20,7 +20,7 @@ The platform implementation is responsible for managing the life cycle of a cont
 
 > **Important!** Contact uploading and removal should be a separate process from the user interface process.
 
-## Implementing a Contact Uploader Handler<a id ="using-the-contact-uploader"></a>
+## Implementing a Contact Uploader Handler<a id ="implementing-a-contact-uploader-handler"></a>
 
 Extend the `ContactUploader` class to implement a custom contact uploader handler.
 

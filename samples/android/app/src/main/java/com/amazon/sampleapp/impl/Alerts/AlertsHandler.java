@@ -81,11 +81,5 @@ public class AlertsHandler extends Alerts {
             }
         );
 
-        mActivity.findViewById( R.id.removeAlertsButton ).setOnClickListener(
-            new View.OnClickListener() {
-                @Override
-                public void onClick( View v ) { onRemoveAllAlerts(); }
-            }
-        );
     }
 }

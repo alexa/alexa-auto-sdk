@@ -36,7 +36,7 @@ const std::string TAG = "aasb::navigation::NavigationHandler";
 namespace aasb {
 namespace navigation {
 
-std::shared_ptr<NavigationHandler>NavigationHandler::create(
+std::shared_ptr<NavigationHandler> NavigationHandler::create(
     std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
     std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher) {
     return std::shared_ptr<NavigationHandler>(new NavigationHandler(logger, responseDispatcher));
@@ -51,19 +51,20 @@ NavigationHandler::NavigationHandler(
     m_navigationState = createNavigationState("NOT_NAVIGATING");
 }
 
-bool NavigationHandler::setDestination( const std::string& payload ) {
-    m_logger->log(Level::VERBOSE, TAG, "setDestination");
+void NavigationHandler::showPreviousWaypoints() {
+    m_logger->log(Level::WARN, TAG, "showPreviousWaypoints not implemented");
+}
 
-    auto responseDispatcher = m_responseDispatcher.lock();
-    if (!responseDispatcher) {
-        m_logger->log(Level::WARN, TAG, "setDestination: Directive dispatcher is out of scope");
-        return false;
-    }
+void NavigationHandler::navigateToPreviousWaypoint() {
+    m_logger->log(Level::WARN, TAG, "navigateToPreviousWaypoint not implemented");
+}
 
-    responseDispatcher->sendDirective(TOPIC_NAVIGATION, ACTION_NAVIGATION_SET_DESTINATION, payload);
-    m_navigationState = createNavigationState("NAVIGATING");
+void NavigationHandler::showAlternativeRoutes( AlternateRouteType alternateRouteType ) {
+    m_logger->log(Level::WARN, TAG, "showAlternativeRoutes not implemented");
+}
 
-    return true;
+void NavigationHandler::controlDisplay( ControlDisplay controlDisplay ) {
+    m_logger->log(Level::WARN, TAG, "controlDisplay not implemented");
 }
 
 bool NavigationHandler::cancelNavigation() {
@@ -82,9 +83,30 @@ bool NavigationHandler::cancelNavigation() {
 }
 
 std::string NavigationHandler::getNavigationState() {
-    m_logger->log(Level::VERBOSE,TAG, "getNavigationState: " + m_navigationState);
+    m_logger->log(Level::VERBOSE, TAG, "getNavigationState: " + m_navigationState);
 
     return m_navigationState;
+}
+
+void NavigationHandler::startNavigation( const std::string& payload ) {
+    m_logger->log(Level::VERBOSE, TAG, "startNavigation");
+
+    auto responseDispatcher = m_responseDispatcher.lock();
+    if (!responseDispatcher) {
+        m_logger->log(Level::WARN, TAG, "startNavigation: Directive dispatcher is out of scope");
+        return;
+    }
+
+    responseDispatcher->sendDirective(TOPIC_NAVIGATION, ACTION_NAVIGATION_START_NAVIGATION, payload);
+    m_navigationState = createNavigationState("NAVIGATING");
+}
+
+void NavigationHandler::announceManeuver( const std::string& payload ) {
+    m_logger->log(Level::WARN, TAG, "announceManeuver not implemented");
+}
+
+void NavigationHandler::announceRoadRegulation( RoadRegulation roadRegulation ) {
+    m_logger->log(Level::WARN, TAG, "announceRoadRegulation not implemented");
 }
 
 std::string NavigationHandler::createNavigationState(std::string state) {

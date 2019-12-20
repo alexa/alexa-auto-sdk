@@ -27,6 +27,8 @@ namespace audio {
 
 class AudioManagerInterface {
 public:
+    virtual ~AudioManagerInterface() = default;
+
     using AudioInputType = aace::audio::AudioInputProvider::AudioInputType;
     using AudioOutputType = aace::audio::AudioOutputProvider::AudioOutputType;
 

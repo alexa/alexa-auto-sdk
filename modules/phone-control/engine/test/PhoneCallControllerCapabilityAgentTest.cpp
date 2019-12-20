@@ -145,6 +145,7 @@ public:
         m_mockGui = std::make_shared<testing::StrictMock<MockGui>>();
 
         EXPECT_CALL(*m_mockContextManager, setState(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(alexaClientSDK::avsCommon::sdkInterfaces::SetStateResult::SUCCESS));
+        EXPECT_CALL(*m_mockFocusManager, releaseChannel(testing::_, testing::_)).Times(testing::AtLeast(1));
 
         m_capAgent = aace::engine::phoneCallController::PhoneCallControllerCapabilityAgent::create(
             m_mockGui, m_mockContextManager, m_mockExceptionSender, m_mockMessageSender, m_mockFocusManager);
@@ -402,7 +403,6 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testCallFailed) {
 
     EXPECT_CALL(*m_mockGui, dial(testing::_)).Times(testing::Exactly(1)).WillOnce(testing::Return(true));
     EXPECT_CALL(*m_mockContextManager, setState(testing::_, testing::_, testing::_, testing::_)).Times(testing::Exactly(2));
-    EXPECT_CALL(*m_mockFocusManager, releaseChannel(testing::_, testing::_)).Times(testing::Exactly(1));
 
     m_capAgent->CapabilityAgent::preHandleDirective(directive, std::move(m_mockDirectiveHandlerResult));
     m_capAgent->CapabilityAgent::handleDirective(directive->getMessageId());
@@ -425,7 +425,6 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testCallStateChangedIdle) {
     auto callId = m_capAgent->createCallId();
     EXPECT_CALL(*m_mockContextManager, setState(testing::_, testing::_, testing::_, testing::_)).Times(testing::Exactly(1));
     EXPECT_CALL(*m_mockMessageSender, sendMessage(testing::_)).Times(testing::Exactly(1));
-    EXPECT_CALL(*m_mockFocusManager, releaseChannel(testing::_, testing::_)).Times(testing::Exactly(1));
 
     m_capAgent->callStateChanged( aace::phoneCallController::PhoneCallControllerEngineInterface::CallState::IDLE, callId, "" );
     m_wakeSetCompletedFuture.wait_for(TIMEOUT);

@@ -17,6 +17,7 @@ message("Disabled AASB Logging is " ${DISABLE_LOGGING})
 message("Enable AASB Unit tests " ${ENABLE_AASB_UNIT_TESTS})
 
 # Import AAC libraries
+include(${AAC_HOME}/share/cmake/AACECarControl.cmake)
 include(${AAC_HOME}/share/cmake/AACECore.cmake)
 include(${AAC_HOME}/share/cmake/AACEAlexa.cmake)
 include(${AAC_HOME}/share/cmake/AACEContactUploader.cmake)
@@ -37,10 +38,10 @@ if(EXISTS ${AAC_HOME}/share/cmake/AACEGloria.cmake)
   set(ENABLE_AAC_GLORIA ON)
 endif()
 
-set(ENABLE_AAC_GSTREAMER_AUDIO OFF)
-if(EXISTS ${AAC_HOME}/share/cmake/AACEGStreamer.cmake)
-  include(${AAC_HOME}/share/cmake/AACEGStreamer.cmake)
-  set(ENABLE_AAC_GSTREAMER_AUDIO ON)
+set(ENABLE_AAC_SYSTEM_AUDIO OFF)
+if(EXISTS ${AAC_HOME}/share/cmake/AACESystemAudio.cmake)
+  include(${AAC_HOME}/share/cmake/AACESystemAudio.cmake)
+  set(ENABLE_AAC_SYSTEM_AUDIO ON)
 endif()
 
 set(ENABLE_AAC_LOCAL_VOICE_CONTROL OFF)
@@ -54,11 +55,18 @@ if(EXISTS ${AAC_HOME}/share/cmake/AACELocalVoiceControl.cmake)
     include(${AAC_HOME}/share/cmake/AACELocalSkillService.cmake)
     set(ENABLE_AAC_LOCAL_SKILLS ON)
 
-    # Car control
-    set(ENABLE_AAC_CAR_CONTROL OFF)
-    if (EXISTS ${AAC_HOME}/share/cmake/AACECarControl.cmake)
-      include(${AAC_HOME}/share/cmake/AACECarControl.cmake)
-      set(ENABLE_AAC_CAR_CONTROL ON)
+    # Car Control Local Service
+    set(ENABLE_AAC_CAR_CONTROL_LOCAL_SERVICE OFF)
+    if(EXISTS ${AAC_HOME}/share/cmake/AACECarControlLocalService.cmake)
+        include(${AAC_HOME}/share/cmake/AACECarControlLocalService.cmake)
+        set(ENABLE_AAC_CAR_CONTROL_LOCAL_SERVICE ON)
+    endif()
+
+    # Address book 
+    set(ENABLE_AAC_ADDRESS_BOOK OFF)
+    if (EXISTS ${AAC_HOME}/share/cmake/AACEAddressBook.cmake)
+      include(${AAC_HOME}/share/cmake/AACEAddressBook.cmake)
+      set(ENABLE_AAC_ADDRESS_BOOK ON)
     endif()
   endif()
 endif()
@@ -67,9 +75,11 @@ list(APPEND CMAKE_LIBRARY_PATH ${AAC_HOME})
 
 set(aace_lib_src
     # aac-platform alexa
+    aasb/aac-platform/alexa/src/AlertsHandler.cpp
     aasb/aac-platform/alexa/src/AlexaClientHandler.cpp
     aasb/aac-platform/alexa/src/AudioPlayerHandler.cpp
     aasb/aac-platform/alexa/src/AuthProviderHandler.cpp
+    aasb/aac-platform/local-voice-control/car-control/src/CarControlHandler.cpp
     aasb/aac-platform/alexa/src/LocalMediaSourceHandler.cpp
     aasb/aac-platform/alexa/src/LocalMediaSourceHandlerManager.cpp
     aasb/aac-platform/alexa/src/LocationProviderHandler.cpp
@@ -101,15 +111,12 @@ if (ENABLE_AAC_GLORIA)
          aasb/aac-platform/gloria/src/ListRendererHandler.cpp)
 endif()
 
-if (ENABLE_AAC_CAR_CONTROL)
-    list(APPEND aace_lib_src
-         aasb/aac-platform/local-voice-control/car-control/src/CarControlHandler.cpp)
-endif()
-
 set(aace_lib_dependencies
     PUBLIC
         AACEAlexaPlatform
         AACEAlexaEngine
+        AACECarControlPlatform
+        AACECarControlEngine
         AACECBLPlatform
         AACECBLEngine
         AACECorePlatform
@@ -132,12 +139,12 @@ if (ENABLE_AAC_LOCAL_SKILLS)
     list(APPEND aace_lib_dependencies AACELocalSkillServiceEngine)
 endif()
 
-if (ENABLE_AAC_CAR_CONTROL)
-    list(APPEND aace_lib_dependencies AACECarControlEngine)
+if (ENABLE_AAC_CAR_CONTROL_LOCAL_SERVICE)
+    list(APPEND aace_lib_dependencies AACECarControlLocalServiceEngine)
 endif()
 
-if (ENABLE_AAC_GSTREAMER_AUDIO)
-    list(APPEND aace_lib_dependencies AACEGStreamerEngine)
+if (ENABLE_AAC_SYSTEM_AUDIO)
+    list(APPEND aace_lib_dependencies AACESystemAudioEngine)
 endif()
 
 if (ENABLE_AAC_LOCAL_VOICE_CONTROL)
@@ -156,6 +163,7 @@ target_include_directories(AlexaAutoServicesBridgeLib
         aasb/bridge/include
     PUBLIC
         aasb/bridge/public/include
+        ${AAC_HOME}/avs_shared
 )
 
 if (DISABLE_LOGGING)
@@ -182,17 +190,16 @@ if (ENABLE_AAC_LOCAL_SKILLS)
         ENABLE_AAC_LOCAL_SKILLS=1)
 endif()
 
-# Disabling car control for AAC SDK 2.0 release
-if (ENABLE_AAC_CAR_CONTROL)
+if (ENABLE_AAC_CAR_CONTROL_LOCAL_SERVICE)
     target_compile_definitions(AlexaAutoServicesBridgeLib
     PRIVATE
-        ENABLE_AAC_CAR_CONTROL=0)
+        ENABLE_AAC_CAR_CONTROL_LOCAL_SERVICE=1)
 endif()
 
-if (ENABLE_AAC_GSTREAMER_AUDIO)
+if (ENABLE_AAC_SYSTEM_AUDIO)
     target_compile_definitions(AlexaAutoServicesBridgeLib
     PRIVATE
-        ENABLE_AAC_GSTREAMER_AUDIO=1)
+        ENABLE_AAC_SYSTEM_AUDIO=1)
 endif()
 
 if (ENABLE_AAC_LOCAL_VOICE_CONTROL)

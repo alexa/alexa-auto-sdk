@@ -29,9 +29,9 @@ namespace addressBook {
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.engine.addressBook.addressBookEngineImpl");
 
-std::shared_ptr<AddressBookEngineImpl> AddressBookEngineImpl::create( std::shared_ptr<aace::addressBook::AddressBook> platfromInterface ) {
+std::shared_ptr<AddressBookEngineImpl> AddressBookEngineImpl::create( std::shared_ptr<aace::addressBook::AddressBook> platformInterface ) {
     try{
-        auto addressBookEngineImpl = std::shared_ptr<AddressBookEngineImpl>( new AddressBookEngineImpl( platfromInterface ) );
+        auto addressBookEngineImpl = std::shared_ptr<AddressBookEngineImpl>( new AddressBookEngineImpl( platformInterface ) );
         ThrowIfNull( addressBookEngineImpl, "addressBookEngineImplIsNull" );
 
         return addressBookEngineImpl;
@@ -41,9 +41,9 @@ std::shared_ptr<AddressBookEngineImpl> AddressBookEngineImpl::create( std::share
     }
 }
 
-AddressBookEngineImpl::AddressBookEngineImpl( std::shared_ptr<aace::addressBook::AddressBook> platfromInterface ) : 
+AddressBookEngineImpl::AddressBookEngineImpl( std::shared_ptr<aace::addressBook::AddressBook> platformInterface ) :
     alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
-    m_platfromInterface( platfromInterface ) {
+    m_platformInterface( platformInterface ) {
 }
 
 void AddressBookEngineImpl::addObserver( std::shared_ptr<AddressBookObserver> observer ) {
@@ -61,6 +61,7 @@ void AddressBookEngineImpl::doShutdown() {
        observer.reset(); 
     }
     m_addressBookEntities.clear();
+    m_platformInterface.reset();
 }
 
 void AddressBookEngineImpl::removeObserver( std::shared_ptr<AddressBookObserver> observer ) {
@@ -114,7 +115,7 @@ bool AddressBookEngineImpl::onRemoveAddressBook( const std::string& addressBookS
 
 bool AddressBookEngineImpl::getEntries( const std::string& addressBookSourceId, std::weak_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> factory ) {
     std::lock_guard<std::mutex> guard( m_mutex );
-    return m_platfromInterface->getEntries( addressBookSourceId, factory );
+    return m_platformInterface->getEntries( addressBookSourceId, factory );
 }
 
 } // aace::engine::addressBook

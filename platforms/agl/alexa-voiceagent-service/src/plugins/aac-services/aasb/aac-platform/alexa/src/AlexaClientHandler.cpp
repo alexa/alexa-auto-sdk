@@ -117,6 +117,8 @@ std::string AlexaClientHandler::convertDialogStateToString(DialogState state) {
             return "THINKING";
         case DialogState::IDLE:
             return "IDLE";
+        case DialogState::EXPECTING:
+            return "EXPECTING";
         default:
             return std::string("UNKNOWN");
     }

@@ -13,9 +13,9 @@
  * permissions and limitations under the License.
  */
 
+#include <AVSCommon/Utils/Logger/ConsoleLogger.h>
 #include <AVSCommon/Utils/Logger/LoggerSinkManager.h>
 #include <AVSCommon/Utils/Logger/LoggerUtils.h>
-#include <AVSCommon/Utils/Logger/ConsoleLogger.h>
 #include <AVSCommon/Utils/Metrics.h>
 
 #include "AACE/Engine/Alexa/AlexaEngineLogger.h"

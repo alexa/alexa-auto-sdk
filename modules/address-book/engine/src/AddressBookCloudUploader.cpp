@@ -88,9 +88,6 @@ static const std::string METRIC_NETWORK_BAD_USER_INPUT = "Network.BadUserInput";
 /// Metric for any Network Error
 static const std::string METRIC_NETWORK_ERROR = "Network.Error";
 
-/// Metric for Auto Provisioning the account
-static const std::string METRIC_AUTO_PROVISION = "AutoProvisioned";
-
 AddressBookCloudUploader::AddressBookCloudUploader() : 
     alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
     m_isShuttingDown(false),
@@ -135,6 +132,7 @@ bool AddressBookCloudUploader::initialize(
 
         m_authDelegate->addAuthObserver( shared_from_this() );
         networkObserver->addObserver( shared_from_this() );
+        m_networkObserver = networkObserver;
         m_addressBookService->addObserver( shared_from_this() );
 
         // Infinite event loop  
@@ -154,6 +152,13 @@ void AddressBookCloudUploader::doShutdown() {
     if( m_eventThread.joinable() ) {
         m_eventThread.join();
     }
+    m_authDelegate->removeAuthObserver( shared_from_this() );
+    m_networkObserver->removeObserver( shared_from_this() );
+    m_addressBookService->removeObserver( shared_from_this() );
+    m_authDelegate.reset();
+    m_networkObserver.reset();
+    m_addressBookService.reset();
+    m_addressBookCloudUploaderRESTAgent.reset();
 }
 
 void AddressBookCloudUploader::onAuthStateChange( AuthObserverInterface::State newState, AuthObserverInterface::Error error ) {
@@ -583,9 +588,6 @@ bool AddressBookCloudUploader::handleUpload( std::shared_ptr<AddressBookEntity> 
             }
         }
 
-        //Check and auto provision comms if not provisioned before
-        ThrowIfNot( checkAndAutoProvisionAccount(), "accountProvisionFailed" );
-
         //Preparing for the upload
         auto cloudAddressBookId = prepareForUpload( addressBookEntity );
         ThrowIf( cloudAddressBookId.empty(), "prepareUploadFailed" );
@@ -705,22 +707,6 @@ const Event AddressBookCloudUploader::popNextEventFromQ() {
     }
 
     return Event::INVALID();
-}
-
-bool AddressBookCloudUploader::checkAndAutoProvisionAccount() {
-    try {
-        if( !m_addressBookCloudUploaderRESTAgent->isAccountProvisioned() ) {
-            ThrowIfNot( m_addressBookCloudUploaderRESTAgent->autoProvisionAccount(), "accountProvisionFailed" );
-            emitCounterMetrics( "checkAndAutoProvisionAccount", METRIC_AUTO_PROVISION, 1 );
-        }
-
-        ThrowIfNot( m_addressBookCloudUploaderRESTAgent->isAccountProvisioned(), "accountNotProvisioned" );
-
-        return true;
-    } catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"checkAndAutoProvisionAccount").d("reason", ex.what()));
-        return false;
-    }
 }
 
 std::string AddressBookCloudUploader::prepareForUpload( std::shared_ptr<AddressBookEntity> addressBookEntity  ) {

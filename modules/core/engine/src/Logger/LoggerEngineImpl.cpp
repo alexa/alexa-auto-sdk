@@ -32,15 +32,15 @@ std::shared_ptr<LoggerEngineImpl> LoggerEngineImpl::create( std::shared_ptr<aace
     try
     {
         auto loggerEngineImpl = std::shared_ptr<LoggerEngineImpl>( new LoggerEngineImpl( platformLoggerInterface ) );
-        
+
         ThrowIfNull( loggerEngineImpl, "createLoggerEngineImplFailed" );
 
         // add ourself as an observer to the logger
         logger->addObserver( loggerEngineImpl );
-       
+
         // set the platform engine interface reference
         platformLoggerInterface->setEngineInterface( loggerEngineImpl );
-     
+
         return loggerEngineImpl;
     }
     catch( std::exception& ex ) {
@@ -55,7 +55,7 @@ bool LoggerEngineImpl::onLogEvent( LogEventObserver::Level level, std::chrono::s
 
 void LoggerEngineImpl::log( aace::logger::Logger::Level level, const std::string& tag, const std::string& message )
 {
-    m_executor.submit( [this,level,tag,message] {
+    m_executor.submit( [level, tag, message] {
         aace::engine::logger::EngineLogger::getInstance()->log( "CLI", level, LX(tag,message) );
     });
 }

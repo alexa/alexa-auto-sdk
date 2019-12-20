@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">2.0.0</span>
+   &#160;<span id="projectnumber">2.1.0</span>
    </div>
   </td>
  </tr>
@@ -86,6 +86,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ac2600cbd59d19ce4f9e5d5134913376f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6d00a8dac76187fd4d7eebc3f13160fd"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classaace_1_1alexa_1_1_auth_provider_engine_interface.html#abe4ab37548dfaf7744afe9078e1792ec">AuthState</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_auth_provider.html#a6d00a8dac76187fd4d7eebc3f13160fd">getAuthState</a> ()=0</td></tr>
 <tr class="separator:a6d00a8dac76187fd4d7eebc3f13160fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5a2736293fd2ae80d5fdb85b372bbd50"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_auth_provider.html#a5a2736293fd2ae80d5fdb85b372bbd50">authFailure</a> (const std::string &amp;token)</td></tr>
+<tr class="separator:a5a2736293fd2ae80d5fdb85b372bbd50"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a38e948a90a4e5ef46e2bdc34eb0b19cf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_auth_provider.html#a38e948a90a4e5ef46e2bdc34eb0b19cf">authStateChanged</a> (<a class="el" href="classaace_1_1alexa_1_1_auth_provider_engine_interface.html#abe4ab37548dfaf7744afe9078e1792ec">AuthState</a> authState, <a class="el" href="classaace_1_1alexa_1_1_auth_provider_engine_interface.html#a006d3fd3bee07feafa325968054abc37">AuthError</a> authError)</td></tr>
 <tr class="separator:a38e948a90a4e5ef46e2bdc34eb0b19cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -177,6 +179,39 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a5a2736293fd2ae80d5fdb85b372bbd50"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5a2736293fd2ae80d5fdb85b372bbd50">&#9670;&nbsp;</a></span>authFailure()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void aace::alexa::AuthProvider::authFailure </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>token</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Notifies the platform implementation that the specified access token was used in an unauthorized request to AVS. AVS responded to this request with a 403 code indicating the token was not valid.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">token</td><td>The access token used in an unauthorized request to AVS </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a38e948a90a4e5ef46e2bdc34eb0b19cf"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a38e948a90a4e5ef46e2bdc34eb0b19cf">&#9670;&nbsp;</a></span>authStateChanged()</h2>
 
@@ -218,7 +253,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 2.0.0 - Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 2.1.0 - Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

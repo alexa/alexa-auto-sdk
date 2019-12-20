@@ -36,6 +36,15 @@ void AlexaMockComponentFactory::doShutdown()
     }
 }
 
+std::shared_ptr<aace::test::avs::MockAlexaInterfaceMessageSenderInternalInterface> AlexaMockComponentFactory::getAlexaInterfaceMessageSenderInternalInterfaceMock()
+{
+    if( m_mockAlexaInterfaceMessageSenderInternalInterface == nullptr ) {
+        m_mockAlexaInterfaceMessageSenderInternalInterface = std::make_shared<aace::test::avs::MockAlexaInterfaceMessageSenderInternalInterface>();
+    }
+    
+    return m_mockAlexaInterfaceMessageSenderInternalInterface;
+}
+
 std::shared_ptr<aace::test::avs::MockCapabilitiesDelegateInterface> AlexaMockComponentFactory::getCapabilitiesDelegateInterfaceMock()
 {
     if( m_mockCapabilitiesDelegateInterface == nullptr ) {
@@ -43,6 +52,107 @@ std::shared_ptr<aace::test::avs::MockCapabilitiesDelegateInterface> AlexaMockCom
     }
     
     return m_mockCapabilitiesDelegateInterface;
+}
+    
+std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockLocaleAssetsManager> AlexaMockComponentFactory::getLocaleAssetsManagerInterfaceMock()
+{
+    if( m_mockLocaleAssetsManagerInterface == nullptr ) {
+        m_mockLocaleAssetsManagerInterface = std::make_shared<alexaClientSDK::avsCommon::sdkInterfaces::test::MockLocaleAssetsManager>();
+    }
+    
+    return m_mockLocaleAssetsManagerInterface;
+}
+    
+std::shared_ptr<aace::test::avs::MockWakeWordConfirmationSetting> AlexaMockComponentFactory::getWakeWordConfirmationSettingMock()
+{
+    if( m_mockWakeWordConfirmationSetting == nullptr ) {
+        m_mockWakeWordConfirmationSetting = std::make_shared<aace::test::avs::MockWakeWordConfirmationSetting>();
+    }
+    
+    return m_mockWakeWordConfirmationSetting;
+}
+    
+std::shared_ptr<aace::test::avs::MockSpeechConfirmationSetting> AlexaMockComponentFactory::getSpeechConfirmationSettingMock()
+{
+    if( m_mockSpeechConfirmationSetting == nullptr ) {
+        m_mockSpeechConfirmationSetting = std::make_shared<aace::test::avs::MockSpeechConfirmationSetting>();
+    }
+    
+    return m_mockSpeechConfirmationSetting;
+}
+
+std::shared_ptr<aace::test::avs::MockSystemSoundPlayerInterface> AlexaMockComponentFactory::getSystemSoundPlayerInterfaceMock()
+{
+    if( m_mockSystemSoundPlayerInterface == nullptr ) {
+        m_mockSystemSoundPlayerInterface = std::make_shared<aace::test::avs::MockSystemSoundPlayerInterface>();
+    }
+    
+    return m_mockSystemSoundPlayerInterface;
+}
+    
+std::shared_ptr<aace::test::avs::MockInternetConnectionMonitorInterface> AlexaMockComponentFactory::getInternetConnectionMonitorInterfaceMock()
+{
+    if( m_mockInternetConnectionMonitorInterface == nullptr ) {
+        m_mockInternetConnectionMonitorInterface = std::make_shared<aace::test::avs::MockInternetConnectionMonitorInterface>();
+    }
+    
+    return m_mockInternetConnectionMonitorInterface;
+}
+    
+std::shared_ptr<aace::test::avs::MockWakeWordsSetting> AlexaMockComponentFactory::getWakeWordsSettingMock()
+{
+    if( m_mockWakeWordsSetting == nullptr ) {
+        m_mockWakeWordsSetting = std::make_shared<aace::test::avs::MockWakeWordsSetting>();
+    }
+    
+    return m_mockWakeWordsSetting;
+}
+
+std::shared_ptr<aace::test::avs::MockSpeechEncoder> AlexaMockComponentFactory::getSpeechEncoderMock()
+{
+    if( m_mockSpeechEncoder == nullptr ) {
+        m_mockSpeechEncoder = std::make_shared<aace::test::avs::MockSpeechEncoder>(nullptr);
+    }
+    
+    return m_mockSpeechEncoder;
+}
+    std::shared_ptr<aace::test::avs::MockRenderPlayerInfoCardsProviderInterface> getRenderPlayerInfoCardsProviderInterfaceMock();
+
+std::shared_ptr<aace::test::avs::MockRenderPlayerInfoCardsProviderInterface> AlexaMockComponentFactory::getRenderPlayerInfoCardsProviderInterfaceMock()
+{
+    if( m_mockRenderPlayerInfoCardsProviderInterface == nullptr ) {
+        m_mockRenderPlayerInfoCardsProviderInterface = std::make_shared<aace::test::avs::MockRenderPlayerInfoCardsProviderInterface>();
+    }
+    
+    return m_mockRenderPlayerInfoCardsProviderInterface;
+}
+
+std::shared_ptr<aace::test::alexa::MockWakewordEngineAdapter> AlexaMockComponentFactory::getWakewordEngineAdapterMock()
+{
+    if( m_mockWakewordEngineAdapter == nullptr ) {
+        m_mockWakewordEngineAdapter = std::make_shared<aace::test::alexa::MockWakewordEngineAdapter>();
+    }
+    
+    return m_mockWakewordEngineAdapter;
+}
+
+std::shared_ptr<aace::test::alexa::MockWakewordVerifier> AlexaMockComponentFactory::getWakewordVerifierMock()
+{
+    if( m_mockWakewordVerifier == nullptr ) {
+        m_mockWakewordVerifier = std::make_shared<aace::test::alexa::MockWakewordVerifier>();
+    }
+    
+    return m_mockWakewordVerifier;
+}
+    
+std::unique_ptr<aace::engine::alexa::DeviceSettingsDelegate> AlexaMockComponentFactory::getDeviceSettingsDelegateMock()
+{
+    if( m_mockDeviceSettingsDelegate == nullptr ) {
+        auto config = alexaClientSDK::avsCommon::utils::configuration::ConfigurationNode::getRoot();
+        m_mockDeviceSettingsDelegate = aace::engine::alexa::DeviceSettingsDelegate::createDeviceSettingsDelegate(config, getCustomerDataManagerMock(), getAVSConnectionManagerMock());
+    }
+    
+    return std::move(m_mockDeviceSettingsDelegate);
 }
 
 std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockContextManager> AlexaMockComponentFactory::getContextManagerInterfaceMock()
@@ -132,7 +242,7 @@ std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> AlexaMockCompo
     {
         m_mockCertifiedSender = alexaClientSDK::certifiedSender::CertifiedSender::create(
             getMessageSenderInterfaceMock(),
-            getAVSConnectionManagerMock(),
+            getAVSConnectionManagerInterfaceMock(),
             getMessageStorageMock(),
             getCustomerDataManagerMock() );
     }
@@ -140,13 +250,61 @@ std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> AlexaMockCompo
     return m_mockCertifiedSender;
 }
 
-std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockAVSConnectionManager> AlexaMockComponentFactory::getAVSConnectionManagerMock()
+std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockAVSConnectionManager> AlexaMockComponentFactory::getAVSConnectionManagerInterfaceMock()
+{
+    if( m_mockAVSConnectionManagerInterface == nullptr ) {
+        m_mockAVSConnectionManagerInterface = std::make_shared<alexaClientSDK::avsCommon::sdkInterfaces::test::MockAVSConnectionManager>();
+    }
+    
+    return m_mockAVSConnectionManagerInterface;
+}
+    
+std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> AlexaMockComponentFactory::getAVSConnectionManagerMock()
 {
     if( m_mockAVSConnectionManager == nullptr ) {
-        m_mockAVSConnectionManager = std::make_shared<alexaClientSDK::avsCommon::sdkInterfaces::test::MockAVSConnectionManager>();
+        auto messageRouter = getMessageRouterMock();
+        auto internetConnectionMonitorInterface = getInternetConnectionMonitorInterfaceMock();
+        m_mockAVSConnectionManager = alexaClientSDK::acl::AVSConnectionManager::create(
+            messageRouter,
+            true,
+            std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface>>(),
+            std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageObserverInterface>>(),
+            internetConnectionMonitorInterface);
     }
     
     return m_mockAVSConnectionManager;
+}
+    
+std::shared_ptr<aace::test::avs::MockDeviceSettingsManager> AlexaMockComponentFactory::getDeviceSettingsManagerMock()
+{
+    if( m_mockDeviceSettingsManager == nullptr ) {
+        m_mockDeviceSettingsManager = std::make_shared<aace::test::avs::MockDeviceSettingsManager>();
+    }
+    
+    return m_mockDeviceSettingsManager;
+}
+    
+std::shared_ptr<aace::test::avs::MockEndpointRegistrationManagerInterface> AlexaMockComponentFactory::getEndpointRegistrationManagerInterfaceMock()
+{
+    if( m_mockEndpointRegistrationManagerInterface == nullptr ) {
+        m_mockEndpointRegistrationManagerInterface = std::make_shared<aace::test::avs::MockEndpointRegistrationManagerInterface>();
+    }
+    
+    return m_mockEndpointRegistrationManagerInterface;
+}
+
+std::unique_ptr<alexaClientSDK::endpoints::EndpointBuilder> AlexaMockComponentFactory::getEndpointBuilderMock()
+{
+    if( m_mockEndpointBuilder == nullptr ) {
+        auto deviceInfo = alexaClientSDK::avsCommon::utils::DeviceInfo::create("clientId", "productId", "1234", "manufacturer", "my device");
+        auto contextManager = getContextManagerInterfaceMock();
+        auto exceptionSender = getExceptionEncounteredSenderInterfaceMock();
+        auto alexaInternalInterface = getAlexaInterfaceMessageSenderInternalInterfaceMock();
+        auto endpointRegistrationManagerInterface = getEndpointRegistrationManagerInterfaceMock();
+        m_mockEndpointBuilder = alexaClientSDK::endpoints::EndpointBuilder::create(*deviceInfo, endpointRegistrationManagerInterface, contextManager, exceptionSender, alexaInternalInterface);
+    }
+    
+    return std::move(m_mockEndpointBuilder);
 }
 
 std::shared_ptr<aace::test::avs::MockMessageStorage> AlexaMockComponentFactory::getMessageStorageMock()
@@ -156,6 +314,15 @@ std::shared_ptr<aace::test::avs::MockMessageStorage> AlexaMockComponentFactory::
     }
     
     return m_mockMessageStorage;
+}
+    
+std::shared_ptr<aace::test::avs::MockMessageRouter> AlexaMockComponentFactory::getMessageRouterMock()
+{
+    if( m_mockMessageRouter == nullptr ) {
+        m_mockMessageRouter = std::make_shared<aace::test::avs::MockMessageRouter>();
+    }
+    
+    return m_mockMessageRouter;
 }
 
 std::shared_ptr<aace::test::avs::MockAttachmentManager> AlexaMockComponentFactory::getAttachmentManagerMock()

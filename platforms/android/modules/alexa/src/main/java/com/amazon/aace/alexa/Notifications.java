@@ -74,6 +74,12 @@ public class Notifications extends PlatformInterface
     public void setIndicator( IndicatorState state ) {
     }
 
+    /**
+     * Notifies the platform implementation of notification received
+     */
+    public void onNotificationReceived() {
+    }
+
     // NativeRef implementation
     final protected long createNativeRef() {
         return createBinder();

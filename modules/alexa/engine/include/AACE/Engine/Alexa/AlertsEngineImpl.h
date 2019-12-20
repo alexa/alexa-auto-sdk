@@ -19,28 +19,29 @@
 #include <memory>
 #include <string>
 
+#include <Alerts/AlertsCapabilityAgent.h>
+#include <Alerts/Storage/SQLiteAlertStorage.h>
 #include <Audio/AudioFactory.h>
 #include <AVSCommon/AVS/Attachment/AttachmentManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/Audio/AlertsAudioFactoryInterface.h>
+#include <AVSCommon/SDKInterfaces/AVSConnectionManagerInterface.h>
+#include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
 #include <AVSCommon/SDKInterfaces/CapabilityConfigurationInterface.h>
 #include <AVSCommon/SDKInterfaces/ConnectionStatusObserverInterface.h>
 #include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
-#include <AVSCommon/SDKInterfaces/DirectiveSequencerInterface.h>
-#include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
 #include <AVSCommon/SDKInterfaces/ExceptionEncounteredSenderInterface.h>
 #include <AVSCommon/SDKInterfaces/FocusManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/MessageSenderInterface.h>
 #include <AVSCommon/SDKInterfaces/SpeakerManagerInterface.h>
-#include <AVSCommon/SDKInterfaces/AVSConnectionManagerInterface.h>
-
-#include <Alerts/AlertsCapabilityAgent.h>
-#include <Alerts/Storage/SQLiteAlertStorage.h>
 #include <ContextManager/ContextManager.h>
+#include <Endpoints/EndpointBuilder.h>
 #include <RegistrationManager/CustomerDataHandler.h>
 
-#include <AACE/Alexa/AlexaEngineInterfaces.h>
 #include <AACE/Alexa/Alerts.h>
+#include <AACE/Alexa/AlexaEngineInterfaces.h>
+#include <AACE/Engine/Alexa/DeviceSettingsDelegate.h>
 #include <AACE/Engine/Audio/AudioManagerInterface.h>
+
 #include "AudioChannelEngineImpl.h"
 
 namespace aace {
@@ -57,7 +58,7 @@ private:
 
     bool initialize(
         std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> audioOutputChannel,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+        std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSConnectionManagerInterface> connectionManager,
         std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedSender,
@@ -67,13 +68,14 @@ private:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::AlertsAudioFactoryInterface> alertsAudioFactory,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
-        std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager );
+        std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager,
+        class DeviceSettingsDelegate& deviceSettingsDelegate);
 
 public:
     static std::shared_ptr<AlertsEngineImpl> create(
         std::shared_ptr<aace::alexa::Alerts> alertsPlatformInterface,
         std::shared_ptr<aace::engine::audio::AudioManagerInterface> audioManager,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+        std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSConnectionManagerInterface> connectionManager,
         std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedSender,
@@ -83,7 +85,8 @@ public:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::AlertsAudioFactoryInterface> alertsAudioFactory,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
-        std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager );
+        std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager,
+        class DeviceSettingsDelegate& deviceSettingsDelegate);
 
     // AlertsEngineInterface
     void onLocalStop() override;

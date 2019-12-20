@@ -1,6 +1,7 @@
 var searchData=
 [
   ['dab',['DAB',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source_1_1_source.html#ad79d251e0f05790ed49c38296e4604a3',1,'com::amazon::aace::alexa::LocalMediaSource::Source']]],
+  ['deactivated',['DEACTIVATED',['../enumcom_1_1amazon_1_1aace_1_1apl_1_1_a_p_l_1_1_activity_event.html#acaec8cc5392e3a6da590604f201c1caa',1,'com::amazon::aace::apl::APL::ActivityEvent']]],
   ['default',['DEFAULT',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter_1_1_navigation.html#a341b202427ebbd1a72b09440e1faae51',1,'com::amazon::aace::alexa::ExternalMediaAdapter::Navigation']]],
   ['deviceconfigurationupdated',['deviceConfigurationUpdated',['../classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#ad7d3413ded20b937afc728931005c122',1,'com::amazon::aace::phonecontrol::PhoneCallController']]],
   ['dial',['dial',['../classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a01d791710c2d299ca213b7723b593b0d',1,'com::amazon::aace::phonecontrol::PhoneCallController']]],
@@ -13,6 +14,8 @@ var searchData=
   ['disconnected',['DISCONNECTED',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_connection_status.html#a438c710b6951494260c66b5a84ee6770',1,'com.amazon.aace.alexa.AlexaClient.ConnectionStatus.DISCONNECTED()'],['../enumcom_1_1amazon_1_1aace_1_1network_1_1_network_info_provider_1_1_network_status.html#ab346b77ac36eb370ec34fa18ccf57aee',1,'com.amazon.aace.network.NetworkInfoProvider.NetworkStatus.DISCONNECTED()'],['../enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_connection_state.html#a7c23dfd53e87f06c93734e4257028c62',1,'com.amazon.aace.phonecontrol.PhoneCallController.ConnectionState.DISCONNECTED()']]],
   ['disconnecting',['DISCONNECTING',['../enumcom_1_1amazon_1_1aace_1_1network_1_1_network_info_provider_1_1_network_status.html#ae2986a50a60397d2a3b325c924c807f3',1,'com::amazon::aace::network::NetworkInfoProvider::NetworkStatus']]],
   ['dns_5ftimedout',['DNS_TIMEDOUT',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_connection_changed_reason.html#acbe9865f13dcd3e988c8904c315df486',1,'com::amazon::aace::alexa::AlexaClient::ConnectionChangedReason']]],
+  ['donotdisturb',['DoNotDisturb',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_do_not_disturb.html',1,'com::amazon::aace::alexa']]],
+  ['donotdisturbchanged',['doNotDisturbChanged',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_do_not_disturb.html#a5f1b4303a59cfec7db0c79e8c3716331',1,'com::amazon::aace::alexa::DoNotDisturb']]],
   ['dtmf_5ffailed',['DTMF_FAILED',['../enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_d_t_m_f_error.html#ab88088edb4bf67479cca64715ca74af5',1,'com::amazon::aace::phonecontrol::PhoneCallController::DTMFError']]],
   ['dtmf_5fsupported',['DTMF_SUPPORTED',['../enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_calling_device_configuration_property.html#aee40d256df727148c0b49dbc712cc1f9',1,'com::amazon::aace::phonecontrol::PhoneCallController::CallingDeviceConfigurationProperty']]],
   ['dtmferror',['DTMFError',['../enumcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller_1_1_d_t_m_f_error.html',1,'com::amazon::aace::phonecontrol::PhoneCallController']]]

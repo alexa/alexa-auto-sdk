@@ -13,18 +13,18 @@
  * permissions and limitations under the License.
  */
 
-#include <AVSCommon/Utils/UUIDGeneration/UUIDGeneration.h>
 #include <AVSCommon/AVS/EventBuilder.h>
+#include <AVSCommon/Utils/UUIDGeneration/UUIDGeneration.h>
 
-#include "AACE/Engine/Alexa/ExternalMediaPlayerEngineImpl.h"
 #include "AACE/Engine/Alexa/ExternalMediaAdapterEngineImpl.h"
+#include "AACE/Engine/Alexa/ExternalMediaPlayerEngineImpl.h"
 #include "AACE/Engine/Alexa/LocalMediaSourceEngineImpl.h"
 #include "AACE/Engine/Core/EngineMacros.h"
 
 #include <rapidjson/document.h>
+#include <rapidjson/error/en.h>
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
-#include <rapidjson/error/en.h>
 
 namespace aace {
 namespace engine {
@@ -41,7 +41,7 @@ ExternalMediaPlayerEngineImpl::ExternalMediaPlayerEngineImpl( const std::string&
 }
 
 bool ExternalMediaPlayerEngineImpl::initialize(
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+	std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
@@ -52,18 +52,15 @@ bool ExternalMediaPlayerEngineImpl::initialize(
 
     try
     {
-        ThrowIfNull( directiveSequencer, "invalidDirectiveSequencer" );
+        ThrowIfNull( defaultEndpointBuilder, "invalidDefaultEndpointBuilder" );
         ThrowIfNull( capabilitiesDelegate, "invalidCapabilitiesDelegate" );
         ThrowIfNull( messageSender, "invalidMessageSender" );
 
         m_externalMediaPlayerCapabilityAgent = alexaClientSDK::capabilityAgents::externalMediaPlayer::ExternalMediaPlayer::create( {}, {}, {}, speakerManager, messageSender, focusManager, contextManager, exceptionSender, playbackRouter );
         ThrowIfNull( m_externalMediaPlayerCapabilityAgent, "couldNotCreateCapabilityAgent" );
 
-        // add capability agent to the directive sequencer
-        ThrowIfNot( directiveSequencer->addDirectiveHandler( m_externalMediaPlayerCapabilityAgent ), "addDirectiveHandlerFailed" );
-
-        // register capability with delegate
-        ThrowIfNot( capabilitiesDelegate->registerCapability( m_externalMediaPlayerCapabilityAgent ), "registerCapabilityFailed");
+        // register capability with the default endpoint
+        defaultEndpointBuilder->withCapability( m_externalMediaPlayerCapabilityAgent, m_externalMediaPlayerCapabilityAgent );
 
         // add ourself as a adapter handler in the external media player capability agent
         m_externalMediaPlayerCapabilityAgent->addAdapterHandler( std::dynamic_pointer_cast<alexaClientSDK::avsCommon::sdkInterfaces::ExternalMediaAdapterHandlerInterface>( shared_from_this() ) );
@@ -81,7 +78,7 @@ bool ExternalMediaPlayerEngineImpl::initialize(
 
 std::shared_ptr<ExternalMediaPlayerEngineImpl> ExternalMediaPlayerEngineImpl::create(
     const std::string& agent,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+	std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
@@ -99,7 +96,7 @@ std::shared_ptr<ExternalMediaPlayerEngineImpl> ExternalMediaPlayerEngineImpl::cr
     
         // create the external media player impl
         externalMediaPlayerEngineImpl = std::shared_ptr<ExternalMediaPlayerEngineImpl>( new ExternalMediaPlayerEngineImpl( agent ) );
-        ThrowIfNot( externalMediaPlayerEngineImpl->initialize( directiveSequencer, capabilitiesDelegate, speakerManager, messageSender, focusManager, contextManager, exceptionSender, playbackRouter ), "initializeExternalMediaPlayerEngineImplFailed" );
+        ThrowIfNot( externalMediaPlayerEngineImpl->initialize( defaultEndpointBuilder, capabilitiesDelegate, speakerManager, messageSender, focusManager, contextManager, exceptionSender, playbackRouter ), "initializeExternalMediaPlayerEngineImplFailed" );
 
         return externalMediaPlayerEngineImpl;
     }

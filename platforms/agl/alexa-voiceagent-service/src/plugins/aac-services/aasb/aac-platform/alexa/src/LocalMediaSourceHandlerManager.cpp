@@ -132,6 +132,30 @@ std::shared_ptr<aasb::alexa::LocalMediaSourceHandler> LocalMediaSourceHandlerMan
     return m_compactDiscSource;
 }
 
+// Create SiriusXM Source
+std::shared_ptr<aasb::alexa::LocalMediaSourceHandler> LocalMediaSourceHandlerManager::getSiriusXMSource() {
+    m_logger->log(Level::VERBOSE, TAG, __FUNCTION__);
+
+    if (nullptr == m_siriusXMSource.get()) {
+        m_siriusXMSource = aasb::alexa::LocalMediaSourceHandler::create(
+            aace::alexa::LocalMediaSource::Source::SIRIUS_XM, m_logger, m_responseDispatcher);
+    }
+
+    return m_siriusXMSource;
+}
+
+// Create DAB Source
+std::shared_ptr<aasb::alexa::LocalMediaSourceHandler> LocalMediaSourceHandlerManager::getDABSource() {
+    m_logger->log(Level::VERBOSE, TAG, __FUNCTION__);
+
+    if (nullptr == m_dabSource.get()) {
+        m_dabSource = aasb::alexa::LocalMediaSourceHandler::create(
+            aace::alexa::LocalMediaSource::Source::DAB, m_logger, m_responseDispatcher);
+    }
+
+    return m_dabSource;
+}
+
 // Received event from application layer
 void LocalMediaSourceHandlerManager::onReceivedEvent(const std::string& action, const std::string& payload) {
     m_logger->log(Level::VERBOSE, TAG, __FUNCTION__);
@@ -156,6 +180,10 @@ void LocalMediaSourceHandlerManager::onReceivedEvent(const std::string& action, 
             m_lineInSource->onReceivedEvent(action, payload);
         } else if (VALUE_LOCAL_MEDIA_SOURCE_COMPACT_DISC.compare(source) == 0) {
             m_compactDiscSource->onReceivedEvent(action, payload);
+        } else if (VALUE_LOCAL_MEDIA_SOURCE_SIRIUS_XM.compare(source) == 0) {
+            m_siriusXMSource->onReceivedEvent(action, payload);
+        } else if (VALUE_LOCAL_MEDIA_SOURCE_DAB.compare(source) == 0) {
+            m_dabSource->onReceivedEvent(action, payload);
         } else {
             m_logger->log(Level::ERROR, TAG, "onReceivedEvent: Unknown source " + std::string(source));
         }

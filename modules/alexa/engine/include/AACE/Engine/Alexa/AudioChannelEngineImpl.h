@@ -17,16 +17,18 @@
 #define AACE_ENGINE_ALEXA_AUDIO_CHANNEL_ENGINE_IMPL_H
 
 #include <istream>
+#include <set>
 
-#include <AVSCommon/Utils/MediaPlayer/MediaPlayerInterface.h>
-#include <AVSCommon/Utils/MediaPlayer/MediaPlayerObserverInterface.h>
-#include <AVSCommon/Utils/Threading/Executor.h>
-#include <AVSCommon/Utils/RequiresShutdown.h>
 #include <AVSCommon/SDKInterfaces/SpeakerInterface.h>
 #include <AVSCommon/SDKInterfaces/SpeakerManagerInterface.h>
+#include <AVSCommon/Utils/MediaPlayer/MediaPlayerInterface.h>
+#include <AVSCommon/Utils/MediaPlayer/MediaPlayerObserverInterface.h>
+#include "AVSCommon/Utils/MediaPlayer/SourceConfig.h"
+#include <AVSCommon/Utils/Threading/Executor.h>
+#include <AVSCommon/Utils/RequiresShutdown.h>
 
-#include <AACE/Engine/Audio/AudioOutputChannelInterface.h>
 #include <AACE/Alexa/AlexaEngineInterfaces.h>
+#include <AACE/Engine/Audio/AudioOutputChannelInterface.h>
 
 namespace aace {
 namespace engine {
@@ -64,16 +66,27 @@ public:
     //
     // alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface
     //
-    alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId setSource( std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader> attachmentReader, const alexaClientSDK::avsCommon::utils::AudioFormat* format = nullptr ) override;
-    alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId setSource( std::shared_ptr<std::istream> stream, bool repeat ) override;
-    alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId setSource( const std::string& url, std::chrono::milliseconds offset, bool repeat ) override;
+    alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId setSource( 
+        std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader> attachmentReader, 
+        const alexaClientSDK::avsCommon::utils::AudioFormat* format, 
+        const alexaClientSDK::avsCommon::utils::mediaPlayer::SourceConfig& config ) override;
+    alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId setSource( 
+        std::shared_ptr<std::istream> stream, 
+        bool repeat, 
+        const alexaClientSDK::avsCommon::utils::mediaPlayer::SourceConfig& config ) override;
+    alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId setSource( 
+        const std::string& url, 
+        std::chrono::milliseconds offset, 
+        const alexaClientSDK::avsCommon::utils::mediaPlayer::SourceConfig& config, 
+        bool repeat) override;
     bool play( alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id ) override;
     bool stop( alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id ) override;
     bool pause( alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id ) override;
     bool resume( alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id ) override;
     std::chrono::milliseconds getOffset( alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id ) override;
     uint64_t getNumBytesBuffered() override;
-    void setObserver( std::shared_ptr<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerObserverInterface> observer ) override;
+    void addObserver( std::shared_ptr<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerObserverInterface> observer ) override;
+    void removeObserver( std::shared_ptr<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerObserverInterface> observer ) override;
 
     //
     // alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface
@@ -130,7 +143,13 @@ private:
 private:
     std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> m_audioOutputChannel;
     
-    std::weak_ptr<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerObserverInterface> m_mediaPlayerObserver;
+    // mutex to serialize access to m_mediaPlayerObservers 
+    std::mutex m_mediaPlayerObserverMutex;
+
+    // access to m_mediaPlayerObservers is protected by m_mediaPlayerObserverMutex
+    using MediaPlayerObserverInterface = alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerObserverInterface;
+    std::set<std::weak_ptr<MediaPlayerObserverInterface>, std::owner_less<std::weak_ptr<MediaPlayerObserverInterface>>> m_mediaPlayerObservers;
+    
     std::weak_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> m_speakerManager;
     
     alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::Type m_speakerType;

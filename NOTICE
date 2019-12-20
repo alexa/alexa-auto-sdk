@@ -10,6 +10,8 @@ builder
 extensions/experimental/gstreamer
 modules/address-book
 modules/alexa
+modules/apl
+Modules/car-control
 modules/cbl
 modules/contact-uploader
 modules/core

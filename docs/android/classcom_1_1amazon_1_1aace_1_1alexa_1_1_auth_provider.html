@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">2.0.0</span>
+   &#160;<span id="projectnumber">2.1.0</span>
    </div>
   </td>
  </tr>
@@ -86,6 +86,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aeedf509b073beea5fd1bf29a170e1c57"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa04277b311b61fdcf18c759714d148b1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider_1_1_auth_state.html">AuthState</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider.html#aa04277b311b61fdcf18c759714d148b1">getAuthState</a> ()</td></tr>
 <tr class="separator:aa04277b311b61fdcf18c759714d148b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a73c6d42ae6537e38fa7a910cf84e5b8a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider.html#a73c6d42ae6537e38fa7a910cf84e5b8a">authFailure</a> (String token)</td></tr>
+<tr class="separator:a73c6d42ae6537e38fa7a910cf84e5b8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae41d2954a60f8ec802e8784d1963f3eb"><td class="memItemLeft" align="right" valign="top">final void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider.html#ae41d2954a60f8ec802e8784d1963f3eb">authStateChange</a> (<a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider_1_1_auth_state.html">AuthState</a> authState, <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider_1_1_auth_error.html">AuthError</a> authError)</td></tr>
 <tr class="separator:ae41d2954a60f8ec802e8784d1963f3eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -130,6 +132,31 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a73c6d42ae6537e38fa7a910cf84e5b8a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a73c6d42ae6537e38fa7a910cf84e5b8a">&#9670;&nbsp;</a></span>authFailure()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void com.amazon.aace.alexa.AuthProvider.authFailure </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>token</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Notifies the platform implementation that the specified access token was used in an unauthorized request to AVS. AVS responded to this request with a 403 code indicating the token was not valid.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">token</td><td>The access token used in an unauthorized request to AVS </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="ae41d2954a60f8ec802e8784d1963f3eb"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae41d2954a60f8ec802e8784d1963f3eb">&#9670;&nbsp;</a></span>authStateChange()</h2>
 
@@ -171,7 +198,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 2.0.0 - Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 2.1.0 - Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

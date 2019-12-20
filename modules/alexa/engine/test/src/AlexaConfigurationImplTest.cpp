@@ -34,12 +34,14 @@ TEST_F( AlexaConfigurationImplTest,createDeviceInfoConfigBestCase )
         "                \"deviceSerialNumber\": \"DEVICE_SERIAL_NUMBER\",\n"
         "                \"clientId\": \"CLIENT_ID\",\n"
         "                \"productId\": \"PRODUCT_ID\"\n"
+        "                \"manufacturerName\": \"MANUFACTURER_NAME\"\n"
+        "                \"description\": \"DESCRIPTION\"\n"
         "            }\n"
         "        }\n"
         "    }\n"
         "}";
 
-    auto config = aace::alexa::config::AlexaConfiguration::createDeviceInfoConfig( "DEVICE_SERIAL_NUMBER", "CLIENT_ID", "PRODUCT_ID" );
+    auto config = aace::alexa::config::AlexaConfiguration::createDeviceInfoConfig( "DEVICE_SERIAL_NUMBER", "CLIENT_ID", "PRODUCT_ID", "MANUFACTURER_NAME", "DESCRIPTION"  );
     
     // compare config stream with expected string value
     std::ostringstream configStr;
@@ -103,6 +105,27 @@ TEST_F(AlexaConfigurationImplTest,createCertifiedSenderConfigBestCase)
         "}";
 
     auto config = aace::alexa::config::AlexaConfiguration::createCertifiedSenderConfig( "DATABASE_PATH" );
+
+    //Convert to ostringstream for comparing the istream
+    std::ostringstream configStr;
+    configStr << config->getStream()->rdbuf();
+    EXPECT_EQ(configStr.str(),expectedConfigStr) << "Error in the Configuration String";
+}
+
+TEST_F(AlexaConfigurationImplTest,createCapabilitiesDelegateConfigBestCase)
+{
+    std::string expectedConfigStr =
+        "{\n"
+        "    \"aace.alexa\": {\n"
+        "        \"avsDeviceSDK\": {\n"
+        "            \"capabilitiesDelegate\": {\n"
+        "                \"databaseFilePath\": \"DATABASE_PATH\"\n"
+        "            }\n"
+        "        }\n"
+        "    }\n"
+        "}";
+
+    auto config = aace::alexa::config::AlexaConfiguration::createCapabilitiesDelegateConfig( "DATABASE_PATH" );
 
     //Convert to ostringstream for comparing the istream
     std::ostringstream configStr;

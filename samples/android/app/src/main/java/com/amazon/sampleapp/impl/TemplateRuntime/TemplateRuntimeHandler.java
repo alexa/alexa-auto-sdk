@@ -16,6 +16,7 @@
 package com.amazon.sampleapp.impl.TemplateRuntime;
 
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.amazon.aace.alexa.ExternalMediaAdapter;
 import com.amazon.aace.alexa.TemplateRuntime;
@@ -48,7 +49,7 @@ public class TemplateRuntimeHandler extends TemplateRuntime {
             // Log payload
             JSONObject template = new JSONObject( payload );
             mLogger.postJSONTemplate( sTag, template.toString( 4 ) );
-
+            Log.i(sTag, payload);
             // Log card
             String type = template.getString( "type" );
             switch ( type ) {
@@ -67,7 +68,17 @@ public class TemplateRuntimeHandler extends TemplateRuntime {
                 case "LocalSearchListTemplate1":
                     mLogger.postDisplayCard( template, LogRecyclerViewAdapter.LOCAL_SEARCH_LIST_TEMPLATE1 );
                     break;
+                case "LocalSearchListTemplate2":
+                    mLogger.postDisplayCard( template, LogRecyclerViewAdapter.LOCAL_SEARCH_LIST_TEMPLATE2 );
+                    break;
+                case "TrafficDetailsTemplate":
+                    mLogger.postDisplayCard( template, LogRecyclerViewAdapter.TRAFFIC_DETAILS_TEMPLATE );
+                    break;
+                case "LocalSearchDetailTemplate1":
+                    mLogger.postDisplayCard( template, LogRecyclerViewAdapter.LOCAL_SEARCH_DETAIL_TEMPLATE1 );
+                    break;
                 default:
+                    mLogger.postError(sTag, "Unknown Template sent");
                     break;
             }
         } catch ( JSONException e ) {

@@ -20,14 +20,15 @@
 #include <unordered_set>
 
 #include <AVSCommon/AVS/CapabilityAgent.h>
+#include <AVSCommon/AVS/CapabilityConfiguration.h>
+#include <AVSCommon/SDKInterfaces/CapabilityConfigurationInterface.h>
+#include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
 #include <AVSCommon/Utils/RequiresShutdown.h>
 #include <AVSCommon/Utils/Threading/Executor.h>
-#include <AVSCommon/SDKInterfaces/CapabilityConfigurationInterface.h>
-#include <AVSCommon/AVS/CapabilityConfiguration.h>
-#include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
+#include <AVSCommon/SDKInterfaces/MessageSenderInterface.h>
 
 
-#include "NavigationObserverInterface.h"
+#include "NavigationHandlerInterface.h"
 
 namespace aace {
 namespace engine {
@@ -40,8 +41,13 @@ class NavigationCapabilityAgent :
     public std::enable_shared_from_this<NavigationCapabilityAgent> {
     
 public:
-    static std::shared_ptr<NavigationCapabilityAgent> create( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager, const std::string& navigationProviderName );
+    static std::shared_ptr<NavigationCapabilityAgent> create(
+        std::shared_ptr<aace::engine::navigation::NavigationHandlerInterface> navigationHandler,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
+        const std::string& navigationProviderName
+    );
 
     /**
      * Destructor.
@@ -57,30 +63,31 @@ public:
     alexaClientSDK::avsCommon::avs::DirectiveHandlerConfiguration getConfiguration() const override;
     /// @}};
 
-    /**
-     * This function adds an observer to @c NavigationCapabilityAgent so that it will get notified for 
-     * @c SetDestination callbacks
-     * 
-     * @param [in] observer The @c NavigationObserverInterface
-     */
-    void addObserver( std::shared_ptr<NavigationObserverInterface> observer );
-
-    /**
-     * This function removes an observer from @c NavigationCapabilityAgent so that it will no longer be notified of
-     * @c SetDestination callbacks.
-     *
-     * @param [in] observer The @c NavigationObserverInterface
-     */
-    void removeObserver( std::shared_ptr<NavigationObserverInterface> observer );
-
     std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>> getCapabilityConfigurations() override;
 
     // StateProviderInterface
     void provideState( const alexaClientSDK::avsCommon::avs::NamespaceAndName& stateProviderName, const unsigned int stateRequestToken ) override;
 
+    /**
+     * Send success event corresponding to the @c EventName
+     *
+     * @param [in] event The @c EventName corresponding to the type of event to be sent.
+     */
+    void navigationEvent( aace::navigation::NavigationEngineInterface::EventName event );
+    
+    /**
+     * Send failure event corresponding to the @c ErrorType
+     *
+     * @param [in] type The @c ErrorType corresponding to the type of error to be sent.
+     * @param [in] code The @c ErrorCode corresponding to the code of error to be sent.
+     * @param [in] description The @c string corresponding to the description of error to be sent.
+     */
+    void navigationError( aace::navigation::NavigationEngineInterface::ErrorType type, aace::navigation::NavigationEngineInterface::ErrorCode code, const std::string& description );
+    
+
 private:
-    NavigationCapabilityAgent( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender, 
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager, const std::string& navigationProviderName );
+    NavigationCapabilityAgent( std::shared_ptr<aace::engine::navigation::NavigationHandlerInterface> navigationHandler, std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender, std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
+            std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender, const std::string& navigationProviderName );
 
     // @name RequiresShutdown Functions
     /// @{
@@ -112,19 +119,33 @@ private:
      * @param [in] info The @c DirectiveInfo containing the @c AVSDirective and the @c DirectiveHandlerResultInterface.
      */
     void setHandlingCompleted(std::shared_ptr<DirectiveInfo> info);
-
+    
     /**
-     * This function handles a @c SetDestination directive.
+     * This function handles a @c startNavigation directive.
      *
      * @param [in] info The @c DirectiveInfo containing the @c AVSDirective and the @c DirectiveHandlerResultInterface.
      */
-    void handleSetDestinationDirective(std::shared_ptr<DirectiveInfo> info);
-
+    void handleStartNavigationDirective(std::shared_ptr<DirectiveInfo> info);
     /**
-     * This function handles a @c SetDestination directive.
+     * This function handles a @c ShowPreviousWaypoints directive.
      *
      * @param [in] info The @c DirectiveInfo containing the @c AVSDirective and the @c DirectiveHandlerResultInterface.
      */
+    void handleShowPreviousWaypointsDirective(std::shared_ptr<DirectiveInfo> info);
+
+    /**
+     * This function handles a @c NavigateToPreviousWaypoint directive.
+     *
+     * @param [in] info The @c DirectiveInfo containing the @c AVSDirective and the @c DirectiveHandlerResultInterface.
+     */
+    void handleNavigateToPreviousWaypointDirective(std::shared_ptr<DirectiveInfo> info);
+        
+    /**
+     * This function handles a @c CancelNavigation directive.
+     *
+     * @param [in] info The @c DirectiveInfo containing the @c AVSDirective and the @c DirectiveHandlerResultInterface.
+     */
+        
     void handleCancelNavigationDirective(std::shared_ptr<DirectiveInfo> info);
 
     /**
@@ -139,10 +160,28 @@ private:
      */
     void executeProvideState( const alexaClientSDK::avsCommon::avs::NamespaceAndName& stateProviderName, const unsigned int stateRequestToken );
 
+    // Executor functions for navigation event handling
+    void executeNavigationEvent( aace::navigation::NavigationEngineInterface::EventName event );
+    void executeNavigationError( aace::navigation::NavigationEngineInterface::ErrorType type, aace::navigation::NavigationEngineInterface::ErrorCode code, const std::string& description );
+    
+    // Convert ErrorCode enum to string based on the error type
+    std::string getNavigationErrorCode(aace::navigation::NavigationEngineInterface::ErrorCode code);
+    std::string getWaypointErrorCode(aace::navigation::NavigationEngineInterface::ErrorCode code);
+
+    // Sends event upon success event
+    void startNavigationSuccess();
+    void showPreviousWaypointsSuccess();
+    void navigateToPreviousWaypointSuccess();
+
+    // Sends event upon fail event
+    void startNavigationError( std::string code, std::string description );
+    void showPreviousWaypointsError( std::string code, std::string description );
+    void navigateToPreviousWaypointError( std::string code, std::string description );
+    
     /**
      * Check Navigation State for validity
      */
-    bool isNavigationStateValid( std::string payload );
+    bool isNavigationStateValid( std::string navigationState  );
 
     /**
      * @name Executor Thread Variables
@@ -151,8 +190,8 @@ private:
      * synchronization.
      */
     /// @{
-    /// A set of observers to be notified when a @c SetDestination directive is received
-    std::unordered_set<std::shared_ptr<NavigationObserverInterface>> m_observers;
+    /// A set of observers to be notified when a @c StartNavigation directive is received
+    std::shared_ptr<NavigationHandlerInterface> m_navigationHandler;
     /// @}
 
     /// Set of capability configurations that will get published using the Capabilities API
@@ -163,6 +202,8 @@ private:
 
     /// The @c ContextManager that needs to be updated of the state.
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> m_contextManager;
+        
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> m_messageSender;
 
     /// The last known NavigationState payload
     std::string m_navigationStatePayload;

@@ -58,6 +58,10 @@ AuthState AuthProviderHandler::getAuthState() {
     return m_authState;
 }
 
+void AuthProviderHandler::authFailure( const std::string& token) {
+    m_logger->log(Level::INFO, TAG, "Authorization Failure due to invalid access token. Login again");
+}
+
 void AuthProviderHandler::clearAuthToken() {
     m_authToken = "";
     m_authState = AuthState::UNINITIALIZED;

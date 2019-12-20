@@ -16,8 +16,8 @@
 #ifndef AACE_ENGINE_ALEXA_INTERFACE_WAKEWORD_ENGINE_MANAGER_H
 #define AACE_ENGINE_ALEXA_INTERFACE_WAKEWORD_ENGINE_MANAGER_H
 
-#include <memory>
 #include <functional>
+#include <memory>
 #include <unordered_map>
 
 #include "WakewordEngineAdapter.h"

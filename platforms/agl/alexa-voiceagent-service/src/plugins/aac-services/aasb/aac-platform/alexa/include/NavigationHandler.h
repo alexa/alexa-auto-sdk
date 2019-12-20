@@ -47,9 +47,15 @@ public:
 
     /// @name aace::navigation::Navigation
     /// @{
-    bool setDestination( const std::string& payload ) override;
+    void showPreviousWaypoints() override;
+    void navigateToPreviousWaypoint() override;
+    void showAlternativeRoutes( AlternateRouteType alternateRouteType ) override;
+    void controlDisplay( ControlDisplay controlDisplay ) override;
     bool cancelNavigation() override;
     std::string getNavigationState() override;
+    void startNavigation( const std::string& payload ) override;
+    void announceManeuver( const std::string& payload ) override;
+    void announceRoadRegulation( RoadRegulation roadRegulation ) override;
     /// @}
 
 private:

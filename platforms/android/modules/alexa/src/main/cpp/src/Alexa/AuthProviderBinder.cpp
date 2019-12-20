@@ -73,6 +73,18 @@ namespace alexa {
         }
     }
 
+    void AuthProviderHandler::authFailure( const std::string& token )
+    {
+        try_with_context
+        {
+            ThrowIfNot( m_obj.invoke<void>( "authFailure", "(Ljava/lang/String;)V", nullptr, JString(token).get() ), "invokeMethodFailed" );
+        }
+        catch_with_ex {
+            AACE_JNI_ERROR(TAG,"authFailure",ex.what());
+            return;
+        }
+    }
+
 } // aace::jni::alexa
 } // aace::jni
 } // aace

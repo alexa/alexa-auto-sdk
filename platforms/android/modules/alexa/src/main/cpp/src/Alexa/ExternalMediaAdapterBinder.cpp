@@ -198,23 +198,27 @@ namespace alexa {
             // PlaybackState
             //
 
-            ThrowIfNot( stateObj.get( "playbackState", "Lcom/amazon/aace/alexa/ExternalMediaAdapter$PlaybackState;", &result.l ), "getFieldFailed" )
+            ThrowIfNot( stateObj.get( "playbackState", "Lcom/amazon/aace/alexa/ExternalMediaAdapter$PlaybackState;", &result.l ), "getFieldFailed" );
             JObject playbackStateObj( result.l, "com/amazon/aace/alexa/ExternalMediaAdapter$PlaybackState" );
 
             ThrowIfNot( playbackStateObj.get( "state", &state.playbackState.state ), "getFieldFailed" );
             ThrowIfNot( playbackStateObj.get( "supportedOperations", "[Lcom/amazon/aace/alexa/ExternalMediaAdapter$SupportedPlaybackOperation;", &result.l ), "getFieldFailed" );
+            // if supportedOperations is nullptr, log warning and don't iterate
+            if ( result.l == nullptr ) {
+                AACE_JNI_WARN(TAG, "ExternalMediaAdapterHandler::getState", "Provided supportedOperations is null, defaulting to empty array");
+            } else {
+                JObjectArray supportedOpsArr( (jobjectArray) result.l );
+                std::vector<SupportedPlaybackOperation> supportedOperations;
+                SupportedPlaybackOperation op;
 
-            JObjectArray supportedOpsArr( (jobjectArray) result.l );
-            std::vector<SupportedPlaybackOperation> supportedOperations;
-            SupportedPlaybackOperation op;
+                for( int j = 0; j < supportedOpsArr.size(); j++ ) {
+                    ThrowIfNot( supportedOpsArr.getAt( j, &result.l ), "getArrayElementFailed" );
+                    ThrowIfNot( JSupportedPlaybackOperation::checkType( result.l, &op ), "invalidPlaybackOperationType" );
+                    supportedOperations.push_back( op );
+                }
 
-            for( int j = 0; j < supportedOpsArr.size(); j++ ) {
-                ThrowIfNot( supportedOpsArr.getAt( j, &result.l ), "getArrayElementFailed" );
-                ThrowIfNot( JSupportedPlaybackOperation::checkType( result.l, &op ), "invalidPlaybackOperationType" );
-                supportedOperations.push_back( op );
+                state.playbackState.supportedOperations = supportedOperations;
             }
-
-            state.playbackState.supportedOperations = supportedOperations;
 
             ThrowIfNot( playbackStateObj.get( "trackOffset", &result.j ), "getFieldFailed" );
             state.playbackState.trackOffset = std::chrono::milliseconds( result.j );

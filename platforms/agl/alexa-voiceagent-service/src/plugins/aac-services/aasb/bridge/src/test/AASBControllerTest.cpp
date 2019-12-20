@@ -44,6 +44,12 @@ const static std::string PRODUCT_ID = "dummy-product-id";
 /// Client id to identify the current user logged into the device.
 const static std::string CLIENT_ID = "dummy-client-id";
 
+/// Manufacturer name of the device.
+const static std::string MANUFACTURER_NAME = "dummy-manufacturer-name";
+
+/// Description of the device.
+const static std::string DESCRIPTION = "dummy-description";
+
 /// Country information.
 const static std::string COUNTRY = "US";
 
@@ -62,6 +68,8 @@ public:
     std::string getProductDSN() { return PRODUCT_DSN; }
     std::string getClientId() { return CLIENT_ID; }
     std::string getProductId() { return PRODUCT_ID; }
+    std::string getManufacturerName() { return MANUFACTURER_NAME; }
+    std::string getDescription() { return DESCRIPTION; }
     bool shouldEnablePhoneCallControl() { return true; }
     bool shouldEnableNavigation() { return true; }
     bool shouldEnableWakeword() { return true; }

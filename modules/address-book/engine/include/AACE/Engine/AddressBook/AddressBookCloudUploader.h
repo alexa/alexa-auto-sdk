@@ -199,6 +199,7 @@ private:
     /// Queue holding the address book events.
     std::deque<Event> m_addressBookEventQ;
 
+    std::shared_ptr<aace::engine::network::NetworkObservableInterface> m_networkObserver;
     std::shared_ptr<AddressBookCloudUploaderRESTAgent> m_addressBookCloudUploaderRESTAgent;
  
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> m_authDelegate;

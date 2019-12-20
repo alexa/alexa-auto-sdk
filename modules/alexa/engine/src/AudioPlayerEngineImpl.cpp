@@ -15,6 +15,7 @@
 
 #include "AACE/Engine/Alexa/AudioPlayerEngineImpl.h"
 #include "AACE/Engine/Core/EngineMacros.h"
+#include <AVSCommon/Utils/MediaPlayer/PooledMediaPlayerFactory.h>
 
 namespace aace {
 namespace engine {
@@ -30,7 +31,7 @@ AudioPlayerEngineImpl::AudioPlayerEngineImpl( std::shared_ptr<aace::alexa::Audio
 
 bool AudioPlayerEngineImpl::initialize(
     std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> audioOutputChannel,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
@@ -38,25 +39,24 @@ bool AudioPlayerEngineImpl::initialize(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter ) {
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter,
+    std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedSender ) {
     
     try
     {
-        m_directiveSequencer = directiveSequencer;
         ThrowIfNot( initializeAudioChannel( audioOutputChannel, speakerManager ), "initializeAudioChannelFailed" );
     
+        auto factory = alexaClientSDK::mediaPlayer::PooledMediaPlayerFactory::create({shared_from_this()});
+    
         // create the capability agent
-        m_audioPlayerCapabilityAgent = alexaClientSDK::capabilityAgents::audioPlayer::AudioPlayer::create( shared_from_this(), messageSender, focusManager, contextManager, exceptionSender, playbackRouter );
+        m_audioPlayerCapabilityAgent = alexaClientSDK::capabilityAgents::audioPlayer::AudioPlayer::create( std::move(factory), messageSender, focusManager, contextManager, exceptionSender, playbackRouter, certifiedSender );
         ThrowIfNull( m_audioPlayerCapabilityAgent, "couldNotCreateCapabilityAgent" );
         
         // add audio observer
         m_audioPlayerCapabilityAgent->addObserver( std::dynamic_pointer_cast<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface>( shared_from_this() ) );
 
-        // add capability agent to the directive sequencer
-        ThrowIfNot( directiveSequencer->addDirectiveHandler( m_audioPlayerCapabilityAgent ), "addDirectiveHandlerFailed" );
-
-        // register capability with delegate
-        ThrowIfNot( capabilitiesDelegate->registerCapability( m_audioPlayerCapabilityAgent ), "registerCapabilityFailed");
+        // register capability with the default endpoint
+        defaultEndpointBuilder->withCapability( m_audioPlayerCapabilityAgent, m_audioPlayerCapabilityAgent );
 
         return true;
     }
@@ -69,7 +69,7 @@ bool AudioPlayerEngineImpl::initialize(
 std::shared_ptr<AudioPlayerEngineImpl> AudioPlayerEngineImpl::create(
     std::shared_ptr<aace::alexa::AudioPlayer> audioPlayerPlatformInterface,
     std::shared_ptr<aace::engine::audio::AudioManagerInterface> audioManager,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
@@ -77,7 +77,8 @@ std::shared_ptr<AudioPlayerEngineImpl> AudioPlayerEngineImpl::create(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter ) {
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter,
+    std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedSender ) {
     
     std::shared_ptr<AudioPlayerEngineImpl> audioPlayerEngineImpl = nullptr;
 
@@ -85,7 +86,7 @@ std::shared_ptr<AudioPlayerEngineImpl> AudioPlayerEngineImpl::create(
     {
         ThrowIfNull( audioPlayerPlatformInterface, "invalidAudioPlayerPlatformInterface" );
         ThrowIfNull( audioManager, "invalidAudioManager" );
-        ThrowIfNull( directiveSequencer, "invalidDirectiveSequencer" );
+        ThrowIfNull( defaultEndpointBuilder, "invalidDefaultEndpointBuilder" );
         ThrowIfNull( messageSender, "invalidMessageSender" );
         ThrowIfNull( focusManager, "invalidFocusManager" );
         ThrowIfNull( contextManager, "invalidContextManager" );
@@ -94,6 +95,7 @@ std::shared_ptr<AudioPlayerEngineImpl> AudioPlayerEngineImpl::create(
         ThrowIfNull( speakerManager, "invalidSpeakerManager" );
         ThrowIfNull( exceptionSender, "invalidExceptionSender" );
         ThrowIfNull( playbackRouter, "invalidPlaybackRouter" );
+        ThrowIfNull( certifiedSender, "invalidCertifiedSender" );
         
         // open the Music audio channel
         auto audioOutputChannel = audioManager->openAudioOutputChannel( "AudioPlayer", aace::audio::AudioOutputProvider::AudioOutputType::MUSIC );
@@ -101,7 +103,7 @@ std::shared_ptr<AudioPlayerEngineImpl> AudioPlayerEngineImpl::create(
 
         audioPlayerEngineImpl = std::shared_ptr<AudioPlayerEngineImpl>( new AudioPlayerEngineImpl( audioPlayerPlatformInterface ) );
         
-        ThrowIfNot( audioPlayerEngineImpl->initialize( audioOutputChannel, directiveSequencer, messageSender, focusManager, contextManager, attachmentManager, capabilitiesDelegate, speakerManager, exceptionSender, playbackRouter ), "initializeAudioPlayerEngineImplFailed" );
+        ThrowIfNot( audioPlayerEngineImpl->initialize( audioOutputChannel, defaultEndpointBuilder, messageSender, focusManager, contextManager, attachmentManager, capabilitiesDelegate, speakerManager, exceptionSender, playbackRouter, certifiedSender ), "initializeAudioPlayerEngineImplFailed" );
 
         return audioPlayerEngineImpl;
     }
@@ -116,15 +118,13 @@ std::shared_ptr<AudioPlayerEngineImpl> AudioPlayerEngineImpl::create(
 
 void AudioPlayerEngineImpl::doShutdown()
 {
-    m_directiveSequencer->removeDirectiveHandler( m_audioPlayerCapabilityAgent );
-    m_directiveSequencer.reset();
-
     if( m_audioPlayerCapabilityAgent != nullptr ) {
         m_audioPlayerCapabilityAgent->removeObserver( std::dynamic_pointer_cast<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface>( shared_from_this() ) );
         m_audioPlayerCapabilityAgent->shutdown();
     }
 
     AudioChannelEngineImpl::doShutdown();
+    m_audioPlayerPlatformInterface.reset();
 }
 
 //
@@ -132,6 +132,12 @@ void AudioPlayerEngineImpl::doShutdown()
 //
 void AudioPlayerEngineImpl::onPlayerActivityChanged( alexaClientSDK::avsCommon::avs::PlayerActivity state, const Context& context ) {
     m_audioPlayerPlatformInterface->playerActivityChanged( static_cast<aace::alexa::AudioPlayer::PlayerActivity>( state ) );
+}
+    
+void AudioPlayerEngineImpl::setObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsObserverInterface> observer) {
+    std::lock_guard<std::mutex> lock{m_observersMutex};
+//    m_renderPlayerObserver = observer;
+    m_audioPlayerCapabilityAgent->setObserver(observer);
 }
 
 } // aace::engine::alexa

@@ -132,6 +132,8 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Utils/Threading/TaskQueue.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Utils/Threading/TaskThread.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Utils/UUID/UUID.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Utils/String/StringUtils.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Utils/Encoding/Base64.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Audio/AudioEngineService.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Audio/AudioInputProviderEngineImpl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Audio/AudioOutputProviderEngineImpl.h
@@ -184,6 +186,8 @@ add_library(AACECoreEngine SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/Threading/TaskQueue.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/Threading/TaskThread.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/UUID/UUID.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/Encoding/Base64.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/String/StringUtils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Audio/AudioEngineService.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Audio/AudioInputProviderEngineImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Audio/AudioOutputProviderEngineImpl.cpp

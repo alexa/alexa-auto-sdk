@@ -13,8 +13,6 @@
  * permissions and limitations under the License.
  */
 
-//#include <AVSCommon/Utils/Configuration/ConfigurationNode.h>
-
 #include "AACE/Engine/Alexa/NotificationsEngineImpl.h"
 #include "AACE/Engine/Core/EngineMacros.h"
 
@@ -32,7 +30,7 @@ NotificationsEngineImpl::NotificationsEngineImpl( std::shared_ptr<aace::alexa::N
 
 bool NotificationsEngineImpl::initialize(
     std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> audioOutputChannel,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
@@ -57,11 +55,8 @@ bool NotificationsEngineImpl::initialize(
         // add the notification state changed observer
         m_notificationsCapabilityAgent->addObserver( std::dynamic_pointer_cast<alexaClientSDK::avsCommon::sdkInterfaces::NotificationsObserverInterface>( shared_from_this() ) );
 
-        // add capability agent to the directive sequencer
-        ThrowIfNot( directiveSequencer->addDirectiveHandler( m_notificationsCapabilityAgent ), "addDirectiveHandlerFailed" );
-
-        // register capability with delegate
-        ThrowIfNot( capabilitiesDelegate->registerCapability( m_notificationsCapabilityAgent ), "registerCapabilityFailed");
+        // register capability with the default endpoint
+        defaultEndpointBuilder->withCapability( m_notificationsCapabilityAgent, m_notificationsCapabilityAgent );
 
         return true;
     }
@@ -74,7 +69,7 @@ bool NotificationsEngineImpl::initialize(
 std::shared_ptr<NotificationsEngineImpl> NotificationsEngineImpl::create(
     std::shared_ptr<aace::alexa::Notifications> notificationsPlatformInterface,
     std::shared_ptr<aace::engine::audio::AudioManagerInterface> audioManager,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
@@ -88,7 +83,7 @@ std::shared_ptr<NotificationsEngineImpl> NotificationsEngineImpl::create(
     {
         ThrowIfNull( notificationsPlatformInterface, "invalidNotificationsPlatformInterface" );
         ThrowIfNull( audioManager, "invalidAudioManager" );
-        ThrowIfNull( directiveSequencer, "invalidDirectiveSequencer" );
+        ThrowIfNull( defaultEndpointBuilder, "invalidDefaultEndpointBuilder" );
         ThrowIfNull( capabilitiesDelegate, "invalidCapabilitiesDelegate" );
         ThrowIfNull( speakerManager, "invalidSpeakerManager" );
         ThrowIfNull( contextManager, "invalidContextManager" );
@@ -102,7 +97,7 @@ std::shared_ptr<NotificationsEngineImpl> NotificationsEngineImpl::create(
 
         notificationsEngineImpl = std::shared_ptr<NotificationsEngineImpl>( new NotificationsEngineImpl( notificationsPlatformInterface ) );
 
-        ThrowIfNot( notificationsEngineImpl->initialize( audioOutputChannel, directiveSequencer, contextManager, capabilitiesDelegate, exceptionSender, notificationsAudioFactory, speakerManager, dataManager ), "initializeNotificationsEngineImplFailed" );
+        ThrowIfNot( notificationsEngineImpl->initialize( audioOutputChannel, defaultEndpointBuilder, contextManager, capabilitiesDelegate, exceptionSender, notificationsAudioFactory, speakerManager, dataManager ), "initializeNotificationsEngineImplFailed" );
 
         return notificationsEngineImpl;
     }
@@ -130,6 +125,10 @@ void NotificationsEngineImpl::onSetIndicator(alexaClientSDK::avsCommon::avs::Ind
     m_notificationsPlatformInterface->setIndicator(static_cast<aace::alexa::Notifications::IndicatorState>( state ));
 }
 
+void NotificationsEngineImpl::onNotificationReceived() {
+    AACE_INFO(LX(TAG,"onNotificationReceived"));
+    m_notificationsPlatformInterface->onNotificationReceived();
+}
 } // aace::engine::alexa
 } // aace::engine
 } // aace

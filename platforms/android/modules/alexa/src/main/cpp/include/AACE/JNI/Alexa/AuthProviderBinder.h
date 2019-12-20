@@ -30,6 +30,7 @@ namespace alexa {
         // aace::alexa::AuthProvider
         std::string getAuthToken() override;
         AuthState getAuthState() override;
+        void authFailure(const std::string& token) override;
 
     private:
         JObject m_obj;

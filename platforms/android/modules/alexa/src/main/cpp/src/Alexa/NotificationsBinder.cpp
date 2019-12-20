@@ -52,6 +52,17 @@ namespace alexa {
         }
     }
 
+    void NotificationsHandler::onNotificationReceived()
+    {
+        try_with_context
+        {
+            ThrowIfNot( m_obj.invoke<void>( "onNotificationReceived", "()V", nullptr ), "invokeFailed" );
+        }
+        catch_with_ex {
+            AACE_JNI_ERROR(TAG,"onNotificationReceived",ex.what());
+        }
+    }
+
 } // aace::alexa
 } // aace::jni
 } // aace

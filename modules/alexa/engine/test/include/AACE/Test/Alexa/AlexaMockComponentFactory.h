@@ -16,8 +16,8 @@
 #ifndef AACE_ENGINE_TEST_ALEXA_MOCK_COMPONENT_FACTORY_H
 #define AACE_ENGINE_TEST_ALEXA_MOCK_COMPONENT_FACTORY_H
 
-#include <AVSCommon/SDKInterfaces/test/MockAVSConnectionManager.h>
 #include <AVSCommon/SDKInterfaces/test/MockContextManager.h>
+#include <AVSCommon/SDKInterfaces/test/MockAVSConnectionManager.h>
 #include <AVSCommon/SDKInterfaces/test/MockDirectiveSequencer.h>
 #include <AVSCommon/SDKInterfaces/test/MockExceptionEncounteredSender.h>
 #include <AVSCommon/SDKInterfaces/test/MockFocusManager.h>
@@ -26,16 +26,36 @@
 #include <AVSCommon/SDKInterfaces/test/MockContextManager.h>
 #include <AVSCommon/SDKInterfaces/test/MockPlaybackRouter.h>
 #include <AVSCommon/SDKInterfaces/test/MockUserInactivityMonitor.h>
+#include <AVSCommon/SDKInterfaces/test/MockLocaleAssetsManager.h>
 
 #include <AVSCommon/Utils/RequiresShutdown.h>
 #include <AVSCommon/AVS/DialogUXStateAggregator.h>
 #include <CertifiedSender/CertifiedSender.h>
+#include <Endpoints/EndpointBuilder.h>
+#include <ACL/AVSConnectionManager.h>
+
 
 #include <AACE/Test/AVS/MockAlertsAudioFactoryInterface.h>
 #include <AACE/Test/AVS/MockNotificationsAudioFactoryInterface.h>
 #include <AACE/Test/AVS/MockAttachmentManager.h>
 #include <AACE/Test/AVS/MockAudioPlayerInterface.h>
+
 #include <AACE/Test/AVS/MockCapabilitiesDelegateInterface.h>
+#include <AACE/Test/AVS/MockDeviceSettingsManager.h>
+#include <AACE/Test/AVS/MockEndpointRegistrationManagerInterface.h>
+#include <AACE/Test/AVS/MockAlexaInterfaceMessageSenderInternalInterface.h>
+#include <AACE/Test/AVS/MockSpeechConfirmationSetting.h>
+#include <AACE/Test/AVS/MockSpeechEncoder.h>
+#include <AACE/Test/AVS/MockSystemSoundPlayerInterface.h>
+#include <AACE/Test/AVS/MockInternetConnectionMonitorInterface.h>
+#include <AACE/Test/AVS/MockWakeWordConfirmationSetting.h>
+#include <AACE/Test/AVS/MockWakeWordsSetting.h>
+#include <AACE/Test/AVS/MockRenderPlayerInfoCardsProviderInterface.h>
+
+#include <AACE/Test/Alexa/MockWakewordEngineAdapter.h>
+#include <AACE/Test/Alexa/MockWakewordVerifier.h>
+#include <AACE/Engine/Alexa/DeviceSettingsDelegate.h>
+
 #include <AACE/Test/AVS/MockConnectionStatusObserver.h>
 #include <AACE/Test/AVS/MockCustomerDataManager.h>
 #include <AACE/Test/AVS/MockMessageObserver.h>
@@ -57,6 +77,8 @@
 #include "MockPlaybackController.h"
 #include "MockTemplateRuntime.h"
 
+
+
 #include <gtest/gtest.h>
 
 namespace aace {
@@ -67,7 +89,21 @@ class AlexaMockComponentFactory : public alexaClientSDK::avsCommon::utils::Requi
 public:
     AlexaMockComponentFactory();
 
+    std::shared_ptr<aace::test::avs::MockAlexaInterfaceMessageSenderInternalInterface> getAlexaInterfaceMessageSenderInternalInterfaceMock();
     std::shared_ptr<aace::test::avs::MockCapabilitiesDelegateInterface> getCapabilitiesDelegateInterfaceMock();
+    std::shared_ptr<aace::test::avs::MockWakeWordConfirmationSetting> getWakeWordConfirmationSettingMock();
+    std::shared_ptr<aace::test::avs::MockSpeechConfirmationSetting> getSpeechConfirmationSettingMock();
+    std::shared_ptr<aace::test::avs::MockSystemSoundPlayerInterface> getSystemSoundPlayerInterfaceMock();
+    std::shared_ptr<aace::test::avs::MockInternetConnectionMonitorInterface> getInternetConnectionMonitorInterfaceMock();
+    std::shared_ptr<aace::test::avs::MockWakeWordsSetting> getWakeWordsSettingMock();
+    std::shared_ptr<aace::test::avs::MockSpeechEncoder> getSpeechEncoderMock();
+    std::shared_ptr<aace::test::avs::MockRenderPlayerInfoCardsProviderInterface> getRenderPlayerInfoCardsProviderInterfaceMock();
+    std::shared_ptr<aace::test::avs::MockDeviceSettingsManager> getDeviceSettingsManagerMock();
+    std::shared_ptr<aace::test::avs::MockEndpointRegistrationManagerInterface> getEndpointRegistrationManagerInterfaceMock();
+    std::shared_ptr<aace::test::alexa::MockWakewordEngineAdapter> getWakewordEngineAdapterMock();
+    std::shared_ptr<aace::test::alexa::MockWakewordVerifier> getWakewordVerifierMock();
+    std::unique_ptr<aace::engine::alexa::DeviceSettingsDelegate> getDeviceSettingsDelegateMock();
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockLocaleAssetsManager> getLocaleAssetsManagerInterfaceMock();
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockContextManager> getContextManagerInterfaceMock();
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockFocusManager> getFocusManagerInterfaceMock();
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockMessageSender> getMessageSenderInterfaceMock();
@@ -78,8 +114,10 @@ public:
     std::shared_ptr<aace::test::avs::MockAlertsAudioFactoryInterface> getAlertsAudioFactoryInterfaceMock();
     std::shared_ptr<aace::test::avs::MockNotificationsAudioFactoryInterface> getNotificationsAudioFactoryInterfaceMock();
     std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> getCertifiedSenderMock();
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockAVSConnectionManager> getAVSConnectionManagerMock();
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockAVSConnectionManager> getAVSConnectionManagerInterfaceMock();
+    std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> getAVSConnectionManagerMock();
     std::shared_ptr<aace::test::avs::MockMessageStorage> getMessageStorageMock();
+    std::shared_ptr<aace::test::avs::MockMessageRouter> getMessageRouterMock();
     std::shared_ptr<aace::test::avs::MockAttachmentManager> getAttachmentManagerMock();
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockPlaybackRouter> getPlaybackRouterMock();
     std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> getDialogUXStateAggregator();
@@ -89,6 +127,8 @@ public:
     std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> getDialogUXStateAggregatorMock();
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockUserInactivityMonitor> getUserInactivityMonitorMock();
     std::shared_ptr<aace::test::avs::MockAudioPlayerInterface> getAudioPlayerInterfaceMock();
+    std::unique_ptr<alexaClientSDK::endpoints::EndpointBuilder> getEndpointBuilderMock();
+
 
     // platform interface mocks
     std::shared_ptr<MockAlerts> getAlertsMock();
@@ -105,7 +145,21 @@ protected:
     void doShutdown() override;
 
 private:
+    std::shared_ptr<aace::test::avs::MockAlexaInterfaceMessageSenderInternalInterface> m_mockAlexaInterfaceMessageSenderInternalInterface;
     std::shared_ptr<aace::test::avs::MockCapabilitiesDelegateInterface> m_mockCapabilitiesDelegateInterface;
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockLocaleAssetsManager> m_mockLocaleAssetsManagerInterface;
+    std::shared_ptr<aace::test::avs::MockWakeWordConfirmationSetting> m_mockWakeWordConfirmationSetting;
+    std::shared_ptr<aace::test::avs::MockSpeechConfirmationSetting> m_mockSpeechConfirmationSetting;
+    std::shared_ptr<aace::test::avs::MockSystemSoundPlayerInterface> m_mockSystemSoundPlayerInterface;
+    std::shared_ptr<aace::test::avs::MockInternetConnectionMonitorInterface> m_mockInternetConnectionMonitorInterface;
+    std::shared_ptr<aace::test::avs::MockWakeWordsSetting> m_mockWakeWordsSetting;
+    std::shared_ptr<aace::test::avs::MockSpeechEncoder> m_mockSpeechEncoder;
+    std::shared_ptr<aace::test::avs::MockRenderPlayerInfoCardsProviderInterface> m_mockRenderPlayerInfoCardsProviderInterface;
+    std::shared_ptr<aace::test::avs::MockDeviceSettingsManager> m_mockDeviceSettingsManager;
+    std::shared_ptr<aace::test::avs::MockEndpointRegistrationManagerInterface> m_mockEndpointRegistrationManagerInterface;
+    std::shared_ptr<aace::test::alexa::MockWakewordEngineAdapter> m_mockWakewordEngineAdapter;
+    std::shared_ptr<aace::test::alexa::MockWakewordVerifier> m_mockWakewordVerifier;
+    std::unique_ptr<aace::engine::alexa::DeviceSettingsDelegate> m_mockDeviceSettingsDelegate;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockContextManager> m_mockContextManagerInterface;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockFocusManager> m_mockFocusManagerInterface;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockMessageSender> m_mockMessageSenderInterface;
@@ -116,8 +170,10 @@ private:
     std::shared_ptr<aace::test::avs::MockAlertsAudioFactoryInterface> m_mockAlertsAudioFactoryInterface;
     std::shared_ptr<aace::test::avs::MockNotificationsAudioFactoryInterface> m_mockNotificationsAudioFactoryInterface;
     std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> m_mockCertifiedSender;
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockAVSConnectionManager> m_mockAVSConnectionManager;
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockAVSConnectionManager> m_mockAVSConnectionManagerInterface;
+    std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> m_mockAVSConnectionManager;
     std::shared_ptr<aace::test::avs::MockMessageStorage> m_mockMessageStorage;
+    std::shared_ptr<aace::test::avs::MockMessageRouter> m_mockMessageRouter;
     std::shared_ptr<aace::test::avs::MockAttachmentManager> m_mockAttachmentManager;
     std::shared_ptr<aace::test::audio::MockAudioManagerInterface> m_mockAudioManager;
     std::shared_ptr<aace::test::audio::MockAudioOutputChannelInterface> m_mockAudioOutputChannel;
@@ -126,6 +182,8 @@ private:
     std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> m_mockDialogUXStateAggregator;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockUserInactivityMonitor> m_mockUserInactivityMonitor;
     std::shared_ptr<aace::test::avs::MockAudioPlayerInterface> m_mockAudioPlayerInterface;
+    std::unique_ptr<alexaClientSDK::endpoints::EndpointBuilder> m_mockEndpointBuilder;
+
 
     // platform interface mocks
     std::shared_ptr<MockAlerts> m_mockAlerts;

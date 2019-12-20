@@ -38,6 +38,7 @@
 #include "SampleApp/Alexa/TemplateRuntimeHandler.h"
 #include "SampleApp/Alexa/AlexaSpeakerHandler.h"
 #include "SampleApp/Alexa/GlobalPresetHandler.h"
+#include "SampleApp/Alexa/DoNotDisturbHandler.h"
 
 // Default Audio Interfaces (File based audio support)
 #include "SampleApp/Audio/AudioInputProviderHandler.h"
@@ -70,11 +71,9 @@
 #include "SampleApp/AddressBook/AddressBookHandler.h"
 
 // Sample CarControl Platform Interfaces
-#ifdef LOCALVOICECONTROL
 #include "SampleApp/CarControl/CarControlHandler.h"
 #include "SampleApp/CarControl/CarControlDataProvider.h"
 #include <AACE/CarControl/CarControlConfiguration.h>
-#endif // LOCALVOICECONTROL
 
 // Alexa Auto Core
 #include <AACE/Core/CoreProperties.h>

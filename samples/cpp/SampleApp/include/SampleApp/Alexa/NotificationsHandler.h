@@ -49,6 +49,7 @@ class NotificationsHandler : public aace::alexa::Notifications /* isa PlatformIn
     // aace::alexa::Notifications interface
 
     auto setIndicator(Notifications::IndicatorState state) -> void override;
+    auto onNotificationReceived() -> void override;
 
   private:
     std::weak_ptr<View> m_console{};

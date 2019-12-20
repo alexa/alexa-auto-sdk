@@ -129,8 +129,9 @@ public:
     
     /**
      * Notifies the Engine of a platform request to clear the user's
-     * pending alerts from storage. This may be useful for a scenario in which a user's pending alerts should not go 
-     * off after he logs out of the application.
+     * pending alerts from local storage. This may be useful for a scenario in which a user's pending alerts should not go 
+     * off after he logs out of the application. This does not clear the user's pending alerts from the Alexa cloud since it
+     * does not support a local 'Remove all alerts' feature.
      */
     void removeAllAlerts();
 

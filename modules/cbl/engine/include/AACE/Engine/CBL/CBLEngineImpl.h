@@ -64,7 +64,8 @@ public:
         std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
         bool enableUserProfile );
 
-    void engineStart();
+    void enable();
+    void disable();
 
     // AuthDelegateInterface
     void addAuthObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer ) override;

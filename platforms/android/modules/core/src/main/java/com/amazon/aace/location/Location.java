@@ -25,8 +25,8 @@ final public class Location
     private double m_altitude;
     private double m_accuracy;
 
-    // used for undefined location values
-    static final public double UNDEFINED = Double.MIN_VALUE;
+    // Used for undefined location values. Hardcoded to match min value of double in C++.
+    static final public double UNDEFINED = 2.22507e-308;
 
     /**
      * Most verbose constructor for a Location object

@@ -19,9 +19,9 @@
 #include "AACE/Engine/Core/EngineMacros.h"
 
 #include <rapidjson/document.h>
+#include <rapidjson/error/en.h>
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
-#include <rapidjson/error/en.h>
 
 namespace aace {
 namespace engine {
@@ -233,8 +233,66 @@ bool ExternalMediaAdapterEngineImpl::handleGetAdapterState( const std::string& l
         state.playbackState.mediaType = static_cast<alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::MediaType>( platformState.playbackState.mediaType );
         state.playbackState.duration = platformState.playbackState.duration;
         
+        // convert AAC SupportedPlaybackOperation to AVS SupportedPlaybackOperation
+        using avsSupportedPlaybackOperation = alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::SupportedPlaybackOperation;
+
         for( auto nextOp : platformState.playbackState.supportedOperations ) {
-            state.playbackState.supportedOperations.push_back( static_cast<alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::SupportedPlaybackOperation>( nextOp ) );
+            switch( nextOp ) {
+                case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::PLAY:
+                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::PLAY );
+                    break;
+                case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::PAUSE:
+                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::PAUSE );
+                    break;
+                case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::STOP:
+                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::STOP );
+                    break;
+                case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::NEXT:
+                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::NEXT );
+                    break;
+                case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::PREVIOUS:
+                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::PREVIOUS );
+                    break;
+                case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::START_OVER:
+                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::START_OVER );
+                    break;
+                case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::FAST_FORWARD:
+                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::FAST_FORWARD );
+                    break;
+                case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::REWIND:
+                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::REWIND );
+                    break;
+                case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::ENABLE_REPEAT:
+                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::ENABLE_REPEAT );
+                    break;
+                case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::ENABLE_REPEAT_ONE:
+                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::ENABLE_REPEAT_ONE );
+                    break;
+                case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::DISABLE_REPEAT:
+                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::DISABLE_REPEAT );
+                    break;
+                case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::ENABLE_SHUFFLE:
+                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::ENABLE_SHUFFLE );
+                    break;
+                case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::DISABLE_SHUFFLE:
+                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::DISABLE_SHUFFLE );
+                    break;
+                case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::FAVORITE:
+                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::FAVORITE );
+                    break;
+                case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::UNFAVORITE:
+                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::UNFAVORITE );
+                    break;
+                case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::SEEK:
+                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::SEEK );
+                    break;
+                case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::ADJUST_SEEK:
+                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::ADJUST_SEEK );
+                    break;
+                default:
+                    AACE_VERBOSE(LX(TAG).m("Unexpected SupportedPlaybackOperation"));
+                    break;
+            }
         }
         
         return true;

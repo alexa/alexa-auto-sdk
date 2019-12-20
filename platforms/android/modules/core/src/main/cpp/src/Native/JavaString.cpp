@@ -53,6 +53,8 @@ namespace native {
             jstring jstr = env->NewStringUTF( str.c_str() );
             ThrowIfJavaEx( env, "newStringUTFFailed" );
             m_ref = GlobalRef<jstring>( jstr );
+            // delete local string ref
+            env->DeleteLocalRef( jstr );
         }
         catch_with_ex {
             AACE_JNI_ERROR(TAG,"JavaString",ex.what());
@@ -66,6 +68,8 @@ namespace native {
             jstring jstr = env->NewStringUTF( str );
             ThrowIfJavaEx( env, "newStringUTFFailed" );
             m_ref = GlobalRef<jstring>( jstr );
+            // delete local string ref
+            env->DeleteLocalRef( jstr );
         }
         catch_with_ex {
             AACE_JNI_ERROR(TAG,"JavaString",ex.what());

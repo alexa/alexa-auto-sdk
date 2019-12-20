@@ -18,10 +18,12 @@
 
 #include <list>
 
-#include <AVSCommon/SDKInterfaces/DirectiveSequencerInterface.h>
-#include <AVSCommon/SDKInterfaces/TemplateRuntimeObserverInterface.h>
-#include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
 #include <AVSCommon/AVS/DialogUXStateAggregator.h>
+#include <AVSCommon/SDKInterfaces/AudioPlayerInterface.h>
+#include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
+#include <AVSCommon/SDKInterfaces/RenderPlayerInfoCardsProviderInterface.h>
+#include <AVSCommon/SDKInterfaces/TemplateRuntimeObserverInterface.h>
+#include <Endpoints/EndpointBuilder.h>
 #include <TemplateRuntime/TemplateRuntime.h>
 
 #include "AACE/Alexa/TemplateRuntime.h"
@@ -30,7 +32,7 @@ namespace aace {
 namespace engine {
 namespace alexa {
 
-class AudioPlayerInterfaceDelegate;
+class RenderPlayerInfoCardsProviderInterfaceDelegate;
 
 class TemplateRuntimeEngineImpl :
     public alexaClientSDK::avsCommon::sdkInterfaces::TemplateRuntimeObserverInterface,
@@ -41,8 +43,8 @@ private:
     TemplateRuntimeEngineImpl( std::shared_ptr<aace::alexa::TemplateRuntime> templateRuntimePlatformInterface );
     
     bool initialize(
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerInterface> audioPlayerInterface,
+        std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
+        std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>>  renderPlayerInfoCardsProviderInterfaces,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
@@ -51,14 +53,14 @@ private:
 public:
     static std::shared_ptr<TemplateRuntimeEngineImpl> create(
         std::shared_ptr<aace::alexa::TemplateRuntime> templateRuntimePlatformInterface,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerInterface> audioPlayerInterface,
+        std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
+        std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>> renderPlayerInfoCardsProviderInterfaces,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender );
     
-    void setAudioPlayerInterface( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerInterface> audioPlayerInterface );
+    void setRenderPlayerInfoCardsProviderInterface( std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>> renderPlayerInfoCardsProviderInterface  );
 
     // TemplateRuntimeObserverInterface
     void renderTemplateCard( const std::string& jsonPayload, alexaClientSDK::avsCommon::avs::FocusState focusState ) override;
@@ -72,39 +74,37 @@ protected:
 private:
     std::shared_ptr<aace::alexa::TemplateRuntime> m_templateRuntimePlatformInterface;
     std::shared_ptr<alexaClientSDK::capabilityAgents::templateRuntime::TemplateRuntime> m_templateRuntimeCapabilityAgent;
-    std::shared_ptr<AudioPlayerInterfaceDelegate> m_audioPlayerInterfaceDelegate;
+    std::shared_ptr<RenderPlayerInfoCardsProviderInterfaceDelegate> m_renderPlayerInfoCardsProviderInterfaceDelegate;
 };
 
 //
-// AudioPlayerInterfaceDelegate
+// RenderPlayerInfoCardsProviderInterfaceDelegate
 //
 
-class AudioPlayerInterfaceDelegate :
-    public alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerInterface,
+class RenderPlayerInfoCardsProviderInterfaceDelegate :
+    public alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface,
     public alexaClientSDK::avsCommon::utils::RequiresShutdown {
     
 private:
-    AudioPlayerInterfaceDelegate( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerInterface> audioPlayerInterface );
+    RenderPlayerInfoCardsProviderInterfaceDelegate( std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>> renderPlayerInfoCardsProviderInterfaces);
 
 public:
-    static std::shared_ptr<AudioPlayerInterfaceDelegate> create( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerInterface> audioPlayerInterface );
+    static std::shared_ptr<RenderPlayerInfoCardsProviderInterfaceDelegate> create( std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>> renderPlayerInfoCardsProviderInterfaces );
     
-    void setDelegate( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerInterface> delegate );
-
-    // AudioPlayerInterface
-    void addObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface> observer ) override;
-    void removeObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface> observer ) override;
-    std::chrono::milliseconds getAudioItemOffset() override;
+    void setDelegate( std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>> delegates );
+    void setObserver(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsObserverInterface> observer) override;
 
 protected:
     virtual void doShutdown() override;
     
 private:
-    std::weak_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerInterface> m_delegate;
+    std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>> m_delegates;
     
-    std::list<std::weak_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface>> m_observers;
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsObserverInterface> m_observer;
     
     std::mutex m_mutex;
+    
+        
 };
 
 } // aace::engine::alexa

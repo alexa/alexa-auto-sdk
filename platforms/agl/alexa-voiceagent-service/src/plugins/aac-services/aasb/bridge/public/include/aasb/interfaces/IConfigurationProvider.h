@@ -18,6 +18,8 @@
 
 #include <string>
 #include <vector>
+#include <istream>
+#include <memory>
 
 namespace aasb {
 namespace bridge {
@@ -51,7 +53,7 @@ public:
         /**
          * Construct the audio io configuration object.
          */
-        AudioIOConfiguration() 
+        AudioIOConfiguration()
             : useGStreamerAudioIO(false),
               voiceInputDevice(""),
               communicationInputDevice(""),
@@ -95,6 +97,14 @@ public:
          * Platform has Compact Disc.
          */
         bool hasCompactDisc;
+        /**
+         * Sirius XM.
+         */
+        bool hasSiriusXM;
+        /**
+         * DAB. 
+         */
+        bool hasDAB;
 
         /**
          * Construct the Local Media Source Configuration object.
@@ -106,7 +116,9 @@ public:
                 hasAMRadio(false),
                 hasSatelliteRadio(false),
                 hasLineIn(false),
-                hasCompactDisc(false) {
+                hasCompactDisc(false),
+                hasSiriusXM(false),
+                hasDAB(false) {
         }
     };
 
@@ -126,13 +138,18 @@ public:
 
     struct CarControlConfiguration {
         /*
-         * Zone
+         * Endpoint
          */
-        struct Zone {
+        struct Endpoint {
             /*
              * Climate controls
              */
             struct Climate {
+                /**
+                 * Control Id
+                 */
+                std::string controlId;
+
                 /**
                  * enabled
                  */
@@ -141,34 +158,51 @@ public:
                 /**
                  * Add sync controller
                 */
-                bool addSyncController;
+                std::string syncControllerId;
 
                 /**
                  * Add recirculation controller
                 */
-                bool addRecirculationController;
+                std::string recirculationControllerId;
 
                 /*
                  * Climate constructor
                  */
                 Climate() :
-                    enabled(false),
-                    addSyncController(false),
-                    addRecirculationController(false) {
-
+                    enabled(false) {
                 }
             };
 
             struct AirConditioner {
+                /**
+                 * Control Id
+                 */
+                std::string controlId;
+
+                /**
+                 * Mode Controller Id
+                 */
+                std::string modeControllerId;
+
+                /**
+                 * Intensity Controller Id
+                 */
+                std::string intensityControllerId;
+
                 /**
                  * enabled
                  */
                 bool enabled;
 
                 /**
-                 * Modes
+                 * Mode values
                  */
-                std::vector<std::string> modes;
+                std::vector<std::string> modeValues;
+
+                /**
+                 * Intensity values
+                 */
+                std::vector<std::string> intensityValues;
 
                 /**
                  *  Air conditioner constructor
@@ -180,6 +214,16 @@ public:
             };
 
             struct Heater {
+                /**
+                 * Control Id
+                 */
+                std::string controlId;
+
+                /**
+                 * Controller Id
+                 */
+                std::string controllerId;
+
                 /**
                  * enabled
                  */
@@ -220,6 +264,16 @@ public:
 
             struct Fan {
                 /**
+                 * Control Id
+                 */
+                std::string controlId;
+
+                /**
+                 * Controller Id
+                 */
+                std::string controllerId;
+
+                /**
                  * enabled
                  */
                 bool enabled;
@@ -244,7 +298,7 @@ public:
                  */
                 Fan() :
                     enabled(false),
-                    minimum(0),
+                    minimum(1),
                     maximum(10),
                     precision(1) {
 
@@ -252,6 +306,16 @@ public:
             };
 
             struct Vent {
+                /**
+                 * Control Id
+                 */
+                std::string controlId;
+
+                /**
+                 * Controller Id
+                 */
+                std::string positionsControllerId;
+
                 /**
                  * enabled
                  */
@@ -272,12 +336,22 @@ public:
 
             struct Window {
                 /**
+                 * Control Id
+                 */
+                std::string controlId;
+
+                /**
+                 * Controller Id
+                 */
+                std::string controllerId;
+
+                /**
                  * enabled
                  */
                 bool enabled;
 
                 /**
-                 * minimum
+                 * Defrost enabled
                  */
                 bool defrost;
 
@@ -291,8 +365,17 @@ public:
                 }
             };
 
-
             struct Light {
+                /**
+                 * Control Id
+                 */
+                std::string controlId;
+
+                /**
+                 * Color controller id
+                 */
+                std::string colorControllerId;
+
                 /**
                  * enabled
                  */
@@ -319,9 +402,14 @@ public:
             };
 
             /*
-             * Name
+             * Enabled
              */
-            std::string name;
+            bool enabled;
+
+            /*
+             * Zone
+             */
+            std::string zone;
 
             /*
              * Climate
@@ -351,7 +439,7 @@ public:
             /*
              * Light
              */
-            Light light;
+            std::vector<Light> lights;
 
             /*
              * AirConditioner
@@ -359,23 +447,22 @@ public:
             AirConditioner airConditioner;
 
             /*
-             * Zone constructor
+             * Endpoint constructor
              */
-            Zone() :
-                name("zone.all") {
-
+            Endpoint() :
+                enabled(false), zone("zone.all") {
             }
         };
 
         /**
          * Enabled or disabled
-         */ 
+         */
         bool enabled;
 
         /**
-         * Climate control zones in the car
+         * Car Control endpoints
          */
-        std::vector<Zone> zones;
+        std::vector<Endpoint> endpoints;
 
 
         /**
@@ -386,6 +473,23 @@ public:
         }
 
     };
+
+    /**
+     * Device settings configuration.
+     */
+    struct DeviceSettingsConfiguration {
+        std::string defaultLocale;
+        std::string defaultTimezone;
+        std::vector<std::string> locales;
+    };
+
+    /**
+     * Provides the device settings configuration. This is optional and
+     * if not given, default values will be used to initialize.
+     *
+     * @return @c DeviceSettingsConfiguration configuration instance.
+     */
+    virtual DeviceSettingsConfiguration getDeviceSettingsConfig() = 0;
 
     /**
      * Provides the local media source configuration.
@@ -436,6 +540,16 @@ public:
      * the product.
      */
     virtual std::string getProductDSN() = 0;
+
+    /**
+     * Gets manufacturer name of the product.
+     */
+    virtual std::string getManufacturerName() = 0;
+
+    /**
+     * Gets product description.
+     */
+    virtual std::string getDescription() = 0;
 
     /**
      * Gets client id of the product (This can be obtained from AVS developer portal).
@@ -511,7 +625,6 @@ public:
      */
     virtual bool shouldEnableLocalVoiceControl() = 0;
 
-
     /**
      * Temporarily added to obtain a location/country from configuration.
      * TODO: Remove once Location provider AAC interface is implemented by routing
@@ -519,6 +632,13 @@ public:
      */
     virtual std::pair<float, float> getCurrentLocation() = 0;
     virtual std::string getCountry() = 0;
+
+    /**
+     * Get Vehicle information.
+     * 
+     * @return std::shared_ptr<std::istream> Stream containing JSON value for vehicle information
+     */
+    virtual std::shared_ptr<std::istream> getVehicleConfig() = 0;
 };
 
 }  // namespace bridge

@@ -1,19 +1,71 @@
-# Building the Alexa Auto SDK
+# Build the Alexa Auto SDK
 
 The `builder` directory contains a collection of software which is required to build the Alexa Auto SDK software components for various target platforms.
 
 **Table of Contents**
 
 * [Overview](#overview)
+* [General Build Requirements](#general-build-requirements)
 * [Quick Start](#quick-start)
-* [Using the Alexa Auto SDK Builder](#using-the-builder)
-* [Using the Alexa Auto SDK OE Layer](#meta-aac)
+* [Using the Auto SDK Builder](#using-the-auto-sdk-builder)
+* [Using the Auto SDK OE Layer](#using-the-auto-sdk-oe-layer)
 
 ## Overview<a id ="overview"></a>
 
-The **Alexa Auto SDK Builder** is based on [OpenEmbedded](https://www.openembedded.org/) (OE), which provides a simple way to cross compile all the Alexa Auto SDK software components for various target platforms and is recommended if you want to use platforms such as **Android** and **QNX**.
+The Alexa Auto SDK Builder is based on [OpenEmbedded](https://www.openembedded.org/) (OE), which provides a simple way to cross compile all the Alexa Auto SDK software components for various target platforms and is recommended if you want to use platforms such as Android and QNX.
 
-For target platforms already based on OpenEmbedded infrastructure, such as [Yocto/Poky](https://www.yoctoproject.org/), you can use an OE-generated SDK or alternatively you can use `meta-aac` layer to build and install the Alexa Auto SDK into your system. See [Alexa Auto SDK OE Layer](#meta-aac) for `meta-aac` layer usage.
+For target platforms already based on OpenEmbedded infrastructure, such as [Yocto/Poky](https://www.yoctoproject.org/), you can use an OE-generated SDK or alternatively you can use `meta-aac` layer to build and install the Alexa Auto SDK into your system. See [Alexa Auto SDK OE Layer](#using-the-auto-sdk-oe-layer) for `meta-aac` layer usage.
+
+## General Build Requirements <a id="general-build-requirements"></a>
+
+You can build on a Linux, Unix, or macOS host of your choice.
+
+However, we recommend and support running a Docker environment with the following configuration.
+
+* macOS Sierra or Ubuntu 16.04 LTS
+* Processor: 2.5 GHz
+* Memory: 16 Gb
+* Storage: 1 Gb+ available to use.
+
+### Build Dependencies and License Information
+
+During the build time, the following dependencies are fetched and built for the target platform by the Alexa Auto SDK Builder. Please refer to each of the individual entities for the particular licenses.
+
+* [AVS Device SDK v1.16](https://github.com/alexa/avs-device-sdk/)
+  * [cURL 7.65.3](https://curl.haxx.se/)
+  * [ngHTTP2 1.39.1](https://github.com/nghttp2/nghttp2)
+  * [SQLite3 3.20.0](https://www.sqlite.org/) or later
+  * [OpenSSL 1.1.0g](https://www.openssl.org/)
+* [Google Test v1.8.0](https://github.com/google/googletest)
+* [libopus 1.3.1](https://opus-codec.org/)
+* [OpenEmbedded-Core Rocko](https://www.openembedded.org/wiki/OpenEmbedded-Core)
+* [BitBake](https://www.yoctoproject.org/software-overview/)
+* [Android Toolchain](https://www.android.com/)
+  * [NDK r20](https://developer.android.com/ndk/)
+  * [SDK Tools 26.0.1](https://developer.android.com/studio/releases/sdk-tools)
+
+> **Note**: that *OpenEmbedded-Core* will fetch and build additional components for preparing the dedicated toolchain for your environment (Such as *GNU Binutils*). Please refer to the [Yocto project](https://www.yoctoproject.org/software-overview/) to understand how it works.
+
+### Supported Target Platforms
+
+The Alexa Auto SDK is supported on the following platforms:
+
+* Android 5.1 Lollipop API Level 22 or higher.
+    * ARM 32-bit
+    * ARM 64-bit
+    * x86 64-bit
+* QNX 7.0
+    * ARM 64-bit
+    * x86 64-bit
+* AGL
+    * ARM 64-bit
+* Generic Linux
+    * x86 64-bit
+* Poky Linux
+    * ARMv7a (+NEON)
+    * AArch64
+
+> **Note**: For Android targets, pre-built platform AARs for the default Auto SDK modules are available in the [JCenter repo](https://jcenter.bintray.com/com/amazon/alexa/aace/). Read the instructions about downloading and using the AARs in the [Android Sample App README](../samples/android/README.md).
 
 ## Quick Start<a id="quick-start"></a>
 
@@ -23,7 +75,7 @@ Run the build process as follows (where `AAC_SDK_HOME` is the location into whic
 $ ${AAC_SDK_HOME}/builder/build.sh <args>
 ```
 
-## Using the Alexa Auto SDK Builder<a id="using-the-builder"></a>
+## Using the Auto SDK Builder<a id="using-the-auto-sdk-builder"></a>
 
 Follow the instructions in this section to use the Alexa Auto SDK Builder OE-based building system to build the complete Alexa Auto SDK software for various cross targets.
 
@@ -95,12 +147,41 @@ $ export ANDROID_HOME=~/User/<user>/Android/sdk
 
 Make sure to accept the licenses in the SDK Manager.
 
-### Running the Alexa Auto SDK Builder
+#### Additional setup for Poky Linux targets
+
+If you are building a Poky Linux ARM target, make sure you have the appropriate toolchain for your target platform prior to running the Alexa Auto SDK Builder. For example, if you are building a Poky Linux ARM target `pokyarm64` on an Ubuntu system you can download and run the [Poky ARM toolchain](http://downloads.yoctoproject.org/releases/yocto/yocto-2.6.1/toolchain/x86_64/poky-glibc-x86_64-core-image-sato-aarch64-toolchain-2.6.1.sh).
+
+Auto SDK Builder will use `/opt/poky/2.6.1` as a root SDK directory by default. You can change this behavior by specifying via `--poky-sdk` option.
+
+#### Additional setup for Generic Linux ARM targets
+
+##### Linaro toolchain
+
+>**Note:** The Linaro Linux targets are available as previews only and have not been tested fully.
+
+Make sure to install the following prerequisites on your host.
+
+* [Linaro Linux targeted binary toolchain](https://www.linaro.org/downloads/)
+  * Version `gcc-linaro-7.4.1-2019.02` is recommended
+
+Linaro toolchains are typically named in the following format: `<version>-<build>-<host>` (e.g. `gcc-linaro-7.4.1-2019.02-x86_64_arm-linux-gnueabihf`)
+
+Auto SDK Builder will try to find Linaro toolchain in above format, under `${HOME}` directory by default. For ARMv7A HF targets, toolchain should be installed in `${HOME}/gcc-linaro-7.4.1-2019.02-x86_64_arm-linux-gnueabihf`.
+
+To change this behavior, you should specify prefix via `--linaro-prefix` option, where prefix should be `<path>/<version>-` format. (Defaults to `${HOME}/gcc-linaro-7.4.1-2019.02-`, and `<build>-<host>` will be determined by Auto SDK Builder.)
+
+##### Cross sysroots
+
+Additionally, you need the cross sysroot directory for your cross targets. Auto SDK Builder will try to find sysroot under `${HOME}/sysroots` directory by default. Sysroot directory name must matches to `<host>` value from the toolchain. For ARMv7A HF targets, your copy of sysroot should be installed in `${HOME}/sysroots/arm-linux-gnueabihf`.
+
+To change this behavior, you should specify the search path via `--linaro-sysroots` option. (Defaults to `${HOME}/sysroots`)
+
+### Running Builder <a id = "running-builder"></a>
 
 To run the Alexa Auto SDK Builder, invoke the following command:
 
 ```
-$ ${AAC_SDK_HOME}/builder/build.sh <platform> [options]
+$ ${AAC_SDK_HOME}/builder/build.sh <platform> -t <target> [options]
 ```
 
 This generates a complete target installation package (where `AAC_SDK_HOME` is the location into which you've installed the Alexa Auto SDK).
@@ -109,61 +190,50 @@ This generates a complete target installation package (where `AAC_SDK_HOME` is t
 
 The following `platforms` are available:
 
+* `linux` for Linux targets
 * `android` for Android targets
 * `qnx7` for QNX7 targets
-* `native` for Generic Linux targets
-* `poky` for Poky-based embedded Linux targets
 * `agl` for Automotive Grade Linux targets
+
+The table below lists the `target` values available to specify the cross compilation target.
+
+You must specify at least one `target`. For multiple targets, use a comma-separated list; for example:
+
+```
+$ ${AAC_SDK_HOME}/builder/build.sh linux -t native,pokyarm,pokyarm64
+```
+
+| Platform Name              | `platform` | `target`      |
+| -------------------------- | -----------| --------------- |
+| Generic Linux (x86-64)     | `linux`    | `native`        |
+| Poky Linux Cortex-A8 HF    | `linux`    | `pokyarm`       |
+| Poky Linux AArch64         | `linux`    | `pokyarm64`     |
+| Generic Linux ARMv7a       | `linux`    | `linaroarmel`   |
+| Generic Linux ARMv7a HF    | `linux`    | `linaroarmhf`   |
+| Android ARMv7a             | `android`  | `androidarm`    |
+| Android ARMv8a             | `android`  | `androidarm64`  |
+| Android x86                | `android`  | `androidx86`    |
+| Android x86-64             | `android`  | `androidx86-64` |
+| QNX AArch64                | `qnx7`     | `qnx7arm64`     |
+| QNX x86-64                 | `qnx7`     | `qnx7x86-64`    |
+| AGL AArch64                | `agl`      | `aglarm64`      |
+
+>**Note:** The `linaroarmel` and `linaroarmhf` targets are available as previews only and have not been tested fully.
+
+For all other targets/toolchains, please refer to the files `meta-aac-builder/conf/machine/*.conf`. Those targets are provided by default for Poky-based Linux systems.
 
 The following `options` are available:
 
 * `-h,--help` to show full available options.
-* `-t,--target <target>` to specify the cross compilation target. This can be a comma-separated list for multiple targets. See the table below for details. Note that if you do not specify the targets, then all possible targets for the platform will be built.
 * `-g,--debug` option to build with debugging options.
-* `-c,--clean` option to clean build. If you specify the OE recipe name with the `--package` option, only the specified recipe will be cleaned.
-* *(Android targets only)* `--android-api <integer>` option to explicitly specify the Android API level. The default is `22`.
-* *(QNX7 targets only)* `--qnx7sdp-path <path>` option to specify QNX 7.0.0 SDP installation (in host). If you run Builder within a Docker environment, host QNX SDP tools are always used, so make sure you have installed Linux tools within SDP even if your host is macOS.
-* `--default-logger-enabled <enabled>` option to enable/disable the default Engine logger ( `On` | `Off` ). This default value is `On`. If you enable the default Engine logger, you must also set the `--default-logger-level <level>` and `--default-logger-sink <sink>` options, either explicitly or by accepting the default values.
-* `--default-logger-level <level>` option to set the logger level for the default Engine logger ( `Verbose` | `Info` | `Metric` | `Warn` | `Error` | `Critical` ). The default value is `Info` for release builds, and `Verbose` for debug builds.
-* `--default-logger-sink <sink>` option to set the logger sink for the default Engine logger ( `Console` | `Syslog` ). The default value is `Syslog` for Android build targets, and `Console` for all other build targets.
-
-The following build targets are available:
-
-| Platform Name              | `-t` value      |
-| -------------------------- | --------------- |
-| Generic Linux              | `native`        |
-| Android ARMv7a             | `androidarm`    |
-| Android ARMv8a             | `androidarm64`  |
-| Android x86                | `androidx86`    |
-| Android x86-64             | `androidx86-64` |
-| QNX AArch64                | `qnx7arm64`     |
-| QNX x86-64                 | `qnx7x86-64`    |
-
->**Note**: Using the Alexa Auto SDK Builder to build the Alexa Auto SDK for macOS targets is not currently supported.
-
-For all other targets/toolchains, please refer to the files `meta-aac-builder/conf/machine/*.conf`. Those targets are provided by default for Poky-based Linux systems:
-
-| Platform Name                          | `-t` value      |
-| -------------------------------------- | --------------- |
-| AGL AArch64                            | `aglarm64`      |
-| Poky Linux ARMv7a (+NEON)              | `pokyarm`       |
-| Poky Linux AArch64                     | `pokyarm64`     |
-
-If you are building a Poky Linux ARM target, make sure you have the appropriate toolchain for your target platform prior to running the Alexa Auto SDK Builder. For example, if you are building a Poky Linux ARM target `pokyarm64` on an Ubuntu system you could download and run the the following script:
-
-> http://downloads.yoctoproject.org/releases/yocto/yocto-2.6.1/toolchain/x86_64/poky-glibc-x86_64-core-image-sato-aarch64-toolchain-2.6.1.sh
-
-To build all the Alexa Auto SDK modules and their dependencies for a *Poky Linux AArch64* target, run the following command:
-
-```
-$ ${AAC_SDK_HOME}/builder/build.sh poky -t pokyarm64
-```
-
-Similarly, to build an *Android ARMv7a* target, run the following command:
-
-```
-$ ${AAC_SDK_HOME}/builder/build.sh android -t androidarm
-```
+* *(Android targets only)* `--android-api <integer>` option to explicitly specify Android API level. The default is `22`.
+* *(QNX7 targets only)* `--qnx7sdp-path <path>` option to specify QNX 7.0.0 SDP installation (in host). If you run Builder within Docker environment, host QNX SDP tools are always used. So make sure you have installed Linux tools within SDP even if your host is macOS.
+* *(Poky Linux & AGL targets only)* `--pokysdk-path <path>` option to specify Poky SDK installation root path.
+* *(Generic Linux ARM targets only)* `--linaro-prefix <prefix>` option to specify the path where the Linaro toolchain is located. See the section *Additional setup for Generic Linux ARM targets* above for the details.
+* *(Generic Linux ARM targets only)* `--linaro-sysroots <path>` option to specify the path where the cross sysroot directories are located. See the section *Additional setup for Generic Linux ARM targets* above for the details.
+* `--default-logger-enabled <enabled>` option to enable/disable the default engine logger ( `On` | `Off` ). This default value is `On`. If you enable the default Engine logger, you must also set the `--default-logger-level <level>` and `--default-logger-sink <sink>` options, either explicitly or by accepting the default values.
+* `--default-logger-level <level>` option to set the logger level for the default engine logger ( `Verbose` | `Info` | `Metric` | `Warn` | `Error` | `Critical` ). The default value is `Info` for release builds, and `Verbose` for debug builds.
+* `--default-logger-sink <sink>` option to set the logger sink for the default engine logger ( `Console` | `Syslog` ). The default value is `Syslog` for Android build targets, and `Console` for all other build targets.
 
 ### Install the Built Package
 
@@ -171,9 +241,9 @@ After you successfully build the Auto SDK, the output directory `deploy` will be
 
 #### For Android targets
 
-Within the output directory, you will find the .aar file for each module. Pre-built default platform AARs for the default Auto SDK modules are also available from the [JCenter repo](https://jcenter.bintray.com/com/amazon/alexa/aace/). You can add these AARs as dependencies of your Android project instead of building the AARs yourself with the Auto SDK Builder.
+Within the output directory, you will find the .aar file (AAR) for each module as well as an sample-core.aar file that is required to generate the Android Sample App. Pre-built default platform AARs for the default Auto SDK modules and the sample-core AAR are also available from the [JCenter repo](https://jcenter.bintray.com/com/amazon/alexa/aace/). You can add these AARs as dependencies of your Android project instead of building the AARs yourself with the Auto SDK Builder.
 
-> **Note:** If you want to implement any optional modules (such as wake word support, Alexa Communications, Local Voice Control (LVC), or Device Client Metrics (DCM)), you must use the AARs generated by the Alexa Auto SDK Builder. The prebuilt AARs available in JCenter are the default Auto SDK modules only.
+> **Note:** If you want to implement any optional modules (such as wake word support, Alexa Communications, Local Voice Control (LVC), Device Client Metrics (DCM), or Voice Chrome), you must use the AARs generated by the Alexa Auto SDK Builder. The prebuilt platform AARs and sample-core AAR available in JCenter are for the default Auto SDK modules only.
 
 #### For Linux/QNX targets
 
@@ -204,7 +274,7 @@ $ ./build.sh clean
 
 On some Android Samsung devices, OpenSSL causes the Alexa Auto Sample App to terminate. You can specify an additional argument `--use-mbedtls` to build the Auto SDK with mbedTLS.
 
-## Using the Alexa Auto SDK OE Layer <a name = "meta-aac"></a>
+## Using the Auto SDK OE Layer <a name = "using-the-auto-sdk-oe-layer"></a>
 
 If you want to integrate the Alexa Auto SDK software into an existing OpenEmbedded-based system, you can use the *Alexa Auto SDK OE Layer* a.k.a `meta-aac`, without using the *Alexa Auto SDK Builder*.
 

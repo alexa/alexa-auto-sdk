@@ -156,18 +156,21 @@ namespace alexa {
 
             ThrowIfNot( playbackStateObj.get( "state", &state.playbackState.state ), "getFieldFailed" );
             ThrowIfNot( playbackStateObj.get( "supportedOperations", "[Lcom/amazon/aace/alexa/LocalMediaSource$SupportedPlaybackOperation;", &result.l ), "getFieldFailed" );
+            if ( result.l == nullptr ) {
+                AACE_JNI_WARN(TAG, "LocalMediaSourceHandler::getState", "Provided supportedOperations is null, defaulting to empty array");
+            } else {
+                JObjectArray supportedOpsArr( (jobjectArray) result.l );
+                std::vector<aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation> supportedOperations;
+                SupportedPlaybackOperation op;
 
-            JObjectArray supportedOpsArr( (jobjectArray) result.l );
-            std::vector<aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation> supportedOperations;
-            SupportedPlaybackOperation op;
+                for( int j = 0; j < supportedOpsArr.size(); j++ ) {
+                    ThrowIfNot( supportedOpsArr.getAt( j, &result.l ), "getArrayElementFailed" );
+                    ThrowIfNot( JLocalSupportedPlaybackOperation::checkType( result.l, &op ), "invalidPlaybackOperationType" );
+                    supportedOperations.push_back( op );
+                }
 
-            for( int j = 0; j < supportedOpsArr.size(); j++ ) {
-                ThrowIfNot( supportedOpsArr.getAt( j, &result.l ), "getArrayElementFailed" );
-                ThrowIfNot( JLocalSupportedPlaybackOperation::checkType( result.l, &op ), "invalidPlaybackOperationType" );
-                supportedOperations.push_back( op );
+                state.playbackState.supportedOperations = supportedOperations;
             }
-
-            state.playbackState.supportedOperations = supportedOperations;
 
             ThrowIfNot( playbackStateObj.get( "trackOffset", &result.j ), "getFieldFailed" );
             state.playbackState.trackOffset = std::chrono::milliseconds( result.j );

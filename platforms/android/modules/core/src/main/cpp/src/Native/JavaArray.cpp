@@ -34,6 +34,8 @@ namespace native {
             jobjectArray arr = env->NewObjectArray( size, elementClass->get(), initialValue );
             ThrowIfJavaEx( env, "newObjectArrayFailed" );
             ThrowIfNot( set( arr ), "setFailed" );
+            // delete local array ref
+            env->DeleteLocalRef(arr);
         }
         catch_with_ex {
             AACE_JNI_ERROR(TAG,"JavaObjectArray",ex.what());
@@ -50,6 +52,8 @@ namespace native {
             jobjectArray arr = env->NewObjectArray( size, elementClass->get(), initialValue );
             ThrowIfJavaEx( env, "newObjectArrayFailed" );
             ThrowIfNot( set( arr ), "setFailed" );
+            // delete local array ref
+            env->DeleteLocalRef(arr);
         }
         catch_with_ex {
             AACE_JNI_ERROR(TAG,"JavaObjectArray",ex.what());

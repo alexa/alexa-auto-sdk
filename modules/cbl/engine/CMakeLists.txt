@@ -31,6 +31,7 @@ target_include_directories(AACECBLEngine
         $<INSTALL_INTERFACE:include>
     PRIVATE
         ${AVS_INCLUDE_DIRS}
+        ${AVS_INCLUDE_DIRS}/../avs_shared
 )
 
 target_link_libraries(AACECBLEngine

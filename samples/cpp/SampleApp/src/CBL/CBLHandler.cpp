@@ -81,6 +81,14 @@ void CBLHandler::cblStateChanged(CBLState state, CBLStateChangedReason reason, c
                         }
                     });
                     break;
+                case CBLStateChangedReason::AUTHORIZATION_EXPIRED:
+                    activity->runOnUIThread([=]() {
+                        if (auto card = activity->findViewById("id:card").lock()) {
+                            auto string = "{\"message\":\"The token has expired. Login again.\"}";
+                            card->set(string, View::Type::CBLAuthorizationExpired);
+                        }
+                    });
+                    break;
                 default:
                     break;
             }

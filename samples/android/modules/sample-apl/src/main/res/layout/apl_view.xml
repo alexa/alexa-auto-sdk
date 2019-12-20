@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent">
+
+    <com.amazon.apl.android.APLLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/apl"
+        android:background="?attr/colorPrimary"
+        android:theme="@style/Theme.AppCompat"
+        app:aplTheme="dark"
+        app:isRound="false"
+        app:mode="hub"
+        />
+
+</LinearLayout>

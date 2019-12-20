@@ -19,6 +19,7 @@
 #include <condition_variable>
 
 #include <AACE/Alexa/LocalMediaSource.h>
+#include <AVSCommon/Utils/Threading/Executor.h>
 #include "ResponseDispatcher.h"
 #include "LoggerHandler.h"
 
@@ -60,6 +61,8 @@ private:
         Source source,
         std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher);
 
+    void updateState();
+
     // Source String
     std::string m_SourceString;
 
@@ -88,6 +91,11 @@ private:
     std::condition_variable m_getStateResponseCv;
     std::mutex m_mutex;
     bool m_didReceiveGetStateResponse;
+
+    bool m_updateInProgress;
+
+    // Thread used for asynchronous calls to get local media source state
+    alexaClientSDK::avsCommon::utils::threading::Executor m_executor;
 };
 
 }  // namespace alexa

@@ -225,11 +225,10 @@ void Application::printMenu(std::shared_ptr<ApplicationContext> applicationConte
             } else {
                 stream << " [ " + key + " ]  " << std::string(keyMax - keyLength, ' ') << name << std::endl;
             }
-            stream << std::endl;
             index++;
         }
     }
-    stream << titleRuler << std::endl;
+    stream << std::endl << titleRuler << std::endl;
     if (menu.count("path")) {
         auto menuFilePath = menu.at("path").get<std::string>();
         int balance = menuColumns - 2 - menuFilePath.length();
@@ -301,6 +300,9 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     views.push_back(TextView::create("id:ConnectionStatus"));
     views.push_back(TextView::create("id:DialogState"));
 
+    // DoNotDisturbHandler view example
+    views.push_back(TextView::create("id:DoNotDisturbState"));
+
     // NotificationsHandler view example
     views.push_back(TextView::create("id:IndicatorState"));
 
@@ -340,11 +342,9 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     auto loggerHandler = logger::LoggerHandler::create(activity);
     Ensures(loggerHandler != nullptr);
 
-#ifdef LOCALVOICECONTROL
     // Create car control handler
     auto carControlHandler = carControl::CarControlHandler::create(activity, loggerHandler);
     Ensures(carControlHandler != nullptr);
-#endif
 
     // Create configuration files for --config files path passed from the command line
     std::vector<std::shared_ptr<aace::core::config::EngineConfiguration>> configurationFiles;
@@ -364,10 +364,31 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     }
 
     // Validate that configuration files are passed in
+    std::vector<json> jsonConfigs;
+    bool configError = false;
+    parseConfigurations(configFilePaths, jsonConfigs);
+    // ------------------------------------------------------------------------
+    // In a production environment we recommend that the application builds
+    // the car control configuration programatically. However, the configuration
+    // can also be passed in to the application. This example builds a
+    // configuration programatically if one is not passed in to the application.
+    // ------------------------------------------------------------------------
+    if (!carControl::CarControlHandler::checkConfiguration(jsonConfigs, carControl::CarControlHandler::ConfigType::CAR)) {
+        console->printRuler();
+        console->printLine("Car control configuration was created");
+        console->printRuler();
+        auto carControlConfig = carControl::CarControlDataProvider::generateCarControlConfig();
+        configurationFiles.push_back(carControlConfig);
+    } else {
+        console->printRuler();
+        console->printLine("Car control configuration found");
+        console->printRuler();
+    }
+    // Initialize values for car control configuration controllers
+    carControl::CarControlDataProvider::initialize(configurationFiles);
+
     if (applicationContext->isAlexaCommsSupported() || applicationContext->isLocalVoiceControlSupported() || applicationContext->isDcmSupported()) {
-        std::vector<json> jsonConfigs;
-        bool configError = false;
-        parseConfigurations(configFilePaths, jsonConfigs);
+        
 #ifdef ALEXACOMMS
         // Config file must be specified
         if (!communication::CommunicationHandler::checkConfiguration(jsonConfigs)) {
@@ -402,28 +423,6 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
              
             return Status::Failure;
         }
-
-#ifdef LOCALVOICECONTROL
-        // ------------------------------------------------------------------------
-        // In a production environment we recommend that the application builds
-        // the car control configuration programatically. However, the configuration
-        // can also be passed in to the application. This example builds a
-        // configuration programatically if one is not passed in to the application.
-        // ------------------------------------------------------------------------
-        if (!carControl::CarControlHandler::checkConfiguration(jsonConfigs, carControl::CarControlHandler::ConfigType::CAR)) {
-            console->printRuler();
-            console->printLine("Car control configuration was created");
-            console->printRuler();
-            auto carControlConfig = carControl::CarControlDataProvider::generateCarControlConfig();
-            configurationFiles.push_back(carControlConfig);
-        } else {
-            console->printRuler();
-            console->printLine("Car control configuration found");
-            console->printRuler();
-        }
-        // Initialize values for car control configuration controllers
-        carControl::CarControlDataProvider::initialize(configurationFiles);
-#endif
     }
 
     // Configure the engine
@@ -488,6 +487,11 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     Ensures(cblHandler != nullptr);
     Ensures(engine->registerPlatformInterface(cblHandler));
 
+    // Alerts
+    auto doNotDisturbHandler = alexa::DoNotDisturbHandler::create(activity, loggerHandler);
+    Ensures(doNotDisturbHandler != nullptr);
+    Ensures(engine->registerPlatformInterface(doNotDisturbHandler));
+
 #ifdef ALEXACOMMS
     // Communications
     auto communicationHandler =
@@ -516,7 +520,7 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
         { aace::alexa::LocalMediaSource::Source::SATELLITE_RADIO, nullptr },
         { aace::alexa::LocalMediaSource::Source::LINE_IN, nullptr },
         { aace::alexa::LocalMediaSource::Source::COMPACT_DISC, nullptr },
-        { aace::alexa::LocalMediaSource::Source::SIRIUS_XM, nullptr },
+        /*{ aace::alexa::LocalMediaSource::Source::SIRIUS_XM, nullptr },*/
         { aace::alexa::LocalMediaSource::Source::DAB, nullptr }
     };
 
@@ -594,7 +598,6 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     Ensures(alexaSpeakerHandler != nullptr);
     Ensures(engine->registerPlatformInterface(alexaSpeakerHandler));
 
-#ifdef LOCALVOICECONTROL
     // Car Control Handler
     if (!engine->registerPlatformInterface(carControlHandler)) {
         loggerHandler->log(Level::INFO, "Application:Engine", "failed to register car control handler");
@@ -604,7 +607,6 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
         }
         return Status::Failure;
     }
-#endif // LOCALVOICECONTROL
 
     // Start the engine
     if (engine->start()) {

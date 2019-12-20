@@ -1,0 +1,25 @@
+{
+  "aace.systemAudio": {
+    "AudioInputProvider": {
+      "devices": {
+        "default": {
+          "module": "QSA",
+          "shared": true
+        }
+      }
+    },
+    "AudioOutputProvider": {
+      "devices": {
+        "default": {
+          "module": "OpenMAX AL"
+        },
+        "raw": {
+          "module": "QSA"
+        }
+      },
+      "types": {
+        "COMMUNICATION": "raw"
+      }
+    }
+  }
+}

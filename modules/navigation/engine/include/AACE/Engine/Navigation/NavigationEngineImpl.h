@@ -16,19 +16,24 @@
 #ifndef AACE_ENGINE_NAVIGATION_NAVIGATION_ENGINE_IMPL_H
 #define AACE_ENGINE_NAVIGATION_NAVIGATION_ENGINE_IMPL_H
 
-#include <AVSCommon/SDKInterfaces/DirectiveSequencerInterface.h>
-#include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
+#include <Endpoints/EndpointBuilder.h>
+
 #include <AACE/Navigation/Navigation.h>
+#include <AACE/Navigation/NavigationEngineInterfaces.h>
 
 #include "NavigationCapabilityAgent.h"
-#include "NavigationObserverInterface.h"
+#include "NavigationHandlerInterface.h"
+#include "DisplayManagerCapabilityAgent.h"
+#include "NavigationAssistanceCapabilityAgent.h"
+
 
 namespace aace {
 namespace engine {
 namespace navigation {
 
 class NavigationEngineImpl :
-    public NavigationObserverInterface,
+    public NavigationHandlerInterface,
+    public aace::navigation::NavigationEngineInterface,
     public alexaClientSDK::avsCommon::utils::RequiresShutdown,
     public std::enable_shared_from_this<NavigationEngineImpl> {
     
@@ -36,24 +41,35 @@ private:
     NavigationEngineImpl( std::shared_ptr<aace::navigation::Navigation> navigationPlatformInterface, const std::string& navigationProviderName );
     
     bool initialize(
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
+	    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager);
     
 public:
     static std::shared_ptr<NavigationEngineImpl> create(
         std::shared_ptr<aace::navigation::Navigation> navigationPlatformInterface,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
+	    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         const std::string& navigationProviderName);
 
-    // NavigationObserverInterface
-    void setDestination( const std::string& payload ) override;
+    // NavigationHandlerInterface
+    void showPreviousWaypoints() override;
+    void navigateToPreviousWaypoint() override;
+    void showAlternativeRoutes( aace::navigation::Navigation::AlternateRouteType alternateRouteType ) override;
+    void controlDisplay( aace::navigation::Navigation::ControlDisplay controlDisplay ) override;
+    void startNavigation( const std::string& payload ) override;
+    void announceManeuver ( const std::string& payload ) override;
+    void announceRoadRegulation ( aace::navigation::Navigation::RoadRegulation roadRegulation ) override;
     void cancelNavigation() override;
     std::string getNavigationState() override;
+
+    // NavigationEngineInterface
+    void onNavigationEvent( EventName event ) override;
+    void onNavigationError( aace::navigation::NavigationEngineInterface::ErrorType type, aace::navigation::NavigationEngineInterface::ErrorCode code, const std::string& description ) override;
+    void onShowAlternativeRoutesSucceeded( const std::string& payload ) override;
     
 protected:
     void doShutdown() override;
@@ -61,6 +77,9 @@ protected:
 private:
     std::shared_ptr<aace::navigation::Navigation> m_navigationPlatformInterface;
     std::shared_ptr<NavigationCapabilityAgent> m_navigationCapabilityAgent;
+    std::shared_ptr<displaymanager::DisplayManagerCapabilityAgent> m_displayManagerCapabilityAgent;
+    std::shared_ptr<navigationassistance::NavigationAssistanceCapabilityAgent> m_navigationAssistanceCapabilityAgent;
+//    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> m_directiveSequencer;
     const std::string& m_navigationProviderName;
 };
 

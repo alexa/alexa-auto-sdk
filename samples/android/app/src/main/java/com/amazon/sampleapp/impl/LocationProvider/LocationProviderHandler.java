@@ -36,6 +36,7 @@ import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.HashSet;
 
 /**
  * A {@link LocationProvider} implementation that retrieves location updates from system GPS and
@@ -72,6 +73,8 @@ public class LocationProviderHandler extends LocationProvider implements Locatio
     private android.location.Location mMockLocation;
     /// Whether mock location is in use
     private boolean mMockLocationEnabled = false;
+    /// Available providers
+    private HashSet<String> mAvailableProviders;
 
     public LocationProviderHandler( Activity activity, LoggerHandler logger ) {
         mActivity = activity;
@@ -84,12 +87,20 @@ public class LocationProviderHandler extends LocationProvider implements Locatio
         mGeocoder = new Geocoder( mActivity );
         mLocationManager = ( LocationManager )
                 activity.getApplicationContext().getSystemService( Context.LOCATION_SERVICE );
+
+        // Initialize set of available providers
+        mAvailableProviders = new HashSet<>();
+        List<String> availableProviders = mLocationManager.getAllProviders();
+        for ( String provider : availableProviders ) {
+            mAvailableProviders.add( provider );
+        }
+
         requestLocationUpdates( LocationManager.NETWORK_PROVIDER );
         requestLocationUpdates( LocationManager.GPS_PROVIDER );
 
         // Retrieve an initial location estimate cached by the location providers
-        getLastKnownLocation( LocationManager.NETWORK_PROVIDER );
-        getLastKnownLocation( LocationManager.GPS_PROVIDER );
+        updateCurrentLocation( LocationManager.NETWORK_PROVIDER );
+        updateCurrentLocation( LocationManager.GPS_PROVIDER );
 
         // Set an initial default mock location
         mMockLocation = new android.location.Location( "" );
@@ -101,22 +112,41 @@ public class LocationProviderHandler extends LocationProvider implements Locatio
     @Override
     public Location getLocation() {
         if ( mMockLocationEnabled ) {
+            double mockLatitude = mMockLocation.getLatitude();
+            double mockLongitude = mMockLocation.getLongitude();
+
+            // prevents coordinate from being (0,0)
+            if ( mockLatitude == 0.0 && mockLongitude == 0.0 ) {
+                return new Location( Location.UNDEFINED, Location.UNDEFINED );
+            }
+
             return new Location(
-                    mMockLocation.getLatitude(),
-                    mMockLocation.getLongitude(),
-                    mMockLocation.getAltitude());
+                    mockLatitude,
+                    mockLongitude,
+                    mMockLocation.getAltitude()
+            );
         }
+
         if ( mCurrentLocation == null ) {
             mLogger.postVerbose( TAG,
                     "No location found. Geolocation context will not be sent. " +
                     "Defaulting to AVS cloud. ");
-            // null indicates no current available location
-            return null;
+            return new Location( Location.UNDEFINED, Location.UNDEFINED );
         }
+
+        double latitude = mCurrentLocation.getLatitude();
+        double longitude = mCurrentLocation.getLongitude();
+
+        // prevents coordinate from being (0,0)
+        if ( latitude == 0.0 && longitude == 0.0 ) {
+            return new Location( Location.UNDEFINED, Location.UNDEFINED );
+        }
+
         return new Location(
-                mCurrentLocation.getLatitude(),
-                mCurrentLocation.getLongitude(),
-                mCurrentLocation.getAltitude());
+                latitude,
+                longitude,
+                mCurrentLocation.getAltitude()
+        );
     }
 
     @Override
@@ -128,18 +158,22 @@ public class LocationProviderHandler extends LocationProvider implements Locatio
 
     @Override
     public void onLocationChanged(android.location.Location location) {
-        if ( !mMockLocationEnabled ) setLocation( location );
+        if ( !mMockLocationEnabled ) {
+            updateLocation( location );
+        }
     }
 
     @Override
     public void onProviderDisabled(String provider) {
         mLogger.postVerbose( TAG, String.format("provider disabled: %s", provider) );
+        mCurrentLocation = null;
     }
 
     @Override
     public void onProviderEnabled(String provider) {
         mLogger.postVerbose( TAG, String.format("provider enabled: %s", provider) );
         requestLocationUpdates( provider );
+        updateCurrentLocation( provider );
     }
 
     @Override
@@ -155,21 +189,21 @@ public class LocationProviderHandler extends LocationProvider implements Locatio
      */
     private void requestLocationUpdates( String provider ) {
         mLogger.postVerbose( TAG, String.format("Requesting location updates using %s", provider) );
-        try {
-            // Request updates from the provider only if it's enabled
-            if ( !mLocationManager.isProviderEnabled( provider ) ) {
-                mLogger.postInfo( TAG, String.format(
-                        "Request location updates attempted, but %s location provider is disabled",
-                        provider) );
-            } else {
+        if ( mAvailableProviders.contains( provider ) ) {
+            try {
                 mLocationManager.requestLocationUpdates(
                         provider,
                         MIN_REFRESH_TIME,
                         MIN_REFRESH_DISTANCE,
-                        this );
+                        this
+                );
+            } catch ( SecurityException e ) {
+                mLogger.postError( TAG, e.getMessage() );
+            } catch ( IllegalArgumentException illegalError ) {
+                mLogger.postError( TAG, illegalError.getMessage() );
             }
-        } catch ( SecurityException e ) {
-            mLogger.postError( TAG, e.getMessage() );
+        } else {
+            mLogger.postVerbose( TAG, String.format( "Provider %s is not available", provider ));
         }
     }
 
@@ -179,7 +213,7 @@ public class LocationProviderHandler extends LocationProvider implements Locatio
      *
      * @param provider The provider from which to get the last known location
      */
-    private void getLastKnownLocation( String provider ){
+    private void updateCurrentLocation( String provider ){
         try {
             // Request location from the provider only if it's enabled
             if ( !mLocationManager.isProviderEnabled( provider ) ) {
@@ -190,8 +224,13 @@ public class LocationProviderHandler extends LocationProvider implements Locatio
                 // Get the last known fix from the provider and update the current location estimate
                 android.location.Location lastKnownLocation =
                         mLocationManager.getLastKnownLocation( provider );
-                if ( lastKnownLocation != null ) setLocation(lastKnownLocation);
-                else mLogger.postInfo( TAG, String.format("last %s location not found", provider) );
+
+                if ( lastKnownLocation != null ) {
+                    updateLocation( lastKnownLocation );
+                }
+                else {
+                    mLogger.postInfo( TAG, String.format("last %s location not found", provider) );
+                }
             }
         }
         catch ( SecurityException e ) {
@@ -206,7 +245,7 @@ public class LocationProviderHandler extends LocationProvider implements Locatio
      *
      * @param location The location to set as the current estimate
      */
-    private void setLocation( android.location.Location location ) {
+    private void updateLocation( android.location.Location location ) {
         if ( mCurrentLocation != null) {
             // Only update if accuracy is equivalent or better or 2 mins since last update
             if ( location.getAccuracy() <= mCurrentLocation.getAccuracy() ||

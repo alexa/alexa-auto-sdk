@@ -25,6 +25,8 @@ namespace audio {
 
 class AudioInputChannelInterface {
 public:
+    virtual ~AudioInputChannelInterface() = default;
+
     using AudioWriteCallback = std::function<void(const int16_t*, const size_t)>;
     using ChannelId = int32_t;
 

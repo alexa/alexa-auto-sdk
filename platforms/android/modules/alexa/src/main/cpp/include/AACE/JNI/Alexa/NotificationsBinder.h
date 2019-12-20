@@ -30,6 +30,8 @@ namespace alexa {
         // aace::alexa::Notifications
         void setIndicator( IndicatorState state ) override;
 
+        void onNotificationReceived() override;
+
     private:
         JObject m_obj;
     };

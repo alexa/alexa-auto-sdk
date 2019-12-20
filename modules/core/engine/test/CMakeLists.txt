@@ -12,7 +12,7 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Audio/MockAudioInputChannelInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Audio/MockAudioOutputChannelInterface.h
 )
- 
+
 source_group("Header Files" FILES ${HEADERS})
 
 #
@@ -27,6 +27,7 @@ target_include_directories(AACECoreTestsLib
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
+    PRIVATE
         ${GTEST_INCLUDE_DIRS}
 )
 

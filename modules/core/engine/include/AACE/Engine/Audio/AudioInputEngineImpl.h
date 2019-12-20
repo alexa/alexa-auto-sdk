@@ -54,7 +54,8 @@ private:
     
     ChannelId m_nextChannelId = 1;
     
-    std::mutex m_mutex;
+    std::mutex m_mutex; // to serialize operations of AudioInputChannelInterface
+    std::mutex m_callbackMutex; // to guard against potential race conditions caused by callback from another thread
 };
 
 }  // audio

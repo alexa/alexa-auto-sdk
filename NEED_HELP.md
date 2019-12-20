@@ -1,24 +1,44 @@
 # Need Help?
 
-## Accessing APIs During Development<a id="whitelisting"></a>
+* [Registering a Product and Creating a Security Profile](#registering-a-product-and-creating-a-security-profile)
+* [Requesting Additional Functionality (whitelisting)](#requesting-additional-functionality-whitelisting)
+* [Reporting an Issue](#reporting-an-issue)
+* [Making Pull Requests](#making-pull-requests)
 
-The following functionality is available with help from your designated Amazon Solutions Architect (SA) or Partner Manager:
+## Registering a Product and Creating a Security Profile <a id = "registering-a-product-and-creating-a-security-profile"></a>
+
+After creating an Amazon developer account, you'll need to [register a product and create a security profile](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/register-a-product.html) on the Alexa Voice Service (AVS) developer portal.
+
+When you follow the instructions to [fill in the product information](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/register-a-product.html#fill-in-product-information):
+
+* Use your own custom information, taking note of the **Product ID**.
+* Be sure to select **Automotive** from the **Product category** pull-down.
+
+When you follow the instructions to [set up your security profile](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/register-a-product.html#set-up-your-security-profile), take note of the generated **Client ID**.
+
+## Requesting Additional Functionality (whitelisting) <a id="requesting-additional-functionality-whitelisting"></a>
+
+The following additional functionality is available with help from your designated Amazon Solutions Architect (SA) or Partner Manager:
 
 * Amazon Music and other music service providers
 * Wake Word support
-* Phone Call Control
 * Alexa Communication
 * Local Voice Control
 * Device Client Metrics
 * Voice Chrome for Android
+* Alexa Presentation Language (APL) component required for APL rendering on the Android Sample App
 
-You will need to provide the Amazon ID of your development device or product on the [AVS Developer Portal](https://developer.amazon.com/avs/home.html#/avs/home).
+In order to use this functionality, your product must be whitelisted by Amazon. Contact your SA or Partner Manager, provide the Amazon ID of your development device, and request the functionality you want to add.
 
-1. Log into the [AVS Developer Portal](https://developer.amazon.com/avs/home.html#/avs/home).
-2. Click **Manage** to the right of your device in its listing on the [My Products](https://developer.amazon.com/avs/home.html#/avs/home) page. Take note of your **Amazon ID** for your device.
-3. Contact your SA or Partner Manager and provide them with the **Amazon ID** and the functionality you'd like to request.
+>**Note:** If you would like to request additional functionality but don't have a designated SA or Partner Manager, please reach out using the "Request More Information" form at the end of the [Alexa Auto Software Development Kit page](https://developer.amazon.com/en-US/alexa/alexa-auto/sdk) on the developer portal.
 
-## Reporting an Issue<a id="reportinganissue"></a>
+To find the Amazon ID for your development device:
+
+1. Log in to the [AVS Developer Portal](https://developer.amazon.com/alexa/console/avs/home).
+2. Click **PRODUCTS**.
+2. Take note of the **Amazon ID** for your device.
+
+## Reporting an Issue <a id="reporting-an-issue"></a>
 
 ### Existing Alexa Auto SDK Customers
 
@@ -33,6 +53,6 @@ Please reach out to the designated Amazon Solutions Architect (SA) or Partner Ma
 
 Please fill out the form "Request more information" at the bottom of the [Alexa Auto Software Development Kit (SDK)](https://developer.amazon.com/alexa-voice-service/alexa-auto-sdk) page. Once you have submitted your request, someone from Amazon will contact you.
 
-## Making Pull Requests<a id="pullrequests"></a>
+## Making Pull Requests <a id="making-pull-requests"></a>
 
 We are **not** accepting pull requests or community contributed bug fixes at this time.

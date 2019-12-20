@@ -31,7 +31,7 @@ AlertsEngineImpl::AlertsEngineImpl( std::shared_ptr<aace::alexa::Alerts> alertsP
 
 bool AlertsEngineImpl::initialize(
     std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> audioOutputChannel,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSConnectionManagerInterface> connectionManager,
     std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedSender,
@@ -41,32 +41,51 @@ bool AlertsEngineImpl::initialize(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::AlertsAudioFactoryInterface> alertsAudioFactory,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
-    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager ) {
+    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager,
+    class DeviceSettingsDelegate& deviceSettingsDelegate) {
 
     try
     {
         ThrowIfNot( initializeAudioChannel( audioOutputChannel, speakerManager ), "initializeAudioChannelFailed" );
 
-        auto alertRenderer = alexaClientSDK::capabilityAgents::alerts::renderer::Renderer::create( std::static_pointer_cast<MediaPlayerInterface>( shared_from_this() ) );
+        // add alarm volume ramp setting to settings manager
+        ThrowIfNot(deviceSettingsDelegate.configureAlarmVolumeRampSetting(), "createAlarmVolumeRampSettingFailed");
+
+        auto alertRenderer = alexaClientSDK::capabilityAgents::alerts::renderer::Renderer::create( 
+            std::static_pointer_cast<MediaPlayerInterface>( shared_from_this() ), 
+            deviceSettingsDelegate.getDeviceSettingsManager() );
         ThrowIfNull( alertRenderer, "couldNotCreateAlertsRenderer" );
 
-        std::shared_ptr<alexaClientSDK::capabilityAgents::alerts::storage::SQLiteAlertStorage> alertStorage = alexaClientSDK::capabilityAgents::alerts::storage::SQLiteAlertStorage::create( alexaClientSDK::avsCommon::utils::configuration::ConfigurationNode::getRoot(), alertsAudioFactory );
+        std::shared_ptr<alexaClientSDK::capabilityAgents::alerts::storage::SQLiteAlertStorage> alertStorage 
+            = alexaClientSDK::capabilityAgents::alerts::storage::SQLiteAlertStorage::create( 
+                alexaClientSDK::avsCommon::utils::configuration::ConfigurationNode::getRoot(), 
+                alertsAudioFactory );
         ThrowIfNull( alertStorage, "couldNotCreateAlertsStorage" );
 
-        m_alertsCapabilityAgent = alexaClientSDK::capabilityAgents::alerts::AlertsCapabilityAgent::create( messageSender, connectionManager, certifiedSender, focusManager, speakerManager, contextManager, exceptionSender, alertStorage, alertsAudioFactory, alertRenderer, dataManager );
+        m_alertsCapabilityAgent = alexaClientSDK::capabilityAgents::alerts::AlertsCapabilityAgent::create( 
+            messageSender,
+            connectionManager,
+            certifiedSender,
+            focusManager,
+            speakerManager,
+            contextManager,
+            exceptionSender,
+            alertStorage,
+            alertsAudioFactory,
+            alertRenderer,
+            dataManager,
+            deviceSettingsDelegate.getConfig<DeviceSettingsDelegate::DeviceSettingsIndex::ALARM_VOLUME_RAMP>().setting
+            );
         ThrowIfNull( m_alertsCapabilityAgent, "couldNotCreateCapabilityAgent" );
 
         // add the alert state changed observer
         m_alertsCapabilityAgent->addObserver( std::dynamic_pointer_cast<alexaClientSDK::capabilityAgents::alerts::AlertObserverInterface>( shared_from_this() ) );
 
-        // add the capability agent to the connection manager
+        // add the capability agent as connection status observer
         connectionManager->addConnectionStatusObserver( m_alertsCapabilityAgent );
 
-        // add capability agent to the directive sequencer
-        ThrowIfNot( directiveSequencer->addDirectiveHandler( m_alertsCapabilityAgent ), "addDirectiveHandlerFailed" );
-
-        // register capability with delegate
-        ThrowIfNot( capabilitiesDelegate->registerCapability( m_alertsCapabilityAgent ), "registerCapabilityFailed");
+        // register the capability with the default endpoint
+        defaultEndpointBuilder->withCapability( m_alertsCapabilityAgent, m_alertsCapabilityAgent );
 
         // set the platform's engine interface reference
         m_alertsPlatformInterface->setEngineInterface( std::dynamic_pointer_cast<aace::alexa::AlertsEngineInterface>( shared_from_this() ) );
@@ -82,7 +101,7 @@ bool AlertsEngineImpl::initialize(
 std::shared_ptr<AlertsEngineImpl> AlertsEngineImpl::create(
     std::shared_ptr<aace::alexa::Alerts> alertsPlatformInterface,
     std::shared_ptr<aace::engine::audio::AudioManagerInterface> audioManager,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSConnectionManagerInterface> connectionManager,
     std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedSender,
@@ -92,7 +111,8 @@ std::shared_ptr<AlertsEngineImpl> AlertsEngineImpl::create(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::AlertsAudioFactoryInterface> alertsAudioFactory,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
-    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager ) {
+    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager,
+    class DeviceSettingsDelegate& deviceSettingsDelegate) {
 
     std::shared_ptr<AlertsEngineImpl> alertsEngineImpl = nullptr;
 
@@ -101,7 +121,7 @@ std::shared_ptr<AlertsEngineImpl> AlertsEngineImpl::create(
         ThrowIfNull( alertsPlatformInterface, "invalidAlertsPlatformInterface" );
         ThrowIfNull( connectionManager, "invalidConnectionManager" );
         ThrowIfNull( audioManager, "invalidAudioManager" );
-        ThrowIfNull( directiveSequencer, "invalidDirectiveSequencer" );
+        ThrowIfNull( defaultEndpointBuilder, "invalidDefaultEndpointBuilder" );
         ThrowIfNull( capabilitiesDelegate, "invalidCapabilitiesDelegate" );
         ThrowIfNull( messageSender, "invalidMessageSender" );
         ThrowIfNull( certifiedSender, "invalidCertifiedSender" );
@@ -112,13 +132,27 @@ std::shared_ptr<AlertsEngineImpl> AlertsEngineImpl::create(
         ThrowIfNull( dataManager, "invalidDataManager" );
         ThrowIfNull( alertsAudioFactory, "invalidAlertsAudioFactory" );
 
-        // open the TTS audio channel
+        // open the alarm audio channel
         auto audioOutputChannel = audioManager->openAudioOutputChannel( "Alerts", aace::audio::AudioOutputProvider::AudioOutputType::ALARM );
         ThrowIfNull( audioOutputChannel, "openAudioOutputChannelFailed" );
 
         alertsEngineImpl = std::shared_ptr<AlertsEngineImpl>( new AlertsEngineImpl( alertsPlatformInterface, connectionManager ) );
 
-        ThrowIfNot( alertsEngineImpl->initialize( audioOutputChannel, directiveSequencer, messageSender, connectionManager, certifiedSender, focusManager, contextManager, capabilitiesDelegate, exceptionSender, alertsAudioFactory, speakerManager, dataManager ), "initializeAlertsEngineImplFailed" );
+        ThrowIfNot( alertsEngineImpl->initialize( 
+            audioOutputChannel,
+            defaultEndpointBuilder,
+            messageSender,
+            connectionManager,
+            certifiedSender,
+            focusManager,
+            contextManager,
+            capabilitiesDelegate,
+            exceptionSender,
+            alertsAudioFactory,
+            speakerManager,
+            dataManager,
+            deviceSettingsDelegate),
+            "initializeAlertsEngineImplFailed" );
 
         return alertsEngineImpl;
     }

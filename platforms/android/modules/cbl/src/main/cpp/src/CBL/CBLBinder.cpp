@@ -48,7 +48,7 @@ namespace cbl {
 
             ThrowIfNot( JCBLState::checkType( state, &stateObj ), "invalidCBLState" );
             ThrowIfNot( JCBLStateChangedReason::checkType( reason, &reasonObj ), "invalidCBLStateChangedReason" );
-            ThrowIfNot( m_obj.invoke<void>( "cblStateChanged", "(Lcom/amazon/aace/cbl/CBL$CBLState;Lcom/amazon/aace/cbl/CBL$CBLStateChangedReason;Ljava/lang/String;Ljava/lang/String;)V", nullptr, stateObj, reasonObj ), "invokeMethodFailed" );
+            ThrowIfNot( m_obj.invoke<void>( "cblStateChanged", "(Lcom/amazon/aace/cbl/CBL$CBLState;Lcom/amazon/aace/cbl/CBL$CBLStateChangedReason;Ljava/lang/String;Ljava/lang/String;)V", nullptr, stateObj, reasonObj, JString(url).get(), JString(code).get() ), "invokeMethodFailed" );
         }
         catch_with_ex {
             AACE_JNI_ERROR(TAG,"cblStateChanged",ex.what());

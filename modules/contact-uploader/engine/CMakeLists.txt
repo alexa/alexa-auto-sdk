@@ -6,8 +6,8 @@ find_path(AVS_INCLUDE_DIRS AVSCommon)
 find_library(AVS_AVS_COMMON_LIBRARY AVSCommon)
 
 set(HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/ContactUploader/ContactUploaderEngineService.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/ContactUploader/ContactUploaderEngineImpl.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/ContactUploader/ContactUploaderEngineService.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/ContactUploader/ContactUploaderRESTAgent.h
 )
 
@@ -15,8 +15,8 @@ source_group("Header Files" FILES ${HEADERS})
 
 add_library(AACEContactUploaderEngine SHARED
     ${HEADERS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ContactUploader/ContactUploaderEngineService.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ContactUploader/ContactUploaderEngineImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ContactUploader/ContactUploaderEngineService.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ContactUploader/ContactUploaderRESTAgent.cpp
 )
 
@@ -26,6 +26,7 @@ target_include_directories(AACEContactUploaderEngine
         $<INSTALL_INTERFACE:include>
     PRIVATE
         ${AVS_INCLUDE_DIRS}
+        ${AVS_INCLUDE_DIRS}/../avs_shared
         ${CURL_INCLUDE_DIRS}
 )
 

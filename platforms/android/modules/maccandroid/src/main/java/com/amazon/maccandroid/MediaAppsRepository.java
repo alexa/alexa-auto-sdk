@@ -22,8 +22,8 @@ public class MediaAppsRepository {
 
     private static MediaAppsRepository sInstance;
     private static final String TAG = MediaAppsRepository.class.getSimpleName();
-    private final Map< String, MediaApp > discoveredMediaApps = new HashMap<>();
-    private final Map< String, MediaApp > authorizedMediaApps = new HashMap<>();
+    private final Map< String, MediaApp > mDiscoveredMediaApps = new HashMap<>();
+    private final Map< String, MediaApp > mAuthorizedMediaApps = new HashMap<>();
 
     private MediaAppsRepository() {
     }
@@ -36,51 +36,55 @@ public class MediaAppsRepository {
     }
 
     void addDiscoveredMediaApp(MediaApp mediaApp) {
+        String playerId = mediaApp.getLocalPlayerId();
         Log.i(TAG, "addDiscoveredMediaApp | " + mediaApp);
-        discoveredMediaApps.put( mediaApp.getLocalPlayerId(), mediaApp );
+        mDiscoveredMediaApps.put( mediaApp.getLocalPlayerId(), mediaApp );
     }
 
     void addAuthorizedMediaApp(MediaApp mediaApp) {
-        Log.i(TAG, "addAuthorizedMediaApp | " + mediaApp);
-        authorizedMediaApps.put( mediaApp.getLocalPlayerId(), mediaApp );
+        String playerId = mediaApp.getLocalPlayerId();
+        if ( mAuthorizedMediaApps.get(playerId) == null ) {
+            Log.i(TAG, "addAuthorizedMediaApp | " + mediaApp);
+            mAuthorizedMediaApps.put( mediaApp.getLocalPlayerId(), mediaApp );
+        } else Log.i(TAG, "addAuthorizedMediaApp | " + playerId + "app is already authorized, do not reauthorize");
     }
 
     MediaApp getDiscoveredMediaApp(String playerId) {
-        return discoveredMediaApps.get(playerId);
+        return mDiscoveredMediaApps.get(playerId);
     }
 
     MediaApp getAuthorizedMediaApp(String playerId) {
-        return authorizedMediaApps.get(playerId);
+        return mAuthorizedMediaApps.get(playerId);
     }
 
     Map< String, MediaApp > getDiscoveredMediaApps() {
-        return discoveredMediaApps;
+        return mDiscoveredMediaApps;
     }
 
     Map <String, MediaApp> getAuthorizedMediaApps() {
-        return authorizedMediaApps;
+        return mAuthorizedMediaApps;
     }
 
     boolean isAuthorizedApp(String app) {
-        return authorizedMediaApps.containsKey(app);
+        return mAuthorizedMediaApps.containsKey(app);
     }
 
     boolean isDiscoveredApp(String app) {
-        return discoveredMediaApps.containsKey(app);
+        return mDiscoveredMediaApps.containsKey(app);
     }
 
     void removeMediaApp(String packageName) {
         Log.i(TAG, "removeMediaApp | " + packageName, new Exception());
-        MediaApp app = discoveredMediaApps.get(packageName);
+        MediaApp app = mDiscoveredMediaApps.get(packageName);
         if (app != null) {
             app.onDestroy();
             MediaAppsStateReporter.getInstance().reportRemovedApp(packageName);
         }
-        discoveredMediaApps.remove(packageName);
-        authorizedMediaApps.remove(packageName);
+        mDiscoveredMediaApps.remove(packageName);
+        mAuthorizedMediaApps.remove(packageName);
     }
 
     void clearDiscoveredApps() {
-        discoveredMediaApps.clear();
+        mDiscoveredMediaApps.clear();
     }
 }

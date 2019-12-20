@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/localSearchDetailTemplate1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/cardBackground"
+    tools:context="com.amazon.sampleapp.MainActivity">
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guidelineLeftMargin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.055" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guidelineRightMargin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.945" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guidelineTopMargin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.044" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guidelineBottomMargin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.956" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guidelineVerticalCenter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:contentDescription="@string/card_local_search_detail_template1_image"
+        app:layout_constraintTop_toBottomOf="@id/guidelineTopMargin"
+        app:layout_constraintEnd_toStartOf="@id/guidelineVerticalCenter"/>
+
+    <TextView
+        android:id="@+id/mainTitle"
+        android:layout_marginTop="50dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif"
+        android:lines="1"
+        android:textAlignment="viewStart"
+        android:textColor="@color/cardMainTitle"
+        android:textSize="32sp"
+        app:layout_constraintEnd_toStartOf="@+id/guidelineRightMargin"
+        app:layout_constraintStart_toStartOf="@id/guidelineVerticalCenter"
+        app:layout_constraintTop_toBottomOf="@id/guidelineTopMargin" />
+
+    <TextView
+        android:id="@+id/subTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-light"
+        android:lines="1"
+        android:textColor="@color/cardSubTitle"
+        android:textSize="32sp"
+        app:layout_constraintEnd_toStartOf="@+id/guidelineRightMargin"
+        app:layout_constraintStart_toStartOf="@id/mainTitle"
+        app:layout_constraintTop_toBottomOf="@id/mainTitle" />
+
+    <TextView
+        android:id="@+id/currentStatus"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:fontFamily="sans-serif-light"
+        android:scrollbars="vertical"
+        android:textColor="@color/cardTextField"
+        android:textSize="24sp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintStart_toStartOf="@id/mainTitle"
+        app:layout_constraintTop_toBottomOf="@id/subTitle" />
+
+    <ImageView
+        android:id="@+id/ratingImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/card_local_search_detail_template1_rating_image"
+        app:layout_constraintStart_toStartOf="@id/mainTitle"
+        app:layout_constraintTop_toBottomOf="@id/currentStatus"/>
+
+    <ImageView
+        android:id="@+id/ratingProviderImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/card_local_search_detail_template1_rating_provider_image"
+        app:layout_constraintStart_toEndOf="@id/ratingImage"
+        app:layout_constraintTop_toBottomOf="@id/currentStatus"/>
+
+    <TextView
+        android:id="@+id/travelDistance"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="sans-serif-light"
+        android:scrollbars="vertical"
+        android:textColor="@color/cardTextField"
+        android:textSize="24sp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintStart_toStartOf="@id/mainTitle"
+        app:layout_constraintTop_toBottomOf="@id/ratingProviderImage" />
+
+    <TextView
+        android:id="@+id/travelTime"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="sans-serif-light"
+        android:scrollbars="vertical"
+        android:textColor="@color/cardTextField"
+        android:textSize="24sp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintStart_toEndOf="@id/travelDistance"
+        app:layout_constraintTop_toBottomOf="@id/ratingProviderImage" />
+
+    <TextView
+        android:id="@+id/offRouteTime"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="sans-serif-light"
+        android:scrollbars="vertical"
+        android:textColor="@color/cardTextField"
+        android:textSize="24sp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintStart_toEndOf="@id/travelTime"
+        app:layout_constraintTop_toBottomOf="@id/ratingProviderImage" />
+
+    <TextView
+        android:id="@+id/address"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="sans-serif-light"
+        android:scrollbars="vertical"
+        android:textColor="@color/cardTextField"
+        android:textSize="24sp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintStart_toStartOf="@id/mainTitle"
+        app:layout_constraintTop_toBottomOf="@id/offRouteTime" />
+
+    <TextView
+        android:id="@+id/phoneNumber"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="sans-serif-light"
+        android:scrollbars="vertical"
+        android:textColor="@color/cardTextField"
+        android:textSize="24sp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintStart_toStartOf="@id/mainTitle"
+        app:layout_constraintTop_toBottomOf="@id/address" />
+
+    <TextView
+        android:id="@+id/provider"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="5dp"
+        android:fontFamily="sans-serif-light"
+        android:scrollbars="vertical"
+        android:textColor="@color/cardTextField"
+        android:textSize="24sp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintStart_toEndOf="@id/phoneNumber"
+        app:layout_constraintTop_toBottomOf="@id/address" />
+
+    <TextView
+        android:id="@+id/ratingValue"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="5dp"
+        android:fontFamily="sans-serif-light"
+        android:scrollbars="vertical"
+        android:textColor="@color/cardTextField"
+        android:textSize="24sp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintStart_toStartOf="@id/mainTitle"
+        app:layout_constraintTop_toBottomOf="@id/provider" />
+
+    <TextView
+        android:id="@+id/ratingProviderName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="5dp"
+        android:fontFamily="sans-serif-light"
+        android:scrollbars="vertical"
+        android:textColor="@color/cardTextField"
+        android:textSize="24sp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintStart_toEndOf="@id/ratingValue"
+        app:layout_constraintTop_toBottomOf="@id/provider" />
+
+    <TextView
+        android:id="@+id/ratingReviewCount"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="5dp"
+        android:fontFamily="sans-serif-light"
+        android:scrollbars="vertical"
+        android:textColor="@color/cardTextField"
+        android:textSize="24sp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintStart_toEndOf="@id/ratingProviderName"
+        app:layout_constraintTop_toBottomOf="@id/provider" />
+
+    <TextView
+        android:id="@+id/priceRange"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="5dp"
+        android:fontFamily="sans-serif-light"
+        android:scrollbars="vertical"
+        android:textColor="@color/cardTextField"
+        android:textSize="24sp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintStart_toEndOf="@id/ratingReviewCount"
+        app:layout_constraintTop_toBottomOf="@id/provider" />
+
+    <TextView
+        android:id="@+id/weekdayHours"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:fontFamily="sans-serif-light"
+        android:scrollbars="vertical"
+        android:textColor="@color/cardTextField"
+        android:textSize="24sp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintStart_toStartOf="@id/mainTitle"
+        app:layout_constraintTop_toBottomOf="@id/priceRange" />
+
+    <TextView
+        android:id="@+id/saturdayHours"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:fontFamily="sans-serif-light"
+        android:scrollbars="vertical"
+        android:textColor="@color/cardTextField"
+        android:textSize="24sp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintStart_toStartOf="@id/mainTitle"
+        app:layout_constraintTop_toBottomOf="@id/weekdayHours" />
+
+    <TextView
+        android:id="@+id/sundayHours"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:fontFamily="sans-serif-light"
+        android:scrollbars="vertical"
+        android:textColor="@color/cardTextField"
+        android:textSize="24sp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintStart_toStartOf="@id/mainTitle"
+        app:layout_constraintTop_toBottomOf="@id/saturdayHours" />
+
+</android.support.constraint.ConstraintLayout>

@@ -26,7 +26,7 @@
 namespace aace {
 namespace contactUploader {
 
-class ContactUploaderEngineInterface : public aace::core::PlatformInterface {
+class ContactUploaderEngineInterface {
 public:
    /**
     * Describes the status of contact uploader to the platform implementation.

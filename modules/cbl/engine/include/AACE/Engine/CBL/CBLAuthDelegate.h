@@ -52,6 +52,13 @@ public:
 
     ~CBLAuthDelegate();
 
+    void enable();
+    void disable();
+
+    void start();
+    void cancel();
+    void reset();
+
     // AuthDelegateInterface
     void addAuthObserver(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer) override;
     void removeAuthObserver(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer) override;
@@ -60,10 +67,6 @@ public:
 
     // CustomerDataHandler
     void clearData() override;
-
-    void start( bool onStart );
-    void cancel();
-    void reset();
 
 private:
     enum class FlowState {
@@ -82,7 +85,10 @@ private:
 
 
     bool initialize();
+    
+    void start( bool explicitAuthorizationRequest );
     void stop( bool reset = false );
+    
     void handleAuthorizationFlow();
     void handleRequestingUserProfile();
 
@@ -126,6 +132,8 @@ private:
     std::shared_ptr<CBLAuthDelegateConfiguration> m_configuration;
 
     bool m_isStopping;
+    bool m_authFailureReported;
+    bool m_explicitAuthorizationRequest;
     std::mutex m_mutex;
     std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface>> m_observers;
 

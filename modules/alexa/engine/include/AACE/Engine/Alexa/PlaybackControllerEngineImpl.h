@@ -16,11 +16,13 @@
 #ifndef AACE_ENGINE_ALEXA_PLAYBACK_CONTROLLER_ENGINE_IMPL_H
 #define AACE_ENGINE_ALEXA_PLAYBACK_CONTROLLER_ENGINE_IMPL_H
 
-#include "AACE/Alexa/PlaybackController.h"
 #include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
 #include <AVSCommon/SDKInterfaces/FocusManagerInterface.h>
+#include <Endpoints/EndpointBuilder.h>
 #include <PlaybackController/PlaybackController.h>
 #include <PlaybackController/PlaybackRouter.h>
+
+#include "AACE/Alexa/PlaybackController.h"
 
 namespace aace {
 namespace engine {
@@ -34,6 +36,7 @@ private:
     PlaybackControllerEngineImpl( std::shared_ptr<aace::alexa::PlaybackController> playbackControllerPlatformInterface );
 
     bool initialize(
+        std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
@@ -42,6 +45,7 @@ private:
 public:
     static std::shared_ptr<PlaybackControllerEngineImpl> create(
         std::shared_ptr<aace::alexa::PlaybackController> playbackControllerPlatformInterface,
+        std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,

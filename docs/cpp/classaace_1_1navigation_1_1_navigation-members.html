@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">2.0.0</span>
+   &#160;<span id="projectnumber">2.1.0</span>
    </div>
   </td>
  </tr>
@@ -71,15 +71,20 @@ $(function() {
 
 <p>This is the complete list of members for <a class="el" href="classaace_1_1navigation_1_1_navigation.html">aace::navigation::Navigation</a>, including all inherited members.</p>
 <table class="directory">
+  <tr class="even"><td class="entry"><a class="el" href="classaace_1_1navigation_1_1_navigation.html#af9e3309727e67403e92f31356b8998b7">announceManeuver</a>(const std::string &amp;payload)=0</td><td class="entry"><a class="el" href="classaace_1_1navigation_1_1_navigation.html">aace::navigation::Navigation</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classaace_1_1navigation_1_1_navigation.html#af3321466338b4447077361f8918dc814">announceRoadRegulation</a>(RoadRegulation roadRegulation)=0</td><td class="entry"><a class="el" href="classaace_1_1navigation_1_1_navigation.html">aace::navigation::Navigation</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="classaace_1_1navigation_1_1_navigation.html#afbda005d6f22d549b01b3700144f1d2a">cancelNavigation</a>()=0</td><td class="entry"><a class="el" href="classaace_1_1navigation_1_1_navigation.html">aace::navigation::Navigation</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
   <tr><td class="entry"><a class="el" href="classaace_1_1navigation_1_1_navigation.html#a173894876f146db7b0e34ffaeab915d7">getNavigationState</a>()=0</td><td class="entry"><a class="el" href="classaace_1_1navigation_1_1_navigation.html">aace::navigation::Navigation</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classaace_1_1navigation_1_1_navigation.html#a8f818b03bb8adc3335140d4402ad5634">setDestination</a>(const std::string &amp;payload)=0</td><td class="entry"><a class="el" href="classaace_1_1navigation_1_1_navigation.html">aace::navigation::Navigation</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classaace_1_1navigation_1_1_navigation.html#a391d9b1c3de2790bdf1e5d7845c22d05">navigationError</a>(ErrorType type, ErrorCode code, const std::string &amp;description)</td><td class="entry"><a class="el" href="classaace_1_1navigation_1_1_navigation.html">aace::navigation::Navigation</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classaace_1_1navigation_1_1_navigation.html#a0593c914f53afaa11c2ccaca8216f17f">navigationEvent</a>(EventName event)</td><td class="entry"><a class="el" href="classaace_1_1navigation_1_1_navigation.html">aace::navigation::Navigation</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classaace_1_1navigation_1_1_navigation.html#a0ddacd8f63a00cdcf322b11007345c9a">showAlternativeRoutesSucceeded</a>(const std::string &amp;payload)</td><td class="entry"><a class="el" href="classaace_1_1navigation_1_1_navigation.html">aace::navigation::Navigation</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classaace_1_1navigation_1_1_navigation.html#abb26aed1a2b2fb215fd9c69cb9b6511c">startNavigation</a>(const std::string &amp;payload)=0</td><td class="entry"><a class="el" href="classaace_1_1navigation_1_1_navigation.html">aace::navigation::Navigation</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
 </table></div><!-- contents -->
 <html>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 2.0.0 - Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 2.1.0 - Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

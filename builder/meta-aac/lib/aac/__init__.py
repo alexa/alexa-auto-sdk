@@ -47,8 +47,12 @@ def get_external_binary_arch(d):
     binary_arch = arch
     if arch == "arm":
         features = d.getVar('TUNE_FEATURES').split(' ')
-        if "armv7a" in features and "callconvention-hard" in features:
-            binary_arch = "armv7ahf"
+        if "armv7a" in features or "armv7ve" in features:
+            # armv7a implies Cortex-A + NEON available
+            binary_arch = "armv7a"
+        # hf suffix should be added
+        if "callconvention-hard" in features:
+            binary_arch = binary_arch + "hf"
     elif arch == "i686" or arch == "i586":
         binary_arch = "x86"
 

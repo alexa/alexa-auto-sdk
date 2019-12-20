@@ -55,6 +55,7 @@ LocalMediaSourceHandler::LocalMediaSourceHandler(
         aace::alexa::LocalMediaSource(source),
         m_responseDispatcher(responseDispatcher) {
     m_SourceString = convertSourceToString(source);
+    m_updateInProgress = false;
 }
 
 bool LocalMediaSourceHandler::play(ContentSelector contentSelectorType, const std::string& payload) {
@@ -199,8 +200,8 @@ bool LocalMediaSourceHandler::adjustSeek(std::chrono::milliseconds deltaOffset) 
     return true;
 }
 
-LocalMediaSourceHandler::LocalMediaSourceState LocalMediaSourceHandler::getState() {
-    m_logger->log(Level::VERBOSE, TAG, "getState " + TOPIC_LOCAL_MEDIA_SOURCE);
+void LocalMediaSourceHandler::updateState() {
+    m_logger->log(Level::INFO, TAG, "updateState: " + m_SourceString);
     if (auto responseDispatcher = m_responseDispatcher.lock()) {
         rapidjson::Document document;
         document.SetObject();
@@ -221,16 +222,38 @@ LocalMediaSourceHandler::LocalMediaSourceState LocalMediaSourceHandler::getState
         std::unique_lock<std::mutex> lock(m_mutex);
         // Block until we receive MediaPlayer position
         if (m_getStateResponseCv.wait_for(lock, TIME_OUT_IN_SECS, [this]() { return m_didReceiveGetStateResponse; })) {
+            // Reset to false so we can wait next time
             m_didReceiveGetStateResponse = false;
-            return m_mediaSourceState;
+            m_updateInProgress = false;
+        } else {
+            m_logger->log(Level::WARN, TAG, "updateState request timed out: " + m_SourceString);
+            m_updateInProgress = false;
         }
-
-        m_logger->log(Level::WARN, TAG, "getState request timed out");
     } else {
         m_logger->log(Level::ERROR, TAG, "responseDispatcher doesn't exist.");
     }
+}
 
-    return LocalMediaSourceHandler::LocalMediaSourceState{};
+LocalMediaSourceHandler::LocalMediaSourceState LocalMediaSourceHandler::getState() {
+    LocalMediaSourceState currentState;
+
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        if (!m_updateInProgress) {
+            m_updateInProgress = true;
+            m_executor.submit([this]{
+                updateState();
+            });
+        }
+    
+        // return current state
+        currentState = m_mediaSourceState;
+    }
+
+    m_logger->log(Level::INFO, TAG, "getState Source: " + m_SourceString + " current state: " + currentState.playbackState.state);
+
+    // Return current state
+    return currentState;
 }
 
 void LocalMediaSourceHandler::onReceivedEvent(const std::string& action, const std::string& payload) {
@@ -240,6 +263,7 @@ void LocalMediaSourceHandler::onReceivedEvent(const std::string& action, const s
         {
             std::lock_guard<std::mutex> lock(m_mutex);
             m_didReceiveGetStateResponse = setMediaSourceState(payload);
+            m_updateInProgress = false;
         }
         m_getStateResponseCv.notify_one();
     } else if (action == aasb::bridge::ACTION_LOCAL_MEDIA_SOURCE_PLAYER_EVENT) {
@@ -305,7 +329,7 @@ bool LocalMediaSourceHandler::setMediaSourceState(const std::string& payload) {
     auto root = document.GetObject();
 
     if (root.HasMember(JSON_ATTR_SESSION_STATE.c_str()) && root[JSON_ATTR_SESSION_STATE.c_str()].IsObject()) {
-        rapidjson::Value sessionStateElement = root[JSON_ATTR_SESSION_STATE.c_str()].GetObject();
+        auto sessionStateElement = root[JSON_ATTR_SESSION_STATE.c_str()].GetObject();
 
         if (sessionStateElement.HasMember(JSON_ATTR_END_POINT_ID.c_str()) &&
             sessionStateElement[JSON_ATTR_END_POINT_ID.c_str()].IsString()) {
@@ -369,7 +393,7 @@ bool LocalMediaSourceHandler::setMediaSourceState(const std::string& payload) {
 
         if (sessionStateElement.HasMember(JSON_ATTR_SUPPORTED_CONTENT_SELECTORS.c_str()) &&
             sessionStateElement[JSON_ATTR_SUPPORTED_CONTENT_SELECTORS.c_str()].IsArray()) {
-            rapidjson::Value supportedContentSelectorsElement =
+            auto supportedContentSelectorsElement =
                 sessionStateElement[JSON_ATTR_SUPPORTED_CONTENT_SELECTORS.c_str()].GetArray();
             for (unsigned int j = 0; j < supportedContentSelectorsElement.Size(); j++) {
                 auto next = supportedContentSelectorsElement[j].GetString();
@@ -403,7 +427,7 @@ bool LocalMediaSourceHandler::setMediaSourceState(const std::string& payload) {
     }
 
     if (root.HasMember(JSON_ATTR_PLAYBACK_STATE.c_str()) && root[JSON_ATTR_PLAYBACK_STATE.c_str()].IsObject()) {
-        rapidjson::Value playbackStateElement = root[JSON_ATTR_PLAYBACK_STATE.c_str()].GetObject();
+        auto playbackStateElement = root[JSON_ATTR_PLAYBACK_STATE.c_str()].GetObject();
         if (playbackStateElement.HasMember(JSON_ATTR_STATE.c_str()) &&
             playbackStateElement[JSON_ATTR_STATE.c_str()].IsString()) {
             m_mediaSourceState.playbackState.state = playbackStateElement[JSON_ATTR_STATE.c_str()].GetString();
@@ -411,22 +435,16 @@ bool LocalMediaSourceHandler::setMediaSourceState(const std::string& payload) {
 
         if (playbackStateElement.HasMember(JSON_ATTR_SUPPORTED_OPERATIONS.c_str()) &&
             playbackStateElement[JSON_ATTR_SUPPORTED_OPERATIONS.c_str()].IsArray()) {
-            rapidjson::Value supportedOperationsElement =
+            auto supportedOperationsElement =
                 playbackStateElement[JSON_ATTR_SUPPORTED_OPERATIONS.c_str()].GetArray();
             for (unsigned int j = 0; j < supportedOperationsElement.Size(); j++) {
                 auto next = supportedOperationsElement[j].GetString();
                 if (VALUE_PLAY.compare(next) == 0) {
                     m_mediaSourceState.playbackState.supportedOperations.push_back(
                         aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::PLAY);
-                } else if (VALUE_RESUME.compare(next) == 0) {
-                    m_mediaSourceState.playbackState.supportedOperations.push_back(
-                        aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::RESUME);
                 } else if (VALUE_PAUSE.compare(next) == 0) {
                     m_mediaSourceState.playbackState.supportedOperations.push_back(
                         aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::PAUSE);
-                } else if (VALUE_RESUME.compare(next) == 0) {
-                    m_mediaSourceState.playbackState.supportedOperations.push_back(
-                        aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::RESUME);
                 } else if (VALUE_STOP.compare(next) == 0) {
                     m_mediaSourceState.playbackState.supportedOperations.push_back(
                         aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::STOP);
@@ -457,6 +475,9 @@ bool LocalMediaSourceHandler::setMediaSourceState(const std::string& payload) {
                 } else if (VALUE_ENABLE_SHUFFLE.compare(next) == 0) {
                     m_mediaSourceState.playbackState.supportedOperations.push_back(
                         aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::ENABLE_SHUFFLE);
+                } else if (VALUE_DISABLE_SHUFFLE.compare(next) == 0) {
+                    m_mediaSourceState.playbackState.supportedOperations.push_back(
+                        aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::DISABLE_SHUFFLE);
                 } else if (VALUE_FAVORITE.compare(next) == 0) {
                     m_mediaSourceState.playbackState.supportedOperations.push_back(
                         aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::FAVORITE);
@@ -497,7 +518,7 @@ bool LocalMediaSourceHandler::setMediaSourceState(const std::string& payload) {
         }
 
         if (playbackStateElement.HasMember(JSON_ATTR_FAVORITES.c_str()) &&
-            playbackStateElement[JSON_ATTR_FAVORITES.c_str()].IsBool()) {
+            playbackStateElement[JSON_ATTR_FAVORITES.c_str()].IsString()) {
             auto favoritesString = playbackStateElement[JSON_ATTR_FAVORITES.c_str()].GetString();
             if (VALUE_FAVORITED.compare(favoritesString) == 0) {
                 m_mediaSourceState.playbackState.favorites = aace::alexa::ExternalMediaAdapter::Favorites::FAVORITED;
@@ -606,7 +627,7 @@ bool LocalMediaSourceHandler::setMediaSourceState(const std::string& payload) {
         }
 
         if (playbackStateElement.HasMember(JSON_ATTR_MEDIA_TYPE.c_str()) &&
-            playbackStateElement[JSON_ATTR_MEDIA_TYPE.c_str()].IsBool()) {
+            playbackStateElement[JSON_ATTR_MEDIA_TYPE.c_str()].IsString()) {
             auto mediaTypeString = playbackStateElement[JSON_ATTR_MEDIA_TYPE.c_str()].GetString();
             if (VALUE_TRACK.compare(mediaTypeString) == 0) {
                 m_mediaSourceState.playbackState.mediaType = aace::alexa::ExternalMediaAdapter::MediaType::TRACK;
@@ -697,6 +718,10 @@ std::string LocalMediaSourceHandler::convertSourceToString(Source source) {
             return VALUE_LOCAL_MEDIA_SOURCE_LINE_IN;
         case Source::COMPACT_DISC:
             return VALUE_LOCAL_MEDIA_SOURCE_COMPACT_DISC;
+        case Source::SIRIUS_XM:
+            return VALUE_LOCAL_MEDIA_SOURCE_SIRIUS_XM;
+        case Source::DAB:
+            return VALUE_LOCAL_MEDIA_SOURCE_DAB;
         default:
             return std::string("UNKNOWN");
     }

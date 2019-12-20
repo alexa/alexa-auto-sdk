@@ -1,29 +1,82 @@
 # Core Module
 
-The Alexa Auto SDK module contains the Engine base classes and the abstract platform interfaces that can be utilized by the platform and/or other modules. It also provides an easy way to integrate Alexa Auto SDK into an application or a framework. This involves configuring and creating an instance of `Engine`, overriding default platform implementation classes, and registering the custom interface handlers with the instantiated Engine.
+The Alexa Auto SDK module contains the Engine base classes and the abstract platform interfaces that can be utilized by the platform and/or other modules.
 
 **Table of Contents**
 
+* [Overview](#overview)
 * [Creating the Engine](#creating-the-engine)
 * [Configuring the Engine](#configuring-the-engine)
-* [Registering Platform Interface Handlers](#registering-platform-interface-handlers)
+* [Extending the Default Platform Implementation](#extending-the-default-platform-implementation)
 * [Starting the Engine](#starting-the-engine)
 * [Stopping the Engine](#stopping-the-engine)
-* [Implementing Log Events](#implementing-log-events)
-* [Implementing Audio](#implementing-audio)
-* [Core Engine Properties](#core-engine-properties)
+* [Getting and Setting Core Engine Properties](#getting-and-setting-core-engine-properties)
 
-## Creating the Engine<a id="creating-the-engine"></a>
+## Overview <a id="overview"></a>
+The Core module provides an easy way to integrate Alexa Auto SDK into an application or a framework. To do this, follow these steps:
 
-You create an instance of the Engine by calling the static function `Engine.create()`:
+1. [Create](#creating-the-engine) and [configure](#configuring-the-engine) an instance of `aace::core::Engine`.
+2. [Override default platform implementation classes](#extending-the-default-platform-implementation) to extend the default Alexa Auto SDK platform implementation and register the platform interface handlers with the instantiated Engine.
+4. [Start the Engine](#starting-the-engine).
+5. [Change the runtime settings](#getting-and-setting-core-engine-properties) if desired.
+
+## Creating the Engine <a id="creating-the-engine"></a>
+
+To create an instance of the Engine, call the static function `Engine.create()`:
 
     m_engine = Engine.create();
 
-## Configuring the Engine<a id= "configuring-the-engine"></a>
+## Configuring the Engine <a id= "configuring-the-engine"></a>
 
-Before you can start the Engine, you must configure it using the required `aace.core.config.EngineConfiguration` object(s) for the services you will be using. The Alexa Auto SDK provides classes for reading the configuration data from a JSON file, as well as programmatically configuring the services.
+Before you can start the Engine, you must configure it using the required `aace.core.config.EngineConfiguration` object(s) for the services you will be using:
 
-> **Note**: For Android certpath, and data path runtime resolution, we recommend configuring the engine programmatically as demonstrated in the sample code below.  
+1. Generate the `EngineConfiguration` object(s). You can do this [using a JSON configuration file](#specifying-configuration-data-using-a-json-file), [programmatically (using factory methods)](#specifying-configuration-data-programmatically), or using a combination of both approaches; however, for Android certpath and data path runtime resolution, we recommend [configuring the engine programmatically](#specifying-configuration-data-programmatically).
+
+    >**Note:** You can generate a single `EngineConfiguration` object that includes all configuration data for the services you will be using, or you can break the configuration data into logical sections and generate multiple `EngineConfiguration` objects. For example, you might generate one `EngineConfiguration` object for each module.
+  
+2. Call the Engine's `configure()` function, passing in the `EngineConfiguration` object(s): 
+
+  * For a single `EngineConfiguration` object, use:
+
+      `engine->configure( config );`
+  
+ *  For multiple `EngineConfiguration` objects, use:
+
+      `engine->configure( { xConfig, yConfig, zConfig, ... } );`
+      
+      replacing `xConfig, yConfig, zConfig` with logical names to identify the `EngineConfiguration` objects you generated; for example: `coreConfig, alexaConfig, navigationConfig`
+
+    > **Note**: You can call the Engine's `configure()` method only once, and you must call it before you register any platform interfaces or start the Engine.
+
+### Configuration Database Files
+
+Some values in the configuration, such as `"defaultlocale"`, are used only to configure the Engine the first time it is started. After the first start, the Auto SDK engine creates configuration database files (also referred to as SQLite database files) so that these settings are preserved the next time you start the application. You can change the default settings if desired.
+
+By default, the Auto SDK stores the configuration database files in the `/opt/AAC/data/` directory, but you have the option to change the path to the configuration database files as part of your Engine configuration. If you delete the database files, the Auto SDK will create new ones the next time you run the application.
+
+### Specifying Configuration Data Using a JSON File <a id = "specifying-configuration-data-using-a-json-file"></a>
+
+The Auto SDK provides a class in [`EngineConfiguration.h`](../../../../modules/core/platform/include/AACE/Core/EngineConfiguration.h) that reads the configuration from a specified JSON file and creates an `EngineConfiguration` object from that configuration:
+
+`aace::core::config::ConfigurationFile::create( “<filename.json>” )`
+ 
+You can include all the configuration data in a single JSON file to create a single `EngineConfiguration` object; for example:
+
+`auto config = aace::core::config::ConfigurationFile::create( “config.json” );`
+
+or break the configuration data into multiple JSON files to create multiple `EngineConfiguration` objects; for example:
+
+```
+auto coreConfig = aace::core::config::ConfigurationFile::create( “core-config.json” );
+auto alexaConfig = aace::core::config::ConfigurationFile::create( “alexa-config.json” );
+auto navigationConfig = aace::core::config::ConfigurationFile::create( “navigation-config.json” );
+```
+
+The [config.json.in](../../../../samples/cpp/assets/config.json.in) file provides an example of a JSON configuration file. If desired, you can use this file as a starting point for customizing the Engine configuration to suit your needs.
+
+### Specifying Configuration Data Programmatically <a id ="specifying-configuration-data-programmatically"></a>
+
+You can also specify the configuration data programmatically by using the configuration factory methods provided in the library. The following code sample provides an example of using factory methods to instantiate an `EngineConfiguration` object:
 
 ```
 m_engine.configure( new EngineConfiguration[]{
@@ -38,18 +91,11 @@ m_engine.configure( new EngineConfiguration[]{
 });
 ```
 
-Read about the `AlexaConfiguration Class` for more information about configurable methods.
-
-* [Alexa Auto SDK for Android](https://alexa.github.io/alexa-auto-sdk/docs/android/)
-* [Alexa Auto SDK for C++](https://alexa.github.io/alexa-auto-sdk/docs/cpp/)
-
-**NOTE:** You can call the Engine's `configure()` method only be once, and you must call it before registering any platform interfaces or starting the Engine.
+See the API reference documentation for the [`AlexaConfiguration Class`](https://alexa.github.io/alexa-auto-sdk/docs/android/classcom_1_1amazon_1_1aace_1_1alexa_1_1config_1_1_alexa_configuration.html) for details about the configurable methods used to generate the `EngineConfiguration` object.
 
 ### Vehicle Information Requirements
 
-You should supply vehicle configuration information to the Alexa Auto SDK through regular Engine configuration. A sample configuration is detailed below. You can generate the `EngineConfiguration` object including this information by using this schema in a `.json` config file or programmatically through the `VehicleConfiguration.createVehicleInfoConfig()` factory method.
-
-The following JSON example lists all of the information that can be used to enhance the Alexa experience in the car.
+You must configure vehicle information in the Engine configuration. A sample configuration is detailed below. You can generate the `EngineConfiguration` object including this information by using this schema in a `.json` config file or programmatically using the `VehicleConfiguration.createVehicleInfoConfig()` factory method.
 
 ```
 {
@@ -72,15 +118,18 @@ The following JSON example lists all of the information that can be used to enha
   }
 }
 ```
-The vehicle information should be provided with a unique vehicle identifier that is not the vehicle identification number (VIN). This information is required to pass the certification process. Read detailed information about the [vehicle configuration class](src/main/java/com/amazon/aace/vehicle/config/VehicleConfiguration.java) in the API reference documentation.
+>**Important!** To pass the certification process, the vehicle information that you provide in the Engine configuration must include a `"vehicleIdentifier"` that is NOT the vehicle identification number (VIN). See the [platform API reference documentation] (https://alexa.github.io/alexa-auto-sdk/docs/android/classcom_1_1amazon_1_1aace_1_1vehicle_1_1config_1_1_vehicle_configuration.html) for more information about the [`VehicleConfiguration`](src/main/java/com/amazon/aace/vehicle/config/VehicleConfiguration.java) class.
 
-## Registering Platform Interface Handlers<a id="registering-platform-interface-handlers"></a>
+## Extending the Default Platform Implementation <a id="extending-the-default-platform-implementation"></a>
 
-A platform implementation should extend each interface it will use by creating an interface handler for it. Each handler will then be registered with the Engine by passing an instance to `registerPlatformInterface()`.
+To extend each Auto SDK interface you will use in your platform implementation:
 
-The functions that are overridden in the interface handlers are typically associated with directives from AVS. The functions that are made available by the interfaces, are typically associated with events or context sent to AVS. It is not always a one-to-one mapping however, because the Alexa Auto SDK attempts to simplify the platform's interaction with AVS.
+1. Create a handler for the interface by overriding the various classes in the library that, when registered with the Engine, allow your application to interact with Amazon services.
+2. Register the handler with the Engine by passing an instance to `registerPlatformInterface`.
 
-An example of creating and registering platform interface handlers with the Engine is shown below.
+The functions that you override in the interface handlers are typically associated with directives from Alexa Voice Service (AVS). The functions that are made available by the interfaces are typically associated with events or context sent to AVS. It is not always a one-to-one mapping however, because the Alexa Auto SDK attempts to simplify the interaction with AVS.
+
+The code sample below provides an example of creating and registering platform interface handlers with the Engine.
 
 ```
 // LoggerHandler.java
@@ -94,34 +143,9 @@ An example of creating and registering platform interface handlers with the Engi
 	m_engine.registerPlatformInterface( m_alexaClient = new AlexaClientHandler( getApplicationContext(), m_logger ) );
 	...
 ```
+The sections below provide information about and examples for creating [logging](#implementing-log-events) and [audio](#implementing-audio) interface handlers with the Engine. For details about creating handlers for the various Auto SDK modules, see the README files for those modules.
 
-## Starting the Engine<a id="starting-the-engine"></a>
-
-After calling configure and registering all required platform interfaces, you can start the Engine. The Engine will first attempt to register all listed interface handlers, and then attempt to establish a connection with the given authorization implementation.
-
-```
-m_engine.start();
-```
-
-## Stopping the Engine<a id="stopping-the-engine"></a>
-
-If you need to stop the engine for any reason, use the Engine's `stop()` method. You can then restart the Engine by calling `start()` again.
-
-```
-if( m_engine != null ) {
-    m_engine.stop();
-}
-```
-
-You should call `dispose()` on the Engine when the app is being destroyed.
-
-```
-if( m_engine != null ) {
-    m_engine.dispose();
-}
-```
-
-## Implementing Log Events<a id="implementing-log-events"></a>
+### Implementing Log Events<a id="implementing-log-events"></a>
 
 The Engine provides a callback for implementing log events from the AVS SDK. This is optional, but useful for the platform implementation.
 
@@ -140,14 +164,14 @@ public class LoggerHandler extends Logger
 
 ```    
 
-### Source Tags
+#### Source Tags
 There are generally three different log `tag` values, depending on the `source`.
 
 * `AVS` refers to logs being passed from the AVS Device SDK.
 * `AAC` refers to logs being passed from the Alexa Auto SDK.
 * `CLI` refers to logs coming from the client itself, by convention.
 
-## Implementing Audio<a id="implementing-audio"></a>
+### Implementing Audio<a id="implementing-audio"></a>
 
 The platform should implement audio input and audio output handling. Other Auto SDK components will make use of the provided implementation to provision audio input and output channels. 
   
@@ -343,31 +367,41 @@ public class AudioOutputHandler extends AudioOutput implements AuthStateObserver
 };
 ```
 
-## Core Engine Properties<a id="core-engine-properties"></a>
+## Starting the Engine<a id="starting-the-engine"></a>
 
-The Core module defines several constants that are used to get and set runtime properties in the Engine. To use these properties call the Engine's `getProperty()` and `setProperty()` methods.
+After creating and registering handlers for all required platform interfaces, you can start the Engine. The Engine will first attempt to register all listed interface handlers, and then attempt to establish a connection with the given authorization implementation.
+
+```
+m_engine.start();
+```
+
+## Stopping the Engine<a id="stopping-the-engine"></a>
+
+If you need to stop the engine for any reason, use the Engine's `stop()` method. You can then restart the Engine by calling `start()` again.
+
+```
+if( m_engine != null ) {
+    m_engine.stop();
+}
+```
+
+You should call `dispose()` on the Engine when the app is being destroyed.
+
+```
+if( m_engine != null ) {
+    m_engine.dispose();
+}
+```
+
+## Getting and Setting Core Engine Properties <a id="getting and-setting-core-engine-properties"></a>
+
+The Core module defines one or more constants (such as `VERSION`) that are used to get and set runtime properties in the Engine. To use these properties, call the Engine's `getProperty()` and `setProperty()` methods.
 
 ```
 // get the SDK version from the Engine
 String version = m_engine.getProperty( com.amazon.aace.core.CoreProperties.VERSION );
 ```
 
-The following constants are defined in the Core module:
+>**Note:** The `setProperty()` method returns `true` if the the property value was successfully updated and `false` if the update failed.
 
-<table>
-<tr>
-<th>Property</th>
-<th>Description</th>
-</tr>
-<tr>
-<td><code>com.amazon.aace.core.CoreProperties.VERSION</code>
-</td>
-<td>The Alexa Auto SDK version.
-<p>
-<b>Note:</b> This is a read-only property.</td>
-
-</tr>
-</table>
-
-
-See the API reference documentation for [CoreProperties](src/main/java/com/amazon/aace/core/CoreProperties.java) for more information.
+The [`CoreProperties`](src/main/java/com/amazon/aace/core/CoreProperties.java) class includes details about the Engine properties defined in the Core module.

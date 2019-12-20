@@ -16,12 +16,12 @@
 #ifndef AACE_ENGINE_ALEXA_EXTERNAL_MEDIA_ADAPTER_ENGINE_IMPL_H
 #define AACE_ENGINE_ALEXA_EXTERNAL_MEDIA_ADAPTER_ENGINE_IMPL_H
 
+#include <functional>
 #include <memory>
+#include <set>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <set>
-#include <functional>
 
 #include <AVSCommon/SDKInterfaces/ExternalMediaAdapterInterface.h>
 #include <AVSCommon/SDKInterfaces/ExternalMediaPlayerInterface.h>

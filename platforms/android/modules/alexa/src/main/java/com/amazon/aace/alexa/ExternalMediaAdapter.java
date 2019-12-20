@@ -124,10 +124,6 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
          */
         PLAY("PLAY"),
         /*
-         * Resume is supported
-         */
-        RESUME("RESUME"),
-        /*
          * Pause is supported
          */
         PAUSE("PAUSE"),

@@ -55,6 +55,12 @@ aace::location::Location LocationProviderHandler::getLocation() {
             longitude = value.at("longitude").get<double>();
         }
     }
+
+    if ( latitude == 0.0 && longitude == 0.0 ) {
+        latitude = aace::location::Location::UNDEFINED;
+        longitude = aace::location::Location::UNDEFINED;
+    }
+
     if (auto console = m_console.lock()) {
         console->printLine("Location", latitude, longitude);
     }

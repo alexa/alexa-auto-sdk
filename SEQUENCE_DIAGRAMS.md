@@ -1,22 +1,13 @@
 # Alexa Module Sequence Diagrams for Alexa Auto SDK
 
-Here are a few sequence diagrams that are representative of some of the basic flows used in the Alexa Auto SDK.
+The following sequence diagrams illustrate two of the basic flows used in the Alexa Auto SDK.
 
-## Login/Logout Sequence Diagram<a id="loginlogout"></a>
+**Table of Contents**
 
-Alexa Auto SDK requires that you use access tokens for login. Application developers need to provide access so that users can register the head unit as an Alexa-enabled product with Login With Amazon (LWA). It is the OEM developer's responsibility to manage authentication and authorization.
+* [Tap to Talk Sequence Diagram](#tap-to-talk-sequence-diagram)
+* [Wake Word Enabled Sequence Diagram](#wake-word-enabled-sequence-diagram)
 
-Alexa Auto SDK doesn't maintain or manage access tokens. Maintaining and managing access tokens is the responsibility of the authorization app being used. To logout the authorization and refresh tokens need to be cleared. Anytime the authorization and refresh tokens are cleared, users must go through the authentication and authorization process again.
-
-![sequence_loginlogout](./assets/aac-loginout.png)
-
-**Additional Authorization Resources:**
-
-* [Customer Experience in Android/Fire apps](https://developer.amazon.com/docs/login-with-amazon/customer-experience-android.html#login-flows)
-* [Implement Authorization for AVS Using Login With Amazon](https://developer.amazon.com/alexa-voice-service/auth)
-* [Understanding Login Authentication with the AVS Sample App and the Node.js Server](https://developer.amazon.com/blogs/alexa/post/bb4a34ad-f805-43d9-bbe0-c113105dd8fd/understanding-login-authentication-with-the-avs-sample-app-and-the-node-js-server)
-
-## Tap to Talk Sequence Diagram<a id="taptotalk"></a>
+## Tap to Talk Sequence Diagram <a id ="tap-to-talk-sequence-diagram"></a>
 
 This sequence diagram illustrates the initial sequence followed to access Alexa through the automotive tap to talk flow. The driver initiates the  action by pushing the voice button located in the car.
 
@@ -38,7 +29,7 @@ This diagram includes the actual names and syntax for the methods and functions 
 
 1. A visual indication should be displayed on the head unit screen indicating that Alexa is in a thinking state. In this state, Alexa is processing the input buffer and creating an appropriate response type. In this example Alexa is creating an audio out file that is sent to the cars head unit to play.  
 
-## Wake Word Enabled Sequence Diagram<a id="wakewordenabled"></a>
+## Wake Word Enabled Sequence Diagram <a id= "wake-word-enabled-sequence-diagram"></a>
 
 This sequence diagram illustrates the initial sequence followed to access Alexa with the wake word enabled. The driver initiates the action by uttering the Alexa wake word.
 

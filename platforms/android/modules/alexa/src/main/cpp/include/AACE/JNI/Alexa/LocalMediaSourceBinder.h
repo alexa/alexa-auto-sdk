@@ -159,7 +159,6 @@ namespace alexa {
         std::vector<std::pair<T,std::string>> getConfiguration() override {
             return {
                 {T::PLAY,"PLAY"},
-                {T::RESUME,"RESUME"},
                 {T::PAUSE,"PAUSE"},
                 {T::STOP,"STOP"},
                 {T::NEXT,"NEXT"},

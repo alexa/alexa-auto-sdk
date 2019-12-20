@@ -28,12 +28,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Set;
+import java.util.Arrays;
 
 class ConfigureViewHolder {
     private static String sTag = "CLI";
     private static int sNumForecastItems = 5; // For weather template card
     private static int sNumListItems = 5; // For list template card
     private static int sNumLocalSearchListItems = 4; // For local search template card
+    private static int sNumWaypoints = 5; // For start navigation card
+    private static int sNumPreviousWaypoints = 5; // For show previous waypoints card
 
     static void configureTextLog( ViewHolderTextLog vh, JSONObject json ) {
         try {
@@ -166,8 +170,7 @@ class ConfigureViewHolder {
                 }
 
                 if ( template.has( "currentWeatherIcon" ) ) {
-                    String currentWeatherIconURL =
-                            getImageUrl( template.getJSONObject( "currentWeatherIcon" ) );
+                    String currentWeatherIconURL = getImageUrl( template.getJSONObject( "currentWeatherIcon" ) );
                     new DownloadImageTask( vh.getCurrentWeatherIcon() ).execute( currentWeatherIconURL );
                 }
 
@@ -216,26 +219,277 @@ class ConfigureViewHolder {
         } catch ( JSONException e ) { Log.e( sTag, e.getMessage() ); }
     }
 
-    static void configureSetDestinationTemplate( ViewHolderSetDestinationTemplate vh, JSONObject json ) {
+    static void configureStartNavigationTemplate( ViewHolderStartNavigationTemplate vh, JSONObject json ) {
         try {
             if ( json.has( "template" ) ) {
                 JSONObject template = json.getJSONObject( "template" );
 
+                // Clear map from previous startNavigation call
+                vh.clear();
                 if ( template.has( "destination" ) ) {
-                    JSONObject dest = template.getJSONObject( "destination" );
+                    JSONObject destination = template.getJSONObject( "destination" );
 
-                    String name = dest.has( "name" ) ? dest.getString( "name" ) : "";
-                    vh.getName().setText( name );
+                    String name = destination.has( "name" ) ? destination.getString( "name" ) : "";
+                    String address = destination.has( "address" ) ? destination.getString( "address" ) : "";
 
-                    String address = dest.has( "singleLineDisplayAddress" )
-                            ? dest.getString( "singleLineDisplayAddress" ) : "";
-                    vh.getAddress().setText( address );
+                    if ( destination.has( "coordinate" ) ) {
+                        JSONObject coord = destination.getJSONObject( "coordinate" );
+                        double lat = coord.getDouble( "latitudeInDegrees" );
+                        double lng = coord.getDouble( "longitudeInDegrees" );
+                        vh.addMarker( lat, lng );
+                    }
 
-                    if ( dest.has( "coordinate" ) ) {
-                        JSONObject coord = dest.getJSONObject( "coordinate" );
-                        double lat = Double.parseDouble( coord.getString( "latitudeInDegrees" ) );
-                        double lng = Double.parseDouble( coord.getString( "longitudeInDegrees" ) );
-                        vh.setPlace( lat,lng );
+                    vh.setDestinationNameAndAddress( name, address );
+                }
+
+                if ( template.has( "waypoints" ) ) {
+                    // handles waypoints in StartNavigation directive
+                    JSONArray waypoints = template.getJSONArray( "waypoints" );
+
+                    int numberOfWaypoints = waypoints.length() < sNumWaypoints ? waypoints.length() : sNumWaypoints;
+                    String[] names = new String[numberOfWaypoints];
+                    String[] addresses = new String[numberOfWaypoints];
+
+                    for ( int i = 0; i < numberOfWaypoints; i++ ) {
+                        JSONObject waypoint = waypoints.getJSONObject(i);
+
+                        String name = waypoint.has( "name" ) ? waypoint.getString( "name" ) : "";
+                        String address = waypoint.has( "address" ) ? waypoint.getString( "address" ) : "";
+
+                        names[i] = name;
+                        addresses[i] = address;
+
+                        if ( waypoint.has( "coordinate" ) ) {
+                            JSONObject coord = waypoint.getJSONObject( "coordinate" );
+                            double lat = coord.getDouble( "latitudeInDegrees" );
+                            double lng = coord.getDouble( "longitudeInDegrees" );
+                            vh.addMarker( lat, lng );
+                        }
+                    }
+
+                    vh.setWaypoints( addresses );
+                } else if ( template.has( "waypoint" ) ) {
+                    // handles the single waypoint in navigateToPreviousDestination
+                    JSONObject waypoint = template.getJSONObject( "waypoint" );
+
+                    String name = waypoint.has( "name" ) ? waypoint.getString( "name" ) : "";
+                    String address = waypoint.has( "address" ) ? waypoint.getString( "address" ) : "";
+
+                    if ( waypoint.has( "coordinate" ) ) {
+                        JSONObject coord = waypoint.getJSONObject( "coordinate" );
+                        double lat = coord.getDouble( "latitudeInDegrees" );
+                        double lng = coord.getDouble( "longitudeInDegrees" );
+                        vh.addMarker( lat, lng );
+                    }
+
+                    vh.setDestinationNameAndAddress( name, address );
+                }
+            }
+        } catch ( JSONException e ) {
+            Log.e( sTag, e.getMessage() );
+        }
+    }
+
+    static void configurePreviousWaypointsTemplate( ViewHolderPreviousWaypointsTemplate vh, JSONObject json ) {
+        try {
+            if ( json.has( "template" ) ) {
+                JSONObject template = json.getJSONObject( "template" );
+
+                if ( template.has( "waypoints" ) ) {
+                    JSONArray waypoints = template.getJSONArray( "waypoints" );
+
+                    String[] names = new String[sNumPreviousWaypoints];
+                    String[] addresses = new String[sNumPreviousWaypoints];
+                    int numberOfWaypoints = waypoints.length() < sNumPreviousWaypoints ? waypoints.length() : sNumPreviousWaypoints;
+                    for ( int i = 0; i < numberOfWaypoints; i++ ) {
+                        JSONObject waypoint = waypoints.getJSONObject(i);
+
+                        String name = waypoint.has( "name" ) ? waypoint.getString( "name" ) : "";
+                        String address = waypoint.has( "address" ) ? waypoint.getString( "address" ) : "";
+
+                        names[i] = name;
+                        addresses[i] = address;
+                    }
+
+                    vh.setWaypoints( names, addresses );
+                }
+            }
+        } catch ( JSONException e ) { Log.e( sTag, e.getMessage() ); }
+    }
+
+    static void configureLocalSearchListTemplate2( ViewHolderLocalSearchListTemplate2 vh,
+                                                   JSONObject json ) {
+        try {
+            if ( json.has( "template" ) ) {
+                JSONObject template = json.getJSONObject("template");
+
+                String mainTitle = "<mainTitle>";
+                String subTitle = "<subTitle>";
+                String address = "<address>";
+                String phoneNumber = "<phoneNumber>";
+                String provider = "<provider>";
+                String image = "<image>";
+                String travelDistance = "<travelDistance>";
+                String travelTime = "<travelTime>";
+                String offRouteTime = "<offRouteTime>";
+                String priceString = "$";
+                String ratingValue = "<ratingValue>";
+                String ratingReviewCount = "<ratingReviewCount>";
+                String ratingImage = "<ratingImage>";
+                String ratingProviderName = "<ratingProviderName>";
+                String ratingProviderImage = "<ratingProviderImage>";
+                String currentStatus = "<currentStatus>";
+
+                if ( template.has( "title" ) ) {
+                    String title = template.getString( "title" );
+                    vh.getTitle().setText( title );
+                }
+
+                if ( template.has( "pointOfInterests" ) ) {
+                    JSONArray pointOfInterests = template.getJSONArray( "pointOfInterests" );
+
+                    // Truncate list
+                    int numListPointOfInterests = pointOfInterests.length() > sNumLocalSearchListItems
+                            ? sNumLocalSearchListItems : pointOfInterests.length();
+
+                    vh.clearList();
+                    for ( int j = 0; j < numListPointOfInterests; j++ ) {
+                        JSONObject POI = pointOfInterests.getJSONObject( j );
+
+                        if ( POI.has( "title" ) ) {
+                            JSONObject title = POI.getJSONObject( "title" );
+                            if ( title.has( "mainTitle" ) ) {
+                                mainTitle = title.getString( "mainTitle" );
+                            }
+
+                            if ( title.has( "subTitle" ) ) {
+                                 subTitle = title.getString( "subTitle" );
+                            }
+                        }
+
+                        if ( POI.has( "address" ) ) {
+                            address = POI.getString( "address" );
+                        }
+                        if ( POI.has( "phoneNumber" ) ) {
+                            phoneNumber = POI.getString( "phoneNumber" );
+                        }
+                        if ( POI.has( "provider" ) ) {
+                            provider = POI.getString( "provider" );
+                        }
+                        if ( POI.has( "image" ) ) {
+                            image = getImageUrl( POI.getJSONObject( "image" ) );
+                        }
+                        if ( POI.has( "travelDistance" ) ) {
+                            travelDistance = POI.getString( "travelDistance" );
+                        }
+                        if ( POI.has( "travelTime" ) ) {
+                            travelTime = " (" + POI.getString( "travelTime" ) + ")";
+                        }
+                        if ( POI.has( "offRouteTime" ) ) {
+                            offRouteTime = POI.getString( "offRouteTime" );
+                        }
+                        if ( POI.has( "priceRange" ) ) {
+                            int priceRange = POI.getInt( "priceRange" );
+                            for ( int i = 1; i < priceRange; i++){
+                                priceString = priceString.concat("$");
+                            }
+                        }
+                        if ( POI.has( "url" ) ) {
+                            // TBD not used in card
+                            //url = POI.getString( "url" );
+                        }
+
+                        if ( POI.has( "rating" ) ) {
+                            JSONObject rating = POI.getJSONObject( "rating" );
+                            if ( rating.has( "value" ) ) {
+                                ratingValue = rating.getString( "value" ) + " stars";
+                            }
+
+                            if ( rating.has( "reviewCount" ) ) {
+                                ratingReviewCount = rating.getString( "reviewCount" ) + " Reviews";
+                            }
+
+                            if ( rating.has( "image" ) ) {
+                                ratingImage = getImageUrl( rating.getJSONObject( "image" ) );
+                            }
+
+                            if ( rating.has( "provider" ) ) {
+                                JSONObject ratingProvider = rating.getJSONObject("provider");
+                                if ( ratingProvider.has( "name" ) ) {
+                                    ratingProviderName = ratingProvider.getString( "name" );
+                                }
+
+                                if ( ratingProvider.has( "image" ) ) {
+                                    ratingProviderImage = getImageUrl( ratingProvider.getJSONObject( "image" ) );
+                                }
+                            }
+                        }
+
+                        if ( POI.has( "coordinate" ) ) {
+                            JSONObject coordinate = POI.getJSONObject("coordinate");
+                            if ( coordinate.has( "latitudeInDegrees" ) ) {
+                                String latitudeInDegrees = coordinate.getString( "latitudeInDegrees" );
+                            }
+
+                            if ( coordinate.has( "longitudeInDegrees" ) ) {
+                                String longitudeInDegrees = coordinate.getString( "longitudeInDegrees" );
+                            }
+                        }
+
+                        if ( POI.has( "currentStatus" ) ) {
+                            currentStatus = POI.getString( "currentStatus" );
+                        }
+                        if ( POI.has( "travelDirection" ) ) {
+                            String travelDirection = POI.getString( "travelDirection" );
+                        }
+
+                        if ( POI.has( "hoursOfOperation" ) ) {
+                            JSONArray hoursOfOperation = POI.getJSONArray( "hoursOfOperation" );
+                            int numListHours = hoursOfOperation.length();
+
+                            for ( int k = 0; k < numListHours; k++ ) {
+                                JSONObject day = hoursOfOperation.getJSONObject( k );
+
+                                String dayOfWeek = day.getString( "dayOfWeek" );
+                                String type = day.getString( "type" );
+                                String hours = day.getString( "hours" );
+
+                                switch(dayOfWeek) {
+                                    // Current simplification to fit current UI card example.
+                                    // TBD: find other UI example for split week day hours
+                                    case "MONDAY":
+                                        String weekDayHours = "Mon - Fri: ";
+                                        if( !type.equals("OPEN_DURING_HOURS") ){
+                                            weekDayHours = weekDayHours.concat(type);
+                                        } else {
+                                            weekDayHours = weekDayHours.concat(hours);
+                                        }
+                                        break;
+                                    case "SATURDAY":
+                                        String saturdayHours = "Sat ";
+                                        if( !type.equals("OPEN_DURING_HOURS") ){
+                                            saturdayHours = saturdayHours.concat(type);
+                                        } else {
+                                            saturdayHours = saturdayHours.concat(hours);
+                                        }
+                                        break;
+                                    case "SUNDAY":
+                                        String sundayHours = "Sun ";
+                                        if( !type.equals("OPEN_DURING_HOURS") ){
+                                            sundayHours = sundayHours.concat(type);
+                                        } else {
+                                            sundayHours = sundayHours.concat(hours);
+                                        }
+                                        break;
+                                }
+                            }
+                        }
+                        String index = String.valueOf( j + 1 );
+                        vh.insertListItem( index, mainTitle, subTitle,
+                                 address, phoneNumber, provider, image, travelDistance,
+                                 travelTime, offRouteTime, priceString, ratingValue,
+                                 ratingReviewCount, ratingImage, ratingProviderName,
+                                 ratingProviderImage, currentStatus );
                     }
                 }
             }
@@ -269,6 +523,221 @@ class ConfigureViewHolder {
                         vh.insertListItem( index, dist, name, address );
                     }
                 }
+            }
+        } catch ( JSONException e ) { Log.e( sTag, e.getMessage() ); }
+    }
+
+    static void configureLocalSearchDetailTemplate1( ViewHolderLocalSearchDetailTemplate1 vh,
+                                                   JSONObject json ) {
+        try {
+            if( json.has("template") ) {
+                JSONObject template = json.getJSONObject( "template" );
+
+                if ( template.has( "title" ) ) {
+                    JSONObject title = template.getJSONObject( "title" );
+                    if ( title.has( "mainTitle" ) ) {
+                        String mainTitle = title.getString( "mainTitle" );
+                        vh.getMainTitle().setText( mainTitle );
+                    }
+
+                    if ( title.has( "subTitle" ) ) {
+                        String subTitle = title.getString( "subTitle" );
+                        vh.getSubTitle().setText( subTitle );
+                    }
+                }
+
+                if ( template.has( "address" ) ) {
+                    String address = template.getString( "address" );
+                    vh.getAddress().setText( address );
+                }
+                if ( template.has( "phoneNumber" ) ) {
+                    String phoneNumber = template.getString( "phoneNumber" );
+                    vh.getPhoneNumber().setText( phoneNumber );
+                }
+                if ( template.has( "provider" ) ) {
+                    String provider = " Data from:" + template.getString( "provider" );
+                    vh.getProvider().setText( provider );
+                }
+                if ( template.has( "image" ) ) {
+                    String image = getImageUrl( template.getJSONObject( "image" ) );
+                    new DownloadImageTask( vh.getImage() ).execute( image );
+                }
+                if ( template.has( "travelDistance" ) ) {
+                    String travelDistance = template.getString( "travelDistance" );
+                    vh.getTravelDistance().setText( travelDistance );
+                }
+                if ( template.has( "travelTime" ) ) {
+                    String travelTime = template.getString( "travelTime" );
+                    vh.getTravelTime().setText( travelTime );
+                }
+                if ( template.has( "offRouteTime" ) ) {
+                    String offRouteTime = template.getString( "offRouteTime" );
+                    vh.getOffRouteTime().setText( offRouteTime );
+                }
+                if ( template.has( "priceRange" ) ) {
+                    int priceRange = template.getInt( "priceRange" );
+                    String priceString = "$";
+                    for ( int i = 1; i < priceRange; i++){
+                        priceString = priceString.concat("$");
+                    }
+                    vh.getPriceRange().setText( priceString );
+                }
+                if ( template.has( "url" ) ) {
+                    String url = template.getString( "url" );
+                   // vh.getUrl().setText( url );
+                }
+
+                if ( template.has( "rating" ) ) {
+                    JSONObject rating = template.getJSONObject( "rating" );
+                    if ( rating.has( "value" ) ) {
+                        String value = rating.getString( "value" ) + " stars";
+                        vh.getRatingValue().setText( value );
+                    }
+
+                    if ( rating.has( "reviewCount" ) ) {
+                        String reviewCount = rating.getString( "reviewCount" ) + " reviews";
+                        vh.getRatingReviewCount().setText( reviewCount );
+                    }
+
+                    if ( rating.has( "image" ) ) {
+                        String image = getImageUrl( rating.getJSONObject( "image" ) );
+                        new DownloadImageTask( vh.getRatingImage() ).execute( image );
+                    }
+
+                    if ( rating.has( "provider" ) ) {
+                        JSONObject provider = rating.getJSONObject("provider");
+                        if ( provider.has( "name" ) ) {
+                            String name = provider.getString( "name" );
+                            vh.getRatingProviderName().setText( name );
+                        }
+
+                        if ( provider.has( "image" ) ) {
+                            String image = getImageUrl( provider.getJSONObject( "image" ) );
+                            new DownloadImageTask( vh.getRatingProviderImage() ).execute( image );
+                        }
+                    }
+                }
+
+                if ( template.has( "coordinate" ) ) {
+                    JSONObject coordinate = template.getJSONObject("coordinate");
+                    if ( coordinate.has( "latitudeInDegrees" ) ) {
+                        String latitudeInDegrees = coordinate.getString( "latitudeInDegrees" );
+                        //vh.getLatitudeInDegrees().setText( latitudeInDegrees );
+                    }
+
+                    if ( coordinate.has( "longitudeInDegrees" ) ) {
+                        String longitudeInDegrees = coordinate.getString( "longitudeInDegrees" );
+                        //vh.getLongitudeInDegrees().setText( longitudeInDegrees );
+                    }
+                }
+
+                if ( template.has( "currentStatus" ) ) {
+                    String currentStatus = template.getString( "currentStatus" );
+                    vh.getCurrentStatus().setText( currentStatus );
+                }
+                if ( template.has( "travelDirection" ) ) {
+                    String travelDirection = template.getString( "travelDirection" );
+                    //vh.getTravelDirection().setText( travelDirection );
+                }
+
+                if ( template.has( "hoursOfOperation" ) ) {
+                    JSONArray hoursOfOperation = template.getJSONArray( "hoursOfOperation" );
+                    int numListItems = hoursOfOperation.length();
+
+                    for ( int j = 0; j < numListItems; j++ ) {
+                        JSONObject day = hoursOfOperation.getJSONObject( j );
+
+                        String dayOfWeek = day.getString( "dayOfWeek" );
+                        String type = day.getString( "type" );
+                        String hours = day.getString( "hours" );
+
+                        switch(dayOfWeek) {
+                            // Current simplification to fit current UI card example.
+                            // TBD: find other UI example for split week day hours
+                            case "MONDAY":
+                                String weekDayHours = "Mon - Fri: ";
+                                if( !type.equals("OPEN_DURING_HOURS") ){
+                                    weekDayHours = weekDayHours.concat(type);
+                                } else {
+                                    weekDayHours = weekDayHours.concat(hours);
+                                }
+                                vh.getWeekdayHours().setText( weekDayHours );
+                                break;
+                            case "SATURDAY":
+                                String saturdayHours = "Sat ";
+                                if( !type.equals("OPEN_DURING_HOURS") ){
+                                    saturdayHours = saturdayHours.concat(type);
+                                } else {
+                                    saturdayHours = saturdayHours.concat(hours);
+                                }
+                                vh.getSaturdayHours().setText( saturdayHours );
+                                break;
+                            case "SUNDAY":
+                                String sundayHours = "Sun ";
+                                if( !type.equals("OPEN_DURING_HOURS") ){
+                                    sundayHours = sundayHours.concat(type);
+                                } else {
+                                    sundayHours = sundayHours.concat(hours);
+                                }
+                                vh.getSundayHours().setText( sundayHours );
+                                break;
+                        }
+                    }
+                }
+            }
+        } catch ( JSONException e ) { Log.e( sTag, e.getMessage() ); }
+    }
+
+    static void configureTrafficDetailsTemplate( ViewHolderTrafficDetailsTemplate vh,
+                                                   JSONObject json ) {
+        try {
+            if( json.has("template") ) {
+                JSONObject template = json.getJSONObject( "template" );
+
+                if ( template.has( "title" ) ) {
+                    JSONObject title = template.getJSONObject( "title" );
+                    if ( title.has( "mainTitle" ) ) {
+                        String mainTitle = title.getString( "mainTitle" );
+                        vh.getMainTitle().setText( mainTitle );
+                    }
+
+                    if ( title.has( "subTitle" ) ) {
+                        String subTitle = title.getString( "subTitle" );
+                        vh.getSubTitle().setText( subTitle );
+                    }
+                }
+
+                if ( template.has( "destinationInfo" ) ) {
+                    JSONObject destinationInfo = template.getJSONObject( "destinationInfo" );
+                    if ( destinationInfo.has( "label" ) ) {
+                        String label = destinationInfo.getString( "label" );
+                        vh.getLabel().setText( label );
+                    }
+                    if ( destinationInfo.has( "address" ) ) {
+                        String address = destinationInfo.getString( "address" );
+                        vh.getAddress().setText( address );
+                    }
+                }
+
+                if ( template.has( "travelDistance" ) ) {
+                    String travelDistance = "(" + template.getString( "travelDistance" ) +")";
+                    vh.getTravelDistance().setText( travelDistance );
+                }
+                if ( template.has( "travelTime" ) ) {
+                    String travelTime = template.getString( "travelTime" );
+                    vh.getTravelTime().setText( travelTime );
+                }
+
+                if ( template.has( "currentTrafficConditionsIcon" ) ) {
+                    String currentTrafficConditionsIconURL = getImageUrl( template.getJSONObject( "currentTrafficConditionsIcon" ) );
+                    new DownloadImageTask( vh.getCurrentTrafficConditionsIcon() ).execute( currentTrafficConditionsIconURL );
+                }
+
+                if ( template.has( "backgroundImageUrl" ) ) {
+                    String backgroundImageURL = getImageUrl( template.getJSONObject( "backgroundImageUrl" ) );
+                    new DownloadImageTask( vh.getBackgroundImage() ).execute( backgroundImageURL );
+                }
+
             }
         } catch ( JSONException e ) { Log.e( sTag, e.getMessage() ); }
     }
@@ -387,7 +856,7 @@ class ConfigureViewHolder {
             } else if ( imageMap.containsKey( "X-SMALL" ) ) {
                 url = imageMap.get( "X-SMALL" );
             }
-        } catch ( JSONException e ) { Log.e( sTag, e.getMessage() ); }
+        } catch ( JSONException e ) { Log.e( sTag, "getImageUrl:" + e.getMessage() ); }
         return url;
     }
 }

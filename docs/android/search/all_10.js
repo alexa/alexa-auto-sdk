@@ -11,5 +11,9 @@ var searchData=
   ['togglepressed',['togglePressed',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_playback_controller.html#ae704411fffffda8c04fec1d59882899f',1,'com::amazon::aace::alexa::PlaybackController']]],
   ['track',['TRACK',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter_1_1_media_type.html#a75b390afb82e0f8d95cff4cf06fec59e',1,'com.amazon.aace.alexa.ExternalMediaAdapter.MediaType.TRACK()'],['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source_1_1_media_type.html#aefed7c68a06513cecf1d1830eea2a148',1,'com.amazon.aace.alexa.LocalMediaSource.MediaType.TRACK()']]],
   ['treble',['TREBLE',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_equalizer_controller_1_1_equalizer_band.html#aaf1c6d5e0d780baab17a53763e2c4688',1,'com::amazon::aace::alexa::EqualizerController::EqualizerBand']]],
-  ['trim',['TRIM',['../enumcom_1_1amazon_1_1aace_1_1vehicle_1_1config_1_1_vehicle_configuration_1_1_vehicle_property_type.html#a52c0f39c73171713335cf2bb2306f799',1,'com::amazon::aace::vehicle::config::VehicleConfiguration::VehiclePropertyType']]]
+  ['trim',['TRIM',['../enumcom_1_1amazon_1_1aace_1_1vehicle_1_1config_1_1_vehicle_configuration_1_1_vehicle_property_type.html#a52c0f39c73171713335cf2bb2306f799',1,'com::amazon::aace::vehicle::config::VehicleConfiguration::VehiclePropertyType']]],
+  ['turnpowercontrolleroff',['turnPowerControllerOff',['../classcom_1_1amazon_1_1aace_1_1car_control_1_1_car_control.html#a1413a325e11f90cb0b6704c3445f062e',1,'com::amazon::aace::carControl::CarControl']]],
+  ['turnpowercontrolleron',['turnPowerControllerOn',['../classcom_1_1amazon_1_1aace_1_1car_control_1_1_car_control.html#a1e28db083c8da5d0a49976a8f28dcffd',1,'com::amazon::aace::carControl::CarControl']]],
+  ['turntogglecontrolleroff',['turnToggleControllerOff',['../classcom_1_1amazon_1_1aace_1_1car_control_1_1_car_control.html#a27a39809a5986fda9a76a2d169e69960',1,'com::amazon::aace::carControl::CarControl']]],
+  ['turntogglecontrolleron',['turnToggleControllerOn',['../classcom_1_1amazon_1_1aace_1_1car_control_1_1_car_control.html#a0a2a3e454c2c275182506e965d92d367',1,'com::amazon::aace::carControl::CarControl']]]
 ];

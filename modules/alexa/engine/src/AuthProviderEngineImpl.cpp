@@ -81,6 +81,7 @@ std::string AuthProviderEngineImpl::getAuthToken()
 
 void AuthProviderEngineImpl::onAuthFailure( const std::string& token ) {
     AACE_DEBUG(LX(TAG,"onAuthFailure").sensitive("token",token));
+    m_authProviderPlatformInterface->authFailure( token );
 }
 
 void AuthProviderEngineImpl::addAuthObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer )

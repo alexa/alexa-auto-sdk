@@ -27,6 +27,7 @@ PlaybackControllerEngineImpl::PlaybackControllerEngineImpl( std::shared_ptr<aace
 }
 
 bool PlaybackControllerEngineImpl::initialize(
+    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
@@ -40,8 +41,8 @@ bool PlaybackControllerEngineImpl::initialize(
         m_playbackRouter = alexaClientSDK::capabilityAgents::playbackController::PlaybackRouter::create( m_playbackControllerCapabilityAgent );
         ThrowIfNull( m_playbackRouter, "couldNotCreatePlaybackRouter" );
 
-        // register capability with delegate
-        ThrowIfNot( capabilitiesDelegate->registerCapability( m_playbackControllerCapabilityAgent ), "registerCapabilityFailed");
+        // register capability configuration with the default endpoint
+        defaultEndpointBuilder->withCapabilityConfiguration( m_playbackControllerCapabilityAgent );
 
         return true;
     }
@@ -53,6 +54,7 @@ bool PlaybackControllerEngineImpl::initialize(
 
 std::shared_ptr<PlaybackControllerEngineImpl> PlaybackControllerEngineImpl::create(
     std::shared_ptr<aace::alexa::PlaybackController> playbackControllerPlatformInterface,
+    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
@@ -63,6 +65,7 @@ std::shared_ptr<PlaybackControllerEngineImpl> PlaybackControllerEngineImpl::crea
     try
     {
         ThrowIfNull( playbackControllerPlatformInterface, "invalidPlaybackControllerPlatformInterface" );
+        ThrowIfNull( defaultEndpointBuilder, "invalidDefaultEndpointBuilder" );
         ThrowIfNull( messageSender, "invalidMessageSender" );
         ThrowIfNull( contextManager, "invalidContextManager" );
         ThrowIfNull( capabilitiesDelegate, "invalidCapabilitiesDelegate" );
@@ -70,7 +73,7 @@ std::shared_ptr<PlaybackControllerEngineImpl> PlaybackControllerEngineImpl::crea
 
         playbackControllerEngineImpl = std::shared_ptr<PlaybackControllerEngineImpl>( new PlaybackControllerEngineImpl( playbackControllerPlatformInterface ) );
 
-        ThrowIfNot( playbackControllerEngineImpl->initialize( messageSender, contextManager, capabilitiesDelegate, focusManager ), "initializePlaybackControllerEngineImplFailed" );
+        ThrowIfNot( playbackControllerEngineImpl->initialize( defaultEndpointBuilder, messageSender, contextManager, capabilitiesDelegate, focusManager ), "initializePlaybackControllerEngineImplFailed" );
 
         // set the platform engine interface reference
         playbackControllerPlatformInterface->setEngineInterface( playbackControllerEngineImpl );

@@ -100,19 +100,19 @@ bool NavigationEngineService::registerPlatformInterfaceType( std::shared_ptr<aac
         auto alexaComponents = getContext()->getServiceInterface<aace::engine::alexa::AlexaComponentInterface>( "aace.alexa" );
         ThrowIfNull( alexaComponents, "invalidAlexaComponentInterface" );
         
-        auto directiveSequencer = alexaComponents->getDirectiveSequencer();
-        ThrowIfNull( directiveSequencer, "directiveSequencerInvalid" );
-
-        auto capabilitiesDelegate = alexaComponents->getCapabilitiesDelegate();
-        ThrowIfNull( capabilitiesDelegate, "capabilitiesDelegateInvalid" );
+        auto defaultEndpointBuilder = alexaComponents->getDefaultEndpointBuilder();
+        ThrowIfNull( defaultEndpointBuilder, "defaultEndpointBuilderInvalid" );
 
         auto exceptionSender = alexaComponents->getExceptionEncounteredSender();
         ThrowIfNull( exceptionSender, "exceptionSenderInvalid" );
 
+        auto messageSender = alexaComponents->getMessageSender();
+        ThrowIfNull( messageSender, "messageSenderInvalid" );
+        
         auto contextManager = alexaComponents->getContextManager();
         ThrowIfNull( contextManager, "contextManagerInvalid" );
 
-        m_navigationEngineImpl = aace::engine::navigation::NavigationEngineImpl::create( navigation, directiveSequencer, capabilitiesDelegate, exceptionSender, contextManager, m_navigationProviderName );
+        m_navigationEngineImpl = aace::engine::navigation::NavigationEngineImpl::create( navigation, defaultEndpointBuilder, exceptionSender, messageSender, contextManager, m_navigationProviderName );
         ThrowIfNull( m_navigationEngineImpl, "createNavigationEngineImplFailed" );
 
         return true;

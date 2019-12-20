@@ -13,8 +13,8 @@
  * permissions and limitations under the License.
  */
 
-#include "AACE/Engine/Alexa/AudioChannelEngineImpl.h"
 #include "AACE/Engine/Alexa/AlexaMetrics.h"
+#include "AACE/Engine/Alexa/AudioChannelEngineImpl.h"
 #include "AACE/Engine/Core/EngineMacros.h"
 
 namespace aace {
@@ -80,7 +80,10 @@ void AudioChannelEngineImpl::doShutdown()
     }
 
     // reset the media observer reference
-    m_mediaPlayerObserver.reset();
+    {
+        std::unique_lock<std::mutex> lock( m_mediaPlayerObserverMutex );
+        m_mediaPlayerObservers.clear();
+    }
     // reset the speaker manager
     m_speakerManager.reset();
 }
@@ -305,8 +308,13 @@ void AudioChannelEngineImpl::executeMediaError( SourceId id, MediaError error, c
     {
         ThrowIf( id == ERROR, "invalidSource" );
         
-        if( auto m_mediaPlayerObserver_lock = m_mediaPlayerObserver.lock() ) {
-            m_mediaPlayerObserver_lock->onPlaybackError( id, static_cast<alexaClientSDK::avsCommon::utils::mediaPlayer::ErrorType>( error ), description );
+        {
+            std::unique_lock<std::mutex> lock( m_mediaPlayerObserverMutex );
+            for( auto&& observer : m_mediaPlayerObservers ) {
+                if( auto observer_lock = observer.lock() ) {
+                    observer_lock->onPlaybackError( id, static_cast<alexaClientSDK::avsCommon::utils::mediaPlayer::ErrorType>( error ), description );
+                }
+            }
         }
         
         m_currentId = ERROR;
@@ -339,8 +347,13 @@ void AudioChannelEngineImpl::executePlaybackStarted( SourceId id )
         handlePrePlaybackStarted( id );
         ThrowIf( id == ERROR, "invalidSource" );
         
-        if( auto m_mediaPlayerObserver_lock = m_mediaPlayerObserver.lock() ) {
-            m_mediaPlayerObserver_lock->onPlaybackStarted( id );
+        {
+            std::unique_lock<std::mutex> lock( m_mediaPlayerObserverMutex );
+            for( auto&& observer : m_mediaPlayerObservers ) {
+                if( auto observer_lock = observer.lock() ) {
+                    observer_lock->onPlaybackStarted( id );
+                }
+            }
         }
         
         handlePostPlaybackStarted( id );
@@ -357,8 +370,13 @@ void AudioChannelEngineImpl::executePlaybackFinished( SourceId id )
         handlePrePlaybackFinished( id );
         ThrowIf( id == ERROR, "invalidSource" );
         
-        if( auto m_mediaPlayerObserver_lock = m_mediaPlayerObserver.lock() ) {
-            m_mediaPlayerObserver_lock->onPlaybackFinished( id );
+        {
+            std::unique_lock<std::mutex> lock( m_mediaPlayerObserverMutex );
+            for( auto&& observer : m_mediaPlayerObservers ) {
+                if( auto observer_lock = observer.lock() ) {
+                    observer_lock->onPlaybackFinished( id );
+                }
+            }
         }
         
         // save the player offset
@@ -382,8 +400,13 @@ void AudioChannelEngineImpl::executePlaybackPaused( SourceId id )
         // save the player offset
         m_savedOffset = std::chrono::milliseconds( m_audioOutputChannel->getPosition() );
 
-        if( auto m_mediaPlayerObserver_lock = m_mediaPlayerObserver.lock() ) {
-            m_mediaPlayerObserver_lock->onPlaybackPaused( id );
+        {
+            std::unique_lock<std::mutex> lock( m_mediaPlayerObserverMutex );
+            for( auto&& observer : m_mediaPlayerObservers ) {
+                if( auto observer_lock = observer.lock() ) {
+                    observer_lock->onPlaybackPaused( id );
+                }
+            }
         }
     }
     catch( std::exception& ex ) {
@@ -397,8 +420,13 @@ void AudioChannelEngineImpl::executePlaybackResumed( SourceId id )
     {
         ThrowIf( id == ERROR, "invalidSource" );
         
-        if( auto m_mediaPlayerObserver_lock = m_mediaPlayerObserver.lock() ) {
-            m_mediaPlayerObserver_lock->onPlaybackResumed( id );
+        {
+            std::unique_lock<std::mutex> lock( m_mediaPlayerObserverMutex );
+            for( auto&& observer : m_mediaPlayerObservers ) {
+                if( auto observer_lock = observer.lock() ) {
+                    observer_lock->onPlaybackResumed( id );
+                }
+            }
         }
     }
     catch( std::exception& ex ) {
@@ -415,8 +443,13 @@ void AudioChannelEngineImpl::executePlaybackStopped( SourceId id )
         // save the player offset
         m_savedOffset = std::chrono::milliseconds( m_audioOutputChannel->getPosition() );
 
-        if( auto m_mediaPlayerObserver_lock = m_mediaPlayerObserver.lock() ) {
-            m_mediaPlayerObserver_lock->onPlaybackStopped( id );
+        {
+            std::unique_lock<std::mutex> lock( m_mediaPlayerObserverMutex );
+            for( auto&& observer : m_mediaPlayerObservers ) {
+                if( auto observer_lock = observer.lock() ) {
+                    observer_lock->onPlaybackStopped( id );
+                }
+            }
         }
     }
     catch( std::exception& ex ) {
@@ -430,10 +463,15 @@ void AudioChannelEngineImpl::executePlaybackError( SourceId id, MediaError error
     {
         ThrowIf( id == ERROR, "invalidSource" );
         
-        if( auto m_mediaPlayerObserver_lock = m_mediaPlayerObserver.lock() ) {
-            m_mediaPlayerObserver_lock->onPlaybackError( id, static_cast<alexaClientSDK::avsCommon::utils::mediaPlayer::ErrorType>( error ), description );
+        {
+            std::unique_lock<std::mutex> lock( m_mediaPlayerObserverMutex );
+            for( auto&& observer : m_mediaPlayerObservers ) {
+                if( auto observer_lock = observer.lock() ) {
+                    observer_lock->onPlaybackError( id, static_cast<alexaClientSDK::avsCommon::utils::mediaPlayer::ErrorType>( error ), description );
+                }
+            }
         }
-        
+ 
         m_currentId = ERROR;
     }
     catch( std::exception& ex ) {
@@ -447,8 +485,13 @@ void AudioChannelEngineImpl::executeBufferUnderrun( SourceId id )
     {
         ThrowIf( id == ERROR, "invalidSource" );
         
-        if( auto m_mediaPlayerObserver_lock = m_mediaPlayerObserver.lock() ) {
-            m_mediaPlayerObserver_lock->onBufferUnderrun( id );
+        {
+            std::unique_lock<std::mutex> lock( m_mediaPlayerObserverMutex );
+            for( auto&& observer : m_mediaPlayerObservers ) {
+                if( auto observer_lock = observer.lock() ) {
+                    observer_lock->onBufferUnderrun( id );
+                }
+            }
         }
     }
     catch( std::exception& ex ) {
@@ -462,8 +505,13 @@ void AudioChannelEngineImpl::executeBufferRefilled( SourceId id )
     {
         ThrowIf( id == ERROR, "invalidSource" );
         
-        if( auto m_mediaPlayerObserver_lock = m_mediaPlayerObserver.lock() ) {
-            m_mediaPlayerObserver_lock->onBufferRefilled( id );
+        {
+            std::unique_lock<std::mutex> lock( m_mediaPlayerObserverMutex );
+            for( auto&& observer : m_mediaPlayerObservers ) {
+                if( auto observer_lock = observer.lock() ) {
+                    observer_lock->onBufferRefilled( id );
+                }
+            }
         }
     }
     catch( std::exception& ex ) {
@@ -485,7 +533,10 @@ void AudioChannelEngineImpl::resetSource()
 // alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface
 //
 
-alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId AudioChannelEngineImpl::setSource( std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader> attachmentReader, const alexaClientSDK::avsCommon::utils::AudioFormat* format )
+alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId AudioChannelEngineImpl::setSource( 
+    std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader> attachmentReader, 
+    const alexaClientSDK::avsCommon::utils::AudioFormat* format,
+    const alexaClientSDK::avsCommon::utils::mediaPlayer::SourceConfig& config )
 {
     std::unique_lock<std::mutex> lock( m_mutex );
 
@@ -497,7 +548,10 @@ alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId Au
     
         m_currentId = nextId();
 
-        ThrowIfNot( m_audioOutputChannel->prepare( AttachmentReaderAudioStream::create( attachmentReader, format ), false ), "audioOutputChannelSetStreamFailed" );
+        auto outputChannel = m_audioOutputChannel;
+        if ( outputChannel != nullptr ) {
+            ThrowIfNot( m_audioOutputChannel->prepare( AttachmentReaderAudioStream::create( attachmentReader, format ), false ), "audioOutputChannelSetStreamFailed" );
+        }
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
@@ -507,7 +561,10 @@ alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId Au
     return m_currentId;
 }
 
-alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId AudioChannelEngineImpl::setSource( std::shared_ptr<std::istream> stream, bool repeat )
+alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId AudioChannelEngineImpl::setSource( 
+    std::shared_ptr<std::istream> stream, 
+    bool repeat,
+    const alexaClientSDK::avsCommon::utils::mediaPlayer::SourceConfig& config )
 {
     std::unique_lock<std::mutex> lock( m_mutex );
 
@@ -520,8 +577,10 @@ alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId Au
         ThrowIfNot( stream->good(), "invalidStream" );
         
         m_currentId = nextId();
-
-        ThrowIfNot( m_audioOutputChannel->prepare( IStreamAudioStream::create( stream ), repeat ), "audioOutputChannelSetStreamFailed" );
+        auto outputChannel = m_audioOutputChannel;
+        if ( outputChannel != nullptr ) {
+            ThrowIfNot( outputChannel->prepare( IStreamAudioStream::create( stream ), repeat ), "audioOutputChannelSetStreamFailed" );
+        }
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState",m_pendingEventState));
@@ -531,7 +590,11 @@ alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId Au
     return m_currentId;
 }
 
-alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId AudioChannelEngineImpl::setSource( const std::string& url, std::chrono::milliseconds offset, bool repeat )
+alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId AudioChannelEngineImpl::setSource( 
+    const std::string& url, 
+    std::chrono::milliseconds offset, 
+    const alexaClientSDK::avsCommon::utils::mediaPlayer::SourceConfig& config,
+    bool repeat )
 {
     std::unique_lock<std::mutex> lock( m_mutex );
 
@@ -544,8 +607,11 @@ alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId Au
         m_url = url;
         m_currentId = nextId();
 
-        ThrowIfNot( m_audioOutputChannel->prepare( m_url, repeat ), "platformMediaPlayerPrepareFailed" );
-        ThrowIfNot( m_audioOutputChannel->setPosition( offset.count() ), "platformMediaPlayerSetPositionFailed" );
+        auto outputChannel = m_audioOutputChannel;
+        if ( outputChannel != nullptr ) {
+            ThrowIfNot( outputChannel->prepare( m_url, repeat ), "platformMediaPlayerPrepareFailed" );
+            ThrowIfNot( outputChannel->setPosition( offset.count() ), "platformMediaPlayerSetPositionFailed" );
+        }
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
@@ -575,7 +641,10 @@ bool AudioChannelEngineImpl::play( alexaClientSDK::avsCommon::utils::mediaPlayer
         sendPendingEvent();
 
         //invoke the platform interface play method
-        ThrowIfNot( m_audioOutputChannel->play(), "platformMediaPlayerPlayFailed" );
+        auto outputChannel = m_audioOutputChannel;
+        if ( outputChannel != nullptr ) {
+            ThrowIfNot( outputChannel->play(), "platformMediaPlayerPlayFailed" );
+        }
 
         // set the expected pending event state
         m_pendingEventState = PendingEventState::PLAYBACK_STARTED;
@@ -605,8 +674,9 @@ bool AudioChannelEngineImpl::stop( alexaClientSDK::avsCommon::utils::mediaPlayer
         sendPendingEvent();
 
         // invoke the platform interface stop method
-        if ( m_audioOutputChannel != nullptr ) {
-            ThrowIfNot( m_audioOutputChannel->stop(), "platformMediaPlayerStopFailed" );
+        auto outputChannel = m_audioOutputChannel;
+        if ( outputChannel != nullptr ) {
+            ThrowIfNot( outputChannel->stop(), "platformMediaPlayerStopFailed" );
         }
 
         // set the expected pending event state and media offset
@@ -640,7 +710,10 @@ bool AudioChannelEngineImpl::pause( alexaClientSDK::avsCommon::utils::mediaPlaye
         sendPendingEvent();
         
         // invoke the platform interface pause method
-        ThrowIfNot( m_audioOutputChannel->pause(), "platformMediaPlayerPauseFailed" );
+        auto outputChannel = m_audioOutputChannel;
+        if ( outputChannel != nullptr ) {
+            ThrowIfNot( outputChannel->pause(), "platformMediaPlayerPauseFailed" );
+        }
         
         // set the expected pending event state and media offset
         m_pendingEventState = PendingEventState::PLAYBACK_PAUSED;
@@ -681,7 +754,10 @@ bool AudioChannelEngineImpl::resume( alexaClientSDK::avsCommon::utils::mediaPlay
         sendPendingEvent();
 
         // invoke the platform interface resume method
-        ThrowIfNot( m_audioOutputChannel->resume(), "platformMediaPlayerResumeFailed" );
+        auto outputChannel = m_audioOutputChannel;
+        if ( outputChannel != nullptr ) {
+            ThrowIfNot( outputChannel->resume(), "platformMediaPlayerResumeFailed" );
+        }
         
         // set the expected pending event state
         m_pendingEventState = PendingEventState::PLAYBACK_RESUMED;
@@ -715,22 +791,17 @@ uint64_t AudioChannelEngineImpl::getNumBytesBuffered() {
     return 0;
 }
 
-void AudioChannelEngineImpl::setObserver( std::shared_ptr<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerObserverInterface> observer )
+void AudioChannelEngineImpl::addObserver( std::shared_ptr<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerObserverInterface> observer )
 {
-    try
-    {
-        if( observer != nullptr )
-        {
-            ThrowIfNotNull( m_mediaPlayerObserver.lock(), "mediaPlayerObserverAlreadySet" );
-            m_mediaPlayerObserver = observer;
-        }
-        else {
-            m_mediaPlayerObserver.reset();
-        }
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
-    }
+    std::unique_lock<std::mutex> lock( m_mediaPlayerObserverMutex );
+    m_mediaPlayerObservers.insert(observer);
+}
+
+void AudioChannelEngineImpl::removeObserver( std::shared_ptr<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerObserverInterface> observer )
+{
+    std::unique_lock<std::mutex> lock( m_mediaPlayerObserverMutex );
+    auto numberErased = m_mediaPlayerObservers.erase(observer);
+    AACE_DEBUG(LX(TAG).d("removed observers", numberErased));
 }
 
 //

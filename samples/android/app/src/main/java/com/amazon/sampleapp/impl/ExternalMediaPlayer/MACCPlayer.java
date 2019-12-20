@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 
-import android.util.Log;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -57,7 +56,6 @@ import static com.amazon.maccandroid.model.APIConstants.Directives.PlayControl.S
 public class MACCPlayer extends ExternalMediaAdapter {
     private static final String TAG = MACCPlayer.class.getSimpleName();
     private final Activity mActivity;
-    public static final int LAST_SCAN_COOLOFF = 15;
     private final Context mContext;
     private final LoggerHandler mLogger;
     private final PlaybackControllerHandler mPlaybackController;
@@ -90,28 +88,28 @@ public class MACCPlayer extends ExternalMediaAdapter {
                 discoveredPlayers[i].validationData = new String[list.get(i).getValidationData().size()];
                 discoveredPlayers[i].validationData = list.get(i).getValidationData().toArray(discoveredPlayers[i].validationData);
                 discoveredPlayers[i].validationMethod = list.get(i).getValidationMethod();
-                Log.i(TAG, "discoveredPlayer: localPlayerId: " + discoveredPlayers[i].localPlayerId
+                mLogger.postVerbose(TAG, "discoveredPlayer: localPlayerId: " + discoveredPlayers[i].localPlayerId
                         + " | spiVersion: " + discoveredPlayers[i].spiVersion
                         + " | validationData: " + discoveredPlayers[i].validationData
                         + " | validationMethod: " + discoveredPlayers[i].validationMethod);
                 for (String validationData : discoveredPlayers[i].validationData) {
-                    Log.i(TAG, "validationData: " + validationData);
+                    mLogger.postVerbose(TAG, "validationData: " + validationData);
                 }
             }
             reportDiscoveredPlayers(discoveredPlayers);
-            Log.i(TAG, "reported players");
+            mLogger.postVerbose(TAG, "reported players");
         }
 
         @Override
         public void onError(String errorName, int errorCode, boolean fatal, String playerId, UUID playbackSessionId) {
-            Log.i(TAG, "onError: " + errorName + " | errorCode: " + errorCode + " | playerId: " + playerId);
+            mLogger.postInfo(TAG, "onError: " + errorName + " | errorCode: " + errorCode + " | playerId: " + playerId);
             playerError(playerId, errorName, errorCode, "none", fatal);
         }
 
         @Override
         public void onPlayerEvent(String playerId, Set<PlayerEvents> playerEvents, String skillToken, UUID playbackSessionId) {
 
-            Log.i(TAG, "onPlayerEvent | events: " + playerEvents);
+            mLogger.postVerbose(TAG, "onPlayerEvent | events: " + playerEvents);
 
             MediaAppPlaybackState state = mClient.getState(playerId).getMediaAppPlaybackState();
             MediaAppMetaData metaData = state.getMediaAppMetaData();
@@ -119,52 +117,46 @@ public class MACCPlayer extends ExternalMediaAdapter {
             for (PlayerEvents event : playerEvents) {
 
                 playerEvent(playerId, event.getName());
-
                 switch( event ) {
-                    case PlaybackStopped:
-                    case PlaybackSessionEnded:
-                        break;
-                    case TrackChanged:
                     case PlaybackStarted:
                         setFocus(playerId);
                         mPlaybackController.setPlayerInfo( metaData.getTrackName(), metaData.getArtist(), SPOTIFY_PROVIDER_NAME );
                         break;
+                    case TrackChanged:
+                        mPlaybackController.setPlayerInfo( metaData.getTrackName(), metaData.getArtist(), SPOTIFY_PROVIDER_NAME );
                     case PlaybackSessionStarted:
                         if( state.getPlaybackState() == PlayBackStateFields.State.PLAYING ) { // already playing at startup
                             setFocus(playerId);
-                            mPlaybackController.setPlayerInfo( metaData.getTrackName(), metaData.getArtist(), SPOTIFY_PROVIDER_NAME );
-                        }
-                        break;
-                    case PlayModeChanged:
-                        if ( mPlaybackController.getProvider().equals( SPOTIFY_PROVIDER_NAME) ) {
                             mPlaybackController.hidePlayerInfoControls(); // reset control view
-                            updateControls(state);
                         }
                         break;
+                }
+                // update controls on all events
+                if ( mPlaybackController.getProvider().equals( SPOTIFY_PROVIDER_NAME) ) {
+                    updateControls(state);
                 }
             }
         }
 
         @Override
         public void requestTokenForPlayerId(String localPlayerId) {
-            Log.i(TAG,"requestTokenForPlayerId");
+            mLogger.postVerbose(TAG,"requestTokenForPlayerId");
             requestToken(localPlayerId);
         }
 
         @Override
         public void onRemovedPlayer(String localPlayerId) {
-            Log.i(TAG, "onRemovedPlayer: " + localPlayerId);
+            mLogger.postVerbose(TAG, "onRemovedPlayer: " + localPlayerId);
             removeDiscoveredPlayer(localPlayerId);
-            scheduleScan();
         }
 
     };
+
     private void updateControls( MediaAppPlaybackState state ){
         PlayBackStateFields.repeat repeat = state.getRepeatMode();
         // Set playback controller states on player event
-
         for( String operation : state.getSupportedOperations() ) {
-            Log.i(TAG, operation );
+            mLogger.postVerbose(TAG, operation );
             switch( operation ) {
                 case "RESUME" :
                     mPlaybackController.stop(); // If resume is currently supported, UI must be in stopped state
@@ -207,7 +199,7 @@ public class MACCPlayer extends ExternalMediaAdapter {
     }
 
     public void runDiscovery() {
-        Log.i(TAG, "runDiscovery");
+        mLogger.postVerbose(TAG, "runDiscovery");
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -216,24 +208,6 @@ public class MACCPlayer extends ExternalMediaAdapter {
         }, 100);
         mLastScanTimeInMillis = Calendar.getInstance().getTimeInMillis();
 
-    }
-
-    public void scheduleScan() {
-        long minutesSinceLastScan = TimeUnit.MILLISECONDS.toMinutes(Calendar
-                .getInstance().getTimeInMillis() - mLastScanTimeInMillis);
-        Log.i(TAG, "scheduleScan | rescheduling scan as last scan was " +
-                minutesSinceLastScan + " minutes ago");
-        mHandler.removeCallbacks(mRunDiscoveryRunnable);
-        if (minutesSinceLastScan > LAST_SCAN_COOLOFF) {
-            Log.i(TAG, "scheduleScan | running scan now as it has surpassed cooloff time");
-            mHandler.post(mRunDiscoveryRunnable);
-        } else {
-            long millisecondDelay = TimeUnit.MINUTES.toMillis(LAST_SCAN_COOLOFF -
-                    minutesSinceLastScan);
-            Log.i(TAG, "scheduleScan | running scan after " + millisecondDelay +
-                    " millisecond delay");
-            mHandler.postDelayed(mRunDiscoveryRunnable, millisecondDelay);
-        }
     }
 
     @Override
@@ -257,9 +231,15 @@ public class MACCPlayer extends ExternalMediaAdapter {
     @Override
     public boolean playControl(String localPlayerId, PlayControlType playControlType) {
         mClient.handleDirective(new PlayControlDirective(localPlayerId, playControlType.toString()));
-        Log.i(TAG, "PLAYCONTROL: " + playControlType.toString());
+        mLogger.postInfo(TAG, "PLAYCONTROL: " + playControlType.toString());
+
+        MediaAppPlaybackState state = mClient.getState(localPlayerId).getMediaAppPlaybackState();
         // enforce correct playback controller GUI states
         switch( playControlType ) {
+            case NEXT:
+            case PREVIOUS:
+                updateControls( state );
+                break;
             case ENABLE_REPEAT:
                 mPlaybackController.updateControlToggle( PlaybackController.PlaybackToggle.LOOP.toString(), true, true );
                 mPlaybackController.updateControlToggle( PlaybackController.PlaybackToggle.REPEAT.toString(), true, false );
@@ -298,7 +278,7 @@ public class MACCPlayer extends ExternalMediaAdapter {
 
     @Override
     public boolean authorize(AuthorizedPlayerInfo[] authorizedPlayers) {
-        Log.i(TAG, "authorized");
+        mLogger.postVerbose(TAG, "authorized");
         List<AuthorizedPlayer> mAuthorizedPlayers = new ArrayList<>();
         for (AuthorizedPlayerInfo playerInfo : authorizedPlayers) {
             mAuthorizedPlayers.add(new AuthorizedPlayer(playerInfo.localPlayerId, playerInfo.authorized));
@@ -311,11 +291,10 @@ public class MACCPlayer extends ExternalMediaAdapter {
     public boolean getState(String localPlayerId,ExternalMediaAdapter.ExternalMediaAdapterState stateToReturn) {
         ExternalMediaPlayerState state = mClient.getState(localPlayerId);
         if (state == null) {
-            Log.i(TAG, "Something went wrong");
+            mLogger.postVerbose(TAG, "Something went wrong");
             return false;
         }
         MediaAppMetaData metaData = state.getMediaAppPlaybackState().getMediaAppMetaData();
-        //Log.i(TAG, "Provider?" + metaData.getMediaProvider() + "source?" + metaData.getPlaybackSource()); //both null
         //ExternalMediaAdapter.ExternalMediaAdapterState stateToReturn = new ExternalMediaAdapterState();
         stateToReturn.playbackState = new PlaybackState();
         stateToReturn.playbackState.state = state.getMediaAppPlaybackState().getPlaybackState() == null ? PlayBackStateFields.State.IDLE.toString() : state.getMediaAppPlaybackState().getPlaybackState().toString();
@@ -339,7 +318,7 @@ public class MACCPlayer extends ExternalMediaAdapter {
         stateToReturn.playbackState.duration = state.getMediaAppPlaybackState().getMediaAppMetaData().getDurationInMilliseconds();
         stateToReturn.sessionState = new SessionState();
         stateToReturn.sessionState.endpointId = state.getMediaAppSessionState().getPlayerid();
-        stateToReturn.sessionState.loggedIn = true; //assumption, mechanism not yet included
+        stateToReturn.sessionState.loggedIn = true; //irrelevant/non-functional to MACC
         stateToReturn.sessionState.userName = "";
         stateToReturn.sessionState.isGuest = false;
         stateToReturn.sessionState.launched = state.getMediaAppSessionState().isLaunched();
@@ -363,7 +342,6 @@ public class MACCPlayer extends ExternalMediaAdapter {
     }
 
     private Favorites getFavorites(PlayBackStateFields.favorite favourite) {
-        //Log.w(TAG,"Favorite="+favourite);
         if (favourite == null) return Favorites.NOT_RATED;
 
         switch(favourite) {
@@ -380,7 +358,7 @@ public class MACCPlayer extends ExternalMediaAdapter {
     private SupportedPlaybackOperation[] getSupportedOperations(Set<String> supportedOperations) {
         List<SupportedPlaybackOperation> returnList = new ArrayList<>();
 
-
+        mLogger.postVerbose( TAG, String.format( "Supported Operations : (%s)", supportedOperations ) );
         for (String operation : supportedOperations) {
             switch (operation) {
                 case PLAY_CONTROL_PLAY:

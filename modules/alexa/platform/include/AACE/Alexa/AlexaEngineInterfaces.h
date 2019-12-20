@@ -415,6 +415,21 @@ public:
 };
 
 /**
+ * DoNotDisturbEngineInterface
+ */
+class DoNotDisturbEngineInterface {
+public:
+    /**
+     * @internal
+     * Notifies the Engine that A DND change has been initiated by the client
+     * 
+     * @param [in] doNotDisturb The DND Setting value
+     * @return true if successful, false if change was rejected
+     */
+    virtual bool onDoNotDisturbChanged( const bool doNotDisturb ) = 0;
+};
+
+/**
  * EqualizerControllerEngineInterface
  */
 class EqualizerControllerEngineInterface {

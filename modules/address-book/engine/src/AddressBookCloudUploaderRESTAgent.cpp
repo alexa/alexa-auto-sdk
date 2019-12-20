@@ -23,7 +23,7 @@ namespace aace {
 namespace engine {
 namespace addressBook {
 
-// String to identify log entries originating from this file.
+/// String to identify log entries originating from this file.
 static const std::string TAG("aace.addressBookCloudService.AddressBookCloudUploaderRESTAgent");
 
 /// The HTTP authorization header to pass the LWA Auth token
@@ -121,35 +121,10 @@ bool AddressBookCloudUploaderRESTAgent::isAccountProvisioned() {
     if( !isPceIdValid() ) {
         auto alexaAccount = getAlexaAccountInfo();
         if( !alexaAccount.commsId.empty() ) {
-            m_pceId = getPceIdFromIndentity( alexaAccount.commsId );
+            m_pceId = getPceIdFromIdentity( alexaAccount.commsId );
         }
     }
     return isPceIdValid();
-}
-
-bool AddressBookCloudUploaderRESTAgent::autoProvisionAccount() {
-    try {
-        auto alexaAccount = getAlexaAccountInfo();
-        ThrowIf( alexaAccount.provisionStatus == CommsProvisionStatus::INVALID, "getAlexaAccountDetailsFailed" );
-
-        if( alexaAccount.provisionStatus == CommsProvisionStatus::UNKNOWN || alexaAccount.provisionStatus == CommsProvisionStatus::DEPROVISIONED ) {
-            // Auto-provision the accountA
-            ThrowIfNot( doAccountAutoProvision( alexaAccount.directedId ), "accountAutoProvisionFailed" );
-        
-            alexaAccount = getAlexaAccountInfo(); // get commsId after auto provisioning.
-            ThrowIf( alexaAccount.commsId.empty(), "commsIdEmptyAfterProvisioning" );
-        }
-
-        ThrowIf( alexaAccount.commsId.empty(), "commsIdEmptyForProvisionedAccount" );
-
-        m_pceId = getPceIdFromIndentity( alexaAccount.commsId );
-        ThrowIf( m_pceId.empty(), "pceIdEmptyForProvisionedAccount" );
-        return true;
-
-    } catch( std::exception& ex ) {
-        AACE_ERROR( LX(TAG,"autoProvisionAccount").d( "reason", ex.what() ) );
-        return false;
-    }
 }
 
 std::vector<std::string> AddressBookCloudUploaderRESTAgent::buildCommonHTTPHeader() {
@@ -168,7 +143,6 @@ std::vector<std::string> AddressBookCloudUploaderRESTAgent::buildCommonHTTPHeade
 
 bool AddressBookCloudUploaderRESTAgent::parseCommonHTTPResponse( const HTTPResponse& response ) {
     if( HTTPResponseCode::SUCCESS_OK == response.code ) {
-        //TBD Check the content-type in Response Header
         return true;
     }
     return false;
@@ -243,7 +217,6 @@ AddressBookCloudUploaderRESTAgent::AlexaAccountInfo AddressBookCloudUploaderREST
 
     // Initialize to default values.
     alexaAccount.commsId = "";
-    alexaAccount.directedId = "";
     alexaAccount.provisionStatus = CommsProvisionStatus::INVALID;
 
     auto httpHeaderData = buildCommonHTTPHeader();
@@ -268,38 +241,14 @@ AddressBookCloudUploaderRESTAgent::AlexaAccountInfo AddressBookCloudUploaderREST
             Throw( "jsonResponseNotValidArray" );
         }
 
-        // Example Response: Array of Alexa Accounts.
-        // [
-        //   {
-        //     "commsId": "string",
-        //     "directedId": "string",
-        //     "phoneCountryCode": "string",
-        //     "phoneNumber": "string",
-        //     "firstName": "string",
-        //     "lastName": "string",
-        //     "signedInUser": false,
-        //     "commsProvisioned": false,
-        //     "commsProvisionStatus":Enum String,
-        //     "isChild": boolean
-        //     "speakerProvisioned": false
-        //   }
-        // ]
         for( rapidjson::Value::ConstValueIterator itr = document.Begin(); itr != document.End(); itr++ ) {
-            if( (*itr)[ "signedInUser" ].IsBool() && (*itr)[ "signedInUser" ].GetBool() ) { // Check if signedInUser is true
+            if( (*itr)[ "signedInUser" ].IsBool() && (*itr)[ "signedInUser" ].GetBool() ) {
                 if( (*itr).HasMember( "commsId" ) ) {
                     if( (*itr)[ "commsId" ].IsString() ) {
                         alexaAccount.commsId = (*itr)[ "commsId" ].GetString();
                     }
                 } else {
                     Throw( "commsIdNotPresent" );
-                }
-
-                if( (*itr).HasMember( "directedId" ) ) {
-                    if( (*itr)[ "directedId" ].IsString() ) {
-                        alexaAccount.directedId = (*itr)[ "directedId" ].GetString();
-                    }
-                } else {
-                    Throw( "directedIdNotPresent" );
                 }
 
                 if( (*itr).HasMember( "commsProvisionStatus" ) ) {
@@ -318,7 +267,7 @@ AddressBookCloudUploaderRESTAgent::AlexaAccountInfo AddressBookCloudUploaderREST
                 } else {
                     Throw( "commsProvisionStatusNotValid" );
                 }
-                break; // Found the singedInUser, so break.
+                break; // Found the signed in user, so break.
             }
         }
         return alexaAccount;
@@ -328,47 +277,7 @@ AddressBookCloudUploaderRESTAgent::AlexaAccountInfo AddressBookCloudUploaderREST
     }
 }
 
-bool AddressBookCloudUploaderRESTAgent::doAccountAutoProvision( const std::string& directedId ) {
-    AddressBookCloudUploaderRESTAgent::HTTPResponse httpResponse;
-    bool validFlag = false;
-
-    auto httpHeaderData = buildCommonHTTPHeader();
-    httpHeaderData.insert( httpHeaderData.end(), CONTENT_TYPE_APPLICATION_JSON );
-
-    auto autoProvisionJson = buildAutoAccountProvisionJson();
-    try {
-        for( int retry = 0; retry < HTTP_RETRY_COUNT; retry++ ) {
-            httpResponse = doPost(
-                ACMS_ENDPOINT + FORWARD_SLASH + ACCOUNTS_PATH + FORWARD_SLASH + directedId + FORWARD_SLASH + USERS_PATH,
-                httpHeaderData, autoProvisionJson, DEFAULT_HTTP_TIMEOUT );
-            if( parseCommonHTTPResponse( httpResponse ) ) {
-                validFlag = true;
-                break;
-            }
-        }
-        ThrowIfNot( validFlag, "httpDoPostFailed" + getHTTPErrorString( httpResponse ) );
-        return true;
-    } catch( std::exception& ex ) {
-        AACE_ERROR( LX(TAG,"doAccountAutoProvision").d( "reason", ex.what() ) );
-        return false;
-    }
-}
-
-std::string AddressBookCloudUploaderRESTAgent::buildAutoAccountProvisionJson() {
-    rapidjson::Document document;
-    document.SetObject();
-
-    document.AddMember( "autoProvision", rapidjson::Value().SetBool(true), document.GetAllocator() );
-
-    // create event string
-    rapidjson::StringBuffer buffer;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-
-    document.Accept(writer);
-    return( std::string( buffer.GetString() ) );
-}
-
-std::string AddressBookCloudUploaderRESTAgent::getPceIdFromIndentity( const std::string& commsId ) {
+std::string AddressBookCloudUploaderRESTAgent::getPceIdFromIdentity( const std::string& commsId ) {
     AddressBookCloudUploaderRESTAgent::HTTPResponse httpResponse;
     rapidjson::Document document;
     std::string pceId = "";
@@ -390,18 +299,6 @@ std::string AddressBookCloudUploaderRESTAgent::getPceIdFromIndentity( const std:
 
         ThrowIfNot( validFlag, "httpDoGetFailed" + getHTTPErrorString( httpResponse ) );
 
-        // Example Response
-        // getIdentityV2 Response.
-        // {
-        //     "commsId": "string",
-        //     "pceId": "string",
-        //     "homeGroupId": "string",
-        //     "aor": "string",
-        //     "hashedCommsId": "string",
-        //     "name": null,
-        //     "commsProvisionStatus": "AUTO_PROVISIONED"
-        // }
-
         if( document.Parse(httpResponse.body.c_str()).HasParseError() ) {
             Throw( "jsonParseError" );
         }
@@ -414,7 +311,7 @@ std::string AddressBookCloudUploaderRESTAgent::getPceIdFromIndentity( const std:
         }
         return pceId;
     } catch( std::exception& ex ) {
-        AACE_ERROR( LX(TAG,"getPceIdFromIndentity").d("reason", ex.what() ) );
+        AACE_ERROR( LX(TAG,"getPceIdFromIdentity").d("reason", ex.what() ) );
         return "";
     }
 }
@@ -447,10 +344,6 @@ std::string AddressBookCloudUploaderRESTAgent::createAndGetCloudAddressBook( con
             Throw( "jsonParseError" );
         }
 
-        // Example Response
-        // {
-        //     addressBookId : "id"
-        // }
         auto it = document.FindMember( "addressBookId" );
         if( it != document.MemberEnd() && it->value.IsString() ) {
             addressBookId = it->value.GetString();
@@ -465,13 +358,6 @@ std::string AddressBookCloudUploaderRESTAgent::createAndGetCloudAddressBook( con
     }
 }
 
-// Sample JSON Request Format
-// POST /users/{pceId}/addressbooks
-// {
-//     addressBookSourceId : "srcId",
-//     addressBookName : "Test",
-//     addressBookType : "phone"
-// }
 std::string AddressBookCloudUploaderRESTAgent::buildCreateAddressBookDataJson( const std::string& addressBookSourceId, const std::string& addressBookType ) {
     rapidjson::Document document;
     document.SetObject();
@@ -511,17 +397,6 @@ bool AddressBookCloudUploaderRESTAgent::getCloudAddressBookId( const std::string
             Throw( "jsonParseError" );
         }
 
-        // Example Response
-        // {
-        //     "addressBooks": [
-        //         {
-        //             "addressBookId": "string",
-        //             "addressBookType": "automotive",
-        //             "addressBookSourceId": "string",
-        //             "addressBookName": "string"
-        //         }
-        //     ]
-        // }
         auto addressBooks = document.FindMember( "addressBooks" );
         if( addressBooks != document.MemberEnd() && addressBooks->value.IsArray() ) {
             if( addressBooks->value.Size() >= 1 ) {
@@ -572,20 +447,6 @@ AddressBookCloudUploaderRESTAgent::HTTPResponse AddressBookCloudUploaderRESTAgen
     return httpResponse;
 }
 
-// {
-//         "id" : "string",
-//         "firstName" : "string",
-//         "lastName" : "string",
-//         "nickName" : "string",
-//         "company" : "string",
-//         "addresses" : [
-//              {
-//                  "type" : "string",
-//                  "value" : "string",
-//                  "label" : "string"
-//              }
-//         ]
-// }
 std::string AddressBookCloudUploaderRESTAgent::buildEntriesJsonString( std::shared_ptr<rapidjson::Document> document ) {
     try {    
         rapidjson::StringBuffer buffer;
@@ -608,16 +469,6 @@ bool AddressBookCloudUploaderRESTAgent::parseCreateAddressBookEntryResponse( con
             Throw( "jsonParseError" );
         }
 
-        // {
-        //     "references": [
-        //         {
-        //             "entryId": "string",
-        //             "entrySourceId": "srcId",
-        //             "status": "SUCCESS",
-        //             "reason": null
-        //         }
-        //     ]
-        // }
         auto references = document.FindMember( "references" );
         if( references != document.MemberEnd() && references->value.IsArray() && references->value.Size() > 0 ) {
             for( rapidjson::Value::ConstValueIterator itr = references->value.Begin(); itr != references->value.End(); itr++ ){

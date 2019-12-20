@@ -17,6 +17,7 @@
 #define AACE_TEST_AVS_MOCK_CUSTOMER_DATA_MANAGER_H
 
 #include <RegistrationManager/CustomerDataManager.h>
+#include <RegistrationManager/CustomerDataHandler.h>
 
 namespace aace {    
 namespace test {

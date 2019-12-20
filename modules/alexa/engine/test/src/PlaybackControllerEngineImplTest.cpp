@@ -56,7 +56,6 @@ protected:
     {
         if( m_configured == false )
         {
-            EXPECT_CALL(*m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),registerCapability(testing::_)).WillOnce(testing::Return(true));
             
             m_configured = true;
         }
@@ -70,6 +69,7 @@ protected:
         
         auto playbackControllerEngineImpl = aace::engine::alexa::PlaybackControllerEngineImpl::create(
             m_alexaMockFactory->getPlaybackControllerMock(),
+            m_alexaMockFactory->getEndpointBuilderMock(),
             m_alexaMockFactory->getMessageSenderInterfaceMock(),
             m_alexaMockFactory->getContextManagerInterfaceMock(),
             m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
@@ -98,6 +98,7 @@ TEST_F(PlaybackControllerEngineImplTest,createWithPlatformInterfaceAsNull)
 {
     auto playbackControllerEngineImpl = aace::engine::alexa::PlaybackControllerEngineImpl::create(
        nullptr,
+        m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
@@ -110,6 +111,7 @@ TEST_F(PlaybackControllerEngineImplTest,createWithMessageSenderAsNull)
 {
     auto playbackControllerEngineImpl = aace::engine::alexa::PlaybackControllerEngineImpl::create(
         m_alexaMockFactory->getPlaybackControllerMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
         nullptr,
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
@@ -122,6 +124,7 @@ TEST_F(PlaybackControllerEngineImplTest,createWithContextManagerAsNull)
 {
     auto playbackControllerEngineImpl = aace::engine::alexa::PlaybackControllerEngineImpl::create(
         m_alexaMockFactory->getPlaybackControllerMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
         nullptr,
         m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
@@ -134,6 +137,7 @@ TEST_F(PlaybackControllerEngineImplTest, createWithCapabilitiesDelegateAsNull)
 {
     auto playbackControllerEngineImpl = aace::engine::alexa::PlaybackControllerEngineImpl::create(
         m_alexaMockFactory->getPlaybackControllerMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         nullptr,
@@ -146,6 +150,7 @@ TEST_F(PlaybackControllerEngineImplTest,createWithFocusManagerAsNull)
 {
     auto playbackControllerEngineImpl = aace::engine::alexa::PlaybackControllerEngineImpl::create(
         m_alexaMockFactory->getPlaybackControllerMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),

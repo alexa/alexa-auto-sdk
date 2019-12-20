@@ -91,6 +91,11 @@ public:
          * Code pair has expired and user will need to initiate the authentication process again
          */
         CODE_PAIR_EXPIRED,
+        
+        /**
+         * The refresh token is invalid, revoked, or was issued to a different client.
+         */
+        AUTHORIZATION_EXPIRED,
 
         /**
          * No reason specified
@@ -125,7 +130,6 @@ public:
      * requestUserProfile must be enabled in configuration
      */
     virtual void setUserProfile( const std::string& name, const std::string& email ) = 0;
-
     /**
      * Notifies the Engine to begin the authorization process
      */ 
@@ -190,6 +194,9 @@ inline std::ostream& operator<<(std::ostream& stream, const CBL::CBLStateChanged
             break;
         case CBL::CBLStateChangedReason::CODE_PAIR_EXPIRED:
             stream << "CODE_PAIR_EXPIRED";
+            break;
+        case CBL::CBLStateChangedReason::AUTHORIZATION_EXPIRED:
+            stream << "AUTHORIZATION_EXPIRED";
             break;
         case CBL::CBLStateChangedReason::NONE:
             stream << "NONE";

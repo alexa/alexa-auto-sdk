@@ -47,20 +47,10 @@ int onLocalMediaSourcePlayerEvent(CtlSourceT* source, json_object* argsJ, json_o
 int onLocalMediaSourcePlayerError(CtlSourceT* source, json_object* argsJ, json_object* queryJ);
 
 // Car Control events coming from VSHL Capabilities
-int onCarControlClimateIsOnResponse(CtlSourceT* source, json_object* argsJ, json_object* queryJ);
-int onCarControlClimateSyncIsOnResponse(CtlSourceT* source, json_object* argsJ, json_object* queryJ);
-int onCarControlAirRecirculationIsOnResponse(CtlSourceT* source, json_object* argsJ, json_object* queryJ);
-int onCarControlAirConditionerIsOnResponse(CtlSourceT* source, json_object* argsJ, json_object* queryJ);
-int onCarControlGetAirConditionerModeResponse(CtlSourceT* source, json_object* argsJ, json_object* queryJ);
-int onCarControlHeaterIsOnResponse(CtlSourceT* source, json_object* argsJ, json_object* queryJ);
-int onCarControlGetHeaterTemperatureResponse(CtlSourceT* source, json_object* argsJ, json_object* queryJ);
-int onCarControlFanIsOnResponse(CtlSourceT* source, json_object* argsJ, json_object* queryJ);
-int onCarControlGetFanSpeedResponse(CtlSourceT* source, json_object* argsJ, json_object* queryJ);
-int onCarControlVentIsOnResponse(CtlSourceT* source, json_object* argsJ, json_object* queryJ);
-int onCarControlGetVentPositionResponse(CtlSourceT* source, json_object* argsJ, json_object* queryJ);
-int onCarControlWindowDefrosterIsOnResponse(CtlSourceT* source, json_object* argsJ, json_object* queryJ);
-int onCarControlLightIsOnResponse(CtlSourceT* source, json_object* argsJ, json_object* queryJ);
-int onCarControlGetLightColorResponse(CtlSourceT* source, json_object* argsJ, json_object* queryJ);
+int onCarControlIsPowerControllerOnResponse(CtlSourceT* source, json_object* argsJ, json_object* queryJ);
+int onCarControlIsToggleControllerOnResponse(CtlSourceT* source, json_object* argsJ, json_object* queryJ);
+int onCarControlGetModeControllerValueResponse(CtlSourceT* source, json_object* argsJ, json_object* queryJ);
+int onCarControlGetRangeControllerValueResponse(CtlSourceT* source, json_object* argsJ, json_object* queryJ);
 
 #ifdef __cplusplus
 }

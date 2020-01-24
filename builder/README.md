@@ -126,6 +126,9 @@ To use Builder on macOS hosts, you must install [Docker Community Edition (CE) f
 
 Upon first run, Builder builds the Docker image `aac/ubuntu-base:<revision>` and creates a dedicated Docker volume `buildervolume` to run the Alexa Auto SDK Builder in your Docker environment. This might take up to an hour to complete.
 
+>**Note:** If you are upgrading from Auto SDK v1.6.0 or earlier to Auto SDK v2.0.0 or later, be sure to clean the `buildervolume` Docker volume before performing the upgrade.
+
+
 >**IMPORTANT NOTE for macOS:** If you are trying to build for QNX targets on a macOS host, you must install QNX 7.0.0 SDP within a **case-sensitive** file system, using additional Linux installation tools. You may need to use an external drive for installation since your system file system is NOT case-sensitive by default.
 
 #### Additional Setup for Android Targets

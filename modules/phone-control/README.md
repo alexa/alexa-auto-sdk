@@ -10,7 +10,7 @@ The Alexa Auto SDK Phone Call Controller module provides the features required b
 
 ## Overview <a id="overview"></a>
 
-By registering a Phone Call Controller in your implementation, you allow the end user to interact with new or ongoing calls using Alexa, and you provide Alexa with the state of the calling device on the platform.
+By registering a Phone Call Controller in your implementation, you allow the end user to interact with new or ongoing calls using Alexa, and you provide Alexa with the state of the calling device on the platform. The Phone Call Controller uses phone contacts uploaded via the [Address Book module](../address-book/README.md).
 
 The platform implementation is responsible for managing the lifecycle of the call session, including  enhancing the end user experience by:
 

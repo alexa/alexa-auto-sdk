@@ -395,7 +395,7 @@ The External Media Adapter allows the platform to declare and use external media
 
 The `LocalMediaSource` interface allows the platform to register a local media source by type(`BLUETOOTH`, `USB`, `LINE_IN`, `AM_RADIO` etc.). Registering a local media source allows playback control of a source via Alexa (e.g. "Alexa, play the CD player") or via button press through the `PlaybackController` interface, if desired. It also enables playback initiation via Alexa by frequency, channel, or preset for relevant source types (e.g. "Alexa, play 98.7 FM")
 
->**Note:** Local media source control with Alexa is currently supported in the US region only.
+>**Note:** Currently, United States English (`en_US`) is the only supported locale for Auto SDK local media source control with Alexa.
 
 The following is an example of registering a CD player local media source using type `Source.COMPACT_DISC`:
 

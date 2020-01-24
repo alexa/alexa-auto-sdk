@@ -9,7 +9,7 @@ The Alexa Auto SDK Contact Uploader module provides a platform interface that yo
 
 ## Overview <a id ="overview"></a>
 
-Alexa Communications can use contacts uploaded via the Contact Uploader module to make calls and announce the caller's name. These contacts are not available for use with any other Alexa devices.
+Both the [Phone Call Controller](../phonecontrol/README.md) and Alexa-to-Alexa communications implemented via the optional Alexa Communications extension use the uploaded phone contacts; however, the uploaded contacts are not available for use with any other Alexa devices.
 
 > **Note**: The Contact Uploader module supports only phone contacts and only online use cases. It is on the deprecation path beginning with Alexa Auto SDK release 2.0.0 and is being superseded by the [Address Book module](../addressbook/README.md). All new implementations should use the Address Book module instead of the Contact Uploader module.
 

@@ -1,14 +1,16 @@
 /*
- * Auto Core Engine SDK
- * Copyright 2017 Amazon.com, Inc. or its affiliates. All Rights Reserved. Amazon.com Confidential Information -- Do Not
- * Distribute.
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
- * These materials are licensed as "Alexa Materials" under the Alexa Voice Service Agreement (the "License") of the
- * Alexa Voice Service Program, which is available at
- * https://developer.amazon.com/public/solutions/alexa/alexa-voice-service/support/terms-and-agreements. See the License
- * for the specific language governing permissions and limitations under the License. These materials are Confidential
- * Information and may not be distributed. These materials are provided to you on an "AS IS" BASIS, WITHOUT WARRANTIES
- * OR CONDITIONS OF ANY KIND, either express or implied.
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
  */
 
 #include "AACE/Engine/CarControl/CarControlConfigurationImpl.h"

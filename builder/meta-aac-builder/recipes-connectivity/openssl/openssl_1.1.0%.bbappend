@@ -1,3 +1,5 @@
+SRC_URI = "http://www.openssl.org/source/old/1.1.0/openssl-${PV}.tar.gz"
+
 do_configure_android() {
 	if [ "${ANDROID_ABI}" = "x86" ]; then
 		# android-x86

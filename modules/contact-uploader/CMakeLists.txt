@@ -31,6 +31,10 @@ if(AAC_HOME)
     include(${AAC_HOME}/share/cmake/AACEAlexa.cmake)
 endif()
 
+if (OBIGO_AIDAEMON)
+	add_definitions("-DOBIGO_AIDAEMON")
+endif()
+
 add_subdirectory(platform)
 add_subdirectory(engine)
 

@@ -76,6 +76,11 @@
 #include <AACE/CarControl/CarControlConfiguration.h>
 #endif // LOCALVOICECONTROL
 
+#ifdef OBIGO_AIDAEMON
+// VPA Directive Platform Interfaces
+#include "SampleApp/VPA/VPADirectiveHandler.h"
+#endif // OBIGO_AIDAEMON
+
 // Alexa Auto Core
 #include <AACE/Core/CoreProperties.h>
 #include <AACE/Core/Engine.h>

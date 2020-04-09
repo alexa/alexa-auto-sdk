@@ -3,6 +3,10 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://SampleApp/src/main.cpp;beginline=4;endline=13;md5=527e9938f0eaf4dbc8d3b17563870ae7"
 
 DEPENDS = "aac-module-core aac-module-alexa aac-module-navigation aac-module-phone-control aac-module-cbl aac-module-address-book"
+# OBIGO VPA AAC Module
+DEPENDS_append = " aac-module-vpa"
+# GLIB
+DEPENDS_append = " glib-2.0 gio-2.0 gobject-2.0 gio-unix-2.0 pkgconfig-native"
 
 PACKAGECONFIG[alexacomms] = "-DALEXACOMMS=ON,,aac-module-communication"
 PACKAGECONFIG[amazonlite] = "-DAMAZONLITE=ON,,aac-module-amazonlite"
@@ -16,5 +20,5 @@ EXTRA_OECMAKE += "-DAAC_ENABLE_ADDRESS_SANITIZER=${AAC_ENABLE_ADDRESS_SANITIZER}
                   -DYOUR_CLIENT_ID=${MY_CLIENT_ID} \
                   -DYOUR_DEVICE_SERIAL_NUMBER=${MY_DEVICE_SERIAL_NUMBER} \
                   -DYOUR_PRODUCT_ID=${MY_PRODUCT_ID}"
-
+EXTRA_OECMAKE_append += "-DOBIGO_AIDAEMON=ON"
 inherit aac-module

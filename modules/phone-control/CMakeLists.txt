@@ -25,6 +25,10 @@ if(AAC_ENABLE_COVERAGE)
     set(CMAKE_CXX_OUTPUT_EXTENSION_REPLACE ON)
 endif()
 
+if (OBIGO_AIDAEMON)
+	add_definitions("-DOBIGO_AIDAEMON")
+endif()
+
 # PhoneCallController module depends on Alexa module
 if(AAC_HOME)
     include(${AAC_HOME}/share/cmake/AACECore.cmake)

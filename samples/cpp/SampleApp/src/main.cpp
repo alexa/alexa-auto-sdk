@@ -19,6 +19,9 @@
 #include "SampleApp/Status.h"
 #include "SampleApp/TTY.h"
 
+#include "SampleApp/VPA/IPCHandler.h"
+#include "SampleApp/VPA/AIDaemon-IPC.h"
+
 using Application = sampleApp::Application;
 using Status = sampleApp::Status;
 
@@ -125,6 +128,12 @@ int main(int argc, const char *argv[]) {
         Ensures(applicationContext != nullptr);
         auto cbreak = false;
         auto options = true;
+
+#ifdef OBIGO_AIDAEMON
+        AIDAEMON::IPCHandler *ipc = AIDAEMON::IPCHandler::GetInstance();
+        ipc->makeDBusServer();
+#endif // OBIGO_AIDAEMON
+
         for (unsigned i = 0; i < size; ++i) {
             auto arg = list[i];
             Ensures(!arg.empty());
@@ -143,6 +152,12 @@ int main(int argc, const char *argv[]) {
                         errorExit(name, "file not found " + arg);
                     }
                     input.close();
+#ifdef OBIGO_AIDAEMON
+                    std::cerr << "Waiting for Configuration \n";
+                    ipc->setConfigPath(arg);
+                    ipc->waitForConfiguration();
+                    std::cerr << "Starting AIDaemon \n";
+#endif // OBIGO_AIDAEMON
                     applicationContext->addConfigFilePath(arg);
                 } else if (c2(arg, 'l', "level")) {
                     if (++i == size) {

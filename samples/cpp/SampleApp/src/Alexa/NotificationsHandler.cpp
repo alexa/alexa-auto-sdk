@@ -21,6 +21,10 @@
 // Guidelines Support Library
 #define GSL_THROW_ON_CONTRACT_VIOLATION
 #include <gsl/contracts.h>
+#ifdef OBIGO_AIDAEMON
+#include "SampleApp/VPA/IPCHandler.h"
+#include "SampleApp/VPA/AIDaemon-IPC.h"
+#endif // OBIGO_AIDAEMON
 
 namespace sampleApp {
 namespace alexa {
@@ -90,7 +94,25 @@ void NotificationsHandler::setupUI() {
             indicatorStateView->setText("");
         }
     });
+
+    // Set Recognize
+    activity->registerObserver(Event::onStateDoNotDisturb, [=](const std::string &event) {
+        log(logger::LoggerHandler::Level::INFO, "onStateDoNotDisturb:");
+        return StateDoNotDisturb();
+    });
 }
+
+#ifdef OBIGO_AIDAEMON
+bool NotificationsHandler::onDoNotDisturb(const std::string &status) {
+    log(logger::LoggerHandler::Level::INFO, "onDoNotDisturb status : " + status);
+    rapidjson::Document dndState(rapidjson::kObjectType);
+    dndState.AddMember(
+        AIDAEMON::DIALOGID,
+        rapidjson::Value().SetString(status.c_str(), status.length(), dndState.GetAllocator()),
+        dndState.GetAllocator());
+        AIDAEMON::IPCHandler::GetInstance()->sendMessage(AIDAEMON::METHODID_AI_DND_STATE, &dndState);
+}
+#endif
 
 } // namespace alexa
 } // namespace sampleApp

@@ -78,6 +78,9 @@ public:
      */
     bool tapToTalk();
 
+#ifdef OBIGO_AIDAEMON
+    bool setRecognizeEvent(const std::string& event);
+#endif
     /**
      * Notifies the Engine of a speech recognition event. The Engine will call @c startAudioInput() to notify 
      * the platform implementation when to start writing audio samples.

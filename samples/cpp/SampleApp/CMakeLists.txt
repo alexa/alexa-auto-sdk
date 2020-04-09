@@ -2,7 +2,11 @@
 
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
-project(SampleApp LANGUAGES CXX)
+project(SampleApp LANGUAGES C CXX)
+
+if(OBIGO_AIDAEMON)
+    include(${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists_AIDaemon.txt)
+endif()
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -39,6 +43,7 @@ if(AAC_HOME)
     include(${AAC_HOME}/share/cmake/AACEPhoneControl.cmake)
     include(${AAC_HOME}/share/cmake/AACECBL.cmake)
     include(${AAC_HOME}/share/cmake/AACEAddressBook.cmake)
+    include(${AAC_HOME}/share/cmake/AACEVPA.cmake)
     if(AMAZONLITE)
         include(${AAC_HOME}/share/cmake/AACEAmazonLite.cmake)
         add_definitions(-DAMAZONLITE)
@@ -83,11 +88,21 @@ else()
     endif()
 endif()
 
-# Find cURL library for the sample app.
+# Find libraries for the sample app.
+if (${USE_OBIGO_BUILD_SYSTEM})
+find_package(PkgConfig)
+pkg_check_modules(SQLite3 REQUIRED sqlite3)
+find_path(CURL_INCLUDE_DIRS NAMES curl/curl.h PATHS "${VPA_SYSROOT_PATH}/usr/include")
+find_library(CURL_LIBRARIES NAMES curl libcurl PATHS "${VPA_SYSROOT_PATH}/usr/lib")
+if (${AMAZONLITE})
+find_library(PRYON_LIBRARIES pryon_lite PATHS "${VPA_SYSROOT_PATH}/usr/lib")
+endif ()
+else ()
 find_package(CURL REQUIRED)
-
 # Find SQLite3 package for the sample app.
 find_package(SQLite3 REQUIRED)
+endif ()
+
 
 set(CXX_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Activity.h
@@ -115,6 +130,7 @@ set(CXX_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Location/LocationProviderHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Logger/LoggerHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Navigation/NavigationHandler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/VPA/VPADirectiveHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Network/NetworkInfoProviderHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/PhoneControl/PhoneControlHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Status.h
@@ -165,6 +181,7 @@ set(CXX_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Location/LocationProviderHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Logger/LoggerHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Navigation/NavigationHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/VPA/VPADirectiveHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Network/NetworkInfoProviderHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/PhoneControl/PhoneControlHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/TaskQueue.cpp
@@ -191,6 +208,7 @@ source_group("Header Files" FILES ${CXX_HEADER_FILES})
 add_executable(SampleApp
     ${CXX_HEADER_FILES}
     ${CXX_SOURCE_FILES}
+    ${AIDAEMON_SOURCES}
 )
 
 target_include_directories(SampleApp PUBLIC
@@ -198,6 +216,7 @@ target_include_directories(SampleApp PUBLIC
     $<INSTALL_INTERFACE:include> # <prefix>/include
     ${CURL_INCLUDE_DIRS}
     ${SQLITE3_INCLUDE_DIRS}
+    ${AIDAEMON_INCLUDES}
 )
 
 target_link_libraries(SampleApp
@@ -213,8 +232,12 @@ target_link_libraries(SampleApp
     AACECBLEngine
     AACEAddressBookPlatform
     AACEAddressBookEngine
+    AACEVPAPlatform
+    AACEVPAEngine
     ${CURL_LIBRARIES}
     ${SQLITE3_LIBRARIES}
+    ${AIDAEMON_LIBRARIES}
+    ${PRYON_LIBRARIES}
 )
 
 if(AMAZONLITE)
@@ -287,9 +310,9 @@ if(NOT CMAKE_SYSTEM_NAME MATCHES "(Darwin)")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--no-as-needed")
 endif()
 
-if(CMAKE_SYSTEM_NAME STREQUAL Linux)
-    add_definitions(-DMONITORAIRPLANEMODEEVENTS)
-endif()
+#if(CMAKE_SYSTEM_NAME STREQUAL Linux)
+#    add_definitions(-DMONITORAIRPLANEMODEEVENTS)
+#endif()
 
 install(
     TARGETS SampleApp

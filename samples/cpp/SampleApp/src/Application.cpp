@@ -40,6 +40,11 @@
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
+#ifdef OBIGO_AIDAEMON
+#include "SampleApp/VPA/IPCHandler.h"
+#include "SampleApp/VPA/AIDaemon-IPC.h"
+#endif // OBIGO_AIDAEMON
+
 namespace sampleApp {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -340,6 +345,12 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     auto loggerHandler = logger::LoggerHandler::create(activity);
     Ensures(loggerHandler != nullptr);
 
+#ifdef OBIGO_AIDAEMON
+    AIDAEMON::IPCHandler *ipc = AIDAEMON::IPCHandler::GetInstance();
+    ipc->setLogger(loggerHandler);
+    ipc->setActivity(activity);
+#endif // OBIGO_AIDAEMON
+
 #ifdef LOCALVOICECONTROL
     // Create car control handler
     auto carControlHandler = carControl::CarControlHandler::create(activity, loggerHandler);
@@ -487,6 +498,9 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     auto cblHandler = cbl::CBLHandler::create(activity, loggerHandler);
     Ensures(cblHandler != nullptr);
     Ensures(engine->registerPlatformInterface(cblHandler));
+#ifdef OBIGO_AIDAEMON    
+    ipc->setCBLHandler(cblHandler);
+#endif // OBIGO_AIDAEMON
 
 #ifdef ALEXACOMMS
     // Communications
@@ -526,6 +540,16 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
         Ensures(source.second != nullptr);
         Ensures(engine->registerPlatformInterface(source.second));
     }
+
+#ifdef OBIGO_AIDAEMON
+    // vpa Driective Handler
+    auto vpaDirectiveHandler = vpa::VPADirectiveHandler::create(activity, loggerHandler);
+    Ensures(vpaDirectiveHandler != nullptr);
+    Ensures(engine->registerPlatformInterface(vpaDirectiveHandler));
+    ipc->setVPAHandler(vpaDirectiveHandler);
+    cblHandler->setToken(
+        vpaDirectiveHandler->getStorage()->get( AIDAEMON::VPA_LOCAL_STORAGE_TABLE, AIDAEMON::KEY_AUTH_STORAGE, "" ));
+#endif // OBIGO_AIDAEMON
 
     // Global Preset Handler
     auto globalPresetHandler = alexa::GlobalPresetHandler::create(activity, loggerHandler);

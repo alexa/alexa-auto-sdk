@@ -22,6 +22,11 @@
 #define GSL_THROW_ON_CONTRACT_VIOLATION
 #include <gsl/contracts.h>
 
+#ifdef OBIGO_AIDAEMON
+#include "SampleApp/VPA/IPCHandler.h"
+#include "SampleApp/VPA/AIDaemon-IPC.h"
+#endif // OBIGO_AIDAEMON
+
 namespace sampleApp {
 namespace alexa {
 
@@ -44,11 +49,19 @@ std::weak_ptr<Activity> AudioPlayerHandler::getActivity() { return m_activity; }
 std::weak_ptr<logger::LoggerHandler> AudioPlayerHandler::getLoggerHandler() { return m_loggerHandler; }
 
 // aace::alexa::AudioPlayer interface
-
+#ifdef OBIGO_AIDAEMON
+void AudioPlayerHandler::playerActivityChanged(AudioPlayer::PlayerActivity state, const std::string audioItemId, std::chrono::milliseconds offset) {
+#else
 void AudioPlayerHandler::playerActivityChanged(AudioPlayer::PlayerActivity state) {
+#endif // OBIGO_AIDAEMON
     std::stringstream ss;
     ss << state;
     log(logger::LoggerHandler::Level::INFO, "playerActivityChanged:state=" + ss.str());
+
+#ifdef OBIGO_AIDAEMON    
+    AIDAEMON::IPCHandler::GetInstance()->sendAudioState( audioItemId, ss.str(), offset );
+#endif // OBIGO_AIDAEMON
+
     auto activity = m_activity.lock();
     if (!activity) {
         return;
@@ -60,6 +73,12 @@ void AudioPlayerHandler::playerActivityChanged(AudioPlayer::PlayerActivity state
     });
     return;
 }
+
+#ifdef OBIGO_AIDAEMON
+void AudioPlayerHandler::readyMVPAAudioPlayer(std::string audioItemId) {
+  AIDAEMON::IPCHandler::GetInstance()->sendAudioState(audioItemId, std::string(AIDAEMON::AUDIO_STATE_IDLE), std::chrono::milliseconds(0), 0);
+}
+#endif
 
 // private
 
@@ -77,6 +96,12 @@ void AudioPlayerHandler::setupUI() {
         return;
     }
     m_console = activity->findViewById("id:console");
+#ifdef OBIGO_AIDAEMON
+    activity->registerObserver(Event::onSetMVPAAudioPlayer, [=](const std::string&) {
+        log(logger::LoggerHandler::Level::VERBOSE, "onSetMVPAAudioPlayer");
+        return setMVPAAudioPlayer();
+    });
+#endif
 }
 
 } // namespace alexa

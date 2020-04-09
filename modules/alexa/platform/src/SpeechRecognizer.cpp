@@ -31,6 +31,17 @@ bool SpeechRecognizer::tapToTalk() {
     return startCapture( Initiator::TAP_TO_TALK );
 }
 
+#ifdef OBIGO_AIDAEMON
+bool SpeechRecognizer::setRecognizeEvent(const std::string& event) {
+    if( auto m_speechRecognizerEngineInterface_lock = m_speechRecognizerEngineInterface.lock() ) {
+        return m_speechRecognizerEngineInterface_lock->onSetRecognizeEvent( event );
+    }
+    else {
+        return false;
+    }
+}
+#endif
+
 bool SpeechRecognizer::startCapture( Initiator initiator, uint64_t keywordBegin, uint64_t keywordEnd, const std::string& keyword ) {
     if( auto m_speechRecognizerEngineInterface_lock = m_speechRecognizerEngineInterface.lock() ) {
         return m_speechRecognizerEngineInterface_lock->onStartCapture( initiator, keywordBegin, keywordEnd, keyword );

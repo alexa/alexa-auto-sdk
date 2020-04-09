@@ -25,9 +25,17 @@ namespace alexa {
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.NotificationsEngineImpl");
 
-NotificationsEngineImpl::NotificationsEngineImpl( std::shared_ptr<aace::alexa::Notifications> notificationsPlatformInterface ) :
+NotificationsEngineImpl::NotificationsEngineImpl( std::shared_ptr<aace::alexa::Notifications> notificationsPlatformInterface 
+#ifdef OBIGO_AIDAEMON
+    ,std::shared_ptr<alexaClientSDK::settings::storage::DeviceSettingStorageInterface> deviceSettingsStorage
+#endif
+    ) :
     AudioChannelEngineImpl( alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::Type::AVS_ALERTS_VOLUME ),
-    m_notificationsPlatformInterface( notificationsPlatformInterface ) {
+    m_notificationsPlatformInterface( notificationsPlatformInterface )
+#ifdef OBIGO_AIDAEMON
+    ,m_deviceSettingsStorage( deviceSettingsStorage )
+#endif
+     {
 }
 
 bool NotificationsEngineImpl::initialize(
@@ -80,7 +88,11 @@ std::shared_ptr<NotificationsEngineImpl> NotificationsEngineImpl::create(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::NotificationsAudioFactoryInterface> notificationsAudioFactory,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
-    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager ) {
+    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager
+#ifdef OBIGO_AIDAEMON
+    ,std::shared_ptr<alexaClientSDK::settings::storage::DeviceSettingStorageInterface> deviceSettingsStorage
+#endif
+     ) {
 
     std::shared_ptr<NotificationsEngineImpl> notificationsEngineImpl = nullptr;
 
@@ -95,15 +107,23 @@ std::shared_ptr<NotificationsEngineImpl> NotificationsEngineImpl::create(
         ThrowIfNull( exceptionSender, "invalidExceptionSender" );
         ThrowIfNull( dataManager, "invalidDataManager" );
         ThrowIfNull( notificationsAudioFactory, "invalidNotificationsAudioFactory" );
+        ThrowIfNull( deviceSettingsStorage, "invaliddeviceSettingsStorage" );
 
         // open an audio channel
         auto audioOutputChannel = audioManager->openAudioOutputChannel( "Notifications", aace::audio::AudioOutputProvider::AudioOutputType::NOTIFICATION );
         ThrowIfNull( audioOutputChannel, "openAudioOutputChannelFailed" );
 
-        notificationsEngineImpl = std::shared_ptr<NotificationsEngineImpl>( new NotificationsEngineImpl( notificationsPlatformInterface ) );
+        notificationsEngineImpl = std::shared_ptr<NotificationsEngineImpl>( new NotificationsEngineImpl( notificationsPlatformInterface
+#ifdef OBIGO_AIDAEMON
+            , deviceSettingsStorage
+#endif
+            ) );
 
         ThrowIfNot( notificationsEngineImpl->initialize( audioOutputChannel, directiveSequencer, contextManager, capabilitiesDelegate, exceptionSender, notificationsAudioFactory, speakerManager, dataManager ), "initializeNotificationsEngineImplFailed" );
-
+#ifdef OBIGO_AIDAEMON
+        // set the platform engine interface reference
+        notificationsPlatformInterface->setEngineInterface( notificationsEngineImpl );
+#endif        
         return notificationsEngineImpl;
     }
     catch( std::exception& ex ) {
@@ -129,6 +149,15 @@ void NotificationsEngineImpl::doShutdown()
 void NotificationsEngineImpl::onSetIndicator(alexaClientSDK::avsCommon::avs::IndicatorState state){
     m_notificationsPlatformInterface->setIndicator(static_cast<aace::alexa::Notifications::IndicatorState>( state ));
 }
+
+#ifdef OBIGO_AIDAEMON
+bool NotificationsEngineImpl::onStateDoNotDisturb()
+{
+    alexaClientSDK::settings::storage::DeviceSettingStorageInterface::SettingStatusAndValue data = m_deviceSettingsStorage->loadSetting("Alexa.DoNotDisturb::enabled");
+    
+    m_notificationsPlatformInterface->onDoNotDisturb(data.second);
+}
+#endif
 
 } // aace::engine::alexa
 } // aace::engine

@@ -1,0 +1,56 @@
+{
+    "aace.alexa": {
+        "avsDeviceSDK": {
+            "deviceInfo": {
+                "clientId": "@client_id@",
+                "deviceSerialNumber": "@device_id@",
+                "productId": "@product_id@"
+            },
+            "libcurlUtils": {
+                "CURLOPT_CAPATH": "@aac_dir@/opt/AAC/etc/cert"
+            },
+            "miscDatabase": {
+                "databaseFilePath": "@db_dir@/miscDatabase.db"
+            },
+            "certifiedSender": {
+                "databaseFilePath": "@db_dir@/certifiedSender.db"
+            },
+            "alertsCapabilityAgent": {
+                "databaseFilePath": "@db_dir@/alertsCapabilityAgent.db"
+            },
+            "notifications": {
+                "databaseFilePath": "@db_dir@/notifications.db"
+            },
+            "settings": {
+                "databaseFilePath": "@db_dir@/settings.db",
+                "defaultAVSClientSettings": {
+                    "locale": "@locale@"
+                }
+            }
+        }
+    },
+    "aace.storage": {
+        "localStoragePath": "@db_dir@/storage.db",
+        "storageType": "sqlite"
+    },
+    "aace.vehicle": {
+        "info": {
+            "make": "Amazon",
+            "model": "AACE",
+            "year": "2019",
+            "trim": "aac",
+            "geography": "US",
+            "version": "1.2.3",
+            "os": "Sample OS 1.0",
+            "arch": "Sample Arch 1.0",
+            "language": "en-US",
+            "microphone": "SingleArray",
+            "countries": "US,GB,IE,CA,DE,AT,IN,JP,AU,NZ,FR",
+            "vehicleIdentifier": "Sample Identifier ABC"
+        },
+        "operatingCountry": "US"
+    },
+    "aace.cbl" : {
+        "enableUserProfile": false
+    }
+}

@@ -102,7 +102,17 @@ enum class Event {
     onRemoveAddressBookPhone,
     onAddAddressBookAuto,
     onRemoveAddressBookAuto,
-
+#ifdef OBIGO_AIDAEMON
+    // SpeechSynthesizer
+    onStartTTS,
+    onStopTTS,
+    // Expect Speech
+    onSpeechRecognizerSetRecognize,
+    // MVPA AudioPlayer
+    onSetMVPAAudioPlayer,
+    // DoNotDisturb
+    onStateDoNotDisturb
+#endif
 };
 
 static const std::map<std::string, Event> EventEnumerator{
@@ -178,7 +188,18 @@ static const std::map<std::string, Event> EventEnumerator{
     {"onAddAddressBookPhone", Event::onAddAddressBookPhone},
     {"onRemoveAddressBookPhone", Event::onRemoveAddressBookPhone},
     {"onAddAddressBookAuto", Event::onAddAddressBookAuto},
-    {"onRemoveAddressBookAuto", Event::onRemoveAddressBookAuto}
+    {"onRemoveAddressBookAuto", Event::onRemoveAddressBookAuto},
+#ifdef OBIGO_AIDAEMON
+    // SpeechSynthesizer
+    {"onStartTTS", Event::onStartTTS},
+    {"onStopTTS", Event::onStopTTS},
+    // Expect Speech
+    {"onSpeechRecognizerSetRecognize", Event::onSpeechRecognizerSetRecognize},
+    // MVPA AudioPlayer
+    {"onSetMVPAAudioPlayer", Event::onSetMVPAAudioPlayer},
+    // DoNotDisturb
+    {"onStateDoNotDisturb", Event::onStateDoNotDisturb},
+#endif
 };
 
 } // namespace sampleApp

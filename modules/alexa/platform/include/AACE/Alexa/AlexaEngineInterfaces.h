@@ -99,7 +99,29 @@ public:
     virtual bool onStopCapture() = 0;
     virtual bool enableWakewordDetection() = 0;
     virtual bool disableWakewordDetection() = 0;
+#ifdef OBIGO_AIDAEMON
+    virtual bool onSetRecognizeEvent(const std::string& event) = 0;
+#endif
 };
+
+#ifdef OBIGO_AIDAEMON
+class SpeechSynthesizerEngineInterface {
+public:
+    
+    virtual bool onstartTTS(std::string startEvent, std::string finishEvent) = 0;
+    virtual bool onstopTTS() = 0;
+};
+
+class AudioPlayerEngineInterface {
+ public:
+    virtual bool onSetMVPAAudioPlayer() = 0;
+};
+
+class NotificationsEngineInterface {
+ public:
+    virtual bool onStateDoNotDisturb() = 0;
+};
+#endif
 
 inline std::ostream& operator<<(std::ostream& stream, const SpeechRecognizerEngineInterface::Initiator& initiator) {
     switch (initiator) {

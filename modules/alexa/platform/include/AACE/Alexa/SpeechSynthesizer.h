@@ -17,6 +17,7 @@
 #define AACE_ALEXA_SPEECH_SYNTHESIZER_H
 
 #include <AACE/Core/PlatformInterface.h>
+#include "AlexaEngineInterfaces.h"
 
 /** @file */
 
@@ -38,6 +39,19 @@ protected:
 
 public:
     virtual ~SpeechSynthesizer();
+#ifdef OBIGO_AIDAEMON
+    bool startTTS(std::string startEvent, std::string finishEvent);
+    bool stopTTS();
+    /**
+     * @internal
+     * Sets the Engine interface delegate
+     *
+     * Should *never* be called by the platform implementation
+     */
+    void setEngineInterface( std::shared_ptr<aace::alexa::SpeechSynthesizerEngineInterface> speechSynthesizerEngineInterface );
+private:
+    std::weak_ptr<aace::alexa::SpeechSynthesizerEngineInterface> m_speechSynthesizerEngineInterface;
+#endif
 };
 
 } // aace::alexa

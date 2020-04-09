@@ -1,0 +1,557 @@
+{
+    "id": "main",
+    "item": [
+        {
+            "do": "notify/onCBLStart",
+            "key": "A",
+            "name": "Authenticate with CBL",
+            "test": "!RefreshToken"
+        },
+        {
+            "do": "notify/onCBLCancel",
+            "key": "C",
+            "name": "Cancel Authentication",
+            "test": "!RefreshToken"
+        },
+        {
+            "do": "notify/onCBLReset",
+            "key": "K",
+            "name": "Reset Authentication",
+            "test": "RefreshToken"
+        },
+        {
+            "do": "GoTo",
+            "key": "F",
+            "name": "Audio File Input",
+            "test": "AudioFileSupported",
+            "value": {
+                "id": "audio-file",
+                "item": [
+                    {
+                        "do": "AudioFile",
+                        "key": "1",
+                        "name": "Alexa, tell me a joke",
+                        "value": "./inputs/alexa_tell_me_a_joke.wav"
+                    },
+                    {
+                        "do": "AudioFile",
+                        "key": "2",
+                        "name": "Alexa, what will today’s weather be?",
+                        "value": "./inputs/alexa_what_will_todays_weather_be.wav"
+                    },
+                    {
+                        "do": "AudioFile",
+                        "key": "3",
+                        "name": "Alexa, stop",
+                        "value": "./inputs/alexa_stop.wav"
+                    },
+                    {
+                        "do": "notify/onSpeechRecognizerDisableWakewordDetection",
+                        "key": "D",
+                        "name": "Disable wake word detection",
+                        "test": "WakeWordSupported"
+                    },
+                    {
+                        "do": "notify/onSpeechRecognizerEnableWakewordDetection",
+                        "key": "E",
+                        "name": "Enable wake word detection",
+                        "test": "WakeWordSupported"
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Audio File Input Menu"
+            }
+        },
+        {
+            "do": "notify/onSpeechRecognizerTapToTalk",
+            "key": "T",
+            "name": "Tap (for Tap-to-Talk)"
+        },
+        {
+            "do": "notify/onSpeechRecognizerHoldToTalk",
+            "key": "B",
+            "name": "Begin Capture (for Hold-to-Talk)",
+            "note": "Tap ${KEYOPEN}S${KEYCLOSE} to stop capturing"
+        },
+        {
+            "do": "notify/onSpeechRecognizerStopCapture",
+            "key": "S",
+            "name": "Stop Capture"
+        },
+        {
+            "do": "GoTo",
+            "key": "H",
+            "name": "Phone Call Controller",
+            "value": {
+                "id": "pcc",
+                "item": [
+                    {
+                        "do": "notify/onPhoneCallControllerConnectionStateChanged",
+                        "key": "1",
+                        "name": "Connect phone",
+                        "value": "CONNECTED"
+                    },
+                    {
+                        "do": "notify/onPhoneCallControllerConnectionStateChanged",
+                        "key": "2",
+                        "name": "Disconnect phone",
+                        "value": "DISCONNECTED"
+                    },
+                    {
+                        "do": "notify/onPhoneCallControllerCallStateChanged",
+                        "key": "3",
+                        "name": "Simulate outgoing call",
+                        "value": "OUTBOUND_RINGING/11111111111111111"
+                    },
+                    {
+                        "do": "notify/onPhoneCallControllerCallStateChanged",
+                        "key": "4",
+                        "name": "Simulate incoming call",
+                        "value": "INBOUND_RINGING"
+                    },
+                    {
+                        "do": "notify/onPhoneCallControllerCallStateChanged",
+                        "key": "5",
+                        "name": "Accept incoming call",
+                        "value": "ACTIVE"
+                    },
+                    {
+                        "do": "notify/onPhoneCallControllerCallStateChanged",
+                        "key": "6",
+                        "name": "Stop/Drop call",
+                        "value": "IDLE"
+                    },
+                    {
+                        "do": "notify/onPhoneCallControllerCallFailed",
+                        "key": "7",
+                        "name": "Simulate failed outgoing call",
+                        "value": "11111111111111111/BUSY/Busy"
+                    },
+                    {
+                        "do": "notify/onPhoneCallControllerShowPayload",
+                        "key": "8",
+                        "name": "Show call information"
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Phone Call Controller Menu"
+            }
+        },
+        {
+            "do": "GoTo",
+            "key": "M",
+            "name": "Communications",
+            "test": "AlexaCommsSupported",
+            "value": {
+                "id": "comms",
+                "item": [
+                    {
+                        "do": "notify/onCommunicationAcceptCall",
+                        "key": "1",
+                        "name": "Accept call"
+                    },
+                    {
+                        "do": "notify/onCommunicationStopCall",
+                        "key": "2",
+                        "name": "Stop call"
+                    },
+                    {
+                        "do": "notify/onCommunicationShowState",
+                        "key": "3",
+                        "name": "Show state"
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Alexa Communications Menu"
+            }
+        },
+        {
+            "do": "GoTo",
+            "key": "N",
+            "name": "Navigation",
+            "value": {
+                "id": "navigation",
+                "item": [
+                    {
+                        "do": "notify/onLoadNavigationState",
+                        "key": "1",
+                        "name": "Load Sample Navigation Context",
+                        "value": "./sampledata/navigationstate.json"
+                    },
+                    {
+                        "do": "notify/onClearNavigationState",
+                        "key": "2",
+                        "name": "Clear Navigation Context"
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Navigation State Menu"
+            }
+        },
+        {
+            "do": "GoTo",
+            "key": "E",
+            "name": "Endpoint",
+            "value": {
+                "id": "endpoint",
+                "item": [
+                    {
+                        "do": "SetEndpoint",
+                        "key": "1",
+                        "name": "Asia",
+                        "value": "https://avs-alexa-fe.amazon.com"
+                    },
+                    {
+                        "do": "SetEndpoint",
+                        "key": "2",
+                        "name": "Europe",
+                        "value": "https://avs-alexa-eu.amazon.com"
+                    },
+                    {
+                        "do": "SetEndpoint",
+                        "key": "3",
+                        "name": "North America",
+                        "value": "https://avs-alexa-na.amazon.com"
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Endpoint Menu"
+            }
+        },
+        {
+            "do": "GoTo",
+            "key": "G",
+            "name": "Geolocation",
+            "value": {
+                "id": "LOCATION",
+                "index": 0,
+                "item": [
+                    {
+                        "do": "Select",
+                        "key": "H",
+                        "name": "Use home location",
+                        "value": {
+                            "latitude": 37.3790629,
+                            "longitude": -122.116578
+                        }
+                    },
+                    {
+                        "do": "Select",
+                        "key": "W",
+                        "name": "Use work location",
+                        "value": {
+                            "latitude": 37.40940725,
+                            "longitude": -122.03644610148677
+                        }
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Geolocation Menu"
+            }
+        },
+        {
+            "do": "GoTo",
+            "key": "L",
+            "name": "Locale",
+            "value": {
+                "id": "LOCALE",
+                "item": [
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Locale Menu"
+            }
+        },
+        {
+            "do": "GoTo",
+            "key": "P",
+            "name": "Logger Level",
+            "value": {
+                "id": "logger-level",
+                "index": 0,
+                "item": [
+                    {
+                        "do": "SetLoggerLevel",
+                        "key": "V",
+                        "name": "VERBOSE",
+                        "value": "VERBOSE"
+                    },
+                    {
+                        "do": "SetLoggerLevel",
+                        "key": "I",
+                        "name": "INFO",
+                        "value": "INFO"
+                    },
+                    {
+                        "do": "SetLoggerLevel",
+                        "key": "M",
+                        "name": "METRIC",
+                        "value": "METRIC"
+                    },
+                    {
+                        "do": "SetLoggerLevel",
+                        "key": "W",
+                        "name": "WARN",
+                        "value": "WARN"
+                    },
+                    {
+                        "do": "SetLoggerLevel",
+                        "key": "E",
+                        "name": "ERROR",
+                        "value": "ERROR"
+                    },
+                    {
+                        "do": "SetLoggerLevel",
+                        "key": "C",
+                        "name": "CRITICAL",
+                        "value": "CRITICAL"
+                    },
+                    {
+                        "do": "SetLoggerLevel",
+                        "key": "N",
+                        "name": "None",
+                        "value": ""
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Logger Level Menu"
+            }
+        },
+        {
+            "do": "GoTo",
+            "key": "V",
+            "name": "Volume",
+            "value": {
+                "id": "volume",
+                "item": [
+                    {
+                        "do": "notify/onAudioManagerSpeaker",
+                        "key": "1",
+                        "name": "Speaker volume up",
+                        "value": "Speaker/volume/+10"
+                    },
+                    {
+                        "do": "notify/onAudioManagerSpeaker",
+                        "key": "2",
+                        "name": "Speaker volume down",
+                        "value": "Speaker/volume/-10"
+                    },
+                    {
+                        "do": "notify/onAudioManagerSpeaker",
+                        "key": "3",
+                        "name": "Speaker mute",
+                        "value": "Speaker/mute/true"
+                    },
+                    {
+                        "do": "notify/onAudioManagerSpeaker",
+                        "key": "4",
+                        "name": "Speaker unmute",
+                        "value": "Speaker/mute/false"
+                    },
+                    {
+                        "do": "notify/onAudioManagerSpeaker",
+                        "key": "5",
+                        "name": "Speaker mid volume",
+                        "value": "Speaker/volume/50"
+                    },
+                    {
+                        "do": "notify/onAudioManagerSpeaker",
+                        "key": "6",
+                        "name": "Alerts mute",
+                        "value": "Alerts/mute/true"
+                    },
+                    {
+                        "do": "notify/onAudioManagerSpeaker",
+                        "key": "7",
+                        "name": "Alerts unmute",
+                        "value": "Alerts/mute/false"
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Volume Menu"
+            }
+        },
+        {
+            "do": "GoTo",
+            "key": "D",
+            "name": "Address Book",
+            "value": {
+                "id": "address-book",
+                "item": [
+                    {
+                        "do": "notify/onAddAddressBookPhone",
+                        "key": "1",
+                        "name": "Add Phone Book",
+                        "value": "./sampledata/Contacts.json"
+                    },
+                    {
+                        "do": "notify/onRemoveAddressBookPhone",
+                        "key": "2",
+                        "name": "Remove Phone Book"
+                    },
+                    {
+                        "do": "notify/onAddAddressBookAuto",
+                        "key": "3",
+                        "name": "Add Navigation(Labelled Address) Book",
+                        "value": "./sampledata/NavigationFavorites.json"
+                    },
+                    {
+                        "do": "notify/onRemoveAddressBookAuto",
+                        "key": "4",
+                        "name": "Remove Navigation(Labelled Address) Book"
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Address Book Menu"
+            }
+        },
+        {
+            "do": "GoTo",
+            "key": "I",
+            "name": "Network Info Provider",
+            "value": {
+                "id": "network-info-provider",
+                "item": [
+                    {
+                        "do": "notify/onNetworkInfoProviderNetworkStatusChanged",
+                        "key": "1",
+                        "name": "Connected network status",
+                        "value": "CONNECTED"
+                    },
+                    {
+                        "do": "notify/onNetworkInfoProviderNetworkStatusChanged",
+                        "key": "2",
+                        "name": "Connecting network status",
+                        "value": "CONNECTING"
+                    },
+                    {
+                        "do": "notify/onNetworkInfoProviderNetworkStatusChanged",
+                        "key": "3",
+                        "name": "Disconnected network status",
+                        "value": "DISCONNECTED"
+                    },
+                    {
+                        "do": "notify/onNetworkInfoProviderNetworkStatusChanged",
+                        "key": "4",
+                        "name": "Disconnecting network status",
+                        "value": "DISCONNECTING"
+                    },
+                    {
+                        "do": "notify/onNetworkInfoProviderNetworkStatusChanged",
+                        "key": "5",
+                        "name": "Unknown network status",
+                        "value": "UNKNOWN"
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Network Info Provider Menu"
+            }
+        },
+        {
+            "do": "GoTo",
+            "key": "W",
+            "name": "Wake Word Detection",
+            "test": "WakeWordSupported",
+            "value": {
+                "id": "wake-word",
+                "item": [
+                    {
+                        "do": "notify/onSpeechRecognizerDisableWakewordDetection",
+                        "key": "D",
+                        "name": "Disable wake word detection",
+                        "test": "WakeWordSupported"
+                    },
+                    {
+                        "do": "notify/onSpeechRecognizerEnableWakewordDetection",
+                        "key": "E",
+                        "name": "Enable wake word detection",
+                        "test": "WakeWordSupported"
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Wake Word Detection Menu"
+            }
+        },
+        {
+            "do": "Help",
+            "key": "?",
+            "name": "Print the current menu"
+        },
+        {
+            "do": "Restart",
+            "key": "R",
+            "name": "Restart application"
+        },
+        {
+            "do": "Quit",
+            "key": "Q",
+            "name": "Quit application"
+        }
+    ],
+    "name": "Main Menu",
+    "text": {
+        "banner": [
+            "",
+            "        _____  __    __    ____                __      ___           ",
+            "       / ___/_/ /___/ /_  / __/__ ___ _  ___  / /__   / _ | ___  ___ ",
+            "      / /__/_  __/_  __/ _\\ \\/ _ `/  ' \\/ _ \\/ / -_) / __ |/ _ \\/ _ \\",
+            "      \\___/ /_/   /_/   /___/\\_,_/_/_/_/ .__/_/\\__/ /_/ |_/ .__/ .__/",
+            "                                      /_/                /_/  /_/    ",
+            "",
+            "  Copyright 2018-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved."
+        ],
+        "keyTapError": [
+            "${KEYOPEN}${KEY}${KEYCLOSE} is not valid in this menu\u0007"
+        ],
+        "keyTapped": [
+            "Tapped ${KEYOPEN}${KEY}${KEYCLOSE}"
+        ]
+    }
+}

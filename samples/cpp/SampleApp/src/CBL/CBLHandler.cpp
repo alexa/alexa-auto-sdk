@@ -24,6 +24,11 @@
 #define GSL_THROW_ON_CONTRACT_VIOLATION
 #include <gsl/contracts.h>
 
+#ifdef OBIGO_AIDAEMON
+#include "SampleApp/VPA/IPCHandler.h"
+#include "SampleApp/VPA/AIDaemon-IPC.h"
+#endif // OBIGO_AIDAEMON
+
 namespace sampleApp {
 namespace cbl {
 
@@ -61,9 +66,16 @@ void CBLHandler::cblStateChanged(CBLState state, CBLStateChangedReason reason, c
                     card->set(string, View::Type::CBLCode);
                 }
             });
+
+#ifdef OBIGO_AIDAEMON
+            // TODO send url to vpa to generate QR Code
+            AIDAEMON::IPCHandler::GetInstance()->setAuthCode(code);
+            AIDAEMON::IPCHandler::GetInstance()->sendAIStatus(
+                AIDAEMON::AI_STATUS_UNAUTH, AIDAEMON::AI_CHANGED_REASON_UNAUTH_PENDING);
+#endif                
             auto command = m_applicationContext->getBrowserCommand();
             if (!command.empty()) {
-                m_applicationContext->executeCommand((command + ' ' + url + "?cbl-code=" + code).c_str());
+                m_applicationContext->executeCommand((command + ' ' + url + "?cbl-code=" + code).c_str());                  
             }
             break;
         }
@@ -105,7 +117,26 @@ void CBLHandler::setRefreshToken(const std::string &refreshToken) {
     // FOR SECURITY REASONS, AUTHENTICATION IS NOT PRESERVED IN THE C++ SAMPLE APP.
     Ensures(m_applicationContext != nullptr);
     m_applicationContext->setRefreshToken(refreshToken);
+
+#ifdef OBIGO_AIDAEMON
+    log(logger::LoggerHandler::Level::INFO, "setRefreshToken : " + refreshToken);
+    AIDAEMON::IPCHandler::GetInstance()->getVPAHandler()->getStorage()->put(
+        AIDAEMON::VPA_LOCAL_STORAGE_TABLE, AIDAEMON::KEY_AUTH_STORAGE, refreshToken);
+#endif       
 }
+
+#ifdef OBIGO_AIDAEMON
+void CBLHandler::setToken(const std::string &refreshToken) {
+    log(logger::LoggerHandler::Level::INFO, "setToken : " + refreshToken);
+
+    Ensures(m_applicationContext != nullptr);
+    m_applicationContext->setRefreshToken(refreshToken);
+}
+
+void CBLHandler::startCBL() {
+    start();
+}
+#endif // OBIGO_AIDAEMON
 
 void CBLHandler::setUserProfile(const std::string &name, const std::string& email) {
     std::stringstream ss;

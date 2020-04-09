@@ -5,3 +5,6 @@
 /build
 
 *native-dependencies/
+aidaemonAAC.tar.gz
+aac-sdk-build-native.tar.gz
+VPA/Host/opt

@@ -10,8 +10,15 @@ add_definitions(-DUSE_FAKEMUTE)
 
 # GStreamer
 find_package(PkgConfig)
-pkg_check_modules(GST REQUIRED gstreamer-1.0>=1.8)
-pkg_check_modules(GST_APP REQUIRED gstreamer-app-1.0>=1.8)
+if(GSTREAMER_VERSION_V0)
+	add_definitions(-DGSTREAMER_VERSION_V0)
+	add_definitions(-DUSE_APPSINK_PULL)
+	pkg_check_modules(GST REQUIRED gstreamer-0.10>=0.10.30)
+	pkg_check_modules(GST_APP REQUIRED gstreamer-app-0.10>=0.10.30)
+else()
+	pkg_check_modules(GST REQUIRED gstreamer-1.0>=1.8)
+	pkg_check_modules(GST_APP REQUIRED gstreamer-app-1.0>=1.8)
+endif()
 
 add_library(aal STATIC
 	src/core.c

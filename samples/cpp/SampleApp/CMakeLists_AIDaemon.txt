@@ -1,0 +1,37 @@
+# Find GLIB 2.0 package for the sample app.
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GLIB REQUIRED glib-2.0)
+pkg_check_modules(GIOUNIX REQUIRED gio-unix-2.0)
+
+set(AIDAEMON_SOURCES)
+if (OBIGO_AIDAEMON)
+    list(APPEND AIDAEMON_SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/VPA/AIDaemon-dbus-generated.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/VPA/base64.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/VPA/IPCHandler.cpp)
+endif()
+
+set(AIDAEMON_INCLUDES)
+if (OBIGO_AIDAEMON)
+    list(APPEND AIDAEMON_INCLUDES
+        ${GLIB_INCLUDE_DIRS}
+        ${GIOUNIX_INCLUDE_DIRS}
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/VPA")
+endif()
+
+set(AIDAEMON_LIBRARIES)
+if (OBIGO_AIDAEMON)
+    list(APPEND AIDAEMON_LIBRARIES
+        ${GLIB_LIBRARIES}
+        ${GIOUNIX_LIBRARIES})
+endif()
+
+if (OBIGO_AIDAEMON)
+    add_definitions(-DOBIGO_AIDAEMON)
+endif()
+
+execute_process(
+    COMMAND python $ENV{AAC_SDK_DIR}/VPA/Version.py AI_DAEMON_VERSION
+)
+
+add_definitions(-DOBIGO_AIDAEMON_VERSION=${AI_DAEMON_VERSION})

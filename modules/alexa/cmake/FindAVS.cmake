@@ -48,6 +48,8 @@ find_library(AVS_SPEECH_ENCODER_LIBRARY SpeechEncoder)
 find_library(AVS_OPUS_ENCODER_CONTEXT_LIBRARY OpusEncoderContext)
 find_library(AVS_SPEECH_SYNTHESIZER_LIBRARY SpeechSynthesizer)
 find_library(AVS_TEMPLATE_RUNTIME_LIBRARY TemplateRuntime)
+find_library(AVS_DND_LIBRARY DoNotDisturbCA)
+find_library(AVS_DEVICE_SETTINGS_LIBRARY DeviceSettings)
 
 set(AVS_LIBRARIES
     ${AVS_ACL_LIBRARY}
@@ -82,6 +84,8 @@ set(AVS_LIBRARIES
     ${AVS_OPUS_ENCODER_CONTEXT_LIBRARY}
     ${AVS_SPEECH_SYNTHESIZER_LIBRARY}
     ${AVS_TEMPLATE_RUNTIME_LIBRARY}
+    ${AVS_DND_LIBRARY}
+    ${AVS_DEVICE_SETTINGS_LIBRARY}
 )
 
 include(FindPackageHandleStandardArgs)

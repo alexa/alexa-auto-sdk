@@ -22,6 +22,11 @@
 #define GSL_THROW_ON_CONTRACT_VIOLATION
 #include <gsl/contracts.h>
 
+#ifdef OBIGO_AIDAEMON
+#include "SampleApp/VPA/IPCHandler.h"
+#include "SampleApp/VPA/AIDaemon-IPC.h"
+#endif // OBIGO_AIDAEMON
+
 namespace sampleApp {
 namespace alexa {
 
@@ -62,9 +67,22 @@ void AlexaClientHandler::dialogStateChanged(AlexaClient::DialogState state) {
     });
     // Special case for test automation
     if (state == AlexaClient::DialogState::IDLE) {
+#ifdef OBIGO_AIDAEMON
+        log(logger::LoggerHandler::Level::INFO, "Idle...");
+        AIDAEMON::IPCHandler::GetInstance()->sendMessage(AIDAEMON::METHODID_NOTI_VR_STATE, AIDAEMON::AI_VR_STATE_IDLE);
         if (auto executor = activity->getExecutor()) {
             executor->submit([=]() { activity->notify(Event::onTestAutomationProcess); });
         }
+    } else if (state == AlexaClient::DialogState::LISTENING) {
+        log(logger::LoggerHandler::Level::INFO, "Listening...");
+        AIDAEMON::IPCHandler::GetInstance()->sendMessage(AIDAEMON::METHODID_NOTI_VR_STATE, AIDAEMON::AI_VR_STATE_LISTENING);
+    } else if (state == AlexaClient::DialogState::THINKING) {
+        log(logger::LoggerHandler::Level::INFO, "Thinking...");
+        AIDAEMON::IPCHandler::GetInstance()->sendMessage(AIDAEMON::METHODID_NOTI_VR_STATE, AIDAEMON::AI_VR_STATE_THINKING);
+    } else if (state == AlexaClient::DialogState::SPEAKING) {
+        log(logger::LoggerHandler::Level::INFO, "Speaking...");
+        AIDAEMON::IPCHandler::GetInstance()->sendMessage(AIDAEMON::METHODID_NOTI_VR_STATE, AIDAEMON::AI_VR_STATE_SPEAKING);
+#endif // OBIGO_AIDAEMON
     }
 }
 
@@ -84,6 +102,18 @@ void AlexaClientHandler::authStateChanged(AlexaClient::AuthState state, AlexaCli
         if (auto console = m_console.lock()) {
             console->printLine("Auth state changed:", state, "(", error, ")");
         }
+
+#ifdef OBIGO_AIDAEMON
+        if (error == AlexaClient::AuthError::AUTHORIZATION_PENDING) {
+            std::ostringstream stream;
+            std::string aireason;
+
+            stream << error;
+            aireason =  stream.str();
+
+            AIDAEMON::IPCHandler::GetInstance()->sendAIStatus(AIDAEMON::AI_STATUS_UNAUTH, aireason);
+        }
+#endif // OBIGO_AIDAEMON 
     });
 }
 
@@ -103,6 +133,21 @@ void AlexaClientHandler::connectionStatusChanged(AlexaClient::ConnectionStatus s
         if (auto console = m_console.lock()) {
             console->printLine("Connection status changed:", status, "(", reason, ")");
         }
+
+#ifdef OBIGO_AIDAEMON
+            std::ostringstream stream;
+            std::string aistatus;
+            std::string aireason;
+
+            stream << status;
+            aistatus =  stream.str();
+
+            stream << reason;
+            aireason =  stream.str();
+
+            AIDAEMON::IPCHandler::GetInstance()->sendAIStatus(aistatus, aireason);
+#endif
+
     });
     // Special case for test automation
     if (status == AlexaClient::ConnectionStatus::CONNECTED) {
@@ -113,6 +158,80 @@ void AlexaClientHandler::connectionStatusChanged(AlexaClient::ConnectionStatus s
         }
     }
 }
+
+#ifdef OBIGO_AIDAEMON
+void AlexaClientHandler::readyTTS(std::string dialogRequestId) {
+  log(logger::LoggerHandler::Level::INFO, "readyTTS dialogRequestId" + dialogRequestId);
+  rapidjson::Document ttsready(rapidjson::kObjectType);
+
+  ttsready.AddMember(
+      AIDAEMON::DIALOGID,
+      rapidjson::Value().SetString(dialogRequestId.c_str(), dialogRequestId.length(), ttsready.GetAllocator()),
+      ttsready.GetAllocator());
+  AIDAEMON::IPCHandler::GetInstance()->sendMessage(AIDAEMON::METHODID_AI_TTS_READY, &ttsready);
+}
+
+void AlexaClientHandler::startedTTS(std::string dialogRequestId) {
+  log(logger::LoggerHandler::Level::INFO, "startedTTS dialogRequestId" + dialogRequestId);
+  rapidjson::Document ttsstart(rapidjson::kObjectType);
+
+  ttsstart.AddMember(
+      AIDAEMON::DIALOGID,
+      rapidjson::Value().SetString(dialogRequestId.c_str(), dialogRequestId.length(), ttsstart.GetAllocator()),
+      ttsstart.GetAllocator());
+  AIDAEMON::IPCHandler::GetInstance()->sendMessage(AIDAEMON::METHODID_NOTI_TTS_START, &ttsstart);
+}
+
+void AlexaClientHandler::finishedTTS(std::string dialogRequestId) {
+  log(logger::LoggerHandler::Level::INFO, "finishedTTS dialogRequestId" + dialogRequestId);
+  rapidjson::Document ttsfinish(rapidjson::kObjectType);
+
+  ttsfinish.AddMember(
+      AIDAEMON::DIALOGID,
+      rapidjson::Value().SetString(dialogRequestId.c_str(), dialogRequestId.length(), ttsfinish.GetAllocator()),
+      ttsfinish.GetAllocator());
+  AIDAEMON::IPCHandler::GetInstance()->sendMessage(AIDAEMON::METHODID_NOTI_TTS_FINISH, &ttsfinish);
+}
+
+#ifdef OBIGO_SPEECH_SENDER
+void AlexaClientHandler::sendDataToMVPA(From from, void* data) {
+  if (from == avsCommon::sdkInterfaces::MVPAInterface::From::SpeechSynthesizer) {
+    log(logger::LoggerHandler::Level::CRITICAL, "sendDataToMVPA From SpeechSynthesizer");
+    using namespace avsCommon::sdkInterfaces;
+    MVPAInterface::MVPASpeech* pSpeechData = static_cast<MVPASpeech*>(data);
+    log(logger::LoggerHandler::Level::CRITICAL, "SeqNum : " + pSpeechData->seqnum);
+    log(logger::LoggerHandler::Level::CRITICAL, "readBytes : " + pSpeechData->readBytes);
+
+    rapidjson::Document speechData(rapidjson::kObjectType);
+    rapidjson::Document::AllocatorType& allocator = speechData.GetAllocator();
+    speechData.AddMember(AIDAEMON::AI_SPEECH_DIALOGID,
+                         rapidjson::Value().SetString(pSpeechData->dialogId.c_str(), pSpeechData->dialogId.length(),
+                                                      speechData.GetAllocator()),
+                         allocator);
+    speechData.AddMember(AIDAEMON::AI_SPEECH_READBYTES,
+                         rapidjson::Value().SetString(pSpeechData->readBytes.c_str(), pSpeechData->readBytes.length(),
+                                                      speechData.GetAllocator()),
+                         allocator);
+    speechData.AddMember(AIDAEMON::AI_SPEECH_NUM,
+                         rapidjson::Value().SetString(pSpeechData->seqnum.c_str(), pSpeechData->seqnum.length(),
+                                                      speechData.GetAllocator()),
+                         allocator);
+
+    if (pSpeechData->readBytes > 0) {
+      std::string encoded =
+          base64_encode(reinterpret_cast<const unsigned char*>(pSpeechData->data), pSpeechData->readBytes);
+      speechData.AddMember(rapidjson::StringRef(AIDAEMON::AI_SPEECH_SPEECH), encoded, allocator);
+    }
+
+    AIDAEMON::IPCHandler::GetInstance()->sendMessage(AIDAEMON::METHODID_AI_SPEECH, &speechData);
+  } else if (from == avsCommon::sdkInterfaces::MVPAInterface::From::Alerts) {
+    log(logger::LoggerHandler::Level::CRITICAL, "sendDataToMVPA From Alerts");
+  } else {
+    log(logger::LoggerHandler::Level::CRITICAL, "sendDataToMVPA From Unknown");
+  }
+}
+#endif  // OBIGO_SPEECH_SENDER
+#endif
 
 // private
 

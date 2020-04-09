@@ -17,8 +17,13 @@
 #define AACE_ALEXA_AUDIO_PLAYER_H
 
 #include <iostream>
+#include <algorithm>
+#include <chrono>
 
 #include <AACE/Core/PlatformInterface.h>
+#ifdef OBIGO_AIDAEMON
+#include "AlexaEngineInterfaces.h"
+#endif
 
 /** @file */
 
@@ -85,7 +90,19 @@ public:
      *
      * @param [in] state The new playback state
      */
+#ifdef OBIGO_AIDAEMON
+    bool setMVPAAudioPlayer();
+
+    virtual void playerActivityChanged(PlayerActivity state, const std::string audioItemId, std::chrono::milliseconds offset) {}
+    virtual void readyMVPAAudioPlayer(std::string audioItemId) {}
+
+    void setEngineInterface(std::shared_ptr<aace::alexa::AudioPlayerEngineInterface> audioPlayerEngineInterface);
+
+private:
+    std::weak_ptr<aace::alexa::AudioPlayerEngineInterface> m_audioPlayerEngineInterface;
+#else 
     virtual void playerActivityChanged( PlayerActivity state ) {}
+#endif // OBIGO_AIDAEMON
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const AudioPlayer::PlayerActivity& state) {

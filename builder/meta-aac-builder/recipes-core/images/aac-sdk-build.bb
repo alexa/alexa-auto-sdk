@@ -12,4 +12,5 @@ IMAGE_INSTALL += "\
     aac-module-contact-uploader \
     aac-module-cbl \
     aac-module-address-book \
+    aac-module-vpa \    
     "

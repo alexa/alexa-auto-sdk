@@ -41,6 +41,10 @@ if (AAC_EMIT_LATENCY_LOGS)
     add_definitions(-DAAC_LATENCY_LOGS_ENABLED)
 endif()
 
+if (OBIGO_AIDAEMON)
+    add_definitions("-DOBIGO_AIDAEMON")
+endif()
+
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
 if(AAC_ENABLE_TESTS)

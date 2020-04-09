@@ -31,6 +31,10 @@ add_definitions(-DACSDK_LOG_MODULE=avsCommon)
 add_definitions(-DAAC_LATENCY_LOGS_ENABLED)
 endif()
 
+if (OBIGO_AIDAEMON)
+add_definitions("-DOBIGO_AIDAEMON")
+endif()
+
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
 # Alexa module is depends on Core module

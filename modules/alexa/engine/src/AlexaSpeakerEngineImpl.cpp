@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -86,7 +86,7 @@ alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::Type AlexaSpeakerEng
         }
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("type", type));
         return AvsSpeakerType::AVS_SPEAKER_VOLUME;
     }
 }
@@ -108,7 +108,7 @@ AlexaSpeakerEngineImpl::SpeakerType AlexaSpeakerEngineImpl::convert( alexaClient
         }
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("type", type));
         return SpeakerType::ALEXA_VOLUME;
     }
 }

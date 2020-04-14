@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -98,12 +98,12 @@ std::shared_ptr<AddressBookCloudUploader> AddressBookCloudUploader::create(
     std::shared_ptr<aace::engine::addressBook::AddressBookServiceInterface> addressBookService,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
     std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
-    std::shared_ptr<aace::network::NetworkInfoProvider> networkProvider,
+    NetworkInfoObserver::NetworkStatus networkStatus,
     std::shared_ptr<aace::engine::network::NetworkObservableInterface> networkObserver ) {
 
     try {
         auto addressBookCloudUploader = std::shared_ptr<AddressBookCloudUploader>( new AddressBookCloudUploader() );
-        ThrowIfNot( addressBookCloudUploader->initialize( addressBookService, authDelegate, deviceInfo, networkProvider, networkObserver ), "initializeAddressBookCloudUploaderFailed" );
+        ThrowIfNot( addressBookCloudUploader->initialize( addressBookService, authDelegate, deviceInfo, networkStatus, networkObserver ), "initializeAddressBookCloudUploaderFailed" );
 
         return addressBookCloudUploader;
     } catch( std::exception &ex ) {
@@ -116,23 +116,24 @@ bool AddressBookCloudUploader::initialize(
     std::shared_ptr<aace::engine::addressBook::AddressBookServiceInterface> addressBookService,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
     std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
-    std::shared_ptr<aace::network::NetworkInfoProvider> networkProvider, 
+    NetworkInfoObserver::NetworkStatus networkStatus,
     std::shared_ptr<aace::engine::network::NetworkObservableInterface> networkObserver ) {
     try {
         m_addressBookService = addressBookService;
         m_authDelegate = authDelegate;
         m_deviceInfo = deviceInfo;
-
-        // get the initial network status from the network provider - if the network provider is not
-        // available then we always treat the network status as CONNECTED
-        m_networkStatus = networkProvider != nullptr ? networkProvider->getNetworkStatus() : NetworkStatus::CONNECTED;
+        m_networkStatus = networkStatus;
+        m_networkObserver = networkObserver;
 
         m_addressBookCloudUploaderRESTAgent = aace::engine::addressBook::AddressBookCloudUploaderRESTAgent::create( authDelegate, m_deviceInfo );
         ThrowIfNull( m_addressBookCloudUploaderRESTAgent, "createAddressBookCloudRESTAgentFailed" );
 
         m_authDelegate->addAuthObserver( shared_from_this() );
-        networkObserver->addObserver( shared_from_this() );
-        m_networkObserver = networkObserver;
+        if( m_networkObserver != nullptr ) { // This could be null when NetworkInfoProvider interface is not registered.
+            m_networkObserver->addObserver( shared_from_this() );
+        } else {
+            AACE_DEBUG(LX(TAG).m("networkObserverNotAvailable"));
+        }
         m_addressBookService->addObserver( shared_from_this() );
 
         // Infinite event loop  
@@ -153,10 +154,12 @@ void AddressBookCloudUploader::doShutdown() {
         m_eventThread.join();
     }
     m_authDelegate->removeAuthObserver( shared_from_this() );
-    m_networkObserver->removeObserver( shared_from_this() );
+    if( m_networkObserver != nullptr ) {
+        m_networkObserver->removeObserver( shared_from_this() );
+        m_networkObserver.reset();
+    }
     m_addressBookService->removeObserver( shared_from_this() );
     m_authDelegate.reset();
-    m_networkObserver.reset();
     m_addressBookService.reset();
     m_addressBookCloudUploaderRESTAgent.reset();
 }
@@ -164,9 +167,7 @@ void AddressBookCloudUploader::doShutdown() {
 void AddressBookCloudUploader::onAuthStateChange( AuthObserverInterface::State newState, AuthObserverInterface::Error error ) {
     std::lock_guard<std::mutex> guard( m_mutex );
     m_isAuthRefreshed = ( AuthObserverInterface::State::REFRESHED == newState );
-
     AACE_DEBUG(LX(TAG,"onAuthStateChange").d( "m_isAuthRefreshed", m_isAuthRefreshed ) );
-
     if( m_isAuthRefreshed ) {
         m_waitStatusChange.notify_all();
     }
@@ -176,9 +177,7 @@ void AddressBookCloudUploader::onNetworkInfoChanged( NetworkInfoObserver::Networ
     std::lock_guard<std::mutex> guard( m_mutex );
     if( m_networkStatus != status ) {
         m_networkStatus = status;
-
         AACE_DEBUG(LX(TAG,"onNetworkInfoChanged").d( "m_networkStatus", m_networkStatus ) );
-
         if( status == NetworkInfoObserver::NetworkStatus::CONNECTED ) {
             m_waitStatusChange.notify_all();
         }
@@ -631,6 +630,7 @@ bool AddressBookCloudUploader::handleRemove( std::shared_ptr<AddressBookEntity> 
 }
 
 void AddressBookCloudUploader::eventLoop() {
+    AACE_INFO(LX(TAG));
     bool cleanAllAddressBookAtStart = true; // Delete all address books in Cloud at start.
     while( !m_isShuttingDown ) {
         // Clean up previous address books in cloud.
@@ -642,9 +642,11 @@ void AddressBookCloudUploader::eventLoop() {
             }
         }
 
+        AACE_DEBUG(LX(TAG).m("waitingForEvents"));
         auto event = popNextEventFromQ(); // blocking call.
 
         if( m_isShuttingDown ) {
+            AACE_INFO(LX(TAG).m("shutdownTriggeredExitEventLoop"));
             break;
         }
 
@@ -656,21 +658,21 @@ void AddressBookCloudUploader::eventLoop() {
                 result = handleRemove( event.getAddressBookEntity() );
             }
 
-            bool enqueueEvent = false;
+            bool enqueueBackPoppedEvent = false;
             if( !result ) {
                 if( m_networkStatus != NetworkStatus::CONNECTED ) { 
                     // If network lost, add back to queue.
-                    enqueueEvent = true;
+                    enqueueBackPoppedEvent = true;
                 } else {
                     event.incrementRetryCount();
                     if( event.getRetryCount() < MAX_EVENT_RETRY ) {
-                        enqueueEvent = true;
+                        enqueueBackPoppedEvent = true;
                     } else {
                         AACE_INFO(LX(TAG,"eventLoop").m("maxRetryReachedDropingtheEvent").d("addressBookSourceId",event.getAddressBookEntity()->getSourceId()).d("eventType",event.getType()));
                     }
                 }
 
-                if( enqueueEvent ) {
+                if( enqueueBackPoppedEvent ) {
                     std::lock_guard<std::mutex> guard( m_mutex );
                     AACE_INFO(LX(TAG,"eventLoop").m("addingBackForRetry").d("addressBookSourceId",event.getAddressBookEntity()->getSourceId()).d("eventType",event.getType()));
                     if( !isEventEnqueuedLocked( Event::Type::REMOVE, event.getAddressBookEntity() ) ) {
@@ -879,20 +881,25 @@ bool AddressBookCloudUploader::deleteAddressBook( std::shared_ptr<AddressBookEnt
 }
 
 bool AddressBookCloudUploader::cleanAllCloudAddressBooks() {
+    AACE_DEBUG(LX(TAG));
     try {
-        std::unique_lock<std::mutex> queueLock{m_mutex};
-        auto shouldNotWait = [this]() { return m_isShuttingDown || ( m_networkStatus == NetworkStatus::CONNECTED && m_isAuthRefreshed); };
+        {
+            std::unique_lock<std::mutex> queueLock{m_mutex};
+            auto shouldNotWait = [this]() { return m_isShuttingDown || ( m_networkStatus == NetworkStatus::CONNECTED && m_isAuthRefreshed); };
 
-        if( !shouldNotWait() ) {
-            m_waitStatusChange.wait( queueLock, shouldNotWait );
+            if( !shouldNotWait() ) {
+                m_waitStatusChange.wait( queueLock, shouldNotWait );
+            }
         }
 
         if( m_isShuttingDown ) {
+            AACE_INFO(LX(TAG).m("shutdownTriggered"));
             return false;
         }
 
         if( !m_addressBookCloudUploaderRESTAgent->isAccountProvisioned() ) {
             // Account not provisioned, no further action required.
+            AACE_DEBUG(LX(TAG).m("accountNotProvisioned"));
             return true;
         }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -40,11 +40,14 @@ bool TemplateRuntimeEngineImpl::initialize(
     
     try
     {
-        m_renderPlayerInfoCardsProviderInterfaceDelegate = RenderPlayerInfoCardsProviderInterfaceDelegate::create( renderPlayerInfoCardsProviderInterfaces );
-        ThrowIfNull( m_renderPlayerInfoCardsProviderInterfaceDelegate, "couldNotCreateAudioPlayerInterfaceDelegate" );
-                
-        m_templateRuntimeCapabilityAgent = alexaClientSDK::capabilityAgents::templateRuntime::TemplateRuntime::create( renderPlayerInfoCardsProviderInterfaces, focusManager, exceptionSender );
+        // The constructor for the TemplateRuntime capability agent takes in a set of renderPlayerInfoCardsProviderInterfaces.  It automatically calls 
+        // set observer on each element in the set and then caches the set.  The set cannot be modified after the constructor.  In our case, we want
+        // to be able to initialize our platform interfaces in an arbitrary order so we need to manage the set of renderPlayerInfoCardsProviderInterfaces
+        // in this class.  As such, we pass in an empty set to the TemplateRuntime and ensure that we call setObserver and clear when applicable.
+        m_templateRuntimeCapabilityAgent = alexaClientSDK::capabilityAgents::templateRuntime::TemplateRuntime::create( std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>>{}, focusManager, exceptionSender );
         ThrowIfNull( m_templateRuntimeCapabilityAgent, "couldNotCreateCapabilityAgent" );
+
+        setRenderPlayerInfoCardsProviderInterface(renderPlayerInfoCardsProviderInterfaces);
 
         // add template runtime observer
         m_templateRuntimeCapabilityAgent->addObserver( shared_from_this() );
@@ -105,10 +108,7 @@ void TemplateRuntimeEngineImpl::doShutdown()
         m_templateRuntimeCapabilityAgent.reset();
     }
     
-    if( m_renderPlayerInfoCardsProviderInterfaceDelegate != nullptr ) {
-        m_renderPlayerInfoCardsProviderInterfaceDelegate->shutdown();
-        m_renderPlayerInfoCardsProviderInterfaceDelegate.reset();
-    }
+    m_renderPlayerInfoCardsProviderInterfaces.clear();
 }
 
 void TemplateRuntimeEngineImpl::renderTemplateCard( const std::string& jsonPayload, alexaClientSDK::avsCommon::avs::FocusState focusState ) {
@@ -127,63 +127,26 @@ void TemplateRuntimeEngineImpl::clearPlayerInfoCard() {
     m_templateRuntimePlatformInterface->clearPlayerInfo();
 }
 
-void TemplateRuntimeEngineImpl::setRenderPlayerInfoCardsProviderInterface( std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>> renderPlayerInfoCardsProviderInterface  ) {
-    m_renderPlayerInfoCardsProviderInterfaceDelegate->setDelegate( renderPlayerInfoCardsProviderInterface );
-}
-    
-
-//
-// RenderPlayerInfoCardsInterfaceDelegate
-//
-
-RenderPlayerInfoCardsProviderInterfaceDelegate::RenderPlayerInfoCardsProviderInterfaceDelegate( std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>> renderPlayerInfoCardsProviderInterfaces ) :
-    alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG + ".RenderPlayerInfoCardsInterfaceDelegate"),
-    m_delegates( renderPlayerInfoCardsProviderInterfaces ) {
-}
-
-std::shared_ptr<RenderPlayerInfoCardsProviderInterfaceDelegate> RenderPlayerInfoCardsProviderInterfaceDelegate::create( std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>> renderPlayerInfoCardsProviderInterfaces ) {
-    return std::shared_ptr<RenderPlayerInfoCardsProviderInterfaceDelegate>( new RenderPlayerInfoCardsProviderInterfaceDelegate( renderPlayerInfoCardsProviderInterfaces ) );
-}
-
-void RenderPlayerInfoCardsProviderInterfaceDelegate::doShutdown() {
-    m_delegates.clear();
-    m_observer.reset();
-}
-
-void RenderPlayerInfoCardsProviderInterfaceDelegate::setDelegate( std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>> delegates )
-{
+void TemplateRuntimeEngineImpl::setRenderPlayerInfoCardsProviderInterface( std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>> renderPlayerInfoCardsProviderInterfaces ) {
     try
     {
         std::lock_guard<std::mutex> lock( m_mutex ) ;
-        for ( const auto& delegate : delegates ) {
-            ThrowIfNull( delegate, "invalidRenderPlayerInfoCardsInterfaceDelegate" );
-            delegate->setObserver( m_observer );
-            m_delegates.insert( delegate );
+        for ( const auto& infoCardProvider : m_renderPlayerInfoCardsProviderInterfaces ) {
+            ThrowIfNull( infoCardProvider, "invalidRenderPlayerInfoCardsProviderInterface" );
+            infoCardProvider->setObserver( nullptr );
         }
-        
+
+        for ( const auto& infoCardProvider : renderPlayerInfoCardsProviderInterfaces ) {
+            ThrowIfNull( infoCardProvider, "invalidRenderPlayerInfoCardsProviderInterface" );
+            infoCardProvider->setObserver( m_templateRuntimeCapabilityAgent );
+        }
+        m_renderPlayerInfoCardsProviderInterfaces = renderPlayerInfoCardsProviderInterfaces;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX("RenderPlayerInfoCardsInterfaceDelegate","setDelegate").d("reason", ex.what()));
+        AACE_ERROR(LX("TemplateRuntimeEngineImpl","setRenderPlayerInfoCardsProviderInterface").d("reason", ex.what()));
     }
 }
-
-void RenderPlayerInfoCardsProviderInterfaceDelegate::setObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsObserverInterface>  observer )
-{
-    if (m_delegates.size() != 0) {
-        for ( const auto& delegate : m_delegates ) {
-            delegate->setObserver( observer );
-        }
-    }
-    else
-    {
-        std::lock_guard<std::mutex> lock( m_mutex ) ;
-        m_observer = observer ;
-    }
     
-    
-}
-
-
 } // aace::engine::alexa
 } // aace::engine
 } // aace

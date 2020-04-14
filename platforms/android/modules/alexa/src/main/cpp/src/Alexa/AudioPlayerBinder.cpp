@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -84,6 +84,38 @@ extern "C"
         }
         catch( const std::exception& ex ) {
             AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_alexa_AudioPlayer_disposeBinder",ex.what());
+        }
+    }
+
+    JNIEXPORT jlong JNICALL
+    Java_com_amazon_aace_alexa_AudioPlayer_getPlayerPosition( JNIEnv* env, jobject /* this */, jlong ref )
+    {
+        try
+        {
+            auto audioPlayerBinder = AUDIO_PLAYER_BINDER(ref);
+            ThrowIfNull( audioPlayerBinder, "invalidAudioPlayerBinder" );
+
+            return audioPlayerBinder->getAudioPlayer()->getPlayerPosition();
+        }
+        catch( const std::exception& ex ) {
+            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_alexa_AudioPlayer_getPlayerPosition",ex.what());
+            return -1;
+        }
+    }
+    
+    JNIEXPORT jlong JNICALL
+    Java_com_amazon_aace_alexa_AudioPlayer_getPlayerDuration( JNIEnv* env, jobject /* this */, jlong ref )
+    {
+        try
+        {
+            auto audioPlayerBinder = AUDIO_PLAYER_BINDER(ref);
+            ThrowIfNull( audioPlayerBinder, "invalidAudioPlayerBinder" );
+
+            return audioPlayerBinder->getAudioPlayer()->getPlayerDuration();
+        }
+        catch( const std::exception& ex ) {
+            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_alexa_AudioPlayer_getPlayerDuration",ex.what());
+            return -1;
         }
     }
 }

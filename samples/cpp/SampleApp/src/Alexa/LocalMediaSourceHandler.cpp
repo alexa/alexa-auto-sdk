@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -96,7 +96,8 @@ bool LocalMediaSourceHandler::play(ContentSelector contentSelectorType, const st
     std::stringstream ss;
     ss << "play::source=" << m_source << " play:contentSelectorType=" << contentSelectorType << " play:payload=" + payload;
     log(logger::LoggerHandler::Level::INFO, ss.str());
-    setFocus();
+    m_localMediaSourceStateMap[m_source] = "PLAYING";
+    
     if (auto activity = m_activity.lock()) {
         activity->runOnUIThread([=]() {
             if (auto console = m_console.lock()) {
@@ -112,7 +113,17 @@ bool LocalMediaSourceHandler::play(ContentSelector contentSelectorType, const st
 bool LocalMediaSourceHandler::playControl(PlayControlType controlType) {
     std::stringstream ss;
     ss << "source:" << m_source << " playControl:controlType=" << controlType;
-    setFocus();
+    switch ( controlType ) {
+        case PlayControlType::RESUME:
+            m_localMediaSourceStateMap[m_source] = "PLAYING";
+            break;
+        case PlayControlType::PAUSE:
+            m_localMediaSourceStateMap[m_source] = "PAUSED";
+            break;
+        default:
+            // no-op for other control types
+            break;
+    }
     log(logger::LoggerHandler::Level::INFO, ss.str());
     if (auto activity = m_activity.lock()) {
         std::stringstream s;
@@ -199,6 +210,7 @@ LocalMediaSourceHandler::LocalMediaSourceState LocalMediaSourceHandler::getState
                 LocalMediaSource::SupportedPlaybackOperation::DISABLE_SHUFFLE,
                 LocalMediaSource::SupportedPlaybackOperation::ENABLE_REPEAT_ONE,
                 LocalMediaSource::SupportedPlaybackOperation::ENABLE_REPEAT,
+                LocalMediaSource::SupportedPlaybackOperation::DISABLE_REPEAT,
                 LocalMediaSource::SupportedPlaybackOperation::SEEK,
                 LocalMediaSource::SupportedPlaybackOperation::ADJUST_SEEK,
                 LocalMediaSource::SupportedPlaybackOperation::START_OVER,
@@ -214,6 +226,7 @@ LocalMediaSourceHandler::LocalMediaSourceState LocalMediaSourceHandler::getState
                 LocalMediaSource::SupportedPlaybackOperation::DISABLE_SHUFFLE,
                 LocalMediaSource::SupportedPlaybackOperation::ENABLE_REPEAT_ONE,
                 LocalMediaSource::SupportedPlaybackOperation::ENABLE_REPEAT,
+                LocalMediaSource::SupportedPlaybackOperation::DISABLE_REPEAT,
                 LocalMediaSource::SupportedPlaybackOperation::SEEK,
                 LocalMediaSource::SupportedPlaybackOperation::ADJUST_SEEK,
                 LocalMediaSource::SupportedPlaybackOperation::START_OVER,

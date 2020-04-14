@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -45,10 +45,16 @@ class ApplicationContext {
     bool m_testAutomation{false};
     json m_menuRegister{};
     logger::LoggerHandler::Level m_level{};
+#ifdef COASSISTANT
+      std::string m_actingAssistant{};
+#endif
     std::string m_applicationDirPath{};
     std::string m_applicationPath{};
     std::string m_audioInputDevice{};
     std::string m_browserCommand{};
+#ifdef COASSISTANT
+      std::string m_defaultAssistant{};
+#endif
     std::string m_mediaPlayerCommand{};
     std::string m_payloadScriptCommand{};
     std::string m_userConfigFilePath{};
@@ -75,6 +81,7 @@ class ApplicationContext {
     auto getApplicationPath() -> std::string;
     auto getAudioInputDevice() -> std::string;
     auto getBrowserCommand() -> std::string;
+    auto getBuildIdentifier() -> std::string;
     auto getConfigFilePath(size_t index = 0) -> std::string;
     auto getConfigFilePaths() -> std::vector<std::string>;
     auto getDirPath(const std::string &path) -> std::string;
@@ -114,7 +121,12 @@ class ApplicationContext {
     auto setSingleThreadedUI(bool singleThreadedUI) -> void;
     auto setUserConfigFilePath(const std::string &userConfigFilePath) -> void;
     auto test(const std::string &value) -> bool;
-
+#ifdef COASSISTANT
+    auto setDefaultAssistant(const std::string &assistant) -> void;
+    auto getDefaultAssistant() -> std::string;
+    auto setActingAssistant(const std::string &assistant) -> void;
+    auto getActingAssistant() -> std::string;
+#endif
 
   private:
     friend cbl::CBLHandler;

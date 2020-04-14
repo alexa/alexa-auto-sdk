@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -47,6 +47,10 @@ public:
          * resume playback
          */
         RESUME,
+        /**
+         * stop the player
+         */
+        STOP,
         /**
          * next song
          */
@@ -101,71 +105,71 @@ public:
      * Supported playback control types reportable by the external media player app
      */
     enum class SupportedPlaybackOperation {
-        /*
+        /**
          * Play is supported (voice only)
          */
         PLAY,
-        /*
+        /**
          * Pause is supported
          */
         PAUSE,
-        /*
+        /**
          * Stop is supported
          */
         STOP,
-        /*
+        /**
          * Next is supported
          */
         NEXT,
-        /*
+        /**
          * Previous is supported
          */
         PREVIOUS,
-        /*
+        /**
          * Start Over is supported
          */
         START_OVER,
-        /*
+        /**
          * Fast Forward is supported
          */
         FAST_FORWARD,
-        /*
+        /**
          * Rewind is supported
          */
         REWIND,
-        /*
+        /**
          * Enable Repeat is supported
          */
         ENABLE_REPEAT,
-        /*
+        /**
          * Enable Repeat One is supported
          */
         ENABLE_REPEAT_ONE,
-        /*
+        /**
          * Disbale Repeat is supported
          */
         DISABLE_REPEAT,
-        /*
+        /**
          * Enable Shuffle is supported
          */
         ENABLE_SHUFFLE,
-        /*
+        /**
          * Disable Shuffle is supported
          */
         DISABLE_SHUFFLE,
-        /*
+        /**
          * Favorite is supported
          */
         FAVORITE,
-        /*
+        /**
          * Unfavorite is supported
          */
         UNFAVORITE,
-        /*
+        /**
          * Seek is supported
          */
         SEEK,
-        /*
+        /**
          * Adjust Seek is supported
          */
         ADJUST_SEEK
@@ -242,7 +246,7 @@ public:
      */
     class SessionState {
     public:
-        /*
+        /**
          * Default Constructor.
          */
         SessionState() = default;
@@ -395,6 +399,10 @@ public:
         std::string localPlayerId;
         /// Authorization status
         bool authorized;
+        /// An opaque token for the domain or skill that is associated with this player
+        std::string defaultSkillToken;
+        // The playerId that identifies this player
+        std::string playerId;
     };
 
 protected:
@@ -449,7 +457,12 @@ public:
      * @return @c true if the platform implementation successfully handled the call, 
      * else @c false
      */
-    virtual bool play( const std::string& localPlayerId, const std::string& playContextToken, int64_t index, std::chrono::milliseconds offset, bool preload, Navigation navigation ) = 0;
+    virtual bool play( const std::string& localPlayerId, const std::string& playContextToken, int64_t index, std::chrono::milliseconds offset, bool preload, Navigation navigation) = 0;
+
+    /**
+     * Extra parameters for credentials 
+     */
+    virtual bool play( const std::string& localPlayerId, const std::string& playContextToken, int64_t index, std::chrono::milliseconds offset, bool preload, Navigation navigation, const std::string& playbackSessionId, const std::string& skillToken );
 
     /**
      * Occurs during playback control via voice interaction or PlaybackController interface
@@ -620,6 +633,9 @@ inline std::ostream& operator<<(std::ostream& stream, const ExternalMediaAdapter
             break;
         case ExternalMediaAdapter::PlayControlType::PAUSE:
             stream << "PAUSE";
+            break;
+        case ExternalMediaAdapter::PlayControlType::STOP:
+            stream << "STOP";
             break;
         case ExternalMediaAdapter::PlayControlType::NEXT:
             stream << "NEXT";

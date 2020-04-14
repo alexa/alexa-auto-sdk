@@ -8,5 +8,7 @@ var searchData=
   ['playererror',['playerError',['../classaace_1_1alexa_1_1_local_media_source.html#a5a007447092c61ff90785b4fa9fa0fd3',1,'aace::alexa::LocalMediaSource']]],
   ['playerevent',['playerEvent',['../classaace_1_1alexa_1_1_local_media_source.html#a874c1999278a4a9598b2cfddf2639563',1,'aace::alexa::LocalMediaSource']]],
   ['prepare',['prepare',['../classaace_1_1audio_1_1_audio_output.html#a2e67f2223e68d842685da2f32f14d49d',1,'aace::audio::AudioOutput::prepare(std::shared_ptr&lt; AudioStream &gt; stream, bool repeating)=0'],['../classaace_1_1audio_1_1_audio_output.html#ac65040330bf053723e6ded2df6c2da88',1,'aace::audio::AudioOutput::prepare(const std::string &amp;url, bool repeating)=0']]],
-  ['processactivityevent',['processActivityEvent',['../classaace_1_1apl_1_1_a_p_l.html#a1e382051d18bc09a39e1f3cd9b9ddb9a',1,'aace::apl::APL']]]
+  ['processactivityevent',['processActivityEvent',['../classaace_1_1apl_1_1_a_p_l.html#a1e382051d18bc09a39e1f3cd9b9ddb9a',1,'aace::apl::APL']]],
+  ['propertychanged',['propertyChanged',['../classaace_1_1property_manager_1_1_property_manager.html#a71d433e4f3149f96ce2b3df3a51d1aa5',1,'aace::propertyManager::PropertyManager']]],
+  ['propertystatechanged',['propertyStateChanged',['../classaace_1_1property_manager_1_1_property_manager.html#acfe5b9136c08b87e35c55045129e5aa3',1,'aace::propertyManager::PropertyManager']]]
 ];

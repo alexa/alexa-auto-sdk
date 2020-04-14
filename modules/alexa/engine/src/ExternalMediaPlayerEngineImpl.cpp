@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -16,10 +16,13 @@
 #include <AVSCommon/AVS/EventBuilder.h>
 #include <AVSCommon/Utils/UUIDGeneration/UUIDGeneration.h>
 
+#include "AACE/Engine/Alexa/AudioPlayerEngineImpl.h"
 #include "AACE/Engine/Alexa/ExternalMediaAdapterEngineImpl.h"
+#include "AACE/Engine/Alexa/ExternalMediaAdapterRegistrationInterface.h"
 #include "AACE/Engine/Alexa/ExternalMediaPlayerEngineImpl.h"
 #include "AACE/Engine/Alexa/LocalMediaSourceEngineImpl.h"
 #include "AACE/Engine/Core/EngineMacros.h"
+#include "AACE/Engine/Core/EngineService.h"
 
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
@@ -35,35 +38,45 @@ static const std::string TAG("aace.alexa.ExternalMediaPlayerEngineImpl");
 
 static const std::string GLOBAL_PRESET_KEY = "preset";
 
+/// Timeout for setting focus operation.
+static const std::chrono::seconds SET_FOCUS_TIMEOUT{5};
+
 ExternalMediaPlayerEngineImpl::ExternalMediaPlayerEngineImpl( const std::string& agent ) :
-    alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
-    m_agent( agent ) {
+    ExternalMediaAdapterHandlerInterface( agent ), m_agent( agent ) {
 }
 
 bool ExternalMediaPlayerEngineImpl::initialize(
-	std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
+    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+    std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedMessageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter ) {
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter,
+    std::shared_ptr<aace::engine::alexa::AudioPlayerObserverDelegate> audioPlayerObserverDelegate,
+    std::shared_ptr<aace::engine::alexa::ExternalMediaAdapterRegistrationInterface> externalMediaAdapterRegistration ) {
 
     try
     {
+        AACE_VERBOSE(LX(TAG));
+
         ThrowIfNull( defaultEndpointBuilder, "invalidDefaultEndpointBuilder" );
         ThrowIfNull( capabilitiesDelegate, "invalidCapabilitiesDelegate" );
         ThrowIfNull( messageSender, "invalidMessageSender" );
 
-        m_externalMediaPlayerCapabilityAgent = alexaClientSDK::capabilityAgents::externalMediaPlayer::ExternalMediaPlayer::create( {}, {}, {}, speakerManager, messageSender, focusManager, contextManager, exceptionSender, playbackRouter );
+        m_externalMediaPlayerCapabilityAgent = aace::engine::alexa::ExternalMediaPlayer::create( m_agent, {}, {}, {}, speakerManager, messageSender, certifiedMessageSender, focusManager, contextManager, exceptionSender, playbackRouter, externalMediaAdapterRegistration );
         ThrowIfNull( m_externalMediaPlayerCapabilityAgent, "couldNotCreateCapabilityAgent" );
+
+        // delegate AudioPlayerObserverInterface
+        audioPlayerObserverDelegate->setDelegate( m_externalMediaPlayerCapabilityAgent );
 
         // register capability with the default endpoint
         defaultEndpointBuilder->withCapability( m_externalMediaPlayerCapabilityAgent, m_externalMediaPlayerCapabilityAgent );
 
-        // add ourself as a adapter handler in the external media player capability agent
-        m_externalMediaPlayerCapabilityAgent->addAdapterHandler( std::dynamic_pointer_cast<alexaClientSDK::avsCommon::sdkInterfaces::ExternalMediaAdapterHandlerInterface>( shared_from_this() ) );
+        // add ourself as an adapter handler in the external media player capability agent
+        m_externalMediaPlayerCapabilityAgent->addAdapterHandler( std::dynamic_pointer_cast<aace::engine::alexa::ExternalMediaAdapterHandlerInterface>( shared_from_this() ) );
 
         m_messageSender = messageSender;
         m_speakerManager = speakerManager;
@@ -82,10 +95,13 @@ std::shared_ptr<ExternalMediaPlayerEngineImpl> ExternalMediaPlayerEngineImpl::cr
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+    std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedMessageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter ) {
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter,
+    std::shared_ptr<aace::engine::alexa::AudioPlayerObserverDelegate> audioPlayerObserverDelegate,
+    std::shared_ptr<aace::engine::alexa::ExternalMediaAdapterRegistrationInterface> externalMediaAdapterRegistration ) {
 
     std::shared_ptr<ExternalMediaPlayerEngineImpl> externalMediaPlayerEngineImpl = nullptr;
 
@@ -96,7 +112,7 @@ std::shared_ptr<ExternalMediaPlayerEngineImpl> ExternalMediaPlayerEngineImpl::cr
     
         // create the external media player impl
         externalMediaPlayerEngineImpl = std::shared_ptr<ExternalMediaPlayerEngineImpl>( new ExternalMediaPlayerEngineImpl( agent ) );
-        ThrowIfNot( externalMediaPlayerEngineImpl->initialize( defaultEndpointBuilder, capabilitiesDelegate, speakerManager, messageSender, focusManager, contextManager, exceptionSender, playbackRouter ), "initializeExternalMediaPlayerEngineImplFailed" );
+        ThrowIfNot( externalMediaPlayerEngineImpl->initialize( defaultEndpointBuilder, capabilitiesDelegate, speakerManager, messageSender, certifiedMessageSender, focusManager, contextManager, exceptionSender, playbackRouter, audioPlayerObserverDelegate, externalMediaAdapterRegistration ), "initializeExternalMediaPlayerEngineImplFailed" );
 
         return externalMediaPlayerEngineImpl;
     }
@@ -181,74 +197,36 @@ bool ExternalMediaPlayerEngineImpl::registerPlatformGlobalPresetHandler( std::sh
     }
 }
 
-std::shared_ptr<ExternalMediaAdapterHandler> ExternalMediaPlayerEngineImpl::getAdapter( const std::string& playerId ) 
+std::shared_ptr<aace::engine::alexa::ExternalMediaAdapterHandlerInterface> ExternalMediaPlayerEngineImpl::getAdapter( const std::string& playerId )
 {
     auto it = m_externalMediaAdapterMap.find( playerId );
     return it != m_externalMediaAdapterMap.end() ? it->second : nullptr;
 }
 
-// alexaClientSDK::avsCommon::sdkInterfaces::ExternalMediaAdapterHandlerInterface
-
-void ExternalMediaPlayerEngineImpl::authorizeDiscoveredPlayers( const std::string& payload )
+std::shared_ptr<aace::engine::alexa::ExternalMediaPlayer> ExternalMediaPlayerEngineImpl::getExternalMediaPlayerCapabilityAgent()
 {
-    try
-    {
-        AACE_VERBOSE(LX(TAG));
+    return m_externalMediaPlayerCapabilityAgent;
+}
 
-        std::vector<PlayerInfo> acknowledgedPlayerList;
-        rapidjson::Document document;
-        
-        // parse the document
-        document.Parse( payload.c_str() );
-        
-        // check the parser error
-        ThrowIf( document.HasParseError(), GetParseError_En( document.GetParseError() ) );
-        ThrowIfNot( document.IsObject(), "invalidPayload" );
+// aace::engine::alexa::ExternalMediaAdapterHandlerInterface
 
-        // get the root payload object
-        auto root = document.GetObject();
-
-        // get the authorized players list from the payload
-        ThrowIfNot( root.HasMember( "players" ) && root["players"].IsArray(), "invalidPlayers" );
-        auto players = root["players"].GetArray();
-        
+std::vector<aace::engine::alexa::PlayerInfo> ExternalMediaPlayerEngineImpl::authorizeDiscoveredPlayers( const std::vector<aace::engine::alexa::PlayerInfo>& authorizedPlayerList ) {
+    
+    AACE_VERBOSE(LX(TAG));
+    try {
+        std::vector<aace::engine::alexa::PlayerInfo> acknowledgedPlayerList;
         std::unique_lock<std::mutex> lock( m_playersMutex );
-
-        // generate the platform authorized player list
-        for( unsigned int j = 0; j < players.Size(); j++ )
+        for( unsigned int j = 0; j < authorizedPlayerList.size(); j++ )
         {
             try {
-                auto next = players[j].GetObject();
-                
-                PlayerInfo acknowledgedPlayerInfo;
-
-                ThrowIfNot( next.HasMember( "localPlayerId" ) && next["localPlayerId"].IsString(), "invalidLocalPlayerId" );
-                std::string localPlayerId = next["localPlayerId"].GetString();
-                acknowledgedPlayerInfo.localPlayerId = localPlayerId;
-
-                if( m_pendingDiscoveredPlayerMap.find( localPlayerId ) != m_pendingDiscoveredPlayerMap.end() ) {
+                aace::engine::alexa::PlayerInfo acknowledgedPlayerInfo = authorizedPlayerList[j];
+            
+                if( m_pendingDiscoveredPlayerMap.find( acknowledgedPlayerInfo.localPlayerId ) != m_pendingDiscoveredPlayerMap.end() ) {
                     // Player has been acknowledged by cloud or local skill. Safe to exclude from future
                     // ReportDiscoveredPlayers events
-                    AACE_VERBOSE(LX(TAG).d("removingPlayerFromPendingDiscoveryList", localPlayerId));
-                    m_pendingDiscoveredPlayerMap.erase( localPlayerId );
+                    AACE_VERBOSE(LX(TAG).d("removingPlayerFromPendingDiscoveryList", acknowledgedPlayerInfo.localPlayerId));
+                    m_pendingDiscoveredPlayerMap.erase( acknowledgedPlayerInfo.localPlayerId );
                 }
-                
-                // set the authorized player info
-                ThrowIfNot( next.HasMember( "authorized" ) && next["authorized"].IsBool(), "invalidAuthorized" );
-                acknowledgedPlayerInfo.authorized = next["authorized"].GetBool();
-                
-                if( acknowledgedPlayerInfo.authorized )
-                {
-                    ThrowIfNot( next.HasMember( "metadata" ) && next["metadata"].IsObject(), "invalidMetadata" );
-                    auto metadata = next["metadata"].GetObject();
-                
-                    ThrowIfNot( metadata.HasMember( "playerId" ) && metadata["playerId"].IsString(), "invalidPlayerId" );
-                    acknowledgedPlayerInfo.playerId = metadata["playerId"].GetString();
-                
-                    ThrowIfNot( metadata.HasMember( "skillToken" ) && metadata["skillToken"].IsString(), "invalidSkillToken" );
-                    acknowledgedPlayerInfo.skillToken = metadata["skillToken"].GetString();
-                }
-                
                 // add the player info to the authorized player list
                 acknowledgedPlayerList.push_back( acknowledgedPlayerInfo );
                 
@@ -259,7 +237,7 @@ void ExternalMediaPlayerEngineImpl::authorizeDiscoveredPlayers( const std::strin
                 AACE_ERROR(LX(TAG).d("reason", ex.what()));
             }
         }
-        
+
         // call the platform media adapter authorization method
         if( acknowledgedPlayerList.empty() == false )
         {
@@ -275,156 +253,67 @@ void ExternalMediaPlayerEngineImpl::authorizeDiscoveredPlayers( const std::strin
                 }
             }
         }
-        
         // send the authorization complete event
         auto event = createAuthorizationCompleteEventLocked();
         auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>( event );
         lock.unlock();
-
         AACE_VERBOSE(LX(TAG).m("sendingAuthorizationCompleteEvent"));
         auto m_messageSender_lock = m_messageSender.lock();
         ThrowIfNull( m_messageSender_lock, "invalidMessageSender" );
         m_messageSender_lock->sendMessage( request );
+        return acknowledgedPlayerList;
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return std::vector<aace::engine::alexa::PlayerInfo>();
     }
 }
 
-void ExternalMediaPlayerEngineImpl::login( const std::string& payload )
+bool ExternalMediaPlayerEngineImpl::login( const std::string& playerId, const std::string& accessToken, const std::string& username, bool forceLogin, std::chrono::milliseconds tokenRefreshIntervalInMilliseconds )
 {
     try
     {
-        AACE_VERBOSE(LX(TAG));
-
-        rapidjson::Document document;
-        
-        // parse the document
-        document.Parse( payload.c_str() );
-        
-        // check the parser error
-        ThrowIf( document.HasParseError(), GetParseError_En( document.GetParseError() ) );
-        ThrowIfNot( document.IsObject(), "invalidPayload" );
-        
-        // get the root payload object
-        auto root = document.GetObject();
-        
-        ThrowIfNot( root.HasMember( "playerId" ) && root["playerId"].IsString(), "invalidPlayerId" );
-        auto playerId = root["playerId"].GetString();
-        
-        ThrowIfNot( root.HasMember( "accessToken" ) && root["accessToken"].IsString(), "invalidAccessToken" );
-        auto accessToken = root["accessToken"].GetString();
-        
-        ThrowIfNot( root.HasMember( "username" ) && root["username"].IsString(), "invalidUsername" );
-        auto username = root["username"].GetString();
-        
-        ThrowIfNot( root.HasMember( "tokenRefreshIntervalInMilliseconds" ) && root["tokenRefreshIntervalInMilliseconds"].IsInt64(), "invalidTokenRefreshInterval" );
-        auto tokenRefreshIntervalInMilliseconds = root["tokenRefreshIntervalInMilliseconds"].GetInt64();
-        
-        ThrowIfNot( root.HasMember( "forceLogin" ) && root["forceLogin"].IsBool(), "invalidForceLogin" );
-        auto forceLogin = root["forceLogin"].GetBool();
+        AACE_VERBOSE(LX(TAG).d("playerId",playerId));
         
         auto adapter = getAdapter( playerId );
         ThrowIfNull( adapter, "invalidMediaPlayerAdapter" );
         
         // call the adapter method
-        ThrowIfNot( adapter->login( playerId, accessToken, username, forceLogin, std::chrono::milliseconds( tokenRefreshIntervalInMilliseconds ) ), "adapterLoginFailed" );
+        ThrowIfNot( adapter->login( playerId, accessToken, username, forceLogin, tokenRefreshIntervalInMilliseconds ), "adapterLoginFailed" );
+        return true;
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
     }
 }
 
-void ExternalMediaPlayerEngineImpl::logout( const std::string& payload )
+bool ExternalMediaPlayerEngineImpl::logout( const std::string& playerId )
 {
     try
     {
-        AACE_VERBOSE(LX(TAG));
+        AACE_VERBOSE(LX(TAG).d("playerId",playerId));
 
-        rapidjson::Document document;
-        
-        // parse the document
-        document.Parse( payload.c_str() );
-        
-        // check the parser error
-        ThrowIf( document.HasParseError(), GetParseError_En( document.GetParseError() ) );
-        ThrowIfNot( document.IsObject(), "invalidPayload" );
-        
-        // get the root payload object
-        auto root = document.GetObject();
-        
-        ThrowIfNot( root.HasMember( "playerId" ) && root["playerId"].IsString(), "invalidPlayerId" );
-        auto playerId = root["playerId"].GetString();
-        
         auto adapter = getAdapter( playerId );
         ThrowIfNull( adapter, "invalidMediaPlayerAdapter" );
-        
+
         // call the adapter method
         ThrowIfNot( adapter->logout( playerId ), "adapterLogoutFailed" );
+        return true;
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
     }
 }
 
-static const std::unordered_map<std::string,aace::alexa::ExternalMediaAdapter::Navigation> NAVIGATION_ENUM_MAP = {
-    { "DEFAULT", aace::alexa::ExternalMediaAdapter::Navigation::DEFAULT },
-    { "NONE", aace::alexa::ExternalMediaAdapter::Navigation::NONE },
-    { "FOREGROUND", aace::alexa::ExternalMediaAdapter::Navigation::FOREGROUND }
-};
-
-static aace::alexa::ExternalMediaAdapter::Navigation getNavigationEnum( std::string name )
-{
-    std::transform( name.begin(), name.end(), name.begin(), [](unsigned char c) -> unsigned char { return static_cast<unsigned char>(std::toupper(c)); } );
-    
-    auto it = NAVIGATION_ENUM_MAP.find( name );
-    
-    return it != NAVIGATION_ENUM_MAP.end() ? it->second : aace::alexa::ExternalMediaAdapter::Navigation::DEFAULT;
-}
-
-void ExternalMediaPlayerEngineImpl::play( const std::string& payload )
+bool ExternalMediaPlayerEngineImpl::play( const std::string& playerId, const std::string& playbackContextToken, const int64_t index, const std::chrono::milliseconds offsetInMilliseconds, const std::string& skillToken,
+        const std::string& playbackSessionId, const std::string& navigation, const bool preload, const alexaClientSDK::avsCommon::avs::PlayRequestor& playRequestor )
 {
     try
     {
         AACE_VERBOSE(LX(TAG));
-
-        rapidjson::Document document;
-        
-        // parse the document
-        document.Parse( payload.c_str() );
-        
-        // check the parser error
-        ThrowIf( document.HasParseError(), GetParseError_En( document.GetParseError() ) );
-        ThrowIfNot( document.IsObject(), "invalidPayload" );
-        
-        // get the root payload object
-        auto root = document.GetObject();
-        
-        ThrowIfNot( root.HasMember( "playerId" ) && root["playerId"].IsString(), "invalidPlayerId" );
-        auto playerId = root["playerId"].GetString();
-        
-        ThrowIfNot( root.HasMember( "skillToken" ) && root["skillToken"].IsString(), "invalidSkillToken" );
-        auto skillToken = root["skillToken"].GetString();
-
-        ThrowIfNot( root.HasMember( "playbackSessionId" ) && root["playbackSessionId"].IsString(), "invalidPlaybackSessionId" );
-        auto playbackSessionId = root["playbackSessionId"].GetString();
-
-        ThrowIfNot( root.HasMember( "index" ) && root["index"].IsInt64(), "invalidIndex" );
-        auto index = root["index"].GetInt64();
-
-        ThrowIfNot( root.HasMember( "offsetInMilliseconds" ) && root["offsetInMilliseconds"].IsInt64(), "invalidOffsetInMilliseconds" );
-        auto offsetInMilliseconds = root["offsetInMilliseconds"].GetInt64();
-
-        ThrowIfNot( root.HasMember( "playbackContextToken" ) && root["playbackContextToken"].IsString(), "invalidPlaybackContextToken" );
-        auto playbackContextToken = root["playbackContextToken"].GetString();
-        
-        ThrowIfNot( root.HasMember( "preload" ) && root["preload"].IsBool(), "invalidPreload" );
-        auto preload = root["preload"].GetBool();
-
-        ThrowIfNot( root.HasMember( "navigation" ) && root["navigation"].IsString(), "invalidNavigation" );
-        auto navigation = root["navigation"].GetString();
-        
-        if ( ( playerId != NULL ) && ( playerId[0] == '\0' ) ) {// empty playerId == global preset case
+        if ( playerId.empty() ) { // empty playerId == global preset case
             std::string token = playbackContextToken;
             size_t gpindex = token.find(GLOBAL_PRESET_KEY);
             ThrowIfNot( gpindex != std::string::npos , "invalidPayloadWithGlobalPreset" );
@@ -433,53 +322,28 @@ void ExternalMediaPlayerEngineImpl::play( const std::string& payload )
             ThrowIfNull( m_globalPresetHandler, "platformGlobalPresetHandlerNull" );
             // send global preset to platform
             m_globalPresetHandler->setGlobalPreset( preset );
+            return true;
         } else {
             // get the platform adapter
             auto adapter = getAdapter( playerId );
             ThrowIfNull( adapter, "invalidMediaPlayerAdapter" );
             
             // call the adapter method
-            ThrowIfNot( adapter->play( playerId, playbackContextToken, index, std::chrono::milliseconds( offsetInMilliseconds ), skillToken, playbackSessionId, preload, getNavigationEnum( navigation ) ), "adapterPlayFailed" );
+            ThrowIfNot( adapter->play( playerId, playbackContextToken, index, offsetInMilliseconds, skillToken, playbackSessionId, navigation, preload, playRequestor ), "adapterPlayFailed" );
+            return true;
         }
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
     }
 }
 
-void ExternalMediaPlayerEngineImpl::playControl( const std::string& payload, alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::RequestType request )
+bool ExternalMediaPlayerEngineImpl::playControl( const std::string& playerId, aace::engine::alexa::RequestType request )
 {
     try
     {
-        AACE_VERBOSE(LX(TAG));
-
-        rapidjson::Document document;
-        
-        // parse the document
-        document.Parse( payload.c_str() );
-        
-        // check the parser error
-        ThrowIf( document.HasParseError(), GetParseError_En( document.GetParseError() ) );
-        ThrowIfNot( document.IsObject(), "invalidPayload" );
-        
-        // get the root payload object
-        auto root = document.GetObject();
-        
-        ThrowIfNot( root.HasMember( "playerId" ) && root["playerId"].IsString(), "invalidPlayerId" );
-        auto playerId = root["playerId"].GetString();
-        
-        playControlForPlayer( playerId, request );
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
-    }
-}
-
-void ExternalMediaPlayerEngineImpl::playControlForPlayer( const std::string& playerId, alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::RequestType request )
-{
-    try
-    {
-        AACE_VERBOSE(LX(TAG).d("playerId",playerId));
+        AACE_VERBOSE(LX(TAG).d("playerId",playerId).d("request",request));
 
         // get the platform adapter
         auto adapter = getAdapter( playerId );
@@ -487,91 +351,61 @@ void ExternalMediaPlayerEngineImpl::playControlForPlayer( const std::string& pla
 
         // call the adapter method
         ThrowIfNot( adapter->playControl( playerId, request ), "adapterPlayControlFailed" );
+        return true;
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
     }
 }
 
-void ExternalMediaPlayerEngineImpl::seek( const std::string& payload )
+bool ExternalMediaPlayerEngineImpl::seek( const std::string& playerId, std::chrono::milliseconds positionMilliseconds )
 {
     try
     {
-        AACE_VERBOSE(LX(TAG));
+        AACE_VERBOSE(LX(TAG).d("playerId",playerId).d("positionMilliseconds",positionMilliseconds.count()));
 
-        rapidjson::Document document;
-        
-        // parse the document
-        document.Parse( payload.c_str() );
-        
-        // check the parser error
-        ThrowIf( document.HasParseError(), GetParseError_En( document.GetParseError() ) );
-        ThrowIfNot( document.IsObject(), "invalidPayload" );
-        
-        // get the root payload object
-        auto root = document.GetObject();
-        
-        ThrowIfNot( root.HasMember( "playerId" ) && root["playerId"].IsString(), "invalidPlayerId" );
-        auto playerId = root["playerId"].GetString();
-        
-        ThrowIfNot( root.HasMember( "positionMilliseconds" ) && root["positionMilliseconds"].IsInt64(), "invalidPositionMilliseconds" );
-        auto positionMilliseconds = root["positionMilliseconds"].GetInt64();
-        
         // get the platform adapter
         auto adapter = getAdapter( playerId );
         ThrowIfNull( adapter, "invalidMediaPlayerAdapter" );
 
         // call the adapter method
-        ThrowIfNot( adapter->seek( playerId, std::chrono::milliseconds( positionMilliseconds ) ), "adapterSeekFailed" );
+        ThrowIfNot( adapter->seek( playerId, positionMilliseconds ), "adapterSeekFailed" );
+        return true;
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
     }
 }
 
-void ExternalMediaPlayerEngineImpl::adjustSeek( const std::string& payload )
+bool ExternalMediaPlayerEngineImpl::adjustSeek( const std::string& playerId, std::chrono::milliseconds deltaPositionMilliseconds )
 {
     try
     {
-        AACE_VERBOSE(LX(TAG));
+        AACE_VERBOSE(LX(TAG).d("playerId",playerId).d("deltaPositionMilliseconds",deltaPositionMilliseconds.count()));
 
-        rapidjson::Document document;
-        
-        // parse the document
-        document.Parse( payload.c_str() );
-        
-        // check the parser error
-        ThrowIf( document.HasParseError(), GetParseError_En( document.GetParseError() ) );
-        ThrowIfNot( document.IsObject(), "invalidPayload" );
-        
-        // get the root payload object
-        auto root = document.GetObject();
-        
-        ThrowIfNot( root.HasMember( "playerId" ) && root["playerId"].IsString(), "invalidPlayerId" );
-        auto playerId = root["playerId"].GetString();
-        
-        ThrowIfNot( root.HasMember( "deltaPositionMilliseconds" ) && root["deltaPositionMilliseconds"].IsInt64(), "invalidDeltaPositionMilliseconds" );
-        auto deltaPositionMilliseconds = root["deltaPositionMilliseconds"].GetInt64();
-        
         // get the platform adapter
         auto adapter = getAdapter( playerId );
         ThrowIfNull( adapter, "invalidMediaPlayerAdapter" );
 
         // call the adapter method
-        ThrowIfNot( adapter->adjustSeek( playerId, std::chrono::milliseconds( deltaPositionMilliseconds ) ), "adapterAdjustSeekFailed" );
+        ThrowIfNot( adapter->adjustSeek( playerId, deltaPositionMilliseconds ), "adapterAdjustSeekFailed" );
+        return true;
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
     }
 }
 
-std::vector<alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::AdapterState> ExternalMediaPlayerEngineImpl::getAdapterStates()
+std::vector<aace::engine::alexa::AdapterState> ExternalMediaPlayerEngineImpl::getAdapterStates()
 {
     try
     {
         AACE_VERBOSE(LX(TAG));
 
-        std::vector<alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::AdapterState> adapterStateList;
+        std::vector<aace::engine::alexa::AdapterState> adapterStateList;
 
         // iterate through the media adapter list and add all of the adapter states
         // for the players that the adapter handles...
@@ -584,7 +418,7 @@ std::vector<alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::Adapt
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
-        return std::vector<alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::AdapterState>();
+        return std::vector<aace::engine::alexa::AdapterState>();
     }
 }
 
@@ -733,6 +567,12 @@ void ExternalMediaPlayerEngineImpl::reportDiscoveredPlayers( const std::vector<a
 void ExternalMediaPlayerEngineImpl::removeDiscoveredPlayer( const std::string& localPlayerId ) 
 {
     AACE_VERBOSE(LX(TAG).d("removingPlayerId",localPlayerId));
+    // if the player is removed while in focus, drop focus
+    if ( localPlayerId.compare(m_externalMediaPlayerCapabilityAgent->getPlayerInFocus()) == 0) { 
+        m_externalMediaPlayerCapabilityAgent->setPlayerInFocus(m_authorizationStateMap[localPlayerId].playerId, false);
+        AACE_VERBOSE(LX(TAG,"setPlayerInFocus to false for player due to discovery removal").d("localPlayerId", localPlayerId));
+    }
+
     m_executor.submit([this, localPlayerId]() {
         std::lock_guard<std::mutex> lock( m_playersMutex );
         m_authorizationStateMap.erase( localPlayerId );
@@ -812,9 +652,38 @@ std::string ExternalMediaPlayerEngineImpl::getLocalPlayerIdForSource( aace::alex
 }
 
 // FocusHandlerInterface
-void ExternalMediaPlayerEngineImpl::setFocus( const std::string& playerId ) {
+void ExternalMediaPlayerEngineImpl::setFocus( const std::string& playerId, bool focusAcquire ) {
     AACE_VERBOSE(LX(TAG).d("playerId",playerId));
-    m_externalMediaPlayerCapabilityAgent->setPlayerInFocus( playerId, true );
+    if ( playerId.empty() ) {
+        AACE_ERROR(LX(TAG,"setPlayerInFocusFailed").d("reason", "empty playerId"));
+        return;
+    }
+    // TBD implement better association on localPlayerId and playerId
+    for( auto& nextAdapter: m_authorizationStateMap )
+    {
+        if ( nextAdapter.second.playerId.compare(playerId) == 0 ) {
+            std::string localPlayerId = nextAdapter.second.localPlayerId;
+            if (m_authorizationStateMap.find(localPlayerId)==m_authorizationStateMap.end() && focusAcquire) {
+                AACE_WARN(LX(TAG,"setPlayerInFocusDelayed").d("reason", "unauthorizedPlayer").d("localPlayerId", localPlayerId));
+                
+                // check if player is pending authorization w/ 5 sec timeout
+                m_executor.submit([this, localPlayerId, playerId, focusAcquire]() {
+                    auto predicate = [this, localPlayerId, playerId](){
+                        if (m_authorizationStateMap.find(localPlayerId)==m_authorizationStateMap.end()) return false;
+                        else return m_authorizationStateMap[localPlayerId].authorized;
+                    };
+                    std::unique_lock<std::mutex> lock( m_mutex );
+                    if (m_attemptedSetFocusPlayerInFocusCondition.wait_for(lock, SET_FOCUS_TIMEOUT, predicate) ) {
+                        // not already in focus
+                        m_externalMediaPlayerCapabilityAgent->setPlayerInFocus( playerId, focusAcquire );
+                    } else {
+                        AACE_ERROR(LX(TAG,"setPlayerInFocusFailed").d("reason", "wait for authorize player timed out").d("localPlayerId", localPlayerId));
+                    } 
+                });
+                // not already in focus
+            } else m_externalMediaPlayerCapabilityAgent->setPlayerInFocus( playerId, focusAcquire );
+        }
+    }
 }
 
 // alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface
@@ -835,9 +704,16 @@ void ExternalMediaPlayerEngineImpl::onConnectionStatusChanged( const Status stat
 // alexaClientSDK::avsCommon::utils::RequiresShutdown
 void ExternalMediaPlayerEngineImpl::doShutdown()
 {
+    AACE_INFO(LX(TAG));
+
+    m_registeredLocalMediaSources.clear();
+    m_globalPresetHandler.reset();
+    m_executor.shutdown();
+
     // shut down external media adapters
     for( auto& adapter : m_externalMediaAdapterList ) {
         adapter->shutdown();
+        adapter.reset();
     }
     // clear the external media adapter list
     m_externalMediaAdapterList.clear();
@@ -850,6 +726,25 @@ void ExternalMediaPlayerEngineImpl::doShutdown()
         m_externalMediaPlayerCapabilityAgent->shutdown();
         m_externalMediaPlayerCapabilityAgent.reset();
     }
+}
+
+// RenderPlayerInfoCardObserverInterface
+void ExternalMediaPlayerEngineImpl::setObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsObserverInterface> observer) {
+    std::lock_guard<std::mutex> lock{m_observersMutex};
+    m_externalMediaPlayerCapabilityAgent->setObserver(observer);
+}
+
+//
+// AudioPlayerObserverDelegate
+//
+void AudioPlayerObserverDelegate::onPlayerActivityChanged( alexaClientSDK::avsCommon::avs::PlayerActivity state, const Context& context ) {
+    if( m_delegate != nullptr ) {
+        m_delegate->onPlayerActivityChanged( state, context );
+    }
+}
+
+void AudioPlayerObserverDelegate::setDelegate( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface> delegate ) {
+    m_delegate = delegate;
 }
 
 } // aace::engine::alexa

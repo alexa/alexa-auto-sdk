@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,22 +17,19 @@
 #define AACE_ENGINE_CBL_CBL_ENGINE_IMPL_H
 
 #include <chrono>
-#include <condition_variable>
 #include <memory>
-#include <mutex>
 #include <string>
-#include <thread>
-#include <unordered_set>
 
 #include <AVSCommon/SDKInterfaces/AuthDelegateInterface.h>
-#include <RegistrationManager/CustomerDataHandler.h>
 #include <AVSCommon/Utils/RequiresShutdown.h>
 
 #include <AACE/CBL/CBL.h>
 #include <AACE/CBL/CBLEngineInterface.h>
+
+#include "AACE/Engine/Alexa/LocaleAssetsManager.h"
+
 #include "CBLAuthDelegate.h"
 #include "CBLAuthRequesterInterface.h"
-#include "CBLAuthDelegateConfiguration.h"
 
 namespace aace {
 namespace engine {
@@ -53,6 +50,7 @@ private:
         std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
         std::chrono::seconds codePairRequestTimeout,
         std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
+        std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> localeAssetManager,
         bool enableUserProfile );
 
 public:
@@ -62,6 +60,7 @@ public:
         std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
         std::chrono::seconds codePairRequestTimeout,
         std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
+        std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> localeAssetManager,
         bool enableUserProfile );
 
     void enable();

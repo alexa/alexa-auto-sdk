@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -77,6 +77,22 @@ void AudioPlayerHandler::setupUI() {
         return;
     }
     m_console = activity->findViewById("id:console");
+
+    activity->registerObserver(Event::onGetPlayerPositionAndDuration, [=](const std::string &value) {
+
+        log(logger::LoggerHandler::Level::VERBOSE, "onGetPlayerPositionAndDuration:");
+        
+        auto playerPosition = getPlayerPosition();
+        auto playerDuration = getPlayerDuration();
+
+        activity->runOnUIThread([=]() {
+            if (auto console = m_console.lock()) {
+                console->printLine("Player Position: " + std::to_string(playerPosition) + " / " + std::to_string(playerDuration));
+            }
+        });
+
+        return true;
+    });
 }
 
 } // namespace alexa

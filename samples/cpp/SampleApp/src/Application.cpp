@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -104,6 +104,7 @@ void parseConfigurations(const std::vector<std::string>& configFilePaths, std::v
 
 void Application::printMenu(std::shared_ptr<ApplicationContext> applicationContext,
                             std::shared_ptr<aace::core::Engine> engine,
+                            std::shared_ptr<sampleApp::propertyManager::PropertyManagerHandler> propertyManagerHandler,
                             std::shared_ptr<View> console,
                             const std::string &id) {
     // ACTIONS:
@@ -117,6 +118,7 @@ void Application::printMenu(std::shared_ptr<ApplicationContext> applicationConte
     //   Restart
     //   Select
     //   SetLocale
+    //   SetTimeZone
     //   SetLoggerLevel
     //   SetProperty
     //   notify/*
@@ -181,8 +183,11 @@ void Application::printMenu(std::shared_ptr<ApplicationContext> applicationConte
             if (action == "Select") {
                 underline = (menu.count("index") && menu.at("index").get<unsigned>() == index);
             } else if (action == "SetLocale") {
-                auto locale = engine->getProperty("aace.alexa.setting.locale");
+                auto locale = propertyManagerHandler->getProperty("aace.alexa.setting.locale");
                 underline = (item.count("value") && item.at("value").get<std::string>() == locale);
+            } else if (action == "SetTimeZone") {
+                auto timezone = propertyManagerHandler->getProperty("aace.alexa.timezone");
+                underline = (item.count("value") && item.at("value").get<std::string>() == timezone);
             } else if (action == "SetLoggerLevel") {
                 if (applicationContext->isLogEnabled()) {
                     auto level = applicationContext->getLevel();
@@ -217,9 +222,9 @@ void Application::printMenu(std::shared_ptr<ApplicationContext> applicationConte
                 static std::regex r("^([^/]+)/(.+)", std::regex::optimize);
                 std::smatch sm{};
                 if (std::regex_match(value, sm, r) || ((sm.size() - 1) == 2)) {
-                    underline = (engine->getProperty(sm[1]) == sm[2]);
+                    underline = (propertyManagerHandler->getProperty(sm[1]) == sm[2]);
                 }
-            }
+            } 
             if (underline) {
                 stream << " [ " + key + " ]  " << std::string(keyMax - keyLength, ' ') << "\e[4m" << name << "\e[0m" << std::endl;
             } else {
@@ -231,9 +236,17 @@ void Application::printMenu(std::shared_ptr<ApplicationContext> applicationConte
     stream << std::endl << titleRuler << std::endl;
     if (menu.count("path")) {
         auto menuFilePath = menu.at("path").get<std::string>();
-        int balance = menuColumns - 2 - menuFilePath.length();
+        auto sdkVersion = propertyManagerHandler->getProperty(aace::core::property::VERSION);
+        auto buildIdentifier = applicationContext->getBuildIdentifier();
+        std::string string;
+        if (!buildIdentifier.empty()) {
+            string = menuFilePath + " (v" + sdkVersion + "-" + buildIdentifier + ")";
+        } else {
+            string = menuFilePath + " (v" + sdkVersion + ")";
+        }
+        int balance = menuColumns - 2 - string.length();
         int left = balance > 1 ? balance / 2 : 0;
-        stream << std::string(left, ' ') << menuFilePath << std::endl;
+        stream << std::string(left, ' ') << string << std::endl;
     }
     stream << std::endl;
     console->print(stream.str());
@@ -436,6 +449,9 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
         return Status::Failure;
     }
 
+    // Important: Logger, Audio IO Providers, Location Provider, and Network Info Provider are
+    // core module features and must be created and registered before the other handlers.
+
     // Register logger handler
     Ensures(engine->registerPlatformInterface(loggerHandler));
 
@@ -467,6 +483,16 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
         defaultAudioOutputProvider->setupUI();
     }
 
+    // Location Provider (Important: Location Provider must be created before the other handlers)
+    auto locationProviderHandler = location::LocationProviderHandler::create(activity, loggerHandler);
+    Ensures(locationProviderHandler != nullptr);
+    Ensures(engine->registerPlatformInterface(locationProviderHandler));
+
+    // Network Info Provider (Important: Network Info Provider must be created before the other handlers)
+    auto networkInfoProviderHandler = network::NetworkInfoProviderHandler::create(activity, loggerHandler);
+    Ensures(networkInfoProviderHandler != nullptr);
+    Ensures(engine->registerPlatformInterface(networkInfoProviderHandler));
+
     // Alerts
     auto alertsHandler = alexa::AlertsHandler::create(activity, loggerHandler);
     Ensures(alertsHandler != nullptr);
@@ -491,6 +517,21 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     auto doNotDisturbHandler = alexa::DoNotDisturbHandler::create(activity, loggerHandler);
     Ensures(doNotDisturbHandler != nullptr);
     Ensures(engine->registerPlatformInterface(doNotDisturbHandler));
+
+#ifdef COASSISTANT
+    // CoAssistant
+    auto coAssistantHandler =
+        coassistant::CoAssistantHandler::create(activity, loggerHandler);
+    Ensures(coAssistantHandler != nullptr);
+    if (!engine->registerPlatformInterface(coAssistantHandler)) {
+        loggerHandler->log(Level::INFO, "Application:Engine", "failed to register coassistant handler");
+        console->printLine("Error: could not register coassistant handler (check config)");
+        if (!engine->shutdown()) {
+            console->printLine("Error: could not be shutdown");
+        }
+        return Status::Failure;
+    }
+#endif
 
 #ifdef ALEXACOMMS
     // Communications
@@ -536,20 +577,10 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     Ensures(globalPresetHandler != nullptr);
     Ensures(engine->registerPlatformInterface(globalPresetHandler));
 
-    // Location Provider
-    auto locationProviderHandler = location::LocationProviderHandler::create(activity, loggerHandler);
-    Ensures(locationProviderHandler != nullptr);
-    Ensures(engine->registerPlatformInterface(locationProviderHandler));
-
     // Navigation
     auto navigationHandler = navigation::NavigationHandler::create(activity, loggerHandler);
     Ensures(navigationHandler != nullptr);
     Ensures(engine->registerPlatformInterface(navigationHandler));
-
-    // Network Info Provider
-    auto networkInfoProviderHandler = network::NetworkInfoProviderHandler::create(activity, loggerHandler);
-    Ensures(networkInfoProviderHandler != nullptr);
-    Ensures(engine->registerPlatformInterface(networkInfoProviderHandler));
 
     // Notifications
     auto notificationsHandler = alexa::NotificationsHandler::create(activity, loggerHandler);
@@ -565,10 +596,16 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     auto playbackControllerHandler = alexa::PlaybackControllerHandler::create(activity, loggerHandler);
     Ensures(playbackControllerHandler != nullptr);
     Ensures(engine->registerPlatformInterface(playbackControllerHandler));
+    
+    // Property Manager
+    auto propertyManagerHandler = propertyManager::PropertyManagerHandler::create( loggerHandler );
+    Ensures(propertyManagerHandler != nullptr);
+    Ensures(engine->registerPlatformInterface(propertyManagerHandler));
 
     // Speech Recognizer
+    // Note : Expects PropertyManager to be not null.
     auto speechRecognizerHandler =
-        alexa::SpeechRecognizerHandler::create(activity, loggerHandler, applicationContext->isWakeWordSupported());
+        alexa::SpeechRecognizerHandler::create(activity, loggerHandler, propertyManagerHandler, applicationContext->isWakeWordSupported());
     Ensures(speechRecognizerHandler != nullptr);
     Ensures(engine->registerPlatformInterface(speechRecognizerHandler));
 
@@ -636,10 +673,10 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
 #endif // ALEXACOMMS
 
     // Setup the interactive text based menu system
-    setupMenu(applicationContext, engine, console);
+    setupMenu(applicationContext, engine, propertyManagerHandler, console);
 
     // Setup the SDK version number and print optional text for the main menu with variables
-    auto VERSION = engine->getProperty(aace::core::property::VERSION);
+    auto VERSION = propertyManagerHandler->getProperty(aace::core::property::VERSION);
     // clang-format off
     std::map<std::string, std::string> variables{
         {"VERSION", VERSION}
@@ -663,7 +700,7 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
             // If not logged in, and user menu is available, run it instead of main
             id = std::string("user");
         }
-        status = runMenu(applicationContext, engine, activity, console, id);
+        status = runMenu(applicationContext, engine, propertyManagerHandler, activity, console, id);
     }
 
     // Stop notifications
@@ -697,6 +734,7 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
 
 Status Application::runMenu(std::shared_ptr<ApplicationContext> applicationContext,
                             std::shared_ptr<aace::core::Engine> engine,
+                            std::shared_ptr<sampleApp::propertyManager::PropertyManagerHandler> propertyManagerHandler,
                             std::shared_ptr<Activity> activity,
                             std::shared_ptr<View> console,
                             const std::string &id) {
@@ -707,7 +745,7 @@ Status Application::runMenu(std::shared_ptr<ApplicationContext> applicationConte
     Ensures(menuPtr != nullptr);
     auto menuFilePath = menuPtr->at("path").get<std::string>();
     auto menuDirPath = applicationContext->getDirPath(menuFilePath);
-    printMenu(applicationContext, engine, console, id);
+    printMenu(applicationContext, engine, propertyManagerHandler, console, id);
     while (auto cin = fgetc(stdin)) {
         auto c = static_cast<unsigned char>(cin);
         static const unsigned char DELETE = 0x7F;
@@ -838,7 +876,7 @@ Status Application::runMenu(std::shared_ptr<ApplicationContext> applicationConte
                         stack.push_back(menuId);
                         menuPtr = applicationContext->getMenuPtr(menuId);
                         if (menuPtr && menuPtr->is_object()) {
-                            printMenu(applicationContext, engine, console, menuId);
+                            printMenu(applicationContext, engine, propertyManagerHandler, console, menuId);
                         } else {
                             console->printLine("Unknown menuId:", menuId);
                             status = Status::Failure;
@@ -884,8 +922,14 @@ Status Application::runMenu(std::shared_ptr<ApplicationContext> applicationConte
                         break;
                     } else if (action == "SetLocale") {
                         auto value = item.at("value").get<std::string>(); // required item.value
-                        engine->setProperty("aace.alexa.setting.locale", value);
+                        propertyManagerHandler->setProperty("aace.alexa.setting.locale", value);
                         console->printLine("aace.alexa.setting.locale =", value);
+                        c = ESC; // go back
+                        break;
+                    } else if (action == "SetTimeZone") {
+                        auto value = item.at("value").get<std::string>(); // required item.value
+                        propertyManagerHandler->setProperty("aace.alexa.timezone", value);
+                        console->printLine("aace.alexa.timezone =", value);
                         c = ESC; // go back
                         break;
                     } else if (action == "SetLoggerLevel") {
@@ -913,7 +957,7 @@ Status Application::runMenu(std::shared_ptr<ApplicationContext> applicationConte
                         static std::regex r("^([^/]+)/(.+)", std::regex::optimize);
                         std::smatch sm{};
                         if (std::regex_match(value, sm, r) || ((sm.size() - 1) == 2)) {
-                            engine->setProperty(sm[1], sm[2]);
+                            propertyManagerHandler->setProperty(sm[1], sm[2]);
                             console->printLine(sm[1], "=", sm[2]);
                         }
                         c = ESC; // go back
@@ -933,11 +977,11 @@ Status Application::runMenu(std::shared_ptr<ApplicationContext> applicationConte
                         stack.pop_back();
                         auto menuId = stack.back();
                         menuPtr = applicationContext->getMenuPtr(menuId);
-                        printMenu(applicationContext, engine, console, menuId);
+                        printMenu(applicationContext, engine, propertyManagerHandler, console, menuId);
                     }
                     break;
                 case HELP: // print help
-                    printMenu(applicationContext, engine, console, stack.back());
+                    printMenu(applicationContext, engine, propertyManagerHandler, console, stack.back());
                     break;
                 case QUIT: // quit app
                     status = Status::Success;
@@ -958,17 +1002,17 @@ Status Application::runMenu(std::shared_ptr<ApplicationContext> applicationConte
     }
     return status;
 }
-
-void Application::setupMenu(std::shared_ptr<ApplicationContext> applicationContext, std::shared_ptr<aace::core::Engine> engine, std::shared_ptr<View> console) {
+    
+void Application::setupMenu(std::shared_ptr<ApplicationContext> applicationContext, std::shared_ptr<aace::core::Engine> engine, std::shared_ptr<sampleApp::propertyManager::PropertyManagerHandler> propertyManagerHandler, std::shared_ptr<View> console) {
     // recursive menu registration
-    std::function<std::string(std::shared_ptr<ApplicationContext>, std::shared_ptr<aace::core::Engine>, std::shared_ptr<View>, json &, std::string &)> f;
-    f = [&f](std::shared_ptr<ApplicationContext> applicationContext, std::shared_ptr<aace::core::Engine> engine, std::shared_ptr<View> console, json &menu,
+    std::function<std::string(std::shared_ptr<ApplicationContext>, std::shared_ptr<aace::core::Engine>, std::shared_ptr<sampleApp::propertyManager::PropertyManagerHandler>, std::shared_ptr<View>, json &, std::string &)> f;
+    f = [&f](std::shared_ptr<ApplicationContext> applicationContext, std::shared_ptr<aace::core::Engine> engine, std::shared_ptr<sampleApp::propertyManager::PropertyManagerHandler> propertyManagerHandler, std::shared_ptr<View> console, json &menu,
              std::string &path) {
         menu["path"] = path;
         Ensures(menu.count("id") == 1);                     // required menu.id
         if (menu.at("id").get<std::string>() == "LOCALE") { // reserved id: LOCALE
             auto item = json::array();
-            auto supportedLocales = engine->getProperty("aace.alexa.supportedLocales");
+            auto supportedLocales = propertyManagerHandler->getProperty("aace.alexa.supportedLocales");
             std::istringstream iss{supportedLocales};
             auto token = std::string();
             unsigned count = std::count(supportedLocales.begin(), supportedLocales.end(), ',') + 1;
@@ -992,7 +1036,7 @@ void Application::setupMenu(std::shared_ptr<ApplicationContext> applicationConte
             for (auto &item : menu.at("item")) {
                 if (item.count("do") && item.at("do") == "GoTo") {
                     if (item.count("value") && item.at("value").is_object()) {
-                        item.at("value") = f(applicationContext, engine, console, item.at("value"), path);
+                        item.at("value") = f(applicationContext, engine, propertyManagerHandler, console, item.at("value"), path);
                     }
                 }
             }
@@ -1015,7 +1059,7 @@ void Application::setupMenu(std::shared_ptr<ApplicationContext> applicationConte
         }
         if (menu.is_array()) {
             for (auto &item : menu) {
-                f(applicationContext, engine, console, item, path);
+                f(applicationContext, engine, propertyManagerHandler, console, item, path);
             }
         } else {
             console->printLine("Error: could not load menu", path);

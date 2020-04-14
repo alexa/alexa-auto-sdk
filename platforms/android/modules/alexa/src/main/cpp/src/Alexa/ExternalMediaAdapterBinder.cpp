@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ namespace alexa {
         }
     }
 
-    bool ExternalMediaAdapterHandler::play( const std::string& localPlayerId, const std::string& playContextToken, int64_t index, std::chrono::milliseconds offset, bool preload, Navigation navigation )
+    bool ExternalMediaAdapterHandler::play( const std::string& localPlayerId, const std::string& playContextToken, int64_t index, std::chrono::milliseconds offset, bool preload, Navigation navigation)
     {
         try_with_context
         {
@@ -81,8 +81,7 @@ namespace alexa {
             jboolean result;
 
             ThrowIfNot( m_obj.invoke( "play", "(Ljava/lang/String;Ljava/lang/String;JJZLcom/amazon/aace/alexa/ExternalMediaAdapter$Navigation;)Z", &result,
-                        JString(localPlayerId).get(), JString(playContextToken).get(), index, offset.count(), preload, navigationObj ), "invokeMethodFailed" );
-
+                        JString(localPlayerId).get(), JString(playContextToken).get(), index, offset.count(), preload, navigationObj), "invokeMethodFailed" );
             return result;
         }
         catch_with_ex {

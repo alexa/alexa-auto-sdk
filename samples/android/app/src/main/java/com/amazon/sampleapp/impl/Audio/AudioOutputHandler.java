@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
 
 package com.amazon.sampleapp.impl.Audio;
 
-import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
+import android.os.Handler;
 
 import com.amazon.aace.alexa.AlexaClient.AuthState;
 import com.amazon.aace.alexa.AlexaClient.AuthError;
@@ -29,6 +29,7 @@ import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
@@ -38,13 +39,12 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class AudioOutputHandler extends AudioOutput implements AuthStateObserver
+public class AudioOutputHandler extends AudioOutput implements AuthStateObserver, Releasable
 {
     private static final String sTag = AudioOutputHandler.class.getSimpleName();
     private static final String sFileName = "alexa_media"; // Note: not thread safe
     private static final long sSkipThresholdInMS = 1500; // 1500 ms
 
-    private final Activity mActivity;
     private final Context mContext;
     private final LoggerHandler mLogger;
     private final String mName;
@@ -58,24 +58,24 @@ public class AudioOutputHandler extends AudioOutput implements AuthStateObserver
     private Timeline.Period mPeriod;
     private Timeline.Window mWindow;
     private long mPosition;
-    private long mLastLivePosition;
 
-    private long mLivePausedPosition;
-    private int mSavedPeriodIndex;
-    private int mSavedWindowIndex;
-    private long mLivePausedOffset;
-    private long mLiveResumedOffset;
-    private boolean mNewPlayReceieved;
+    private long mLivePlaybackStartedTime;
+    private long mLivePreviousTotalTimePlayed;
+    private boolean mPlaying;
+    private boolean mPaused;
 
-    public AudioOutputHandler( Activity activity,
-                               LoggerHandler logger,
-                               String name ) {
-        mActivity = activity;
-        mContext = activity.getApplicationContext();
+
+    AudioOutputHandler( Context context,
+                        LoggerHandler logger,
+                        String name,
+                        Handler handler ) {
+        mContext = context;
         mLogger = logger;
         mName = name;
-        mMediaSourceFactory = new MediaSourceFactory( mContext, mLogger, mName );
+        mMediaSourceFactory = new MediaSourceFactory( mContext, mLogger, mName, handler );
         mRepeating = false;
+        mPlaying = false;
+        mPaused = false;
         mPeriod = new Timeline.Period();
         mWindow = new Timeline.Window();
 
@@ -93,8 +93,7 @@ public class AudioOutputHandler extends AudioOutput implements AuthStateObserver
         mPlayer.setPlayWhenReady( false );
         mPlayer.stop( true );
         // reset live station offsets
-        mLiveResumedOffset = 0;
-        mLivePausedPosition = 0;
+        mLivePreviousTotalTimePlayed = 0;
     }
 
     public boolean isPlaying() {
@@ -157,8 +156,6 @@ public class AudioOutputHandler extends AudioOutput implements AuthStateObserver
     @Override
     public boolean play() {
         mLogger.postVerbose( sTag, String.format( "(%s) Handling play()", mName ) );
-        mNewPlayReceieved = true; // remember new play received
-        mSavedPeriodIndex = mPlayer.getCurrentPeriodIndex(); // remember period index
         mPlayer.setPlayWhenReady( true );
         return true;
     }
@@ -166,6 +163,7 @@ public class AudioOutputHandler extends AudioOutput implements AuthStateObserver
     @Override
     public boolean stop() {
         mLogger.postVerbose( sTag, String.format( "(%s) Handling stop()", mName ) );
+        mPaused = false;
         if ( !mPlayer.getPlayWhenReady() ) {
             // Player is already not playing. Notify Engine of stop
             onPlaybackStopped();
@@ -176,13 +174,7 @@ public class AudioOutputHandler extends AudioOutput implements AuthStateObserver
     @Override
     public boolean pause() {
         mLogger.postVerbose( sTag, String.format( "(%s) Handling pause()", mName ) );
-
-        Timeline currentTimeline = mPlayer.getCurrentTimeline();
-        if( !currentTimeline.isEmpty() && mPlayer.isCurrentWindowDynamic() ) { // If pausing live station.
-            mLivePausedOffset = 0;
-            mLivePausedPosition = mPosition; // save paused position
-        }
-
+        mPaused = true;
         mPlayer.setPlayWhenReady( false );
         return true;
     }
@@ -190,18 +182,6 @@ public class AudioOutputHandler extends AudioOutput implements AuthStateObserver
     @Override
     public boolean resume() {
         mLogger.postVerbose( sTag, String.format( "(%s) Handling resume()", mName ) );
-
-        Timeline currentTimeline = mPlayer.getCurrentTimeline();
-        if ( !currentTimeline.isEmpty() && mPlayer.isCurrentWindowDynamic() ) {  // If resuming live station reset to 0.
-            mPlayer.seekToDefaultPosition(); // reset player position to its default
-            mLivePausedOffset = Math.abs( mPlayer.getCurrentPosition() ); // get the new position
-            mLivePausedOffset -= currentTimeline.getPeriod(mSavedPeriodIndex, mPeriod).getPositionInWindowMs(); // adjust for window
-            mLivePausedOffset -= mLiveResumedOffset; // adjust for stopped offset
-            mLivePausedOffset -= mLivePausedPosition; // adjust for paused offset
-
-            mLivePausedPosition = 0; // reset paused position
-        }
-
         mPlayer.setPlayWhenReady( true );
         return true;
     }
@@ -210,37 +190,21 @@ public class AudioOutputHandler extends AudioOutput implements AuthStateObserver
     public boolean setPosition( long position ) {
         mLogger.postVerbose( sTag, String.format( "(%s) Handling setPosition(%s)", mName, position ) );
         mPlayer.seekTo( position );
-        mLiveResumedOffset -= position;
         return true;
     }
 
     @Override
     public long getPosition() {
-        Timeline currentTimeline = mPlayer.getCurrentTimeline();
         mPosition = Math.abs( mPlayer.getCurrentPosition() );
 
-        if ( !currentTimeline.isEmpty() && mPlayer.isCurrentWindowDynamic() ) {
-            if ( mLivePausedPosition == 0 ) { // not during pause
-                mPosition -= currentTimeline.getPeriod(mSavedPeriodIndex, mPeriod).getPositionInWindowMs(); // Adjust position to be relative to start of period rather than window.
-                mPosition -= mLiveResumedOffset; // Offset saved for live station stopped / played
-                mPosition -= mLivePausedOffset; // Offset saved for live station paused / resumed
-                mLogger.postVerbose( sTag, String.format( "DEBUG, mPosition (%s), mSavedPeriodIndex (%s), mPeriod (%s), mLiveResumedOffset (%s),  mLivePausedOffset (%s)",
-                        mPosition, mSavedPeriodIndex, mPeriod, mLiveResumedOffset, mLivePausedOffset ) );
+        if ( mPlayer.isCurrentWindowDynamic() ) {
+            if ( mPlaying ) { // not during pause
+                mPosition = System.currentTimeMillis() - mLivePlaybackStartedTime + mLivePreviousTotalTimePlayed;
             } else{
-                mLogger.postVerbose( sTag, String.format( "(%s) Handling livePaused getPosition(%s)", mName, mLivePausedPosition ) );
-                return mLivePausedPosition; // the saved position during a live station paused state
+                mPosition = mLivePreviousTotalTimePlayed;
             }
 
-            long skipDifference = mPosition - mLastLivePosition;
-            // difference in position normally 1000ms +/- 10ms
-            if ( skipDifference > sSkipThresholdInMS){ // skips 10 - 20s while resuming live radio sometimes, if significant skip: update live resumed offset
-                mLogger.postVerbose( sTag, String.format( "getPosition live position skipped: (%s)", skipDifference ) );
-                mLiveResumedOffset += skipDifference;
-                mPosition -= skipDifference;
-            }
-            mLastLivePosition = mPosition;
         }
-
         mLogger.postVerbose( sTag, String.format( "(%s) Handling getPosition(%s)", mName, mPosition ) );
         return mPosition;
     }
@@ -249,6 +213,19 @@ public class AudioOutputHandler extends AudioOutput implements AuthStateObserver
     public long getDuration() {
         long duration = mPlayer.getDuration();
         return duration != C.TIME_UNSET ? duration : TIME_UNKNOWN;
+    }
+
+    @Override
+    public long getNumBytesBuffered() {
+        Format audioFormat = mPlayer.getAudioFormat();
+        if (audioFormat.bitrate == Format.NO_VALUE) {
+            return 0;
+        }
+        long bufferMs = mPlayer.getBufferedPosition() - mPlayer.getCurrentPosition();
+        if (bufferMs < 0) {
+            return 0;
+        }
+        return bufferMs * audioFormat.bitrate / 1000 / 8;
     }
 
     @Override
@@ -281,25 +258,17 @@ public class AudioOutputHandler extends AudioOutput implements AuthStateObserver
 
     private void onPlaybackStarted () {
         mLogger.postVerbose( sTag, String.format( "(%s) Media State Changed. STATE: PLAYING", mName ) );
+        mLivePlaybackStartedTime = System.currentTimeMillis();
+        mPlaying = true;
+        mPaused = false;
         mediaStateChanged( MediaState.PLAYING );
-
-        mSavedWindowIndex = mPlayer.getCurrentWindowIndex(); // remember window index
-        mPlayer.getCurrentTimeline().getWindow(mSavedWindowIndex, mWindow); // set window
-        mSavedPeriodIndex = mPlayer.getCurrentPeriodIndex(); // remember period index
-        mPlayer.getCurrentTimeline().getPeriod(mSavedWindowIndex, mPeriod); // set period
-        /*mLogger.postVerbose( sTag, String.format( "(%s) Media State Changed. STATE: PLAYING, mSavedWindowIndex (%s), fPI (%s), LPI (%s), winduration(%s)",
-                mName, mSavedWindowIndex, mWindow.firstPeriodIndex, mWindow.lastPeriodIndex, mWindow.durationUs ) );*/
-
-        if ( mNewPlayReceieved && mPlayer.isCurrentWindowDynamic() ) { // remember offset if new play for live station
-            mPlayer.seekToDefaultPosition();
-            mLiveResumedOffset += Math.abs( mPlayer.getCurrentPosition() );
-            mNewPlayReceieved = false;
-        }
     }
 
     private void onPlaybackStopped () {
         mLogger.postVerbose( sTag, String.format( "(%s) Media State Changed. STATE: STOPPED", mName ) );
-
+        // if triggered via pause, keep previous offset
+        if (mPaused) mLivePreviousTotalTimePlayed += System.currentTimeMillis() - mLivePlaybackStartedTime;
+        mPlaying = false;
         mediaStateChanged( MediaState.STOPPED );
     }
 
@@ -310,6 +279,7 @@ public class AudioOutputHandler extends AudioOutput implements AuthStateObserver
         } else {
             mPlayer.setRepeatMode( Player.REPEAT_MODE_OFF );
             mLogger.postVerbose( sTag, String.format( "(%s) Media State Changed. STATE: STOPPED", mName ) );
+            mPlaying = false;
             mediaStateChanged( MediaState.STOPPED );
         }
     }
@@ -329,6 +299,12 @@ public class AudioOutputHandler extends AudioOutput implements AuthStateObserver
                 mPlayer.setPlayWhenReady( false );
             }
         }
+    }
+
+    @Override
+    public void release() {
+        mPlayer.release();
+        dispose();
     }
 
     //

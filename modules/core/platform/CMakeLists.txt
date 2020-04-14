@@ -22,6 +22,9 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Audio/AudioOutputProvider.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Audio/AudioOutput.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Audio/AudioStream.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/PropertyManager/PropertyManager.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/PropertyManager/PropertyManagerEngineInterface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Audio/AudioFormat.h
 )
 
 source_group("Header Files" FILES ${HEADERS})
@@ -40,6 +43,8 @@ add_library(AACECorePlatform SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Audio/AudioOutputProvider.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Audio/AudioOutput.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Audio/AudioStream.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/PropertyManager/PropertyManager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Audio/AudioFormat.cpp
 )
 
 target_include_directories(AACECorePlatform

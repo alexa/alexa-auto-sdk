@@ -1,5 +1,5 @@
  /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -169,7 +169,7 @@ AddressBookCloudUploaderRESTAgent::HTTPResponse AddressBookCloudUploaderRESTAgen
         auto httpGet = alexaClientSDK::avsCommon::utils::libcurlUtils::HttpGet::create();
         ThrowIfNull( httpGet, "nullHttpGet" );
 
-        return httpGet->doGet( url, headers );
+        return httpGet->doGet( url, headers, DEFAULT_HTTP_TIMEOUT );
     } catch( std::exception& ex ) {
         AACE_ERROR( LX(TAG,"doGet").d("reason", ex.what() ) );
         return AddressBookCloudUploaderRESTAgent::HTTPResponse();
@@ -183,7 +183,7 @@ AddressBookCloudUploaderRESTAgent::HTTPResponse AddressBookCloudUploaderRESTAgen
         auto httpDelete = alexaClientSDK::avsCommon::utils::libcurlUtils::HttpDelete::create();
         ThrowIfNull( httpDelete, "nullHttpDelete" );
 
-        return httpDelete->doDelete( url, headers );
+        return httpDelete->doDelete( url, headers, DEFAULT_HTTP_TIMEOUT );
     } catch( std::exception& ex ) {
         AACE_ERROR( LX(TAG,"doDelete").d("reason", ex.what() ) );
         return AddressBookCloudUploaderRESTAgent::HTTPResponse();

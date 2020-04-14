@@ -3,6 +3,10 @@
 find_package(GTest REQUIRED)
 find_library(GMOCK_LIBRARY NAMES gmock)
 find_library(GMOCK_MAIN_LIBRARY NAMES gmock_main)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
 
 set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Core/CoreTestHelper.h
@@ -28,11 +32,15 @@ target_include_directories(AACECoreTestsLib
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
     PRIVATE
+        ${AVS_INCLUDE_DIRS}
         ${GTEST_INCLUDE_DIRS}
 )
 
 target_link_libraries(AACECoreTestsLib
     AACECorePlatform
+    AACECoreEngine
+    ${AVS_AVS_COMMON_LIBRARY}
+
 )
 
 install(
@@ -62,16 +70,21 @@ target_include_directories(AACECoreTests
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
+    PRIVATE
+        ${AVS_INCLUDE_DIRS}
+
 )
 
 target_link_libraries(AACECoreTests
     AACECorePlatform
     AACECoreEngine
     AACECoreTestsLib
+    ${AVS_AVS_COMMON_LIBRARY}
     GTest::GTest
     GTest::Main
     ${GMOCK_LIBRARY}
     ${GMOCK_MAIN_LIBRARY}
+    GTest::GTest GTest::Main
 )
 
 set (TEST_NAME AACECoreTests)

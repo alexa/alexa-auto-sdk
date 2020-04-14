@@ -32,6 +32,10 @@ if(AAC_ENABLE_COVERAGE)
     set(CMAKE_CXX_OUTPUT_EXTENSION_REPLACE ON)
 endif()
 
+if(CPP_BUILD_IDENTIFIER)
+   add_definitions(-DBUILD_IDENTIFIER=${CPP_BUILD_IDENTIFIER})
+endif()
+
 if(AAC_HOME)
     include(${AAC_HOME}/share/cmake/AACECore.cmake)
     include(${AAC_HOME}/share/cmake/AACEAlexa.cmake)
@@ -43,6 +47,10 @@ if(AAC_HOME)
     if(AMAZONLITE)
         include(${AAC_HOME}/share/cmake/AACEAmazonLite.cmake)
         add_definitions(-DAMAZONLITE)
+    endif()
+    if(COASSISTANT)
+        include(${AAC_HOME}/share/cmake/AACECoAssistant.cmake)
+        add_definitions(-DCOASSISTANT)
     endif()
     if(LOCALVOICECONTROL)
         include(${AAC_HOME}/share/cmake/AACECarControlLocalService.cmake)
@@ -66,9 +74,15 @@ if(AAC_HOME)
     if(LOOPBACK_DETECTOR)
         include(${AAC_HOME}/share/cmake/AACELoopbackDetector.cmake)
     endif()
+    if(SPOTIFY)
+        include(${AAC_HOME}/share/cmake/AACESpotify.cmake)
+    endif()
 else()
     if(AMAZONLITE)
         add_definitions(-DAMAZONLITE)
+    endif()
+    if(COASSISTANT)
+        add_definitions(-DCOASSISTANT)
     endif()
     if(LOCALVOICECONTROL)
         add_definitions(-DLOCALVOICECONTROL)
@@ -124,6 +138,7 @@ set(CXX_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Navigation/NavigationHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Network/NetworkInfoProviderHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/PhoneControl/PhoneControlHandler.h
+     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/PropertyManager/PropertyManagerHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Status.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Subject.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/TaskQueue.h
@@ -131,6 +146,12 @@ set(CXX_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/TTY.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Views.h    
 )
+
+if(COASSISTANT)
+    set(CXX_HEADER_FILES ${CXX_HEADER_FILES}
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/CoAssistant/CoAssistantHandler.h
+    )
+endif()
 
 if(ALEXACOMMS)
     set(CXX_HEADER_FILES ${CXX_HEADER_FILES}
@@ -168,11 +189,18 @@ set(CXX_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Navigation/NavigationHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Network/NetworkInfoProviderHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/PhoneControl/PhoneControlHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/PropertyManager/PropertyManagerHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/TaskQueue.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/TaskThread.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Views.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
 )
+
+if(COASSISTANT)
+    set(CXX_SOURCE_FILES ${CXX_SOURCE_FILES}
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/CoAssistant/CoAssistantHandler.cpp
+    )
+endif()
 
 if(ALEXACOMMS)
     set(CXX_SOURCE_FILES ${CXX_SOURCE_FILES}
@@ -220,6 +248,13 @@ if(AMAZONLITE)
     )
 endif()
 
+if(COASSISTANT)
+    target_link_libraries(SampleApp
+        AACECoAssistantPlatform
+        AACECoAssistantEngine
+    )
+endif()
+
 if(FILEAUDIO)
     target_link_libraries(SampleApp
         AACEFileAudio
@@ -261,6 +296,13 @@ if(LOOPBACK_DETECTOR)
     target_link_libraries(SampleApp AACELoopbackDetectorEngine)
 endif()
 
+if(SPOTIFY)
+    target_link_libraries(SampleApp
+        AACESpotifyPlatform
+        AACESpotifyEngine
+    )
+endif()
+
 if(NOT CMAKE_SYSTEM_NAME MATCHES "(Android|QNX)")
     target_link_libraries(SampleApp pthread)
 endif()
@@ -293,10 +335,48 @@ install(
 
 # Install files for SampleApp execution
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../assets/config.json.in ${CMAKE_CURRENT_BINARY_DIR}/configure/config.json)
+# clientId (str)
+if(MY_CLIENT_ID)
+    set(YOUR_CLIENT_ID "${MY_CLIENT_ID}")
+else()
+    set(YOUR_CLIENT_ID "")
+endif()
+
+# deviceSerialNumber (str)
+if(MY_DEVICE_SERIAL_NUMBER)
+    set(YOUR_DEVICE_SERIAL_NUMBER "${MY_DEVICE_SERIAL_NUMBER}")
+else()
+    set(YOUR_DEVICE_SERIAL_NUMBER "")
+endif()
+
+# productId (str)
+if(MY_PRODUCT_ID)
+    set(YOUR_PRODUCT_ID "${MY_PRODUCT_ID}")
+else()
+    set(YOUR_PRODUCT_ID "")
+endif()
+
+# manufacturerName (str)
+if(MY_MANUFACTURER_NAME)
+    set(YOUR_MANUFACTURER_NAME "${MY_MANUFACTURER_NAME}")
+else()
+    set(YOUR_MANUFACTURER_NAME "")
+endif()
+
+# description (str)
+if(MY_DESCRIPTION)
+    set(YOUR_DESCRIPTION "${MY_DESCRIPTION}")
+else()
+    set(YOUR_DESCRIPTION "")
+endif()
+
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/../assets/config.json.in
+    ${CMAKE_CURRENT_BINARY_DIR}/../assets/config.json
+)
 
 install(
-    FILES ${CMAKE_CURRENT_BINARY_DIR}/configure/config.json
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/../assets/config.json
           ${CMAKE_CURRENT_SOURCE_DIR}/../assets/menu.json
     DESTINATION etc
 )

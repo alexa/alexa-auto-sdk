@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -12,13 +12,15 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
+#include <AVSCommon/Utils/Optional.h>
 
-#include "AACE/Engine/Vehicle/VehicleEngineService.h"
-#include "AACE/Engine/Vehicle/VehiclePropertyInterface.h"
+#include "AACE/Engine/Core/EngineMacros.h"
 #include "AACE/Engine/Storage/LocalStorageInterface.h"
 #include "AACE/Engine/Utils/JSON/JSON.h"
+#include "AACE/Engine/Vehicle/VehicleEngineService.h"
+#include "AACE/Engine/Vehicle/VehiclePropertyInterface.h"
+#include "AACE/Engine/Utils/String/StringUtils.h"
 #include "AACE/Engine/Core/EngineMacros.h"
-
 #include "AACE/Vehicle/VehicleProperties.h"
 
 #include <rapidjson/document.h>
@@ -29,202 +31,248 @@ namespace aace {
 namespace engine {
 namespace vehicle {
 
-// String to identify log entries originating from this file.
+/// String to identify log entries originating from this file
 static const std::string TAG("aace.vehicle.VehicleEngineService");
-
-// name of the table used for the local storage database
+/// Name of the table used for the local storage database
 static const std::string VEHICLE_SERVICE_LOCAL_STORAGE_TABLE = "aace.vehicle";
 
 // register the service
 REGISTER_SERVICE(VehicleEngineService)
 
-VehicleEngineService::VehicleEngineService( const aace::engine::core::ServiceDescription& description ) :
-    m_recordEmpty(true),
-    m_recordFull(true),
-    aace::engine::core::EngineService( description ) {
+VehicleEngineService::VehicleEngineService(const aace::engine::core::ServiceDescription& description) :
+        aace::engine::core::EngineService(description),
+        m_recordEmpty(true),
+        m_recordFull(true),
+        m_vehicleInfoConfigured(false) {
 }
 
-std::string VehicleEngineService::getVehicleProperty( VehiclePropertyType type ) {
-    auto it = m_vehiclePropertyMap.find( type );
+std::string VehicleEngineService::getVehicleProperty(VehiclePropertyType type) {
+    auto it = m_vehiclePropertyMap.find(type);
     return it != m_vehiclePropertyMap.end() ? it->second : "";
 }
 
-std::string VehicleEngineService::getVehiclePropertyAttribute( VehiclePropertyType property ) {
-    switch( property )
-    {
-        case VehiclePropertyType::MAKE: return "Make";
-        case VehiclePropertyType::MODEL: return "Model";
-        case VehiclePropertyType::YEAR: return "Year";
-        case VehiclePropertyType::TRIM: return "Trim";
-        case VehiclePropertyType::GEOGRAPHY: return "Geography";
-        case VehiclePropertyType::VERSION: return "SWVersion";
-        case VehiclePropertyType::OPERATING_SYSTEM: return "OS";
-        case VehiclePropertyType::HARDWARE_ARCH: return "HW";
-        case VehiclePropertyType::LANGUAGE: return "Language";
-        case VehiclePropertyType::MICROPHONE: return "Microphone";
-        case VehiclePropertyType::COUNTRY_LIST: return "Countries";
-        case VehiclePropertyType::VEHICLE_IDENTIFIER: return "VehicleIdentifier";
+VehiclePropertyMap VehicleEngineService::getVehicleProperties() {
+    return m_vehiclePropertyMap;
+}
+
+std::string VehicleEngineService::getPropertyAttributeForMetric(VehiclePropertyType property) {
+    switch (property) {
+        case VehiclePropertyType::MAKE:
+            return "Make";
+        case VehiclePropertyType::MODEL:
+            return "Model";
+        case VehiclePropertyType::YEAR:
+            return "Year";
+        case VehiclePropertyType::TRIM:
+            return "Trim";
+        case VehiclePropertyType::GEOGRAPHY:
+            return "Geography";
+        case VehiclePropertyType::VERSION:
+            return "SWVersion";
+        case VehiclePropertyType::OPERATING_SYSTEM:
+            return "OS";
+        case VehiclePropertyType::HARDWARE_ARCH:
+            return "HW";
+        case VehiclePropertyType::LANGUAGE:
+            return "Language";
+        case VehiclePropertyType::MICROPHONE:
+            return "Microphone";
+        case VehiclePropertyType::COUNTRY_LIST:
+            return "Countries";
+        case VehiclePropertyType::VEHICLE_IDENTIFIER:
+            return "VehicleIdentifier";
     }
     return "";
 }
 
 bool VehicleEngineService::initialize() {
-    ThrowIfNot( registerServiceInterface<VehiclePropertyInterface>( shared_from_this() ), "registerVehiclePropertyInterfaceFailed" );
-    return true;
+    
+    try {
+    
+        ThrowIfNot( registerServiceInterface<VehiclePropertyInterface>( shared_from_this() ), "registerVehiclePropertyInterfaceFailed" );
+        ThrowIfNot( registerProperties(), "registerPropertiesFailed" );
+        return true;
+    }
+    catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
+}
+    
+bool VehicleEngineService::registerProperties() {
+    
+    try {
+        // get the property engine service interface from the property manager service
+        auto propertyManager = getContext()->getServiceInterface<aace::engine::propertyManager::PropertyManagerServiceInterface>("aace.propertyManager");
+        ThrowIfNull( propertyManager, "nullPropertyManagerServiceInterface" );
+
+        propertyManager->registerProperty(aace::engine::propertyManager::PropertyDescription(
+            aace::vehicle::property::OPERATING_COUNTRY,
+            std::bind(
+                &VehicleEngineService::setProperty_operatingCountry,
+                this,
+                std::placeholders::_1,
+                std::placeholders::_2,
+                std::placeholders::_3,
+                std::placeholders::_4),
+            std::bind(&VehicleEngineService::getProperty_operatingCountry, this)));
+        return true;
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
 }
 
-bool VehicleEngineService::setup()
-{
-    try
-    {
+bool VehicleEngineService::setup() {
+    try {
         // get the operating country from the settings
-        auto localStorage = getContext()->getServiceInterface<aace::engine::storage::LocalStorageInterface>( "aace.storage" );
-        
-        if( localStorage != nullptr && localStorage->containsKey( VEHICLE_SERVICE_LOCAL_STORAGE_TABLE, "operatingCountry" ) ) {
-            m_operatingCountry = localStorage->get( VEHICLE_SERVICE_LOCAL_STORAGE_TABLE, "operatingCountry", m_operatingCountry );
+        auto localStorage =
+            getContext()->getServiceInterface<aace::engine::storage::LocalStorageInterface>("aace.storage");
+
+        if (localStorage != nullptr &&
+            localStorage->containsKey(VEHICLE_SERVICE_LOCAL_STORAGE_TABLE, "operatingCountry")) {
+            m_operatingCountry =
+                localStorage->get(VEHICLE_SERVICE_LOCAL_STORAGE_TABLE, "operatingCountry", m_operatingCountry);
         }
 
         // warn if the vehicle property map has not been configured
-        if( m_vehiclePropertyMap.empty() ) {
-            AACE_WARN(LX(TAG,"setup").m("vehicleInfoNotConfigured"));
+        if (m_vehiclePropertyMap.empty()) {
+            AACE_WARN(LX(TAG, "setup").m("vehicleInfoNotConfigured"));
         }
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"setup").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "setup").d("reason", ex.what()));
         return false;
     }
 
     return true;
 }
 
-bool VehicleEngineService::checkVehicleConfigProperty( rapidjson::Value& root, const char* key, bool warnIfMissing )
-{
-    ReturnIf( root.HasMember( key ) && root[key].IsString(), true );
-    
-    if( warnIfMissing ) {
-        AACE_WARN(LX(TAG,"checkProperty").d("reason","missingVehicleProperty").d("property",key));
+bool VehicleEngineService::checkVehicleConfigProperty(rapidjson::Value& root, const char* key, bool warnIfMissing) {
+    ReturnIf(root.HasMember(key) && root[key].IsString(), true);
+
+    if (warnIfMissing) {
+        AACE_WARN(LX(TAG, "checkProperty").d("reason", "missingVehicleProperty").d("property", key));
     }
-    
+
     return false;
 }
 
-std::string VehicleEngineService::getVehicleConfigProperty( rapidjson::Value& root, const char* key, const char* defaultValue, bool warnIfMissing )
-{
-    ReturnIfNot( checkVehicleConfigProperty( root, key, warnIfMissing ), defaultValue );
+std::string VehicleEngineService::getVehicleConfigProperty(
+    rapidjson::Value& root,
+    const char* key,
+    const char* defaultValue,
+    bool warnIfMissing) {
+    ReturnIfNot(checkVehicleConfigProperty(root, key, warnIfMissing), defaultValue);
 
     std::string value = root[key].GetString();
-    
+
     // log the vehicle property
-    AACE_INFO(LX(TAG,"VehicleProperty").d(key,value));
-    
+    AACE_INFO(LX(TAG, "VehicleProperty").d(key, value));
+
     return value;
 }
 
-bool VehicleEngineService::configure( std::shared_ptr<std::istream> configuration )
-{
-    try
-    {
-        auto document = aace::engine::utils::json::parse( configuration );
-        ThrowIfNull( document, "parseConfigurationStreamFailed" );
-        
+bool VehicleEngineService::configure(std::shared_ptr<std::istream> configuration) {
+    try {
+        auto document = aace::engine::utils::json::parse(configuration);
+        ThrowIfNull(document, "parseConfigurationStreamFailed");
+
         auto vehicleConfigRoot = document->GetObject();
 
-        if( vehicleConfigRoot.HasMember( "info" ) && vehicleConfigRoot["info"].IsObject() )
-        {
+        if (vehicleConfigRoot.HasMember("info") && vehicleConfigRoot["info"].IsObject()) {
             rapidjson::Value info = vehicleConfigRoot["info"].GetObject();
-            
-            m_vehiclePropertyMap[VehiclePropertyType::MAKE] = getVehicleConfigProperty( info, "make" );
-            m_vehiclePropertyMap[VehiclePropertyType::MODEL] = getVehicleConfigProperty( info, "model" );
-            m_vehiclePropertyMap[VehiclePropertyType::YEAR] = getVehicleConfigProperty( info, "year" );
-            m_vehiclePropertyMap[VehiclePropertyType::TRIM] = getVehicleConfigProperty( info, "trim" );
-            m_vehiclePropertyMap[VehiclePropertyType::GEOGRAPHY] = getVehicleConfigProperty( info, "geography" );
-            m_vehiclePropertyMap[VehiclePropertyType::VERSION] = getVehicleConfigProperty( info, "version" );
-            m_vehiclePropertyMap[VehiclePropertyType::OPERATING_SYSTEM] = getVehicleConfigProperty( info, "os" );
-            m_vehiclePropertyMap[VehiclePropertyType::HARDWARE_ARCH] = getVehicleConfigProperty( info, "arch" );
-            m_vehiclePropertyMap[VehiclePropertyType::LANGUAGE] = getVehicleConfigProperty( info, "language" );
-            m_vehiclePropertyMap[VehiclePropertyType::MICROPHONE] = getVehicleConfigProperty(info, "microphone" );
-            m_vehiclePropertyMap[VehiclePropertyType::COUNTRY_LIST] = getVehicleConfigProperty(info, "countries" );
-            m_vehiclePropertyMap[VehiclePropertyType::VEHICLE_IDENTIFIER] = getVehicleConfigProperty(info, "vehicleIdentifier");
+
+            m_vehiclePropertyMap[VehiclePropertyType::MAKE] = getVehicleConfigProperty(info, "make");
+            m_vehiclePropertyMap[VehiclePropertyType::MODEL] = getVehicleConfigProperty(info, "model");
+            m_vehiclePropertyMap[VehiclePropertyType::YEAR] = getVehicleConfigProperty(info, "year");
+            m_vehiclePropertyMap[VehiclePropertyType::TRIM] = getVehicleConfigProperty(info, "trim");
+            m_vehiclePropertyMap[VehiclePropertyType::GEOGRAPHY] = getVehicleConfigProperty(info, "geography");
+            m_vehiclePropertyMap[VehiclePropertyType::VERSION] = getVehicleConfigProperty(info, "version");
+            m_vehiclePropertyMap[VehiclePropertyType::OPERATING_SYSTEM] = getVehicleConfigProperty(info, "os");
+            m_vehiclePropertyMap[VehiclePropertyType::HARDWARE_ARCH] = getVehicleConfigProperty(info, "arch");
+            m_vehiclePropertyMap[VehiclePropertyType::LANGUAGE] = getVehicleConfigProperty(info, "language");
+            m_vehiclePropertyMap[VehiclePropertyType::MICROPHONE] = getVehicleConfigProperty(info, "microphone");
+            m_vehiclePropertyMap[VehiclePropertyType::COUNTRY_LIST] = getVehicleConfigProperty(info, "countries");
+            m_vehiclePropertyMap[VehiclePropertyType::VEHICLE_IDENTIFIER] =
+                getVehicleConfigProperty(info, "vehicleIdentifier");
+
+            m_vehicleInfoConfigured  = true;
         }
-        
-        if( vehicleConfigRoot.HasMember( "operatingCountry" ) && vehicleConfigRoot["operatingCountry"].IsString() ) {
+
+        if (vehicleConfigRoot.HasMember("operatingCountry") && vehicleConfigRoot["operatingCountry"].IsString()) {
             m_operatingCountry = vehicleConfigRoot["operatingCountry"].GetString();
         }
 
-        ThrowIfNot( registerServiceInterface<VehicleEngineService>( shared_from_this() ), "registerVehicleEngineServiceFailed" );
+        // Register the vehicle engine service
+        ThrowIfNot(
+            registerServiceInterface<VehicleEngineService>(shared_from_this()), "registerVehicleEngineServiceFailed");
 
         return true;
-    }
-    catch( std::exception& ex ) {
-        AACE_WARN(LX(TAG,"configure").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_WARN(LX(TAG, "configure").d("reason", ex.what()));
         return false;
     }
 }
 
-bool VehicleEngineService::setProperty( const std::string& key, const std::string& value )
-{
+bool VehicleEngineService::isVehicleInfoConfigured() {
+    return m_vehicleInfoConfigured;
+}
+
+bool VehicleEngineService::setProperty_operatingCountry(
+    const std::string& value,
+    bool& changed,
+    bool& async,
+    const SetPropertyResultCallback& callbackFunction) {
     try
     {
-        if( key.compare( aace::vehicle::property::OPERATING_COUNTRY ) == 0 )
-        {
-            auto localStorage = getContext()->getServiceInterface<aace::engine::storage::LocalStorageInterface>( "aace.storage" );
-
-            ThrowIfNull( localStorage, "localStorageInterfaceInvalid" );
-            ThrowIfNot( localStorage->put( VEHICLE_SERVICE_LOCAL_STORAGE_TABLE, "operatingCountry", value ), "setLocalStorageFailed" );
-            
-            m_operatingCountry = value;
-        }
-        else {
-            return false;
-        }
+        AACE_INFO(LX(TAG).sensitive("value", value));
         
+        ReturnIf( aace::engine::utils::string::equal(value, m_operatingCountry), true);
+         
+        auto localStorage = getContext()->getServiceInterface<aace::engine::storage::LocalStorageInterface>( "aace.storage" );
+        
+        ThrowIfNull( localStorage, "localStorageInterfaceInvalid" );
+        ThrowIfNot( localStorage->put( VEHICLE_SERVICE_LOCAL_STORAGE_TABLE, "operatingCountry", value ), "setLocalStorageFailed" );
+        
+        m_operatingCountry = value;
+        changed = true;
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"setProperty").d("reason", ex.what()).d("key",key).d("value",value));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).sensitive("value",value));
         return false;
     }
 }
 
-std::string VehicleEngineService::getProperty( const std::string& key )
+std::string VehicleEngineService::getProperty_operatingCountry()
 {
-    try
-    {    
-        if( key.compare( aace::vehicle::property::OPERATING_COUNTRY ) == 0 ) {
-            return m_operatingCountry;
-        }
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"getProperty").d("reason", ex.what()).d("key",key));
-    }
-    
-    return std::string();
+    AACE_INFO(LX(TAG));
+    return m_operatingCountry;
 }
 
 std::shared_ptr<aace::engine::metrics::MetricEvent> VehicleEngineService::generateVehiclePropertiesMetric(bool full) {
     std::string program = "AlexaAuto_Vehicle";
     std::string source = "VehicleConfiguration";
-    std::shared_ptr<aace::engine::metrics::MetricEvent> currentMetric = 
+    std::shared_ptr<aace::engine::metrics::MetricEvent> currentMetric =
         std::shared_ptr<aace::engine::metrics::MetricEvent>(new aace::engine::metrics::MetricEvent(program, source));
 
     if (full) {
-        AACE_INFO(LX(TAG,"generateMetric").m("Added vehicle properties"));
-        for( auto itr : m_vehiclePropertyMap ) {
+        AACE_INFO(LX(TAG, "generateMetric").m("Added vehicle properties"));
+        for (auto itr : m_vehiclePropertyMap) {
             VehiclePropertyType property = itr.first;
-            std::string dataPointName = getVehiclePropertyAttribute(property);
+            std::string dataPointName = getPropertyAttributeForMetric(property);
             std::string dataPointValue = itr.second;
 
             // sanitize any delimiter characters from dataPointValue to maintain metric formatting
             char delimiters[] = ";=,:";
-            for (char delimiter : delimiters)
-            {
-                std::replace( dataPointValue.begin(), dataPointValue.end(), delimiter, '-');
+            for (char delimiter : delimiters) {
+                std::replace(dataPointValue.begin(), dataPointValue.end(), delimiter, '-');
             }
 
             currentMetric->addString(dataPointName, dataPointValue);
         }
     } else {
-        AACE_INFO(LX(TAG,"generateMetric").m("Omitting vehicle properties"));
+        AACE_INFO(LX(TAG, "generateMetric").m("Omitting vehicle properties"));
         currentMetric->addString("vehicle_metadata_not_included", "Device is not authenticated");
     }
 
@@ -236,18 +284,17 @@ std::shared_ptr<aace::engine::metrics::MetricEvent> VehicleEngineService::genera
  * Only necessary to emit the metric once for empty or full.
  */
 void VehicleEngineService::record(bool full) {
-
     // Only need record each metric once
     if (!full && m_recordEmpty) {
         auto metric = generateVehiclePropertiesMetric(full);
-        AACE_INFO(LX(TAG,"record").m("Recording metric without vehicle information"));
+        AACE_INFO(LX(TAG, "record").m("Recording metric without vehicle information"));
         metric->record();
         m_recordEmpty = false;
-    } 
+    }
 
     if (full && m_recordFull) {
         auto metric = generateVehiclePropertiesMetric(full);
-        AACE_INFO(LX(TAG,"record").m("Recording metric with vehicle information"));
+        AACE_INFO(LX(TAG, "record").m("Recording metric with vehicle information"));
         metric->record();
         m_recordFull = false;
     }

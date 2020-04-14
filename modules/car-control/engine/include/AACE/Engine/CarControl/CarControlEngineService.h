@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include <unordered_map>
 
 #include "AACE/CarControl/CarControl.h"
+#include "AACE/Engine/CarControl/AssetStore.h"
 #include "AACE/Engine/CarControl/CarControlEngineImpl.h"
 #include "AACE/Engine/CarControl/Endpoint.h"
 #include "AACE/Engine/Storage/StorageEngineService.h"
@@ -28,11 +29,12 @@ namespace aace {
 namespace engine {
 namespace carControl {
 
-class CarControlEngineService :
-    public aace::engine::core::EngineService,
-    public std::enable_shared_from_this<CarControlEngineService> {
+class CarControlEngineService
+        : public aace::engine::core::EngineService
+        , public std::enable_shared_from_this<CarControlEngineService> {
 public:
-    DESCRIBE("aace.carControl", VERSION("1.0"), DEPENDS(aace::engine::storage::StorageEngineService))
+    DESCRIBE("aace.carControl", VERSION("1.0"),
+             DEPENDS(aace::engine::storage::StorageEngineService))
 public:
     virtual ~CarControlEngineService();
 
@@ -40,25 +42,26 @@ public:
     /// @{
     bool registerPlatformInterface(std::shared_ptr<aace::core::PlatformInterface> platformInterface) override;
 
+public:
     /**
      * Set whether the @c CarControlLocalService is available
      *
      * @param [in] isAvailable @c true if the local service is available
      */
     virtual void setLocalServiceAvailability(bool isAvailable);
+
     /**
      * Check whether the @c CarControlLocalService is available
      *
      * @return @c true if the local service is available
      */
-    virtual bool isLocalServiceAvailable();;
+    virtual bool isLocalServiceAvailable();
 
 protected:
     bool initialize() override;
     bool configure(std::shared_ptr<std::istream> configuration) override;
     bool setup() override;
     bool shutdown() override;
-    bool setProperty(const std::string& key, const std::string& value) override;
     /// @}
 
     CarControlEngineService(const aace::engine::core::ServiceDescription& description);
@@ -73,12 +76,18 @@ private:
 
     /// The engine implementation instance
     std::shared_ptr<aace::engine::carControl::CarControlEngineImpl> m_carControlEngineImpl;
-    /// Whether the @c CarControlEngineService has been configured
-    bool m_configured = false;
-    /// A map of endpoint ID to the corresponding @c Endpoint object
+
+    /// The AssetStore used to store friendly name / locale pairs for the assets describing all endpoints
+    aace::engine::carControl::AssetStore m_assetStore;
+
+    /// A map of endpoint IDs to the corresponding @c Endpoint object for all configured endpoints
     std::unordered_map<std::string, std::shared_ptr<aace::engine::carControl::Endpoint>> m_endpoints;
+
     /// Whether the @c CarControlLocalService is available
     bool m_isLocalServiceAvailable = false;
+
+    /// Whether the @c CarControlEngineService has been configured
+    bool m_configured = false;
 };
 
 }  // namespace carControl

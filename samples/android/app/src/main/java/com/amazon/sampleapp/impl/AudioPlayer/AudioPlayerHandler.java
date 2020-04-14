@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -28,14 +28,12 @@ public class AudioPlayerHandler extends AudioPlayer
 {
     private static String TAG = AudioPlayerHandler.class.getSimpleName();
     private LoggerHandler mLogger = null;
-    private AudioOutputProviderHandler mAudioOutputProvider = null;
     private PlaybackControllerHandler mPlaybackController = null;
     private AudioPlayerStateHandler mAudioPlayerStateHandler = null;
 
-    public AudioPlayerHandler( LoggerHandler logger, AudioOutputProviderHandler audioOutputProvider, PlaybackControllerHandler playbackController ) {
+    public AudioPlayerHandler( LoggerHandler logger, PlaybackControllerHandler playbackController ) {
         mLogger = logger;
         mPlaybackController = playbackController;
-        mAudioOutputProvider = audioOutputProvider;
         mAudioPlayerStateHandler = new AudioPlayerStateHandler();
     }
 
@@ -61,20 +59,15 @@ public class AudioPlayerHandler extends AudioPlayer
         {
             if( msg.what == UPDATE_PROGRESS )
             {
-                AudioOutput audioOutput = mAudioOutputProvider.getOutputChannel( "AudioPlayer" );
-
-                if( audioOutput != null )
-                {
-                    long position = audioOutput.getPosition();
-
-                    if(audioOutput.getDuration() == AudioOutput.TIME_UNKNOWN) {
-                        position = AudioOutput.TIME_UNKNOWN;
-                    }
-
-                    mPlaybackController.setTime( position, audioOutput.getDuration() );
-
-                    sendEmptyMessageDelayed( UPDATE_PROGRESS, 1000 - (position % 1000) );
+                long position = getPlayerPosition();
+                long duration = getPlayerDuration();
+                if( duration == AudioPlayer.TIME_UNKNOWN ) {
+                    position = AudioPlayer.TIME_UNKNOWN;
                 }
+
+                mPlaybackController.setTime( position, duration );
+
+                sendEmptyMessageDelayed( UPDATE_PROGRESS, 1000 - (position % 1000) );
             }
             else if( msg.what == PlayerActivity.PLAYING.ordinal() ) {
                 mPlaybackController.start();

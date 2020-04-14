@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">2.1.0</span>
+   &#160;<span id="projectnumber">2.2.0</span>
    </div>
   </td>
  </tr>
@@ -170,6 +170,9 @@ $(function() {
 <li>artistName
 : <a class="el" href="classaace_1_1alexa_1_1_external_media_adapter_1_1_playback_state.html#ac4a8c7f055df29c5df58a0f1f93aa774">aace::alexa::ExternalMediaAdapter::PlaybackState</a>
 , <a class="el" href="classaace_1_1alexa_1_1_local_media_source_1_1_playback_state.html#ac4e528288c407184054986b7c5f4401c">aace::alexa::LocalMediaSource::PlaybackState</a>
+</li>
+<li>AudioStreamProperty()
+: <a class="el" href="classaace_1_1audio_1_1_audio_stream_property.html#a3ae61e4591b926ae67ab2985e6f1cd72">aace::audio::AudioStreamProperty</a>
 </li>
 <li>AuthError
 : <a class="el" href="classaace_1_1alexa_1_1_auth_provider.html#a6f44b8c435407a4ff782fd931afc05ab">aace::alexa::AuthProvider</a>
@@ -381,6 +384,9 @@ $(function() {
 <li>DatapointType
 : <a class="el" href="classaace_1_1metrics_1_1_metrics_uploader.html#a67e6fa51b9ef4b8a9b293870363eb4b5">aace::metrics::MetricsUploader</a>
 </li>
+<li>defaultSkillToken
+: <a class="el" href="classaace_1_1alexa_1_1_external_media_adapter_1_1_authorized_player_info.html#a819a92a8ef3efd20ddf855b2d681146d">aace::alexa::ExternalMediaAdapter::AuthorizedPlayerInfo</a>
+</li>
 <li>deviceConfigurationUpdated()
 : <a class="el" href="classaace_1_1phone_call_controller_1_1_phone_call_controller.html#a3d36c76efd0e96bd84196a8dcd5071de">aace::phoneCallController::PhoneCallController</a>
 </li>
@@ -473,6 +479,9 @@ $(function() {
 <li>getDuration()
 : <a class="el" href="classaace_1_1audio_1_1_audio_output.html#af0ee84c73cd22161c02497508556ee90">aace::audio::AudioOutput</a>
 </li>
+<li>getKey()
+: <a class="el" href="classaace_1_1audio_1_1_audio_stream_property.html#a84c0802fe136f0b6487e216b3b6fafe0">aace::audio::AudioStreamProperty</a>
+</li>
 <li>getLatitude()
 : <a class="el" href="classaace_1_1location_1_1_location.html#a2ff0516c0cb41fa318b75edd5e81f5e0">aace::location::Location</a>
 </li>
@@ -491,11 +500,21 @@ $(function() {
 <li>getNetworkStatus()
 : <a class="el" href="classaace_1_1network_1_1_network_info_provider.html#ad7cf08c5dbaad707cc176e422258ee1d">aace::network::NetworkInfoProvider</a>
 </li>
+<li>getNumBytesBuffered()
+: <a class="el" href="classaace_1_1audio_1_1_audio_output.html#a9fc6bddf91b8365fbd134ce024e25dfa">aace::audio::AudioOutput</a>
+</li>
+<li>getPlayerDuration()
+: <a class="el" href="classaace_1_1alexa_1_1_audio_player.html#a79508257fa720e5fe633c5b76c0ff911">aace::alexa::AudioPlayer</a>
+</li>
+<li>getPlayerPosition()
+: <a class="el" href="classaace_1_1alexa_1_1_audio_player.html#aa2b61c4887d9bca905914559b23fcf38">aace::alexa::AudioPlayer</a>
+</li>
 <li>getPosition()
 : <a class="el" href="classaace_1_1audio_1_1_audio_output.html#a04ff4005d0f36300bc54421906b89299">aace::audio::AudioOutput</a>
 </li>
 <li>getProperty()
 : <a class="el" href="classaace_1_1core_1_1_engine.html#abab5399f2030131a54f1ba93e4981508">aace::core::Engine</a>
+, <a class="el" href="classaace_1_1property_manager_1_1_property_manager.html#a1892fedbf2193e03f040758207a4dea6">aace::propertyManager::PropertyManager</a>
 </li>
 <li>getRangeControllerValue()
 : <a class="el" href="classaace_1_1car_control_1_1_car_control.html#a37f2556dd5b73fe6a098679b9cce60d5">aace::carControl::CarControl</a>
@@ -519,6 +538,9 @@ $(function() {
 </li>
 <li>getTimeAsString()
 : <a class="el" href="classaace_1_1location_1_1_location.html#aea77abc6aa7edc610312fde96cb77d7a">aace::location::Location</a>
+</li>
+<li>getValue()
+: <a class="el" href="classaace_1_1audio_1_1_audio_stream_property.html#a9d8ef88c1f40c83b75d0f1928f09605f">aace::audio::AudioStreamProperty</a>
 </li>
 <li>getVisualContext()
 : <a class="el" href="classaace_1_1apl_1_1_a_p_l.html#a97bcf6e8f7709626c6e5f9b2b06861ef">aace::apl::APL</a>
@@ -677,8 +699,17 @@ $(function() {
 
 
 <h3><a id="index_o"></a>- o -</h3><ul>
+<li>onGetPlayerDuration()
+: <a class="el" href="classaace_1_1alexa_1_1_audio_player_engine_interface.html#a380a99414e5f66c1ab1ed771e92a64cd">aace::alexa::AudioPlayerEngineInterface</a>
+</li>
+<li>onGetPlayerPosition()
+: <a class="el" href="classaace_1_1alexa_1_1_audio_player_engine_interface.html#a8b16159c547ae8f0703d3a8385fa6ff8">aace::alexa::AudioPlayerEngineInterface</a>
+</li>
 <li>onNotificationReceived()
 : <a class="el" href="classaace_1_1alexa_1_1_notifications.html#a72f76e86a5e8a022db2aee933751c7dc">aace::alexa::Notifications</a>
+</li>
+<li>operator=()
+: <a class="el" href="classaace_1_1audio_1_1_audio_stream_property.html#a924207ad94f9a5d8409e6048e229da37">aace::audio::AudioStreamProperty</a>
 </li>
 </ul>
 
@@ -741,10 +772,16 @@ $(function() {
 : <a class="el" href="classaace_1_1alexa_1_1_local_media_source.html#a874c1999278a4a9598b2cfddf2639563">aace::alexa::LocalMediaSource</a>
 </li>
 <li>prepare()
-: <a class="el" href="classaace_1_1audio_1_1_audio_output.html#a2e67f2223e68d842685da2f32f14d49d">aace::audio::AudioOutput</a>
+: <a class="el" href="classaace_1_1audio_1_1_audio_output.html#ac65040330bf053723e6ded2df6c2da88">aace::audio::AudioOutput</a>
 </li>
 <li>processActivityEvent()
 : <a class="el" href="classaace_1_1apl_1_1_a_p_l.html#a1e382051d18bc09a39e1f3cd9b9ddb9a">aace::apl::APL</a>
+</li>
+<li>propertyChanged()
+: <a class="el" href="classaace_1_1property_manager_1_1_property_manager.html#a71d433e4f3149f96ce2b3df3a51d1aa5">aace::propertyManager::PropertyManager</a>
+</li>
+<li>propertyStateChanged()
+: <a class="el" href="classaace_1_1property_manager_1_1_property_manager.html#acfe5b9136c08b87e35c55045129e5aa3">aace::propertyManager::PropertyManager</a>
 </li>
 </ul>
 
@@ -808,7 +845,12 @@ $(function() {
 </li>
 <li>sessionState
 : <a class="el" href="classaace_1_1alexa_1_1_external_media_adapter_1_1_external_media_adapter_state.html#aa5e42c3124172f96c11377bed58963aa">aace::alexa::ExternalMediaAdapter::ExternalMediaAdapterState</a>
-, <a class="el" href="classaace_1_1alexa_1_1_local_media_source_1_1_local_media_source_state.html#a1a0533445205c67cca585e45ba1e9486">aace::alexa::LocalMediaSource::LocalMediaSourceState</a>
+</li>
+<li>SessionState()
+: <a class="el" href="classaace_1_1alexa_1_1_external_media_adapter_1_1_session_state.html#a9261f692ab89c0a12b494cf707d83daa">aace::alexa::ExternalMediaAdapter::SessionState</a>
+</li>
+<li>sessionState
+: <a class="el" href="classaace_1_1alexa_1_1_local_media_source_1_1_local_media_source_state.html#a1a0533445205c67cca585e45ba1e9486">aace::alexa::LocalMediaSource::LocalMediaSourceState</a>
 </li>
 <li>setAPLMaxVersion()
 : <a class="el" href="classaace_1_1apl_1_1_a_p_l.html#ae78b5ed9cf53ac882d12bdff99d69638">aace::apl::APL</a>
@@ -823,7 +865,7 @@ $(function() {
 : <a class="el" href="classaace_1_1alexa_1_1_do_not_disturb.html#adf4a853a8f3366e416127d1f1767ccab">aace::alexa::DoNotDisturb</a>
 </li>
 <li>setFocus()
-: <a class="el" href="classaace_1_1alexa_1_1_local_media_source.html#a4bd1345a78aa1d1ec6f730a5c8a0c790">aace::alexa::LocalMediaSource</a>
+: <a class="el" href="classaace_1_1alexa_1_1_local_media_source.html#ad1217e4c192da618ae846ba57c8611ac">aace::alexa::LocalMediaSource</a>
 </li>
 <li>setIndicator()
 : <a class="el" href="classaace_1_1alexa_1_1_notifications.html#ac88ce22736f266b4ef6d703b7e2fbc58">aace::alexa::Notifications</a>
@@ -836,6 +878,7 @@ $(function() {
 </li>
 <li>setProperty()
 : <a class="el" href="classaace_1_1core_1_1_engine.html#a65f89859ff67cfaa56051785543ceae2">aace::core::Engine</a>
+, <a class="el" href="classaace_1_1property_manager_1_1_property_manager.html#a07bd961c86047b1b1e5de7366bf83820">aace::propertyManager::PropertyManager</a>
 </li>
 <li>setRangeControllerValue()
 : <a class="el" href="classaace_1_1car_control_1_1_car_control.html#a6eb554713a311dcf2dbe6aca00e1739e">aace::carControl::CarControl</a>
@@ -917,7 +960,8 @@ $(function() {
 : <a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#abf68ff89209ddbd51fbd9fa7abe21b41">aace::alexa::config::AlexaConfiguration</a>
 </li>
 <li>TIME_UNKNOWN
-: <a class="el" href="classaace_1_1audio_1_1_audio_output.html#a6e6edf1cd19f4da033cfe3607d8872f3">aace::audio::AudioOutput</a>
+: <a class="el" href="classaace_1_1alexa_1_1_audio_player.html#a1dfdec2432e3caf9dc5f92d95aa231f1">aace::alexa::AudioPlayer</a>
+, <a class="el" href="classaace_1_1audio_1_1_audio_output.html#a6e6edf1cd19f4da033cfe3607d8872f3">aace::audio::AudioOutput</a>
 </li>
 <li>tinyURL
 : <a class="el" href="classaace_1_1alexa_1_1_external_media_adapter_1_1_playback_state.html#aa5ddbdfee98be70abd85a447201c63fc">aace::alexa::ExternalMediaAdapter::PlaybackState</a>
@@ -1010,7 +1054,7 @@ $(function() {
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 2.1.0 - Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 2.2.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

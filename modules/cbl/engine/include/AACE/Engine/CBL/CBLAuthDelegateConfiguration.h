@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -20,7 +20,10 @@
 #include <memory>
 #include <string>
 
+#include <AVSCommon/Utils/DeviceInfo.h>
+
 #include "AACE/Engine/Alexa/AlexaEndpointInterface.h"
+#include "AACE/Engine/Alexa/LocaleAssetsManager.h"
 
 namespace aace {
 namespace engine {
@@ -32,7 +35,8 @@ public:
     static std::shared_ptr<CBLAuthDelegateConfiguration> create(
         std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
         std::chrono::seconds codePairRequestTimeout,
-        std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints );
+        std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
+        std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> localeAssetManager );
 
     std::string getClientId() const;
     std::string getProductId() const;
@@ -45,11 +49,18 @@ public:
     std::string getRefreshTokenUrl() const;
     std::string getScopeData() const;
 
+    /**
+     * Function to get the default locale to be used in HTTP Accept-Language header while
+     * requesting for the code pair.
+     */
+    std::string getDefaultLocale() const;
+
 private:
 
     bool initialize( std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
         std::chrono::seconds codePairRequestTimeout,
-        std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints );
+        std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
+        std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> localeAssetManager );
 
     bool initScopeData();
 
@@ -59,6 +70,10 @@ private:
     std::chrono::seconds m_accessTokenRefreshHeadStart;
     std::string m_scopeData;
     std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> m_alexaEndpoints;
+
+    /// Weak reference to the @c LocaleAssetsManager for getting the default locale.
+    std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> m_localeAssetManager;
+
 };
 
 } // aace::engine::cbl

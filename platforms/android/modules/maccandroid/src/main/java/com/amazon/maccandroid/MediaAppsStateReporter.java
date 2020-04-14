@@ -37,7 +37,7 @@ public class MediaAppsStateReporter {
         UUID playbackSessionId = null;
         if (app != null) {
             playbackSessionId = app.getPlaybackSessionId();
-        }
+        } else Log.e(TAG, "reportError app is null");
         mMACCAndroidClient.reportError(error.getName(), error.getErrorCode(), false, playerId,
                 playbackSessionId);
     }
@@ -77,6 +77,10 @@ public class MediaAppsStateReporter {
     }
 
     static void setTestStateReporter(MediaAppsStateReporter testInstance) {
+        if (testInstance == null) {
+            Log.e(TAG, "setTestStateReporter testInstance is null");
+            return;
+        }
         sInstance = testInstance;
     }
 

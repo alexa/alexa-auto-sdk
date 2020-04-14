@@ -2,7 +2,7 @@
   "version": 1,
   "assets": [
     {
-      "assetId": "Alexa.DeviceName.Fan",
+      "assetId": "Alexa.Automotive.DeviceName.Fan",
       "values": [
         {
           "locales": [
@@ -18,7 +18,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "ventilador",
           "synonyms": [
@@ -35,13 +36,14 @@
           "synonyms": [
             "air",
             "soufflante",
-            "flux d'air"
+            "flux d'air",
+            "flux d' air"
           ]
         }
       ]
     },
     {
-      "assetId": "Alexa.DeviceName.Car",
+      "assetId": "Alexa.Automotive.DeviceName.Car",
       "values": [
         {
           "locales": [
@@ -55,7 +57,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "auto",
           "synonyms": [
@@ -77,7 +80,7 @@
       ]
     },
     {
-      "assetId": "Alexa.DeviceName.Heater",
+      "assetId": "Alexa.Automotive.DeviceName.Heater",
       "values": [
         {
           "locales": [
@@ -89,7 +92,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "calefactor",
           "synonyms": [
@@ -106,7 +110,7 @@
       ]
     },
     {
-      "assetId": "Alexa.DeviceName.Cooler",
+      "assetId": "Alexa.Automotive.DeviceName.Cooler",
       "values": [
         {
           "locales": [
@@ -118,7 +122,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "enfriador",
           "synonyms": [
@@ -135,7 +140,7 @@
       ]
     },
     {
-      "assetId": "Alexa.DeviceName.ClimateControl",
+      "assetId": "Alexa.Automotive.DeviceName.ClimateControl",
       "values": [
         {
           "locales": [
@@ -147,11 +152,13 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "climatización",
           "synonyms": [
-            "climatizador"
+            "climatizador",
+            "control de climatización"
           ]
         },
         {
@@ -164,7 +171,7 @@
       ]
     },
     {
-      "assetId": "Alexa.DeviceName.AirConditioner",
+      "assetId": "Alexa.Automotive.DeviceName.AirConditioner",
       "values": [
         {
           "locales": [
@@ -182,14 +189,16 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "aire acondicionado",
           "synonyms": [
             "climatización",
             "ac",
             "a/c",
-            "a c"
+            "a c",
+            "a. c."
           ]
         },
         {
@@ -199,15 +208,17 @@
           "defaultValue": "climatiseur",
           "synonyms": [
             "conditionneur d'air",
+            "conditionneur d' air",
             "climatisation",
             "air climatisé",
-            "ac"
+            "ac",
+            "a. c."
           ]
         }
       ]
     },
     {
-      "assetId": "Alexa.DeviceName.Windshield",
+      "assetId": "Alexa.Automotive.DeviceName.Windshield",
       "values": [
         {
           "locales": [
@@ -219,7 +230,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "parabrisas",
           "synonyms": []
@@ -234,7 +246,7 @@
       ]
     },
     {
-      "assetId": "Alexa.DeviceName.Window",
+      "assetId": "Alexa.Automotive.DeviceName.Window",
       "values": [
         {
           "locales": [
@@ -246,7 +258,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "ventana",
           "synonyms": []
@@ -261,7 +274,7 @@
       ]
     },
     {
-      "assetId": "Alexa.DeviceName.Light",
+      "assetId": "Alexa.Automotive.DeviceName.Light",
       "values": [
         {
           "locales": [
@@ -273,7 +286,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "luz",
           "synonyms": []
@@ -288,7 +302,7 @@
       ]
     },
     {
-      "assetId": "Alexa.DeviceName.ReadingLight",
+      "assetId": "Alexa.Automotive.DeviceName.ReadingLight",
       "values": [
         {
           "locales": [
@@ -300,7 +314,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "luz de lectura",
           "synonyms": []
@@ -315,7 +330,7 @@
       ]
     },
     {
-      "assetId": "Alexa.DeviceName.DomeLight",
+      "assetId": "Alexa.Automotive.DeviceName.DomeLight",
       "values": [
         {
           "locales": [
@@ -327,10 +342,13 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "luz del techo",
-          "synonyms": []
+          "synonyms": [
+            "luz interior"
+          ]
         },
         {
           "locales": [
@@ -342,7 +360,7 @@
       ]
     },
     {
-      "assetId": "Alexa.DeviceName.CabinLight",
+      "assetId": "Alexa.Automotive.DeviceName.CabinLight",
       "values": [
         {
           "locales": [
@@ -354,7 +372,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "luz de la cabina",
           "synonyms": [
@@ -371,7 +390,7 @@
       ]
     },
     {
-      "assetId": "Alexa.DeviceName.AmbientLight",
+      "assetId": "Alexa.Automotive.DeviceName.AmbientLight",
       "values": [
         {
           "locales": [
@@ -387,13 +406,15 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "luz ambiental",
           "synonyms": [
             "iluminación ambiental",
             "luz de ambiente",
-            "iluminación de ambiente"
+            "iluminación de ambiente",
+            "luces ambientales"
           ]
         },
         {
@@ -410,7 +431,7 @@
       ]
     },
     {
-      "assetId": "Alexa.DeviceName.TrunkLight",
+      "assetId": "Alexa.Automotive.DeviceName.TrunkLight",
       "values": [
         {
           "locales": [
@@ -422,7 +443,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "luz del maletero",
           "synonyms": [
@@ -439,7 +461,7 @@
       ]
     },
     {
-      "assetId": "Alexa.DeviceName.Vent",
+      "assetId": "Alexa.Automotive.DeviceName.Vent",
       "values": [
         {
           "locales": [
@@ -457,7 +479,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "rejilla",
           "synonyms": [
@@ -484,7 +507,180 @@
       ]
     },
     {
-      "assetId": "Alexa.Setting.BodyVents",
+      "assetId": "Alexa.Automotive.DeviceName.SeatHeater",
+      "values": [
+        {
+          "locales": [
+            "en-US",
+            "en-CA"
+          ],
+          "defaultValue": "seat heater",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "es-MX",
+            "es-US"
+          ],
+          "defaultValue": "calentador de asiento",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "fr-CA"
+          ],
+          "defaultValue": "siège chauffant",
+          "synonyms": []
+        }
+      ]
+    },
+    {
+      "assetId": "Alexa.Automotive.DeviceName.DriverSeat",
+      "values": [
+        {
+          "locales": [
+            "en-US",
+            "en-CA"
+          ],
+          "defaultValue": "seat",
+          "synonyms": [
+            "driver seat",
+            "driver side seat"
+          ]
+        },
+        {
+          "locales": [
+            "es-MX",
+            "es-US"
+          ],
+          "defaultValue": "asiento",
+          "synonyms": [
+            "asiento del conductor",
+            "asiento del lado del conductor"
+          ]
+        },
+        {
+          "locales": [
+            "fr-CA"
+          ],
+          "defaultValue": "siège",
+          "synonyms": [
+            "siège conducteur",
+            "siège du conducteur"
+          ]
+        }
+      ]
+    },
+    {
+      "assetId": "Alexa.Automotive.DeviceName.PassengerSeat",
+      "values": [
+        {
+          "locales": [
+            "en-US",
+            "en-CA"
+          ],
+          "defaultValue": "passenger seat",
+          "synonyms": [
+            "passenger side seat"
+          ]
+        },
+        {
+          "locales": [
+            "es-MX",
+            "es-US"
+          ],
+          "defaultValue": "asiento del pasajero",
+          "synonyms": [
+            "asiento del lado del pasajero",
+            "asiento del copiloto",
+            "asiento del lado del copiloto"
+          ]
+        },
+        {
+          "locales": [
+            "fr-CA"
+          ],
+          "defaultValue": "siège passager",
+          "synonyms": [
+            "siège du passager"
+          ]
+        }
+      ]
+    },
+    {
+      "assetId": "Alexa.Automotive.DeviceName.LeftSeat",
+      "values": [
+        {
+          "locales": [
+            "en-US",
+            "en-CA"
+          ],
+          "defaultValue": "left seat",
+          "synonyms": [
+            "left side seat"
+          ]
+        },
+        {
+          "locales": [
+            "es-MX",
+            "es-US"
+          ],
+          "defaultValue": "asiento izquierdo",
+          "synonyms": [
+            "asiento de la izquierda",
+            "asiento del lado izquierdo"
+          ]
+        },
+        {
+          "locales": [
+            "fr-CA"
+          ],
+          "defaultValue": "siège gauche",
+          "synonyms": [
+            "siège de gauche",
+            "siège côté gauche"
+          ]
+        }
+      ]
+    },
+    {
+      "assetId": "Alexa.Automotive.DeviceName.RightSeat",
+      "values": [
+        {
+          "locales": [
+            "en-US",
+            "en-CA"
+          ],
+          "defaultValue": "right seat",
+          "synonyms": [
+            "right side seat"
+          ]
+        },
+        {
+          "locales": [
+            "es-MX",
+            "es-US"
+          ],
+          "defaultValue": "asiento derecho",
+          "synonyms": [
+            "asiento de la derecha",
+            "asiento del lado derecho"
+          ]
+        },
+        {
+          "locales": [
+            "fr-CA"
+          ],
+          "defaultValue": "siège droit",
+          "synonyms": [
+            "siège de droite",
+            "siège côté droit"
+          ]
+        }
+      ]
+    },
+    {
+      "assetId": "Alexa.Automotive.Setting.BodyVents",
       "values": [
         {
           "locales": [
@@ -502,7 +698,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "rejillas para el cuerpo",
           "synonyms": [
@@ -529,7 +726,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Setting.FloorVents",
+      "assetId": "Alexa.Automotive.Setting.FloorVents",
       "values": [
         {
           "locales": [
@@ -549,7 +746,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "rejillas para el piso",
           "synonyms": [
@@ -579,7 +777,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Setting.WindshieldVents",
+      "assetId": "Alexa.Automotive.Setting.WindshieldVents",
       "values": [
         {
           "locales": [
@@ -594,7 +792,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "rejillas del parabrisas",
           "synonyms": [
@@ -615,7 +814,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Setting.MixVents",
+      "assetId": "Alexa.Automotive.Setting.MixVents",
       "values": [
         {
           "locales": [
@@ -633,7 +832,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "rejillas mixtas",
           "synonyms": [
@@ -659,7 +859,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Setting.AirRecirculation",
+      "assetId": "Alexa.Automotive.Setting.AirRecirculation",
       "values": [
         {
           "locales": [
@@ -673,7 +873,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "recirculación de aire",
           "synonyms": [
@@ -692,7 +893,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Setting.Defrost",
+      "assetId": "Alexa.Automotive.Setting.Defrost",
       "values": [
         {
           "locales": [
@@ -706,7 +907,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "descongelador",
           "synonyms": [
@@ -725,7 +927,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Setting.Defog",
+      "assetId": "Alexa.Automotive.Setting.Defog",
       "values": [
         {
           "locales": [
@@ -739,7 +941,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "desempañador",
           "synonyms": [
@@ -758,7 +961,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Setting.ClimateSync",
+      "assetId": "Alexa.Automotive.Setting.ClimateSync",
       "values": [
         {
           "locales": [
@@ -773,7 +976,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "sincronización del clima",
           "synonyms": [
@@ -798,7 +1002,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Setting.Color",
+      "assetId": "Alexa.Automotive.Setting.Color",
       "values": [
         {
           "locales": [
@@ -810,7 +1014,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "color",
           "synonyms": []
@@ -825,7 +1030,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Setting.Auto",
+      "assetId": "Alexa.Automotive.Setting.Auto",
       "values": [
         {
           "locales": [
@@ -841,7 +1046,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "auto",
           "synonyms": [
@@ -864,7 +1070,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Setting.Manual",
+      "assetId": "Alexa.Automotive.Setting.Manual",
       "values": [
         {
           "locales": [
@@ -878,7 +1084,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "manual",
           "synonyms": [
@@ -897,7 +1104,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Setting.Economy",
+      "assetId": "Alexa.Automotive.Setting.Economy",
       "values": [
         {
           "locales": [
@@ -913,7 +1120,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "economía",
           "synonyms": [
@@ -937,7 +1145,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Setting.FanSpeed",
+      "assetId": "Alexa.Automotive.Setting.FanSpeed",
       "values": [
         {
           "locales": [
@@ -954,7 +1162,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "velocidad del ventilador",
           "synonyms": [
@@ -971,6 +1180,7 @@
           "defaultValue": "vitesse du ventilateur",
           "synonyms": [
             "vitesse du flux d'air",
+            "vitesse du flux d' air",
             "vitesse du vent",
             "vitesse de l'air",
             "vélocité de l'air"
@@ -979,7 +1189,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Setting.Temperature",
+      "assetId": "Alexa.Automotive.Setting.Temperature",
       "values": [
         {
           "locales": [
@@ -993,7 +1203,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "temperatura",
           "synonyms": [
@@ -1012,7 +1223,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Setting.Intensity",
+      "assetId": "Alexa.Automotive.Setting.Intensity",
       "values": [
         {
           "locales": [
@@ -1024,7 +1235,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "intensidad",
           "synonyms": []
@@ -1039,7 +1251,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Setting.Mode",
+      "assetId": "Alexa.Automotive.Setting.Mode",
       "values": [
         {
           "locales": [
@@ -1051,7 +1263,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "modo",
           "synonyms": []
@@ -1066,7 +1279,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Setting.Position",
+      "assetId": "Alexa.Automotive.Setting.Position",
       "values": [
         {
           "locales": [
@@ -1078,7 +1291,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "posición",
           "synonyms": []
@@ -1093,7 +1307,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Setting.Heat",
+      "assetId": "Alexa.Automotive.Setting.Heat",
       "values": [
         {
           "locales": [
@@ -1105,7 +1319,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "calor",
           "synonyms": [
@@ -1122,7 +1337,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Value.Low",
+      "assetId": "Alexa.Automotive.Value.Low",
       "values": [
         {
           "locales": [
@@ -1134,7 +1349,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "bajo",
           "synonyms": []
@@ -1149,7 +1365,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Value.Minimum",
+      "assetId": "Alexa.Automotive.Value.Minimum",
       "values": [
         {
           "locales": [
@@ -1164,12 +1380,13 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "mínimo",
           "synonyms": [
             "mín",
-            "más bajo"
+            "lo más bajo"
           ]
         },
         {
@@ -1185,7 +1402,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Value.Medium",
+      "assetId": "Alexa.Automotive.Value.Medium",
       "values": [
         {
           "locales": [
@@ -1200,7 +1417,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "medio",
           "synonyms": [
@@ -1221,7 +1439,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Value.High",
+      "assetId": "Alexa.Automotive.Value.High",
       "values": [
         {
           "locales": [
@@ -1233,7 +1451,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "alto",
           "synonyms": []
@@ -1248,7 +1467,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Value.Maximum",
+      "assetId": "Alexa.Automotive.Value.Maximum",
       "values": [
         {
           "locales": [
@@ -1263,7 +1482,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "máximo",
           "synonyms": [
@@ -1284,7 +1504,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Value.White",
+      "assetId": "Alexa.Automotive.Value.White",
       "values": [
         {
           "locales": [
@@ -1296,7 +1516,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "blanco",
           "synonyms": []
@@ -1311,7 +1532,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Value.Red",
+      "assetId": "Alexa.Automotive.Value.Red",
       "values": [
         {
           "locales": [
@@ -1323,7 +1544,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "rojo",
           "synonyms": []
@@ -1338,7 +1560,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Value.Orange",
+      "assetId": "Alexa.Automotive.Value.Orange",
       "values": [
         {
           "locales": [
@@ -1350,7 +1572,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "naranja",
           "synonyms": []
@@ -1365,7 +1588,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Value.Yellow",
+      "assetId": "Alexa.Automotive.Value.Yellow",
       "values": [
         {
           "locales": [
@@ -1377,7 +1600,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "amarillo",
           "synonyms": []
@@ -1392,7 +1616,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Value.Green",
+      "assetId": "Alexa.Automotive.Value.Green",
       "values": [
         {
           "locales": [
@@ -1404,7 +1628,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "verde",
           "synonyms": []
@@ -1419,7 +1644,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Value.Blue",
+      "assetId": "Alexa.Automotive.Value.Blue",
       "values": [
         {
           "locales": [
@@ -1431,7 +1656,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "azul",
           "synonyms": []
@@ -1446,7 +1672,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Value.Indigo",
+      "assetId": "Alexa.Automotive.Value.Indigo",
       "values": [
         {
           "locales": [
@@ -1458,7 +1684,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "índigo",
           "synonyms": []
@@ -1473,7 +1700,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Value.Violet",
+      "assetId": "Alexa.Automotive.Value.Violet",
       "values": [
         {
           "locales": [
@@ -1485,7 +1712,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "morado",
           "synonyms": [
@@ -1502,7 +1730,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Location.All",
+      "assetId": "Alexa.Automotive.Location.All",
       "values": [
         {
           "locales": [
@@ -1516,7 +1744,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "en todas partes",
           "synonyms": [
@@ -1535,7 +1764,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Location.Driver",
+      "assetId": "Alexa.Automotive.Location.Driver",
       "values": [
         {
           "locales": [
@@ -1544,12 +1773,14 @@
           ],
           "defaultValue": "driver",
           "synonyms": [
-            "front driver"
+            "front driver",
+            "driver side"
           ]
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "conductor",
           "synonyms": [
@@ -1568,7 +1799,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Location.Passenger",
+      "assetId": "Alexa.Automotive.Location.Passenger",
       "values": [
         {
           "locales": [
@@ -1577,12 +1808,14 @@
           ],
           "defaultValue": "passenger",
           "synonyms": [
-            "front passenger"
+            "front passenger",
+            "passenger side"
           ]
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "pasajero",
           "synonyms": [
@@ -1601,7 +1834,67 @@
       ]
     },
     {
-      "assetId": "Alexa.Location.RearDriver",
+      "assetId": "Alexa.Automotive.Location.Left",
+      "values": [
+        {
+          "locales": [
+            "en-US",
+            "en-CA"
+          ],
+          "defaultValue": "left",
+          "synonyms": [
+            "left side"
+          ]
+        },
+        {
+          "locales": [
+            "es-MX",
+            "es-US"
+          ],
+          "defaultValue": "izquierda",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "fr-CA"
+          ],
+          "defaultValue": "gauche",
+          "synonyms": []
+        }
+      ]
+    },
+    {
+      "assetId": "Alexa.Automotive.Location.Right",
+      "values": [
+        {
+          "locales": [
+            "en-US",
+            "en-CA"
+          ],
+          "defaultValue": "right",
+          "synonyms": [
+            "right side"
+          ]
+        },
+        {
+          "locales": [
+            "es-MX",
+            "es-US"
+          ],
+          "defaultValue": "derecha",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "fr-CA"
+          ],
+          "defaultValue": "droit",
+          "synonyms": []
+        }
+      ]
+    },
+    {
+      "assetId": "Alexa.Automotive.Location.RearDriver",
       "values": [
         {
           "locales": [
@@ -1615,7 +1908,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "conductor trasero",
           "synonyms": [
@@ -1633,7 +1927,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Location.RearPassenger",
+      "assetId": "Alexa.Automotive.Location.RearPassenger",
       "values": [
         {
           "locales": [
@@ -1647,7 +1941,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "pasajero trasero",
           "synonyms": [
@@ -1665,7 +1960,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Location.Front",
+      "assetId": "Alexa.Automotive.Location.Front",
       "values": [
         {
           "locales": [
@@ -1677,11 +1972,13 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "frente",
           "synonyms": [
-            "adelante"
+            "adelante",
+            "enfrente"
           ]
         },
         {
@@ -1694,7 +1991,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Location.Rear",
+      "assetId": "Alexa.Automotive.Location.Rear",
       "values": [
         {
           "locales": [
@@ -1708,11 +2005,13 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "parte posterior",
           "synonyms": [
-            "atrás"
+            "atrás",
+            "trasera"
           ]
         },
         {
@@ -1727,7 +2026,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Location.DriverRow",
+      "assetId": "Alexa.Automotive.Location.DriverRow",
       "values": [
         {
           "locales": [
@@ -1739,7 +2038,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "fila del conductor",
           "synonyms": [
@@ -1756,7 +2056,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Location.PassengerRow",
+      "assetId": "Alexa.Automotive.Location.PassengerRow",
       "values": [
         {
           "locales": [
@@ -1768,7 +2068,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "fila del pasajero",
           "synonyms": []
@@ -1783,7 +2084,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Location.FirstRow",
+      "assetId": "Alexa.Automotive.Location.FirstRow",
       "values": [
         {
           "locales": [
@@ -1797,7 +2098,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "primera fila",
           "synonyms": [
@@ -1816,7 +2118,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Location.SecondRow",
+      "assetId": "Alexa.Automotive.Location.SecondRow",
       "values": [
         {
           "locales": [
@@ -1830,7 +2132,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "segunda fila",
           "synonyms": [
@@ -1849,7 +2152,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Location.ThirdRow",
+      "assetId": "Alexa.Automotive.Location.ThirdRow",
       "values": [
         {
           "locales": [
@@ -1863,7 +2166,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "tercera fila",
           "synonyms": [
@@ -1882,7 +2186,7 @@
       ]
     },
     {
-      "assetId": "Alexa.Location.FourthRow",
+      "assetId": "Alexa.Automotive.Location.FourthRow",
       "values": [
         {
           "locales": [
@@ -1896,7 +2200,8 @@
         },
         {
           "locales": [
-            "es-MX"
+            "es-MX",
+            "es-US"
           ],
           "defaultValue": "cuarta fila",
           "synonyms": [

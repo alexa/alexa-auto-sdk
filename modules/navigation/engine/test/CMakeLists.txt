@@ -2,9 +2,12 @@ find_package(GTest REQUIRED)
 find_library(GMOCK_LIBRARY NAMES gmock)
 find_library(GMOCK_MAIN_LIBRARY NAMES gmock_main)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
+
 set(UNIT_TEST_SRCS
     NavigationEngineImplTest.cpp
     NavigationCapabilityAgentTest.cpp
+    NavigationAssistanceCapabilityAgentTest.cpp
 )
 
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})

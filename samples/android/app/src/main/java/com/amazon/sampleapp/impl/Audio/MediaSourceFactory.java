@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -48,16 +48,17 @@ class MediaSourceFactory {
     private final LoggerHandler mLogger;
     private final Context mContext;
     private final String mName;
-    private final Handler mMainHandler = new Handler();
+    private final Handler mMainHandler;
     private final PlaylistParser mPlaylistParser = new PlaylistParser();
     private final MediaSourceListener mMediaSourceListener = new MediaSourceListener();
     private final DataSource.Factory mFileDataSourceFactory = new FileDataSourceFactory( null );
     private final DataSource.Factory mHttpDataSourceFactory;
 
-    MediaSourceFactory( Context context, LoggerHandler logger, String name ) {
+    MediaSourceFactory( Context context, LoggerHandler logger, String name, Handler handler ) {
         mContext = context;
         mLogger = logger;
         mName = name;
+        mMainHandler = handler;
         mHttpDataSourceFactory = buildHttpDataSourceFactory( mContext );
     }
 

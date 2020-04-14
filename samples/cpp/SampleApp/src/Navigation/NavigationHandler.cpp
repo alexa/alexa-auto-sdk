@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -209,7 +209,7 @@ void NavigationHandler::controlDisplay(ControlDisplay controlDisplay) {
             break;
         default:
             log( logger::LoggerHandler::Level::ERROR, "controlDisplay:invalidControlDisplayValue" );
-            break;
+            return;
     }
     navigationEvent( eventName );
 }
@@ -236,6 +236,7 @@ void NavigationHandler::announceManeuver( const std::string &payload ) {
     }
     else {
         log( logger::LoggerHandler::Level::ERROR, "announceManeuver:invalidManueverTypeValue" );
+        return;
     }
     navigationEvent( eventName );
 }
@@ -252,7 +253,7 @@ void NavigationHandler::announceRoadRegulation( aace::navigation::Navigation::Ro
             break;
         default:
             log( logger::LoggerHandler::Level::ERROR, "announceRoadRegulation:invalidRoadRegulationValue" );
-            break;
+            return;
     }
     navigationEvent( eventName );
 }

@@ -8,7 +8,6 @@ LICENSE = "BSD-3-Clause"
 
 PACKAGE_BEFORE_PN = "${PN}-compiler ${PN}-lite"
 
-DEPENDS = "zlib"
 RDEPENDS_${PN}-compiler = "${PN}"
 RDEPENDS_${PN}-dev += "${PN}-compiler"
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -71,6 +71,9 @@ enum class Event {
     // PlaybackController
     onPlaybackControllerButtonPressed,
     onPlaybackControllerTogglePressed,
+
+    // Audio Player
+    onGetPlayerPositionAndDuration,
 
     // Speaker
     onSpeakerLocalVolumeSet,
@@ -153,6 +156,9 @@ static const std::map<std::string, Event> EventEnumerator{
     // PlaybackController
     {"onPlaybackControllerButtonPressed", Event::onPlaybackControllerButtonPressed},
     {"onPlaybackControllerTogglePressed", Event::onPlaybackControllerTogglePressed},
+    
+    // Audio Player
+    {"onGetPlayerPositionAndDuration", Event::onGetPlayerPositionAndDuration},
 
     // Speaker
     {"onSpeakerLocalVolumeSet", Event::onSpeakerLocalVolumeSet},

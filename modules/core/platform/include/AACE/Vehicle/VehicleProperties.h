@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -23,8 +23,9 @@ namespace vehicle {
 namespace property {
 
 /**
- * This property is used with Engine::setProperty() to change the current operating country. The value
- * must be a valid 2-letter ISO country code.
+ * This property is used with
+ * aace::propertyManager::PropertyManager::setProperty() to change the current
+ * operating country. The value must be a valid 2-letter ISO country code.
  */
 static const std::string OPERATING_COUNTRY = "aace.vehicle.operatingCountry";
 

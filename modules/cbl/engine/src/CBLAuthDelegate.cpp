@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -25,11 +25,10 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
-#include <AVSCommon/AVS/Initialization/AlexaClientSDKInit.h>
-#include <AVSCommon/Utils/DeviceInfo.h>
 #include <AVSCommon/Utils/LibcurlUtils/HttpPost.h>
 #include <AVSCommon/Utils/LibcurlUtils/HttpResponseCodes.h>
 #include <AVSCommon/Utils/Logger/Logger.h>
+#include <AVSCommon/Utils/RetryTimer.h>
 
 #include "AACE/Engine/CBL/CBLAuthDelegate.h"
 #include "AACE/Engine/Core/EngineMacros.h"
@@ -313,7 +312,7 @@ void CBLAuthDelegate::addAuthObserver(std::shared_ptr<AuthObserverInterface> obs
         ThrowIfNull( observer, "nullObserver" );
 
         if( m_observers.insert(observer).second == false ) {
-            Throw( "observerAlreadyAdded")
+            Throw( "observerAlreadyAdded");
         }
         observer->onAuthStateChange(m_authState, m_authError);
     }
@@ -372,6 +371,7 @@ CBLAuthDelegate::CBLAuthDelegate(
         m_retryCount{0},
         m_newRefreshToken{false},
         m_threadActive{false},
+        m_stateChangeReason{CBLAuthRequesterInterface::CBLStateChangedReason::NONE},
         m_enableUserProfile{enableUserProfile} {
         
     AACE_DEBUG(LX(TAG));
@@ -419,14 +419,8 @@ void CBLAuthDelegate::stop( bool reset )
     try
     {
         AACE_DEBUG(LX(TAG).d("reset",reset));
-        
-        if( m_authState == AuthObserverInterface::State::REFRESHED ) {
-             m_cblAuthRequester->cblStateChanged( CBLAuthRequesterInterface::CBLState::STOPPING, CBLAuthRequesterInterface::CBLStateChangedReason::NONE);
-        }
-        {
-            std::lock_guard<std::mutex> lock(m_mutex);
-            m_isStopping = true;
-        }
+        /* auto nextState = */ handleStopping();
+
         m_wake.notify_one();
         if (m_authorizationFlowThread.joinable()) {
             m_authorizationFlowThread.join();
@@ -496,7 +490,7 @@ alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse CBLAuthDelegate::do
         auto httpGet = alexaClientSDK::avsCommon::utils::libcurlUtils::HttpGet::create();
         ThrowIfNull( httpGet, "nullHttpGet" );
 
-        return httpGet->doGet( url, headers );
+        return httpGet->doGet( url, headers, m_configuration->getRequestTimeout() );
     } catch( std::exception& ex ) {
         AACE_ERROR( LX(TAG).d("reason", ex.what() ) );
         return alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse();
@@ -754,7 +748,7 @@ void CBLAuthDelegate::handleRequestingUserProfile() {
         AACE_DEBUG(LX(TAG));
 
         auto response = requestUserProfile();
-        ThrowIfNot(response.code == HTTPResponseCode::SUCCESS_OK,"Error making request")
+        ThrowIfNot(response.code == HTTPResponseCode::SUCCESS_OK,"Error making request");
 
         std::string name;
         std::string email;
@@ -792,7 +786,7 @@ HTTPResponse CBLAuthDelegate::requestCodePair() {
         {POST_KEY_SCOPE, m_scope},
         {POST_KEY_SCOPE_DATA, m_configuration->getScopeData()},
     };
-    const std::vector<std::string> headerLines = {HEADER_LINE_URLENCODED};
+    const std::vector<std::string> headerLines = {HEADER_LINE_URLENCODED,HEADER_LINE_LANGUAGE_PREFIX + m_configuration->getDefaultLocale()};
 
     return doPost(
         m_configuration->getRequestCodePairUrl(), headerLines, postData, m_configuration->getRequestTimeout());

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -51,6 +51,12 @@ void TemplateRuntimeHandler::renderTemplate(const std::string &payload) {
     if (!activity) {
         return;
     }
+    
+    if(wasPayloadJustSeen(payload)) {
+        //ignore
+        return;
+    }
+    
     m_startTemplate = std::chrono::system_clock::now();
     activity->runOnUIThread([=]() {
         auto applicationContext = activity->getApplicationContext();
@@ -97,6 +103,12 @@ void TemplateRuntimeHandler::renderPlayerInfo(const std::string &payload) {
     if (!activity) {
         return;
     }
+    
+    if(wasPayloadJustSeen(payload)) {
+        //ignore
+        return;
+    }
+    
     m_startPlayerInfo = std::chrono::system_clock::now();
     activity->runOnUIThread([=]() {
         auto applicationContext = activity->getApplicationContext();
@@ -153,6 +165,23 @@ void TemplateRuntimeHandler::setupUI() {
         return;
     }
     m_console = activity->findViewById("id:console");
+}
+
+bool TemplateRuntimeHandler::wasPayloadJustSeen(const std::string &payload) {
+    auto elapsed = std::chrono::steady_clock::now() - m_whenCachedLastpayload;
+    unsigned milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+
+    const unsigned MIN_MILLISECONDS_ELAPSED_FOR_PRINTING_SAME_RESULT = 1000;
+    if(milliseconds < MIN_MILLISECONDS_ELAPSED_FOR_PRINTING_SAME_RESULT ) {
+        if(m_lastPayload == payload) {
+            return true;
+        }
+    }
+    
+    m_lastPayload = payload;
+    m_whenCachedLastpayload = std::chrono::steady_clock::now();
+    
+    return false;
 }
 
 } // namespace alexa

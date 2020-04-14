@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 
 #include "AACE/Core/Engine.h"
 #include "AACE/Logger/Logger.h"
+#include "AACE/Engine/PropertyManager/PropertyManagerServiceInterface.h"
 #include "EngineServiceManager.h"
 #include "ServiceDescription.h"
 
@@ -48,11 +49,12 @@ public:
     bool start() override;
     bool stop() override;
     bool shutdown() override;
-    bool setProperty( const std::string& key, const std::string& value ) override;
-    std::string getProperty( const std::string& key ) override;
+    bool setProperty( const std::string& name, const std::string& value ) override;
+    std::string getProperty( const std::string& name ) override;
 
     // create the engine
     static std::shared_ptr<EngineImpl> create();
+    std::string getProperty_version();
     
 protected:
     std::shared_ptr<EngineServiceContext> getService( const std::string& type ) override;
@@ -62,6 +64,7 @@ private:
     bool checkServices();
 
     std::shared_ptr<EngineService> getServiceFromPropertyKey( const std::string& key );
+    bool registerProperties();
 
 private:
     std::unordered_map<std::string,std::shared_ptr<EngineService>> m_registeredServiceMap;

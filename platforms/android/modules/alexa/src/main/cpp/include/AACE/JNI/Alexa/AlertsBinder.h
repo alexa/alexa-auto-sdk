@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -73,7 +73,9 @@ namespace alexa {
                 {T::PAST_DUE,"PAST_DUE"},
                 {T::FOCUS_ENTERED_FOREGROUND,"FOCUS_ENTERED_FOREGROUND"},
                 {T::FOCUS_ENTERED_BACKGROUND,"FOCUS_ENTERED_BACKGROUND"},
-                {T::ERROR,"ERROR"}
+                {T::ERROR,"ERROR"},
+                {T::DELETED,"DELETED"},
+                {T::SCHEDULED_FOR_LATER,"SCHEDULED_FOR_LATER"}
             };
         }
     };

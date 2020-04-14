@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -87,7 +87,17 @@ public:
         /**
          * The alert has encountered an error.
          */
-        ERROR
+        ERROR,
+        
+        /**
+        * The alert has been deleted.
+        */
+        DELETED,
+        
+        /**
+        * The alert has been scheduled to trigger at a future time.
+        */
+        SCHEDULED_FOR_LATER
     };
 
     /**
@@ -175,6 +185,12 @@ inline std::ostream& operator<<(std::ostream& stream, const Alerts::AlertState& 
             break;
         case Alerts::AlertState::ERROR:
             stream << "ERROR";
+            break;
+        case Alerts::AlertState::DELETED:
+            stream << "DELETED";
+            break;
+        case Alerts::AlertState::SCHEDULED_FOR_LATER:
+            stream << "SCHEDULED_FOR_LATER";
             break;
     }
     return stream;

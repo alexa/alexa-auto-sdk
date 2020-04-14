@@ -396,12 +396,12 @@ CarControlConfiguration& CarControlConfigurationImpl::createZone(const std::stri
 }
 
 CarControlConfiguration& CarControlConfigurationImpl::addDefaultAssetsPath(const std::string& path) {
-    m_defaultAssetsPath = path;
+    m_document["aace.carControl"]["assets"]["defaultAssetsPath"] = path;
     return *this;
 }
 
 CarControlConfiguration& CarControlConfigurationImpl::addCustomAssetsPath(const std::string& path) {
-    m_customAssetsPath = path;
+    m_document["aace.carControl"]["assets"]["customAssetsPath"] = path;
     return *this;
 }
 

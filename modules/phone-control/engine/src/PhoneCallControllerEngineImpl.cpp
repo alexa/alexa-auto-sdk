@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -126,6 +126,8 @@ std::shared_ptr<PhoneCallControllerEngineImpl> PhoneCallControllerEngineImpl::cr
         ThrowIfNull( exceptionSender, "nullExceptionSender" );
         ThrowIfNull( messageSender, "nullMessageSender" );
         ThrowIfNull( focusManager, "nullFocusManager" );
+        ThrowIfNull( authDelegate, "nullAuthDelegate" );
+        ThrowIfNull( deviceInfo, "nullDeviceInfo" );
 
         auto phoneCallControllerEngineImpl = std::shared_ptr<PhoneCallControllerEngineImpl>( new PhoneCallControllerEngineImpl( phoneCallControllerPlatformInterface ) );
 
@@ -143,16 +145,31 @@ std::shared_ptr<PhoneCallControllerEngineImpl> PhoneCallControllerEngineImpl::cr
 }
 
 void PhoneCallControllerEngineImpl::doShutdown() {
+    AACE_INFO(LX(TAG));
+
     {
         std::lock_guard<std::mutex>lock(m_mutex);
         m_isShuttingDown = true;
+        m_wakeAutoProvisioningLoop.notify_one();
     }
-    if( m_phoneCallControllerCapabilityAgent != nullptr ) {
+
+    if (m_autoProvisioningThread.joinable()) {
+        m_autoProvisioningThread.join();
+    }
+
+    if (m_authDelegate != nullptr ) {
+        m_authDelegate->removeAuthObserver( shared_from_this() );
+        m_authDelegate.reset();
+    }
+
+    if (m_phoneCallControllerCapabilityAgent != nullptr ) {
         m_phoneCallControllerCapabilityAgent->shutdown();
         m_phoneCallControllerCapabilityAgent.reset();
     }
+
     if( m_phoneCallControllerPlatformInterface != nullptr ) {
         m_phoneCallControllerPlatformInterface->setEngineInterface( nullptr );
+        m_phoneCallControllerPlatformInterface.reset();
     }
 }
 

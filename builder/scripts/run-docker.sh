@@ -13,7 +13,7 @@ if [ -z "$(which docker)" ]; then
 fi
 
 VM_HOME="/home/builder"
-IMAGE_REVISION="20190515"
+IMAGE_REVISION="20200126"
 IMAGE_NAME="aac/ubuntu-base:${IMAGE_REVISION}"
 VOLUME_NAME="buildervolume"
 VOLUME_MOUNT_POINT="/workdir"
@@ -40,7 +40,7 @@ execute_command() {
 	${IMAGE_NAME} $@
 }
 
-if [[ "$(docker images -q ${IMAGE_NAME} 2> /dev/null)" == "" ]]; then
+if [[ "$(docker images -q ${IMAGE_NAME} 2> /dev/null)" == "" ]] || [ ! -z ${FORCE_DOCKER_IMAGE_REBUILD} ]; then
 	note "Building Docker image..."
 	docker build --tag ${IMAGE_NAME} ${BUILDER_HOME}/scripts
 fi

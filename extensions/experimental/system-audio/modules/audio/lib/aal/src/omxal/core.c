@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -52,10 +52,13 @@ static void omxal_deinitialize()
 
 extern const aal_player_ops_t omxal_player_ops;
 
+// clang-format off
 aal_module_t omxal_module = {
 	.name = "OpenMAX AL",
+	.capabilities = AAL_MODULE_CAP_URL_PLAYBACK,
 	.initialize = omxal_initialize,
 	.deinitialize = omxal_deinitialize,
 	.player_ops = &omxal_player_ops,
 	.recorder_ops = NULL
 };
+// clang-format on

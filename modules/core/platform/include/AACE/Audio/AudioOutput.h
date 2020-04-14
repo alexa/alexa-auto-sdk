@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -177,6 +177,13 @@ public:
      * @return The duration of the current audio source in milliseconds, or @c TIME_UNKNOWN.
      */
     virtual int64_t getDuration() = 0;
+
+    /**
+     * Returns the amount of audio data buffered.
+     *
+     * @return the number of bytes of the audio data buffered, or 0 if it's unknown.
+     */
+    virtual int64_t getNumBytesBuffered();
 
     /**
      * Notifies the platform implementation to set the volume of the output channel. The

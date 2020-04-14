@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -66,7 +66,6 @@ public class LVCInteractionService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand; startId: " + startId);
-
         if (mLVCService != null) {
             // Connection to LVC service is already established
             Log.i(TAG, "onStartCommand received when LVC service is already connected");
@@ -114,6 +113,7 @@ public class LVCInteractionService extends Service {
     }
 
     private void sendAHEInitSuccess(String result) {
+
         Intent intent = new Intent();
         intent.setAction(LVC_RECEIVER_INTENT);
         intent.putExtra(LVC_RECEIVER_CONFIGURATION, result);
@@ -200,6 +200,28 @@ public class LVCInteractionService extends Service {
                 config.put("CarControl", carControlNode);
                 String carControlAssetsPath = getCarControlAssetsPath(appDataDirPath);
                 carControlNode.put("CustomAssetsFilePath", carControlAssetsPath);
+
+                // To configure LVC to use the custom volume range, add the "CustomVolume" node.
+                // This tells the LVC service in the LVC APK to use a volume range different than
+                // the default. If your application does not use a custom volume range for online
+                // utterances, skip supplying a custom volume configuration to LVC.
+                //
+                // To facilitate the testing, we check if a custom volume configuration file
+                // "CustomVolume.json" is present on root of the SD card. If present, it should
+                // define the custom volume config in the JSON format as shown below and should match
+                // the custom configuration you use for the cloud.
+                //
+                // {
+                //    "CustomVolume": {
+                //          "minVolumeValue": "<Min VUI Volume Value>",
+                //          "maxVolumeValue": "<Max VUI Volume Value>",
+                //          "volumeAdjustmentStepValue": "<Device volume adjustment step value>"
+                //     }
+                //  }
+                JSONObject customVolumeConfig = FileUtils.getConfigFromSDCard("CustomVolume.json", "CustomVolume");
+                if (customVolumeConfig != null) {
+                    config.put("CustomVolume", customVolumeConfig);
+                }
 
                 configString = config.toString();
             } catch (JSONException e) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -98,7 +98,7 @@ public:
         {
             std::unique_lock<std::mutex> lock(m_mutex);
 
-            while (data_end - frag_begin >= m_frag_size * 2) {
+            while ((size_t)(data_end - frag_begin) >= m_frag_size * 2) {
                 // queue a fragment with calculated time
                 m_fragments.emplace_back(frag_time, std::vector<T>(frag_begin, frag_begin + m_frag_size));
                 frag_begin += m_frag_size;

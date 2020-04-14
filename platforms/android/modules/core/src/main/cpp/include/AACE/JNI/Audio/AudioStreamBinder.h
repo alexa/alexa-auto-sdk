@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -40,10 +40,10 @@ namespace audio {
     };
 
     //
-    // JEncoding
+    // JAudioStreamEncoding
     //
 
-    class JEncodingConfig : public EnumConfiguration<aace::audio::AudioStream::Encoding> {
+    class JAudioStreamEncodingConfig : public EnumConfiguration<aace::audio::AudioStream::Encoding> {
     public:
         using T = aace::audio::AudioStream::Encoding;
 
@@ -61,7 +61,101 @@ namespace audio {
         }
     };
 
-    using JEncoding = JEnum<aace::audio::AudioStream::Encoding,JEncodingConfig>;
+    using JAudioStreamEncoding = JEnum<aace::audio::AudioStream::Encoding,JAudioStreamEncodingConfig>;
+
+    //
+    // JAudioFormatEncoding
+    //
+
+    class JAudioFormatEncodingConfig : public EnumConfiguration<aace::audio::AudioFormat::Encoding> {
+    public:
+        using T = aace::audio::AudioFormat::Encoding;
+
+        const char* getClassName() override {
+            return "com/amazon/aace/audio/AudioFormat$Encoding";
+        }
+
+        std::vector<std::pair<T,std::string>> getConfiguration() override {
+            return {
+                {T::UNKNOWN,"UNKNOWN"},
+                {T::LPCM,"LPCM"},
+                {T::MP3,"MP3"},
+                {T::OPUS,"OPUS"}
+            };
+        }
+    };
+
+    using JAudioFormatEncoding = JEnum<aace::audio::AudioFormat::Encoding,JAudioFormatEncodingConfig>;
+
+    //
+    // JAudioFormatSampleFormat
+    //
+
+    class JAudioFormatSampleFormatConfig : public EnumConfiguration<aace::audio::AudioFormat::SampleFormat> {
+    public:
+        using T = aace::audio::AudioFormat::SampleFormat;
+
+        const char* getClassName() override {
+            return "com/amazon/aace/audio/AudioFormat$SampleFormat";
+        }
+
+        std::vector<std::pair<T,std::string>> getConfiguration() override {
+            return {
+                {T::UNKNOWN,"UNKNOWN"},
+                {T::SIGNED,"SIGNED"},
+                {T::UNSIGNED,"UNSIGNED"},
+                {T::FLOAT,"FLOAT"}
+            };
+        }
+    };
+
+    using JAudioFormatSampleFormat = JEnum<aace::audio::AudioFormat::SampleFormat,JAudioFormatSampleFormatConfig>;
+
+    //
+    // JAudioFormatLayout
+    //
+
+    class JAudioFormatLayoutConfig : public EnumConfiguration<aace::audio::AudioFormat::Layout> {
+    public:
+        using T = aace::audio::AudioFormat::Layout;
+
+        const char* getClassName() override {
+            return "com/amazon/aace/audio/AudioFormat$Layout";
+        }
+
+        std::vector<std::pair<T,std::string>> getConfiguration() override {
+            return {
+                {T::UNKNOWN,"UNKNOWN"},
+                {T::NON_INTERLEAVED,"NON_INTERLEAVED"},
+                {T::INTERLEAVED,"INTERLEAVED"}
+            };
+        }
+    };
+
+    using JAudioFormatLayout = JEnum<aace::audio::AudioFormat::Layout,JAudioFormatLayoutConfig>;
+
+    //
+    // JAudioFormatEndianness
+    //
+
+    class JAudioFormatEndiannessConfig : public EnumConfiguration<aace::audio::AudioFormat::Endianness> {
+    public:
+        using T = aace::audio::AudioFormat::Endianness;
+
+        const char* getClassName() override {
+            return "com/amazon/aace/audio/AudioFormat$Endianness";
+        }
+
+        std::vector<std::pair<T,std::string>> getConfiguration() override {
+            return {
+                {T::UNKNOWN,"UNKNOWN"},
+                {T::LITTLE,"LITTLE"},
+                {T::BIG,"BIG"}
+            };
+        }
+    };
+
+    using JAudioFormatEndianness = JEnum<aace::audio::AudioFormat::Endianness,JAudioFormatEndiannessConfig>;
 
 } // aace::jni::audio
 } // aace::jni

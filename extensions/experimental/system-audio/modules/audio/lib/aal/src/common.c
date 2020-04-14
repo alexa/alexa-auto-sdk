@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -48,6 +48,21 @@ int aal_get_module_count()
 	return count;
 }
 
+uint32_t aal_get_module_capabilities(int module_id)
+{
+	return modules[module_id]->capabilities;
+}
+
+int aal_find_module_by_capability(uint32_t caps)
+{
+	for (int i = 0; modules[i] != NULL; ++i) {
+		if ((modules[i]->capabilities & caps) == caps) {
+			return i;
+		}
+	}
+	return AAL_INVALID_MODULE;
+}
+
 const char *aal_get_module_name(int module_id)
 {
 	return modules[module_id]->name;
@@ -89,7 +104,7 @@ void aal_logv(int level, const char* format, va_list args) {
     }
 }
 
-aal_handle_t aal_player_create(const aal_attributes_t *attr)
+aal_handle_t aal_player_create(const aal_attributes_t *attr, aal_audio_parameters_t *params)
 {
 	aal_common_context_t *ctx;
 
@@ -98,7 +113,7 @@ aal_handle_t aal_player_create(const aal_attributes_t *attr)
 		return NULL;
 	}
 
-	ctx = (aal_common_context_t *) modules[attr->module_id]->player_ops->create(attr);
+	ctx = (aal_common_context_t *) modules[attr->module_id]->player_ops->create(attr, params);
 	if (ctx) {
 		ctx->listener = attr->listener;
 		ctx->user_data = attr->user_data;
@@ -133,6 +148,11 @@ int64_t aal_player_get_duration(aal_handle_t handle)
 	return MODULE(handle)->player_ops->get_duration(handle);
 }
 
+int64_t aal_player_get_num_bytes_buffered(aal_handle_t handle)
+{
+	return MODULE(handle)->player_ops->get_num_bytes_buffered(handle);
+}
+
 void aal_player_seek(aal_handle_t handle, int64_t position)
 {
 	MODULE(handle)->player_ops->seek(handle, position);
@@ -158,17 +178,12 @@ void aal_player_notify_end_of_stream(aal_handle_t handle)
 	MODULE(handle)->player_ops->notify_end_of_stream(handle);
 }
 
-void aal_player_set_stream_type(aal_handle_t handle, const aal_stream_type_t type)
-{
-	MODULE(handle)->player_ops->set_stream_type(handle, type);
-}
-
 void aal_player_destroy(aal_handle_t handle)
 {
 	MODULE(handle)->player_ops->destroy(handle);
 }
 
-aal_handle_t aal_recorder_create(const aal_attributes_t *attr)
+aal_handle_t aal_recorder_create(const aal_attributes_t *attr, aal_lpcm_parameters_t *params)
 {
 	aal_common_context_t *ctx;
 
@@ -177,7 +192,7 @@ aal_handle_t aal_recorder_create(const aal_attributes_t *attr)
 		return NULL;
 	}
 
-	ctx = (aal_common_context_t *) modules[attr->module_id]->recorder_ops->create(attr);
+	ctx = (aal_common_context_t *) modules[attr->module_id]->recorder_ops->create(attr, params);
 	if (ctx) {
 		ctx->listener = attr->listener;
 		ctx->user_data = attr->user_data;

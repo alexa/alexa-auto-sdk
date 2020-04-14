@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -23,6 +23,10 @@ ExternalMediaAdapter::~ExternalMediaAdapter() = default;
 //
 // Engine interface methods
 //
+
+bool ExternalMediaAdapter::play( const std::string& localPlayerId, const std::string& playContextToken, int64_t index, std::chrono::milliseconds offset, bool preload, Navigation navigation, const std::string& playbackSessionId, const std::string& skillToken ) {
+    return play( localPlayerId, playContextToken, index, offset, preload, navigation );
+}
 
 void ExternalMediaAdapter::reportDiscoveredPlayers( const std::vector<DiscoveredPlayerInfo>& discoveredPlayers ) {
     if( auto m_externalMediaAdapterEngineInterface_lock = m_externalMediaAdapterEngineInterface.lock() ) {

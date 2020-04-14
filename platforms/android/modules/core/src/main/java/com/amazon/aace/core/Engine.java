@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -101,16 +101,39 @@ final public class Engine extends NativeRef
     }
 
     /**
+     * @note This method is deprecated. Use
+     *       com.amazon.aace.propertyManager.PropertyManager.setProperty()
+     *
      * Sets a property value in the Engine
      *
-     * @param  key The key used by the Engine to identify the property
-     *
-     * @param  value The property value to set in the Engine
-     *
-     * @return @c true if property value was set, else @c false
+     * @param name The name used by the Engine to identify the property.
+     *        The property name must be one of the property constants recognized
+     *        by the Engine, e.g. the properties in
+     *        @c com.amazon.aace.alexa.AlexaProperties.java
+     * @param value The property setting
+     * @return @c true if the property value was updated or set to the current
+     *         setting, else @c false if an error occured.
      */
     public boolean setProperty( String key, String value ) {
         return setProperty( getNativeRef(), key, value );
+    }
+
+    /**
+     * @note This method is deprecated. Use
+     *       com.amazon.aace.propertyManager.PropertyManager.getProperty()
+     *
+     * Retrieves the setting for the property identified by
+     * @c name from the Engine
+     *
+     * @param name The name used by the Engine to identify the property.
+     *        The property name must be one of the property constants recognized
+     *        by the Engine, e.g. the properties in
+     *        @c com.amazon.aace.alexa.AlexaProperties.java
+     * @return The property value as a string, or an empty string if the
+     *        property value was not found
+     */
+    public String getProperty( String key ) {
+        return getProperty( getNativeRef(), key );
     }
 
     // Retrieve library names of built modules
@@ -138,17 +161,6 @@ final public class Engine extends NativeRef
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
         }
-    }
-
-    /**
-     * Returns a property value from the Engine
-     *
-     * @param  key The key used by the Engine to identify the property
-     *
-     * @returns The property value as a string
-     */
-    public String getProperty( String key ) {
-        return getProperty( getNativeRef(), key );
     }
 
     public boolean setNativeEnv( String name, String value ) {

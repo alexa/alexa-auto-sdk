@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -149,7 +149,7 @@ void SpeechSynthesizerEngineImpl::handlePrePlaybackStarted( SourceId id )
             m_directiveSequencer_lock->getDialogRequestId(), m_directiveSequencer_lock->isDialogRequestOnline());
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("id", id));
     }
 }
 
@@ -167,7 +167,7 @@ void SpeechSynthesizerEngineImpl::handlePrePlaybackFinished( SourceId id )
             m_directiveSequencer_lock->getDialogRequestId(), m_directiveSequencer_lock->isDialogRequestOnline());
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("id", id));
     }
 }
 

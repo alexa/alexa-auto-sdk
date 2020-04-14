@@ -2,13 +2,14 @@ package com.amazon.sampleapp.impl.LocalMediaSource;
 
 import android.content.Context;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
+import com.amazon.sampleapp.impl.PlaybackController.PlaybackControllerHandler;
 
 public class FMLocalMediaSource extends LocalMediaSourceHandler
 {
     String m_state = "IDLE";
 
-    public FMLocalMediaSource( Context context, LoggerHandler logger ) {
-        super( context, logger, Source.FM_RADIO );
+    public FMLocalMediaSource(Context context, LoggerHandler logger, PlaybackControllerHandler playbackControllerHandler) {
+        super( context, logger, Source.FM_RADIO, playbackControllerHandler );
     }
 
     @Override

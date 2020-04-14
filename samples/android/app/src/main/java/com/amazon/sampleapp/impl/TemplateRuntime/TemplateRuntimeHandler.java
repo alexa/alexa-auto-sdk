@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -119,9 +119,7 @@ public class TemplateRuntimeHandler extends TemplateRuntime {
 
                 String title = content.has( "title" ) ? content.getString( "title" ) : "";
                 String artist = content.has( "titleSubtext1" ) ? content.getString( "titleSubtext1" ) : "";
-                JSONObject provider = content.getJSONObject( "provider" );
-                String name = provider.has( "name" ) ? provider.getString( "name" ) : "";
-                mPlaybackController.setPlayerInfo( title, artist, name );
+                mPlaybackController.setPlayerInfo( title, artist, providerName );
             }
 
             // Log only if audio item has changed

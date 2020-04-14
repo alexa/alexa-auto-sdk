@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -122,15 +122,19 @@ bool AudioInputImpl::initialize() {
         const aal_attributes_t attr = {
             .name = m_name.c_str(),
             .device = m_deviceName.c_str(),
-            .rate = m_sampleRate,
             .uri = nullptr,
             .listener = &aalListener,
             .user_data = this,
-            .module_id = m_moduleId
+            .module_id = m_moduleId,
+        };
+        aal_lpcm_parameters_t params = {
+            .sample_format = AAL_SAMPLE_FORMAT_DEFAULT,
+            .channels = 0,
+            .sample_rate = m_sampleRate,
         };
         // clang-format on
 
-        m_recorder = aal_recorder_create(&attr);
+        m_recorder = aal_recorder_create(&attr, &params);
         ThrowIfNull(m_recorder, "createRecorderFailed");
 
         return true;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -192,6 +192,9 @@ void NavigationEngineImpl::onNavigationEvent( EventName event ) {
         case aace::navigation::NavigationEngineInterface::EventName::CARPOOL_RULES_REGULATION_ANNOUNCED:
             m_navigationAssistanceCapabilityAgent->navigationEvent( event );
             break;
+        default:
+            AACE_WARN( LX( TAG,"onNavigationEvent" ).d( "reason", "Invalid EventName" ) );
+            break;
     }
 }
     
@@ -231,6 +234,9 @@ void NavigationEngineImpl::onNavigationError( aace::navigation::NavigationEngine
         case aace::navigation::NavigationEngineInterface::ErrorType::SPEED_LIMIT_REGULATION_FAILED :
         case aace::navigation::NavigationEngineInterface::ErrorType::CARPOOL_RULES_REGULATION_FAILED :
             m_navigationAssistanceCapabilityAgent->navigationError( type, code, description);
+            break;
+        default:
+            AACE_WARN( LX( TAG,"onNavigationError" ).d( "reason", "Invalid Navigation ErrorType" ) );
             break;
     }
 }

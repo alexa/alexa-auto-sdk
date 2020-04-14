@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -47,6 +47,11 @@
 // Sample Code-Based Linking (CBL) Interfaces
 #include "SampleApp/CBL/CBLHandler.h"
 
+// Sample CoAssistant Platform Interfaces
+#ifdef COASSISTANT
+#include "SampleApp/CoAssistant/CoAssistantHandler.h"
+#endif // COASSISTANT
+
 // Sample Communications Platform Interfaces
 #ifdef ALEXACOMMS
 #include "SampleApp/Communication/CommunicationHandler.h"
@@ -66,6 +71,9 @@
 
 // Sample PhoneControl Platform Interfaces
 #include "SampleApp/PhoneControl/PhoneControlHandler.h"
+
+// Sample Property Manager Platform Interfaces
+#include "SampleApp/PropertyManager/PropertyManagerHandler.h"
 
 // Sample AddressBook Platform Interfaces
 #include "SampleApp/AddressBook/AddressBookHandler.h"
@@ -97,6 +105,7 @@ class Application {
     static std::unique_ptr<Application> create() { return std::unique_ptr<Application>(new Application()); }
     auto printMenu(std::shared_ptr<ApplicationContext> applicationContext,
                    std::shared_ptr<aace::core::Engine> engine,
+                   std::shared_ptr<sampleApp::propertyManager::PropertyManagerHandler> propertyManagerHandler,
                    std::shared_ptr<View> console,
                    const std::string &id) -> void;
     auto printMenuText(std::shared_ptr<ApplicationContext> applicationContext,
@@ -108,10 +117,11 @@ class Application {
     auto run(std::shared_ptr<ApplicationContext> applicationContext) -> Status;
     auto runMenu(std::shared_ptr<ApplicationContext> applicationContext,
                  std::shared_ptr<aace::core::Engine> engine,
+                 std::shared_ptr<sampleApp::propertyManager::PropertyManagerHandler> propertyManagerHandler,
                  std::shared_ptr<Activity> activity,
                  std::shared_ptr<View> console,
                  const std::string &id) -> Status;
-    auto setupMenu(std::shared_ptr<ApplicationContext> applicationContext, std::shared_ptr<aace::core::Engine> engine, std::shared_ptr<View> console) -> void;
+    auto setupMenu(std::shared_ptr<ApplicationContext> applicationContext, std::shared_ptr<aace::core::Engine> engine, std::shared_ptr<sampleApp::propertyManager::PropertyManagerHandler> propertyManagerHandler, std::shared_ptr<View> console) -> void;
 };
 
 } // namespace sampleApp

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,25 +17,27 @@
 #define AACE_AUDIO_AUDIO_STREAM_H
 
 #include <iostream>
+#include <vector>
+#include <string>
+
+#include "AudioFormat.h"
 
 /** @file */
 
 namespace aace {
 namespace audio {
 
+class AudioStreamProperty;
+
 class AudioStream {
 public:
-    enum class Encoding {
-        UNKNOWN,
-        LPCM,
-        MP3,
-        OPUS
-    };
+    using AudioFormat = aace::audio::AudioFormat;
+    using Encoding = AudioFormat::Encoding;
 
     virtual ~AudioStream();
 
     /**
-     * Reads audio data from the strean when available. Audio data will be 
+     * Reads audio data from the strean when available. Audio data will be
      * available while @c isClosed() returns false.
      *
      * @param [out] data The buffer where audio data should be copied
@@ -44,7 +46,7 @@ public:
      * or -1 if an error occurred
      */
     virtual ssize_t read( char* data, const size_t size ) = 0;
-    
+
     /**
      * Checks if the audio stream from the no more data available to read.
      *
@@ -53,33 +55,79 @@ public:
      */
 
     virtual bool isClosed() = 0;
-    
+
     /**
      * Returns the encoding format of the @c AudioStream. If the encoding is not known
      * then @c Encoding::UNKNOWN will be returned.
      *
      * @return @c Encoding format of the @c AudioStream
+     * @deprecated Use @c getAudioFormat to return the audio stream encoding and additional
+     * audio format properties.
      */
     virtual Encoding getEncoding();
+
+    /**
+     * Returns the audio format properties of this stream, including the audio encoding type.
+     *
+     * @return @c AudioFormat specified for this stream.
+     */
+    virtual AudioFormat getAudioFormat();
+
+    /**
+     * Returns optional meta-data properties for the @c AudioStream.
+     *
+     * @return List of meta-data properties for the @c AudioStream.
+     */
+    virtual std::vector<AudioStreamProperty> getProperties();
 };
 
-inline std::ostream& operator<<(std::ostream& stream, const AudioStream::Encoding& encoding) {
-    switch (encoding) {
-        case AudioStream::Encoding::UNKNOWN:
-            stream << "UNKNOWN";
-            break;
-        case AudioStream::Encoding::LPCM:
-            stream << "LPCM";
-            break;
-        case AudioStream::Encoding::MP3:
-            stream << "MP3";
-            break;
-        case AudioStream::Encoding::OPUS:
-            stream << "OPUS";
-            break;
+/**
+ * Key/value type for providing meta-data with the AudioStream.
+ */
+class AudioStreamProperty {
+public:
+    /**
+     * AudioStreamProperty constructor
+     *
+     * @param  key The property key
+     * @param  value The property value
+     */
+    AudioStreamProperty( const std::string& key, const std::string& value ) : m_key{ key }, m_value{ value } {}
+
+    /**
+     * AudioStreamProperty copy constructor
+     *
+     * @param  prop The @c AudioStreamProperty being copied
+     */
+    AudioStreamProperty( const AudioStreamProperty &other ) {
+        *this = other;
     }
-    return stream;
-}
+
+    /**
+     * AudioStreamProperty copy constructor
+     *
+     * @param  other The @c AudioStreamProperty being assigned
+     */
+    AudioStreamProperty& operator=(const AudioStreamProperty& other) = default;
+
+    /**
+     * @return The property key
+     */
+    std::string getKey() {
+        return m_key;
+    }
+
+    /**
+     * @return The property value
+     */
+    std::string getValue() {
+        return m_value;
+    }
+
+private:
+    std::string m_key;
+    std::string m_value;
+};
 
 } // aace::audio
 } // aace

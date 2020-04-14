@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -33,6 +33,8 @@ public:
     MOCK_METHOD0(resume,bool());
     MOCK_METHOD0(getPosition,int64_t());
     MOCK_METHOD1(setPosition,bool(int64_t position));
+    MOCK_METHOD0(getDuration,int64_t());
+    MOCK_METHOD0(getNumBytesBuffered,int64_t());
     MOCK_METHOD1(volumeChanged,bool(float volume));
     MOCK_METHOD1(mutedStateChanged,bool(MutedState state));
     MOCK_METHOD1(setEngineInterface,void(std::shared_ptr<aace::audio::AudioOutputEngineInterface> audioOutputEngineInterface));

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -18,40 +18,70 @@ package com.amazon.aace.alexa;
 public class AlexaProperties {
 
     /**
-     * This read-only property is used with Engine.getProperty() to check if the Engine has wake word support.
-     * If wake word is not supported in the Engine, attempts to enable wake word detection by
-     * the @c SpeechRecognizer will fail.
+     * This read-only property is used with
+     * com.amazon.aace.propertyManager.PropertyManager.getProperty() to check
+     * if the Engine has wake word support. If wake word is not supported in
+     * the Engine, attempts to enable wake word detection by the
+     * @c SpeechRecognizer will fail.
      * @hideinitializer
      */
     public static final String WAKEWORD_SUPPORTED = "aace.alexa.wakewordSupported";
 
     /**
-     * This property is used with Engine.setProperty() to change the firmware version that is reported
-     * to AVS. The value must be a positive, signed 32-bit integer represented
-     * as a string.
+     * This property is used with
+     * com.amazon.aace.propertyManager.PropertyManager.setProperty() to change  
+     * the firmware version that is reported to AVS. The value must be a
+     * positive, 32-bit signed integer represented as a string.
      * @hideinitializer
      */
     public static final String FIRMWARE_VERSION = "aace.alexa.system.firmwareVersion";
 
     /**
-     * This property is used with Engine.setProperty() to change the current locale setting for AVS.
-     * The value should be a valid locale accepted by AVS. Calling Engine.getProperty() with the
+     * This property is used with
+     * com.amazon.aace.propertyManager.PropertyManager.setProperty() to change
+     * the current locale setting for Alexa. The value must be a valid locale  
+     * accepted by AVS. Calling
+     * com.amazon.aace.propertyManager.PropertyManager.getProperty() with the
      * SUPPORTED_LOCALES property provides the list of supported locales.
      * @hideinitializer
      */
     public static final String LOCALE = "aace.alexa.setting.locale";
 
     /**
-     * This read-only property is used with Engine.getProperty() to see all AVS supported locales. The return
-     * value is a comma-separated list, e.g. "de-DE,en-AU,..."
+     * This read-only property is used with
+     * com.amazon.aace.propertyManager.PropertyManager.getProperty() to see all
+     * AVS-supported locales. The return value is a comma-separated list, 
+     * e.g. "de-DE,en-AU,..."
      * @hideinitializer
      */
     public static final String SUPPORTED_LOCALES = "aace.alexa.supportedLocales";
 
     /**
-     *
-     * This read-only property is used with Engine.getProperty() to check if the vehicle's country is supported.
+     * This read-only property is used with
+     * com.amazon.aace.propertyManager.PropertyManager.getProperty() to check
+     * if the vehicle's country is supported.
      * @hideinitializer
      */
     public static final String COUNTRY_SUPPORTED = "aace.alexa.countrySupported";
+
+    /**
+    * This property is used with
+    * com.amazon.aace.propertyManager.PropertyManager.setProperty() to change the 
+    * current timezone setting of the device. The value must be a valid timezone 
+    * accepted by AVS. 
+    * Calling com.amazon.aace.propertyManager.PropertyManager.getProperty()
+    * with the TIMEZONE property provides the current timezone of the device.
+    * @hideinitializer
+    */
+    public static final String TIMEZONE = "aace.alexa.timezone";
+
+    /**
+     * This property is used with
+     * com.amazon.aace.propertyManager.PropertyManager.setProperty() to change 
+     * the current wake word enabled setting. The value must be a boolean 
+     * represented as a string, i.e. "true" or "false". Call
+     * com.amazon.aace.propertyManager.PropertyManager.getProperty() with the
+     * WAKEWORD_ENABLED property to check whether wake word is enabled.
+     */
+    public static final String WAKEWORD_ENABLED = "aace.alexa.wakewordEnabled";
 }

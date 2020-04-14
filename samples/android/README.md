@@ -10,7 +10,7 @@ The purpose of the Android Sample App is to provide useful example code to help 
 * [Running the Android Sample App](#running-the-android-sample-app)
 * [Using the Android Sample App](#using-the-android-sample-app)
 * [Debugging Notes](#debugging-notes)
-* [Release Notes](#v210-release-notes)
+* [Release Notes](#v220-release-notes)
 
 ## Prerequisites<a id="prerequisites"></a>
 
@@ -72,6 +72,8 @@ Choose one of the following two options to include the Alexa Auto SDK build depe
 
 > **Note:** If you want to implement any optional modules (such as wake word support, Alexa Communications, Local Voice Control (LVC), Device Client Metrics (DCM), or Voice Chrome for Android), you must choose option 2 and build the platform AARs and the core-sample AAR using the Auto SDK Builder. The prebuilt AARs available in JCenter are for the default Auto SDK modules only.
 
+> **Note:** The Auto SDK requires Gradle version 4.10.1 - 5.6.2 (5.1.1 - 5.6.2 if you are using Android Studio).
+
 #### Option 1: Use the pre-built platform AARs (remote build flavor)
 
 The pre-built platform AARs for the default Auto SDK modules and the core-sample AAR required to run the Android Sample App are available in the [JCenter repo](https://jcenter.bintray.com/com/amazon/alexa/aace/).
@@ -107,10 +109,11 @@ $ gradle assembleLocalRelease
 Alternatively, you can follow the steps to [configure the project in Android Studio](#configure-the-project-in-android-studio).
 
 >**Note:** If you get gradle-related errors (such as `Could not open settings remapped class cache...`, `Could not open settings generic class cache...`, or `BUG! exception in phase 'semantic analysis' in source unit 'BuildScript' Unsupported class file major version 57`) when attempting to build the Android Sample App using the Alexa Auto SDK Builder, install Java 8 and point the java_home directory to 1.8:
-`export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)`
-This issue should be resolved with the release of Gradle 6.0.
+`export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)`.
 
 ### Configure the Project in Android Studio<a id="configure-the-project-in-android-studio"></a> (optional)
+
+> **Note:** The Auto SDK requires Android Studio version 3.4.1+. In addition, you must ensure that the Gradle version you are using is compatible with the Android Studio version you are using. See the [Android Gradle Plugin Release Notes](https://developer.android.com/studio/releases/gradle-plugin#updating-gradle) for information about matching Android Studio versions to Gradle versions.
 
 > **Note:** These instructions assume that you have [populated the `app/assets/app_config.json` file](#editing-the-configuration-file) with information specific to your device and [included the Alexa Auto SDK build dependencies (AAR files)](#including-alexa-auto-sdk-build-dependencies-aar-files).
 
@@ -197,13 +200,13 @@ To debug all external libraries which are not built by Android Studio, follow th
 
 Prerequisite: Install the Low Level Debugger (LLDB) package in Android Studio. You can find the LLDB component on the **SDK Manager** -> **SDK Tools** tab.
 
-1. Use the builder script to generate a build with debug symbols. See the [Builder README](../../builder/README.md#running-builder) for documentation of builder options. For example, to build an Android x86 build with debugging symbols use:
+1. Use the builder script to generate a build with debug symbols. See the [Builder README](../../builder/README.md#builder-command-arguments) for documentation of builder options. For example, to build an Android x86-64 build with debugging symbols use:
 
-	`builder/build.sh android -t androidx86 -g`
+	`builder/build.sh android -t androidx86-64 -g`
 2. Debug symbols are located at:
 
 	`builder/deploy/android<arch>/aac-sdk-build-<arch>-android-<apilevel>-dbg.tar.gz`
-3. Extract the symbol tar: (`tar -xvf aac-sdk-build-<arch>-android-<apilevel>-dbg.tar.gz`). Extracted symbols are located here: `builder/deploy/androidx86/opt/AAC/lib/.debug`
+3. Extract the symbol tar: (`tar -xvf aac-sdk-build-<arch>-android-<apilevel>-dbg.tar.gz`). Extracted symbols are located here: `builder/deploy/androidx86-64/opt/AAC/lib/.debug`
 4. Rebuild the platform AARs using: `builder/build.sh gradle -g`
 5. Rebuild the Sample App in Android Studio.
 6. Launch the Sample App in Android studio by pressing the **Debug 'app'** button on the toolbar
@@ -211,7 +214,7 @@ Prerequisite: Install the Low Level Debugger (LLDB) package in Android Studio. Y
 8. In the debug window, switch to the **lldb** tab.
 9. To debug each external library, provide LLDB the location of the library's symbols using `add-dsym`. For example:
 
-	`(lldb) add-dsym ${AAC_SDK_HOME}/builder/deploy/androidx86/opt/AAC/lib/.debug/libAACECoreEngine.so`
+	`(lldb) add-dsym ${AAC_SDK_HOME}/builder/deploy/androidx86-64/opt/AAC/lib/.debug/libAACECoreEngine.so`
 10. Use LLDB `image lookup` to locate the function to debug. For example: `image lookup -vn EngineImpl::start`
 11. If you are debugging on macOS, then the `CompileUnit` (source file) output of LLDB `image lookup` points to the file system in the docker image. Use LLDB `settings set target.source-map` to direct LLDB to locate the source on the local file system instead. For example:
 
@@ -229,18 +232,18 @@ aac-module-core/0.99.0-r0/src/engine/src/ ${AAC_SDK_HOME}/modules/core/engine/sr
 
 > **Note**: If the LLDB window isn't visible in the debug tab, select **Run** -> **Edit Configurations** -> **Debugger** and change the `Debug Type` to `Native`.
 
-## v2.1.0 Release Notes<a id="v210-release-notes"></a>
+## v2.2.0 Release Notes<a id="v220-release-notes"></a>
+### Enhancements
+* Added a **TimeZone** option to the menu. The list of available timezone options is updated every time there is a change from the Alexa companion app.
+
 
 ### Resolved Issues
-
-* Fixed an issue where pressing the **Pause** button immediately after pressing the **Next** button did not advance or pause the music.
-* Fixed an issue that required you to start the Sample App after enabling location services in order to use the location services.
+* Fixed an issue where the GUI did not accurately reflect the states of the Navigation Favorites and Navigation State controls across app relaunch.
+* Fixed an issue where clicking the **Cancel Login** button to cancel login in the Android Sample App returned a “Cancelling CBL flow” message, but CBL authentication was not cancelled.
   
 ### Known Issues
-* When you click the **Cancel Login** button to cancel login in the Android Sample App, the Sample App returns a “Cancelling CBL flow” message, but CBL authentication is not cancelled. To cancel the login, you must restart the Sample App.
-* The GUI display of the **Navigation Favorites** setting is not consistent after you relaunch the Sample App. For example, if you set **Navigation Favorites** to **ON** then relaunch the Sample App, the **Navigation Favorites** setting displays as **OFF** upon relaunch. This is a GUI issue only; the navigation favorites setting itself persists after you relaunch the Sample App.
+* When you upgrade the Auto SDK Android Sample App from v.2.1 to v2.2, an `INTERNAL_SERVICE_EXCEPTION` is displayed. Functionality is not impacted, and you can ignore the error.
 * Alexa Presentation Language (APL) rendering does not support ssmlToSpeech and ssmlToText transformers. Therefore, some skills, like Jeopardy, will not provide the expected user experience.
-* If the microphone is in use, the Android Sample App does not disable Alexa triggers such as PTT.
 * The Android Sample App goes into listening mode when calling 911, as Alexa prompts users to say "Alexa, Cancel" to stop. This is due to the fact that the Android platform does not provide audio loopback to cancel out self triggers. See the [Loopback Detector README](../../extensions/loopback-detector/README.md) for an example of how to use the Auto SDK with the AmazonLite wake word to cancel out self references.
 * The `AudioOutput.prepare()` method implementation in `AudioOutputHandler` blocks returning until it reads the full audio attachment from the Engine on the caller's thread. It should not do this and instead should return quickly and read the attachment on a separate thread.
 * A generic error TTS is returned when the user initiates offline contact calling before uploading contacts to the cloud on the Android Sample App with the optional Local Voice Control extension.

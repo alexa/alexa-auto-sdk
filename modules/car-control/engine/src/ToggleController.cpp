@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -24,15 +24,11 @@ namespace carControl {
 /// String to identify log entries originating from this file.
 static const std::string TAG("aace.engine.carControl.ToggleController");
 
-/// Alias for readability
-/// @{
-/// @}
-
 std::shared_ptr<ToggleController> ToggleController::create(
     const json& j,
     const std::string& endpointId,
     const std::string& interface,
-    AssetStore& assetStore) {
+    const AssetStore& assetStore) {
     try {
         std::string instance = j.at("instance");
         ThrowIf(instance.empty(), "missingInstance");
@@ -41,14 +37,13 @@ std::shared_ptr<ToggleController> ToggleController::create(
             alexaClientSDK::capabilityAgents::toggleController::ToggleControllerAttributeBuilder::create();
         alexaClientSDK::avsCommon::avs::CapabilityResources capabilityResources;
 
-        auto locale = assetStore.getLocale();
         auto& friendlyNames = j.at("capabilityResources").at("friendlyNames");
         for (auto& item : friendlyNames.items()) {
             auto& value = item.value().at("value");
             std::string assetId = value.at("assetId");
-            const std::vector<std::string>& names = assetStore.getValues(assetId);
+            const std::vector<AssetStore::NameLocalePair>& names = assetStore.getFriendlyNames(assetId);
             for (auto name = names.begin(); name != names.end(); ++name) {
-                capabilityResources.addFriendlyNameWithText(*name, locale);
+                capabilityResources.addFriendlyNameWithText(name->first, name->second);
             }
         }
         attributeBuilder->withCapabilityResources(capabilityResources);

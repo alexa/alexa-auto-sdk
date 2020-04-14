@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -92,19 +92,34 @@ public:
     virtual bool shutdown() = 0;
 
     /**
+     * @note This method is deprecated. Use
+     *       aace::propertyManager::PropertyManager::setProperty()
+     *
      * Sets a property value in the Engine
      *
-     * @param [in] key The key used by the Engine to identify the property
-     * @param [in] value The property value to set in the Engine
-     * @return @c true if property value was set, else @c false
+     * @param [in] name The name used by the Engine to identify the property.
+     *        The property name must be one of the property constants recognized
+     *        by the Engine, e.g. the properties in
+     *        @c aace::alexa::property::AlexaProperties.h
+     * @param [in] value The property setting
+     * @return @c true if the property value was updated or set to the current
+     *         setting, else @c false if an error occured.
      */
     virtual bool setProperty( const std::string& key, const std::string& value ) = 0;
     
     /**
-     * Returns a property value from the Engine
+     * @note This method is deprecated. Use
+     *       aace::propertyManager::PropertyManager::getProperty()
      *
-     * @param [in] key The key used by the Engine to identify the property
-     * @returns The property value as a string
+     * Retrieves the setting for the property identified by
+     * @c name from the Engine
+     *
+     * @param [in] name The name used by the Engine to identify the property.
+     *        The property name must be one of the property constants recognized
+     *        by the Engine, e.g. the properties in
+     *        @c aace::alexa::property::AlexaProperties.h
+     * @return The property value as a string, or an empty string if the 
+     *        property value was not found
      */
     virtual std::string getProperty( const std::string& key ) = 0;
     

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -67,6 +67,7 @@ bool AddressBookEngineService::registerPlatformInterface( std::shared_ptr<aace::
 bool AddressBookEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::addressBook::AddressBook> platformInterface ) {
     try {
         AACE_INFO(LX(TAG,"registerPlatformInterfaceType"));
+        ThrowIfNotNull( m_addressBookEngineImpl, "platformInterfaceAlreadyRegistered" );
 
         m_addressBookEngineImpl = AddressBookEngineImpl::create( platformInterface );
         ThrowIfNull( m_addressBookEngineImpl, "createAddressBookEngineImplFailed" );
@@ -83,12 +84,14 @@ bool AddressBookEngineService::registerPlatformInterfaceType( std::shared_ptr<aa
         ThrowIfNull( deviceInfo, "deviceInfoInvalid" );
 
         auto networkProvider = getContext()->getServiceInterface<aace::network::NetworkInfoProvider>( "aace.network" );
-        ThrowIfNull( networkProvider, "networkProviderInvalid" );
+
+        // get the initial network status from the network provider - if the network provider is not
+        // available then we always treat the network status as CONNECTED
+        auto networkStatus = networkProvider != nullptr ? networkProvider->getNetworkStatus() : aace::network::NetworkInfoProvider::NetworkStatus::CONNECTED;
 
         auto networkObserver = getContext()->getServiceInterface<aace::engine::network::NetworkObservableInterface>( "aace.network" );
-        ThrowIfNull( networkObserver, "networkObserverInvalid" );
 
-        m_addressBookCloudUploader = aace::engine::addressBook::AddressBookCloudUploader::create( m_addressBookEngineImpl, authDelegate, deviceInfo, networkProvider, networkObserver );
+        m_addressBookCloudUploader = aace::engine::addressBook::AddressBookCloudUploader::create( m_addressBookEngineImpl, authDelegate, deviceInfo, networkStatus, networkObserver );
         ThrowIfNull( m_addressBookCloudUploader, "createAddressBookCloudUploaderFailed" );
 
         // set the engine interface reference

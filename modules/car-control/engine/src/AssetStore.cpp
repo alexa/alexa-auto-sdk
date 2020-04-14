@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -13,8 +13,8 @@
  * permissions and limitations under the License.
  */
 
-#include <AACE/Engine/CarControl/AssetsDefault.h>
 #include <AACE/Engine/CarControl/AssetStore.h>
+#include <AACE/Engine/CarControl/AssetsDefault.h>
 #include <AACE/Engine/Core/EngineMacros.h>
 
 #include <sstream>
@@ -30,9 +30,6 @@ namespace carControl {
 /// String to identify log entries originating from this file.
 static const std::string TAG("aace.carControl.AssetStore");
 
-AssetStore::AssetStore(const std::string& locale) : m_locale{locale} {
-}
-
 AssetStore::~AssetStore() {
     clear();
 }
@@ -47,50 +44,39 @@ bool AssetStore::addAssets(const std::string& path) {
     }
 }
 
-std::string AssetStore::getLocale() {
-    return m_locale;
-}
-
-const std::vector<std::string>& AssetStore::getValues(const std::string& id) {
-    if (m_assets.find(id) == m_assets.end()) {
-        return m_empty;
-    }
-    return m_assets[id];
-}
-
-void AssetStore::print() {
-    for (auto& item : m_assets) {
-        std::cout << item.first << std::endl;
-        for (auto value = item.second.begin(); value != item.second.end(); ++value) {
-            std::cout << "'" + *value + "' ";
-        }
-        std::cout << std::endl;
-    }
+bool AssetStore::addDefaultAssets() {
+    std::stringstream stream(ASSETS_DEFAULT);
+    return addAssets(stream);
 }
 
 bool AssetStore::addAssets(std::istream& stream) {
     try {
         if (stream.good()) {
             json j = json::parse(stream);
-            json items = j.at("assets");
-            for (auto& item : items.items()) {
-                std::vector<std::string> items;
-                auto asset = item.value();
-                std::string assetId = asset["assetId"];
-                json values = asset["values"];
-                for (auto& valueItem : values.items()) {
-                    json value = valueItem.value();
-                    std::vector<std::string> locales = value.at("locales");
-                    if (std::find(locales.begin(), locales.end(), m_locale) == locales.end()) continue;
-                    std::string defaultValue = value["defaultValue"];
-                    json synonyms = value["synonyms"];
-                    items.push_back(defaultValue);
-                    for (auto& synonym : synonyms.items()) {
-                        items.push_back(synonym.value());
+            json assetArray = j.at("assets");
+            for (auto& assetItem : assetArray.items()) {
+                // For each asset, add an entry to the asset map
+                // 'names' will hold all synonyms for all locales for all values
+                std::vector<NameLocalePair> names;
+                auto assetObject = assetItem.value();
+                std::string assetId = assetObject["assetId"];
+                json valuesArray = assetObject["values"];
+                for (auto& valueItem : valuesArray.items()) {
+                    json valueObject = valueItem.value();
+                    std::string defaultValue = valueObject["defaultValue"];
+                    json synonyms = valueObject["synonyms"];
+                    std::vector<std::string> locales = valueObject.at("locales");
+                    // For every locale, add the defaultValue and each synonym
+                    // to the list of names for this assetId
+                    for (auto locale = locales.begin(); locale != locales.end(); ++locale) {
+                        names.push_back({defaultValue, *locale});
+                        for (auto& synonym : synonyms.items()) {
+                            names.push_back({synonym.value(), *locale});
+                        }
                     }
                 }
-                ThrowIf(items.empty(), "noAssetFriendlyNameFor " + assetId);
-                m_assets.emplace(assetId, items);
+                ThrowIf(names.empty(), "noAssetFriendlyNameFor " + assetId);
+                m_assets.emplace(assetId, names);
             }
             return true;
         }
@@ -102,16 +88,20 @@ bool AssetStore::addAssets(std::istream& stream) {
     }
 }
 
+const std::vector<AssetStore::NameLocalePair>& AssetStore::getFriendlyNames(const std::string& assetId) const {
+    auto iter = m_assets.find(assetId);
+    if (iter != m_assets.end()) { 
+        return iter->second;
+    } else {
+        return m_empty;
+    }
+}
+
 void AssetStore::clear() {
     for (auto value : m_assets) {
         value.second.clear();
     }
     m_assets.clear();
-}
-
-bool AssetStore::addDefaultAssets() {
-    std::stringstream stream(ASSETS_DEFAULT);
-    return addAssets(stream);
 }
 
 }  // namespace carControl

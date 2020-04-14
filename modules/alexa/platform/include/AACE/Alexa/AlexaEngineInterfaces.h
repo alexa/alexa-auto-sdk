@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -411,7 +411,7 @@ class LocalMediaSourceEngineInterface {
 public:
     virtual void onPlayerEvent( const std::string& eventName ) = 0;
     virtual void onPlayerError( const std::string& errorName, long code, const std::string& description, bool fatal ) = 0;
-    virtual void onSetFocus() = 0;
+    virtual void onSetFocus( bool focusAcquire = true ) = 0;
 };
 
 /**
@@ -511,6 +511,30 @@ inline std::ostream& operator<<( std::ostream& stream, const EqualizerController
     stream << equalizerBandToString(band);
     return stream;
 }
+
+/**
+ * AudioPlayerEngineInterface
+ */
+class AudioPlayerEngineInterface {
+public:
+    /**
+     * Returns the current playback position of the audio player.
+     * If the audio source is not playing, the most recent position played
+     * should be returned.
+     *
+     * @return The audio player's playback position in milliseconds,
+     * or @c TIME_UNKNOWN if the current media position is unknown or invalid.
+     */
+    virtual int64_t onGetPlayerPosition() = 0;
+
+    /**
+     * Returns the playback duration of the audio player.
+     *
+     * @return The audio player's playback duration in milliseconds,
+     * or @c TIME_UNKNOWN if the duration is unknown or invalid.
+     */
+    virtual int64_t onGetPlayerDuration() = 0;
+};
 
 } // aace::alexa
 } // aace

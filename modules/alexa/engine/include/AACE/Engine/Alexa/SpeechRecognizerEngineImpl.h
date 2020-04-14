@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -170,6 +170,7 @@ private:
     std::shared_ptr<aace::engine::alexa::WakewordEngineAdapter> m_wakewordEngineAdapter;
     //bool m_expectingAudio = false;
     bool m_wakewordEnabled = false;
+    bool m_initialWakewordEnabledState = true;
 
     std::shared_ptr<aace::engine::alexa::WakewordVerifier> m_wakewordVerifier;
     alexaClientSDK::avsCommon::utils::threading::Executor m_executor;

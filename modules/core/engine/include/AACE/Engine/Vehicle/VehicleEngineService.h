@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -19,10 +19,11 @@
 #include <unordered_map>
 
 #include "AACE/Engine/Core/EngineService.h"
-#include "AACE/Engine/Vehicle/VehiclePropertyInterface.h"
 #include "AACE/Engine/Metrics/MetricEvent.h"
 #include "AACE/Engine/Storage/StorageEngineService.h"
-
+#include "AACE/Engine/Vehicle/VehiclePropertyInterface.h"
+#include "AACE/Engine/PropertyManager/PropertyManagerServiceInterface.h"
+#include "AACE/Engine/PropertyManager/PropertyManagerEngineService.h"
 #include "AACE/Vehicle/VehicleConfiguration.h"
 
 #include <rapidjson/document.h>
@@ -31,61 +32,86 @@ namespace aace {
 namespace engine {
 namespace vehicle {
 
-struct EnumHash
-{
-    template <typename T>
-    std::size_t operator()(T t) const {
-        return static_cast<std::size_t>(t);
-    }
-};
-
-class VehicleEngineService :
-    public aace::engine::core::EngineService,
-    public VehiclePropertyInterface,
-    public std::enable_shared_from_this<VehicleEngineService> {
-    
+class VehicleEngineService
+        : public aace::engine::core::EngineService
+        , public VehiclePropertyInterface
+        , public std::enable_shared_from_this<VehicleEngineService> {
 public:
-    DESCRIBE("aace.vehicle",VERSION("1.0"),DEPENDS(aace::engine::storage::StorageEngineService))
+    DESCRIBE("aace.vehicle",VERSION("1.0"),
+             DEPENDS(aace::engine::storage::StorageEngineService),
+             DEPENDS(aace::engine::propertyManager::PropertyManagerEngineService))
 
 public:
+    /// Aliases for readability
+    /// @{
+    using VehiclePropertyMap = aace::engine::vehicle::VehiclePropertyMap;
     using VehiclePropertyType = aace::vehicle::config::VehicleConfiguration::VehiclePropertyType;
+    /// @}
 
 private:
-    VehicleEngineService( const aace::engine::core::ServiceDescription& description );
+    VehicleEngineService(const aace::engine::core::ServiceDescription& description);
 
 public:
     virtual ~VehicleEngineService() = default;
     
-    // VehiclePropertyInterface
-    std::string getVehicleProperty( VehiclePropertyType type ) override;
-    
-    // Emit vehicle metric
+    using SetPropertyResultCallback = std::function<void(const std::string&, const std::string&, const std::string&)>;
+            
+    /// @name VehiclePropertyInterface methods
+    /// @{
+    std::string getVehicleProperty(VehiclePropertyType type) override;
+    VehiclePropertyMap getVehicleProperties() override;
+    bool isVehicleInfoConfigured() override;
+    /// @}
+
+    /// Emit vehicle metric
     void record(bool full);
+    
+    bool setProperty_operatingCountry(
+        const std::string& value,
+        bool& changed,
+        bool& async,
+        const SetPropertyResultCallback& callbackFunction);
+    std::string getProperty_operatingCountry();
 
 protected:
+    /// @name EngineService methods
+    /// @{
     bool initialize() override;
     bool setup() override;
-    bool configure( std::shared_ptr<std::istream> configuration ) override;
-    bool setProperty( const std::string& key, const std::string& value ) override;
-    std::string getProperty( const std::string& key ) override;
+    bool configure(std::shared_ptr<std::istream> configuration) override;
+    /// @}
 
-    bool checkVehicleConfigProperty( rapidjson::Value& root, const char* key, bool warnIfMissing = true );
-    std::string getVehicleConfigProperty( rapidjson::Value& root, const char* key, const char* defaultValue = "", bool warnIfMissing = true );
-    std::string getVehiclePropertyAttribute( VehiclePropertyType property);
+    bool checkVehicleConfigProperty(rapidjson::Value& root, const char* key, bool warnIfMissing = true);
+
+    std::string getVehicleConfigProperty(
+        rapidjson::Value& root,
+        const char* key,
+        const char* defaultValue = "",
+        bool warnIfMissing = true);
+
+    /**
+     * Gets the attribute described by the specified @c VehiclePropertyType as a string. The value returned corresponds
+     * to the name of the attribute as required for metrics.
+     */
+    std::string getPropertyAttributeForMetric(VehiclePropertyType property);
     std::shared_ptr<aace::engine::metrics::MetricEvent> generateVehiclePropertiesMetric(bool empty);
+
+private:
+    bool registerProperties();
 
 private:
     std::unordered_map<VehiclePropertyType,std::string,EnumHash> m_vehiclePropertyMap;
     std::string m_operatingCountry;
-
-    // Record empty metric flag
+    /// Record empty metric flag
     bool m_recordEmpty;
-    // Record full metric flag
+    /// Record full metric flag
     bool m_recordFull;
+    /// Whether "aace.vehicle.info" is configured
+    bool m_vehicleInfoConfigured;
 };
 
-} // aace::engine::vehicle
-} // aace::engine
-} // aace
+}  // namespace vehicle
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_VEHICLE_VEHICLE_ENGINE_SERVICE_H
+#endif  // AACE_ENGINE_VEHICLE_VEHICLE_ENGINE_SERVICE_H

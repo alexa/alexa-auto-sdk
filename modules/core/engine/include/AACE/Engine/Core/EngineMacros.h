@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -26,19 +26,19 @@
 #define macro_dispatcher__(func, nargs) func ## nargs
 
 // exceptions
-#define Throw(reason) throw std::runtime_error(reason);
-#define ThrowIf(arg,reason) if(arg){throw std::runtime_error(reason);}
-#define ThrowIfNot(arg,reason) if(!(arg)){throw std::runtime_error(reason);}
-#define ThrowIfNull(arg,reason) if((arg)==nullptr){throw std::runtime_error(reason);}
-#define ThrowIfNotNull(arg,reason) if((arg)!=nullptr){throw std::runtime_error(reason);}
+#define Throw(reason) throw std::runtime_error(reason)
+#define ThrowIf(arg,reason) do { if(arg){throw std::runtime_error(reason);} } while (false)
+#define ThrowIfNot(arg,reason) do { if(!(arg)){throw std::runtime_error(reason);} } while (false)
+#define ThrowIfNull(arg,reason) do { if((arg)==nullptr){throw std::runtime_error(reason);} } while (false)
+#define ThrowIfNotNull(arg,reason) do { if((arg)!=nullptr){throw std::runtime_error(reason);} } while (false)
 
 #define ReturnIf(...) macro_dispatcher(ReturnIf, __VA_ARGS__)(__VA_ARGS__)
-#define ReturnIf1(arg) if(arg){return;}
-#define ReturnIf2(arg,result) if(arg){return(result);}
+#define ReturnIf1(arg) do { if(arg){return;} } while(false)
+#define ReturnIf2(arg,result) do { if(arg){return(result);} } while(false)
 
 #define ReturnIfNot(...) macro_dispatcher(ReturnIfNot, __VA_ARGS__)(__VA_ARGS__)
-#define ReturnIfNot1(arg) if(!(arg)){return;}
-#define ReturnIfNot2(arg, result) if(!(arg)){return(result);}
+#define ReturnIfNot1(arg) do { if(!(arg)){return;} } while(false)
+#define ReturnIfNot2(arg, result) do { if(!(arg)){return(result);} } while(false)
 
 // logging
 #define AACE_LOGGER (aace::engine::logger::EngineLogger::getInstance())

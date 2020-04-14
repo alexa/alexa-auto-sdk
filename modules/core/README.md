@@ -11,7 +11,7 @@ The Alexa Auto SDK Core module contains the Engine base classes and the abstract
 * [Extending the Default Platform Implementation](#extending-the-default-platform-implementation)
 * [Starting the Engine](#starting-the-engine)
 * [Stopping the Engine](#stopping-the-engine)
-* [Getting and Setting Core Engine Properties](#getting-and-setting-core-engine-properties)
+* [Managing Runtime Properties with the Property Manager](#managing-runtime-properties-with-the-property-manager)
 
 ## Overview <a id="overview"></a>
 
@@ -68,7 +68,7 @@ You can include all the configuration data in a single JSON file to create a sin
 
 or break the configuration data into multiple JSON files to create multiple `EngineConfiguration` objects; for example:
 
-```
+```cpp
 auto coreConfig = aace::core::config::ConfigurationFile::create( “core-config.json” );
 auto alexaConfig = aace::core::config::ConfigurationFile::create( “alexa-config.json” );
 auto navigationConfig = aace::core::config::ConfigurationFile::create( “navigation-config.json” );
@@ -80,7 +80,7 @@ The [config.json.in](../../samples/cpp/assets/config.json.in) file provides an e
 
 You can also specify the configuration data programmatically by using the configuration factory methods provided in the library. For example, you can configure the `alertsCapabilityAgent` settings by instantiating an `EngineConfiguration` object with the following method:
 
-```
+```cpp
 auto alertsConfig = aace::alexa::config::AlexaConfiguration::createAlertsConfig
     ("<SQLITE_DATABASE_FILE_PATH>" );
 ```
@@ -91,7 +91,7 @@ See the API reference documentation for the [`AlexaConfiguration` class](https:/
 
 You must configure vehicle information in the Engine configuration. A sample configuration is detailed below. You can generate the `EngineConfiguration` object including this information by using this schema in a `.json` config file or programmatically through the `VehicleConfiguration::createVehicleInfoConfig()` factory method.
 
-```
+```cpp
 {
   "aace.vehicle":
   {
@@ -112,7 +112,9 @@ You must configure vehicle information in the Engine configuration. A sample con
   }
 }
 ```
->**Important!** To pass the certification process, the vehicle information that you provide in the Engine configuration must include a `"vehicleIdentifier"` that is NOT the vehicle identification number (VIN). See the [platform API reference documentation](https://alexa.github.io/alexa-auto-sdk/docs/cpp/classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html) for more information about the [`VehicleConfiguration`](./platform/include/AACE/Vehicle/VehicleConfiguration.h) class.
+For details about the vehicle properties included in the `VehicleConfiguration` class, see the[`VehicleConfiguration.h`](./platform/include/AACE/Vehicle/VehicleConfiguration.h) file.
+
+>**Important!** To pass the certification process, the vehicle information that you provide in the Engine configuration must include a `"vehicleIdentifier"` that is NOT the vehicle identification number (VIN).
 
 ## Extending the Default Platform Implementation <a id="extending-the-default-platform-implementation"></a>
 
@@ -140,7 +142,7 @@ To extend each Auto SDK interface you will use in your platform implementation:
 
 The functions that you override in the interface handlers are typically associated with directives from Alexa Voice Service (AVS). The functions that are made available by the interfaces are typically associated with events or context sent to AVS. It is not always a one-to-one mapping however, because the Alexa Auto SDK attempts to simplify the interaction with AVS.
 
-The sections below provide information about and examples for creating and registering [location request](#implementing-a-location-provider), [network information](#implementing-a-network-information-provider), [logging](#implementing-log-events), and [audio](#implementing-audio) interface handlers with the Engine. For details about creating handlers for the various Auto SDK modules, see the README files for those modules.
+The sections below provide information about and examples for creating and registering [location provider](#implementing-a-location-provider), [network information provider](#implementing-a-network-information-provider), [logging](#implementing-log-events), and [audio](#implementing-audio) interface handlers with the Engine. For details about creating handlers for the various Auto SDK modules, see the README files for those modules.
 
 ### Implementing a Location Provider <a id = "implementing-a-location-provider"></a>
 
@@ -148,7 +150,7 @@ The Engine provides a callback for implementing location requests from Alexa and
 
 To implement a custom `LocationProvider` handler to provide location using the default Engine `LocationProvider` class, extend the `LocationProvider` class:
 
-```
+```cpp
 #include <AACE/Location/LocationProvider.h>
 
 class MyLocationProvider : public aace::location::LocationProvider {
@@ -166,41 +168,45 @@ class MyLocationProvider : public aace::location::LocationProvider {
 engine->registerPlatformInterface( std::make_shared<MyLocationProvider>());
 ```
 
-### Implementing Network Information Provider <a id = "implementing-a-network-information-provider"></a>
+### Implementing a Network Information Provider <a id = "implementing-a-network-information-provider"></a>
 
-The Engine provides callbacks for implementing network information requests and informing the Engine of network changes. This is dependent on the platform implementation.
+The `NetworkInfoProvider` platform interface provides methods that you can implement in a custom handler to allow your application to monitor network connectivity and send network status change events whenever the network status changes. Methods such as `getNetworkStatus()` and `getWifiSignalStrength()` allow the Engine to retrieve network status information, while the `networkStatusChanged()` method informs the Engine about network status changes.
+
+The `NetworkInfoProvider` methods are dependent on your platform implementation and are required by various internal Auto SDK components to get the initial network status from the network provider and update that status appropriately. When you implement the `NetworkInfoProvider` platform interface correctly, Auto SDK components that use the methods provided by this interface work more effectively and can adapt their internal behavior to the initial network status and changing network status events as they come in.
 
 > **Important!** Connectivity monitoring is the responsibility of the platform. The Alexa Auto SDK doesn't monitor network connectivity.
 
-To implement a custom `NetworkInfoProvider` handler to provide network information using the default Engine NetworkInfoProvider class, extend the `NetworkInfoProvider` class:
+To implement a custom handler to monitor network connectivity and send network status change events, extend the `NetworkInfoProvider` class:
 
-```
+```cpp
 #include <AACE/Network/NetworkInfoProvider.h>
-
+...
 class MyNetworkInfoProvider : public aace::network::NetworkInfoProvider {
+public:
+    aace::network::NetworkInfoProvider::NetworkStatus getNetworkStatus() override {
+        // Return the current network status as determined on the platform.
+        // Here we return the default, but you should return the real network status.
+        return aace::network::NetworkInfoProvider::NetworkStatus::CONNECTED;
+    }
 
-    NetworkStatus getNetworkStatus() override {
-        // get platform network status
-        return platformStatus;
+    int getWifiSignalStrength() override {
+        // Return the current WiFi signal strength RSSI (Received Signal Strength Indicator)
+        // as determined on the platform.
+        // Here we return the default, but you should return the real WiFi signal strength.
+        return 100;
     }
-  
-    int getWifiSignalStrength() override{
-        // get current network RSSI
-        return platformRSSI;
-    }
-    ...
 
-    void MyNetworkStatusChangedHandler(...) {
-        //provide platform network status inform
-        int rrsi;
-        NetworkStatus status;
-        networkStatusChanged( status, rssi);
-    }
-    ...
 };
 
 // Register the platform interface with the Engine
-engine->registerPlatformInterface( std::make_shared<MyNetworkInfoProvider>());
+auto myNetworkInfoProvider = std::make_shared<MyNetworkInfoProvider>();
+engine->registerPlatformInterface( myNetworkInfoProvider );
+
+...
+
+// Send networkStatusChanged() notifications as Network Status and WiFi signal strength change on the platform
+myNetworkInfoProvider->networkStatusChanged( networkStatus, wifiSignalStrength );
+
 ```
 
 ### Implementing Log Events <a id="implementing-log-events"></a>
@@ -209,7 +215,7 @@ The Engine provides a callback for implementing log events from the AVS SDK. Thi
 
 To implement a custom log event handler for logging events from AVS using the default engine Logger class, extend the `Logger` class:
 
-```
+```cpp
 #include <AACE/Logger/Logger.h>
 
 class MyLogger : public aace::logger::Logger {
@@ -225,13 +231,13 @@ class MyLogger : public aace::logger::Logger {
 engine->registerPlatformInterface( std::make_shared<MyLogger>());
 ```        
     
-### Implementing Audio<a id="implementing-audio"></a>
+### Implementing Audio <a id="implementing-audio"></a>
 
 The platform should implement audio input and audio output handling. Other Auto SDK components can then make use of the provided implementation to provision audio input and output channels. 
   
 The `AudioInputProvider` should provide a platform-specific implementation of the `AudioInput` interface, for the type of input specified by the `AudioInputType` parameter when its `openChannel()` method is called, with only one instance of `AudioInput` per `AudioInputType`. For example, the `SpeechRecognizer` engine implementation requests an audio channel for type `VOICE`, while AlexaComms requests a channel for type `COMMUNICATION` - the implementation determines if these are shared or separate input channels. If it is a shared input channel, then whenever the platform implementation writes data to the interface, any instance in the Engine that has opened that channel will receive a callback with the audio data.
   
-```
+```cpp
 #include <AACE/Audio/AudioInputProvider.h>
 ...
 class AudioInputProviderHandler : public aace::audio::AudioInputProvider {
@@ -276,7 +282,7 @@ The audio input format for all input types should be encoded as:
 
 * Signed, little endian byte order
 
-```
+```cpp
 #include <AACE/Audio/AudioInput.h>
 ...
 class AudioInputHandler : public aace::audio::AudioInput {
@@ -312,7 +318,7 @@ The `AudioOutputProvider` implementation determines how to handle each different
 
 A more sophisticated implementation may provide completely different `AudioOutput` implementations depending on the audio type - for example, providing a low level audio implementation for `NOTIFICATION` and `EARCON` types, and a high level implementation (such as ExoPlayer) for `TTS` and `MUSIC`. The best approach is highly dependent on your system-specific use case.
 
-```
+```cpp
 #include <AACE/Audio/AudioOutputProvider.h>
 ...
 class AudioOutputProviderHandler : public aace::audio::AudioOutputProvider {
@@ -331,7 +337,7 @@ The `AudioOutput` describes a platform-specific implementation of an audio outpu
 
 The full `AudioOutput` API is described below. 
 
-```
+```cpp
 #include <AACE/Audio/AudioOutput.h>
 class AudioOutputHandler :
     public aace::audio::AudioOutput,
@@ -421,16 +427,83 @@ You should call `dispose()` on the Engine when the app is being destroyed.
 ```
 engine->dispose();
 ```
-  
-## Getting and Setting Core Engine Properties <a id ="getting-and-setting-core-engine-properties"></a>
+## Managing Runtime Properties with the Property Manager <a id ="managing-runtime-properties-with-the-property-manager"></a>
 
-The Core module defines one or more constants (such as `VERSION`) that are used to get and set runtime properties in the Engine. To use these properties, include the `CoreProperties.h` header in your source code and call the Engine's `getProperty()` and `setProperty()` methods.
+Certain modules in the Auto SDK define constants (for example `FIRMWARE_VERSION` and `LOCALE`) that are used to get and set the values of runtime properties in the Engine. Changes to property values may also be initiated from the Alexa Voice Service (AVS). For example, the `TIMEZONE` property may be changed through AVS when the user changes the timezone setting in the Alexa Companion App.
 
-    #include <AACE/Core/CoreProperties.h>
+The Auto SDK Property Manager maintains the runtime properties by storing properties and listeners to the properties and delegating the `setProperty()` and `getProperty()` calls from your application to the respective Engine services. It also calls `propertyChanged()` to notify your application about property value changes originating in the Engine. The Property Manager includes a `PropertyManager` platform interface that provides the following methods:
 
-    // get the SDK version number from the Engine
-    auto version = m_engine->getProperty( aace::core::property::VERSION );
+* `setProperty()` - called by your application to set a property value in the Engine.
+* `getProperty()` - called by your application to retrieve a property value from the Engine.
+    >**Note:** `setProperty()` is asynchronous. After calling `setProperty()`, `getProperty()` returns the updated value only after the Engine calls `propertyStateChanged()` with `PropertyState::SUCCEEDED`.
+* `propertyStateChanged()` - notifies your application about the status of a property value change (`SUCCEEDED` or `FAILED`). This is an asynchronous response to your application's call to `setProperty()`.
+* `propertyChanged()` - notifies your application about a property value change in the Engine that was initiated internally, either by AVS or an Engine component.
 
->**Note:** The `setProperty()` method returns `true` if the the property value was successfully updated and `false` if the update failed.
+>**NOTE:** `PropertyManager::setProperty()` and `PropertyManager::getProperty()` replace deprecated `Engine::setProperty()` and `Engine::getProperty()` in Auto SDK v2.2 and later.
 
-The [CoreProperties](./platform/include/AACE/Core/CoreProperties.h) class includes details about the Engine properties defined in the Core module.
+### Property Manager Sequence Diagrams
+
+#### Application Changes a Property Value
+The following sequence diagram illustrates the flow when your application calls `setProperty()` to set a property value in the Engine.
+<details><summary>Click to expand or collapse the diagram</summary>
+<p>
+![Set_Property](./assets/PropertyManager_set.png)
+</p>
+</details>
+
+#### Application Retrieves a Property Value
+The following sequence diagram illustrates the flow when your application calls `getProperty()` to retrieve a property value from the Engine.
+<details><summary>Click to expand or collapse the diagram</summary>
+<p>
+![Get_Property](./assets/PropertyManager_get.png)
+</p>
+</details>
+
+#### Notification of Property Value Change Initiated by AVS
+The following sequence diagram illustrates the flow when a property value change is initiated by AVS and the Property Manager notifies your application.
+<details><summary>Click to expand or collapse the diagram</summary>
+<p>
+![Property_Changed](./assets/PropertyManager_changed.png)
+</p>
+</details>
+
+### Implementing a Custom Property Manager Handler
+To implement a custom Property Manager handler to set and retrieve Engine property values and be notified of property value changes, extend the `PropertyManager` class:
+
+```cpp
+#include <AACE/PropertyManager/PropertyManager.h>
+
+class MyPropertyManager : public aace::propertyManager::PropertyManager {
+    
+    void propertyStateChanged(const std::string& name, const std::string& value, const PropertyState state) override {
+        // Handle the status of a property change after a call to setProperty().
+    }
+              
+    void propertyChanged(const std::string& name, const std::string& newValue) override {
+        // Handle the property value change initiated by the Engine.
+        // For example, if the user sets the TIMEZONE to "Pacific Standard Time - Vancouver"
+        // in the companion app, your application gets a call to:
+        // propertyChanged(aace::alexa::property::TIMEZONE, "America/Vancouver")
+    }
+}
+...
+
+// Register the platform interface with the Engine
+auto m_propertyManagerHandler = std::make_shared<MyPropertyManagerHandler>();
+engine->registerPlatformInterface( m_propertyManagerHandler );
+
+// You can also set and retrieve properties in the Engine by calling the inherited
+// setProperty() and getProperty() methods.
+
+// For example, to set the LOCALE property to English-Canada:
+m_propertyManagerHandler->setProperty(aace::alexa::property::LOCALE, "en-CA");
+
+// For example, to retrieve the value of the LOCALE property:
+auto locale  = m_propertyManagerHandler->getProperty(aace::alexa::property::LOCALE);
+
+```
+### Property Definitions
+The definitions of the properties used with the `PropertyManager::setProperty()` and `PropertyManager::getProperty()` methods are included in the [AlexaProperties.h](../alexa/platform/include/AACE/Alexa/AlexaProperties.h) and [CoreProperties.h](./platform/include/AACE/Core/CoreProperties.h) files. For a list of the Alexa Voice Service (AVS) supported locales for the `LOCALE` property, see the [Alexa Voice Service (AVS) documentation](https://developer.amazon.com/docs/alexa-voice-service/system.html#locales).
+
+
+

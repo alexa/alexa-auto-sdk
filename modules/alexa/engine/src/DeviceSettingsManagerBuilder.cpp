@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -22,17 +22,12 @@
 #include <System/LocaleHandler.h>
 #include <System/TimeZoneHandler.h>
 
+#include "AACE/Engine/Core/EngineMacros.h"
+
 #include "AACE/Engine/Alexa/DeviceSettingsManagerBuilder.h"
 
 /// String to identify log entries originating from this file.
 static const std::string TAG("SettingsManagerBuilder");
-
-/**
- * Create a LogEntry using this file's TAG and the specified event string.
- *
- * @param The event string for this @c LogEntry.
- */
-#define LX(event) alexaClientSDK::avsCommon::utils::logger::LogEntry(TAG, event)
 
 namespace aace {
 namespace engine {
@@ -53,7 +48,7 @@ static const std::string DEFAULT_TIMEZONE_CONFIGURATION_KEY = "defaultTimezone";
 template <typename PointerT>
 static inline bool checkPointer(const std::shared_ptr<PointerT>& pointer, const std::string& variableName) {
     if (!pointer) {
-        ACSDK_ERROR(LX("checkPointerFailed").d("variable", variableName));
+        AACE_ERROR(LX("checkPointerFailed").d("variable", variableName));
         return false;
     }
     return true;
@@ -88,13 +83,13 @@ bool addSetting<0>(DeviceSettingsManagerBuilder builder, DeviceSettingsManager& 
 
 std::unique_ptr<DeviceSettingsManager> DeviceSettingsManagerBuilder::build() {
     if (m_foundError) {
-        ACSDK_ERROR(LX("buildFailed").d("reason", "settingConstructionFailed"));
+        AACE_ERROR(LX("buildFailed").d("reason", "settingConstructionFailed"));
         return nullptr;
     }
 
     std::unique_ptr<DeviceSettingsManager> manager{new DeviceSettingsManager(m_dataManager)};
     if (!addSetting<NUMBER_OF_SETTINGS - 1>(*this, *manager)) {
-        ACSDK_ERROR(LX("buildFailed").d("reason", "addSettingFailed"));
+        AACE_ERROR(LX("buildFailed").d("reason", "addSettingFailed"));
         return nullptr;
     }
     return manager;
@@ -141,7 +136,7 @@ DeviceSettingsManagerBuilder& DeviceSettingsManagerBuilder::withLocaleSetting(
         std::move(localeEventSender), std::move(dummySender), m_settingStorage, localeAssetsManager);
 
     if (!setting) {
-        ACSDK_ERROR(LX("createLocaleWakeWordsSettingFailed").d("reason", "cannotAddSetting"));
+        AACE_ERROR(LX("createLocaleWakeWordsSettingFailed").d("reason", "cannotAddSetting"));
         m_foundError = true;
         return *this;
     } else {
@@ -163,7 +158,7 @@ DeviceSettingsManagerBuilder& DeviceSettingsManagerBuilder::withLocaleAndWakeWor
         std::move(localeEventSender), std::move(wakeWordsEventSender), m_settingStorage, localeAssetsManager);
 
     if (!setting) {
-        ACSDK_ERROR(LX("createLocaleWakeWordsSettingFailed").d("reason", "cannotAddSetting"));
+        AACE_ERROR(LX("createLocaleWakeWordsSettingFailed").d("reason", "cannotAddSetting"));
         m_foundError = true;
         return *this;
     } else {
@@ -180,7 +175,7 @@ DeviceSettingsManagerBuilder& DeviceSettingsManagerBuilder::withLocaleAndWakeWor
 DeviceSettingsManagerBuilder& DeviceSettingsManagerBuilder::withDoNotDisturbSetting(
     const std::shared_ptr<capabilityAgents::doNotDisturb::DoNotDisturbCapabilityAgent>& dndCA) {
     if (!dndCA) {
-        ACSDK_ERROR(LX("withDNDSettingFailed").d("reason", "nullCA"));
+        AACE_ERROR(LX("withDNDSettingFailed").d("reason", "nullCA"));
         m_foundError = true;
         return *this;
     }

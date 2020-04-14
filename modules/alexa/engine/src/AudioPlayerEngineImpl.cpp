@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -40,7 +40,8 @@ bool AudioPlayerEngineImpl::initialize(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter,
-    std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedSender ) {
+    std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedSender,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface> audioPlayerObserverDelegate ) {
     
     try
     {
@@ -52,8 +53,9 @@ bool AudioPlayerEngineImpl::initialize(
         m_audioPlayerCapabilityAgent = alexaClientSDK::capabilityAgents::audioPlayer::AudioPlayer::create( std::move(factory), messageSender, focusManager, contextManager, exceptionSender, playbackRouter, certifiedSender );
         ThrowIfNull( m_audioPlayerCapabilityAgent, "couldNotCreateCapabilityAgent" );
         
-        // add audio observer
+        // add audio player observers
         m_audioPlayerCapabilityAgent->addObserver( std::dynamic_pointer_cast<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface>( shared_from_this() ) );
+        m_audioPlayerCapabilityAgent->addObserver( audioPlayerObserverDelegate );
 
         // register capability with the default endpoint
         defaultEndpointBuilder->withCapability( m_audioPlayerCapabilityAgent, m_audioPlayerCapabilityAgent );
@@ -78,7 +80,8 @@ std::shared_ptr<AudioPlayerEngineImpl> AudioPlayerEngineImpl::create(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter,
-    std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedSender ) {
+    std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedSender,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface> audioPlayerObserverDelegate ) {
     
     std::shared_ptr<AudioPlayerEngineImpl> audioPlayerEngineImpl = nullptr;
 
@@ -96,6 +99,7 @@ std::shared_ptr<AudioPlayerEngineImpl> AudioPlayerEngineImpl::create(
         ThrowIfNull( exceptionSender, "invalidExceptionSender" );
         ThrowIfNull( playbackRouter, "invalidPlaybackRouter" );
         ThrowIfNull( certifiedSender, "invalidCertifiedSender" );
+        ThrowIfNull( audioPlayerObserverDelegate, "invalidAudioPlayerObserverInterfaceDelegate" );
         
         // open the Music audio channel
         auto audioOutputChannel = audioManager->openAudioOutputChannel( "AudioPlayer", aace::audio::AudioOutputProvider::AudioOutputType::MUSIC );
@@ -103,7 +107,10 @@ std::shared_ptr<AudioPlayerEngineImpl> AudioPlayerEngineImpl::create(
 
         audioPlayerEngineImpl = std::shared_ptr<AudioPlayerEngineImpl>( new AudioPlayerEngineImpl( audioPlayerPlatformInterface ) );
         
-        ThrowIfNot( audioPlayerEngineImpl->initialize( audioOutputChannel, defaultEndpointBuilder, messageSender, focusManager, contextManager, attachmentManager, capabilitiesDelegate, speakerManager, exceptionSender, playbackRouter, certifiedSender ), "initializeAudioPlayerEngineImplFailed" );
+        ThrowIfNot( audioPlayerEngineImpl->initialize( audioOutputChannel, defaultEndpointBuilder, messageSender, focusManager, contextManager, attachmentManager, capabilitiesDelegate, speakerManager, exceptionSender, playbackRouter, certifiedSender, audioPlayerObserverDelegate ), "initializeAudioPlayerEngineImplFailed" );
+
+        // set the platform's engine interface reference
+        audioPlayerPlatformInterface->setEngineInterface( audioPlayerEngineImpl );
 
         return audioPlayerEngineImpl;
     }
@@ -124,7 +131,22 @@ void AudioPlayerEngineImpl::doShutdown()
     }
 
     AudioChannelEngineImpl::doShutdown();
-    m_audioPlayerPlatformInterface.reset();
+    
+    if( m_audioPlayerPlatformInterface != nullptr ) {
+        m_audioPlayerPlatformInterface->setEngineInterface( nullptr );
+        m_audioPlayerPlatformInterface.reset();
+    }
+}
+
+//
+// AudioPlayerEngineInterface
+//
+int64_t AudioPlayerEngineImpl::onGetPlayerPosition() {
+    return getMediaPosition();
+}
+
+int64_t AudioPlayerEngineImpl::onGetPlayerDuration() {
+    return getMediaDuration();
 }
 
 //
@@ -136,7 +158,6 @@ void AudioPlayerEngineImpl::onPlayerActivityChanged( alexaClientSDK::avsCommon::
     
 void AudioPlayerEngineImpl::setObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsObserverInterface> observer) {
     std::lock_guard<std::mutex> lock{m_observersMutex};
-//    m_renderPlayerObserver = observer;
     m_audioPlayerCapabilityAgent->setObserver(observer);
 }
 

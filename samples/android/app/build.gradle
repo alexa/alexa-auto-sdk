@@ -7,7 +7,7 @@ android {
         minSdkVersion 22
         targetSdkVersion 28
         versionCode 1
-        versionName "2.1"
+        versionName "2.2"
     }
     buildTypes {
         release {
@@ -39,31 +39,29 @@ android {
 }
 
 ext {
-    remoteLibVersion = "2.1+"
+    remoteLibVersion = "2.2+"
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar','*.aar'], dir: 'src/main/libs')
-    gradle.startParameter.getTaskNames().each { task ->
-        if(task.toLowerCase().contains("local")) {
-            localImplementation fileTree(include: ['*.jar','*.aar'], dir: "${project.rootDir}/../../builder/deploy/aar")
-        }
+    implementation fileTree(include: ['*.jar', '*.aar'], dir: 'src/main/libs')
+
+    def tasks = gradle.startParameter.getTaskNames()
+    if (tasks.empty || tasks.any { it.toLowerCase().contains("local") }) {
+        localImplementation fileTree(include: ['*.jar', '*.aar'], dir: "${project.rootDir}/../../builder/deploy/aar")
+    } else if (tasks.any { it.toLowerCase().contains("remote") }) {
+        remoteImplementation "com.amazon.alexa.aace:core:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:alexa:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:addressbook:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:apl:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:cbl:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:contactuploader:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:car-control:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:maccandroid:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:navigation:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:phonecontrol:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:sample-core:${remoteLibVersion}@aar"
     }
-    gradle.startParameter.getTaskNames().each { task ->
-        if(task.toLowerCase().contains("remote")) {
-            remoteImplementation "com.amazon.alexa.aace:core:${remoteLibVersion}@aar"
-            remoteImplementation "com.amazon.alexa.aace:alexa:${remoteLibVersion}@aar"
-            remoteImplementation "com.amazon.alexa.aace:addressbook:${remoteLibVersion}@aar"
-            remoteImplementation "com.amazon.alexa.aace:apl:${remoteLibVersion}@aar"
-            remoteImplementation "com.amazon.alexa.aace:cbl:${remoteLibVersion}@aar"
-            remoteImplementation "com.amazon.alexa.aace:contactuploader:${remoteLibVersion}@aar"
-            remoteImplementation "com.amazon.alexa.aace:car-control:${remoteLibVersion}@aar"
-            remoteImplementation "com.amazon.alexa.aace:maccandroid:${remoteLibVersion}@aar"
-            remoteImplementation "com.amazon.alexa.aace:navigation:${remoteLibVersion}@aar"
-            remoteImplementation "com.amazon.alexa.aace:phonecontrol:${remoteLibVersion}@aar"
-            remoteImplementation "com.amazon.alexa.aace:sample-core:${remoteLibVersion}@aar"
-        }
-    }
+
     implementation 'com.android.support:appcompat-v7:28+'
     implementation 'com.android.support:design:28+'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'

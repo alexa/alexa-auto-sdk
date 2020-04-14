@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -112,7 +112,7 @@ private:
         std::shared_ptr<aace::engine::addressBook::AddressBookServiceInterface> addressBookService,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
-        std::shared_ptr<aace::network::NetworkInfoProvider> networkProvider,
+        NetworkInfoObserver::NetworkStatus networkStatus,
         std::shared_ptr<aace::engine::network::NetworkObservableInterface> networkObserver );
 
 public:
@@ -120,7 +120,7 @@ public:
         std::shared_ptr<aace::engine::addressBook::AddressBookServiceInterface> addressBookService,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
-        std::shared_ptr<aace::network::NetworkInfoProvider> networkProvider,
+        NetworkInfoObserver::NetworkStatus networkStatus,
         std::shared_ptr<aace::engine::network::NetworkObservableInterface> networkObserver );
 
     // AddressBookObserver

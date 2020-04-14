@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -299,6 +299,22 @@ extern "C"
         }
         catch( const std::exception& ex ) {
             AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_alexa_config_AlexaConfiguration_createEqualizerControllerConfigBinder",ex.what());
+            return 0;
+        }
+    }
+
+    JNIEXPORT jlong JNICALL
+    Java_com_amazon_aace_alexa_config_AlexaConfiguration_createExternalMediaPlayerConfigBinder( JNIEnv* env, jobject obj, jstring agent )
+    {
+        try
+        {
+            auto config = aace::alexa::config::AlexaConfiguration::createExternalMediaPlayerConfig( JString(agent).toStdStr() );
+            ThrowIfNull( config, "createExternalMediaPlayerConfigFailed" );
+
+            return reinterpret_cast<long>( new aace::jni::core::config::EngineConfigurationBinder( config ) );
+        }
+        catch( const std::exception& ex ) {
+            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_alexa_config_AlexaConfiguration_createExternalMediaPlayerConfigBinder",ex.what());
             return 0;
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -13,9 +13,11 @@
  * permissions and limitations under the License.
  */
 
+#define G_LOG_DOMAIN "AAL"
 #include "core.h"
 
 #include <gst/app/gstappsrc.h>
+#include <gst/audio/audio.h>
 #include <string.h>
 
 #define USE_APPSRC_CALLBACK 1
@@ -86,23 +88,49 @@ static void source_setup_callback(GstElement *playbin, GstElement *source, gpoin
 	g_signal_connect(source, "seek-data", G_CALLBACK(seek_data_callback), ctx);
 #endif
 
-	if (ctx->caps_string) {
-		// Setup appsrc caps
-		GstCaps *caps = gst_caps_from_string(ctx->caps_string);
+	char* caps_string;
+	switch (ctx->audio_params.stream_type) {
+	case AAL_STREAM_LPCM:
+		caps_string = gstreamer_audio_pcm_caps(
+		    GstAudioFormat_from_aal_sample_format(ctx->audio_params.lpcm.sample_format),
+		    ctx->audio_params.lpcm.channels,
+		    ctx->audio_params.lpcm.sample_rate);
+		break;
+	default:
+		caps_string = NULL;
+		break;
+	}
+	g_debug("caps_string: %s\n", caps_string ? caps_string : "(null)");
+
+	if (caps_string) {
+		GstCaps *caps = gst_caps_from_string(caps_string);
 		gst_app_src_set_caps(GST_APP_SRC(source), caps);
 		gst_caps_unref(caps);
+		g_free(caps_string);
 	}
 
 	g_object_set(G_OBJECT(source), "format", GST_FORMAT_TIME, NULL);
 }
 
-static aal_handle_t gstreamer_player_create(const aal_attributes_t *attr)
+static aal_handle_t gstreamer_player_create(const aal_attributes_t *attr, aal_audio_parameters_t* params)
 {
 	bool success = false;
-	aal_gst_context_t *ctx;
+	aal_gst_context_t *ctx = NULL;
 	GstElement *bin = NULL;
 	GstElement *sink = NULL;
 	GstElement *volume = NULL;
+
+	if (!attr->uri || IS_EMPTY_STRING(attr->uri)) {
+		if (params != NULL && params->stream_type != AAL_STREAM_LPCM) {
+			g_debug("Should only specify audio parameters for LPCM stream");
+			goto exit;
+		}
+	} else {
+		if (params != NULL) {
+			g_debug("Specifying audio parameters for file is not supported");
+			goto exit;
+		}
+	}
 
 	ctx = gstreamer_create_context(NULL, "playbin", attr);
 	if (!ctx)
@@ -143,6 +171,14 @@ static aal_handle_t gstreamer_player_create(const aal_attributes_t *attr)
 	gst_object_unref(pad);
 
 	if (!attr->uri || IS_EMPTY_STRING(attr->uri)) {
+		if (params != NULL) {
+			ctx->audio_params = *params;
+		} else {
+			ctx->audio_params.stream_type = AAL_STREAM_LPCM;
+			ctx->audio_params.lpcm.sample_format = AAL_AVS_SAMPLE_FORMAT;
+			ctx->audio_params.lpcm.channels = AAL_AVS_CHANNELS;
+			ctx->audio_params.lpcm.channels = AAL_AVS_SAMPLE_RATE;
+		}
 		g_object_set(GST_OBJECT(ctx->pipeline), "uri", APPSRC_URI, NULL);
 	} else {
 		g_object_set(GST_OBJECT(ctx->pipeline), "uri", attr->uri, NULL);
@@ -162,8 +198,10 @@ exit:
 	if (!success) {
 		if (bin)
 			gst_object_unref(bin);
-		if (ctx)
+		if (ctx) {
 			gstreamer_destroy(ctx);
+			ctx = NULL;
+		}
 	}
 
 	return (aal_handle_t) ctx;
@@ -191,6 +229,18 @@ static int64_t gstreamer_player_get_duration(aal_handle_t handle)
 	return duration / GST_MSECOND;
 }
 
+static int64_t gstreamer_player_get_num_bytes_buffered(aal_handle_t handle)
+{
+	GstElement *source = NULL;
+	aal_gst_context_t *ctx = (aal_gst_context_t *)handle;
+
+	g_object_get(ctx->pipeline, "source", &source, NULL);
+
+	if (GST_IS_APP_SRC(source))
+		return gst_app_src_get_current_level_bytes(GST_APP_SRC(source));
+	return 0;
+}
+
 static void gstreamer_player_seek(aal_handle_t handle, int64_t position)
 {
 	aal_gst_context_t *ctx = (aal_gst_context_t *) handle;
@@ -209,10 +259,22 @@ static void gstreamer_player_seek(aal_handle_t handle, int64_t position)
 static void gstreamer_player_set_volume(aal_handle_t handle, double volume)
 {
 	aal_gst_context_t *ctx = (aal_gst_context_t *) handle;
+
 	GstElement *volume_elem = gst_bin_get_by_name(GST_BIN(ctx->pipeline), "volume");
-	if (!volume_elem) {
-		g_debug("Volume element is not available");
-		return;
+	if (volume_elem == NULL) {
+		GstBin* audio_sink_bin = NULL;
+		g_object_get(GST_OBJECT(ctx->pipeline), "audio-sink", &audio_sink_bin, NULL);
+		if (!audio_sink_bin) {
+			g_debug("Audio sink bin is not available");
+			return;
+		}
+
+		volume_elem = gst_bin_get_by_name(audio_sink_bin, "volume");
+		gst_object_unref(audio_sink_bin);
+		if (!volume_elem) {
+			g_debug("Volume element is not available");
+			return;
+		}
 	}
 
 	if (volume < MIN_VOLUME || MAX_VOLUME < volume) {
@@ -315,17 +377,6 @@ static void gstreamer_player_notify_end_of_stream(aal_handle_t handle)
 		gst_app_src_end_of_stream(GST_APP_SRC(source));
 }
 
-static void gstreamer_player_set_stream_type(aal_handle_t handle, const aal_stream_type_t type)
-{
-	aal_gst_context_t *ctx = (aal_gst_context_t *) handle;
-	// Setup appsink caps
-	switch (type) {
-	case AAL_STREAM_LPCM: ctx->caps_string = CAPS_RAW; break;
-	case AAL_STREAM_MP3: ctx->caps_string = CAPS_MP3; break;
-	default: ctx->caps_string = NULL;
-	}
-}
-
 const aal_player_ops_t gstreamer_player_ops = {
 	.create = gstreamer_player_create,
 	.play = gstreamer_play,
@@ -333,11 +384,11 @@ const aal_player_ops_t gstreamer_player_ops = {
 	.stop = gstreamer_stop,
 	.get_position = gstreamer_player_get_position,
 	.get_duration = gstreamer_player_get_duration,
+	.get_num_bytes_buffered = gstreamer_player_get_num_bytes_buffered,
 	.seek = gstreamer_player_seek,
 	.set_volume = gstreamer_player_set_volume,
 	.set_mute = gstreamer_player_set_mute,
 	.write = gstreamer_player_write,
 	.notify_end_of_stream = gstreamer_player_notify_end_of_stream,
-	.set_stream_type = gstreamer_player_set_stream_type,
 	.destroy = gstreamer_destroy
 };

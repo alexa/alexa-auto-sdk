@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -55,19 +55,18 @@ public:
         m_mockContextManager = std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockContextManager>>(); 
         m_mockNavigationProviderName = "HERE";
         m_alexaMockFactory = alexa::AlexaTestHelper::createAlexaMockComponentFactory();
-
-        EXPECT_CALL(*m_mockDirectiveSequencer, addDirectiveHandler(testing::_)).WillOnce(testing::Return(true));
         m_navigationEngineImpl = aace::engine::navigation::NavigationEngineImpl::create(
             m_mockPlatformInterface,
             m_alexaMockFactory->getEndpointBuilderMock(),
-            m_mockExceptionEncounteredSender,
+            m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
             m_alexaMockFactory->getMessageSenderInterfaceMock(),
-            m_mockContextManager,
+            m_alexaMockFactory->getContextManagerInterfaceMock(),
             m_mockNavigationProviderName
         );
     }
     void TearDown() override{
         m_navigationEngineImpl->shutdown();
+        m_alexaMockFactory->shutdown();
     }
 
     std::shared_ptr<aace::engine::navigation::NavigationEngineImpl> m_navigationEngineImpl;

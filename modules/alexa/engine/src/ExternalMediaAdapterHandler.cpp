@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -29,6 +29,9 @@ namespace alexa {
 
 static const uint8_t DEFAULT_SPEAKER_VOLUME = 50;
 
+/// Timeout for setting focus operation.
+static const std::chrono::seconds SET_FOCUS_TIMEOUT{5};
+
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.ExternalMediaAdapterHandler");
 
@@ -36,7 +39,7 @@ static const std::string TAG("aace.alexa.ExternalMediaAdapterHandler");
 static const std::string EXTERNAL_MEDIA_PLAYER_AGENT = "alexaAutoSDK";
 
 ExternalMediaAdapterHandler::ExternalMediaAdapterHandler( std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender, std::shared_ptr<FocusHandlerInterface> focusHandler ) :
-    alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
+    ExternalMediaAdapterHandlerInterface::ExternalMediaAdapterHandlerInterface(TAG),
     m_discoveredPlayerSender( discoveredPlayerSender ), 
     m_focusHandler( focusHandler ),
     m_muted( false ),
@@ -61,26 +64,50 @@ bool ExternalMediaAdapterHandler::initializeAdapterHandler( std::shared_ptr<alex
 }
 
 bool ExternalMediaAdapterHandler::validatePlayer( const std::string& localPlayerId, bool checkAuthorized ) {
+    if ( localPlayerId.empty() ) return false;
     auto it = m_playerInfoMap.find( localPlayerId );
     return it != m_playerInfoMap.end() && (it->second.authorized || checkAuthorized == false);
 }
 
-bool ExternalMediaAdapterHandler::setFocus( const std::string& localPlayerId )
+bool ExternalMediaAdapterHandler::setFocus( const std::string& localPlayerId, bool focusAcquire )
 {
     try
     {
-        ThrowIfNot( validatePlayer( localPlayerId ), "invalidPlayerInfo" );
+        ThrowIfNot( validatePlayer( localPlayerId, false ), "invalidPlayerInfo" );
         auto playerInfo = m_playerInfoMap[localPlayerId];
+        auto playerId = playerInfo.playerId;
         
-        auto m_focusHandler_lock = m_focusHandler.lock();
-        ThrowIfNull( m_focusHandler_lock, "invalidFocusHandler" );
+        auto focusHandler_lock = m_focusHandler.lock();
+        ThrowIfNull( focusHandler_lock, "invalidFocusHandler" );
+
+        if (!playerId.empty()) {
+            focusHandler_lock->setFocus( playerId, focusAcquire );
+            return true;
+        }
         
-        m_focusHandler_lock->setFocus( playerInfo.playerId );
+        AACE_WARN(LX(TAG,"setFocusDelayed").d("reason", "unauthorizedPlayer"));
+    
+        // check if player is pending authorization w/ 5 sec timeout
+        m_executor.submit([this, localPlayerId, playerId, focusAcquire, focusHandler_lock]() {
+            auto predicate = [this, localPlayerId, playerId](){
+                if (m_playerInfoMap.find(localPlayerId)==m_playerInfoMap.end()) return false;
+                else return m_playerInfoMap[localPlayerId].authorized;
+            };
+            std::unique_lock<std::mutex> lock( m_mutex );
+            if (m_attemptedSetFocusPlayerInFocusCondition.wait_for(lock, SET_FOCUS_TIMEOUT, predicate) ) {
+                // not already in focus
+                focusHandler_lock->setFocus( playerId, focusAcquire );
+            } else {
+                AACE_ERROR(LX(TAG,"setPlayerInFocusFailed").d("reason", "wait for authorize player timed out").d("localPlayerId", localPlayerId));
+                m_focusHandler.expired();
+            } 
+        });
         
-        return true;
+        return true; 
+        
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"setFocus").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG,"setFocus").d("reason", ex.what()).d("localPlayerId", localPlayerId));
         return false;
     }
 }
@@ -100,6 +127,8 @@ std::vector<PlayerInfo> ExternalMediaAdapterHandler::authorizeDiscoveredPlayers(
                 
                 info.localPlayerId = next.localPlayerId;
                 info.authorized = next.authorized;
+                info.defaultSkillToken = next.skillToken;
+                info.playerId = next.playerId;
             
                 authorizedPlayerInfoList.push_back( info );
                 supportedPlayerList.push_back( next );
@@ -120,7 +149,7 @@ std::vector<PlayerInfo> ExternalMediaAdapterHandler::authorizeDiscoveredPlayers(
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"authorizeDiscoveredPlayers").d("reason", ex.what()));
-        return  std::vector<PlayerInfo>();
+        return std::vector<PlayerInfo>();
     }
 }
 
@@ -137,7 +166,7 @@ bool ExternalMediaAdapterHandler::login( const std::string& playerId, const std:
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"login").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG,"login").d("reason", ex.what()).d("playerId", playerId).d("userName", userName).d("forceLogin", forceLogin));
         return false;
     }
 }
@@ -155,12 +184,27 @@ bool ExternalMediaAdapterHandler::logout( const std::string& playerId )
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"logout").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG,"logout").d("reason", ex.what()).d("playerId", playerId));
         return false;
     }
 }
 
-bool ExternalMediaAdapterHandler::play( const std::string& playerId, const std::string& playContextToken, int64_t index, std::chrono::milliseconds offset, const std::string& skillToken, const std::string& playbackSessionId, bool preload, aace::alexa::ExternalMediaAdapter::Navigation navigation )
+static const std::unordered_map<std::string,aace::alexa::ExternalMediaAdapter::Navigation> NAVIGATION_ENUM_MAP = {
+    { "DEFAULT", aace::alexa::ExternalMediaAdapter::Navigation::DEFAULT },
+    { "NONE", aace::alexa::ExternalMediaAdapter::Navigation::NONE },
+    { "FOREGROUND", aace::alexa::ExternalMediaAdapter::Navigation::FOREGROUND }
+};
+
+static aace::alexa::ExternalMediaAdapter::Navigation getNavigationEnum( std::string name )
+{
+    std::transform( name.begin(), name.end(), name.begin(), [](unsigned char c) -> unsigned char { return static_cast<unsigned char>(std::toupper(c)); } );
+
+    auto it = NAVIGATION_ENUM_MAP.find( name );
+
+    return it != NAVIGATION_ENUM_MAP.end() ? it->second : aace::alexa::ExternalMediaAdapter::Navigation::DEFAULT;
+}
+
+bool ExternalMediaAdapterHandler::play( const std::string& playerId, const std::string& playContextToken, int64_t index, std::chrono::milliseconds offset, const std::string& skillToken, const std::string& playbackSessionId, const std::string& navigation, bool preload, const alexaClientSDK::avsCommon::avs::PlayRequestor& playRequestor )
 {
     try
     {
@@ -176,19 +220,19 @@ bool ExternalMediaAdapterHandler::play( const std::string& playerId, const std::
     
         playerInfo.skillToken = skillToken;
         playerInfo.playbackSessionId = playbackSessionId;
-    
+
         // call the platform media adapter
-        ThrowIfNot( handlePlay( localPlayerId, playContextToken, index, offset, preload, navigation ), "handlePlayFailed" );
+        ThrowIfNot( handlePlay( localPlayerId, playContextToken, index, offset, preload, getNavigationEnum( navigation ), playbackSessionId, skillToken ), "handlePlayFailed" );
     
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"play").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG,"play").d("reason", ex.what()).d("playerId", playerId));
         return false;
     }
 }
 
-bool ExternalMediaAdapterHandler::playControl( const std::string& playerId, alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::RequestType requestType )
+bool ExternalMediaAdapterHandler::playControl( const std::string& playerId, aace::engine::alexa::RequestType requestType )
 {
     try
     {
@@ -196,7 +240,7 @@ bool ExternalMediaAdapterHandler::playControl( const std::string& playerId, alex
         ThrowIf( it == m_alexaToLocalPlayerIdMap.end(), "invalidPlayerId" );
     
         // convert RequestType to PlayControlType
-        using RequestType = alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::RequestType;
+        using RequestType = aace::engine::alexa::RequestType;
         using PlayControlType = aace::alexa::ExternalMediaAdapter::PlayControlType;
         
         PlayControlType controlType;
@@ -205,6 +249,7 @@ bool ExternalMediaAdapterHandler::playControl( const std::string& playerId, alex
         {
             case RequestType::PAUSE: controlType = PlayControlType::PAUSE; break;
             case RequestType::RESUME: controlType = PlayControlType::RESUME; break;
+            case RequestType::STOP: controlType = PlayControlType::STOP; break;
             case RequestType::NEXT: controlType = PlayControlType::NEXT; break;
             case RequestType::PREVIOUS: controlType = PlayControlType::PREVIOUS; break;
             case RequestType::START_OVER: controlType = PlayControlType::START_OVER; break;
@@ -226,7 +271,7 @@ bool ExternalMediaAdapterHandler::playControl( const std::string& playerId, alex
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"playControl").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG,"playControl").d("reason", ex.what()).d("playerId", playerId));
         return false;
     }
 }
@@ -244,7 +289,7 @@ bool ExternalMediaAdapterHandler::seek( const std::string& playerId, std::chrono
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"seek").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG,"seek").d("reason", ex.what()).d("playerId", playerId));
         return false;
     }
 }
@@ -262,16 +307,16 @@ bool ExternalMediaAdapterHandler::adjustSeek( const std::string& playerId, std::
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"adjustSeek").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG,"adjustSeek").d("reason", ex.what()).d("playerId", playerId));
         return false;
     }
 }
 
-std::vector<alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::AdapterState> ExternalMediaAdapterHandler::getAdapterStates()
+std::vector<aace::engine::alexa::AdapterState> ExternalMediaAdapterHandler::getAdapterStates()
 {
     try
     {
-        std::vector<alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::AdapterState> adapterStateList;
+        std::vector<aace::engine::alexa::AdapterState> adapterStateList;
 
         for( const auto& next : m_playerInfoMap )
         {
@@ -279,7 +324,7 @@ std::vector<alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::Adapt
             
             if( playerInfo.authorized )
             {
-                alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::AdapterState state;
+                aace::engine::alexa::AdapterState state;
                 
                 // default session state
                 state.sessionState.playerId = playerInfo.playerId;
@@ -301,7 +346,7 @@ std::vector<alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::Adapt
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"getAdapterStates").d("reason", ex.what()));
-        return std::vector<alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::AdapterState>();
+        return std::vector<aace::engine::alexa::AdapterState>();
     }
 }
 
@@ -337,7 +382,7 @@ std::string ExternalMediaAdapterHandler::createExternalMediaPlayerEvent( const s
         return alexaClientSDK::avsCommon::avs::buildJsonEventString( "ExternalMediaPlayer", event, "", buffer.GetString() ).second;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"createExternalMediaPlayerEvent").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG,"createExternalMediaPlayerEvent").d("reason", ex.what()).d("localPlayerId", localPlayerId));
         return "";
     }
 }
@@ -387,7 +432,7 @@ bool ExternalMediaAdapterHandler::setMute( bool mute )
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("mute", mute));
         return false;
     }
 }
@@ -457,11 +502,16 @@ bool ExternalMediaAdapterHandler::removeDiscoveredPlayer( const std::string& loc
     }
 }
 
-//
-// PlayerInfo
-//
+void ExternalMediaAdapterHandler::doShutdown() {
+    m_executor.shutdown();
 
-PlayerInfo::PlayerInfo( const std::string& localId, const std::string& spi, bool authorized ) : localPlayerId( localId ), spiVersion( spi ) {
+    if (!m_discoveredPlayerSender.expired()) {
+        m_discoveredPlayerSender.reset();
+    }
+
+    if (!m_focusHandler.expired()) {
+        m_focusHandler.reset();
+    }
 }
 
 

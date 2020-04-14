@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -31,11 +31,15 @@
 #include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
 #include <AVSCommon/SDKInterfaces/CapabilityConfigurationInterface.h>
 #include <AVSCommon/SDKInterfaces/ConnectionStatusObserverInterface.h>
+#include <AVSCommon/SDKInterfaces/RenderPlayerInfoCardsProviderInterface.h>
 #include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/ExceptionEncounteredSenderInterface.h>
-#include <AVSCommon/SDKInterfaces/ExternalMediaAdapterInterface.h>
-#include <AVSCommon/SDKInterfaces/ExternalMediaAdapterHandlerInterface.h>
-#include <AVSCommon/SDKInterfaces/ExternalMediaPlayerInterface.h>
+// #include <AVSCommon/SDKInterfaces/ExternalMediaAdapterInterface.h>
+// #include <AVSCommon/SDKInterfaces/ExternalMediaAdapterHandlerInterface.h>
+// #include <AVSCommon/SDKInterfaces/ExternalMediaPlayerInterface.h>
+#include "ExternalMediaAdapterInterface.h"
+#include "ExternalMediaAdapterHandlerInterface.h"
+#include "ExternalMediaPlayerInterface.h"
 #include <AVSCommon/SDKInterfaces/FocusManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/MessageSenderInterface.h>
 #include <AVSCommon/SDKInterfaces/PlaybackHandlerInterface.h>
@@ -44,14 +48,16 @@
 #include <AVSCommon/Utils/RequiresShutdown.h>
 #include <AVSCommon/Utils/Threading/Executor.h>
 #include <Endpoints/EndpointBuilder.h>
-#include <ExternalMediaPlayer/ExternalMediaPlayer.h>
+// #include <ExternalMediaPlayer/ExternalMediaPlayer.h>
+#include "ExternalMediaPlayer.h"
 
 #include "AACE/Alexa/AlexaEngineInterfaces.h"
 #include "AACE/Alexa/ExternalMediaAdapter.h"
 #include "AACE/Alexa/GlobalPreset.h"
 #include "AACE/Alexa/LocalMediaSource.h"
-
-#include "ExternalMediaAdapterHandler.h"
+#include "AACE/Engine/Alexa/ExternalMediaAdapterHandler.h"
+#include "AACE/Engine/Network/NetworkInfoObserver.h"
+#include "AACE/Engine/Network/NetworkObservableInterface.h"
 
 #include <rapidjson/document.h>
 
@@ -59,12 +65,14 @@ namespace aace {
 namespace engine {
 namespace alexa {
 
+class AudioPlayerObserverDelegate;
+
 class ExternalMediaPlayerEngineImpl :
     public DiscoveredPlayerSenderInterface,
     public FocusHandlerInterface,
-    public alexaClientSDK::avsCommon::utils::RequiresShutdown,
-    public alexaClientSDK::avsCommon::sdkInterfaces::ExternalMediaAdapterHandlerInterface,
+    public aace::engine::alexa::ExternalMediaAdapterHandlerInterface,
     public alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface,
+    public alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface,
     public std::enable_shared_from_this<ExternalMediaPlayerEngineImpl> {
     
 private:
@@ -79,12 +87,15 @@ private:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+        std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedMessageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter );
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter,
+        std::shared_ptr<aace::engine::alexa::AudioPlayerObserverDelegate> audioPlayerObserverDelegate,
+        std::shared_ptr<aace::engine::alexa::ExternalMediaAdapterRegistrationInterface> externalMediaAdapterRegistration );
 
-    std::shared_ptr<ExternalMediaAdapterHandler> getAdapter( const std::string& playerId );
+    std::shared_ptr<aace::engine::alexa::ExternalMediaAdapterHandlerInterface> getAdapter( const std::string& playerId );
     std::string getLocalPlayerIdForSource( aace::alexa::LocalMediaSource::Source source );
 
     // functions with the "Locked" suffix must only be called if the calling thread holds @c m_playersMutex
@@ -100,35 +111,44 @@ public:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+        std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedMessageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter );
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter,
+        std::shared_ptr<aace::engine::alexa::AudioPlayerObserverDelegate> audioPlayerObserverDelegate,
+        std::shared_ptr<aace::engine::alexa::ExternalMediaAdapterRegistrationInterface> externalMediaAdapterRegistration );
+
+    std::shared_ptr<aace::engine::alexa::ExternalMediaPlayer> getExternalMediaPlayerCapabilityAgent();
 
     bool registerPlatformMediaAdapter( std::shared_ptr<aace::alexa::ExternalMediaAdapter> platformMediaAdapter );
     bool registerPlatformMediaAdapter( std::shared_ptr<aace::alexa::LocalMediaSource> platformMediaAdapter );
     bool registerPlatformGlobalPresetHandler( std::shared_ptr<aace::alexa::GlobalPreset> platformGlobalPreset );
     
     // alexaClientSDK::avsCommon::sdkInterfaces::ExternalMediaAdapterHandlerInterface
-    void authorizeDiscoveredPlayers( const std::string& payload ) override;
-    void login( const std::string& payload ) override;
-    void logout( const std::string& payload ) override;
-    void play( const std::string& payload ) override;
-    void playControl( const std::string& payload, alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::RequestType request ) override;
-    void playControlForPlayer( const std::string& playerId, alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::RequestType request ) override;
-    void seek( const std::string& payload ) override;
-    void adjustSeek( const std::string& payload ) override;
-    std::vector<alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::AdapterState> getAdapterStates() override;
+    std::vector<aace::engine::alexa::PlayerInfo> authorizeDiscoveredPlayers( const std::vector<aace::engine::alexa::PlayerInfo>& authorizedPlayerList ) override;
+    bool login( const std::string& playerId, const std::string& accessToken, const std::string& userName, bool forceLogin, std::chrono::milliseconds tokenRefreshInterval ) override;
+    bool logout( const std::string& playerId ) override;
+    bool play( const std::string& playerId, const std::string& playContextToken, const int64_t index, const std::chrono::milliseconds offset, const std::string& skillToken,
+        const std::string& playbackSessionId, const std::string& navigation, const bool preload, const alexaClientSDK::avsCommon::avs::PlayRequestor& playRequestor ) override;
+    bool playControl( const std::string& playerId, aace::engine::alexa::RequestType requestType ) override;
+    bool seek( const std::string& playerId, std::chrono::milliseconds positionMilliseconds ) override;
+    bool adjustSeek( const std::string& playerId, std::chrono::milliseconds offsetMilliseconds ) override;
+    std::vector<aace::engine::alexa::AdapterState> getAdapterStates() override;
     
     // DiscoveredPlayerSenderInterface
     void reportDiscoveredPlayers( const std::vector<aace::alexa::ExternalMediaAdapter::DiscoveredPlayerInfo>& discoveredPlayers ) override;
     void removeDiscoveredPlayer( const std::string& localPlayerId ) override;
     
     // FocusHandlerInterface
-    void setFocus( const std::string& playerId ) override;
+    void setFocus( const std::string& playerId, bool focusAcquire ) override;
 
     // alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface
     void onConnectionStatusChanged( const Status status, const ChangedReason reason ) override;
+
+    // RenderPlayerInfoCardsObserver interface
+    void setObserver(
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsObserverInterface> observer) override;
 
 protected:
     virtual void doShutdown() override;
@@ -139,17 +159,17 @@ private:
     std::weak_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> m_messageSender;
     std::weak_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> m_speakerManager;
     
-    std::shared_ptr<alexaClientSDK::capabilityAgents::externalMediaPlayer::ExternalMediaPlayer> m_externalMediaPlayerCapabilityAgent;
+    std::shared_ptr<aace::engine::alexa::ExternalMediaPlayer> m_externalMediaPlayerCapabilityAgent;
     /**
      * A list of every registered @c ExternalMediaAdapterHandler.
      */
-    std::vector<std::shared_ptr<ExternalMediaAdapterHandler>> m_externalMediaAdapterList;
+    std::vector<std::shared_ptr<aace::engine::alexa::ExternalMediaAdapterHandlerInterface>> m_externalMediaAdapterList;
     /**
      * A map of playerIds to their corresponding @c ExternalMediaAdapterHandler handlers. A playerId in this map
      * was authorized by an AuthorizeDiscoveredPlayers directive and the ExternalMediaAdapterHandler that is responsible
      * for it.
      */
-    std::unordered_map<std::string,std::shared_ptr<ExternalMediaAdapterHandler>> m_externalMediaAdapterMap;
+    std::unordered_map<std::string,std::shared_ptr<aace::engine::alexa::ExternalMediaAdapterHandlerInterface>> m_externalMediaAdapterMap;
     /**
      * A set of @c LocalMediaSource sources corresponding to registered adapters.
      */
@@ -178,9 +198,17 @@ private:
      * Serializes access to @c m_connectionStatus
      */
     std::mutex m_connectionMutex;
+    /**
+     * Serializes generic access 
+     */
+    std::mutex m_mutex;
+    /**
+     * Serializes generic condition 
+     */
+    std::condition_variable m_attemptedSetFocusPlayerInFocusCondition;
 
     /**
-     * Global presets platform interface
+     * Condition variable for thread to wait for 
      */
     std::shared_ptr<aace::alexa::GlobalPreset> m_globalPresetHandler;
 
@@ -196,6 +224,21 @@ private:
      */
     alexaClientSDK::avsCommon::utils::threading::Executor m_executor;
 
+    /// Mutex to serialize access to the observers.
+    std::mutex m_observersMutex;
+};
+
+//
+// AudioPlayerObserverDelegate
+//
+
+class AudioPlayerObserverDelegate : public alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface  {
+public:
+    AudioPlayerObserverDelegate() = default;
+    void onPlayerActivityChanged( alexaClientSDK::avsCommon::avs::PlayerActivity state, const Context& context ) override;
+    void setDelegate( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface> delegate );
+private:
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface> m_delegate;
 };
 
 } // aace::engine::alexa

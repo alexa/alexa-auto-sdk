@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
 
 #include "AACE/Alexa/AlexaProperties.h"
 #include "AACE/Engine/Alexa/AlexaComponentInterface.h"
-#include "AACE/Engine/CarControl/AssetStore.h"
 #include "AACE/Engine/CarControl/CarControlEngineService.h"
 #include "AACE/Engine/CarControl/Endpoint.h"
 #include "AACE/Engine/Core/EngineMacros.h"
@@ -64,8 +63,9 @@ CarControlEngineService::~CarControlEngineService() = default;
 
 bool CarControlEngineService::initialize() {
     try {
-        ThrowIfNot( registerServiceInterface<CarControlEngineService>( shared_from_this() ),
-            "registerCarControlEngineServiceFailed" );
+        ThrowIfNot(
+            registerServiceInterface<CarControlEngineService>(shared_from_this()),
+            "registerCarControlEngineServiceFailed");
         return true;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
@@ -75,42 +75,43 @@ bool CarControlEngineService::initialize() {
 
 bool CarControlEngineService::configure(std::shared_ptr<std::istream> configuration) {
     try {
-        AACE_DEBUG(LX(TAG).d("isLocalServiceAvailable",isLocalServiceAvailable()));
+        AACE_DEBUG(LX(TAG).d("isLocalServiceAvailable", isLocalServiceAvailable()));
         ThrowIf(m_configured, "carControlEngineServiceAlreadyConfigured");
 
         json jconfiguration;
         jconfiguration = json::parse(*configuration);
 
         // Ingest assets from the file path(s) specified in configuration, else use the hardcoded default assets, and
-        // store them in an @c AssetStore. This facilitates retrieval of friendly names for an Endpoint during its
-        // construction. The asset store is created with hardcoded en-US locale since it's the only locale supported.
-        AssetStore assetStore("en-US");
+        // store them in an @c AssetStore. This facilitates retrieval of friendly name/locale pairs for an Endpoint
+        // during its construction.
         if (jconfiguration.contains(CONFIG_KEY_ASSETS) && jconfiguration[CONFIG_KEY_ASSETS].is_object()) {
             auto& assets = jconfiguration.at(CONFIG_KEY_ASSETS);
             if (assets.contains(CONFIG_KEY_DEFAULT_ASSETS_PATH) && assets[CONFIG_KEY_DEFAULT_ASSETS_PATH].is_string()) {
                 std::string path = assets.at(CONFIG_KEY_DEFAULT_ASSETS_PATH);
-                ThrowIfNot(assetStore.addAssets(path), "addDefaultAssetsFromPathFailed");
+                AACE_DEBUG(LX(TAG).m("addingDefaultAssetsFromPath").sensitive("path", path));
+                ThrowIfNot(m_assetStore.addAssets(path), "addDefaultAssetsFromPathFailed");
             } else {
-                ThrowIfNot(assetStore.addDefaultAssets(), "addDefaultAssetsFailed");
+                ThrowIfNot(m_assetStore.addDefaultAssets(), "addDefaultAssetsFailed");
             }
             if (assets.contains(CONFIG_KEY_CUSTOM_ASSETS_PATH) && assets[CONFIG_KEY_CUSTOM_ASSETS_PATH].is_string()) {
                 std::string path = assets.at(CONFIG_KEY_CUSTOM_ASSETS_PATH);
-                ThrowIfNot(assetStore.addAssets(path), "addCustomAssetsFromPathFailed");
+                AACE_DEBUG(LX(TAG).m("addingCustomAssetsFromPath").sensitive("path", path));
+                ThrowIfNot(m_assetStore.addAssets(path), "addCustomAssetsFromPathFailed");
             }
         } else {
-            ThrowIfNot(assetStore.addDefaultAssets(), "addDefaultAssetsFailed");
+            ThrowIfNot(m_assetStore.addDefaultAssets(), "addDefaultAssetsFailed");
         }
 
         // Construct an object representation of each endpoint in configuration
         if (jconfiguration.contains(CONFIG_KEY_ENDPOINTS) && jconfiguration.at(CONFIG_KEY_ENDPOINTS).is_array()) {
             for (auto& item : jconfiguration.at(CONFIG_KEY_ENDPOINTS).items()) {
-                auto endpoint = Endpoint::create(item.value(), assetStore);
+                auto endpoint = Endpoint::create(item.value(), m_assetStore);
                 ThrowIfNull(endpoint, "createEndpointFailed");
                 ThrowIfNot(m_endpoints.insert({endpoint->getId(), endpoint}).second, "insertEndpointFailed");
             }
         }
 
-        // Write the configuration to storage for retrieval by the car control local service module
+        // Write the configuration to storage for retrieval by the car control local service
         auto localStorage =
             getContext()->getServiceInterface<aace::engine::storage::LocalStorageInterface>(AACE_STORAGE_SERVICE_KEY);
         ThrowIfNull(localStorage, "invalidLocalStorage");
@@ -136,21 +137,28 @@ bool CarControlEngineService::setup() {
             auto endpointBuilderFactory = alexaComponents->getEndpointBuilderFactory();
             ThrowIfNull(endpointBuilderFactory, "nullEndpointBuilderFactory");
 
-            // Car control endpoints use the same "manufacturerName" as the configured DeviceInfo for the default
-            // endpoint
-            std::string manufacturerName = "Amazon";
+            // Car control endpoints use the same "manufacturerName" and "description" as the configured DeviceInfo for
+            // the default endpoint since "aace.carControl" config currently does not expect these values to be provided
+            std::string manufacturerName = "";
+            std::string description = "";
             auto deviceInfo = alexaComponents->getDeviceInfo();
             if (deviceInfo != nullptr) {
                 manufacturerName = deviceInfo->getManufacturerName();
+                description = deviceInfo->getDeviceDescription();
             }
 
             for (auto& endpoint : m_endpoints) {
-                endpoint.second->build(m_carControlEngineImpl, endpointBuilderFactory, manufacturerName);
+                endpoint.second->build(
+                    m_carControlEngineImpl, endpointBuilderFactory, m_assetStore, manufacturerName, description);
             }
+
+            // The contents of the AssetStore won't be used again, so we can release the memory
+            m_assetStore.clear();
         }
         return true;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        m_assetStore.clear();
         return false;
     }
 }
@@ -169,6 +177,8 @@ bool CarControlEngineService::registerPlatformInterface(
 bool CarControlEngineService::registerPlatformInterfaceType(
     std::shared_ptr<aace::carControl::CarControl> platformInterface) {
     try {
+        ThrowIfNotNull( m_carControlEngineImpl, "platformInterfaceAlreadyRegistered" );
+
         m_carControlEngineImpl = CarControlEngineImpl::create(platformInterface);
         ThrowIfNull(m_carControlEngineImpl, "createCarControlEngineImplFailed");
 
@@ -191,15 +201,14 @@ bool CarControlEngineService::isLocalServiceAvailable() {
     return m_isLocalServiceAvailable;
 }
 
-bool CarControlEngineService::setProperty(const std::string& key, const std::string& value) {
-    if (key.compare("aace.localVoiceControl.locale") == 0) {
-        AACE_DEBUG(LX(TAG).d("key", key).d("value", value));
-        return true;
-    }
-    return false;
-}
-
 bool CarControlEngineService::shutdown() {
+    AACE_INFO(LX(TAG));
+
+    if (m_carControlEngineImpl != nullptr) {
+        m_carControlEngineImpl->shutdown();
+        m_carControlEngineImpl.reset();
+    }
+
     return true;
 }
 

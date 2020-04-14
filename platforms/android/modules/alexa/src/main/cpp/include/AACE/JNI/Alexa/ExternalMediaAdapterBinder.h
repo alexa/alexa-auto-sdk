@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ namespace alexa {
         // aace::alexa::ExternalMediaAdapter
         bool login( const std::string& localPlayerId, const std::string& accessToken, const std::string& userName, bool forceLogin, std::chrono::milliseconds tokenRefreshInterval ) override;
         bool logout( const std::string& localPlayerId ) override;
-        bool play( const std::string& localPlayerId, const std::string& playContextToken, int64_t index, std::chrono::milliseconds offset, bool preload, Navigation navigation ) override;
+        bool play( const std::string& localPlayerId, const std::string& playContextToken, int64_t index, std::chrono::milliseconds offset, bool preload, Navigation navigation) override;
         bool playControl( const std::string & localPlayerId, PlayControlType requestType ) override;
         bool seek( const std::string& localPlayerId, std::chrono::milliseconds offset ) override;
         bool adjustSeek( const std::string & localPlayerId, std::chrono::milliseconds deltaOffset ) override;
@@ -98,6 +98,7 @@ namespace alexa {
             return {
                 {T::RESUME,"RESUME"},
                 {T::PAUSE,"PAUSE"},
+                {T::STOP,"STOP"},
                 {T::NEXT,"NEXT"},
                 {T::PREVIOUS,"PREVIOUS"},
                 {T::START_OVER,"START_OVER"},
@@ -201,6 +202,28 @@ namespace alexa {
     };
 
     using JMediaType = JEnum<ExternalMediaAdapterHandler::MediaType,JMediaTypeConfig>;
+
+    //
+    // JPlayRequestor
+    //
+
+    // class JPlayRequestorConfig : public EnumConfiguration<ExternalMediaAdapterHandler::PlayRequestor> {
+    // public:
+    //     using T = ExternalMediaAdapterHandler::PlayRequestor;
+
+    //     const char* getClassName() override {
+    //         return "com/amazon/aace/alexa/ExternalMediaAdapter$PlayRequestor";
+    //     }
+
+    //     std::vector<std::pair<T,std::string>> getConfiguration() override {
+    //         return {
+    //             {T::USER,"USER"},
+    //             {T::ALERT,"ALERT"}
+    //         };
+    //     }
+    // };
+
+    // using JPlayRequestor = JEnum<ExternalMediaAdapterHandler::PlayRequestor,JPlayRequestorConfig>;
 
     //
     // JMutedState

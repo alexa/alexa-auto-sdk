@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,8 +17,7 @@
 #include <sys/time.h>
 #include "core.h"
 
-#define DEFAULT_AUDIO_RATE 		16000
-#define DEFAULT_AUDIO_FRAG_SIZE 640
+#define DEFAULT_AUDIO_FRAG_SIZE (AAL_AVS_SAMPLE_RATE * 2 * 20 / 1000)
 
 static ssize_t qsa_read_from_write_buffer(aal_qsa_context_t *ctx, uint8_t *buffer, bool *need_data)
 {
@@ -37,35 +36,6 @@ static ssize_t qsa_read_from_write_buffer(aal_qsa_context_t *ctx, uint8_t *buffe
 	pthread_mutex_unlock(&ctx->lock);
 
 	return size;
-}
-
-static ssize_t qsa_player_write(aal_handle_t handle, const char *data, const size_t size)
-{
-	aal_qsa_context_t *ctx = (aal_qsa_context_t *) handle;
-	ssize_t written;
-
-	debug("Write %ld bytes into buffer", size);
-	pthread_mutex_lock(&ctx->lock);
-	/* All or nothing */
-	if (ringbuf_bytes_free(ctx->write_buffer) < size) {
-		debug("Not enough space for write buffer");
-		written = 0;
-	} else {
-		ringbuf_memcpy_into(ctx->write_buffer, data, size);
-		written = size;
-	}
-	pthread_mutex_unlock(&ctx->lock);
-
-	return written;
-}
-
-static void qsa_player_notify_end_of_stream(aal_handle_t handle)
-{
-	aal_qsa_context_t *ctx = (aal_qsa_context_t *) handle;
-
-	pthread_mutex_lock(&ctx->lock);
-	ctx->eos = true;
-	pthread_mutex_unlock(&ctx->lock);
 }
 
 static void *qsa_read_loop(void *argument)
@@ -158,7 +128,15 @@ static void *qsa_read_loop(void *argument)
 		}
 
 		pthread_mutex_lock(&ctx->lock);
-		stop_requested = ctx->stop_requested;
+		{
+			ctx->status.channel = ctx->channel;
+			int r = snd_pcm_plugin_status(ctx->pcm_handle, &ctx->status);
+			if (r != 0) {
+				debug("failed to get audio status: %d", r);
+			}
+
+			stop_requested = ctx->stop_requested;
+		}
 		pthread_mutex_unlock(&ctx->lock);
 	} while (!stop_requested);
 
@@ -198,7 +176,7 @@ bail:
 	return r;
 }
 
-static void qsa_play(aal_handle_t handle)
+void qsa_play(aal_handle_t handle)
 {
 	aal_qsa_context_t *ctx = (aal_qsa_context_t *) handle;
 	int r;
@@ -235,7 +213,7 @@ bail:
 	return;
 }
 
-static void qsa_stop(aal_handle_t handle)
+void qsa_stop(aal_handle_t handle)
 {
 	aal_qsa_context_t *ctx = (aal_qsa_context_t *) handle;
 
@@ -243,11 +221,9 @@ static void qsa_stop(aal_handle_t handle)
 	pthread_mutex_lock(&ctx->lock);
 	ctx->stop_requested = true;
 	pthread_mutex_unlock(&ctx->lock);
-
-	//pthread_join(ctx->thread, NULL);
 }
 
-static void qsa_destroy(aal_handle_t handle)
+void qsa_destroy(aal_handle_t handle)
 {
 	aal_qsa_context_t *ctx = (aal_qsa_context_t *) handle;
 	if (ctx->pcm_handle)
@@ -255,26 +231,52 @@ static void qsa_destroy(aal_handle_t handle)
 	free(ctx);
 }
 
-static aal_handle_t qsa_create_context(int32_t channel, const aal_attributes_t *attr)
+int32_t snd_pcm_format_from_aal_sample_format(aal_sample_format_t sf) {
+	switch (sf) {
+	case AAL_SAMPLE_FORMAT_S16LE:
+	default:
+		return SND_PCM_SFMT_S16_LE;
+	}
+}
+
+aal_handle_t qsa_create_context(int32_t channel, const aal_attributes_t *attrs, aal_audio_parameters_t *audio_params)
 {
 	int r;
-	int open_mode = (channel == SND_PCM_CHANNEL_PLAYBACK) ?
-		SND_PCM_OPEN_PLAYBACK : SND_PCM_OPEN_CAPTURE;
+
+	if (attrs->uri != NULL && strlen(attrs->uri) > 0) {
+		debug("Should not specify an URI");
+		return NULL;
+	}
+	if (audio_params != NULL && audio_params->stream_type != AAL_STREAM_LPCM) {
+		debug("Only LPCM is supported");
+		return NULL;
+	}
+
+	int open_mode;
+	if (channel == SND_PCM_CHANNEL_PLAYBACK) {
+		open_mode = SND_PCM_OPEN_PLAYBACK;
+	}
+	else {
+		open_mode = SND_PCM_OPEN_CAPTURE;
+	}
 
 	/* Allocate context */
 	aal_qsa_context_t *ctx;
 	ctx = (aal_qsa_context_t *) calloc(1, sizeof(aal_qsa_context_t));
 	bail_if_null(ctx);
 	ctx->channel = channel;
+	if (audio_params != NULL) {
+		ctx->audio_params = *audio_params;
+	}
 
-	if (!attr->device || IS_EMPTY_STRING(attr->device)) {
+	if (!attrs->device || IS_EMPTY_STRING(attrs->device)) {
 		debug("Open preferred PCM card: channel=%d", ctx->channel);
 		r = snd_pcm_open_preferred(&ctx->pcm_handle, NULL, NULL, open_mode);
 		bail_if_error(r);
 	} else {
 		// TODO: May need "snd_pcm_open" support as well
-		debug("Open PCM card by name: name=%s, channel=%d", attr->device, ctx->channel);
-		r = snd_pcm_open_name(&ctx->pcm_handle, attr->device, open_mode);
+		debug("Open PCM card by name: name=%s, channel=%d", attrs->device, ctx->channel);
+		r = snd_pcm_open_name(&ctx->pcm_handle, attrs->device, open_mode);
 		bail_if_error(r);
 	}
 
@@ -300,23 +302,40 @@ static aal_handle_t qsa_create_context(int32_t channel, const aal_attributes_t *
 	snd_pcm_channel_params_t params = {0};
 	params.channel = ctx->channel;
 	params.mode = SND_PCM_MODE_BLOCK;
+	params.time = true;
+	params.ust_time = true;
 
 	/* AVS Format: Mono 16kHz 16-bit signed integer */
 	params.format.interleave = 1;
-	params.format.rate = DEFAULT_AUDIO_RATE;
-	params.format.voices = 1;
-	params.format.format = SND_PCM_SFMT_S16_LE;
 
 	params.start_mode = SND_PCM_START_DATA;
 	params.stop_mode = SND_PCM_STOP_STOP;
 
+	aal_lpcm_parameters_t* lpcm = &ctx->audio_params.lpcm;
 	if (channel == SND_PCM_CHANNEL_PLAYBACK) {
+		if (lpcm->channels == 0) {
+			lpcm->channels = AAL_AVS_CHANNELS;
+		}
+		if (lpcm->sample_rate == 0) {
+			lpcm->sample_rate = AAL_AVS_SAMPLE_RATE;
+		}
+		params.format.format = snd_pcm_format_from_aal_sample_format(lpcm->sample_format);
+		params.format.voices = lpcm->channels;
+		params.format.rate = lpcm->sample_rate;
+
 		params.start_mode = SND_PCM_START_FULL;
 		params.stop_mode = SND_PCM_STOP_STOP;
 		params.buf.block.frag_size = channel_info.max_fragment_size;
 		/* Note: -1 is the default value from QNX sample code */
 		params.buf.block.frags_max = -1;
 	} else if (channel == SND_PCM_CHANNEL_CAPTURE) {
+		lpcm->channels = AAL_AVS_CHANNELS;
+		lpcm->sample_rate = AAL_AVS_SAMPLE_RATE;
+
+		params.format.format = snd_pcm_format_from_aal_sample_format(lpcm->sample_format);
+		params.format.voices = lpcm->channels;
+		params.format.rate = lpcm->sample_rate;
+
 		params.start_mode = SND_PCM_START_DATA;
 		params.stop_mode = SND_PCM_STOP_STOP;
 		params.buf.block.frag_size = DEFAULT_AUDIO_FRAG_SIZE;
@@ -339,86 +358,16 @@ bail:
 	return NULL;
 }
 
-static aal_handle_t qsa_player_create(const aal_attributes_t *attr)
-{
-	if (attr->uri && !IS_EMPTY_STRING(attr->uri)) {
-		debug("URI is not supported, stream only");
-		return NULL;
-	}
-	return qsa_create_context(SND_PCM_CHANNEL_PLAYBACK, attr);
-}
+extern const aal_player_ops_t qsa_player_ops;
+extern const aal_recorder_ops_t qsa_recorder_ops;
 
-static void qsa_player_pause(aal_handle_t handle)
-{
-	debug("player_pause not supported");
-}
-
-int64_t qsa_player_get_position(aal_handle_t handle)
-{
-	debug("player_get_position not supported");
-	return -1;
-}
-
-int64_t qsa_player_get_duration(aal_handle_t handle)
-{
-	debug("player_get_duration not supported");
-	return -1;
-}
-
-void qsa_player_seek(aal_handle_t handle, int64_t position)
-{
-	debug("player_seek not supported");
-}
-
-void qsa_player_set_volume(aal_handle_t handle, double volume)
-{
-	debug("player_set_volume not supported");
-}
-
-void qsa_player_set_mute(aal_handle_t handle, bool mute)
-{
-	debug("player_set_mute not supported");
-}
-
-static void qsa_player_set_stream_type(aal_handle_t handle, const aal_stream_type_t type)
-{
-	if (type != AAL_STREAM_LPCM) {
-		debug("Unsupported Type: %d", type);
-	}
-}
-
-static aal_handle_t qsa_recorder_create(const aal_attributes_t *attr)
-{
-	return qsa_create_context(SND_PCM_CHANNEL_CAPTURE, attr);
-}
-
-const aal_player_ops_t qsa_player_ops = {
-	.create = qsa_player_create,
-	.play = qsa_play,
-	.pause = qsa_player_pause,
-	.stop = qsa_stop,
-	.get_position = qsa_player_get_position,
-	.get_duration = qsa_player_get_duration,
-	.seek = qsa_player_seek,
-	.set_volume = qsa_player_set_volume,
-	.set_mute = qsa_player_set_mute,
-	.write = qsa_player_write,
-	.notify_end_of_stream = qsa_player_notify_end_of_stream,
-	.set_stream_type = qsa_player_set_stream_type,
-	.destroy = qsa_destroy
-};
-
-static const aal_recorder_ops_t qsa_recorder_ops = {
-	.create = qsa_recorder_create,
-	.play = qsa_play,
-	.stop = qsa_stop,
-	.destroy = qsa_destroy
-};
-
+// clang-format off
 aal_module_t qsa_module = {
 	.name = "QSA",
+	.capabilities = AAL_MODULE_CAP_STREAM_PLAYBACK | AAL_MODULE_CAP_LPCM_PLAYBACK,
 	.initialize = NULL,
 	.deinitialize = NULL,
 	.player_ops = &qsa_player_ops,
 	.recorder_ops = &qsa_recorder_ops
 };
+// clang-format on

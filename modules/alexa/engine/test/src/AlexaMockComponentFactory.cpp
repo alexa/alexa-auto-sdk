@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -145,14 +145,15 @@ std::shared_ptr<aace::test::alexa::MockWakewordVerifier> AlexaMockComponentFacto
     return m_mockWakewordVerifier;
 }
     
-std::unique_ptr<aace::engine::alexa::DeviceSettingsDelegate> AlexaMockComponentFactory::getDeviceSettingsDelegateMock()
+std::shared_ptr<aace::test::alexa::MockDeviceSettingsDelegate> AlexaMockComponentFactory::getDeviceSettingsDelegateMock()
 {
     if( m_mockDeviceSettingsDelegate == nullptr ) {
-        auto config = alexaClientSDK::avsCommon::utils::configuration::ConfigurationNode::getRoot();
-        m_mockDeviceSettingsDelegate = aace::engine::alexa::DeviceSettingsDelegate::createDeviceSettingsDelegate(config, getCustomerDataManagerMock(), getAVSConnectionManagerMock());
+//        auto config = alexaClientSDK::avsCommon::utils::configuration::ConfigurationNode::getRoot();
+//        m_mockDeviceSettingsDelegate = aace::engine::alexa::DeviceSettingsDelegate::createDeviceSettingsDelegate(config, getCustomerDataManagerMock(), getAVSConnectionManagerMock());
+        m_mockDeviceSettingsDelegate = std::make_shared<aace::test::alexa::MockDeviceSettingsDelegate>();
     }
     
-    return std::move(m_mockDeviceSettingsDelegate);
+    return m_mockDeviceSettingsDelegate;
 }
 
 std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockContextManager> AlexaMockComponentFactory::getContextManagerInterfaceMock()
@@ -395,6 +396,15 @@ std::shared_ptr<aace::test::avs::MockAudioPlayerInterface> AlexaMockComponentFac
     }
     
     return m_mockAudioPlayerInterface;
+}
+    
+std::shared_ptr<aace::test::avs::MockAudioPlayerObserverInterface> AlexaMockComponentFactory::getAudioPlayerObserverInterfaceMock()
+{
+    if( m_mockAudioPlayerObserverInterface == nullptr ) {
+        m_mockAudioPlayerObserverInterface = std::make_shared<aace::test::avs::MockAudioPlayerObserverInterface>();
+    }
+    
+    return m_mockAudioPlayerObserverInterface;
 }
 
 //

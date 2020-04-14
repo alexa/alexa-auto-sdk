@@ -310,6 +310,52 @@
 
         </LinearLayout>
 
+        <!-- TIMEZONE -->
+        <LinearLayout
+            android:id="@+id/timezone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:background="@color/drawerSection"
+            android:orientation="vertical"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
+            <!-- Header -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ALEXA TIMEZONE"
+                android:textColor="@color/drawerHeader"
+                android:textSize="18sp" />
+            <!-- Spinner -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:background="@color/drawerSection"
+                android:orientation="horizontal"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingRight="10dp"
+                    android:text="SELECTED\nTIMEZONE"
+                    android:textColor="@color/drawerHeader"
+                    android:textSize="16sp" />
+
+                <Spinner
+                    android:id="@+id/timezone_spinner"
+                    android:layout_width="198dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
         <!-- Wake Word -->
         <LinearLayout
             android:id="@+id/wakeWord"

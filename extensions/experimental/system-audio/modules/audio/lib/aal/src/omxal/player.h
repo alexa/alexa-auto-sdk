@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -28,6 +28,8 @@ typedef struct {
 	XASeekItf seek_itf;
 	XAVolumeItf volume_itf;
 	XAConfigExtensionsItf config_itf;
+	XAPrefetchStatusItf prefetch_status_itf;
+	XAStreamInformationItf stream_info_itf;
 } aal_omxal_player_context_t;
 
 #endif // __AAL_OMXAL_PLAYER_H_

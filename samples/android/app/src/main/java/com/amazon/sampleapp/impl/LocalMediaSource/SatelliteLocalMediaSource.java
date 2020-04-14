@@ -2,13 +2,14 @@ package com.amazon.sampleapp.impl.LocalMediaSource;
 
 import android.content.Context;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
+import com.amazon.sampleapp.impl.PlaybackController.PlaybackControllerHandler;
 
 public class SatelliteLocalMediaSource extends LocalMediaSourceHandler
 {
     String m_state = "IDLE";
 
-    public SatelliteLocalMediaSource( Context context, LoggerHandler logger ) {
-        super( context, logger, Source.SATELLITE_RADIO );
+    public SatelliteLocalMediaSource(Context context, LoggerHandler logger, PlaybackControllerHandler playbackControllerHandler) {
+        super( context, logger, Source.SATELLITE_RADIO, playbackControllerHandler );
     }
 
     @Override

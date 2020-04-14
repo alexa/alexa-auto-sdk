@@ -1,5 +1,5 @@
 /*
-* Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+* Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License").
 * You may not use this file except in compliance with the License.
@@ -143,7 +143,12 @@ std::shared_future<bool> SystemSoundPlayer::playTone( Tone tone )
 // SystemSoundAudioStream
 //
 
-SystemSoundAudioStream::SystemSoundAudioStream( std::shared_ptr<std::istream> stream ) : m_stream( stream ), m_closed( false ) {
+SystemSoundAudioStream::SystemSoundAudioStream(
+    std::shared_ptr<std::istream> stream,
+    alexaClientSDK::avsCommon::sdkInterfaces::SystemSoundPlayerInterface::Tone tone ) :
+        m_stream( stream ),
+        m_tone( tone ),
+        m_closed( false ) {
 }
 
 std::shared_ptr<SystemSoundAudioStream> SystemSoundAudioStream::create(
@@ -155,11 +160,13 @@ std::shared_ptr<SystemSoundAudioStream> SystemSoundAudioStream::create(
     switch( tone )
     {
         case alexaClientSDK::avsCommon::sdkInterfaces::SystemSoundPlayerInterface::Tone::WAKEWORD_NOTIFICATION:
-            stream = std::shared_ptr<SystemSoundAudioStream>( new SystemSoundAudioStream( audioFactory->wakeWordNotificationTone()() ) );
+            stream = std::shared_ptr<SystemSoundAudioStream>( new SystemSoundAudioStream( audioFactory->wakeWordNotificationTone()(),
+                    alexaClientSDK::avsCommon::sdkInterfaces::SystemSoundPlayerInterface::Tone::WAKEWORD_NOTIFICATION ) );
             break;
             
         case alexaClientSDK::avsCommon::sdkInterfaces::SystemSoundPlayerInterface::Tone::END_SPEECH:
-            stream = std::shared_ptr<SystemSoundAudioStream>( new SystemSoundAudioStream( audioFactory->endSpeechTone()() ) );
+            stream = std::shared_ptr<SystemSoundAudioStream>( new SystemSoundAudioStream( audioFactory->endSpeechTone()(),
+                    alexaClientSDK::avsCommon::sdkInterfaces::SystemSoundPlayerInterface::Tone::END_SPEECH ) );
             break;
     }
 
@@ -187,7 +194,7 @@ ssize_t SystemSoundAudioStream::read( char* data, const size_t size )
         return count;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG+".SystemSoundAudioStream").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG+".SystemSoundAudioStream").d("reason", ex.what()).d("size", size).d("closed", m_closed));
         m_closed = true;
         return 0;
     }
@@ -195,6 +202,14 @@ ssize_t SystemSoundAudioStream::read( char* data, const size_t size )
 
 bool SystemSoundAudioStream::isClosed() {
     return m_closed;
+}
+
+std::vector<aace::audio::AudioStreamProperty> SystemSoundAudioStream::getProperties()
+{
+    return {
+        { "cache-policy", "ALWAYS" },
+        { "cache-id", "aace.alexa.SystemSoundPlayer#" + std::to_string( static_cast<int>( m_tone ) ) }
+    };
 }
 
 }  // alexa

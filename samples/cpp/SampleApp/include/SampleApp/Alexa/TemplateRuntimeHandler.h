@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -56,9 +56,13 @@ class TemplateRuntimeHandler : public aace::alexa::TemplateRuntime /* isa Platfo
     std::weak_ptr<View> m_console{};
     std::chrono::time_point<std::chrono::system_clock> m_startPlayerInfo{};
     std::chrono::time_point<std::chrono::system_clock> m_startTemplate{};
+    
+    std::chrono::time_point<std::chrono::steady_clock> m_whenCachedLastpayload{};
+    std::string m_lastPayload;
 
     auto log(logger::LoggerHandler::Level level, const std::string &message) -> void;
     auto setupUI() -> void;
+    auto wasPayloadJustSeen(const std::string &payload) -> bool;
 };
 
 } // namespace alexa

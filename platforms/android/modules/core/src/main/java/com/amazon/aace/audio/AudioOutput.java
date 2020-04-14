@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -278,6 +278,15 @@ abstract public class AudioOutput extends NativeRef
     }
 
     /**
+     * Returns the amount of audio data buffered.
+     *
+     * @return the number of bytes of the audio data buffered, or 0 if it's unknown.
+     */
+    public long getNumBytesBuffered() {
+        return 0;
+    }
+
+    /**
      * Notifies the platform implementation to set the volume of the output channel. The
      * @c volume value should be scaled to fit the needs of the platform.
      *
@@ -312,8 +321,11 @@ abstract public class AudioOutput extends NativeRef
      *
      * @sa MediaError
      */
-    final protected void mediaError( MediaError type, String error ) {
+    protected void mediaError( MediaError type, String error ) {
         mediaError( getNativeRef(), type, error);
+        if ( mMediaStateListener != null ) {
+            mMediaStateListener.mediaError( type, error );
+        }
     }
 
     /**
@@ -324,8 +336,11 @@ abstract public class AudioOutput extends NativeRef
      *
      * @sa MediaState
      */
-    final protected void mediaStateChanged( MediaState state ) {
+    protected void mediaStateChanged( MediaState state ) {
         mediaStateChanged( getNativeRef(), state );
+        if ( mMediaStateListener != null ) {
+            mMediaStateListener.mediaStateChanged( state );
+        }
     }
 
     protected long createNativeRef() {
@@ -341,4 +356,17 @@ abstract public class AudioOutput extends NativeRef
     private native void disposeBinder( long nativeRef );
     private native void mediaError( long nativeObject, MediaError type, String error );
     private native void mediaStateChanged( long nativeObject, MediaState state );
+
+    // MediaStateListener
+
+    public interface MediaStateListener {
+        void mediaError( MediaError type, String error );
+        void mediaStateChanged( MediaState state );
+    }
+
+    public void setMediaStateListener( MediaStateListener listener ) {
+        mMediaStateListener = listener;
+    }
+
+    private MediaStateListener mMediaStateListener;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -42,12 +42,14 @@
 
 #include "AACE/Engine/Alexa/AlexaEngineService.h"
 #include "AACE/Alexa/AlexaProperties.h"
+#include "AACE/Engine/Alexa/VehicleData.h"
 #include "AACE/Engine/Alexa/WakewordObservableInterface.h"
 #include "AACE/Engine/Alexa/WakewordVerifier.h"
 #include "AACE/Core/CoreProperties.h"
 #include "AACE/Engine/Core/EngineMacros.h"
 #include "AACE/Engine/Network/NetworkObservableInterface.h"
 #include "AACE/Engine/Utils/JSON/JSON.h"
+#include "AACE/Engine/Utils/String/StringUtils.h"
 #include "AACE/Vehicle/VehicleProperties.h"
 #include "AACE/Engine/Vehicle/VehiclePropertyInterface.h"
 
@@ -78,6 +80,10 @@ static const std::vector<alexaClientSDK::afml::FocusManager::ChannelConfiguratio
 
 static const std::string DEFAULT_AVS_GATEWAY = "https://alexa.na.gateway.devices.a2z.com";
 static const std::string DEFAULT_CBL_ENDPOINT = "https://api.amazon.com/auth/O2/";
+static const std::string DEFAULT_EXTERNAL_MEDIA_PLAYER_AGENT = "RUHAV8PRLD";
+
+static const std::string PROPERTY_CHANGE_SUCCEEDED = "SUCCEEDED";
+static const std::string PROPERTY_CHANGE_FAILED = "FAILED";
 
 // register the service
 REGISTER_SERVICE(AlexaEngineService)
@@ -88,7 +94,8 @@ AlexaEngineService::AlexaEngineService( const aace::engine::core::ServiceDescrip
     m_configured( false ),
     m_previouslyStarted( false ),
     m_encoderEnabled ( false ),
-    m_networkStatus( NetworkInfoObserver::NetworkStatus::UNKNOWN )
+    m_networkStatus( NetworkInfoObserver::NetworkStatus::UNKNOWN ),
+    m_externalMediaPlayerAgent( "" )
 {
 #ifdef DEBUG
     m_logger = AlexaEngineLogger::create( alexaClientSDK::avsCommon::utils::logger::Level::DEBUG9 );
@@ -105,13 +112,94 @@ bool AlexaEngineService::initialize()
         m_wakewordEngineManager = std::make_shared<WakewordEngineManager>();
         ThrowIfNot( registerServiceInterface<WakewordEngineManager>( m_wakewordEngineManager ), "registerWakewordEngineManagerFailed" );
         
+        ThrowIfNot( registerProperties(), "registerPropertiesFailed" );
+
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"initialize").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
 
+}
+    
+bool AlexaEngineService::registerProperties() {
+    try {
+        // get the property engine service interface from the property manager service
+        auto propertyManager = getContext()->getServiceInterface<aace::engine::propertyManager::PropertyManagerServiceInterface>("aace.propertyManager");
+        ThrowIfNull( propertyManager, "nullPropertyManagerServiceInterface" );
+        
+        // Register property - FIRMWARE_VERSION
+        propertyManager->registerProperty(aace::engine::propertyManager::PropertyDescription(
+            aace::alexa::property::FIRMWARE_VERSION,
+            std::bind(
+                &AlexaEngineService::setProperty_firmwareVersion,
+                this,
+                std::placeholders::_1,
+                std::placeholders::_2,
+                std::placeholders::_3,
+                std::placeholders::_4),
+            std::bind(&AlexaEngineService::getProperty_firmwareVersion, this)));
+
+        // Register property - WAKEWORD_SUPPORTED
+        propertyManager->registerProperty(aace::engine::propertyManager::PropertyDescription(
+            aace::alexa::property::WAKEWORD_SUPPORTED,
+            nullptr,
+            std::bind(&AlexaEngineService::getProperty_wakewordSupported, this)));
+
+        // Register property - LOCALE
+        propertyManager->registerProperty(aace::engine::propertyManager::PropertyDescription(
+            aace::alexa::property::LOCALE,
+            std::bind(
+                &AlexaEngineService::setProperty_locale,
+                this,
+                std::placeholders::_1,
+                std::placeholders::_2,
+                std::placeholders::_3,
+                std::placeholders::_4),
+            std::bind(&AlexaEngineService::getProperty_locale, this)));
+
+        // Register property - SUPPORTED_LOCALES
+        propertyManager->registerProperty(aace::engine::propertyManager::PropertyDescription(
+            aace::alexa::property::SUPPORTED_LOCALES,
+            nullptr,
+            std::bind(&AlexaEngineService::getProperty_supportedLocales, this)));
+
+        // Register property - COUNTRY_SUPPORTED
+        propertyManager->registerProperty(aace::engine::propertyManager::PropertyDescription(
+            aace::alexa::property::COUNTRY_SUPPORTED,
+            nullptr,
+            std::bind(&AlexaEngineService::getProperty_countrySupported, this)));
+
+        // Register property - WAKEWORD_ENABLED
+        propertyManager->registerProperty(aace::engine::propertyManager::PropertyDescription(
+            aace::alexa::property::WAKEWORD_ENABLED,
+            std::bind(
+                &AlexaEngineService::setProperty_wakewordEnabled,
+                this,
+                std::placeholders::_1,
+                std::placeholders::_2,
+                std::placeholders::_3,
+                std::placeholders::_4),
+            std::bind(&AlexaEngineService::getProperty_wakewordEnabled, this)));
+
+        // Register property - TIMEZONE
+        propertyManager->registerProperty(aace::engine::propertyManager::PropertyDescription(
+            aace::alexa::property::TIMEZONE,
+            std::bind(
+                &AlexaEngineService::setProperty_timezone,
+                this,
+                std::placeholders::_1,
+                std::placeholders::_2,
+                std::placeholders::_3,
+                std::placeholders::_4),
+            std::bind(&AlexaEngineService::getProperty_timezone, this)));
+
+        return true;
+    } catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
 }
 
 bool AlexaEngineService::configureDeviceSDK( std::shared_ptr<std::istream> configuration )
@@ -232,6 +320,7 @@ bool AlexaEngineService::configureDeviceSDK( std::shared_ptr<std::istream> confi
         bool wakeWordEnabled = !m_wakewordEngineName.empty();
         m_localeAssetManager = LocaleAssetsManager::create(wakeWordEnabled);
         ThrowIfNot( m_localeAssetManager, "createLocaleAssetsManagerFailed" );
+        ThrowIfNot( registerServiceInterface<LocaleAssetsManager>( m_localeAssetManager ), "registerLocaleAssetsManagerServiceInterfaceFailed" );
 
         // Create the software info sender - Reports software info to AVS per the System interface
         m_softwareInfoSenderObserver = std::make_shared<AlexaEngineSoftwareInfoSenderObserver>();
@@ -286,14 +375,24 @@ bool AlexaEngineService::configureDeviceSDK( std::shared_ptr<std::istream> confi
         m_playbackRouterDelegate = std::shared_ptr<PlaybackRouterDelegate>( new PlaybackRouterDelegate() );
         ThrowIfNull( m_playbackRouterDelegate, "couldNotCreatePlaybackRouterDelegate" );
 
+        // Create the playback router delegate
+        m_audioPlayerObserverDelegate = std::shared_ptr<AudioPlayerObserverDelegate>( new AudioPlayerObserverDelegate() );
+        ThrowIfNull( m_audioPlayerObserverDelegate, "couldNotCreateAudioPlayerObserverDelegate" );
+
         // Create the audio factory
         m_audioFactory = std::make_shared<alexaClientSDK::applicationUtilities::resources::audio::AudioFactory>();
 
         // Create the device settings delegate
         m_deviceSettingsDelegate = DeviceSettingsDelegate::createDeviceSettingsDelegate(config, m_customerDataManager, m_connectionManager);
-
+        
         // create the timezone setting
-        ThrowIfNot(m_deviceSettingsDelegate->configureTimeZoneSetting(), "createTimeZoneSettingFailed");
+        if (!m_timezone.empty()) {
+            ThrowIfNot(m_deviceSettingsDelegate->configureTimeZoneSetting(m_timezone), "createTimeZoneSettingFailed");
+        } else {
+            ThrowIfNot(m_deviceSettingsDelegate->configureTimeZoneSetting(), "createTimeZoneSettingFailed");
+        }
+        m_deviceSettingsDelegate->getDeviceSettingsManager()
+            ->addObserver<DeviceSettingsDelegate::DeviceSettingsIndex::TIMEZONE>(shared_from_this());
 
         // create the timezone handler
         auto timezoneHandler = alexaClientSDK::capabilityAgents::system::TimeZoneHandler::create(
@@ -315,7 +414,7 @@ bool AlexaEngineService::configureDeviceSDK( std::shared_ptr<std::istream> confi
         m_connectionManager->addConnectionStatusObserver( m_clientObserver );
         
         // Create the Alexa Engine global settings observer
-        m_globalSettingsObserver = std::make_shared<AlexaEngineGlobalSettingsObserver>();
+        m_globalSettingsObserver = std::make_shared<AlexaEngineGlobalSettingsObserver>();      
 
         // Create the endpoint builder factory
         m_endpointBuilderFactory = EndpointBuilderFactory::create( 
@@ -325,6 +424,27 @@ bool AlexaEngineService::configureDeviceSDK( std::shared_ptr<std::istream> confi
             m_exceptionSender,
             m_alexaMessageSender);
         ThrowIfNull( m_endpointBuilderFactory, "createEndpointBuilderFactoryFailed" );
+
+        // Create the VehicleData capability provider
+        // Note: For Auto SDK version 2.2 we create a dummy endpoint to host this capability
+        auto vehicleEngineService = getContext()->getServiceInterface<aace::engine::vehicle::VehicleEngineService>( "aace.vehicle" );
+        if (vehicleEngineService != nullptr && vehicleEngineService->isVehicleInfoConfigured()) {
+            auto vehicleProperties = vehicleEngineService->getVehicleProperties();
+            auto vehicleData = VehicleData::create(vehicleProperties);
+            auto endpointBuilder = m_endpointBuilderFactory->createEndpointBuilder();
+            endpointBuilder->withCapabilityConfiguration(vehicleData);
+            endpointBuilder->withDerivedEndpointId("_AutoSDKVehicleMetadata");
+            endpointBuilder->withFriendlyName("_AutoSDKVehicleMetadata");
+            endpointBuilder->withDescription("Internal reference endpoint");
+            endpointBuilder->withManufacturerName(m_deviceInfo->getManufacturerName());
+            endpointBuilder->withDisplayCategory({"VEHICLE"});
+            endpointBuilder->withCookies({{"createdBy", "AutoSDK"}});
+            auto endpointId = endpointBuilder->build();
+            ThrowIfNot(endpointId.hasValue(), "couldNotBuildVehicleDataEndpoint");
+            endpointBuilder.reset();
+        } else {
+            AACE_WARN(LX(TAG,"configure").m("nullVehicleEngineService").m("skippingVehicleDataCapability"));
+        }  
 
         return true;
     }
@@ -430,8 +550,11 @@ bool AlexaEngineService::configure( std::shared_ptr<std::istream> configuration 
 
                 deviceSDKConfigRoot["deviceSettings"].AddMember("locales", std::move(locales), allocator);
             }
-        }
 
+            if (deviceSDKConfigRoot["deviceSettings"].HasMember("defaultTimezone")) {
+                m_timezone = deviceSDKConfigRoot["deviceSettings"]["defaultTimezone"].GetString();
+            }
+        }
         rapidjson::StringBuffer buffer;
         rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
         deviceSDKConfig.Accept(writer);
@@ -445,9 +568,6 @@ bool AlexaEngineService::configure( std::shared_ptr<std::istream> configuration 
         m_audioFormat.encoding = alexaClientSDK::avsCommon::utils::AudioFormat::Encoding::LPCM;
         m_audioFormat.layout = alexaClientSDK::avsCommon::utils::AudioFormat::Layout::INTERLEAVED;
     
-        // default external media player agent
-        m_externalMediaPlayerAgent = "RUHAV8PRLD";
-
         // Register the alexa component interface - Allows retrieval of the Alexa components
         ThrowIfNot( registerServiceInterface<AlexaComponentInterface>( shared_from_this() ), "registerAlexaComponentInterfaceFailed" );
 
@@ -483,10 +603,9 @@ bool AlexaEngineService::setup()
         // register locale capability agent
         ThrowIfNot( m_directiveSequencer->addDirectiveHandler( std::move( localeHandler ) ), "registerLocaleHandlerFailed" );
 
-
         // get the local storage interface from the storage service
         m_localStorage = getContext()->getServiceInterface<aace::engine::storage::LocalStorageInterface>( "aace.storage" );
-        ThrowIfNull( m_localStorage, "invalidLocalStorage" )
+        ThrowIfNull( m_localStorage, "invalidLocalStorage" );
 
         auto authDelegate = newFactoryInstance<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface>( []() {
             return nullptr;
@@ -534,7 +653,7 @@ bool AlexaEngineService::setup()
          */
         auto reportGenerator = alexaClientSDK::capabilityAgents::system::StateReportGenerator::create(
             m_deviceSettingsDelegate->getDeviceSettingsManager(), m_deviceSettingsDelegate->getConfigurations());
-        ThrowIfNot(reportGenerator.hasValue(), "unableToCreateStateReportGenerator")
+        ThrowIfNot(reportGenerator.hasValue(), "unableToCreateStateReportGenerator");
 
         std::vector<alexaClientSDK::capabilityAgents::system::StateReportGenerator> reportGenerators{{reportGenerator.value()}};
         auto reportStateHandler = alexaClientSDK::capabilityAgents::system::ReportStateHandler::create(
@@ -569,7 +688,7 @@ bool AlexaEngineService::setup()
         
         // check if the vehicle is in a supported country
         m_countrySupported = isCountrySupported( country );
-        
+
         return true;
     }
     catch( std::exception& ex ) {
@@ -606,9 +725,15 @@ bool AlexaEngineService::start()
             recordVehicleMetric(false);
         }
 
+        // get the property engine service interface from the property manager service
+        auto propertyManager =
+            getContext()->getServiceInterface<aace::engine::propertyManager::PropertyManagerServiceInterface>(
+                "aace.propertyManager");
+        ThrowIfNull(propertyManager, "nullPropertyManagerServiceInterface");
+
         // enable speech recognizer wakeword if enabled by engine/platform implementations
         if( m_speechRecognizerEngineImpl != nullptr && m_speechRecognizerEngineImpl->isWakewordEnabled() ) {
-            AACE_DEBUG(LX(TAG,"start").d("isWakewordEnabled", m_speechRecognizerEngineImpl->isWakewordEnabled()));
+            AACE_DEBUG(LX(TAG).d("isWakewordEnabled", m_speechRecognizerEngineImpl->isWakewordEnabled()));
             ThrowIfNot( m_speechRecognizerEngineImpl->enableWakewordDetection(), "enabledWakewordDetectionFailed" );
         }
 
@@ -630,8 +755,19 @@ bool AlexaEngineService::stop()
         // disable the avs connection and wait for the disconnected state
         disconnect();
 
-        if( m_speechRecognizerEngineImpl != nullptr && m_speechRecognizerEngineImpl->isWakewordEnabled() ) {
-            ThrowIfNot( m_speechRecognizerEngineImpl->disableWakewordDetection(), "disableWakewordDetectionFailed" );
+        // get the property engine service interface from the property manager service
+        auto propertyManager =
+            getContext()->getServiceInterface<aace::engine::propertyManager::PropertyManagerServiceInterface>(
+                "aace.propertyManager");
+        ThrowIfNull(propertyManager, "nullPropertyManagerServiceInterface");
+
+        if (m_speechRecognizerEngineImpl != nullptr &&
+            aace::engine::utils::string::equal(
+                propertyManager->getProperty(aace::alexa::property::WAKEWORD_ENABLED), "true")) {
+            ThrowIfNot(
+                propertyManager->setProperty(
+                    aace::alexa::property::WAKEWORD_ENABLED, aace::engine::utils::string::FALSE),
+                "disableWakewordDetectionFailed");
         }
 
         return true;
@@ -754,17 +890,9 @@ bool AlexaEngineService::shutdown()
             m_certifiedSender->shutdown();
             m_certifiedSender.reset();
         }
-
-        if( m_connectionManager != nullptr ) {
-            AACE_DEBUG(LX(TAG,"shutdown").m("ConnectionManager"));
-            m_connectionManager->shutdown();
-            m_connectionManager.reset();
-        }
         
-        if( m_messageRouter != nullptr ) {
-            AACE_DEBUG(LX(TAG,"shutdown").m("MessageRouter"));
-            m_messageRouter->shutdown();
-            m_messageRouter.reset();
+        if( m_deviceSettingsDelegate != nullptr ) {
+            m_deviceSettingsDelegate.reset();
         }
         
         if( m_softwareInfoSender != nullptr ) {
@@ -810,12 +938,6 @@ bool AlexaEngineService::shutdown()
             m_capabilitiesDelegate.reset();
         }
         
-        if( m_logger != nullptr ) {
-            AACE_DEBUG(LX(TAG,"shutdown").m("AlexaEngineLogger"));
-            m_logger->shutdown();
-            m_logger.reset();
-        }
-
         if( m_authDelegateRouter != nullptr ) {
             m_authDelegateRouter.reset();
         }
@@ -824,11 +946,7 @@ bool AlexaEngineService::shutdown()
             m_interactionModelCapabilityAgent.reset();
         }
 
-        if ( m_deviceSettingsDelegate != nullptr ) {
-            m_deviceSettingsDelegate.reset();
-        }
-
-         if ( m_endpointManager != nullptr ) {
+        if ( m_endpointManager != nullptr ) {
             m_endpointManager.reset();
         }
 
@@ -845,15 +963,38 @@ bool AlexaEngineService::shutdown()
         }
 
         if ( m_apiGatewayCapabilityAgent != nullptr ) {
+            AACE_DEBUG(LX(TAG,"shutdown").m("ApiGatewayCapabilityAgent"));
             m_apiGatewayCapabilityAgent->shutdown();
             m_apiGatewayCapabilityAgent.reset();
         }
 
+        if( m_messageRouter != nullptr ) {
+            AACE_DEBUG(LX(TAG,"shutdown").m("MessageRouter"));
+            m_messageRouter->shutdown();
+            m_messageRouter.reset();
+        }
+        
+        if( m_connectionManager != nullptr ) {
+            AACE_DEBUG(LX(TAG,"shutdown").m("ConnectionManager"));
+            m_connectionManager->shutdown();
+            m_connectionManager.reset();
+        }
+        
         if ( m_alexaMessageSender != nullptr ) {
+            AACE_DEBUG(LX(TAG,"shutdown").m("AlexaMessageSender"));
             m_alexaMessageSender->shutdown();
             m_alexaMessageSender.reset();
         }
-
+        
+        if( m_logger != nullptr ) {
+            AACE_DEBUG(LX(TAG,"shutdown").m("AlexaEngineLogger"));
+            m_logger->shutdown();
+            m_logger.reset();
+        }
+        
+        m_audioFocusManager.reset();
+        m_visualFocusManager.reset();
+        
         // shutdown the executer
         m_executor.shutdown();
         
@@ -868,118 +1009,340 @@ bool AlexaEngineService::shutdown()
     }
 }
 
-bool AlexaEngineService::setProperty( const std::string& key, const std::string& value )
-{
-    try
-    {
-        if( key.compare( aace::alexa::property::FIRMWARE_VERSION ) == 0 )
-        {
-            m_firmwareVersion = std::stoul( value );
-            
-            if( m_softwareInfoSender != nullptr ) {
-                m_softwareInfoSender->setFirmwareVersion( m_firmwareVersion );
-            }
-        }
-        else if( key.compare( aace::alexa::property::WAKEWORD_SUPPORTED ) == 0 ) {
-            Throw( "readOnlyProperty" );
-        }
-        else if( key.compare( aace::alexa::property::SUPPORTED_LOCALES ) == 0 ) {
-            Throw( "readOnlyProperty" );
-        }
-        else if( key.compare( aace::alexa::property::COUNTRY_SUPPORTED ) == 0 ) {
-            Throw( "readOnlyProperty" );
-        }
-        else if( m_deviceSettingsDelegate != nullptr )
-        {
-            auto pos = key.find( "aace.alexa.setting." );
-            ReturnIfNot( pos == 0, false );
-
-            if( key.compare( aace::alexa::property::LOCALE ) == 0 ) {
-                alexaClientSDK::settings::DeviceLocales locales;
-                size_t position;
-                std::string valueCopy = value;
-                std::string delim = ",";
-                while((position = valueCopy.find(delim)) != std::string::npos) {
-                    std::string local = valueCopy.substr(0, pos);
-                    valueCopy.erase(0, pos + delim.length());
-                    locales.push_back(local);
-                }
-                locales.push_back(valueCopy);
-                m_deviceSettingsDelegate->getDeviceSettingsManager()->setValue<DeviceSettingsDelegate::DeviceSettingsIndex::LOCALE>(locales);
-            
-                // Cascading the LOCALE change to Wakeword Engine.
-                getContext()->setProperty( aace::engine::wakeword::property::WAKEWORD_ENGINE_LOCALE, value );
-
-                // Cascading the LOCALE change to Local Voice Control.
-                getContext()->setProperty( "aace.localVoiceControl.locale", value );
-           }
-        }
-        else {
-            return false;
-        }
-        
-        AACE_INFO(LX(TAG,"setProperty").d("key",key).d("value",value));
-        
+bool AlexaEngineService::setProperty_firmwareVersion(
+    const std::string& value,
+    bool& changed,
+    bool& async,
+    const SetPropertyResultCallback& callbackFunction) {
+    try {
+        AACE_INFO(LX(TAG).sensitive("value",value));
+        ThrowIfNull(m_softwareInfoSender, "nullSoftwareInfoSender");
+        ReturnIf(aace::engine::utils::string::equal(value, std::to_string( m_firmwareVersion )), true);
+        m_firmwareVersion = std::stoul( value );
+        ThrowIfNot( m_softwareInfoSender->setFirmwareVersion( m_firmwareVersion ), "setFirmwareVersionFailed" );
+        changed = true;
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"setProperty").d("reason", ex.what()).d("key",key).d("value",value));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
 }
 
-std::string AlexaEngineService::getProperty( const std::string& key )
-{
-    try
-    {    
-        if( key.compare( aace::alexa::property::FIRMWARE_VERSION ) == 0 ) {
-            return std::to_string( m_firmwareVersion );
-        }
-        else if( key.compare( aace::alexa::property::WAKEWORD_SUPPORTED ) == 0 ) {
-            if( m_speechRecognizerEngineImpl != nullptr && m_speechRecognizerEngineImpl->isWakewordSupported() ) {
-                return "true";
-            } else {
-                return "false";
-            }
-        }
-        else if( key.compare( aace::alexa::property::SUPPORTED_LOCALES ) == 0 ) {
-            const auto& locales = m_localeAssetManager->getSupportedLocales();
-            std::string ret;
-            for(auto& locale : locales) {
-                ret += locale + ",";
-            }
-            if(!ret.empty()) {
-                ret = ret.substr(0, ret.size() - 1);
-            }
-            return ret;
-        }
-        else if( key.compare( aace::alexa::property::COUNTRY_SUPPORTED ) == 0 )
-        {
-            rapidjson::Document document( rapidjson::kObjectType );
-
-            document.AddMember( "supported", rapidjson::Value().SetBool( m_countrySupported ), document.GetAllocator() );
-
-            return aace::engine::utils::json::toString( document );
-        }
-        else if(m_deviceSettingsDelegate != nullptr )
-        {
-            if( key.compare( aace::alexa::property::LOCALE ) == 0 ) {
-                auto result = m_deviceSettingsDelegate->getDeviceSettingsManager()->getValue<DeviceSettingsDelegate::DeviceSettingsIndex::LOCALE>();
-                ThrowIfNot(result.first, "getSettingFailed");
-                std::string locales;
-                for(auto&& local : result.second) {
-                    locales += local + ",";
-                }
-                locales = locales.substr(0, locales.length() - 1); //removing trailing comma
-                return locales;
-            }
-        }
+std::string AlexaEngineService::getProperty_firmwareVersion() {
+    
+    try {
+        AACE_INFO(LX(TAG));
+        return std::to_string( m_firmwareVersion );
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"getProperty").d("reason", ex.what()).d("key",key));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return "";
     }
+}
+
+std::string AlexaEngineService::getProperty_wakewordSupported() {
     
-    return std::string();
+    try {
+        AACE_INFO(LX(TAG));
+        ThrowIfNull( m_speechRecognizerEngineImpl, "nullSpeechRecognizerEngineImpl" );
+        return m_speechRecognizerEngineImpl->isWakewordSupported() ? aace::engine::utils::string::TRUE : aace::engine::utils::string::FALSE;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return "";
+    }
+}
+
+bool AlexaEngineService::setProperty_locale(
+    const std::string& value,
+    bool& changed,
+    bool& async,
+    const SetPropertyResultCallback& callbackFunction) {
+    try {
+        AACE_INFO(LX(TAG).sensitive("value",value));
+        ThrowIfNull( m_deviceSettingsDelegate, "nullDeviceSettingsDelegate" );
+        ReturnIf( aace::engine::utils::string::equal( value, getProperty_locale() ), true );
+        int pos = 0;
+        alexaClientSDK::settings::DeviceLocales locales;
+        size_t position;
+        std::string valueCopy = value;
+        std::string delim = ",";
+        while((position = valueCopy.find(delim)) != std::string::npos) {
+            std::string local = valueCopy.substr(0, pos);
+            valueCopy.erase(0, pos + delim.length());
+            locales.push_back(local);
+        }
+        locales.push_back(valueCopy);
+        {
+            std::lock_guard<std::mutex> lock(m_setPropertyResultCallbackMutex);
+            m_localeCallbackFunction = callbackFunction;
+        }
+        auto setSettingResult = m_deviceSettingsDelegate->getDeviceSettingsManager()->setValue<DeviceSettingsDelegate::DeviceSettingsIndex::LOCALE>(locales);
+        
+        switch( setSettingResult ) {
+            case SetSettingResult::BUSY:
+                Throw( "anotherChangeAlreadyInProgress");
+            case SetSettingResult::UNAVAILABLE_SETTING:
+                Throw( "settingRequestedDoesNotExist");
+            case SetSettingResult::INVALID_VALUE:
+                Throw( "valueRequestedIsInvalid");
+            case SetSettingResult::INTERNAL_ERROR:
+                Throw( "requestFailedDuetoInternalError");
+            case SetSettingResult::UNSUPPORTED_OPERATION:
+                Throw( "unsupportedOperation");
+            case SetSettingResult::NO_CHANGE:
+            case SetSettingResult::ENQUEUED:
+                break;
+            default:
+                break;
+        }
+        changed = true;
+        async = true;
+        return true;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
+}
+
+std::string AlexaEngineService::getProperty_locale() {
+    
+    try {
+        AACE_INFO(LX(TAG));
+        auto result = m_deviceSettingsDelegate->getDeviceSettingsManager()->getValue<DeviceSettingsDelegate::DeviceSettingsIndex::LOCALE>();
+        if(!result.first) {
+            AACE_WARN(LX(TAG).d("getSettingFailed", "returning default locale"));
+        }
+        std::string locales;
+        for(auto&& local : result.second) {
+            locales += local + ",";
+        }
+        locales = locales.substr(0, locales.length() - 1); //removing trailing comma
+        return locales;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return "";
+    }
+}
+    
+std::string AlexaEngineService::getProperty_supportedLocales() {
+    try {
+        AACE_INFO(LX(TAG));
+        ThrowIfNull( m_localeAssetManager, "nullLocaleAssetManager" );
+        const auto& locales = m_localeAssetManager->getSupportedLocales();
+        std::string ret;
+        for(auto& locale : locales) {
+            ret += locale + ",";
+        }
+        if(!ret.empty()) {
+            ret = ret.substr(0, ret.size() - 1);
+        }
+        return ret;
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return "";
+    }
+}
+
+bool AlexaEngineService::setProperty_timezone(
+    const std::string& value,
+    bool& changed,
+    bool& async,
+    const SetPropertyResultCallback& callbackFunction) {
+    try {
+        AACE_INFO(LX(TAG).sensitive("value", value));
+        ReturnIf(aace::engine::utils::string::equal(value, getProperty_timezone()), true);
+        {
+            std::lock_guard<std::mutex> lock(m_setPropertyResultCallbackMutex);
+            m_timezoneCallbackFunction = callbackFunction;
+        }
+        auto setSettingResult = m_deviceSettingsDelegate->getDeviceSettingsManager()
+                                    ->setValue<DeviceSettingsDelegate::DeviceSettingsIndex::TIMEZONE>(value);
+        switch (setSettingResult) {
+            case SetSettingResult::BUSY:
+                Throw("anotherChangeAlreadyInProgress");
+            case SetSettingResult::UNAVAILABLE_SETTING:
+                Throw("settingRequestedDoesNotExist");
+            case SetSettingResult::INVALID_VALUE:
+                Throw("valueRequestedIsInvalid");
+            case SetSettingResult::INTERNAL_ERROR:
+                Throw("requestFailedDuetoInternalError");
+            case SetSettingResult::UNSUPPORTED_OPERATION:
+                Throw("unsupportedOperation");
+            // We do not expect to get the setSettingResult::NO_CHANGE 
+            case SetSettingResult::NO_CHANGE:
+            case SetSettingResult::ENQUEUED:
+                break;
+            default:
+                break;
+        }
+        changed = true;
+        async = true;
+        return true;
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
+}
+
+std::string AlexaEngineService::getProperty_timezone() {
+    try {
+        AACE_INFO(LX(TAG));
+        auto timeZone = m_deviceSettingsDelegate->getDeviceSettingsManager()
+                            ->getValue<DeviceSettingsDelegate::DeviceSettingsIndex::TIMEZONE>();
+        return timeZone.second;
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return "";
+    }
+}
+
+void AlexaEngineService::onSettingNotification(
+    const std::string& value,
+    alexaClientSDK::settings::SettingNotifications notification) {
+    try {
+        AACE_DEBUG(LX(TAG).d("notification", notification).sensitive("value",value));
+
+        // get the property engine service interface from the property manager service
+        auto propertyManager =
+            getContext()->getServiceInterface<aace::engine::propertyManager::PropertyManagerServiceInterface>(
+                "aace.propertyManager");
+        ThrowIfNull(propertyManager, "nullPropertyManagerServiceInterface");
+        if (notification != alexaClientSDK::settings::SettingNotifications::AVS_CHANGE) {
+            ReturnIfNot(m_timezoneCallbackFunction);
+        }
+        std::lock_guard<std::mutex> lock(m_setPropertyResultCallbackMutex);
+        switch (notification) {
+            case alexaClientSDK::settings::SettingNotifications::AVS_CHANGE:
+                propertyManager->updatePropertyValue(aace::alexa::property::TIMEZONE, value);
+                break;
+            case alexaClientSDK::settings::SettingNotifications::AVS_CHANGE_FAILED:
+                Throw("AVS_CHANGE_FAILED");
+                break;
+            case alexaClientSDK::settings::SettingNotifications::LOCAL_CHANGE_FAILED:
+                m_timezoneCallbackFunction(aace::alexa::property::TIMEZONE, value, PROPERTY_CHANGE_FAILED);
+                Throw("LOCAL_CHANGE_FAILED");
+                break;
+            case alexaClientSDK::settings::SettingNotifications::LOCAL_CHANGE_IN_PROGRESS:
+            case alexaClientSDK::settings::SettingNotifications::AVS_CHANGE_IN_PROGRESS:
+                break;
+            case alexaClientSDK::settings::SettingNotifications::LOCAL_CHANGE:
+                m_timezoneCallbackFunction(aace::alexa::property::TIMEZONE, value, PROPERTY_CHANGE_SUCCEEDED);
+                break;
+            case alexaClientSDK::settings::SettingNotifications::LOCAL_CHANGE_CANCELLED:
+                m_timezoneCallbackFunction(aace::alexa::property::TIMEZONE, value, PROPERTY_CHANGE_FAILED);
+                break;
+            case alexaClientSDK::settings::SettingNotifications::AVS_CHANGE_CANCELLED:
+                break;
+            default:
+                m_timezoneCallbackFunction(aace::alexa::property::TIMEZONE, value, PROPERTY_CHANGE_FAILED);
+                break;
+        }
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+    }
+}
+
+std::string AlexaEngineService::getProperty_countrySupported() {
+    
+    try {
+        AACE_INFO(LX(TAG));
+        rapidjson::Document document( rapidjson::kObjectType );
+        
+        document.AddMember( "supported", rapidjson::Value().SetBool( m_countrySupported ), document.GetAllocator() );
+        
+        return aace::engine::utils::json::toString( document );
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return "";
+    }
+}
+
+void AlexaEngineService::onSettingNotification( const alexaClientSDK::settings::DeviceLocales& deviceLocales, alexaClientSDK::settings::SettingNotifications notification) {
+    std::string locales;
+    try {
+        for (auto&& locale : deviceLocales) {
+            locales += locale + ",";
+        }
+        locales = locales.substr(0, locales.length() - 1);  // removing trailing comma
+        AACE_DEBUG(LX(TAG).d("notification", notification));
+
+        // get the property engine service interface from the property manager service
+        auto propertyManager = getContext()->getServiceInterface<aace::engine::propertyManager::PropertyManagerServiceInterface>("aace.propertyManager");
+        ThrowIfNull( propertyManager, "nullPropertyManagerServiceInterface" );
+        if (notification != alexaClientSDK::settings::SettingNotifications::AVS_CHANGE) {
+            ReturnIfNot(m_localeCallbackFunction);
+        }
+        std::lock_guard<std::mutex> lock(m_setPropertyResultCallbackMutex);
+        switch( notification ) {
+            case alexaClientSDK::settings::SettingNotifications::AVS_CHANGE: {
+                propertyManager->updatePropertyValue(aace::alexa::property::LOCALE, locales);
+                break;
+            }
+            case alexaClientSDK::settings::SettingNotifications::AVS_CHANGE_FAILED:
+                Throw("AVS_CHANGE_FAILED");
+                break;
+            case alexaClientSDK::settings::SettingNotifications::LOCAL_CHANGE_FAILED:
+                m_localeCallbackFunction(aace::alexa::property::LOCALE, locales, PROPERTY_CHANGE_FAILED);
+                Throw("LOCAL_CHANGE_FAILED");
+                break;
+            case alexaClientSDK::settings::SettingNotifications::LOCAL_CHANGE_IN_PROGRESS:
+            case alexaClientSDK::settings::SettingNotifications::AVS_CHANGE_IN_PROGRESS:
+                break;
+            case alexaClientSDK::settings::SettingNotifications::LOCAL_CHANGE:
+                m_localeCallbackFunction(aace::alexa::property::LOCALE, locales, PROPERTY_CHANGE_SUCCEEDED);
+                break;
+            case alexaClientSDK::settings::SettingNotifications::LOCAL_CHANGE_CANCELLED:
+                m_localeCallbackFunction(aace::alexa::property::LOCALE, locales, PROPERTY_CHANGE_FAILED);
+                break;
+            case alexaClientSDK::settings::SettingNotifications::AVS_CHANGE_CANCELLED:
+                break;
+            default:
+                m_localeCallbackFunction(aace::alexa::property::LOCALE, locales, PROPERTY_CHANGE_FAILED);
+                break;
+        }
+    } catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+    }
+}
+
+bool AlexaEngineService::setProperty_wakewordEnabled(
+    const std::string& value,
+    bool& changed,
+    bool& async,
+    const SetPropertyResultCallback& callbackFunction) {
+    try {
+        AACE_INFO(LX(TAG).sensitive("value", value));
+        ThrowIfNull(m_speechRecognizerEngineImpl, "nullSpeechRecognizerEngineImpl");
+        if (aace::engine::utils::string::equal(value, aace::engine::utils::string::TRUE)) {
+            return m_speechRecognizerEngineImpl->isWakewordSupported() &&
+                   m_speechRecognizerEngineImpl->enableWakewordDetection();
+        } else {
+            return m_speechRecognizerEngineImpl->isWakewordSupported() &&
+                   m_speechRecognizerEngineImpl->disableWakewordDetection();
+        }
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
+}
+
+std::string AlexaEngineService::getProperty_wakewordEnabled() {
+    try {
+        AACE_INFO(LX(TAG));
+        ThrowIfNull(m_speechRecognizerEngineImpl, "nullSpeechRecognizerEngineImpl");
+        return m_speechRecognizerEngineImpl->isWakewordSupported() && m_speechRecognizerEngineImpl->isWakewordEnabled()
+                   ? aace::engine::utils::string::TRUE
+                   : aace::engine::utils::string::FALSE;
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return aace::engine::utils::string::FALSE;
+    }
 }
 
 bool AlexaEngineService::connect()
@@ -1041,8 +1404,12 @@ std::string AlexaEngineService::getVehicleCountry()
 {
     try
     {
+        // get the property engine service interface from the property manager service
+        auto propertyManager = getContext()->getServiceInterface<aace::engine::propertyManager::PropertyManagerServiceInterface>("aace.propertyManager");
+        ThrowIfNull( propertyManager, "nullPropertyManagerServiceInterface" );
+        
         // get the operating country code
-        std::string country = getContext()->getProperty( aace::vehicle::property::OPERATING_COUNTRY );
+        std::string country = propertyManager->getProperty( aace::vehicle::property::OPERATING_COUNTRY );
         
         // if not operating country has been set, then get the location
         // based country from the location provider...
@@ -1335,6 +1702,7 @@ bool AlexaEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::al
   
         ThrowIfNull( m_speechRecognizerEngineImpl, "createSpeechRecognizerEngineImplFailed" );
         m_connectionManager->addConnectionStatusObserver( m_speechRecognizerEngineImpl );
+        m_deviceSettingsDelegate->getDeviceSettingsManager()->addObserver<DeviceSettingsDelegate::DeviceSettingsIndex::LOCALE>(shared_from_this());
 
         return true;
     }
@@ -1422,9 +1790,10 @@ bool AlexaEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::al
             m_speakerManager, 
             m_exceptionSender, 
             m_playbackRouterDelegate,
-            m_certifiedSender );
+            m_certifiedSender,
+            m_audioPlayerObserverDelegate );
         ThrowIfNull( m_audioPlayerEngineImpl, "createAudioPlayerEngineImplFailed" );
-        m_renderPlayerInfoCardsProviderInterfaces = {m_audioPlayerEngineImpl};
+        m_renderPlayerInfoCardsProviderInterfaces.insert(m_audioPlayerEngineImpl);
         
         
         // if a template interface has been registered it needs to know about the
@@ -1523,6 +1892,15 @@ bool AlexaEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::al
         
         // register the platform media adapter
         ThrowIfNot( m_externalMediaPlayerEngineImpl->registerPlatformMediaAdapter( externalMediaAdapter ), "registerPlatformMediaAdapterFailed" );
+
+        m_renderPlayerInfoCardsProviderInterfaces.insert( m_externalMediaPlayerEngineImpl );
+        
+        
+        // if a template interface has been registered it needs to know about the
+        // audio player so it will receive audio player templates
+        if( m_templateRuntimeEngineImpl != nullptr ) {
+            m_templateRuntimeEngineImpl->setRenderPlayerInfoCardsProviderInterface( m_renderPlayerInfoCardsProviderInterfaces );
+        }
     
         return true;
     }
@@ -1536,24 +1914,45 @@ bool AlexaEngineService::createExternalMediaPlayerImpl()
 {
     try
     {
+        AACE_VERBOSE(LX(TAG));
+
         ReturnIf( m_externalMediaPlayerEngineImpl != nullptr, true );
-    
+
+        // create external media adapter registration factory instance (default is nullptr)
+        auto externalMediaAdapterRegistration = newFactoryInstance<aace::engine::alexa::ExternalMediaAdapterRegistrationInterface>([]() {
+            return nullptr;
+        });
+
+        // set agent if not configured
+        if( m_externalMediaPlayerAgent.empty() ) {
+            if( externalMediaAdapterRegistration != nullptr ) {
+                m_externalMediaPlayerAgent = externalMediaAdapterRegistration->getAgent();
+            }
+            else {
+                m_externalMediaPlayerAgent = DEFAULT_EXTERNAL_MEDIA_PLAYER_AGENT;
+            }
+        }
+        AACE_VERBOSE(LX(TAG).d("agent", m_externalMediaPlayerAgent));
+
         // create the external media player impl if is null
-        m_externalMediaPlayerEngineImpl = aace::engine::alexa::ExternalMediaPlayerEngineImpl::create( 
-            m_externalMediaPlayerAgent, 
+        m_externalMediaPlayerEngineImpl = aace::engine::alexa::ExternalMediaPlayerEngineImpl::create(
+            m_externalMediaPlayerAgent,
             m_defaultEndpointBuilder, 
             m_capabilitiesDelegate, 
             m_speakerManager, 
-            m_connectionManager, 
+            m_connectionManager,
+            m_certifiedSender, 
             m_audioFocusManager, 
             m_contextManager, 
             m_exceptionSender, 
-            m_playbackRouterDelegate );
+            m_playbackRouterDelegate,
+            m_audioPlayerObserverDelegate,
+            externalMediaAdapterRegistration);
         ThrowIfNull( m_externalMediaPlayerEngineImpl, "createExternalMediaPlayerEngineImplFailed" );
 
         // external media player impl needs to observer connection manager connections status
         m_connectionManager->addConnectionStatusObserver( m_externalMediaPlayerEngineImpl );
-    
+
         return true;
     }
     catch( std::exception& ex ) {
@@ -1776,6 +2175,10 @@ std::shared_ptr<aace::engine::alexa::EndpointBuilderFactory> AlexaEngineService:
 
 std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> AlexaEngineService::getExceptionEncounteredSender() {
     return m_exceptionSender;
+}
+
+std::shared_ptr<aace::engine::alexa::ExternalMediaPlayer> AlexaEngineService::getExternalMediaPlayer() {
+    return m_externalMediaPlayerEngineImpl != nullptr ? m_externalMediaPlayerEngineImpl->getExternalMediaPlayerCapabilityAgent() : nullptr;
 }
 
 std::shared_ptr<alexaClientSDK::adsl::MessageInterpreter> AlexaEngineService::getMessageInterpreter() {

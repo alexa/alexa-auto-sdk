@@ -1,5 +1,8 @@
 # AACE Core Engine
 
+find_path(AVS_INCLUDE_DIRS AVSCommon)
+find_library(AVS_AVS_COMMON_LIBRARY AVSCommon)
+
 configure_file (
     "${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Core/EngineVersion.h.in"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Core/EngineVersion.h"
@@ -142,6 +145,11 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Audio/AudioManagerInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Audio/AudioInputChannelInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Audio/AudioOutputChannelInterface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/PropertyManager/PropertyManagerServiceInterface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/PropertyManager/PropertyListenerInterface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/PropertyManager/PropertyManagerEngineImpl.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/PropertyManager/PropertyManagerEngineService.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/PropertyManager/PropertyDescription.h
 )
  
 source_group("Header Files" FILES ${HEADERS})
@@ -193,6 +201,9 @@ add_library(AACECoreEngine SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Audio/AudioOutputProviderEngineImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Audio/AudioInputEngineImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Audio/AudioOutputEngineImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/PropertyManager/PropertyManagerEngineImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/PropertyManager/PropertyManagerEngineService.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/PropertyManager/PropertyDescription.cpp
 )
 
 find_path(RAPIDJSON_INCLUDE_DIR rapidjson/rapidjson.h
@@ -215,6 +226,8 @@ target_link_libraries(AACECoreEngine
         AACECorePlatform
     PRIVATE
         ${SQLITE3_LIBRARIES}
+        ${AVS_AVS_COMMON_LIBRARY}
+        ${AVS_ENDPOINTS_LIBRARY}
 )
 
 install(

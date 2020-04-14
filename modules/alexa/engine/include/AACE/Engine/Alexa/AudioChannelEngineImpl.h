@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 
 #include <istream>
 #include <set>
+#include <atomic>
 
 #include <AVSCommon/SDKInterfaces/SpeakerInterface.h>
 #include <AVSCommon/SDKInterfaces/SpeakerManagerInterface.h>
@@ -56,10 +57,12 @@ public:
     
     virtual ~AudioChannelEngineImpl() = default;
 
+    int64_t getMediaPosition();
+    int64_t getMediaDuration();
+
     //
     // aace::audio::AudioOutputEngineInterface
     //
-    
     void onMediaStateChanged( MediaState state ) override;
     void onMediaError( MediaError error, const std::string& description ) override;
 
@@ -142,6 +145,7 @@ private:
 
 private:
     std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> m_audioOutputChannel;
+    std::weak_ptr<class AttachmentReaderAudioStream> m_attachmentReader;
     
     // mutex to serialize access to m_mediaPlayerObservers 
     std::mutex m_mediaPlayerObserverMutex;
@@ -203,7 +207,7 @@ inline std::ostream& operator<<(std::ostream& stream, const AudioChannelEngineIm
 
 class AttachmentReaderAudioStream : public aace::audio::AudioStream {
 private:
-    AttachmentReaderAudioStream( std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader> attachmentReader, Encoding encoding = Encoding::UNKNOWN );
+    AttachmentReaderAudioStream( std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader> attachmentReader, const AudioFormat& audioFormat = AudioFormat::UNKNOWN );
    
 public:
     static std::shared_ptr<AttachmentReaderAudioStream> create( std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader> attachmentReader, const alexaClientSDK::avsCommon::utils::AudioFormat* format );
@@ -211,13 +215,15 @@ public:
     // aace::audio::AudioStream
     ssize_t read( char* data, const size_t size ) override;
     bool isClosed() override;
-    Encoding getEncoding() override;
+    AudioFormat getAudioFormat() override;
+    
+    void close();
     
 private:
     std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader> m_attachmentReader;
     alexaClientSDK::avsCommon::avs::attachment::AttachmentReader::ReadStatus m_status;
-    bool m_closed;
-    Encoding m_encoding;
+    std::atomic<bool> m_closed;
+    AudioFormat m_audioFormat;
 };
 
 //

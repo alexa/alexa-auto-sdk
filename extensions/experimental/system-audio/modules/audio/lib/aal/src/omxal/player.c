@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ static void omxal_play_callback(XAPlayItf caller, void *pContext, XAuint32 event
 	}
 }
 
-static aal_handle_t omxal_player_create(const aal_attributes_t *attr)
+static aal_handle_t omxal_player_create(const aal_attributes_t *attrs, aal_audio_parameters_t *params)
 {
 	aal_omxal_player_context_t *ctx = NULL;
 	XAresult r;
@@ -67,12 +67,21 @@ static aal_handle_t omxal_player_create(const aal_attributes_t *attr)
 	char *ca_path = NULL;
 #endif
 
+	if (attrs->uri == NULL || strlen(attrs->uri) == 0) {
+		debug("Invalid URI is specified");
+		return NULL;
+	}
+	if (params != NULL) {
+		debug("Explicitly specifying stream type is not supported");
+		return NULL;
+	}
+
 	XADataLocator_URI source_locator = {
 		.locatorType = XA_DATALOCATOR_URI,
 #if defined(__OMXAL_V_1_0__)
-		.URI = attr->uri
+		.URI = attrs->uri
 #else
-		.pURI = attr->uri
+		.pURI = attrs->uri
 #endif
 	};
 	XADataSource source = {
@@ -103,10 +112,10 @@ static aal_handle_t omxal_player_create(const aal_attributes_t *attr)
 
 	/* Convert "file://<path>" -> "<path>" */
 	l = strlen(URI_FILE_PREFIX);
-	if (strncmp(URI_FILE_PREFIX, attr->uri, l) == 0) {
-		int len = strlen(attr->uri) - l;
+	if (strncmp(URI_FILE_PREFIX, attrs->uri, l) == 0) {
+		int len = strlen(attrs->uri) - l;
 		ctx->file_path = (char *) calloc(len + 1, sizeof (char));
-		strncpy(ctx->file_path, attr->uri + l, len);
+		strncpy(ctx->file_path, attrs->uri + l, len);
 		debug("Update file path %s", ctx->file_path);
 #if defined(__OMXAL_V_1_0__)
 		source_locator.URI = ctx->file_path;
@@ -142,6 +151,10 @@ static aal_handle_t omxal_player_create(const aal_attributes_t *attr)
 	r = (*(ctx->player))->GetInterface(ctx->player, XA_IID_SEEK, (void *) &(ctx->seek_itf));
 	bail_if_error(r);
 	r = (*(ctx->player))->GetInterface(ctx->player, XA_IID_CONFIGEXTENSION, (void *) &(ctx->config_itf));
+	bail_if_error(r);
+	r = (*(ctx->player))->GetInterface(ctx->player, XA_IID_PREFETCHSTATUS, (void *) &(ctx->prefetch_status_itf));
+	bail_if_error(r);
+	r = (*(ctx->player))->GetInterface(ctx->player, XA_IID_STREAMINFORMATION, (void *) &(ctx->stream_info_itf));
 	bail_if_error(r);
 
 #if defined(__QNXNTO__)
@@ -230,15 +243,45 @@ bail:
 	return 0;
 }
 
+static int64_t omxal_player_get_num_bytes_buffered(aal_handle_t handle) {
+	aal_omxal_player_context_t *ctx = (aal_omxal_player_context_t *)handle;
+	XAresult r;
+	XAuint32 status;
+	XApermille fill_level;
+
+	r = (*(ctx->prefetch_status_itf))->GetPrefetchStatus(ctx->prefetch_status_itf, &status);
+	bail_if_error(r);
+
+	switch (status) {
+	case XA_PREFETCHSTATUS_SUFFICIENTDATA:
+		r = (*(ctx->prefetch_status_itf))->GetFillLevel(ctx->prefetch_status_itf, &fill_level);
+		bail_if_error(r);
+		break;
+	case XA_PREFETCHSTATUS_UNDERFLOW:
+	case XA_PREFETCHSTATUS_OVERFLOW:
+	default:
+		return 0;
+	}
+
+	XAAudioStreamInformation asi;
+	r = (*(ctx->stream_info_itf))->QueryStreamInformation(ctx->stream_info_itf, 1, &asi);
+	bail_if_error(r);
+
+	// Currently no way to check buffered duration. Assume 1 second buffer.
+	return asi.bitRate / 8  * 1 * fill_level / 1000;
+bail:
+	return 0;
+}
+
 static void omxal_player_seek(aal_handle_t handle, int64_t position)
 {
 	aal_omxal_player_context_t *ctx = (aal_omxal_player_context_t *) handle;
 	XAresult r;
 
-	r = (*(ctx->seek_itf))->
-		SetPosition(ctx->seek_itf, (XAmillisecond) position, XA_SEEKMODE_FAST);
-
-	return;
+	r = (*(ctx->seek_itf))->SetPosition(ctx->seek_itf, (XAmillisecond)position, XA_SEEKMODE_FAST);
+	if (r != XA_RESULT_SUCCESS) {
+		debug("Failed to seek: %d", r);
+	}
 }
 
 static void omxal_player_set_volume(aal_handle_t handle, double volume)
@@ -250,11 +293,15 @@ static void omxal_player_set_volume(aal_handle_t handle, double volume)
 	XAmillibel maxLevel;
 	r = (*(ctx->volume_itf))->GetMaxVolumeLevel(ctx->volume_itf, &maxLevel);
 	if (r != XA_RESULT_SUCCESS) {
-		debug("Failed to get max volume level");
+		debug("Failed to get max volume level: %d", r);
 		return;
 	}
 	debug("Max volume level = %d", maxLevel);
 
+#if defined(__QNXNTO__)
+	/* QNX implementation is broken, use amp * 100 */
+	mB = volume * 100;
+#else
 	if (volume >= 1.0f) {
 		mB = maxLevel;
 	} else if (volume < 0.01f) {
@@ -263,9 +310,11 @@ static void omxal_player_set_volume(aal_handle_t handle, double volume)
 		mB = maxLevel + 2000.0f * log10(volume);
 		debug("Calc val %f amp -> %d mB", volume, mB);
 	}
+#endif
+
 	r = (*(ctx->volume_itf))->SetVolumeLevel(ctx->volume_itf, mB);
 	if (r != XA_RESULT_SUCCESS) {
-		debug("Failed to set volume level");
+		debug("Failed to set volume level: %d", r);
 	}
 }
 
@@ -299,11 +348,11 @@ const aal_player_ops_t omxal_player_ops = {
 	.stop = omxal_player_stop,
 	.get_position = omxal_player_get_position,
 	.get_duration = omxal_player_get_duration,
+	.get_num_bytes_buffered = omxal_player_get_num_bytes_buffered,
 	.seek = omxal_player_seek,
 	.set_volume = omxal_player_set_volume,
 	.set_mute = omxal_player_set_mute,
 	.write = NULL,
 	.notify_end_of_stream = NULL,
-	.set_stream_type = NULL,
 	.destroy = omxal_player_destroy
 };

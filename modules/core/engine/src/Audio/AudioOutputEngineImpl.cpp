@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -142,6 +142,27 @@ bool AudioOutputEngineImpl::setPosition( int64_t position )
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
+    }
+}
+
+int64_t AudioOutputEngineImpl::getDuration() {
+    try {
+        return m_platformAudioOutput->getDuration();
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
+}
+
+int64_t AudioOutputEngineImpl::getNumBytesBuffered()
+{
+    try
+    {
+        return m_platformAudioOutput->getNumBytesBuffered();
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return 0;
     }
 }
 

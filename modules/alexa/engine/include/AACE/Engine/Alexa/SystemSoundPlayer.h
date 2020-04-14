@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 
 #include <AACE/Engine/Audio/AudioManagerInterface.h>
 #include <AACE/Audio/AudioEngineInterfaces.h>
+#include <AACE/Audio/AudioFormat.h>
 
 namespace aace {
 namespace engine {
@@ -71,7 +72,7 @@ private:
 
 class SystemSoundAudioStream : public aace::audio::AudioStream {
 private:
-    SystemSoundAudioStream( std::shared_ptr<std::istream> stream );
+    SystemSoundAudioStream( std::shared_ptr<std::istream> stream, alexaClientSDK::avsCommon::sdkInterfaces::SystemSoundPlayerInterface::Tone tone );
    
 public:
     static std::shared_ptr<SystemSoundAudioStream> create(
@@ -81,9 +82,11 @@ public:
     // aace::audio::AudioStream
     ssize_t read( char* data, const size_t size ) override;
     bool isClosed() override;
-    
+    std::vector<aace::audio::AudioStreamProperty> getProperties() override;
+
 private:
     std::shared_ptr<std::istream> m_stream;
+    alexaClientSDK::avsCommon::sdkInterfaces::SystemSoundPlayerInterface::Tone m_tone;
     bool m_closed;
 };
 

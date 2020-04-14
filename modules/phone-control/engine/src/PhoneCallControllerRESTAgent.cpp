@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ const std::string DEFAULT_PFM = "US";
 const std::string DEFAULT_USER_AGENT_VALUE = "AutoSDK/PhoneCallController/1.0";
 
 /// Default value for the HTTP request timeout.
-static const std::chrono::seconds DEFAULT_HTTP_TIMEOUT = std::chrono::seconds(5);
+static const std::chrono::seconds DEFAULT_HTTP_TIMEOUT = std::chrono::seconds(60);
 
 /// ACMS Endpoint 
 static const std::string ACMS_ENDPOINT = "https://alexa-comms-mobile-service-na.amazon.com";
@@ -154,7 +154,7 @@ static alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse doGet( const
         auto httpGet = alexaClientSDK::avsCommon::utils::libcurlUtils::HttpGet::create();
         ThrowIfNull( httpGet, "nullHttpGet" );
 
-        return httpGet->doGet( url, headers );
+        return httpGet->doGet( url, headers, DEFAULT_HTTP_TIMEOUT );
     } catch( std::exception& ex ) {
         AACE_ERROR( LX(TAG,"doGet").d("reason", ex.what() ) );
         return alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse();

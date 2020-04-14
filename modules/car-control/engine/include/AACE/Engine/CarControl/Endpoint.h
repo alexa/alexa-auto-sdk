@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -35,23 +35,68 @@ namespace carControl {
 class Endpoint {
 public:
     /**
-     * Create an @c Endpoint object.
+     * Create an @c Endpoint object from the specified JSON configuration.
+     * The provided JSON is expected to follow the format of a single endpoint
+     * entry of the "endpoints" array of "aace.carControl" configuration, e.g.
+     * @code
+     * {
+     * "endpointId": "driver.fan",
+     * "endpointResources": {
+     *      "friendlyNames": [
+     *          {
+     *              "@type": "asset",
+     *              "value": {
+     *                  "assetId": "Alexa.Automotive.DeviceName.Fan"
+     *              }
+     *          }
+     *      ]
+     * },
+     * "capabilities": [
+     *      {
+     *          "type": "AlexaInterface",
+     *          "interface": "Alexa.PowerController",
+     *          "version": "3",
+     *          "properties": {
+     *              "supported": [
+     *                  {
+     *                      "name": "powerState"
+     *                  }
+     *              ],
+     *              "proactivelyReported": false,
+     *              "retrievable": false
+     *          }
+     *      }
+     * ],
+     * "relationships": {
+     *      "isMemberOf": {
+     *          "zoneID": "zone.all"
+     *      }
+     * }
+     * }
+     * @endcode
      *
+     * @param endpointConfig The entry of the "endpoints" array of "aace.carControl" config used to construct
+     *        this endpoint.
+     * @param assetStore The @c AssetStore storing the asset friendly name literals used in the configuration
      * @return A pointer to a new @c Endpoint if arguments are valid, otherwise @c nullptr.
      */
-    static std::shared_ptr<Endpoint> create(const json& endpointConfig, AssetStore& assetStore);
+    static std::shared_ptr<Endpoint> create(const json& endpointConfig, const AssetStore& assetStore);
+
     /**
      * Endpoint destructor
      */
     ~Endpoint();
 
+    /**
+     * Get the configured endpoint ID for this endpoint
+     */
     std::string getId();
 
     /**
      * Constructs the AVS SDK representation of the endpoint for registration with the endpoint registration manager,
      * which includes the following:
      *  @li Creating the internal representation of this endpoint with an @c EndpointBuilder
-     *  @li Performing the translation of 'EndpointResources' to use multiple endpoints for multiple friendly names
+     *  @li Performing the translation of assetIds from 'EndpointResources' to the literal text representations
      *  @li Creating the internal representation of the capabilities of this endpoint by calling
      *  CapabilityController::build()
      *
@@ -60,7 +105,9 @@ public:
     bool build(
         std::shared_ptr<CarControlServiceInterface> carControlServiceInterface,
         std::shared_ptr<aace::engine::alexa::EndpointBuilderFactory> endpointBuilderFactory,
-        const std::string& manufacturer = "");
+        const AssetStore& assetStore,
+        const std::string& manufacturer = "",
+        const std::string& description = "");
 
     /**
      * Adds a controller with the specified ID to this endpoint
@@ -68,12 +115,20 @@ public:
     bool addController(const std::string& id, std::shared_ptr<CapabilityController> controller);
 
 private:
-    Endpoint(const std::string endpointId, const std::vector<std::string>& names);
+    /**
+     * Endpoint constructor
+     *
+     * @param endpointId The configured ID for this endpoint
+     * @param assetIds A complete list of asset IDs used to identify this endpoint
+     */
+    Endpoint(const std::string endpointId, const std::vector<std::string>& assetIds);
+
+    /// The configured endpoint ID for this endpoint
     std::string m_endpointId;
+
     /// A list of all asset IDs used to identify this endpoint's friendly names
     std::vector<std::string> m_assetIds;
-    /// A list of all friendly names used to identify this endpoint
-    std::vector<std::string> m_names;
+
     /// A map of controllers belonging to this endpoint keyed by controller id
     std::unordered_map<std::string, std::shared_ptr<CapabilityController>> m_controllers;
 };

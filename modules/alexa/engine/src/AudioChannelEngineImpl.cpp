@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ bool AudioChannelEngineImpl::initializeAudioChannel(
         m_audioOutputChannel = audioOutputChannel;
     
         // set the audio output channel engine interface
-        audioOutputChannel->setEngineInterface( shared_from_this() );
+        m_audioOutputChannel->setEngineInterface( shared_from_this() );
     
         // add the speaker impl to the speaker manager
         speakerManager->addSpeaker( shared_from_this() );
@@ -71,12 +71,19 @@ bool AudioChannelEngineImpl::initializeAudioChannel(
 
 void AudioChannelEngineImpl::doShutdown()
 {
+    AACE_INFO(LX(TAG));
+
     m_executor.shutdown();
 
     // reset the audio output channel engine interface
     if( m_audioOutputChannel != nullptr ) {
+        m_audioOutputChannel->stop();
         m_audioOutputChannel->setEngineInterface( nullptr );
         m_audioOutputChannel.reset();
+    }
+
+    if(auto reader = m_attachmentReader.lock()) {
+        reader->close();
     }
 
     // reset the media observer reference
@@ -121,8 +128,16 @@ void AudioChannelEngineImpl::sendEvent( PendingEventState state )
         });
     }
     else {
-        AACE_WARN(LX(TAG).d("reason","unhandledEventState").d("state",state));
+        AACE_WARN(LX(TAG).d("reason","unhandledEventState").d("state",state).d("m_currentId", m_currentId));
     }
+}
+
+int64_t AudioChannelEngineImpl::getMediaPosition() {
+    return m_audioOutputChannel->getPosition();
+}
+
+int64_t AudioChannelEngineImpl::getMediaDuration() {
+    return m_audioOutputChannel->getDuration();
 }
 
 //
@@ -289,7 +304,7 @@ void AudioChannelEngineImpl::executeMediaStateChanged( SourceId id, MediaState s
         m_currentMediaState = state;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("currentState",m_currentMediaState).d("newState",state).d("pendingEvent",m_pendingEventState));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("currentState",m_currentMediaState).d("newState",state).d("pendingEvent",m_pendingEventState).d("id", id));
     }
 }
 
@@ -320,7 +335,7 @@ void AudioChannelEngineImpl::executeMediaError( SourceId id, MediaError error, c
         m_currentId = ERROR;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("id", id));
     }
 }
 
@@ -359,7 +374,7 @@ void AudioChannelEngineImpl::executePlaybackStarted( SourceId id )
         handlePostPlaybackStarted( id );
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState",m_pendingEventState));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState",m_pendingEventState).d("id", id));
     }
 }
 
@@ -387,7 +402,7 @@ void AudioChannelEngineImpl::executePlaybackFinished( SourceId id )
         handlePostPlaybackFinished( id );
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState",m_pendingEventState));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState",m_pendingEventState).d("id", id));
     }
 }
 
@@ -410,7 +425,7 @@ void AudioChannelEngineImpl::executePlaybackPaused( SourceId id )
         }
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState",m_pendingEventState));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState",m_pendingEventState).d("id", id));
     }
 }
 
@@ -430,7 +445,7 @@ void AudioChannelEngineImpl::executePlaybackResumed( SourceId id )
         }
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState",m_pendingEventState));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState",m_pendingEventState).d("id", id));
     }
 }
 
@@ -453,7 +468,7 @@ void AudioChannelEngineImpl::executePlaybackStopped( SourceId id )
         }
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState",m_pendingEventState));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState",m_pendingEventState).d("id", id));
     }
 }
 
@@ -475,7 +490,7 @@ void AudioChannelEngineImpl::executePlaybackError( SourceId id, MediaError error
         m_currentId = ERROR;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("id", id).d("error", error).d("description", description));
     }
 }
 
@@ -495,7 +510,7 @@ void AudioChannelEngineImpl::executeBufferUnderrun( SourceId id )
         }
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("id", id));
     }
 }
 
@@ -515,7 +530,7 @@ void AudioChannelEngineImpl::executeBufferRefilled( SourceId id )
         }
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("id", id));
     }
 }
 
@@ -550,11 +565,13 @@ alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId Au
 
         auto outputChannel = m_audioOutputChannel;
         if ( outputChannel != nullptr ) {
-            ThrowIfNot( m_audioOutputChannel->prepare( AttachmentReaderAudioStream::create( attachmentReader, format ), false ), "audioOutputChannelSetStreamFailed" );
+            auto reader = AttachmentReaderAudioStream::create( attachmentReader, format );
+            m_attachmentReader = reader;
+            ThrowIfNot( m_audioOutputChannel->prepare( reader, false ), "audioOutputChannelSetStreamFailed" );
         }
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("id", m_currentId).d("type", "attachment"));
         resetSource();
     }
     
@@ -583,7 +600,7 @@ alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId Au
         }
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState",m_pendingEventState));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState",m_pendingEventState).d("repeat", repeat).d("id", m_currentId));
         resetSource();
     }
 
@@ -614,7 +631,7 @@ alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId Au
         }
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("url", url).d("repeat", repeat).d("id", m_currentId));
         resetSource();
     }
 
@@ -652,7 +669,7 @@ bool AudioChannelEngineImpl::play( alexaClientSDK::avsCommon::utils::mediaPlayer
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState",m_pendingEventState));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState",m_pendingEventState).d("id", id));
         return false;
     }
 }
@@ -726,7 +743,7 @@ bool AudioChannelEngineImpl::pause( alexaClientSDK::avsCommon::utils::mediaPlaye
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState",m_pendingEventState));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState",m_pendingEventState).d("id", id));
         return false;
     }
 }
@@ -765,7 +782,7 @@ bool AudioChannelEngineImpl::resume( alexaClientSDK::avsCommon::utils::mediaPlay
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState",m_pendingEventState));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState",m_pendingEventState).d("id", id));
         return false;
     }
 }
@@ -782,13 +799,24 @@ std::chrono::milliseconds AudioChannelEngineImpl::getOffset( alexaClientSDK::avs
         return offset;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("id", id));
         return std::chrono::milliseconds( 0 );
     }
 }
 
 uint64_t AudioChannelEngineImpl::getNumBytesBuffered() {
-    return 0;
+    try
+    {
+        if (m_audioOutputChannel != nullptr) {
+            return (uint64_t) m_audioOutputChannel->getNumBytesBuffered();
+        } else {
+            return 0;
+        }
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return 0;
+    }
 }
 
 void AudioChannelEngineImpl::addObserver( std::shared_ptr<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerObserverInterface> observer )
@@ -822,7 +850,7 @@ bool AudioChannelEngineImpl::setVolume( int8_t volume )
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("id", m_currentId).d("volume", volume));
         return false;
     }
 }
@@ -835,7 +863,7 @@ bool AudioChannelEngineImpl::adjustVolume( int8_t delta )
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("id", m_currentId).d("delta", delta));
         return false;
     }
 }
@@ -853,7 +881,7 @@ bool AudioChannelEngineImpl::setMute( bool mute )
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("id", m_currentId).d("mute", mute));
         return false;
     }
 }
@@ -867,7 +895,7 @@ bool AudioChannelEngineImpl::getSpeakerSettings( alexaClientSDK::avsCommon::sdkI
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("id", m_currentId));
         return false;
     }
 }
@@ -880,7 +908,7 @@ bool AudioChannelEngineImpl::validateSource( alexaClientSDK::avsCommon::utils::m
 {
     try
     {
-        ThrowIf( m_currentId != id, "invalidSource" )
+        ThrowIf( m_currentId != id, "invalidSource" );
         return true;
     }
     catch( std::exception& ex ) {
@@ -893,35 +921,78 @@ bool AudioChannelEngineImpl::validateSource( alexaClientSDK::avsCommon::utils::m
 // AttachmentReaderStream
 //
 
+using AudioFormat = AttachmentReaderAudioStream::AudioFormat;
+
+static AudioFormat DEFAULT_ATTACHMENT_AUDIO_FORMAT = AudioFormat(
+    AudioFormat::Encoding::MP3, AudioFormat::SampleFormat::UNKNOWN, AudioFormat::Layout::UNKNOWN, AudioFormat::Endianness::UNKNOWN, 0, 0, 0
+);
+    
 AttachmentReaderAudioStream::AttachmentReaderAudioStream(
     std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader> attachmentReader,
-    Encoding encoding ) :
+    const AudioFormat& format ) :
         m_attachmentReader( attachmentReader ),
         m_status( alexaClientSDK::avsCommon::avs::attachment::AttachmentReader::ReadStatus::OK ),
         m_closed( false ),
-        m_encoding( encoding ) {
+        m_audioFormat( format ) {
 }
 
 std::shared_ptr<AttachmentReaderAudioStream> AttachmentReaderAudioStream::create(
     std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader> attachmentReader,
     const alexaClientSDK::avsCommon::utils::AudioFormat* format ) {
 
-    Encoding encoding = Encoding::MP3;
-    
-    if( format != nullptr )
+    try
     {
+        ReturnIf( format == nullptr, std::shared_ptr<AttachmentReaderAudioStream>( new AttachmentReaderAudioStream( attachmentReader, DEFAULT_ATTACHMENT_AUDIO_FORMAT ) ) );
+
+        AudioFormat::Encoding encoding;
+        AudioFormat::Layout layout;
+        AudioFormat::Endianness endianess;
+
         switch( format->encoding )
         {
             case alexaClientSDK::avsCommon::utils::AudioFormat::Encoding::LPCM:
-                encoding = Encoding::LPCM;
+                encoding = AudioFormat::Encoding::LPCM;
                 break;
             case alexaClientSDK::avsCommon::utils::AudioFormat::Encoding::OPUS:
-                encoding = Encoding::OPUS;
+                encoding = AudioFormat::Encoding::OPUS;
                 break;
         }
+        
+        switch( format->layout )
+        {
+            case alexaClientSDK::avsCommon::utils::AudioFormat::Layout::INTERLEAVED:
+                layout = AudioFormat::Layout::INTERLEAVED;
+                break;
+            case alexaClientSDK::avsCommon::utils::AudioFormat::Layout::NON_INTERLEAVED:
+                layout = AudioFormat::Layout::NON_INTERLEAVED;
+                break;
+        }
+        
+        switch( format->endianness )
+        {
+            case alexaClientSDK::avsCommon::utils::AudioFormat::Endianness::BIG:
+                endianess = AudioFormat::Endianness::BIG;
+                break;
+            case alexaClientSDK::avsCommon::utils::AudioFormat::Endianness::LITTLE:
+                endianess = AudioFormat::Endianness::LITTLE;
+                break;
+        }
+        
+        return std::shared_ptr<AttachmentReaderAudioStream>(
+            new AttachmentReaderAudioStream( attachmentReader,
+                AudioFormat(
+                    encoding,
+                    format->dataSigned ? AudioFormat::SampleFormat::SIGNED : AudioFormat::SampleFormat::UNSIGNED,
+                    layout,
+                    endianess,
+                    format->sampleRateHz,
+                    format->sampleSizeInBits,
+                    format->numChannels )));
     }
-
-    return std::shared_ptr<AttachmentReaderAudioStream>( new AttachmentReaderAudioStream( attachmentReader, encoding ) );
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return nullptr;
+    }
 }
 
 ssize_t AttachmentReaderAudioStream::read( char* data, const size_t size )
@@ -937,18 +1008,23 @@ ssize_t AttachmentReaderAudioStream::read( char* data, const size_t size )
         return count;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG+".AttachmentReaderAudioStream").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG+".AttachmentReaderAudioStream").d("reason", ex.what()).d("size", size));
         m_closed = true;
         return 0;
     }
+}
+
+void AttachmentReaderAudioStream::close() {
+    m_attachmentReader->close(alexaClientSDK::avsCommon::avs::attachment::AttachmentReader::ClosePoint::IMMEDIATELY);
+    m_closed = true;
 }
 
 bool AttachmentReaderAudioStream::isClosed() {
     return m_closed;
 }
 
-AttachmentReaderAudioStream::Encoding AttachmentReaderAudioStream::getEncoding() {
-    return m_encoding;
+AudioFormat AttachmentReaderAudioStream::getAudioFormat() {
+    return m_audioFormat;
 }
 
 //
@@ -983,7 +1059,7 @@ ssize_t IStreamAudioStream::read( char* data, const size_t size )
         return count;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG+".IStreamAudioStream").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG+".IStreamAudioStream").d("reason", ex.what()).d("size", size));
         m_closed = true;
         return 0;
     }

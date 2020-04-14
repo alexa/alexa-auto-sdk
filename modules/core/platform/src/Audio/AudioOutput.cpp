@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -19,6 +19,10 @@ namespace aace {
 namespace audio {
 
 AudioOutput::~AudioOutput() = default; // key function
+
+int64_t AudioOutput::getNumBytesBuffered() {
+    return 0;
+}
 
 void AudioOutput::mediaStateChanged( MediaState state ) {
     if( auto m_audioOutputEngineInterface_lock = m_audioOutputEngineInterface.lock() ) {

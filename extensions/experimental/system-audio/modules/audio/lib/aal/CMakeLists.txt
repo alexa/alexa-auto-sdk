@@ -22,7 +22,7 @@ if(ENABLE_GSTREAMER)
 		${GST_APP_INCLUDE_DIRS}
 	)
 	list(APPEND AAL_MODULE_LIBRARIES
-		${GST_LDFLAGS}
+		${GST_LDFLAGS} -lgstaudio-1.0
 		${GST_APP_LDFLAGS}
 	)
 endif()
@@ -43,6 +43,8 @@ if(ENABLE_QSA)
 	add_definitions(-DCONFIG_QSA)
 	list(APPEND AAL_MODULE_SRC
 		src/qsa/core.c
+		src/qsa/player.c
+		src/qsa/recorder.c
 		lib/c-ringbuf/ringbuf.c
 	)
 	list(APPEND AAL_MODULE_INCLUDE_DIRS

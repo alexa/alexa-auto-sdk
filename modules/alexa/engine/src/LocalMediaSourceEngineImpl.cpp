@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -130,7 +130,7 @@ bool LocalMediaSourceEngineImpl::handleLogin( const std::string& localPlayerId, 
         Throw( "unsupportedLocalMediaSourceOperation" );
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"handleLogin").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG,"handleLogin").d("reason", ex.what()).d("playerId", localPlayerId).d("userName", userName).d("forceLogin", forceLogin));
         return false;
     }
 }
@@ -144,12 +144,12 @@ bool LocalMediaSourceEngineImpl::handleLogout( const std::string& localPlayerId 
         Throw( "unsupportedLocalMediaSourceOperation" );
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"handleLogout").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG,"handleLogout").d("reason", ex.what()).d("playerId", localPlayerId));
         return false;
     }
 }
 
-bool LocalMediaSourceEngineImpl::handlePlay( const std::string& localPlayerId, const std::string& playContextToken, int64_t index, std::chrono::milliseconds offset, bool preload, aace::alexa::ExternalMediaAdapter::Navigation navigation )
+bool LocalMediaSourceEngineImpl::handlePlay( const std::string& localPlayerId, const std::string& playContextToken, int64_t index, std::chrono::milliseconds offset, bool preload, aace::alexa::ExternalMediaAdapter::Navigation navigation, const std::string& playbackSessionId, const std::string& skillToken )
 {
     try
     {
@@ -169,10 +169,18 @@ bool LocalMediaSourceEngineImpl::handlePlay( const std::string& localPlayerId, c
         std::string selectionPayload = playContextToken.substr(separatorIndex + 1); //  i.e."98.7"
 
         ThrowIfNot( m_platformLocalMediaSource->play( contentSelector, selectionPayload ), "platformMediaAdapterPlayFailed" );
+        // set focus on successful play
+        ThrowIfNot( setFocus( m_localPlayerId, true ), "setFocusFailed" );
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"handlePlay").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG,"handlePlay").d("reason", ex.what()).d("playerId", localPlayerId).d("preload", preload));
+        // unset focus if playback fails
+        try {
+            ThrowIfNot( setFocus( m_localPlayerId, false ), "setFocusFailed" );
+        } catch( std::exception& ex ) {
+            AACE_ERROR(LX(TAG,"setFocus").d("reason", ex.what()));
+        }
         return false;
     }
 }
@@ -184,11 +192,20 @@ bool LocalMediaSourceEngineImpl::handlePlayControl( const std::string& localPlay
         AACE_VERBOSE(LX(TAG));
 
         ThrowIfNot( m_platformLocalMediaSource->playControl( playControlType ), "platformMediaAdapterPlayControlFailed" );
-    
+        // set focus on successful RESUME control
+        if ( playControlType == aace::alexa::ExternalMediaAdapter::PlayControlType::RESUME ) ThrowIfNot( setFocus( m_localPlayerId, true ), "setFocusFailed" );
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"handlePlayControl").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG,"handlePlayControl").d("reason", ex.what()).d("playerId", localPlayerId).d("playControlType", playControlType));
+        if ( playControlType ==  aace::alexa::ExternalMediaAdapter::PlayControlType::RESUME ) {
+            // unset focus if playback fails
+            try {
+                ThrowIfNot( setFocus( m_localPlayerId, false ), "setFocusFailed" );
+            } catch( std::exception& ex ) {
+                AACE_ERROR(LX(TAG,"setFocus").d("reason", ex.what()));
+            }
+        }
         return false;
     }
 }
@@ -204,7 +221,7 @@ bool LocalMediaSourceEngineImpl::handleSeek( const std::string& localPlayerId, s
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"handleSeek").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG,"handleSeek").d("reason", ex.what()).d("playerId", localPlayerId));
         return false;
     }
 }
@@ -220,12 +237,12 @@ bool LocalMediaSourceEngineImpl::handleAdjustSeek( const std::string& localPlaye
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"adjustSeek").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG,"adjustSeek").d("reason", ex.what()).d("playerId", localPlayerId));
         return false;
     }
 }
 
-bool LocalMediaSourceEngineImpl::handleGetAdapterState( const std::string& localPlayerId, alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::AdapterState& state )
+bool LocalMediaSourceEngineImpl::handleGetAdapterState( const std::string& localPlayerId, aace::engine::alexa::AdapterState& state )
 {
     try
     {
@@ -274,7 +291,7 @@ bool LocalMediaSourceEngineImpl::handleGetAdapterState( const std::string& local
         state.playbackState.trackOffset = platformState.playbackState.trackOffset;
         state.playbackState.shuffleEnabled = platformState.playbackState.shuffleEnabled;
         state.playbackState.repeatEnabled = platformState.playbackState.repeatEnabled;
-        state.playbackState.favorites = static_cast<alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::Favorites>( platformState.playbackState.favorites );
+        state.playbackState.favorites = static_cast<aace::engine::alexa::Favorites>( platformState.playbackState.favorites );
         state.playbackState.type = platformState.playbackState.type;
         state.playbackState.playbackSource = platformState.playbackState.playbackSource;
         state.playbackState.playbackSourceId = platformState.playbackState.playbackSourceId;
@@ -291,11 +308,11 @@ bool LocalMediaSourceEngineImpl::handleGetAdapterState( const std::string& local
         state.playbackState.largeURL = platformState.playbackState.largeURL;
         state.playbackState.coverId = platformState.playbackState.coverId;
         state.playbackState.mediaProvider = platformState.playbackState.mediaProvider;
-        state.playbackState.mediaType = static_cast<alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::MediaType>( platformState.playbackState.mediaType );
+        state.playbackState.mediaType = static_cast<aace::engine::alexa::MediaType>( platformState.playbackState.mediaType );
         state.playbackState.duration = platformState.playbackState.duration;
         
         // convert AAC SupportedPlaybackOperation to AVS SupportedPlaybackOperation
-        using avsSupportedPlaybackOperation = alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::SupportedPlaybackOperation;
+        using avsSupportedPlaybackOperation = aace::engine::alexa::SupportedPlaybackOperation;
 
         for( auto nextOp : platformState.playbackState.supportedOperations ) {
             switch( nextOp ) {
@@ -359,7 +376,7 @@ bool LocalMediaSourceEngineImpl::handleGetAdapterState( const std::string& local
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"handleGetAdapterState").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG,"handleGetAdapterState").d("reason", ex.what()).d("playerId", localPlayerId));
         return false;
     }
 }
@@ -423,7 +440,7 @@ bool LocalMediaSourceEngineImpl::handleSetMute( bool mute )
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("mute", mute));
         return false;
     }
 }
@@ -449,7 +466,7 @@ void LocalMediaSourceEngineImpl::onPlayerEvent( const std::string& eventName )
         m_messageSender_lock->sendMessage( request );
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"onPlayerEvent").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG,"onPlayerEvent").d("reason", ex.what()).d("eventName", eventName));
     }
 }
 
@@ -473,15 +490,15 @@ void LocalMediaSourceEngineImpl::onPlayerError( const std::string& errorName, lo
         m_messageSender_lock->sendMessage( request );
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"onPlayerError").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG,"onPlayerError").d("reason", ex.what()).d("errorName", errorName).d("code", code).d("description", description).d("fatal", fatal));
     }
 }
 
-void LocalMediaSourceEngineImpl::onSetFocus()
+void LocalMediaSourceEngineImpl::onSetFocus( bool focusAcquire )
 {
     try
     {
-        ThrowIfNot( setFocus( m_localPlayerId ), "setFocusFailed" );
+        ThrowIfNot( setFocus( m_localPlayerId, focusAcquire ), "setFocusFailed" );
     }
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"onSetFocus").d("reason", ex.what()));
@@ -499,6 +516,7 @@ void LocalMediaSourceEngineImpl::doShutdown()
     }
 
     m_messageSender.reset();
+    ExternalMediaAdapterHandler::doShutdown();
 }
 
 } // aace::engine::alexa

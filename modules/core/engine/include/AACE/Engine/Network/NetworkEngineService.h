@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 #define AACE_ENGINE_NETWORK_NETWORK_ENGINE_SERVICE_H
 
 #include "AACE/Engine/Core/EngineService.h"
+#include "AACE/Engine/PropertyManager/PropertyManagerServiceInterface.h"
+#include "AACE/Engine/PropertyManager/PropertyManagerEngineService.h"
 #include "AACE/Network/NetworkInfoProvider.h"
 
 #include "NetworkInfoProviderEngineImpl.h"
@@ -27,18 +29,25 @@ namespace network {
 
 class NetworkEngineService : public aace::engine::core::EngineService {
 public:
-    DESCRIBE("aace.network",VERSION("1.0"))
+    DESCRIBE("aace.network",VERSION("1.0"),
+        DEPENDS(aace::engine::propertyManager::PropertyManagerEngineService))
 
 private:
     NetworkEngineService( const aace::engine::core::ServiceDescription& description );
     
 public:
     virtual ~NetworkEngineService() = default;
+    using SetPropertyResultCallback = std::function<void(const std::string&, const std::string&, const std::string&)>;
+    bool setProperty_networkInterface(
+        const std::string& value,
+        bool& changed,
+        bool& async,
+        const SetPropertyResultCallback& callbackFunction);
+    std::string getProperty_networkInterface();
     
 protected:
+    bool initialize() override;
     bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) override;
-    bool setProperty( const std::string& key, const std::string& value ) override;
-    std::string getProperty( const std::string& key ) override;
 
 private:
 
@@ -50,7 +59,8 @@ private:
     }
     
     bool registerPlatformInterfaceType( std::shared_ptr<aace::network::NetworkInfoProvider> networkInfoProvider );
-
+    bool registerProperties();
+    
 private:
     std::shared_ptr<NetworkInfoProviderEngineImpl> m_networkInfoProviderEngineImpl;
     std::shared_ptr<aace::network::NetworkInfoProvider> m_networkInfoProvider;

@@ -56,6 +56,11 @@ while [[ $# -gt 0 ]]; do
 		FORCE_DOCKER="1"
 		shift
 		;;
+		--enable-coverage)
+		ENABLE_COVERAGE=1
+		EXTRA_CONFS+=("-DAAC_ENABLE_COVERAGE")
+		shift
+		;;
 		-D*=*)
 		EXTRA_CONFS+=("${1:2}")
 		shift
@@ -323,6 +328,11 @@ execute_bitbake() {
 copy_images() {
 	mkdir -p ${DEPLOY_DIR}/${TARGET}
 	cp -P ${BUILD_DIR}/tmp*/deploy/images/${TARGET}/${PACKAGE}* ${DEPLOY_DIR}/${TARGET} 2>/dev/null || :
+	if [ "${ENABLE_COVERAGE}" = "1" ]; then
+		note "Copying coverage metadata files to ${DEPLOY_DIR}/${TARGET}/coverage/"
+		mkdir -p ${DEPLOY_DIR}/${TARGET}/coverage
+		find ${BUILD_DIR}/tmp*/ -name "*.gcno" | xargs cp -ft ${DEPLOY_DIR}/${TARGET}/coverage
+	fi
 }
 
 build() {

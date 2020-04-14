@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -70,15 +70,10 @@ protected:
         {
             EXPECT_CALL(*m_alexaMockFactory->getAudioManagerMock(),openAudioOutputChannel("Alerts",aace::audio::AudioOutputProvider::AudioOutputType::ALARM))
                 .WillOnce(testing::Return(m_alexaMockFactory->getAudioOutputChannelMock()));
-            EXPECT_CALL(*m_alexaMockFactory->getAudioOutputChannelMock(),setEngineInterface(testing::_)).Times(testing::Exactly(2));;
             EXPECT_CALL(*m_alexaMockFactory->getMessageStorageMock(),open()).WillOnce(::testing::Return(true));
-            EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),addDirectiveHandler(testing::_)).WillOnce(testing::Return(true));
             EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),doShutdown());
-            EXPECT_CALL(*m_alexaMockFactory->getContextManagerInterfaceMock(),setState(testing::_, testing::_,testing::_,testing::_));
             EXPECT_CALL(*m_alexaMockFactory->getAVSConnectionManagerInterfaceMock(),addConnectionStatusObserver(testing::_)).Times(testing::AtLeast(1));
             EXPECT_CALL(*m_alexaMockFactory->getAVSConnectionManagerInterfaceMock(),removeConnectionStatusObserver(testing::_)).Times(testing::AtLeast(1));
-            EXPECT_CALL(*m_alexaMockFactory->getFocusManagerInterfaceMock(),addObserver(testing::_));
-            EXPECT_CALL(*m_alexaMockFactory->getSpeakerManagerInterfaceMock(), addSpeakerManagerObserver(testing::_)).Times(testing::AtLeast(1));
             EXPECT_CALL(*m_alexaMockFactory->getSpeakerManagerInterfaceMock(), addSpeaker(testing::_)).Times(testing::AtLeast(1));
             EXPECT_CALL(*m_alexaMockFactory->getSpeakerManagerInterfaceMock(), getSpeakerSettings(testing::_,testing::_))
                 .WillRepeatedly(testing::Invoke([](alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::Type, alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::SpeakerSettings*) {
@@ -96,7 +91,6 @@ protected:
         if( m_configured == false ) {
             configure();
         }
-
         auto alertsEngineImpl = aace::engine::alexa::AlertsEngineImpl::create(
             m_alexaMockFactory->getAlertsMock(),
             m_alexaMockFactory->getAudioManagerMock(),

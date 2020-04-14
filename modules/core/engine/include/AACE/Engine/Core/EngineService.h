@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -81,8 +81,6 @@ protected:
     virtual bool stop();
     virtual bool shutdown();
     virtual bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface );
-    virtual bool setProperty( const std::string& key, const std::string& value );
-    virtual std::string getProperty( const std::string& key );
 
     std::shared_ptr<aace::engine::core::EngineContext> getContext();
 

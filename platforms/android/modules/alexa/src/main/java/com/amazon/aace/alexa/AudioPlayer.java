@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -95,11 +95,38 @@ public class AudioPlayer extends PlatformInterface
     }
 
     /**
+     * Used when audio time is unknown or indeterminate.
+     */
+    static public final long TIME_UNKNOWN = -1;
+
+    /**
      * Notifies the platform implementation of a change in audio playback state
      *
      * @param  state The new playback state
      */
     public void playerActivityChanged( PlayerActivity state ) {
+    }
+
+    /**
+     * Returns the current playback position of the audio player.
+     * If the audio source is not playing, the most recent position played
+     * will be returned.
+     *
+     * @return The audio player's playback position in milliseconds, 
+     * or @c TIME_UNKNOWN if the current media position is unknown or invalid.
+     */
+    final public long getPlayerPosition() {
+        return getPlayerPosition( getNativeRef() );
+    }
+
+    /**
+     * Returns the playback duration of the audio player.
+     *
+     * @return The audio player's playback duration in milliseconds,
+     * or @c TIME_UNKNOWN if the current media position is unknown or invalid.
+     */
+    final public long getPlayerDuration() {
+        return getPlayerDuration( getNativeRef() );
     }
 
     // NativeRef implementation
@@ -114,6 +141,8 @@ public class AudioPlayer extends PlatformInterface
     // Native Engine JNI methods
     private native long createBinder();
     private native void disposeBinder( long nativeRef );
+    private native long getPlayerPosition( long nativeRef );
+    private native long getPlayerDuration( long nativeRef );
 }
 
 

@@ -11,7 +11,7 @@ The purpose of the C++ Sample App is to provide useful example code to help you 
 * [Running the C++ Sample App](#running-the-c-sample-app)
 * [Using the C++ Sample App](#using-the-c-sample-app)
 * [Troubleshooting](#troubleshooting)
-* [Release Notes](#v210-release-notes)
+* [Release Notes](#v220-release-notes)
 
 ## Prerequisites <a id="prerequisites"></a>
 
@@ -221,21 +221,20 @@ The Sample App does not configure SiriusXM as a local media source by default. I
     
     To resolve this, edit the `samples/cpp/assets/config.json` file and choose a unique serial number.
 
-## v2.1.0 Release Notes <a id = "v210-release-notes"></a>
+## v2.2.0 Release Notes <a id = "v220-release-notes"></a>
 ### Enhancements
-
-The C++ Sample App now provides multimedia support for QNX, which allows you to use the C++ Sample App on QNX platforms with live audio input and output.
-
->**Note:** The SHOUTcast/lcecast streaming format is not supported.
+* Added a **TimeZone** option to the menu. The supported values are stored in the [menu.json file](./assets/menu.json).
+* Added playback control options for music (such as play, pause, stop, rewind, and shuffle) to the menu.
+* Updated the System Audio extension to include the ability to parse audio playlist source types.
 
 ### Resolved Issues
-
-* Fixed an issue where if you were using the C++ Sample App with the optional Local Voice Control (LVC) extension, the LVC extension might be delayed in response for up to a few minutes if both the Sample App and the LVC processes are initiated in quick succession of each other.
+* Fixed an issue where the C++ Sample App local media source did not pause when switching to music streams such as Amazon Music or SiriusXM.
 
 ### Known Issues
 * Alarms and music playback cannot be muted separately on QNX platforms using the C++ Sample App.
-* The C++ Sample App local media source does not pause when switching to music streams such as Amazon Music or SiriusXM.
+* You may experience volume control issues when running the C++ Sample App on QNX. These issues are caused by a known OpenMAX AL (application layer) problem that has been resolved in the 11/28/19 release of QNX Multimedia Suite 2.0. Please contact QNX directly to obtain the fix.
+* You may experience intermittent distorted audio when streaming SiriusXM on the QNX platform.
 * Increasing/decreasing speaker volume in quick succession causes lag and delayed responses from Alexa.
-* Using the C++ Sample App to play Audible books on Poky Linux for iMX8 (ARM 64-bit) is not supported.
+* Using the C++ Sample App to play Audible books or Amazon Music is not supported on Poky Linux for iMX8 (ARM 64-bit).
 
 Refer to the [System Audio extension README](../../extensions/experimental/system-audio/README.md) for known issues related to audio.

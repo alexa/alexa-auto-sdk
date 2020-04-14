@@ -93,6 +93,10 @@
     <string name="alexa_locale">ALEXA LOCALE</string>
     <string name="locale_text">SELECTED LOCALE</string>
 
+    <!-- Timezone -->
+    <string name="timezone">TIMEZONE</string>
+    <string name="timezone_text">SELECTED TIMEZONE</string>
+
     <!-- Alerts -->
     <string name="alerts">ALERTS</string>
     <string name="alerts_state">ALERT STATE:</string>

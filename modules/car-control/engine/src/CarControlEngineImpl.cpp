@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -36,12 +36,12 @@ CarControlEngineImpl::CarControlEngineImpl(std::shared_ptr<aace::carControl::Car
 }
 
 bool CarControlEngineImpl::turnPowerControllerOn(const std::string& endpointId) {
-    AACE_INFO(LX(POWER_CONTROLLER_TAG).d("endpoint", endpointId).d("name", "TurnOn"));
+    AACE_DEBUG(LX(POWER_CONTROLLER_TAG).sensitive("endpoint", endpointId).sensitive("name", "TurnOn"));
     return m_platformInterface->turnPowerControllerOn(endpointId);
 }
 
 bool CarControlEngineImpl::turnPowerControllerOff(const std::string& endpointId) {
-    AACE_INFO(LX(POWER_CONTROLLER_TAG).d("endpoint", endpointId).d("name", "TurnOff"));
+    AACE_DEBUG(LX(POWER_CONTROLLER_TAG).sensitive("endpoint", endpointId).sensitive("name", "TurnOff"));
     return m_platformInterface->turnPowerControllerOff(endpointId);
 }
 
@@ -50,12 +50,18 @@ bool CarControlEngineImpl::isPowerControllerOn(const std::string& endpointId, bo
 }
 
 bool CarControlEngineImpl::turnToggleControllerOn(const std::string& endpointId, const std::string& instance) {
-    AACE_INFO(LX(TOGGLE_CONTROLLER_TAG).d("endpoint", endpointId).d("name", "TurnOn").d("instance", instance));
+    AACE_DEBUG(LX(TOGGLE_CONTROLLER_TAG)
+                  .sensitive("endpoint", endpointId)
+                  .sensitive("name", "TurnOn")
+                  .sensitive("instance", instance));
     return m_platformInterface->turnToggleControllerOn(endpointId, instance);
 }
 
 bool CarControlEngineImpl::turnToggleControllerOff(const std::string& endpointId, const std::string& instance) {
-    AACE_INFO(LX(TOGGLE_CONTROLLER_TAG).d("endpoint", endpointId).d("name", "TurnOff").d("instance", instance));
+    AACE_DEBUG(LX(TOGGLE_CONTROLLER_TAG)
+                  .sensitive("endpoint", endpointId)
+                  .sensitive("name", "TurnOff")
+                  .sensitive("instance", instance));
     return m_platformInterface->turnToggleControllerOff(endpointId, instance);
 }
 
@@ -70,7 +76,11 @@ bool CarControlEngineImpl::setRangeControllerValue(
     const std::string& endpointId,
     const std::string& instance,
     double value) {
-    AACE_INFO(LX(RANGE_CONTROLLER_TAG).d("endpoint", endpointId).d("name", "SetRangeValue").d("instance", instance).d("rangeValue", value));
+    AACE_DEBUG(LX(RANGE_CONTROLLER_TAG)
+                  .sensitive("endpoint", endpointId)
+                  .sensitive("name", "SetRangeValue")
+                  .sensitive("instance", instance)
+                  .sensitive("rangeValue", value));
     return m_platformInterface->setRangeControllerValue(endpointId, instance, value);
 }
 
@@ -78,7 +88,11 @@ bool CarControlEngineImpl::adjustRangeControllerValue(
     const std::string& endpointId,
     const std::string& instance,
     double delta) {
-    AACE_INFO(LX(RANGE_CONTROLLER_TAG).d("endpoint", endpointId).d("name", "AdjustRangeValue").d("instance", instance).d("rangeValueDelta", delta));
+    AACE_DEBUG(LX(RANGE_CONTROLLER_TAG)
+                  .sensitive("endpoint", endpointId)
+                  .sensitive("name", "AdjustRangeValue")
+                  .sensitive("instance", instance)
+                  .sensitive("rangeValueDelta", delta));
     return m_platformInterface->adjustRangeControllerValue(endpointId, instance, delta);
 }
 
@@ -93,7 +107,11 @@ bool CarControlEngineImpl::setModeControllerValue(
     const std::string& endpointId,
     const std::string& instance,
     const std::string& value) {
-    AACE_INFO(LX(MODE_CONTROLLER_TAG).d("endpoint", endpointId).d("name", "SetMode").d("instance", instance).d("mode", value));
+    AACE_DEBUG(LX(MODE_CONTROLLER_TAG)
+                  .sensitive("endpoint", endpointId)
+                  .sensitive("name", "SetMode")
+                  .sensitive("instance", instance)
+                  .sensitive("mode", value));
     return m_platformInterface->setModeControllerValue(endpointId, instance, value);
 }
 
@@ -101,7 +119,11 @@ bool CarControlEngineImpl::adjustModeControllerValue(
     const std::string& endpointId,
     const std::string& instance,
     int delta) {
-    AACE_INFO(LX(MODE_CONTROLLER_TAG).d("endpoint", endpointId).d("name", "AdjustMode").d("instance", instance).d("modeDelta", delta));
+    AACE_DEBUG(LX(MODE_CONTROLLER_TAG)
+                  .sensitive("endpoint", endpointId)
+                  .sensitive("name", "AdjustMode")
+                  .sensitive("instance", instance)
+                  .sensitive("modeDelta", delta));
     return m_platformInterface->adjustModeControllerValue(endpointId, instance, delta);
 }
 
@@ -113,7 +135,9 @@ bool CarControlEngineImpl::getModeControllerValue(
 }
 
 void CarControlEngineImpl::doShutdown() {
-    m_platformInterface.reset();
+    if (m_platformInterface != nullptr) {
+        m_platformInterface.reset();
+    }
 }
 
 }  // namespace carControl

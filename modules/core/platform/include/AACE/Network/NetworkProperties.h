@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -23,11 +23,11 @@ namespace network {
 namespace property {
 
 /**
- * This property is used with Engine::setProperty() to set the network interface to be used
- * for the network connection. The value must be an IP address or network interface name.
- *
- * Return @true if successful in switching the network interface otherwise @false
- */
+ * This property is used with
+ * aace::propertyManager::PropertyManager::setProperty() to set the network
+ * interface to be used for the network connection. The value must be an IP
+ * address or network interface name.
+*/
 static const std::string NETWORK_INTERFACE = "aace.network.networkInterface";
 
 } // aace::network::property

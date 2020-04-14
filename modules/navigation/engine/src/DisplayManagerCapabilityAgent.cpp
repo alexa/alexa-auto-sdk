@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -154,11 +154,11 @@ alexaClientSDK::avsCommon::avs::DirectiveHandlerConfiguration displaymanager::Di
 DisplayManagerCapabilityAgent::DisplayManagerCapabilityAgent( std::shared_ptr<aace::engine::navigation::NavigationHandlerInterface> navigationHandler, std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager ) :
-    m_navigationHandler{ navigationHandler },
     alexaClientSDK::avsCommon::avs::CapabilityAgent{NAMESPACE, exceptionSender},
     alexaClientSDK::avsCommon::utils::RequiresShutdown{"DisplayManagerCapabilityAgent"},
-    m_messageSender{ messageSender },
-    m_contextManager{ contextManager } {
+    m_navigationHandler{ navigationHandler },
+    m_contextManager{ contextManager },
+    m_messageSender{ messageSender } {
     m_capabilityConfigurations.insert( getDisplayManagerCapabilityConfiguration() );
 }
 

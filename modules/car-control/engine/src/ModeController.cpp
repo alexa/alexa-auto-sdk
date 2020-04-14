@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ std::shared_ptr<ModeController> ModeController::create(
     const json& controllerConfig,
     const std::string& endpointId,
     const std::string& interface,
-    AssetStore& assetStore) {
+    const AssetStore& assetStore) {
     try {
         std::string instance = controllerConfig.at("instance");
         ThrowIf(instance.empty(), "missingInstance");
@@ -46,14 +46,14 @@ std::shared_ptr<ModeController> ModeController::create(
             alexaClientSDK::capabilityAgents::modeController::ModeControllerAttributeBuilder::create();
         alexaClientSDK::avsCommon::avs::CapabilityResources capabilityResources;
 
-        auto locale = assetStore.getLocale();
         auto& friendlyNames = controllerConfig.at("capabilityResources").at("friendlyNames");
         for (auto& item : friendlyNames.items()) {
+            // Note: this is assuming the friendly name label is "asset" type
             auto& value = item.value().at("value");
             std::string assetId = value.at("assetId");
-            const std::vector<std::string>& names = assetStore.getValues(assetId);
+            const std::vector<AssetStore::NameLocalePair>& names = assetStore.getFriendlyNames(assetId);
             for (auto name = names.begin(); name != names.end(); ++name) {
-                capabilityResources.addFriendlyNameWithText(*name, locale);
+                capabilityResources.addFriendlyNameWithText(name->first, name->second);
             }
         }
         attributeBuilder->withCapabilityResources(capabilityResources);
@@ -73,9 +73,9 @@ std::shared_ptr<ModeController> ModeController::create(
             for (auto& item : friendlyNames.items()) {
                 auto& value = item.value().at("value");
                 std::string assetId = value.at("assetId");
-                const std::vector<std::string>& names = assetStore.getValues(assetId);
+                const std::vector<AssetStore::NameLocalePair>& names = assetStore.getFriendlyNames(assetId);
                 for (auto name = names.begin(); name != names.end(); ++name) {
-                    modeResources.addFriendlyNameWithText(*name, locale);
+                    modeResources.addFriendlyNameWithText(name->first, name->second);
                 }
             }
             attributeBuilder->addMode(value, modeResources);

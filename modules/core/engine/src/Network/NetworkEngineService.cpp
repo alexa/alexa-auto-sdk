@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 #include "AACE/Engine/Network/NetworkEngineService.h"
 #include "AACE/Engine/Core/EngineMacros.h"
+#include "AACE/Engine/Utils/String/StringUtils.h"
 
 #include "AACE/Network/NetworkProperties.h"
 
@@ -33,6 +34,43 @@ REGISTER_SERVICE(NetworkEngineService);
 NetworkEngineService::NetworkEngineService( const aace::engine::core::ServiceDescription& description ) : aace::engine::core::EngineService( description ) {
 }
 
+bool NetworkEngineService::initialize() {
+    
+    try {
+        ThrowIfNot( registerProperties(), "registerPropertiesFailed" );
+        return true;
+    }
+    catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
+    
+}
+    
+bool NetworkEngineService::registerProperties() {
+    
+    try {
+        // get the property engine service interface from the property manager service
+        auto propertyManager = getContext()->getServiceInterface<aace::engine::propertyManager::PropertyManagerServiceInterface>("aace.propertyManager");
+        ThrowIfNull( propertyManager, "nullPropertyManagerServiceInterface" );
+
+        propertyManager->registerProperty(aace::engine::propertyManager::PropertyDescription(
+            aace::network::property::NETWORK_INTERFACE,
+            std::bind(
+                &NetworkEngineService::setProperty_networkInterface,
+                this,
+                std::placeholders::_1,
+                std::placeholders::_2,
+                std::placeholders::_3,
+                std::placeholders::_4),
+            std::bind(&NetworkEngineService::getProperty_networkInterface, this)));
+        return true;
+    }
+    catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
+}
 bool NetworkEngineService::registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface )
 {
     try
@@ -74,36 +112,35 @@ bool NetworkEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::
     }
 }
 
-bool NetworkEngineService::setProperty( const std::string& key, const std::string& value )
-{
+bool NetworkEngineService::setProperty_networkInterface(
+    const std::string& value,
+    bool& changed,
+    bool& async,
+    const SetPropertyResultCallback& callbackFunction) {
     try
     {
-        if( key.compare( aace::network::property::NETWORK_INTERFACE ) == 0 )
-        {
-            ThrowIfNot( m_networkInfoProviderEngineImpl->setNetworkInterface( value ), "setNetworkInterfaceFailed" );
-        }
-        else {
-            return false;
-        }
-
+        AACE_INFO(LX(TAG).sensitive("value",value));
+        ReturnIf( aace::engine::utils::string::equal(value, getProperty_networkInterface() ), true );
+        ThrowIfNot( m_networkInfoProviderEngineImpl->setNetworkInterface( value ), "setNetworkInterfaceFailed" );
+        changed = true;
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"setProperty").d("reason", ex.what()).d("key",key).d("value",value));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("value",value));
         return false;
     }
 }
 
-std::string NetworkEngineService::getProperty( const std::string& key )
+std::string NetworkEngineService::getProperty_networkInterface()
 {
     try
     {
-        if( key.compare( aace::network::property::NETWORK_INTERFACE ) == 0 ) {
-            return m_networkInfoProviderEngineImpl->getNetworkInterface();
-        }
+        AACE_INFO(LX(TAG));
+        return m_networkInfoProviderEngineImpl->getNetworkInterface();
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"getProperty").d("reason", ex.what()).d("key",key));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return "";
     }
     
     return std::string();

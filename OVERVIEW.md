@@ -64,7 +64,7 @@ The Alexa Communications extension enables integration with Alexa-to-Alexa calli
 To install the optional Alexa Communications extension, you must download the appropriate archive version from the [Auto SDK Alexa Comms Extension resources directory](https://developer.amazon.com/alexa/console/avs/preview/resources/details/Auto%20SDK%20Alexa%20Comms%20Extension).
 
 ### Local Voice Control (LVC) extension <a id="local-voice-control-extension"></a>
-The Local Voice Control (LVC) extension provides car control, communication, navigation, and entertainment functionality, with and without an internet connection. It includes components that run an Alexa endpoint inside the vehicle's head unit. Local Voice Control is currently supported on Linux x86 64-bit, Linux ARM 32/64-bit, Android x86 32/64-bit, and Android ARM 32/64-bit platforms.
+The Local Voice Control (LVC) extension provides car control, communication, navigation, and entertainment functionality, with and without an internet connection. It includes components that run an Alexa endpoint inside the vehicle's head unit. Local Voice Control is currently supported on Linux x86 64-bit, Linux ARM 32/64-bit, Android x86 64-bit, and Android ARM 32/64-bit platforms.
 
 To install the optional LVC extension, you must download the appropriate archive version from the [Auto SDK Local Voice Control Extension resources directory](https://developer.amazon.com/alexa/console/avs/preview/resources/details/Auto%20SDK%20Local%20Voice%20Control%20Extension).
 
@@ -74,6 +74,6 @@ The Device Client Metrics (DCM) extension enables logging and uploading Alexa Au
 To install the optional DCM extension, you must download the appropriate archive version from the [Auto SDK Device Metric Upload Service Extension resources directory](https://developer.amazon.com/alexa/console/avs/preview/resources/details/Auto%20SDK%20Metric%20Upload%20Service%20Extension).
 
 ### Voice Chrome for Android extension <a id="voice-chrome-extension"></a>
-The Voice Chrome extension adds Voice Chrome support to the Auto SDK for Android x86 32/64-bit and Android ARM 32/64-bit platforms. Voice Chrome provides a consistent set of visual cues representing Alexa attention state across a range of Alexa-enabled devices. The Voice Chrome extension includes a prebuilt Android AAR library for easy integration with your applications, as well as a patch to the Android Sample App that adds the Voice Chrome functionality.
+The Voice Chrome extension adds Voice Chrome support to the Auto SDK for Android x86 64-bit and Android ARM 32/64-bit platforms. Voice Chrome provides a consistent set of visual cues representing Alexa attention state across a range of Alexa-enabled devices. The Voice Chrome extension includes a prebuilt Android AAR library for easy integration with your applications, as well as a patch to the Android Sample App that adds the Voice Chrome functionality.
 
 To install the optional Voice Chrome for Android extension, you must download the appropriate archive version from the [Auto SDK Voice Chrome Extension resources directory](https://developer.amazon.com/alexa/console/avs/preview/resources/details/Auto%20SDK%20Voice%20Chrome%20Extension).

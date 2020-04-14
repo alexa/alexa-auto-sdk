@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -27,6 +27,9 @@
 // Guidelines Support Library
 #define GSL_THROW_ON_CONTRACT_VIOLATION
 #include <gsl/contracts.h>
+
+#define MAKE_STR(x) _MAKE_STR(x)
+#define _MAKE_STR(x) #x
 
 namespace sampleApp {
 
@@ -104,6 +107,14 @@ std::string ApplicationContext::getApplicationPath() { return m_applicationPath;
 std::string ApplicationContext::getAudioInputDevice() { return m_audioInputDevice; }
 
 std::string ApplicationContext::getBrowserCommand() { return m_browserCommand; }
+
+std::string ApplicationContext::getBuildIdentifier() {
+     #ifdef BUILD_IDENTIFIER
+        return MAKE_STR(BUILD_IDENTIFIER);
+     #else
+        return "";
+     #endif // BUILD_IDENTIFIER
+}
 
 std::string ApplicationContext::getConfigFilePath(size_t index) { return m_configFilePaths[index]; }
 
@@ -274,6 +285,22 @@ void ApplicationContext::setPayloadScriptCommand(const std::string &payloadScrip
 void ApplicationContext::setSingleThreadedUI(bool singleThreadedUI) { m_singleThreadedUI = singleThreadedUI; }
 
 void ApplicationContext::setUserConfigFilePath(const std::string &userConfigFilePath) { m_userConfigFilePath = userConfigFilePath; };
+
+#ifdef COASSISTANT
+void ApplicationContext::setDefaultAssistant(const std::string &assistant) { m_defaultAssistant = assistant; }
+
+std::string ApplicationContext::getDefaultAssistant() {
+    transform(m_defaultAssistant.begin(), m_defaultAssistant.end(), m_defaultAssistant.begin(), ::toupper);
+    return m_defaultAssistant;
+}
+
+void ApplicationContext::setActingAssistant(const std::string &assistant) { m_actingAssistant = assistant; }
+
+std::string ApplicationContext::getActingAssistant() {
+    transform(m_actingAssistant.begin(), m_actingAssistant.end(), m_actingAssistant.begin(), ::toupper);
+    return m_actingAssistant;
+}
+#endif
 
 // private
 

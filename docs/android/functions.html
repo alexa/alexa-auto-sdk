@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">2.1.0</span>
+   &#160;<span id="projectnumber">2.2.0</span>
    </div>
   </td>
  </tr>
@@ -340,6 +340,9 @@ $(function() {
 <li>createEqualizerControllerConfig()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1config_1_1_alexa_configuration.html#a1658a973095541d26d06ce451654bb21">com.amazon.aace.alexa.config.AlexaConfiguration</a>
 </li>
+<li>createExternalMediaPlayerConfig()
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1config_1_1_alexa_configuration.html#a5a25037353f7f03af8462240aedbc5ea">com.amazon.aace.alexa.config.AlexaConfiguration</a>
+</li>
 <li>createFileSinkConfig()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1logger_1_1config_1_1_logger_configuration.html#abbb56f552fcde3ca7e2f9fbed732a04c">com.amazon.aace.logger.config.LoggerConfiguration</a>
 </li>
@@ -394,6 +397,9 @@ $(function() {
 </li>
 <li>DEFAULT
 : <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter_1_1_navigation.html#a341b202427ebbd1a72b09440e1faae51">com.amazon.aace.alexa.ExternalMediaAdapter.Navigation</a>
+</li>
+<li>DELETED
+: <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alerts_1_1_alert_state.html#ad649eccb44e9f6b6edc1c053b15a6f14">com.amazon.aace.alexa.Alerts.AlertState</a>
 </li>
 <li>deviceConfigurationUpdated()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#ad7d3413ded20b937afc728931005c122">com.amazon.aace.phonecontrol.PhoneCallController</a>
@@ -482,6 +488,9 @@ $(function() {
 
 
 <h3><a id="index_f"></a>- f -</h3><ul>
+<li>FAILED
+: <a class="el" href="enumcom_1_1amazon_1_1aace_1_1property_manager_1_1_property_manager_1_1_property_state.html#ac11ed124711872a3e9c60391fcf639a2">com.amazon.aace.propertyManager.PropertyManager.PropertyState</a>
+</li>
 <li>FAILURE_PROTOCOL_ERROR
 : <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_connection_changed_reason.html#acb096ffb04882dde59e47a2336823072">com.amazon.aace.alexa.AlexaClient.ConnectionChangedReason</a>
 </li>
@@ -561,11 +570,21 @@ $(function() {
 <li>getNetworkStatus()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1network_1_1_network_info_provider.html#aa16f831498c598c862c116aec7745a38">com.amazon.aace.network.NetworkInfoProvider</a>
 </li>
+<li>getNumBytesBuffered()
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1audio_1_1_audio_output.html#a2c5ab7cf1d8a4183a7b58716dccf916b">com.amazon.aace.audio.AudioOutput</a>
+</li>
+<li>getPlayerDuration()
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_player.html#a3ddd0246911b32d798dad3dae3e7e64d">com.amazon.aace.alexa.AudioPlayer</a>
+</li>
+<li>getPlayerPosition()
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_player.html#ac5af34b211180066c0a72d768800dc0d">com.amazon.aace.alexa.AudioPlayer</a>
+</li>
 <li>getPosition()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1audio_1_1_audio_output.html#affc2aadf7fe81a6a9463152ae51420f8">com.amazon.aace.audio.AudioOutput</a>
 </li>
 <li>getProperty()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_engine.html#a9aa96efbfcb7b0132917957bccb85159">com.amazon.aace.core.Engine</a>
+, <a class="el" href="classcom_1_1amazon_1_1aace_1_1property_manager_1_1_property_manager.html#ae18af547c39b0c8e2a763e34d988f4a2">com.amazon.aace.propertyManager.PropertyManager</a>
 </li>
 <li>getRangeControllerValue()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1car_control_1_1_car_control.html#ae694da83885a8ab8c5c481ac06f382a4">com.amazon.aace.carControl.CarControl</a>
@@ -741,10 +760,10 @@ $(function() {
 : <a class="el" href="enumcom_1_1amazon_1_1aace_1_1audio_1_1_audio_output_1_1_media_error.html#a92154f383495a93ab4eb197218e83e62">com.amazon.aace.audio.AudioOutput.MediaError</a>
 </li>
 <li>mediaError()
-: <a class="el" href="classcom_1_1amazon_1_1aace_1_1audio_1_1_audio_output.html#a30d57dba1ccaca01ae2070c636b10647">com.amazon.aace.audio.AudioOutput</a>
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1audio_1_1_audio_output.html#affc23414f8a4c0dc7aa518e398123d3c">com.amazon.aace.audio.AudioOutput</a>
 </li>
 <li>mediaStateChanged()
-: <a class="el" href="classcom_1_1amazon_1_1aace_1_1audio_1_1_audio_output.html#a5b970675b88441a908f496494ddacdd8">com.amazon.aace.audio.AudioOutput</a>
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1audio_1_1_audio_output.html#a9e50601e05eb9d32e1f56d75e7849fc3">com.amazon.aace.audio.AudioOutput</a>
 </li>
 <li>METRIC
 : <a class="el" href="enumcom_1_1amazon_1_1aace_1_1logger_1_1_logger_1_1_level.html#a3fb8000c5538432243c47b03951b0aa3">com.amazon.aace.logger.Logger.Level</a>
@@ -894,7 +913,7 @@ $(function() {
 , <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source_1_1_media_type.html#a26bcbd93a59deb6da184f0521292e149">com.amazon.aace.alexa.LocalMediaSource.MediaType</a>
 </li>
 <li>prepare()
-: <a class="el" href="classcom_1_1amazon_1_1aace_1_1audio_1_1_audio_output.html#aff7e7f7323143c4843d48a0650ce91b4">com.amazon.aace.audio.AudioOutput</a>
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1audio_1_1_audio_output.html#ae3726cd2b38409262fadedc25a9a68e7">com.amazon.aace.audio.AudioOutput</a>
 </li>
 <li>PRESET
 : <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source_1_1_content_selector.html#a7e83aee7db7cdf5eca08d53eb1052379">com.amazon.aace.alexa.LocalMediaSource.ContentSelector</a>
@@ -906,6 +925,12 @@ $(function() {
 </li>
 <li>processActivityEvent()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1apl_1_1_a_p_l.html#afb0b59ce5e87005456cc34cb79fed1e8">com.amazon.aace.apl.APL</a>
+</li>
+<li>propertyChanged()
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1property_manager_1_1_property_manager.html#aa914e628f95f552b87c7dda3ba902a4a">com.amazon.aace.propertyManager.PropertyManager</a>
+</li>
+<li>propertyStateChanged()
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1property_manager_1_1_property_manager.html#a6c1d4f9e41142872da267073d481f014">com.amazon.aace.propertyManager.PropertyManager</a>
 </li>
 </ul>
 
@@ -1000,6 +1025,9 @@ $(function() {
 <li>SATELLITE_RADIO
 : <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source_1_1_source.html#a705bb0517f4c7206dd72e306d36ec3d2">com.amazon.aace.alexa.LocalMediaSource.Source</a>
 </li>
+<li>SCHEDULED_FOR_LATER
+: <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alerts_1_1_alert_state.html#a0a4f1b8ecfb1f4231f7ad6f59f63cf12">com.amazon.aace.alexa.Alerts.AlertState</a>
+</li>
 <li>seek()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter.html#a6c511f6d0967158f9512d5359e4a4a10">com.amazon.aace.alexa.ExternalMediaAdapter</a>
 , <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source.html#a0f65d94b6aa9a24a7d896939adc8d4a4">com.amazon.aace.alexa.LocalMediaSource</a>
@@ -1008,7 +1036,7 @@ $(function() {
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a84929af8429fa585444691eb965da31a">com.amazon.aace.phonecontrol.PhoneCallController</a>
 </li>
 <li>sendDTMFFailed()
-: <a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a6deac75764abd61feefcff05756ed367">com.amazon.aace.phonecontrol.PhoneCallController</a>
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#aaa339310c1f1f0c29b99308677572a47">com.amazon.aace.phonecontrol.PhoneCallController</a>
 </li>
 <li>sendDTMFSucceeded()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#abbef49449a17271bc67e885054c50416">com.amazon.aace.phonecontrol.PhoneCallController</a>
@@ -1043,7 +1071,7 @@ $(function() {
 </li>
 <li>setFocus()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter.html#adcf544d90c89515cd2de3af216ee53cf">com.amazon.aace.alexa.ExternalMediaAdapter</a>
-, <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source.html#a41d4aad196e6ea9eb5e41287426fb7de">com.amazon.aace.alexa.LocalMediaSource</a>
+, <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source.html#a20a6fa8f3826b39e7f19d74a761a0ed6">com.amazon.aace.alexa.LocalMediaSource</a>
 </li>
 <li>setIndicator()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_notifications.html#ab83e0f63cbd01de0c1fb2cf0b331b9cf">com.amazon.aace.alexa.Notifications</a>
@@ -1056,6 +1084,7 @@ $(function() {
 </li>
 <li>setProperty()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_engine.html#a2739fa7b37aa1c292d5a55c6e0127189">com.amazon.aace.core.Engine</a>
+, <a class="el" href="classcom_1_1amazon_1_1aace_1_1property_manager_1_1_property_manager.html#a6a6b6d34ba96850c38f1aa3d40786c7d">com.amazon.aace.propertyManager.PropertyManager</a>
 </li>
 <li>setRangeControllerValue()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1car_control_1_1_car_control.html#afe04323771ca2cbbc44de5ecb93c38ce">com.amazon.aace.carControl.CarControl</a>
@@ -1118,6 +1147,10 @@ $(function() {
 : <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter_1_1_media_type.html#abaf69899cd9c1923e968b7f9ceb3abcd">com.amazon.aace.alexa.ExternalMediaAdapter.MediaType</a>
 , <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source_1_1_media_type.html#a952425c84c795ae0890d141f89943531">com.amazon.aace.alexa.LocalMediaSource.MediaType</a>
 </li>
+<li>STOP
+: <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter_1_1_play_control_type.html#a8849e1e147ccccb1608e7546159550ed">com.amazon.aace.alexa.ExternalMediaAdapter.PlayControlType</a>
+, <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source_1_1_play_control_type.html#a4cce624af67a1cb61e357d4da036ac0f">com.amazon.aace.alexa.LocalMediaSource.PlayControlType</a>
+</li>
 <li>stop()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1audio_1_1_audio_output.html#a93328cd0e726f19b596a18343418082c">com.amazon.aace.audio.AudioOutput</a>
 , <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_engine.html#af3f1799a40b40389cdb3c03a4b518c28">com.amazon.aace.core.Engine</a>
@@ -1133,6 +1166,9 @@ $(function() {
 </li>
 <li>STOPPING
 : <a class="el" href="enumcom_1_1amazon_1_1aace_1_1cbl_1_1_c_b_l_1_1_c_b_l_state.html#a75da149e307bf18c96e2cc49186bf2da">com.amazon.aace.cbl.CBL.CBLState</a>
+</li>
+<li>SUCCEEDED
+: <a class="el" href="enumcom_1_1amazon_1_1aace_1_1property_manager_1_1_property_manager_1_1_property_state.html#ac142bdd5dc1e3f9bc8b2fd9a3e68d227">com.amazon.aace.propertyManager.PropertyManager.PropertyState</a>
 </li>
 <li>SUCCESS
 : <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_connection_changed_reason.html#a850ede07c92d1e48f8d1eacddb190d58">com.amazon.aace.alexa.AlexaClient.ConnectionChangedReason</a>
@@ -1158,7 +1194,8 @@ $(function() {
 : <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_playback_controller_1_1_playback_toggle.html#ae03c25bb16b59fb29f1c136b1b2f2c56">com.amazon.aace.alexa.PlaybackController.PlaybackToggle</a>
 </li>
 <li>TIME_UNKNOWN
-: <a class="el" href="classcom_1_1amazon_1_1aace_1_1audio_1_1_audio_output.html#a60658d83dc03b3999057ace2b2cabefd">com.amazon.aace.audio.AudioOutput</a>
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_player.html#aeedf104185c5b77717b01d8ebae74c9a">com.amazon.aace.alexa.AudioPlayer</a>
+, <a class="el" href="classcom_1_1amazon_1_1aace_1_1audio_1_1_audio_output.html#a60658d83dc03b3999057ace2b2cabefd">com.amazon.aace.audio.AudioOutput</a>
 </li>
 <li>TIMEOUT
 : <a class="el" href="enumcom_1_1amazon_1_1aace_1_1cbl_1_1_c_b_l_1_1_c_b_l_state_changed_reason.html#a1c1495251c637f827cdc04598ce2cb7c">com.amazon.aace.cbl.CBL.CBLStateChangedReason</a>
@@ -1295,7 +1332,7 @@ $(function() {
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 2.1.0 - Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 2.2.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

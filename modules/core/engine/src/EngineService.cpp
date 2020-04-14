@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -234,14 +234,6 @@ bool EngineService::stop() {
 
 bool EngineService::shutdown() {
     return true;
-}
-
-bool EngineService::setProperty( const std::string& key, const std::string& value ) {
-    return false;
-}
-
-std::string EngineService::getProperty( const std::string& key ) {
-    return std::string();
 }
 
 bool EngineService::registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) {

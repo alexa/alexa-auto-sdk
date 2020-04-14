@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -310,14 +310,14 @@ extern "C"
     }
 
     JNIEXPORT void JNICALL
-    Java_com_amazon_aace_alexa_LocalMediaSource_setFocus( JNIEnv * env , jobject /* this */, jlong ref )
+    Java_com_amazon_aace_alexa_LocalMediaSource_setFocus( JNIEnv * env , jobject /* this */, jlong ref, jboolean focusAcquire )
     {
         try
         {
             auto localMediaSourceBinder = LOCAL_MEDIA_SOURCE_BINDER(ref);
             ThrowIfNull( localMediaSourceBinder, "invalidLocalMediaSourceBinder" );
 
-            localMediaSourceBinder->getLocalMediaSource()->setFocus();
+            localMediaSourceBinder->getLocalMediaSource()->setFocus( focusAcquire );
         }
         catch( const std::exception& ex ) {
             AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_alexa_LocalMediaSource_setFocus",ex.what());

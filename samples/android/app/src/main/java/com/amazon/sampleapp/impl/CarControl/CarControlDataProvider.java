@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -129,36 +129,43 @@ public class CarControlDataProvider {
     }
 
     /**
-     * Generate car control configuration.
+     * Build an example car control configuration for the Auto SDK Engine.
      */
     public static EngineConfiguration generateCarControlConfig() {
-        // Define common values for speed range controllers
+        // Define common values for speed RangeControllers
         int SPEED_MIN = 1, SPEED_MEDIUM=5, SPEED_MAX = 10, SPEED_PRECISION = 1;
-        // Define common values for temperature range controllers
+        // Define common values for temperature RangeControllers
         int TEMPERATURE_MIN = 60, TEMPERATURE_MEDIUM=76, TEMPERATURE_MAX = 90, TEMPERATURE_PRECISION = 2;
 
         CarControlConfiguration config = CarControlConfiguration.create();
+
         //---------------------------------------------------------------------
-        // Create a Fan controls for the specified zones. Also add a fan speed
-        // range controller defined SPEED_MIN and SPEED_MAX. Add some
+        // Create a "fan" endpoint, and add a "speed" RangeController using
+        // SPEED_MIN, SPEED_MAX, and SPEED_PRECISION constants. Add some named
         // presets to set the fan speed to preset values. Note that preset
-        // values must be exact increments of the SPEED_PRECISION, otherwise
-        // it will not work. Lastly, add a power control.
-        // Alexa utterances:
-        //    Alexa turn on the <zone> fan
-        //    Alexa turn off the <zone> fan
-        //    Alexa set the <zone> fan low/minimum/medium/high/max
-        //    Alexa set the <zone> fan to <value between SPEED_MIN and SPEED_MAX >
-        //    Alexa increase/decrease <zone> fan speed
+        // values must be exact increments of the SPEED_PRECISION, otherwise 
+        // it will not work. Lastly, add a PowerController for the fan.
+        //
+        // Things to try:
+        //    Alexa, turn on the fan 
+        //    Alexa, turn the fan off
+        //    Alexa, set the fan to low|minimum|medium|high|max
+        //    Alexa, set the fan to < value between SPEED_MIN and SPEED_MAX > 
+        //    Alexa, turn up the blower
+        //    Alexa, increase|decrease fan speed by three
         //---------------------------------------------------------------------
         String[] controlIds = { "all.fan" };
+        // Create the example endpoint configuration without using zones, which work 
+        // only in hybrid mode with Local Voice Control.  Use generic assets for 
+        // friendly names and synonyms.
+        // See modules/car-control/assets/assets-1P.json for reference
         String[] zones = {  CarControlConfiguration.Zone.ALL };
 
         for (int i=0; i < controlIds.length; i++) {
             config.createControl(controlIds[i], zones[i])
                 .addAssetId(CarControlAssets.Device.FAN)
                 .addPowerController(true)
-                .addRangeController("speed", true, SPEED_MIN, SPEED_MAX, SPEED_PRECISION, "")
+                .addRangeController("speed", false, SPEED_MIN, SPEED_MAX, SPEED_PRECISION, "")
                     .addAssetId(CarControlAssets.Setting.FAN_SPEED)
                     .addPreset(SPEED_MIN)
                         .addAssetId(CarControlAssets.Value.LOW)
@@ -174,17 +181,19 @@ public class CarControlDataProvider {
         }
 
         //---------------------------------------------------------------------
-        // Create a Heater controls for the specified zones. Add a temperature
-        // range controller defined TEMPERATURE_MIN and TEMPERATURE_MAX. Add some
-        // presets to set the temperature to preset values. Note that preset
+        // Create a "heater" endpoint. Add a "temperature" RangeController using
+        // the TEMPERATURE_MIN, TEMPERATURE_MAX and TEMPERATURE_PRECISION constants. 
+        // Add presets to set the temperature to preset values. Note that preset
         // values must be exact increments of the TEMPERATURE_PRECISION, otherwise
-        // it will not work. Lastly, add a power control.
-        // Alexa utterances:
-        //    Alexa turn on the <zone> heater
-        //    Alexa turn off the <zone> heater
-        //    Alexa set the <zone> heater low/minimum/medium/high/max
-        //    Alexa set the <zone> heater to <value between SPEED_MIN and SPEED_MAX >
-        //    Alexa increase/decrease <zone> heater temperature
+        // it will not work. Lastly, add a PowerController.
+        //
+        // Things to try:
+        //    Alexa, turn on the heater 
+        //    Alexa, turn the heater off
+        //    Alexa, set the temperature to low|minimum|medium|high|max
+        //    Alexa, set the temperature to < value between TEMPERATURE_MIN and TEMPERATURE_MAX > 
+        //    Alexa, increase/decrease the temperature 
+        //    Alexa, increase the temperature by four
         //---------------------------------------------------------------------
         controlIds = new String[] { "all.heater" };
         zones = new String[] { CarControlConfiguration.Zone.ALL };
@@ -193,7 +202,7 @@ public class CarControlDataProvider {
                 .addAssetId(CarControlAssets.Device.HEATER)
                 .addAssetId(CarControlAssets.Device.COOLER)
                 .addPowerController(true)
-                .addRangeController("temperature", true, TEMPERATURE_MIN, TEMPERATURE_MAX, TEMPERATURE_PRECISION, CarControlAssets.Unit.FAHRENHEIT)
+                .addRangeController("temperature", false, TEMPERATURE_MIN, TEMPERATURE_MAX, TEMPERATURE_PRECISION, CarControlAssets.Unit.FAHRENHEIT)
                     .addAssetId(CarControlAssets.Setting.TEMPERATURE)
                     .addAssetId(CarControlAssets.Setting.HEAT)
                     .addPreset(TEMPERATURE_MIN)
@@ -210,12 +219,13 @@ public class CarControlDataProvider {
         }
 
         //---------------------------------------------------------------------
-        // Create light controls for specified zones. Add a power controller.
-        // Alexa utterances:
-        //    Alexa turn on the <zone> light
-        //    Alexa turn off the <zone> light
+        // Create a generic "light" endpoint. Add a PowerController for it. 
+        //
+        // Things to try:
+        //    Alexa, turn on the light 
+        //    Alexa, turn off the light 
         //---------------------------------------------------------------------
-        controlIds = new String[] { "driver.light" };
+        controlIds = new String[] { "all.light" };
         zones = new String[] { CarControlConfiguration.Zone.ALL };
         for (int i=0; i < controlIds.length; i++) {
             config.createControl(controlIds[i], zones[i])
@@ -226,19 +236,22 @@ public class CarControlDataProvider {
         }
 
         //---------------------------------------------------------------------
-        // Create air conditioner controller for specified zones. Add a power
-        // controller and a mode controller with user defined mode values.
-        // Alexa utterances:
-        //    Alexa turn on the air conditioner
-        //    Alexa turn on the <zone> air conditioner
-        //    Alexa turn off the <zone> air conditioner
-        //    Alexa set the <zone> air conditioner to economy/auto/manual
-        //    Alexa set the <zone> air conditioner intensity to low/medium/high
-        //    Alexa increase/decrease the <zone> air conditioner
+        // Create an "air conditioner" endpoint. Add a PowerController 
+        // and a ModeController, and define mode values.  Make the "intensity"
+        // ModeController ordered to enable AdjustMode utterances like "Turn up
+        // the A/C".
+        //
+        // Things to try:
+        //    Alexa, turn on the air conditioner 
+        //    Alexa, turn the air conditioner off
+        //    Alexa, turn off the AC 
+        //    Alexa, set the air conditioner to economy/auto/manual
+        //    Alexa, set the air conditioner to low/medium/high
+        //    Alexa, increase/decrease the air conditioner 
         //---------------------------------------------------------------------
         config.createControl("ac", CarControlConfiguration.Zone.ALL)
                 .addAssetId(CarControlAssets.Device.AIR_CONDITIONER)
-                .addModeController("mode", true, false)
+                .addModeController("mode", false, false)
                     .addAssetId(CarControlAssets.Setting.MODE)
                     .addValue(Mode.ECONOMY)
                         .addAssetId(CarControlAssets.Setting.ECONOMY)
@@ -246,7 +259,7 @@ public class CarControlDataProvider {
                         .addAssetId(CarControlAssets.Setting.AUTO)
                     .addValue(Mode.MANUAL)
                         .addAssetId(CarControlAssets.Setting.MANUAL)
-                .addModeController("intensity", true, true)
+                .addModeController("intensity", false, true)
                     .addAssetId(CarControlAssets.Setting.INTENSITY)
                     .addValue(Intensity.LOW)
                         .addAssetId(CarControlAssets.Value.LOW)
@@ -272,27 +285,32 @@ public class CarControlDataProvider {
         m_modeControllers.put(genKey("ac", "intensity"), acIntensity);
 
         //---------------------------------------------------------------------
-        // Create window controller for specified zone. Add a toggle
-        // controller
-        // Alexa utterances:
-        //    Alexa turn on the window defroster
-        //    Alexa turn off the window defroster
+        // Create a "windshield" endpoint. Add a controller for a defroster. A
+        // PowerController would be global to the windshield itself,
+        // which could have other controllers (wipers, for example), so a 
+        // ToggleController is best here.
+        //
+        // Things to try:
+        //    Alexa, turn on the defroster 
+        //    Alexa, turn the defroster off
         //---------------------------------------------------------------------
         config.createControl("all.windshield", CarControlConfiguration.Zone.ALL)
             .addAssetId(CarControlAssets.Device.WINDSHIELD)
             .addAssetId(CarControlAssets.Device.WINDOW)
-            .addToggleController("defroster", true)
+            .addToggleController("defroster", false)
                 .addAssetId(CarControlAssets.Setting.DEFROST)
                 .addAssetId(CarControlAssets.Setting.DEFOG);
         m_boolControllers.put(genKey("all.windshield", "defroster"), new BoolController());
 
         //---------------------------------------------------------------------
-        // Create car lights. Add a power controller and mode controller to
-        // change the color for ambient light.
-        // Alexa utterances:
-        //    Alexa turn on the <zone> light
-        //    Alexa turn off the <zone> light
-        //    Alexa set ambient light to red
+        // Model the interior lighting by adding endpoints for the various 
+        // controllable lights in the car. Add PowerControllers to each, and a
+        // ModeController to change the color of the ambient lighting.
+        //
+        // Things to try:
+        //    Alexa, turn on the light
+        //    Alexa, turn off the light
+        //    Alexa, set ambient light to red 
         //---------------------------------------------------------------------
         config.createControl("dome.light", CarControlConfiguration.Zone.ALL)
             .addAssetId(CarControlAssets.Device.DOME_LIGHT)
@@ -308,7 +326,7 @@ public class CarControlDataProvider {
         config.createControl("ambient.light", CarControlConfiguration.Zone.ALL)
             .addAssetId(CarControlAssets.Device.AMBIENT_LIGHT)
             .addPowerController(true)
-            .addModeController("color", true, true)
+            .addModeController("color", false, true)
                 .addAssetId(CarControlAssets.Setting.COLOR)
                 .addValue(Color.RED)
                     .addAssetId(CarControlAssets.Color.RED)
@@ -338,17 +356,18 @@ public class CarControlDataProvider {
         ambientLight.addMode(Color.VIOLET);
         m_modeControllers.put(genKey("ambient.light", "color"), ambientLight);
         //---------------------------------------------------------------------
-        // Create vent controller. Add a power controller and mode controller to
-        // change the vent positions.
-        // Alexa utterances:
-        //    Alexa turn on the <zone> vent
-        //    Alexa turn off the <zone> vent
-        //    Alexa set the <zone> vent to floor
+        // Create a "vent" endpoint. Add a PowerController. Add a ModeController 
+        // to change the vent positions and values for the modes. 
+        //
+        // Things to try:
+        //    Alexa, turn on the vent
+        //    Alexa, turn off the vent
+        //    Alexa, set the vent to floor|body|mix
         //---------------------------------------------------------------------
         config.createControl("vent", CarControlConfiguration.Zone.ALL)
             .addAssetId(CarControlAssets.Device.VENT)
             .addPowerController(true)
-            .addModeController("position", true, true)
+            .addModeController("position", false, true)
                 .addAssetId(CarControlAssets.Setting.POSITION)
                 .addValue(VentPosition.BODY)
                     .addAssetId(CarControlAssets.Setting.BODY_VENTS)
@@ -366,18 +385,19 @@ public class CarControlDataProvider {
         ventPosition.addMode(VentPosition.MIX);
         m_modeControllers.put(genKey("vent", "position"), ventPosition);
         //---------------------------------------------------------------------
-        // Create a car controller. Add toggle controllers to turn on/off air
-        // recirculation, climate sync, and camera.
-        // Alexa utterances:
-        //    Alexa turn on/off the air recirculation
-        //    Alexa turn on/off the air sync
-        //    Alexa turn on/off the camera
+        // Create a generic "car" endpoint for miscellaneous controls not 
+        // associated with any other endpoint. For example, add ToggleControllers
+        // for air recirculation and climate control sync.
+        //
+        // Things to try:
+        //    Alexa, turn on|off recirculation 
+        //    Alexa, turn on|off climate control sync 
         //---------------------------------------------------------------------
         config.createControl("car", CarControlConfiguration.Zone.ALL)
                 .addAssetId(CarControlAssets.Device.CAR)
-                .addToggleController("recirculate", true)
+                .addToggleController("recirculate", false)
                     .addAssetId(CarControlAssets.Setting.AIR_RECIRCULATION)
-                .addToggleController("climate.sync", true)
+                .addToggleController("climate.sync", false)
                     .addAssetId(CarControlAssets.Setting.CLIMATE_SYNC);
         m_boolControllers.put(genKey("car", "recirculate"), new BoolController());
         m_boolControllers.put(genKey("car", "climate.sync"), new BoolController());

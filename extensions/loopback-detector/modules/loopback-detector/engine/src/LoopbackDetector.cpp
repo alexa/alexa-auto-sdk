@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. and its affiliates. All Rights Reserved.
+ * Copyright 2019-2020 Amazon.com, Inc. and its affiliates. All Rights Reserved.
  *
  * SPDX-License-Identifier: LicenseRef-.amazon.com.-ASL-1.0
  *
@@ -28,9 +28,6 @@ static const size_t MAX_READERS = 2;
 
 /// The amount of audio data to keep in the ring buffer.
 static const std::chrono::seconds AMOUNT_OF_AUDIO_DATA_IN_BUFFER = std::chrono::seconds(5);
-
-/// The amount of time for secondary wake-word detection
-static const std::chrono::milliseconds DETECTION_THRESHOLD = std::chrono::milliseconds(500);
 
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.LoopbackDetector");

@@ -1,6 +1,48 @@
 # Change Log
 
 ___
+## v2.2.0 released on 2020-04-15
+
+### Enhancements
+* Added a Car Control module to support online-only car control use cases without the optional Local Voice Control (LVC) extension. The Car Control module provides the car control functionality introduced in Auto SDK 2.0.0 but does not require the LVC extension.
+* Made various enhancements to the External Media Player (EMP) Adapter to improve EMP behavior and facilitate implementation of Alexa audio focus.
+* Introduced the Property Manager, a new platform interface that allows you to set and retrieve Engine property values and be notified of property value changes. 
+* Added support for setting the timezone of a vehicle. The [AlexaProperties.h](./modules/alexa/platform/include/AACE/Alexa/AlexaProperties.h) and [AlexaProperties.java](./platforms/android/modules/alexa/src/main/java/com/amazon/aace/alexa/AlexaProperties.java) files now include a `TIMEZONE` property setting that is registered with the Property Manager during initialization and which you can manage using the Property Manager platform interface.
+* Added support for specifying a custom volume range for voice interactions in implementations that use the optional Local Voice Control (LVC) extension.
+* Separated the LVC language models into independent APKs rather than providing them directly in the LVC APK as was done in previous releases. One language model APK is provided for each supported locale (currently en-US, en-CA, and fr-CA).
+
+### Resolved Issues
+* Fixed an issue where the CBL state did not change to stopped when you cancelled login with `CBL::cancel()`.
+* Fixed an issue where volume adjustments were lost when pausing and resuming music.
+* Fixed an External Media Player (EMP) Engine implementation that caused an unexpected sequence of Local Media Source playControl() method invocations such as play, then pause, followed by play again in quick succession.
+* Fixed an issue where the Engine might hang during shutdown if it was shut down while TTS was being played or read.
+* Fixed an issue where Auto SDK initialization failed at startup when applications using the optional LVC extension didn't register a NetworkInfoProvider platform interface.
+* Fixed an issue where building the Auto SDK with senstive logging enabled was not working as expected.
+* Added alerts error enums (`DELETED` and `SCHEDULED_FOR_LATER`) to the [`Alerts.h`](./modules/alexa/platform/include/AACE/Alexa/Alerts.h) and [`Alerts.java`](./platforms/android/modules/alexa/src/main/java/com/amazon/aace/alexa/Alerts.java) files.
+* With the exception of road regulation and maneuver events, the Alexa cloud no longer returns an `INVALID_REQUEST_EXCEPTION` or `INTERNAL_SERVICE_EXCEPTION` in response to navigation events sent by the Auto SDK.
+* Alexa now prompts or notifies the clients and rejects the ping packet when the user deregisters from the companion app.
+
+### Known Issues
+* General
+  * If the local timezone of your device differs from the timezone that was configured through the Alexa companion app, the user may experience unexpected behavior. For example, if your device shows 12pm PST, but the device on the Alexa companion app is configured with an EST timezone, then asking "Alexa set an alarm for 1pm today," will return, "Sorry I can't set alarms in the past". Auto SDK v2.2.0 adds support for setting the timezone of the vehicle, which allows your device to synchronize with the timezone set in the Alexa companion app; however, the Auto SDK currently does not receive a `SetTimeZone` directive when the timezone is changed from the companion app.
+* Navigation
+  * The Alexa cloud currently returns an `INTERNAL_SERVICE_EXCEPTION` in response to any navigation road regulation or manuever event sent by the Auto SDK (triggered by an utterance such as "which lane should I take", for example). You may see a harmless error/exception in the logs.
+* Car Control
+  * Certain car control utterances return errors. Problematic utterances include natural versions of certain test utterances (for example, “turn on the light“ instead of “please turn on the light in the car”); utterances that include the words “lights” or “my”; and utterances to control the defroster or defogger that use “put on” or “set on” rather than “turn on” or “switch on”.
+  * Setting the air conditioner using range controller control capabilities (for example “set the air conditioner to 65” or “set the air conditioner to low”) is not currently supported.
+  * In offline mode, the utterances "turn ac on”, “turn off ac”, “turn ac off”, and “turn up ac" return errors.
+* Communications
+  * When using LVC in online mode, users can redial a call when the phone connection state has been switched to OFF.
+  * DTMF utterances that include the letters "A", "B", "C", or "D" (for example "press A" or "dial 3*#B") are ignored.
+  * Calling numbers such as 1800xxxxxxx using utterances such as “Alexa call one eight double oh...” may return unexpected results. Similarly, calling numbers using utterances that include "triple", "hundred" and "thousand" and pressing special characters such as # or * using utterances such as "Alexa press *#" may return unexpected results. Therefore we recommend that your client application ignore special characters, dots, and non-numeric characters when requesting Alexa to call or press digits.
+* Entertainment
+  * A user playing any skill with extended multi-turn dialogues (such as Jeopardy or Skyrim) cannot accept or reject incoming Alexa-to-Alexa calls using voice.
+  * A user playing notifications while music is playing will hear the music for a split second between the end of one notification and the start of the next.
+  * When online, Alexa does not recognize the utterance “Switch to line In.”
+* Authentication
+  * The CBL module uses a backoff when refreshing the access token after expiry. If internet is disconnected when the refresh is attempted, it could take up to a minute for the token to refresh when the internet connection is restored.
+  * If you log out and log in, the client-side Do Not Disturb (DND) state may not be synchronized with the Alexa cloud.
+
 ## v2.1.0 released on 2019-12-19:
 
 ### Enhancements

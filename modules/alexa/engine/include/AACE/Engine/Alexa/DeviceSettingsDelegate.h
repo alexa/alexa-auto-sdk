@@ -1,5 +1,5 @@
  /*
-  * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+  * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
   *
   * Licensed under the Apache License, Version 2.0 (the "License").
   * You may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@
 
  class DeviceSettingsDelegate {
  public:
+    DeviceSettingsDelegate() = default;
     using DeviceSettingsManager =  alexaClientSDK::settings::DeviceSettingsManager;
 
     template<size_t index>
@@ -85,8 +86,6 @@
     std::shared_ptr<alexaClientSDK::settings::DeviceSettingsManager> m_deviceSettingsManager;
     std::shared_ptr<alexaClientSDK::settings::storage::DeviceSettingStorageInterface> m_deviceSettingStorage;
     std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> m_connectionManager;
-
-    DeviceSettingsDelegate() = default;
  };
 
 template<size_t index>

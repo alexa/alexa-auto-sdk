@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -46,6 +46,8 @@ public:
     bool resume() override;
     int64_t getPosition() override;
     bool setPosition( int64_t position ) override;
+    int64_t getDuration() override;
+    int64_t getNumBytesBuffered() override;
     bool volumeChanged( float volume ) override;
     bool mutedStateChanged( MutedState state ) override;
     void setEngineInterface( std::shared_ptr<aace::audio::AudioOutputEngineInterface> audioOutputEngineInterface ) override;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -123,7 +123,10 @@ bool CBLEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::cbl:
 
         auto alexaEndpoints = getContext()->getServiceInterface<aace::engine::alexa::AlexaEndpointInterface>( "aace.alexa" );
 
-        m_cblEngineImpl = aace::engine::cbl::CBLEngineImpl::create( cbl, customerDataManager, deviceInfo, m_codePairRequestTimeout, alexaEndpoints, m_enableUserProfile );
+        auto localeAssetManager = getContext()->getServiceInterface<aace::engine::alexa::LocaleAssetsManager>( "aace.alexa" );
+        ThrowIfNull( localeAssetManager, "invalidLocaleAssetManager" );
+
+        m_cblEngineImpl = aace::engine::cbl::CBLEngineImpl::create( cbl, customerDataManager, deviceInfo, m_codePairRequestTimeout, alexaEndpoints, localeAssetManager, m_enableUserProfile );
         ThrowIfNull( m_cblEngineImpl, "createCBLEngineImplFailed" );
         
         auto alexaService = getContext()->getService<aace::engine::alexa::AlexaEngineService>();

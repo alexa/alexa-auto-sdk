@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
-#include <AVSCommon/Utils/DeviceInfo.h>
 #include <AVSCommon/Utils/Logger/Logger.h>
 
 #include "AACE/Engine/CBL/CBLAuthDelegateConfiguration.h"
@@ -60,17 +59,21 @@ static const std::string REQUEST_TOKEN_PATH = "token";
 /// Path suffix for URl used in token refresh requests to @c LWA.
 static const std::string REFRESH_TOKEN_PATH = "token";
 
+/// Fallback default locale
+static const std::string FALLBACK_DEFAULT_LOCALE = "en-US";
+
 std::shared_ptr<CBLAuthDelegateConfiguration> CBLAuthDelegateConfiguration::create(
     std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
     std::chrono::seconds codePairRequestTimeout,
-    std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints ) {
+    std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
+    std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> localeAssetManager ) {
     
     try {
         AACE_DEBUG(LX(TAG,"create"));
         std::shared_ptr<CBLAuthDelegateConfiguration> configuration = std::shared_ptr<CBLAuthDelegateConfiguration>( new CBLAuthDelegateConfiguration() );
-        ThrowIfNull( configuration, "CBLAuthDelegateConfigurationInvalid" )
+        ThrowIfNull( configuration, "CBLAuthDelegateConfigurationInvalid" );
 
-        configuration->initialize( deviceInfo, codePairRequestTimeout, alexaEndpoints );
+        configuration->initialize( deviceInfo, codePairRequestTimeout, alexaEndpoints, localeAssetManager );
         return configuration;
     }
     catch( std::exception& ex ) {
@@ -82,7 +85,8 @@ std::shared_ptr<CBLAuthDelegateConfiguration> CBLAuthDelegateConfiguration::crea
 bool CBLAuthDelegateConfiguration::initialize(
         std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
         std::chrono::seconds codePairRequestTimeout,
-        std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints ) {
+        std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
+        std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> localeAssetManager ) {
 
     try {
         AACE_DEBUG(LX(TAG,"init"));
@@ -92,9 +96,10 @@ bool CBLAuthDelegateConfiguration::initialize(
         m_codePairRequestTimeout = codePairRequestTimeout;
         m_accessTokenRefreshHeadStart = DEFAULT_ACCESS_TOKEN_REFRESH_HEAD_START;
         m_alexaEndpoints = alexaEndpoints;
+        m_localeAssetManager = localeAssetManager;
 
         if (initScopeData() == false ) {
-            Throw( "initScopeDataFailed" )
+            Throw( "initScopeDataFailed" );
         }
         return true;
     }
@@ -145,6 +150,15 @@ std::string CBLAuthDelegateConfiguration::getScopeData() const {
     return m_scopeData;
 }
 
+std::string CBLAuthDelegateConfiguration::getDefaultLocale() const {
+    if (auto localeAssetManagerSharedPtr = m_localeAssetManager.lock()) {
+        return localeAssetManagerSharedPtr->getDefaultLocale();
+    } else {
+        AACE_WARN(LX(TAG).m("failedToLocklocaleAssetManager"));
+        return FALLBACK_DEFAULT_LOCALE;
+    }
+}
+
 bool CBLAuthDelegateConfiguration::initScopeData() {
     try {
         AACE_DEBUG(LX(TAG,"initScopeData"));
@@ -162,7 +176,7 @@ bool CBLAuthDelegateConfiguration::initScopeData() {
         StringBuffer buffer;
         Writer<StringBuffer> writer(buffer);
 
-        ThrowIfNot( scopeData.Accept(writer), "acceptFailed" )
+        ThrowIfNot( scopeData.Accept(writer), "acceptFailed" );
 
         m_scopeData = buffer.GetString();
         AACE_DEBUG(LX(TAG,"initScopeDataSucceeded").sensitive("scopeData", m_scopeData));

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -120,6 +120,7 @@ public class MediaApp extends MediaBrowserCompat.ConnectionCallback {
     public void onConnected() {
         super.onConnected();
         if (mMediaBrowser == null) {
+            Log.e(TAG, "onConnected mMediaBrowser is null" );
             return;
         }
 
@@ -129,13 +130,15 @@ public class MediaApp extends MediaBrowserCompat.ConnectionCallback {
         try {
             mMediaController = new MediaControllerCompat(mContext, token);
             Bundle extras = mMediaController.getExtras();
-            if (extras.containsKey(APIConstants.ExtrasKeys.SPI_VERSION_KEY) ) {
-                mSpiVersion = extras.getString(APIConstants.ExtrasKeys.SPI_VERSION_KEY);
-            }
+            if( extras != null ) {
+                if (extras.containsKey(APIConstants.ExtrasKeys.SPI_VERSION_KEY) ) {
+                    mSpiVersion = extras.getString(APIConstants.ExtrasKeys.SPI_VERSION_KEY);
+                }
 
-            if (extras.containsKey(APIConstants.ExtrasKeys.PLAYER_COOKIE_KEY)) {
-                mPlayerCookie = extras.getString(APIConstants.ExtrasKeys.PLAYER_COOKIE_KEY);
-            }
+                if (extras.containsKey(APIConstants.ExtrasKeys.PLAYER_COOKIE_KEY)) {
+                    mPlayerCookie = extras.getString(APIConstants.ExtrasKeys.PLAYER_COOKIE_KEY);
+                }
+            } else Log.e( TAG, "MediaControllerCompat extras is null");
 
             mSessionReady = true; // mMediaController.isSessionReady();
 
@@ -158,6 +161,7 @@ public class MediaApp extends MediaBrowserCompat.ConnectionCallback {
 
     public void refreshPlaybackState() {
         if (mMediaController == null) {
+            Log.e(TAG, "refreshPlaybackState mMediaController is null" );
             return;
         }
         mMediaControllerCallback.onPlaybackStateChanged(mMediaController.getPlaybackState());
@@ -204,7 +208,8 @@ public class MediaApp extends MediaBrowserCompat.ConnectionCallback {
     private boolean doesControllerSupportsRequiredActions( MediaControllerCompat controller ) {
         PlaybackStateCompat playbackState = controller.getPlaybackState();
         if (playbackState == null) {
-            return true;
+            Log.e(TAG, "doesControllerSupportsRequiredActions playbackState is null" );
+            return false;
         }
         long actions = playbackState.getActions();
         return ( ( actions & PlaybackStateCompat.ACTION_PLAY_FROM_URI ) > 0 )

@@ -3,7 +3,7 @@ find_library(GMOCK_LIBRARY NAMES gmock)
 find_library(GMOCK_MAIN_LIBRARY NAMES gmock_main)
 
 find_library(CURL_LIBRARY NAMES curl)
-
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
 set(UNIT_TEST_SRCS
 )
 

@@ -16,14 +16,13 @@ The Alexa Auto SDK Alexa module provides interfaces for standard Alexa features.
 * [Handling Playback Controller Events](#handling-playback-controller-events)
 * [Handling Equalizer Control](#handling-equalizer-control)
 * [Handling Display Card Templates](#handling-display-card-templates)
-* [Handling Global Presets](#handling-global-presets)
 * [Handling External Media Apps](#handling-external-media-apps)
 * [Handling Local Media Sources](#handling-local-media-sources)
+* [Handling Global Presets](#handling-global-presets)
 * [Handling Notifications](#handling-notifications)
 * [Handling Alerts](#handling-alerts)
 * [Handling Alexa State Changes](#handling-alexa-state-changes)
 * [Handling Do Not Disturb](#handling-do-not-disturb)
-* [Getting and Setting Alexa Engine Properties](#getting-and-setting-alexa-engine-properties)
 
 ## Alexa Module Sequence Diagrams <a id="alexa-module-sequence-diagrams"> </a>
 
@@ -113,7 +112,9 @@ engine->registerPlatformInterface( mySpeechSynthesizer );
 
 Every request to Alexa Voice Service (AVS) requires an access token from Logon with Amazon (LWA). The `AuthProvider` platform interface is responsible for acquiring and refreshing access tokens.  You can obtain a token from LWA as described in the [LWA documentation](https://developer.amazon.com/docs/login-with-amazon/documentation-overview.html) and create a custom implementation of the `AuthProvider` platform interface to acquire access tokens. If you don't want to acquire access tokens yourself, you can use the [Alexa Auto SDK Code-Based-Linking (CBL) module](../cbl/README.md), which implements the CBL mechanism of acquiring access tokens.
 
->**Note:** It is the responsibility of the platform implementation to provide an authorization method for establishing a connection to AVS. The Alexa Auto SDK provides an interface to handle authorization state changes and storing context. In addition, the access and refresh tokens must be cleared when the user logs out, and any time the access and refresh tokens are cleared, users must go through the authentication and authorization process again.
+> **Note:** It is the responsibility of the platform implementation to provide an authorization method for establishing a connection to AVS. The Alexa Auto SDK provides an interface to handle authorization state changes and storing context. In addition, the access and refresh tokens must be cleared when the user logs out, and any time the access and refresh tokens are cleared, users must go through the authentication and authorization process again.
+
+> **Note:** Your application should stop the audio player if the user logs out of a device when music is currently playing.
 
 To implement a custom handler for authentication, extend the `AuthProvider` class:
 
@@ -193,8 +194,6 @@ Contact your Alexa Auto Solution Architect (SA) for help with whitelisting. Whit
 * Max:
 
 This does not impact the range used in the directives to the device. You must continue to use the SDK 0-100 volume range used by `AudioOutput` and `AlexaSpeaker` and map these values to the correct range in your implementation.
-
->**Note:** Currently, specifying a custom volume range for voice interactions is supported by default in online only mode and not in implementations that use the optional Local Voice Control (LVC) extension. If your implementation uses LVC and you would like to configure a custom volume range, please contact your SA for guidance.
 
 ## Handling Alexa Speaker <a id="handling-alexa-speaker"></a>
 
@@ -370,32 +369,108 @@ engine->registerPlatformInterface( std::make_shared<MyTemplateRuntime>() );
 ```
 >**Note:** In the case of lists, it is the responsibility of the platform implementation to handle pagination. Alexa sends down the entire list as a JSON response and starts reading out the first five elements of the list. At the end of the first five elements, Alexa prompts the user whether or not to read the remaining elements from the list. If the user chooses to proceed with the remaining elements, Alexa sends down the entire list as a JSON response but starts reading from the sixth element onwards.
 
-## Handling Global Presets <a id ="handling-global-presets"></a>
+## Handling External Media Application Sources <a id="handling-external-media-apps"></a>
 
-The Global Preset interface is used to handle "Alexa, play preset \<number>\" utterances. The meaning of the preset `number` passed through `setGlobalPreset()` is determined by the `GlobalPreset` platform implementation registered with the Engine, and the implementation should suit the needs of the vehicle's infotainment system. 
+The External Media Player (EMP) Adapter allows you to declare and use external media application sources in your application. In order to interface with the EMP Adapter, you must use one of the following:
 
-Registering a `GlobalPreset` implementation with the Engine is required for Alexa to set presets for any local media `Source` type that may use them (e.g. `AM_RADIO`, `FM_RADIO`, `SIRIUS_XM`). 
+* A media connection client to interface the EMP Adapter to the external app. The Android Sample App supports an example external media connection client called the Media App Command and Control (MACC) client. You can use the MACC client to interface with the Spotify app running on Android. For details about the MACC client, see the Android version of the [Alexa module README](../../platforms/android/modules/alexa#handling-external-media-adapter-with-maccandroidclient).
+* An embedded media app. For information about external embedded media app solutions, please contact your SA or Partner Manager.
+
+You must register and implement each EMP Adapter (along with its associated external client or library), and on startup, you must run discovery to validate each external media application. This allows AVS to exercise playback control over that source type. The `reportDiscoveredPlayers()` method reports the discovered players. This method can be called at any time during the Engine lifecycle. When the cloud authorizes a specific player, you will get a call to the `authorize()` interface. Both the  `reportDiscoveredPlayers()` method and the `authorize()` method can contain one or more players. 
+
+You should call two interface methods whenever media application events occur:
+
+* The `playerEvent()` method informs the cloud of the player event to maintain synchronization.
+* The `playerError()` method informs the cloud of a player error and should be handled in the same way as the `playerEvent()` method. 
+
+The `login()` and `logout()` methods inform AVS of login state changes, if applicable. If your application has the ability to handle cloud-based login and logout, you should also call the `loginComplete()` and `logoutComplete()` methods where appropriate. 
+
+When the user makes an Alexa voice request (for example, "Play Spotify"), the `play()` method is invoked. This method contains various parameters, including the player id of the player to which the playback information should be routed. 
+
+Whether through voice or GUI event, the `playControl()` method is called with the relevant `PlayControlType`. Similar to `play()` the control should be routed to the appropriate player.
+
+The `PlaybackController` APIs control playback of an `ExternalMediaAdapter` implementation such as a media app connection client when it is the player in focus. This is useful in scenarios such as when the external app is playing, but its own GUI is not displayed, and you wish to use the same GUI to control the external app as traditional Alexa-managed music that plays through the `AudioPlayer` interface. 
+
+The Alexa client tracks the focus via the `playerEvent()` and `playerError()` methods in addition to successful calls to `play()` and `playControl()`. If the external media application obtains Alexa client focus in some way other than via Alexa interaction (for example via external GUI navigation), you can call the `setFocus()` method to force the Alexa client's focus state. Additional calls to `setFocus()` are redundant, but should not have adverse effects. 
+
+`PlayControlType` is sent corresponding to the player's `supportedOperations`. The `supportedOperations` are specified in the `getState()` interface. 
+
+The `seek()` and `adjustSeek()` methods are invokable via Alexa if the currently in-focus external player supports them. `seek()` specifies an absolute offset, whereas `adjustSeek()` specifies a relative offset. 
+
+The `volumeChanged()` and `mutedStateChanged()` methods are invoked to change the volume and mute state of the currently-focused external player. `volumeChanged()` specifies the new volume. `mutedStateChanged()` specifies the new `MutedState`.
+
+The `getState()` method is called to synchronize the external player's state with the cloud. This method is used to maintain correct state during startup, and after every Alexa request. 
+
+You construct the `ExternalMediaAdapterState` object using the data taken from the media app connection client or embedded player app (associated via `localPlayerId`) and return the state information.
+
+The following table describes the fields comprising a `ExternalMediaAdapterState`, which includes two sub-components: `PlaybackState`, and `SessionState`.
+
+| State        | Type           | Notes  |
+| ------------- |:-------------:| -----:|
+| **PlaybackState**      |
+| state      | String        |   "IDLE"/"STOPPED"/"PLAYING" required |
+| supportedOperations | SupportedPlaybackOperation[] | (see SupportedOperation) required |
+| trackOffset      | long  |   optional |
+| shuffleEnabled      | boolean       |   required |
+| repeatEnabled      | boolean       |   required |
+| favorites      | Favorites  | FAVORITED/UNFAVORITED/NOT_RATED optional |
+| type      | String  |   "ExternalMediaPlayerMusicItem" required |
+| playbackSource      | String       |   If available else use local player name. optional|
+| playbackSourceId      | String  |   empty |
+| trackName      | String   |   If available else use local player name. optional|
+| trackId      | String    |   empty |
+| trackNumber      | String   |  optional |
+| artistName      | String    |  optional |
+| artistId      | String   |   empty |
+| albumName      | String |   optional |
+| albumId      | String |   empty |
+| tinyURL      | String |   optional |
+| smallURL      | String |   optional |
+| mediumURL      | String |   optional |
+| largeURL      | String |   optional |
+| coverId      | String  |   empty |
+| mediaProvider      | String  |   optional |
+| mediaType      | MediaType |   TRACK, PODCAST, STATION, AD, SAMPLE, OTHER required |
+| duration      | long  |   optional |
+| **SessionsState** |
+| endpointId      | String  |   empty |
+| loggedIn      | boolean  |   empty |
+| userName      | String  |   empty |
+| isGuest      | boolean  |   empty |
+| launched      | boolean  |   True if MediaController was successfully connected and MediaControllerCompat.Callback.onSessionDestroyed has not been invoked. |
+| active      | boolean  |   Media session state. required  |
+| accessToken      | String  |   empty |
+| tokenRefreshInterval      | long  |   empty |
+| playerCookie      | String  |   A player may declare arbitrary information for itself. optional |
+| spiVersion      | String  |   "1.0" required  |
+
+
+`supportedOperations` should be a list of the operations that the external media adapter supports. Below is a list of all possible `supportedOperations`.
 
 ```
-#include <AACE/Alexa/GlobalPreset.h>
-...
-class MyGlobalPresetHandler : public aace::alexa::GlobalPreset {	
-public:
-void setGlobalPreset( int number ) override {
-    // handle the preset, via routing to local media source
-}
-...
-```    
-
-## Handling External Media Apps <a id="handling-external-media-apps"></a>
-
-The External Media Adapter allows the platform to declare and use external media application sources such as Spotify. You must register and implement each External Media Adapter along with its associated external client. On startup, you must run discovery in order to validate each external media application. This allows AVS to exercise playback control over that source type. Currently this feature is only officially supported on the Android platform. 
+SupportedPlaybackOperation.PLAY,
+SupportedPlaybackOperation.PAUSE,
+SupportedPlaybackOperation.STOP,
+SupportedPlaybackOperation.PREVIOUS,
+SupportedPlaybackOperation.NEXT,
+SupportedPlaybackOperation.ENABLE_SHUFFLE,
+SupportedPlaybackOperation.DISABLE_SHUFFLE,
+SupportedPlaybackOperation.ENABLE_REPEAT_ONE,
+SupportedPlaybackOperation.ENABLE_REPEAT,
+SupportedPlaybackOperation.DISABLE_REPEAT,
+SupportedPlaybackOperation.SEEK,
+SupportedPlaybackOperation.ADJUST_SEEK,
+SupportedPlaybackOperation.FAVORITE,
+SupportedPlaybackOperation.UNFAVORITE,
+SupportedPlaybackOperation.FAST_FORWARD,
+SupportedPlaybackOperation.REWIND,
+SupportedPlaybackOperation.START_OVER
+```
+>**Note:** Currently PLAY/PAUSE/STOP will always be supported for a source. Passing null will allow ALL supported operations for the source. 
 
 ## Handling Local Media Sources <a id ="handling-local-media-sources"></a>
 
-The `LocalMediaSource` interface allows the platform to register a local media source by type(`BLUETOOTH`, `USB`, `LINE_IN`, `AM_RADIO` etc.). Registering a local media source allows playback control of a source via Alexa (e.g. "Alexa, play the CD player") or via button press through the `PlaybackController` interface, if desired. It also enables playback initiation via Alexa by frequency, channel, or preset for relevant source types (e.g. "Alexa, play 98.7 FM")
-
->**Note:** Currently, United States English (`en_US`) is the only supported locale for Auto SDK local media source control with Alexa.
+The `LocalMediaSource` interface allows the platform to register a local media source by type (`BLUETOOTH`, `USB`, `LINE_IN`, `AM_RADIO` etc.). Registering a local media source allows playback control of that source via Alexa (e.g. "Alexa, play the CD player") or via button press through the `PlaybackController` interface, if desired. It also enables playback initiation via Alexa by frequency, channel, or preset for relevant source types (e.g. "Alexa, play 98.7 FM").
 
 The following is an example of registering a CD player local media source using type `Source.COMPACT_DISC`:
 
@@ -419,41 +494,38 @@ class MyCDLocalMediaSource : public aace::alexa::LocalMediaSource {
 ... 
 ```
 
-The `play()` method is called when Alexa invokes play by `ContentSelector` type for a radio local media source (e.g. `AM_RADIO`, `FM_RADIO`, `SIRIUS_XM`). The `payload` is a string that depends on the `ContentSelector` type and local media `Source` type.
+The `play()` method is called when Alexa invokes play by `ContentSelector` type (`FREQUENCY`, `CHANNEL`, `PRESET`) for a radio local media source (`AM_RADIO`, `FM_RADIO`, `SIRIUS_XM`). The `payload` is a string that depends on the `ContentSelector` type and local media `Source` type.
 
 ```	
 bool play( ContentSelector type, std::string payload ) override {
-    setFocus();
     // play initiation for frequency, channel, or presets
     ...
 }
 ``` 
+The table below provides details about the supported payload, range, and increment for each `ContentSelector` type (and `Source`):
 
-This method will not be invoked if a source cannot handle the specified content selection type.
-
-The implementation depends on the local media source; however if the call is handled successfully, `setFocus()` should always be called. This informs the Engine that the local player is in focus. 
-
-Content selector type details are as shown below:
-
-| type | example supported payload | supported range | increment |
+| type (source) | example supported payload | supported range | increment |
 |------|---------|---|---|
 | FREQUENCY(FM) | "98.7" | 88.1 - 107.9 | 0.2 |
 | FREQUENCY(AM) | "1050" | 540 - 1700 | 10 |
 | FREQUENCY(FM) | "93.7 HD 2" | 88.1 - 107.9, HD 1-3 | 0.2, 1 |
 | CHANNEL(SXM) | "1" | 1-999 | 1 |
-| PRESET | "2" | 1-99 | 1 | 
+| PRESET(AM,FM, SXM) | "2" | 1-99 | 1 | 
+
+The `play()` method will not be invoked if a source cannot handle the specified `ContentSelector` type.
+
+>**Note:** Cases in which a preset is requested but the source is unknown are handled by the `GlobalPreset` interface. See [Handling Global Presets](#handling-global-presets) for details.
 
 The `playControl()` method is called with a `PlayControlType`(e.g. `RESUME`, `PAUSE`, `NEXT`, `SHUFFLE`, `REPEAT` etc.) when either Alexa or the GUI (using the `PlaybackController` APIs) invokes a playback control on the local media source.
 
 ```	
 bool playControl( PlayControlType controlType ) override {
-    setFocus();
     // handle the control type appropriately for CD player
     return true;
 }
 ```
 
->**Note:** The `play()` method is used to initiate playback with specified content selection, whereas `playControl(RESUME)` is used to play or resume whatever is already playing.
+>**Note:** The `play()` method is used to initiate playback with specified content selection, whereas `playControl(RESUME)` is used to play or resume the source that is already in focus.
 
 The `seek()` and `adjustSeek()` methods are invoked to seek the currently focused `LocalMediaSource`. These methods are only used by sources that are capable of seeking. `seek()` is for specifying an absolute offset, whereas `adjustSeek()` if for specifying a relative offset. 
 
@@ -484,6 +556,24 @@ public boolean mutedStateChanged( MutedState state ) {
 ...
 ```
 
+Whether or not you call `setFocus()` depends on the desired client behavior. When playback of a source is requested via Alexa, the focus is handled internally. However, if the focus on a source is changed externally, you should use `setFocus()` to notify Alexa of that change. Additional calls to `setFocus()` are redundant, but should not have adverse effects.
+
+```	
+class MyFMRadioLocalMediaSource : public aace::alexa::LocalMediaSource {
+...
+    // public method in source handler	
+    void setAlexaFocusForFMRadio( bool isFocused ) {  
+    ...  
+    	// FM Radio begins playback independently of Alexa
+       	setFocus( true ); // or setFocus();
+    ...    
+     	// FM Radio should not be in focus anymore with Alexa-independant behavior( non playback controller or voice interaction )
+       	setFocus( false );
+...    
+```
+
+`playerError()` and `playerEvent()` are not used currently for local media sources; however, calling them should have no adverse effect. 
+
 The `getState()` method is called to synchronize the local player's state with the cloud. This method is used to maintain correct state during startup and with every Alexa request. All relevant information should be added to the `LocalMediaSourceState` and returned. 
 
 Many fields of the `LocalMediaSourceState` are not required for local media source players. You should omit these as noted below.
@@ -502,12 +592,12 @@ The following table describes the fields comprising a `LocalMediaSourceState`, w
 | State        | Type           | Notes  |
 | ------------- |:-------------:| -----:|
 | **PlaybackState**      | 
-| state      | String        |   "IDLE/STOPPED/PLAYING" required |
-| supportedOperations | SupportedOperations[] | (see SupportedOperation) required |
+| state      | String        |   "IDLE"/"STOPPED"/"PLAYING" required |
+| supportedOperations | SupportedPlaybackOperation[] | (see SupportedPlaybackOperation) required |
 | trackOffset      | long  |   optional |
 | shuffleEnabled      | boolean       |   optional |
 | repeatEnabled      | boolean       |   optional |
-| favorites      | Favorites  |   {FAVORITED/UNFAVORITED/NOT_RATED} optional  |
+| favorites      | Favorites  |   FAVORITED/UNFAVORITED/NOT_RATED optional  |
 | type      | String  |   "ExternalMediaPlayerMusicItem" required |
 | playbackSource      | String       |   If available else use local player name. optional|
 | playbackSourceId      | String  |   empty |
@@ -524,7 +614,7 @@ The following table describes the fields comprising a `LocalMediaSourceState`, w
 | largeURL      | String |   optional |
 | coverId      | String  |   empty |
 | mediaProvider      | String  |   optional |
-| mediaType      | MediaType |   {TRACK, PODCAST, STATION, AD, SAMPLE, OTHER} optional |
+| mediaType      | MediaType |   TRACK, PODCAST, STATION, AD, SAMPLE, OTHER optional |
 | duration      | long  |   optional |
 | **SessionsState** | 
 | endpointId      | String  |   empty |
@@ -538,7 +628,7 @@ The following table describes the fields comprising a `LocalMediaSourceState`, w
 | playerCookie      | String  |   A player may declare arbitrary information for itself. optional |
 | spiVersion      | String  |   "1.0" required  |
 
-`supportedOperations` should list the operations which the local media source supports. Below is a list of all `supportedOperations`:
+`supportedOperations` should list the operations which the local media source supports. Below is a list of all `SupportedPlaybackOperation`:
 
 ```
 LocalMediaSource::SupportedPlaybackOperation::PLAY,
@@ -559,14 +649,35 @@ LocalMediaSource::SupportedPlaybackOperation::FAST_FORWARD,
 LocalMediaSource::SupportedPlaybackOperation::REWIND,
 LocalMediaSource::SupportedPlaybackOperation::START_OVER
 ```
+>**Note:** Currently PLAY/PAUSE/STOP are always supported for a source. Passing null allows ALL supported operations for the source. 
+
 
 `supportedContentSelectors` should list the content selection types the local source can support. Below is a table of valid pairs.
 
-| Source | supportable `ContentSelector`'s |
+| Source | Supportable `ContentSelector` Values |
 |---|---|
 | `AM_RADIO` |  `PRESET`, `FREQUENCY` |
 | `FM_RADIO` |  `PRESET`, `FREQUENCY` |
 | `SIRIUS_XM` |  `PRESET`, `CHANNEL` |
+
+## Handling Global Presets <a id ="handling-global-presets"></a>
+
+The Global Preset interface handles "Alexa, play preset \<number>\" utterances without requiring that users explicitly say which local media source (`AM_RADIO`, `FM_RADIO`, `SIRIUS_XM`) actually corresponds to the preset.
+
+The meaning of the `preset` passed through `setGlobalPreset()` is determined by the `GlobalPreset` platform implementation registered with the Engine and should suit the needs of the vehicle's infotainment system. When the `setGlobalPreset()` method is called, your implementation should map the preset to a preset that makes sense for your current client context.
+
+You must register a `GlobalPreset` implementation with the Engine in order for Alexa to set presets for any local media `Source` type that may use them (e.g. `AM_RADIO`, `FM_RADIO`, `SIRIUS_XM`). 
+
+```
+#include <AACE/Alexa/GlobalPreset.h>
+...
+class MyGlobalPresetHandler : public aace::alexa::GlobalPreset {	
+public:
+void setGlobalPreset( int preset ) override {
+    // handle the preset, via routing to local media source
+}
+...
+```    
 
 ## Handling Notifications <a id ="handling-notifications"></a>
 
@@ -685,19 +796,3 @@ class MyAlexaClient : public aace::alexa::AlexaClient {
 // Register the platform interface with the Engine
 engine->registerPlatformInterface( std::make_shared<MyAlexaClient>() );
 ```
-
-## Getting and Setting Alexa Engine Properties <a id="getting-and-setting-alexa-engine-properties"></a>
-
-The Alexa module defines several constants (for example `FIRMWARE_VERSION` and `LOCALE`) that are used to get and set runtime properties in the Engine. To use these properties, include the `AlexaProperties.h` header in your source code and call the Engine's `getProperty()` and `setProperty()` methods.
-
-```
-// get the current locale setting from the Engine
-String locale = m_engine->getProperty( com.amazon.aace.alexa.AlexaProperties.LOCALE );
-
-// set the current locale setting in the Engine
-m_engine->setProperty( com.amazon.aace.alexa.AlexaProperties.LOCALE, "en-US" );
-```
-
->**Note:** The `setProperty()` method returns `true` if the the property value was successfully updated and `false` if the update failed.
-
-The [AlexaProperties](./platform/include/AACE/Alexa/AlexaProperties.h) class includes details about the Engine properties defined in the Alexa module. For a list of the Alexa Voice Service (AVS) supported locales for the `LOCALE` property, see the [Alexa Voice Service (AVS) documentation](https://developer.amazon.com/docs/alexa-voice-service/system.html#locales).

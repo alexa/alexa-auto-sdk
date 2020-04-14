@@ -21,8 +21,14 @@ exit_with_usage() {
 	echo " --pokysdk-path <path>      = Specify custom Poky installation directory. (Default: /opt/poky/2.6.1)"
 	echo " --linaro-prefix <prefix>   = Specify Linaro toolchain path prefix. See the README for the details. (Default: ~/gcc-linaro-7.4.1-2019.02-)"
 	echo " --linaro-sysroots <path>   = Specify the directory where the cross sysroots are located. (Default: ~/sysroots)"
-	echo " --enable-sensitive-logs    = Enable sensitive logs only when building with debugging options."
-	echo " --enable-latency-logs      = Enable user perceived latency logs only when building with debugging options."
+	echo " --enable-sensitive-logs    = Enable inclusion of sensitive data in debugging logs. If you enable sensitive logs, you must also build with"
+	echo "                              debugging options (--debug)."
+	echo "                              IMPORTANT: If you enable sensitive logs, make sure you redact any sensitive data if posting logs publicly."
+	echo " --enable-latency-logs      = Enable user perceived latency logs."
+	echo " --enable-curl-logs         = Enable logging of upstream/downstream messages exchanged through the AVS Device SDK. Will only enable in"
+	echo "                              debug builds. Enabling this option will also enable sensitive logging. The directory to save the curl logs"
+	echo "                              must be configured via the AAC config stream:"
+	echo '                              { "aace.alexa" : { "avsDeviceSDK" : { "libcurlUtils" : { "streamLogPrefix" : "<PATH_PREFIX>" } } } }'
 	echo " --enable-tests             = Enable building test packages for AAC and AVS modules."
 	echo ""
 	echo " --force-docker             = Force builds to happen inside an Ubuntu docker container."
@@ -93,6 +99,11 @@ while [[ $# -gt 0 ]]; do
 		SENSITIVE_LOGS="1"
 		shift
 		;;
+		--enable-curl-logs)
+		CURL_LOGS="1"
+		SENSITIVE_LOGS="1"
+		shift
+		;;
 		--enable-latency-logs)
 		LATENCY_LOGS="1"
 		shift
@@ -124,6 +135,15 @@ while [[ $# -gt 0 ]]; do
 		USE_MBEDTLS="1"
 		shift
 		;;
+		--enable-address-sanitizer)
+		# This sets a AAC_ENABLE_ADDRESS_SANITIZER for the consuming application. See samples/cpp/SampleApp/CMakeLists.txt for an example.
+		ENABLE_ADDRESS_SANITIZER=1
+		shift
+		;;
+		--enable-coverage)
+		ENABLE_COVERAGE=1
+		shift
+		;;
 		-D*=*)
 		DEFINES+=("$1")
 		shift
@@ -147,6 +167,7 @@ DEBUG_BUILD=${DEBUG_BUILD:-0}
 ANDROID_API_LEVEL=${ANDROID_API_LEVEL:-22}
 QNX_BASE=${QNX_BASE:-"${HOME}/qnx700"}
 SENSITIVE_LOGS=${SENSITIVE_LOGS:-0}
+CURL_LOGS=${CURL_LOGS:-0}
 LATENCY_LOGS=${LATENCY_LOGS:-0}
 ENABLE_TESTS=${ENABLE_TESTS:-0}
 FORCE_DOCKER=${FORCE_DOCKER:-0}
@@ -173,6 +194,18 @@ init_extra_local_conf() {
 			note "Enable sensitive logs"
 			echo "AAC_SENSITIVE_LOGS = \"1\"" >> ${extra_local_conf}
 		fi
+		if [ ${CURL_LOGS} = "1" ]; then
+			note "Enable curl logs (for AVS SDK)"
+			echo "AAC_CURL_LOGS = \"1\"" >> ${extra_local_conf}
+		fi
+	else
+		note "Enable release build"
+		if [ ${CURL_LOGS} = "1" ]; then
+			error_and_exit "--enable-curl-logs option not supported in non-DEBUG build."
+		fi
+		if [ ${SENSITIVE_LOGS} = "1" ]; then
+			error_and_exit "--enable-sensitive-logs option not supported in non-DEBUG build."
+		fi
 	fi
 	if [ ${LATENCY_LOGS} = "1" ]; then
 		note "Enable user perceived latency logs"
@@ -182,6 +215,15 @@ init_extra_local_conf() {
 		note "Enable tests to build"
 		echo "AAC_ENABLE_TESTS = \"1\"" >> ${extra_local_conf}
 		echo "AVS_ENABLE_TESTS = \"1\"" >> ${extra_local_conf}
+	fi
+	if [ "${ENABLE_COVERAGE}" = "1" ]; then
+		note "Enable coverage for AAC modules"
+		echo "AAC_ENABLE_COVERAGE = \"1\"" >> ${extra_local_conf}
+		SCRIPT_OPTIONS="${SCRIPT_OPTIONS} --enable-coverage"
+	fi
+	if [ "${ENABLE_ADDRESS_SANITIZER}" = "1" ]; then
+		note "Enable address sanitizer cmake variable"
+		echo "AAC_ENABLE_ADDRESS_SANITIZER = \"1\"" >> ${extra_local_conf}
 	fi
 	if [ "${DEFAULT_LOGGER_ENABLED}" ]; then
 		note "Set default logger enabled: ${DEFAULT_LOGGER_ENABLED}"
@@ -196,7 +238,7 @@ init_extra_local_conf() {
 		echo "AAC_DEFAULT_LOGGER_SINK = \"${DEFAULT_LOGGER_SINK}\"" >> ${extra_local_conf}
 	fi
 	if [ ${FORCE_DOCKER} = "1" ]; then
-		note "Force using Docker for builer"
+		note "Force using Docker for builder"
 		SCRIPT_OPTIONS="${SCRIPT_OPTIONS} --force-docker"
 	fi
 	if [ ${USE_MBEDTLS} = "1" ]; then

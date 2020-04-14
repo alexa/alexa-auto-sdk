@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">2.1.0</span>
+   &#160;<span id="projectnumber">2.2.0</span>
    </div>
   </td>
  </tr>
@@ -108,6 +108,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a2d621811ac53c6128ad435546ba964e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af0ee84c73cd22161c02497508556ee90"><td class="memItemLeft" align="right" valign="top">virtual int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1audio_1_1_audio_output.html#af0ee84c73cd22161c02497508556ee90">getDuration</a> ()=0</td></tr>
 <tr class="separator:af0ee84c73cd22161c02497508556ee90"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9fc6bddf91b8365fbd134ce024e25dfa"><td class="memItemLeft" align="right" valign="top">virtual int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1audio_1_1_audio_output.html#a9fc6bddf91b8365fbd134ce024e25dfa">getNumBytesBuffered</a> ()</td></tr>
+<tr class="separator:a9fc6bddf91b8365fbd134ce024e25dfa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1a6e4c80146a448b4532f80f613dba11"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1audio_1_1_audio_output.html#a1a6e4c80146a448b4532f80f613dba11">volumeChanged</a> (float volume)=0</td></tr>
 <tr class="separator:a1a6e4c80146a448b4532f80f613dba11"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a51ae5c98c56a0ed6328b1444d0aaf041"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1audio_1_1_audio_output.html#a51ae5c98c56a0ed6328b1444d0aaf041">mutedStateChanged</a> (<a class="el" href="classaace_1_1audio_1_1_audio_output.html#ad03cbdbbf172fd64a16c16b64d8a4b05">MutedState</a> state)=0</td></tr>
@@ -474,6 +476,33 @@ Static Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a9fc6bddf91b8365fbd134ce024e25dfa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9fc6bddf91b8365fbd134ce024e25dfa">&#9670;&nbsp;</a></span>getNumBytesBuffered()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int64_t aace::audio::AudioOutput::getNumBytesBuffered </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Returns the amount of audio data buffered.</p>
+<dl class="section return"><dt>Returns</dt><dd>the number of bytes of the audio data buffered, or 0 if it's unknown. </dd></dl>
+
+</div>
+</div>
 <a id="a1a6e4c80146a448b4532f80f613dba11"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1a6e4c80146a448b4532f80f613dba11">&#9670;&nbsp;</a></span>volumeChanged()</h2>
 
@@ -634,7 +663,7 @@ Static Public Attributes</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 2.1.0 - Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 2.2.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

@@ -30,6 +30,7 @@ public class AddressBookHandler extends AddressBook {
 
     private static final String sContactsSourceId = "0001";
     private static final String sNavigationFavoritesSourceId = "0002";
+    private static final String[] sSourceIds = { sContactsSourceId, sNavigationFavoritesSourceId };
 
     private final String mContactsDataPath;
     private final String mNavigationFavoritesDataPath;
@@ -301,5 +302,11 @@ public class AddressBookHandler extends AddressBook {
 
         mLogger.postInfo( sTag, String.format( "success status of adding contacts with ID: (%s): (%b)", contactsSourceId, success ));
         return success;
+    }
+
+    public void removeAllAddressBooks() {
+        for ( String id : sSourceIds ) {
+            removeAddressBook( id );
+        }
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -43,6 +43,10 @@ abstract public class LocalMediaSource extends PlatformInterface
          * pause playback
          */
         PAUSE("PAUSE"),
+        /**
+         * stop the player
+         */
+        STOP("STOP"),
         /**
          * next song
          */
@@ -620,9 +624,18 @@ abstract public class LocalMediaSource extends PlatformInterface
 
     /**
      * Should be called on local media source player events. This will switch the media focus to that context.
+     * 
+     * @param focusAcquire true if focus should be acquired, false if focus should be abandoned
+     */
+    public void setFocus( boolean focusAcquire ) {
+        setFocus( getNativeRef(), focusAcquire );
+    }
+
+    /**
+     * Overload of above for backward compatibility. Always acquires focus.
      */
     public void setFocus() {
-        setFocus( getNativeRef() );
+        setFocus( getNativeRef(), true );
     }
 
     /**
@@ -672,7 +685,7 @@ abstract public class LocalMediaSource extends PlatformInterface
     private native void disposeBinder( long nativeRef );
     private native void playerEvent( long nativeRef, String eventName );
     private native void playerError( long nativeRef, String errorName, long code, String description, boolean fatal );
-    private native void setFocus( long nativeRef );
+    private native void setFocus( long nativeRef, boolean focusAcquire );
 }
 
 // END OF FILE

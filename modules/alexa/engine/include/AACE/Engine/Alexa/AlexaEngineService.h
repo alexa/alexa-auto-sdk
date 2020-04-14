@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -75,6 +75,7 @@
 #include <System/UserInactivityMonitor.h>
 
 #include "AACE/Engine/Alexa/LocaleAssetsManager.h"
+#include "AACE/Engine/Alexa/ExternalMediaAdapterRegistrationInterface.h"
 #include "AACE/Engine/Audio/AudioEngineService.h"
 #include "AACE/Engine/Core/EngineService.h"
 #include "AACE/Engine/Location/LocationEngineService.h"
@@ -83,6 +84,10 @@
 #include "AACE/Engine/Network/NetworkInfoObserver.h"
 #include "AACE/Engine/Vehicle/VehicleEngineService.h"
 #include "AACE/Engine/Storage/StorageEngineService.h"
+#include "AACE/Engine/PropertyManager/PropertyManagerEngineService.h"
+#include "AACE/Engine/PropertyManager/PropertyManagerServiceInterface.h"
+#include "AACE/Engine/PropertyManager/PropertyDescription.h"
+
 
 #include "AlertsEngineImpl.h"
 #include "AlexaClientEngineImpl.h"
@@ -104,7 +109,6 @@
 #include "SpeechSynthesizerEngineImpl.h"
 #include "SystemSoundPlayer.h"
 #include "TemplateRuntimeEngineImpl.h"
-#include "WakewordEngineAdapterProperty.h"
 #include "WakewordEngineManager.h"
 #include "WakewordObservableInterface.h"
 #include "WakewordObserverInterface.h"
@@ -119,17 +123,19 @@ class AlexaEngineSoftwareInfoSenderObserver;
 class AuthDelegateRouter;
 class HttpPutDelegate;
 class PlaybackRouterDelegate;
+class AudioPlayerObserverDelegate;
 
-class AlexaEngineService :
-    public aace::engine::core::EngineService,
-    public aace::engine::network::NetworkInfoObserver,
-    public alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface,
-    public alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesObserverInterface,
-    public AlexaComponentInterface,
-    public AlexaEndpointInterface,
-    public WakewordObservableInterface,
-    public std::enable_shared_from_this<AlexaEngineService> {
-
+class AlexaEngineService
+        : public aace::engine::core::EngineService
+        , public aace::engine::network::NetworkInfoObserver
+        , public alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface
+        , public alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesObserverInterface
+        , public alexaClientSDK::settings::SettingObserverInterface<alexaClientSDK::settings::LocalesSetting>
+        , public alexaClientSDK::settings::SettingObserverInterface<alexaClientSDK::settings::TimeZoneSetting>
+        , public AlexaComponentInterface
+        , public AlexaEndpointInterface
+        , public WakewordObservableInterface
+        , public std::enable_shared_from_this<AlexaEngineService> {
 public:
     DESCRIBE("aace.alexa", VERSION("1.0"),
         DEPENDS(aace::engine::audio::AudioEngineService),
@@ -137,14 +143,17 @@ public:
         DEPENDS(aace::engine::logger::LoggerEngineService),
         DEPENDS(aace::engine::network::NetworkEngineService),
         DEPENDS(aace::engine::storage::StorageEngineService),
-        DEPENDS(aace::engine::vehicle::VehicleEngineService))
+        DEPENDS(aace::engine::vehicle::VehicleEngineService),
+        DEPENDS(aace::engine::propertyManager::PropertyManagerEngineService))
 
 private:
     AlexaEngineService( const aace::engine::core::ServiceDescription& description );
 
 public:
     virtual ~AlexaEngineService() = default;
-    
+
+    using SetPropertyResultCallback = std::function<void(const std::string&, const std::string&, const std::string&)>;
+
     /// alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface
     /// @{
     void onAuthStateChange( AuthObserverInterface::State newState, AuthObserverInterface::Error error ) override;
@@ -177,6 +186,7 @@ public:
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> getDirectiveSequencer() override;
     std::shared_ptr<aace::engine::alexa::EndpointBuilderFactory> getEndpointBuilderFactory() override;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> getExceptionEncounteredSender() override;
+    std::shared_ptr<aace::engine::alexa::ExternalMediaPlayer> getExternalMediaPlayer() override;
     std::shared_ptr<alexaClientSDK::adsl::MessageInterpreter> getMessageInterpreter() override;
     std::shared_ptr<alexaClientSDK::acl::MessageRouterInterface> getMessageRouter() override;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> getMessageSender() override;
@@ -196,6 +206,58 @@ public:
     void addWakewordObserver( std::shared_ptr<WakewordObserverInterface> observer ) override;
     void removeWakewordObserver( std::shared_ptr<WakewordObserverInterface> observer ) override;
     /// @}
+    
+    // SettingObserverInterface for LOCALE setting.
+    void onSettingNotification( const alexaClientSDK::settings::DeviceLocales& deviceLocales, alexaClientSDK::settings::SettingNotifications notification) override;
+
+    // SettingObserverInterface for TIMEZONE setting.
+    void onSettingNotification(const std::string& value, alexaClientSDK::settings::SettingNotifications notification)
+        override;
+
+    /// Setters and Getter for the properties maintained by AlexaEngineService
+    /// @{
+    bool setProperty_firmwareVersion(
+        const std::string& value,
+        bool& changed,
+        bool& async,
+        const SetPropertyResultCallback& callbackFunction);
+    std::string getProperty_firmwareVersion();
+    std::string getProperty_wakewordSupported();
+
+    /** This is an asynchronous operation. It uses the @c callbackFunction to
+     * notify the PropertyManagerEngineService of the result of this
+     * set operation after a call to
+     * SettingObserverInterface::onSettingNotification() is received from the
+     * AVS DEVICE SDK denoting the result of the set operation.
+     */
+    bool setProperty_locale(
+        const std::string& value,
+        bool& changed,
+        bool& sync,
+        const SetPropertyResultCallback& callbackFunction);
+
+    /** This is an asynchronous operation. It uses the @c callbackFunction to
+     * notify the PropertyManagerEngineService of the result of this
+     * set operation after a call to
+     * SettingObserverInterface::onSettingNotification() is received from the
+     * AVS DEVICE SDK denoting the result of the set operation.
+     */
+    bool setProperty_timezone(
+        const std::string& value,
+        bool& changed,
+        bool& sync,
+        const SetPropertyResultCallback& callbackFunction);
+    std::string getProperty_locale();
+    std::string getProperty_supportedLocales();
+    std::string getProperty_countrySupported();
+    std::string getProperty_timezone();
+    bool setProperty_wakewordEnabled(
+        const std::string& value,
+        bool& changed,
+        bool& async,
+        const SetPropertyResultCallback& callbackFunction);
+    std::string getProperty_wakewordEnabled();
+    /// @}
 
 protected:
     bool initialize() override;
@@ -205,15 +267,13 @@ protected:
     bool stop() override;
     bool shutdown() override;
     bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) override;
-    bool setProperty( const std::string& key, const std::string& value ) override;
-    std::string getProperty( const std::string& key ) override;
 
 private:
     bool configureDeviceSDK( std::shared_ptr<std::istream> configuration );
-
     bool connect();
     bool disconnect();
     void recordVehicleMetric(bool full);
+    bool registerProperties();
 
     // country supported
     std::string getVehicleCountry();
@@ -243,6 +303,9 @@ private:
     bool registerPlatformInterfaceType( std::shared_ptr<aace::alexa::TemplateRuntime> templateRuntime );
 
     bool createExternalMediaPlayerImpl();
+
+    SetPropertyResultCallback m_localeCallbackFunction;
+    SetPropertyResultCallback m_timezoneCallbackFunction;
 
 private:
     std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> m_connectionManager;
@@ -286,6 +349,7 @@ private:
     std::shared_ptr<HttpPutDelegate> m_httpPutDelegate;
     std::shared_ptr<PlaybackRouterDelegate> m_playbackRouterDelegate;
     std::shared_ptr<SystemSoundPlayer> m_systemSoundPlayer;
+    std::shared_ptr<AudioPlayerObserverDelegate> m_audioPlayerObserverDelegate;
     
     std::shared_ptr<aace::engine::storage::LocalStorageInterface> m_localStorage;
     std::shared_ptr<aace::alexa::AuthProvider> m_authProviderPlatformInterface;
@@ -304,11 +368,12 @@ private:
     bool m_countrySupported = false;
     bool m_encoderEnabled;
     std::string m_encoderName;
-    std::string m_externalMediaPlayerAgent;
     alexaClientSDK::avsCommon::sdkInterfaces::softwareInfo::FirmwareVersion m_firmwareVersion = 1;
     NetworkInfoObserver::NetworkStatus m_networkStatus;
+    std::string m_externalMediaPlayerAgent;
     /// Holds the connection state to AVS before changing the network interface.
     bool m_previousAVSConnectionState = false;
+    std::string m_timezone;
 
     // engine implementation object references
     std::shared_ptr<aace::engine::alexa::AlertsEngineImpl> m_alertsEngineImpl;
@@ -333,7 +398,7 @@ private:
 
     // location service
     std::shared_ptr<AlexaEngineLocationStateProvider> m_locationStateProvider;
-
+        
     std::shared_ptr<WakewordEngineManager> m_wakewordEngineManager;
     std::string m_wakewordEngineName;
 
@@ -342,6 +407,8 @@ private:
 
     // executer
     alexaClientSDK::avsCommon::utils::threading::Executor m_executor;
+
+    std::mutex m_setPropertyResultCallbackMutex;
 };
 
 //

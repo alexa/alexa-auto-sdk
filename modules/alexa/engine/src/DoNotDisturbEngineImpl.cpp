@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -80,7 +80,7 @@ std::shared_ptr<DoNotDisturbEngineImpl> DoNotDisturbEngineImpl::create(
 
     try
     {
-        ThrowIfNull( doNotDisturbPlatformInterface, "invalidAlertsPlatformInterface" );
+        ThrowIfNull( doNotDisturbPlatformInterface, "invalidDoNotDisturbPlatformInterface" );
         ThrowIfNull( defaultEndpointBuilder, "invalidDefaultEndpointBuilder" );
         ThrowIfNull( connectionManager, "invalidConnectionManager" );
 
@@ -136,6 +136,12 @@ void DoNotDisturbEngineImpl::onSettingNotification( const bool& value, alexaClie
                 break;
             case alexaClientSDK::settings::SettingNotifications::LOCAL_CHANGE_FAILED:
                 AACE_ERROR(LX(TAG,"onSettingNotificationFailed").d("reason", "LOCAL_CHANGE_FAILED"));
+                break;
+            case alexaClientSDK::settings::SettingNotifications::LOCAL_CHANGE_IN_PROGRESS:
+            case alexaClientSDK::settings::SettingNotifications::AVS_CHANGE_IN_PROGRESS:
+            case alexaClientSDK::settings::SettingNotifications::LOCAL_CHANGE_CANCELLED:
+            case alexaClientSDK::settings::SettingNotifications::AVS_CHANGE_CANCELLED:
+                // Do nothing
                 break;
         }
     } else AACE_ERROR(LX(TAG,"onSettingNotificationFailed").d("reason", "no platform interface registered"));

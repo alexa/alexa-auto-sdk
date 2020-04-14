@@ -7,6 +7,8 @@ endif()
 # Find AVS
 find_package(AVS 1.17)
 
+add_definitions(-DRAPIDJSON_HAS_STDSTRING)
+
 set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AlertsEngineImpl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/NotificationsEngineImpl.h
@@ -18,6 +20,7 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AlexaMetrics.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AudioChannelEngineImpl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AudioPlayerEngineImpl.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/DiscoveredPlayerSenderInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/EndpointBuilderFactory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/EqualizerControllerEngineImpl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/PlaybackControllerEngineImpl.h
@@ -26,15 +29,24 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/TemplateRuntimeEngineImpl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AuthProviderEngineImpl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AlexaComponentInterface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/ExternalMediaAdapterConstants.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/ExternalMediaPlayerEngineImpl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/ExternalMediaAdapterEngineImpl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/ExternalMediaAdapterHandler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/ExternalMediaPlayer.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AdapterUtils.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AuthorizedSender.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/ExternalMediaAdapterHandlerInterface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/ExternalMediaAdapterInterface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/ExternalMediaPlayerInterface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/ExternalMediaPlayerObserverInterface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/ExternalMediaAdapterRegistrationInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/LocalMediaSourceEngineImpl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/DoNotDisturbEngineImpl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/UPLService.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/VehicleData.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AlexaSpeakerEngineImpl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/WakewordEngineAdapter.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/WakewordEngineAdapterProperty.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/WakewordEngineManager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/WakewordObservableInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/WakewordObserverInterface.h
@@ -67,6 +79,9 @@ add_library(AACEAlexaEngine SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ExternalMediaAdapterEngineImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ExternalMediaAdapterHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ExternalMediaPlayerEngineImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ExternalMediaPlayer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/AuthorizedSender.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/AdapterUtils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/LocaleAssetsManager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/LocalMediaSourceEngineImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/NotificationsEngineImpl.cpp
@@ -76,6 +91,7 @@ add_library(AACEAlexaEngine SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/SystemSoundPlayer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/TemplateRuntimeEngineImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/UPLService.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/VehicleData.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/WakewordEngineManager.cpp
 )
 

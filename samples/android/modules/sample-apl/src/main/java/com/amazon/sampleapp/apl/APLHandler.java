@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -16,41 +16,43 @@
 package com.amazon.sampleapp.apl;
 
 import android.app.Activity;
-import android.util.Log;
-import android.view.View;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 
 import com.amazon.aace.apl.APL;
-import com.amazon.aace.audio.AudioOutputProvider;
 import com.amazon.apl.android.APLController;
 import com.amazon.apl.android.APLLayout;
 import com.amazon.apl.android.APLOptions;
 import com.amazon.apl.android.APLOptionsBuilder;
 import com.amazon.apl.android.Content;
-import com.amazon.apl.android.APLController;
 import com.amazon.apl.android.Scaling;
 import com.amazon.apl.android.dependencies.IOpenUrlCallback;
-import com.amazon.apl.android.dependencies.impl.OpenUrlCallback;
 import com.amazon.apl.android.dependencies.ITtsPlayer;
 import com.amazon.apl.android.dependencies.TtsSourceProvider;
+import com.amazon.apl.android.dependencies.impl.OpenUrlCallback;
 import com.amazon.apl.android.dependencies.impl.TtsPlayer;
-import com.amazon.apl.android.providers.impl.HttpRetrieverProvider;;
 import com.amazon.apl.android.providers.IDataRetriever;
 import com.amazon.apl.android.providers.ITtsPlayerProvider;
+import com.amazon.apl.android.providers.impl.HttpRetrieverProvider;
 import com.amazon.apl.enums.ViewportMode;
 import com.amazon.sampleapp.apl.R;
 import com.amazon.sampleapp.apl.content.AssetContentCallback;
 import com.amazon.sampleapp.core.SampleAppContext;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Vector;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+/**
+ * This class implements the Auto SDK APL platform interface. This handles coordinates taking
+ * APL document data from the AUto SDK and passed it to the APL rendering engine.
+ */
 public class APLHandler extends APL {
 
     private static final String sTag = "APLHandler";
@@ -58,24 +60,23 @@ public class APLHandler extends APL {
     private final Activity mActivity;
     private APLLayout mAplLayout;
     private APLController mAplController;
-    private AudioOutputProvider mAudioOutputProvider;
     private String mToken;
     private String mNewToken;
     private JSONObject mVisualContext;
     private String mVersion;
     private JSONArray mSupportedViewPorts;
     private ViewPager mViewPager;
-    private APLTtsPlayerProvider mTtsPlayerProvider;
+    private APLOptions mOptions;
+    private ITtsPlayerProvider mPlayer;
+    private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
 
     public APLHandler(SampleAppContext sampleAppContext) {
         mActivity = sampleAppContext.getActivity();
-        mAudioOutputProvider = sampleAppContext.getAudioOutputProvider();
         mViewPager = sampleAppContext.getViewPager();
 
-        // Initialize APL
-
+        // Initialize APL layout and TTS player
         mAplLayout = mActivity.findViewById(R.id.apl);
-        mTtsPlayerProvider = new APLTtsPlayerProvider(mAudioOutputProvider);
+        createTTSPlayer();
     }
 
     @Override
@@ -83,7 +84,6 @@ public class APLHandler extends APL {
         try {
             JSONObject context = new JSONObject()
                     .put("token", mToken)
-                    .put("presentationToken", mToken)
                     .put("version", mVersion)
                     .put("componentsVisibleOnScreen", new JSONArray().put(mVisualContext));
 
@@ -100,13 +100,14 @@ public class APLHandler extends APL {
         try {
             // Extract document and data
             JSONObject payload = new JSONObject(jsonPayload);
+            Log.i(sTag, "APL render document: " + payload.toString(4));
             JSONObject document = payload.getJSONObject("document");
             JSONObject dataSources = payload.getJSONObject("datasources");
 
-            // Save version
+            mToken = token;
             mVersion = document.getString("version");
 
-            Log.i(sTag, "APL render document version: " + mVersion + " token: " + token + " windowId: " + windowId);
+            Log.i(sTag, "APL render document version: " + mVersion + " token: " + mToken + " windowId: " + windowId);
 
             if (payload.has("supportedViewports")) {
                 mSupportedViewPorts = payload.getJSONArray("supportedViewports");
@@ -119,7 +120,7 @@ public class APLHandler extends APL {
 
             // Fetch assets and render
             AssetContentCallback assetContentCallback = new AssetContentCallback(mActivity, data);
-            assetContentCallback.addCompleteCallback(content -> doRender(doc, content, token));
+            assetContentCallback.addCompleteCallback(content -> doRender(doc, content));
 
             // Inflate the document
             try {
@@ -134,33 +135,67 @@ public class APLHandler extends APL {
 
     @Override
     public void clearDocument() {
-        Log.v(sTag, "clearDocument and visual context");
+        Log.i(sTag, "clearDocument and visual context");
         mVisualContext = null;
-        clearCard();
+
+        mActivity.runOnUiThread(() -> {
+            if (mAplController != null) {
+                Log.i(sTag, "Finishing previous document token: " + mToken);
+                mAplController.finishDocument();
+                mAplController = null;
+            } else {
+                Log.w(sTag, "APL controller will not be shutdown: " + mToken);
+            }
+            // Show main fragment
+            mViewPager.setCurrentItem(0, true);
+            mExecutor.submit(() -> {
+                Log.i(sTag, "Clearing card: token: " + mToken);
+                clearCard();
+            });
+        });
     }
 
     @Override
     public void executeCommands(String payload, String token) {
-        try {
-            // Log payload and token
-            Log.i(sTag, "executeCommands called: " + payload);
-            JSONObject commands = new JSONObject(payload);
-            if (commands.has("commands")) {
-                mAplController.executeCommands(commands.getJSONArray("commands").toString());
-                executeCommandsResult(mToken, true, "");
-            } else {
-                Log.e(sTag, "executeCommands did have commands object");
-                executeCommandsResult(mToken, false, "Missing commands");
+        mToken = token;
+        mActivity.runOnUiThread(() -> {
+            try {
+                // Log payload and token
+                Log.i(sTag, "executeCommands called: " + payload);
+                JSONObject commands = new JSONObject(payload);
+                if (commands.has("commands")) {
+                    mAplController.executeCommands(commands.getJSONArray("commands").toString());
+                    mExecutor.submit(() -> {
+                        Log.i(sTag, "executeCommands result succeeded. token: " + mToken);
+                        executeCommandsResult(mToken, true, "");
+                        processActivityEvent(mToken, APL.ActivityEvent.ACTIVATED);
+                    });
+                } else {
+                    mExecutor.submit(() -> {
+                        Log.e(sTag, "executeCommands failed. token: " + mToken);
+                        executeCommandsResult(mToken, false, "Missing commands");
+                    });
+                }
+            } catch (Exception e) {
+                Log.e(sTag, "executeCommands failed. token: " + mToken + " error: " + e.getMessage());
+                mExecutor.submit(() -> {
+                    executeCommandsResult(mToken, false, e.getMessage());
+                });
+
             }
-        } catch (Exception e) {
-            Log.e(sTag, e.getMessage());
-            executeCommandsResult(mToken, false, e.getMessage());
-        }
+        });
     }
 
     @Override
     public void interruptCommandSequence() {
-        Log.i(sTag, "interruptCommandSequence");
+        mActivity.runOnUiThread(() -> {
+            try {
+                Log.i(sTag, "Interrupting command sequence");
+                mAplController.cancelExecution();
+            } catch (Exception e) {
+                Log.e(sTag, "Interrupting command sequence did not succeed: " + e.getMessage());
+            }
+        });
     }
 
     /**
@@ -170,32 +205,24 @@ public class APLHandler extends APL {
      * @param doc     raw document for test command extraction
      * @param content the inflated contents
      */
-    private void doRender(String doc, Content content, String token) {
-        APLOptions options = createAPLOptions(doc);
-
-        mActivity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    // IF token is different, then we are dealing with a different skill
-                    if (mToken != null && !mToken.equals(token)) {
-                        Log.i(sTag, "Finishing previous document token: " + mToken + " newToken: " + token);
-                        if (mAplController != null) {
-//                            mAplController.finishDocument();
-                            mAplController = null;
-                        }
-                    }
-
-                    mToken = token;
-                    mAplController = APLController.renderDocument(content, options, mAplLayout.getPresenter());
-                    mViewPager.setCurrentItem(1, true);
+    private void doRender(String doc, Content content) {
+        mActivity.runOnUiThread(() -> {
+            try {
+                Log.i(sTag, "Render sending activity event ACTIVATED. token: " + mToken);
+                processActivityEvent(mToken, APL.ActivityEvent.ACTIVATED);
+                mOptions = createAPLOptions(doc);
+                mAplController = APLController.renderDocument(content, mOptions, mAplLayout.getPresenter());
+                mViewPager.setCurrentItem(1, true);
+                mExecutor.submit(() -> {
+                    Log.i(sTag, "Render result succeeded. token: " + mToken);
                     renderDocumentResult(mToken, true, "");
-                } catch (Exception e) {
-                    Log.e(sTag, e.getMessage());
+                });
+            } catch (Exception e) {
+                mExecutor.submit(() -> {
+                    Log.e(sTag, "Render result failed: token: " + mToken + " error: " + e.getMessage());
                     renderDocumentResult(mToken, false, e.getMessage());
-                }
+                });
             }
-
         });
     }
 
@@ -209,7 +236,6 @@ public class APLHandler extends APL {
         return APLOptionsBuilder
                 .create("APLSampleApp configuration", "1.0")
                 .allowOpenUrl(true)
-                //.mediaPlayerProvider(mediaPlayerProvider)
                 .openUrlCallback(createOpenURLCallback())
                 .dataRetrieverProvider(() -> new IDataRetriever() {
                     private HttpRetrieverProvider mProvider = new HttpRetrieverProvider();
@@ -223,7 +249,7 @@ public class APLHandler extends APL {
                     public void cancelAll() {
                     }
                 })
-                .ttsPlayerProvider(mTtsPlayerProvider)
+                .ttsPlayerProvider(mPlayer)
                 .sendEventCallback((args, components, sources) -> {
                     try {
                         String userEvent = new UserEventPayload(mToken, args, components, sources).toString();
@@ -293,6 +319,45 @@ public class APLHandler extends APL {
         }
 
         return scaling;
+    }
+
+    /**
+     * Create the TTS player that will handle text to speech transformers and speech marks.
+     */
+    void createTTSPlayer() {
+        mPlayer = new ITtsPlayerProvider() {
+            private TtsPlayer ttsPlayer;
+
+            @Override
+            public ITtsPlayer getPlayer() {
+                if (ttsPlayer == null) {
+                    ttsPlayer = new TtsPlayer(mActivity);
+                    Log.i(sTag, "Created TTS player");
+                }
+                return ttsPlayer;
+            }
+
+            @Override
+            public void prepare(String source, TtsSourceProvider ttsSourceProvider) {
+                try {
+                    Log.i(sTag, "prepare: " + source);
+                    ttsSourceProvider.onSource(new URL(source));
+                } catch (MalformedURLException e) {
+                    Log.e(sTag, "Malformed TTS Url " + source);
+                }
+            }
+
+            @Override
+            public void onDocumentFinish() {
+                if (ttsPlayer != null) {
+                    Log.i(sTag, "Releasing TTS player");
+                    ttsPlayer.release();
+                    ttsPlayer = null;
+                } else {
+                    Log.w(sTag, "TTS player is null");
+                }
+            }
+        };
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ protected:
         {
             EXPECT_CALL(*m_alexaMockFactory->getAudioManagerMock(),openAudioOutputChannel("AudioPlayer",aace::audio::AudioOutputProvider::AudioOutputType::MUSIC))
                 .WillOnce(testing::Return(m_alexaMockFactory->getAudioOutputChannelMock()));
-            EXPECT_CALL(*m_alexaMockFactory->getAudioOutputChannelMock(),setEngineInterface(testing::_)).Times(testing::Exactly(2));;
+//            EXPECT_CALL(*m_alexaMockFactory->getAudioOutputChannelMock(),setEngineInterface(testing::_)).Times(testing::Exactly(2));
             EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),addDirectiveHandler(testing::_)).WillOnce(testing::Return(true));
             EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),doShutdown());
             EXPECT_CALL(*m_alexaMockFactory->getContextManagerInterfaceMock(),setStateProvider(testing::_, testing::_)).Times(testing::AtLeast(1));
@@ -102,7 +102,8 @@ protected:
             m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
             m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
             m_alexaMockFactory->getPlaybackRouterMock(),
-            m_alexaMockFactory->getCertifiedSenderMock() );
+            m_alexaMockFactory->getCertifiedSenderMock(),
+            m_alexaMockFactory->getAudioPlayerObserverInterfaceMock());
         
         return audioPlayerEngineImpl;
     }
@@ -139,9 +140,10 @@ TEST_F(AudioPlayerEngineImplTest,createWithPlatformInterfaceAsNull)
         m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         m_alexaMockFactory->getPlaybackRouterMock(),
-        m_alexaMockFactory->getCertifiedSenderMock() );
+        m_alexaMockFactory->getCertifiedSenderMock(),
+        m_alexaMockFactory->getAudioPlayerObserverInterfaceMock());
     
-    ASSERT_EQ(audioPlayerEngineImpl,nullptr) << "AlertEngineImpl pointer expected to be null";
+    ASSERT_EQ(audioPlayerEngineImpl,nullptr) << "AudioPlayerEngineImpl pointer expected to be null";
 }
 
 TEST_F(AudioPlayerEngineImplTest, createWithAudioManagerInterfaceAsNull)
@@ -160,9 +162,10 @@ TEST_F(AudioPlayerEngineImplTest, createWithAudioManagerInterfaceAsNull)
         m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         m_alexaMockFactory->getPlaybackRouterMock(),
-        m_alexaMockFactory->getCertifiedSenderMock() );
+        m_alexaMockFactory->getCertifiedSenderMock(),
+        m_alexaMockFactory->getAudioPlayerObserverInterfaceMock());
     
-    ASSERT_EQ(audioPlayerEngineImpl,nullptr) << "AlertEngineImpl pointer expected to be null";
+    ASSERT_EQ(audioPlayerEngineImpl,nullptr) << "AudioPlayerEngineImpl pointer expected to be null";
 }
 
 TEST_F(AudioPlayerEngineImplTest,createWithDirectiveSequencerAsNull)
@@ -181,9 +184,10 @@ TEST_F(AudioPlayerEngineImplTest,createWithDirectiveSequencerAsNull)
         m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         m_alexaMockFactory->getPlaybackRouterMock(),
-        m_alexaMockFactory->getCertifiedSenderMock() );
+        m_alexaMockFactory->getCertifiedSenderMock(),
+        m_alexaMockFactory->getAudioPlayerObserverInterfaceMock());
     
-    ASSERT_EQ(audioPlayerEngineImpl,nullptr) << "AlertEngineImpl pointer expected to be null";
+    ASSERT_EQ(audioPlayerEngineImpl,nullptr) << "AudioPlayerEngineImpl pointer expected to be null";
 }
 
 TEST_F(AudioPlayerEngineImplTest,createWithMessageSenderAsNull)
@@ -202,9 +206,10 @@ TEST_F(AudioPlayerEngineImplTest,createWithMessageSenderAsNull)
         m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         m_alexaMockFactory->getPlaybackRouterMock(),
-        m_alexaMockFactory->getCertifiedSenderMock() );
+        m_alexaMockFactory->getCertifiedSenderMock(),
+        m_alexaMockFactory->getAudioPlayerObserverInterfaceMock());
     
-    ASSERT_EQ(audioPlayerEngineImpl,nullptr) << "AlertEngineImpl pointer expected to be null";
+    ASSERT_EQ(audioPlayerEngineImpl,nullptr) << "AudioPlayerEngineImpl pointer expected to be null";
 }
 
 TEST_F(AudioPlayerEngineImplTest,createWithFocusManagerAsNull)
@@ -223,9 +228,10 @@ TEST_F(AudioPlayerEngineImplTest,createWithFocusManagerAsNull)
         m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         m_alexaMockFactory->getPlaybackRouterMock(),
-        m_alexaMockFactory->getCertifiedSenderMock() );
+        m_alexaMockFactory->getCertifiedSenderMock(),
+        m_alexaMockFactory->getAudioPlayerObserverInterfaceMock());
     
-    ASSERT_EQ(audioPlayerEngineImpl,nullptr) << "AlertEngineImpl pointer expected to be null";
+    ASSERT_EQ(audioPlayerEngineImpl,nullptr) << "AudioPlayerEngineImpl pointer expected to be null";
 }
 
 TEST_F(AudioPlayerEngineImplTest,createWithContextManagerAsNull)
@@ -244,9 +250,10 @@ TEST_F(AudioPlayerEngineImplTest,createWithContextManagerAsNull)
         m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         m_alexaMockFactory->getPlaybackRouterMock(),
-        m_alexaMockFactory->getCertifiedSenderMock() );
+        m_alexaMockFactory->getCertifiedSenderMock(),
+        m_alexaMockFactory->getAudioPlayerObserverInterfaceMock());
     
-    ASSERT_EQ(audioPlayerEngineImpl,nullptr) << "AlertEngineImpl pointer expected to be null";
+    ASSERT_EQ(audioPlayerEngineImpl,nullptr) << "AudioPlayerEngineImpl pointer expected to be null";
 }
 
 TEST_F(AudioPlayerEngineImplTest, createWithAttachmentManagerAsNull)
@@ -265,9 +272,10 @@ TEST_F(AudioPlayerEngineImplTest, createWithAttachmentManagerAsNull)
         m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         m_alexaMockFactory->getPlaybackRouterMock(),
-        m_alexaMockFactory->getCertifiedSenderMock() );
+        m_alexaMockFactory->getCertifiedSenderMock(),
+        m_alexaMockFactory->getAudioPlayerObserverInterfaceMock());
     
-    ASSERT_EQ(audioPlayerEngineImpl,nullptr) << "AlertEngineImpl pointer expected to be null";
+    ASSERT_EQ(audioPlayerEngineImpl,nullptr) << "AudioPlayerEngineImpl pointer expected to be null";
 }
 
 TEST_F(AudioPlayerEngineImplTest, createWithCapabilitiesDelegateAsNull)
@@ -286,9 +294,10 @@ TEST_F(AudioPlayerEngineImplTest, createWithCapabilitiesDelegateAsNull)
         m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         m_alexaMockFactory->getPlaybackRouterMock(),
-        m_alexaMockFactory->getCertifiedSenderMock() );
+        m_alexaMockFactory->getCertifiedSenderMock(),
+        m_alexaMockFactory->getAudioPlayerObserverInterfaceMock());
     
-    ASSERT_EQ(audioPlayerEngineImpl,nullptr) << "AlertEngineImpl pointer expected to be null";
+    ASSERT_EQ(audioPlayerEngineImpl,nullptr) << "AudioPlayerEngineImpl pointer expected to be null";
 }
 
 TEST_F(AudioPlayerEngineImplTest,createWithSpeakerManagerAsNull)
@@ -307,9 +316,10 @@ TEST_F(AudioPlayerEngineImplTest,createWithSpeakerManagerAsNull)
         nullptr,
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         m_alexaMockFactory->getPlaybackRouterMock(),
-        m_alexaMockFactory->getCertifiedSenderMock() );
+        m_alexaMockFactory->getCertifiedSenderMock(),
+        m_alexaMockFactory->getAudioPlayerObserverInterfaceMock());
     
-    ASSERT_EQ(audioPlayerEngineImpl,nullptr) << "AlertEngineImpl pointer expected to be null";
+    ASSERT_EQ(audioPlayerEngineImpl,nullptr) << "AudioPlayerEngineImpl pointer expected to be null";
 }
 
 TEST_F(AudioPlayerEngineImplTest,createWithExceptionSenderAsNull)
@@ -328,9 +338,10 @@ TEST_F(AudioPlayerEngineImplTest,createWithExceptionSenderAsNull)
         m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
         nullptr,
         m_alexaMockFactory->getPlaybackRouterMock(),
-        m_alexaMockFactory->getCertifiedSenderMock() );
+        m_alexaMockFactory->getCertifiedSenderMock(),
+        m_alexaMockFactory->getAudioPlayerObserverInterfaceMock());
     
-    ASSERT_EQ(audioPlayerEngineImpl,nullptr) << "AlertEngineImpl pointer expected to be null";
+    ASSERT_EQ(audioPlayerEngineImpl,nullptr) << "AudioPlayerEngineImpl pointer expected to be null";
 }
 
 TEST_F(AudioPlayerEngineImplTest,createWithPlaybackRouterAsNull)
@@ -349,9 +360,10 @@ TEST_F(AudioPlayerEngineImplTest,createWithPlaybackRouterAsNull)
         m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         nullptr,
-        m_alexaMockFactory->getCertifiedSenderMock() );
+        m_alexaMockFactory->getCertifiedSenderMock(),
+        m_alexaMockFactory->getAudioPlayerObserverInterfaceMock());
     
-    ASSERT_EQ(audioPlayerEngineImpl,nullptr) << "AlertEngineImpl pointer expected to be null";
+    ASSERT_EQ(audioPlayerEngineImpl,nullptr) << "AudioPlayerEngineImpl pointer expected to be null";
 }
 
 TEST_F(AudioPlayerEngineImplTest,createWithCertifiedSenderAsNull)
@@ -370,7 +382,30 @@ TEST_F(AudioPlayerEngineImplTest,createWithCertifiedSenderAsNull)
         m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         m_alexaMockFactory->getPlaybackRouterMock(),
-        nullptr );
+        nullptr,
+        m_alexaMockFactory->getAudioPlayerObserverInterfaceMock());
     
-    ASSERT_EQ(audioPlayerEngineImpl,nullptr) << "AlertEngineImpl pointer expected to be null";
+    ASSERT_EQ(audioPlayerEngineImpl,nullptr) << "AudioPlayerEngineImpl pointer expected to be null";
+}
+
+TEST_F(AudioPlayerEngineImplTest,createWithAudioPlayerObserverInterfaceAsNull)
+{
+    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),doShutdown());
+    
+    auto audioPlayerEngineImpl = aace::engine::alexa::AudioPlayerEngineImpl::create(
+        m_alexaMockFactory->getAudioPlayerMock(),
+        m_alexaMockFactory->getAudioManagerMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
+        m_alexaMockFactory->getMessageSenderInterfaceMock(),
+        m_alexaMockFactory->getFocusManagerInterfaceMock(),
+        m_alexaMockFactory->getContextManagerInterfaceMock(),
+        m_alexaMockFactory->getAttachmentManagerMock(),
+        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
+        m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
+        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
+        m_alexaMockFactory->getPlaybackRouterMock(),
+        m_alexaMockFactory->getCertifiedSenderMock(),
+        nullptr);
+    
+    ASSERT_EQ(audioPlayerEngineImpl,nullptr) << "AudioPlayerEngineImpl pointer expected to be null";
 }

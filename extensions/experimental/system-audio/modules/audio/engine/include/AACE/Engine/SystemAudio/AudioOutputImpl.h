@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@
 #include <atomic>
 #include <mutex>
 #include <aal.h>
+#include <vector>
+#include <deque>
 
 namespace aace {
 namespace engine {
@@ -51,6 +53,7 @@ public:
     int64_t getPosition() override;
     bool setPosition(int64_t position) override;
     int64_t getDuration() override;
+    int64_t getNumBytesBuffered() override;
     bool volumeChanged(float volume) override;
     bool mutedStateChanged(MutedState state) override;
 
@@ -68,7 +71,8 @@ private:
 
     bool executePrepare(std::shared_ptr<aace::audio::AudioStream> stream, bool repeating);
     bool executePrepare(const std::string& url, bool repeating);
-    bool prepareLocked(const std::string& url, bool repeating);
+    bool prepareLocked(const std::string& url, std::shared_ptr<aace::audio::AudioStream> stream, bool repeating);
+    void preparePlayer(const std::string& url, std::shared_ptr<aace::audio::AudioStream> stream);
     bool executePlay();
     bool executeStop();
     bool executePause();
@@ -76,8 +80,11 @@ private:
     int64_t executeGetPosition();
     bool executeSetPosition(int64_t position);
     int64_t executeGetDuration();
+    int64_t executeGetNumBytesBuffered();
     bool executeVolumeChanged(float volume);
     bool executeMutedStateChanged(MutedState state);
+
+    std::vector<std::string> parsePlaylistUrl(const std::string& url);
 
     enum class State {
         Created, Initialized,
@@ -96,6 +103,8 @@ private:
     std::string m_name;
     aal_handle_t m_player = nullptr;
     std::shared_ptr<aace::audio::AudioStream> m_currentStream;
+    std::string m_mediaUrl;
+    std::deque<std::string> m_mediaQueue;
     bool m_repeating = false;
     int64_t m_currentPosition = 0;
     float m_currentVolume = 0.5;

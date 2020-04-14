@@ -38,6 +38,7 @@ set(CORE_SOURCE
     ${CORE_CPP_DIR}/src/Vehicle/VehicleConfigurationBinder.cpp
     ${CORE_CPP_DIR}/src/Metrics/MetricsUploaderBinder.cpp
     ${CORE_CPP_DIR}/src/Logger/LoggerConfigurationBinder.cpp
+    ${CORE_CPP_DIR}/src/PropertyManager/PropertyManagerBinder.cpp
 
 )
 set(CORE_DEPENDENCIES

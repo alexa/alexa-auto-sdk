@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -21,9 +21,11 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
+import com.amazon.aace.alexa.AlexaProperties;
 import com.amazon.aace.alexa.SpeechRecognizer;
 import com.amazon.sampleapp.R;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
+import com.amazon.sampleapp.impl.PropertyManager.PropertyManagerHandler;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -44,10 +46,12 @@ public class SpeechRecognizerHandler extends SpeechRecognizer {
     private final View mToggleItem;
     private final View mMessage;
     private final TextView mLocaleMessage;
+    private PropertyManagerHandler  mPropertyManager;
     // AutoVoiceChrome controller
 
     public SpeechRecognizerHandler( Activity activity,
                                     LoggerHandler logger,
+                                    PropertyManagerHandler propertyManager,
                                     boolean wakeWordEnabled ) {
         super( wakeWordEnabled );
         mActivity = activity;
@@ -63,6 +67,9 @@ public class SpeechRecognizerHandler extends SpeechRecognizer {
 
         // Wakeword locale switching Message
         mLocaleMessage = mActivity.findViewById( R.id.wakeWordLocaleChangeMessage );
+
+        mPropertyManager = propertyManager;
+
 
         disableWakeWordUI();
     }
@@ -121,7 +128,7 @@ public class SpeechRecognizerHandler extends SpeechRecognizer {
                     mExecutor.submit( new Runnable() {
                         @Override
                         public void run() {
-                            enableWakewordDetection();
+                            mPropertyManager.setProperty(AlexaProperties.WAKEWORD_ENABLED, "true");
                         }
                     } );
 
@@ -131,7 +138,7 @@ public class SpeechRecognizerHandler extends SpeechRecognizer {
                     mExecutor.submit( new Runnable() {
                         @Override
                         public void run() {
-                            disableWakewordDetection();
+                            mPropertyManager.setProperty(AlexaProperties.WAKEWORD_ENABLED, "false");
                         }
                     } );
                     mLocaleMessage.setVisibility( View.GONE );

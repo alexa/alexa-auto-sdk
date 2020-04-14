@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ std::shared_ptr<CBLEngineImpl> CBLEngineImpl::create(
     std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
     std::chrono::seconds codePairRequestTimeout,
     std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
+    std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> localeAssetManager,
     bool enableUserProfile ) {
     
     std::shared_ptr<CBLEngineImpl> cblEngineImpl = nullptr;
@@ -44,7 +45,7 @@ std::shared_ptr<CBLEngineImpl> CBLEngineImpl::create(
 
         cblEngineImpl = std::shared_ptr<CBLEngineImpl>( new CBLEngineImpl( cblPlatformInterface ) );
 
-        ThrowIfNot( cblEngineImpl->initialize( customerDataManager, deviceInfo, codePairRequestTimeout, alexaEndpoints, enableUserProfile ), "initializeCBLEngineImplFailed" );
+        ThrowIfNot( cblEngineImpl->initialize( customerDataManager, deviceInfo, codePairRequestTimeout, alexaEndpoints, localeAssetManager, enableUserProfile ), "initializeCBLEngineImplFailed" );
 
         // set the cbb engine interface
         cblPlatformInterface->setEngineInterface( cblEngineImpl );
@@ -68,6 +69,7 @@ bool CBLEngineImpl::initialize (
     std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
     std::chrono::seconds codePairRequestTimeout,
     std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
+    std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> localeAssetManager,
     bool enableUserProfile ) {
 
     try
@@ -75,7 +77,7 @@ bool CBLEngineImpl::initialize (
         ThrowIfNull( customerDataManager, "invalidCustomerDataManager" );
         ThrowIfNull( deviceInfo, "invalidDeviceInfo" );
 
-        std::shared_ptr<CBLAuthDelegateConfiguration> configuration = CBLAuthDelegateConfiguration::create( deviceInfo, codePairRequestTimeout, alexaEndpoints );
+        std::shared_ptr<CBLAuthDelegateConfiguration> configuration = CBLAuthDelegateConfiguration::create( deviceInfo, codePairRequestTimeout, alexaEndpoints, localeAssetManager );
         ThrowIfNull( configuration, "nullCBLAuthDelegateConfiguration");
 
         m_cblAuthDelegate = CBLAuthDelegate::create( customerDataManager, configuration, shared_from_this(), enableUserProfile );

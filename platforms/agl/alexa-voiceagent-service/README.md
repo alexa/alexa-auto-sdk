@@ -11,7 +11,7 @@ The Automotive Grade Linux (AGL) Alexa Voice Agent is Alexa client software that
 * [Building the AGL Voice Agent](#building-the-agl-alexa-voice-agent)
 * [Installing and Running the AGL Alexa Voice Agent](#installing-and-running-the-agl-alexa-voice-agent)
 * [Authorizing with the Alexa Voice Service (AVS)](#authorizing-with-the-alexa-voice-service-avs)
-* [Release Notes](#v210-release-notes)
+* [Release Notes](#v220-release-notes)
 
 ## Overview <a id ="overview"></a>
 
@@ -370,9 +370,9 @@ To access the Alexa Voice Service (AVS) your product must acquire [Login with Am
 3. Click the **Subscribe to CBL Events** button to display a URL and code in the event box of the page.
 4. Navigate to the URL, enter the code, and agree to authorize your product. This will move the Alexa Voice Agent binding to the `CONNECTED and AUTHORIZED` state, and it will be ready to accept user utterances.
 
-## v2.1.0 Release Notes <a id="v210-release-notes"></a>
+## v2.2.0 Release Notes <a id="v220-release-notes"></a>
 
-#### Supported Features
+### Supported Features
 
 * Car Control (requires LVC extension)
 * Local Media Services
@@ -383,10 +383,11 @@ To access the Alexa Voice Service (AVS) your product must acquire [Login with Am
 * Online Music Playback
 * Playback Controller
 
-#### Known Issues
-	
-* The Alexa voice agent supports timers and alarms, however, in order to implement them you must assign them an audio role different than the ones you assign to TTS and music. Auto SDK v2.1.0 supports AGL v7.99, which provides only two functioning audio roles: “emergency” and “multimedia”. Since you must assign these roles to TTS and music in order to support those functionalities, no additional audio roles remain to be assigned to alarms and timers.
-* After repeated barge-ins, the AGL Alexa voice agent may no longer play TTS responses. The dialog state will change from `THINKING` to `IDLE` unexpectedly. Rebooting the device or Alexa voice agent will fix the issue.
-* Playback controls are not supported for local media sources.
-* Adjusting volume by delta has no effect; however, you can adjust the volume by absolute values or up/down requests.
+### Resolved Issues
+* Playback controls are now supported for local media sources.
+* Adjusting volume by delta now works as expected.
+* Fixed an issue where, after repeated barge-ins, the AGL Alexa voice agent no longer played TTS responses. 
+
+### Known Issues	
+* The Alexa voice agent supports timers and alarms, however, in order to implement them you must assign them an audio role different than the ones you assign to TTS and music. Auto SDK v2.2.0 supports AGL v7.99, which provides only two functioning audio roles: “emergency” and “multimedia”. Since you must assign these roles to TTS and music in order to support those functionalities, no additional audio roles remain to be assigned to alarms and timers.
 * There is no way to log out after authorizing with AVS. Restart the Alexa Voice Agent to authorize again.

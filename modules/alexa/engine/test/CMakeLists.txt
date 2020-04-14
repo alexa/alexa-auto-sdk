@@ -3,6 +3,10 @@
 find_package(GTest REQUIRED)
 find_library(GMOCK_LIBRARY NAMES gmock)
 find_library(GMOCK_MAIN_LIBRARY NAMES gmock_main)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
 
 set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockAlertsAudioFactoryInterface.h
@@ -10,6 +14,7 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockNotificationsAudioFactoryInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockAttachmentManager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockAudioPlayerInterface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockAudioPlayerObserverInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockCapabilitiesDelegateInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockConnectionStatusObserver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockCustomerDataManager.h
@@ -39,6 +44,9 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Alexa/MockAlexaClient.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Alexa/MockWakewordEngineAdapter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Alexa/MockWakewordVerifier.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/MockDeviceSettingStorage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Alexa/MockDeviceSettingsDelegate.h
+
 )
 source_group("Header Files" FILES ${HEADERS})
 
@@ -55,10 +63,10 @@ target_include_directories(AACEAlexaTestsLib
         PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
-        ${GTEST_INCLUDE_DIRS}
         PRIVATE
         ${AVS_INCLUDE_DIRS}
-)
+        ${GTEST_INCLUDE_DIRS}
+    )
 
 set(UNIT_TEST_SRCS
     AlexaClientEngineImplTest.cpp
@@ -120,6 +128,7 @@ add_executable(AACEAlexaTests
     ${CMAKE_CURRENT_SOURCE_DIR}/src/SpeechSynthesizerEngineImplTest.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/SpeechRecognizerEngineImplTest.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AlexaEngineClientObserverTest.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/DoNotDisturbEngineImplTest.cpp
 )
 
 target_include_directories(AACEAlexaTests

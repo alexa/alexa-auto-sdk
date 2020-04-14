@@ -147,6 +147,155 @@
         },
         {
             "do": "GoTo",
+            "key": "Y",
+            "name": "Playback Controller",
+            "value": {
+                "id": "playback-controller",
+                "item": [
+                    {
+                        "do": "notify/onPlaybackControllerButtonPressed",
+                        "key": "1",
+                        "name": "Button Play",
+                        "value": "PLAY"
+                    },
+                    {
+                        "do": "notify/onPlaybackControllerButtonPressed",
+                        "key": "2",
+                        "name": "Button Pause",
+                        "value": "PAUSE"
+                    },
+                    {
+                        "do": "notify/onPlaybackControllerButtonPressed",
+                        "key": "3",
+                        "name": "Button Next",
+                        "value": "NEXT"
+                    },
+                    {
+                        "do": "notify/onPlaybackControllerButtonPressed",
+                        "key": "4",
+                        "name": "Button Previous",
+                        "value": "PREVIOUS"
+                    },
+                    {
+                        "do": "notify/onPlaybackControllerButtonPressed",
+                        "key": "5",
+                        "name": "Button Skip Forward",
+                        "value": "SKIP_FORWARD"
+                    },
+                    {
+                        "do": "notify/onPlaybackControllerButtonPressed",
+                        "key": "6",
+                        "name": "Button Skip Backward",
+                        "value": "SKIP_BACKWARD"
+                    },
+                    {
+                        "do": "GoTo",
+                        "key": "T",
+                        "name": "Toggle Menu",
+                        "value": {
+                            "id": "playback-controller-toggle",
+                            "item": [
+                                {
+                                    "do": "notify/onPlaybackControllerTogglePressed",
+                                    "key": "1",
+                                    "name": "Toggle Shuffle On",
+                                    "value": "SHUFFLE/true"
+                                },
+                                {
+                                    "do": "notify/onPlaybackControllerTogglePressed",
+                                    "key": "2",
+                                    "name": "Toggle Shuffle Off",
+                                    "value": "SHUFFLE/false"
+                                },
+                                {
+                                    "do": "notify/onPlaybackControllerTogglePressed",
+                                    "key": "3",
+                                    "name": "Toggle Loop On",
+                                    "value": "LOOP/true"
+                                },
+                                {
+                                    "do": "notify/onPlaybackControllerTogglePressed",
+                                    "key": "4",
+                                    "name": "Toggle Loop Off",
+                                    "value": "LOOP/false"
+                                },
+                                {
+                                    "do": "notify/onPlaybackControllerTogglePressed",
+                                    "key": "5",
+                                    "name": "Toggle Repeat On",
+                                    "value": "REPEAT/true"
+                                },
+                                {
+                                    "do": "notify/onPlaybackControllerTogglePressed",
+                                    "key": "6",
+                                    "name": "Toggle Repeat Off",
+                                    "value": "REPEAT/false"
+                                },
+                                {
+                                    "do": "notify/onPlaybackControllerTogglePressed",
+                                    "key": "7",
+                                    "name": "Toggle Thumbs Up On",
+                                    "value": "THUMBS_UP/true"
+                                },
+                                {
+                                    "do": "notify/onPlaybackControllerTogglePressed",
+                                    "key": "8",
+                                    "name": "Toggle Thumbs Up Off",
+                                    "value": "THUMBS_UP/false"
+                                },
+                                {
+                                    "do": "notify/onPlaybackControllerTogglePressed",
+                                    "key": "9",
+                                    "name": "Toggle Thumbs Down On",
+                                    "value": "THUMBS_DOWN/true"
+                                },
+                                {
+                                    "do": "notify/onPlaybackControllerTogglePressed",
+                                    "key": "0",
+                                    "name": "Toggle Thumbs Down Off",
+                                    "value": "THUMBS_DOWN/false"
+                                },
+                                {
+                                    "do": "GoBack",
+                                    "key": "esc",
+                                    "name": "Go back"
+                                }
+                            ],
+                            "name": "Playback Controller Toggle Menu"
+                        }
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Playback Controller Menu"
+            }
+        },
+        {
+            "do": "GoTo",
+            "key": "J",
+            "name": "Audio Player",
+            "value": {
+                "id": "audio-player",
+                "item": [
+                    {
+                        "do": "notify/onGetPlayerPositionAndDuration",
+                        "key": "P",
+                        "name": "Get Player Position and Duration"
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Audio Player Menu"
+            }
+        },
+        {
+            "do": "GoTo",
             "key": "M",
             "name": "Communications",
             "test": "AlexaCommsSupported",
@@ -258,6 +407,58 @@
                     }
                 ],
                 "name": "Locale Menu"
+            }
+        },
+        {
+            "do": "GoTo",
+            "key": "Z",
+            "name": "TimeZone",
+            "value": {
+                "id": "TIMEZONE",
+                "item": [
+                    {
+                        "do": "SetTimeZone",
+                        "key": "1",
+                        "name": "America/Vancouver",
+                        "value": "America/Vancouver"
+                    },
+                    {
+                        "do": "SetTimeZone",
+                        "key": "2",
+                        "name": "America/Edmonton",
+                        "value": "America/Edmonton"
+                    },
+                    {
+                        "do": "SetTimeZone",
+                        "key": "3",
+                        "name": "America/Winnipeg",
+                        "value": "America/Winnipeg"
+                    },
+                    {
+                        "do": "SetTimeZone",
+                        "key": "4",
+                        "name": "America/Toronto",
+                        "value": "America/Toronto"
+                    },
+                    {
+                        "do": "SetTimeZone",
+                        "key": "5",
+                        "name": "America/Halifax",
+                        "value": "America/Halifax"
+                    },
+                    {
+                        "do": "SetTimeZone",
+                        "key": "6",
+                        "name": "America/St_Johns",
+                        "value": "America/St_Johns"
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Time Zones Menu"
             }
         },
         {
@@ -526,7 +727,7 @@
             "      \\___/ /_/   /_/   /___/\\_,_/_/_/_/ .__/_/\\__/ /_/ |_/ .__/ .__/",
             "                                      /_/                /_/  /_/    ",
             "",
-            "  Copyright 2018-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved."
+            "  Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved."
         ],
         "keyTapError": [
             "${KEYOPEN}${KEY}${KEYCLOSE} is not valid in this menu\u0007"

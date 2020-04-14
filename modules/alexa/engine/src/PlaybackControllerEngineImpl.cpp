@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -23,7 +23,9 @@ namespace alexa {
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.PlaybackControllerEngineImpl");
 
-PlaybackControllerEngineImpl::PlaybackControllerEngineImpl( std::shared_ptr<aace::alexa::PlaybackController> playbackControllerPlatformInterface ) : alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG) {
+PlaybackControllerEngineImpl::PlaybackControllerEngineImpl( std::shared_ptr<aace::alexa::PlaybackController> playbackControllerPlatformInterface ) :
+    alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
+    m_playbackControllerPlatformInterface( playbackControllerPlatformInterface ) {
 }
 
 bool PlaybackControllerEngineImpl::initialize(

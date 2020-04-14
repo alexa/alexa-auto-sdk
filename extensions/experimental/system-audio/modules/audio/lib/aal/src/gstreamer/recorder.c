@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
  * permissions and limitations under the License.
  */
 
+#define G_LOG_DOMAIN "AAL"
 #include "core.h"
 #include <stdio.h>
 
@@ -63,7 +64,7 @@ GstAppSinkCallbacks app_sink_callbacks = {
 	.new_sample = new_sample_callback
 };
 
-static aal_handle_t gstreamer_recorder_create(const aal_attributes_t *attr)
+static aal_handle_t gstreamer_recorder_create(const aal_attributes_t *attr, aal_lpcm_parameters_t *params)
 {
 	aal_gst_context_t* ctx = NULL;
 	GstElement* pipeline = NULL;
@@ -77,16 +78,23 @@ static aal_handle_t gstreamer_recorder_create(const aal_attributes_t *attr)
 		snprintf(src_desc, sizeof(src_desc), "alsasrc device=%s", attr->device);
 	}
 
-	if (attr->rate != 0) {
-		gchar src_caps[64] = {0};
-		snprintf(src_caps, sizeof(src_caps), " ! audio/x-raw,format=S16LE,rate=%d,channels=1", attr->rate);
+	if (params->sample_rate != 0 || params->channels != 0) {
+		GstAudioFormat in_sample_format = GstAudioFormat_from_aal_sample_format(params->sample_format);
+		int in_channels = (params->channels != 0) ? params->channels : AAL_AVS_CHANNELS;
+
+		gchar *caps = gstreamer_audio_pcm_caps(in_sample_format, in_channels, params->sample_rate);
+		gchar src_caps[128] = {0};
+		snprintf(src_caps, sizeof(src_caps), " ! %s", caps);
+		g_free(caps);
 		strncat(src_desc, src_caps, sizeof(src_desc) - 1);
 	}
 
-	gchar pipeline_desc[256] = {0};
+	gchar* sink_caps = gstreamer_audio_pcm_caps(GstAudioFormat_from_aal_sample_format(AAL_AVS_SAMPLE_FORMAT), AAL_AVS_CHANNELS, AAL_AVS_SAMPLE_RATE);
+	gchar pipeline_desc[512] = {0};
 	snprintf(pipeline_desc, sizeof(pipeline_desc),
 		"%s ! audioconvert ! audioresample ! appsink name=sink caps=\"%s\"",
-		src_desc, CAPS_RAW);
+		src_desc, sink_caps);
+	g_free(sink_caps);
 
 	GError* launch_err = NULL;
 	g_info("gst_parse_launch : %s\n", pipeline_desc);
@@ -99,7 +107,8 @@ static aal_handle_t gstreamer_recorder_create(const aal_attributes_t *attr)
 
 	ctx = gstreamer_create_context(pipeline, NULL, attr);
 	if (!ctx)
-	    goto failed;
+		goto failed;
+	ctx->audio_params.lpcm = *params;
 
 	sink = gst_bin_get_by_name(GST_BIN(pipeline), "sink");
 	gst_app_sink_set_callbacks(GST_APP_SINK(sink), &app_sink_callbacks, ctx, NULL);
@@ -111,15 +120,15 @@ static aal_handle_t gstreamer_recorder_create(const aal_attributes_t *attr)
 
 failed:
 	if (ctx) {
-	    gstreamer_destroy(ctx);
-	    ctx = NULL;
+		gstreamer_destroy(ctx);
+		ctx = NULL;
 	}
 	if (pipeline) {
-	    gst_object_unref(pipeline);
+		gst_object_unref(pipeline);
 	}
 exit:
 	if (sink) {
-	    gst_object_unref(sink);
+		gst_object_unref(sink);
 	}
 	return (aal_handle_t) ctx;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -106,6 +106,9 @@ public:
     bool stopCapture();
 
     /**
+     * @note This method is deprecated. Use
+     *       aace::propertyManager::PropertyManager::setProperty()
+     *
      * Notifies the Engine to enable the wake word engine. Wake word must be supported in the Engine to be enabled
      * by this call.
      *
@@ -114,6 +117,9 @@ public:
     bool enableWakewordDetection();
 
     /**
+     * @note This method is deprecated. Use
+     *       aace::propertyManager::PropertyManager::setProperty()
+     *
      * Notifies the Engine to disable the wake word engine
      *
      * @return @c true if the Engine successfully disabled wakeword detection, else @c false
@@ -121,6 +127,9 @@ public:
     bool disableWakewordDetection();
 
     /**
+     * @note This method is deprecated. Use
+     *       aace::propertyManager::PropertyManager::getProperty()
+     *
      * Checks if wake word detection is enabled in the Engine
      *
      * @return @c true if wake word detection is enabled, else @c false

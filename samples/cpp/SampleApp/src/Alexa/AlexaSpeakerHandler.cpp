@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -41,6 +41,13 @@ AlexaSpeakerHandler::AlexaSpeakerHandler(std::weak_ptr<Activity> activity, std::
 std::weak_ptr<Activity> AlexaSpeakerHandler::getActivity() { return m_activity; }
 
 std::weak_ptr<logger::LoggerHandler> AlexaSpeakerHandler::getLoggerHandler() { return m_loggerHandler; }
+
+// aace::alexa::AlexaSpeaker interface
+void AlexaSpeakerHandler::speakerSettingsChanged( aace::alexa::AlexaSpeaker::SpeakerType type, bool local, int8_t volume, bool mute ) {
+    std::stringstream ss;
+    ss << "[type="<<type<<",local="<<local<<",volume="<<static_cast<int>(volume)<<",mute="<<mute<<"]";
+    log(logger::LoggerHandler::Level::INFO, "speakerSettingsChanged"+ ss.str());
+}
 
 // private
 

@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">2.1.0</span>
+   &#160;<span id="projectnumber">2.2.0</span>
    </div>
   </td>
  </tr>
@@ -67,6 +67,7 @@ $(function() {
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-attribs">Static Public Attributes</a> &#124;
 <a href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_player-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">com.amazon.aace.alexa.AudioPlayer Class Reference</div>  </div>
@@ -82,6 +83,15 @@ Classes</h2></td></tr>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a826430dfb938c33497f02acd26ab9c46"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_player.html#a826430dfb938c33497f02acd26ab9c46">playerActivityChanged</a> (<a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_player_1_1_player_activity.html">PlayerActivity</a> state)</td></tr>
 <tr class="separator:a826430dfb938c33497f02acd26ab9c46"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac5af34b211180066c0a72d768800dc0d"><td class="memItemLeft" align="right" valign="top">final long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_player.html#ac5af34b211180066c0a72d768800dc0d">getPlayerPosition</a> ()</td></tr>
+<tr class="separator:ac5af34b211180066c0a72d768800dc0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ddd0246911b32d798dad3dae3e7e64d"><td class="memItemLeft" align="right" valign="top">final long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_player.html#a3ddd0246911b32d798dad3dae3e7e64d">getPlayerDuration</a> ()</td></tr>
+<tr class="separator:a3ddd0246911b32d798dad3dae3e7e64d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
+Static Public Attributes</h2></td></tr>
+<tr class="memitem:aeedf104185c5b77717b01d8ebae74c9a"><td class="memItemLeft" align="right" valign="top">static final long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_player.html#aeedf104185c5b77717b01d8ebae74c9a">TIME_UNKNOWN</a> = -1</td></tr>
+<tr class="separator:aeedf104185c5b77717b01d8ebae74c9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_player.html">AudioPlayer</a> should be extended to handle audio output from the Engine.</p>
@@ -115,12 +125,74 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="ac5af34b211180066c0a72d768800dc0d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac5af34b211180066c0a72d768800dc0d">&#9670;&nbsp;</a></span>getPlayerPosition()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">final long com.amazon.aace.alexa.AudioPlayer.getPlayerPosition </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Returns the current playback position of the audio player. If the audio source is not playing, the most recent position played will be returned.</p>
+<dl class="section return"><dt>Returns</dt><dd>The audio player's playback position in milliseconds, or <code>TIME_UNKNOWN</code> if the current media position is unknown or invalid. </dd></dl>
+
+</div>
+</div>
+<a id="a3ddd0246911b32d798dad3dae3e7e64d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3ddd0246911b32d798dad3dae3e7e64d">&#9670;&nbsp;</a></span>getPlayerDuration()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">final long com.amazon.aace.alexa.AudioPlayer.getPlayerDuration </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Returns the playback duration of the audio player.</p>
+<dl class="section return"><dt>Returns</dt><dd>The audio player's playback duration in milliseconds, or <code>TIME_UNKNOWN</code> if the current media position is unknown or invalid. </dd></dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="aeedf104185c5b77717b01d8ebae74c9a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeedf104185c5b77717b01d8ebae74c9a">&#9670;&nbsp;</a></span>TIME_UNKNOWN</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">final long com.amazon.aace.alexa.AudioPlayer.TIME_UNKNOWN = -1</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Used when audio time is unknown or indeterminate. </p>
+
+</div>
+</div>
 </div><!-- contents -->
 <html>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 2.1.0 - Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 2.2.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -31,7 +31,8 @@ static const std::string TAG("aace.alexa.AlexaEngineLogger");
 AlexaEngineLogger::AlexaEngineLogger( alexaClientSDK::avsCommon::utils::logger::Level level ) :
     alexaClientSDK::avsCommon::utils::logger::Logger( level ),
     alexaClientSDK::avsCommon::utils::RequiresShutdown( TAG ) {
-    
+
+    m_engineLogger = AACE_LOGGER;
     init( alexaClientSDK::avsCommon::utils::configuration::ConfigurationNode::getRoot()[TAG] );
 }
 
@@ -63,7 +64,7 @@ void AlexaEngineLogger::emit( alexaClientSDK::avsCommon::utils::logger::Level le
             aaceLevel = aace::logger::Logger::Level::METRIC;
         }
     }
-    AACE_LOGGER->log( "AVS", TAG, aaceLevel, time, threadMoniker ? threadMoniker : "", text ? text : "" );
+    m_engineLogger->log( "AVS", TAG, aaceLevel, time, threadMoniker ? threadMoniker : "", text ? text : "" );
 }
 
 aace::logger::Logger::Level AlexaEngineLogger::map( alexaClientSDK::avsCommon::utils::logger::Level level )

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -84,10 +84,11 @@ bool EngineImpl::initialize()
         for( auto next : m_orderedServiceList ) {
             ThrowIfNot( next->handleInitializeEngineEvent( shared_from_this() ), "handleInitializeEngineEventFailed" );
         }
-
+        
         // set initialize flag
         m_initialized = true;
         
+        ThrowIfNot( registerProperties(), "registerPropertiesFailed" );
         return true;
     }
     catch( std::exception& ex ) {
@@ -96,6 +97,22 @@ bool EngineImpl::initialize()
     }
 }
 
+bool EngineImpl::registerProperties()
+{
+    try {
+        // get the property engine service interface from the property manager service
+        auto propertyManager = getServiceInterface<aace::engine::propertyManager::PropertyManagerServiceInterface>("aace.propertyManager");
+        ThrowIfNull( propertyManager, "nullPropertyManagerServiceInterface" );
+
+        propertyManager->registerProperty(aace::engine::propertyManager::PropertyDescription(
+            aace::core::property::VERSION, nullptr, std::bind(&EngineImpl::getProperty_version, this)));
+        return true;
+    } catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG,"initialize").d("reason", ex.what()));
+        return false;
+    }
+}
+    
 bool EngineImpl::shutdown()
 {
     try
@@ -435,75 +452,47 @@ std::shared_ptr<EngineService> EngineImpl::getServiceFromPropertyKey( const std:
     return nullptr;
 }
 
-bool EngineImpl::setProperty( const std::string& key, const std::string& value )
+   
+std::string EngineImpl::getProperty_version() {
+    
+    try {
+        AACE_INFO(LX(TAG));
+        return aace::engine::core::version::getEngineVersion().toString();
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return "";
+    }
+}
+    
+bool EngineImpl::setProperty( const std::string& name, const std::string& value )
 {
     try
     {
-        ThrowIf( key.empty(), "invalidPropertyKey" );
-    
-        auto service = getServiceFromPropertyKey( key );
+        // get the property engine service interface from the property manager service
+        auto propertyManager = getServiceInterface<aace::engine::propertyManager::PropertyManagerServiceInterface>("aace.propertyManager");
+        ThrowIfNull( propertyManager, "nullPropertyManagerServiceInterface" );
         
-        // if the property starts with a service id then delegate the setProperty() call to
-        // the specified service implementation
-        if( service != nullptr ) {
-            return service->setProperty( key, value );
-        }
-        
-        // check core properties
-        else if( key.compare( aace::core::property::VERSION ) == 0 ) {
-            Throw( "readOnlyProperty" );
-        }
-        
-        // iterate through registered engine modules and call setProperty() for each module
-        else
-        {
-            for( auto next : m_orderedServiceList ) {
-                ReturnIf( next->setProperty( key, value ), true );
-            }
-        }
-        
-        Throw( "unhandledProperty" );
+        return propertyManager->setProperty( name, value, true );
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"setProperty").d("reason", ex.what()).d("key",key).d("value",value));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("name",name).sensitive("value",value));
         return false;
     }
 }
 
-std::string EngineImpl::getProperty( const std::string& key )
+std::string EngineImpl::getProperty( const std::string& name )
 {
     try
     {
-        ThrowIf( key.empty(), "invalidPropertyKey" );
-
-        auto service = getServiceFromPropertyKey( key );
+        // get the property engine service interface from the property manager service
+        auto propertyManager = getServiceInterface<aace::engine::propertyManager::PropertyManagerServiceInterface>("aace.propertyManager");
+        ThrowIfNull( propertyManager, "nullPropertyManagerServiceInterface" );
         
-        // if the property starts with a service id then delegate the getProperty() call to
-        // the specified service implementation
-        if( service != nullptr ) {
-            return service->getProperty( key );
-        }
-    
-        // core properties
-        else if( key.compare( aace::core::property::VERSION ) == 0 ) {
-            return aace::engine::core::version::getEngineVersion().toString();
-        }
-        
-        // iterate through registered engine modules and call getProperty() for each module
-        else
-        {
-            std::string result;
-
-            for( auto next : m_orderedServiceList ) {
-                result = next->getProperty( key );
-                ReturnIfNot( result.empty(), result );
-            }
-
-            Throw( "unhandledProperty" );
-        }
+        return propertyManager->getProperty( name );
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"getProperty").d("reason", ex.what()).d("key",key));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("name",name));
         return std::string();
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -62,6 +62,10 @@ public class MediaControllerCallback extends MediaControllerCompat.Callback {
 
     @Override
     public void onSessionEvent( String event, Bundle extras ) {
+        if (extras == null) {
+            Log.e(TAG, "onSessionEvent extras is null");
+            return;
+        }
         if (APIConstants.Events.SESSION_EVENT_REQUEST_TOKEN.equals(event)) {
             MediaAppsStateReporter.getInstance().requestToken(mMediaAppPackageName);
         }
@@ -71,6 +75,7 @@ public class MediaControllerCallback extends MediaControllerCompat.Callback {
     @Override
     public void onPlaybackStateChanged(PlaybackStateCompat state) {
         if (state == null) {
+            Log.e(TAG, "onPlaybackStateChanged state is null");
             return;
         }
         Log.i(TAG, "onPlaybackStateChanged : " + state);
@@ -221,10 +226,11 @@ public class MediaControllerCallback extends MediaControllerCompat.Callback {
 
     @Override
     public void onMetadataChanged( MediaMetadataCompat metadata ) {
-        Log.i(TAG, "onMetadataChanged: " + metadata);
         if (metadata == null) {
+            Log.e(TAG, "onMetadataChanged metadata is null ");
             return;
         }
+        Log.i(TAG, "onMetadataChanged: " + metadata);
         super.onMetadataChanged( metadata );
         final Set<PlayerEvents> eventsToSend = new HashSet<>();
 
@@ -282,6 +288,10 @@ public class MediaControllerCallback extends MediaControllerCompat.Callback {
 
     @Override
     public void onExtrasChanged( Bundle extras ) {
+        if ( extras == null ) {
+            Log.e(TAG, "onExtrasChanged extras is null");
+            return;
+        }
         super.onExtrasChanged( extras );
         final String spiVersion = extras.getString(APIConstants.ExtrasKeys.SPI_VERSION_KEY);
         final String playerCookie = extras.getString(APIConstants.ExtrasKeys.PLAYER_COOKIE_KEY);

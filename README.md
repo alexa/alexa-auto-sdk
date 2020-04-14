@@ -6,7 +6,7 @@ The [Alexa Auto SDK](./OVERVIEW.md) contains essential client-side software requ
 
 > **Important!** You need to register for an [Amazon Developer Account](https://developer.amazon.com/home.html) and [create an Alexa device and security profile](./NEED_HELP.md#registering-a-product-and-creating-a-security-profile) to use the Alexa Auto SDK.
 
-1. Clone the `alexa-auto-sdk` repository into your project and [build](./builder/README.md) the Auto SDK package.
+1. Clone the `alexa-auto-sdk` repository into your project and [build the Auto SDK package](./builder/README.md#using-the-auto-sdk-builder).
 
 2. Install the built package on your [target hardware](./builder/README.md#supported-target-platforms).
 3. Create and configure an instance of the Engine. For details, see the [C++](./modules/core/README.md#creating-the-engine) or [Android](./platforms/android/modules/core/README.md#creating-the-engine) Core module documentation.
@@ -21,8 +21,7 @@ The [Alexa Auto SDK](./OVERVIEW.md) contains essential client-side software requ
      * **CBL** (for [C++](./modules/cbl/README.md) or [Android](./platforms/android/modules/cbl/README.md)) - enables you to implement the Code-Based Linking (CBL) mechanism of acquiring Login with Amazon (LWA) access tokens.
      *  **Alexa Presentation Language (APL)** (for [C++](./modules/apl/README.md) or [Android](./platforms/android/modules/apl/README.md)) - enables your application to support APL directives and events for devices with graphical user interface (GUI) support. 
 5. Start the Engine using the `start()` command.
-6. Get/set runtime Core and Alexa Engine properties, if desired. For details, see the Core ([C++](./modules/core/README.md#getting-and-setting-core-engine-properties) or [Android](./platforms/android/modules/core/README.md#getting-and-setting-core-engine-properties)) and Alexa ([C++](./modules/alexa/README.md#getting-and-setting-alexa-engine-properties) or [Android](./platforms/android/modules/alexa/README.md#getting-and-setting-alexa-engine-properties)) module documentation.
-7. Use the Sample App ([C++](./samples/cpp/README.md) or [Android](./samples/android/README.md)) to see how the Auto SDK works and to test end-to-end functionality. 
+6. Use the Sample App ([C++](./samples/cpp/README.md) or [Android](./samples/android/README.md)) to see how the Auto SDK works and to test end-to-end functionality. 
 
 [Additional functionality](./OVERVIEW.md#optional-extensions) (for example, AmazonLite Wake Word, Alexa Communications, Local Voice Control (LVC), Device Client Metrics (DCM), and Voice Chrome for Android) is available with [help from your Amazon Solutions Architect (SA) or Partner Manager](./NEED_HELP.md#requesting-additional-functionality-whitelisting).
 
@@ -33,7 +32,7 @@ For a summary of feature enhancements, updates, and resolved and known issues, s
 >**Note:** [Android Sample App](./samples/android/README.md#v210-release-notes), [C++ Sample App](./samples/cpp/README.md#v210-release-notes), and [Automotive Grade Linux (AGL) Alexa Voice Agent](./platforms/agl/alexa-voiceagent-service/README.md#v210-release-notes) release notes are provided in their respective READMEs.
 
 ## Migration Guide
-For guidelines on migrating from Auto SDK 2.0 to Auto SDK 2.1 see the [Migration Guide](./MIGRATION.md).
+For guidelines on migrating from Auto SDK 2.1 to 2.2 and from Auto SDK 2.0 to Auto SDK 2.1, see the [Migration Guide](./MIGRATION.md).
 
 ## Learn More
 

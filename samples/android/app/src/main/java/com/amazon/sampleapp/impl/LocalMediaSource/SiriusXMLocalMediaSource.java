@@ -2,13 +2,14 @@ package com.amazon.sampleapp.impl.LocalMediaSource;
 
 import android.content.Context;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
+import com.amazon.sampleapp.impl.PlaybackController.PlaybackControllerHandler;
 
 public class SiriusXMLocalMediaSource extends LocalMediaSourceHandler
 {
     String m_state = "IDLE";
 
-    public SiriusXMLocalMediaSource( Context context, LoggerHandler logger ) {
-        super( context, logger, Source.SIRIUS_XM );
+    public SiriusXMLocalMediaSource(Context context, LoggerHandler logger, PlaybackControllerHandler playbackControllerHandler) {
+        super( context, logger, Source.SIRIUS_XM, playbackControllerHandler );
     }
 
     @Override

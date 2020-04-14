@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -122,6 +122,9 @@ bool SpeechRecognizerEngineImpl::initialize(
         
         m_directiveSequencer = directiveSequencer;
         m_wakewordVerifier = wakewordVerifier;
+        
+        // get the initialize wakeword enabled state from the platform interface
+        m_wakewordEnabled = isWakewordSupported() && m_speechRecognizerPlatformInterface->isWakewordDetectionEnabled();
 
         return true;
     }
@@ -301,7 +304,7 @@ bool SpeechRecognizerEngineImpl::startAudioInput()
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"startAudioInput").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG,"startAudioInput").d("reason", ex.what()).d("id", m_currentChannelId));
         return false;
     }
 }
@@ -322,7 +325,7 @@ bool SpeechRecognizerEngineImpl::stopAudioInput()
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"stopAudioInput").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG,"stopAudioInput").d("reason", ex.what()).d("id", m_currentChannelId));
         m_currentChannelId = aace::engine::audio::AudioInputChannelInterface::INVALID_CHANNEL;
         return false;
     }
@@ -371,7 +374,7 @@ bool SpeechRecognizerEngineImpl::onStartCapture( Initiator initiator, uint64_t k
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"onStartCapture").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG,"onStartCapture").d("reason", ex.what()).d("initiator", initiator).d("state", m_state).d("id", m_currentChannelId));
         return false;
     }
 }
@@ -384,7 +387,7 @@ bool SpeechRecognizerEngineImpl::onStopCapture()
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"onStopCapture").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG,"onStopCapture").d("reason", ex.what()).d("id", m_currentChannelId));
         return false;
     }
 }
@@ -402,7 +405,7 @@ ssize_t SpeechRecognizerEngineImpl::write( const int16_t* data, const size_t siz
         return result;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"write").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG,"write").d("reason", ex.what()).d("id", m_currentChannelId));
         return -1;
     }
 }
@@ -458,21 +461,16 @@ bool SpeechRecognizerEngineImpl::startCapture(
 
         ThrowIfNot( m_audioInputProcessor->recognize( *audioProvider, initiator, std::chrono::steady_clock::now(), begin, keywordEnd, keyword ).get(), "recognizeFailed" );
         
-        if( isExpectingAudio() == false )
-        {
-            // let the recognizer know we are expecting audio from the platform interface
-            //setExpectingAudioState( true );
-            
-            // notify the platform that we are expecting audio... if the platform returns
-            // and error then we reset the expecting audio state and throw an exception
+        // notify the platform that we are expecting audio... if the platform returns
+        // and error then we reset the expecting audio state and throw an exception
+        if( isExpectingAudio() == false ) {
             ThrowIfNot( startAudioInput(), "startAudioInputFailed" );
         }
         
         return true;
     }
     catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"startCapture").d("reason", ex.what()));
-        //setExpectingAudioState( false );
+        AACE_ERROR(LX(TAG,"startCapture").d("reason", ex.what()).d("id", m_currentChannelId));
         m_audioInputProcessor->resetState();
         return false;
     }
@@ -483,7 +481,7 @@ bool SpeechRecognizerEngineImpl::isWakewordSupported() {
 }
 
 bool SpeechRecognizerEngineImpl::isWakewordEnabled() {
-    return isWakewordSupported() && m_speechRecognizerPlatformInterface->isWakewordDetectionEnabled();
+    return m_wakewordEnabled;
 }
 
 bool SpeechRecognizerEngineImpl::enableWakewordDetection()
@@ -493,15 +491,17 @@ bool SpeechRecognizerEngineImpl::enableWakewordDetection()
         // check to make sure wakeword is supported
         ThrowIfNot( isWakewordSupported(), "wakewordNotSupported" );
         
-        // check if wakeword detection is already enabled
-        ReturnIf( m_wakewordEnabled, true );
+        // check if wakeword detection is already enabled, and we are not in the initial
+        // wakeword enable state (this is the first time we are enabling!)
+        ReturnIf( m_wakewordEnabled && m_initialWakewordEnabledState == false, true );
 
+        // enable the wakeword engine adapter
         ThrowIfNot( m_wakewordEngineAdapter->enable(), "enableFailed" );
 
         // set the wakeword enabled and expecting audio flags to true
         m_wakewordEnabled = true;
-        //setExpectingAudioState( true );
-
+        m_initialWakewordEnabledState = false;
+        
         // tell the platform interface to start providing audio input
         ThrowIfNot( startAudioInput(), "startAudioInputFailed" );
 

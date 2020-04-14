@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">2.1.0</span>
+   &#160;<span id="projectnumber">2.2.0</span>
    </div>
   </td>
  </tr>
@@ -104,6 +104,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aee0442626b3e43ebb25120abbefd452f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1e37476cccbe2e7656c299a3c8f173aa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source.html#a1e37476cccbe2e7656c299a3c8f173aa">playerError</a> (String errorName, long code, String description, boolean fatal)</td></tr>
 <tr class="separator:a1e37476cccbe2e7656c299a3c8f173aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a20a6fa8f3826b39e7f19d74a761a0ed6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source.html#a20a6fa8f3826b39e7f19d74a761a0ed6">setFocus</a> (boolean focusAcquire)</td></tr>
+<tr class="separator:a20a6fa8f3826b39e7f19d74a761a0ed6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a41d4aad196e6ea9eb5e41287426fb7de"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source.html#a41d4aad196e6ea9eb5e41287426fb7de">setFocus</a> ()</td></tr>
 <tr class="separator:a41d4aad196e6ea9eb5e41287426fb7de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab8cf2993bd0dce8a71cf147a08fbe2cb"><td class="memItemLeft" align="right" valign="top">final <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source_1_1_source.html">Source</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source.html#ab8cf2993bd0dce8a71cf147a08fbe2cb">getSource</a> ()</td></tr>
@@ -319,8 +321,33 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a20a6fa8f3826b39e7f19d74a761a0ed6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a20a6fa8f3826b39e7f19d74a761a0ed6">&#9670;&nbsp;</a></span>setFocus() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void com.amazon.aace.alexa.LocalMediaSource.setFocus </td>
+          <td>(</td>
+          <td class="paramtype">boolean&#160;</td>
+          <td class="paramname"><em>focusAcquire</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Should be called on local media source player events. This will switch the media focus to that context.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">focusAcquire</td><td>true if focus should be acquired, false if focus should be abandoned </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a41d4aad196e6ea9eb5e41287426fb7de"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a41d4aad196e6ea9eb5e41287426fb7de">&#9670;&nbsp;</a></span>setFocus()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a41d4aad196e6ea9eb5e41287426fb7de">&#9670;&nbsp;</a></span>setFocus() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -333,7 +360,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Should be called on local media source player events. This will switch the media focus to that context. </p>
+<p>Overload of above for backward compatibility. Always acquires focus. </p>
 
 </div>
 </div>
@@ -412,7 +439,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 2.1.0 - Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 2.2.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

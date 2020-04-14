@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -44,6 +44,9 @@ class AlexaSpeakerHandler : public aace::alexa::AlexaSpeaker /* isa PlatformInte
     }
     auto getActivity() -> std::weak_ptr<Activity>;
     auto getLoggerHandler() -> std::weak_ptr<logger::LoggerHandler>;
+
+    // aace::alexa::AlexaSpeaker interface
+    auto speakerSettingsChanged( aace::alexa::AlexaSpeaker::SpeakerType type, bool local, int8_t volume, bool mute ) -> void override;
 
   private:
     std::weak_ptr<View> m_console{};

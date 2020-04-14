@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ final public class AudioStream extends NativeRef
         /**
          * @hideinitializer
          */
-        BUFFERING("OPUS");
+        OPUS("OPUS");
 
         /**
          * @internal
@@ -58,6 +58,37 @@ final public class AudioStream extends NativeRef
         public String toString() {
             return m_name;
         }
+    }
+
+    /**
+     * Key/value pair used for audio stream meta-data.
+     */
+    public static class AudioStreamProperty {
+        /// The property key
+        private String mKey;
+        /// The property value
+        private String mValue;
+
+        /**
+         * AudioStreamProperty constructor
+         *
+         * @param  key The property key
+         * @param  value The property value
+         */
+        public AudioStreamProperty( String key, String value ) {
+            mKey = key;
+            mValue = value;
+        }
+
+        /**
+         * @return The property key
+         */
+        public String getKey() { return mKey; }
+
+        /**
+         * @return The property value
+         */
+        public String getValue() { return mValue; }
     }
 
     /**
@@ -98,6 +129,20 @@ final public class AudioStream extends NativeRef
         return getEncoding( getNativeRef() );
     }
 
+    /**
+     * @return The @c AudioFormat for this @c AudioStream.
+     */
+    final public AudioFormat getAudioFormat() {
+        return getAudioFormat( getNativeRef() );
+    }
+
+     /**
+     * @return List of meta-data properties for this @c AudioStream.
+     */
+    final public AudioStreamProperty[] getProperties() {
+        return getProperties( getNativeRef() );
+    }
+
     protected long createNativeRef() {
         return 0;
     }
@@ -111,4 +156,6 @@ final public class AudioStream extends NativeRef
     private native int read( long nativeObject, byte[] data, long offset, long size );
     private native boolean isClosed( long nativeObject );
     private native Encoding getEncoding( long nativeObject );
+    private native AudioFormat getAudioFormat( long nativeObject );
+    private native AudioStreamProperty[] getProperties( long nativeObject );
 }

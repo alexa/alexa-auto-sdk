@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -14,6 +14,10 @@
  */
 
 #include "SampleApp/Alexa/AlexaClientHandler.h"
+
+#ifdef COASSISTANT
+#include "SampleApp/ApplicationContext.h"
+#endif
 
 // C++ Standard Library
 #include <sstream>
@@ -57,7 +61,11 @@ void AlexaClientHandler::dialogStateChanged(AlexaClient::DialogState state) {
             dialogStateView->setText(text);
         }
         if (auto console = m_console.lock()) {
+#ifdef COASSISTANT
+            console->printLine("Dialog state changed:", state, "( Assistant =", activity->getApplicationContext()->getActingAssistant(), ")");
+#else
             console->printLine("Dialog state changed:", state);
+#endif
         }
     });
     // Special case for test automation

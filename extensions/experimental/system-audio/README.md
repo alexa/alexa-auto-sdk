@@ -178,6 +178,6 @@ Here is a configuration example for Linux platforms:
 
 The above example shows how you could provide "Speaker reference" into the engine. Note that the `card` parameter corresponds to the ALSA device name.
 
-## Known Issues
+## Playlist URL Support
 
-* Content from media streaming services (such as TuneIn) that deliver ASHX URLs currently is not supported.
+The System Audio extension supports playback of playlist URL from media streaming services (such as TuneIn) based on `PlaylistParser` provided by AVS Device SDK. The current supported formats include M3U and PLS. Note that only the first playable entry will be played in the current implementation. Choosing a variant based on stream information or continuing playback of the second or later entry is not supported right now.

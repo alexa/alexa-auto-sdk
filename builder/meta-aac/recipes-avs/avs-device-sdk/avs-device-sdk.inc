@@ -15,6 +15,7 @@ inherit pkgconfig cmake devlibsonly unittests
 
 EXTRA_OECMAKE += "-DCMAKE_BUILD_TYPE=${AAC_BUILD_TYPE} \
                   -DACSDK_EMIT_SENSITIVE_LOGS=${AAC_SENSITIVE_LOGS} \
+                  -DACSDK_EMIT_CURL_LOGS=${AAC_CURL_LOGS} \
                   -DACSDK_LATENCY_LOG=${AAC_LATENCY_LOGS} \
                   -DBUILD_TESTING=${AVS_ENABLE_TESTS} \
 				  -DENABLE_ALL_ENDPOINT_CONTROLLERS=ON"

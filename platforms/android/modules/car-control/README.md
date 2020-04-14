@@ -90,7 +90,7 @@ An endpoint description includes
             {
                 "@type": "asset",
                 "value": {
-                    "assetId": "Alexa.DeviceName.Fan"
+                    "assetId": "Alexa.Automotive.DeviceName.Fan"
                 }
             }
         ]
@@ -131,7 +131,7 @@ A zone description includes
             {
                 "@type": "asset",
                 "value": {
-                    "assetId": "Alexa.Location.All"
+                    "assetId": "Alexa.Automotive.Location.All"
                 }
             }
         ]
@@ -209,7 +209,7 @@ An asset description includes:
     "version": 1,
     "assets": [
         {
-            "assetId": "Alexa.DeviceName.Fan",
+            "assetId": "Alexa.Automotive.DeviceName.Fan",
             "values": [
                 {
                     "locales": [
@@ -230,79 +230,83 @@ An asset description includes:
 </p>
 </details>  
 
-A set of default assets is defined in the Auto SDK Engine. This set of assets covers a wide range of use cases required to describe the controllable endpoints of a vehicle. The names of the predefined assetIds are defined as [constants](./src/main/java/com/amazon/aace/carControl/CarControlAssets.java) in the com.amazon.aace.carControl package for easy use. Should you need to change the values of the default assets, you can provide a path to a file that defines them in the optional `defaultAssetsPath` field in the `assets` node of the configuration. The [file](./assets/assets-1P.json) is provided for you to copy, modify, and install in your chosen location if needed.  
+A set of default assets is defined in the Auto SDK Engine. This set of assets covers a wide range of use cases required to describe the controllable endpoints of a vehicle. The names of the predefined assetIds are defined as [constants](./src/main/java/com/amazon/aace/carControl/CarControlAssets.java) in the com.amazon.aace.carControl package for easy use. 
 
 <details><summary>Predefined assetIds (click to expand or collapse)</summary>
 <p>
 
 ```
-    "Alexa.DeviceName.AirConditioner"
-    "Alexa.DeviceName.AmbientLight"
-    "Alexa.DeviceName.CabinLight"
-    "Alexa.DeviceName.Car"
-    "Alexa.DeviceName.ClimateControl"
-    "Alexa.DeviceName.Cooler"
-    "Alexa.DeviceName.DomeLight"
-    "Alexa.DeviceName.Fan"
-    "Alexa.DeviceName.Heater"
-    "Alexa.DeviceName.Light"
-    "Alexa.DeviceName.ReadingLight"
-    "Alexa.DeviceName.TrunkLight"
-    "Alexa.DeviceName.Vent"
-    "Alexa.DeviceName.Window"
-    "Alexa.DeviceName.Windshield"
-    "Alexa.Location.All"
-    "Alexa.Location.Driver"
-    "Alexa.Location.DriverRow"
-    "Alexa.Location.FirstRow"
-    "Alexa.Location.FourthRow"
-    "Alexa.Location.Front"
-    "Alexa.Location.Passenger"
-    "Alexa.Location.PassengerRow"
-    "Alexa.Location.Rear"
-    "Alexa.Location.RearDriver"
-    "Alexa.Location.RearPassenger"
-    "Alexa.Location.SecondRow"
-    "Alexa.Location.ThirdRow"
-    "Alexa.Setting.AirRecirculation"
-    "Alexa.Setting.Auto"
-    "Alexa.Setting.BodyVents"
-    "Alexa.Setting.ClimateSync"
-    "Alexa.Setting.Color"
-    "Alexa.Setting.Defog"
-    "Alexa.Setting.Defrost"
-    "Alexa.Setting.Economy"
-    "Alexa.Setting.FanSpeed"
-    "Alexa.Setting.FloorVents"
-    "Alexa.Setting.Heat"
-    "Alexa.Setting.Intensity"
-    "Alexa.Setting.Manual"
-    "Alexa.Setting.MixVents"
-    "Alexa.Setting.Mode"
-    "Alexa.Setting.Position"
-    "Alexa.Setting.Temperature"
-    "Alexa.Setting.WindshieldVents"
-    "Alexa.Unit.Temperature.Celsius"
-    "Alexa.Unit.Temperature.Fahrenheit"
-    "Alexa.Value.Blue"
-    "Alexa.Value.Green"
-    "Alexa.Value.Indigo"
-    "Alexa.Value.Orange"
-    "Alexa.Value.Red"
-    "Alexa.Value.Violet"
-    "Alexa.Value.White"
-    "Alexa.Value.Yellow"
-    "Alexa.Value.High"
-    "Alexa.Value.Low"
-    "Alexa.Value.Maximum"
-    "Alexa.Value.Medium"
-    "Alexa.Value.Minimum"
+    "Alexa.Automotive.DeviceName.AirConditioner"
+    "Alexa.Automotive.DeviceName.AmbientLight"
+    "Alexa.Automotive.DeviceName.CabinLight"
+    "Alexa.Automotive.DeviceName.Car"
+    "Alexa.Automotive.DeviceName.ClimateControl"
+    "Alexa.Automotive.DeviceName.Cooler"
+    "Alexa.Automotive.DeviceName.DomeLight"
+    "Alexa.Automotive.DeviceName.Fan"
+    "Alexa.Automotive.DeviceName.Heater"
+    "Alexa.Automotive.DeviceName.Light"
+    "Alexa.Automotive.DeviceName.ReadingLight"
+    "Alexa.Automotive.DeviceName.TrunkLight"
+    "Alexa.Automotive.DeviceName.Vent"
+    "Alexa.Automotive.DeviceName.Window"
+    "Alexa.Automotive.DeviceName.Windshield"
+    "Alexa.Automotive.Location.All"
+    "Alexa.Automotive.Location.Driver"
+    "Alexa.Automotive.Location.DriverRow"
+    "Alexa.Automotive.Location.FirstRow"
+    "Alexa.Automotive.Location.FourthRow"
+    "Alexa.Automotive.Location.Front"
+    "Alexa.Automotive.Location.Passenger"
+    "Alexa.Automotive.Location.PassengerRow"
+    "Alexa.Automotive.Location.Rear"
+    "Alexa.Automotive.Location.RearDriver"
+    "Alexa.Automotive.Location.RearPassenger"
+    "Alexa.Automotive.Location.SecondRow"
+    "Alexa.Automotive.Location.ThirdRow"
+    "Alexa.Automotive.Setting.AirRecirculation"
+    "Alexa.Automotive.Setting.Auto"
+    "Alexa.Automotive.Setting.BodyVents"
+    "Alexa.Automotive.Setting.ClimateSync"
+    "Alexa.Automotive.Setting.Color"
+    "Alexa.Automotive.Setting.Defog"
+    "Alexa.Automotive.Setting.Defrost"
+    "Alexa.Automotive.Setting.Economy"
+    "Alexa.Automotive.Setting.FanSpeed"
+    "Alexa.Automotive.Setting.FloorVents"
+    "Alexa.Automotive.Setting.Heat"
+    "Alexa.Automotive.Setting.Intensity"
+    "Alexa.Automotive.Setting.Manual"
+    "Alexa.Automotive.Setting.MixVents"
+    "Alexa.Automotive.Setting.Mode"
+    "Alexa.Automotive.Setting.Position"
+    "Alexa.Automotive.Setting.Temperature"
+    "Alexa.Automotive.Setting.WindshieldVents"
+    "Alexa.Automotive.Unit.Temperature.Celsius"
+    "Alexa.Automotive.Unit.Temperature.Fahrenheit"
+    "Alexa.Automotive.Value.Blue"
+    "Alexa.Automotive.Value.Green"
+    "Alexa.Automotive.Value.Indigo"
+    "Alexa.Automotive.Value.Orange"
+    "Alexa.Automotive.Value.Red"
+    "Alexa.Automotive.Value.Violet"
+    "Alexa.Automotive.Value.White"
+    "Alexa.Automotive.Value.Yellow"
+    "Alexa.Automotive.Value.High"
+    "Alexa.Automotive.Value.Low"
+    "Alexa.Automotive.Value.Maximum"
+    "Alexa.Automotive.Value.Medium"
+    "Alexa.Automotive.Value.Minimum"
 ```
-
 </p>
 </details>
 <br>
-You can add complementary assets alongside the defaults if an endpoint in your vehicle cannot be described using one of the predefined assetIds. To do this, define your custom assets in a single JSON file and specify the path to that file in the optional `customAssetsPath` field in the `assets` element of the configuration.
+
+>**Note:** Should you need to change a default asset value, you can override the assets in the Engine by providing a path to a file that defines them. The [default assets file](./assets/assets-1P.json) is provided for you to copy, modify, and install in your chosen location. Provide the path to this file in the optional `defaultAssetsPath` field in the `assets` node of the car control configuration. Typically this configuration override is not necessary, but the Auto SDK provides the option, if needed. This override applies only to online-only systems without the optional LVC extension.
+
+You can add custom complementary assets alongside the defaults if an endpoint in your vehicle cannot be described using one of the predefined assetIds. To do this, define your custom assets in a single JSON file, ensuring that every `assetId` uses the prefix `"My.”`. Specify the path to that JSON file in the optional `customAssetsPath` field in the `assets` node of the configuration. The format of this file is the same as the format for the [default assets](./assets/assets-1P.json).
+
+>**Note for hybrid systems with LVC:** The file at the path you provide in the `assets.customAssetsPath` field of the Auto SDK car control configuration must be the same as the custom assets file you configure for your `ILVCClient` using the LVC APK.
 
 <details>
 <summary>Example complementary asset definition (click to expand or collapse)</summary>
@@ -331,7 +335,7 @@ You can add complementary assets alongside the defaults if an endpoint in your v
 </p>
 </details>
 
->**Note:** If you need not specify either a default or custom assets path in your configuration, exclude the "assets" node entirely.
+>**Note:** If you don't need to specify either a default or a custom assets path in your configuration, exclude the "assets" node of configuration entirely.
  
 ### Capabilities <a id="capabilities"></a>
 
@@ -390,7 +394,7 @@ For more details, please refer to the online [ToggleController documentation](ht
             {
                 "@type": "asset",
                 "value": {
-                    "assetId": "Alexa.Setting.ClimateSync"
+                    "assetId": "Alexa.Automotive.Setting.ClimateSync"
                 }
             }
         ]
@@ -440,7 +444,7 @@ For more details, please refer to the online [RangeController documentation](htt
         {
             "@type": "asset",
             "value": {
-                "assetId": "Alexa.Setting.FanSpeed"
+                "assetId": "Alexa.Automotive.Setting.FanSpeed"
             }
         }
     ]
@@ -468,13 +472,13 @@ For more details, please refer to the online [RangeController documentation](htt
                         {
                             "@type": "asset",
                             "value": {
-                                "assetId": "Alexa.Value.Low"
+                                "assetId": "Alexa.Automotive.Value.Low"
                             }
                         },
                         {
                             "@type": "asset",
                             "value": {
-                                "assetId": "Alexa.Value.Minimum"
+                                "assetId": "Alexa.Automotive.Value.Minimum"
                             }
                         }
                     ]
@@ -487,7 +491,7 @@ For more details, please refer to the online [RangeController documentation](htt
                         {
                             "@type": "asset",
                             "value": {
-                                "assetId": "Alexa.Value.Medium"
+                                "assetId": "Alexa.Automotive.Value.Medium"
                             }
                         }
                     ]
@@ -500,13 +504,13 @@ For more details, please refer to the online [RangeController documentation](htt
                         {
                             "@type": "asset",
                             "value": {
-                                "assetId": "Alexa.Value.High"
+                                "assetId": "Alexa.Automotive.Value.High"
                             }
                         },
                         {
                             "@type": "asset",
                             "value": {
-                                "assetId": "Alexa.Value.Maximum"
+                                "assetId": "Alexa.Automotive.Value.Maximum"
                             }
                         }
                     ]
@@ -553,7 +557,7 @@ For more details, please refer to the online [ModeController documentation](http
             {
                 "@type": "asset",
                 "value": {
-                    "assetId": "Alexa.Setting.Mode"
+                    "assetId": "Alexa.Automotive.Setting.Mode"
                 }
             }
         ]
@@ -577,7 +581,7 @@ For more details, please refer to the online [ModeController documentation](http
                         {
                             "@type": "asset",
                             "value": {
-                                "assetId": "Alexa.Setting.Economy"
+                                "assetId": "Alexa.Automotive.Setting.Economy"
                             }
                         }
                     ]
@@ -590,7 +594,7 @@ For more details, please refer to the online [ModeController documentation](http
                         {
                             "@type": "asset",
                             "value": {
-                                "assetId": "Alexa.Setting.Auto"
+                                "assetId": "Alexa.Automotive.Setting.Auto"
                             }
                         }
                     ]
@@ -603,7 +607,7 @@ For more details, please refer to the online [ModeController documentation](http
                         {
                             "@type": "asset",
                             "value": {
-                                "assetId": "Alexa.Setting.Manual"
+                                "assetId": "Alexa.Automotive.Setting.Manual"
                             }
                         }
                     ]
@@ -632,23 +636,24 @@ ArrayList<EngineConfiguration> configuration = new ArrayList<EngineConfiguration
 ...
 
 CarControlConfiguration config = CarControlConfiguration.create();
-config.addZone("zone.all")
-	.addAssetId("Alexa.Location.All")
-.createControl("heater", "zone.all")
-    .addAssetId("Alexa.DeviceName.Heater")
-    .addAssetId("Alexa.DeviceName.Cooler")
-    .addPowerController(true)
-    .addRangeController("temperature", true, 60, 90, 1, "Alexa.Unit.Temperature.Fahrenheit")
-        .addAssetId(CarControlAssets.Setting.TEMPERATURE)
-        .addAssetId(CarControlAssets.Setting.HEAT)
-        .addPreset(60)
-            .addAssetId("Alexa.Value.Low")
-            .addAssetId("Alexa.Value.Minimum")
-        .addPreset(75)
-            .addAssetId("Alexa.Value.Medium")
-        .addPreset(90)
-            .addAssetId("Alexa.Value.High")
-            .addAssetId("Alexa.Value.Maximum");
+// Point to your custom assets definition, if your config requires it, else exclude this
+config.addCustomAssetsPath("/path/to/custom/assets.json")
+
+    .createControl("heater", CarControlConfiguration.Zone.ALL)
+        .addAssetId(CarControlAssets.Device.HEATER)
+        .addAssetId(CarControlAssets.Device.COOLER)
+        .addPowerController(true)
+        .addRangeController("temperature", false, 60, 90, 1, CarControlAssets.Unit.FAHRENHEIT)
+            .addAssetId(CarControlAssets.Setting.TEMPERATURE)
+            .addAssetId(CarControlAssets.Setting.HEAT)
+            .addPreset(60)
+                .addAssetId(CarControlAssets.Value.LOW)
+                .addAssetId(CarControlAssets.Value.MINIMUM)
+            .addPreset(75)
+                .addAssetId(CarControlAssets.Value.MEDIUM)
+            .addPreset(90)
+                .addAssetId(CarControlAssets.Value.HIGH)
+                .addAssetId(CarControlAssets.Value.MAXIMUM);
 
 configuration.add(config)
 ```
@@ -661,7 +666,6 @@ configuration.add(config)
 {
     "aace.carControl": {
         "assets": {
-            "defaultAssetsPath": "/path/to/default/assets.json",
             "customAssetsPath": "/path/to/custom/assets.json"
         },
 
@@ -673,13 +677,13 @@ configuration.add(config)
                         {
                             "@type": "asset",
                             "value": {
-                                "assetId": "Alexa.DeviceName.Heater"
+                                "assetId": "Alexa.Automotive.DeviceName.Heater"
                             }
                         },
                         {
                             "@type": "asset",
                             "value": {
-                                "assetId": "Alexa.DeviceName.Cooler"
+                                "assetId": "Alexa.Automotive.DeviceName.Cooler"
                             }
                         }
                     ]
@@ -709,13 +713,13 @@ configuration.add(config)
                                 {
                                     "@type": "asset",
                                     "value": {
-                                        "assetId": "Alexa.Setting.Temperature"
+                                        "assetId": "Alexa.Automotive.Setting.Temperature"
                                     }
                                 },
                                 {
                                     "@type": "asset",
                                     "value": {
-                                        "assetId": "Alexa.Setting.Heat"
+                                        "assetId": "Alexa.Automotive.Setting.Heat"
                                     }
                                 }
                             ]
@@ -744,13 +748,13 @@ configuration.add(config)
                                             {
                                                 "@type": "asset",
                                                 "value": {
-                                                    "assetId": "Alexa.Value.Low"
+                                                    "assetId": "Alexa.Automotive.Value.Low"
                                                 }
                                             },
                                             {
                                                 "@type": "asset",
                                                 "value": {
-                                                    "assetId": "Alexa.Value.Minimum"
+                                                    "assetId": "Alexa.Automotive.Value.Minimum"
                                                 }
                                             }
                                         ]
@@ -763,7 +767,7 @@ configuration.add(config)
                                             {
                                                 "@type": "asset",
                                                 "value": {
-                                                    "assetId": "Alexa.Value.Medium"
+                                                    "assetId": "Alexa.Automotive.Value.Medium"
                                                 }
                                             }
                                         ]
@@ -776,13 +780,13 @@ configuration.add(config)
                                             {
                                                 "@type": "asset",
                                                 "value": {
-                                                    "assetId": "Alexa.Value.High"
+                                                    "assetId": "Alexa.Automotive.Value.High"
                                                 }
                                             },
                                             {
                                                 "@type": "asset",
                                                 "value": {
-                                                    "assetId": "Alexa.Value.Maximum"
+                                                    "assetId": "Alexa.Automotive.Value.Maximum"
                                                 }
                                             }
                                         ]
@@ -807,7 +811,7 @@ configuration.add(config)
                         {
                             "@type": "asset",
                             "value": {
-                                "assetId": "Alexa.Location.All"
+                                "assetId": "Alexa.Automotive.Location.All"
                             }
                         }
                     ]
@@ -915,7 +919,7 @@ This section provides sample configuration snippets (both JSON and the programma
             {
                 "@type": "asset",
                 "value": {
-                    "assetId": "Alexa.DeviceName.Fan"
+                    "assetId": "Alexa.Automotive.DeviceName.Fan"
                 }
             }
         ]
@@ -945,7 +949,7 @@ This section provides sample configuration snippets (both JSON and the programma
                     {
                         "@type": "asset",
                         "value": {
-                            "assetId": "Alexa.Setting.FanSpeed"
+                            "assetId": "Alexa.Automotive.Setting.FanSpeed"
                         }
                     }
                 ]
@@ -973,13 +977,13 @@ This section provides sample configuration snippets (both JSON and the programma
                                 {
                                     "@type": "asset",
                                     "value": {
-                                        "assetId": "Alexa.Value.Low"
+                                        "assetId": "Alexa.Automotive.Value.Low"
                                     }
                                 },
                                 {
                                     "@type": "asset",
                                     "value": {
-                                        "assetId": "Alexa.Value.Minimum"
+                                        "assetId": "Alexa.Automotive.Value.Minimum"
                                     }
                                 }
                             ]
@@ -992,7 +996,7 @@ This section provides sample configuration snippets (both JSON and the programma
                                 {
                                     "@type": "asset",
                                     "value": {
-                                        "assetId": "Alexa.Value.Medium"
+                                        "assetId": "Alexa.Automotive.Value.Medium"
                                     }
                                 }
                             ]
@@ -1005,13 +1009,13 @@ This section provides sample configuration snippets (both JSON and the programma
                                 {
                                     "@type": "asset",
                                     "value": {
-                                        "assetId": "Alexa.Value.High"
+                                        "assetId": "Alexa.Automotive.Value.High"
                                     }
                                 },
                                 {
                                     "@type": "asset",
                                     "value": {
-                                        "assetId": "Alexa.Value.Maximum"
+                                        "assetId": "Alexa.Automotive.Value.Maximum"
                                     }
                                 }
                             ]
@@ -1036,19 +1040,19 @@ This section provides sample configuration snippets (both JSON and the programma
 <p>
 
 ```java
-config->createControl("front.fan", "zone.all")
-    .addAssetId("Alexa.DeviceName.Fan")
+config->createControl("all.fan", CarControlConfiguration.Zone.ALL)
+    .addAssetId(CarControlAssets.Device.FAN)
     .addPowerController(true)
-    .addRangeController("speed", true, 0, 10, 1)
-        .addAssetId("Alexa.Setting.FanSpeed")
+    .addRangeController("speed", false, 0, 10, 1)
+        .addAssetId(CarControlAssets.Setting.FAN_SPEED)
         .addPreset(0)
-            .addAssetId("Alexa.Value.Low")
-            .addAssetId("Alexa.Value.Minimum")
+            .addAssetId(CarControlAssets.Value.LOW)
+            .addAssetId(CarControlAssets.Value.MINIMUM)
         .addPreset(5)
-            .addAssetId("Alexa.Value.Medium")
+            .addAssetId(CarControlAssets.Value.MEDIUM)
         .addPreset(10)
-            .addAssetId("Alexa.Value.High")
-            .addAssetId("Alexa.Value.Maximum")
+            .addAssetId(CarControlAssets.Value.HIGH)
+            .addAssetId(CarControlAssets.Value.MAXIMUM)
 ```
 
 </p>
@@ -1067,13 +1071,13 @@ config->createControl("front.fan", "zone.all")
             {
                 "@type": "asset",
                 "value": {
-                    "assetId": "Alexa.DeviceName.Heater"
+                    "assetId": "Alexa.Automotive.DeviceName.Heater"
                 }
             },
             {
                 "@type": "asset",
                 "value": {
-                    "assetId": "Alexa.DeviceName.Cooler"
+                    "assetId": "Alexa.Automotive.DeviceName.Cooler"
                 }
             }
         ]
@@ -1103,13 +1107,13 @@ config->createControl("front.fan", "zone.all")
                     {
                         "@type": "asset",
                         "value": {
-                            "assetId": "Alexa.Setting.Temperature"
+                            "assetId": "Alexa.Automotive.Setting.Temperature"
                         }
                     },
                     {
                         "@type": "asset",
                         "value": {
-                            "assetId": "Alexa.Setting.Heat"
+                            "assetId": "Alexa.Automotive.Setting.Heat"
                         }
                     }
                 ]
@@ -1138,13 +1142,13 @@ config->createControl("front.fan", "zone.all")
                                 {
                                     "@type": "asset",
                                     "value": {
-                                        "assetId": "Alexa.Value.Low"
+                                        "assetId": "Alexa.Automotive.Value.Low"
                                     }
                                 },
                                 {
                                     "@type": "asset",
                                     "value": {
-                                        "assetId": "Alexa.Value.Minimum"
+                                        "assetId": "Alexa.Automotive.Value.Minimum"
                                     }
                                 }
                             ]
@@ -1157,7 +1161,7 @@ config->createControl("front.fan", "zone.all")
                                 {
                                     "@type": "asset",
                                     "value": {
-                                        "assetId": "Alexa.Value.Medium"
+                                        "assetId": "Alexa.Automotive.Value.Medium"
                                     }
                                 }
                             ]
@@ -1170,13 +1174,13 @@ config->createControl("front.fan", "zone.all")
                                 {
                                     "@type": "asset",
                                     "value": {
-                                        "assetId": "Alexa.Value.High"
+                                        "assetId": "Alexa.Automotive.Value.High"
                                     }
                                 },
                                 {
                                     "@type": "asset",
                                     "value": {
-                                        "assetId": "Alexa.Value.Maximum"
+                                        "assetId": "Alexa.Automotive.Value.Maximum"
                                     }
                                 }
                             ]
@@ -1201,21 +1205,21 @@ config->createControl("front.fan", "zone.all")
 <p>
 
 ```java
-config.createControl("all.heater", "zone.all")
-    .addAssetId("Alexa.DeviceName.Heater")
-    .addAssetId("Alexa.DeviceName.Cooler")
+config.createControl("all.heater", CarControlConfiguration.Zone.ALL)
+    .addAssetId(CarControlAssets.Device.HEATER)
+    .addAssetId(CarControlAssets.Device.COOLER)
     .addPowerController(true)
-    .addRangeController("temperature", true, 60, 90, 1, "Alexa.Unit.Temperature.Fahrenheit")
-        .addAssetId("Alexa.Setting.Temperature")
-        .addAssetId("Alexa.Setting.Heat")
+    .addRangeController("temperature", false, 60, 90, 1, CarControlAssets.Unit.FAHRENHEIT)
+        .addAssetId(CarControlAssets.Setting.TEMPERATURE)
+        .addAssetId(CarControlAssets.Setting.HEAT)
         .addPreset(60)
-            .addAssetId("Alexa.Value.Low")
-            .addAssetId("Alexa.Value.Minimum")
+            .addAssetId(CarControlAssets.Value.LOW)
+            .addAssetId(CarControlAssets.Value.MINIMUM)
         .addPreset(75)
-            .addAssetId("Alexa.Value.Medium")
+            .addAssetId(CarControlAssets.Value.MEDIUM)
         .addPreset(90)
-            .addAssetId("Alexa.Value.High")
-            .addAssetId("Alexa.Value.Maximum")
+            .addAssetId(CarControlAssets.Value.HIGH)
+            .addAssetId(CarControlAssets.Value.Maximum)
 ```
 
 </p>
@@ -1234,7 +1238,7 @@ config.createControl("all.heater", "zone.all")
             {
                 "@type": "asset",
                 "value": {
-                    "assetId": "Alexa.DeviceName.Vent"
+                    "assetId": "Alexa.Automotive.DeviceName.Vent"
                 }
             }
         ]
@@ -1264,7 +1268,7 @@ config.createControl("all.heater", "zone.all")
                     {
                         "@type": "asset",
                         "value": {
-                            "assetId": "Alexa.Setting.Position"
+                            "assetId": "Alexa.Automotive.Setting.Position"
                         }
                     }
                 ]
@@ -1288,7 +1292,7 @@ config.createControl("all.heater", "zone.all")
                                 {
                                     "@type": "asset",
                                     "value": {
-                                        "assetId": "Alexa.Setting.BodyVents"
+                                        "assetId": "Alexa.Automotive.Setting.BodyVents"
                                     }
                                 }
                             ]
@@ -1301,7 +1305,7 @@ config.createControl("all.heater", "zone.all")
                                 {
                                     "@type": "asset",
                                     "value": {
-                                        "assetId": "Alexa.Setting.FloorVents"
+                                        "assetId": "Alexa.Automotive.Setting.FloorVents"
                                     }
                                 }
                             ]
@@ -1314,7 +1318,7 @@ config.createControl("all.heater", "zone.all")
                                 {
                                     "@type": "asset",
                                     "value": {
-                                        "assetId": "Alexa.Setting.WindshieldVents"
+                                        "assetId": "Alexa.Automotive.Setting.WindshieldVents"
                                     }
                                 }
                             ]
@@ -1327,7 +1331,7 @@ config.createControl("all.heater", "zone.all")
                                 {
                                     "@type": "asset",
                                     "value": {
-                                        "assetId": "Alexa.Setting.MixVents"
+                                        "assetId": "Alexa.Automotive.Setting.MixVents"
                                     }
                                 }
                             ]
@@ -1352,19 +1356,19 @@ config.createControl("all.heater", "zone.all")
 <p>
 
 ```java
-config.createControl("vent", "zone.all")
-    .addAssetId("Alexa.DeviceName.Vent")
-    .addPowerController(false)
-    .addModeController("position", false, false)
-        .addAssetId("Alexa.Setting.Position")
-        .addValue("BODY")
-            .addAssetId("Alexa.Setting.BodyVents")
-        .addValue("FLOOR")
-            .addAssetId("Alexa.Setting.FloorVents")
-        .addValue("WINDSHIELD")
-            .addAssetId("Alexa.Setting.WindshieldVents")
-        .addValue("MIX")
-            .addAssetId("Alexa.Setting.MixVents")
+config.createControl("vent", CarControlConfiguration.Zone.ALL)
+        .addAssetId(CarControlAssets.Device.VENT)
+        .addPowerController(true)
+        .addModeController("position", true, true)
+            .addAssetId(CarControlAssets.Setting.POSITION)
+            .addValue(VentPosition.BODY)
+                .addAssetId(CarControlAssets.Setting.BODY_VENTS)
+            .addValue(VentPosition.FLOOR)
+                .addAssetId(CarControlAssets.Setting.FLOOR_VENTS)
+            .addValue(VentPosition.WINDSHIELD)
+                .addAssetId(CarControlAssets.Setting.WINDSHIELD_VENTS)
+            .addValue(VentPosition.MIX)
+                .addAssetId(CarControlAssets.Setting.MIX_VENTS);
 ```
 
 </p>
@@ -1383,13 +1387,13 @@ config.createControl("vent", "zone.all")
             {
                 "@type": "asset",
                 "value": {
-                    "assetId": "Alexa.DeviceName.DomeLight"
+                    "assetId": "Alexa.Automotive.DeviceName.DomeLight"
                 }
             },
             {
                 "@type": "asset",
                 "value": {
-                    "assetId": "Alexa.DeviceName.CabinLight"
+                    "assetId": "Alexa.Automotive.DeviceName.CabinLight"
                 }
             }
         ]
@@ -1425,10 +1429,10 @@ config.createControl("vent", "zone.all")
 <p>
 
 ```java
-config.createControl("dome.light", "zone.all")
-    .addAssetId("Alexa.DeviceName.DomeLight")
-    .addAssetId("Alexa.DeviceName.CabinLight")
-    .addPowerController(false)
+config.createControl("dome.light", CarControlConfiguration.Zone.ALL)
+        .addAssetId(CarControlAssets.Device.DOME_LIGHT)
+        .addAssetId(CarControlAssets.Device.CABIN_LIGHT)
+        .addPowerController(true);
 ```
 
 </p>
@@ -1447,7 +1451,7 @@ config.createControl("dome.light", "zone.all")
             {
                 "@type": "asset",
                 "value": {
-                    "assetId": "Alexa.DeviceName.AmbientLight"
+                    "assetId": "Alexa.Automotive.DeviceName.AmbientLight"
                 }
             }
         ]
@@ -1477,7 +1481,7 @@ config.createControl("dome.light", "zone.all")
                     {
                         "@type": "asset",
                         "value": {
-                            "assetId": "Alexa.Setting.Color"
+                            "assetId": "Alexa.Automotive.Setting.Color"
                         }
                     }
                 ]
@@ -1492,6 +1496,7 @@ config.createControl("dome.light", "zone.all")
                 "retrievable": false
             },
             "configuration": {
+                "ordered": false,
                 "supportedModes": [
                     {
                         "value": "RED",
@@ -1500,7 +1505,7 @@ config.createControl("dome.light", "zone.all")
                                 {
                                     "@type": "asset",
                                     "value": {
-                                        "assetId": "Alexa.Value.Red"
+                                        "assetId": "Alexa.Automotive.Value.Red"
                                     }
                                 }
                             ]
@@ -1513,7 +1518,7 @@ config.createControl("dome.light", "zone.all")
                                 {
                                     "@type": "asset",
                                     "value": {
-                                        "assetId": "Alexa.Value.Blue"
+                                        "assetId": "Alexa.Automotive.Value.Blue"
                                     }
                                 }
                             ]
@@ -1526,7 +1531,7 @@ config.createControl("dome.light", "zone.all")
                                 {
                                     "@type": "asset",
                                     "value": {
-                                        "assetId": "Alexa.Value.Green"
+                                        "assetId": "Alexa.Automotive.Value.Green"
                                     }
                                 }
                             ]
@@ -1539,7 +1544,7 @@ config.createControl("dome.light", "zone.all")
                                 {
                                     "@type": "asset",
                                     "value": {
-                                        "assetId": "Alexa.Value.White"
+                                        "assetId": "Alexa.Automotive.Value.White"
                                     }
                                 }
                             ]
@@ -1552,7 +1557,7 @@ config.createControl("dome.light", "zone.all")
                                 {
                                     "@type": "asset",
                                     "value": {
-                                        "assetId": "Alexa.Value.Orange"
+                                        "assetId": "Alexa.Automotive.Value.Orange"
                                     }
                                 }
                             ]
@@ -1565,7 +1570,7 @@ config.createControl("dome.light", "zone.all")
                                 {
                                     "@type": "asset",
                                     "value": {
-                                        "assetId": "Alexa.Value.Yellow"
+                                        "assetId": "Alexa.Automotive.Value.Yellow"
                                     }
                                 }
                             ]
@@ -1578,7 +1583,7 @@ config.createControl("dome.light", "zone.all")
                                 {
                                     "@type": "asset",
                                     "value": {
-                                        "assetId": "Alexa.Value.Indigo"
+                                        "assetId": "Alexa.Automotive.Value.Indigo"
                                     }
                                 }
                             ]
@@ -1591,7 +1596,7 @@ config.createControl("dome.light", "zone.all")
                                 {
                                     "@type": "asset",
                                     "value": {
-                                        "assetId": "Alexa.Value.Violet"
+                                        "assetId": "Alexa.Automotive.Value.Violet"
                                     }
                                 }
                             ]
@@ -1616,27 +1621,27 @@ config.createControl("dome.light", "zone.all")
 <p>
 
 ```java
-config.createControl("ambient.light", "zone.all")
-    .addAssetId("Alexa.DeviceName.AmbientLight")
-    .addPowerController(true)
-    .addModeController("color", false, true)
-        .addAssetId("Alexa.Setting.Color")
-        .addValue("RED")
-            .addAssetId("Alexa.Value.Red")
-        .addValue("BLUE")
-            .addAssetId("Alexa.Value.Blue")
-        .addValue("GREEN")
-            .addAssetId("Alexa.Value.Green")
-        .addValue("WHITE")
-            .addAssetId("Alexa.Value.White")
-        .addValue("ORANGE")
-            .addAssetId("Alexa.Value.Orange")
-        .addValue("YELLOW")
-            .addAssetId("Alexa.Value.Yellow")
-        .addValue("INDIGO")
-            .addAssetId("Alexa.Value.Indigo")
-        .addValue("VIOLET")
-            .addAssetId("Alexa.Value.Violet")
+config.createControl("ambient.light", CarControlConfiguration.Zone.ALL)
+        .addAssetId(CarControlAssets.Device.AMBIENT_LIGHT)
+        .addPowerController(true)
+        .addModeController("color", false, false)
+            .addAssetId(CarControlAssets.Setting.COLOR)
+            .addValue("RED")
+                .addAssetId(CarControlAssets.Color.RED)
+            .addValue("BLUE")
+                .addAssetId(CarControlAssets.Color.BLUE)
+            .addValue("GREEN")
+                .addAssetId(CarControlAssets.Color.GREEN)
+            .addValue("WHITE")
+                .addAssetId(CarControlAssets.Color.WHITE)
+            .addValue("ORANGE")
+                .addAssetId(CarControlAssets.Color.ORANGE)
+            .addValue("YELLOW")
+                .addAssetId(CarControlAssets.Color.YELLOW)
+            .addValue("INDIGO")
+                .addAssetId(CarControlAssets.Color.INDIGO)
+            .addValue("VIOLET")
+                .addAssetId(CarControlAssets.Color.VIOLET);
 ```
 
 </p>

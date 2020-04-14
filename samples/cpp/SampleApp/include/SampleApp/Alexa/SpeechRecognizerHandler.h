@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -20,7 +20,9 @@
 //#include "SampleApp/AudioFileReader.h"
 //#include "SampleApp/AudioInputManager.h"
 #include "SampleApp/Logger/LoggerHandler.h"
+#include "SampleApp/PropertyManager/PropertyManagerHandler.h"
 
+#include <AACE/Alexa/AlexaProperties.h>
 #include <AACE/Alexa/SpeechRecognizer.h>
 
 // Alexa Auto Core - Audio Reference Implementation
@@ -43,6 +45,7 @@ class SpeechRecognizerHandler : public aace::alexa::SpeechRecognizer /* isa Plat
   private:
     std::weak_ptr<Activity> m_activity{};
     std::weak_ptr<logger::LoggerHandler> m_loggerHandler{};
+    std::weak_ptr<propertyManager::PropertyManagerHandler> m_propertyManagerHandler{};
     //std::shared_ptr<sampleApp::AudioInputManager> m_platformAudioCapture{};
 
     std::string m_audioFilePath{};
@@ -53,6 +56,7 @@ class SpeechRecognizerHandler : public aace::alexa::SpeechRecognizer /* isa Plat
   protected:
     SpeechRecognizerHandler(std::weak_ptr<Activity> activity,
                             std::weak_ptr<logger::LoggerHandler> loggerHandler,
+                            std::weak_ptr<propertyManager::PropertyManagerHandler> propertyManagerHandler,
                             //std::shared_ptr<sampleApp::AudioInputManager> platformAudioCapture,
                             bool wakewordDetectionEnabled);
 

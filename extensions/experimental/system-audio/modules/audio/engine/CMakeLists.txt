@@ -1,6 +1,7 @@
 # AACE SystemAudio Engine
 
 find_library(AVS_AVS_COMMON_LIBRARY AVSCommon)
+find_library(AVS_PLAYLIST_PARSER_LIBRARY PlaylistParser)
 
 add_library(AACESystemAudioEngine SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/SystemAudioEngineService.cpp
@@ -25,6 +26,7 @@ target_link_libraries(AACESystemAudioEngine
         AACECoreEngine
     PRIVATE
         ${AVS_AVS_COMMON_LIBRARY}
+        ${AVS_PLAYLIST_PARSER_LIBRARY}
         aal
 )
 

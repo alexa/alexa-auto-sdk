@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -71,7 +71,11 @@ static const std::string AVS_DEVICE_SDK_CONFIG =
     "    \"deviceInfo\":{"
     "        \"deviceSerialNumber\":\"12345678\", "
     "        \"clientId\":\"DummyClientId\","
-    "        \"productId\":\"DummyProductID\""
+    "        \"productId\":\"DummyProductID\","
+    "        \"manufacturerName\":\"DummyManufacturerName\","
+    "        \"description\": \"desc\""
+    "    },"
+    "    \"avsGatewayManager\":{"
     "    },"
     "    \"capabilitiesDelegate\":{"
     "    },"
@@ -81,11 +85,12 @@ static const std::string AVS_DEVICE_SDK_CONFIG =
     "    \"alertsCapabilityAgent\":{"
     "        \"databaseFilePath\":\"alerts.db\""
     "    },"
-    "    \"settings\":{"
+    "    \"deviceSettings\":{"
     "        \"databaseFilePath\":\"settings.db\","
-    "        \"defaultAVSClientSettings\":{"
-    "            \"locale\":\"en-US\""
-    "        }"
+    "        \"locales\":[\"en-US\",\"en-GB\",\"de-DE\",\"en-IN\",\"en-CA\",\"ja-JP\",\"en-AU\",\"fr-FR\",\"it-IT\",\"es-ES\",\"es-MX\",\"fr-CA\",\"es-US\", \"hi-IN\", \"pt-BR\"],"
+    "        \"defaultLocale\":\"en-US\","
+    "        \"localeCombinations\":[[\"en-CA\", \"fr-CA\"],[\"fr-CA\", \"en-CA\"]],"
+    "        \"defaultTimezone\":\"America/Vancouver\""
     "    },"
     "    \"bluetooth\" : {"
     "        \"databaseFilePath\":\"bluetooth.db\""

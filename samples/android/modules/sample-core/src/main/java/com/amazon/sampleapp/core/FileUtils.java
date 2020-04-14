@@ -1,6 +1,7 @@
 package com.amazon.sampleapp.core;
 
 import android.content.res.AssetManager;
+import android.os.Environment;
 import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -115,6 +116,31 @@ public class FileUtils {
                 Log.w(TAG, "No device config specified in " + configAssetName);
             }
         }
+        return config;
+    }
+
+    /**
+     * Returns a JSONObject representing the config object keyed by 'configRootKey' from the
+     * 'configFileName' file in the SD Card directory, or null if the config cannot be read
+     */
+    public static JSONObject getConfigFromSDCard(String configFileName, String configRootKey) {
+        JSONObject config = null;
+        File file = new File(Environment.getExternalStorageDirectory(), configFileName);
+        if (file.exists()) {
+            JSONObject obj = null;
+            try (InputStream is = new FileInputStream(file)) {
+                byte[] buffer = new byte[is.available()];
+                is.read(buffer);
+                String json = new String(buffer, "UTF-8");
+                obj = new JSONObject(json);
+                config = obj.getJSONObject(configRootKey);
+            } catch (IOException e) {
+                Log.w(TAG, String.format("Cannot read %s from sd card directory", configFileName), e);
+            } catch (JSONException e) {
+                Log.w(TAG, "Invalid config in " + configFileName, e);
+            }
+        }
+
         return config;
     }
 }

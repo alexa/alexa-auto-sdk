@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -101,6 +101,7 @@ import com.amazon.sampleapp.impl.NetworkInfoProvider.NetworkInfoProviderHandler;
 import com.amazon.sampleapp.impl.Notifications.NotificationsHandler;
 import com.amazon.sampleapp.impl.PhoneCallController.PhoneCallControllerHandler;
 import com.amazon.sampleapp.impl.PlaybackController.PlaybackControllerHandler;
+import com.amazon.sampleapp.impl.PropertyManager.PropertyManagerHandler;
 import com.amazon.sampleapp.impl.SpeechRecognizer.SpeechRecognizerHandler;
 import com.amazon.sampleapp.impl.SpeechSynthesizer.SpeechSynthesizerHandler;
 import com.amazon.sampleapp.impl.TemplateRuntime.TemplateRuntimeHandler;
@@ -170,6 +171,9 @@ public class MainActivity extends AppCompatActivity implements Observer {
     // Network
     private NetworkInfoProviderHandler mNetworkInfoProvider;
 
+    // Property Manager
+    private PropertyManagerHandler mPropertyManager;
+
     /* Tab Fragment Adapter */
     private TabFragmentAdapter mAdapter;
 
@@ -213,6 +217,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private Object mDisableStartOfRequestEarconLock = new Object();
     private Object mDisableEndOfRequestEarconLock = new Object();
 
+    //Timezone
+    private final List<String> timezoneArray = new ArrayList<String>( Arrays.asList("America/Vancouver", "America/Edmonton", "America/Winnipeg",
+            "America/Toronto", "America/Halifax", "America/St_Johns") );
+    ArrayAdapter<String> timezoneAdapter;
     /* AutoVoiceChrome Controller */
 
     @Override
@@ -469,11 +477,19 @@ public class MainActivity extends AppCompatActivity implements Observer {
             )
         ) throw new RuntimeException( "Could not register PlaybackController platform interface" );
 
+        // PropertyManager
+        if ( !mEngine.registerPlatformInterface(
+                mPropertyManager = new PropertyManagerHandler( this, mLogger )
+            )
+        ) throw new RuntimeException( "Could not register PropertyManager platform interface" );
+
         // SpeechRecognizer
+        // Note : Expects PropertyManager to be not null.
         if ( !mEngine.registerPlatformInterface(
                 mSpeechRecognizer = new SpeechRecognizerHandler(
                         this,
                         mLogger,
+                        mPropertyManager,
                         true
                 )
             )
@@ -481,7 +497,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
         // AudioPlayer
         if ( !mEngine.registerPlatformInterface(
-                mAudioPlayer = new AudioPlayerHandler( mLogger, mAudioOutputProvider, mPlaybackController )
+                mAudioPlayer = new AudioPlayerHandler( mLogger, mPlaybackController )
             )
         ) throw new RuntimeException( "Could not register AudioPlayer platform interface" );
 
@@ -595,47 +611,47 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
         // Mock CD platform handler
         if ( !mEngine.registerPlatformInterface(
-                mCDLocalMediaSource = new CDLocalMediaSource(this, mLogger)
+                mCDLocalMediaSource = new CDLocalMediaSource(this, mLogger, mPlaybackController)
         ) ) throw new RuntimeException( "Could not register Mock CD player Local Media Source platform interface" );
 
         // Mock DAB platform handler
         if ( !mEngine.registerPlatformInterface(
-                mDABLocalMediaSource = new DABLocalMediaSource(this, mLogger)
+                mDABLocalMediaSource = new DABLocalMediaSource(this, mLogger, mPlaybackController)
         ) ) throw new RuntimeException( "Could not register Mock DAB player Local Media Source platform interface" );
 
         // Mock AM platform handler
         if ( !mEngine.registerPlatformInterface(
-            mAMLocalMediaSource = new AMLocalMediaSource(this, mLogger)
+            mAMLocalMediaSource = new AMLocalMediaSource(this, mLogger, mPlaybackController)
         ) ) throw new RuntimeException( "Could not register Mock AM radio player Local Media Source platform interface" );
 
         // Mock SIRIUSXM platform handler
         /*if ( !mEngine.registerPlatformInterface(
-                mSIRUSXMLocalMediaSource = new SiriusXMLocalMediaSource(this, mLogger)
+                mSIRUSXMLocalMediaSource = new SiriusXMLocalMediaSource(this, mLogger, mPlaybackController)
         ) ) throw new RuntimeException( "Could not register Mock SIRIUSXM player Local Media Source platform interface" );*/
 
         // Mock FM platform handler
         if ( !mEngine.registerPlatformInterface(
-                mFMLocalMediaSource = new FMLocalMediaSource(this, mLogger)
+                mFMLocalMediaSource = new FMLocalMediaSource(this, mLogger, mPlaybackController)
         ) ) throw new RuntimeException( "Could not register Mock FM radio player Local Media Source platform interface" );
 
         // Mock Bluetooth platform handler
         if ( !mEngine.registerPlatformInterface(
-                mBTLocalMediaSource = new BluetoothLocalMediaSource(this, mLogger)
+                mBTLocalMediaSource = new BluetoothLocalMediaSource(this, mLogger, mPlaybackController)
         ) ) throw new RuntimeException( "Could not register Mock Bluetooth player Local Media Source platform interface" );
 
         // Mock Line In platform handler
         if ( !mEngine.registerPlatformInterface(
-                mLILocalMediaSource = new LineInLocalMediaSource(this, mLogger)
+                mLILocalMediaSource = new LineInLocalMediaSource(this, mLogger, mPlaybackController)
         ) ) throw new RuntimeException( "Could not register Mock Line In player Local Media Source platform interface" );
 
         // Mock Satellite Radio platform handler
         if ( !mEngine.registerPlatformInterface(
-                mSATRADLocalMediaSource = new SatelliteLocalMediaSource(this, mLogger)
+                mSATRADLocalMediaSource = new SatelliteLocalMediaSource(this, mLogger, mPlaybackController)
         ) ) throw new RuntimeException( "Could not register Mock Satellite radio player Local Media Source platform interface" );
 
         // Mock USB platform handler
         if ( !mEngine.registerPlatformInterface(
-                mUSBLocalMediaSource = new USBLocalMediaSource(this, mLogger)
+                mUSBLocalMediaSource = new USBLocalMediaSource(this, mLogger, mPlaybackController)
         ) ) throw new RuntimeException( "Could not register Mock USB player Local Media Source platform interface" );
 
         // Mock global preset
@@ -647,7 +663,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         loadPlatformInterfacesAndLoadUI( mEngine, extraFactories, sampleAppContext );
 
         // Alexa Locale
-        final String supportedLocales = mEngine.getProperty(AlexaProperties.SUPPORTED_LOCALES);
+        final String supportedLocales = mPropertyManager.getProperty(AlexaProperties.SUPPORTED_LOCALES);
         final String[] localesArray = supportedLocales.split(",");
 
         ArrayAdapter<String> localeAdapter = new ArrayAdapter<String>(this,
@@ -656,7 +672,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         Spinner spinnerView = (Spinner) findViewById(R.id.locale_spinner);
         spinnerView.setAdapter(localeAdapter);
 
-        final String defaultLocale = mEngine.getProperty(AlexaProperties.LOCALE);
+        final String defaultLocale = mPropertyManager.getProperty(AlexaProperties.LOCALE);
 
         int localePosition = localeAdapter.getPosition(defaultLocale);
         if (localePosition < 0) {
@@ -670,12 +686,12 @@ public class MainActivity extends AppCompatActivity implements Observer {
             public void onItemSelected (AdapterView<?> arg0, View arg1,
                                         int position, long arg3) {
                 String s = localesArray[position];
-                if( !mEngine.getProperty(AlexaProperties.LOCALE).equals(s) ) {
+                if( !mPropertyManager.getProperty(AlexaProperties.LOCALE).equals(s) ) {
 
                     Toast.makeText(MainActivity.this, "Switching Alexa locale to " + s,
                             Toast.LENGTH_SHORT).show();
 
-                    mEngine.setProperty(AlexaProperties.LOCALE, s);
+                    mPropertyManager.setProperty(AlexaProperties.LOCALE, s);
                 }
             }
 
@@ -685,24 +701,44 @@ public class MainActivity extends AppCompatActivity implements Observer {
             }
         });
 
+        // Timezone
+        setUpTimeZoneUI();
+
         // Start the engine
         if ( !mEngine.start() ) throw new RuntimeException( "Could not start engine" );
         mEngineStarted = true;
 
         // Check if Amazonlite is supported
-        if ( mEngine.getProperty( AlexaProperties.WAKEWORD_SUPPORTED ).equals( "true" )){
+        if ( mPropertyManager.getProperty( AlexaProperties.WAKEWORD_SUPPORTED ).equals( "true" )){
             mSpeechRecognizer.enableWakeWordUI();
         }
-        mLogger.postInfo("Wakeword supported: ", mEngine.getProperty( AlexaProperties.WAKEWORD_SUPPORTED ));
+        mLogger.postInfo("Wakeword supported: ", mPropertyManager.getProperty( AlexaProperties.WAKEWORD_SUPPORTED ));
 
         //log whether LocationProvider gave a supported country
-        mLogger.postInfo( "Country Supported: ",  mEngine.getProperty( AlexaProperties.COUNTRY_SUPPORTED ));
+        mLogger.postInfo( "Country Supported: ",  mPropertyManager.getProperty( AlexaProperties.COUNTRY_SUPPORTED ));
 
         // Initialize AutoVoiceChrome
 
         mAddressBook.onInitialize();
         initTapToTalk();
         initEarconsSettings();
+    }
+
+    public void updateTimezoneSpinner(String timezone) {
+        runOnUiThread( new Runnable() {
+            public void run() {
+                if(!timezoneArray.contains(timezone)) {
+                    timezoneArray.add(timezone);
+                    final String[] timezones = new String[timezoneArray.size()];
+                    Spinner spinnerView = (Spinner) findViewById(R.id.timezone_spinner);
+                    timezoneAdapter = new ArrayAdapter<String>(MainActivity.this,
+                            android.R.layout.simple_spinner_item, timezoneArray.toArray(timezones));
+                    spinnerView.setAdapter(timezoneAdapter);
+                    int timezonePosition = timezoneAdapter.getPosition(timezone);
+                    spinnerView.setSelection ( timezonePosition );
+                }
+            }
+        } );
     }
 
     /**
@@ -835,6 +871,11 @@ public class MainActivity extends AppCompatActivity implements Observer {
         if ( mNetworkInfoProvider != null ) { mNetworkInfoProvider.unregister(); }
 
         if ( mAlexaClient != null && mCBLHandler != null ) { mAlexaClient.removeAuthStateObserver( mCBLHandler ); }
+
+        // cleanup for restarting sample app while using LVE
+        if ( mAddressBook != null ) {
+            mAddressBook.removeAllAddressBooks();
+        }
 
         if ( mEngine != null ) { mEngine.dispose(); }
 
@@ -1115,5 +1156,37 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 if ( !engine.registerPlatformInterface( platformInterface ) ) throw new RuntimeException( "Could not register extra module interface" );
             }
         }
+    }
+    private void setUpTimeZoneUI() {
+        final String[] timezones = new String[timezoneArray.size()];
+        timezoneAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, timezoneArray.toArray(timezones));
+
+        Spinner spinnerView = (Spinner) findViewById(R.id.timezone_spinner);
+        spinnerView.setAdapter(timezoneAdapter);
+
+        final String defaultTimeZone = mPropertyManager.getProperty(AlexaProperties.TIMEZONE);
+
+        int timezonePosition = timezoneAdapter.getPosition(defaultTimeZone);
+        spinnerView.setSelection ( timezonePosition );
+        spinnerView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected (AdapterView<?> arg0, View arg1,
+                                        int position, long arg3) {
+                String s = timezoneArray.get(position);
+                if( !mPropertyManager.getProperty(AlexaProperties.TIMEZONE).equals(s) ) {
+
+                    Toast.makeText(MainActivity.this, "Switching timezone to " + s,
+                            Toast.LENGTH_SHORT).show();
+
+                    mPropertyManager.setProperty(AlexaProperties.TIMEZONE, s);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+                // TODO Auto-generated method stub
+            }
+        });
     }
 }

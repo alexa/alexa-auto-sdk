@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
  * permissions and limitations under the License.
  */
 
+#include <AVSCommon/AVS/EndpointResources.h>
 #include <Endpoints/EndpointBuilder.h>
 
 #include <AACE/Engine/CarControl/AssetStore.h>
@@ -40,27 +41,31 @@ static const std::string CAPABILITY_RANGE_CONTROLLER = "Alexa.RangeController";
 /// The namespace and name of the ToggleController capability interface
 static const std::string CAPABILITY_TOGGLE_CONTROLLER = "Alexa.ToggleController";
 
-/// The 'assetId' configuration key
-static const std::string CONFIG_KEY_ASSET_ID = "assetId";
-/// The 'capabilities' configuration key
-static const std::string CONFIG_KEY_CAPABILITIES = "capabilities";
 /// The 'endpointId' configuration key
 static const std::string CONFIG_KEY_ENDPOINT_ID = "endpointId";
 /// The 'endpointResources' configuration key
 static const std::string CONFIG_KEY_ENDPOINT_RESOURCES = "endpointResources";
 /// The 'friendlyNames' configuration key
 static const std::string CONFIG_KEY_FRIENDLY_NAMES = "friendlyNames";
-/// The 'interface' configuration key
-static const std::string CONFIG_KEY_INTERFACE = "interface";
 /// The 'type' configuration key
 static const std::string CONFIG_KEY_TYPE = "@type";
+/// The 'asset' label type
+static const std::string CONFIG_TYPE_ASSET = "asset";
 /// The 'value' configuration key
 static const std::string CONFIG_KEY_VALUE = "value";
+/// The 'assetId' configuration key
+static const std::string CONFIG_KEY_ASSET_ID = "assetId";
+
+/// The 'capabilities' configuration key
+static const std::string CONFIG_KEY_CAPABILITIES = "capabilities";
+/// The 'interface' configuration key
+static const std::string CONFIG_KEY_INTERFACE = "interface";
+
 
 /// The display category for the endpoint in the companion app
 static const std::string DISPLAY_CATEGORY = "VEHICLE";
 
-std::shared_ptr<Endpoint> Endpoint::create(const json& endpointConfig, AssetStore& assetStore) {
+std::shared_ptr<Endpoint> Endpoint::create(const json& endpointConfig, const AssetStore& assetStore) {
     try {
         ThrowIfNot(endpointConfig.contains(CONFIG_KEY_ENDPOINT_ID), "noEndpointId");
         std::string endpointId = endpointConfig.at(CONFIG_KEY_ENDPOINT_ID);
@@ -74,20 +79,16 @@ std::shared_ptr<Endpoint> Endpoint::create(const json& endpointConfig, AssetStor
         std::vector<std::string> assetIds;
         for (auto& item : friendlyNames.items()) {
             auto& type = item.value().at(CONFIG_KEY_TYPE);
-            ThrowIfNot(type == "asset", "expectedAssetTypeResource");
+            // For now, "text" labels
+            // (https://developer.amazon.com/en-US/docs/alexa/device-apis/resources-and-assets.html#label-object) are
+            // not allowed, since aace.carControl config has always expected assets
+            ThrowIfNot(type == CONFIG_TYPE_ASSET, "expectedAssetTypeResource");
             auto& value = item.value().at(CONFIG_KEY_VALUE);
             std::string assetId = value.at(CONFIG_KEY_ASSET_ID);
             assetIds.push_back(assetId);
         }
 
-        // Retrieve all friendly names for this endpoint from the @c AssetStore
-        std::vector<std::string> names;
-        for (auto assetId = assetIds.begin(); assetId != assetIds.end(); ++assetId) {
-            const std::vector<std::string>& friendlyNames = assetStore.getValues(*assetId);
-            names.insert(names.end(), friendlyNames.begin(), friendlyNames.end());
-        }
-
-        auto endpoint = std::shared_ptr<Endpoint>(new Endpoint(endpointId, names));
+        auto endpoint = std::shared_ptr<Endpoint>(new Endpoint(endpointId, assetIds));
         ThrowIfNull(endpoint, "cannotCreateEndpoint");
 
         // Add capability controllers to the Endpoint
@@ -129,14 +130,13 @@ bool Endpoint::addController(const std::string& id, std::shared_ptr<CapabilityCo
     return result.second;
 }
 
-Endpoint::Endpoint(const std::string endpointId, const std::vector<std::string>& names) :
+Endpoint::Endpoint(const std::string endpointId, const std::vector<std::string>& assetIds) :
         m_endpointId{endpointId},
-        m_names{names} {
+        m_assetIds{assetIds} {
 }
 
 Endpoint::~Endpoint() {
     m_assetIds.clear();
-    m_names.clear();
     m_controllers.clear();
 }
 
@@ -147,41 +147,35 @@ std::string Endpoint::getId() {
 bool Endpoint::build(
     std::shared_ptr<CarControlServiceInterface> carControlServiceInterface,
     std::shared_ptr<aace::engine::alexa::EndpointBuilderFactory> endpointBuilderFactory,
-    const std::string& manufacturer) {
+    const AssetStore& assetStore,
+    const std::string& manufacturer,
+    const std::string& description) {
     try {
-        auto id = getId();
-        std::string derivedId;
-        // For every friendly name used to describe this endpoint, create a uniquely-identified duplicate AVS SDK
-        // Endpoint representation since 'endpointResources' is not supported in the cloud
-        int index = 0;
-        for (auto name = m_names.begin(); name != m_names.end(); ++name, ++index) {
-            auto endpointBuilder = endpointBuilderFactory->createEndpointBuilder();
-            ThrowIfNull(endpointBuilder, "couldNotCreateEndpointBuilder");
-            // For each duplicate endpoint:
-            // 1. Create a unique endpoint ID by appending the index to the base endpoint ID
-            // 2. Associate the duplicate endpoint with the base endpoint through the 'isEquivalentOf' cookie
-            if (index) {
-                endpointBuilder->withDerivedEndpointId(id + "." + std::to_string(index));
-                endpointBuilder->withCookies({{"isEquivalentOf", derivedId}});
-            } else {
-                endpointBuilder->withDerivedEndpointId(id);
-            }
-            endpointBuilder->withFriendlyName(*name);
-            endpointBuilder->withDisplayCategory({DISPLAY_CATEGORY});
-            endpointBuilder->withDescription({*name});
-            endpointBuilder->withManufacturerName({manufacturer});
+        auto endpointBuilder = endpointBuilderFactory->createEndpointBuilder();
+        ThrowIfNull(endpointBuilder, "couldNotCreateEndpointBuilder");
 
-            for (auto& item : m_controllers) {
-                auto controller = item.second;
-                controller->build(carControlServiceInterface, endpointBuilder);
+        alexaClientSDK::avsCommon::avs::EndpointResources endpointResources;
+        for (auto asset = m_assetIds.begin(); asset != m_assetIds.end(); ++asset) {
+            const std::vector<AssetStore::NameLocalePair>& names = assetStore.getFriendlyNames(*asset);
+            for (auto name = names.begin(); name != names.end(); ++name) {
+                endpointResources.addFriendlyNameWithText(name->first, name->second);
             }
-            auto endpointId = endpointBuilder->build();
-            ThrowIfNot(endpointId.hasValue(), "couldNotBuildEndpoint");
-            if (derivedId.empty()) {
-                derivedId = endpointId.value();
-            }
-            endpointBuilder.reset();
         }
+        // Note: "aace.carControl" config currently does not use manufacturer name, so we fill in a default
+        endpointResources.addManufacturerNameWithText(manufacturer, "en-US");
+        // Note: "aace.carControl" config currently does not use a description, so we fill in a default
+        endpointResources.addDescriptionWithText(description, "en-US");
+        endpointBuilder->withEndpointResources(endpointResources);
+        endpointBuilder->withDerivedEndpointId(getId());
+        endpointBuilder->withDisplayCategory({DISPLAY_CATEGORY});
+
+        for (auto& item : m_controllers) {
+            auto controller = item.second;
+            controller->build(carControlServiceInterface, endpointBuilder);
+        }
+        auto endpointId = endpointBuilder->build();
+        ThrowIfNot(endpointId.hasValue(), "couldNotBuildEndpoint");
+        endpointBuilder.reset();
         return true;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));

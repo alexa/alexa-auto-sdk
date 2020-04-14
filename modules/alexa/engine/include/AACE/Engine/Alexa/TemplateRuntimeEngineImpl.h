@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -74,37 +74,9 @@ protected:
 private:
     std::shared_ptr<aace::alexa::TemplateRuntime> m_templateRuntimePlatformInterface;
     std::shared_ptr<alexaClientSDK::capabilityAgents::templateRuntime::TemplateRuntime> m_templateRuntimeCapabilityAgent;
-    std::shared_ptr<RenderPlayerInfoCardsProviderInterfaceDelegate> m_renderPlayerInfoCardsProviderInterfaceDelegate;
-};
-
-//
-// RenderPlayerInfoCardsProviderInterfaceDelegate
-//
-
-class RenderPlayerInfoCardsProviderInterfaceDelegate :
-    public alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface,
-    public alexaClientSDK::avsCommon::utils::RequiresShutdown {
     
-private:
-    RenderPlayerInfoCardsProviderInterfaceDelegate( std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>> renderPlayerInfoCardsProviderInterfaces);
-
-public:
-    static std::shared_ptr<RenderPlayerInfoCardsProviderInterfaceDelegate> create( std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>> renderPlayerInfoCardsProviderInterfaces );
-    
-    void setDelegate( std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>> delegates );
-    void setObserver(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsObserverInterface> observer) override;
-
-protected:
-    virtual void doShutdown() override;
-    
-private:
-    std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>> m_delegates;
-    
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsObserverInterface> m_observer;
-    
+    std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>> m_renderPlayerInfoCardsProviderInterfaces;
     std::mutex m_mutex;
-    
-        
 };
 
 } // aace::engine::alexa

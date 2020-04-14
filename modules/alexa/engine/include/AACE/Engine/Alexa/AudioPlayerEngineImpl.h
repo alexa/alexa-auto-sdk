@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@
 #include <Endpoints/EndpointBuilder.h>
 #include <CertifiedSender/CertifiedSender.h>
 
+#include <AACE/Alexa/AlexaEngineInterfaces.h>
 #include <AACE/Alexa/AudioPlayer.h>
 #include <AACE/Engine/Audio/AudioManagerInterface.h>
 
@@ -44,6 +45,7 @@ class PlaybackRouterDelegate;
 
 class AudioPlayerEngineImpl :
     public AudioChannelEngineImpl,
+    public aace::alexa::AudioPlayerEngineInterface,
     public alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface,
     public alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface{
     
@@ -61,7 +63,8 @@ private:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter,
-        std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedSender );
+        std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedSender,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface> audioPlayerObserverDelegate );
 
 public:
     static std::shared_ptr<AudioPlayerEngineImpl> create(
@@ -76,7 +79,14 @@ public:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter,
-        std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedSender );
+        std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedSender,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface> audioPlayerObserverDelegate );
+        
+    //
+    // AudioPlayerEngineInterface
+    //
+    int64_t onGetPlayerPosition() override;
+    int64_t onGetPlayerDuration() override;
         
     //
     // AudioPlayerObserverInterface
@@ -87,7 +97,6 @@ public:
     /// @{
     void setObserver(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsObserverInterface> observer) override;
     /// @}
-
 
 protected:
     virtual void doShutdown() override;

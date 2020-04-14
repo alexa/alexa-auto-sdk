@@ -1,16 +1,58 @@
 # Alexa Auto SDK Migration Guide
 
-This guide outlines the changes you will need to make to migrate from Auto SDK v2.0 to Auto SDK v2.1. 
+This guide outlines the changes you will need to make to migrate from Auto SDK v2.0 to later versions of the Auto SDK.
+
+>**Note:** If you are upgrading more than one version, you must include the changes in all the relevant sections of this guide. For example, if you are migrating from Auto SDK v2.0 to Auto SDK v2.2, you must include the changes described under [Migrating from Auto SDK v2.0 to v2.1](#migrating-from-auto-sdk-v20-to-v21) as well as the changes described under [Migrating from Auto SDK v2.1 to v2.2](#migrating-from-auto-sdk-v21-to-v22).
 
 **Table of Contents**
 
-* [Build Changes](#build-changes)
-* [Engine Configuration File Updates](#engine-configuration-file-updates)
-* [Navigation Enhancements](#navigation-enhancements)
-* [Car Control Source File Relocation](#car-control-source-file-relocation)
-* [Code-Based Linking (CBL) Handler in Sample Apps](#code-based-linking-cbl-handler-in-the-sample-apps)
+* [Migrating from Auto SDK v2.1 to v2.2](#migrating-from-auto-sdk-v21-to-v22)
+  * [Implementing the Property Manager Interface](#implementing-the-property-manager-interface)
+  * [Car Control Changes](#car-control-changes)
+* [Migrating from Auto SDK v2.0 to v2.1](#migrating-from-auto-sdk-v20-to-v21)
+  * [Build Changes](#build-changes)
+  * [Engine Configuration File Updates](#engine-configuration-file-updates)
+  * [Navigation Enhancements](#navigation-enhancements)
+  * [Car Control Source File Relocation](#car-control-source-file-relocation)
+  * [Code-Based Linking (CBL) Handler in Sample Apps](#code-based-linking-cbl-handler-in-the-sample-apps)
 
-## Build Changes <a id = "build-changes"></a>
+## Migrating from Auto SDK v2.1 to v2.2 <a id = "migrating-from-auto-sdk-v21-to-v22"></a>
+This section outlines the changes you will need to make to migrate from Auto SDK v2.1 to Auto SDK v2.2.
+
+### Implementing the Property Manager Interface<a id = "implementing-the-property-manager-interface"></a>
+Auto SDK v2.2 introduces the Property Manager, a component that maintains runtime properties by storing property values and listeners and delegating the `setProperty()` and `getProperty()` calls from your application to the respective Engine services. The Engine invokes the PropertyManager platform interface method `propertyChanged()` to notify your application about property value changes originating internally. The property values may be set by Auto SDK modules that define constants (for example `FIRMWARE_VERSION` and `LOCALE`), or they may be initiated from the Alexa Voice Service (AVS), such as when the user changes the `TIMEZONE` setting in the Alexa Companion App.
+
+`PropertyManager::setProperty()` and `PropertyManager::getProperty()` replace deprecated `Engine::setProperty()` and `Engine::getProperty()`. For details about the Property Manager platform interface, see "Managing Runtime Properties with the Property Manager" ([for C++](./modules/core/README.md#managing-runtime-properties-with-the-property-manager) or [for Android](./platforms/android/modules/core/README.md#managing-runtime-properties-with-the-property-manager)).
+
+### Car Control Changes <a id = "car-control-changes"></a>
+This section documents the changes you will need to make to migrate your Car Control implementation to Auto SDK v2.2.
+
+#### New Asset ID Prefix
+The asset ID prefix for default assets has been changed from `"Alexa."` to `"Alexa.Automotive."`. This change requires a code or configuration change only if your existing car control implementation uses the `CarControlConfiguration` configuration builder with the literal strings of asset IDs. If your existing car control implementation uses the predefined constants in `CarControlAssets.h` or `CarControlAssets.java`, then no change is required.
+
+#### Specifying the Path to Custom Car Control Assets
+If your implementation using the Local Voice Control (LVC) extension uses custom assets for car control, you must specify the path to the custom assets in both the `aace.carControl` Auto SDK car control configuration and the LVC configuration, not just the LVC configuration as in Auto SDK v2.0.
+
+* **For C++ implementations:** The default LVC configuration for Linux expects any custom assets to be defined in a file called `assets.json` located at `/opt/LVC/data/led-service/assets/assets.json`. Use this path when you configure the `assets.customAssetsPath` field in the Auto SDK car control configuration, or provide a path to an assets file with equivalent content.
+* **For Android implementations:** The file at the path you provide in the `assets.customAssetsPath` field of the Auto SDK car control configuration must be the same as the custom assets file you configure for your `ILVCClient` using the LVC APK.
+
+#### Car Control Config Builder Asset Methods
+
+Two new `CarControlConfiguration` methods are now implemented in the Engine:
+
+* `CarControlConfiguration::addCustomAssetsPath()`
+* `CarControlConfiguration::addDefaultAssetsPath()`
+
+> **Note:** These methods were also present in Auto SDK v2.1; however they didn't function as designed. They have been updated to function correctly in Auto SDK v2.2.
+
+This implementation populates the `"aace.carControl"` configuration object with the
+`"assets.customAssetsPath"` and `"assets.defaultAssetsPath"` nodes.
+
+
+## Migrating from Auto SDK v2.0 to v2.1 <a id = "migrating-from-auto-sdk-v20-to-v21"></a>
+This section outlines the changes you will need to make to migrate from Auto SDK v2.0 to Auto SDK v2.1.
+
+### Build Changes <a id = "build-changes"></a>
 The following build changes have been introduced in Auto SDK v2.1:
 
 * The builder script usage has changed for Linux targets. All Linux targets now use the same platform name (`linux`), and `-t <target>` is mandatory. For example, to build for a Linux native target, use:
@@ -25,7 +67,7 @@ The following build changes have been introduced in Auto SDK v2.1:
 
 * For QNX targets, you must cross-compile with the QNX multimedia software for the system audio extension (which is built by default for QNX targets). This requires a QNX Multimedia Suite license. See the [System Audio extension README](./extensions/experimental/system-audio/README.md) for details.
 
-## Engine Configuration File Updates <a id = "engine-configuration-file-updates"></a>
+### Engine Configuration File Updates <a id = "engine-configuration-file-updates"></a>
 
 The AVS Device SDK portion of the Auto SDK Engine configuration (the `aace.alexa.avsDeviceSDK` node) has been updated. See the [`config.json.in`](./samples/cpp/assets/config.json.in) file for details.
 
@@ -36,13 +78,13 @@ The AVS Device SDK portion of the Auto SDK Engine configuration (the `aace.alexa
     * `"deviceSettings"` now requires a `"defaultTimezone"`.
 
 
-## Navigation Enhancements <a id = "navigation-enhancements"></a>
+### Navigation Enhancements <a id = "navigation-enhancements"></a>
 
 Auto SDK v2.1 introduces additional navigation features that you can integrate in your application to enrich the user's experience: add/cancel a waypoint, show/navigate to a previous destination, turn and lane guidance, and map display control. Implementing these enhancements required deprecating the `setDestination()` interface in favor of the `startNavigation()` interface and adding several additional interfaces.
 
 To migrate from Auto SDK v2.0 to Auto SDK v2.1, you must update your platform implementation to use the `startNavigation()` method instead of the `setDestination()` method, modify the payload for the `getNavigationState()` method, and implement the new navigation methods. This guide takes you through these steps. Please see the Navigation module README for [C++](./modules/navigation/README.md) or [Android](./platforms/android/modules/navigation/README.md) for additional information and resources.
 
-### What's New
+#### What's New
 
 The following abstract methods have been added to the Navigation platform interface:
 
@@ -68,7 +110,7 @@ The following method now returns a different payload:
 
 * `getNavigationState()`
 
-### Implementing the New Navigation Features
+#### Implementing the New Navigation Features
 
 To implement the new navigation features, follow these steps:
 
@@ -325,18 +367,20 @@ void NavigationHandler::showPreviousWaypoints() {
 </p>
 </details>
 
-### New TemplateRuntime Interface Version
+#### New TemplateRuntime Interface Version
 
 The Auto SDK now implements version 1.2 of the TemplateRuntime interface to handle display card templates. If you support TemplateRuntime in your implementation, you must update your implementation to support the new card types.
 
 The TemplateRuntime interface remains the same, but the `LocalSearchListTemplate1` template has been deprecated in favor of the new `LocalSearchListTemplate2` template. In addition, two new templates (`TrafficDetailsTemplate` and `LocalSearchDetailTemplate1`), are now supported. The `TrafficDetailsTemplate` includes commute information to favorite destinations such as home or work. The `LocalSearchDetailTemplate1` template includes information about specific locations or information in response to users asking for details about locations presented in the `LocalSearchListTemplate2` template. For details about the TemplateRuntime interface, see the [Alexa Voice Service (AVS) documentation](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/templateruntime.html). For details about implementing TemplateRuntime in your Auto SDK implementation see the Alexa module README for [C++](./modules/alexa/README.md#handling-display-card-templates) or [Android](./platforms/android/modules/alexa/README.md#handling-display-card-templates).
 
 
-## Car Control Source File Relocation <a id = "car-control-source-file-relocation"></a>
+### Car Control Source File Relocation <a id = "car-control-source-file-relocation"></a>
 
 The Car Control module platform interface files and documentation are now located in `aac-sdk/modules/car-control` for C++ and `aac-sdk/platforms/android/modules/car-control` for Android, rather than in the Local Voice Control (LVC) extension directory structure.
 
-## Code-Based-Linking (CBL) Handler in the Sample Apps <a id = "code-based-linking-cbl-handler-in-the-sample-apps"></a>
+>**Note:** In addition, if you use custom assets for car control in an implementation with the optional Local Voice Control (LVC) extension, you must specify the path to the custom assets in both the Auto SDK car control configuration and the LVC configuration, not just the LVC configuration. For details, see [Path to Custom Car Control Assets for LVC Implementations](#path-to-custom-car-control-assets-for-lvc-implementations).
+
+### Code-Based-Linking (CBL) Handler in the Sample Apps <a id = "code-based-linking-cbl-handler-in-the-sample-apps"></a>
 Both of the Auto SDK Sample Apps now include the Code-Based Linking (CBL) handler implementation (in favor of the `AuthProvider` handler implementation ) to handle obtaining access tokens from Login with Amazon (LWA). Changing from the `AuthProvider` handler to the CBL handler is *not a required change*, but we recommend that you use the Auto SDK CBL interface for ease of implementation. For details about the CBL handler, please see the CBL module README [for C++](./modules/cbl/README.md) or [for Android](./platforms/android/modules/cbl/README.md).
 
 If you want to continue using the `AuthProvider` interface, we recommend that you implement the new `onAuthFailure()` method that exposes 403 "unauthorized request" exceptions from Alexa Voice Service (AVS). This method may be invoked, for example, when your product makes a request to AVS using an access token obtained for a device which has been deregistered from the Alexa companion app. In the Sample Apps, you can override the  interface and unset your login credentials as if the user had done so with your GUI interface: 

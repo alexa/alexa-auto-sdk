@@ -117,22 +117,9 @@ public class MACCPlayer extends ExternalMediaAdapter {
             for (PlayerEvents event : playerEvents) {
 
                 playerEvent(playerId, event.getName());
-                switch( event ) {
-                    case PlaybackStarted:
-                        setFocus(playerId);
-                        mPlaybackController.setPlayerInfo( metaData.getTrackName(), metaData.getArtist(), SPOTIFY_PROVIDER_NAME );
-                        break;
-                    case TrackChanged:
-                        mPlaybackController.setPlayerInfo( metaData.getTrackName(), metaData.getArtist(), SPOTIFY_PROVIDER_NAME );
-                    case PlaybackSessionStarted:
-                        if( state.getPlaybackState() == PlayBackStateFields.State.PLAYING ) { // already playing at startup
-                            setFocus(playerId);
-                            mPlaybackController.hidePlayerInfoControls(); // reset control view
-                        }
-                        break;
-                }
-                // update controls on all events
-                if ( mPlaybackController.getProvider().equals( SPOTIFY_PROVIDER_NAME) ) {
+                if( state.getPlaybackState() == PlayBackStateFields.State.PLAYING || mPlaybackController.getProvider().equals(SPOTIFY_PROVIDER_NAME) ) { // is playing
+                    mPlaybackController.hidePlayerInfoControls(); // reset control view
+                    mPlaybackController.setPlayerInfo( metaData.getTrackName(), metaData.getArtist(), SPOTIFY_PROVIDER_NAME );
                     updateControls(state);
                 }
             }
@@ -148,6 +135,7 @@ public class MACCPlayer extends ExternalMediaAdapter {
         public void onRemovedPlayer(String localPlayerId) {
             mLogger.postVerbose(TAG, "onRemovedPlayer: " + localPlayerId);
             removeDiscoveredPlayer(localPlayerId);
+            mPlaybackController.hideAllPlayerControls(); // reset control view
         }
 
     };
@@ -161,8 +149,8 @@ public class MACCPlayer extends ExternalMediaAdapter {
                 case "RESUME" :
                     mPlaybackController.stop(); // If resume is currently supported, UI must be in stopped state
                     break;
-                case "PAUSE" :
                 case "STOP" :
+                case "PAUSE" :
                     mPlaybackController.start(); // If pause/stop is currently supported, UI must be in started state
                     break;
                 case "ENABLE_REPEAT" :
@@ -207,7 +195,6 @@ public class MACCPlayer extends ExternalMediaAdapter {
             }
         }, 100);
         mLastScanTimeInMillis = Calendar.getInstance().getTimeInMillis();
-
     }
 
     @Override
@@ -224,6 +211,7 @@ public class MACCPlayer extends ExternalMediaAdapter {
 
     @Override
     public boolean play(String localPlayerId, String playContextToken, long index, long offset, boolean preload, Navigation navigation) {
+        mLogger.postVerbose(TAG, "play requested for: " + localPlayerId);
         mClient.handleDirective(new PlayDirective(localPlayerId, playContextToken, index, offset, preload, navigation.toString()));
         return true;
     }
@@ -264,14 +252,12 @@ public class MACCPlayer extends ExternalMediaAdapter {
 
     @Override
     public boolean seek(String localPlayerId, long offset) {
-        setFocus(localPlayerId);
         mClient.handleDirective(new SeekDirective(localPlayerId, (int) offset));
         return true;
     }
 
     @Override
     public boolean adjustSeek(String localPlayerId, long deltaOffset) {
-        setFocus(localPlayerId);
         mClient.handleDirective(new AdjustSeekDirective(localPlayerId, (int) deltaOffset));
         return true;
     }
@@ -295,7 +281,6 @@ public class MACCPlayer extends ExternalMediaAdapter {
             return false;
         }
         MediaAppMetaData metaData = state.getMediaAppPlaybackState().getMediaAppMetaData();
-        //ExternalMediaAdapter.ExternalMediaAdapterState stateToReturn = new ExternalMediaAdapterState();
         stateToReturn.playbackState = new PlaybackState();
         stateToReturn.playbackState.state = state.getMediaAppPlaybackState().getPlaybackState() == null ? PlayBackStateFields.State.IDLE.toString() : state.getMediaAppPlaybackState().getPlaybackState().toString();
         stateToReturn.playbackState.supportedOperations = getSupportedOperations(state.getMediaAppPlaybackState().getSupportedOperations());
@@ -424,9 +409,9 @@ public class MACCPlayer extends ExternalMediaAdapter {
             mLogger.postInfo( TAG, String.format( "(%s) Handling volumeChanged(%s)", "MACC", volume ) );
             mVolume = volume;
             if ( mMutedState == MutedState.MUTED ) {
-                // mPlayer.setVolume( 0 );
+                // set volume for external player(s) behavior here
             } else {
-                // mPlayer.setVolume( volume );
+                // set volume for external player(s) behavior here
             }
         }
         return true;
@@ -436,7 +421,7 @@ public class MACCPlayer extends ExternalMediaAdapter {
     public boolean mutedStateChanged( MutedState state ) {
         if( state != mMutedState ) {
             mLogger.postInfo( TAG, String.format( "Muted state changed (%s) to %s.", "MACC", state ) );
-            //mPlayer.setVolume( state == MutedState.MUTED ? 0 : mVolume );
+            // set mute for external player(s) behavior here
             mMutedState = state;
         }
         return true;

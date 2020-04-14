@@ -1,10 +1,12 @@
 package com.amazon.sampleapp.impl.Audio;
 
 import android.app.Activity;
+import android.media.AudioManager;
 
 import com.amazon.aace.audio.AudioOutput;
 import com.amazon.aace.audio.AudioOutputProvider;
 import com.amazon.sampleapp.impl.AlexaClient.AlexaClientHandler;
+import com.amazon.sampleapp.impl.AlexaClient.AuthStateObserver;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 
 import java.util.HashMap;
@@ -30,28 +32,31 @@ public class AudioOutputProviderHandler extends AudioOutputProvider
         return mAudioOutputMap.containsKey( name ) ? mAudioOutputMap.get( name ) : null;
     }
 
+    private static int intoStreamType(AudioOutputType type) {
+        switch (type) {
+            case NOTIFICATION:
+            case ALARM:
+                return AudioManager.STREAM_NOTIFICATION;
+            case RINGTONE:
+                return AudioManager.STREAM_RING;
+            case COMMUNICATION:
+            case EARCON:
+                return AudioManager.STREAM_VOICE_CALL;
+            case MUSIC:
+            default:
+                return AudioManager.STREAM_MUSIC;
+        }
+    }
+
     @Override
     public AudioOutput openChannel( String name, AudioOutputType type )
     {
         mLogger.postInfo( sTag, String.format( "openChannel[name=%s,type=%s]", name, type.toString() ) );
 
-        AudioOutput audioOutputChannel = null;
+        UnifiedAudioOutput audioOutput = new UnifiedAudioOutput( mActivity.getApplicationContext(), mLogger, name, intoStreamType(type) );
+        mAlexaClientHandler.registerAuthStateObserver( audioOutput );
 
-        switch( type )
-        {
-            case COMMUNICATION:
-                audioOutputChannel = new RawAudioOutputHandler( mActivity, mLogger, name );
-                break;
-
-            default:
-                AudioOutputHandler audioOutputHandler = new AudioOutputHandler( mActivity, mLogger, name );
-                audioOutputChannel = audioOutputHandler;
-                mAlexaClientHandler.registerAuthStateObserver( audioOutputHandler );
-                break;
-        }
-
-        mAudioOutputMap.put( name, audioOutputChannel );
-
-        return audioOutputChannel;
+        mAudioOutputMap.put( name, audioOutput );
+        return audioOutput;
     }
 }

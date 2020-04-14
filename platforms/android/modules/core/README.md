@@ -10,12 +10,12 @@ The Alexa Auto SDK module contains the Engine base classes and the abstract plat
 * [Extending the Default Platform Implementation](#extending-the-default-platform-implementation)
 * [Starting the Engine](#starting-the-engine)
 * [Stopping the Engine](#stopping-the-engine)
-* [Getting and Setting Core Engine Properties](#getting-and-setting-core-engine-properties)
+* [Managing Runtime Properties with the Property Manager](#managing-runtime-properties-with-the-property-manager)
 
 ## Overview <a id="overview"></a>
 The Core module provides an easy way to integrate Alexa Auto SDK into an application or a framework. To do this, follow these steps:
 
-1. [Create](#creating-the-engine) and [configure](#configuring-the-engine) an instance of `aace::core::Engine`.
+1. [Create](#creating-the-engine) and [configure](#configuring-the-engine) an instance of `aace.core.Engine`.
 2. [Override default platform implementation classes](#extending-the-default-platform-implementation) to extend the default Alexa Auto SDK platform implementation and register the platform interface handlers with the instantiated Engine.
 4. [Start the Engine](#starting-the-engine).
 5. [Change the runtime settings](#getting-and-setting-core-engine-properties) if desired.
@@ -56,20 +56,20 @@ By default, the Auto SDK stores the configuration database files in the `/opt/AA
 
 ### Specifying Configuration Data Using a JSON File <a id = "specifying-configuration-data-using-a-json-file"></a>
 
-The Auto SDK provides a class in [`EngineConfiguration.h`](../../../../modules/core/platform/include/AACE/Core/EngineConfiguration.h) that reads the configuration from a specified JSON file and creates an `EngineConfiguration` object from that configuration:
+The Auto SDK provides a class in [`EngineConfiguration.java`](./src/main/java/com/amazon/aace/core/config/EngineConfiguration.java) that reads the configuration from a specified JSON file and creates an `EngineConfiguration` object from that configuration:
 
-`aace::core::config::ConfigurationFile::create( “<filename.json>” )`
+`com.amazon.aace.core.config.ConfigurationFile.create( “<filename.json>” )`
  
 You can include all the configuration data in a single JSON file to create a single `EngineConfiguration` object; for example:
 
-`auto config = aace::core::config::ConfigurationFile::create( “config.json” );`
+`auto config = aace.core.config.ConfigurationFile.create( “config.json” );`
 
 or break the configuration data into multiple JSON files to create multiple `EngineConfiguration` objects; for example:
 
-```
-auto coreConfig = aace::core::config::ConfigurationFile::create( “core-config.json” );
-auto alexaConfig = aace::core::config::ConfigurationFile::create( “alexa-config.json” );
-auto navigationConfig = aace::core::config::ConfigurationFile::create( “navigation-config.json” );
+```java
+auto coreConfig = com.amazon.aace.core.config.ConfigurationFile.create( “core-config.json” );
+auto alexaConfig = com.amazon.aace.core.config.ConfigurationFile.create( “alexa-config.json” );
+auto navigationConfig = com.amazon.aace.core.config.ConfigurationFile.create( “navigation-config.json” );
 ```
 
 The [config.json.in](../../../../samples/cpp/assets/config.json.in) file provides an example of a JSON configuration file. If desired, you can use this file as a starting point for customizing the Engine configuration to suit your needs.
@@ -78,7 +78,7 @@ The [config.json.in](../../../../samples/cpp/assets/config.json.in) file provide
 
 You can also specify the configuration data programmatically by using the configuration factory methods provided in the library. The following code sample provides an example of using factory methods to instantiate an `EngineConfiguration` object:
 
-```
+```java
 m_engine.configure( new EngineConfiguration[]{
     AlexaConfiguration.createCurlConfig( "<CERTS_PATH>" ),
     AlexaConfiguration.createDeviceInfoConfig(  "<DEVICE_SERIAL_NUMBER>", "<CLIENT_ID>", "<PRODUCT_ID>" ),
@@ -97,7 +97,7 @@ See the API reference documentation for the [`AlexaConfiguration Class`](https:/
 
 You must configure vehicle information in the Engine configuration. A sample configuration is detailed below. You can generate the `EngineConfiguration` object including this information by using this schema in a `.json` config file or programmatically using the `VehicleConfiguration.createVehicleInfoConfig()` factory method.
 
-```
+```java
 {
   "aace.vehicle":
   {
@@ -118,7 +118,10 @@ You must configure vehicle information in the Engine configuration. A sample con
   }
 }
 ```
->**Important!** To pass the certification process, the vehicle information that you provide in the Engine configuration must include a `"vehicleIdentifier"` that is NOT the vehicle identification number (VIN). See the [platform API reference documentation] (https://alexa.github.io/alexa-auto-sdk/docs/android/classcom_1_1amazon_1_1aace_1_1vehicle_1_1config_1_1_vehicle_configuration.html) for more information about the [`VehicleConfiguration`](src/main/java/com/amazon/aace/vehicle/config/VehicleConfiguration.java) class.
+
+For details about the vehicle properties included in the `VehicleConfiguration` class, see the [`VehicleConfiguration.java`](src/main/java/com/amazon/aace/vehicle/config/VehicleConfiguration.java) file.
+
+>**Important!** To pass the certification process, the vehicle information that you provide in the Engine configuration must include a `"vehicleIdentifier"` that is NOT the vehicle identification number (VIN).
 
 ## Extending the Default Platform Implementation <a id="extending-the-default-platform-implementation"></a>
 
@@ -131,7 +134,7 @@ The functions that you override in the interface handlers are typically associat
 
 The code sample below provides an example of creating and registering platform interface handlers with the Engine.
 
-```
+```java
 // LoggerHandler.java
 	public class LoggerHandler extends Logger {
 	...
@@ -143,7 +146,55 @@ The code sample below provides an example of creating and registering platform i
 	m_engine.registerPlatformInterface( m_alexaClient = new AlexaClientHandler( getApplicationContext(), m_logger ) );
 	...
 ```
-The sections below provide information about and examples for creating [logging](#implementing-log-events) and [audio](#implementing-audio) interface handlers with the Engine. For details about creating handlers for the various Auto SDK modules, see the README files for those modules.
+The sections below provide information about and examples for creating [location provider](#implementing-a-location-provider), [network information provider](#implementing-a-network-information-provider), [logging](#implementing-log-events) and [audio](#implementing-audio) interface handlers with the Engine. For details about creating handlers for the various Auto SDK modules, see the README files for those modules.
+
+### Implementing a Location Provider<a id="implementing-a-location-provider"></a>
+The Engine provides a callback for implementing location requests from Alexa and other modules and a location type definition. This is optional and dependent on the platform implementation.
+
+To implement a custom `LocationProvider` handler to provide location using the default Engine `LocationProvider` class, extend the `LocationProvider` class:
+
+```java
+public class LocationProviderHandler extends LocationProvider {
+
+	@Override
+	abstract public location getLocation(); {
+		// get platform location
+	}
+	...
+}	
+```
+### Implementing a Network Information Provider <a id = "implementing-a-network-information-provider"></a>
+
+The `NetworkInfoProvider` platform interface provides methods that you can implement in a custom handler to allow your application to monitor network connectivity and send network status change events whenever the network status changes. Methods such as `getNetworkStatus()` and `getWifiSignalStrength()` allow the Engine to retrieve network status information, while the `networkStatusChanged()` method informs the Engine about network status changes.
+
+The `NetworkInfoProvider` methods are dependent on your platform implementation and are required by various internal Auto SDK components to get the initial network status from the network provider and update that status appropriately. When you implement the `NetworkInfoProvider` platform interface correctly, Auto SDK components that use the methods provided by this interface work more effectively and can adapt their internal behavior to the initial network status and changing network status events as they come in.
+
+> **Important!** Connectivity monitoring is the responsibility of the platform. The Alexa Auto SDK doesn't monitor network connectivity.
+
+To implement a custom handler to monitor network connectivity and send network status change events, extend the `NetworkInfoProvider` class:
+
+```java
+public class NetworkInfoProviderHandler extends NetworkInfoProvider {
+
+	@Override
+	public NetworkStatus getNetworkStatus(); {
+		// Return the current network status as determined on the platform.
+		// Here we return the default, but you should return the real network status.
+		return NetworkStatus.CONNECTED;
+	}
+	
+	@Override
+	public int getWifiSignalStrength(); {
+		// Return the current WiFi signal strength RSSI (Received Signal Strength Indicator)
+		// as determined on the platform.
+		// Here we return the default, but you should return the real WiFi signal strength.
+		return 100;
+	}
+	
+}	
+
+```
+>**Note:** Refer to the Android Sample App for an example of how to call `networkStatusChanged()` when network status changes.
 
 ### Implementing Log Events<a id="implementing-log-events"></a>
 
@@ -151,7 +202,7 @@ The Engine provides a callback for implementing log events from the AVS SDK. Thi
 
 To implement a custom log event handler for logging events from AVS using the default engine Logger class, extend the `Logger` class:
 
-```
+```java
 public class LoggerHandler extends Logger
 {
 	@Override
@@ -177,7 +228,7 @@ The platform should implement audio input and audio output handling. Other Auto 
   
 The `AudioInputProvider` should provide a platform specific implementation of the `AudioInput` interface, for the type of input specified by the `AudioInputType` parameter, when its `openChannel()` method is called. There should be only one instance of `AudioInput` per `AudioInputType`. For example, the `SpeechRecognizer` Engine implementation requests an audio channel for type `VOICE`, while AlexaComms requests a channel for type `COMMUNICATION` - it's up to the implementation to determine if these are shared or separate input channels. If it is a shared input channel, then whenever the platform implementation writes data to the interface, any instance in the Engine that has opened that channel will receive a callback with the audio data.
   
-```
+```java
 public class AudioInputProviderHandler extends AudioInputProvider
 {
 ...
@@ -212,7 +263,7 @@ The audio input format for all input types should be encoded as:
 * Single channel
 * Signed, little endian byte order
 
-```
+```java
 public class AudioInputHandler extends AudioInput
 {
     ...
@@ -252,7 +303,7 @@ It's up to the `AudioOutputProvider` implementation to determine how to handle e
 
 A more sophisticated implementation may provide completely different `AudioOutput` implementations depending on the audio type - for example, providing a low level audio implementation for `NOTIFICATION` and `EARCON` types, and a high level implementation (such as ExoPlayer) for `TTS` and `MUSIC`. The best approach is highly dependent on your system specific use case.
 
-```
+```java
 public class AudioOutputProviderHandler extends AudioOutputProvider
 {
     ...
@@ -285,7 +336,7 @@ The `AudioOutput` describes a platform-specific implementation of an audio outpu
 
 The full `AudioOutput` API is described below. 
 
-```
+```java
 public class AudioOutputHandler extends AudioOutput implements AuthStateObserver
 { 
     ...
@@ -393,15 +444,81 @@ if( m_engine != null ) {
 }
 ```
 
-## Getting and Setting Core Engine Properties <a id="getting and-setting-core-engine-properties"></a>
+## Managing Runtime Properties with the Property Manager <a id ="managing-runtime-properties-with-the-property-manager"></a>
 
-The Core module defines one or more constants (such as `VERSION`) that are used to get and set runtime properties in the Engine. To use these properties, call the Engine's `getProperty()` and `setProperty()` methods.
+Certain modules in the Auto SDK define constants (for example `FIRMWARE_VERSION` and `LOCALE`) that are used to get and set the values of runtime properties in the Engine. Changes to property values may also be initiated from the Alexa Voice Service (AVS). For example, the `TIMEZONE` property may be changed through AVS when the user changes the timezone setting in the Alexa Companion App.
+
+The Auto SDK Property Manager maintains the runtime properties by storing properties and listeners to the properties and delegating the `setProperty()` and `getProperty()` calls to from your application to the respective Engine services. It also calls `propertyChanged()` to notify your application about property value changes originating in the Engine. The Property Manager includes a `PropertyManager` platform interface that provides the following methods:
+
+* `setProperty()` - called by your application to set a property value in the Engine.
+* `getProperty()` - called by your application to retrieve a property value from the Engine.
+    >**Note:** `setProperty()` is asynchronous. After calling `setProperty()`, `getProperty()` returns the updated value only after the Engine calls `propertyStateChanged()` with `PropertyState.SUCCEEDED`.
+* `propertyStateChanged()` - notifies your application about the status of a property value change (`SUCCEEDED` or `FAILED`). This is an asynchronous response to your application's call to `setProperty()`.
+* `propertyChanged()` - notifies your application about a property value change in the Engine that was initiated internally, either by AVS or an Engine component.
+
+>**NOTE:** `PropertyManager.setProperty()` and `PropertyManager.getProperty()` replace deprecated `Engine.setProperty()` and `Engine.getProperty()` in Auto SDK v2.2 and later.
+
+### Property Manager Sequence Diagrams
+
+#### Application Changes a Property Value
+The following sequence diagram illustrates the flow when your application calls `setProperty()` to set a property value in the Engine.
+<details><summary>Click to expand or collapse the diagram</summary>
+<p>
+![Set_Property](./assets/PropertyManager_set.png)
+</p>
+</details>
+
+#### Application Retrieves a Property Value
+The following sequence diagram illustrates the flow when your application calls `getProperty()` to retrieve a property value from the Engine.
+<details><summary>Click to expand or collapse the diagram</summary>
+<p>
+![Get_Property](./assets/PropertyManager_get.png)
+</p>
+</details>
+
+#### Notification of Property Value Change Initiated via AVS
+The following sequence diagram illustrates the flow when a property value change is initiated by AVS and the Property Manager notifies your application.
+<details><summary>Click to expand or collapse the diagram</summary>
+<p>
+![Property_Changed](./assets/PropertyManager_changed.png)
+</p>
+</details>
+
+### Implementing a Custom Property Manager Handler
+To implement a custom Property Manager handler to set and retrieve Engine property values and be notified of property value changes, extend the `PropertyManager` class:
+
+```java
+public class PropertyManagerHandler extends PropertyManager {
+
+    @Override
+    public void propertyStateChanged(String name, String value, PropertyState state) {
+       // Handle the status of a property change after a call to setProperty().
+    }
+    
+    @Override
+    public void propertyChanged( String name, String newValue ) {
+        // Handle the property value change initiated by the Engine.
+        // For example, if the user sets the TIMEZONE to "Pacific Standard Time - Vancouver"
+        // in the companion app, your application gets a call to:
+        // propertyChanged(com.amazon.aace.alexa.TIMEZONE, "America/Vancouver")
+    }
+}
+...
+
+// Register the platform interface with the Engine
+PropertyManager mPropertyManager = newPropertyManagerHandler();
+mEngine.registerPlatformInterface ( mPropertyManager );
+
+// You can also set and retrieve properties in the Engine by calling the inherited
+// setProperty() and getProperty() methods.
+
+// For example, to set the LOCALE property to English-Canada:
+mPropertyManager.setProperty(com.amazon.aace.alexa.AlexaProperties.LOCALE, "en-CA");
+
+// For example, to retrieve the value of the LOCALE property:
+String locale  = mPropertyManager.getProperty(com.amazon.aace.alexa.AlexaProperties.LOCALE);
 
 ```
-// get the SDK version from the Engine
-String version = m_engine.getProperty( com.amazon.aace.core.CoreProperties.VERSION );
-```
+### Property Definitions
+The definitions of the properties used with the `PropertyManager.setProperty()` and `PropertyManager.getProperty()` methods are included in the [AlexaProperties.java](../alexa/src/main/java/com/amazon/aace/alexa/AlexaProperties.java) and [CoreProperties.java](./src/main/java/com/amazon/aace/core/CoreProperties.java) files. For a list of the Alexa Voice Service (AVS) supported locales for the `LOCALE` property, see the [Alexa Voice Service (AVS) documentation](https://developer.amazon.com/docs/alexa-voice-service/system.html#locales).
 
->**Note:** The `setProperty()` method returns `true` if the the property value was successfully updated and `false` if the update failed.
-
-The [`CoreProperties`](src/main/java/com/amazon/aace/core/CoreProperties.java) class includes details about the Engine properties defined in the Core module.

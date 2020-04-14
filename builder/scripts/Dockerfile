@@ -40,4 +40,7 @@ RUN sudo apt-get update && sudo apt-get install -y quilt \
 RUN sudo apt-get update && sudo apt-get install -y \
     libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
 
+# Coverage support
+RUN sudo apt-get update && sudo apt-get install -y lcov
+
 CMD "/bin/bash"

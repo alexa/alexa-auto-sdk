@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+#include <AVSCommon/AVS/Initialization/AlexaClientSDKInit.h>
 #include <AVSCommon/SDKInterfaces/test/MockContextManager.h>
 #include <AVSCommon/SDKInterfaces/test/MockExceptionEncounteredSender.h>
 #include <AVSCommon/SDKInterfaces/test/MockMessageSender.h>
@@ -38,7 +39,9 @@ static const std::string CAPABILITIES_CONFIG_JSON =
     "    \"deviceInfo\":{"
     "        \"deviceSerialNumber\":\"MockAddressBookTest\", "
     "        \"clientId\":\"MockClientId\","
-    "        \"productId\":\"MockProductID\""
+    "        \"productId\":\"MockProductID\","
+    "        \"manufacturerName\":\"MockManufacturerName\","
+    "        \"description\":\"MockDescription\""
     "    }"
     " }";
 
@@ -72,6 +75,7 @@ class PhoneCallControllerEngineImplTest : public ::testing::Test {
 public:
     void SetUp() override {
         auto inString = std::shared_ptr<std::istringstream>(new std::istringstream(CAPABILITIES_CONFIG_JSON));
+        alexaClientSDK::avsCommon::avs::initialization::AlexaClientSDKInit::initialize({inString});
 
         m_mockPlatformInterface = std::make_shared<testing::StrictMock<MockPhoneCallControllerPlatformInterface>>();
         m_mockContextManager = std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockContextManager>>();
@@ -82,6 +86,8 @@ public:
         m_mockAuthDelegate = std::make_shared<testing::StrictMock<MockAuthDelegateInterface>>();
         m_deviceInfo = alexaClientSDK::avsCommon::utils::DeviceInfo::create(alexaClientSDK::avsCommon::utils::configuration::ConfigurationNode::getRoot());
 
+        EXPECT_CALL(*m_mockAuthDelegate, addAuthObserver(testing::_)).WillOnce(testing::Return());
+        EXPECT_CALL(*m_mockAuthDelegate, removeAuthObserver(testing::_)).WillOnce(testing::Return());
         EXPECT_CALL(*m_mockFocusManager, releaseChannel(testing::_, testing::_)).Times(testing::Exactly(1));
         EXPECT_CALL(*m_mockContextManager, setState(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(alexaClientSDK::avsCommon::sdkInterfaces::SetStateResult::SUCCESS));
         m_engineImpl = aace::engine::phoneCallController::PhoneCallControllerEngineImpl::create(
@@ -97,6 +103,9 @@ public:
     }
     void TearDown() override {
         m_engineImpl->shutdown();
+        if( alexaClientSDK::avsCommon::avs::initialization::AlexaClientSDKInit::isInitialized() ) {
+            alexaClientSDK::avsCommon::avs::initialization::AlexaClientSDKInit::uninitialize();
+        }
     }
 
     std::shared_ptr<aace::engine::phoneCallController::PhoneCallControllerEngineImpl> m_engineImpl;

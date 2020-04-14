@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@
 #include <unordered_map>
 #include <vector>
 
-#include <AVSCommon/SDKInterfaces/ExternalMediaAdapterInterface.h>
-#include <AVSCommon/SDKInterfaces/ExternalMediaPlayerInterface.h>
+#include "ExternalMediaAdapterInterface.h"
+#include "ExternalMediaPlayerInterface.h"
 #include <AVSCommon/SDKInterfaces/MessageSenderInterface.h>
 #include <AVSCommon/SDKInterfaces/SpeakerManagerInterface.h>
 #include <AVSCommon/Utils/RequiresShutdown.h>
@@ -65,11 +65,11 @@ protected:
     bool handleAuthorization( const std::vector<aace::alexa::ExternalMediaAdapter::AuthorizedPlayerInfo>& authorizedPlayerList ) override;
     bool handleLogin( const std::string& localPlayerId, const std::string& accessToken, const std::string& userName, bool forceLogin, std::chrono::milliseconds tokenRefreshInterval ) override;
     bool handleLogout( const std::string& localPlayerId ) override;
-    bool handlePlay( const std::string& localPlayerId, const std::string& playContextToken, int64_t index, std::chrono::milliseconds offset, bool preload, aace::alexa::ExternalMediaAdapter::Navigation navigation ) override;
+    bool handlePlay( const std::string& localPlayerId, const std::string& playContextToken, int64_t index, std::chrono::milliseconds offset, bool preload, aace::alexa::ExternalMediaAdapter::Navigation navigation, const std::string& playbackSessionId, const std::string& skillToken ) override;
     bool handlePlayControl( const std::string& localPlayerId, aace::alexa::ExternalMediaAdapter::PlayControlType playControlType ) override;
     bool handleSeek( const std::string& localPlayerId, std::chrono::milliseconds offset ) override;
     bool handleAdjustSeek( const std::string& localPlayerId, std::chrono::milliseconds deltaOffset ) override;
-    bool handleGetAdapterState( const std::string& localPlayerId, alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer::AdapterState& state ) override;
+    bool handleGetAdapterState( const std::string& localPlayerId, AdapterState& state ) override;
 
     bool handleSetVolume( int8_t volume ) override;
     bool handleSetMute( bool mute ) override;

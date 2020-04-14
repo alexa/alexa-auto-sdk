@@ -1,6 +1,7 @@
 var searchData=
 [
   ['dab',['DAB',['../classaace_1_1alexa_1_1_local_media_source.html#a193e995a51acffd671f2e9b93fe176b3ab30917aa48bf6125b9e85daf9c6eb5fc',1,'aace::alexa::LocalMediaSource']]],
+  ['deleted',['DELETED',['../classaace_1_1alexa_1_1_alerts.html#a81cccb7e632cf26b7903d9c9c168fb22a63c2867fdcae0e8e8413d7ac21b69b59',1,'aace::alexa::Alerts']]],
   ['dialing',['DIALING',['../classaace_1_1phone_call_controller_1_1_phone_call_controller_engine_interface.html#aca981e480f3b8704f5c50c6f859b8432a6c9becac74f2d56eab5eeea8d8fb4b67',1,'aace::phoneCallController::PhoneCallControllerEngineInterface']]],
   ['disconnected',['DISCONNECTED',['../classaace_1_1alexa_1_1_alexa_client.html#a375451d4d9cb626701ac8cbaa02ffbe2a99c8ce56e7ab246445d3b134724428f3',1,'aace::alexa::AlexaClient::DISCONNECTED()'],['../classaace_1_1network_1_1_network_info_provider_engine_interface.html#a749ba056220c9a3bb9ed9e100fc8f0d1a99c8ce56e7ab246445d3b134724428f3',1,'aace::network::NetworkInfoProviderEngineInterface::DISCONNECTED()'],['../classaace_1_1phone_call_controller_1_1_phone_call_controller_engine_interface.html#a811798c0331570b684648f0cd71a82a8a99c8ce56e7ab246445d3b134724428f3',1,'aace::phoneCallController::PhoneCallControllerEngineInterface::DISCONNECTED()']]],
   ['disconnecting',['DISCONNECTING',['../classaace_1_1network_1_1_network_info_provider_engine_interface.html#a749ba056220c9a3bb9ed9e100fc8f0d1aad793e31fab5703fc5b990cf40f8a585',1,'aace::network::NetworkInfoProviderEngineInterface']]],

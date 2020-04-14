@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -142,7 +142,7 @@ namespace audio {
         }
         catch_with_ex {
             AACE_JNI_ERROR(TAG,"getPosition",ex.what());
-            return false;
+            return AudioOutput::TIME_UNKNOWN;
         }
     }
 
@@ -170,7 +170,21 @@ namespace audio {
         }
         catch_with_ex {
             AACE_JNI_ERROR(TAG,"getDuration",ex.what());
-            return false;
+            return AudioOutput::TIME_UNKNOWN;
+        }
+    }
+
+    int64_t AudioOutputHandler::getNumBytesBuffered()
+    {
+        try_with_context
+        {
+            jlong result;
+            ThrowIfNot( m_obj.invoke( "getNumBytesBuffered", "()J", &result ), "invokeMethodFailed" );
+            return result;
+        }
+        catch_with_ex {
+            AACE_JNI_ERROR(TAG,"getNumBytesBuffered",ex.what());
+            return 0;
         }
     }
 

@@ -20,6 +20,7 @@ The [Alexa Auto SDK](./OVERVIEW.md) contains essential client-side software requ
      * **Address Book** (for [C++](./modules/address-book/README.md) or [Android](./platforms/android/modules/addressbook/README.md)) - enables you to augment the communications and navigation capabilities of Alexa with user data such as phone contacts and/or navigation favorites
      * **CBL** (for [C++](./modules/cbl/README.md) or [Android](./platforms/android/modules/cbl/README.md)) - enables you to implement the Code-Based Linking (CBL) mechanism of acquiring Login with Amazon (LWA) access tokens.
      *  **Alexa Presentation Language (APL)** (for [C++](./modules/apl/README.md) or [Android](./platforms/android/modules/apl/README.md)) - enables your application to support APL directives and events for devices with graphical user interface (GUI) support. 
+     *  **Car Control** (for [C++](./modules/car-control/README.md) or [Android](./platforms/android/modules/car-control/README.md)) - enables your application to build a custom vehicle-control experience that allows the user to voice-control vehicle features using Alexa.
 5. Start the Engine using the `start()` command.
 6. Use the Sample App ([C++](./samples/cpp/README.md) or [Android](./samples/android/README.md)) to see how the Auto SDK works and to test end-to-end functionality. 
 

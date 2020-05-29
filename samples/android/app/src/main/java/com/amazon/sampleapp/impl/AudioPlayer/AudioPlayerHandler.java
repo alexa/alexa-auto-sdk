@@ -19,68 +19,19 @@ import android.os.Handler;
 import android.os.Message;
 
 import com.amazon.aace.alexa.AudioPlayer;
-import com.amazon.aace.audio.AudioOutput;
-import com.amazon.sampleapp.impl.Audio.AudioOutputProviderHandler;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
-import com.amazon.sampleapp.impl.PlaybackController.PlaybackControllerHandler;
 
 public class AudioPlayerHandler extends AudioPlayer
 {
     private static String TAG = AudioPlayerHandler.class.getSimpleName();
     private LoggerHandler mLogger = null;
-    private PlaybackControllerHandler mPlaybackController = null;
-    private AudioPlayerStateHandler mAudioPlayerStateHandler = null;
 
-    public AudioPlayerHandler( LoggerHandler logger, PlaybackControllerHandler playbackController ) {
+    public AudioPlayerHandler( LoggerHandler logger ) {
         mLogger = logger;
-        mPlaybackController = playbackController;
-        mAudioPlayerStateHandler = new AudioPlayerStateHandler();
     }
 
     @Override
     public void playerActivityChanged(AudioPlayer.PlayerActivity state) {
         mLogger.postInfo( TAG, String.format( "playerActivityChanged: %s", state.toString() ) );
-        mAudioPlayerStateHandler.sendEmptyMessage( state.ordinal() );
-    }
-
-    //
-    // ProgressHandler
-    //
-
-    static private int UPDATE_PROGRESS = Integer.MAX_VALUE;
-
-    private class AudioPlayerStateHandler extends Handler
-    {
-        AudioPlayerStateHandler() {
-        }
-
-        @Override
-        public void handleMessage( Message msg )
-        {
-            if( msg.what == UPDATE_PROGRESS )
-            {
-                long position = getPlayerPosition();
-                long duration = getPlayerDuration();
-                if( duration == AudioPlayer.TIME_UNKNOWN ) {
-                    position = AudioPlayer.TIME_UNKNOWN;
-                }
-
-                mPlaybackController.setTime( position, duration );
-
-                sendEmptyMessageDelayed( UPDATE_PROGRESS, 1000 - (position % 1000) );
-            }
-            else if( msg.what == PlayerActivity.PLAYING.ordinal() ) {
-                mPlaybackController.start();
-                sendEmptyMessage( UPDATE_PROGRESS );
-            }
-            else if( msg.what == PlayerActivity.STOPPED.ordinal() ) {
-                mPlaybackController.stop();
-                removeMessages( UPDATE_PROGRESS );
-            }
-            else if( msg.what == PlayerActivity.FINISHED.ordinal() ) {
-                mPlaybackController.reset();
-                removeMessages( UPDATE_PROGRESS );
-            }
-        }
     }
 }

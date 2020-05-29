@@ -381,6 +381,11 @@ bool LocalMediaSourceEngineImpl::handleGetAdapterState( const std::string& local
     }
 }
 
+std::chrono::milliseconds LocalMediaSourceEngineImpl::handleGetOffset( const std::string& localPlayerId )
+{
+    return std::chrono::milliseconds::zero();
+}
+
 std::string LocalMediaSourceEngineImpl::getPlayerId( Source source) {
     switch( source )
     {

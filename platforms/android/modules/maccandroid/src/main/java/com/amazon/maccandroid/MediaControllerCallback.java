@@ -40,7 +40,7 @@ public class MediaControllerCallback extends MediaControllerCompat.Callback {
     private PlaybackStateCompat mPrevState;
     private MediaApp mMediaApp;
     private Set<PlayerEvents> mEventsToSendQueue;
-    private boolean mUnauthorizedReported = false;
+    private boolean mReportUnauthorized = false;
 
     MediaControllerCallback(String packageName, MediaApp mediaApp) {
         mMediaAppPackageName = packageName;
@@ -172,9 +172,9 @@ public class MediaControllerCallback extends MediaControllerCompat.Callback {
 
             case PlaybackStateCompat.ERROR_CODE_AUTHENTICATION_EXPIRED:
                 // block multiple extra calls for unauthorized
-                if ( mUnauthorizedReported == false ) {
-                    reportErrorEvent( MediaAppPlayerError.UNPLAYABLE_BY_AUTHORIZATION );
-                    mUnauthorizedReported = true;
+                if (mReportUnauthorized == true) {
+                    reportErrorEvent(MediaAppPlayerError.UNPLAYABLE_BY_AUTHORIZATION);
+                    mReportUnauthorized = false;
                 }
                 break;
 
@@ -314,6 +314,6 @@ public class MediaControllerCallback extends MediaControllerCompat.Callback {
     // allow unauthorized to be reported again.
     public void resetUnauthorizedReported(){
         Log.i(TAG, "resetUnauthorizedReported for: " + mMediaAppPackageName);
-        mUnauthorizedReported = false;
+        mReportUnauthorized = true;
     }
 }

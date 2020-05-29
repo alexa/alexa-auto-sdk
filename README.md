@@ -33,7 +33,7 @@ For a summary of feature enhancements, updates, and resolved and known issues, s
 >**Note:** [Android Sample App](./samples/android/README.md#v210-release-notes), [C++ Sample App](./samples/cpp/README.md#v210-release-notes), and [Automotive Grade Linux (AGL) Alexa Voice Agent](./platforms/agl/alexa-voiceagent-service/README.md#v210-release-notes) release notes are provided in their respective READMEs.
 
 ## Migration Guide
-For guidelines on migrating from Auto SDK 2.1 to 2.2 and from Auto SDK 2.0 to Auto SDK 2.1, see the [Migration Guide](./MIGRATION.md).
+For guidelines on migrating Auto SDK versions, see the [Migration Guide](./MIGRATION.md).
 
 ## Learn More
 

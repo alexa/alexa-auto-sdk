@@ -497,7 +497,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
         // AudioPlayer
         if ( !mEngine.registerPlatformInterface(
-                mAudioPlayer = new AudioPlayerHandler( mLogger, mPlaybackController )
+                mAudioPlayer = new AudioPlayerHandler( mLogger )
             )
         ) throw new RuntimeException( "Could not register AudioPlayer platform interface" );
 
@@ -776,6 +776,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
                         EqualizerConfiguration.getMinBandLevel(),
                         EqualizerConfiguration.getMaxBandLevel(),
                         EqualizerConfiguration.getDefaultBandLevels() ),
+                // Uncomment the below line to specify the speaker manager values
+                //AlexaConfiguration.createSpeakerManagerConfig( true ),
                 // Uncomment the below line to specify the template runtime values
                 //AlexaConfiguration.createTemplateRuntimeTimeoutConfig( timeoutList ),
                 StorageConfiguration.createLocalStorageConfig(appDataDir.getPath() + "/localStorage.sqlite"),

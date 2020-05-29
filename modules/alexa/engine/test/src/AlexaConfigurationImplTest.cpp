@@ -221,6 +221,25 @@ TEST_F(AlexaConfigurationImplTest,createSettingsConfigBestCase)
     EXPECT_EQ(configStr.str(),expectedConfigStr) << "Error in the Configuration String";
 }
 
+TEST_F(AlexaConfigurationImplTest,createSpeakerManagerConfigBestCase)
+{
+    std::string expectedConfigStr =
+        "{\n"
+        "    \"aace.alexa\": {\n"
+        "        \"speakerManager\": {\n"
+        "            \"enabled\": true\n"
+        "        }\n"
+        "    }\n"
+        "}";
+
+    auto config = aace::alexa::config::AlexaConfiguration::createSpeakerManagerConfig( true );
+
+    //Convert to ostringstream for comparing the istream
+    std::ostringstream configStr;
+    configStr << config->getStream()->rdbuf();
+    EXPECT_EQ(configStr.str(),expectedConfigStr) << "Error in the Configuration String";
+}
+
 TEST_F(AlexaConfigurationImplTest,createSystemConfigBestCase)
 {
     std::string expectedConfigStr =

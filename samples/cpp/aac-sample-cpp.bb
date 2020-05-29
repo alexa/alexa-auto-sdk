@@ -6,7 +6,6 @@ DEPENDS = "aac-module-core aac-module-alexa aac-module-navigation aac-module-pho
 
 PACKAGECONFIG[alexacomms] = "-DALEXACOMMS=ON,,aac-module-communication"
 PACKAGECONFIG[amazonlite] = "-DAMAZONLITE=ON,,aac-module-amazonlite"
-PACKAGECONFIG[coassistant] = "-DCOASSISTANT=ON,,aac-module-coassistant"
 PACKAGECONFIG[lvc] = "-DLOCALVOICECONTROL=ON,,aac-module-local-skill-service aac-module-local-voice-control aac-module-address-book-local-service aac-module-car-control-local-service"
 PACKAGECONFIG[system-audio] = "-DSYSTEMAUDIO=ON,,aac-module-system-audio"
 PACKAGECONFIG[dcm] = "-DDCM=ON,,aac-module-dcm-native-metrics"

@@ -26,6 +26,7 @@
 #include <Endpoints/EndpointBuilder.h>
 #include <TemplateRuntime/TemplateRuntime.h>
 
+#include "AACE/Alexa/AlexaEngineInterfaces.h"
 #include "AACE/Alexa/TemplateRuntime.h"
 
 namespace aace {
@@ -35,6 +36,7 @@ namespace alexa {
 class RenderPlayerInfoCardsProviderInterfaceDelegate;
 
 class TemplateRuntimeEngineImpl :
+    public aace::alexa::TemplateRuntimeEngineInterface,
     public alexaClientSDK::avsCommon::sdkInterfaces::TemplateRuntimeObserverInterface,
     public alexaClientSDK::avsCommon::utils::RequiresShutdown,
     public std::enable_shared_from_this<TemplateRuntimeEngineImpl> {
@@ -62,7 +64,14 @@ public:
     
     void setRenderPlayerInfoCardsProviderInterface( std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>> renderPlayerInfoCardsProviderInterface  );
 
+    //
+    // TemplateRuntimeEngineInterface
+    //
+    void onDisplayCardCleared() override;
+
+    //
     // TemplateRuntimeObserverInterface
+    //
     void renderTemplateCard( const std::string& jsonPayload, alexaClientSDK::avsCommon::avs::FocusState focusState ) override;
     void clearTemplateCard() override;
     void renderPlayerInfoCard( const std::string& jsonPayload, alexaClientSDK::avsCommon::sdkInterfaces::TemplateRuntimeObserverInterface::AudioPlayerInfo audioPlayerInfo, alexaClientSDK::avsCommon::avs::FocusState focusState ) override;

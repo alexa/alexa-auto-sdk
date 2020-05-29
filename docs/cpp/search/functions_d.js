@@ -7,8 +7,8 @@ var searchData=
   ['removeuploadedcontacts',['removeUploadedContacts',['../classaace_1_1contact_uploader_1_1_contact_uploader.html#a3fa5b4ad76872e3f3aa39d5c54dbf7f6',1,'aace::contactUploader::ContactUploader']]],
   ['renderdocument',['renderDocument',['../classaace_1_1apl_1_1_a_p_l.html#a605da3ae66ca91baa83f71442e0c4273',1,'aace::apl::APL']]],
   ['renderdocumentresult',['renderDocumentResult',['../classaace_1_1apl_1_1_a_p_l.html#a42ad9effa8cb1ae3ca95fa65c3378993',1,'aace::apl::APL']]],
-  ['renderplayerinfo',['renderPlayerInfo',['../classaace_1_1alexa_1_1_template_runtime.html#a71852ea84caa81de6cd633006c76ad51',1,'aace::alexa::TemplateRuntime']]],
-  ['rendertemplate',['renderTemplate',['../classaace_1_1alexa_1_1_template_runtime.html#a8bac9d4c6a49d5f7e3ae64fbc477b325',1,'aace::alexa::TemplateRuntime']]],
+  ['renderplayerinfo',['renderPlayerInfo',['../classaace_1_1alexa_1_1_template_runtime.html#a1afe1f3ac8d283d81d83cc86c87ae630',1,'aace::alexa::TemplateRuntime::renderPlayerInfo(const std::string &amp;payload)'],['../classaace_1_1alexa_1_1_template_runtime.html#a43b20a5021af05074ed7fb5bc6b04171',1,'aace::alexa::TemplateRuntime::renderPlayerInfo(const std::string &amp;payload, PlayerActivity audioPlayerState, std::chrono::milliseconds offset, FocusState focusState)']]],
+  ['rendertemplate',['renderTemplate',['../classaace_1_1alexa_1_1_template_runtime.html#a8641f59365ad4d927674a1893e4bad2a',1,'aace::alexa::TemplateRuntime::renderTemplate(const std::string &amp;payload)'],['../classaace_1_1alexa_1_1_template_runtime.html#a0aed566472c6db7b8749aa1f85aac143',1,'aace::alexa::TemplateRuntime::renderTemplate(const std::string &amp;payload, FocusState focusState)']]],
   ['reset',['reset',['../classaace_1_1cbl_1_1_c_b_l.html#a6b9bf59fb1f4a358273851049b2a74b6',1,'aace::cbl::CBL']]],
   ['resume',['resume',['../classaace_1_1audio_1_1_audio_output.html#a16da42e4ec758e6635ab01c01bd435e5',1,'aace::audio::AudioOutput']]]
 ];

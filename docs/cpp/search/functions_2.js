@@ -39,6 +39,7 @@ var searchData=
   ['createnotificationsconfig',['createNotificationsConfig',['../classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a5205a15e4b9f8596a6aff6e4c26595fa',1,'aace::alexa::config::AlexaConfiguration']]],
   ['createoperatingcountryconfig',['createOperatingCountryConfig',['../classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a469681a9d4866c0e898f512fe98eb8ab',1,'aace::vehicle::config::VehicleConfiguration']]],
   ['createsettingsconfig',['createSettingsConfig',['../classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a08aee7c879ef040c17d32bd9a781a940',1,'aace::alexa::config::AlexaConfiguration']]],
+  ['createspeakermanagerconfig',['createSpeakerManagerConfig',['../classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a53c25e237c84550bd09d8d46b79a99f3',1,'aace::alexa::config::AlexaConfiguration']]],
   ['createspeechrecognizerconfig',['createSpeechRecognizerConfig',['../classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#aacb872514a75a1fdc3d54d17b64a2ec6',1,'aace::alexa::config::AlexaConfiguration']]],
   ['createsyslogsinkconfig',['createSyslogSinkConfig',['../classaace_1_1logger_1_1config_1_1_logger_configuration.html#a60f4bbc3559e3d9900cfed5bef4fa86a',1,'aace::logger::config::LoggerConfiguration']]],
   ['createsystemconfig',['createSystemConfig',['../classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a1a918b6c9d057360a64ace0ba68df93a',1,'aace::alexa::config::AlexaConfiguration']]],

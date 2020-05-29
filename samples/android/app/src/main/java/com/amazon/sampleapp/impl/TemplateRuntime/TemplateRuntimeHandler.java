@@ -15,12 +15,16 @@
 
 package com.amazon.sampleapp.impl.TemplateRuntime;
 
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+// import com.amazon.aace.alexa.AudioPlayer;
+import com.amazon.aace.audio.AudioOutput;
 import com.amazon.aace.alexa.ExternalMediaAdapter;
 import com.amazon.aace.alexa.TemplateRuntime;
-import com.amazon.sampleapp.impl.ExternalMediaPlayer.MACCPlayer;
+// import com.amazon.sampleapp.impl.ExternalMediaPlayer.MACCPlayer;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 import com.amazon.sampleapp.impl.PlaybackController.PlaybackControllerHandler;
 import com.amazon.sampleapp.logView.LogRecyclerViewAdapter;
@@ -35,16 +39,22 @@ public class TemplateRuntimeHandler extends TemplateRuntime {
 
     private final LoggerHandler mLogger;
     private final PlaybackControllerHandler mPlaybackController;
+    private AudioPlayerStateHandler mAudioPlayerStateHandler = null;
     private String mCurrentAudioItemId;
+    private long mDelay, mDuration, mPosition;
 
     public TemplateRuntimeHandler( LoggerHandler logger,
                                    @Nullable PlaybackControllerHandler playbackController ) {
         mLogger = logger;
         mPlaybackController = playbackController;
+        mAudioPlayerStateHandler = new AudioPlayerStateHandler();
+        mDelay = 0;
+        mDuration = AudioOutput.TIME_UNKNOWN;
+        mPosition = AudioOutput.TIME_UNKNOWN;
     }
 
     @Override
-    public void renderTemplate( String payload ) {
+    public void renderTemplate( String payload, FocusState focusState ) {
         try {
             // Log payload
             JSONObject template = new JSONObject( payload );
@@ -87,7 +97,7 @@ public class TemplateRuntimeHandler extends TemplateRuntime {
     }
 
     @Override
-    public void renderPlayerInfo( String payload ) {
+    public void renderPlayerInfo(String payload, PlayerActivity audioPlayerState, long offset, FocusState focusState ) {
         try {
             JSONObject playerInfo = new JSONObject( payload );
             String audioItemId = playerInfo.getString( "audioItemId" );
@@ -120,6 +130,21 @@ public class TemplateRuntimeHandler extends TemplateRuntime {
                 String title = content.has( "title" ) ? content.getString( "title" ) : "";
                 String artist = content.has( "titleSubtext1" ) ? content.getString( "titleSubtext1" ) : "";
                 mPlaybackController.setPlayerInfo( title, artist, providerName );
+
+                // Get the media length in milliseconds (i.e. duration)
+                long mediaLengthInMilliseconds = content.has( "mediaLengthInMilliseconds" ) ? content.getInt( "mediaLengthInMilliseconds" ) : AudioOutput.TIME_UNKNOWN;
+
+                mDelay = 0;
+                mDuration = mediaLengthInMilliseconds;
+                if( mDuration == AudioOutput.TIME_UNKNOWN ) {
+                    mPosition = AudioOutput.TIME_UNKNOWN;
+                }
+                else {
+                    mPosition = offset;
+                }
+
+                mPlaybackController.setTime( mPosition, mDuration );
+                mAudioPlayerStateHandler.sendEmptyMessage( audioPlayerState.ordinal() );
             }
 
             // Log only if audio item has changed
@@ -149,9 +174,52 @@ public class TemplateRuntimeHandler extends TemplateRuntime {
     @Override
     public void clearPlayerInfo() {
         mLogger.postInfo( sTag, "handle clearPlayerInfo()" );
-        if ( mPlaybackController != null && !mPlaybackController.getProvider().equals(MACCPlayer.SPOTIFY_PROVIDER_NAME) ) {
+        if( mPlaybackController != null ) {
             mPlaybackController.setPlayerInfo("", "", "");
             mPlaybackController.hidePlayerInfoControls();
+        }
+    }
+
+    //
+    // ProgressHandler
+    //
+
+    static private int UPDATE_PROGRESS = Integer.MAX_VALUE;
+
+    private class AudioPlayerStateHandler extends Handler
+    {
+        AudioPlayerStateHandler() {
+        }
+
+        @Override
+        public void handleMessage( Message msg )
+        {
+            if( msg.what == UPDATE_PROGRESS )
+            {
+                mPlaybackController.setTime( mPosition, mDuration );
+
+                if( mDelay > 0 ) {
+                    mPosition += mDelay;
+                    if( mPosition > mDuration) {
+                        mPosition = mDuration;
+                    }
+                }
+                mDelay = 1000 - (mPosition % 1000);
+                sendEmptyMessageDelayed( UPDATE_PROGRESS, mDelay );
+            }
+            else if( msg.what == TemplateRuntime.PlayerActivity.PLAYING.ordinal() ) {
+                removeMessages( UPDATE_PROGRESS );
+                mPlaybackController.start();
+                sendEmptyMessage( UPDATE_PROGRESS );
+            }
+            else if( msg.what == TemplateRuntime.PlayerActivity.STOPPED.ordinal() ) {
+                mPlaybackController.stop();
+                removeMessages( UPDATE_PROGRESS );
+            }
+            else if( msg.what == TemplateRuntime.PlayerActivity.FINISHED.ordinal() ) {
+                mPlaybackController.reset();
+                removeMessages( UPDATE_PROGRESS );
+            }
         }
     }
 }

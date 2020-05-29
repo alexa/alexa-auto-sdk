@@ -28,8 +28,8 @@ namespace alexa {
         TemplateRuntimeHandler( jobject obj );
 
         // aace::alexa::TemplateRuntime
-        void renderTemplate( const std::string& payload ) override;
-        void renderPlayerInfo( const std::string& payload ) override;
+        void renderTemplate( const std::string& payload, FocusState focusState ) override;
+        void renderPlayerInfo( const std::string& payload, PlayerActivity audioPlayerState, std::chrono::milliseconds offset, FocusState focusState ) override;
         void clearTemplate() override;
         void clearPlayerInfo() override;
 
@@ -45,9 +45,61 @@ namespace alexa {
             return m_templateRuntimeHandler;
         }
 
+        std::shared_ptr<TemplateRuntimeHandler> getTemplateRuntime() {
+            return m_templateRuntimeHandler;
+        }
+
     private:
         std::shared_ptr<TemplateRuntimeHandler> m_templateRuntimeHandler;
     };
+
+    //
+    // JTemplateRuntimeFocusState
+    //
+    class JTemplateRuntimeFocusStateConfig : public EnumConfiguration<TemplateRuntimeHandler::FocusState> {
+    public:
+        using T = TemplateRuntimeHandler::FocusState;
+
+        const char* getClassName() override {
+            return "com/amazon/aace/alexa/TemplateRuntime$FocusState";
+        }
+
+        std::vector<std::pair<T,std::string>> getConfiguration() override {
+            return {
+                {T::FOREGROUND,"FOREGROUND"},
+                {T::BACKGROUND,"BACKGROUND"},
+                {T::NONE,"NONE"}
+            };
+        }
+    };
+
+    using JTemplateRuntimeFocusState = JEnum<JTemplateRuntimeFocusStateConfig::T,JTemplateRuntimeFocusStateConfig>;
+
+    //
+    // JTemplateRuntimePlayerActivity
+    //
+
+    class JTemplateRuntimePlayerActivityConfig : public EnumConfiguration<TemplateRuntimeHandler::PlayerActivity> {
+    public:
+        using T = TemplateRuntimeHandler::PlayerActivity;
+
+        const char* getClassName() override {
+            return "com/amazon/aace/alexa/TemplateRuntime$PlayerActivity";
+        }
+
+        std::vector<std::pair<T,std::string>> getConfiguration() override {
+            return {
+                {T::IDLE,"IDLE"},
+                {T::PLAYING,"PLAYING"},
+                {T::STOPPED,"STOPPED"},
+                {T::PAUSED,"PAUSED"},
+                {T::BUFFER_UNDERRUN,"BUFFER_UNDERRUN"},
+                {T::FINISHED,"FINISHED"}
+            };
+        }
+    };
+
+    using JTemplateRuntimePlayerActivity = JEnum<TemplateRuntimeHandler::PlayerActivity,JTemplateRuntimePlayerActivityConfig>;
 
 } // aace::alexa
 } // aace::jni

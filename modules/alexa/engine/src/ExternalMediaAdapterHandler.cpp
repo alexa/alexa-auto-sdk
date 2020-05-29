@@ -262,6 +262,8 @@ bool ExternalMediaAdapterHandler::playControl( const std::string& playerId, aace
             case RequestType::DISABLE_SHUFFLE: controlType = PlayControlType::DISABLE_SHUFFLE; break;
             case RequestType::FAVORITE: controlType = PlayControlType::FAVORITE; break;
             case RequestType::UNFAVORITE: controlType = PlayControlType::UNFAVORITE; break;
+            // internal
+            case RequestType::PAUSE_RESUME_TOGGLE: controlType = PlayControlType::PAUSE_RESUME_TOGGLE; break;
             default: Throw( "unsupportedRequestType" );
         }
     
@@ -312,7 +314,7 @@ bool ExternalMediaAdapterHandler::adjustSeek( const std::string& playerId, std::
     }
 }
 
-std::vector<aace::engine::alexa::AdapterState> ExternalMediaAdapterHandler::getAdapterStates()
+std::vector<aace::engine::alexa::AdapterState> ExternalMediaAdapterHandler::getAdapterStates( bool all )
 {
     try
     {
@@ -335,8 +337,10 @@ std::vector<aace::engine::alexa::AdapterState> ExternalMediaAdapterHandler::getA
                 // default playback state
                 state.playbackState.playerId = playerInfo.playerId;
 
-                // get the player state from the adapter implementation
-                ThrowIfNot( handleGetAdapterState( playerInfo.localPlayerId, state ), "handleGetAdapterStateFailed" );
+                if( all ) {
+                    // get the player state from the adapter implementation
+                    ThrowIfNot( handleGetAdapterState( playerInfo.localPlayerId, state ), "handleGetAdapterStateFailed" );
+                }
 
                 adapterStateList.push_back( state );
             }
@@ -347,6 +351,21 @@ std::vector<aace::engine::alexa::AdapterState> ExternalMediaAdapterHandler::getA
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG,"getAdapterStates").d("reason", ex.what()));
         return std::vector<aace::engine::alexa::AdapterState>();
+    }
+}
+
+std::chrono::milliseconds ExternalMediaAdapterHandler::getOffset( const std::string& playerId ) {
+    try
+    {
+        auto it = m_alexaToLocalPlayerIdMap.find( playerId );
+        ThrowIf( it == m_alexaToLocalPlayerIdMap.end(), "invalidPlayerId" );
+
+        // call the platform media adapter
+        return handleGetOffset( it->second );
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("playerId", playerId));
+        return std::chrono::milliseconds::zero();
     }
 }
 

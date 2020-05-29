@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">2.2.0</span>
+   &#160;<span id="projectnumber">2.2.1</span>
    </div>
   </td>
  </tr>
@@ -102,6 +102,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ae2bef490d146d40b7dcf7cf76f011fbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0ddaaef81a0c9edbdffc2f4149f638e8"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter.html#a0ddaaef81a0c9edbdffc2f4149f638e8">authorize</a> (AuthorizedPlayerInfo[] authorizedPlayers)</td></tr>
 <tr class="separator:a0ddaaef81a0c9edbdffc2f4149f638e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa933301d5c170a953adf431c294f603d"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter.html#aa933301d5c170a953adf431c294f603d">getOffset</a> ()</td></tr>
+<tr class="separator:aa933301d5c170a953adf431c294f603d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2c32897522b03df84e84a04e2c15296b"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter.html#a2c32897522b03df84e84a04e2c15296b">getState</a> (String localPlayerId, ExternalMediaAdapterState state)</td></tr>
 <tr class="separator:a2c32897522b03df84e84a04e2c15296b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa9b7aaa10e0d43695714364a616c86c4"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter.html#aa9b7aaa10e0d43695714364a616c86c4">volumeChanged</a> (float volume)</td></tr>
@@ -414,6 +416,25 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation successfully handled the call, else <code>false</code> </dd></dl>
+
+</div>
+</div>
+<a id="aa933301d5c170a953adf431c294f603d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa933301d5c170a953adf431c294f603d">&#9670;&nbsp;</a></span>getOffset()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">long com.amazon.aace.alexa.ExternalMediaAdapter.getOffset </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>This function retrieves the offset of the current track the adapter is handling.</p>
+<dl class="section return"><dt>Returns</dt><dd>This returns the offset in milliseconds. </dd></dl>
 
 </div>
 </div>
@@ -754,7 +775,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 2.2.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 2.2.1 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

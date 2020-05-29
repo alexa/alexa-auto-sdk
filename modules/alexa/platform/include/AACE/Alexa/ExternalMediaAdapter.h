@@ -98,7 +98,12 @@ public:
         /**
          * unfavorite song
          */
-        UNFAVORITE
+        UNFAVORITE,
+        /**
+         * @internal
+         * toggle pause resume playback
+         */
+        PAUSE_RESUME_TOGGLE
     };
 
     /**
@@ -519,6 +524,13 @@ public:
     virtual bool authorize( const std::vector<AuthorizedPlayerInfo>& authorizedPlayers ) = 0;
 
     /**
+     * This function retrieves the offset of the current track the adapter is handling.
+     *
+     * @return This returns the offset in milliseconds.
+     */
+    virtual std::chrono::milliseconds getOffset( const std::string& localPlayerId );
+
+    /**
      * Must provide the local external media player apps @PlaybackState, and @SessionState information to maintain cloud sync
      *
      * @param [in] localPlayerId The opaque token that uniquely identifies the local external player app
@@ -672,6 +684,10 @@ inline std::ostream& operator<<(std::ostream& stream, const ExternalMediaAdapter
             break;
         case ExternalMediaAdapter::PlayControlType::UNFAVORITE:
             stream << "UNFAVORITE";
+            break;
+        // internal
+        case ExternalMediaAdapter::PlayControlType::PAUSE_RESUME_TOGGLE:
+            stream << "PAUSE_RESUME_TOGGLE";
             break;
     }
     return stream;

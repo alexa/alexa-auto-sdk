@@ -10,7 +10,7 @@ The purpose of the Android Sample App is to provide useful example code to help 
 * [Running the Android Sample App](#running-the-android-sample-app)
 * [Using the Android Sample App](#using-the-android-sample-app)
 * [Debugging Notes](#debugging-notes)
-* [Release Notes](#v220-release-notes)
+* [Release Notes](#v221-release-notes)
 
 ## Prerequisites<a id="prerequisites"></a>
 
@@ -183,6 +183,30 @@ The Sample App does not configure SiriusXM as a local media source by default. I
 
 >**Note:** When SiriusXM is present as a local media source, the cloud defaults to local SiriusXM only and blocks any use of the cloud SiriusXM service even if the local implementation/service is unavailable or not enabled.  
 
+### SpeakerManager Configuration
+
+`SpeakerManager` is now a configurable option, enabled by default. When not enabled, user requests to change the volume or mute now have an appropriate Alexa response, e.g. "Sorry, I can't control the volume on your device".
+
+You can programmatically generate speaker manager configuration using the `createSpeakerManagerConfig()` factory method, or provide the equivalent JSON values in a configuration file.
+```
+{
+    "aace.alexa": {
+        "speakerManager": {
+            "enabled": false
+        }
+    }
+}
+```
+
+See the the Android Sample App MainActivity.java for an example of programmatically generating your speaker manager configuration.
+```
+ArrayList<EngineConfiguration> configuration = new ArrayList<EngineConfiguration>(Arrays.asList(
+    ...
+    AlexaConfiguration.createSpeakerManagerConfig( false ),
+    ...
+));
+```
+
 ## Debugging notes<a id = "debugging-notes"></a>
 
 ### Debugging the Sample App
@@ -232,7 +256,22 @@ aac-module-core/0.99.0-r0/src/engine/src/ ${AAC_SDK_HOME}/modules/core/engine/sr
 
 > **Note**: If the LLDB window isn't visible in the debug tab, select **Run** -> **Edit Configurations** -> **Debugger** and change the `Debug Type` to `Native`.
 
+## v2.2.1 Release Notes <a id = "v221-release-notes"></a>
+
+See [CHANGELOG](../../CHANGELOG.md) for more general information about the v2.2.1 release.
+
+### Enhancements
+* Introduces additional TemplateRuntime platform interface features that you can integrate in your application to enrich the user's experience with Now Playing cards for AudioPlayer and ExternalMediaPlayer implementations.
+
+### Resolved Issues
+No resolved issues.
+
+### Known Issues
+* On the Android Sample App, media playback gets into "No Content Playing" state where all GUI playback control breaks, when pressing next after force closing an external media app.
+* All previous known issues listed below.
+
 ## v2.2.0 Release Notes<a id="v220-release-notes"></a>
+
 ### Enhancements
 * Added a **TimeZone** option to the menu. The list of available timezone options is updated every time there is a change from the Alexa companion app.
 

@@ -1,6 +1,22 @@
 # Change Log
 
 ___
+## v2.2.1 released on 2020-05-29
+
+### Enhancements
+* Added enhancements to the maccandroid module to allow `SupportedOperations` to be overridden to support custom actions.
+* Enhanced the `TemplateRuntime` platform interface to support focus and audio player metadata in renderTemplate and renderPlayerInfo methods. This is a backward compatible change, see the [migration guide](MIGRATION.md#migrating-from-auto-sdk-v22-to-v221) for details.
+* `SpeakerManager` is now a configurable option, enabled by default. When not enabled, user requests to change the volume or mute now have an appropriate Alexa response, e.g. "Sorry, I can't control the volume on your device".
+
+### Resolved Issues
+* Fixed issues in the maccandroid module to a) rediscover media apps after getting the app removed callback, and b) change the behavior to only report unauthorized when the user specifically asks to play a media app.
+* On the QNX platform, prevent unnecessary flushing for audio output.
+
+### Known Issues
+* On the Android Sample App, media playback gets into "No Content Playing" state where all GUI playback control breaks, when pressing next after force closing an external media app.
+* Playback controls in the C++ Sample App Playback Controller Menu are static text items and do not change visual state (e.g. add/remove, hilite, select) based on audio player metadata.
+* Sometimes asking Alexa to repeat a song, or a playlist, does not produce the expected result.
+
 ## v2.2.0 released on 2020-04-15
 
 ### Enhancements

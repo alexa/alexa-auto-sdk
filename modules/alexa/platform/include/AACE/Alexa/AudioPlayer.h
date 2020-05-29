@@ -16,10 +16,9 @@
 #ifndef AACE_ALEXA_AUDIO_PLAYER_H
 #define AACE_ALEXA_AUDIO_PLAYER_H
 
-#include <iostream>
-
 #include <AACE/Core/PlatformInterface.h>
 #include "AlexaEngineInterfaces.h"
+#include "PlayerActivity.h"
 
 /** @file */
 
@@ -44,40 +43,9 @@ protected:
 
 public:
     /**
-     * Specifies the state of audio playback activity
+     * Alias the common PlayerActivity namespace.
      */
-    enum class PlayerActivity {
-
-        /**
-         * Audio playback has not yet begun.
-         */
-        IDLE,
-
-        /**
-         * Audio is currently playing.
-         */
-        PLAYING,
-
-        /**
-         * Audio playback is stopped, either from a stop directive or playback error.
-         */
-        STOPPED,
-
-        /**
-         * Audio playback is paused.
-         */
-        PAUSED,
-
-        /**
-         * Audio playback is stalled because a buffer underrun has occurred.
-         */
-        BUFFER_UNDERRUN,
-
-        /**
-         * Audio playback is finished.
-         */
-        FINISHED
-    };
+    using PlayerActivity = aace::alexa::PlayerActivity;
 
     /**
      * Used when audio time is unknown or indeterminate.
@@ -122,30 +90,6 @@ public:
 private:
     std::weak_ptr<aace::alexa::AudioPlayerEngineInterface> m_audioPlayerEngineInterface;
 };
-
-inline std::ostream& operator<<(std::ostream& stream, const AudioPlayer::PlayerActivity& state) {
-    switch (state) {
-        case AudioPlayer::PlayerActivity::IDLE:
-            stream << "IDLE";
-            break;
-        case AudioPlayer::PlayerActivity::PLAYING:
-            stream << "PLAYING";
-            break;
-        case AudioPlayer::PlayerActivity::STOPPED:
-            stream << "STOPPED";
-            break;
-        case AudioPlayer::PlayerActivity::PAUSED:
-            stream << "PAUSED";
-            break;
-        case AudioPlayer::PlayerActivity::BUFFER_UNDERRUN:
-            stream << "BUFFER_UNDERRUN";
-            break;
-        case AudioPlayer::PlayerActivity::FINISHED:
-            stream << "FINISHED";
-            break;
-    }
-    return stream;
-}
 
 } // aace::alexa
 } // aace

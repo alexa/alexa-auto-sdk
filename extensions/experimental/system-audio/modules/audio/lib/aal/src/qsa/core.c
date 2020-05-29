@@ -15,6 +15,8 @@
 
 #include <stdlib.h>
 #include <sys/time.h>
+#include <string.h>
+#include <pthread.h>
 #include "core.h"
 
 #define DEFAULT_AUDIO_FRAG_SIZE (AAL_AVS_SAMPLE_RATE * 2 * 20 / 1000)
@@ -42,7 +44,7 @@ static void *qsa_read_loop(void *argument)
 {
 	aal_qsa_context_t *ctx = (aal_qsa_context_t *) argument;
 	aal_status_t status = AAL_ERROR;
-	bool stop_requested = false; // TODO: replace with a better solution
+	bool stop_requested = false;
 
 	uint8_t *buffer = (uint8_t *) malloc(ctx->buffer_size);
 	bail_if_null(buffer);
@@ -144,9 +146,6 @@ static void *qsa_read_loop(void *argument)
 	status = AAL_UNKNOWN;
 
 bail:
-	debug("Flush PCM...");
-	snd_pcm_plugin_flush(ctx->pcm_handle, ctx->channel);
-
 	if (ctx->listener->on_stop)
 		ctx->listener->on_stop(status, ctx->user_data);
 
@@ -162,8 +161,20 @@ static int qsa_start_thread(aal_qsa_context_t *ctx)
 
 	r = pthread_attr_init(&attr);
 	bail_if_error(r);
-
 	attr_init = true;
+
+	pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED);
+	pthread_attr_setschedpolicy(&attr, SCHED_RR);
+
+	struct sched_param sched_param;
+	pthread_attr_getschedparam(&attr, &sched_param);
+	if (ctx->channel == SND_PCM_CHANNEL_CAPTURE) {
+		sched_param.sched_priority = ctx->base_sched_priority + 1;
+	} else {
+		sched_param.sched_priority = ctx->base_sched_priority;
+	}
+	debug("Set thread priority to %d", sched_param.sched_priority);
+	pthread_attr_setschedparam(&attr, &sched_param);
 
 	ctx->stop_requested = false;
 	r = pthread_create(&ctx->thread, &attr, qsa_read_loop, ctx);
@@ -346,6 +357,11 @@ aal_handle_t qsa_create_context(int32_t channel, const aal_attributes_t *attrs, 
 	debug("Configure PCM params and ready");
 	r = snd_pcm_plugin_params(ctx->pcm_handle, &params);
 	bail_if_error(r);
+
+	struct sched_param sched_param;
+	int sched_policy;
+	pthread_getschedparam(pthread_self(), &sched_policy, &sched_param);
+	ctx->base_sched_priority = sched_param.sched_priority;
 
 	return ctx;
 

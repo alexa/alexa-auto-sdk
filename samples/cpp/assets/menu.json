@@ -156,12 +156,14 @@
                         "do": "notify/onPlaybackControllerButtonPressed",
                         "key": "1",
                         "name": "Button Play",
+                        "note": "Registered EMP performs internal toggle pause resume playback",
                         "value": "PLAY"
                     },
                     {
                         "do": "notify/onPlaybackControllerButtonPressed",
                         "key": "2",
                         "name": "Button Pause",
+                        "note": "Registered EMP performs internal toggle pause resume playback",
                         "value": "PAUSE"
                     },
                     {

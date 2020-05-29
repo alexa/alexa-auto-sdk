@@ -36,6 +36,7 @@ typedef struct {
 	bool eos;
 	ringbuf_t write_buffer;
 	snd_pcm_channel_status_t status;
+	int base_sched_priority;
 
 	aal_audio_parameters_t audio_params; // actual audio parameters applied
 } aal_qsa_context_t;

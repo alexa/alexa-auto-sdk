@@ -44,7 +44,7 @@ namespace alexa {
         {
             jobject stateObj;
 
-            ThrowIfNot( JPlayerActivity::checkType( state, &stateObj ), "invalidState" );
+            ThrowIfNot( JAudioPlayerPlayerActivity::checkType( state, &stateObj ), "invalidState" );
             ThrowIfNot( m_obj.invoke<void>( "playerActivityChanged", "(Lcom/amazon/aace/alexa/AudioPlayer$PlayerActivity;)V", nullptr, stateObj ), "invokeFailed" );
         }
         catch_with_ex {

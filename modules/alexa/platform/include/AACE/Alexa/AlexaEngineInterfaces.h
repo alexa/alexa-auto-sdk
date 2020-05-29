@@ -536,6 +536,18 @@ public:
     virtual int64_t onGetPlayerDuration() = 0;
 };
 
+/**
+ * TemplateRuntimeEngineInterface
+ */
+class TemplateRuntimeEngineInterface {
+public:
+    /**
+     * Notifies the Engine that a display card has been cleared from the screen. Upon getting
+     * this notification, the @c TemplateRuntime will release the visual channel.
+     */
+    virtual void onDisplayCardCleared() = 0;
+};
+
 } // aace::alexa
 } // aace
 

@@ -45,8 +45,10 @@ std::weak_ptr<logger::LoggerHandler> TemplateRuntimeHandler::getLoggerHandler() 
 
 // aace::alexa::TemplateRuntime interface
 
-void TemplateRuntimeHandler::renderTemplate(const std::string &payload) {
-    log(logger::LoggerHandler::Level::INFO, "renderTemplate:payload=" + payload);
+void TemplateRuntimeHandler::renderTemplate(const std::string &payload, FocusState focusState) {
+    std::stringstream ss;
+    ss << "focusState=" << focusState;
+    log(logger::LoggerHandler::Level::INFO, "renderTemplate:payload=" + payload + "," + ss.str());
     auto activity = m_activity.lock();
     if (!activity) {
         return;
@@ -97,8 +99,10 @@ void TemplateRuntimeHandler::clearTemplate() {
     });
 }
 
-void TemplateRuntimeHandler::renderPlayerInfo(const std::string &payload) {
-    log(logger::LoggerHandler::Level::INFO, "renderPlayerInfo:payload=" + payload);
+void TemplateRuntimeHandler::renderPlayerInfo(const std::string &payload, PlayerActivity audioPlayerState, std::chrono::milliseconds offset, FocusState focusState) {
+    std::stringstream ss;
+    ss << "audioPlayerState=" << audioPlayerState << ",offset=" << offset.count() << ",focusState=" << focusState;
+    log(logger::LoggerHandler::Level::INFO, "renderPlayerInfo:payload=" + payload + "," + ss.str());
     auto activity = m_activity.lock();
     if (!activity) {
         return;

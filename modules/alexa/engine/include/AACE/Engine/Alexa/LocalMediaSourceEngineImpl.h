@@ -66,6 +66,7 @@ protected:
     bool handleSeek( const std::string& localPlayerId, std::chrono::milliseconds offset ) override;
     bool handleAdjustSeek( const std::string& localPlayerId, std::chrono::milliseconds deltaOffset ) override;
     bool handleGetAdapterState( const std::string& localPlayerId, aace::engine::alexa::AdapterState& state ) override;
+    std::chrono::milliseconds handleGetOffset( const std::string& playerId ) override;
 
     bool handleSetVolume( int8_t volume ) override;
     bool handleSetMute( bool mute ) override;

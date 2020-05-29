@@ -47,9 +47,9 @@ class TemplateRuntimeHandler : public aace::alexa::TemplateRuntime /* isa Platfo
 
     // aace::alexa::TemplateRuntime interface
 
-    auto renderTemplate(const std::string &payload) -> void override;
+    auto renderTemplate(const std::string &payload, FocusState focusState) -> void override;
     auto clearTemplate() -> void override;
-    auto renderPlayerInfo(const std::string &payload) -> void override;
+    auto renderPlayerInfo(const std::string &payload, PlayerActivity audioPlayerState, std::chrono::milliseconds offset, FocusState focusState) -> void override;
     auto clearPlayerInfo() -> void override;
 
   private:

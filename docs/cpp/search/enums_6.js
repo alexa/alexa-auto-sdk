@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['mutedstate',['MutedState',['../classaace_1_1audio_1_1_audio_output.html#ad03cbdbbf172fd64a16c16b64d8a4b05',1,'aace::audio::AudioOutput']]]
+  ['level',['Level',['../classaace_1_1logger_1_1_logger_engine_interface.html#aa97c461bbc4f77638b45f7eb9271b786',1,'aace::logger::LoggerEngineInterface']]]
 ];

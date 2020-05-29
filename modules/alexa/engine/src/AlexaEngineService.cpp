@@ -95,7 +95,8 @@ AlexaEngineService::AlexaEngineService( const aace::engine::core::ServiceDescrip
     m_previouslyStarted( false ),
     m_encoderEnabled ( false ),
     m_networkStatus( NetworkInfoObserver::NetworkStatus::UNKNOWN ),
-    m_externalMediaPlayerAgent( "" )
+    m_externalMediaPlayerAgent( "" ),
+    m_speakerManagerEnabled( true )
 {
 #ifdef DEBUG
     m_logger = AlexaEngineLogger::create( alexaClientSDK::avsCommon::utils::logger::Level::DEBUG9 );
@@ -266,7 +267,7 @@ bool AlexaEngineService::configureDeviceSDK( std::shared_ptr<std::istream> confi
         m_messageRouter = newFactoryInstance<alexaClientSDK::acl::MessageRouterInterface>( [this]() {
             return std::make_shared<alexaClientSDK::acl::MessageRouter>( m_authDelegateRouter, m_attachmentManager, m_transportFactory );
         });
-        ThrowIfNull( m_messageRouter, "crateMessageRouterFailed" );
+        ThrowIfNull( m_messageRouter, "createMessageRouterFailed" );
 
         // Create the connection manager - Glues together all networking components
         m_connectionManager = alexaClientSDK::acl::AVSConnectionManager::create( m_messageRouter, false );
@@ -360,7 +361,9 @@ bool AlexaEngineService::configureDeviceSDK( std::shared_ptr<std::istream> confi
         m_speakerManager = alexaClientSDK::capabilityAgents::speakerManager::SpeakerManager::create( {}, m_contextManager, m_connectionManager, m_exceptionSender );
         ThrowIfNull( m_speakerManager, "createSpeakerManagerFailed" );
         registerServiceInterface<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface>( m_speakerManager );
-        m_defaultEndpointBuilder->withCapability( m_speakerManager, m_speakerManager );
+        if( m_speakerManagerEnabled ) {
+            m_defaultEndpointBuilder->withCapability( m_speakerManager, m_speakerManager );
+        }
 
         // Create interaction model capability agent
         std::shared_ptr<alexaClientSDK::capabilityAgents::interactionModel::InteractionModelCapabilityAgent> m_interactionModelCapabilityAgent =
@@ -477,6 +480,15 @@ bool AlexaEngineService::configure( std::shared_ptr<std::istream> configuration 
             
             if( system.HasMember( "firmwareVersion" ) && system["firmwareVersion"].IsUint() ) {
                 m_firmwareVersion = system["firmwareVersion"].GetUint();
+            }
+        }
+
+        if( alexaConfigRoot.HasMember( "speakerManager" ) && alexaConfigRoot["speakerManager"].IsObject() )
+        {
+            auto speakerManager = alexaConfigRoot["speakerManager"].GetObject();
+
+            if( speakerManager.HasMember( "enabled" ) && speakerManager["enabled"].IsBool() ) {
+                m_speakerManagerEnabled = speakerManager["enabled"].GetBool();
             }
         }
         

@@ -96,7 +96,12 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
         /**
          * unfavorite song
          */
-        UNFAVORITE("UNFAVORITE");
+        UNFAVORITE("UNFAVORITE"),
+        /**
+         * @internal
+         * toggle pause resume playback
+         */
+        PAUSE_RESUME_TOGGLE("PAUSE_RESUME_TOGGLE");
 
         /**
          * @internal
@@ -641,6 +646,15 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
      */
     public boolean authorize( AuthorizedPlayerInfo[] authorizedPlayers ) {
         return false;
+    }
+
+    /**
+     * This function retrieves the offset of the current track the adapter is handling.
+     *
+     * @return This returns the offset in milliseconds.
+     */
+    public long getOffset() {
+        return 0;
     }
 
     /**

@@ -23,6 +23,8 @@ import android.os.Looper;
 
 import com.amazon.maccandroid.model.APIConstants;
 import com.amazon.maccandroid.model.Directive.Directive;
+import com.amazon.maccandroid.model.PlayerEvents;
+import com.amazon.maccandroid.model.SupportedOperations;
 import com.amazon.maccandroid.model.errors.CapabilityAgentError;
 import com.amazon.maccandroid.model.players.AuthorizedPlayer;
 import com.amazon.maccandroid.model.players.DiscoveredPlayer;
@@ -46,6 +48,7 @@ public class MACCAndroidClient {
     private final MediaAppsDirectivesHandler mDirectivesHandler;
     private final DiscoverAndReportMediaAppsHandler mDiscoverAndReportMediaAppshandler;
     private MACCAndroidClientCallback mMACCAndroidClientCallback;
+    private final SupportedOperations mSupportedOperations;
 
     /**
      * App initiated connection to  MACCAndroidClient
@@ -55,6 +58,7 @@ public class MACCAndroidClient {
         @Override
         public void onReceive(Context context, Intent intent) {
             // Checking to make sure intent has the information we need
+            Log.i(TAG, "onReceive intent : " + intent);
             if (intent!= null && intent.getExtras() != null && intent.getExtras().
                     containsKey(Intent.EXTRA_COMPONENT_NAME)) {
                 final ComponentName componentName = (ComponentName) intent.getExtras().get(
@@ -71,6 +75,7 @@ public class MACCAndroidClient {
 
                         @Override
                         public void onConnectionFailure(CapabilityAgentError error) {
+                        	Log.i(TAG, "onConnectionFailure");
                             MediaAppsStateReporter.getInstance().reportError(
                                     componentName.getPackageName(), error);
                             MediaAppsRepository.getInstance().removeMediaApp(
@@ -95,13 +100,17 @@ public class MACCAndroidClient {
     };
 
     public MACCAndroidClient(Context context) {
+        this(context, new SupportedOperations());
+    }
+
+    public MACCAndroidClient(Context context, SupportedOperations supportedOperations) {
         super();
         mContext = context;
+        mSupportedOperations = supportedOperations;
         MediaAppsStateReporter.getInstance().initalize(this);
         mDiscoverAndReportMediaAppshandler = new DiscoverAndReportMediaAppsHandler(Looper.getMainLooper(), mContext);
-        mDirectivesHandler = new MediaAppsDirectivesHandler(context);
-        mContext.registerReceiver(mAppInitiatedBroadcastReceiver,
-                new IntentFilter(APIConstants.Actions.CONNECT_ACTION),
+        mDirectivesHandler = new MediaAppsDirectivesHandler(context, mSupportedOperations);
+        mContext.registerReceiver(mAppInitiatedBroadcastReceiver, new IntentFilter(APIConstants.Actions.CONNECT_ACTION),
                 APIConstants.Permissions.EMP_CONNECT_PERMISSION, null);
     }
 
@@ -152,7 +161,8 @@ public class MACCAndroidClient {
             return null;
         }
         Log.i(TAG, "getState | playerId:" + playerId);
-        ExternalMediaPlayerState state = new ExternalMediaPlayerState(MediaAppsRepository.getInstance().getAuthorizedMediaApp(playerId));
+        ExternalMediaPlayerState state = new ExternalMediaPlayerState(
+                MediaAppsRepository.getInstance().getAuthorizedMediaApp(playerId), mSupportedOperations);
         return state;
     }
 
@@ -212,5 +222,6 @@ public class MACCAndroidClient {
 
     public void reportRemovedApp(String localPlayerId) {
         mMACCAndroidClientCallback.onRemovedPlayer(localPlayerId);
+        runDiscovery();
     }
 }

@@ -86,7 +86,9 @@ namespace alexa {
                 {T::ENABLE_SHUFFLE,"ENABLE_SHUFFLE"},
                 {T::DISABLE_SHUFFLE,"DISABLE_SHUFFLE"},
                 {T::FAVORITE,"FAVORITE"},
-                {T::UNFAVORITE,"UNFAVORITE"}
+                {T::UNFAVORITE,"UNFAVORITE"},
+                // internal
+                {T::PAUSE_RESUME_TOGGLE,"PAUSE_RESUME_TOGGLE"}
             };
         }
     };

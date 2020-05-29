@@ -25,6 +25,38 @@ namespace alexa {
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.TemplateRuntimeEngineImpl");
 
+// Convert AVS FocusState type to an AACE FocusState type for use in the platform interface.
+static aace::alexa::FocusState convertFocusState( alexaClientSDK::avsCommon::avs::FocusState focusState ) {
+    switch ( focusState ) {
+        case alexaClientSDK::avsCommon::avs::FocusState::FOREGROUND:
+            return aace::alexa::FocusState::FOREGROUND;
+        case alexaClientSDK::avsCommon::avs::FocusState::BACKGROUND:
+            return aace::alexa::FocusState::BACKGROUND;
+        case alexaClientSDK::avsCommon::avs::FocusState::NONE:
+            return aace::alexa::FocusState::NONE;
+    }
+    return aace::alexa::FocusState::NONE; // control should never reach here
+}
+
+// Convert AVS PlayerActivity type to an AACE PlayerActivity type for use in the platform interface.
+static aace::alexa::PlayerActivity convertPlayerActivity( alexaClientSDK::avsCommon::avs::PlayerActivity playerActivity ) {
+    switch ( playerActivity ) {
+        case alexaClientSDK::avsCommon::avs::PlayerActivity::IDLE:
+            return aace::alexa::PlayerActivity::IDLE;
+        case alexaClientSDK::avsCommon::avs::PlayerActivity::PLAYING:
+            return aace::alexa::PlayerActivity::PLAYING;
+        case alexaClientSDK::avsCommon::avs::PlayerActivity::STOPPED:
+            return aace::alexa::PlayerActivity::STOPPED;
+        case alexaClientSDK::avsCommon::avs::PlayerActivity::PAUSED:
+            return aace::alexa::PlayerActivity::PAUSED;
+        case alexaClientSDK::avsCommon::avs::PlayerActivity::BUFFER_UNDERRUN:
+            return aace::alexa::PlayerActivity::BUFFER_UNDERRUN;
+        case alexaClientSDK::avsCommon::avs::PlayerActivity::FINISHED:
+            return aace::alexa::PlayerActivity::FINISHED;
+    }
+    return aace::alexa::PlayerActivity::IDLE; // control should never reach here
+}
+
 TemplateRuntimeEngineImpl::TemplateRuntimeEngineImpl( std::shared_ptr<aace::alexa::TemplateRuntime> templateRuntimePlatformInterface ) :
         alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
         m_templateRuntimePlatformInterface( templateRuntimePlatformInterface ) {
@@ -90,6 +122,9 @@ std::shared_ptr<TemplateRuntimeEngineImpl> TemplateRuntimeEngineImpl::create(
         
         ThrowIfNot( templateRuntimeEngineImpl->initialize( defaultEndpointBuilder, renderPlayerInfoCardsProviderInterfaces, focusManager, capabilitiesDelegate, dialogUXStateAggregator, exceptionSender ), "initializeTemplateRuntimeEngineImplFailed" );
 
+        // set the platform's engine interface reference
+        templateRuntimePlatformInterface->setEngineInterface( templateRuntimeEngineImpl );
+
         return templateRuntimeEngineImpl;
     }
     catch( std::exception& ex ) {
@@ -107,12 +142,16 @@ void TemplateRuntimeEngineImpl::doShutdown()
         m_templateRuntimeCapabilityAgent->shutdown();
         m_templateRuntimeCapabilityAgent.reset();
     }
-    
+
+    if( m_templateRuntimePlatformInterface != nullptr ) {
+        m_templateRuntimePlatformInterface->setEngineInterface( nullptr );
+    }
+
     m_renderPlayerInfoCardsProviderInterfaces.clear();
 }
 
 void TemplateRuntimeEngineImpl::renderTemplateCard( const std::string& jsonPayload, alexaClientSDK::avsCommon::avs::FocusState focusState ) {
-    m_templateRuntimePlatformInterface->renderTemplate( jsonPayload );
+    m_templateRuntimePlatformInterface->renderTemplate( jsonPayload, convertFocusState( focusState ) );
 }
 
 void TemplateRuntimeEngineImpl::clearTemplateCard() {
@@ -120,7 +159,7 @@ void TemplateRuntimeEngineImpl::clearTemplateCard() {
 }
 
 void TemplateRuntimeEngineImpl::renderPlayerInfoCard( const std::string& jsonPayload, alexaClientSDK::avsCommon::sdkInterfaces::TemplateRuntimeObserverInterface::AudioPlayerInfo audioPlayerInfo, alexaClientSDK::avsCommon::avs::FocusState focusState ) {
-    m_templateRuntimePlatformInterface->renderPlayerInfo( jsonPayload );
+    m_templateRuntimePlatformInterface->renderPlayerInfo( jsonPayload, convertPlayerActivity( audioPlayerInfo.audioPlayerState ), audioPlayerInfo.offset, convertFocusState( focusState ) );
 }
 
 void TemplateRuntimeEngineImpl::clearPlayerInfoCard() {
@@ -147,6 +186,15 @@ void TemplateRuntimeEngineImpl::setRenderPlayerInfoCardsProviderInterface( std::
     }
 }
     
+//
+// TemplateRuntimeEngineInterface
+//
+void TemplateRuntimeEngineImpl::onDisplayCardCleared() {
+    if( m_templateRuntimeCapabilityAgent != nullptr ) {
+        m_templateRuntimeCapabilityAgent->displayCardCleared();
+    }
+}
+
 } // aace::engine::alexa
 } // aace::engine
 } // aace

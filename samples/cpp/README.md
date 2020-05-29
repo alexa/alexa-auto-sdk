@@ -11,7 +11,7 @@ The purpose of the C++ Sample App is to provide useful example code to help you 
 * [Running the C++ Sample App](#running-the-c-sample-app)
 * [Using the C++ Sample App](#using-the-c-sample-app)
 * [Troubleshooting](#troubleshooting)
-* [Release Notes](#v220-release-notes)
+* [Release Notes](#v221-release-notes)
 
 ## Prerequisites <a id="prerequisites"></a>
 
@@ -221,7 +221,22 @@ The Sample App does not configure SiriusXM as a local media source by default. I
     
     To resolve this, edit the `samples/cpp/assets/config.json` file and choose a unique serial number.
 
+## v2.2.1 Release Notes <a id = "v221-release-notes"></a>
+
+See [CHANGELOG](../../CHANGELOG.md) for more general information about the v2.2.1 release.
+
+### Enhancements
+* Introduces additional TemplateRuntime platform interface features that you can integrate in your application to enrich the user's experience with Now Playing cards for AudioPlayer and ExternalMediaPlayer implementations.
+
+### Resolved Issues
+No resolved issues.
+
+### Known Issues
+* Playback controls in the C++ Sample App Playback Controller Menu are static text items and do not change visual state (e.g. add/remove, hilite, select) based on audio player metadata. 
+* All previous known issues listed below.
+
 ## v2.2.0 Release Notes <a id = "v220-release-notes"></a>
+
 ### Enhancements
 * Added a **TimeZone** option to the menu. The supported values are stored in the [menu.json file](./assets/menu.json).
 * Added playback control options for music (such as play, pause, stop, rewind, and shuffle) to the menu.

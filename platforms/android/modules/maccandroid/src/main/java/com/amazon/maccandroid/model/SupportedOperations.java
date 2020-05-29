@@ -43,7 +43,7 @@ import static com.amazon.maccandroid.model.APIConstants.Directives.PlayControl.P
 import static com.amazon.maccandroid.model.APIConstants.Directives.PlayControl.SEEK_CONTROL_SET_SEEK_POSITION;
 
 public class SupportedOperations {
-    private final String TAG = SupportedOperations.class.getSimpleName();
+    private static final String TAG = SupportedOperations.class.getSimpleName();
 
     public Set< String > getSupportedOperations(MediaApp app ) {
         Set< String > operations = new HashSet<>( );
@@ -83,7 +83,8 @@ public class SupportedOperations {
             operations.add( PLAY_CONTROL_ENABLE_REPEAT_ONE );
             operations.add( PLAY_CONTROL_DISABLE_REPEAT );
         }
-        Log.i(TAG , "supportedOperations: " + operations);
+
+        Log.i(TAG, "supportedOperations: " + operations);
         return operations;
     }
 }

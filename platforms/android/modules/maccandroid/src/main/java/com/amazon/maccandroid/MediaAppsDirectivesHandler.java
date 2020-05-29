@@ -18,7 +18,6 @@ package com.amazon.maccandroid;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.media.Rating;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -40,7 +39,6 @@ import com.amazon.maccandroid.model.errors.CapabilityAgentError;
 import com.amazon.maccandroid.model.SupportedOperations;
 import com.amazon.maccandroid.model.players.AuthorizedPlayer;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -60,12 +58,14 @@ public class MediaAppsDirectivesHandler implements MediaAppsConnectionListener {
 
     private final Context mContext;
     private final Handler mMainThreadDirectivesHandler;
+    private final SupportedOperations mSupportedOperations;
 
     private Directive mCachedDirective = null;
 
-    public MediaAppsDirectivesHandler(Context context) {
+    public MediaAppsDirectivesHandler(Context context, SupportedOperations supportedOperations) {
         mContext = context;
         mMainThreadDirectivesHandler = new Handler(Looper.getMainLooper());
+        mSupportedOperations = supportedOperations;
     }
 
     public void handleDirective(final Directive directive) {
@@ -384,7 +384,10 @@ public class MediaAppsDirectivesHandler implements MediaAppsConnectionListener {
         } else {
             return true;
         }
-        return (new SupportedOperations()).getSupportedOperations(MediaAppsRepository.getInstance().getAuthorizedMediaApp(directive.getPlayerId())).contains(action);
+        return mSupportedOperations
+                .getSupportedOperations(
+                        MediaAppsRepository.getInstance().getAuthorizedMediaApp(directive.getPlayerId()))
+                .contains(action);
     }
 
     @Override
@@ -405,6 +408,7 @@ public class MediaAppsDirectivesHandler implements MediaAppsConnectionListener {
 
     @Override
     public void onConnectionFailure(CapabilityAgentError error ) {
+    	Log.i(TAG, "onConnectionFailure");
         MediaAppsRepository.getInstance().removeMediaApp(mCachedDirective.getPlayerId());
         MediaAppsStateReporter.getInstance().reportError(mCachedDirective.getPlayerId(), error);
     }

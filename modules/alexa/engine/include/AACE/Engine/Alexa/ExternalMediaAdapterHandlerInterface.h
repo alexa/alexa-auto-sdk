@@ -49,7 +49,8 @@ public:
     virtual bool playControl( const std::string& playerId, aace::engine::alexa::RequestType requestType ) = 0;
     virtual bool seek( const std::string& playerId, std::chrono::milliseconds offset ) = 0;
     virtual bool adjustSeek( const std::string& playerId, std::chrono::milliseconds deltaOffset ) = 0;
-    virtual std::vector<aace::engine::alexa::AdapterState> getAdapterStates() = 0;
+    virtual std::vector<aace::engine::alexa::AdapterState> getAdapterStates( bool all = true ) = 0;
+    virtual std::chrono::milliseconds getOffset( const std::string& playerId ) = 0;
 };
 
 inline ExternalMediaAdapterHandlerInterface::ExternalMediaAdapterHandlerInterface( const std::string& name ) : alexaClientSDK::avsCommon::utils::RequiresShutdown( name ) {

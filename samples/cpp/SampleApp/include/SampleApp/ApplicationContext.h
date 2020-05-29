@@ -45,16 +45,10 @@ class ApplicationContext {
     bool m_testAutomation{false};
     json m_menuRegister{};
     logger::LoggerHandler::Level m_level{};
-#ifdef COASSISTANT
-      std::string m_actingAssistant{};
-#endif
     std::string m_applicationDirPath{};
     std::string m_applicationPath{};
     std::string m_audioInputDevice{};
     std::string m_browserCommand{};
-#ifdef COASSISTANT
-      std::string m_defaultAssistant{};
-#endif
     std::string m_mediaPlayerCommand{};
     std::string m_payloadScriptCommand{};
     std::string m_userConfigFilePath{};
@@ -121,12 +115,7 @@ class ApplicationContext {
     auto setSingleThreadedUI(bool singleThreadedUI) -> void;
     auto setUserConfigFilePath(const std::string &userConfigFilePath) -> void;
     auto test(const std::string &value) -> bool;
-#ifdef COASSISTANT
-    auto setDefaultAssistant(const std::string &assistant) -> void;
-    auto getDefaultAssistant() -> std::string;
-    auto setActingAssistant(const std::string &assistant) -> void;
-    auto getActingAssistant() -> std::string;
-#endif
+
 
   private:
     friend cbl::CBLHandler;

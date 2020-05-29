@@ -170,6 +170,20 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
     return aace::core::config::StreamConfiguration::create( aace::engine::utils::json::toStream( document ) );
 }
 
+std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createSpeakerManagerConfig( bool enabled )
+{
+    rapidjson::Document document( rapidjson::kObjectType );
+    rapidjson::Value aaceAlexaElement( rapidjson::kObjectType );
+    rapidjson::Value speakerManagerElement( rapidjson::kObjectType );
+
+    speakerManagerElement.AddMember( "enabled", rapidjson::Value().SetBool( enabled ), document.GetAllocator() );
+    aaceAlexaElement.AddMember( "speakerManager", speakerManagerElement, document.GetAllocator() );
+
+    document.AddMember( "aace.alexa", aaceAlexaElement, document.GetAllocator() );
+
+    return aace::core::config::StreamConfiguration::create( aace::engine::utils::json::toStream( document ) );
+}
+
 std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createSystemConfig( uint32_t firmwareVersion )
 {
     rapidjson::Document document( rapidjson::kObjectType );

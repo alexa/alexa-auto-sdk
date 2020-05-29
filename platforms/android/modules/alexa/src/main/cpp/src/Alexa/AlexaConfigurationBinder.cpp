@@ -225,6 +225,22 @@ extern "C"
     }
 
     JNIEXPORT jlong JNICALL
+    Java_com_amazon_aace_alexa_config_AlexaConfiguration_createSpeakerManagerConfigBinder( JNIEnv* env, jobject obj, jboolean enabled )
+    {
+        try
+        {
+            auto config = aace::alexa::config::AlexaConfiguration::createSpeakerManagerConfig( enabled );
+            ThrowIfNull( config, "createSpeakerManagerConfigFailed" );
+
+            return reinterpret_cast<long>( new aace::jni::core::config::EngineConfigurationBinder( config ) );
+        }
+        catch( const std::exception& ex ) {
+            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_alexa_config_AlexaConfiguration_createSpeakerManagerConfigBinder",ex.what());
+            return 0;
+        }
+    }
+
+    JNIEXPORT jlong JNICALL
     Java_com_amazon_aace_alexa_config_AlexaConfiguration_createSystemConfigBinder( JNIEnv* env, jobject obj, jint firmwareVersion )
     {
         try

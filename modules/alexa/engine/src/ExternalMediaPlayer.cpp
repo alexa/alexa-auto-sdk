@@ -81,7 +81,7 @@ static const std::string EXTERNALMEDIAPLAYER_CAPABILITY_INTERFACE_TYPE = ALEXA_I
 /// ExternalMediaPlayer interface name
 static const std::string EXTERNALMEDIAPLAYER_CAPABILITY_INTERFACE_NAME = "ExternalMediaPlayer";
 /// ExternalMediaPlayer interface version
-static const std::string EXTERNALMEDIAPLAYER_CAPABILITY_INTERFACE_VERSION = "1.1";
+static const std::string EXTERNALMEDIAPLAYER_CAPABILITY_INTERFACE_VERSION = "1.1"; // 1.2
 
 /// Alexa.PlaybackStateReporter name.
 static const std::string PLAYBACKSTATEREPORTER_CAPABILITY_INTERFACE_NAME = PLAYBACKSTATEREPORTER_STATE_NAMESPACE;
@@ -988,6 +988,19 @@ std::shared_ptr<ExternalMediaAdapterInterface> ExternalMediaPlayer::getAdapterBy
     return getAdapterByLocalPlayerId(localPlayerId);
 }
 
+std::shared_ptr<ExternalMediaAdapterHandlerInterface> ExternalMediaPlayer::getAdapterHandlerByPlayerId(const std::string& playerId) {
+    AACE_VERBOSE(LX(TAG));
+    for (auto adapterHandler : m_adapterHandlers) {
+        auto adapterStates = adapterHandler->getAdapterStates( false );
+        for (auto adapterState : adapterStates) {
+            if (adapterState.sessionState.playerId == playerId) {
+                return adapterHandler;
+            }
+        }
+    }
+    return nullptr;
+}
+
 std::shared_ptr<ExternalMediaAdapterInterface> ExternalMediaPlayer::getAdapterByLocalPlayerId(
     const std::string& localPlayerId) {
     AACE_VERBOSE(LX(TAG));
@@ -1392,6 +1405,9 @@ void ExternalMediaPlayer::setPlayerInFocus(const std::string& playerInFocus, boo
         m_playerInFocusConditionVariable.notify_all();
 
         m_playbackRouter->setHandler(shared_from_this());
+        m_adapterHandlerInFocus = nullptr;
+        m_adapterInFocus = nullptr;
+
         // Acquire the channel and have this ExternalMediaPlayer manage the focus state.
         if (m_focus == FocusState::NONE && m_focusAcquireInProgress != true && !registered ) {
             // m_currentActivity = alexaClientSDK::avsCommon::avs::PlayerActivity::IDLE;
@@ -1450,13 +1466,17 @@ std::chrono::milliseconds ExternalMediaPlayer::getAudioItemOffset() {
     AACE_VERBOSE(LX(TAG));
     std::lock_guard<std::mutex> lock{m_inFocusAdapterMutex};
     if (!m_adapterInFocus) {
-        AACE_ERROR(LX(TAG,"getAudioItemOffsetFailed").d("reason", "NoActiveAdapter").d("player", m_playerInFocus));
-        return std::chrono::milliseconds::zero();
+        if (!m_adapterHandlerInFocus) {
+            AACE_ERROR(LX(TAG,"getAudioItemOffsetFailed").d("reason", "NoActiveAdapter").d("player", m_playerInFocus));
+            return std::chrono::milliseconds::zero();
+        }
+        return m_adapterHandlerInFocus->getOffset(m_playerInFocus);
     }
     return m_adapterInFocus->getOffset();
 }
 
 void ExternalMediaPlayer::setPlayerInFocus(const std::string& playerInFocus) {
+    AACE_VERBOSE(LX(TAG).d("playerInFocus", playerInFocus));
     // registered EMP adapter will not use this focus manger
     auto registered = isRegisteredPlayerId( playerInFocus );
     if( !registered )
@@ -1464,11 +1484,17 @@ void ExternalMediaPlayer::setPlayerInFocus(const std::string& playerInFocus) {
         auto lock = std::unique_lock<std::mutex>(m_authorizedMutex);
         if (m_authorizedAdapters.find(playerInFocus) == m_authorizedAdapters.end()) {
             AACE_ERROR(LX(TAG,"setPlayerInFocusFailed").d("reason", "unauthorizedPlayer").d("playerId", playerInFocus));
+            return;
         }
     }
-    AACE_DEBUG(LX(TAG).d("playerInFocus", playerInFocus));
-    std::shared_ptr<aace::engine::alexa::ExternalMediaAdapterInterface> adapterInFocus =
-        !registered ? getAdapterByLocalPlayerId(playerInFocus) : nullptr;
+    AACE_VERBOSE(LX(TAG).d("playerInFocus", playerInFocus));
+    std::shared_ptr<aace::engine::alexa::ExternalMediaAdapterInterface> adapterInFocus = nullptr;
+    std::shared_ptr<ExternalMediaAdapterHandlerInterface> adapterHandlerInFocus = nullptr;
+    if( !registered ) {
+        adapterInFocus = getAdapterByPlayerId(playerInFocus);
+    } else {
+        adapterHandlerInFocus = getAdapterHandlerByPlayerId(playerInFocus);
+    }
 
     {
         std::lock_guard<std::mutex> lock{m_inFocusAdapterMutex};
@@ -1478,6 +1504,7 @@ void ExternalMediaPlayer::setPlayerInFocus(const std::string& playerInFocus) {
         }
         m_playerInFocus = playerInFocus;
         m_playbackRouter->setHandler(shared_from_this());
+        m_adapterHandlerInFocus = adapterHandlerInFocus;
         m_adapterInFocus = adapterInFocus;
     }
 }
@@ -1488,51 +1515,35 @@ void ExternalMediaPlayer::onButtonPressed(PlaybackButton button) {
         std::lock_guard<std::mutex> lock{m_inFocusAdapterMutex};
         playerInFocus = m_playerInFocus;
     }
-    std::string localPlayerId;
 
     auto buttonIt = g_buttonToRequestType.find(button);
-
     if (g_buttonToRequestType.end() == buttonIt) {
-        AACE_ERROR(LX(TAG,"ButtonToRequestTypeNotFound").d("button", button));
+        AACE_ERROR(LX("onButtonPressedFailed").d("reason", "buttonToRequestTypeNotFound").d("button", button));
         return;
     }
+
+    auto requestType = buttonIt->second;
+
     if (!playerInFocus.empty()) {
-        setHaltInitiatorRequestHelper(buttonIt->second);
-	    m_executor.submit([this, buttonIt]() {
-	        for (auto adapterHandler : m_adapterHandlers) {
-	            adapterHandler->playControl(m_playerInFocus, buttonIt->second);
-	        }
-	    });
-
-        // adapter code below
-
-        /*auto lock = std::unique_lock<std::mutex>(m_authorizedMutex);
-        auto playerIdToLocalPlayerId = m_authorizedAdapters.find(playerInFocus);
-
-        if (m_authorizedAdapters.end() == playerIdToLocalPlayerId) {
-            AACE_ERROR(LX(TAG,"onButtonPressedFailed").d("reason", "noMatchingLocalId").d(PLAYER_ID, m_playerInFocus));
-            return;
+        if (isRegisteredPlayerId(playerInFocus)) {
+            if (requestType == RequestType::PAUSE || requestType == RequestType::RESUME) {
+                requestType = RequestType::PAUSE_RESUME_TOGGLE; // registered adapter handler expects this
+            }
+            if (auto adapterHandlerInFocus = getAdapterHandlerByPlayerId(playerInFocus)) {
+                adapterHandlerInFocus->playControl(playerInFocus, requestType);
+            }
+            else {
+                AACE_ERROR(LX("onButtonPressedFailed").d("reason", "adapterHandlerInFocusNotFound").d("playerInFocus", playerInFocus));
+            }
         }
-        localPlayerId = playerIdToLocalPlayerId->second;
-
-        lock.unlock();
-
-        auto adapter = getAdapterByLocalPlayerId(localPlayerId);
-
-        if (!adapter) {
-            // Should never reach here as playerInFocus is always set based on a contract with AVS.
-            AACE_ERROR(LX(TAG,"AdapterNotFound").d("player", localPlayerId));
-            return;
+        else {
+            setHaltInitiatorRequestHelper(requestType);
+            m_executor.submit([this, playerInFocus, requestType]() {
+                for (auto adapterHandler : m_adapterHandlers) {
+                    adapterHandler->playControl(playerInFocus, requestType);
+                }
+            });
         }
-
-        auto buttonIt = g_buttonToRequestType.find(button);
-
-        if (g_buttonToRequestType.end() == buttonIt) {
-            AACE_ERROR(LX(TAG,"ButtonToRequestTypeNotFound").d("button", button));
-            return;
-        }
-
-        adapter->handlePlayControl(buttonIt->second);*/
     }
 }
 
@@ -1542,64 +1553,42 @@ void ExternalMediaPlayer::onTogglePressed(PlaybackToggle toggle, bool action) {
         std::lock_guard<std::mutex> lock{m_inFocusAdapterMutex};
         playerInFocus = m_playerInFocus;
     }
+
     auto toggleIt = g_toggleToRequestType.find(toggle);
     if (g_toggleToRequestType.end() == toggleIt) {
-        AACE_ERROR(LX(TAG,"ToggleToRequestTypeNotFound").d("toggle", toggle));
+        AACE_ERROR(LX("onTogglePressedFailed").d("reason", "toggleToRequestTypeNotFound").d("toggle", toggle));
         return;
     }
 
     // toggleStates map is <SELECTED,DESELECTED>
     auto toggleStates = toggleIt->second;
-    std::string localPlayerId;
+
     if (!playerInFocus.empty()) {
-        // adapter handler specific code
-        m_executor.submit([this, action, toggleStates]() {
-            for (auto adapterHandler : m_adapterHandlers) {
+        if (isRegisteredPlayerId(playerInFocus)) {
+            if (auto adapterHandlerInFocus = getAdapterHandlerByPlayerId(playerInFocus)) {
                 if (action) {
-                    adapterHandler->playControl(m_playerInFocus, toggleStates.first);
+                    adapterHandlerInFocus->playControl(playerInFocus, toggleStates.first);
                 }
                 else {
-                    adapterHandler->playControl(m_playerInFocus, toggleStates.second);
+                    adapterHandlerInFocus->playControl(playerInFocus, toggleStates.second);
                 }
             }
-        });
-
-        // commented out below avs-device-sdk 1.19 adapter specific changes. 
-        // TBD: merge adapter/adapterHandler functionality
-
-        // auto lock = std::unique_lock<std::mutex>(m_authorizedMutex);
-        // auto playerIdToLocalPlayerId = m_authorizedAdapters.find(m_playerInFocus);
-
-        // if (m_authorizedAdapters.end() == playerIdToLocalPlayerId) {
-        //     AACE_ERROR(LX(TAG,"onTogglePressedFailed").d("reason", "noMatchingLocalId").d(PLAYER_ID, m_playerInFocus));
-        //     return;
-        // }
-
-        // localPlayerId = playerIdToLocalPlayerId->second;
-
-        // lock.unlock();
-        // auto adapter = getAdapterByLocalPlayerId(localPlayerId);
-
-        // if (!adapter) {
-        //     // Should never reach here as playerInFocus is always set based on a contract with AVS.
-        //     AACE_ERROR(LX(TAG,"AdapterNotFound").d("player", localPlayerId));
-        //     return;
-        // }
-
-        // auto toggleIt = g_toggleToRequestType.find(toggle);
-        // if (g_toggleToRequestType.end() == toggleIt) {
-        //     AACE_ERROR(LX(TAG,"ToggleToRequestTypeNotFound").d("toggle", toggle));
-        //     return;
-        // }
-
-        // // toggleStates map is <SELECTED,DESELECTED>
-        // auto toggleStates = toggleIt->second;
-
-        // if (action) {
-        //     adapter->handlePlayControl(toggleStates.first);
-        // } else {
-        //     adapter->handlePlayControl(toggleStates.second);
-        // }
+            else {
+                AACE_ERROR(LX("onTogglePressedFailed").d("reason", "adapterHandlerInFocusNotFound").d("playerInFocus", playerInFocus));
+            }
+        }
+        else {
+            m_executor.submit([this, playerInFocus, action, toggleStates]() {
+                for (auto adapterHandler : m_adapterHandlers) {
+                    if (action) {
+                        adapterHandler->playControl(playerInFocus, toggleStates.first);
+                    }
+                    else {
+                        adapterHandler->playControl(playerInFocus, toggleStates.second);
+                    }
+                }
+            });
+        }
     }
 }
 
@@ -1822,7 +1811,7 @@ std::string ExternalMediaPlayer::providePlaybackState(std::vector<aace::engine::
         notifyObservers(sessionState.playerId, &update);
     }
 
-    // notifyRenderPlayerInfoCardsObservers();
+    notifyRenderPlayerInfoCardsObservers();
 
     // adapter handlers
     for (auto adapterState : adapterStates) {
@@ -1986,43 +1975,40 @@ void ExternalMediaPlayer::notifyObservers(
 void ExternalMediaPlayer::notifyRenderPlayerInfoCardsObservers() {
     AACE_VERBOSE(LX(TAG));
 
-    for (auto adapterHandler : m_adapterHandlers) {
-        // check against currently known playback state, not already paused
-        auto adapterStates = adapterHandler->getAdapterStates();
-        for (auto adapterState : adapterStates) {
-            if ( adapterState.sessionState.playerId.compare(m_playerInFocus) == 0) { // match playerId
-                std::stringstream ss{adapterState.playbackState.state};
-                alexaClientSDK::avsCommon::avs::PlayerActivity playerActivity = alexaClientSDK::avsCommon::avs::PlayerActivity::IDLE;
-                ss >> playerActivity;
-                AACE_VERBOSE(LX(TAG).d("playerActivity", adapterState.playbackState.state));
-                if (ss.fail()) {
-                    AACE_ERROR(LX(TAG,"notifyRenderPlayerInfoCardsFailed")
-                                    .d("reason", "invalidState")
-                                    .d("state", adapterState.playbackState.state));
-                    return;
-                }
-                RenderPlayerInfoCardsObserverInterface::Context context;
-                context.audioItemId = adapterState.playbackState.trackId;
-                context.offset = getAudioItemOffset();
-                context.mediaProperties = shared_from_this();
-                {
-                    std::lock_guard<std::mutex> lock{m_observersMutex};
-                    if (m_renderPlayerObserver) {
-                        m_renderPlayerObserver->onRenderPlayerCardsInfoChanged(playerActivity, context);
-                    }
-                }
+    std::unique_lock<std::mutex> lock{m_inFocusAdapterMutex};
+    if (m_adapterHandlerInFocus) {
+        bool found = false;
+        aace::engine::alexa::AdapterState adapterState;
+        auto adapterStates = m_adapterHandlerInFocus->getAdapterStates();
+        for (auto state : adapterStates) {
+            if (state.sessionState.playerId == m_playerInFocus) {
+                adapterState = state;
+                found = true;
+                break;
             }
         }
-    }
+        if (!found) {
+            AACE_ERROR(LX(TAG,"notifyRenderPlayerInfoCardsFailed")
+                            .d("reason", "stateNotFound"));
+            return;
+        }
 
-    std::unique_lock<std::mutex> lock{m_inFocusAdapterMutex};
-    if (m_adapterInFocus) {
-        auto adapterState = m_adapterInFocus->getState();
         lock.unlock();
-        std::stringstream ss{adapterState.playbackState.state};
         alexaClientSDK::avsCommon::avs::PlayerActivity playerActivity = alexaClientSDK::avsCommon::avs::PlayerActivity::IDLE;
-        ss >> playerActivity;
-        if (ss.fail()) {
+        std::string str = adapterState.playbackState.state;
+        if ("IDLE" == str) {
+            playerActivity = PlayerActivity::IDLE;
+        } else if ("START_PLAYING" == str || "PLAYING" == str) {
+            playerActivity = PlayerActivity::PLAYING;
+        } else if ("IS_STOPPING" == str || "STOPPED" == str) {
+            playerActivity = PlayerActivity::STOPPED;
+        } else if ("IS_PAUSING" == str || "PAUSED" == str) {
+            playerActivity = PlayerActivity::PAUSED;
+        } else if ("BUFFER_UNDERRUN" == str) {
+            playerActivity = PlayerActivity::BUFFER_UNDERRUN;
+        } else if ("FINISHED" == str) {
+            playerActivity = PlayerActivity::FINISHED;
+        } else {
             AACE_ERROR(LX(TAG,"notifyRenderPlayerInfoCardsFailed")
                             .d("reason", "invalidState")
                             .d("state", adapterState.playbackState.state));

@@ -163,6 +163,20 @@ namespace alexa {
         }
     }
 
+    std::chrono::milliseconds ExternalMediaAdapterHandler::getOffset( const std::string& localPlayerId )
+    {
+        try_with_context
+        {
+            jlong result;
+            ThrowIfNot( m_obj.invoke( "getOffset", "()J", &result ), "invokeMethodFailed" );
+            return std::chrono::milliseconds( result );
+        }
+        catch_with_ex {
+            AACE_JNI_ERROR(TAG,"getOffset",ex.what());
+            return std::chrono::milliseconds::zero();
+        }
+    }
+
     bool ExternalMediaAdapterHandler::getState( const std::string& localPlayerId, ExternalMediaAdapterState& state )
     {
         try_with_context

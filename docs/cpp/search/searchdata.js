@@ -5,10 +5,10 @@ var indexSectionsWithContent =
   2: "a",
   3: "abcdeghilmnoprstvw~",
   4: "acdefilmprstuv",
-  5: "acdeilmnptv",
-  6: "acdeilmnpstv",
+  5: "acdefilmnptv",
+  6: "acdefilmnpstv",
   7: "abcdefghilmnoprstuvwy",
-  8: "a"
+  8: "ad"
 };
 
 var indexSectionNames =

@@ -6,6 +6,11 @@ This guide outlines the changes you will need to make to migrate from Auto SDK v
 
 **Table of Contents**
 
+* [Migrating from Auto SDK v2.2 to v2.2.1](#migrating-from-auto-sdk-v22-to-v221)
+  * [TemplateRuntime Enhancements](#templateruntime-enhancements)
+    * [renderTemplate](#templateruntime-rendertemplate)
+    * [renderPlayerInfo](#templateruntime-renderplayerinfo)
+    * [Sample Apps](#templateruntime-sampleapps)
 * [Migrating from Auto SDK v2.1 to v2.2](#migrating-from-auto-sdk-v21-to-v22)
   * [Implementing the Property Manager Interface](#implementing-the-property-manager-interface)
   * [Car Control Changes](#car-control-changes)
@@ -15,6 +20,65 @@ This guide outlines the changes you will need to make to migrate from Auto SDK v
   * [Navigation Enhancements](#navigation-enhancements)
   * [Car Control Source File Relocation](#car-control-source-file-relocation)
   * [Code-Based Linking (CBL) Handler in Sample Apps](#code-based-linking-cbl-handler-in-the-sample-apps)
+
+## Migrating from Auto SDK v2.2 to v2.2.1 <a id = "migrating-from-auto-sdk-v22-to-v221"></a>
+This section outlines the changes you will need to make to migrate from Auto SDK v2.2 to Auto SDK v2.2.1.
+
+### TemplateRuntime Enhancements <a id = "templateruntime-enhancements"></a>
+Auto SDK v2.2.1 introduces additional TemplateRuntime platform interface features that you can integrate in your application to enrich the user's experience with Now Playing cards for AudioPlayer and ExternalMediaPlayer implementations. [Now Playing cards](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/templateruntime.html#renderplayerinfo) are a form of display cards — visual aids that complement the Alexa voice experience — that contain media metadata, player controls and album art delivered in the TemplateRuntime RenderPlayerInfo directive.
+
+Migration is only required to support the new features, but is highly recommended for the following reasons:
+1. AudioPlayer and TemplateRuntime are now decoupled.
+2. The following TemplateRuntime methods are now deprecated:
+   1. The `renderTemplate( const std::string& payload )` method is deprecated. Use `renderTemplate( const std::string& payload, FocusState focusState )` instead.
+   2. The `renderPlayerInfo( const std::string& payload )` method is deprecated. Use `renderPlayerInfo( const std::string& payload, PlayerActivity audioPlayerState, std::chrono::milliseconds offset, FocusState focusState )` instead.
+
+#### renderTemplate <a id = "templateruntime-rendertemplate"></a>
+
+**Method**
+```
+renderTemplate( const std::string& payload,
+                FocusState focusState )
+```
+The new renderTemplate method provides visual metadata associated with a user request to Alexa. The platform implementation should parse the template metadata and render a display card for the user.
+
+**Parameters**
+- `payload` Renderable template metadata in structured JSON format
+- `focusState` The **FocusState** of the channel used by TemplateRuntime interface
+  - `FOREGROUND` Represents the highest focus a Channel can have
+  - `BACKGROUND` Represents the intermediate level focus a Channel can have
+
+#### renderPlayerInfo <a id = "templateruntime-renderplayerinfo"></a>
+
+**Method**
+```
+renderPlayerInfo( const std::string& payload,
+                  PlayerActivity audioPlayerState,
+                  std::chrono::milliseconds offset,
+                  FocusState focusState )
+```
+
+The new renderPlayerInfo method provides visual metadata associated with a user request to Alexa for audio playback. The platform implementation should parse the player info metadata and render a display card for the user. The `audioPlayerState` and `offset` are useful for implementing the progress bar in the display card. It is assumed that the client is responsible for progressing the progress bar when the `AudioPlayer` is in `PLAYING` state.
+
+**Parameters**
+- `payload` Renderable player info metadata in structured JSON format
+- `audioPlayerState` The state of the `AudioPlayer`
+  - `IDLE` Audio playback has not yet begun
+  - `PLAYING` Audio is currently playing
+  - `STOPPED` Audio playback is stopped, either from a stop directive or playback error
+  - `PAUSED` Audio playback is paused
+  - `BUFFER_UNDERRUN` Audio playback is stalled because a buffer underrun has occurred
+  - `FINISHED` Audio playback is finished
+- `offset` The offset in millisecond of the media that `AudioPlayer` is handling
+- `focusState` The `FocusState` of the channel used by TemplateRuntime interface
+  - `FOREGROUND` Represents the highest focus a Channel can have
+  - `BACKGROUND` Represents the intermediate level focus a Channel can have
+
+#### Sample Apps <a id = "templateruntime-sampleapps"></a>
+
+The Android Sample App demonstrates the new features in `TemplateRuntimeHandler.java` in GUI form. Refer to sample app source code and [Alexa Voice Service documentation](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/templateruntime.html#renderplayerinfo) for specific implementation details.
+
+The C++ Sample App simply demonstrates the new features by printing `audioPlayerState`, `offset`, and `focusState` to the console in the `TemplateRuntimeHandler::renderPlayerInfo()` method of `TemplateRuntimeHandler.cpp`.
 
 ## Migrating from Auto SDK v2.1 to v2.2 <a id = "migrating-from-auto-sdk-v21-to-v22"></a>
 This section outlines the changes you will need to make to migrate from Auto SDK v2.1 to Auto SDK v2.2.

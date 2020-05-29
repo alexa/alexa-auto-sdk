@@ -85,11 +85,13 @@ void ContentView::set(const std::string &string, const Type type) {
             try {
                 auto object = json::parse(string);
                 Ensures(object.is_object());
-                if (object.count("code")) {
-                    stream << "Code: " << object.at("code").get<std::string>() << std::endl;
-                }
-                if (object.count("url")) {
-                    stream << "URL:  " << object.at("url").get<std::string>() << std::endl;
+                if (object.count("code") && object.count("url")) {
+                    auto code = object.at("code").get<std::string>();
+                    auto url = object.at("url").get<std::string>();
+                    stream << "Code: " << code << std::endl;
+                    stream << "URL:  " << url << std::endl;
+                    stream << std::endl;
+                    stream << url << "?cbl-code=" << code << std::endl;
                 }
             } catch (std::exception &e) {
                 stream << "CBLCode parser error" << e.what() << std::endl;

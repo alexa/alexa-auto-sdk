@@ -18,15 +18,19 @@
 namespace aace {
 namespace alexa {
 
-ExternalMediaAdapter::~ExternalMediaAdapter() = default;
-
-//
-// Engine interface methods
-//
+ExternalMediaAdapter::~ExternalMediaAdapter() = default; // key function
 
 bool ExternalMediaAdapter::play( const std::string& localPlayerId, const std::string& playContextToken, int64_t index, std::chrono::milliseconds offset, bool preload, Navigation navigation, const std::string& playbackSessionId, const std::string& skillToken ) {
     return play( localPlayerId, playContextToken, index, offset, preload, navigation );
 }
+
+std::chrono::milliseconds ExternalMediaAdapter::getOffset( const std::string& localPlayerId ) {
+    return std::chrono::milliseconds::zero();
+}
+
+//
+// Engine interface methods
+//
 
 void ExternalMediaAdapter::reportDiscoveredPlayers( const std::vector<DiscoveredPlayerInfo>& discoveredPlayers ) {
     if( auto m_externalMediaAdapterEngineInterface_lock = m_externalMediaAdapterEngineInterface.lock() ) {

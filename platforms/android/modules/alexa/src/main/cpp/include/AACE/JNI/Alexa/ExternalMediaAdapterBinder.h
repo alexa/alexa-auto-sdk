@@ -35,6 +35,7 @@ namespace alexa {
         bool seek( const std::string& localPlayerId, std::chrono::milliseconds offset ) override;
         bool adjustSeek( const std::string & localPlayerId, std::chrono::milliseconds deltaOffset ) override;
         bool authorize( const std::vector<AuthorizedPlayerInfo>& authorizedPlayers ) override;
+        std::chrono::milliseconds getOffset( const std::string& localPlayerId ) override;
         bool getState( const std::string& localPlayerId, ExternalMediaAdapterState& state ) override;
         bool volumeChanged( float volume ) override;
         bool mutedStateChanged( MutedState state ) override;
@@ -110,7 +111,9 @@ namespace alexa {
                 {T::ENABLE_SHUFFLE,"ENABLE_SHUFFLE"},
                 {T::DISABLE_SHUFFLE,"DISABLE_SHUFFLE"},
                 {T::FAVORITE,"FAVORITE"},
-                {T::UNFAVORITE,"UNFAVORITE"}
+                {T::UNFAVORITE,"UNFAVORITE"},
+                // internal
+                {T::PAUSE_RESUME_TOGGLE,"PAUSE_RESUME_TOGGLE"}
             };
         }
     };

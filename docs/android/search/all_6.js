@@ -15,6 +15,7 @@ var searchData=
   ['getnavigationstate',['getNavigationState',['../classcom_1_1amazon_1_1aace_1_1navigation_1_1_navigation.html#ab9c911a083f6b927749106f3e3763dde',1,'com::amazon::aace::navigation::Navigation']]],
   ['getnetworkstatus',['getNetworkStatus',['../classcom_1_1amazon_1_1aace_1_1network_1_1_network_info_provider.html#aa16f831498c598c862c116aec7745a38',1,'com::amazon::aace::network::NetworkInfoProvider']]],
   ['getnumbytesbuffered',['getNumBytesBuffered',['../classcom_1_1amazon_1_1aace_1_1audio_1_1_audio_output.html#a2c5ab7cf1d8a4183a7b58716dccf916b',1,'com::amazon::aace::audio::AudioOutput']]],
+  ['getoffset',['getOffset',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter.html#aa933301d5c170a953adf431c294f603d',1,'com::amazon::aace::alexa::ExternalMediaAdapter']]],
   ['getplayerduration',['getPlayerDuration',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_player.html#a3ddd0246911b32d798dad3dae3e7e64d',1,'com::amazon::aace::alexa::AudioPlayer']]],
   ['getplayerposition',['getPlayerPosition',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_player.html#ac5af34b211180066c0a72d768800dc0d',1,'com::amazon::aace::alexa::AudioPlayer']]],
   ['getposition',['getPosition',['../classcom_1_1amazon_1_1aace_1_1audio_1_1_audio_output.html#affc2aadf7fe81a6a9463152ae51420f8',1,'com::amazon::aace::audio::AudioOutput']]],

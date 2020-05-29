@@ -74,7 +74,7 @@ public class MediaAppsRepository {
     }
 
     void removeMediaApp(String packageName) {
-        Log.i(TAG, "removeMediaApp | " + packageName, new Exception());
+        Log.i(TAG, "removeMediaApp | " + packageName);
         MediaApp app = mDiscoveredMediaApps.get(packageName);
         if (app != null) {
             app.onDestroy();

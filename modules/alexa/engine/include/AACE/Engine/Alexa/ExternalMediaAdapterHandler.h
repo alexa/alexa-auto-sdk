@@ -72,6 +72,7 @@ protected:
     virtual bool handleSeek( const std::string& playerId, std::chrono::milliseconds offset ) = 0;
     virtual bool handleAdjustSeek( const std::string& playerId, std::chrono::milliseconds deltaOffset ) = 0;
     virtual bool handleGetAdapterState( const std::string& playerId, aace::engine::alexa::AdapterState& state ) = 0;
+    virtual std::chrono::milliseconds handleGetOffset( const std::string& playerId ) = 0;
 
     virtual bool handleSetVolume( int8_t volume ) = 0;
     virtual bool handleSetMute( bool mute ) = 0;
@@ -87,7 +88,8 @@ public:
     bool playControl( const std::string& playerId, aace::engine::alexa::RequestType requestType ) override;
     bool seek( const std::string& playerId, std::chrono::milliseconds offset ) override;
     bool adjustSeek( const std::string& playerId, std::chrono::milliseconds deltaOffset ) override;
-    std::vector<AdapterState> getAdapterStates() override;
+    std::vector<AdapterState> getAdapterStates( bool all ) override;
+    std::chrono::milliseconds getOffset( const std::string& playerId ) override;
 
     // alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface
     bool setVolume( int8_t volume ) override;

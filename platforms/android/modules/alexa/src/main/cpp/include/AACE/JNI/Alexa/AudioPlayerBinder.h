@@ -51,10 +51,10 @@ namespace alexa {
     };
 
     //
-    // JPlayerActivity
+    // JAudioPlayerPlayerActivity
     //
 
-    class JPlayerActivityConfig : public EnumConfiguration<AudioPlayerHandler::PlayerActivity> {
+    class JAudioPlayerPlayerActivityConfig : public EnumConfiguration<AudioPlayerHandler::PlayerActivity> {
     public:
         using T = AudioPlayerHandler::PlayerActivity;
 
@@ -74,7 +74,7 @@ namespace alexa {
         }
     };
 
-    using JPlayerActivity = JEnum<AudioPlayerHandler::PlayerActivity,JPlayerActivityConfig>;
+    using JAudioPlayerPlayerActivity = JEnum<AudioPlayerHandler::PlayerActivity,JAudioPlayerPlayerActivityConfig>;
 
 } // aace::alexa
 } // aace::jni

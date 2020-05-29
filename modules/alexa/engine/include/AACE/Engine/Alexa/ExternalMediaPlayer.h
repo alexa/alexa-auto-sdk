@@ -537,6 +537,16 @@ private:
         const std::string& playerId);
 
     /**
+     * Helper method to get an adapter handler by playerId.
+     *
+     * @param playerId The cloud assigned playerId.
+     *
+     * @return An instance of the adapter handler if found, else a nullptr.
+     */
+    std::shared_ptr<ExternalMediaAdapterHandlerInterface> getAdapterHandlerByPlayerId(
+        const std::string& playerId);
+
+    /**
      * Helper method to get an adapter by localPlayerId.
      *
      * @param localPlayerId The local player id associated with a player.
@@ -597,6 +607,10 @@ private:
     /// The adapter with the @c m_playerInFocus which currently has focus.  Access to @c m_adapterInFocus is
     // protected by @c m_inFocusAdapterMutex.
     std::shared_ptr<ExternalMediaAdapterInterface> m_adapterInFocus;
+
+    /// The adapter handler with the @c m_playerInFocus which currently has focus.
+    /// Access to @c m_adapterHandlerInFocus is protected by @c m_inFocusAdapterMutex.
+    std::shared_ptr<ExternalMediaAdapterHandlerInterface> m_adapterHandlerInFocus;
 
     /// Mutex to serialize access to the @c m_playerInFocus.
     std::mutex m_inFocusAdapterMutex;

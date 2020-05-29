@@ -518,21 +518,6 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     Ensures(doNotDisturbHandler != nullptr);
     Ensures(engine->registerPlatformInterface(doNotDisturbHandler));
 
-#ifdef COASSISTANT
-    // CoAssistant
-    auto coAssistantHandler =
-        coassistant::CoAssistantHandler::create(activity, loggerHandler);
-    Ensures(coAssistantHandler != nullptr);
-    if (!engine->registerPlatformInterface(coAssistantHandler)) {
-        loggerHandler->log(Level::INFO, "Application:Engine", "failed to register coassistant handler");
-        console->printLine("Error: could not register coassistant handler (check config)");
-        if (!engine->shutdown()) {
-            console->printLine("Error: could not be shutdown");
-        }
-        return Status::Failure;
-    }
-#endif
-
 #ifdef ALEXACOMMS
     // Communications
     auto communicationHandler =

@@ -286,22 +286,6 @@ void ApplicationContext::setSingleThreadedUI(bool singleThreadedUI) { m_singleTh
 
 void ApplicationContext::setUserConfigFilePath(const std::string &userConfigFilePath) { m_userConfigFilePath = userConfigFilePath; };
 
-#ifdef COASSISTANT
-void ApplicationContext::setDefaultAssistant(const std::string &assistant) { m_defaultAssistant = assistant; }
-
-std::string ApplicationContext::getDefaultAssistant() {
-    transform(m_defaultAssistant.begin(), m_defaultAssistant.end(), m_defaultAssistant.begin(), ::toupper);
-    return m_defaultAssistant;
-}
-
-void ApplicationContext::setActingAssistant(const std::string &assistant) { m_actingAssistant = assistant; }
-
-std::string ApplicationContext::getActingAssistant() {
-    transform(m_actingAssistant.begin(), m_actingAssistant.end(), m_actingAssistant.begin(), ::toupper);
-    return m_actingAssistant;
-}
-#endif
-
 // private
 
 std::string ApplicationContext::getRefreshToken() { return m_refreshToken; }

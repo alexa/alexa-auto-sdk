@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">2.2.0</span>
+   &#160;<span id="projectnumber">2.2.1</span>
    </div>
   </td>
  </tr>
@@ -359,6 +359,9 @@ $(function() {
 <li>createSettingsConfig()
 : <a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a08aee7c879ef040c17d32bd9a781a940">aace::alexa::config::AlexaConfiguration</a>
 </li>
+<li>createSpeakerManagerConfig()
+: <a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a53c25e237c84550bd09d8d46b79a99f3">aace::alexa::config::AlexaConfiguration</a>
+</li>
 <li>createSpeechRecognizerConfig()
 : <a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#aacb872514a75a1fdc3d54d17b64a2ec6">aace::alexa::config::AlexaConfiguration</a>
 </li>
@@ -401,6 +404,9 @@ $(function() {
 </li>
 <li>disableWakewordDetection()
 : <a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#ae8655a4ecaab90892d240d5f21602e86">aace::alexa::SpeechRecognizer</a>
+</li>
+<li>displayCardCleared()
+: <a class="el" href="classaace_1_1alexa_1_1_template_runtime.html#a056c771904624b16bafdd97d97619b80">aace::alexa::TemplateRuntime</a>
 </li>
 <li>doNotDisturbChanged()
 : <a class="el" href="classaace_1_1alexa_1_1_do_not_disturb.html#a5ea5c9f9142db27b3a1c704012294f7b">aace::alexa::DoNotDisturb</a>
@@ -453,6 +459,9 @@ $(function() {
 <li>favorites
 : <a class="el" href="classaace_1_1alexa_1_1_external_media_adapter_1_1_playback_state.html#a4a8a97314926068ffe56d36544c964e0">aace::alexa::ExternalMediaAdapter::PlaybackState</a>
 , <a class="el" href="classaace_1_1alexa_1_1_local_media_source_1_1_playback_state.html#a21f1fe29e355b3df6efe8961cfb2b424">aace::alexa::LocalMediaSource::PlaybackState</a>
+</li>
+<li>FocusState
+: <a class="el" href="classaace_1_1alexa_1_1_template_runtime.html#a5d54a3bd39730d828d4514b550c8d211">aace::alexa::TemplateRuntime</a>
 </li>
 </ul>
 
@@ -699,6 +708,9 @@ $(function() {
 
 
 <h3><a id="index_o"></a>- o -</h3><ul>
+<li>onDisplayCardCleared()
+: <a class="el" href="classaace_1_1alexa_1_1_template_runtime_engine_interface.html#ae996902577687707f57ef00b240752f5">aace::alexa::TemplateRuntimeEngineInterface</a>
+</li>
 <li>onGetPlayerDuration()
 : <a class="el" href="classaace_1_1alexa_1_1_audio_player_engine_interface.html#a380a99414e5f66c1ab1ed771e92a64cd">aace::alexa::AudioPlayerEngineInterface</a>
 </li>
@@ -757,7 +769,7 @@ $(function() {
 : <a class="el" href="classaace_1_1alexa_1_1_local_media_source.html#aea96a47b1442b4c5fa2906b2e0d9a4a9">aace::alexa::LocalMediaSource</a>
 </li>
 <li>PlayerActivity
-: <a class="el" href="classaace_1_1alexa_1_1_audio_player.html#a17204286fb862354d6474a7d7a2fd7ba">aace::alexa::AudioPlayer</a>
+: <a class="el" href="classaace_1_1alexa_1_1_audio_player.html#afb9cdf00184a4e792b2207583145ef34">aace::alexa::AudioPlayer</a>
 </li>
 <li>playerActivityChanged()
 : <a class="el" href="classaace_1_1alexa_1_1_audio_player.html#a13c5a430737a7d55a39525da2a90a7a1">aace::alexa::AudioPlayer</a>
@@ -809,10 +821,10 @@ $(function() {
 : <a class="el" href="classaace_1_1apl_1_1_a_p_l.html#a42ad9effa8cb1ae3ca95fa65c3378993">aace::apl::APL</a>
 </li>
 <li>renderPlayerInfo()
-: <a class="el" href="classaace_1_1alexa_1_1_template_runtime.html#a71852ea84caa81de6cd633006c76ad51">aace::alexa::TemplateRuntime</a>
+: <a class="el" href="classaace_1_1alexa_1_1_template_runtime.html#a1afe1f3ac8d283d81d83cc86c87ae630">aace::alexa::TemplateRuntime</a>
 </li>
 <li>renderTemplate()
-: <a class="el" href="classaace_1_1alexa_1_1_template_runtime.html#a8bac9d4c6a49d5f7e3ae64fbc477b325">aace::alexa::TemplateRuntime</a>
+: <a class="el" href="classaace_1_1alexa_1_1_template_runtime.html#a8641f59365ad4d927674a1893e4bad2a">aace::alexa::TemplateRuntime</a>
 </li>
 <li>repeatEnabled
 : <a class="el" href="classaace_1_1alexa_1_1_external_media_adapter_1_1_playback_state.html#ad18c03b18fc5fd59d4502cb5902841c9">aace::alexa::ExternalMediaAdapter::PlaybackState</a>
@@ -1054,7 +1066,7 @@ $(function() {
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 2.2.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 2.2.1 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

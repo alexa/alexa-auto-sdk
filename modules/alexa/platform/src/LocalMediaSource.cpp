@@ -23,7 +23,7 @@ namespace alexa {
 
 LocalMediaSource::LocalMediaSource( Source source ) : m_source( source ) {}
 
-LocalMediaSource::~LocalMediaSource() = default;
+LocalMediaSource::~LocalMediaSource() = default; // key function
 
 LocalMediaSource::LocalMediaSourceState::LocalMediaSourceState() {}
 

@@ -48,10 +48,6 @@ if(AAC_HOME)
         include(${AAC_HOME}/share/cmake/AACEAmazonLite.cmake)
         add_definitions(-DAMAZONLITE)
     endif()
-    if(COASSISTANT)
-        include(${AAC_HOME}/share/cmake/AACECoAssistant.cmake)
-        add_definitions(-DCOASSISTANT)
-    endif()
     if(LOCALVOICECONTROL)
         include(${AAC_HOME}/share/cmake/AACECarControlLocalService.cmake)
         include(${AAC_HOME}/share/cmake/AACELocalVoiceControl.cmake)
@@ -80,9 +76,6 @@ if(AAC_HOME)
 else()
     if(AMAZONLITE)
         add_definitions(-DAMAZONLITE)
-    endif()
-    if(COASSISTANT)
-        add_definitions(-DCOASSISTANT)
     endif()
     if(LOCALVOICECONTROL)
         add_definitions(-DLOCALVOICECONTROL)
@@ -147,12 +140,6 @@ set(CXX_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Views.h    
 )
 
-if(COASSISTANT)
-    set(CXX_HEADER_FILES ${CXX_HEADER_FILES}
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/CoAssistant/CoAssistantHandler.h
-    )
-endif()
-
 if(ALEXACOMMS)
     set(CXX_HEADER_FILES ${CXX_HEADER_FILES}
         ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Communication/CommunicationHandler.h
@@ -195,12 +182,6 @@ set(CXX_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Views.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
 )
-
-if(COASSISTANT)
-    set(CXX_SOURCE_FILES ${CXX_SOURCE_FILES}
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/CoAssistant/CoAssistantHandler.cpp
-    )
-endif()
 
 if(ALEXACOMMS)
     set(CXX_SOURCE_FILES ${CXX_SOURCE_FILES}
@@ -245,13 +226,6 @@ if(AMAZONLITE)
     target_link_libraries(SampleApp
         # AACEAmazonLitePlatform
         AACEAmazonLiteEngine
-    )
-endif()
-
-if(COASSISTANT)
-    target_link_libraries(SampleApp
-        AACECoAssistantPlatform
-        AACECoAssistantEngine
     )
 endif()
 

@@ -16,7 +16,13 @@
 #ifndef AACE_ALEXA_TEMPLATE_RUNTIME_H
 #define AACE_ALEXA_TEMPLATE_RUNTIME_H
 
-#include "AACE/Core/PlatformInterface.h"
+#include <chrono>
+#include <string>
+
+#include <AACE/Core/PlatformInterface.h>
+#include "AlexaEngineInterfaces.h"
+#include "FocusState.h"
+#include "PlayerActivity.h"
 
 /** @file */
 
@@ -37,7 +43,27 @@ protected:
     TemplateRuntime() = default;
 
 public:
+    /**
+     * Alias the common FocusState and PlayerActivity namespaces.
+     */
+    using FocusState = aace::alexa::FocusState;
+    using PlayerActivity = aace::alexa::PlayerActivity;
+
     virtual ~TemplateRuntime();
+
+    /**
+     * @deprecated
+     * Use @c renderTemplate( const std::string& payload, FocusState focusState ).
+     *
+     * Provides visual metadata associated with a user request to Alexa.
+     * The platform implementation should parse the template metadata and render
+     * a display card for the user.
+     *
+     * For supported templates and rendering guidelines, see https://alexa.design/DevDocRenderTemplate
+     *
+     * @param [in] payload Renderable template metadata in structured JSON format
+     */
+    virtual void renderTemplate( const std::string& payload );
 
     /**
      * Provides visual metadata associated with a user request to Alexa.
@@ -47,16 +73,20 @@ public:
      * For supported templates and rendering guidelines, see https://alexa.design/DevDocRenderTemplate
      *
      * @param [in] payload Renderable template metadata in structured JSON format
+     * @param [in] focusState The @c FocusState of the channel used by TemplateRuntime interface
      */
-    virtual void renderTemplate( const std::string& payload ) = 0;
-    
+    virtual void renderTemplate( const std::string& payload, FocusState focusState );
+
     /**
      * Notifies the platform implementation to dismiss the template display card
      */
     virtual void clearTemplate() = 0;
 
     /**
-     * Provides visual metadata associated with a user request to Alexa for audio playback. 
+     * @deprecated
+     * Use @c renderPlayerInfo( const std::string& payload, PlayerActivity audioPlayerState, std::chrono::milliseconds offset, FocusState focusState ).
+     *
+     * Provides visual metadata associated with a user request to Alexa for audio playback.
      * The platform implementation should parse the player info metadata and render
      * a display card for the user.
      *
@@ -66,12 +96,47 @@ public:
      * @sa PlaybackController
      * @sa AudioPlayer
      */
-    virtual void renderPlayerInfo( const std::string& payload ) = 0;
-    
+    virtual void renderPlayerInfo( const std::string& payload );
+
+    /**
+     * Provides visual metadata associated with a user request to Alexa for audio playback.
+     * The platform implementation should parse the player info metadata and render a display
+     * card for the user. The audioPlayerState and offset are useful for implementing the
+     * progress bar in the display card. It is assumed that the client is responsible
+     * for progressing the progress bar when the @c AudioPlayer is in PLAYING state.
+     *
+     * For rendering guidelines, see https://amzn.to/DevDocTemplatePlayerInfo
+     *
+     * @param [in] payload Renderable player info metadata in structured JSON format
+     * @param [in] audioPlayerState The state of the @c AudioPlayer
+     * @param [in] offset The offset in millisecond of the media that @c AudioPlayer is handling
+     * @param [in] focusState The @c FocusState of the channel used by TemplateRuntime interface
+     * @sa PlaybackController
+     * @sa AudioPlayer
+     */
+    virtual void renderPlayerInfo( const std::string& payload, PlayerActivity audioPlayerState, std::chrono::milliseconds offset, FocusState focusState );
+
     /**
      * Notifies the platform implementation to dismiss the player info display card
      */
     virtual void clearPlayerInfo() = 0;
+
+    /**
+     * Notifies the Engine that a display card has been cleared from the screen. Upon getting
+     * this notification, the @c TemplateRuntime will release the visual channel.
+     */
+    void displayCardCleared();
+
+    /**
+     * @internal
+     * Sets the Engine interface delegate.
+     *
+     * Should *never* be called by the platform implementation.
+     */
+    void setEngineInterface( std::shared_ptr<aace::alexa::TemplateRuntimeEngineInterface> templateRuntimeEngineInterface );
+
+private:
+    std::weak_ptr<aace::alexa::TemplateRuntimeEngineInterface> m_templateRuntimeEngineInterface;
 };
 
 } // aace::alexa

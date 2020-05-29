@@ -134,7 +134,8 @@ public:
     bool playControl( const std::string& playerId, aace::engine::alexa::RequestType requestType ) override;
     bool seek( const std::string& playerId, std::chrono::milliseconds positionMilliseconds ) override;
     bool adjustSeek( const std::string& playerId, std::chrono::milliseconds offsetMilliseconds ) override;
-    std::vector<aace::engine::alexa::AdapterState> getAdapterStates() override;
+    std::vector<aace::engine::alexa::AdapterState> getAdapterStates( bool all ) override;
+    std::chrono::milliseconds getOffset( const std::string& playerId ) override;
     
     // DiscoveredPlayerSenderInterface
     void reportDiscoveredPlayers( const std::vector<aace::alexa::ExternalMediaAdapter::DiscoveredPlayerInfo>& discoveredPlayers ) override;

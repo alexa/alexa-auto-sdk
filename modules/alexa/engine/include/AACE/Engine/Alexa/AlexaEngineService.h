@@ -373,6 +373,7 @@ private:
     std::string m_externalMediaPlayerAgent;
     /// Holds the connection state to AVS before changing the network interface.
     bool m_previousAVSConnectionState = false;
+    bool m_speakerManagerEnabled;
     std::string m_timezone;
 
     // engine implementation object references

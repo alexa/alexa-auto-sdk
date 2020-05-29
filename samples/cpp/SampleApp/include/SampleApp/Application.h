@@ -47,11 +47,6 @@
 // Sample Code-Based Linking (CBL) Interfaces
 #include "SampleApp/CBL/CBLHandler.h"
 
-// Sample CoAssistant Platform Interfaces
-#ifdef COASSISTANT
-#include "SampleApp/CoAssistant/CoAssistantHandler.h"
-#endif // COASSISTANT
-
 // Sample Communications Platform Interfaces
 #ifdef ALEXACOMMS
 #include "SampleApp/Communication/CommunicationHandler.h"

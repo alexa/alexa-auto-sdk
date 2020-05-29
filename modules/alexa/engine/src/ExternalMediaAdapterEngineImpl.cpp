@@ -303,6 +303,19 @@ bool ExternalMediaAdapterEngineImpl::handleGetAdapterState( const std::string& l
     }
 }
 
+std::chrono::milliseconds ExternalMediaAdapterEngineImpl::handleGetOffset( const std::string& localPlayerId )
+{
+    try
+    {
+        // get the external media adapter offset from the platform interface
+        return m_platformMediaAdapter->getOffset( localPlayerId );
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return std::chrono::milliseconds::zero();
+    }
+}
+
 bool ExternalMediaAdapterEngineImpl::handleSetVolume( int8_t volume )
 {
     try

@@ -138,6 +138,7 @@ public class PlaybackControllerHandler extends PlaybackController {
             public void onClick( View v ) {
                 previousButtonPressed();
                 disableButtons();
+                disableProgress();
             }
         });
 
@@ -159,6 +160,7 @@ public class PlaybackControllerHandler extends PlaybackController {
             public void onClick( View v ) {
                 nextButtonPressed();
                 disableButtons();
+                disableProgress();
             }
         });
 
@@ -271,6 +273,7 @@ public class PlaybackControllerHandler extends PlaybackController {
             @Override
             public void run() {
                 enableButtons();
+                enableProgress();
                 mControlPlayPause.setChecked(true);
                 mProgress.setMax( 1000 );
             }
@@ -282,6 +285,7 @@ public class PlaybackControllerHandler extends PlaybackController {
             @Override
             public void run() {
                 enableButtons();
+                enableProgress();
                 mControlPlayPause.setChecked(false);
             }
         });
@@ -400,17 +404,20 @@ public class PlaybackControllerHandler extends PlaybackController {
 
     public void setTime( long position, long duration )
     {
-        if( mCurrentDuration != duration )
-        {
-            mEndTime.setText( stringForTime( duration ) );
-            mCurrentDuration = duration;
-        }
-        else
-        {
-            mProgress.setProgress( (int) (1000L * position / duration) );
-        }
+        mActivity.runOnUiThread( new Runnable() {
+            @Override
+            public void run() {
+                if( mCurrentDuration != duration ) {
+                    mEndTime.setText( stringForTime( duration ) );
+                    mCurrentDuration = duration;
+                }
 
-        mProgressTime.setText( stringForTime( position ) );
+                if( mProgress.isEnabled() ) {
+                    mProgress.setProgress( (duration > 0) ? (int) (1000L * position / duration) : 0 );
+                    mProgressTime.setText( stringForTime( position ) );
+                }
+            }
+        });
     }
 
     private String stringForTime( long timeMs )
@@ -447,6 +454,10 @@ public class PlaybackControllerHandler extends PlaybackController {
         mThumbsDownToggle.setEnabled( true );
     }
 
+    private void enableProgress() {
+        mProgress.setEnabled( true );
+    }
+
     private void disableButtons() {
         mControlPrev.setEnabled( false );
         mControlPlayPause.setEnabled( false );
@@ -460,5 +471,9 @@ public class PlaybackControllerHandler extends PlaybackController {
         mRepeatToggle.setEnabled( false );
         mThumbsUpToggle.setEnabled( false );
         mThumbsDownToggle.setEnabled( false );
+    }
+
+    private void disableProgress() {
+        mProgress.setEnabled( false );
     }
 }

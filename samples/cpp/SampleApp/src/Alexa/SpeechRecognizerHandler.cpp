@@ -15,10 +15,6 @@
 
 #include "SampleApp/Alexa/SpeechRecognizerHandler.h"
 
-#ifdef COASSISTANT
-#include "SampleApp/ApplicationContext.h"
-#endif
-
 // C++ Standard Library
 #include <cstring>
 #include <regex>
@@ -62,9 +58,6 @@ bool SpeechRecognizerHandler::wakewordDetected(const std::string &wakeword) {
     if (!activity) {
         return false;
     }
-#ifdef COASSISTANT
-    activity->getApplicationContext()->setActingAssistant(wakeword);
-#endif
     activity->runOnUIThread([=]() {
         if (auto console = m_console.lock()) {
             console->printLine("Wakeword detected:", wakeword);
@@ -105,20 +98,12 @@ void SpeechRecognizerHandler::setupUI() {
 
     // holdToTalk
     activity->registerObserver(Event::onSpeechRecognizerHoldToTalk, [=](const std::string &) {
-#ifdef COASSISTANT
-        auto applicationContext = activity->getApplicationContext();
-        applicationContext->setActingAssistant(applicationContext->getDefaultAssistant());
-#endif
         log(logger::LoggerHandler::Level::VERBOSE, "onSpeechRecognizerHoldToTalk");
         return holdToTalk();
     });
 
     // tapToTalk
     activity->registerObserver(Event::onSpeechRecognizerTapToTalk, [=](const std::string &value) {
-#ifdef COASSISTANT
-        auto applicationContext = activity->getApplicationContext();
-        applicationContext->setActingAssistant(applicationContext->getDefaultAssistant());
-#endif
         log(logger::LoggerHandler::Level::VERBOSE, "onSpeechRecognizerTapToTalk:" + value);
         return tapToTalk();
     });

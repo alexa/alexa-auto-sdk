@@ -199,6 +199,20 @@ This does not impact the range used in the directives to the device. You must co
 
 The Alexa service keeps track of two device volume types: `ALEXA_VOLUME` and `ALERTS_VOLUME`. The `aace::alexa::AlexaSpeaker` class should be implemented by the platform to both set the volume and mute state of these two speaker types and allow the user to set the volume and mute state of these two speaker types locally via GUI as applicable. 
 
+### SpeakerManager Configuration
+
+`SpeakerManager` is now a configurable option, enabled by default. When not enabled, user requests to change the volume or mute now have an appropriate Alexa response, e.g. "Sorry, I can't control the volume on your device".
+
+You can programmatically generate speaker manager configuration using the `createSpeakerManagerConfig()` factory method, or provide the equivalent JSON values in a configuration file.
+```
+{
+    "aace.alexa": {
+        "speakerManager": {
+            "enabled": false
+        }
+    }
+}
+```
 
 ## Handling Audio Player <a id ="handling-audio-player"></a>
 
@@ -354,11 +368,11 @@ To implement a custom handler for GUI templates, extend the `TemplateRuntime` cl
 #include <AACE/Alexa/TemplateRuntime.h>
 class MyTemplateRuntime : public aace::alexa::TemplateRuntime {
     public:
-        void renderTemplate( const std::string& payload ) override {
+        void renderTemplate( const std::string& payload, FocusState focusState ) override {
         // handle rendering the template data specified in payload
         }
         
-        void renderPlayerInfo( const std::string& payload ) override {
+        void renderPlayerInfo( const std::string& payload, PlayerActivity audioPlayerState, std::chrono::milliseconds offset, FocusState focusState ) override {
         // handle rendering the player info data specified in payload
         }
 };

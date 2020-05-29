@@ -16,9 +16,7 @@
 package com.amazon.maccandroid.model.state;
 
 import android.os.SystemClock;
-import android.provider.MediaStore;
 import android.support.v4.media.MediaMetadataCompat;
-import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 
 import com.amazon.maccandroid.MediaApp;
@@ -42,7 +40,7 @@ public class MediaAppPlaybackState {
     private final PlayBackStateFields.favorite mFavourite;
     private final MediaAppMetaData mMediaAppMetaData;
 
-    public MediaAppPlaybackState(MediaApp app) {
+    public MediaAppPlaybackState(MediaApp app, SupportedOperations supportedOperations) {
         String type = EXTERNAL_MEDIA_PLAYER_TYPE;
 
         if (app.getPlayerPlaybackInfo() == null || app.getPlayerPlaybackInfo().getPlaybackState() == null) {
@@ -59,7 +57,7 @@ public class MediaAppPlaybackState {
 
 
         mPlaybackState = getExternalMediaPlayerState(app.getPlayerPlaybackInfo().getPlaybackState().getState());
-        mSupportedOperations = new SupportedOperations().getSupportedOperations(app);
+        mSupportedOperations = supportedOperations.getSupportedOperations(app);
         mPositionMilliseconds = getPositionMilliseconds(playBackState);
         mShuffleMode = getShuffleEnabled(app.getPlayerPlaybackInfo().getShuffleMode());
         mRepeatMode = getRepeatEnabled(app.getPlayerPlaybackInfo().getRepeatMode());

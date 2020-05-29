@@ -399,7 +399,7 @@ bool ExternalMediaPlayerEngineImpl::adjustSeek( const std::string& playerId, std
     }
 }
 
-std::vector<aace::engine::alexa::AdapterState> ExternalMediaPlayerEngineImpl::getAdapterStates()
+std::vector<aace::engine::alexa::AdapterState> ExternalMediaPlayerEngineImpl::getAdapterStates( bool all )
 {
     try
     {
@@ -410,7 +410,7 @@ std::vector<aace::engine::alexa::AdapterState> ExternalMediaPlayerEngineImpl::ge
         // iterate through the media adapter list and add all of the adapter states
         // for the players that the adapter handles...
         for( auto next : m_externalMediaAdapterList ) {
-            auto adapterStates = next->getAdapterStates();
+            auto adapterStates = next->getAdapterStates( all );
             adapterStateList.insert( adapterStateList.end(), adapterStates.begin(), adapterStates.end() );
         }
         
@@ -419,6 +419,24 @@ std::vector<aace::engine::alexa::AdapterState> ExternalMediaPlayerEngineImpl::ge
     catch( std::exception& ex ) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return std::vector<aace::engine::alexa::AdapterState>();
+    }
+}
+
+std::chrono::milliseconds ExternalMediaPlayerEngineImpl::getOffset( const std::string& playerId ) {
+    try
+    {
+        AACE_VERBOSE(LX(TAG).d("playerId",playerId));
+
+        // get the platform adapter
+        auto adapter = getAdapter( playerId );
+        ThrowIfNull( adapter, "invalidMediaPlayerAdapter" );
+
+        // call the adapter method
+        return adapter->getOffset( playerId );
+    }
+    catch( std::exception& ex ) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("playerId", playerId));
+        return std::chrono::milliseconds::zero();
     }
 }
 

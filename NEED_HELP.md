@@ -20,6 +20,7 @@ When you follow the instructions to [set up your security profile](https://devel
 
 The following additional functionality is available with help from your designated Amazon Solutions Architect (SA) or Partner Manager:
 
+* Address Book contact and navigation favorites uploading
 * Amazon Music and other music service providers
 * Wake Word support
 * Alexa Communication

@@ -3,6 +3,8 @@
 
 The Alexa Auto SDK Address Book module provides the features required by a platform implementation to augment the communications and navigation capabilities of Alexa with user data such as phone contacts and/or navigation favorites ("home", "work", etc.), allowing the user to upload and access phone contacts, or navigation favorites, or both.
 
+> **Note:** In order to use the Address Book contact and navigation favorites uploading functionality, your product must be whitelisted by Amazon. See [Requesting Additional Functionality (whitelisting)](../../NEED_HELP.md#requesting-additional-functionality-whitelisting) for details.
+
 **Table of Contents**
 
 * [Overview](#overview)

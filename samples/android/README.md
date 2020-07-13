@@ -81,7 +81,7 @@ The pre-built platform AARs for the default Auto SDK modules and the core-sample
 The Sample App builder scripts are configured to use JCenter to always pull the latest release artifacts during compilation. To run the builder scripts, issue the following command:
 
 ```
-$ gradle assembleRemoteRelease
+$ ./gradlew assembleRemoteRelease
 ```
 
 Alternatively, you can manually download the platform AARs and core-sample AAR from the [JCenter repo](https://jcenter.bintray.com/com/amazon/alexa/aace/) to
@@ -104,7 +104,7 @@ If you do not use the pre-built platform AARs and core-sample AAR, you must buil
 Once you have generated the platform AARs and the core-sample AAR, issue the following command to run the builder scripts:
 
 ``` 
-$ gradle assembleLocalRelease
+$ ./gradlew assembleLocalRelease
 ```
 Alternatively, you can follow the steps to [configure the project in Android Studio](#configure-the-project-in-android-studio).
 

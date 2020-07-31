@@ -28,21 +28,24 @@ namespace cbl {
  */
 class CBLAuthRequesterInterface {
 public:
-
     using CBLStateChangedReason = aace::cbl::CBL::CBLStateChangedReason;
     using CBLState = aace::cbl::CBL::CBLState;
-    
-    virtual void cblStateChanged( CBLState state, CBLStateChangedReason reason, const std::string& url = "", const std::string& code = "" ) = 0;
+
+    virtual void cblStateChanged(
+        CBLState state,
+        CBLStateChangedReason reason,
+        const std::string& url = "",
+        const std::string& code = "") = 0;
     virtual void clearRefreshToken() = 0;
-    virtual void setRefreshToken( const std::string& refreshToken ) = 0;
+    virtual void setRefreshToken(const std::string& refreshToken) = 0;
     virtual std::string getRefreshToken() = 0;
-    virtual void setUserProfile( const std::string& name, const std::string& email ) = 0;
+    virtual void setUserProfile(const std::string& name, const std::string& email) = 0;
 
     virtual ~CBLAuthRequesterInterface() = default;
 };
 
-} // aace::engine::cbl
-} // aace::engine
-} // aace
+}  // namespace cbl
+}  // namespace engine
+}  // namespace aace
 
 #endif

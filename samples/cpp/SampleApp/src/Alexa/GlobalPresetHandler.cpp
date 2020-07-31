@@ -31,21 +31,25 @@ namespace alexa {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-GlobalPresetHandler::GlobalPresetHandler(std::weak_ptr<Activity> activity,
-                                           std::weak_ptr<logger::LoggerHandler> loggerHandler)
-    : m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
+GlobalPresetHandler::GlobalPresetHandler(
+    std::weak_ptr<Activity> activity,
+    std::weak_ptr<logger::LoggerHandler> loggerHandler) :
+        m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
     setupUI();
 }
 
-std::weak_ptr<Activity> GlobalPresetHandler::getActivity() { return m_activity; }
+std::weak_ptr<Activity> GlobalPresetHandler::getActivity() {
+    return m_activity;
+}
 
-std::weak_ptr<logger::LoggerHandler> GlobalPresetHandler::getLoggerHandler() { return m_loggerHandler; }
+std::weak_ptr<logger::LoggerHandler> GlobalPresetHandler::getLoggerHandler() {
+    return m_loggerHandler;
+}
 
 // aace::alexa::GlobalPreset interface
 
-void GlobalPresetHandler::setGlobalPreset( int preset ) {
-    
-    log( logger::LoggerHandler::Level::INFO, std::to_string( preset ) );
+void GlobalPresetHandler::setGlobalPreset(int preset) {
+    log(logger::LoggerHandler::Level::INFO, std::to_string(preset));
     auto activity = m_activity.lock();
     if (!activity) {
         return;
@@ -53,7 +57,7 @@ void GlobalPresetHandler::setGlobalPreset( int preset ) {
     activity->runOnUIThread([=]() {
         if (auto console = m_console.lock()) {
             console->printRuler();
-            console->printLine("Set global preset: ", std::to_string( preset ) );
+            console->printLine("Set global preset: ", std::to_string(preset));
             console->printRuler();
         }
     });
@@ -61,7 +65,7 @@ void GlobalPresetHandler::setGlobalPreset( int preset ) {
 
 // private
 
-void GlobalPresetHandler::log(logger::LoggerHandler::Level level, const std::string &message) {
+void GlobalPresetHandler::log(logger::LoggerHandler::Level level, const std::string& message) {
     auto loggerHandler = m_loggerHandler.lock();
     if (!loggerHandler) {
         return;
@@ -77,5 +81,5 @@ void GlobalPresetHandler::setupUI() {
     m_console = activity->findViewById("id:console");
 }
 
-} // namespace alexa
-} // namespace sampleApp
+}  // namespace alexa
+}  // namespace sampleApp

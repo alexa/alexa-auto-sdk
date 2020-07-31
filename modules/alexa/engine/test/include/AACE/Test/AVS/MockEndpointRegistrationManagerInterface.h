@@ -18,22 +18,29 @@
 
 #include <AVSCommon/SDKInterfaces/Endpoints/EndpointRegistrationManagerInterface.h>
 
-namespace aace {    
+namespace aace {
 namespace test {
 namespace avs {
 
-class MockEndpointRegistrationManagerInterface : public alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointRegistrationManagerInterface {
+class MockEndpointRegistrationManagerInterface
+        : public alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointRegistrationManagerInterface {
 public:
-    MOCK_METHOD1(registerEndpoint,
-                 std::future<RegistrationResult>(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointInterface> endpoint));
-    MOCK_METHOD1(addObserver,
-                 void(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointRegistrationObserverInterface> observer));
-    MOCK_METHOD1(removeObserver,
-                 void(const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointRegistrationObserverInterface>& observer));
+    MOCK_METHOD1(
+        registerEndpoint,
+        std::future<RegistrationResult>(
+            std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointInterface> endpoint));
+    MOCK_METHOD1(
+        addObserver,
+        void(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointRegistrationObserverInterface>
+                 observer));
+    MOCK_METHOD1(
+        removeObserver,
+        void(const std::shared_ptr<
+             alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointRegistrationObserverInterface>& observer));
 };
 
-} // aace::test::avs
-} // aace::test
-} // aace
+}  // namespace avs
+}  // namespace test
+}  // namespace aace
 
-#endif //AACE_TEST_AVS_MOCK_ENDPOINT_REGISTRATION_MANAGER_INTERFACE_H
+#endif  //AACE_TEST_AVS_MOCK_ENDPOINT_REGISTRATION_MANAGER_INTERFACE_H

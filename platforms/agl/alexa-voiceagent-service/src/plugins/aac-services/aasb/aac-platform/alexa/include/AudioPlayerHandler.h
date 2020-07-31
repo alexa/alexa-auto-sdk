@@ -37,14 +37,12 @@ public:
      *      received from alexa.
      * @param speaker Speaker to control the volume of @c mediaPlayer.
      */
-    static std::shared_ptr<AudioPlayerHandler> create(
-        std::shared_ptr<aasb::core::logger::LoggerHandler> logger);
+    static std::shared_ptr<AudioPlayerHandler> create(std::shared_ptr<aasb::core::logger::LoggerHandler> logger);
 
     void onReceivedEvent(const std::string& action, const std::string& payload);
 
 private:
-    AudioPlayerHandler(
-        std::shared_ptr<aasb::core::logger::LoggerHandler> logger);
+    AudioPlayerHandler(std::shared_ptr<aasb::core::logger::LoggerHandler> logger);
 
     std::shared_ptr<aasb::core::logger::LoggerHandler> m_logger;
 };

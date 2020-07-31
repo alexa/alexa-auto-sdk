@@ -5,7 +5,7 @@ if(EXTERNALMEDIAPLAYER_1_1)
 endif()
 
 # Find AVS
-find_package(AVS 1.17)
+find_package(AVS 1.19)
 
 add_definitions(-DRAPIDJSON_HAS_STDSTRING)
 

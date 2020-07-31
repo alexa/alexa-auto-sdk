@@ -18,13 +18,21 @@
 namespace aace {
 namespace alexa {
 
-ExternalMediaAdapter::~ExternalMediaAdapter() = default; // key function
+ExternalMediaAdapter::~ExternalMediaAdapter() = default;  // key function
 
-bool ExternalMediaAdapter::play( const std::string& localPlayerId, const std::string& playContextToken, int64_t index, std::chrono::milliseconds offset, bool preload, Navigation navigation, const std::string& playbackSessionId, const std::string& skillToken ) {
-    return play( localPlayerId, playContextToken, index, offset, preload, navigation );
+bool ExternalMediaAdapter::play(
+    const std::string& localPlayerId,
+    const std::string& playContextToken,
+    int64_t index,
+    std::chrono::milliseconds offset,
+    bool preload,
+    Navigation navigation,
+    const std::string& playbackSessionId,
+    const std::string& skillToken) {
+    return play(localPlayerId, playContextToken, index, offset, preload, navigation);
 }
 
-std::chrono::milliseconds ExternalMediaAdapter::getOffset( const std::string& localPlayerId ) {
+std::chrono::milliseconds ExternalMediaAdapter::getOffset(const std::string& localPlayerId) {
     return std::chrono::milliseconds::zero();
 }
 
@@ -32,57 +40,63 @@ std::chrono::milliseconds ExternalMediaAdapter::getOffset( const std::string& lo
 // Engine interface methods
 //
 
-void ExternalMediaAdapter::reportDiscoveredPlayers( const std::vector<DiscoveredPlayerInfo>& discoveredPlayers ) {
-    if( auto m_externalMediaAdapterEngineInterface_lock = m_externalMediaAdapterEngineInterface.lock() ) {
-        m_externalMediaAdapterEngineInterface_lock->onReportDiscoveredPlayers( discoveredPlayers );
+void ExternalMediaAdapter::reportDiscoveredPlayers(const std::vector<DiscoveredPlayerInfo>& discoveredPlayers) {
+    if (auto m_externalMediaAdapterEngineInterface_lock = m_externalMediaAdapterEngineInterface.lock()) {
+        m_externalMediaAdapterEngineInterface_lock->onReportDiscoveredPlayers(discoveredPlayers);
     }
 }
 
-void ExternalMediaAdapter::requestToken( const std::string& localPlayerId ) {
-    if( auto m_externalMediaAdapterEngineInterface_lock = m_externalMediaAdapterEngineInterface.lock() ) {
-        m_externalMediaAdapterEngineInterface_lock->onRequestToken( localPlayerId );
+void ExternalMediaAdapter::requestToken(const std::string& localPlayerId) {
+    if (auto m_externalMediaAdapterEngineInterface_lock = m_externalMediaAdapterEngineInterface.lock()) {
+        m_externalMediaAdapterEngineInterface_lock->onRequestToken(localPlayerId);
     }
 }
 
-void ExternalMediaAdapter::loginComplete( const std::string& localPlayerId ) {
-    if( auto m_externalMediaAdapterEngineInterface_lock = m_externalMediaAdapterEngineInterface.lock() ) {
-        m_externalMediaAdapterEngineInterface_lock->onLoginComplete( localPlayerId );
+void ExternalMediaAdapter::loginComplete(const std::string& localPlayerId) {
+    if (auto m_externalMediaAdapterEngineInterface_lock = m_externalMediaAdapterEngineInterface.lock()) {
+        m_externalMediaAdapterEngineInterface_lock->onLoginComplete(localPlayerId);
     }
 }
 
-void ExternalMediaAdapter::logoutComplete( const std::string& localPlayerId ) {
-    if( auto m_externalMediaAdapterEngineInterface_lock = m_externalMediaAdapterEngineInterface.lock() ) {
-        m_externalMediaAdapterEngineInterface_lock->onLogoutComplete( localPlayerId );
+void ExternalMediaAdapter::logoutComplete(const std::string& localPlayerId) {
+    if (auto m_externalMediaAdapterEngineInterface_lock = m_externalMediaAdapterEngineInterface.lock()) {
+        m_externalMediaAdapterEngineInterface_lock->onLogoutComplete(localPlayerId);
     }
 }
 
-void ExternalMediaAdapter::playerEvent( const std::string& localPlayerId, const std::string& eventName ) {
-    if( auto m_externalMediaAdapterEngineInterface_lock = m_externalMediaAdapterEngineInterface.lock() ) {
-        m_externalMediaAdapterEngineInterface_lock->onPlayerEvent( localPlayerId, eventName );
+void ExternalMediaAdapter::playerEvent(const std::string& localPlayerId, const std::string& eventName) {
+    if (auto m_externalMediaAdapterEngineInterface_lock = m_externalMediaAdapterEngineInterface.lock()) {
+        m_externalMediaAdapterEngineInterface_lock->onPlayerEvent(localPlayerId, eventName);
     }
 }
 
-void ExternalMediaAdapter::playerError( const std::string& localPlayerId, const std::string& errorName, long code, const std::string& description, bool fatal ) {
-    if( auto m_externalMediaAdapterEngineInterface_lock = m_externalMediaAdapterEngineInterface.lock() ) {
-        m_externalMediaAdapterEngineInterface_lock->onPlayerError( localPlayerId, errorName, code, description, fatal );
+void ExternalMediaAdapter::playerError(
+    const std::string& localPlayerId,
+    const std::string& errorName,
+    long code,
+    const std::string& description,
+    bool fatal) {
+    if (auto m_externalMediaAdapterEngineInterface_lock = m_externalMediaAdapterEngineInterface.lock()) {
+        m_externalMediaAdapterEngineInterface_lock->onPlayerError(localPlayerId, errorName, code, description, fatal);
     }
 }
 
-void ExternalMediaAdapter::setFocus( const std::string& localPlayerId ) {
-    if( auto m_externalMediaAdapterEngineInterface_lock = m_externalMediaAdapterEngineInterface.lock() ) {
-        m_externalMediaAdapterEngineInterface_lock->onSetFocus( localPlayerId );
+void ExternalMediaAdapter::setFocus(const std::string& localPlayerId) {
+    if (auto m_externalMediaAdapterEngineInterface_lock = m_externalMediaAdapterEngineInterface.lock()) {
+        m_externalMediaAdapterEngineInterface_lock->onSetFocus(localPlayerId);
     }
 }
 
-void ExternalMediaAdapter::removeDiscoveredPlayer( const std::string& localPlayerId ) {
-    if( auto m_externalMediaAdapterEngineInterface_lock = m_externalMediaAdapterEngineInterface.lock() ) {
-        m_externalMediaAdapterEngineInterface_lock->onRemoveDiscoveredPlayer( localPlayerId );
+void ExternalMediaAdapter::removeDiscoveredPlayer(const std::string& localPlayerId) {
+    if (auto m_externalMediaAdapterEngineInterface_lock = m_externalMediaAdapterEngineInterface.lock()) {
+        m_externalMediaAdapterEngineInterface_lock->onRemoveDiscoveredPlayer(localPlayerId);
     }
 }
 
-void ExternalMediaAdapter::setEngineInterface( std::shared_ptr<aace::alexa::ExternalMediaAdapterEngineInterface> externalMediaAdapterEngineInterface ) {
+void ExternalMediaAdapter::setEngineInterface(
+    std::shared_ptr<aace::alexa::ExternalMediaAdapterEngineInterface> externalMediaAdapterEngineInterface) {
     m_externalMediaAdapterEngineInterface = externalMediaAdapterEngineInterface;
 }
 
-} // aace::alexa
-} // aac
+}  // namespace alexa
+}  // namespace aace

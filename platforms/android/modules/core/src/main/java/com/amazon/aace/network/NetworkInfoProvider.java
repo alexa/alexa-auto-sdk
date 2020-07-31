@@ -20,13 +20,11 @@ import com.amazon.aace.core.*;
 /**
  * NetworkInfoProvider should be extended to report network connectivity events to the Engine.
  */
-abstract public class NetworkInfoProvider extends PlatformInterface
-{
+abstract public class NetworkInfoProvider extends PlatformInterface {
     /**
      * Describes the status of network connectivity
      */
-    public enum NetworkStatus
-    {
+    public enum NetworkStatus {
         /**
          * The network is unknown.
          * @hideinitializer
@@ -61,7 +59,7 @@ abstract public class NetworkInfoProvider extends PlatformInterface
         /**
          * @internal
          */
-        private NetworkStatus( String name ) {
+        private NetworkStatus(String name) {
             m_name = name;
         }
 
@@ -73,8 +71,7 @@ abstract public class NetworkInfoProvider extends PlatformInterface
         }
     }
 
-    public NetworkInfoProvider() {
-    }
+    public NetworkInfoProvider() {}
 
     /**
      * Returns the current network connectivity status on the platform
@@ -101,8 +98,8 @@ abstract public class NetworkInfoProvider extends PlatformInterface
      *
      * @param  wifiSignalStrength The RSSI of the WiFi connection
      */
-    public void networkStatusChanged( NetworkStatus status, int wifiSignalStrength ) {
-        networkStatusChanged( getNativeRef(), status, wifiSignalStrength );
+    public void networkStatusChanged(NetworkStatus status, int wifiSignalStrength) {
+        networkStatusChanged(getNativeRef(), status, wifiSignalStrength);
     }
 
     // NativeRef implementation
@@ -110,14 +107,14 @@ abstract public class NetworkInfoProvider extends PlatformInterface
         return createBinder();
     }
 
-    final protected void disposeNativeRef( long nativeRef ) {
-        disposeBinder( nativeRef );
+    final protected void disposeNativeRef(long nativeRef) {
+        disposeBinder(nativeRef);
     }
 
     // Native Engine JNI methods
     private native long createBinder();
-    private native void disposeBinder( long nativeRef );
-    private native void networkStatusChanged( long nativeRef, NetworkStatus status, int wifiSignalStrength );
+    private native void disposeBinder(long nativeRef);
+    private native void networkStatusChanged(long nativeRef, NetworkStatus status, int wifiSignalStrength);
 }
 
 // END OF FILE

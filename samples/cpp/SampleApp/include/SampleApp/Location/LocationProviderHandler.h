@@ -31,15 +31,16 @@ namespace location {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class LocationProviderHandler : public aace::location::LocationProvider /* isa PlatformInterface */ {
-  private:
+private:
     std::weak_ptr<Activity> m_activity{};
     std::weak_ptr<logger::LoggerHandler> m_loggerHandler{};
 
-  protected:
+protected:
     LocationProviderHandler(std::weak_ptr<Activity> activity, std::weak_ptr<logger::LoggerHandler> loggerHandler);
 
-  public:
-    template <typename... Args> static auto create(Args &&... args) -> std::shared_ptr<LocationProviderHandler> {
+public:
+    template <typename... Args>
+    static auto create(Args&&... args) -> std::shared_ptr<LocationProviderHandler> {
         return std::shared_ptr<LocationProviderHandler>(new LocationProviderHandler(args...));
     }
     auto getActivity() -> std::weak_ptr<Activity>;
@@ -49,14 +50,14 @@ class LocationProviderHandler : public aace::location::LocationProvider /* isa P
 
     auto getLocation() -> aace::location::Location override;
 
-  private:
+private:
     std::weak_ptr<View> m_console{};
 
-    auto log(logger::LoggerHandler::Level level, const std::string &message) -> void;
+    auto log(logger::LoggerHandler::Level level, const std::string& message) -> void;
     auto setupUI() -> void;
 };
 
-} // namespace location
-} // namespace sampleApp
+}  // namespace location
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_LOCATION_LOCATIONPROVIDERHANDLER_H
+#endif  // SAMPLEAPP_LOCATION_LOCATIONPROVIDERHANDLER_H

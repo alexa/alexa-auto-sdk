@@ -23,31 +23,31 @@ namespace aace {
 namespace jni {
 namespace alexa {
 
-    class GlobalPresetHandler : public aace::alexa::GlobalPreset {
-    public:
-        GlobalPresetHandler( jobject obj );
+class GlobalPresetHandler : public aace::alexa::GlobalPreset {
+public:
+    GlobalPresetHandler(jobject obj);
 
-        // aace::alexa::GlobalPreset
-        void setGlobalPreset( int preset ) override;
+    // aace::alexa::GlobalPreset
+    void setGlobalPreset(int preset) override;
 
-    private:
-        JObject m_obj;
-    };
+private:
+    JObject m_obj;
+};
 
-    class GlobalPresetBinder : public aace::jni::core::PlatformInterfaceBinder {
-    public:
-        GlobalPresetBinder( jobject obj );
+class GlobalPresetBinder : public aace::jni::core::PlatformInterfaceBinder {
+public:
+    GlobalPresetBinder(jobject obj);
 
-        std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
-            return m_globalPresetHandler;
-        }
+    std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
+        return m_globalPresetHandler;
+    }
 
-        private:
-        std::shared_ptr<GlobalPresetHandler> m_globalPresetHandler;
-    };
+private:
+    std::shared_ptr<GlobalPresetHandler> m_globalPresetHandler;
+};
 
-} // aace::alexa
-} // aace::jni
-} // aace
+}  // namespace alexa
+}  // namespace jni
+}  // namespace aace
 
-#endif //AACE_JNI_ALEXA_GLOBAL_PRESET_BINDER_H
+#endif  //AACE_JNI_ALEXA_GLOBAL_PRESET_BINDER_H

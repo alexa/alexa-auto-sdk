@@ -6,19 +6,18 @@ package com.amazon.maccandroid.model;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 
-
 /**
  * Class representing the playback state ({@link PlaybackStateCompat}, {@link MediaMetadataCompat},
  * etc) of a player.
  */
 public class PlayerPlaybackInfo {
-
     private PlaybackStateCompat mPlaybackState;
     private MediaMetadataCompat mMetadata;
     int mRepeatMode;
     int mShuffleMode;
 
-    public PlayerPlaybackInfo(PlaybackStateCompat playbackState, MediaMetadataCompat metadata, int repeatMode, int shuffleMode) {
+    public PlayerPlaybackInfo(
+            PlaybackStateCompat playbackState, MediaMetadataCompat metadata, int repeatMode, int shuffleMode) {
         mPlaybackState = playbackState;
         mMetadata = metadata;
         mRepeatMode = repeatMode;

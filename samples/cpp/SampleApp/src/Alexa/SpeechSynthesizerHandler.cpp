@@ -28,21 +28,26 @@ namespace alexa {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-SpeechSynthesizerHandler::SpeechSynthesizerHandler(std::weak_ptr<Activity> activity,
-                                                   std::weak_ptr<logger::LoggerHandler> loggerHandler)
-    : m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
+SpeechSynthesizerHandler::SpeechSynthesizerHandler(
+    std::weak_ptr<Activity> activity,
+    std::weak_ptr<logger::LoggerHandler> loggerHandler) :
+        m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
     // Expects((m_activity != nullptr) && (m_loggerHandler != nullptr));
     // Expects((mediaPlayer != nullptr) && (speaker != nullptr));
     setupUI();
 }
 
-std::weak_ptr<Activity> SpeechSynthesizerHandler::getActivity() { return m_activity; }
+std::weak_ptr<Activity> SpeechSynthesizerHandler::getActivity() {
+    return m_activity;
+}
 
-std::weak_ptr<logger::LoggerHandler> SpeechSynthesizerHandler::getLoggerHandler() { return m_loggerHandler; }
+std::weak_ptr<logger::LoggerHandler> SpeechSynthesizerHandler::getLoggerHandler() {
+    return m_loggerHandler;
+}
 
 // private
 
-void SpeechSynthesizerHandler::log(logger::LoggerHandler::Level level, const std::string &message) {
+void SpeechSynthesizerHandler::log(logger::LoggerHandler::Level level, const std::string& message) {
     auto loggerHandler = m_loggerHandler.lock();
     if (!loggerHandler) {
         return;
@@ -57,5 +62,5 @@ void SpeechSynthesizerHandler::setupUI() {
     }
 }
 
-} // namespace alexa
-} // namespace sampleApp
+}  // namespace alexa
+}  // namespace sampleApp

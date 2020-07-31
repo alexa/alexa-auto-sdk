@@ -16,7 +16,6 @@
 package com.amazon.maccandroid.model;
 
 public class PlayBackStateFields {
-
     public enum State {
         IDLE,
         PLAYING,
@@ -25,24 +24,27 @@ public class PlayBackStateFields {
         FINISHED,
         FAST_FORWARDING,
         REWINDING,
-        BUFFER_UNDERRUN,;
+        BUFFER_UNDERRUN,
+        ;
     }
 
     public enum shuffle {
         SHUFFLED,
-        NOT_SHUFFLED,;
+        NOT_SHUFFLED,
+        ;
     }
 
     public enum repeat {
         REPEATED,
         ONE_REPEATED,
-        NOT_REPEATED,;
+        NOT_REPEATED,
+        ;
     }
 
     public enum favorite {
         NOT_RATED,
         FAVORITED,
-        UNFAVORITED,;
+        UNFAVORITED,
+        ;
     }
-
 }

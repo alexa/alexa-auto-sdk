@@ -25,13 +25,15 @@ namespace alexa {
 
 class MockAlerts : public aace::alexa::Alerts {
 public:
-    MOCK_METHOD3( alertStateChanged, void(const std::string& alertToken,aace::alexa::Alerts::AlertState state, const std::string& reason) );
-    MOCK_METHOD2( alertCreated, void(const std::string& alertToken, const std::string& detailedInfo) );
-    MOCK_METHOD1( alertDeleted, void(const std::string& alertToken) );
+    MOCK_METHOD3(
+        alertStateChanged,
+        void(const std::string& alertToken, aace::alexa::Alerts::AlertState state, const std::string& reason));
+    MOCK_METHOD2(alertCreated, void(const std::string& alertToken, const std::string& detailedInfo));
+    MOCK_METHOD1(alertDeleted, void(const std::string& alertToken));
 };
 
-} // aace::test::alexa
-} // aace::test
-} // aace
+}  // namespace alexa
+}  // namespace test
+}  // namespace aace
 
-#endif // AACE_TEST_ALEXA_MOCK_ALERTS_H
+#endif  // AACE_TEST_ALEXA_MOCK_ALERTS_H

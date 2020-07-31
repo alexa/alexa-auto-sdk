@@ -33,16 +33,16 @@ protected:
 
 public:
     virtual ~GlobalPreset();
-    
+
     /**
      * Called after receiving a global preset play directive
      *
      * @param [in] The preset integer from the playbackContextToken
      */
-    virtual void setGlobalPreset( int preset ) = 0;
+    virtual void setGlobalPreset(int preset) = 0;
 };
-    
-} // aace::alexa
-} // aace
 
-#endif // AACE_ALEXA_GLOBAL_PRESET_H
+}  // namespace alexa
+}  // namespace aace
+
+#endif  // AACE_ALEXA_GLOBAL_PRESET_H

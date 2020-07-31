@@ -25,28 +25,37 @@
 #include <ringbuf.h>
 
 typedef struct {
-	COMMON_CONTEXT;
+    COMMON_CONTEXT;
 
-	snd_pcm_t *pcm_handle;
-	int32_t channel;
-	int32_t buffer_size;
-	pthread_t thread;
-	pthread_mutex_t lock;
-	bool stop_requested;
-	bool eos;
-	ringbuf_t write_buffer;
-	snd_pcm_channel_status_t status;
-	int base_sched_priority;
+    snd_pcm_t* pcm_handle;
+    snd_mixer_t* mixer_handle;
+    snd_mixer_group_t mixer_group;
+    double saved_volume;
+    int32_t channel;
+    int32_t buffer_size;
+    pthread_t thread;
+    pthread_mutex_t lock;
+    bool stop_requested;
+    bool eos;
+    ringbuf_t write_buffer;
+    snd_pcm_channel_status_t status;
+    int base_sched_priority;
 
-	aal_audio_parameters_t audio_params; // actual audio parameters applied
+    aal_audio_parameters_t audio_params;  // actual audio parameters applied
 } aal_qsa_context_t;
 
-#define bail_if_error(X) { if ((X) < 0) goto bail; }
-#define bail_if_null(X) { if ((X) == NULL) goto bail; }
+#define bail_if_error(X)        \
+    {                           \
+        if ((X) < 0) goto bail; \
+    }
+#define bail_if_null(X)             \
+    {                               \
+        if ((X) == NULL) goto bail; \
+    }
 
-aal_handle_t qsa_create_context(int32_t channel, const aal_attributes_t *attrs, aal_audio_parameters_t *params);
+aal_handle_t qsa_create_context(int32_t channel, const aal_attributes_t* attrs, aal_audio_parameters_t* params);
 void qsa_play(aal_handle_t handle);
 void qsa_stop(aal_handle_t handle);
 void qsa_destroy(aal_handle_t handle);
 
-#endif // __AAL_QSA_CORE_H_
+#endif  // __AAL_QSA_CORE_H_

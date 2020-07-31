@@ -34,49 +34,45 @@ import java.util.concurrent.Executors;
 // AutoVoiceChrome imports
 
 public class SpeechRecognizerHandler extends SpeechRecognizer {
-
     private static final String TAG = SpeechRecognizerHandler.class.getSimpleName();
 
     private final Activity mActivity;
     private final LoggerHandler mLogger;
     private AudioCueObservable mAudioCueObservable = new AudioCueObservable();
-    private final ExecutorService mExecutor = Executors.newFixedThreadPool( 1 );
+    private final ExecutorService mExecutor = Executors.newFixedThreadPool(1);
     private boolean mWakeWordEnabled;
     private boolean mAllowStopCapture = false; // Only true if holdToTalk() returned true
     private final View mToggleItem;
     private final View mMessage;
     private final TextView mLocaleMessage;
-    private PropertyManagerHandler  mPropertyManager;
+    private PropertyManagerHandler mPropertyManager;
     // AutoVoiceChrome controller
 
-    public SpeechRecognizerHandler( Activity activity,
-                                    LoggerHandler logger,
-                                    PropertyManagerHandler propertyManager,
-                                    boolean wakeWordEnabled ) {
-        super( wakeWordEnabled );
+    public SpeechRecognizerHandler(
+            Activity activity, LoggerHandler logger, PropertyManagerHandler propertyManager, boolean wakeWordEnabled) {
+        super(wakeWordEnabled);
         mActivity = activity;
         mLogger = logger;
         mWakeWordEnabled = wakeWordEnabled;
 
         // Toggle Wake Word switch
-        mToggleItem = mActivity.findViewById( R.id.toggleWakeWord );
-        ( ( TextView ) mToggleItem.findViewById( R.id.text ) ).setText( R.string.wake_word_enabled );
+        mToggleItem = mActivity.findViewById(R.id.toggleWakeWord);
+        ((TextView) mToggleItem.findViewById(R.id.text)).setText(R.string.wake_word_enabled);
 
         // Wake Word not supported message
-        mMessage = mActivity.findViewById( R.id.wakeWordNotSupportedMessage );
+        mMessage = mActivity.findViewById(R.id.wakeWordNotSupportedMessage);
 
         // Wakeword locale switching Message
-        mLocaleMessage = mActivity.findViewById( R.id.wakeWordLocaleChangeMessage );
+        mLocaleMessage = mActivity.findViewById(R.id.wakeWordLocaleChangeMessage);
 
         mPropertyManager = propertyManager;
-
 
         disableWakeWordUI();
     }
 
     @Override
-    public boolean wakewordDetected( String wakeWord ) {
-        mAudioCueObservable.playAudioCue( AudioCueState.START_VOICE );
+    public boolean wakewordDetected(String wakeWord) {
+        mAudioCueObservable.playAudioCue(AudioCueState.START_VOICE);
 
         // Notify Error state to AutoVoiceChrome if disconnected with Alexa
 
@@ -85,69 +81,70 @@ public class SpeechRecognizerHandler extends SpeechRecognizer {
 
     @Override
     public void endOfSpeechDetected() {
-        mAudioCueObservable.playAudioCue( AudioCueState.END );
+        mAudioCueObservable.playAudioCue(AudioCueState.END);
     }
 
     public void onTapToTalk() {
-        if ( tapToTalk() ) mAudioCueObservable.playAudioCue( AudioCueState.START_TOUCH );
+        if (tapToTalk())
+            mAudioCueObservable.playAudioCue(AudioCueState.START_TOUCH);
     }
 
     public void onHoldToTalk() {
         mAllowStopCapture = false;
-        if ( holdToTalk() ) {
+        if (holdToTalk()) {
             mAllowStopCapture = true;
-            mAudioCueObservable.playAudioCue( AudioCueState.START_TOUCH );
+            mAudioCueObservable.playAudioCue(AudioCueState.START_TOUCH);
         }
     }
 
     public void onReleaseHoldToTalk() {
-        if ( mAllowStopCapture ) stopCapture();
+        if (mAllowStopCapture)
+            stopCapture();
         mAllowStopCapture = false;
     }
 
     private void disableWakeWordUI() {
-        mToggleItem.setVisibility( View.GONE );
-        mMessage.setVisibility( View.VISIBLE );
-        mLocaleMessage.setVisibility( View.GONE );
+        mToggleItem.setVisibility(View.GONE);
+        mMessage.setVisibility(View.VISIBLE);
+        mLocaleMessage.setVisibility(View.GONE);
     }
 
     public void enableWakeWordUI() {
         // Show toggle Wake Word option only if Wake Word supported
-        final SwitchCompat wakeWordSwitch = mToggleItem.findViewById( R.id.drawerSwitch );
-        mToggleItem.setVisibility( View.VISIBLE );
-        mMessage.setVisibility( View.GONE );
-        wakeWordSwitch.setChecked( mWakeWordEnabled );
-        mLocaleMessage.setVisibility( View.VISIBLE );
+        final SwitchCompat wakeWordSwitch = mToggleItem.findViewById(R.id.drawerSwitch);
+        mToggleItem.setVisibility(View.VISIBLE);
+        mMessage.setVisibility(View.GONE);
+        wakeWordSwitch.setChecked(mWakeWordEnabled);
+        mLocaleMessage.setVisibility(View.VISIBLE);
 
-        wakeWordSwitch.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener
-                () {
+        wakeWordSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged( CompoundButton buttonView, boolean isChecked ) {
-                if ( isChecked ) {
-                    mLogger.postInfo( TAG, "Enabling Wake Word" );
-                    mExecutor.submit( new Runnable() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    mLogger.postInfo(TAG, "Enabling Wake Word");
+                    mExecutor.submit(new Runnable() {
                         @Override
                         public void run() {
                             mPropertyManager.setProperty(AlexaProperties.WAKEWORD_ENABLED, "true");
                         }
-                    } );
+                    });
 
-                    mLocaleMessage.setVisibility( View.VISIBLE );
+                    mLocaleMessage.setVisibility(View.VISIBLE);
                 } else {
-                    mLogger.postInfo( TAG, "Disabling Wake Word" );
-                    mExecutor.submit( new Runnable() {
+                    mLogger.postInfo(TAG, "Disabling Wake Word");
+                    mExecutor.submit(new Runnable() {
                         @Override
                         public void run() {
                             mPropertyManager.setProperty(AlexaProperties.WAKEWORD_ENABLED, "false");
                         }
-                    } );
-                    mLocaleMessage.setVisibility( View.GONE );
+                    });
+                    mLocaleMessage.setVisibility(View.GONE);
                 }
                 // Notify wake word changes to AutoVoiceChrome
 
                 mWakeWordEnabled = isChecked;
             }
-        } );
+        });
     }
 
     /* For playing speech recognition audio cues */
@@ -155,16 +152,16 @@ public class SpeechRecognizerHandler extends SpeechRecognizer {
     public enum AudioCueState { START_TOUCH, START_VOICE, END }
 
     public static class AudioCueObservable extends Observable {
-
-        void playAudioCue( AudioCueState state ) {
+        void playAudioCue(AudioCueState state) {
             setChanged();
-            notifyObservers( state );
+            notifyObservers(state);
         }
     }
 
-    public void addObserver( Observer observer ) {
-        if ( mAudioCueObservable == null ) mAudioCueObservable = new AudioCueObservable();
-        mAudioCueObservable.addObserver( observer );
+    public void addObserver(Observer observer) {
+        if (mAudioCueObservable == null)
+            mAudioCueObservable = new AudioCueObservable();
+        mAudioCueObservable.addObserver(observer);
     }
 
     // AutoVoiceChrome related functions

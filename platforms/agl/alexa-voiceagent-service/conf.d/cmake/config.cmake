@@ -25,6 +25,7 @@ set(PROJECT_AUTHOR "Amazon.com")
 set(PROJECT_AUTHOR_MAIL "")
 set(PROJECT_LICENSE "APL2.0")
 set(PROJECT_LANGUAGES "CXX")
+set(PROJECT_URL "https://github.com/alexa/alexa-auto-sdk")
 
 # Where are stored the project configuration files
 # relative to the root project directory

@@ -30,26 +30,30 @@ std::unordered_map<std::string, BoolController> CarControlDataProvider::m_boolCo
 std::unordered_map<std::string, ModeController> CarControlDataProvider::m_modeControllers;
 std::unordered_map<std::string, RangeController> CarControlDataProvider::m_rangeControllers;
 
-BoolController& CarControlDataProvider::getBoolController(const std::string& controlId, const std::string& controllerId) {
+BoolController& CarControlDataProvider::getBoolController(
+    const std::string& controlId,
+    const std::string& controllerId) {
     return m_boolControllers[genKey(controlId, controllerId)];
-} 
-
-ModeController& CarControlDataProvider::getModeController(const std::string& controlId, const std::string& controllerId) {
-    return m_modeControllers[genKey(controlId, controllerId)];
-
 }
-    
-RangeController& CarControlDataProvider::getRangeController(const std::string& controlId, const std::string& controllerId) {
+
+ModeController& CarControlDataProvider::getModeController(
+    const std::string& controlId,
+    const std::string& controllerId) {
+    return m_modeControllers[genKey(controlId, controllerId)];
+}
+
+RangeController& CarControlDataProvider::getRangeController(
+    const std::string& controlId,
+    const std::string& controllerId) {
     return m_rangeControllers[genKey(controlId, controllerId)];
 }
 
 void CarControlDataProvider::initialize(std::vector<std::shared_ptr<aace::core::config::EngineConfiguration>> configs) {
-
     json carControl;
 
-    // See if a car control configuration is specified that will overrride 
+    // See if a car control configuration is specified that will overrride
     // the generated one
-    for(auto config: configs) {
+    for (auto config : configs) {
         auto configStream = config->getStream();
         try {
             json j = json::parse(*configStream);
@@ -57,10 +61,10 @@ void CarControlDataProvider::initialize(std::vector<std::shared_ptr<aace::core::
             if (j.find("aace.carControl") != j.end()) {
                 carControl = j["aace.carControl"];
             }
-        } catch (json::exception &e) {
+        } catch (json::exception& e) {
         }
 
-        // Always reset the config otherwise the Auto SDK Engine will not find it 
+        // Always reset the config otherwise the Auto SDK Engine will not find it
         configStream->clear();
         configStream->seekg(0);
 
@@ -69,17 +73,16 @@ void CarControlDataProvider::initialize(std::vector<std::shared_ptr<aace::core::
             break;
         }
     }
-    
+
     // Build client configuration from configuration file
     try {
-
         if (carControl.empty()) {
             return;
         }
 
         json endpoints = carControl["endpoints"];
 
-        for (auto& endpoint: endpoints) {
+        for (auto& endpoint : endpoints) {
             if (!endpoint.empty()) {
                 std::string endpointId = endpoint["endpointId"];
                 json capabilities = endpoint["capabilities"];
@@ -93,14 +96,13 @@ void CarControlDataProvider::initialize(std::vector<std::shared_ptr<aace::core::
                                 json supportedModes = configuration["supportedModes"];
                                 if (!supportedModes.empty()) {
                                     ModeController modeController;
-                                    for (auto& mode: supportedModes) {
+                                    for (auto& mode : supportedModes) {
                                         modeController.addMode(mode["value"]);
                                     }
                                     m_modeControllers[genKey(endpointId, controllerId)] = modeController;
                                 }
                             }
-                        } else
-                        if (controller == "Alexa.RangeController") {
+                        } else if (controller == "Alexa.RangeController") {
                             std::string controllerId = capability["instance"];
                             json configuration = capability["configuration"];
                             if (!configuration.empty()) {
@@ -111,12 +113,10 @@ void CarControlDataProvider::initialize(std::vector<std::shared_ptr<aace::core::
                                     m_rangeControllers[genKey(endpointId, controllerId)] = RangeController(min, max);
                                 }
                             }
-                        } else
-                        if (controller == "Alexa.ToggleController") {
+                        } else if (controller == "Alexa.ToggleController") {
                             std::string controllerId = capability["instance"];
                             m_boolControllers[genKey(endpointId, controllerId)] = BoolController();
-                        } else
-                        if (controller == "Alexa.PowerController") {
+                        } else if (controller == "Alexa.PowerController") {
                             m_boolControllers[genKey(endpointId)] = BoolController();
                         }
                     }
@@ -128,222 +128,410 @@ void CarControlDataProvider::initialize(std::vector<std::shared_ptr<aace::core::
 }
 
 std::string CarControlDataProvider::genKey(std::string endpointId, std::string controllerId) {
-    return  endpointId + "#" + controllerId;
+    return endpointId + "#" + controllerId;
 }
 
 // Build an example car control configuration for the Auto SDK Engine
+// See modules/car-control/assets/assets-1P.json for all the friendly names for each asset
 std::shared_ptr<aace::core::config::EngineConfiguration> CarControlDataProvider::generateCarControlConfig() {
-
-    // Define common values for speed RangeControllers
-    int SPEED_MIN = 1, SPEED_MEDIUM=5, SPEED_MAX = 10, SPEED_PRECISION = 1;
-    // Define common values for temperature RangeControllers
-    int TEMPERATURE_MIN = 60, TEMPERATURE_MEDIUM=76, TEMPERATURE_MAX = 90, TEMPERATURE_PRECISION = 2;
-
     auto config = CarControlConfiguration::create();
 
-    // Create the example endpoint configuration without using zones, which work 
-    // only in hybrid mode with Local Voice Control.  Use generic assets for 
-    // friendly names and synonyms.
-    // See modules/car-control/assets/assets-1P.json for reference
+    // clang-format off
 
+    //--------------------------------------------------------------------------
+    // Important note: See the car control module README at
+    // modules/car-control/README.md for the suggested modeling of endpoints.
+    // The sample configuration in the README document is the source of truth
+    // for configuring features supported for car control rather than what is
+    // shown below.
+    //--------------------------------------------------------------------------
     config
         //---------------------------------------------------------------------
-        // Create a "fan" endpoint, and add a "speed" RangeController using
-        // SPEED_MIN, SPEED_MAX, and SPEED_PRECISION constants. Add some named
-        // presets to set the fan speed to preset values. Note that preset
-        // values must be exact increments of the SPEED_PRECISION, otherwise 
-        // it will not work. Lastly, add a PowerController for the fan.
+        // Define the zones of the vehicle.
+        // Ensure the endpoint IDs added to the zones are also defined.
+        //---------------------------------------------------------------------
+        ->createZone("zone.all")
+            .addAssetId(alexa::location::ALL)
+            .addMembers({
+                "all.fan",
+                "all.heater",
+                "ac",
+                "vent",
+                "ambient.light",
+                "reading.light"})
+        .createZone("zone.rear")
+            .addAssetId(alexa::location::REAR)
+            .addMembers({"rear.windshield"})
+        .createZone("zone.front")
+            .addAssetId(alexa::location::FRONT)
+            .addMembers({
+                "front.light",
+                "driver.seat",
+                "passenger.seat"})
+        .createZone("zone.driver")
+            .addAssetId(alexa::location::DRIVER)
+            .addAssetId(alexa::location::LEFT)
+            .addMembers({
+                "driver.fan",
+                "driver.heater",
+                "driver.seat",
+                "driver.light",
+                "driver.window"})
+        .createZone("zone.passenger")
+            .addAssetId(alexa::location::PASSENGER)
+            .addAssetId(alexa::location::RIGHT)
+            .addMembers({
+                "passenger.fan",
+                "passenger.heater",
+                "passenger.seat",
+                "passenger.light"})
+        .createZone("zone.secondRow")
+            .addAssetId(alexa::location::SECOND_ROW)
+            .addMembers({"secondRow.heater", "secondRow.light"})
+
+        // Since "zone.all" is set to default, utterances matching endpoints in 
+        // this zone take precedence
+        .setDefaultZone("zone.all")
+
+        //---------------------------------------------------------------------
+        // Create "fan" endpoints for various zones.
         //
         // Things to try:
-        //    Alexa, turn on the fan 
-        //    Alexa, turn the fan off
-        //    Alexa, set the fan to low|minimum|medium|high|max
-        //    Alexa, set the fan to < value between SPEED_MIN and SPEED_MAX > 
-        //    Alexa, turn up the blower
-        //    Alexa, increase|decrease fan speed by three
-        //---------------------------------------------------------------------
-        ->createControl("all.fan", zone::ALL)
+        //    "Alexa, turn [on|off] the fan"
+        //    "Alexa, turn [on|off] the [driver|passenger] fan"
+        //    "Alexa, set the fan speed to [low|minimum|medium|high|max]"
+        //    "Alexa, set the fan to <value between 1 and 10>"
+        //    "Alexa, turn up the blower"
+        //    "Alexa, [increase|decrease] the fan speed by 3"
+        //---------------------------------------------------------------------  
+        .createEndpoint("all.fan")
             .addAssetId(alexa::device::FAN)
             .addPowerController(false)
-            .addRangeController("speed", false, SPEED_MIN, SPEED_MAX, SPEED_PRECISION)
+            .addRangeController("speed", false, 1, 10, 1)
                 .addAssetId(alexa::setting::FAN_SPEED)
-                .addPreset(SPEED_MIN)
+                .addPreset(1)
                     .addAssetId(alexa::value::LOW)
                     .addAssetId(alexa::value::MINIMUM)
-                .addPreset(SPEED_MEDIUM)
+                .addPreset(5)
                     .addAssetId(alexa::value::MEDIUM)
-                .addPreset(SPEED_MAX)
+                .addPreset(10)
+                    .addAssetId(alexa::value::HIGH)
+                    .addAssetId(alexa::value::MAXIMUM)
+        .createEndpoint("driver.fan")
+            .addAssetId(alexa::device::FAN)
+            .addPowerController(false)
+            .addRangeController("speed", false, 1, 10, 1)
+                .addAssetId(alexa::setting::FAN_SPEED)
+                .addPreset(1)
+                    .addAssetId(alexa::value::LOW)
+                    .addAssetId(alexa::value::MINIMUM)
+                .addPreset(5)
+                    .addAssetId(alexa::value::MEDIUM)
+                .addPreset(10)
+                    .addAssetId(alexa::value::HIGH)
+                    .addAssetId(alexa::value::MAXIMUM)
+        .createEndpoint("passenger.fan")
+            .addAssetId(alexa::device::FAN)
+            .addPowerController(false)
+            .addRangeController("speed", false, 1, 10, 1)
+                .addAssetId(alexa::setting::FAN_SPEED)
+                .addPreset(1)
+                    .addAssetId(alexa::value::LOW)
+                    .addAssetId(alexa::value::MINIMUM)
+                .addPreset(5)
+                    .addAssetId(alexa::value::MEDIUM)
+                .addPreset(10)
                     .addAssetId(alexa::value::HIGH)
                     .addAssetId(alexa::value::MAXIMUM)
         //---------------------------------------------------------------------
-        // Create a "heater" endpoint. Add a "temperature" RangeController using
-        // the TEMPERATURE_MIN, TEMPERATURE_MAX and TEMPERATURE_PRECISION constants. 
-        // Add presets to set the temperature to preset values. Note that preset
-        // values must be exact increments of the TEMPERATURE_PRECISION, otherwise
-        // it will not work. Lastly, add a PowerController.
+        // Create a "heater" endpoint for various zones. 
         //
         // Things to try:
-        //    Alexa, turn on the heater 
-        //    Alexa, turn the heater off
-        //    Alexa, set the temperature to low|minimum|medium|high|max
-        //    Alexa, set the temperature to < value between TEMPERATURE_MIN and TEMPERATURE_MAX > 
-        //    Alexa, increase/decrease the temperature 
-        //    Alexa, increase the temperature by four
+        //    "Alexa, turn [on|off] the heater"
+        //    "Alexa, turn [on|off] the [driver|passenger|second row] heater"
+        //    "Alexa, set the temperature to [low|minimum|medium|high|max]"
+        //    "Alexa, set the temperature to <value between 60 and 90>"
+        //    "Alexa, [increase/decrease] the temperature"
+        //    "Alexa, increase the temperature by 4"
         //---------------------------------------------------------------------
-        .createControl("all.heater", zone::ALL)
+        .createEndpoint("all.heater")
             .addAssetId(alexa::device::HEATER)
             .addAssetId(alexa::device::COOLER)
             .addPowerController(false)
-            .addRangeController("temperature", false, TEMPERATURE_MIN, TEMPERATURE_MAX, TEMPERATURE_PRECISION, alexa::unit::FAHRENHEIT)
+            .addRangeController(
+                "temperature", false, 60, 90, 1, alexa::unit::FAHRENHEIT)
                 .addAssetId(alexa::setting::TEMPERATURE)
                 .addAssetId(alexa::setting::HEAT)
-                .addPreset(TEMPERATURE_MIN)
+                .addPreset(60)
                     .addAssetId(alexa::value::LOW)
                     .addAssetId(alexa::value::MINIMUM)
-                .addPreset(TEMPERATURE_MEDIUM)
+                .addPreset(75)
                     .addAssetId(alexa::value::MEDIUM)
-                .addPreset(TEMPERATURE_MAX)
+                .addPreset(90)
+                    .addAssetId(alexa::value::HIGH)
+                    .addAssetId(alexa::value::MAXIMUM)
+        .createEndpoint("driver.heater")
+            .addAssetId(alexa::device::HEATER)
+            .addAssetId(alexa::device::COOLER)
+            .addPowerController(false)
+            .addRangeController("temperature", false, 60, 90, 1)
+                .addAssetId(alexa::setting::TEMPERATURE)
+                .addAssetId(alexa::setting::HEAT)
+                .addPreset(60)
+                    .addAssetId(alexa::value::LOW)
+                    .addAssetId(alexa::value::MINIMUM)
+                .addPreset(75)
+                    .addAssetId(alexa::value::MEDIUM)
+                .addPreset(90)
+                    .addAssetId(alexa::value::HIGH)
+                    .addAssetId(alexa::value::MAXIMUM)
+        .createEndpoint("passenger.heater")
+            .addAssetId(alexa::device::HEATER)
+            .addAssetId(alexa::device::COOLER)
+            .addPowerController(false)
+            .addRangeController("temperature", false, 60, 90, 1)
+                .addAssetId(alexa::setting::TEMPERATURE)
+                .addAssetId(alexa::setting::HEAT)
+                .addPreset(60)
+                    .addAssetId(alexa::value::LOW)
+                    .addAssetId(alexa::value::MINIMUM)
+                .addPreset(75)
+                    .addAssetId(alexa::value::MEDIUM)
+                .addPreset(90)
+                    .addAssetId(alexa::value::HIGH)
+                    .addAssetId(alexa::value::MAXIMUM)
+        .createEndpoint("secondRow.heater")
+            .addAssetId(alexa::device::HEATER)
+            .addAssetId(alexa::device::COOLER)
+            .addPowerController(false)
+            .addRangeController(
+                "temperature", false, 60, 90, 1, alexa::unit::FAHRENHEIT)
+                .addAssetId(alexa::setting::TEMPERATURE)
+                .addAssetId(alexa::setting::HEAT)
+                .addPreset(60)
+                    .addAssetId(alexa::value::LOW)
+                    .addAssetId(alexa::value::MINIMUM)
+                .addPreset(75)
+                    .addAssetId(alexa::value::MEDIUM)
+                .addPreset(90)
                     .addAssetId(alexa::value::HIGH)
                     .addAssetId(alexa::value::MAXIMUM)
         //---------------------------------------------------------------------
-        // Create a generic "light" endpoint. Add a PowerController for it. 
+        // Create a "window" endpoint for the driver zone. 
+        // This endpoint includes a semantic action mapping for more natural 
+        // voice targeting.
         //
         // Things to try:
-        //    Alexa, turn on the light 
-        //    Alexa, turn off the light 
+        //    Without semantic action mappings...
+        //      "Alexa, set the driver window height to [low|medium|high]""
+        //    With semantic action mappings...
+        //      "Alexa, [open|close|raise|lower] the driver window"
         //---------------------------------------------------------------------
-        .createControl("all.light", zone::ALL)
+        .createEndpoint("driver.window")
+            .addAssetId(alexa::device::WINDOW)
+            .addRangeController("height", false, 0, 100, 1)
+                .addAssetId(alexa::setting::HEIGHT)
+                .addPreset(0)
+                    .addAssetId(alexa::value::LOW)
+                    .addAssetId(alexa::value::MINIMUM)
+                .addPreset(50)
+                    .addAssetId(alexa::value::MEDIUM)
+                .addPreset(100)
+                    .addAssetId(alexa::value::HIGH)
+                    .addAssetId(alexa::value::MAXIMUM)
+                .addActionSetRange({aace::carControl::config::action::OPEN}, 0)
+                .addActionSetRange({aace::carControl::config::action::CLOSE}, 100)
+                .addActionAdjustRange({aace::carControl::config::action::RAISE}, 10)
+                .addActionAdjustRange({aace::carControl::config::action::LOWER}, -10) 
+        //---------------------------------------------------------------------
+        // Create generic "light" endpoints for various zones.
+        //
+        // Things to try:
+        //    "Alexa, turn [on|off] the [driver|passenger|front|second row] light"
+        //---------------------------------------------------------------------
+        .createEndpoint("driver.light")
+            .addAssetId(alexa::device::LIGHT)
+            .addPowerController(false)
+        .createEndpoint("passenger.light")
+            .addAssetId(alexa::device::LIGHT)
+            .addPowerController(false)
+        .createEndpoint("front.light")
+            .addAssetId(alexa::device::LIGHT)
+            .addPowerController(false)
+        .createEndpoint("secondRow.light")
             .addAssetId(alexa::device::LIGHT)
             .addPowerController(false)
         //---------------------------------------------------------------------
-        // Create an "air conditioner" endpoint. Add a PowerController 
-        // and a ModeController, and define mode values.  Make the "intensity"
-        // ModeController ordered to enable AdjustMode utterances like "Turn up
-        // the A/C".
+        // Create various additional endpoints for specialized "lights"
         //
         // Things to try:
-        //    Alexa, turn on the air conditioner 
-        //    Alexa, turn the air conditioner off
-        //    Alexa, turn off the AC 
-        //    Alexa, set the air conditioner to economy/auto/manual
-        //    Alexa, set the air conditioner to low/medium/high
-        //    Alexa, increase/decrease the air conditioner 
+        //    "Alexa, turn [on|off] the light"
+        //    "Alexa, turn [on|off] the [dome|cabin|reading] light"
+        //    "Alexa, set the ambient light to blue"
         //---------------------------------------------------------------------
-        .createControl("ac", zone::ALL)
-            .addAssetId(alexa::device::AIR_CONDITIONER)
-            .addModeController("mode", false, false)
-                .addAssetId(alexa::setting::MODE)
-                .addValue(mode::ECONOMY)
-                    .addAssetId(alexa::setting::ECONOMY)
-                .addValue(mode::AUTO)
-                    .addAssetId(alexa::setting::AUTO)
-                .addValue(mode::MANUAL)
-                    .addAssetId(alexa::setting::MANUAL)
-            .addModeController("intensity", false, true)
-                .addAssetId(alexa::setting::INTENSITY)
-                .addValue(intensity::LOW)
-                    .addAssetId(alexa::value::LOW)
-                    .addAssetId(alexa::value::MINIMUM)
-                .addValue(intensity::MEDIUM)
-                    .addAssetId(alexa::value::MEDIUM)
-                .addValue(intensity::HIGH)
-                    .addAssetId(alexa::value::HIGH)
-                    .addAssetId(alexa::value::MAXIMUM)
-            .addPowerController(false)
-        //---------------------------------------------------------------------
-        // Create a "windshield" endpoint. Add a controller for a defroster. A
-        // PowerController would be global to the windshield itself,
-        // which could have other controllers (wipers, for example), so a 
-        // ToggleController is best here.
-        //
-        // Things to try:
-        //    Alexa, turn on the defroster 
-        //    Alexa, turn the defroster off
-        //---------------------------------------------------------------------
-        .createControl("all.windshield", zone::ALL)
-            .addAssetId(alexa::device::WINDSHIELD)
-            .addAssetId(alexa::device::WINDOW)
-            .addToggleController("defroster", false)
-                .addAssetId(alexa::setting::DEFROST)
-                .addAssetId(alexa::setting::DEFOG)
-        //---------------------------------------------------------------------
-        // Model the interior lighting by adding endpoints for the various 
-        // controllable lights in the car. Add PowerControllers to each, and a
-        // ModeController to change the color of the ambient lighting.
-        //
-        // Things to try:
-        //    Alexa, turn on the light
-        //    Alexa, turn off the light
-        //    Alexa, set ambient light to red 
-        //---------------------------------------------------------------------
-        .createControl("dome.light", zone::ALL)
+        .createEndpoint("dome.light")
             .addAssetId(alexa::device::DOME_LIGHT)
             .addAssetId(alexa::device::CABIN_LIGHT)
             .addPowerController(false)
-        .createControl("reading.light", zone::ALL)
+        .createEndpoint("reading.light")
             .addAssetId(alexa::device::READING_LIGHT)
             .addPowerController(false)
-        .createControl("ambient.light", zone::ALL)
+        .createEndpoint("ambient.light")
             .addAssetId(alexa::device::AMBIENT_LIGHT)
             .addPowerController(false)
             .addModeController("color", false, true)
                 .addAssetId(alexa::setting::COLOR)
-                .addValue(color::RED)
+                .addAssetId(alexa::setting::MODE)
+                .addValue("RED")
                     .addAssetId(alexa::color::RED)
-                .addValue(color::BLUE)
+                .addValue("BLUE")
                     .addAssetId(alexa::color::BLUE)
-                .addValue(color::GREEN)
+                .addValue("GREEN")
                     .addAssetId(alexa::color::GREEN)
-                .addValue(color::WHITE)
+                .addValue("WHITE")
                     .addAssetId(alexa::color::WHITE)
-                .addValue(color::ORANGE)
+                .addValue("ORANGE")
                     .addAssetId(alexa::color::ORANGE)
-                .addValue(color::YELLOW)
+                .addValue("YELLOW")
                     .addAssetId(alexa::color::YELLOW)
-                .addValue(color::INDIGO)
+                .addValue("INDIGO")
                     .addAssetId(alexa::color::INDIGO)
-                .addValue(color::VIOLET)
+                .addValue("VIOLET")
                     .addAssetId(alexa::color::VIOLET)
         //---------------------------------------------------------------------
-        // Create a "vent" endpoint. Add a PowerController. Add a ModeController 
-        // to change the vent positions and values for the modes. 
+        // Create an "air conditioner" endpoint.
         //
         // Things to try:
-        //    Alexa, turn on the vent
-        //    Alexa, turn off the vent
-        //    Alexa, set the vent to floor|body|mix
+        //    "Alexa, turn [on|off] the [air conditioner|AC]"
+        //    "Alexa, set the AC mode to [economy|auto|manual]"
+        //    "Alexa, set the AC intensity to [min|low|medium|high|max]"
+        //    "Alexa, [increase|decrease] the AC"
+        //    "Alexa, [raise|lower]" the AC
         //---------------------------------------------------------------------
-        .createControl("vent", zone::ALL)
-            .addAssetId(alexa::device::VENT)
+        .createEndpoint("ac")
+            .addAssetId(alexa::device::AIR_CONDITIONER)
             .addPowerController(false)
+            .addModeController("mode", false, false)
+                .addAssetId(alexa::setting::MODE)
+                .addValue("ECONOMY")
+                    .addAssetId(alexa::setting::ECONOMY)
+                .addValue("AUTO")
+                    .addAssetId(alexa::setting::AUTO)
+                .addValue("MANUAL")
+                    .addAssetId(alexa::setting::MANUAL)
+            .addModeController("intensity", false, true)
+                .addAssetId(alexa::setting::INTENSITY)
+                .addValue("LOW")
+                    .addAssetId(alexa::value::LOW)
+                    .addAssetId(alexa::value::MINIMUM)
+                .addValue("MEDIUM")
+                    .addAssetId(alexa::value::MEDIUM)
+                .addValue("HIGH")
+                    .addAssetId(alexa::value::HIGH)
+                    .addAssetId(alexa::value::MAXIMUM)
+                .addActionAdjustMode({aace::carControl::config::action::RAISE}, 1)
+                .addActionAdjustMode({aace::carControl::config::action::LOWER}, -1)
+        //---------------------------------------------------------------------
+        // Create a "windshield" endpoint for the rear zone.
+        //
+        // Things to try:
+        //    "Alexa, turn [on|off] the rear windshield defroster"
+        //---------------------------------------------------------------------
+        .createEndpoint("rear.windshield")
+            .addAssetId(alexa::device::WINDSHIELD)
+            .addAssetId(alexa::device::WINDOW)
+            .addToggleController("defroster", false)
+                .addAssetId(alexa::setting::DEFROST)
+        //---------------------------------------------------------------------
+        // Create a "vent" endpoint. 
+        // This endpoint includes a semantic action mapping for more natural 
+        // voice targeting.
+        //
+        // Things to try:
+        //    "Alexa, turn [on|off] the vent"
+        //    "Alexa, set the vent position to [floor|body|mix]"
+        //    "Alexa, [open|close|raise|lower] the vent"
+        //---------------------------------------------------------------------
+        .createEndpoint("vent")
+            .addAssetId(alexa::device::VENT)
+            .addPowerController(true)
             .addModeController("position", false, true)
                 .addAssetId(alexa::setting::POSITION)
-                .addValue(ventPosition::BODY)
+                .addValue("BODY")
                     .addAssetId(alexa::setting::BODY_VENTS)
-                .addValue(ventPosition::FLOOR)
+                .addValue("FLOOR")
                     .addAssetId(alexa::setting::FLOOR_VENTS)
-                .addValue(ventPosition::WINDSHIELD)
+                .addValue("WINDSHIELD")
                     .addAssetId(alexa::setting::WINDSHIELD_VENTS)
-                .addValue(ventPosition::MIX)
+                .addValue("MIX")
                     .addAssetId(alexa::setting::MIX_VENTS)
+            .addToggleController("height", false)
+                .addAssetId(alexa::setting::POSITION)
+                .addActionTurnOn({aace::carControl::config::action::OPEN, 
+                    aace::carControl::config::action::RAISE})
+                .addActionTurnOff({aace::carControl::config::action::CLOSE, 
+                    aace::carControl::config::action::LOWER})
         //---------------------------------------------------------------------
-        // Create a generic "car" endpoint for miscellaneous controls not 
-        // associated with any other endpoint. For example, add ToggleControllers
-        // for air recirculation and climate control sync.
+        // Create "seat heater" endpoints for driver and passenger zones.
         //
         // Things to try:
-        //    Alexa, turn on|off recirculation 
-        //    Alexa, turn on|off climate control sync 
+        //    "Alexa, turn [on|off] the [driver|passenger] seat heater"
+        //    "Alexa, set the [driver|passenger] seat heater intensity to 
+        //          [low|minimum|medium|high|max]"
+        //    "Alexa, set the [driver|passenger] seat heater to 
+        //          <value between 1 and 3>"
+        //    "Alexa, [turn up|increase|decrease] the [driver|passenger] seat 
+        //          heater"
+        //---------------------------------------------------------------------  
+        .createEndpoint("driver.seat")
+            .addAssetId(alexa::device::SEAT)
+            .addToggleController("heater", false)
+                .addAssetId(alexa::device::HEATER)
+                .addAssetId(alexa::setting::HEAT)
+            .addRangeController("heaterintensity", false, 1, 3, 1)
+                .addAssetId(alexa::device::HEATER)
+                .addAssetId(alexa::setting::HEAT)
+                .addPreset(1)
+                    .addAssetId(alexa::value::LOW)
+                    .addAssetId(alexa::value::MINIMUM)
+                .addPreset(2)
+                    .addAssetId(alexa::value::MEDIUM)
+                .addPreset(3)
+                    .addAssetId(alexa::value::HIGH)
+                    .addAssetId(alexa::value::MAXIMUM)
+        .createEndpoint("passenger.seat")
+            .addAssetId(alexa::device::SEAT)
+            .addToggleController("heater", false)
+                .addAssetId(alexa::device::HEATER)
+                .addAssetId(alexa::setting::HEAT)
+            .addRangeController("heaterintensity", false, 1, 3, 1)
+                .addAssetId(alexa::device::HEATER)
+                .addAssetId(alexa::setting::HEAT)
+                .addPreset(1)
+                    .addAssetId(alexa::value::LOW)
+                    .addAssetId(alexa::value::MINIMUM)
+                .addPreset(2)
+                    .addAssetId(alexa::value::MEDIUM)
+                .addPreset(3)
+                    .addAssetId(alexa::value::HIGH)
+                    .addAssetId(alexa::value::MAXIMUM)
         //---------------------------------------------------------------------
-        .createControl("car", zone::ALL)
+        // Create a "car" root endpoint for miscellaneous controls not
+        // associated with any other endpoint.
+        //
+        // Things to try:
+        //    "Alexa, turn [on|off] air recirculation"
+        //    "Alexa, turn [on|off] climate sync"
+        //---------------------------------------------------------------------
+        .createEndpoint("car")
             .addAssetId(alexa::device::CAR)
             .addToggleController("recirculate", false)
                 .addAssetId(alexa::setting::AIR_RECIRCULATION)
             .addToggleController("climate.sync", false)
                 .addAssetId(alexa::setting::CLIMATE_SYNC);
-
+    // clang-format on
     return config;
 }
 
-} // sampleApp::carControl 
-} // sampleApp
+}  // namespace carControl
+}  // namespace sampleApp

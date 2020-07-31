@@ -35,15 +35,14 @@ namespace aace {
 namespace engine {
 namespace cbl {
 
-class CBLEngineImpl :
-    public alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface,
-    public CBLAuthRequesterInterface,
-    public aace::cbl::CBLEngineInterface,
-    public alexaClientSDK::avsCommon::utils::RequiresShutdown,
-    public std::enable_shared_from_this<CBLEngineImpl> {
-    
+class CBLEngineImpl
+        : public alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface
+        , public CBLAuthRequesterInterface
+        , public aace::cbl::CBLEngineInterface
+        , public alexaClientSDK::avsCommon::utils::RequiresShutdown
+        , public std::enable_shared_from_this<CBLEngineImpl> {
 private:
-    CBLEngineImpl( std::shared_ptr<aace::cbl::CBL> cblPlatformInterface );
+    CBLEngineImpl(std::shared_ptr<aace::cbl::CBL> cblPlatformInterface);
 
     bool initialize(
         std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> customerDataManager,
@@ -51,7 +50,7 @@ private:
         std::chrono::seconds codePairRequestTimeout,
         std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
         std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> localeAssetManager,
-        bool enableUserProfile );
+        bool enableUserProfile);
 
 public:
     static std::shared_ptr<CBLEngineImpl> create(
@@ -61,23 +60,29 @@ public:
         std::chrono::seconds codePairRequestTimeout,
         std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
         std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> localeAssetManager,
-        bool enableUserProfile );
+        bool enableUserProfile);
 
     void enable();
     void disable();
 
     // AuthDelegateInterface
-    void addAuthObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer ) override;
-    void removeAuthObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer ) override;
+    void addAuthObserver(
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer) override;
+    void removeAuthObserver(
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer) override;
     std::string getAuthToken() override;
     void onAuthFailure(const std::string& token) override;
 
     // CBLAuthRequestInterface
-    void cblStateChanged( CBLAuthRequesterInterface::CBLState state, CBLAuthRequesterInterface::CBLStateChangedReason reason, const std::string& url, const std::string& code ) override;
+    void cblStateChanged(
+        CBLAuthRequesterInterface::CBLState state,
+        CBLAuthRequesterInterface::CBLStateChangedReason reason,
+        const std::string& url,
+        const std::string& code) override;
     void clearRefreshToken() override;
-    void setRefreshToken( const std::string& refreshToken ) override;
+    void setRefreshToken(const std::string& refreshToken) override;
     std::string getRefreshToken() override;
-    void setUserProfile( const std::string& name, const std::string& email ) override;
+    void setUserProfile(const std::string& name, const std::string& email) override;
 
     // CBLEngineInterface
     void onStart() override;
@@ -92,8 +97,8 @@ private:
     std::shared_ptr<CBLAuthDelegate> m_cblAuthDelegate;
 };
 
-} // aace::engine::cbl
-} // aace::engine
-} // aace
+}  // namespace cbl
+}  // namespace engine
+}  // namespace aace
 
 #endif

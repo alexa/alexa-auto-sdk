@@ -17,8 +17,7 @@ package com.amazon.aace.audio;
 
 import com.amazon.aace.core.NativeRef;
 
-abstract public class AudioInput extends NativeRef
-{
+abstract public class AudioInput extends NativeRef {
     public boolean startAudioInput() {
         return false;
     }
@@ -27,28 +26,28 @@ abstract public class AudioInput extends NativeRef
         return false;
     }
 
-    final public long write( byte[] data ) {
-        return write( getNativeRef(), data, 0, data.length );
+    final public long write(byte[] data) {
+        return write(getNativeRef(), data, 0, data.length);
     }
 
-    final public long write( byte[] data, long size ) {
-        return write( getNativeRef(), data, 0, size );
+    final public long write(byte[] data, long size) {
+        return write(getNativeRef(), data, 0, size);
     }
 
-    final public long write( byte[] data, long offset, long size ) {
-        return write( getNativeRef(), data, offset, size );
+    final public long write(byte[] data, long offset, long size) {
+        return write(getNativeRef(), data, offset, size);
     }
 
     protected long createNativeRef() {
         return createBinder();
     }
 
-    protected void disposeNativeRef( long nativeRef ) {
-        disposeBinder( nativeRef );
+    protected void disposeNativeRef(long nativeRef) {
+        disposeBinder(nativeRef);
     }
 
     // Native Engine JNI methods
     private native long createBinder();
-    private native void disposeBinder( long nativeRef );
-    private native long write( long nativeObject, byte[] data, long offset, long size );
+    private native void disposeBinder(long nativeRef);
+    private native long write(long nativeObject, byte[] data, long offset, long size);
 }

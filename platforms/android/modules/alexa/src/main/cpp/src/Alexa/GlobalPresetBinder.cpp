@@ -22,58 +22,49 @@ namespace aace {
 namespace jni {
 namespace alexa {
 
-    //
-    // GlobalPresetBinder
-    //
+//
+// GlobalPresetBinder
+//
 
-    GlobalPresetBinder::GlobalPresetBinder( jobject obj ) {
-        m_globalPresetHandler = std::make_shared<GlobalPresetHandler>( obj );
+GlobalPresetBinder::GlobalPresetBinder(jobject obj) {
+    m_globalPresetHandler = std::make_shared<GlobalPresetHandler>(obj);
+}
+
+//
+// GlobalPresetHandler
+//
+
+GlobalPresetHandler::GlobalPresetHandler(jobject obj) : m_obj(obj, "com/amazon/aace/alexa/GlobalPreset") {
+}
+
+void GlobalPresetHandler::setGlobalPreset(int preset) {
+    try_with_context {
+        ThrowIfNot(m_obj.invoke<void>("setGlobalPreset", "(I)V", nullptr, preset), "invokeMethodFailed");
     }
-
-    //
-    // GlobalPresetHandler
-    //
-
-    GlobalPresetHandler::GlobalPresetHandler( jobject obj ) : m_obj( obj, "com/amazon/aace/alexa/GlobalPreset" ) {
-    }
-
-    void GlobalPresetHandler::setGlobalPreset( int preset )
-    {
-        try_with_context
-        {
-            ThrowIfNot( m_obj.invoke<void>( "setGlobalPreset", "(I)V", nullptr, preset ), "invokeMethodFailed" );
-        }
-        catch_with_ex {
-            AACE_JNI_ERROR(TAG,"setGlobalPreset",ex.what());
-        }
-    }
-
-} // aace::alexa
-} // aace::jni
-} // aace
-
-#define GLOBAL_PRESET_BINDER(ref) reinterpret_cast<aace::jni::alexa::GlobalPresetBinder *>( ref )
-
-extern "C"
-{
-    JNIEXPORT jlong JNICALL
-    Java_com_amazon_aace_alexa_GlobalPreset_createBinder( JNIEnv* env, jobject obj ) {
-        return reinterpret_cast<long>( new aace::jni::alexa::GlobalPresetBinder( obj ) );
-    }
-    
-    JNIEXPORT void JNICALL
-    Java_com_amazon_aace_alexa_GlobalPreset_disposeBinder( JNIEnv* env, jobject /* this */, jlong ref )
-    {
-        try
-        {
-            auto globalPresetBinder = GLOBAL_PRESET_BINDER(ref);
-            ThrowIfNull( globalPresetBinder, "invalidGlobalPresetBinder" );
-            delete globalPresetBinder;
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_alexa_GlobalPreset_disposeBinder",ex.what());
-        }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "setGlobalPreset", ex.what());
     }
 }
 
+}  // namespace alexa
+}  // namespace jni
+}  // namespace aace
 
+#define GLOBAL_PRESET_BINDER(ref) reinterpret_cast<aace::jni::alexa::GlobalPresetBinder*>(ref)
+
+extern "C" {
+JNIEXPORT jlong JNICALL Java_com_amazon_aace_alexa_GlobalPreset_createBinder(JNIEnv* env, jobject obj) {
+    return reinterpret_cast<long>(new aace::jni::alexa::GlobalPresetBinder(obj));
+}
+
+JNIEXPORT void JNICALL
+Java_com_amazon_aace_alexa_GlobalPreset_disposeBinder(JNIEnv* env, jobject /* this */, jlong ref) {
+    try {
+        auto globalPresetBinder = GLOBAL_PRESET_BINDER(ref);
+        ThrowIfNull(globalPresetBinder, "invalidGlobalPresetBinder");
+        delete globalPresetBinder;
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_alexa_GlobalPreset_disposeBinder", ex.what());
+    }
+}
+}

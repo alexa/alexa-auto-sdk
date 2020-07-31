@@ -24,66 +24,66 @@ namespace aace {
 namespace jni {
 namespace apl {
 
-    class APLHandler : public aace::apl::APL {
-    public:
-        APLHandler( jobject obj );
+class APLHandler : public aace::apl::APL {
+public:
+    APLHandler(jobject obj);
 
-        std::string getVisualContext() override;
+    std::string getVisualContext() override;
 
-        // aace::apl::APL
+    // aace::apl::APL
 
-        void renderDocument(const std::string& jsonPayload, const std::string& token, const std::string& windowId) override;
-        void clearDocument() override;
-        void executeCommands(const std::string& jsonPayload, const std::string& token) override;
-        void interruptCommandSequence() override;
+    void renderDocument(const std::string& jsonPayload, const std::string& token, const std::string& windowId) override;
+    void clearDocument() override;
+    void executeCommands(const std::string& jsonPayload, const std::string& token) override;
+    void interruptCommandSequence() override;
 
-    private:
-        JObject m_obj;
-    };
+private:
+    JObject m_obj;
+};
 
-    class APLBinder : public aace::jni::core::PlatformInterfaceBinder {
-    public:
-        APLBinder( jobject obj );
+class APLBinder : public aace::jni::core::PlatformInterfaceBinder {
+public:
+    APLBinder(jobject obj);
 
-        std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
-            return m_aplHandler;
-        }
+    std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
+        return m_aplHandler;
+    }
 
-        std::shared_ptr<APLHandler> getAPL() {
-            return m_aplHandler;
-        }
+    std::shared_ptr<APLHandler> getAPL() {
+        return m_aplHandler;
+    }
 
-    private:
-        std::shared_ptr<APLHandler> m_aplHandler;
-    };
+private:
+    std::shared_ptr<APLHandler> m_aplHandler;
+};
 
-    //
-    // JActivityEvent
-    //
+//
+// JActivityEvent
+//
 
-    class JActivityEventConfig : public EnumConfiguration<APLHandler::ActivityEvent> {
-    public:
-        using T = APLHandler::ActivityEvent;
+class JActivityEventConfig : public EnumConfiguration<APLHandler::ActivityEvent> {
+public:
+    using T = APLHandler::ActivityEvent;
 
-        const char* getClassName() override {
-            return "com/amazon/aace/apl/APL$ActivityEvent";
-        }
+    const char* getClassName() override {
+        return "com/amazon/aace/apl/APL$ActivityEvent";
+    }
 
-        std::vector<std::pair<T,std::string>> getConfiguration() override {
-            return {
-                {T::ACTIVATED,"ACTIVATED"},
-                {T::DEACTIVATED,"DEACTIVATED"},
-                {T::ONE_TIME,"ONE_TIME"},
-                {T::INTERRUPT,"INTERRUPT"},
-                {T::UNKNOWN,"UNKNOWN"},
-            };
-        }
-    };
+    std::vector<std::pair<T, std::string>> getConfiguration() override {
+        return {
+            {T::ACTIVATED, "ACTIVATED"},
+            {T::DEACTIVATED, "DEACTIVATED"},
+            {T::ONE_TIME, "ONE_TIME"},
+            {T::INTERRUPT, "INTERRUPT"},
+            {T::UNKNOWN, "UNKNOWN"},
+        };
+    }
+};
 
-    using JActivityEvent = JEnum<APLHandler::ActivityEvent,JActivityEventConfig>;
+using JActivityEvent = JEnum<APLHandler::ActivityEvent, JActivityEventConfig>;
 
-} // aace::jni::apl
-} // aace::jni
-} // aace
+}  // namespace apl
+}  // namespace jni
+}  // namespace aace
 
-#endif //AACE_JNI_APL_APL_BINDER_H
+#endif  //AACE_JNI_APL_APL_BINDER_H

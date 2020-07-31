@@ -48,9 +48,7 @@ bool SystemAudioEngineService::initialize() {
         AACE_DEBUG(LX(TAG, "AAL Module found").d("name", name).d("id", i));
     }
 
-    aal_set_log_func([](int level, const char* log, int c) {
-        AACE_DEBUG(LX(TAG, "AAL").m(log));
-    });
+    aal_set_log_func([](int level, const char* log, int c) { AACE_DEBUG(LX(TAG, "AAL").m(log)); });
 
     return true;
 }
@@ -114,8 +112,10 @@ bool SystemAudioEngineService::isConfigEnabled(const std::string& name) {
     return enabled;
 }
 
-std::unique_ptr<DeviceConfig> SystemAudioEngineService::getDeviceConfig(const std::string& name, const std::string& type) {
-    std::unique_ptr<DeviceConfig> deviceConfig(new DeviceConfig {
+std::unique_ptr<DeviceConfig> SystemAudioEngineService::getDeviceConfig(
+    const std::string& name,
+    const std::string& type) {
+    std::unique_ptr<DeviceConfig> deviceConfig(new DeviceConfig{
         .name = "default",
         .module = "GStreamer",
     });
@@ -163,11 +163,12 @@ std::unique_ptr<DeviceConfig> SystemAudioEngineService::getDeviceConfig(const st
         AACE_WARN(LX(TAG, "Config not found, will use default settings").d("name", name).d("type", type));
     }
 
-    AACE_DEBUG(LX(TAG, "Use configuration").d("type", type)
-        .d("module", deviceConfig->module)
-        .d("card", deviceConfig->card)
-        .d("rate", deviceConfig->rate)
-        .d("shared", deviceConfig->shared));
+    AACE_DEBUG(LX(TAG, "Use configuration")
+                   .d("type", type)
+                   .d("module", deviceConfig->module)
+                   .d("card", deviceConfig->card)
+                   .d("rate", deviceConfig->rate)
+                   .d("shared", deviceConfig->shared));
 
     return deviceConfig;
 }
@@ -176,22 +177,20 @@ std::unique_ptr<DeviceConfig> SystemAudioEngineService::getDeviceConfig(const st
 // AudioInputProvider
 //
 
-
 class AudioInputProviderImpl : public aace::audio::AudioInputProvider {
 public:
     AudioInputProviderImpl(std::weak_ptr<SystemAudioEngineService> service);
     std::shared_ptr<aace::audio::AudioInput> openChannel(const std::string& name, AudioInputType type) override;
+
 private:
     std::weak_ptr<SystemAudioEngineService> m_service;
     std::unordered_map<std::string, std::shared_ptr<AudioInputImpl>> m_sharedInputs;
 };
 
-AudioInputProviderImpl::AudioInputProviderImpl(std::weak_ptr<SystemAudioEngineService> service)
-    : m_service{service} {}
+AudioInputProviderImpl::AudioInputProviderImpl(std::weak_ptr<SystemAudioEngineService> service) : m_service{service} {
+}
 
-std::shared_ptr<AudioInput> AudioInputProviderImpl::openChannel(
-    const std::string& name,
-    AudioInputType type) {
+std::shared_ptr<AudioInput> AudioInputProviderImpl::openChannel(const std::string& name, AudioInputType type) {
     try {
         auto service = m_service.lock();
         ThrowIfNull(service, "SystemAudioEngineService is not available");
@@ -232,16 +231,15 @@ class AudioOutputProviderImpl : public aace::audio::AudioOutputProvider {
 public:
     AudioOutputProviderImpl(std::weak_ptr<SystemAudioEngineService> service);
     std::shared_ptr<aace::audio::AudioOutput> openChannel(const std::string& name, AudioOutputType type) override;
+
 private:
     std::weak_ptr<SystemAudioEngineService> m_service;
 };
 
-AudioOutputProviderImpl::AudioOutputProviderImpl(std::weak_ptr<SystemAudioEngineService> service)
-    : m_service{service} {}
+AudioOutputProviderImpl::AudioOutputProviderImpl(std::weak_ptr<SystemAudioEngineService> service) : m_service{service} {
+}
 
-std::shared_ptr<AudioOutput> AudioOutputProviderImpl::openChannel(
-    const std::string& name,
-    AudioOutputType type) {
+std::shared_ptr<AudioOutput> AudioOutputProviderImpl::openChannel(const std::string& name, AudioOutputType type) {
     try {
         auto service = m_service.lock();
         ThrowIfNull(service, "SystemAudioEngineService is not available");

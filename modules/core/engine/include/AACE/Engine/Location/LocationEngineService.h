@@ -25,34 +25,33 @@ namespace location {
 
 class LocationEngineService : public aace::engine::core::EngineService {
 public:
-    DESCRIBE("aace.location",VERSION("1.0"))
+    DESCRIBE("aace.location", VERSION("1.0"))
 
 private:
-    LocationEngineService( const aace::engine::core::ServiceDescription& description );
+    LocationEngineService(const aace::engine::core::ServiceDescription& description);
 
 public:
     virtual ~LocationEngineService() = default;
-    
-protected:
-    bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) override;
-    
-private:
 
+protected:
+    bool registerPlatformInterface(std::shared_ptr<aace::core::PlatformInterface> platformInterface) override;
+
+private:
     // platform interface registration
     template <class T>
-    bool registerPlatformInterfaceType( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) {
-        std::shared_ptr<T> typedPlatformInterface = std::dynamic_pointer_cast<T>( platformInterface );
-        return typedPlatformInterface != nullptr ? registerPlatformInterfaceType( typedPlatformInterface ) : false;
+    bool registerPlatformInterfaceType(std::shared_ptr<aace::core::PlatformInterface> platformInterface) {
+        std::shared_ptr<T> typedPlatformInterface = std::dynamic_pointer_cast<T>(platformInterface);
+        return typedPlatformInterface != nullptr ? registerPlatformInterfaceType(typedPlatformInterface) : false;
     }
-    
-    bool registerPlatformInterfaceType( std::shared_ptr<aace::location::LocationProvider> locationProvider );
+
+    bool registerPlatformInterfaceType(std::shared_ptr<aace::location::LocationProvider> locationProvider);
 
 private:
     std::shared_ptr<aace::location::LocationProvider> m_locationProvider;
 };
 
-} // aace::engine::location
-} // aace::engine
-} // aace
+}  // namespace location
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_LOCATION_LOCATION_ENGINE_SERVICE_H
+#endif  // AACE_ENGINE_LOCATION_LOCATION_ENGINE_SERVICE_H

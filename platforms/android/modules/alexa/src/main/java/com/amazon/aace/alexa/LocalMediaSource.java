@@ -30,15 +30,13 @@ import com.amazon.aace.core.PlatformInterface;
  *
  * @sa PlaybackController
  */
-abstract public class LocalMediaSource extends PlatformInterface
-{
+abstract public class LocalMediaSource extends PlatformInterface {
     private final Source mSource;
 
     /**
      * Describes the playback control type
      */
-    public enum PlayControlType
-    {
+    public enum PlayControlType {
         /**
          * resume playback
          */
@@ -108,7 +106,7 @@ abstract public class LocalMediaSource extends PlatformInterface
         /**
          * @internal
          */
-        private PlayControlType( String name ) {
+        private PlayControlType(String name) {
             m_name = name;
         }
 
@@ -123,8 +121,7 @@ abstract public class LocalMediaSource extends PlatformInterface
     /**
      * The Local Media Source type
      */
-    public enum Source
-    {
+    public enum Source {
         /**
          * bluetooth source
          */
@@ -170,7 +167,7 @@ abstract public class LocalMediaSource extends PlatformInterface
         /**
          * @internal
          */
-        private Source( String name ) {
+        private Source(String name) {
             m_name = name;
         }
 
@@ -185,8 +182,7 @@ abstract public class LocalMediaSource extends PlatformInterface
     /**
      * The play content selection type
      */
-    public enum ContentSelector
-    {
+    public enum ContentSelector {
         /**
          * preset selection
          */
@@ -208,7 +204,7 @@ abstract public class LocalMediaSource extends PlatformInterface
         /**
          * @internal
          */
-        private ContentSelector( String name ) {
+        private ContentSelector(String name) {
             m_name = name;
         }
 
@@ -223,8 +219,7 @@ abstract public class LocalMediaSource extends PlatformInterface
     /**
      * Supported playback control types reportable by the external media app
      */
-    public enum SupportedPlaybackOperation
-    {
+    public enum SupportedPlaybackOperation {
         /*
          * Play is supported (voice only)
          */
@@ -302,7 +297,7 @@ abstract public class LocalMediaSource extends PlatformInterface
         /**
          * @internal
          */
-        private SupportedPlaybackOperation( String name ) {
+        private SupportedPlaybackOperation(String name) {
             m_name = name;
         }
 
@@ -317,8 +312,7 @@ abstract public class LocalMediaSource extends PlatformInterface
     /**
      * Favorites song status
      */
-    public enum Favorites
-    {
+    public enum Favorites {
         /**
          * song is favorited
          */
@@ -340,7 +334,7 @@ abstract public class LocalMediaSource extends PlatformInterface
         /**
          * @internal
          */
-        private Favorites( String name ) {
+        private Favorites(String name) {
             m_name = name;
         }
 
@@ -355,8 +349,7 @@ abstract public class LocalMediaSource extends PlatformInterface
     /**
      * Type of the current media source
      */
-    public enum MediaType
-    {
+    public enum MediaType {
         /**
          * A single song source
          */
@@ -390,7 +383,7 @@ abstract public class LocalMediaSource extends PlatformInterface
         /**
          * @internal
          */
-        private MediaType( String name ) {
+        private MediaType(String name) {
             m_name = name;
         }
 
@@ -405,8 +398,7 @@ abstract public class LocalMediaSource extends PlatformInterface
     /**
      * struct that represents the session state of a player.
      */
-    static public class SessionState
-    {
+    static public class SessionState {
         /// The unique device endpoint.
         public String endpointId = "";
 
@@ -447,8 +439,7 @@ abstract public class LocalMediaSource extends PlatformInterface
     /**
      * struct that encapsulates a players playback state.
      */
-    static public class PlaybackState
-    {
+    static public class PlaybackState {
         /// The state of the default player - IDLE/STOPPED/PLAYING...
         public String state = "IDLE";
 
@@ -473,8 +464,8 @@ abstract public class LocalMediaSource extends PlatformInterface
         /// The display name for current playback context, e.g. playlist name.
         public String playbackSource = "";
 
-        /// An arbitrary identifier for current playback context as per the music provider, e.g. a URI that can be saved as
-        /// a preset or queried to Music Service Provider services for additional info.
+        /// An arbitrary identifier for current playback context as per the music provider, e.g. a URI that can be saved
+        /// as a preset or queried to Music Service Provider services for additional info.
         public String playbackSourceId = "";
 
         /// The display name for the currently playing trackname of the track.
@@ -490,15 +481,15 @@ abstract public class LocalMediaSource extends PlatformInterface
         /// The display name for the currently playing artist.
         public String artistName = "";
 
-        /// An arbitrary identifier for currently playing artist as per the music provider, e.g. a URI that can be queried
-        /// to MSP services for additional info.
+        /// An arbitrary identifier for currently playing artist as per the music provider, e.g. a URI that can be
+        /// queried to MSP services for additional info.
         public String artistId = "";
 
         /// The display name of the currently playing album.
         public String albumName = "";
 
-        /// Arbitrary identifier for currently playing album specific to the music provider, e.g. a URI that can be queried
-        /// to MSP services for additional info.
+        /// Arbitrary identifier for currently playing album specific to the music provider, e.g. a URI that can be
+        /// queried to MSP services for additional info.
         public String albumId = "";
 
         /// The URL for tiny cover art image resource} .
@@ -513,8 +504,8 @@ abstract public class LocalMediaSource extends PlatformInterface
         /// The URL for large cover art image resource} .
         public String largeURL = "";
 
-        /// The Arbitrary identifier for cover art image resource specific to the music provider, for retrieval from an MSP
-        /// API.
+        /// The Arbitrary identifier for cover art image resource specific to the music provider, for retrieval from an
+        /// MSP API.
         public String coverId = "";
 
         /// Music Service Provider name for the currently playing media item; distinct from the application identity
@@ -531,8 +522,7 @@ abstract public class LocalMediaSource extends PlatformInterface
     /**
      * Class that encapsulates an player session and playback state.
      */
-    static public class LocalMediaSourceState
-    {
+    static public class LocalMediaSourceState {
         /// Variable to hold the session state.
         public SessionState sessionState;
 
@@ -540,17 +530,18 @@ abstract public class LocalMediaSource extends PlatformInterface
         public PlaybackState playbackState;
     }
 
-    protected LocalMediaSource( Source source ) {
+    protected LocalMediaSource(Source source) {
         mSource = source;
     }
 
     /**
-     * Called when the user first calls play for the local media via voice control. ( Currently this is not used in LocalMediaSource)
+     * Called when the user first calls play for the local media via voice control. ( Currently this is not used in
+     * LocalMediaSource)
      *
      * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
-    public boolean play( ContentSelector selector, String payload ) {
+    public boolean play(ContentSelector selector, String payload) {
         return false;
     }
 
@@ -564,7 +555,7 @@ abstract public class LocalMediaSource extends PlatformInterface
      * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
-    public boolean playControl( PlayControlType controlType ) {
+    public boolean playControl(PlayControlType controlType) {
         return false;
     }
 
@@ -576,7 +567,7 @@ abstract public class LocalMediaSource extends PlatformInterface
      * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
-    public boolean seek( long offset ) {
+    public boolean seek(long offset) {
         return false;
     }
 
@@ -588,7 +579,7 @@ abstract public class LocalMediaSource extends PlatformInterface
      * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
-    public boolean adjustSeek( long deltaOffset ) {
+    public boolean adjustSeek(long deltaOffset) {
         return false;
     }
 
@@ -607,8 +598,8 @@ abstract public class LocalMediaSource extends PlatformInterface
      *
      * @param eventName Canonical event name
      */
-    public void playerEvent( String eventName ) {
-        playerEvent( getNativeRef(), eventName );
+    public void playerEvent(String eventName) {
+        playerEvent(getNativeRef(), eventName);
     }
 
     /**
@@ -622,24 +613,24 @@ abstract public class LocalMediaSource extends PlatformInterface
      *
      * @param fatal true if the error is fatal
      */
-    public void playerError( String errorName, long code, String description, boolean fatal ) {
-        playerError( getNativeRef(), errorName, code, description, fatal );
+    public void playerError(String errorName, long code, String description, boolean fatal) {
+        playerError(getNativeRef(), errorName, code, description, fatal);
     }
 
     /**
      * Should be called on local media source player events. This will switch the media focus to that context.
-     * 
+     *
      * @param focusAcquire true if focus should be acquired, false if focus should be abandoned
      */
-    public void setFocus( boolean focusAcquire ) {
-        setFocus( getNativeRef(), focusAcquire );
+    public void setFocus(boolean focusAcquire) {
+        setFocus(getNativeRef(), focusAcquire);
     }
 
     /**
      * Overload of above for backward compatibility. Always acquires focus.
      */
     public void setFocus() {
-        setFocus( getNativeRef(), true );
+        setFocus(getNativeRef(), true);
     }
 
     /**
@@ -658,7 +649,7 @@ abstract public class LocalMediaSource extends PlatformInterface
      * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
-    public boolean volumeChanged( float volume ) {
+    public boolean volumeChanged(float volume) {
         return false;
     }
 
@@ -671,25 +662,25 @@ abstract public class LocalMediaSource extends PlatformInterface
      * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
-    public boolean mutedStateChanged( MutedState state ) {
+    public boolean mutedStateChanged(MutedState state) {
         return false;
     }
 
     // NativeRef implementation
     final protected long createNativeRef() {
-        return createBinder( getSource() );
+        return createBinder(getSource());
     }
 
-    final protected void disposeNativeRef( long nativeRef ) {
-        disposeBinder( nativeRef );
+    final protected void disposeNativeRef(long nativeRef) {
+        disposeBinder(nativeRef);
     }
 
     // Native Engine JNI methods
-    private native long createBinder( Source source );
-    private native void disposeBinder( long nativeRef );
-    private native void playerEvent( long nativeRef, String eventName );
-    private native void playerError( long nativeRef, String errorName, long code, String description, boolean fatal );
-    private native void setFocus( long nativeRef, boolean focusAcquire );
+    private native long createBinder(Source source);
+    private native void disposeBinder(long nativeRef);
+    private native void playerEvent(long nativeRef, String eventName);
+    private native void playerError(long nativeRef, String errorName, long code, String description, boolean fatal);
+    private native void setFocus(long nativeRef, boolean focusAcquire);
 }
 
 // END OF FILE

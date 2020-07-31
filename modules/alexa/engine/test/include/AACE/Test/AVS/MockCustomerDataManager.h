@@ -19,19 +19,19 @@
 #include <RegistrationManager/CustomerDataManager.h>
 #include <RegistrationManager/CustomerDataHandler.h>
 
-namespace aace {    
+namespace aace {
 namespace test {
 namespace avs {
 
 class MockCustomerDataManager : public alexaClientSDK::registrationManager::CustomerDataManager {
 public:
-    MOCK_METHOD1(addDataHandler,void(alexaClientSDK::registrationManager::CustomerDataHandler* handler));
-    MOCK_METHOD1(removeDataHandler,void(alexaClientSDK::registrationManager::CustomerDataHandler* handler));
-    MOCK_METHOD0(clearData,void());
+    MOCK_METHOD1(addDataHandler, void(alexaClientSDK::registrationManager::CustomerDataHandler* handler));
+    MOCK_METHOD1(removeDataHandler, void(alexaClientSDK::registrationManager::CustomerDataHandler* handler));
+    MOCK_METHOD0(clearData, void());
 };
 
-} // aace::test::avs
-} // aace::test
-} // aace
+}  // namespace avs
+}  // namespace test
+}  // namespace aace
 
-#endif // AACE_TEST_AVS_MOCK_CUSTOMER_DATA_MANAGER_H
+#endif  // AACE_TEST_AVS_MOCK_CUSTOMER_DATA_MANAGER_H

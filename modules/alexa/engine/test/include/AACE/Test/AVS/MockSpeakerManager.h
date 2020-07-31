@@ -32,18 +32,24 @@ public:
         std::future<bool>(
             avsCommon::sdkInterfaces::SpeakerInterface::Type type,
             int8_t volume,
-            bool forceNoNotifications, SpeakerManagerObserverInterface::Source source));
+            bool forceNoNotifications,
+            SpeakerManagerObserverInterface::Source source));
 
     MOCK_METHOD4(
         adjustVolume,
         std::future<bool>(
             avsCommon::sdkInterfaces::SpeakerInterface::Type type,
             int8_t delta,
-            bool forceNoNotifications, SpeakerManagerObserverInterface::Source source));
+            bool forceNoNotifications,
+            SpeakerManagerObserverInterface::Source source));
 
     MOCK_METHOD4(
         setMute,
-        std::future<bool>(avsCommon::sdkInterfaces::SpeakerInterface::Type type, bool mute, bool forceNoNotifications, SpeakerManagerObserverInterface::Source source));
+        std::future<bool>(
+            avsCommon::sdkInterfaces::SpeakerInterface::Type type,
+            bool mute,
+            bool forceNoNotifications,
+            SpeakerManagerObserverInterface::Source source));
 
     MOCK_METHOD2(
         getSpeakerSettings,

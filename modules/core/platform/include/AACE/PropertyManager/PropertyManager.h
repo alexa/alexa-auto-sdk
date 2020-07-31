@@ -41,7 +41,7 @@ protected:
 
 public:
     virtual ~PropertyManager();
-    
+
     using PropertyState = aace::propertyManager::PropertyManagerEngineInterface::PropertyState;
     /**
      * Sets a property value in the Engine. setProperty() is an asynchronous
@@ -57,7 +57,7 @@ public:
      *         setting, else @c false if an error occured.
      */
     bool setProperty(const std::string& name, const std::string& value);
-    
+
     /**
      * Notifies the platform implementation of the status of a property change
      * after a call to setProperty().

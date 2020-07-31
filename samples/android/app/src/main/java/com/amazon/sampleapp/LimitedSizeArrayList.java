@@ -7,36 +7,36 @@ import java.util.Collection;
  * Custom ArrayList to limit the number of items that can be added
  * Once the list reaches maxSize, older items gets deleted
  */
-public class LimitedSizeArrayList< T > extends ArrayList<T> {
+public class LimitedSizeArrayList<T> extends ArrayList<T> {
     private int maxSize;
 
-    public LimitedSizeArrayList(int size){
+    public LimitedSizeArrayList(int size) {
         this.maxSize = size;
     }
 
     @Override
-    public boolean add(T t){
+    public boolean add(T t) {
         boolean r = super.add(t);
-        limitSize( );
+        limitSize();
         return r;
     }
 
     @Override
-    public boolean addAll( Collection< ? extends T > c ) {
-        boolean r = super.addAll( c );
-        limitSize( );
+    public boolean addAll(Collection<? extends T> c) {
+        boolean r = super.addAll(c);
+        limitSize();
         return r;
     }
 
     @Override
-    public void add( int index, T element ) {
-        super.add( index, element );
-        limitSize( );
+    public void add(int index, T element) {
+        super.add(index, element);
+        limitSize();
     }
 
-    private void limitSize( ) {
-        int size = size( );
-        if ( size > maxSize){
+    private void limitSize() {
+        int size = size();
+        if (size > maxSize) {
             removeRange(0, size - maxSize);
         }
     }

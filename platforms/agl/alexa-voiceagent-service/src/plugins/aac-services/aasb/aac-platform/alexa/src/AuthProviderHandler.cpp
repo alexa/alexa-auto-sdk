@@ -58,7 +58,7 @@ AuthState AuthProviderHandler::getAuthState() {
     return m_authState;
 }
 
-void AuthProviderHandler::authFailure( const std::string& token) {
+void AuthProviderHandler::authFailure(const std::string& token) {
     m_logger->log(Level::INFO, TAG, "Authorization Failure due to invalid access token. Login again");
 }
 

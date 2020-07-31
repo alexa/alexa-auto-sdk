@@ -18,30 +18,29 @@
 namespace aace {
 namespace navigation {
 
-Navigation::~Navigation() = default; // key function
+Navigation::~Navigation() = default;  // key function
 
-void Navigation::navigationEvent( EventName event ) {
-    if ( m_navigationEngineInterface != nullptr ) {
-        m_navigationEngineInterface->onNavigationEvent( event );
+void Navigation::navigationEvent(EventName event) {
+    if (m_navigationEngineInterface != nullptr) {
+        m_navigationEngineInterface->onNavigationEvent(event);
     }
 }
 
-void Navigation::navigationError( ErrorType type, ErrorCode code, const std::string& description ) {
-    if ( m_navigationEngineInterface != nullptr ) {
-        m_navigationEngineInterface->onNavigationError( type, code, description );
+void Navigation::navigationError(ErrorType type, ErrorCode code, const std::string& description) {
+    if (m_navigationEngineInterface != nullptr) {
+        m_navigationEngineInterface->onNavigationError(type, code, description);
     }
 }
 
-void Navigation::showAlternativeRoutesSucceeded( const std::string& payload ) {
-    if ( m_navigationEngineInterface != nullptr ) {
-        m_navigationEngineInterface->onShowAlternativeRoutesSucceeded( payload );
+void Navigation::showAlternativeRoutesSucceeded(const std::string& payload) {
+    if (m_navigationEngineInterface != nullptr) {
+        m_navigationEngineInterface->onShowAlternativeRoutesSucceeded(payload);
     }
 }
 
-void Navigation::setEngineInterface ( std::shared_ptr<NavigationEngineInterface>  navigationEngineInterface ) {
+void Navigation::setEngineInterface(std::shared_ptr<NavigationEngineInterface> navigationEngineInterface) {
     m_navigationEngineInterface = navigationEngineInterface;
 }
-    
 
-} // aace::navigation
-} // aac
+}  // namespace navigation
+}  // namespace aace

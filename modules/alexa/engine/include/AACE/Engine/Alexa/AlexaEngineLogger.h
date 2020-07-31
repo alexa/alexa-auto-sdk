@@ -26,28 +26,31 @@ namespace aace {
 namespace engine {
 namespace alexa {
 
-class AlexaEngineLogger :
-    public alexaClientSDK::avsCommon::utils::logger::Logger,
-    public alexaClientSDK::avsCommon::utils::RequiresShutdown {
-    
+class AlexaEngineLogger
+        : public alexaClientSDK::avsCommon::utils::logger::Logger
+        , public alexaClientSDK::avsCommon::utils::RequiresShutdown {
 private:
-    AlexaEngineLogger( alexaClientSDK::avsCommon::utils::logger::Level level );
+    AlexaEngineLogger(alexaClientSDK::avsCommon::utils::logger::Level level);
 
 protected:
     virtual void doShutdown() override;
 
 public:
-    static std::shared_ptr<AlexaEngineLogger> create( alexaClientSDK::avsCommon::utils::logger::Level level );
+    static std::shared_ptr<AlexaEngineLogger> create(alexaClientSDK::avsCommon::utils::logger::Level level);
 
-    virtual void emit( alexaClientSDK::avsCommon::utils::logger::Level level, std::chrono::system_clock::time_point time, const char* threadMoniker, const char* text ) override;
+    virtual void emit(
+        alexaClientSDK::avsCommon::utils::logger::Level level,
+        std::chrono::system_clock::time_point time,
+        const char* threadMoniker,
+        const char* text) override;
 
 private:
-    aace::logger::Logger::Level map( alexaClientSDK::avsCommon::utils::logger::Level level );
+    aace::logger::Logger::Level map(alexaClientSDK::avsCommon::utils::logger::Level level);
     std::shared_ptr<aace::engine::logger::EngineLogger> m_engineLogger;
 };
 
-} // aace::engine::alexa
-} // aace::engine
-} // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_ALEXA_ALEXA_ENGINE_LOGGER_H
+#endif  // AACE_ENGINE_ALEXA_ALEXA_ENGINE_LOGGER_H

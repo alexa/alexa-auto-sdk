@@ -37,7 +37,7 @@ namespace alexa {
  * for rendering cards that adhere to design guidelines
  * for the platform device type. For screen-specific design guidance, see the AVS UX Design Overview:
  * https://developer.amazon.com/docs/alexa-voice-service/ux-design-overview.html#displaycards
- */    
+ */
 class TemplateRuntime : public aace::core::PlatformInterface {
 protected:
     TemplateRuntime() = default;
@@ -63,7 +63,7 @@ public:
      *
      * @param [in] payload Renderable template metadata in structured JSON format
      */
-    virtual void renderTemplate( const std::string& payload );
+    virtual void renderTemplate(const std::string& payload);
 
     /**
      * Provides visual metadata associated with a user request to Alexa.
@@ -75,7 +75,7 @@ public:
      * @param [in] payload Renderable template metadata in structured JSON format
      * @param [in] focusState The @c FocusState of the channel used by TemplateRuntime interface
      */
-    virtual void renderTemplate( const std::string& payload, FocusState focusState );
+    virtual void renderTemplate(const std::string& payload, FocusState focusState);
 
     /**
      * Notifies the platform implementation to dismiss the template display card
@@ -96,7 +96,7 @@ public:
      * @sa PlaybackController
      * @sa AudioPlayer
      */
-    virtual void renderPlayerInfo( const std::string& payload );
+    virtual void renderPlayerInfo(const std::string& payload);
 
     /**
      * Provides visual metadata associated with a user request to Alexa for audio playback.
@@ -114,7 +114,11 @@ public:
      * @sa PlaybackController
      * @sa AudioPlayer
      */
-    virtual void renderPlayerInfo( const std::string& payload, PlayerActivity audioPlayerState, std::chrono::milliseconds offset, FocusState focusState );
+    virtual void renderPlayerInfo(
+        const std::string& payload,
+        PlayerActivity audioPlayerState,
+        std::chrono::milliseconds offset,
+        FocusState focusState);
 
     /**
      * Notifies the platform implementation to dismiss the player info display card
@@ -133,13 +137,14 @@ public:
      *
      * Should *never* be called by the platform implementation.
      */
-    void setEngineInterface( std::shared_ptr<aace::alexa::TemplateRuntimeEngineInterface> templateRuntimeEngineInterface );
+    void setEngineInterface(
+        std::shared_ptr<aace::alexa::TemplateRuntimeEngineInterface> templateRuntimeEngineInterface);
 
 private:
     std::weak_ptr<aace::alexa::TemplateRuntimeEngineInterface> m_templateRuntimeEngineInterface;
 };
 
-} // aace::alexa
-} // aace
+}  // namespace alexa
+}  // namespace aace
 
-#endif // AACE_ALEXA_TEMPLATE_RUNTIME_H
+#endif  // AACE_ALEXA_TEMPLATE_RUNTIME_H

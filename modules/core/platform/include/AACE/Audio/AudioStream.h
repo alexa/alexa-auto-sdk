@@ -34,6 +34,20 @@ public:
     using AudioFormat = aace::audio::AudioFormat;
     using Encoding = AudioFormat::Encoding;
 
+    /**
+     * An enum representing @c MediaType value.
+     */
+    enum class MediaType {
+        /// MPEG media type.
+        MPEG,
+
+        /// WAV media type.
+        WAV,
+
+        /// The media type is unknown.
+        UNKNOWN
+    };
+
     virtual ~AudioStream();
 
     /**
@@ -45,7 +59,7 @@ public:
      * @return The number of bytes read, 0 if the end of stream is reached or data is not currently available,
      * or -1 if an error occurred
      */
-    virtual ssize_t read( char* data, const size_t size ) = 0;
+    virtual ssize_t read(char* data, const size_t size) = 0;
 
     /**
      * Checks if the audio stream from the no more data available to read.
@@ -74,6 +88,14 @@ public:
     virtual AudioFormat getAudioFormat();
 
     /**
+     * Returns the media type of the @c AudioStream. If the type is not known
+     * then @c MediaType::UNKNOWN will be returned.
+     *
+     * @return @c MediaType specified for this stream.
+     */
+    virtual MediaType getMediaType();
+
+    /**
      * Returns optional meta-data properties for the @c AudioStream.
      *
      * @return List of meta-data properties for the @c AudioStream.
@@ -92,14 +114,15 @@ public:
      * @param  key The property key
      * @param  value The property value
      */
-    AudioStreamProperty( const std::string& key, const std::string& value ) : m_key{ key }, m_value{ value } {}
+    AudioStreamProperty(const std::string& key, const std::string& value) : m_key{key}, m_value{value} {
+    }
 
     /**
      * AudioStreamProperty copy constructor
      *
      * @param  prop The @c AudioStreamProperty being copied
      */
-    AudioStreamProperty( const AudioStreamProperty &other ) {
+    AudioStreamProperty(const AudioStreamProperty& other) {
         *this = other;
     }
 
@@ -129,7 +152,7 @@ private:
     std::string m_value;
 };
 
-} // aace::audio
-} // aace
+}  // namespace audio
+}  // namespace aace
 
-#endif // AACE_AUDIO_AUDIO_STREAM_H
+#endif  // AACE_AUDIO_AUDIO_STREAM_H

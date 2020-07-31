@@ -27,16 +27,13 @@ struct MockWakeWordsSetting : alexaClientSDK::settings::WakeWordsSetting {
 public:
     MockWakeWordsSetting() : alexaClientSDK::settings::WakeWordsSetting{{""}} {
     }
-    MOCK_METHOD1(setLocalChange,
-                 SetSettingResult(const alexaClientSDK::settings::WakeWordsSetting::ValueType& value));
-    MOCK_METHOD1(setAvsChange,
-                 bool(const alexaClientSDK::settings::WakeWordsSetting::ValueType& value));
-    MOCK_METHOD1(clearData,
-                 bool(const alexaClientSDK::settings::WakeWordsSetting::ValueType& value));
+    MOCK_METHOD1(setLocalChange, SetSettingResult(const alexaClientSDK::settings::WakeWordsSetting::ValueType& value));
+    MOCK_METHOD1(setAvsChange, bool(const alexaClientSDK::settings::WakeWordsSetting::ValueType& value));
+    MOCK_METHOD1(clearData, bool(const alexaClientSDK::settings::WakeWordsSetting::ValueType& value));
 };
 
-} // aace::test::avs
-} // aace::test
-} // aace
+}  // namespace avs
+}  // namespace test
+}  // namespace aace
 
-#endif //AACE_TEST_AVS_MOCK_WAKEWORDS_SETTING_H
+#endif  //AACE_TEST_AVS_MOCK_WAKEWORDS_SETTING_H

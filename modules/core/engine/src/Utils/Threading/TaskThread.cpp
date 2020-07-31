@@ -57,7 +57,7 @@ void TaskThread::processTasksLoop() {
     }
 }
 
-} // aace::engine::utils::threading
-} // aace::engine::utils
-} // aace::engine
-} // aace
+}  // namespace threading
+}  // namespace utils
+}  // namespace engine
+}  // namespace aace

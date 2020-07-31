@@ -19,16 +19,16 @@ public class PackageMetadata {
     private final String mSpiVersion;
     private final String mPlayerCookie;
 
-    public PackageMetadata(String spiVersion, String playerCookie ) {
+    public PackageMetadata(String spiVersion, String playerCookie) {
         mSpiVersion = spiVersion;
         mPlayerCookie = playerCookie;
     }
 
-    public String getSpiVersion( ) {
+    public String getSpiVersion() {
         return mSpiVersion;
     }
 
-    public String getPlayerCookie( ) {
+    public String getPlayerCookie() {
         return mPlayerCookie;
     }
 }

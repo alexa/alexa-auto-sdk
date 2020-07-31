@@ -19,100 +19,96 @@
 namespace aace {
 namespace engine {
 namespace alexa {
-    
+
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.AuthProviderEngineImpl");
 
-std::shared_ptr<AuthProviderEngineImpl> AuthProviderEngineImpl::create( std::shared_ptr<aace::alexa::AuthProvider> authProvider )
-{
+std::shared_ptr<AuthProviderEngineImpl> AuthProviderEngineImpl::create(
+    std::shared_ptr<aace::alexa::AuthProvider> authProvider) {
     std::shared_ptr<AuthProviderEngineImpl> authProviderEngineImpl = nullptr;
 
-    try
-    {
-        ThrowIfNull( authProvider, "invalidAuthProviderPlatformInterface" );
-        authProviderEngineImpl = std::shared_ptr<AuthProviderEngineImpl>( new AuthProviderEngineImpl( authProvider ) );
-        
+    try {
+        ThrowIfNull(authProvider, "invalidAuthProviderPlatformInterface");
+        authProviderEngineImpl = std::shared_ptr<AuthProviderEngineImpl>(new AuthProviderEngineImpl(authProvider));
+
         // set the platform engine interface reference
-        authProvider->setEngineInterface( authProviderEngineImpl );
+        authProvider->setEngineInterface(authProviderEngineImpl);
 
         return authProviderEngineImpl;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"create").d("reason", ex.what()));
-        if( authProviderEngineImpl != nullptr ) {
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "create").d("reason", ex.what()));
+        if (authProviderEngineImpl != nullptr) {
             authProviderEngineImpl->shutdown();
         }
         return nullptr;
     }
 }
 
-AuthProviderEngineImpl::AuthProviderEngineImpl( std::shared_ptr<aace::alexa::AuthProvider> authProvider ) :
-    alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
-    m_authProviderPlatformInterface( authProvider ),
-    m_authState( AuthState::UNINITIALIZED ),
-    m_authError( AuthError::NO_ERROR ) {
+AuthProviderEngineImpl::AuthProviderEngineImpl(std::shared_ptr<aace::alexa::AuthProvider> authProvider) :
+        alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
+        m_authProviderPlatformInterface(authProvider),
+        m_authState(AuthState::UNINITIALIZED),
+        m_authError(AuthError::NO_ERROR) {
 }
 
-void AuthProviderEngineImpl::doShutdown()
-{
-    if( m_authProviderPlatformInterface != nullptr ) {
-        m_authProviderPlatformInterface->setEngineInterface( nullptr );
+void AuthProviderEngineImpl::doShutdown() {
+    if (m_authProviderPlatformInterface != nullptr) {
+        m_authProviderPlatformInterface->setEngineInterface(nullptr);
     }
-    
+
     m_observers.clear();
 }
 
 AuthProviderEngineImpl::AuthState AuthProviderEngineImpl::getAuthState() {
-    return m_authProviderPlatformInterface != nullptr ? m_authProviderPlatformInterface->getAuthState() : AuthState::UNINITIALIZED;
+    return m_authProviderPlatformInterface != nullptr ? m_authProviderPlatformInterface->getAuthState()
+                                                      : AuthState::UNINITIALIZED;
 }
 
-std::string AuthProviderEngineImpl::getAuthToken()
-{
-    try
-    {
-        ThrowIfNull( m_authProviderPlatformInterface, "nullAuthProvider" );
+std::string AuthProviderEngineImpl::getAuthToken() {
+    try {
+        ThrowIfNull(m_authProviderPlatformInterface, "nullAuthProvider");
         return m_authProviderPlatformInterface->getAuthToken();
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"getAuthToken").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "getAuthToken").d("reason", ex.what()));
         return std::string();
     }
 }
 
-void AuthProviderEngineImpl::onAuthFailure( const std::string& token ) {
-    AACE_DEBUG(LX(TAG,"onAuthFailure").sensitive("token",token));
-    m_authProviderPlatformInterface->authFailure( token );
+void AuthProviderEngineImpl::onAuthFailure(const std::string& token) {
+    AACE_DEBUG(LX(TAG, "onAuthFailure").sensitive("token", token));
+    m_authProviderPlatformInterface->authFailure(token);
 }
 
-void AuthProviderEngineImpl::addAuthObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer )
-{
-    std::lock_guard<std::mutex> lock( m_mutex ) ;
-    
-    m_observers.insert( observer );
-    
-    observer->onAuthStateChange( static_cast<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State>( m_authState ),
-                                 static_cast<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error>( m_authError ) );
+void AuthProviderEngineImpl::addAuthObserver(
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer) {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    m_observers.insert(observer);
+
+    observer->onAuthStateChange(
+        static_cast<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State>(m_authState),
+        static_cast<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error>(m_authError));
 };
 
-void AuthProviderEngineImpl::removeAuthObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer ) {
-    std::lock_guard<std::mutex> lock( m_mutex );
-    m_observers.erase( observer );
+void AuthProviderEngineImpl::removeAuthObserver(
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer) {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_observers.erase(observer);
 };
 
-void AuthProviderEngineImpl::onAuthStateChanged( AuthState authState, AuthError authError )
-{
+void AuthProviderEngineImpl::onAuthStateChanged(AuthState authState, AuthError authError) {
     auto observerListCopy = m_observers;
-    
+
     m_authState = authState;
     m_authError = authError;
-    
-    for( const auto& observer : observerListCopy )
-    {
-        observer->onAuthStateChange( static_cast<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State>( m_authState ),
-                                     static_cast<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error>( m_authError ) );
+
+    for (const auto& observer : observerListCopy) {
+        observer->onAuthStateChange(
+            static_cast<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State>(m_authState),
+            static_cast<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error>(m_authError));
     }
 };
 
-} // aace::engine::alexa
-} // aace::engine
-} // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace

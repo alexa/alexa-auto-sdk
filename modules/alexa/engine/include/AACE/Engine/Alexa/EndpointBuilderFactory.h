@@ -32,7 +32,7 @@ namespace alexa {
 /**
  * Creates @c alexaClientSDK::endpoints::EndpointBuilder instances for configuring new endpoints to be controlled by 
  * the device
- */ 
+ */
 class EndpointBuilderFactory : public alexaClientSDK::avsCommon::utils::RequiresShutdown {
 public:
     /**
@@ -47,11 +47,12 @@ public:
      */
     static std::shared_ptr<EndpointBuilderFactory> create(
         std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointRegistrationManagerInterface> endpointRegistrationManager,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointRegistrationManagerInterface>
+            endpointRegistrationManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::capabilityAgents::alexa::AlexaInterfaceMessageSender> alexaMessageSender);
-    
+
     /**
      * Creates an endpoint builder to configure a new endpoint to be controlled by the device.
      *
@@ -60,6 +61,7 @@ public:
      * client has been connected will fail.
      */
     std::unique_ptr<alexaClientSDK::endpoints::EndpointBuilder> createEndpointBuilder();
+
 protected:
     /// RequiresShutdown
     /// @{
@@ -77,7 +79,8 @@ private:
      */
     EndpointBuilderFactory(
         std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointRegistrationManagerInterface> endpointRegistrationManager,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointRegistrationManagerInterface>
+            endpointRegistrationManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::capabilityAgents::alexa::AlexaInterfaceMessageSender> alexaMessageSender);
@@ -85,7 +88,8 @@ private:
     /// Information about the Alexa client device
     std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> m_deviceInfo;
     /// Registers new endpoints
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointRegistrationManagerInterface> m_endpointManager;
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointRegistrationManagerInterface>
+        m_endpointManager;
     /// Retrieves the state of an endpoint
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> m_contextManager;
     /// Sends exceptions
@@ -94,7 +98,7 @@ private:
     std::shared_ptr<alexaClientSDK::capabilityAgents::alexa::AlexaInterfaceMessageSender> m_alexaMessageSender;
 };
 
-} // aace::engine::alexa
-} // aace::engine
-} // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace
 #endif

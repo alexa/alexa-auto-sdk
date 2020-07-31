@@ -23,7 +23,8 @@ namespace sampleApp {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TaskThread::TaskThread(std::shared_ptr<TaskQueue> taskQueue) : m_taskQueue{taskQueue}, m_shutdown{false} {}
+TaskThread::TaskThread(std::shared_ptr<TaskQueue> taskQueue) : m_taskQueue{taskQueue}, m_shutdown{false} {
+}
 
 TaskThread::~TaskThread() {
     m_shutdown = true;
@@ -33,9 +34,13 @@ TaskThread::~TaskThread() {
     }
 }
 
-void TaskThread::start() { m_thread = std::thread{std::bind(&TaskThread::processTasksLoop, this)}; }
+void TaskThread::start() {
+    m_thread = std::thread{std::bind(&TaskThread::processTasksLoop, this)};
+}
 
-bool TaskThread::isShutdown() { return m_shutdown; }
+bool TaskThread::isShutdown() {
+    return m_shutdown;
+}
 
 void TaskThread::processTasksLoop() {
     while (!m_shutdown) {
@@ -55,4 +60,4 @@ void TaskThread::processTasksLoop() {
     }
 }
 
-} // namespace sampleApp
+}  // namespace sampleApp

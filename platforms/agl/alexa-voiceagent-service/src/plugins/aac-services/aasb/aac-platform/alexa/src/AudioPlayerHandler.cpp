@@ -28,16 +28,13 @@ const std::string TAG = "aasb::alexa::AudioPlayerHandler";
 
 std::shared_ptr<aasb::alexa::AudioPlayerHandler> AudioPlayerHandler::create(
     std::shared_ptr<aasb::core::logger::LoggerHandler> logger) {
-    auto audioPlayerHandler = std::shared_ptr<aasb::alexa::AudioPlayerHandler>(
-        new AudioPlayerHandler(logger));
+    auto audioPlayerHandler = std::shared_ptr<aasb::alexa::AudioPlayerHandler>(new AudioPlayerHandler(logger));
 
     return audioPlayerHandler;
 }
 
-AudioPlayerHandler::AudioPlayerHandler(
-    std::shared_ptr<aasb::core::logger::LoggerHandler> logger) :
-        aace::alexa::AudioPlayer(),
-        m_logger(logger) {
+AudioPlayerHandler::AudioPlayerHandler(std::shared_ptr<aasb::core::logger::LoggerHandler> logger) :
+        aace::alexa::AudioPlayer(), m_logger(logger) {
 }
 
 void AudioPlayerHandler::onReceivedEvent(const std::string& action, const std::string& payload) {
@@ -66,12 +63,10 @@ void AudioPlayerHandler::onReceivedEvent(const std::string& action, const std::s
                 m_logger->log(Level::WARN, TAG, "playerActivity: Invalid args " + payload);
             }
         }
-
     }
 
-   m_logger->log(Level::WARN, TAG, "onReceivedEvent: Unknown action " + action);
+    m_logger->log(Level::WARN, TAG, "onReceivedEvent: Unknown action " + action);
 }
 
- 
 }  // namespace alexa
 }  // namespace aasb

@@ -4,7 +4,6 @@ public class AuthorizedPlayer {
     private final String mLocalPlayerId;
     private final boolean mAuthorized;
 
-
     public AuthorizedPlayer(String localPlayerId, boolean authorized) {
         mLocalPlayerId = localPlayerId;
         mAuthorized = authorized;

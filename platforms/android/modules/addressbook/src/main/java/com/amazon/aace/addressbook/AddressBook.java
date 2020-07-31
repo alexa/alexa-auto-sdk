@@ -29,20 +29,19 @@ abstract public class AddressBook extends PlatformInterface {
         /**
          * Contacts
          */
-        CONTACT( "CONTACT" ),
+        CONTACT("CONTACT"),
 
         /**
          * Navigation
          */
-        NAVIGATION( "NAVIGATION" );
-
+        NAVIGATION("NAVIGATION");
 
         /**
          * @internal
          */
         private String addressBookTypeName;
 
-        AddressBookType( String addressBookTypeName ) {
+        AddressBookType(String addressBookTypeName) {
             this.addressBookTypeName = addressBookTypeName;
         }
 
@@ -52,8 +51,7 @@ abstract public class AddressBook extends PlatformInterface {
         }
     }
 
-    public AddressBook() {
-    }
+    public AddressBook() {}
 
     /**
      * Notifies the engine on an availability of an address book
@@ -63,8 +61,8 @@ abstract public class AddressBook extends PlatformInterface {
      * @param [in] type Type of the address book @c AddressBookType.
      * @return @c false if address book was already added or some internal error otherwise @c true on successful.
      */
-    final public boolean addAddressBook( String addressBookSourceId, String name, AddressBookType type ) {
-        return addAddressBook( getNativeRef(), addressBookSourceId, name, type );
+    final public boolean addAddressBook(String addressBookSourceId, String name, AddressBookType type) {
+        return addAddressBook(getNativeRef(), addressBookSourceId, name, type);
     }
 
     /**
@@ -73,8 +71,8 @@ abstract public class AddressBook extends PlatformInterface {
      * @param [in] addressBookSourceId A unique identifier for an address book.
      * @return @c false if address book does not already added or some internal error otherwise @c true on successful.
      */
-    final public boolean removeAddressBook( String addressBookSourceId ) {
-        return removeAddressBook( getNativeRef(), addressBookSourceId );
+    final public boolean removeAddressBook(String addressBookSourceId) {
+        return removeAddressBook(getNativeRef(), addressBookSourceId);
     }
 
     /**
@@ -86,7 +84,7 @@ abstract public class AddressBook extends PlatformInterface {
      * @return Return @c true if platform implementation has successfully ingested all the entries of the address book
      * otherwise @c false.
      */
-    public boolean getEntries( String addressBookSourceId, IAddressBookEntriesFactory factory ) {
+    public boolean getEntries(String addressBookSourceId, IAddressBookEntriesFactory factory) {
         return false;
     }
 
@@ -95,13 +93,14 @@ abstract public class AddressBook extends PlatformInterface {
         return createBinder();
     }
 
-    final protected void disposeNativeRef( long nativeRef ) {
-        disposeBinder( nativeRef );
+    final protected void disposeNativeRef(long nativeRef) {
+        disposeBinder(nativeRef);
     }
 
     // Native Engine JNI methods
     private native long createBinder();
-    private native void disposeBinder( long nativeRef );
-    private native boolean addAddressBook( long nativeRef, String addressBookSourceId, String name, AddressBookType type );
-    private native boolean removeAddressBook( long nativeRef, String addressBookSourceId );
+    private native void disposeBinder(long nativeRef);
+    private native boolean addAddressBook(
+            long nativeRef, String addressBookSourceId, String name, AddressBookType type);
+    private native boolean removeAddressBook(long nativeRef, String addressBookSourceId);
 }

@@ -32,7 +32,7 @@ However, we recommend and support running a Docker environment with the followin
 
 During the build time, the following dependencies are fetched and built for the target platform by the Alexa Auto SDK Builder. Please refer to each of the individual entities for the particular licenses.
 
-* [AVS Device SDK v1.17](https://github.com/alexa/avs-device-sdk/)
+* [AVS Device SDK v1.19.1](https://github.com/alexa/avs-device-sdk/)
   * [cURL 7.65.3](https://curl.haxx.se/)
   * [ngHTTP2 1.39.1](https://github.com/nghttp2/nghttp2)
   * [SQLite3 3.20.0](https://www.sqlite.org/) or later
@@ -187,7 +187,7 @@ To change this behavior, you should specify the search path via the `--linaro-sy
 * Make sure to install the following prerequisites on your host:
 
   * Android Studio 3.4.1+
-  * Gradle 4.10.1 - 5.6.2 (5.1.1 - 5.6.2 if you are using Android Studio)
+  * Gradle 5.6.4 or above
 
   >**Note:**  You must ensure that the Gradle version you are using is compatible with the Android Studio version you are using. See the [Android Gradle Plugin Release Notes](https://developer.android.com/studio/releases/gradle-plugin#updating-gradle) for information about matching Android Studio versions to Gradle versions.
 

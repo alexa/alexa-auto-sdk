@@ -21,12 +21,11 @@ import com.amazon.aace.core.NativeRef;
  * PlatformInterface is the base class for all platform interfaces.
  * It can be extended to create custom platform interfaces.
  */
-abstract public class EngineConfiguration extends NativeRef
-{
-    protected void disposeNativeRef( long nativeRef ) {
-        disposeBinder( nativeRef );
+abstract public class EngineConfiguration extends NativeRef {
+    protected void disposeNativeRef(long nativeRef) {
+        disposeBinder(nativeRef);
     }
 
     // Native Engine JNI methods
-    private native void disposeBinder( long nativeRef );
+    private native void disposeBinder(long nativeRef);
 }

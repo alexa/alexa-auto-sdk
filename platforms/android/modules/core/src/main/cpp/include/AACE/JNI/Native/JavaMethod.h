@@ -25,58 +25,62 @@ namespace aace {
 namespace jni {
 namespace native {
 
-    class JavaMethod {
-    private:
-        JavaMethod( const std::string& name, const std::string& signature, jmethodID methodID );
+class JavaMethod {
+private:
+    JavaMethod(const std::string& name, const std::string& signature, jmethodID methodID);
 
-    public:
-        static std::shared_ptr<JavaMethod> create( const char* name, const char* signature, jmethodID methodID );
+public:
+    static std::shared_ptr<JavaMethod> create(const char* name, const char* signature, jmethodID methodID);
 
-        jmethodID getMethodID();
+    jmethodID getMethodID();
 
-    private:
-        std::string m_name;
-        std::string m_signature;
-        jmethodID m_methodID;
-    };
+private:
+    std::string m_name;
+    std::string m_signature;
+    jmethodID m_methodID;
+};
 
-    using JavaMethodPtr = std::shared_ptr<JavaMethod>;
+using JavaMethodPtr = std::shared_ptr<JavaMethod>;
 
-    //
-    // JavaMethodInfo
-    //
+//
+// JavaMethodInfo
+//
 
-    class JavaMethodInfo {
-    public:
-        JavaMethodInfo() = default;
-        JavaMethodInfo( const char* name, const char* signature, bool is_static = false ) : m_id( name ), m_name( name ), m_signature( signature ), m_static( is_static ) {}
-        JavaMethodInfo( const char* id, const char* name, const char* signature, bool is_static = false ) : m_id( id ), m_name( name ), m_signature( signature ), m_static( is_static ) {}
+class JavaMethodInfo {
+public:
+    JavaMethodInfo() = default;
+    JavaMethodInfo(const char* name, const char* signature, bool is_static = false) :
+            m_id(name), m_name(name), m_signature(signature), m_static(is_static) {
+    }
+    JavaMethodInfo(const char* id, const char* name, const char* signature, bool is_static = false) :
+            m_id(id), m_name(name), m_signature(signature), m_static(is_static) {
+    }
 
-        const std::string& getId() {
-            return m_id;
-        }
+    const std::string& getId() {
+        return m_id;
+    }
 
-        const std::string& getName() {
-            return m_name;
-        }
+    const std::string& getName() {
+        return m_name;
+    }
 
-        const std::string& getSignature() {
-            return m_signature;
-        }
+    const std::string& getSignature() {
+        return m_signature;
+    }
 
-        bool isStatic() {
-            return m_static;
-        }
+    bool isStatic() {
+        return m_static;
+    }
 
-    private:
-        std::string m_id;
-        std::string m_name;
-        std::string m_signature;
-        bool m_static;
-    };
+private:
+    std::string m_id;
+    std::string m_name;
+    std::string m_signature;
+    bool m_static;
+};
 
-} // aace::jni::native
-} // aace::jni
-} // aace
+}  // namespace native
+}  // namespace jni
+}  // namespace aace
 
-#endif // AACE_JNI_NATIVE_JAVA_METHOD_H
+#endif  // AACE_JNI_NATIVE_JAVA_METHOD_H

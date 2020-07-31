@@ -33,68 +33,36 @@ using json = nlohmann::json;
 namespace sampleApp {
 namespace carControl {
 
-namespace mode {
-    static const std::string AUTO                 = "AUTOMATIC";
-    static const std::string ECONOMY              = "ECONOMY";
-    static const std::string MANUAL               = "MANUAL";
-    static const std::string MAXIMUM              = "MAXIMUM";
-}
-
-namespace ventPosition {
-    static const std::string BODY                 = "BODY";
-    static const std::string MIX                  = "MIX";
-    static const std::string FLOOR                = "FLOOR";
-    static const std::string WINDSHIELD           = "WINDSHIELD";
-}
-
-namespace color {
-    static const std::string WHITE                = "WHITE";
-    static const std::string RED                  = "RED";
-    static const std::string ORANGE               = "ORANGE";
-    static const std::string YELLOW               = "YELLOW";
-    static const std::string GREEN                = "GREEN";
-    static const std::string BLUE                 = "BLUE";
-    static const std::string INDIGO               = "INDIGO";
-    static const std::string VIOLET               = "VIOLET";
-}
-
-namespace intensity {
-    static const std::string LOW                  = "LOW";
-    static const std::string MEDIUM               = "MEDIUM";
-    static const std::string HIGH                 = "HIGH";
-}
-
 class CarControlDataProvider {
-
 public:
-    
     /**
      * Initialize data from car control configuration.
      */
-    static auto initialize(std::vector<std::shared_ptr<aace::core::config::EngineConfiguration>> configurationFiles) -> void;
+    static auto initialize(std::vector<std::shared_ptr<aace::core::config::EngineConfiguration>> configurationFiles)
+        -> void;
 
     /**
      * Generate car control configuration.
      */
     static auto generateCarControlConfig() -> std::shared_ptr<aace::core::config::EngineConfiguration>;
-    
+
     /**
      * Return Power/Toggle Controller 
      */
-    static auto getBoolController(const std::string& controlId, const std::string& controllerId = "") -> BoolController&;
+    static auto getBoolController(const std::string& controlId, const std::string& controllerId = "")
+        -> BoolController&;
 
     /**
      * Return Mode Controller
      */
-    static auto getModeController(const std::string& controlId, const std::string& controllerId) ->  ModeController&;
-    
+    static auto getModeController(const std::string& controlId, const std::string& controllerId) -> ModeController&;
+
     /**
      * Return Range Controller
      */
-    static auto getRangeController(const std::string& controlId, const std::string& controllerId) ->  RangeController&;
+    static auto getRangeController(const std::string& controlId, const std::string& controllerId) -> RangeController&;
 
 private:
-
     // Generates a key for map lookup
     static auto genKey(std::string endpointId, std::string controllerId = "") -> std::string;
     // Used to maintain state of Power and Toggle controllers
@@ -105,7 +73,7 @@ private:
     static std::unordered_map<std::string, RangeController> m_rangeControllers;
 };
 
-} // sampleApp::carControl 
-} // sampleApp
+}  // namespace carControl
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_CARCONTROL_CARCONTROL_DATA_PROVIDER_H
+#endif  // SAMPLEAPP_CARCONTROL_CARCONTROL_DATA_PROVIDER_H

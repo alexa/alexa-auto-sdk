@@ -16,10 +16,10 @@
 #ifndef AACE_ENGINE_CAR_CONTROL_RANGECONTROLLER_H
 #define AACE_ENGINE_CAR_CONTROL_RANGECONTROLLER_H
 
-#include <nlohmann/json.hpp>
-
 #include <AVSCommon/SDKInterfaces/RangeController/RangeControllerInterface.h>
 #include <Endpoints/EndpointBuilder.h>
+
+#include <nlohmann/json.hpp>
 
 #include "AACE/Engine/CarControl/PrimitiveController.h"
 

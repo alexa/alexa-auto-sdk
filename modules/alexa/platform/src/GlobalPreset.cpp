@@ -18,7 +18,7 @@
 namespace aace {
 namespace alexa {
 
-GlobalPreset::~GlobalPreset() = default; // key function
+GlobalPreset::~GlobalPreset() = default;  // key function
 
-} // aace::alexa
-} // aac
+}  // namespace alexa
+}  // namespace aace

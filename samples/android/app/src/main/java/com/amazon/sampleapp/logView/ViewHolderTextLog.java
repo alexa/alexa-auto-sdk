@@ -25,17 +25,16 @@ import com.amazon.sampleapp.R;
 public class ViewHolderTextLog extends RecyclerView.ViewHolder {
     private TextView mLog;
 
-    public ViewHolderTextLog( View v ) {
-        super( v );
-        mLog = v.findViewById( R.id.logItem );
-        mLog.setTextColor( Color.WHITE );
+    public ViewHolderTextLog(View v) {
+        super(v);
+        mLog = v.findViewById(R.id.logItem);
+        mLog.setTextColor(Color.WHITE);
     }
 
     public TextView getLog() {
         return mLog;
     }
-    public void setHighlight( int hl ) {
-        mLog.setTextColor( Color.parseColor( String.format( "#%06X", hl ) ) );
+    public void setHighlight(int hl) {
+        mLog.setTextColor(Color.parseColor(String.format("#%06X", hl)));
     }
 }
-

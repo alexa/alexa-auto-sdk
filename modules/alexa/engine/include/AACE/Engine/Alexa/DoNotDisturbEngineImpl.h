@@ -38,52 +38,52 @@ namespace aace {
 namespace engine {
 namespace alexa {
 
-class DoNotDisturbEngineImpl :
-    public alexaClientSDK::settings::SettingObserverInterface<alexaClientSDK::settings::DoNotDisturbSetting>,
-    public aace::alexa::DoNotDisturbEngineInterface,
-    public std::enable_shared_from_this<DoNotDisturbEngineImpl>,
-    public alexaClientSDK::avsCommon::utils::RequiresShutdown {
+class DoNotDisturbEngineImpl
+        : public alexaClientSDK::settings::SettingObserverInterface<alexaClientSDK::settings::DoNotDisturbSetting>
+        , public aace::alexa::DoNotDisturbEngineInterface
+        , public std::enable_shared_from_this<DoNotDisturbEngineImpl>
+        , public alexaClientSDK::avsCommon::utils::RequiresShutdown {
+private:
+    DoNotDisturbEngineImpl(std::shared_ptr<aace::alexa::DoNotDisturb> doNotDisturbPlatformInterface);
 
-    private: 
-        DoNotDisturbEngineImpl( std::shared_ptr<aace::alexa::DoNotDisturb> doNotDisturbPlatformInterface );
-
-        bool initialize(
-	    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
+    bool initialize(
+        std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
         std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> connectionManager,
         std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> customerDataManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-        aace::engine::alexa::DeviceSettingsDelegate& deviceSettingsDelegate );
+        aace::engine::alexa::DeviceSettingsDelegate& deviceSettingsDelegate);
 
-    public:
-        static std::shared_ptr<DoNotDisturbEngineImpl> create(
+public:
+    static std::shared_ptr<DoNotDisturbEngineImpl> create(
         std::shared_ptr<aace::alexa::DoNotDisturb> doNotDisturbPlatformInterface,
-	    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
+        std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
         std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> connectionManager,
         std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> customerDataManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-        aace::engine::alexa::DeviceSettingsDelegate& deviceSettingsDelegate );
+        aace::engine::alexa::DeviceSettingsDelegate& deviceSettingsDelegate);
 
-        // DoNotDisturbEngineInterface
-        bool onDoNotDisturbChanged( bool doNotDisturb ) override; 
+    // DoNotDisturbEngineInterface
+    bool onDoNotDisturbChanged(bool doNotDisturb) override;
 
-        // SettingObserverInterface
-        void onSettingNotification( const bool & value, alexaClientSDK::settings::SettingNotifications notification) override;
+    // SettingObserverInterface
+    void onSettingNotification(const bool& value, alexaClientSDK::settings::SettingNotifications notification) override;
 
-    protected:
-        virtual void doShutdown() override;
-    
-    private:
-        std::shared_ptr<aace::alexa::DoNotDisturb> m_doNotDisturbPlatformInterface;
-        std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> m_connectionManager;
-        std::shared_ptr<alexaClientSDK::capabilityAgents::doNotDisturb::DoNotDisturbCapabilityAgent> m_doNotDisturbCapabilityAgent;
-        /// An executor used for serializing requests on agent's own thread of execution.
-        alexaClientSDK::avsCommon::utils::threading::Executor m_executor;
+protected:
+    virtual void doShutdown() override;
+
+private:
+    std::shared_ptr<aace::alexa::DoNotDisturb> m_doNotDisturbPlatformInterface;
+    std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> m_connectionManager;
+    std::shared_ptr<alexaClientSDK::capabilityAgents::doNotDisturb::DoNotDisturbCapabilityAgent>
+        m_doNotDisturbCapabilityAgent;
+    /// An executor used for serializing requests on agent's own thread of execution.
+    alexaClientSDK::avsCommon::utils::threading::Executor m_executor;
 };
 
-} // aace::engine::alexa
-} // aace::engine
-} // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_ALEXA_DO_NOT_DISTURB_ENGINE_IMPL_H
+#endif  // AACE_ENGINE_ALEXA_DO_NOT_DISTURB_ENGINE_IMPL_H

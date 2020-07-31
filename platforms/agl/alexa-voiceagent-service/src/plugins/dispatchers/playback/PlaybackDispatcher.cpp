@@ -48,7 +48,6 @@ std::shared_ptr<PlaybackDispatcher> PlaybackDispatcher::create(
     std::shared_ptr<ILogger> logger,
     std::shared_ptr<IAASBController> aasbController,
     std::shared_ptr<IAFBApi> api) {
-
     return std::shared_ptr<PlaybackDispatcher>(new PlaybackDispatcher(logger, aasbController, api));
 }
 
@@ -56,9 +55,7 @@ PlaybackDispatcher::PlaybackDispatcher(
     std::shared_ptr<ILogger> logger,
     std::shared_ptr<IAASBController> aasbController,
     std::shared_ptr<IAFBApi> api) :
-        m_logger(logger),
-        m_aasbController(aasbController),
-        m_api(api) {
+        m_logger(logger), m_aasbController(aasbController), m_api(api) {
 }
 
 void PlaybackDispatcher::onReceivedDirective(const std::string& action, const std::string& jsonPayload) {
@@ -68,20 +65,15 @@ void PlaybackDispatcher::onReceivedDirective(const std::string& action, const st
 bool PlaybackDispatcher::subscribeToPlaybackControlEvents() {
     m_logger->log(Level::INFO, TAG, "Subscribing to playback control capabilities");
 
-    json_object *argsJ = json_object_new_object();
-    json_object *actionsJ = json_object_new_array();
+    json_object* argsJ = json_object_new_object();
+    json_object* actionsJ = json_object_new_array();
     json_object_array_add(actionsJ, json_object_new_string(VSHL_CAPABILITY_PLAYBACK_BUTTON_PRESSED.c_str()));
     json_object_object_add(argsJ, agl::alexa::JSON_ATTR_ACTIONS.c_str(), actionsJ);
 
     json_object* response = NULL;
     std::string error, info;
     int result = m_api->callSync(
-        agl::alexa::VSHL_CAPABILITIES_API_NAME,
-        VSHL_CAPABILITY_VERB_PLAYBACK_SUBSCRIBE,
-        argsJ,
-        &response,
-        error,
-        info);
+        agl::alexa::VSHL_CAPABILITIES_API_NAME, VSHL_CAPABILITY_VERB_PLAYBACK_SUBSCRIBE, argsJ, &response, error, info);
     if (result != 0) {
         m_logger->log(Level::ERROR, TAG, "Failed to subscribe to playback control capabilities. Error: " + error);
     }
@@ -95,10 +87,7 @@ bool PlaybackDispatcher::subscribeToPlaybackControlEvents() {
 
 void PlaybackDispatcher::onButtonPressed(const std::string& payload) {
     m_logger->log(Level::DEBUG, TAG, "buttonPressed " + payload);
-    m_aasbController->onReceivedEvent(
-        TOPIC_PLAYBACK_CONTROLLER,
-        ACTION_PLAYBACK_BUTTON_PRESSED,
-        payload);
+    m_aasbController->onReceivedEvent(TOPIC_PLAYBACK_CONTROLLER, ACTION_PLAYBACK_BUTTON_PRESSED, payload);
 }
 
 }  // namespace playback

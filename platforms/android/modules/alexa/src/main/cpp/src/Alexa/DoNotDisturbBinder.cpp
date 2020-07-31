@@ -23,80 +23,69 @@ namespace aace {
 namespace jni {
 namespace alexa {
 
-    //
-    // DoNotDisturbBinder
-    //
+//
+// DoNotDisturbBinder
+//
 
-    DoNotDisturbBinder::DoNotDisturbBinder( jobject obj ) {
-        m_doNotDisturbHandler = std::make_shared<DoNotDisturbHandler>( obj );
+DoNotDisturbBinder::DoNotDisturbBinder(jobject obj) {
+    m_doNotDisturbHandler = std::make_shared<DoNotDisturbHandler>(obj);
+}
+
+//
+// DoNotDisturbHandler
+//
+
+DoNotDisturbHandler::DoNotDisturbHandler(jobject obj) : m_obj(obj, "com/amazon/aace/alexa/DoNotDisturb") {
+}
+
+void DoNotDisturbHandler::setDoNotDisturb(const bool doNotDisturb) {
+    try_with_context {
+        ThrowIfNot(m_obj.invoke<void>("setDoNotDisturb", "(Z)V", nullptr, doNotDisturb), "invokeMethodFailed");
     }
-
-    //
-    // DoNotDisturbHandler
-    //
-
-    DoNotDisturbHandler::DoNotDisturbHandler( jobject obj ) : m_obj( obj, "com/amazon/aace/alexa/DoNotDisturb" ) {
-    }
-
-    void DoNotDisturbHandler::setDoNotDisturb( const bool doNotDisturb )
-    {
-        try_with_context
-        {
-            ThrowIfNot( m_obj.invoke<void>( "setDoNotDisturb", "(Z)V", nullptr, doNotDisturb ), "invokeMethodFailed" );
-        }
-        catch_with_ex {
-            AACE_JNI_ERROR(TAG,"setDoNotDisturb",ex.what());
-        }
-    }
-
-} // aace::alexa
-} // aace::jni
-} // aace
-
-#define DO_NOT_DISTURB_BINDER(ref) reinterpret_cast<aace::jni::alexa::DoNotDisturbBinder *>( ref )
-
-extern "C"
-{
-    JNIEXPORT jlong JNICALL
-    Java_com_amazon_aace_alexa_DoNotDisturb_createBinder( JNIEnv* env, jobject obj )
-    {
-        try
-        {
-            return reinterpret_cast<long>( new aace::jni::alexa::DoNotDisturbBinder( obj ) );
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_alexa_DoNotDisturb_createBinder",ex.what());
-            return 0;
-        }
-    }
-
-    JNIEXPORT void JNICALL
-    Java_com_amazon_aace_alexa_DoNotDisturb_disposeBinder( JNIEnv* env, jobject /* this */, jlong ref )
-    {
-        try
-        {
-            auto doNotDisturbBinder = DO_NOT_DISTURB_BINDER(ref);
-            ThrowIfNull( doNotDisturbBinder, "invalidDoNotDisturbBinder" );
-            delete doNotDisturbBinder;
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_alexa_DoNotDisturb_disposeBinder",ex.what());
-        }
-    }
-
-    JNIEXPORT bool JNICALL
-    Java_com_amazon_aace_alexa_DoNotDisturb_doNotDisturbChanged( JNIEnv* env, jobject /* this */, jlong ref, jboolean doNotDisturb )
-    {
-        try
-        {
-            auto doNotDisturbBinder = DO_NOT_DISTURB_BINDER(ref);
-            ThrowIfNull( doNotDisturbBinder, "invalidDoNotDisturbBinder" );
-            return doNotDisturbBinder->getDoNotDisturb()->doNotDisturbChanged( doNotDisturb );
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_alexa_DoNotDisturb_doNotDisturbChanged",ex.what());
-            return false;
-        }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "setDoNotDisturb", ex.what());
     }
 }
 
+}  // namespace alexa
+}  // namespace jni
+}  // namespace aace
+
+#define DO_NOT_DISTURB_BINDER(ref) reinterpret_cast<aace::jni::alexa::DoNotDisturbBinder*>(ref)
+
+extern "C" {
+JNIEXPORT jlong JNICALL Java_com_amazon_aace_alexa_DoNotDisturb_createBinder(JNIEnv* env, jobject obj) {
+    try {
+        return reinterpret_cast<long>(new aace::jni::alexa::DoNotDisturbBinder(obj));
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_alexa_DoNotDisturb_createBinder", ex.what());
+        return 0;
+    }
+}
+
+JNIEXPORT void JNICALL
+Java_com_amazon_aace_alexa_DoNotDisturb_disposeBinder(JNIEnv* env, jobject /* this */, jlong ref) {
+    try {
+        auto doNotDisturbBinder = DO_NOT_DISTURB_BINDER(ref);
+        ThrowIfNull(doNotDisturbBinder, "invalidDoNotDisturbBinder");
+        delete doNotDisturbBinder;
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_alexa_DoNotDisturb_disposeBinder", ex.what());
+    }
+}
+
+JNIEXPORT bool JNICALL Java_com_amazon_aace_alexa_DoNotDisturb_doNotDisturbChanged(
+    JNIEnv* env,
+    jobject /* this */,
+    jlong ref,
+    jboolean doNotDisturb) {
+    try {
+        auto doNotDisturbBinder = DO_NOT_DISTURB_BINDER(ref);
+        ThrowIfNull(doNotDisturbBinder, "invalidDoNotDisturbBinder");
+        return doNotDisturbBinder->getDoNotDisturb()->doNotDisturbChanged(doNotDisturb);
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_alexa_DoNotDisturb_doNotDisturbChanged", ex.what());
+        return false;
+    }
+}
+}

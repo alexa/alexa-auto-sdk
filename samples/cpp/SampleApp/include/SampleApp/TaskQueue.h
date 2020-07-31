@@ -38,7 +38,7 @@ namespace sampleApp {
  * A TaskQueue contains a queue of tasks to run
  */
 class TaskQueue {
-  public:
+public:
     /**
      * Constructs an empty TaskQueue.
      */
@@ -53,7 +53,8 @@ class TaskQueue {
      * @returns A @c std::future to access the return value of the task. If the queue is shutdown, the task will be
      *     dropped, and an invalid future will be returned.
      */
-    template <typename Task, typename... Args> auto push(Task task, Args &&... args) -> std::future<decltype(task(args...))>;
+    template <typename Task, typename... Args>
+    auto push(Task task, Args&&... args) -> std::future<decltype(task(args...))>;
 
     /**
      * Pushes a task on the front of the queue. If the queue is shutdown, the task will be dropped, and an invalid
@@ -64,7 +65,8 @@ class TaskQueue {
      * @returns A @c std::future to access the return value of the task. If the queue is shutdown, the task will be
      *     dropped, and an invalid future will be returned.
      */
-    template <typename Task, typename... Args> auto pushToFront(Task task, Args &&... args) -> std::future<decltype(task(args...))>;
+    template <typename Task, typename... Args>
+    auto pushToFront(Task task, Args&&... args) -> std::future<decltype(task(args...))>;
 
     /**
      * Returns and removes the task at the front of the queue. If there are no tasks, this call will block until there
@@ -88,7 +90,7 @@ class TaskQueue {
      */
     bool isShutdown();
 
-  private:
+private:
     /// The queue type to use for holding tasks.
     using Queue = std::deque<std::unique_ptr<std::function<void()>>>;
 
@@ -102,7 +104,8 @@ class TaskQueue {
      * @returns A @c std::future to access the return value of the task. If the queue is shutdown, the task will be
      *     dropped, and an invalid future will be returned.
      */
-    template <typename Task, typename... Args> auto pushTo(bool front, Task task, Args &&... args) -> std::future<decltype(task(args...))>;
+    template <typename Task, typename... Args>
+    auto pushTo(bool front, Task task, Args&&... args) -> std::future<decltype(task(args...))>;
 
     /// The queue of tasks
     Queue m_queue;
@@ -117,12 +120,14 @@ class TaskQueue {
     std::atomic_bool m_shutdown;
 };
 
-template <typename Task, typename... Args> auto TaskQueue::push(Task task, Args &&... args) -> std::future<decltype(task(args...))> {
+template <typename Task, typename... Args>
+auto TaskQueue::push(Task task, Args&&... args) -> std::future<decltype(task(args...))> {
     bool front = true;
     return pushTo(!front, std::forward<Task>(task), std::forward<Args>(args)...);
 }
 
-template <typename Task, typename... Args> auto TaskQueue::pushToFront(Task task, Args &&... args) -> std::future<decltype(task(args...))> {
+template <typename Task, typename... Args>
+auto TaskQueue::pushToFront(Task task, Args&&... args) -> std::future<decltype(task(args...))> {
     bool front = true;
     return pushTo(front, std::forward<Task>(task), std::forward<Args>(args)...);
 }
@@ -133,7 +138,10 @@ template <typename Task, typename... Args> auto TaskQueue::pushToFront(Task task
  * @param promise The @c std::promise to fulfill when @c future is fulfilled.
  * @param future The @c std::future on which to wait for a result to forward to @c promise.
  */
-template <typename T> inline static void forwardPromise(std::shared_ptr<std::promise<T>> promise, std::future<T> *future) { promise->set_value(future->get()); }
+template <typename T>
+inline static void forwardPromise(std::shared_ptr<std::promise<T>> promise, std::future<T>* future) {
+    promise->set_value(future->get());
+}
 
 /**
  * Specialization of @c forwardPromise() for @c void types.
@@ -141,12 +149,14 @@ template <typename T> inline static void forwardPromise(std::shared_ptr<std::pro
  * @param promise The @c std::promise to fulfill when @c future is fulfilled.
  * @param future The @c std::future on which to wait before fulfilling @c promise.
  */
-template <> inline void forwardPromise<void>(std::shared_ptr<std::promise<void>> promise, std::future<void> *future) {
+template <>
+inline void forwardPromise<void>(std::shared_ptr<std::promise<void>> promise, std::future<void>* future) {
     future->get();
     promise->set_value();
 }
 
-template <typename Task, typename... Args> auto TaskQueue::pushTo(bool front, Task task, Args &&... args) -> std::future<decltype(task(args...))> {
+template <typename Task, typename... Args>
+auto TaskQueue::pushTo(bool front, Task task, Args&&... args) -> std::future<decltype(task(args...))> {
     // Remove arguments from the tasks type by binding the arguments to the task.
     auto boundTask = std::bind(std::forward<Task>(task), std::forward<Args>(args)...);
 
@@ -200,6 +210,6 @@ template <typename Task, typename... Args> auto TaskQueue::pushTo(bool front, Ta
     return cleanupFuture;
 }
 
-} // namespace sampleApp
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_TASKQUEUE_H
+#endif  // SAMPLEAPP_TASKQUEUE_H

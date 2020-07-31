@@ -21,11 +21,9 @@
 #include <AACE/Alexa/AlexaConfiguration.h>
 #include <AACE/Engine/Core/EngineMacros.h>
 
-class AlexaConfigurationImplTest : public ::testing::Test {
-};
+class AlexaConfigurationImplTest : public ::testing::Test {};
 
-TEST_F( AlexaConfigurationImplTest,createDeviceInfoConfigBestCase )
-{
+TEST_F(AlexaConfigurationImplTest, createDeviceInfoConfigBestCase) {
     std::string expectedConfigStr =
         "{\n"
         "    \"aace.alexa\": {\n"
@@ -33,24 +31,24 @@ TEST_F( AlexaConfigurationImplTest,createDeviceInfoConfigBestCase )
         "            \"deviceInfo\": {\n"
         "                \"deviceSerialNumber\": \"DEVICE_SERIAL_NUMBER\",\n"
         "                \"clientId\": \"CLIENT_ID\",\n"
-        "                \"productId\": \"PRODUCT_ID\"\n"
-        "                \"manufacturerName\": \"MANUFACTURER_NAME\"\n"
+        "                \"productId\": \"PRODUCT_ID\",\n"
+        "                \"manufacturerName\": \"MANUFACTURER_NAME\",\n"
         "                \"description\": \"DESCRIPTION\"\n"
         "            }\n"
         "        }\n"
         "    }\n"
         "}";
 
-    auto config = aace::alexa::config::AlexaConfiguration::createDeviceInfoConfig( "DEVICE_SERIAL_NUMBER", "CLIENT_ID", "PRODUCT_ID", "MANUFACTURER_NAME", "DESCRIPTION"  );
-    
+    auto config = aace::alexa::config::AlexaConfiguration::createDeviceInfoConfig(
+        "DEVICE_SERIAL_NUMBER", "CLIENT_ID", "PRODUCT_ID", "MANUFACTURER_NAME", "DESCRIPTION");
+
     // compare config stream with expected string value
     std::ostringstream configStr;
     configStr << config->getStream()->rdbuf();
-    EXPECT_EQ(configStr.str(),expectedConfigStr) << "Error in the Configuration String";
+    EXPECT_EQ(configStr.str(), expectedConfigStr) << "Error in the Configuration String";
 }
 
-TEST_F(AlexaConfigurationImplTest,createAlertsConfigBestCase)
-{
+TEST_F(AlexaConfigurationImplTest, createAlertsConfigBestCase) {
     std::string expectedConfigStr =
         "{\n"
         "    \"aace.alexa\": {\n"
@@ -62,16 +60,15 @@ TEST_F(AlexaConfigurationImplTest,createAlertsConfigBestCase)
         "    }\n"
         "}";
 
-    auto config = aace::alexa::config::AlexaConfiguration::createAlertsConfig( "DATABASE_PATH" );
+    auto config = aace::alexa::config::AlexaConfiguration::createAlertsConfig("DATABASE_PATH");
 
     //Convert to ostringstream for comparing the istream
     std::ostringstream configStr;
     configStr << config->getStream()->rdbuf();
-    EXPECT_EQ(configStr.str(),expectedConfigStr) << "Error in the Configuration String";
+    EXPECT_EQ(configStr.str(), expectedConfigStr) << "Error in the Configuration String";
 }
 
-TEST_F(AlexaConfigurationImplTest,createNotificationsConfigBestCase)
-{
+TEST_F(AlexaConfigurationImplTest, createNotificationsConfigBestCase) {
     std::string expectedConfigStr =
         "{\n"
         "    \"aace.alexa\": {\n"
@@ -83,16 +80,15 @@ TEST_F(AlexaConfigurationImplTest,createNotificationsConfigBestCase)
         "    }\n"
         "}";
 
-    auto config = aace::alexa::config::AlexaConfiguration::createNotificationsConfig( "DATABASE_PATH" );
+    auto config = aace::alexa::config::AlexaConfiguration::createNotificationsConfig("DATABASE_PATH");
 
     //Convert to ostringstream for comparing the istream
     std::ostringstream configStr;
     configStr << config->getStream()->rdbuf();
-    EXPECT_EQ(configStr.str(),expectedConfigStr) << "Error in the Configuration String";
+    EXPECT_EQ(configStr.str(), expectedConfigStr) << "Error in the Configuration String";
 }
 
-TEST_F(AlexaConfigurationImplTest,createCertifiedSenderConfigBestCase)
-{
+TEST_F(AlexaConfigurationImplTest, createCertifiedSenderConfigBestCase) {
     std::string expectedConfigStr =
         "{\n"
         "    \"aace.alexa\": {\n"
@@ -104,16 +100,15 @@ TEST_F(AlexaConfigurationImplTest,createCertifiedSenderConfigBestCase)
         "    }\n"
         "}";
 
-    auto config = aace::alexa::config::AlexaConfiguration::createCertifiedSenderConfig( "DATABASE_PATH" );
+    auto config = aace::alexa::config::AlexaConfiguration::createCertifiedSenderConfig("DATABASE_PATH");
 
     //Convert to ostringstream for comparing the istream
     std::ostringstream configStr;
     configStr << config->getStream()->rdbuf();
-    EXPECT_EQ(configStr.str(),expectedConfigStr) << "Error in the Configuration String";
+    EXPECT_EQ(configStr.str(), expectedConfigStr) << "Error in the Configuration String";
 }
 
-TEST_F(AlexaConfigurationImplTest,createCapabilitiesDelegateConfigBestCase)
-{
+TEST_F(AlexaConfigurationImplTest, createCapabilitiesDelegateConfigBestCase) {
     std::string expectedConfigStr =
         "{\n"
         "    \"aace.alexa\": {\n"
@@ -125,16 +120,15 @@ TEST_F(AlexaConfigurationImplTest,createCapabilitiesDelegateConfigBestCase)
         "    }\n"
         "}";
 
-    auto config = aace::alexa::config::AlexaConfiguration::createCapabilitiesDelegateConfig( "DATABASE_PATH" );
+    auto config = aace::alexa::config::AlexaConfiguration::createCapabilitiesDelegateConfig("DATABASE_PATH");
 
     //Convert to ostringstream for comparing the istream
     std::ostringstream configStr;
     configStr << config->getStream()->rdbuf();
-    EXPECT_EQ(configStr.str(),expectedConfigStr) << "Error in the Configuration String";
+    EXPECT_EQ(configStr.str(), expectedConfigStr) << "Error in the Configuration String";
 }
 
-TEST_F(AlexaConfigurationImplTest,createCurlConfigBestCase)
-{
+TEST_F(AlexaConfigurationImplTest, createCurlConfigBestCase) {
     std::string expectedConfigStr =
         "{\n"
         "    \"aace.alexa\": {\n"
@@ -146,16 +140,15 @@ TEST_F(AlexaConfigurationImplTest,createCurlConfigBestCase)
         "    }\n"
         "}";
 
-    auto config = aace::alexa::config::AlexaConfiguration::createCurlConfig( "CAPATH" );
+    auto config = aace::alexa::config::AlexaConfiguration::createCurlConfig("CAPATH");
 
     //Convert to ostringstream for comparing the istream
     std::ostringstream configStr;
     configStr << config->getStream()->rdbuf();
-    EXPECT_EQ(configStr.str(),expectedConfigStr) << "Error in the Configuration String";
+    EXPECT_EQ(configStr.str(), expectedConfigStr) << "Error in the Configuration String";
 }
 
-TEST_F(AlexaConfigurationImplTest,createCurlConfigWithNetworkInterface)
-{
+TEST_F(AlexaConfigurationImplTest, createCurlConfigWithNetworkInterface) {
     std::string expectedConfigStr =
         "{\n"
         "    \"aace.alexa\": {\n"
@@ -168,16 +161,15 @@ TEST_F(AlexaConfigurationImplTest,createCurlConfigWithNetworkInterface)
         "    }\n"
         "}";
 
-    auto config = aace::alexa::config::AlexaConfiguration::createCurlConfig( "CAPATH", "INTERFACE" );
+    auto config = aace::alexa::config::AlexaConfiguration::createCurlConfig("CAPATH", "INTERFACE");
 
     //Convert to ostringstream for comparing the istream
     std::ostringstream configStr;
     configStr << config->getStream()->rdbuf();
-    EXPECT_EQ(configStr.str(),expectedConfigStr) << "Error in the Configuration String";
+    EXPECT_EQ(configStr.str(), expectedConfigStr) << "Error in the Configuration String";
 }
 
-TEST_F(AlexaConfigurationImplTest,createCurlConfigWithEmptyStringNetworkInterface)
-{
+TEST_F(AlexaConfigurationImplTest, createCurlConfigWithEmptyStringNetworkInterface) {
     std::string expectedConfigStr =
         "{\n"
         "    \"aace.alexa\": {\n"
@@ -189,40 +181,40 @@ TEST_F(AlexaConfigurationImplTest,createCurlConfigWithEmptyStringNetworkInterfac
         "    }\n"
         "}";
 
-    auto config = aace::alexa::config::AlexaConfiguration::createCurlConfig( "CAPATH", "" );
+    auto config = aace::alexa::config::AlexaConfiguration::createCurlConfig("CAPATH", "");
 
     //Convert to ostringstream for comparing the istream
     std::ostringstream configStr;
     configStr << config->getStream()->rdbuf();
-    EXPECT_EQ(configStr.str(),expectedConfigStr) << "Error in the Configuration String";
+    EXPECT_EQ(configStr.str(), expectedConfigStr) << "Error in the Configuration String";
 }
 
-TEST_F(AlexaConfigurationImplTest,createSettingsConfigBestCase)
-{
+TEST_F(AlexaConfigurationImplTest, createSettingsConfigBestCase) {
     std::string expectedConfigStr =
         "{\n"
         "    \"aace.alexa\": {\n"
         "        \"avsDeviceSDK\": {\n"
-        "            \"settings\": {\n"
-        "                \"databaseFilePath\": \"DATABASE_PATH\",\n"
-        "                \"defaultAVSClientSettings\": {\n"
-        "                    \"locale\": \"LOCALE\"\n"
-        "                }\n"
+        "            \"deviceSettings\": {\n"
+        "                \"locales\": [\n"
+        "                    \"LOCALE\"\n"
+        "                ],\n"
+        "                \"defaultLocale\": \"LOCALE\",\n"
+        "                \"defaultTimezone\": \"America/Vancouver\",\n"
+        "                \"databaseFilePath\": \"DATABASE_PATH\"\n"
         "            }\n"
         "        }\n"
         "    }\n"
         "}";
 
-    auto config = aace::alexa::config::AlexaConfiguration::createSettingsConfig( "DATABASE_PATH", "LOCALE" );
+    auto config = aace::alexa::config::AlexaConfiguration::createSettingsConfig("DATABASE_PATH", "LOCALE");
 
     //Convert to ostringstream for comparing the istream
     std::ostringstream configStr;
     configStr << config->getStream()->rdbuf();
-    EXPECT_EQ(configStr.str(),expectedConfigStr) << "Error in the Configuration String";
+    EXPECT_EQ(configStr.str(), expectedConfigStr) << "Error in the Configuration String";
 }
 
-TEST_F(AlexaConfigurationImplTest,createSpeakerManagerConfigBestCase)
-{
+TEST_F(AlexaConfigurationImplTest, createSpeakerManagerConfigBestCase) {
     std::string expectedConfigStr =
         "{\n"
         "    \"aace.alexa\": {\n"
@@ -232,16 +224,15 @@ TEST_F(AlexaConfigurationImplTest,createSpeakerManagerConfigBestCase)
         "    }\n"
         "}";
 
-    auto config = aace::alexa::config::AlexaConfiguration::createSpeakerManagerConfig( true );
+    auto config = aace::alexa::config::AlexaConfiguration::createSpeakerManagerConfig(true);
 
     //Convert to ostringstream for comparing the istream
     std::ostringstream configStr;
     configStr << config->getStream()->rdbuf();
-    EXPECT_EQ(configStr.str(),expectedConfigStr) << "Error in the Configuration String";
+    EXPECT_EQ(configStr.str(), expectedConfigStr) << "Error in the Configuration String";
 }
 
-TEST_F(AlexaConfigurationImplTest,createSystemConfigBestCase)
-{
+TEST_F(AlexaConfigurationImplTest, createSystemConfigBestCase) {
     std::string expectedConfigStr =
         "{\n"
         "    \"aace.alexa\": {\n"
@@ -251,16 +242,15 @@ TEST_F(AlexaConfigurationImplTest,createSystemConfigBestCase)
         "    }\n"
         "}";
 
-    auto config = aace::alexa::config::AlexaConfiguration::createSystemConfig( 1 );
+    auto config = aace::alexa::config::AlexaConfiguration::createSystemConfig(1);
 
     //Convert to ostringstream for comparing the istream
     std::ostringstream configStr;
     configStr << config->getStream()->rdbuf();
-    EXPECT_EQ(configStr.str(),expectedConfigStr) << "Error in the Configuration String";
+    EXPECT_EQ(configStr.str(), expectedConfigStr) << "Error in the Configuration String";
 }
 
-TEST_F(AlexaConfigurationImplTest,createMiscStorageConfigBestCase)
-{
+TEST_F(AlexaConfigurationImplTest, createMiscStorageConfigBestCase) {
     std::string expectedConfigStr =
         "{\n"
         "    \"aace.alexa\": {\n"
@@ -272,16 +262,15 @@ TEST_F(AlexaConfigurationImplTest,createMiscStorageConfigBestCase)
         "    }\n"
         "}";
 
-    auto config = aace::alexa::config::AlexaConfiguration::createMiscStorageConfig( "DATABASE_PATH" );
+    auto config = aace::alexa::config::AlexaConfiguration::createMiscStorageConfig("DATABASE_PATH");
 
     //Convert to ostringstream for comparing the istream
     std::ostringstream configStr;
     configStr << config->getStream()->rdbuf();
-    EXPECT_EQ(configStr.str(),expectedConfigStr) << "Error in the Configuration String";
+    EXPECT_EQ(configStr.str(), expectedConfigStr) << "Error in the Configuration String";
 }
 
-TEST_F(AlexaConfigurationImplTest, createTemplateRuntimeConfigBestCase)
-{
+TEST_F(AlexaConfigurationImplTest, createTemplateRuntimeConfigBestCase) {
     using TimeoutType = aace::alexa::config::AlexaConfiguration::TemplateRuntimeTimeoutType;
 
     std::string expectedConfigStr =
@@ -297,20 +286,18 @@ TEST_F(AlexaConfigurationImplTest, createTemplateRuntimeConfigBestCase)
         "    }\n"
         "}";
 
-    auto config = aace::alexa::config::AlexaConfiguration::createTemplateRuntimeTimeoutConfig( {
-        { TimeoutType::DISPLAY_CARD_TTS_FINISHED_TIMEOUT, std::chrono::milliseconds( 1000 ) },
-        { TimeoutType::DISPLAY_CARD_AUDIO_PLAYBACK_FINISHED_TIMEOUT, std::chrono::milliseconds( 1000 ) },
-        { TimeoutType::DISPLAY_CARD_AUDIO_PLAYBACK_STOPPED_PAUSED_TIMEOUT, std::chrono::milliseconds( 1000 ) }
-    });
+    auto config = aace::alexa::config::AlexaConfiguration::createTemplateRuntimeTimeoutConfig(
+        {{TimeoutType::DISPLAY_CARD_TTS_FINISHED_TIMEOUT, std::chrono::milliseconds(1000)},
+         {TimeoutType::DISPLAY_CARD_AUDIO_PLAYBACK_FINISHED_TIMEOUT, std::chrono::milliseconds(1000)},
+         {TimeoutType::DISPLAY_CARD_AUDIO_PLAYBACK_STOPPED_PAUSED_TIMEOUT, std::chrono::milliseconds(1000)}});
 
     //Convert to ostringstream for comparing the istream
     std::ostringstream configStr;
     configStr << config->getStream()->rdbuf();
-    EXPECT_EQ(configStr.str(),expectedConfigStr) << "Error in the Configuration String";
+    EXPECT_EQ(configStr.str(), expectedConfigStr) << "Error in the Configuration String";
 }
 
-TEST_F(AlexaConfigurationImplTest, createTemplateRuntimeConfigWithOneKeyBestCase)
-{
+TEST_F(AlexaConfigurationImplTest, createTemplateRuntimeConfigWithOneKeyBestCase) {
     using TimeoutType = aace::alexa::config::AlexaConfiguration::TemplateRuntimeTimeoutType;
 
     std::string expectedConfigStr =
@@ -324,18 +311,16 @@ TEST_F(AlexaConfigurationImplTest, createTemplateRuntimeConfigWithOneKeyBestCase
         "    }\n"
         "}";
 
-    auto config = aace::alexa::config::AlexaConfiguration::createTemplateRuntimeTimeoutConfig( {
-        { TimeoutType::DISPLAY_CARD_AUDIO_PLAYBACK_FINISHED_TIMEOUT, std::chrono::milliseconds( 1000 ) }
-    });
+    auto config = aace::alexa::config::AlexaConfiguration::createTemplateRuntimeTimeoutConfig(
+        {{TimeoutType::DISPLAY_CARD_AUDIO_PLAYBACK_FINISHED_TIMEOUT, std::chrono::milliseconds(1000)}});
 
     //Convert to ostringstream for comparing the istream
     std::ostringstream configStr;
     configStr << config->getStream()->rdbuf();
-    EXPECT_EQ(configStr.str(),expectedConfigStr) << "Error in the Configuration String";
+    EXPECT_EQ(configStr.str(), expectedConfigStr) << "Error in the Configuration String";
 }
 
-TEST_F(AlexaConfigurationImplTest, createTemplateRuntimeConfigWithNoKeys)
-{
+TEST_F(AlexaConfigurationImplTest, createTemplateRuntimeConfigWithNoKeys) {
     std::string expectedConfigStr =
         "{\n"
         "    \"aace.alexa\": {\n"
@@ -345,11 +330,10 @@ TEST_F(AlexaConfigurationImplTest, createTemplateRuntimeConfigWithNoKeys)
         "    }\n"
         "}";
 
-    auto config = aace::alexa::config::AlexaConfiguration::createTemplateRuntimeTimeoutConfig( {} );
+    auto config = aace::alexa::config::AlexaConfiguration::createTemplateRuntimeTimeoutConfig({});
 
     //Convert to ostringstream for comparing the istream
     std::ostringstream configStr;
     configStr << config->getStream()->rdbuf();
-    EXPECT_EQ(configStr.str(),expectedConfigStr) << "Error in the Configuration String";
+    EXPECT_EQ(configStr.str(), expectedConfigStr) << "Error in the Configuration String";
 }
-

@@ -31,7 +31,7 @@ protected:
 
 public:
     virtual ~AudioInput();
-    
+
     /**
      * Writes audio samples to the Engine for processing by the wake word engine or streaming to AVS.
      *
@@ -46,7 +46,7 @@ public:
      * @return The number of samples successfully written to the Engine or a negative error code
      * if data could not be written
      */
-    ssize_t write( const int16_t* data, const size_t size );
+    ssize_t write(const int16_t* data, const size_t size);
 
     /**
      * Notifies the platform implementation to start writing audio samples to the Engine via @c write().
@@ -63,20 +63,20 @@ public:
      * @return @c true if the platform handled the call successfully, else @c false
      */
     virtual bool stopAudioInput() = 0;
-    
+
     /**
      * @internal
      * Sets the Engine interface delegate
      *
      * Should *never* be called by the platform implementation
      */
-    void setEngineInterface( std::shared_ptr<aace::audio::AudioInputEngineInterface> audioInputEngineInterface );
+    void setEngineInterface(std::shared_ptr<aace::audio::AudioInputEngineInterface> audioInputEngineInterface);
 
 private:
     std::shared_ptr<aace::audio::AudioInputEngineInterface> m_audioInputEngineInterface;
 };
 
-} // aace::audio
-} // aace
+}  // namespace audio
+}  // namespace aace
 
-#endif // AACE_AUDIO_AUDIO_INPUT_H
+#endif  // AACE_AUDIO_AUDIO_INPUT_H

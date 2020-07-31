@@ -33,43 +33,70 @@ namespace aace {
 namespace engine {
 namespace alexa {
 
-class LocalMediaSourceEngineImpl :
-    public ExternalMediaAdapterHandler,
-    public aace::alexa::LocalMediaSourceEngineInterface {
-
+class LocalMediaSourceEngineImpl
+        : public ExternalMediaAdapterHandler
+        , public aace::alexa::LocalMediaSourceEngineInterface {
 private:
-    LocalMediaSourceEngineImpl( std::shared_ptr<aace::alexa::LocalMediaSource> platformLocalMediaSource, const std::string& localPlayerId, std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender, std::shared_ptr<FocusHandlerInterface> focusHandler );
-    
-    bool initialize( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender, std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager );
-    
+    LocalMediaSourceEngineImpl(
+        std::shared_ptr<aace::alexa::LocalMediaSource> platformLocalMediaSource,
+        const std::string& localPlayerId,
+        std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender,
+        std::shared_ptr<FocusHandlerInterface> focusHandler);
+
+    bool initialize(
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager);
+
     using ContentSelector = aace::alexa::LocalMediaSource::ContentSelector;
 
     using Source = aace::alexa::LocalMediaSource::Source;
 
-    std::string getPlayerId( Source source );
+    std::string getPlayerId(Source source);
 
 public:
-    static std::shared_ptr<LocalMediaSourceEngineImpl> create( std::shared_ptr<aace::alexa::LocalMediaSource> platformLocalMediaSource, const std::string& localPlayerId, std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender, std::shared_ptr<FocusHandlerInterface> focusHandler, std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender, std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager );
-    
+    static std::shared_ptr<LocalMediaSourceEngineImpl> create(
+        std::shared_ptr<aace::alexa::LocalMediaSource> platformLocalMediaSource,
+        const std::string& localPlayerId,
+        std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender,
+        std::shared_ptr<FocusHandlerInterface> focusHandler,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager);
+
     // aace::alexa::LocalMediaSourceEngineInterface
-    void onPlayerEvent( const std::string& eventName ) override;
-    void onPlayerError( const std::string& errorName, long code, const std::string& description, bool fatal ) override;
-    void onSetFocus( bool focusAcquire = true ) override;
+    void onPlayerEvent(const std::string& eventName) override;
+    void onPlayerError(const std::string& errorName, long code, const std::string& description, bool fatal) override;
+    void onSetFocus(bool focusAcquire = true) override;
 
 protected:
     // ExternalMediaAdapterHandler
-    bool handleAuthorization( const std::vector<aace::alexa::ExternalMediaAdapter::AuthorizedPlayerInfo>& authorizedPlayerList ) override;
-    bool handleLogin( const std::string& localPlayerId, const std::string& accessToken, const std::string& userName, bool forceLogin, std::chrono::milliseconds tokenRefreshInterval ) override;
-    bool handleLogout( const std::string& localPlayerId ) override;
-    bool handlePlay( const std::string& localPlayerId, const std::string& playContextToken, int64_t index, std::chrono::milliseconds offset, bool preload, aace::alexa::ExternalMediaAdapter::Navigation navigation, const std::string& playbackSessionId, const std::string& skillToken ) override;
-    bool handlePlayControl( const std::string& localPlayerId, aace::alexa::ExternalMediaAdapter::PlayControlType playControlType ) override;
-    bool handleSeek( const std::string& localPlayerId, std::chrono::milliseconds offset ) override;
-    bool handleAdjustSeek( const std::string& localPlayerId, std::chrono::milliseconds deltaOffset ) override;
-    bool handleGetAdapterState( const std::string& localPlayerId, aace::engine::alexa::AdapterState& state ) override;
-    std::chrono::milliseconds handleGetOffset( const std::string& playerId ) override;
+    bool handleAuthorization(
+        const std::vector<aace::alexa::ExternalMediaAdapter::AuthorizedPlayerInfo>& authorizedPlayerList) override;
+    bool handleLogin(
+        const std::string& localPlayerId,
+        const std::string& accessToken,
+        const std::string& userName,
+        bool forceLogin,
+        std::chrono::milliseconds tokenRefreshInterval) override;
+    bool handleLogout(const std::string& localPlayerId) override;
+    bool handlePlay(
+        const std::string& localPlayerId,
+        const std::string& playContextToken,
+        int64_t index,
+        std::chrono::milliseconds offset,
+        bool preload,
+        aace::alexa::ExternalMediaAdapter::Navigation navigation,
+        const std::string& playbackSessionId,
+        const std::string& skillToken) override;
+    bool handlePlayControl(
+        const std::string& localPlayerId,
+        aace::alexa::ExternalMediaAdapter::PlayControlType playControlType) override;
+    bool handleSeek(const std::string& localPlayerId, std::chrono::milliseconds offset) override;
+    bool handleAdjustSeek(const std::string& localPlayerId, std::chrono::milliseconds deltaOffset) override;
+    bool handleGetAdapterState(const std::string& localPlayerId, aace::engine::alexa::AdapterState& state) override;
+    std::chrono::milliseconds handleGetOffset(const std::string& playerId) override;
 
-    bool handleSetVolume( int8_t volume ) override;
-    bool handleSetMute( bool mute ) override;
+    bool handleSetVolume(int8_t volume) override;
+    bool handleSetMute(bool mute) override;
 
     void doShutdown() override;
 
@@ -78,12 +105,11 @@ private:
     std::weak_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> m_messageSender;
 
     std::string m_localPlayerId;
-    std::unordered_map<std::string,ContentSelector> m_contentSelectorNameMap;
-
+    std::unordered_map<std::string, ContentSelector> m_contentSelectorNameMap;
 };
 
-} // aace::engine::alexa
-} // aace::engine
-} // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_ALEXA_LOCAL_MEDIA_SOURCE_ENGINE_IMPL_H
+#endif  // AACE_ENGINE_ALEXA_LOCAL_MEDIA_SOURCE_ENGINE_IMPL_H

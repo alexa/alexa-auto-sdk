@@ -22,8 +22,7 @@ namespace alexa {
 
 static const std::string TAG("aace.alexa.WakewordEngineManager");
 
-bool WakewordEngineManager::registerFactory(const std::string &name, WakewordEngineAdapterFactory factory)
-{
+bool WakewordEngineManager::registerFactory(const std::string& name, WakewordEngineAdapterFactory factory) {
     if (m_factoryMap.find(name) == m_factoryMap.end()) {
         m_factoryMap[name] = factory;
         return true;
@@ -32,8 +31,9 @@ bool WakewordEngineManager::registerFactory(const std::string &name, WakewordEng
     }
 }
 
-std::shared_ptr<WakewordEngineAdapter> WakewordEngineManager::createAdapter(const AdapterType &type, const std::string &name)
-{
+std::shared_ptr<WakewordEngineAdapter> WakewordEngineManager::createAdapter(
+    const AdapterType& type,
+    const std::string& name) {
     auto it = m_factoryMap.begin();
     if (it == m_factoryMap.end()) {
         AACE_ERROR(LX(TAG, "No factory has been registered."));
@@ -53,6 +53,6 @@ std::shared_ptr<WakewordEngineAdapter> WakewordEngineManager::createAdapter(cons
     return it->second(type);
 }
 
-} // aace::engine::alexa
-} // aace::engine
-} // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace

@@ -18,18 +18,19 @@
 namespace aace {
 namespace alexa {
 
-DoNotDisturb::~DoNotDisturb() = default; // key function
+DoNotDisturb::~DoNotDisturb() = default;  // key function
 
-bool DoNotDisturb::doNotDisturbChanged( const bool doNotDisturb) {
-    if( auto doNotDisturbEngineInterface_lock = m_doNotDisturbEngineInterface.lock() ) {
-        return doNotDisturbEngineInterface_lock->onDoNotDisturbChanged( doNotDisturb );
+bool DoNotDisturb::doNotDisturbChanged(const bool doNotDisturb) {
+    if (auto doNotDisturbEngineInterface_lock = m_doNotDisturbEngineInterface.lock()) {
+        return doNotDisturbEngineInterface_lock->onDoNotDisturbChanged(doNotDisturb);
     }
     return false;
 }
 
-void DoNotDisturb::setEngineInterface( std::shared_ptr<aace::alexa::DoNotDisturbEngineInterface> doNotDisturbEngineInterface ) {
+void DoNotDisturb::setEngineInterface(
+    std::shared_ptr<aace::alexa::DoNotDisturbEngineInterface> doNotDisturbEngineInterface) {
     m_doNotDisturbEngineInterface = doNotDisturbEngineInterface;
 }
 
-} // aace::alexa
-} // aace
+}  // namespace alexa
+}  // namespace aace

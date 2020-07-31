@@ -29,12 +29,12 @@ public:
     virtual ~WakewordObservableInterface() = default;
 
 public:
-    virtual void addWakewordObserver( std::shared_ptr<WakewordObserverInterface> observer ) = 0;
-    virtual void removeWakewordObserver( std::shared_ptr<WakewordObserverInterface> observer ) = 0;
+    virtual void addWakewordObserver(std::shared_ptr<WakewordObserverInterface> observer) = 0;
+    virtual void removeWakewordObserver(std::shared_ptr<WakewordObserverInterface> observer) = 0;
 };
 
-} // aace::engine::alexa
-} // aace::engine
-} // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_ALEXA_INTERFACE_WAKEWORD_OBSERVABLE_INTERFACE_H
+#endif  // AACE_ENGINE_ALEXA_INTERFACE_WAKEWORD_OBSERVABLE_INTERFACE_H

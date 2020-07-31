@@ -31,27 +31,31 @@ public class ViewHolderListTemplate1 extends RecyclerView.ViewHolder {
     private final LinearLayout mContentList;
     private final LayoutInflater mInf;
 
-    public ViewHolderListTemplate1(View v, LayoutInflater inf ) {
-        super( v );
-        mMainTitle = v.findViewById( R.id.mainTitle );
-        mSubTitle = v.findViewById( R.id.subTitle );
+    public ViewHolderListTemplate1(View v, LayoutInflater inf) {
+        super(v);
+        mMainTitle = v.findViewById(R.id.mainTitle);
+        mSubTitle = v.findViewById(R.id.subTitle);
         ConstraintLayout listContainer = v.findViewById(R.id.listContainer);
-        mIndexList = listContainer.findViewById( R.id.indexList );
-        mContentList = listContainer.findViewById( R.id.contentList );
+        mIndexList = listContainer.findViewById(R.id.indexList);
+        mContentList = listContainer.findViewById(R.id.contentList);
         mInf = inf;
     }
 
-    public TextView getMainTitle(){ return mMainTitle; }
-    public TextView getSubTitle(){ return mSubTitle; }
+    public TextView getMainTitle() {
+        return mMainTitle;
+    }
+    public TextView getSubTitle() {
+        return mSubTitle;
+    }
 
-    public void insertListItem( String index, String content ) {
-        View indexItem = mInf.inflate( R.layout.card_list_template1_item_index, mIndexList, false );
-        ( ( TextView ) indexItem.findViewById( R.id.index ) ).setText( index );
-        mIndexList.addView( indexItem );
+    public void insertListItem(String index, String content) {
+        View indexItem = mInf.inflate(R.layout.card_list_template1_item_index, mIndexList, false);
+        ((TextView) indexItem.findViewById(R.id.index)).setText(index);
+        mIndexList.addView(indexItem);
 
-        View contentItem = mInf.inflate( R.layout.card_list_template1_item_content, mContentList, false );
-        ( ( TextView ) contentItem.findViewById( R.id.content ) ).setText( content );
-        mContentList.addView( contentItem );
+        View contentItem = mInf.inflate(R.layout.card_list_template1_item_content, mContentList, false);
+        ((TextView) contentItem.findViewById(R.id.content)).setText(content);
+        mContentList.addView(contentItem);
     }
 
     public void clearLists() {

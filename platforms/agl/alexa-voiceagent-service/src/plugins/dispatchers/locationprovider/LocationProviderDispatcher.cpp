@@ -39,32 +39,27 @@ std::shared_ptr<LocationProviderDispatcher> LocationProviderDispatcher::create(
     std::shared_ptr<ILogger> logger,
     std::shared_ptr<IAASBController> aasbController,
     std::shared_ptr<IConfigurationProvider> configProvider) {
-
-    return std::shared_ptr<LocationProviderDispatcher>(new LocationProviderDispatcher(logger, aasbController, configProvider));
+    return std::shared_ptr<LocationProviderDispatcher>(
+        new LocationProviderDispatcher(logger, aasbController, configProvider));
 }
 
 LocationProviderDispatcher::LocationProviderDispatcher(
     std::shared_ptr<ILogger> logger,
     std::shared_ptr<IAASBController> aasbController,
     std::shared_ptr<IConfigurationProvider> configProvider) :
-        m_logger(logger),
-        m_aasbController(aasbController),
-        m_configProvider(configProvider) {
+        m_logger(logger), m_aasbController(aasbController), m_configProvider(configProvider) {
 }
 
-void LocationProviderDispatcher::onReceivedDirective(
-    const std::string& action,
-    const std::string& payload) {
-
+void LocationProviderDispatcher::onReceivedDirective(const std::string& action, const std::string& payload) {
     m_logger->log(Level::DEBUG, TAG, "Processing locationprovider directive: " + action);
 
     if (action == aasb::bridge::ACTION_LOCATION_REQUEST_CURRENT_LOCATION) {
-        json_object *responseJ = json_object_new_object();
-        json_object *isSucceededJ = json_object_new_boolean(true);
+        json_object* responseJ = json_object_new_object();
+        json_object* isSucceededJ = json_object_new_boolean(true);
 
         auto location = m_configProvider->getCurrentLocation();
-        json_object *latitudeJ = json_object_new_double(location.first);
-        json_object *longitudeJ = json_object_new_double(location.second);
+        json_object* latitudeJ = json_object_new_double(location.first);
+        json_object* longitudeJ = json_object_new_double(location.second);
 
         json_object_object_add(responseJ, aasb::bridge::JSON_ATTR_LOCATION_IS_REQUEST_SUCCEEDED.c_str(), isSucceededJ);
         json_object_object_add(responseJ, aasb::bridge::JSON_ATTR_LOCATION_LATITUDE.c_str(), latitudeJ);
@@ -76,7 +71,6 @@ void LocationProviderDispatcher::onReceivedDirective(
             std::string(json_object_to_json_string(responseJ)));
     }
 }
-
 
 }  // namespace locationprovider
 }  // namespace dispatcher

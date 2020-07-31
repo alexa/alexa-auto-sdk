@@ -17,9 +17,9 @@
 #define SAMPLEAPP_SUBJECT_H
 
 // C++ Standard Library
-#include <map>    // std::map
-#include <string> // std::string
-#include <vector> //std::vector
+#include <map>     // std::map
+#include <string>  // std::string
+#include <vector>  //std::vector
 
 namespace sampleApp {
 
@@ -29,24 +29,27 @@ namespace sampleApp {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-template <typename Event> class Subject {
-  private:
-    std::map<Event, std::vector<std::function<bool(const std::string &)>>> m_observers{};
+template <typename Event>
+class Subject {
+private:
+    std::map<Event, std::vector<std::function<bool(const std::string&)>>> m_observers{};
 
-  public:
-    template <typename Observer> void registerObserver(const Event &event, Observer &&observer) {
+public:
+    template <typename Observer>
+    void registerObserver(const Event& event, Observer&& observer) {
         m_observers[std::move(event)].push_back(std::forward<Observer>(observer));
     }
-    template <typename Observer> void registerObserver(Event &&event, Observer &&observer) {
+    template <typename Observer>
+    void registerObserver(Event&& event, Observer&& observer) {
         m_observers[std::move(event)].push_back(std::forward<Observer>(observer));
     }
     auto clearObservers() -> void {
         m_observers.clear();
     }
-    auto notify(const Event &event, const std::string &value = "") const -> bool {
+    auto notify(const Event& event, const std::string& value = "") const -> bool {
         bool result = false;
         if (m_observers.count(event) > 0) {
-            for (const auto &observer : m_observers.at(event)) {
+            for (const auto& observer : m_observers.at(event)) {
                 result |= observer(value);
             }
         }
@@ -54,6 +57,6 @@ template <typename Event> class Subject {
     }
 };
 
-} // namespace sampleApp
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_SUBJECT_H
+#endif  // SAMPLEAPP_SUBJECT_H

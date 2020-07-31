@@ -32,5 +32,9 @@ std::vector<AudioStreamProperty> AudioStream::getProperties() {
     return {};
 }
 
-} // aace::audio
-} // aace
+AudioStream::MediaType AudioStream::getMediaType() {
+    return MediaType::UNKNOWN;
+}
+
+}  // namespace audio
+}  // namespace aace

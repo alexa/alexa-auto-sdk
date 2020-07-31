@@ -28,39 +28,35 @@ static const std::string TAG("aace.location.LocationEngineService");
 // register the service
 REGISTER_SERVICE(LocationEngineService)
 
-LocationEngineService::LocationEngineService( const aace::engine::core::ServiceDescription& description ) : aace::engine::core::EngineService( description ) {
+LocationEngineService::LocationEngineService(const aace::engine::core::ServiceDescription& description) :
+        aace::engine::core::EngineService(description) {
 }
 
-bool LocationEngineService::registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface )
-{
-    try
-    {
-        ReturnIf( registerPlatformInterfaceType<aace::location::LocationProvider>( platformInterface ), true );
+bool LocationEngineService::registerPlatformInterface(
+    std::shared_ptr<aace::core::PlatformInterface> platformInterface) {
+    try {
+        ReturnIf(registerPlatformInterfaceType<aace::location::LocationProvider>(platformInterface), true);
         return false;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"registerPlatformInterface").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "registerPlatformInterface").d("reason", ex.what()));
         return false;
     }
 }
 
-bool LocationEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::location::LocationProvider> locationProvider )
-{
-    try
-    {
-        ThrowIfNotNull( m_locationProvider, "platformInterfaceAlreadyRegistered" );
+bool LocationEngineService::registerPlatformInterfaceType(
+    std::shared_ptr<aace::location::LocationProvider> locationProvider) {
+    try {
+        ThrowIfNotNull(m_locationProvider, "platformInterfaceAlreadyRegistered");
         m_locationProvider = locationProvider;
-        registerServiceInterface<aace::location::LocationProvider>( m_locationProvider );
-  
+        registerServiceInterface<aace::location::LocationProvider>(m_locationProvider);
+
         return true;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"registerPlatformInterfaceType<LocationProvider>").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "registerPlatformInterfaceType<LocationProvider>").d("reason", ex.what()));
         return false;
     }
 }
 
-} // aace::engine::location
-} // aace::engine
-} // aace
-
+}  // namespace location
+}  // namespace engine
+}  // namespace aace

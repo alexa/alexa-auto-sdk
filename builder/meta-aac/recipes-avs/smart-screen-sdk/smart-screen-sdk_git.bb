@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.TXT;md5=8af6ce427017dadf03f47608d86f3716"
 DEPENDS = "avs-device-sdk"
 
 SRC_URI = "git://github.com/alexa/alexa-smart-screen-sdk-for-linux.git"
-SRCREV = "ddead91198e59b1f3fac8e362799e9a4349b25bf"
+SRCREV = "c2196bef8adb1970a2bfd6572547e566468a77e9"
 S = "${WORKDIR}/git"
 
 SRC_URI += "file://0001-Smart-Screen-SDK-for-Alexa-Auto-SDK.patch \

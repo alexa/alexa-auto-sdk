@@ -89,7 +89,9 @@ add_custom_command(
         ${AAC_HOME}/lib/libEqualizerImplementations.so
         ${AAC_HOME}/lib/libExternalMediaPlayer.so
         ${AAC_HOME}/lib/libInteractionModel.so
+        ${AAC_HOME}/lib/libInterruptModel.so
         ${AAC_HOME}/lib/libKWD.so
+        ${AAC_HOME}/lib/libMessaging.so
         ${AAC_HOME}/lib/libModeController.so
         ${AAC_HOME}/lib/libMRM.so
         ${AAC_HOME}/lib/libNotifications.so
@@ -112,3 +114,21 @@ add_custom_command(
         ${AAC_HOME}/lib/libopus.so
         $<TARGET_FILE_DIR:AACEAlexaAndroid>
 )
+
+# Copy additional mbed TLS AAC dependencies if available
+if(EXISTS "${AAC_HOME}/lib/libmbedtls.so")
+    set(HAS_MBEDTLS_SHARED_LIBRARY ON)
+else()
+    set(HAS_MBEDTLS_SHARED_LIBRARY OFF)
+endif()
+if(HAS_MBEDTLS_SHARED_LIBRARY)
+    add_custom_command(
+        TARGET AACEAlexaAndroid
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+            ${AAC_HOME}/lib/libmbedcrypto.so
+            ${AAC_HOME}/lib/libmbedtls.so
+            ${AAC_HOME}/lib/libmbedx509.so
+            $<TARGET_FILE_DIR:AACEAlexaAndroid>
+    )
+endif()

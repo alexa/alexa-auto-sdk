@@ -31,28 +31,40 @@ public class ViewHolderWeatherTemplate extends RecyclerView.ViewHolder {
     private final TextView mLowTemp;
     private final View[] mForecasts = new View[5];
 
-    ViewHolderWeatherTemplate( View v ) {
-        super( v );
-        mMainTitle = v.findViewById( R.id.mainTitle );
-        mSubTitle = v.findViewById( R.id.subTitle );
-        mCurrentWeatherIcon = v.findViewById( R.id.currentWeatherIcon );
-        mCurrentWeather = v.findViewById( R.id.currentWeather );
-        mHighTemp = v.findViewById( R.id.highTempCurrent );
-        mLowTemp = v.findViewById( R.id.lowTempCurrent );
-        mForecasts[0] = v.findViewById( R.id.forecast0 );
-        mForecasts[1] = v.findViewById( R.id.forecast1 );
-        mForecasts[2] = v.findViewById( R.id.forecast2 );
-        mForecasts[3] = v.findViewById( R.id.forecast3 );
-        mForecasts[4] = v.findViewById( R.id.forecast4 );
+    ViewHolderWeatherTemplate(View v) {
+        super(v);
+        mMainTitle = v.findViewById(R.id.mainTitle);
+        mSubTitle = v.findViewById(R.id.subTitle);
+        mCurrentWeatherIcon = v.findViewById(R.id.currentWeatherIcon);
+        mCurrentWeather = v.findViewById(R.id.currentWeather);
+        mHighTemp = v.findViewById(R.id.highTempCurrent);
+        mLowTemp = v.findViewById(R.id.lowTempCurrent);
+        mForecasts[0] = v.findViewById(R.id.forecast0);
+        mForecasts[1] = v.findViewById(R.id.forecast1);
+        mForecasts[2] = v.findViewById(R.id.forecast2);
+        mForecasts[3] = v.findViewById(R.id.forecast3);
+        mForecasts[4] = v.findViewById(R.id.forecast4);
     }
 
-    public TextView getMainTitle() { return mMainTitle; }
-    public TextView getSubTitle() { return mSubTitle; }
-    public ImageView getCurrentWeatherIcon() { return mCurrentWeatherIcon; }
-    public TextView getCurrentWeather() { return mCurrentWeather; }
-    public TextView getHighTemp() { return mHighTemp; }
-    public TextView getLowTemp() { return mLowTemp; }
-    public View getForecast (int number ){
-        return mForecasts[ number ];
+    public TextView getMainTitle() {
+        return mMainTitle;
+    }
+    public TextView getSubTitle() {
+        return mSubTitle;
+    }
+    public ImageView getCurrentWeatherIcon() {
+        return mCurrentWeatherIcon;
+    }
+    public TextView getCurrentWeather() {
+        return mCurrentWeather;
+    }
+    public TextView getHighTemp() {
+        return mHighTemp;
+    }
+    public TextView getLowTemp() {
+        return mLowTemp;
+    }
+    public View getForecast(int number) {
+        return mForecasts[number];
     }
 }

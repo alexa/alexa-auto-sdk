@@ -20,5 +20,5 @@ import com.amazon.maccandroid.model.errors.CapabilityAgentError;
 public interface MediaAppsConnectionListener {
     void onConnectionSuccessful();
 
-    void onConnectionFailure( CapabilityAgentError error );
+    void onConnectionFailure(CapabilityAgentError error);
 }

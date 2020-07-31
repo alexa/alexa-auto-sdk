@@ -27,41 +27,40 @@ namespace cbl {
 
 class CBLEngineService : public aace::engine::core::EngineService {
 public:
-    DESCRIBE("aace.cbl",VERSION("1.0"),DEPENDS(aace::engine::alexa::AlexaEngineService))
+    DESCRIBE("aace.cbl", VERSION("1.0"), DEPENDS(aace::engine::alexa::AlexaEngineService))
 
 private:
-    CBLEngineService( const aace::engine::core::ServiceDescription& description );
+    CBLEngineService(const aace::engine::core::ServiceDescription& description);
 
 public:
     virtual ~CBLEngineService() = default;
 
 protected:
-    bool configure( std::shared_ptr<std::istream> configuration ) override;
+    bool configure(std::shared_ptr<std::istream> configuration) override;
     bool start() override;
     bool stop() override;
     bool shutdown() override;
-    bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) override;
+    bool registerPlatformInterface(std::shared_ptr<aace::core::PlatformInterface> platformInterface) override;
 
 private:
     // platform interface registration
     template <class T>
-    bool registerPlatformInterfaceType( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) {
-        std::shared_ptr<T> typedPlatformInterface = std::dynamic_pointer_cast<T>( platformInterface );
-        return typedPlatformInterface != nullptr ? registerPlatformInterfaceType( typedPlatformInterface ) : false;
+    bool registerPlatformInterfaceType(std::shared_ptr<aace::core::PlatformInterface> platformInterface) {
+        std::shared_ptr<T> typedPlatformInterface = std::dynamic_pointer_cast<T>(platformInterface);
+        return typedPlatformInterface != nullptr ? registerPlatformInterfaceType(typedPlatformInterface) : false;
     }
 
-    bool registerPlatformInterfaceType( std::shared_ptr<aace::cbl::CBL> cbl );
+    bool registerPlatformInterfaceType(std::shared_ptr<aace::cbl::CBL> cbl);
 
 private:
     std::shared_ptr<aace::engine::cbl::CBLEngineImpl> m_cblEngineImpl;
     std::chrono::seconds m_codePairRequestTimeout;
     std::string m_endpoint;
     bool m_enableUserProfile;
-
 };
 
-} // aace::engine::cbl
-} // aace::engine
-} // aace
+}  // namespace cbl
+}  // namespace engine
+}  // namespace aace
 
 #endif

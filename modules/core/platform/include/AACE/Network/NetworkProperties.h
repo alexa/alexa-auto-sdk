@@ -30,8 +30,8 @@ namespace property {
 */
 static const std::string NETWORK_INTERFACE = "aace.network.networkInterface";
 
-} // aace::network::property
-} // aace::network
-} // aace
+}  // namespace property
+}  // namespace network
+}  // namespace aace
 
-#endif // AACE_NETWORK_PROPERTY_NETWORK_PROPERTIES_H
+#endif  // AACE_NETWORK_PROPERTY_NETWORK_PROPERTIES_H

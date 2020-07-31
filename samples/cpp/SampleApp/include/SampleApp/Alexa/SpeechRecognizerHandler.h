@@ -29,7 +29,7 @@
 //#include <AACE/Audio/AudioCapture.h>
 
 // C++ Standard Library
-#include <atomic> // std::atomic
+#include <atomic>  // std::atomic
 
 namespace sampleApp {
 
@@ -42,7 +42,7 @@ namespace alexa {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class SpeechRecognizerHandler : public aace::alexa::SpeechRecognizer /* isa PlatformInterface */ {
-  private:
+private:
     std::weak_ptr<Activity> m_activity{};
     std::weak_ptr<logger::LoggerHandler> m_loggerHandler{};
     std::weak_ptr<propertyManager::PropertyManagerHandler> m_propertyManagerHandler{};
@@ -53,38 +53,40 @@ class SpeechRecognizerHandler : public aace::alexa::SpeechRecognizer /* isa Plat
     std::atomic<bool> m_shouldStopStreamingAudioFile{false};
     std::future<void> m_streamTask{};
 
-  protected:
-    SpeechRecognizerHandler(std::weak_ptr<Activity> activity,
-                            std::weak_ptr<logger::LoggerHandler> loggerHandler,
-                            std::weak_ptr<propertyManager::PropertyManagerHandler> propertyManagerHandler,
-                            //std::shared_ptr<sampleApp::AudioInputManager> platformAudioCapture,
-                            bool wakewordDetectionEnabled);
+protected:
+    SpeechRecognizerHandler(
+        std::weak_ptr<Activity> activity,
+        std::weak_ptr<logger::LoggerHandler> loggerHandler,
+        std::weak_ptr<propertyManager::PropertyManagerHandler> propertyManagerHandler,
+        //std::shared_ptr<sampleApp::AudioInputManager> platformAudioCapture,
+        bool wakewordDetectionEnabled);
 
-  public:
-    template <typename... Args> static auto create(Args &&... args) -> std::shared_ptr<SpeechRecognizerHandler> {
+public:
+    template <typename... Args>
+    static auto create(Args&&... args) -> std::shared_ptr<SpeechRecognizerHandler> {
         return std::shared_ptr<SpeechRecognizerHandler>(new SpeechRecognizerHandler(args...));
     }
     auto getActivity() -> std::weak_ptr<Activity>;
     auto getLoggerHandler() -> std::weak_ptr<logger::LoggerHandler>;
-//    auto startStreamingAudioFile(const std::string &audioFilePath) -> bool;
-//    auto stopStreamingAudioFile() -> bool;
-//    auto streamAudioFile(const std::string &audioFilePath) -> bool;
+    //    auto startStreamingAudioFile(const std::string &audioFilePath) -> bool;
+    //    auto stopStreamingAudioFile() -> bool;
+    //    auto streamAudioFile(const std::string &audioFilePath) -> bool;
 
     // aace::alexa::SpeechRecognizer interface
 
-    auto wakewordDetected(const std::string &wakeword) -> bool override;
+    auto wakewordDetected(const std::string& wakeword) -> bool override;
     auto endOfSpeechDetected() -> void override;
     //auto startAudioInput() -> bool override;
     //auto stopAudioInput() -> bool override;
 
-  private:
+private:
     std::weak_ptr<View> m_console{};
 
-    auto log(logger::LoggerHandler::Level level, const std::string &message) -> void;
+    auto log(logger::LoggerHandler::Level level, const std::string& message) -> void;
     auto setupUI() -> void;
 };
 
-} // namespace alexa
-} // namespace sampleApp
+}  // namespace alexa
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_ALEXA_SPEECHRECOGNIZERHANDLER_H
+#endif  // SAMPLEAPP_ALEXA_SPEECHRECOGNIZERHANDLER_H

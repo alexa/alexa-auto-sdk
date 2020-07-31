@@ -30,37 +30,38 @@ namespace aace {
 namespace engine {
 namespace alexa {
 
-class SystemSoundPlayer :
-    public aace::audio::AudioOutputEngineInterface,
-    public alexaClientSDK::avsCommon::sdkInterfaces::SystemSoundPlayerInterface,
-    public std::enable_shared_from_this<SystemSoundPlayer> {
-
+class SystemSoundPlayer
+        : public aace::audio::AudioOutputEngineInterface
+        , public alexaClientSDK::avsCommon::sdkInterfaces::SystemSoundPlayerInterface
+        , public std::enable_shared_from_this<SystemSoundPlayer> {
 private:
     SystemSoundPlayer() = default;
-    
+
     bool initialize(
         std::shared_ptr<aace::engine::audio::AudioManagerInterface> audioManager,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::SystemSoundAudioFactoryInterface> audioFactory );
-    
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::SystemSoundAudioFactoryInterface>
+            audioFactory);
+
     std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> getAudioChannel();
-    
+
 public:
     static std::shared_ptr<SystemSoundPlayer> create(
         std::shared_ptr<aace::engine::audio::AudioManagerInterface> audioManager,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::SystemSoundAudioFactoryInterface> audioFactory );
-    
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::SystemSoundAudioFactoryInterface>
+            audioFactory);
+
     // aace::audio::AudioOutputEngineInterface
-    void onMediaStateChanged( MediaState state ) override;
-    void onMediaError( MediaError error, const std::string& description ) override;
+    void onMediaStateChanged(MediaState state) override;
+    void onMediaError(MediaError error, const std::string& description) override;
 
     // alexaClientSDK::avsCommon::sdkInterfaces::SystemSoundPlayerInterface
-    std::shared_future<bool> playTone( Tone tone ) override;
+    std::shared_future<bool> playTone(Tone tone) override;
 
 private:
     std::weak_ptr<aace::engine::audio::AudioManagerInterface> m_audioManager;
     std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> m_audioOutputChannel;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::SystemSoundAudioFactoryInterface> m_audioFactory;
-    
+
     std::shared_future<bool> m_sharedFuture;
     std::promise<bool> m_playTonePromise;
     std::mutex m_mutex;
@@ -72,26 +73,30 @@ private:
 
 class SystemSoundAudioStream : public aace::audio::AudioStream {
 private:
-    SystemSoundAudioStream( std::shared_ptr<std::istream> stream, alexaClientSDK::avsCommon::sdkInterfaces::SystemSoundPlayerInterface::Tone tone );
-   
+    SystemSoundAudioStream(
+        std::shared_ptr<std::istream> stream,
+        alexaClientSDK::avsCommon::utils::MediaType mediaType,
+        alexaClientSDK::avsCommon::sdkInterfaces::SystemSoundPlayerInterface::Tone tone);
+
 public:
     static std::shared_ptr<SystemSoundAudioStream> create(
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::SystemSoundAudioFactoryInterface> audioFactory,
-        alexaClientSDK::avsCommon::sdkInterfaces::SystemSoundPlayerInterface::Tone tone );
-    
+        alexaClientSDK::avsCommon::sdkInterfaces::SystemSoundPlayerInterface::Tone tone);
+
     // aace::audio::AudioStream
-    ssize_t read( char* data, const size_t size ) override;
+    ssize_t read(char* data, const size_t size) override;
     bool isClosed() override;
     std::vector<aace::audio::AudioStreamProperty> getProperties() override;
 
 private:
     std::shared_ptr<std::istream> m_stream;
+    alexaClientSDK::avsCommon::utils::MediaType m_mediaType;
     alexaClientSDK::avsCommon::sdkInterfaces::SystemSoundPlayerInterface::Tone m_tone;
     bool m_closed;
 };
 
-}  // alexa
-}  // engine
-}  // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace
 
 #endif

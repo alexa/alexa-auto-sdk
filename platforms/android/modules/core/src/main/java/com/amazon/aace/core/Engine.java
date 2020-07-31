@@ -20,8 +20,8 @@ import android.util.Log;
 
 import com.amazon.aace.core.config.EngineConfiguration;
 
-import org.json.JSONObject;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.InputStream;
 
@@ -30,13 +30,10 @@ import java.io.InputStream;
  * it is responsible for managing the interactions between the platform and AVS.
  * The platform implementation should *not* extend Engine; it is extended in the SDK.
  */
-final public class Engine extends NativeRef
-{
-
+final public class Engine extends NativeRef {
     private static final String TAG = "CoreEngine";
 
-    private Engine() {
-    }
+    private Engine() {}
 
     /**
      * Creates a new instance of an Engine object.
@@ -53,15 +50,14 @@ final public class Engine extends NativeRef
      * @c EngineConfiguration[]
      * @return @c true if the Engine configuration was successful, else @c false
      */
-    public boolean configure( EngineConfiguration[] configurationList )
-    {
+    public boolean configure(EngineConfiguration[] configurationList) {
         long[] configurationRefList = new long[configurationList.length];
 
-        for( int j = 0; j < configurationList.length; j++ ) {
+        for (int j = 0; j < configurationList.length; j++) {
             configurationRefList[j] = configurationList[j].getNativeRef();
         }
 
-        return configure( getNativeRef(), configurationRefList );
+        return configure(getNativeRef(), configurationRefList);
     }
 
     /**
@@ -72,7 +68,7 @@ final public class Engine extends NativeRef
      * @sa stop()
      */
     public boolean start() {
-        return start( getNativeRef() );
+        return start(getNativeRef());
     }
 
     /**
@@ -83,7 +79,7 @@ final public class Engine extends NativeRef
      * @sa start()
      */
     public boolean stop() {
-        return stop( getNativeRef() );
+        return stop(getNativeRef());
     }
 
     /**
@@ -96,8 +92,8 @@ final public class Engine extends NativeRef
      *
      * @sa com.amazon.aace.core.PlatformInterface
      */
-    public boolean registerPlatformInterface( PlatformInterface platformInterface ) {
-        return registerPlatformInterface( getNativeRef(), platformInterface.getNativeRef() );
+    public boolean registerPlatformInterface(PlatformInterface platformInterface) {
+        return registerPlatformInterface(getNativeRef(), platformInterface.getNativeRef());
     }
 
     /**
@@ -114,8 +110,8 @@ final public class Engine extends NativeRef
      * @return @c true if the property value was updated or set to the current
      *         setting, else @c false if an error occured.
      */
-    public boolean setProperty( String key, String value ) {
-        return setProperty( getNativeRef(), key, value );
+    public boolean setProperty(String key, String value) {
+        return setProperty(getNativeRef(), key, value);
     }
 
     /**
@@ -132,8 +128,8 @@ final public class Engine extends NativeRef
      * @return The property value as a string, or an empty string if the
      *        property value was not found
      */
-    public String getProperty( String key ) {
-        return getProperty( getNativeRef(), key );
+    public String getProperty(String key) {
+        return getProperty(getNativeRef(), key);
     }
 
     // Retrieve library names of built modules
@@ -144,14 +140,14 @@ final public class Engine extends NativeRef
             String category = "name";
             String[] fileList = context.getAssets().list(folderName);
             for (String s : fileList) {
-                InputStream is = context.getAssets().open(folderName+"/"+s);
+                InputStream is = context.getAssets().open(folderName + "/" + s);
                 byte[] buffer = new byte[is.available()];
                 is.read(buffer);
                 String json = new String(buffer, "UTF-8");
                 JSONObject obj = new JSONObject(json);
-                if( obj != null ) {
+                if (obj != null) {
                     JSONArray jsonArray = obj.getJSONArray(libraryKey);
-                    for (int i = 0; i<jsonArray.length();i++) {
+                    for (int i = 0; i < jsonArray.length(); i++) {
                         String libraryName = jsonArray.getJSONObject(i).getString(category);
                         System.loadLibrary(libraryName);
                     }
@@ -163,28 +159,26 @@ final public class Engine extends NativeRef
         }
     }
 
-    public boolean setNativeEnv( String name, String value ) {
-        return setNativeEnv( getNativeRef(), name, value );
+    public boolean setNativeEnv(String name, String value) {
+        return setNativeEnv(getNativeRef(), name, value);
     }
 
     protected long createNativeRef() {
         return createBinder();
     }
 
-    protected void disposeNativeRef( long nativeRef ) {
-        disposeBinder( nativeRef );
+    protected void disposeNativeRef(long nativeRef) {
+        disposeBinder(nativeRef);
     }
 
     // Native Engine JNI methods
     private native long createBinder();
-    private native void disposeBinder( long nativeRef );
-    private native boolean configure( long nativeRef, long[] configurationRefList );
-    private native boolean start( long nativeRef );
-    private native boolean stop( long nativeRef );
-    private native boolean registerPlatformInterface( long nativeRef, long platformInterfaceRef );
-    private native boolean setProperty( long nativeRef, String key, String value );
-    private native String getProperty( long nativeRef, String key );
-    private native boolean setNativeEnv( long nativeRef, String name, String value );
+    private native void disposeBinder(long nativeRef);
+    private native boolean configure(long nativeRef, long[] configurationRefList);
+    private native boolean start(long nativeRef);
+    private native boolean stop(long nativeRef);
+    private native boolean registerPlatformInterface(long nativeRef, long platformInterfaceRef);
+    private native boolean setProperty(long nativeRef, String key, String value);
+    private native String getProperty(long nativeRef, String key);
+    private native boolean setNativeEnv(long nativeRef, String name, String value);
 }
-
-

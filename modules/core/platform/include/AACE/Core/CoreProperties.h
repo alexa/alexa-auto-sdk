@@ -29,8 +29,8 @@ namespace property {
  */
 static const std::string VERSION = "aace.core.version";
 
-} // aace::core::property
-} // aace::core
-} // aace
+}  // namespace property
+}  // namespace core
+}  // namespace aace
 
-#endif // AACE_CORE_PROPERTY_CORE_PROPERTIES_H
+#endif  // AACE_CORE_PROPERTY_CORE_PROPERTIES_H

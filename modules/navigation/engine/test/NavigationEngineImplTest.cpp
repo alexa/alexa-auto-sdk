@@ -21,11 +21,9 @@
 #include "AVSCommon/SDKInterfaces/test/MockDirectiveSequencer.h"
 #include "AVSCommon/SDKInterfaces/test/MockContextManager.h"
 
-
 #include "AACE/Test/Alexa/AlexaTestHelper.h"
 #include "AACE/Navigation/Navigation.h"
 #include "AACE/Engine/Navigation/NavigationEngineImpl.h"
-
 
 namespace aace {
 namespace test {
@@ -33,26 +31,27 @@ namespace unit {
 
 class MockNavigationPlatformInterface : public aace::navigation::Navigation {
 public:
-    MOCK_METHOD0( cancelNavigation, bool() );
-    MOCK_METHOD0( getNavigationState, std::string() );
-    MOCK_METHOD0( showPreviousWaypoints, void() );
-    MOCK_METHOD0( navigateToPreviousWaypoint, void() );
-    MOCK_METHOD1( showAlternativeRoutes, void(AlternateRouteType alternateRouteType) );
-    MOCK_METHOD1( controlDisplay, void(ControlDisplay controlDisplay) );
-    MOCK_METHOD1( startNavigation, void(const std::string& payload) );
-    MOCK_METHOD1( announceManeuver, void(const std::string& payload) );
-    MOCK_METHOD1( announceRoadRegulation, void(RoadRegulation roadRegulation) );
+    MOCK_METHOD0(cancelNavigation, bool());
+    MOCK_METHOD0(getNavigationState, std::string());
+    MOCK_METHOD0(showPreviousWaypoints, void());
+    MOCK_METHOD0(navigateToPreviousWaypoint, void());
+    MOCK_METHOD1(showAlternativeRoutes, void(AlternateRouteType alternateRouteType));
+    MOCK_METHOD1(controlDisplay, void(ControlDisplay controlDisplay));
+    MOCK_METHOD1(startNavigation, void(const std::string& payload));
+    MOCK_METHOD1(announceManeuver, void(const std::string& payload));
+    MOCK_METHOD1(announceRoadRegulation, void(RoadRegulation roadRegulation));
 };
-
 
 class NavigationEngineImplTest : public ::testing::Test {
 public:
-
     void SetUp() override {
         m_mockPlatformInterface = std::make_shared<testing::StrictMock<MockNavigationPlatformInterface>>();
-        m_mockDirectiveSequencer = std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockDirectiveSequencer>>();
-        m_mockExceptionEncounteredSender = std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockExceptionEncounteredSender>>();
-        m_mockContextManager = std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockContextManager>>(); 
+        m_mockDirectiveSequencer = std::make_shared<
+            testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockDirectiveSequencer>>();
+        m_mockExceptionEncounteredSender = std::make_shared<
+            testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockExceptionEncounteredSender>>();
+        m_mockContextManager =
+            std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockContextManager>>();
         m_mockNavigationProviderName = "HERE";
         m_alexaMockFactory = alexa::AlexaTestHelper::createAlexaMockComponentFactory();
         m_navigationEngineImpl = aace::engine::navigation::NavigationEngineImpl::create(
@@ -61,10 +60,9 @@ public:
             m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
             m_alexaMockFactory->getMessageSenderInterfaceMock(),
             m_alexaMockFactory->getContextManagerInterfaceMock(),
-            m_mockNavigationProviderName
-        );
+            m_mockNavigationProviderName);
     }
-    void TearDown() override{
+    void TearDown() override {
         m_navigationEngineImpl->shutdown();
         m_alexaMockFactory->shutdown();
     }
@@ -75,30 +73,32 @@ public:
     std::shared_ptr<aace::navigation::Navigation> m_mockPlatformInterface;
 
     /// An exception sender used to send exception encountered events to AVS.
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockExceptionEncounteredSender> m_mockExceptionEncounteredSender;
-    
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockExceptionEncounteredSender>
+        m_mockExceptionEncounteredSender;
+
     /// A directive sequencer.
-    std::shared_ptr<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockDirectiveSequencer>> m_mockDirectiveSequencer;
+    std::shared_ptr<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockDirectiveSequencer>>
+        m_mockDirectiveSequencer;
 
     // a context manager
-    std::shared_ptr<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockContextManager>> m_mockContextManager; 
+    std::shared_ptr<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockContextManager>>
+        m_mockContextManager;
 
     // provider name
     std::string m_mockNavigationProviderName;
-    
+
     // test helper for providing common mocks
     std::shared_ptr<alexa::AlexaMockComponentFactory> m_alexaMockFactory;
-
 };
 
 /**
  * Test create() with nullptrs
  */
-TEST_F( NavigationEngineImplTest, create ) {
+TEST_F(NavigationEngineImplTest, create) {
     EXPECT_NE(nullptr, m_navigationEngineImpl);
 }
 
-TEST_F( NavigationEngineImplTest, createWithNullPlatform ) {
+TEST_F(NavigationEngineImplTest, createWithNullPlatform) {
     std::shared_ptr<aace::engine::navigation::NavigationEngineImpl> testNavigationEngineImpl;
     testNavigationEngineImpl = engine::navigation::NavigationEngineImpl::create(
         nullptr,
@@ -110,7 +110,7 @@ TEST_F( NavigationEngineImplTest, createWithNullPlatform ) {
     EXPECT_EQ(nullptr, testNavigationEngineImpl);
 }
 
-TEST_F( NavigationEngineImplTest, createWithNullEndpointBuilder ) {
+TEST_F(NavigationEngineImplTest, createWithNullEndpointBuilder) {
     std::shared_ptr<aace::engine::navigation::NavigationEngineImpl> testNavigationEngineImpl;
     testNavigationEngineImpl = engine::navigation::NavigationEngineImpl::create(
         m_mockPlatformInterface,
@@ -122,7 +122,7 @@ TEST_F( NavigationEngineImplTest, createWithNullEndpointBuilder ) {
     EXPECT_EQ(nullptr, testNavigationEngineImpl);
 }
 
-TEST_F( NavigationEngineImplTest, createWithNullExceptionEncounteredSender ) {
+TEST_F(NavigationEngineImplTest, createWithNullExceptionEncounteredSender) {
     std::shared_ptr<aace::engine::navigation::NavigationEngineImpl> testNavigationEngineImpl;
     testNavigationEngineImpl = engine::navigation::NavigationEngineImpl::create(
         m_mockPlatformInterface,
@@ -134,7 +134,7 @@ TEST_F( NavigationEngineImplTest, createWithNullExceptionEncounteredSender ) {
     EXPECT_EQ(nullptr, testNavigationEngineImpl);
 }
 
-TEST_F( NavigationEngineImplTest, createWithNullContextManager ) {
+TEST_F(NavigationEngineImplTest, createWithNullContextManager) {
     std::shared_ptr<aace::engine::navigation::NavigationEngineImpl> testNavigationEngineImpl;
     testNavigationEngineImpl = engine::navigation::NavigationEngineImpl::create(
         m_mockPlatformInterface,
@@ -149,4 +149,3 @@ TEST_F( NavigationEngineImplTest, createWithNullContextManager ) {
 }  // namespace unit
 }  // namespace test
 }  // namespace aace
-

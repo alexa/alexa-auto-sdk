@@ -40,7 +40,7 @@ using VehiclePropertyMap = std::unordered_map<VehiclePropertyType, std::string, 
 
 /**
  * VehiclePropertyInterface allows components to retrieve vehicle properties from the "aace.vehicle" configuration
- */ 
+ */
 class VehiclePropertyInterface {
 public:
     /// Destructor
@@ -48,18 +48,20 @@ public:
 
     /**
      * Retrieves the property setting in "aace.vehicle" configuration corresponding to the provided 
-     * @c VehiclePropertyType key.
+     * @c VehiclePropertyType key. The value returned will be an empty string if the value was not configured.
      *
      * @param type The property corresponding to the value to retrieve
-     * @return The "aace.vehicle" value corresponding to the provided property type
+     * @return The "aace.vehicle" value corresponding to the provided property type or an empty string if not present.
      */
     virtual std::string getVehicleProperty(VehiclePropertyType type) = 0;
 
     /**
-     * Retrieves a map of @c VehiclePropertyType keys to string values from "aace.vehicle" configuration. Every property 
-     * required by "aace.vehicle" configuration is expected to be present in the map.
+     * Retrieves a map of @c VehiclePropertyType keys to string values from "aace.vehicle" configuration. Only
+     * properties present in "aace.vehicle" configuration will be in the map.
+     *
+     * @note The map will be empty if "aace.vehicle" does not have any properties configured.
      * 
-     * @return The complete map of @c VehiclePropertyType keys to their string value settings
+     * @return The map of @c VehiclePropertyType keys to their string value settings.
      */
     virtual VehiclePropertyMap getVehicleProperties() = 0;
 

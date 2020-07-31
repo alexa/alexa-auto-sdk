@@ -21,7 +21,6 @@ import com.amazon.aace.core.config.EngineConfiguration;
  * A factory interface for creating CBL configuration objects
  */
 public class CBLConfiguration {
-
     private static final String TAG = "CBLConfiguration";
 
     /**
@@ -32,7 +31,7 @@ public class CBLConfiguration {
      * @code    {.json}
      * {
      *   "aace.cbl": {
-     *     "requestTimeout": <REQUEST_TIMEOUT_IN_SECONDS> 
+     *     "requestTimeout": <REQUEST_TIMEOUT_IN_SECONDS>
      *   }
      * }
      * @endcode
@@ -40,17 +39,17 @@ public class CBLConfiguration {
      * @param  requestTimeout The timeout used for requesting code pair
      * The default configuration of 60 seconds will be overriden with this value when configured.
      */
-    public static EngineConfiguration createCBLConfig( final int seconds ) {
+    public static EngineConfiguration createCBLConfig(final int seconds) {
         return new EngineConfiguration() {
             @Override
             protected long createNativeRef() {
-                return createCBLConfigBinder( seconds );
+                return createCBLConfigBinder(seconds);
             }
         };
     }
 
     // Native Engine JNI methods
-    static private native long createCBLConfigBinder( int seconds );
+    static private native long createCBLConfigBinder(int seconds);
 
     /**
      * Factory method used to programmatically generate cbl configuration data.
@@ -67,14 +66,14 @@ public class CBLConfiguration {
      *
      * @param [in] enableUserProfile Enable functionality to request user profile
      */
-    public static EngineConfiguration createCBLUserProfileConfig( final boolean enableUserProfile ) {
+    public static EngineConfiguration createCBLUserProfileConfig(final boolean enableUserProfile) {
         return new EngineConfiguration() {
             @Override
             protected long createNativeRef() {
-                return createCBLUserProfileConfigBinder( enableUserProfile );
+                return createCBLUserProfileConfigBinder(enableUserProfile);
             }
         };
     }
 
-    static private native long createCBLUserProfileConfigBinder( boolean enableUserProfile );
+    static private native long createCBLUserProfileConfigBinder(boolean enableUserProfile);
 }

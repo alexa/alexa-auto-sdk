@@ -33,7 +33,11 @@ public:
     ~AudioInputImpl();
 
     // Factory
-    static std::unique_ptr<AudioInputImpl> create(int moduleId, const std::string& deviceName, int sampleRate, const std::string& name = "");
+    static std::unique_ptr<AudioInputImpl> create(
+        int moduleId,
+        const std::string& deviceName,
+        int sampleRate,
+        const std::string& name = "");
 
     // aace::audio::AudioInput
     bool startAudioInput() override;

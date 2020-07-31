@@ -16,16 +16,15 @@
 package com.amazon.sampleapp.impl.CarControl;
 
 import android.content.Context;
+
 import com.amazon.aace.carControl.CarControl;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
-
 
 /**
  * This class demonstrates a how to handle Car Control platform interfaces.
  * It uses the CarControlDataProvider class to retrieve and store values.
  */
-public class CarControlHandler extends CarControl
-{
+public class CarControlHandler extends CarControl {
     private static final String TAG = "CarControl";
     private static final String MODE_CONTROLLER = "ModeController";
     private static final String POWER_CONTROLLER = "PowerController";
@@ -34,7 +33,7 @@ public class CarControlHandler extends CarControl
 
     private LoggerHandler mLogger;
 
-    public CarControlHandler( Context cCarControl, LoggerHandler logger ) {
+    public CarControlHandler(Context cCarControl, LoggerHandler logger) {
         mLogger = logger;
     }
 
@@ -46,9 +45,12 @@ public class CarControlHandler extends CarControl
         mLogger.postInfo(TAG, log);
 
         StringBuilder prettyPrint = new StringBuilder("\n");
-        prettyPrint.append("Entity   : Power Controller").append("\n")
-                   .append("Endpoint : ").append(endpointId).append("\n")
-                   .append("Action   : Turn On");
+        prettyPrint.append("Entity   : Power Controller")
+                .append("\n")
+                .append("Endpoint : ")
+                .append(endpointId)
+                .append("\n")
+                .append("Action   : Turn On");
         mLogger.postInfo(TAG, prettyPrint.toString());
     }
 
@@ -60,9 +62,12 @@ public class CarControlHandler extends CarControl
         mLogger.postInfo(TAG, log);
 
         StringBuilder prettyPrint = new StringBuilder("\n");
-        prettyPrint.append("Entity   : Power Controller").append("\n")
-                   .append("Endpoint : ").append(endpointId).append("\n")
-                   .append("Action   : Turn Off");
+        prettyPrint.append("Entity   : Power Controller")
+                .append("\n")
+                .append("Endpoint : ")
+                .append(endpointId)
+                .append("\n")
+                .append("Action   : Turn Off");
         mLogger.postInfo(TAG, prettyPrint.toString());
     }
 
@@ -71,10 +76,15 @@ public class CarControlHandler extends CarControl
         boolean isOn = CarControlDataProvider.getBoolController(endpointId).getValue();
 
         StringBuilder prettyPrint = new StringBuilder("\n");
-        prettyPrint.append("Entity   : Power Controller").append("\n")
-                   .append("Endpoint : ").append(endpointId).append("\n")
-                   .append("Action   : Query State").append("\n")
-                   .append("State    : ").append(isOn ? "On" : "Off");
+        prettyPrint.append("Entity   : Power Controller")
+                .append("\n")
+                .append("Endpoint : ")
+                .append(endpointId)
+                .append("\n")
+                .append("Action   : Query State")
+                .append("\n")
+                .append("State    : ")
+                .append(isOn ? "On" : "Off");
         mLogger.postInfo(TAG, prettyPrint.toString());
 
         return isOn;
@@ -84,14 +94,20 @@ public class CarControlHandler extends CarControl
     public void turnToggleControllerOn(String endpointId, String controllerId) throws Exception {
         CarControlDataProvider.getBoolController(endpointId, controllerId).setValue(true);
 
-        String log = TOGGLE_CONTROLLER + ",endpoint=" + endpointId + ",name=TurnOn" + ",instance=" + controllerId;
+        String log = TOGGLE_CONTROLLER + ",endpoint=" + endpointId + ",name=TurnOn"
+                + ",instance=" + controllerId;
         mLogger.postInfo(TAG, log);
 
         StringBuilder prettyPrint = new StringBuilder("\n");
-        prettyPrint.append("Entity     : Toggle Controller").append("\n")
-                   .append("Endpoint   : ").append(endpointId).append("\n")
-                   .append("Controller : ").append(controllerId).append("\n")
-                   .append("Action     : Turn On");
+        prettyPrint.append("Entity     : Toggle Controller")
+                .append("\n")
+                .append("Endpoint   : ")
+                .append(endpointId)
+                .append("\n")
+                .append("Controller : ")
+                .append(controllerId)
+                .append("\n")
+                .append("Action     : Turn On");
         mLogger.postInfo(TAG, prettyPrint.toString());
     }
 
@@ -99,14 +115,20 @@ public class CarControlHandler extends CarControl
     public void turnToggleControllerOff(String endpointId, String controllerId) throws Exception {
         CarControlDataProvider.getBoolController(endpointId, controllerId).setValue(false);
 
-        String log = TOGGLE_CONTROLLER + ",endpoint=" + endpointId + ",name=TurnOff" + ",instance=" + controllerId;
+        String log = TOGGLE_CONTROLLER + ",endpoint=" + endpointId + ",name=TurnOff"
+                + ",instance=" + controllerId;
         mLogger.postInfo(TAG, log);
 
         StringBuilder prettyPrint = new StringBuilder("\n");
-        prettyPrint.append("Entity     : Toggle Controller").append("\n")
-                   .append("Endpoint   : ").append(endpointId).append("\n")
-                   .append("Controller : ").append(controllerId).append("\n")
-                   .append("Action     : Turn Off");
+        prettyPrint.append("Entity     : Toggle Controller")
+                .append("\n")
+                .append("Endpoint   : ")
+                .append(endpointId)
+                .append("\n")
+                .append("Controller : ")
+                .append(controllerId)
+                .append("\n")
+                .append("Action     : Turn Off");
         mLogger.postInfo(TAG, prettyPrint.toString());
     }
 
@@ -115,11 +137,18 @@ public class CarControlHandler extends CarControl
         boolean isOn = CarControlDataProvider.getBoolController(endpointId, controllerId).getValue();
 
         StringBuilder prettyPrint = new StringBuilder("\n");
-        prettyPrint.append("Entity     : Toggle Controller").append("\n")
-                   .append("Endpoint   : ").append(endpointId).append("\n")
-                   .append("Controller : ").append(controllerId).append("\n")
-                   .append("Action     : Query State").append("\n")
-                   .append("State      : ").append(isOn ? "On" : "Off");
+        prettyPrint.append("Entity     : Toggle Controller")
+                .append("\n")
+                .append("Endpoint   : ")
+                .append(endpointId)
+                .append("\n")
+                .append("Controller : ")
+                .append(controllerId)
+                .append("\n")
+                .append("Action     : Query State")
+                .append("\n")
+                .append("State      : ")
+                .append(isOn ? "On" : "Off");
         mLogger.postInfo(TAG, prettyPrint.toString());
 
         return isOn;
@@ -129,19 +158,23 @@ public class CarControlHandler extends CarControl
     public void setRangeControllerValue(String endpointId, String controllerId, double value) throws Exception {
         CarControlDataProvider.getRangeController(endpointId, controllerId).setValue(value);
 
-        String log = RANGE_CONTROLLER
-                + ",endpoint=" + endpointId
-                + ",name=SetRangeValue"
-                + ",instance=" + controllerId
-                + ",rangeValue=" + value;
+        String log = RANGE_CONTROLLER + ",endpoint=" + endpointId + ",name=SetRangeValue"
+                + ",instance=" + controllerId + ",rangeValue=" + value;
         mLogger.postInfo(TAG, log);
 
         StringBuilder prettyPrint = new StringBuilder("\n");
-        prettyPrint.append("Entity     : Range Controller").append("\n")
-                   .append("Endpoint   : ").append(endpointId).append("\n")
-                   .append("Controller : ").append(controllerId).append("\n")
-                   .append("Action     : Set Value").append("\n")
-                   .append("Value      : ").append(value);
+        prettyPrint.append("Entity     : Range Controller")
+                .append("\n")
+                .append("Endpoint   : ")
+                .append(endpointId)
+                .append("\n")
+                .append("Controller : ")
+                .append(controllerId)
+                .append("\n")
+                .append("Action     : Set Value")
+                .append("\n")
+                .append("Value      : ")
+                .append(value);
         mLogger.postInfo(TAG, prettyPrint.toString());
     }
 
@@ -151,21 +184,29 @@ public class CarControlHandler extends CarControl
         CarControlDataProvider.getRangeController(endpointId, controllerId).adjustValue(delta);
         double valueNew = CarControlDataProvider.getRangeController(endpointId, controllerId).getValue();
 
-        String log = RANGE_CONTROLLER
-                + ",endpoint=" + endpointId
-                + ",name=AdjustRangeValue"
-                + ",instance=" + controllerId
-                + ",rangeValueDelta=" + delta;
+        String log = RANGE_CONTROLLER + ",endpoint=" + endpointId + ",name=AdjustRangeValue"
+                + ",instance=" + controllerId + ",rangeValueDelta=" + delta;
         mLogger.postInfo(TAG, log);
 
         StringBuilder prettyPrint = new StringBuilder("\n");
-        prettyPrint.append("Entity     : Range Controller").append("\n")
-                   .append("Endpoint   : ").append(endpointId).append("\n")
-                   .append("Controller : ").append(controllerId).append("\n")
-                   .append("Action     : Adjust Value").append("\n")
-                   .append("Value      : ").append(value).append("\n")
-                   .append("Delta      : ").append(delta).append("\n")
-                   .append("New Value  : ").append(valueNew);
+        prettyPrint.append("Entity     : Range Controller")
+                .append("\n")
+                .append("Endpoint   : ")
+                .append(endpointId)
+                .append("\n")
+                .append("Controller : ")
+                .append(controllerId)
+                .append("\n")
+                .append("Action     : Adjust Value")
+                .append("\n")
+                .append("Value      : ")
+                .append(value)
+                .append("\n")
+                .append("Delta      : ")
+                .append(delta)
+                .append("\n")
+                .append("New Value  : ")
+                .append(valueNew);
         mLogger.postInfo(TAG, prettyPrint.toString());
     }
 
@@ -174,11 +215,18 @@ public class CarControlHandler extends CarControl
         double value = CarControlDataProvider.getRangeController(endpointId, controllerId).getValue();
 
         StringBuilder prettyPrint = new StringBuilder("\n");
-        prettyPrint.append("Entity     : Range Controller").append("\n")
-                   .append("Endpoint   : ").append(endpointId).append("\n")
-                   .append("Controller : ").append(controllerId).append("\n")
-                   .append("Action     : Get Value").append("\n")
-                   .append("Value      : ").append(value);
+        prettyPrint.append("Entity     : Range Controller")
+                .append("\n")
+                .append("Endpoint   : ")
+                .append(endpointId)
+                .append("\n")
+                .append("Controller : ")
+                .append(controllerId)
+                .append("\n")
+                .append("Action     : Get Value")
+                .append("\n")
+                .append("Value      : ")
+                .append(value);
         mLogger.postInfo(TAG, prettyPrint.toString());
 
         return value;
@@ -188,43 +236,55 @@ public class CarControlHandler extends CarControl
     public void setModeControllerValue(String endpointId, String controllerId, String value) throws Exception {
         CarControlDataProvider.getModeController(endpointId, controllerId).setMode(value);
 
-        String log = MODE_CONTROLLER
-                + ",endpoint=" + endpointId
-                + ",name=SetMode"
-                + ",instance=" + controllerId
-                + ",mode=" + value;
+        String log = MODE_CONTROLLER + ",endpoint=" + endpointId + ",name=SetMode"
+                + ",instance=" + controllerId + ",mode=" + value;
         mLogger.postInfo(TAG, log);
 
         StringBuilder prettyPrint = new StringBuilder("\n");
-        prettyPrint.append("Entity     : Mode Controller").append("\n")
-                   .append("Endpoint   : ").append(endpointId).append("\n")
-                   .append("Controller : ").append(controllerId).append("\n")
-                   .append("Action     : Set Mode").append("\n")
-                   .append("Value      : ").append(value);
+        prettyPrint.append("Entity     : Mode Controller")
+                .append("\n")
+                .append("Endpoint   : ")
+                .append(endpointId)
+                .append("\n")
+                .append("Controller : ")
+                .append(controllerId)
+                .append("\n")
+                .append("Action     : Set Mode")
+                .append("\n")
+                .append("Value      : ")
+                .append(value);
         mLogger.postInfo(TAG, prettyPrint.toString());
     }
 
     @Override
-    public void adjustModeControllerValue(String endpointId, String controllerId, int delta) throws Exception  {
+    public void adjustModeControllerValue(String endpointId, String controllerId, int delta) throws Exception {
         String value = CarControlDataProvider.getModeController(endpointId, controllerId).getMode();
         CarControlDataProvider.getModeController(endpointId, controllerId).adjustMode(delta);
         String valueNew = CarControlDataProvider.getModeController(endpointId, controllerId).getMode();
 
-        String log = MODE_CONTROLLER
-                + ",endpoint=" + endpointId
-                + ",name=AdjustMode"
-                + ",instance=" + controllerId
-                + ",modeDelta=" + delta;
+        String log = MODE_CONTROLLER + ",endpoint=" + endpointId + ",name=AdjustMode"
+                + ",instance=" + controllerId + ",modeDelta=" + delta;
         mLogger.postInfo(TAG, log);
 
         StringBuilder prettyPrint = new StringBuilder("\n");
-        prettyPrint.append("Entity     : Mode Controller").append("\n")
-                   .append("Endpoint   : ").append(endpointId).append("\n")
-                   .append("Controller : ").append(controllerId).append("\n")
-                   .append("Action     : Adjust Value").append("\n")
-                   .append("Value      : ").append(value).append("\n")
-                   .append("Delta      : ").append(delta).append("\n")
-                   .append("New Value  : ").append(valueNew);
+        prettyPrint.append("Entity     : Mode Controller")
+                .append("\n")
+                .append("Endpoint   : ")
+                .append(endpointId)
+                .append("\n")
+                .append("Controller : ")
+                .append(controllerId)
+                .append("\n")
+                .append("Action     : Adjust Value")
+                .append("\n")
+                .append("Value      : ")
+                .append(value)
+                .append("\n")
+                .append("Delta      : ")
+                .append(delta)
+                .append("\n")
+                .append("New Value  : ")
+                .append(valueNew);
         mLogger.postInfo(TAG, prettyPrint.toString());
     }
 
@@ -233,11 +293,18 @@ public class CarControlHandler extends CarControl
         String value = CarControlDataProvider.getModeController(endpointId, controllerId).getMode();
 
         StringBuilder prettyPrint = new StringBuilder("\n");
-        prettyPrint.append("Entity     : Mode Controller").append("\n")
-                   .append("Endpoint   : ").append(endpointId).append("\n")
-                   .append("Controller : ").append(controllerId).append("\n")
-                   .append("Action     : Get Value").append("\n")
-                   .append("Value      : ").append(value);
+        prettyPrint.append("Entity     : Mode Controller")
+                .append("\n")
+                .append("Endpoint   : ")
+                .append(endpointId)
+                .append("\n")
+                .append("Controller : ")
+                .append(controllerId)
+                .append("\n")
+                .append("Action     : Get Value")
+                .append("\n")
+                .append("Value      : ")
+                .append(value);
         mLogger.postInfo(TAG, prettyPrint.toString());
 
         return value;

@@ -28,7 +28,7 @@ namespace contactUploader {
 
 class ContactUploaderEngineInterface {
 public:
-   /**
+    /**
     * Describes the status of contact uploader to the platform implementation.
     */
     enum class ContactUploaderStatus {
@@ -62,7 +62,7 @@ public:
          * @li failedContact.reason : The reason for the failure.
         */
         UPLOAD_CONTACTS_COMPLETED,
-        
+
         /**
          * Uploading of contacts is Canceled.
          */
@@ -77,12 +77,12 @@ public:
          * Removing the contacts from Cloud has started.
          */
         REMOVE_CONTACTS_STARTED,
-        
+
         /**
          * Removed the contacts from Cloud.
          */
         REMOVE_CONTACTS_COMPLETED,
-        
+
         /**
          * Error while removing contacts from Cloud.
          */
@@ -98,11 +98,13 @@ public:
     virtual bool onAddContactsBegin() = 0;
     virtual bool onAddContactsEnd() = 0;
     virtual bool onAddContactsCancel() = 0;
-    virtual bool onAddContact( const std::string& contact ) = 0;
+    virtual bool onAddContact(const std::string& contact) = 0;
     virtual bool onRemoveUploadedContacts() = 0;
 };
 
-inline std::ostream& operator<<(std::ostream& stream, const ContactUploaderEngineInterface::ContactUploaderStatus& status) {
+inline std::ostream& operator<<(
+    std::ostream& stream,
+    const ContactUploaderEngineInterface::ContactUploaderStatus& status) {
     switch (status) {
         case ContactUploaderEngineInterface::ContactUploaderStatus::UPLOAD_CONTACTS_STARTED:
             stream << "UPLOAD_CONTACTS_STARTED";
@@ -135,7 +137,7 @@ inline std::ostream& operator<<(std::ostream& stream, const ContactUploaderEngin
     return stream;
 }
 
-} // aace::contactUploader
-} // aace
+}  // namespace contactUploader
+}  // namespace aace
 
-#endif // AACE_CONTACTUPLOADER_CONTACTUPLOADER_ENGINE_INTERFACE_H
+#endif  // AACE_CONTACTUPLOADER_CONTACTUPLOADER_ENGINE_INTERFACE_H

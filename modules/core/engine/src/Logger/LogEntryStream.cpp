@@ -26,6 +26,6 @@ const char* LogEntryStream::c_str() const {
     return LogEntryBuffer::c_str();
 }
 
-} // aace::engine::logger
-} // aace::engine
-} // aace
+}  // namespace logger
+}  // namespace engine
+}  // namespace aace

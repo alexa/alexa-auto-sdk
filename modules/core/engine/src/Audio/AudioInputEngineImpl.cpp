@@ -23,24 +23,23 @@ namespace aace {
 namespace engine {
 namespace audio {
 
-AudioInputEngineImpl::AudioInputEngineImpl( std::shared_ptr<aace::audio::AudioInput> platformAudioInput ) : m_platformAudioInput( platformAudioInput ) {
+AudioInputEngineImpl::AudioInputEngineImpl(std::shared_ptr<aace::audio::AudioInput> platformAudioInput) :
+        m_platformAudioInput(platformAudioInput) {
 }
 
-std::shared_ptr<AudioInputEngineImpl> AudioInputEngineImpl::create( std::shared_ptr<aace::audio::AudioInput> platformAudioInput )
-{
-    try
-    {
-        ThrowIfNull( platformAudioInput, "invalidAudioInputPlatformInterface" );
-        
-        auto audioInputEngineImpl = std::shared_ptr<AudioInputEngineImpl>( new AudioInputEngineImpl( platformAudioInput ) );
-        
+std::shared_ptr<AudioInputEngineImpl> AudioInputEngineImpl::create(
+    std::shared_ptr<aace::audio::AudioInput> platformAudioInput) {
+    try {
+        ThrowIfNull(platformAudioInput, "invalidAudioInputPlatformInterface");
+
+        auto audioInputEngineImpl = std::shared_ptr<AudioInputEngineImpl>(new AudioInputEngineImpl(platformAudioInput));
+
         // set the platform engine interface reference
-        platformAudioInput->setEngineInterface( audioInputEngineImpl );
-        
+        platformAudioInput->setEngineInterface(audioInputEngineImpl);
+
         return audioInputEngineImpl;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"create").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "create").d("reason", ex.what()));
         return nullptr;
     }
 }
@@ -50,95 +49,85 @@ AudioInputChannelInterface::ChannelId AudioInputEngineImpl::getNextChannelId() {
 }
 
 // AudioInputChannelInterface
-AudioInputChannelInterface::ChannelId AudioInputEngineImpl::start( AudioWriteCallback callback )
-{
-    try
-    {
-        std::lock_guard<std::mutex> clientLock( m_mutex );
-        std::unique_lock<std::mutex> callbackLock( m_callbackMutex );
-        
+AudioInputChannelInterface::ChannelId AudioInputEngineImpl::start(AudioWriteCallback callback) {
+    try {
+        std::lock_guard<std::mutex> clientLock(m_mutex);
+        std::unique_lock<std::mutex> callbackLock(m_callbackMutex);
+
         // call the platform startAudioInput() if there are no observers
-        if( m_callbackMap.empty() ) {
+        if (m_callbackMap.empty()) {
             // Release the lock temporarily so that audio data callback can acquire it and prevent deadlock
             callbackLock.unlock();
-            ThrowIfNot( m_platformAudioInput->startAudioInput(), "startPlatformAudioInputFailed" );
+            ThrowIfNot(m_platformAudioInput->startAudioInput(), "startPlatformAudioInputFailed");
             callbackLock.lock();
         }
-        
+
         // get the next channel id
         auto id = getNextChannelId();
-        
+
         // add the callback to the channel callback map
         m_callbackMap[id] = callback;
-        
+
         return id;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"start").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "start").d("reason", ex.what()));
         return INVALID_CHANNEL;
     }
 }
 
-bool AudioInputEngineImpl::stop( ChannelId id )
-{
-    try
-    {
-        std::lock_guard<std::mutex> clientLock( m_mutex );
-        std::unique_lock<std::mutex> callbackLock( m_callbackMutex );
-        
-        auto it = m_callbackMap.find( id );
-        ThrowIf( it == m_callbackMap.end(), "invalidChannelId" );
-        
+bool AudioInputEngineImpl::stop(ChannelId id) {
+    try {
+        std::lock_guard<std::mutex> clientLock(m_mutex);
+        std::unique_lock<std::mutex> callbackLock(m_callbackMutex);
+
+        auto it = m_callbackMap.find(id);
+        ThrowIf(it == m_callbackMap.end(), "invalidChannelId");
+
         // call the platform stopAudioInput() if the channel is the only channel
         // requesting audio from the audio provider
-        if( m_callbackMap.size() == 1 ) {
+        if (m_callbackMap.size() == 1) {
             // Release the lock temporarily so that audio data callback can acquire it and prevent deadlock
             callbackLock.unlock();
-            ThrowIfNot( m_platformAudioInput->stopAudioInput(), "stopPlatformAudioInputFailed" );
+            ThrowIfNot(m_platformAudioInput->stopAudioInput(), "stopPlatformAudioInputFailed");
             callbackLock.lock();
         }
-        
+
         // we successfully stopped the platform audio, so we need to remove
         // the audio channel from the channel list
-        m_callbackMap.erase( it );
+        m_callbackMap.erase(it);
 
         return true;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"stop").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "stop").d("reason", ex.what()));
         return false;
     }
 }
-    
+
 void AudioInputEngineImpl::doShutdown() {
-    std::lock_guard<std::mutex> clientLock( m_mutex );
-    m_platformAudioInput->setEngineInterface( nullptr );
+    std::lock_guard<std::mutex> clientLock(m_mutex);
+    m_platformAudioInput->setEngineInterface(nullptr);
 }
 
-
 // AudioInputChannelEngineInterface
-ssize_t AudioInputEngineImpl::write( const int16_t* data, const size_t size )
-{
-    try
-    {
-        std::lock_guard<std::mutex> callbackLock( m_callbackMutex );
-        
+ssize_t AudioInputEngineImpl::write(const int16_t* data, const size_t size) {
+    try {
+        std::lock_guard<std::mutex> callbackLock(m_callbackMutex);
+
         // execute the register callbacks
-        for( auto& next : m_callbackMap ) {
-            next.second( data, size );
+        for (auto& next : m_callbackMap) {
+            next.second(data, size);
         }
-        
+
         // always return a successfull write even if some of the callbacks failed to write all
         // of the data being provided... the audio input channel should handle retries or buffering
         // on its own if it is needed!
         return size;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"write").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "write").d("reason", ex.what()));
         return 0;
     }
 }
 
-} // aace::engine::audio
-} // aace::engine
-} // aace
+}  // namespace audio
+}  // namespace engine
+}  // namespace aace

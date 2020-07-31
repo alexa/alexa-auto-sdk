@@ -8,6 +8,7 @@ var searchData=
   ['sessionstate',['SessionState',['../classaace_1_1alexa_1_1_external_media_adapter_1_1_session_state.html#a9261f692ab89c0a12b494cf707d83daa',1,'aace::alexa::ExternalMediaAdapter::SessionState']]],
   ['setaplmaxversion',['setAPLMaxVersion',['../classaace_1_1apl_1_1_a_p_l.html#ae78b5ed9cf53ac882d12bdff99d69638',1,'aace::apl::APL']]],
   ['setbandlevels',['setBandLevels',['../classaace_1_1alexa_1_1_equalizer_controller.html#a9f0774201117c45bc87f68e571f2478e',1,'aace::alexa::EqualizerController']]],
+  ['setdefaultzone',['setDefaultZone',['../classaace_1_1car_control_1_1config_1_1_car_control_configuration.html#ac1c48da7ee8a6244c27414b97a40f3a0',1,'aace::carControl::config::CarControlConfiguration']]],
   ['setdocumentidletimeout',['setDocumentIdleTimeout',['../classaace_1_1apl_1_1_a_p_l.html#ad6270378b772440b1d4679b844d4d928',1,'aace::apl::APL']]],
   ['setdonotdisturb',['setDoNotDisturb',['../classaace_1_1alexa_1_1_do_not_disturb.html#adf4a853a8f3366e416127d1f1767ccab',1,'aace::alexa::DoNotDisturb']]],
   ['setfocus',['setFocus',['../classaace_1_1alexa_1_1_local_media_source.html#ad1217e4c192da618ae846ba57c8611ac',1,'aace::alexa::LocalMediaSource']]],
@@ -25,5 +26,6 @@ var searchData=
   ['startcapture',['startCapture',['../classaace_1_1alexa_1_1_speech_recognizer.html#ab2d1df9942a32ff6eb829211a1ebffba',1,'aace::alexa::SpeechRecognizer']]],
   ['startnavigation',['startNavigation',['../classaace_1_1navigation_1_1_navigation.html#abb26aed1a2b2fb215fd9c69cb9b6511c',1,'aace::navigation::Navigation']]],
   ['stop',['stop',['../classaace_1_1audio_1_1_audio_output.html#a80a92aeb055e394e6661c43f9217c670',1,'aace::audio::AudioOutput::stop()'],['../classaace_1_1core_1_1_engine.html#a456599306224a018b0c7b708594671f2',1,'aace::core::Engine::stop()'],['../classaace_1_1phone_call_controller_1_1_phone_call_controller.html#adbeb8a3a5c7f6e7bfd290ebe81770cae',1,'aace::phoneCallController::PhoneCallController::stop()']]],
-  ['stopcapture',['stopCapture',['../classaace_1_1alexa_1_1_speech_recognizer.html#afbbd237e855308ed0d440c7f3d469a69',1,'aace::alexa::SpeechRecognizer']]]
+  ['stopcapture',['stopCapture',['../classaace_1_1alexa_1_1_speech_recognizer.html#afbbd237e855308ed0d440c7f3d469a69',1,'aace::alexa::SpeechRecognizer']]],
+  ['stopforegroundactivity',['stopForegroundActivity',['../classaace_1_1alexa_1_1_alexa_client.html#a5ac8bb84af2126339c7bf685d3540bac',1,'aace::alexa::AlexaClient']]]
 ];

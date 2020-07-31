@@ -18,22 +18,23 @@
 
 #include <AVSCommon/SDKInterfaces/AudioPlayerInterface.h>
 
-namespace aace {    
+namespace aace {
 namespace test {
 namespace avs {
 
 class MockAudioPlayerInterface : public alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerInterface {
 public:
-    MOCK_METHOD1(addObserver,
+    MOCK_METHOD1(
+        addObserver,
         void(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface> observer));
-    MOCK_METHOD1(removeObserver,
+    MOCK_METHOD1(
+        removeObserver,
         void(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface> observer));
-    MOCK_METHOD0(getAudioItemOffset,
-        std::chrono::milliseconds());
+    MOCK_METHOD0(stopPlayback, void());
 };
 
-} // aace::test::avs
-} // aace::test
-} // aace
+}  // namespace avs
+}  // namespace test
+}  // namespace aace
 
-#endif //AACE_TEST_UNIT_MOCK_AUDIOPLAYER_INTERFACE_H_
+#endif  //AACE_TEST_UNIT_MOCK_AUDIOPLAYER_INTERFACE_H_

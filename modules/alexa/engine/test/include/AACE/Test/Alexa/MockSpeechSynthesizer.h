@@ -23,11 +23,10 @@ namespace aace {
 namespace test {
 namespace alexa {
 
-class MockSpeechSynthesizer : public aace::alexa::SpeechSynthesizer {
-};
+class MockSpeechSynthesizer : public aace::alexa::SpeechSynthesizer {};
 
-} // aace::test::alexa
-} // aace::test
-} // aace
+}  // namespace alexa
+}  // namespace test
+}  // namespace aace
 
-#endif // AACE_TEST_ALEXA_MOCK_SPEECH_SYNTHESIZER_H
+#endif  // AACE_TEST_ALEXA_MOCK_SPEECH_SYNTHESIZER_H

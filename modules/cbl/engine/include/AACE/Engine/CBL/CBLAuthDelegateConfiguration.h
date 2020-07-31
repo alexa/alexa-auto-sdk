@@ -31,12 +31,11 @@ namespace cbl {
 
 class CBLAuthDelegateConfiguration {
 public:
-
     static std::shared_ptr<CBLAuthDelegateConfiguration> create(
         std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
         std::chrono::seconds codePairRequestTimeout,
         std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
-        std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> localeAssetManager );
+        std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> localeAssetManager);
 
     std::string getClientId() const;
     std::string getProductId() const;
@@ -56,11 +55,11 @@ public:
     std::string getDefaultLocale() const;
 
 private:
-
-    bool initialize( std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
+    bool initialize(
+        std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
         std::chrono::seconds codePairRequestTimeout,
         std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
-        std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> localeAssetManager );
+        std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> localeAssetManager);
 
     bool initScopeData();
 
@@ -73,11 +72,10 @@ private:
 
     /// Weak reference to the @c LocaleAssetsManager for getting the default locale.
     std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> m_localeAssetManager;
-
 };
 
-} // aace::engine::cbl
-} // aace::engine
-} // aace
+}  // namespace cbl
+}  // namespace engine
+}  // namespace aace
 
 #endif

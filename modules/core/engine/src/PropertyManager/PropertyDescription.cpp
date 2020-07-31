@@ -24,9 +24,7 @@ namespace propertyManager {
 static const std::string TAG("aace.core.PropertyDescription");
 
 PropertyDescription::PropertyDescription(const std::string& name, Setter setter, Getter getter) :
-        m_setter(setter),
-        m_getter(getter),
-        m_name(name) {
+        m_setter(setter), m_getter(getter), m_name(name) {
 }
 
 PropertyDescription::PropertyDescription(const PropertyDescription& other) {

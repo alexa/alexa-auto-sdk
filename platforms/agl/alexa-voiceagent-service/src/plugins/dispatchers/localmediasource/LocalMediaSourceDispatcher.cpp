@@ -42,13 +42,13 @@ static std::string VSHL_CAPABILITY_LOCAL_MEDIA_SOURCE = "localmediasource";
 static std::string VSHL_CAPABILITY_VERB_LOCAL_MEDIA_SOURCE_PUBLISH = VSHL_CAPABILITY_LOCAL_MEDIA_SOURCE + "/publish";
 
 // LocalMediaSource subscribe verb to subscribe for vshl capabilities events from Apps.
-static std::string VSHL_CAPABILITY_VERB_LOCAL_MEDIA_SOURCE_SUBSCRIBE = VSHL_CAPABILITY_LOCAL_MEDIA_SOURCE + "/subscribe";
+static std::string VSHL_CAPABILITY_VERB_LOCAL_MEDIA_SOURCE_SUBSCRIBE =
+    VSHL_CAPABILITY_LOCAL_MEDIA_SOURCE + "/subscribe";
 
 std::shared_ptr<LocalMediaSourceDispatcher> LocalMediaSourceDispatcher::create(
     std::shared_ptr<ILogger> logger,
     std::shared_ptr<IAASBController> aasbController,
     std::shared_ptr<IAFBApi> api) {
-
     return std::shared_ptr<LocalMediaSourceDispatcher>(new LocalMediaSourceDispatcher(logger, aasbController, api));
 }
 
@@ -56,22 +56,30 @@ LocalMediaSourceDispatcher::LocalMediaSourceDispatcher(
     std::shared_ptr<ILogger> logger,
     std::shared_ptr<IAASBController> aasbController,
     std::shared_ptr<IAFBApi> api) :
-        m_logger(logger),
-        m_aasbController(aasbController),
-        m_api(api) {
+        m_logger(logger), m_aasbController(aasbController), m_api(api) {
 }
 
-void LocalMediaSourceDispatcher::onReceivedDirective(
-    const std::string& action,
-    const std::string& payload) {
-
+void LocalMediaSourceDispatcher::onReceivedDirective(const std::string& action, const std::string& payload) {
     m_logger->log(Level::DEBUG, TAG, "Processing localmediasource directive: " + action);
 
     std::string vshlCapabilityAction = action;
 
     json_object* argsJ = json_object_new_object();
     json_object* actionJ = json_object_new_string(vshlCapabilityAction.c_str());
-    json_object* payloadJ = json_object_new_string(payload.c_str());
+    json_object* payloadJ = NULL;
+
+    if (payload.length()) {
+        payloadJ = json_tokener_parse(payload.c_str());
+    } else {
+        m_logger->log(Level::ERROR, TAG, "Unable to parse payload JSON. Setting to empty string: " + payload);
+        payloadJ = json_object_new_string("");
+    }
+
+    if (!payloadJ) {
+        m_logger->log(Level::ERROR, TAG, "Unable to parse payload JSON: " + payload);
+        return;
+    }
+
     json_object_object_add(argsJ, agl::alexa::JSON_ATTR_ACTION.c_str(), actionJ);
     json_object_object_add(argsJ, agl::alexa::JSON_ATTR_PAYLOAD.c_str(), payloadJ);
 
@@ -90,9 +98,10 @@ void LocalMediaSourceDispatcher::onReceivedDirective(
 bool LocalMediaSourceDispatcher::subscribeToLocalMediaSourceEvents() {
     m_logger->log(Level::INFO, TAG, "Subscribing to localmediasource control capabilities");
 
-    json_object *argsJ = json_object_new_object();
-    json_object *actionsJ = json_object_new_array();
-    json_object_array_add(actionsJ, json_object_new_string(aasb::bridge::ACTION_LOCAL_MEDIA_SOURCE_GET_STATE_RESPONSE.c_str()));
+    json_object* argsJ = json_object_new_object();
+    json_object* actionsJ = json_object_new_array();
+    json_object_array_add(
+        actionsJ, json_object_new_string(aasb::bridge::ACTION_LOCAL_MEDIA_SOURCE_GET_STATE_RESPONSE.c_str()));
 
     json_object_object_add(argsJ, agl::alexa::JSON_ATTR_ACTIONS.c_str(), actionsJ);
 
@@ -106,7 +115,8 @@ bool LocalMediaSourceDispatcher::subscribeToLocalMediaSourceEvents() {
         error,
         info);
     if (result != 0) {
-        m_logger->log(Level::ERROR, TAG, "Failed to subscribe to localmediasource control capabilities. Error: " + error);
+        m_logger->log(
+            Level::ERROR, TAG, "Failed to subscribe to localmediasource control capabilities. Error: " + error);
     }
 
     if (response != NULL) {
@@ -117,24 +127,15 @@ bool LocalMediaSourceDispatcher::subscribeToLocalMediaSourceEvents() {
 }
 
 void LocalMediaSourceDispatcher::onGetStateResponse(const std::string& payload) {
-    m_aasbController->onReceivedEvent(
-        TOPIC_LOCAL_MEDIA_SOURCE,
-        ACTION_LOCAL_MEDIA_SOURCE_GET_STATE_RESPONSE,
-        payload);
+    m_aasbController->onReceivedEvent(TOPIC_LOCAL_MEDIA_SOURCE, ACTION_LOCAL_MEDIA_SOURCE_GET_STATE_RESPONSE, payload);
 }
 
 void LocalMediaSourceDispatcher::onPlayerEvent(const std::string& payload) {
-    m_aasbController->onReceivedEvent(
-        TOPIC_LOCAL_MEDIA_SOURCE,
-        ACTION_LOCAL_MEDIA_SOURCE_PLAYER_EVENT,
-        payload);
+    m_aasbController->onReceivedEvent(TOPIC_LOCAL_MEDIA_SOURCE, ACTION_LOCAL_MEDIA_SOURCE_PLAYER_EVENT, payload);
 }
 
 void LocalMediaSourceDispatcher::onPlayerError(const std::string& payload) {
-    m_aasbController->onReceivedEvent(
-        TOPIC_LOCAL_MEDIA_SOURCE,
-        ACTION_LOCAL_MEDIA_SOURCE_PLAYER_ERROR,
-        payload);
+    m_aasbController->onReceivedEvent(TOPIC_LOCAL_MEDIA_SOURCE, ACTION_LOCAL_MEDIA_SOURCE_PLAYER_ERROR, payload);
 }
 
 }  // namespace localmediasource

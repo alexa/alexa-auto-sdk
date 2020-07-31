@@ -100,7 +100,7 @@ void LoopbackDetector::doShutdown() {
 
     if (m_wakewordEngineAdapter != nullptr) {
         m_wakewordEngineAdapter->disable();
-        m_wakewordEngineAdapter->removeKeyWordObserver( shared_from_this() );
+        m_wakewordEngineAdapter->removeKeyWordObserver(shared_from_this());
         m_wakewordEngineAdapter.reset();
     }
 }
@@ -144,8 +144,7 @@ bool LoopbackDetector::startAudioInput() {
 
         // throw an exception if we failed to start the audio input channel
         ThrowIf(
-            m_currentChannelId == audio::AudioInputChannelInterface::INVALID_CHANNEL,
-            "audioInputChannelStartFailed");
+            m_currentChannelId == audio::AudioInputChannelInterface::INVALID_CHANNEL, "audioInputChannelStartFailed");
 
         return true;
     } catch (std::exception& ex) {
@@ -156,9 +155,7 @@ bool LoopbackDetector::startAudioInput() {
 
 bool LoopbackDetector::stopAudioInput() {
     try {
-        ThrowIf(
-            m_currentChannelId == audio::AudioInputChannelInterface::INVALID_CHANNEL,
-            "invalidAudioChannelId");
+        ThrowIf(m_currentChannelId == audio::AudioInputChannelInterface::INVALID_CHANNEL, "invalidAudioChannelId");
         ThrowIfNot(m_audioInputChannel->stop(m_currentChannelId), "audioInputChannelStopFailed");
 
         // reset the channel id
@@ -174,7 +171,7 @@ bool LoopbackDetector::stopAudioInput() {
 
 ssize_t LoopbackDetector::write(const int16_t* data, const size_t size) {
     try {
-        ThrowIfNull( m_audioInputWriter, "nullAudioInputWriter" );
+        ThrowIfNull(m_audioInputWriter, "nullAudioInputWriter");
 
         ssize_t result = m_audioInputWriter->write(data, size);
         ThrowIf(result < 0, "errorWritingData");

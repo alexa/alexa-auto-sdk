@@ -24,7 +24,6 @@
 #include <aasb/AASBControllerFactory.h>
 #include <aasb/interfaces/IAASBController.h>
 
-
 /// Plugin headers
 #include "AlexaConsts.h"
 #include "afb/AFBApiImpl.h"
@@ -60,7 +59,6 @@ static std::shared_ptr<agl::audio::Audio> sAudio;
 static std::shared_ptr<aasb::bridge::IAASBController> sAASBController;
 
 using Level = agl::common::interfaces::ILogger::Level;
-
 
 /**
  * Parse the json object and extract action and payload from the object.
@@ -150,8 +148,8 @@ CTLP_INIT(plugin, ret) {
         return -1;
     }
 
-    sAlexaPlaybackDispatcher = agl::dispatcher::playback::PlaybackDispatcher::create(
-        sAFBLogger, sAASBController, sAFBApi);
+    sAlexaPlaybackDispatcher =
+        agl::dispatcher::playback::PlaybackDispatcher::create(sAFBLogger, sAASBController, sAFBApi);
     if (!sAlexaPlaybackDispatcher) {
         sAFBLogger->log(Level::ERROR, TAG, "PlaybackDispatcher::create failed");
         return -1;
@@ -165,8 +163,8 @@ CTLP_INIT(plugin, ret) {
         aasb::bridge::TOPIC_PLAYBACK_CONTROLLER, sAlexaPlaybackDispatcher);
 
     if (sAASBConfigProvider->shouldEnableNavigation()) {
-        sAlexaNavigationDispatcher = agl::dispatcher::navigation::NavigationDispatcher::create(
-            sAFBLogger, sAASBController, sAFBApi);
+        sAlexaNavigationDispatcher =
+            agl::dispatcher::navigation::NavigationDispatcher::create(sAFBLogger, sAASBController, sAFBApi);
         if (!sAlexaNavigationDispatcher) {
             sAFBLogger->log(Level::ERROR, TAG, "NavigationDispatcher::create failed");
             return -1;
@@ -178,8 +176,8 @@ CTLP_INIT(plugin, ret) {
     }
 
     if (sAASBConfigProvider->shouldEnablePhoneCallControl()) {
-        sAlexaPhoneCallDispatcher = agl::dispatcher::phonecall::PhoneCallDispatcher::create(
-            sAFBLogger, sAASBController, sAFBApi);
+        sAlexaPhoneCallDispatcher =
+            agl::dispatcher::phonecall::PhoneCallDispatcher::create(sAFBLogger, sAASBController, sAFBApi);
         if (!sAlexaPhoneCallDispatcher) {
             sAFBLogger->log(Level::ERROR, TAG, "PhoneCallDispatcher::create failed");
             return -1;
@@ -195,15 +193,16 @@ CTLP_INIT(plugin, ret) {
     }
 
     if (sAASBConfigProvider->shouldEnableLocalMediaSource()) {
-        sAlexaLocalMediaSourceDispatcher = agl::dispatcher::localmediasource::LocalMediaSourceDispatcher::create(
-            sAFBLogger, sAASBController, sAFBApi);
+        sAlexaLocalMediaSourceDispatcher =
+            agl::dispatcher::localmediasource::LocalMediaSourceDispatcher::create(sAFBLogger, sAASBController, sAFBApi);
         if (!sAlexaLocalMediaSourceDispatcher) {
             sAFBLogger->log(Level::ERROR, TAG, "LocalMediaSourceDispatcher::create failed");
             return -1;
         }
 
         if (!sAlexaLocalMediaSourceDispatcher->subscribeToLocalMediaSourceEvents()) {
-            sAFBLogger->log(Level::WARNING, TAG, "LocalMediaSourceDispatcher::subscribeToLocalMediaSourceEvents failed");
+            sAFBLogger->log(
+                Level::WARNING, TAG, "LocalMediaSourceDispatcher::subscribeToLocalMediaSourceEvents failed");
         }
 
         // To process localmediasource directives coming from Alexa
@@ -311,8 +310,7 @@ CTLP_CAPI(setAuthToken, source, argsJ, eventJ) {
     }
 
     std::string authToken = document[agl::alexa::JSON_ATTR_AUTH_TOKEN.c_str()].GetString();
-    sAASBController->onReceivedEvent(
-        aasb::bridge::TOPIC_AUTH_PROVIDER, aasb::bridge::ACTION_SET_AUTH_TOKEN, authToken);
+    sAASBController->onReceivedEvent(aasb::bridge::TOPIC_AUTH_PROVIDER, aasb::bridge::ACTION_SET_AUTH_TOKEN, authToken);
 
     afb_req_success(source->request, NULL, NULL);
     sAFBLogger->log(Level::DEBUG, TAG, "setAuthToken completed");
@@ -363,9 +361,8 @@ CTLP_CAPI(subscribeToCBLEvents, source, argsJ, eventJ) {
     }
 
     // Start the CBL process.
-    sAASBController->onReceivedEvent(
-        aasb::bridge::TOPIC_CBL, aasb::bridge::ACTION_CBL_START, "");    
-    
+    sAASBController->onReceivedEvent(aasb::bridge::TOPIC_CBL, aasb::bridge::ACTION_CBL_START, "");
+
     sAFBLogger->log(Level::DEBUG, TAG, "subscribed to all CBL events");
     afb_req_success(source->request, NULL, NULL);
     return 0;

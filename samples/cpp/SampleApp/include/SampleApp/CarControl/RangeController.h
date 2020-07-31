@@ -28,15 +28,16 @@ namespace carControl {
  * range controller to be able to query, set, and adjust range values.
  */
 class RangeController {
-
 private:
     double m_min;
     double m_max;
     double m_value;
 
 public:
-    RangeController(){}
-    RangeController(double min, double max) : m_min{min}, m_max{max}, m_value{min} {}
+    RangeController() {
+    }
+    RangeController(double min, double max) : m_min{min}, m_max{max}, m_value{min} {
+    }
 
     double getValue() {
         return m_value;
@@ -52,11 +53,11 @@ public:
 
 private:
     void clamp(double value) {
-        m_value = std::min(m_max, std::max( value, m_min));
+        m_value = std::min(m_max, std::max(value, m_min));
     }
 };
 
-} // namespace carControl
-} // namespace sampleApp
+}  // namespace carControl
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_CARCONTROL_RANGECONTROLLER_H
+#endif  // SAMPLEAPP_CARCONTROL_RANGECONTROLLER_H

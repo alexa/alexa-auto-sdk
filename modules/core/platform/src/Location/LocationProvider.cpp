@@ -18,11 +18,11 @@
 namespace aace {
 namespace location {
 
-LocationProvider::~LocationProvider() = default; // key function
+LocationProvider::~LocationProvider() = default;  // key function
 
 std::string LocationProvider::getCountry() {
     return "";
 }
 
-} // aace::location
-} // aace
+}  // namespace location
+}  // namespace aace

@@ -22,33 +22,28 @@
 #include <gst/gst.h>
 #include <gst/audio/audio-format.h>
 
-typedef enum {
-	AAL_STATE_NULL = 0,
-	AAL_STATE_SS,
-	AAL_STATE_EOS,
-	AAL_STATE_ERROR
-} aal_state_t;
+typedef enum { AAL_STATE_NULL = 0, AAL_STATE_SS, AAL_STATE_EOS, AAL_STATE_ERROR } aal_state_t;
 
 typedef struct {
-	COMMON_CONTEXT;
+    COMMON_CONTEXT;
 
-	const char* name;
-	GstElement *pipeline;
-	uint64_t pending_position;
-	aal_state_t state;
+    const char* name;
+    GstElement* pipeline;
+    uint64_t pending_position;
+    aal_state_t state;
 #ifdef USE_FAKEMUTE
-	double saved_volume;
+    double saved_volume;
 #endif
-	pthread_t thread_id;
-	GMainLoop* main_loop;
-	GMainContext* worker_context;
+    pthread_t thread_id;
+    GMainLoop* main_loop;
+    GMainContext* worker_context;
 
-	aal_audio_parameters_t audio_params;
+    aal_audio_parameters_t audio_params;
 } aal_gst_context_t;
 
-aal_gst_context_t *gstreamer_create_context(GstElement *pipeline, const char *element, const aal_attributes_t *attr);
-GstElement *gstreamer_create_and_add_element(GstElement *bin, const char *factory, const char *name);
-void gstreamer_start_main_loop(aal_gst_context_t *ctx);
+aal_gst_context_t* gstreamer_create_context(GstElement* pipeline, const char* element, const aal_attributes_t* attr);
+GstElement* gstreamer_create_and_add_element(GstElement* bin, const char* factory, const char* name);
+void gstreamer_start_main_loop(aal_gst_context_t* ctx);
 void gstreamer_destroy(aal_handle_t handle);
 void gstreamer_play(aal_handle_t handle);
 void gstreamer_stop(aal_handle_t handle);
@@ -58,4 +53,4 @@ char* gstreamer_audio_pcm_caps(GstAudioFormat sample_format, int channels, int s
 char* gstreamer_audio_mp3_caps(int mpeg_version, int mpeg_audio_version, int layer);
 GstAudioFormat GstAudioFormat_from_aal_sample_format(aal_sample_format_t sf);
 
-#endif // __AAL_GSTREAMER_CORE_H_
+#endif  // __AAL_GSTREAMER_CORE_H_

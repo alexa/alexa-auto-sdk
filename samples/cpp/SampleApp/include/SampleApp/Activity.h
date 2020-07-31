@@ -28,7 +28,7 @@
 
 namespace sampleApp {
 
-class ApplicationContext; // forward declare
+class ApplicationContext;  // forward declare
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -37,30 +37,37 @@ class ApplicationContext; // forward declare
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class Activity : public Subject<Event> {
-  private:
+private:
     bool m_singleThreadedUI{false};
     std::shared_ptr<ApplicationContext> m_applicationContext{};
     std::shared_ptr<Executor> m_executor{};
     std::vector<std::shared_ptr<View>> m_views{};
 
-  protected:
+protected:
     Activity(std::shared_ptr<ApplicationContext> applicationContext, std::vector<std::shared_ptr<View>> views);
 
-  public:
-    template <typename... Args> static std::shared_ptr<Activity> create(Args &&... args) { return std::shared_ptr<Activity>(new Activity(args...)); }
-    template <typename... Args> void runOnUIThread(Args &&... args) {
+public:
+    template <typename... Args>
+    static std::shared_ptr<Activity> create(Args&&... args) {
+        return std::shared_ptr<Activity>(new Activity(args...));
+    }
+    template <typename... Args>
+    void runOnUIThread(Args&&... args) {
         if (m_singleThreadedUI) {
-            run(args...); // UI runs on the main thread
+            run(args...);  // UI runs on the main thread
         } else {
             m_executor->submit(args...);
         }
     };
-    template <typename Func, typename... Args> auto run(Func &&func, Args &&... args) -> void { func(std::forward<Args>(args)...); }
-    auto findViewById(const std::string &id) -> std::weak_ptr<View>;
+    template <typename Func, typename... Args>
+    auto run(Func&& func, Args&&... args) -> void {
+        func(std::forward<Args>(args)...);
+    }
+    auto findViewById(const std::string& id) -> std::weak_ptr<View>;
     auto getApplicationContext() -> std::shared_ptr<ApplicationContext>;
     auto getExecutor() -> std::shared_ptr<Executor>;
 };
 
-} // namespace sampleApp
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_ACTIVITY_H
+#endif  // SAMPLEAPP_ACTIVITY_H

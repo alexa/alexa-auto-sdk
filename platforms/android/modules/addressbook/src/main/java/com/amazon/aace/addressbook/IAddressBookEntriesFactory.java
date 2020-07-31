@@ -18,7 +18,6 @@ package com.amazon.aace.addressbook;
 import com.amazon.aace.core.NativeRef;
 
 final public class IAddressBookEntriesFactory extends NativeRef {
-
     /**
      * Add name.
      *
@@ -26,8 +25,8 @@ final public class IAddressBookEntriesFactory extends NativeRef {
      * @param [in] name Name of the entry, or an empty string if not available.
      * @return @c true on successful or @c false when name for the id was already added or if entryId is empty.
      */
-    final public boolean addName( String entryId, String name ) {
-        return addName( getNativeRef(), entryId, name, "", "" );
+    final public boolean addName(String entryId, String name) {
+        return addName(getNativeRef(), entryId, name, "", "");
     }
 
     /**
@@ -38,8 +37,8 @@ final public class IAddressBookEntriesFactory extends NativeRef {
      * @param [in] lastName Last name of the entry, or an empty string if not available.
      * @return @c true on successful or @c false when name for the id was already added or if entryId is empty.
      */
-    final public boolean addName( String entryId, String firstName, String lastName ) {
-        return addName( getNativeRef(), entryId, firstName, lastName, "" );
+    final public boolean addName(String entryId, String firstName, String lastName) {
+        return addName(getNativeRef(), entryId, firstName, lastName, "");
     }
 
     /**
@@ -51,8 +50,8 @@ final public class IAddressBookEntriesFactory extends NativeRef {
      * @param [in] nickName Nick name of the entry, or an empty string if not available.
      * @return @c true on successful or @c false when name for the id was already added or if entryId is empty.
      */
-    final public boolean addName( String entryId, String firstName, String lastName, String nickName ) {
-        return addName( getNativeRef(), entryId, firstName, lastName, nickName );
+    final public boolean addName(String entryId, String firstName, String lastName, String nickName) {
+        return addName(getNativeRef(), entryId, firstName, lastName, nickName);
     }
 
     /**
@@ -63,8 +62,8 @@ final public class IAddressBookEntriesFactory extends NativeRef {
      * @param [in] number Numeric phone number, or an empty string if not available.
      * @return @c true on successful or @c false when reached the max allowed per entryId or if entryId is empty.
      */
-    final public boolean addPhone( String entryId, String label, String number ) {
-        return addPhone( getNativeRef(), entryId, label, number );
+    final public boolean addPhone(String entryId, String label, String number) {
+        return addPhone(getNativeRef(), entryId, label, number);
     }
 
     /**
@@ -85,48 +84,29 @@ final public class IAddressBookEntriesFactory extends NativeRef {
      * @param [in] accuracyInMeters Accuracy in meters, or zero if not available.
      * @return @c true on successful or @c false when reached the max allowed per id or if entryId is empty.
      */
-    final public boolean addPostalAddress( String entryId,
-        String label,
-        String addressLine1,
-        String addressLine2,
-        String addressLine3,
-        String city,
-        String stateOrRegion,
-        String districtOrCounty,
-        String postalCode,
-        String country,
-        double latitudeInDegrees,
-        double longitudeInDegrees,
-        double accuracyInMeters ) {
-            return addPostalAddress( getNativeRef(), entryId, label, addressLine1, addressLine2, addressLine3, city, 
-                stateOrRegion, districtOrCounty, postalCode, country, latitudeInDegrees, longitudeInDegrees, accuracyInMeters );
-
+    final public boolean addPostalAddress(String entryId, String label, String addressLine1, String addressLine2,
+            String addressLine3, String city, String stateOrRegion, String districtOrCounty, String postalCode,
+            String country, double latitudeInDegrees, double longitudeInDegrees, double accuracyInMeters) {
+        return addPostalAddress(getNativeRef(), entryId, label, addressLine1, addressLine2, addressLine3, city,
+                stateOrRegion, districtOrCounty, postalCode, country, latitudeInDegrees, longitudeInDegrees,
+                accuracyInMeters);
     }
 
     protected long createNativeRef() {
         return 0;
     }
 
-    protected void disposeNativeRef( long nativeRef ) {
-        disposeBinder( nativeRef );
+    protected void disposeNativeRef(long nativeRef) {
+        disposeBinder(nativeRef);
     }
 
     // Native Engine JNI methods
-    private native void disposeBinder( long nativeRef );
-    private native boolean addName( long nativeObject, String entryId, String firstName, String lastName, String nickName );
-    private native boolean addPhone( long nativeObject, String entryId, String label, String number );
-    private native boolean addPostalAddress( long nativeObject, String entryId,
-        String label,
-        String addressLine1,
-        String addressLine2,
-        String addressLine3,
-        String city,
-        String stateOrRegion,
-        String districtOrCounty,
-        String postalCode,
-        String country,
-        double latitudeInDegrees,
-        double longitudeInDegrees,
-        double accuracyInMeters );
-
+    private native void disposeBinder(long nativeRef);
+    private native boolean addName(
+            long nativeObject, String entryId, String firstName, String lastName, String nickName);
+    private native boolean addPhone(long nativeObject, String entryId, String label, String number);
+    private native boolean addPostalAddress(long nativeObject, String entryId, String label, String addressLine1,
+            String addressLine2, String addressLine3, String city, String stateOrRegion, String districtOrCounty,
+            String postalCode, String country, double latitudeInDegrees, double longitudeInDegrees,
+            double accuracyInMeters);
 }

@@ -19,45 +19,46 @@ namespace aace {
 namespace contactUploader {
 
 bool ContactUploader::addContactsBegin() {
-    if( m_contactUploaderEngineInterface != nullptr ) {
-        return( m_contactUploaderEngineInterface->onAddContactsBegin() );
+    if (m_contactUploaderEngineInterface != nullptr) {
+        return (m_contactUploaderEngineInterface->onAddContactsBegin());
     }
     return false;
 }
 
 bool ContactUploader::addContactsEnd() {
-    if( m_contactUploaderEngineInterface != nullptr ) {
-        return( m_contactUploaderEngineInterface->onAddContactsEnd() );
+    if (m_contactUploaderEngineInterface != nullptr) {
+        return (m_contactUploaderEngineInterface->onAddContactsEnd());
     }
     return false;
 }
 
 bool ContactUploader::addContactsCancel() {
-    if( m_contactUploaderEngineInterface != nullptr ) {
-        return( m_contactUploaderEngineInterface->onAddContactsCancel() );
+    if (m_contactUploaderEngineInterface != nullptr) {
+        return (m_contactUploaderEngineInterface->onAddContactsCancel());
     }
     return false;
 }
 
-bool ContactUploader::addContact( const std::string &contact ) {
-    if( m_contactUploaderEngineInterface != nullptr ) {
-        return( m_contactUploaderEngineInterface->onAddContact( contact ) );
+bool ContactUploader::addContact(const std::string& contact) {
+    if (m_contactUploaderEngineInterface != nullptr) {
+        return (m_contactUploaderEngineInterface->onAddContact(contact));
     }
     return false;
 }
 
-bool ContactUploader::removeUploadedContacts( ){
-    if( m_contactUploaderEngineInterface != nullptr ) {
-        return( m_contactUploaderEngineInterface->onRemoveUploadedContacts( ) );
+bool ContactUploader::removeUploadedContacts() {
+    if (m_contactUploaderEngineInterface != nullptr) {
+        return (m_contactUploaderEngineInterface->onRemoveUploadedContacts());
     }
     return false;
 }
 
-void ContactUploader::setEngineInterface ( std::shared_ptr<ContactUploaderEngineInterface>  contactUploaderEngineInterface ) {
+void ContactUploader::setEngineInterface(
+    std::shared_ptr<ContactUploaderEngineInterface> contactUploaderEngineInterface) {
     m_contactUploaderEngineInterface = contactUploaderEngineInterface;
 }
 
-ContactUploader::~ContactUploader() = default; //key function
+ContactUploader::~ContactUploader() = default;  //key function
 
-} // aace::contactUploader
-} // aace
+}  // namespace contactUploader
+}  // namespace aace

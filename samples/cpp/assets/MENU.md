@@ -2,23 +2,30 @@
 
 This document outlines the menu system that drives the C++ Sample App.
 
-- [Menu File](#menu-file)
-- [Menu Object](#menu-object)
-- [Menu Item Object](#menu-item-object)
-- [Menu Actions](#menu-actions)
-    - [AudioFile](#audiofile)
-    - [GoBack](#goback)
-    - [GoTo](#goto)
-    - [Help](#help)
-    - [Login](#login)
-    - [Logout](#logout)
-    - [Quit](#quit)
-    - [Restart](#restart)
-    - [Select](#select)
-    - [SetLocale](#setlocale)
-    - [SetLoggerLevel](#setloggerlevel)
-    - [SetProperty](#setproperty)
-    - [notify/*](#notify)
+- [C++ Sample App Menu System](#c-sample-app-menu-system)
+  - [Menu File<a id="menu-file"></a>](#menu-file)
+  - [Menu Object<a id="menu-object"></a>](#menu-object)
+  - [Menu Item Object<a id="menu-item-object"></a>](#menu-item-object)
+  - [Menu Actions<a id="menu-actions"></a>](#menu-actions)
+    - [AudioFile<a id="audiofile"></a>](#audiofile)
+    - [GoBack<a id="goback"></a>](#goback)
+    - [GoTo<a id="goto"></a>](#goto)
+    - [Help<a id="help"></a>](#help)
+    - [Login<a id="login"></a>](#login)
+    - [Logout<a id="logout"></a>](#logout)
+    - [Quit<a id="quit"></a>](#quit)
+    - [Restart<a id="restart"></a>](#restart)
+    - [Select<a id="select"></a>](#select)
+    - [SetLocale<a id="setlocale"></a>](#setlocale)
+    - [SetLoggerLevel<a id="setloggerlevel"></a>](#setloggerlevel)
+    - [SetProperty<a id="setproperty"></a>](#setproperty)
+    - [notify/*<a id="notify"></a>](#notify)
+      - [Values](#values)
+        - [onAudioManagerSpeaker](#onaudiomanagerspeaker)
+        - [onConversationsReport](#onconversationsreport)
+        - [onMessagingEndpointConnection](#onmessagingendpointconnection)
+        - [onMessagingEndpointPermission](#onmessagingendpointpermission)
+        - [onSendMessageStatus/onUpdateMessagesStatus](#onsendmessagestatusonupdatemessagesstatus)
 
 ## Menu File<a id="menu-file"></a>
 
@@ -186,7 +193,7 @@ For example:
 }
 ```
 
->**Note:** Audio files must be 16KHz mono, 16-bit little-endian in PCM WAV format. Make sure that the audio starts with the `Alexa` wakeword.  
+>**Note:** Audio files must be 16KHz mono, 16-bit little-endian in PCM WAV format. Make sure that the audio starts with the `Alexa` wakeword.
 
 ### GoBack<a id="goback"></a>
 
@@ -453,8 +460,28 @@ The **notify/*** action exercises the application platform interfaces with event
 | onCommunicationStopCall                     | -
 | onCommunicationShowDisplayInfo              | -
 | onCommunicationShowState                    | -
-| **DoNotDisturb**                            | 
+| **DoNotDisturb**                            |
 | onDoNotDisturbChanged                       | -
+| **Logger**                                  |
+| onLoggerLog                                 | `level/tag/message`
+| **Messaging**                               |
+| onConversationsReport                       | `path`
+| onMessagingEndpointConnection               | `state`
+| onMessagingEndpointPermission               | `permission/value`
+| onSendMessageStatus                         | `[code/message]`
+| onShowMessagingInfo                         | -
+| onToggleAutomaticResponses                  | -
+| onUpdateMessagesStatus                      | `[code/message]`
+| **NetworkInfoProvider**                     |
+| onNetworkInfoProviderNetworkStatusChanged   | `status[/wifiSignalStrength]`
+| **PhoneCallController**                     |
+| onPhoneCallControllerConnectionStateChanged | `state`
+| onPhoneCallControllerCallStateChanged       | `state[/callId[/callerId]]`
+| onPhoneCallControllerCallFailed             | `callId/code/message`
+| onPhoneCallControllerCallerIdReceived       | `callId/callerId`
+| onPhoneCallControllerSendDTMFSucceeded      | `callId`
+| onPhoneCallControllerSendDTMFFailed         | `callId/code/message`
+| onPhoneCallControllerShowPayload            | -
 | **PlaybackController**                      |
 | onPlaybackControllerButtonPressed           | `button`
 | onPlaybackControllerTogglePressed           | `toggle/action`
@@ -467,18 +494,8 @@ The **notify/*** action exercises the application platform interfaces with event
 | onSpeechRecognizerDisableWakewordDetection  | -
 | onSpeechRecognizerStartStreamingAudioFile   | [audio file path](#audiofile)
 | onSpeechRecognizerStopStreamingAudioFile    | -
-| **Logger**                                  |
-| onLoggerLog                                 | `level/tag/message`
-| **NetworkInfoProvider**                     |
-| onNetworkInfoProviderNetworkStatusChanged   | `status[/wifiSignalStrength]`
-| **PhoneCallController**                     |
-| onPhoneCallControllerConnectionStateChanged | `state`
-| onPhoneCallControllerCallStateChanged       | `state[/callId[/callerId]]`
-| onPhoneCallControllerCallFailed             | `callId/code/message`
-| onPhoneCallControllerCallerIdReceived       | `callId/callerId`
-| onPhoneCallControllerSendDTMFSucceeded      | `callId`
-| onPhoneCallControllerSendDTMFFailed         | `callId/code/message`
-| onPhoneCallControllerShowPayload            | -
+| **AlexaClient**                             |
+| onStopForegroundActivity                    | -
 
 For example:
 
@@ -497,10 +514,36 @@ For example:
 ```
 #### Values
 
-##### onAudioManagerSpeaker 
+##### onAudioManagerSpeaker
 
-| Field               | Values                           
+| Field               | Values
 | ------------------- | ---------------------------------
 | identity            | Speaker, Alerts
 | name                | volume, mute
 | value               | true, false, +/-*number*, number
+
+##### onConversationsReport
+
+| Field               | Values
+| ------------------- | ---------------------------------
+| path                | File path to file containing sample conversations
+
+##### onMessagingEndpointConnection
+
+| Field               | Values
+| ------------------- | ---------------------------------
+| state               | CONNECTED, DISCONNECTED (see `Messaging::ConnectionState`)
+
+##### onMessagingEndpointPermission
+
+| Field               | Values
+| ------------------- | ---------------------------------
+| permission          | SEND, READ
+| value               | ON, OFF  (see `Messaging::PermissionState`)
+
+##### onSendMessageStatus/onUpdateMessagesStatus
+
+| Field               | Values
+| ------------------- | ---------------------------------
+| code                | GENERIC_FAILURE, NO_CONNECTIVITY, NO_PERMISSION (see `Messaging::ErrorCode`)
+| message             | A string with the error code message

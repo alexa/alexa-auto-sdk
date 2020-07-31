@@ -19,41 +19,69 @@
 namespace aace {
 namespace engine {
 namespace alexa {
-    
+
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.AlexaClientEngineImpl");
-    
-AlexaClientEngineImpl::AlexaClientEngineImpl( std::shared_ptr<aace::alexa::AlexaClient> alexaClientPlatformInterface ) : m_alexaClientPlatformInterface( alexaClientPlatformInterface ) {
+
+AlexaClientEngineImpl::AlexaClientEngineImpl(
+    std::shared_ptr<aace::alexa::AlexaClient> alexaClientPlatformInterface,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> audioFocusManager,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> visualFocusManager) :
+        m_alexaClientPlatformInterface(alexaClientPlatformInterface),
+        m_audioFocusManager(audioFocusManager),
+        m_visualFocusManager(visualFocusManager) {
 }
 
-std::shared_ptr<AlexaClientEngineImpl> AlexaClientEngineImpl::create( std::shared_ptr<aace::alexa::AlexaClient> alexaClientPlatformInterface )
-{
-    try
-    {
-        ThrowIfNull( alexaClientPlatformInterface, "invalidAlexaClientPlatformInterface" );
-        return std::shared_ptr<AlexaClientEngineImpl>( new AlexaClientEngineImpl( alexaClientPlatformInterface ) );
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"create").d("reason", ex.what()));
+std::shared_ptr<AlexaClientEngineImpl> AlexaClientEngineImpl::create(
+    std::shared_ptr<aace::alexa::AlexaClient> alexaClientPlatformInterface,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> audioFocusManager,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> visualFocusManager) {
+    try {
+        ThrowIfNull(alexaClientPlatformInterface, "invalidAlexaClientPlatformInterface");
+        ThrowIfNull(audioFocusManager, "invalidAudioFocusManager");
+        ThrowIfNull(visualFocusManager, "invalidVisualFocusManager");
+        auto alexaClientEngineImpl = std::shared_ptr<AlexaClientEngineImpl>(
+            new AlexaClientEngineImpl(alexaClientPlatformInterface, audioFocusManager, visualFocusManager));
+
+        alexaClientPlatformInterface->setEngineInterface(alexaClientEngineImpl);
+
+        return alexaClientEngineImpl;
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "create").d("reason", ex.what()));
         return nullptr;
     }
 }
 
 // AuthObserverInterface
-void AlexaClientEngineImpl::onAuthStateChange( alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State state, alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error error ) {
-    m_alexaClientPlatformInterface->authStateChanged( static_cast<aace::alexa::AlexaClient::AuthState>( state ), static_cast<aace::alexa::AlexaClient::AuthError>( error ) );
+void AlexaClientEngineImpl::onAuthStateChange(
+    alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State state,
+    alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error error) {
+    m_alexaClientPlatformInterface->authStateChanged(
+        static_cast<aace::alexa::AlexaClient::AuthState>(state),
+        static_cast<aace::alexa::AlexaClient::AuthError>(error));
 }
 
 // ConnectionStatusObserverInterface
-void AlexaClientEngineImpl::onConnectionStatusChanged( const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status status, const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::ChangedReason reason ) {
-    m_alexaClientPlatformInterface->connectionStatusChanged( static_cast<aace::alexa::AlexaClient::ConnectionStatus>( status ), static_cast<aace::alexa::AlexaClient::ConnectionChangedReason>( reason ) );
+void AlexaClientEngineImpl::onConnectionStatusChanged(
+    const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status status,
+    const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::ChangedReason reason) {
+    m_alexaClientPlatformInterface->connectionStatusChanged(
+        static_cast<aace::alexa::AlexaClient::ConnectionStatus>(status),
+        static_cast<aace::alexa::AlexaClient::ConnectionChangedReason>(reason));
 }
 
 // DialogUXStateObserverInterface
-void AlexaClientEngineImpl::onDialogUXStateChanged( alexaClientSDK::avsCommon::sdkInterfaces::DialogUXStateObserverInterface::DialogUXState state ) {
-    m_alexaClientPlatformInterface->dialogStateChanged( static_cast<aace::alexa::AlexaClient::DialogState>( state ) );
+void AlexaClientEngineImpl::onDialogUXStateChanged(
+    alexaClientSDK::avsCommon::sdkInterfaces::DialogUXStateObserverInterface::DialogUXState state) {
+    m_alexaClientPlatformInterface->dialogStateChanged(static_cast<aace::alexa::AlexaClient::DialogState>(state));
 }
 
-} // aace::engine::alexa
-} // aace::engine
-} // aace
+// AlexaClientEngineInterface
+void AlexaClientEngineImpl::onStopForegroundActivity() {
+    m_audioFocusManager->stopForegroundActivity();
+    m_visualFocusManager->stopForegroundActivity();
+}
+
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace

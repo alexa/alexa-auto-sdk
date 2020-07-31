@@ -52,8 +52,7 @@ inline ObservableSessionProperties::ObservableSessionProperties() : loggedIn{fal
 }
 
 inline ObservableSessionProperties::ObservableSessionProperties(bool loggedIn, const std::string& userName) :
-        loggedIn{loggedIn},
-        userName{userName} {
+        loggedIn{loggedIn}, userName{userName} {
 }
 
 inline bool operator==(
@@ -95,22 +94,19 @@ struct ObservablePlaybackStateProperties {
 };
 
 inline ObservablePlaybackStateProperties::ObservablePlaybackStateProperties() :
-        state{"IDLE"},
-        trackName{""},
-        playRequestor{} {};
+        state{"IDLE"}, trackName{""}, playRequestor{} {};
 
 inline ObservablePlaybackStateProperties::ObservablePlaybackStateProperties(
     const std::string& state,
     const std::string& trackName,
     const alexaClientSDK::avsCommon::avs::PlayRequestor& playRequestor) :
-        state{state},
-        trackName{trackName},
-        playRequestor{playRequestor} {};
+        state{state}, trackName{trackName}, playRequestor{playRequestor} {};
 
 inline bool operator==(
     const ObservablePlaybackStateProperties& observableA,
     const ObservablePlaybackStateProperties& observableB) {
-    return observableA.state == observableB.state && observableA.trackName == observableB.trackName && observableA.playRequestor.type == observableB.playRequestor.type;
+    return observableA.state == observableB.state && observableA.trackName == observableB.trackName &&
+           observableA.playRequestor.type == observableB.playRequestor.type;
 }
 
 /**
@@ -139,12 +135,11 @@ public:
      */
     virtual void onPlaybackStateProvided(
         const std::string& playerId,
-        const ObservablePlaybackStateProperties
-            playbackStateProperties) = 0;
+        const ObservablePlaybackStateProperties playbackStateProperties) = 0;
 };
 
-}  // alexa
-}  // engine
-}  // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace
 
 #endif  // AACE_ENGINE_ALEXA_EXTERNALMEDIAPLAYEROBSERVERINTERFACE_H

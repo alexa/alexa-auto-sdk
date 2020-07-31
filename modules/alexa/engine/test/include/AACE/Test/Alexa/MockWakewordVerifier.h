@@ -18,18 +18,17 @@
 
 #include <AACE/Engine/Alexa/WakewordVerifier.h>
 
-namespace aace {    
+namespace aace {
 namespace test {
 namespace alexa {
 
 class MockWakewordVerifier : public aace::engine::alexa::WakewordVerifier {
 public:
-    MOCK_METHOD2(verify,
-        bool(const std::string& wakeword, const std::chrono::milliseconds& timeout));
+    MOCK_METHOD2(verify, bool(const std::string& wakeword, const std::chrono::milliseconds& timeout));
 };
 
-} // aace::test::alexa
-} // aace::test
-} // aace
+}  // namespace alexa
+}  // namespace test
+}  // namespace aace
 
-#endif //AACE_TEST_AVS_MOCK_WAKEWORD_VERIFIER_H
+#endif  //AACE_TEST_AVS_MOCK_WAKEWORD_VERIFIER_H

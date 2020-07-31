@@ -23,108 +23,95 @@ namespace aace {
 namespace jni {
 namespace location {
 
-    //
-    // LocationProviderBinder
-    //
+//
+// LocationProviderBinder
+//
 
-    LocationProviderBinder::LocationProviderBinder( jobject obj ) {
-        m_locationProviderHandler = std::make_shared<LocationProviderHandler>( obj );
+LocationProviderBinder::LocationProviderBinder(jobject obj) {
+    m_locationProviderHandler = std::make_shared<LocationProviderHandler>(obj);
+}
+
+//
+// LocationProviderHandler
+//
+
+LocationProviderHandler::LocationProviderHandler(jobject obj) :
+        m_obj(obj, "com/amazon/aace/location/LocationProvider") {
+}
+
+aace::location::Location LocationProviderHandler::getLocation() {
+    try_with_context {
+        jobject result = nullptr;
+
+        ThrowIfNot(m_obj.invoke("getLocation", "()Lcom/amazon/aace/location/Location;", &result), "invokeMethodFailed");
+        ThrowIfNull(result, "invalidLocation");
+
+        return JLocation(result).getLocation();
     }
-
-    //
-    // LocationProviderHandler
-    //
-
-    LocationProviderHandler::LocationProviderHandler( jobject obj ) : m_obj( obj, "com/amazon/aace/location/LocationProvider" ) {
-    }
-
-    aace::location::Location LocationProviderHandler::getLocation()
-    {
-        try_with_context
-        {
-            jobject result = nullptr;
-
-            ThrowIfNot( m_obj.invoke( "getLocation", "()Lcom/amazon/aace/location/Location;", &result ), "invokeMethodFailed" );
-            ThrowIfNull( result, "invalidLocation" );
-
-            return JLocation( result ).getLocation();
-        }
-        catch_with_ex {
-            AACE_JNI_ERROR(TAG,"getLocation",ex.what());
-            return aace::location::Location( aace::location::Location::UNDEFINED, aace::location::Location::UNDEFINED );
-        }
-    }
-
-    std::string LocationProviderHandler::getCountry()
-    {
-        try_with_context
-        {
-            jstring result;
-
-            ThrowIfNot( m_obj.invoke( "getCountry", "()Ljava/lang/String;", &result ), "invokeMethodFailed" );
-
-            return JString( result ).toStdStr();
-        }
-        catch_with_ex {
-            AACE_JNI_ERROR(TAG,"getCountry",ex.what());
-            return std::string();
-        }
-    }
-
-    //
-    // JLocation
-    //
-    aace::location::Location JLocation::getLocation()
-    {
-        try_with_context
-        {
-            jdouble latitude;
-            ThrowIfNot( invoke( "getLatitude", "()D", &latitude ), "invokeMethodFailed" );
-
-            jdouble longitude;
-            ThrowIfNot( invoke( "getLongitude", "()D", &longitude ), "invokeMethodFailed" );
-
-            jdouble altitude;
-            ThrowIfNot( invoke( "getAltitude", "()D", &altitude ), "invokeMethodFailed" );
-
-            jdouble accuracy;
-            ThrowIfNot( invoke( "getAccuracy", "()D", &accuracy ), "invokeMethodFailed" );
-
-            return aace::location::Location( latitude, longitude, altitude, accuracy );
-
-        }
-        catch_with_ex {
-            AACE_JNI_ERROR("aace.jni.alexa.LocationProviderBinder:JLocation","getLocation",ex.what());
-            return aace::location::Location( aace::location::Location::UNDEFINED, aace::location::Location::UNDEFINED );
-        }
-    }
-
-} // aace::jni::location
-} // aace::jni
-} // aace
-
-#define LOCATION_PROVIDER_BINDER(ref) reinterpret_cast<aace::jni::location::LocationProviderBinder *>( ref )
-
-extern "C"
-{
-    JNIEXPORT jlong JNICALL
-    Java_com_amazon_aace_location_LocationProvider_createBinder( JNIEnv* env, jobject obj )  {
-        return reinterpret_cast<long>( new aace::jni::location::LocationProviderBinder( obj ) );
-    }
-
-    JNIEXPORT void JNICALL
-    Java_com_amazon_aace_location_LocationProvider_disposeBinder( JNIEnv* env, jobject /* this */, jlong ref )
-    {
-        try
-        {
-            auto locationProviderBinder = LOCATION_PROVIDER_BINDER(ref);
-            ThrowIfNull( locationProviderBinder, "invalidLocationProviderBinder" );
-            delete locationProviderBinder;
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_location_LocationProvider_disposeBinder",ex.what());
-        }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "getLocation", ex.what());
+        return aace::location::Location(aace::location::Location::UNDEFINED, aace::location::Location::UNDEFINED);
     }
 }
 
+std::string LocationProviderHandler::getCountry() {
+    try_with_context {
+        jstring result;
 
+        ThrowIfNot(m_obj.invoke("getCountry", "()Ljava/lang/String;", &result), "invokeMethodFailed");
+
+        return JString(result).toStdStr();
+    }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "getCountry", ex.what());
+        return std::string();
+    }
+}
+
+//
+// JLocation
+//
+aace::location::Location JLocation::getLocation() {
+    try_with_context {
+        jdouble latitude;
+        ThrowIfNot(invoke("getLatitude", "()D", &latitude), "invokeMethodFailed");
+
+        jdouble longitude;
+        ThrowIfNot(invoke("getLongitude", "()D", &longitude), "invokeMethodFailed");
+
+        jdouble altitude;
+        ThrowIfNot(invoke("getAltitude", "()D", &altitude), "invokeMethodFailed");
+
+        jdouble accuracy;
+        ThrowIfNot(invoke("getAccuracy", "()D", &accuracy), "invokeMethodFailed");
+
+        return aace::location::Location(latitude, longitude, altitude, accuracy);
+    }
+    catch_with_ex {
+        AACE_JNI_ERROR("aace.jni.alexa.LocationProviderBinder:JLocation", "getLocation", ex.what());
+        return aace::location::Location(aace::location::Location::UNDEFINED, aace::location::Location::UNDEFINED);
+    }
+}
+
+}  // namespace location
+}  // namespace jni
+}  // namespace aace
+
+#define LOCATION_PROVIDER_BINDER(ref) reinterpret_cast<aace::jni::location::LocationProviderBinder*>(ref)
+
+extern "C" {
+JNIEXPORT jlong JNICALL Java_com_amazon_aace_location_LocationProvider_createBinder(JNIEnv* env, jobject obj) {
+    return reinterpret_cast<long>(new aace::jni::location::LocationProviderBinder(obj));
+}
+
+JNIEXPORT void JNICALL
+Java_com_amazon_aace_location_LocationProvider_disposeBinder(JNIEnv* env, jobject /* this */, jlong ref) {
+    try {
+        auto locationProviderBinder = LOCATION_PROVIDER_BINDER(ref);
+        ThrowIfNull(locationProviderBinder, "invalidLocationProviderBinder");
+        delete locationProviderBinder;
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_location_LocationProvider_disposeBinder", ex.what());
+    }
+}
+}

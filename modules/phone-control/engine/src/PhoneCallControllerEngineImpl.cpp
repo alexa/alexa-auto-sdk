@@ -47,99 +47,114 @@ static const std::string METRIC_AUTO_PROVISION = "AutoProvisioned";
  * @param retryCount The number of times we have retried
  * @return The time that the next retry should be attempted
  */
-static std::chrono::steady_clock::time_point calculateTimeToRetry( int retryCount ) {
+static std::chrono::steady_clock::time_point calculateTimeToRetry(int retryCount) {
     /// Approximate amount of time to wait between retries.
     const static std::vector<int> retryBackoffTimes = {
-        500,     // Retry 1:  0.5s
-        1000,    // Retry 2:  1.0s
+        500,   // Retry 1:  0.5s
+        1000,  // Retry 2:  1.0s
     };
 
     // Retry Timer Object.
-    alexaClientSDK::avsCommon::utils::RetryTimer RETRY_TIMER( retryBackoffTimes );
+    alexaClientSDK::avsCommon::utils::RetryTimer RETRY_TIMER(retryBackoffTimes);
 
-    return std::chrono::steady_clock::now() + RETRY_TIMER.calculateTimeToRetry( retryCount );
+    return std::chrono::steady_clock::now() + RETRY_TIMER.calculateTimeToRetry(retryCount);
 }
 
-static void emitCounterMetrics( const std::string& methodName, const std::string& key, const int value ) {
-    auto metricEvent = std::shared_ptr<aace::engine::metrics::MetricEvent>( new aace::engine::metrics::MetricEvent( METRIC_PROGRAM_NAME, methodName ) );
-    if( metricEvent ) {
-        metricEvent->addCounter( key, value );
+static void emitCounterMetrics(const std::string& methodName, const std::string& key, const int value) {
+    auto metricEvent = std::shared_ptr<aace::engine::metrics::MetricEvent>(
+        new aace::engine::metrics::MetricEvent(METRIC_PROGRAM_NAME, methodName));
+    if (metricEvent) {
+        metricEvent->addCounter(key, value);
         metricEvent->record();
     }
 }
 
-PhoneCallControllerEngineImpl::PhoneCallControllerEngineImpl( std::shared_ptr<aace::phoneCallController::PhoneCallController> phoneCallControllerPlatformInterface ) :
-    alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
-    m_phoneCallControllerPlatformInterface( phoneCallControllerPlatformInterface ),
-    m_isShuttingDown( false ),
-    m_isAuthRefreshed( false ) {
+PhoneCallControllerEngineImpl::PhoneCallControllerEngineImpl(
+    std::shared_ptr<aace::phoneCallController::PhoneCallController> phoneCallControllerPlatformInterface) :
+        alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
+        m_phoneCallControllerPlatformInterface(phoneCallControllerPlatformInterface),
+        m_isShuttingDown(false),
+        m_isAuthRefreshed(false) {
 }
 
-bool PhoneCallControllerEngineImpl::initialize (
+bool PhoneCallControllerEngineImpl::initialize(
     std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
-    std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo ) {
-
+    std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
+    std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints) {
     try {
-        m_phoneCallControllerCapabilityAgent = PhoneCallControllerCapabilityAgent::create( shared_from_this(), contextManager, exceptionSender, messageSender, focusManager );
-        ThrowIfNull( m_phoneCallControllerCapabilityAgent, "couldNotCreateCapabilityAgent" );
+        m_phoneCallControllerCapabilityAgent = PhoneCallControllerCapabilityAgent::create(
+            shared_from_this(), contextManager, exceptionSender, messageSender, focusManager);
+        ThrowIfNull(m_phoneCallControllerCapabilityAgent, "couldNotCreateCapabilityAgent");
 
         m_authDelegate = authDelegate;
         m_deviceInfo = deviceInfo;
+        m_alexaEndpoints = alexaEndpoints;
 
-        m_authDelegate->addAuthObserver( shared_from_this() );
+        m_authDelegate->addAuthObserver(shared_from_this());
 
         // register capability with the default endpoint
-        defaultEndpointBuilder->withCapability( m_phoneCallControllerCapabilityAgent, m_phoneCallControllerCapabilityAgent );
+        defaultEndpointBuilder->withCapability(
+            m_phoneCallControllerCapabilityAgent, m_phoneCallControllerCapabilityAgent);
 
         // Start with phone connection state as DISCONNECTED.
-        m_connectionState = aace::phoneCallController::PhoneCallControllerEngineInterface::ConnectionState::DISCONNECTED;
+        m_connectionState =
+            aace::phoneCallController::PhoneCallControllerEngineInterface::ConnectionState::DISCONNECTED;
 
         m_autoProvisioningThread = std::thread(&PhoneCallControllerEngineImpl::autoProvisioningThread, this);
 
         return true;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"initialize").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "initialize").d("reason", ex.what()));
         return false;
     }
 }
 
 std::shared_ptr<PhoneCallControllerEngineImpl> PhoneCallControllerEngineImpl::create(
-    std::shared_ptr<aace::phoneCallController::PhoneCallController> phoneCallControllerPlatformInterface, 
+    std::shared_ptr<aace::phoneCallController::PhoneCallController> phoneCallControllerPlatformInterface,
     std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
-    std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo ) {
-
+    std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
+    std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints) {
     try {
-        ThrowIfNull( phoneCallControllerPlatformInterface, "nullPlatformInterface" );
-        ThrowIfNull( defaultEndpointBuilder, "nullDefaultEndpointBuilder" );
-        ThrowIfNull( contextManager, "nullContextManager" );
-        ThrowIfNull( exceptionSender, "nullExceptionSender" );
-        ThrowIfNull( messageSender, "nullMessageSender" );
-        ThrowIfNull( focusManager, "nullFocusManager" );
-        ThrowIfNull( authDelegate, "nullAuthDelegate" );
-        ThrowIfNull( deviceInfo, "nullDeviceInfo" );
+        ThrowIfNull(phoneCallControllerPlatformInterface, "nullPlatformInterface");
+        ThrowIfNull(defaultEndpointBuilder, "nullDefaultEndpointBuilder");
+        ThrowIfNull(contextManager, "nullContextManager");
+        ThrowIfNull(exceptionSender, "nullExceptionSender");
+        ThrowIfNull(messageSender, "nullMessageSender");
+        ThrowIfNull(focusManager, "nullFocusManager");
+        ThrowIfNull(authDelegate, "nullAuthDelegate");
+        ThrowIfNull(deviceInfo, "nullDeviceInfo");
 
-        auto phoneCallControllerEngineImpl = std::shared_ptr<PhoneCallControllerEngineImpl>( new PhoneCallControllerEngineImpl( phoneCallControllerPlatformInterface ) );
+        auto phoneCallControllerEngineImpl = std::shared_ptr<PhoneCallControllerEngineImpl>(
+            new PhoneCallControllerEngineImpl(phoneCallControllerPlatformInterface));
 
-        ThrowIfNot( phoneCallControllerEngineImpl->initialize( defaultEndpointBuilder, contextManager, exceptionSender, messageSender, focusManager, authDelegate, deviceInfo ), "initializePhoneCallControllerEngineImplFailed" );
+        ThrowIfNot(
+            phoneCallControllerEngineImpl->initialize(
+                defaultEndpointBuilder,
+                contextManager,
+                exceptionSender,
+                messageSender,
+                focusManager,
+                authDelegate,
+                deviceInfo,
+                alexaEndpoints),
+            "initializePhoneCallControllerEngineImplFailed");
 
         // set the platform engine interface reference
-        phoneCallControllerPlatformInterface->setEngineInterface( phoneCallControllerEngineImpl );
+        phoneCallControllerPlatformInterface->setEngineInterface(phoneCallControllerEngineImpl);
 
         return phoneCallControllerEngineImpl;
-    }
-    catch ( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"create").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "create").d("reason", ex.what()));
         return nullptr;
     }
 }
@@ -148,7 +163,7 @@ void PhoneCallControllerEngineImpl::doShutdown() {
     AACE_INFO(LX(TAG));
 
     {
-        std::lock_guard<std::mutex>lock(m_mutex);
+        std::lock_guard<std::mutex> lock(m_mutex);
         m_isShuttingDown = true;
         m_wakeAutoProvisioningLoop.notify_one();
     }
@@ -157,188 +172,203 @@ void PhoneCallControllerEngineImpl::doShutdown() {
         m_autoProvisioningThread.join();
     }
 
-    if (m_authDelegate != nullptr ) {
-        m_authDelegate->removeAuthObserver( shared_from_this() );
+    if (m_authDelegate != nullptr) {
+        m_authDelegate->removeAuthObserver(shared_from_this());
         m_authDelegate.reset();
     }
 
-    if (m_phoneCallControllerCapabilityAgent != nullptr ) {
+    if (m_phoneCallControllerCapabilityAgent != nullptr) {
         m_phoneCallControllerCapabilityAgent->shutdown();
         m_phoneCallControllerCapabilityAgent.reset();
     }
 
-    if( m_phoneCallControllerPlatformInterface != nullptr ) {
-        m_phoneCallControllerPlatformInterface->setEngineInterface( nullptr );
+    if (m_phoneCallControllerPlatformInterface != nullptr) {
+        m_phoneCallControllerPlatformInterface->setEngineInterface(nullptr);
         m_phoneCallControllerPlatformInterface.reset();
     }
 }
 
-void PhoneCallControllerEngineImpl::onConnectionStateChanged( ConnectionState state  ) {
-    if( m_phoneCallControllerCapabilityAgent != nullptr ) {
-        m_phoneCallControllerCapabilityAgent->connectionStateChanged( state );
+void PhoneCallControllerEngineImpl::onConnectionStateChanged(ConnectionState state) {
+    if (m_phoneCallControllerCapabilityAgent != nullptr) {
+        m_phoneCallControllerCapabilityAgent->connectionStateChanged(state);
     }
 }
 
-void PhoneCallControllerEngineImpl::onCallStateChanged ( CallState state, const std::string& callId, const std::string& callerId ) {
-    if( m_phoneCallControllerCapabilityAgent != nullptr ) {
-        m_phoneCallControllerCapabilityAgent->callStateChanged( state, callId, callerId );
-    } 
-}
-
-void PhoneCallControllerEngineImpl::onCallFailed( const std::string& callId, CallError code, const std::string& message ) {
-    if( m_phoneCallControllerCapabilityAgent != nullptr ) {
-        m_phoneCallControllerCapabilityAgent->callFailed( callId, code, message );
+void PhoneCallControllerEngineImpl::onCallStateChanged(
+    CallState state,
+    const std::string& callId,
+    const std::string& callerId) {
+    if (m_phoneCallControllerCapabilityAgent != nullptr) {
+        m_phoneCallControllerCapabilityAgent->callStateChanged(state, callId, callerId);
     }
 }
 
-void PhoneCallControllerEngineImpl::onCallerIdReceived( const std::string& callId, const std::string& callerId ) {
-    if( m_phoneCallControllerCapabilityAgent != nullptr ) {
-        m_phoneCallControllerCapabilityAgent->callerIdReceived( callId, callerId );
+void PhoneCallControllerEngineImpl::onCallFailed(
+    const std::string& callId,
+    CallError code,
+    const std::string& message) {
+    if (m_phoneCallControllerCapabilityAgent != nullptr) {
+        m_phoneCallControllerCapabilityAgent->callFailed(callId, code, message);
     }
 }
 
-void PhoneCallControllerEngineImpl::onSendDTMFSucceeded( const std::string& callId) {
-    if( m_phoneCallControllerCapabilityAgent != nullptr ) {
-        m_phoneCallControllerCapabilityAgent->sendDTMFSucceeded( callId );
+void PhoneCallControllerEngineImpl::onCallerIdReceived(const std::string& callId, const std::string& callerId) {
+    if (m_phoneCallControllerCapabilityAgent != nullptr) {
+        m_phoneCallControllerCapabilityAgent->callerIdReceived(callId, callerId);
     }
 }
 
-void PhoneCallControllerEngineImpl::onSendDTMFFailed( const std::string& callId, DTMFError code, const std::string& message ) {
-    if( m_phoneCallControllerCapabilityAgent != nullptr ) {
-        m_phoneCallControllerCapabilityAgent->sendDTMFFailed( callId, code, message );
+void PhoneCallControllerEngineImpl::onSendDTMFSucceeded(const std::string& callId) {
+    if (m_phoneCallControllerCapabilityAgent != nullptr) {
+        m_phoneCallControllerCapabilityAgent->sendDTMFSucceeded(callId);
     }
 }
 
-void PhoneCallControllerEngineImpl::onDeviceConfigurationUpdated( std::unordered_map<PhoneCallControllerEngineInterface::CallingDeviceConfigurationProperty, bool> configurationMap ) {
-    if( m_phoneCallControllerCapabilityAgent != nullptr ) {
-        m_phoneCallControllerCapabilityAgent->deviceConfigurationUpdated( configurationMap );
+void PhoneCallControllerEngineImpl::onSendDTMFFailed(
+    const std::string& callId,
+    DTMFError code,
+    const std::string& message) {
+    if (m_phoneCallControllerCapabilityAgent != nullptr) {
+        m_phoneCallControllerCapabilityAgent->sendDTMFFailed(callId, code, message);
+    }
+}
+
+void PhoneCallControllerEngineImpl::onDeviceConfigurationUpdated(
+    std::unordered_map<PhoneCallControllerEngineInterface::CallingDeviceConfigurationProperty, bool> configurationMap) {
+    if (m_phoneCallControllerCapabilityAgent != nullptr) {
+        m_phoneCallControllerCapabilityAgent->deviceConfigurationUpdated(configurationMap);
     }
 }
 std::string PhoneCallControllerEngineImpl::onCreateCallId() {
-    if( m_phoneCallControllerCapabilityAgent != nullptr ) {
+    if (m_phoneCallControllerCapabilityAgent != nullptr) {
         return m_phoneCallControllerCapabilityAgent->createCallId();
     }
     return "";
 }
 
-bool PhoneCallControllerEngineImpl::dial( const std::string& payload ) {
-    if( m_phoneCallControllerPlatformInterface != nullptr ) {
-        return m_phoneCallControllerPlatformInterface->dial( payload );
+bool PhoneCallControllerEngineImpl::dial(const std::string& payload) {
+    if (m_phoneCallControllerPlatformInterface != nullptr) {
+        return m_phoneCallControllerPlatformInterface->dial(payload);
     }
     return false;
 }
 
-bool PhoneCallControllerEngineImpl::redial( const std::string& payload ) {
-    if( m_phoneCallControllerPlatformInterface != nullptr ) {
-        return m_phoneCallControllerPlatformInterface->redial( payload );
+bool PhoneCallControllerEngineImpl::redial(const std::string& payload) {
+    if (m_phoneCallControllerPlatformInterface != nullptr) {
+        return m_phoneCallControllerPlatformInterface->redial(payload);
     }
     return false;
 }
 
-void PhoneCallControllerEngineImpl::answer( const std::string& payload ) {
-    if( m_phoneCallControllerPlatformInterface != nullptr ) {
-        m_phoneCallControllerPlatformInterface->answer( payload );
+void PhoneCallControllerEngineImpl::answer(const std::string& payload) {
+    if (m_phoneCallControllerPlatformInterface != nullptr) {
+        m_phoneCallControllerPlatformInterface->answer(payload);
     }
 }
 
-void PhoneCallControllerEngineImpl::stop( const std::string& payload ) {
-    if( m_phoneCallControllerPlatformInterface != nullptr ) {
-        m_phoneCallControllerPlatformInterface->stop( payload );
+void PhoneCallControllerEngineImpl::stop(const std::string& payload) {
+    if (m_phoneCallControllerPlatformInterface != nullptr) {
+        m_phoneCallControllerPlatformInterface->stop(payload);
     }
 }
 
-void PhoneCallControllerEngineImpl::playRingtone( const std::string& payload ) {
+void PhoneCallControllerEngineImpl::playRingtone(const std::string& payload) {
 }
 
-void PhoneCallControllerEngineImpl::sendDTMF( const std::string& payload ) {
-    if( m_phoneCallControllerPlatformInterface != nullptr ) {
-        m_phoneCallControllerPlatformInterface->sendDTMF( payload );
+void PhoneCallControllerEngineImpl::sendDTMF(const std::string& payload) {
+    if (m_phoneCallControllerPlatformInterface != nullptr) {
+        m_phoneCallControllerPlatformInterface->sendDTMF(payload);
     }
 }
 
-void PhoneCallControllerEngineImpl::onAuthStateChange( AuthObserverInterface::State newState, AuthObserverInterface::Error error ) {
-    AACE_DEBUG(LX(TAG,"onAuthStateChange").d( "newState", newState ) );
+void PhoneCallControllerEngineImpl::onAuthStateChange(
+    AuthObserverInterface::State newState,
+    AuthObserverInterface::Error error) {
+    AACE_DEBUG(LX(TAG, "onAuthStateChange").d("newState", newState));
 
-    std::unique_lock<std::mutex> lock( m_mutex );
-    m_isAuthRefreshed = ( AuthObserverInterface::State::REFRESHED == newState );
+    std::unique_lock<std::mutex> lock(m_mutex);
+    m_isAuthRefreshed = (AuthObserverInterface::State::REFRESHED == newState);
     lock.unlock();
 
-    if( m_isAuthRefreshed ) {
+    if (m_isAuthRefreshed) {
         m_wakeAutoProvisioningLoop.notify_one();
     }
 }
 
 void PhoneCallControllerEngineImpl::autoProvisioningThread() {
-    AACE_DEBUG(LX(TAG,__func__));
-    auto waitOnCondition = [this]() { return ( m_isShuttingDown || m_isAuthRefreshed ); };
+    AACE_DEBUG(LX(TAG, __func__));
+    auto waitOnCondition = [this]() { return (m_isShuttingDown || m_isAuthRefreshed); };
 
-    while(true) {
-        std::unique_lock<std::mutex> lock( m_mutex );
-        if( !waitOnCondition() ) {
-            m_wakeAutoProvisioningLoop.wait( lock, waitOnCondition );
+    while (true) {
+        std::unique_lock<std::mutex> lock(m_mutex);
+        if (!waitOnCondition()) {
+            m_wakeAutoProvisioningLoop.wait(lock, waitOnCondition);
         }
 
-        if( m_isShuttingDown ) {
-            AACE_DEBUG(LX(TAG,__func__).m("autoProvisioning worker thread shutting down"));
+        if (m_isShuttingDown) {
+            AACE_DEBUG(LX(TAG, __func__).m("autoProvisioning worker thread shutting down"));
             return;
         }
         lock.unlock();
 
         AlexaAccountInfo alexaAccountInfo;
         int retryCounter = 0;
-        while( !m_isShuttingDown && retryCounter < MAX_HTTP_RETRY_COUNT ) {
-            alexaAccountInfo = getAlexaAccountInfo( m_authDelegate, m_deviceInfo );
-            if( AlexaAccountInfo::AccountProvisionStatus::INVALID != alexaAccountInfo.provisionStatus ) {
+        while (!m_isShuttingDown && retryCounter < MAX_HTTP_RETRY_COUNT) {
+            alexaAccountInfo = getAlexaAccountInfo(m_authDelegate, m_deviceInfo, m_alexaEndpoints);
+            if (AlexaAccountInfo::AccountProvisionStatus::INVALID != alexaAccountInfo.provisionStatus) {
                 break;
             }
             retryCounter++;
-            if( AlexaAccountInfo::AccountProvisionStatus::INVALID == alexaAccountInfo.provisionStatus && retryCounter < MAX_HTTP_RETRY_COUNT ) {
-                AACE_DEBUG(LX(TAG,__func__).m( "retryingGetAlexaAccountInfo" ) );
-                std::unique_lock<std::mutex> lock( m_mutex );
-                m_waitNetworkRetry.wait_until( lock, calculateTimeToRetry( retryCounter - 1 ), [this] { return m_isShuttingDown; } );
+            if (AlexaAccountInfo::AccountProvisionStatus::INVALID == alexaAccountInfo.provisionStatus &&
+                retryCounter < MAX_HTTP_RETRY_COUNT) {
+                AACE_DEBUG(LX(TAG, __func__).m("retryingGetAlexaAccountInfo"));
+                std::unique_lock<std::mutex> lock(m_mutex);
+                m_waitNetworkRetry.wait_until(
+                    lock, calculateTimeToRetry(retryCounter - 1), [this] { return m_isShuttingDown; });
                 continue;
             }
         }
 
-        if( AlexaAccountInfo::AccountProvisionStatus::INVALID == alexaAccountInfo.provisionStatus ) {
-            AACE_ERROR(LX(TAG,__func__).m( "failedToGetAccountInfo" ) );
+        if (AlexaAccountInfo::AccountProvisionStatus::INVALID == alexaAccountInfo.provisionStatus) {
+            AACE_ERROR(LX(TAG, __func__).m("failedToGetAccountInfo"));
             return;
         }
 
-        if( AlexaAccountInfo::AccountProvisionStatus::DEPROVISIONED == alexaAccountInfo.provisionStatus ) {
-            AACE_WARN(LX(TAG,__func__).m( "accountInDeprovisionedState" ) );
+        if (AlexaAccountInfo::AccountProvisionStatus::DEPROVISIONED == alexaAccountInfo.provisionStatus) {
+            AACE_WARN(LX(TAG, __func__).m("accountInDeprovisionedState"));
             return;
         }
 
-        if( AlexaAccountInfo::AccountProvisionStatus::PROVISIONED == alexaAccountInfo.provisionStatus ||
-            AlexaAccountInfo::AccountProvisionStatus::AUTO_PROVISIONED == alexaAccountInfo.provisionStatus ) {
-            AACE_INFO(LX(TAG,__func__).m( "accountAlreadyProvisioned" ) );
+        if (AlexaAccountInfo::AccountProvisionStatus::PROVISIONED == alexaAccountInfo.provisionStatus ||
+            AlexaAccountInfo::AccountProvisionStatus::AUTO_PROVISIONED == alexaAccountInfo.provisionStatus) {
+            AACE_INFO(LX(TAG, __func__).m("accountAlreadyProvisioned"));
             return;
         }
 
-        if( AlexaAccountInfo::AccountProvisionStatus::UNKNOWN == alexaAccountInfo.provisionStatus ) {
-            AACE_INFO(LX(TAG,__func__).m( "beingAutoProvisioning" ) );
+        if (AlexaAccountInfo::AccountProvisionStatus::UNKNOWN == alexaAccountInfo.provisionStatus) {
+            AACE_INFO(LX(TAG, __func__).m("beingAutoProvisioning"));
             bool success = false;
             int retryCounter = 0;
-            while( !m_isShuttingDown && retryCounter < MAX_HTTP_RETRY_COUNT ) {
-                success = doAccountAutoProvision( alexaAccountInfo, m_authDelegate, m_deviceInfo );
-                if( success ) {
+            while (!m_isShuttingDown && retryCounter < MAX_HTTP_RETRY_COUNT) {
+                success = doAccountAutoProvision(alexaAccountInfo, m_authDelegate, m_deviceInfo, m_alexaEndpoints);
+                if (success) {
                     break;
-                } 
+                }
                 retryCounter++;
-                if( retryCounter < MAX_HTTP_RETRY_COUNT ) {
-                    AACE_DEBUG(LX(TAG,__func__).m( "retryingDoAccountAutoProvision" ) );
-                    std::unique_lock<std::mutex> lock( m_mutex );
-                    m_waitNetworkRetry.wait_until( lock, calculateTimeToRetry( retryCounter - 1 ), [this] { return m_isShuttingDown; } );
+                if (retryCounter < MAX_HTTP_RETRY_COUNT) {
+                    AACE_DEBUG(LX(TAG, __func__).m("retryingDoAccountAutoProvision"));
+                    std::unique_lock<std::mutex> lock(m_mutex);
+                    m_waitNetworkRetry.wait_until(
+                        lock, calculateTimeToRetry(retryCounter - 1), [this] { return m_isShuttingDown; });
                     continue;
                 }
             }
 
-            if( success ) {
-                AACE_INFO(LX(TAG,__func__).m( "autoProvisioningSuccessfull" ) );
-                emitCounterMetrics( "autoProvisioningThread", METRIC_AUTO_PROVISION, 1 );
+            if (success) {
+                AACE_INFO(LX(TAG, __func__).m("autoProvisioningSuccessfull"));
+                emitCounterMetrics("autoProvisioningThread", METRIC_AUTO_PROVISION, 1);
             } else {
-                AACE_ERROR(LX(TAG,__func__).m( "autoProvisioningAccountFailed" ) );
+                AACE_ERROR(LX(TAG, __func__).m("autoProvisioningAccountFailed"));
             }
 
             return;
@@ -346,6 +376,6 @@ void PhoneCallControllerEngineImpl::autoProvisioningThread() {
     };
 }
 
-} // aace::engine::phoneCallController
-} // aace::engine
-} // aace
+}  // namespace phoneCallController
+}  // namespace engine
+}  // namespace aace

@@ -5,5 +5,5 @@ import com.amazon.aace.network.NetworkInfoProvider.NetworkStatus;
 // An interface for an observer of network status changes
 public interface NetworkConnectionObserver {
     // notify observer of connection status change
-    void onConnectionStatusChanged( NetworkStatus status );
+    void onConnectionStatusChanged(NetworkStatus status);
 }

@@ -32,7 +32,6 @@ namespace alexa {
 using namespace alexaClientSDK::avsCommon::sdkInterfaces;
 using namespace alexaClientSDK::avsCommon::utils::json::jsonUtils;
 
-
 /// String to identify log entries originating from this file.
 static const std::string TAG("AuthorizedSender");
 
@@ -74,9 +73,9 @@ void AuthorizedSender::sendMessage(std::shared_ptr<alexaClientSDK::avsCommon::av
     rapidjson::ParseResult result = document.Parse(request->getJsonContent().c_str());
     if (!result) {
         AACE_ERROR(LX("parseMessageFailed")
-                        .d("reason", "parseFailed")
-                        .d("error", GetParseError_En(result.Code()))
-                        .d("offset", result.Offset()));
+                       .d("reason", "parseFailed")
+                       .d("error", GetParseError_En(result.Code()))
+                       .d("offset", result.Offset()));
         request->sendCompleted(MessageRequestObserverInterface::Status::BAD_REQUEST);
         return;
     }
@@ -126,6 +125,6 @@ void AuthorizedSender::updateAuthorizedPlayers(const std::unordered_set<std::str
     m_authorizedPlayerIds = playerIds;
 }
 
-}  // namespace externalMediaPlayer
-}  // namespace capabilityAgents
-}  // namespace alexaClientSDK
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace

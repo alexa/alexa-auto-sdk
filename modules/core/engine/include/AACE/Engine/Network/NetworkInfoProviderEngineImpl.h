@@ -29,34 +29,31 @@ namespace aace {
 namespace engine {
 namespace network {
 
-class NetworkInfoProviderEngineImpl :
-    public aace::network::NetworkInfoProviderEngineInterface,
-    public NetworkObservableInterface {
-
+class NetworkInfoProviderEngineImpl
+        : public aace::network::NetworkInfoProviderEngineInterface
+        , public NetworkObservableInterface {
 private:
-    NetworkInfoProviderEngineImpl();
+    NetworkInfoProviderEngineImpl() = default;
 
 public:
     static std::shared_ptr<NetworkInfoProviderEngineImpl> create();
 
     // aace::engine::network::NetworkObservableInterface
-    void addObserver( std::shared_ptr<NetworkInfoObserver> observer ) override;
-    void removeObserver( std::shared_ptr<NetworkInfoObserver> observer ) override;
+    void addObserver(std::shared_ptr<NetworkInfoObserver> observer) override;
+    void removeObserver(std::shared_ptr<NetworkInfoObserver> observer) override;
 
     // NetworkInfoProviderEngineInterface
-    virtual void networkInfoChanged( NetworkStatus status, int wifiSignalStrength ) override;
+    virtual void networkInfoChanged(NetworkStatus status, int wifiSignalStrength) override;
 
-    bool setNetworkInterface( const std::string& networkInterface );
-    std::string getNetworkInterface();
+    bool setNetworkInterface(const std::string& networkInterface);
 
 private:
     std::unordered_set<std::shared_ptr<NetworkInfoObserver>> m_observers;
     std::mutex m_mutex;
-    std::string m_networkInterface;
 };
 
-} // aace::engine::network
-} // aace::engine
-} // aace
+}  // namespace network
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_NETWORK_NETWORK_INFO_PROVIDER_ENGINE_IMPL_H
+#endif  // AACE_ENGINE_NETWORK_NETWORK_INFO_PROVIDER_ENGINE_IMPL_H

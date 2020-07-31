@@ -35,8 +35,8 @@ import com.amazon.maccandroid.model.Directive.LogoutDirective;
 import com.amazon.maccandroid.model.Directive.PlayControlDirective;
 import com.amazon.maccandroid.model.Directive.PlayDirective;
 import com.amazon.maccandroid.model.Directive.SeekDirective;
-import com.amazon.maccandroid.model.errors.CapabilityAgentError;
 import com.amazon.maccandroid.model.SupportedOperations;
+import com.amazon.maccandroid.model.errors.CapabilityAgentError;
 import com.amazon.maccandroid.model.players.AuthorizedPlayer;
 
 import java.util.List;
@@ -69,61 +69,62 @@ public class MediaAppsDirectivesHandler implements MediaAppsConnectionListener {
     }
 
     public void handleDirective(final Directive directive) {
-        Log.i(TAG, "handleDirective | directive type: " + directive.getClass().getSimpleName()
-                + " | for player id: " + directive.getPlayerId());
+        Log.i(TAG,
+                "handleDirective | directive type: " + directive.getClass().getSimpleName()
+                        + " | for player id: " + directive.getPlayerId());
 
-        Map< String, MediaApp > mediaApps = MediaAppsRepository.getInstance().getAuthorizedMediaApps();
+        Map<String, MediaApp> mediaApps = MediaAppsRepository.getInstance().getAuthorizedMediaApps();
         for (String app : mediaApps.keySet()) {
             Log.i(TAG, app);
         }
 
-
         if (mediaApps.containsKey(directive.getPlayerId())) {
-            MediaApp mediaApp = mediaApps.get(directive.getPlayerId() );
+            MediaApp mediaApp = mediaApps.get(directive.getPlayerId());
             MediaControllerCompat mediaController = mediaApp.getMediaController();
 
-            if (mediaController != null){ // && mediaController.isSessionReady() ) {
+            if (mediaController != null) { // && mediaController.isSessionReady() ) {
                 Log.i(TAG, "handleDirective| mediacontroller is already connected");
                 handleDirectiveForSession(directive, mediaController);
             } else {
                 if (isAppInstalled(mContext, mediaApp.getLocalPlayerId())) {
                     Log.i(TAG, "handleDirective| app is already installed trying to connect");
-                    mediaApp.connect(this );
+                    mediaApp.connect(this);
                     mCachedDirective = directive;
                 } else {
                     Log.i(TAG, "error");
-                    MediaAppsStateReporter.getInstance().reportError(directive.getPlayerId(),
-                            CapabilityAgentError.PLAYER_NOT_FOUND);
+                    MediaAppsStateReporter.getInstance().reportError(
+                            directive.getPlayerId(), CapabilityAgentError.PLAYER_NOT_FOUND);
                 }
             }
         } else {
             Log.i(TAG, "handleDirective | player id not found");
-            MediaAppsStateReporter.getInstance().reportError(directive.getPlayerId(),
-                    CapabilityAgentError.PLAYER_UNKNOWN);
+            MediaAppsStateReporter.getInstance().reportError(
+                    directive.getPlayerId(), CapabilityAgentError.PLAYER_UNKNOWN);
         }
-
     }
 
     private void handleDirectiveForSession(Directive directive, MediaControllerCompat mediaController) {
-//         if (!actionSupported(directive, mediaController)) {
-//             Log.i(TAG, "Action is not supported");
-//             MediaAppsStateReporter.getInstance().reportError(directive.getPlayerId(),
-//                     CapabilityAgentError.OPERATION_UNSUPPORTED);
-//             return;
-//         }
+        //         if (!actionSupported(directive, mediaController)) {
+        //             Log.i(TAG, "Action is not supported");
+        //             MediaAppsStateReporter.getInstance().reportError(directive.getPlayerId(),
+        //                     CapabilityAgentError.OPERATION_UNSUPPORTED);
+        //             return;
+        //         }
 
         final MediaControllerCompat finalMediaController = mediaController;
 
-        final MediaApp finalMediaApp = MediaAppsRepository.getInstance().getAuthorizedMediaApps().get( directive.getPlayerId() );
+        final MediaApp finalMediaApp =
+                MediaAppsRepository.getInstance().getAuthorizedMediaApps().get(directive.getPlayerId());
 
         if (directive instanceof LoginDirective) {
             LoginDirective loginDirective = (LoginDirective) directive;
-            Bundle extras  = new Bundle();
-            extras.putString("accessToken" , (loginDirective.getAccessToken()));
+            Bundle extras = new Bundle();
+            extras.putString("accessToken", (loginDirective.getAccessToken()));
             extras.putString("username", (loginDirective.getUserName()));
             extras.putInt("tokenRefreshIntervalInMilliseconds", (int) loginDirective.getRefreshInterval());
             extras.putBoolean("forceLogin", loginDirective.isForce());
-            mediaController.getTransportControls().sendCustomAction(APIConstants.Directives.ExternalMediaPlayerDirectives.CUSTOM_ACTION_LOGIN, extras);
+            mediaController.getTransportControls().sendCustomAction(
+                    APIConstants.Directives.ExternalMediaPlayerDirectives.CUSTOM_ACTION_LOGIN, extras);
         } else if (directive instanceof LogoutDirective) {
             // IGNORE
         } else if (directive instanceof PlayDirective) {
@@ -133,7 +134,7 @@ public class MediaAppsDirectivesHandler implements MediaAppsConnectionListener {
 
             // if user tries to play with unauthorized Spotify, allow error to be sent again
             finalMediaApp.resetUnauthorizedReported();
-            
+
             if (playDirective.isPreload()) {
                 Log.i(TAG, "handleDirectiveForSession | is preload |  media controller | here is the URI: " + playUri);
                 mMainThreadDirectivesHandler.post(new Runnable() {
@@ -144,7 +145,7 @@ public class MediaAppsDirectivesHandler implements MediaAppsConnectionListener {
                 });
             } else {
                 Log.i(TAG, "handleDirectiveForSession | not preload |  media controller | here is the URI: " + playUri);
-//                finalMediaController.getTransportControls().playFromUri(playUri, null);
+                //                finalMediaController.getTransportControls().playFromUri(playUri, null);
                 mMainThreadDirectivesHandler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -163,7 +164,8 @@ public class MediaAppsDirectivesHandler implements MediaAppsConnectionListener {
                     mMainThreadDirectivesHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            finalMediaController.getTransportControls().play();;
+                            finalMediaController.getTransportControls().play();
+                            ;
                         }
                     });
 
@@ -173,7 +175,8 @@ public class MediaAppsDirectivesHandler implements MediaAppsConnectionListener {
                     mMainThreadDirectivesHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            finalMediaController.getTransportControls().stop();;
+                            finalMediaController.getTransportControls().stop();
+                            ;
                         }
                     });
                     break;
@@ -182,7 +185,8 @@ public class MediaAppsDirectivesHandler implements MediaAppsConnectionListener {
                     mMainThreadDirectivesHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            finalMediaController.getTransportControls().pause();;
+                            finalMediaController.getTransportControls().pause();
+                            ;
                         }
                     });
                     break;
@@ -191,7 +195,8 @@ public class MediaAppsDirectivesHandler implements MediaAppsConnectionListener {
                     mMainThreadDirectivesHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            finalMediaController.getTransportControls().seekTo(0);;
+                            finalMediaController.getTransportControls().seekTo(0);
+                            ;
                         }
                     });
                     break;
@@ -200,7 +205,8 @@ public class MediaAppsDirectivesHandler implements MediaAppsConnectionListener {
                     mMainThreadDirectivesHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            finalMediaController.getTransportControls().skipToPrevious();;
+                            finalMediaController.getTransportControls().skipToPrevious();
+                            ;
                         }
                     });
                     break;
@@ -209,7 +215,8 @@ public class MediaAppsDirectivesHandler implements MediaAppsConnectionListener {
                     mMainThreadDirectivesHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            finalMediaController.getTransportControls().skipToNext();;
+                            finalMediaController.getTransportControls().skipToNext();
+                            ;
                         }
                     });
                     break;
@@ -218,7 +225,8 @@ public class MediaAppsDirectivesHandler implements MediaAppsConnectionListener {
                     mMainThreadDirectivesHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            finalMediaController.getTransportControls().rewind();;
+                            finalMediaController.getTransportControls().rewind();
+                            ;
                         }
                     });
                     break;
@@ -236,7 +244,8 @@ public class MediaAppsDirectivesHandler implements MediaAppsConnectionListener {
                     mMainThreadDirectivesHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            finalMediaController.getTransportControls().setRepeatMode(PlaybackStateCompat.REPEAT_MODE_ALL) ;
+                            finalMediaController.getTransportControls().setRepeatMode(
+                                    PlaybackStateCompat.REPEAT_MODE_ALL);
                         }
                     });
                     break;
@@ -245,7 +254,8 @@ public class MediaAppsDirectivesHandler implements MediaAppsConnectionListener {
                     mMainThreadDirectivesHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            finalMediaController.getTransportControls().setRepeatMode(PlaybackStateCompat.REPEAT_MODE_ONE);
+                            finalMediaController.getTransportControls().setRepeatMode(
+                                    PlaybackStateCompat.REPEAT_MODE_ONE);
                         }
                     });
                     break;
@@ -254,7 +264,8 @@ public class MediaAppsDirectivesHandler implements MediaAppsConnectionListener {
                     mMainThreadDirectivesHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            finalMediaController.getTransportControls().setRepeatMode(PlaybackStateCompat.REPEAT_MODE_NONE);
+                            finalMediaController.getTransportControls().setRepeatMode(
+                                    PlaybackStateCompat.REPEAT_MODE_NONE);
                         }
                     });
                     break;
@@ -263,7 +274,8 @@ public class MediaAppsDirectivesHandler implements MediaAppsConnectionListener {
                     mMainThreadDirectivesHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            finalMediaController.getTransportControls().setShuffleMode(PlaybackStateCompat.SHUFFLE_MODE_ALL);
+                            finalMediaController.getTransportControls().setShuffleMode(
+                                    PlaybackStateCompat.SHUFFLE_MODE_ALL);
                         }
                     });
                     break;
@@ -272,7 +284,8 @@ public class MediaAppsDirectivesHandler implements MediaAppsConnectionListener {
                     mMainThreadDirectivesHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            finalMediaController.getTransportControls().setShuffleMode(PlaybackStateCompat.SHUFFLE_MODE_NONE);
+                            finalMediaController.getTransportControls().setShuffleMode(
+                                    PlaybackStateCompat.SHUFFLE_MODE_NONE);
                         }
                     });
                     break;
@@ -299,37 +312,35 @@ public class MediaAppsDirectivesHandler implements MediaAppsConnectionListener {
             mediaController.getTransportControls().seekTo(((SeekDirective) directive).getOffset());
         } else if (directive instanceof AdjustSeekDirective) {
             PlaybackStateCompat playbackState = mediaController.getPlaybackState();
-                long position = (long ) (playbackState.getPosition()
-                        + playbackState.getPlaybackSpeed()
-                        * (SystemClock.elapsedRealtime() - playbackState.getLastPositionUpdateTime() )
-                        + ((AdjustSeekDirective) directive).getDelta() );
-                mediaController.getTransportControls().seekTo(position);
+            long position = (long) (playbackState.getPosition()
+                    + playbackState.getPlaybackSpeed()
+                            * (SystemClock.elapsedRealtime() - playbackState.getLastPositionUpdateTime())
+                    + ((AdjustSeekDirective) directive).getDelta());
+            mediaController.getTransportControls().seekTo(position);
         } else {
-            Log.e(TAG, "Unsupported directive " + directive );
-                MediaAppsStateReporter.getInstance().reportError(directive.getPlayerId(),
-                        CapabilityAgentError.OPERATION_UNSUPPORTED);
+            Log.e(TAG, "Unsupported directive " + directive);
+            MediaAppsStateReporter.getInstance().reportError(
+                    directive.getPlayerId(), CapabilityAgentError.OPERATION_UNSUPPORTED);
         }
     }
 
     private Uri constructPlayUri(PlayDirective playDirective) {
-
         StringBuilder uriBuilder = new StringBuilder();
         // Spotify has a different way of building the URI. The others are as per the MACC requirements.
         if (playDirective.getToken().startsWith(SPOTIFY_SPECIFIC_URI)) {
             uriBuilder.append(ALEXA_SCHEMA)
-                .append(SCHEMA_SEPARATOR)
-                .append(playDirective.getToken())
-                .append(QUERY_INITIATOR);
+                    .append(SCHEMA_SEPARATOR)
+                    .append(playDirective.getToken())
+                    .append(QUERY_INITIATOR);
 
-                constructQuery(INDEX_KEY, String.valueOf(playDirective.getIndex()), uriBuilder)
-                .append(QUERY_SEPARATOR);
+            constructQuery(INDEX_KEY, String.valueOf(playDirective.getIndex()), uriBuilder).append(QUERY_SEPARATOR);
 
-        constructQuery(OFFSET_MILLISECONDS_KEY, String.valueOf(playDirective.getOffest()), uriBuilder)
-                .append(QUERY_SEPARATOR);
+            constructQuery(OFFSET_MILLISECONDS_KEY, String.valueOf(playDirective.getOffest()), uriBuilder)
+                    .append(QUERY_SEPARATOR);
 
-                constructQuery(NAVIGATION_KEY, playDirective.getNavigation(), uriBuilder);
+            constructQuery(NAVIGATION_KEY, playDirective.getNavigation(), uriBuilder);
 
-                return Uri.parse(uriBuilder.toString());
+            return Uri.parse(uriBuilder.toString());
         } else {
             Uri.Builder builder = new Uri.Builder();
             builder.scheme(ALEXA_SCHEMA)
@@ -345,40 +356,40 @@ public class MediaAppsDirectivesHandler implements MediaAppsConnectionListener {
         return uriBuilder.append(key).append(QUERY_ASSIGNER).append(value);
     }
 
-    private boolean isAppInstalled(Context context, String packageName ) {
+    private boolean isAppInstalled(Context context, String packageName) {
         Log.i(TAG, "isAppInstalled:" + packageName);
         boolean installed = true;
         try {
-            context.getPackageManager().getApplicationInfo(packageName, 0 );
-        } catch (PackageManager.NameNotFoundException e ) {
+            context.getPackageManager().getApplicationInfo(packageName, 0);
+        } catch (PackageManager.NameNotFoundException e) {
             // This should not happen. If we get a media session for a package, then the
             // package must be installed on the device.
-            Log.e(TAG, "Unable to load package details", e );
+            Log.e(TAG, "Unable to load package details", e);
             installed = false;
         }
         return installed;
     }
 
-    private void startSessionActivity(MediaControllerCompat mediaController ) {
+    private void startSessionActivity(MediaControllerCompat mediaController) {
         PendingIntent intent = mediaController.getSessionActivity();
-        if (intent != null ) {
+        if (intent != null) {
             try {
                 intent.send();
                 return;
-            } catch (PendingIntent.CanceledException e ) {
+            } catch (PendingIntent.CanceledException e) {
                 e.printStackTrace();
-                Log.e(TAG, e.toString() );
+                Log.e(TAG, e.toString());
             }
         }
-        Log.w(TAG, "Failed to open app by session activity." );
+        Log.w(TAG, "Failed to open app by session activity.");
     }
 
-    private boolean actionSupported(Directive directive, MediaControllerCompat mediaController ) {
+    private boolean actionSupported(Directive directive, MediaControllerCompat mediaController) {
         String action = null;
         if (directive instanceof PlayControlDirective) {
             action = ((PlayControlDirective) directive).getType();
         } else if (directive instanceof SeekDirective) {
-//            action = SupportedOperations.SET_SEEK_POSITION;
+            //            action = SupportedOperations.SET_SEEK_POSITION;
             // Spotify is not reporting this TODO
             return true;
         } else {
@@ -393,37 +404,37 @@ public class MediaAppsDirectivesHandler implements MediaAppsConnectionListener {
     @Override
     public void onConnectionSuccessful() {
         Log.i(TAG, "onConnectionSuccessful to : " + mCachedDirective.getPlayerId());
-        Log.i(TAG, "Authorized app: " + MediaAppsRepository.getInstance().
-                getAuthorizedMediaApp(mCachedDirective.getPlayerId()));
-        MediaControllerCompat controller = MediaAppsRepository.getInstance().
-                getAuthorizedMediaApp(mCachedDirective.getPlayerId()).getMediaController();
-//        if (controller.isSessionReady()) {
-            Log.i(TAG, "Session ready");
-            handleDirectiveForSession(mCachedDirective, controller);
-//        } else {
-//            Log.i(TAG, "session not ready");
-//        }
+        Log.i(TAG,
+                "Authorized app: "
+                        + MediaAppsRepository.getInstance().getAuthorizedMediaApp(mCachedDirective.getPlayerId()));
+        MediaControllerCompat controller = MediaAppsRepository.getInstance()
+                                                   .getAuthorizedMediaApp(mCachedDirective.getPlayerId())
+                                                   .getMediaController();
+        //        if (controller.isSessionReady()) {
+        Log.i(TAG, "Session ready");
+        handleDirectiveForSession(mCachedDirective, controller);
+        //        } else {
+        //            Log.i(TAG, "session not ready");
+        //        }
         mCachedDirective = null;
     }
 
     @Override
-    public void onConnectionFailure(CapabilityAgentError error ) {
-    	Log.i(TAG, "onConnectionFailure");
+    public void onConnectionFailure(CapabilityAgentError error) {
+        Log.i(TAG, "onConnectionFailure");
         MediaAppsRepository.getInstance().removeMediaApp(mCachedDirective.getPlayerId());
         MediaAppsStateReporter.getInstance().reportError(mCachedDirective.getPlayerId(), error);
     }
 
     public void handleAuthorizedPlayers(List<AuthorizedPlayer> players) {
         Log.i(TAG, "handleAuthorizedPlayers");
-        for (AuthorizedPlayer player: players) {
+        for (AuthorizedPlayer player : players) {
             if (MediaAppsRepository.getInstance().isDiscoveredApp(player.getLocalPlayerId())) {
                 Log.i(TAG, "handleAuthorizedPlayers | found local player id");
-                MediaApp app = MediaAppsRepository.getInstance().
-                        getDiscoveredMediaApp(player.getLocalPlayerId());
+                MediaApp app = MediaAppsRepository.getInstance().getDiscoveredMediaApp(player.getLocalPlayerId());
                 if (player.isAuthorized()) {
                     // App is new and has not been added before
-                    if ((MediaAppsRepository.getInstance().getAuthorizedMediaApp(
-                            player.getLocalPlayerId()) == null)) {
+                    if ((MediaAppsRepository.getInstance().getAuthorizedMediaApp(player.getLocalPlayerId()) == null)) {
                         MediaAppsRepository.getInstance().addAuthorizedMediaApp(app);
                         // Now that app is authorized, send up any playbackstate events necessary
                         // for the cloud

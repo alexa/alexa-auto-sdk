@@ -28,7 +28,6 @@ import java.util.Set;
 // AutoVoiceChrome imports
 
 public class AlexaClientHandler extends AlexaClient {
-
     private static final String TAG = AlexaClientHandler.class.getSimpleName();
 
     private final Activity mActivity;
@@ -46,7 +45,7 @@ public class AlexaClientHandler extends AlexaClient {
 
     // AutoVoiceChrome controller
 
-    public AlexaClientHandler( Activity activity, LoggerHandler logger ) {
+    public AlexaClientHandler(Activity activity, LoggerHandler logger) {
         mActivity = activity;
         mLogger = logger;
         mObservers = new HashSet<>();
@@ -54,12 +53,12 @@ public class AlexaClientHandler extends AlexaClient {
     }
 
     @Override
-    public void dialogStateChanged( final DialogState state ) {
-        mLogger.postInfo( TAG,  "Dialog State Changed. STATE: " + state );
-        mActivity.runOnUiThread( new Runnable() {
+    public void dialogStateChanged(final DialogState state) {
+        mLogger.postInfo(TAG, "Dialog State Changed. STATE: " + state);
+        mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mDialogText.setText( state != null ? state.toString() : "" );
+                mDialogText.setText(state != null ? state.toString() : "");
             }
         });
 
@@ -67,76 +66,77 @@ public class AlexaClientHandler extends AlexaClient {
     }
 
     @Override
-    public void authStateChanged( final AuthState state, final AuthError error ) {
-        if ( error == AuthError.NO_ERROR ) {
-            mLogger.postInfo( TAG, "Auth State Changed. STATE: " + state );
+    public void authStateChanged(final AuthState state, final AuthError error) {
+        if (error == AuthError.NO_ERROR) {
+            mLogger.postInfo(TAG, "Auth State Changed. STATE: " + state);
         } else {
-            mLogger.postWarn( TAG, String.format( "Auth State Changed. STATE: %s, ERROR: %s",
-                    state, error ) );
+            mLogger.postWarn(TAG, String.format("Auth State Changed. STATE: %s, ERROR: %s", state, error));
         }
-        mActivity.runOnUiThread( new Runnable() {
+        mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mAuthText.setText( state != null ? state.toString() : "" );
+                mAuthText.setText(state != null ? state.toString() : "");
             }
         });
 
-        notifyAuthStateObservers( state, error );
+        notifyAuthStateObservers(state, error);
         mAuthState = state;
         mAuthError = error;
     }
 
     @Override
-    public void connectionStatusChanged( final ConnectionStatus status,
-                                         final ConnectionChangedReason reason ) {
+    public void connectionStatusChanged(final ConnectionStatus status, final ConnectionChangedReason reason) {
         mConnectionStatus = status;
-        mLogger.postInfo( TAG, String.format( "Connection Status Changed. STATUS: %s, REASON: %s",
-                status, reason ) );
-        mActivity.runOnUiThread( new Runnable() {
+        mLogger.postInfo(TAG, String.format("Connection Status Changed. STATUS: %s, REASON: %s", status, reason));
+        mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mConnectionText.setText( status != null ? status.toString() : "" );
+                mConnectionText.setText(status != null ? status.toString() : "");
             }
         });
 
         // Notify error state change to AutoVoiceChrome
     }
 
-    public ConnectionStatus getConnectionStatus () { return mConnectionStatus; }
+    public ConnectionStatus getConnectionStatus() {
+        return mConnectionStatus;
+    }
 
-    public void registerAuthStateObserver( AuthStateObserver observer ) {
-        synchronized ( mObservers ) {
-            if ( observer == null ) return;
-            mObservers.add( observer );
+    public void registerAuthStateObserver(AuthStateObserver observer) {
+        synchronized (mObservers) {
+            if (observer == null)
+                return;
+            mObservers.add(observer);
 
             // notify newly registered observer with the current state
-            observer.onAuthStateChanged( mAuthState, mAuthError );
+            observer.onAuthStateChanged(mAuthState, mAuthError);
         }
     }
 
-    public void removeAuthStateObserver( AuthStateObserver observer ) {
-        synchronized ( mObservers ) {
-            if ( observer == null ) return;
-            mObservers.remove( observer );
+    public void removeAuthStateObserver(AuthStateObserver observer) {
+        synchronized (mObservers) {
+            if (observer == null)
+                return;
+            mObservers.remove(observer);
         }
     }
 
-    private void notifyAuthStateObservers( AuthState authState, AuthError authError ) {
-        synchronized ( mObservers ) {
-            for ( AuthStateObserver observer : mObservers ) {
-                observer.onAuthStateChanged( authState, authError );
+    private void notifyAuthStateObservers(AuthState authState, AuthError authError) {
+        synchronized (mObservers) {
+            for (AuthStateObserver observer : mObservers) {
+                observer.onAuthStateChanged(authState, authError);
             }
         }
     }
 
     private void setupGUI() {
-        mConnectionText = mActivity.findViewById( R.id.connectionState );
-        mAuthText = mActivity.findViewById( R.id.authState );
-        mDialogText = mActivity.findViewById( R.id.dialogState );
+        mConnectionText = mActivity.findViewById(R.id.connectionState);
+        mAuthText = mActivity.findViewById(R.id.authState);
+        mDialogText = mActivity.findViewById(R.id.dialogState);
 
-        mConnectionText.setText( AlexaClient.ConnectionStatus.DISCONNECTED.toString() );
-        mAuthText.setText( AlexaClient.AuthState.UNINITIALIZED.toString() );
-        mDialogText.setText(AlexaClient.DialogState.IDLE.toString() );
+        mConnectionText.setText(AlexaClient.ConnectionStatus.DISCONNECTED.toString());
+        mAuthText.setText(AlexaClient.AuthState.UNINITIALIZED.toString());
+        mDialogText.setText(AlexaClient.DialogState.IDLE.toString());
     }
 
     // AutoVoiceChrome related functions

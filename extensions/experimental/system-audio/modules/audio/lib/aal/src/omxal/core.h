@@ -21,18 +21,24 @@
 
 #include <OMXAL/OpenMAXAL.h>
 #if defined(__QNXNTO__)
-	#define __OMXAL_V_1_1__
-	#include <OMXAL/OpenMAXAL_QNX.h>
-	#include <OMXAL/OpenMAXAL_QNXConfigExt.h>
+#define __OMXAL_V_1_1__
+#include <OMXAL/OpenMAXAL_QNX.h>
+#include <OMXAL/OpenMAXAL_QNXConfigExt.h>
 #elif defined(__ANDROID__)
-	#define __OMXAL_V_1_0__
+#define __OMXAL_V_1_0__
 #endif
 
-#define bail_if_error(X) { if ((X) != XA_RESULT_SUCCESS) goto bail; }
-#define bail_if_null(X) { if ((X) == NULL) goto bail; }
+#define bail_if_error(X)                         \
+    {                                            \
+        if ((X) != XA_RESULT_SUCCESS) goto bail; \
+    }
+#define bail_if_null(X)             \
+    {                               \
+        if ((X) == NULL) goto bail; \
+    }
 
 #define to_XAboolean(b) (b) ? XA_BOOLEAN_TRUE : XA_BOOLEAN_FALSE
 
 extern XAEngineItf engine_itf;
 
-#endif // __AAL_OMXAL_CORE_H_
+#endif  // __AAL_OMXAL_CORE_H_

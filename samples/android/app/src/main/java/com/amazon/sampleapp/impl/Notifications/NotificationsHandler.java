@@ -23,27 +23,25 @@ import com.amazon.sampleapp.R;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 
 public class NotificationsHandler extends Notifications {
-
     private static final String sTag = "Notifications";
 
     private final Activity mActivity;
     private final LoggerHandler mLogger;
     private TextView mStateText;
 
-    public NotificationsHandler( Activity activity,
-                                 LoggerHandler logger ) {
+    public NotificationsHandler(Activity activity, LoggerHandler logger) {
         mActivity = activity;
         mLogger = logger;
-        mStateText = mActivity.findViewById( R.id.indicatorState );
+        mStateText = mActivity.findViewById(R.id.indicatorState);
     }
 
     @Override
-    public void setIndicator( final IndicatorState state ) {
-        mLogger.postInfo( sTag, "Indicator State: " + state );
+    public void setIndicator(final IndicatorState state) {
+        mLogger.postInfo(sTag, "Indicator State: " + state);
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mStateText.setText( state != null ? state.toString() : "" );
+                mStateText.setText(state != null ? state.toString() : "");
             }
         });
     }

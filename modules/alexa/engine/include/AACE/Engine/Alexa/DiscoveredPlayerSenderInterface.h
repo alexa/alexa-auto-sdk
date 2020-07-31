@@ -27,12 +27,13 @@ namespace alexa {
 
 class DiscoveredPlayerSenderInterface {
 public:
-    virtual void reportDiscoveredPlayers( const std::vector<aace::alexa::ExternalMediaAdapter::DiscoveredPlayerInfo>& discoveredPlayers ) = 0;
-    virtual void removeDiscoveredPlayer( const std::string& localPlayerId ) = 0;
+    virtual void reportDiscoveredPlayers(
+        const std::vector<aace::alexa::ExternalMediaAdapter::DiscoveredPlayerInfo>& discoveredPlayers) = 0;
+    virtual void removeDiscoveredPlayer(const std::string& localPlayerId) = 0;
 };
 
-} // alexa
-} // engine
-} // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_AACE_DISCOVERED_PLAYER_SENDER_INTERFACE_H
+#endif  // AACE_ENGINE_AACE_DISCOVERED_PLAYER_SENDER_INTERFACE_H

@@ -21,14 +21,13 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 
 import com.amazon.aace.alexa.AlexaProperties;
+import com.amazon.aace.logger.Logger;
 import com.amazon.aace.propertyManager.PropertyManager;
+import com.amazon.sampleapp.MainActivity;
 import com.amazon.sampleapp.R;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
-import com.amazon.aace.logger.Logger;
-import com.amazon.sampleapp.MainActivity;
 
 public class PropertyManagerHandler extends PropertyManager {
-
     private final LoggerHandler mLogger;
     private final MainActivity mActivity;
 
@@ -45,7 +44,7 @@ public class PropertyManagerHandler extends PropertyManager {
     }
 
     @Override
-    public void propertyChanged (String key, String newValue){
+    public void propertyChanged(String key, String newValue) {
         mLogger.postInfo(TAG, "key : " + key + " new value : " + newValue);
         if (key.equals(AlexaProperties.TIMEZONE)) {
             mActivity.updateTimezoneSpinner(newValue);

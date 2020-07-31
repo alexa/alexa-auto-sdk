@@ -28,17 +28,24 @@ public class ViewHolderBodyTemplate2 extends RecyclerView.ViewHolder {
     private final TextView mTextField;
     private final ImageView mImage;
 
-    public ViewHolderBodyTemplate2(View v ) {
-        super( v );
-        mMainTitle = v.findViewById( R.id.mainTitle );
-        mSubTitle = v.findViewById( R.id.subTitle );
-        mTextField = v.findViewById( R.id.textField );
-        mImage = v.findViewById( R.id.image );
+    public ViewHolderBodyTemplate2(View v) {
+        super(v);
+        mMainTitle = v.findViewById(R.id.mainTitle);
+        mSubTitle = v.findViewById(R.id.subTitle);
+        mTextField = v.findViewById(R.id.textField);
+        mImage = v.findViewById(R.id.image);
     }
 
-    public TextView getMainTitle() { return mMainTitle; }
-    public TextView getSubTitle() { return mSubTitle; }
-    public TextView getTextField() { return mTextField; }
-    public ImageView getImage() { return mImage; }
+    public TextView getMainTitle() {
+        return mMainTitle;
+    }
+    public TextView getSubTitle() {
+        return mSubTitle;
+    }
+    public TextView getTextField() {
+        return mTextField;
+    }
+    public ImageView getImage() {
+        return mImage;
+    }
 }
-

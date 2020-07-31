@@ -23,50 +23,51 @@ namespace aace {
 namespace jni {
 namespace location {
 
-    //
-    // LocationProviderHandler
-    //
+//
+// LocationProviderHandler
+//
 
-    class LocationProviderHandler : public aace::location::LocationProvider {
-    public:
-        LocationProviderHandler( jobject obj );
+class LocationProviderHandler : public aace::location::LocationProvider {
+public:
+    LocationProviderHandler(jobject obj);
 
-    public:
-        aace::location::Location getLocation() override;
-        std::string getCountry() override;
+public:
+    aace::location::Location getLocation() override;
+    std::string getCountry() override;
 
-    private:
-        JObject m_obj;
-    };
+private:
+    JObject m_obj;
+};
 
-    //
-    // LocationProviderBinder
-    //
+//
+// LocationProviderBinder
+//
 
-    class LocationProviderBinder : public aace::jni::core::PlatformInterfaceBinder {
-    public:
-        LocationProviderBinder( jobject obj );
+class LocationProviderBinder : public aace::jni::core::PlatformInterfaceBinder {
+public:
+    LocationProviderBinder(jobject obj);
 
-        std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
-            return m_locationProviderHandler;
-        }
+    std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
+        return m_locationProviderHandler;
+    }
 
-    private:
-        std::shared_ptr<LocationProviderHandler> m_locationProviderHandler;
-    };
+private:
+    std::shared_ptr<LocationProviderHandler> m_locationProviderHandler;
+};
 
-    //
-    // JLocation
-    //
+//
+// JLocation
+//
 
-    class JLocation : public JObject {
-    public:
-        JLocation( jobject obj ) : JObject( obj, "com/amazon/aace/location/Location" ) {}
-        aace::location::Location getLocation();
-    };
+class JLocation : public JObject {
+public:
+    JLocation(jobject obj) : JObject(obj, "com/amazon/aace/location/Location") {
+    }
+    aace::location::Location getLocation();
+};
 
-} // aace::jni::location
-} // aace::jni
-} // aace
+}  // namespace location
+}  // namespace jni
+}  // namespace aace
 
-#endif // AACE_JNI_LOCATION_LOCATION_PROVIDER_BINDER_H
+#endif  // AACE_JNI_LOCATION_LOCATION_PROVIDER_BINDER_H

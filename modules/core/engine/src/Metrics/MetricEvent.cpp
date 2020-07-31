@@ -14,23 +14,17 @@ static const std::string TAG("MetricEvent");
 /// Default number of samples for metric.
 const std::string METRIC_NUM_SAMPLES_DEFAULT = "1";
 
-MetricEvent::MetricEvent(const std::string& program, const std::string& source) : 
+MetricEvent::MetricEvent(const std::string& program, const std::string& source) :
         MetricEvent(program, source, MetricPriority::NR) {
 }
 
-MetricEvent::MetricEvent(
-        const std::string& program, 
-        const std::string& source, 
-        MetricPriority priority ) :
-            m_program{program},
-            m_source(source),
-            m_metricLog{""},
-            m_priority{priority} {
+MetricEvent::MetricEvent(const std::string& program, const std::string& source, MetricPriority priority) :
+        m_program{program}, m_source(source), m_metricLog{""}, m_priority{priority} {
     m_metricLog.append(m_program).append(":").append(m_source);
 }
 
 void MetricEvent::addTimer(const std::string& name, double value) {
-    addDataToLog(name, std::to_string(value), MetricDataType::TI, METRIC_NUM_SAMPLES_DEFAULT);    
+    addDataToLog(name, std::to_string(value), MetricDataType::TI, METRIC_NUM_SAMPLES_DEFAULT);
 }
 
 void MetricEvent::addString(const std::string& name, const std::string& value) {
@@ -74,6 +68,6 @@ std::string MetricEvent::dataTypeToString(MetricDataType type) {
     return "";
 }
 
-}  // metrics
-}  // engine
-}  // aace
+}  // namespace metrics
+}  // namespace engine
+}  // namespace aace

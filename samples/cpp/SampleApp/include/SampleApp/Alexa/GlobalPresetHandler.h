@@ -31,16 +31,16 @@ namespace alexa {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class GlobalPresetHandler : public aace::alexa::GlobalPreset /* isa PlatformInterface */ {
-  private:
+private:
     std::weak_ptr<Activity> m_activity{};
     std::weak_ptr<logger::LoggerHandler> m_loggerHandler{};
 
-  protected:
-    GlobalPresetHandler(std::weak_ptr<Activity> activity,
-                  std::weak_ptr<logger::LoggerHandler> loggerHandler);
+protected:
+    GlobalPresetHandler(std::weak_ptr<Activity> activity, std::weak_ptr<logger::LoggerHandler> loggerHandler);
 
-  public:
-    template <typename... Args> static auto create(Args &&... args) -> std::shared_ptr<GlobalPreset> {
+public:
+    template <typename... Args>
+    static auto create(Args&&... args) -> std::shared_ptr<GlobalPreset> {
         return std::shared_ptr<GlobalPreset>(new GlobalPresetHandler(args...));
     }
     auto getActivity() -> std::weak_ptr<Activity>;
@@ -48,16 +48,16 @@ class GlobalPresetHandler : public aace::alexa::GlobalPreset /* isa PlatformInte
 
     // aace::alexa::GlobalPreset interface
 
-    auto setGlobalPreset( int preset ) -> void override;
+    auto setGlobalPreset(int preset) -> void override;
 
-  private:
+private:
     std::weak_ptr<View> m_console{};
 
-    auto log(logger::LoggerHandler::Level level, const std::string &message) -> void;
+    auto log(logger::LoggerHandler::Level level, const std::string& message) -> void;
     auto setupUI() -> void;
 };
 
-} // namespace alexa
-} // namespace sampleApp
+}  // namespace alexa
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_ALEXA_GLOBALPRESETHANDLER_H
+#endif  // SAMPLEAPP_ALEXA_GLOBALPRESETHANDLER_H

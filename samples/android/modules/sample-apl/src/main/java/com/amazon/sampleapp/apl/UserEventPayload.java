@@ -39,10 +39,8 @@ public class UserEventPayload {
     private final JSONObject mComponents;
     private static int requestId = 1;
 
-    public UserEventPayload(final String token,
-                            final Object[] args,
-                            final Map<String, Object> components,
-                            final Map<String, Object> sources) throws Exception {
+    public UserEventPayload(final String token, final Object[] args, final Map<String, Object> components,
+            final Map<String, Object> sources) throws Exception {
         mToken = token;
         mArguments = new JSONArray((args));
         mComponents = new JSONObject(components);

@@ -18,7 +18,7 @@
 
 namespace aace {
 namespace cbl {
-    
+
 class CBLEngineInterface {
 public:
     virtual void onStart() = 0;
@@ -26,7 +26,7 @@ public:
     virtual void onReset() = 0;
 };
 
-} // aace::cbl
-} // aace
+}  // namespace cbl
+}  // namespace aace
 
 #endif

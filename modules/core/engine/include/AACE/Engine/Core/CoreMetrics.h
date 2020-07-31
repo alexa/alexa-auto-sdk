@@ -24,7 +24,6 @@ namespace core {
 
 class CoreMetrics {
 public:
-    
     /**
      * Enum indicating the location where the metric message was issued
      */
@@ -36,7 +35,6 @@ public:
         ENGINE_START_END,
         ENGINE_START_EXCEPTION
     };
-    
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const CoreMetrics::Location& location) {
@@ -62,15 +60,15 @@ inline std::ostream& operator<<(std::ostream& stream, const CoreMetrics::Locatio
     }
     return stream;
 }
-    
-}  // core
-}  // engine
-}  // aace
+
+}  // namespace core
+}  // namespace engine
+}  // namespace aace
 
 #ifdef AAC_LATENCY_LOGS_ENABLED
 #define CORE_METRIC(entry, location) AACE_LOG(AACE_LOG_LEVEL::METRIC, entry.d("Location", location))
-#else // AAC_LATENCY_LOGS_ENABLED
+#else  // AAC_LATENCY_LOGS_ENABLED
 #define CORE_METRIC(entry, location)
-#endif // AAC_LATENCY_LOGS_ENABLED
+#endif  // AAC_LATENCY_LOGS_ENABLED
 
-#endif // AACE_ENGINE_CORE_CORE_METRICS_H
+#endif  // AACE_ENGINE_CORE_CORE_METRICS_H

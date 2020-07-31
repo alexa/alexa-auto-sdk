@@ -7,6 +7,7 @@ The Alexa Auto SDK Alexa module provides interfaces for standard Alexa features.
 **Table of Contents**
 
 * [Alexa Module Sequence Diagrams](#alexa-module-sequence-diagrams)
+* [Configuring Alexa Module](#alexa-module-configuration)
 * [Handling Speech Input](#handling-speech-input)
 * [Handling Speech Output](#handling-speech-output)
 * [Handling Authentication](#handling-authentication)
@@ -31,10 +32,100 @@ For a view of how the Alexa Auto SDK flow works in selected use cases, see these
 * [Tap to Talk Sequence Diagram](../../SEQUENCE_DIAGRAMS.md#tap-to-talk-sequence-diagram)
 * [Wake Word Enabled Sequence Diagram](../../SEQUENCE_DIAGRAMS.md#wake-word-enabled-sequence-diagram)
 
+## Configuring Alexa module <a id="alexa-module-configuration"></a>
+
+The Alexa module can be configured in two different ways:
+* Specifying Configuration Data Programmatically.
+* Specifying Configuration Data Using a JSON File.
+
+## Configuring using a JSON File
+
+### Using a JSON File 
+Include the following structure in the JSON file:
+
+```
+"aace.alexa": {
+        "avsDeviceSDK": {
+            "deviceInfo": {
+                "clientId": "${YOUR_CLIENT_ID}",
+                "deviceSerialNumber": "${YOUR_DEVICE_SERIAL_NUMBER}",
+                "productId": "${YOUR_PRODUCT_ID}",
+                "manufacturerName": "${YOUR_MANUFACTURER_NAME}",
+                "description": "${YOUR_DESCRIPTION}"
+            },
+            "libcurlUtils": {
+                "CURLOPT_CAPATH" : "<CA_CERTIFICATES_FILE_PATH>"
+                "CURLOPT_INTERFACE" : "<NETWORK_INTERFACE_NAME>"
+            },
+            "miscDatabase": {
+                "databaseFilePath": "<SQLITE_DATABASE_FILE_PATH>"
+            },
+            "certifiedSender": {
+                "databaseFilePath": "<SQLITE_DATABASE_FILE_PATH>"
+            },
+            "alertsCapabilityAgent": {
+                "databaseFilePath": "<SQLITE_DATABASE_FILE_PATH>"
+            },
+            "notifications": {
+                "databaseFilePath": "<SQLITE_DATABASE_FILE_PATH>"
+            },
+            "capabilitiesDelegate": {
+                "databaseFilePath": "<SQLITE_DATABASE_FILE_PATH>"
+            },
+            "deviceSettings": {
+                "databaseFilePath": "<SQLITE_DATABASE_FILE_PATH>",
+                "locales": [<LIST_OF_LOCALE_STRINGS>],
+                "defaultLocale": "<DEFAULT_LOCALE_STRING>",
+                "localeCombinations": [[<LOCALE_STRING_PAIR>]],
+                "defaultTimezone": "<TIMEZONE>"
+            }
+        }
+    }
+```
+The `deviceInfo` field contains the details of the device. The fields `libcurlUtils`, `miscDatabase`, `certifiedSender`, `alertsCapabilityAgent`, `notifications`, and `capabilitiesDelegate` specify the respective database file paths.
+
+The `deviceSettings` field specifies the settings on the device. The `databaseFilePath` is the path to the SQLite database that stores persistent settings. The database will be created on initialization if it does not already exist.
+`defaultLocale` specifies the default locale string. The default value is "en-US".
+`locales` specifies the list of locales supported by the device. The default value is `["en-US","en-GB","de-DE","en-IN","en-CA","ja-JP","en-AU","fr-FR","it-IT","es-ES","es-MX","fr-CA","es-US", "hi-IN", "pt-BR"]`.
+`localeCombinations` specifies the list of locale pairs available on the device, which enables the Engine to support Dual Language Switching. The permitted combinations are `[["en-CA","fr-CA"],["fr-CA","en-CA"],["en-US","es-US"],["es-US","en-US"],["en-IN","hi-IN"],["hi-IN","en-IN"]]`. Ensure each locale included in a pair in the `localeCombinations` field also exists in the "locales" field, which declares all locales supported by the device. 
+Any application can select the pair as a locale setting on the device based on the primary locale ( first locale in the pair), only if the secondary locale ( second locale in the pair) is supported by the application. The Engine should also be configured with this permitted pair.
+
+**Note:** Dynamic Language Switching is only available in online mode. 
+
+For file-based configuration, if `locales` field is not specified, the Engine gets automatically configured with the default locale combinations.
+
+### Using programmatic configuration
+All of the above specified fields can be configured programatically using the methods provided by the AlexaConfiguration platform interface. For example, to create `DeviceInfoConfig`:
+
+```cpp
+auto deviceConfig = aace::alexa::config::AlexaConfiguration::createDeviceInfoConfig
+    ("<DEVICE_SERIAL_NUMBER>", "<CLIENT_ID>", "<PRODUCT_ID>", "<MANUFACTURER_NAME>", "<DESCRIPTION>");
+```
+
+```cpp
+auto deviceSettingsConfig = aace::alexa::config::AlexaConfiguration::createDeviceSettingsConfig(
+    "<SQLITE_DATABASE_FILE_PATH>", [<LIST_OF_LOCALE_STRINGS>], "<DEFAULT_LOCALE_STRING>", "<TIMEZONE>", [[<LOCALE_STRING_PAIR>]]);
+```
+
+Refer to the [core module](../core/README.md) documentation for steps to specify configuration data programatically or through a JSON file.
+
 ## Handling Speech Input <a id="handling-speech-input"></a>
 
 It is the responsibility of the `AudioInputProvider` platform implementation to supply audio data to the Engine so that Alexa can process voice input. Since the Engine does not know how audio is managed on a specific platform, the specific audio capture implementation is up to you. An audio playback sound (earcon) is played whenever speech input is invoked. The playback is handled by whichever audio channel is assigned to the EARCON type. [Read more about handling media and volume here](#handling-audio-output).
 
+You can programmatically generate encoder configuration using the `aace::alexa::config::AlexaConfiguration::createSpeechRecognizerConfig()` factory method, or provide the equivalent JSON values in a configuration file.
+
+```
+{
+    "aace.alexa": {
+       "speechRecognizer": {
+           "encoder": {
+                "name": "<ENCODER_NAME>"
+           }
+       }
+    }
+}
+```
 To implement a custom handler for speech input, extend the `SpeechRecognizer` class:
 
 ```
@@ -203,7 +294,7 @@ The Alexa service keeps track of two device volume types: `ALEXA_VOLUME` and `AL
 
 `SpeakerManager` is now a configurable option, enabled by default. When not enabled, user requests to change the volume or mute now have an appropriate Alexa response, e.g. "Sorry, I can't control the volume on your device".
 
-You can programmatically generate speaker manager configuration using the `createSpeakerManagerConfig()` factory method, or provide the equivalent JSON values in a configuration file.
+You can programmatically generate speaker manager configuration using the `aace::alexa::config::AlexaConfiguration::createSpeakerManagerConfig()` factory method, or provide the equivalent JSON values in a configuration file.
 ```
 {
     "aace.alexa": {
@@ -297,7 +388,39 @@ The platform implementation is responsible for the following:
 * Applying equalization to only selected portions of the audio output so that Alexa's speech, alarms, etc. will not be affected
 * Persisting settings across power cycles
 
-The Equalizer Controller is configurable to the device's capabilities. See `aace::alexa::config::AlexaConfiguration::createEqualizerControllerConfig` for details on configuring the supported bands, default state, and decibel adjustment range.
+You can programmatically generate Equalizer Controller configuration with details such as supported bands, default state, and decibel adjustment range using the `aace::alexa::config::AlexaConfiguration::createEqualizerControllerConfig()` factory method, or provide the equivalent JSON values in a configuration file.
+
+```
+{
+    "aace.alexa" {
+        "equalizer": {
+            "bands": {
+                "BASS": true,
+                "MIDRANGE": false,
+                "TREBLE": true
+            },
+            "defaultState": {
+                "bands": {
+                    "BASS": 4,
+                    "TREBLE": -1
+                }
+            },
+            "minLevel": -6,
+            "maxLevel": 6
+        }
+    }
+}
+```
+
+// For example, 2 supported bands with amplitude gains ranging from -8dB to +8dB, each with a default of 0dB
+auto eqConfig = aace::alexa::config::AlexaConfiguration::createEqualizerControllerConfig(
+    {EqualizerBand::BASS, EqualizerBand::TREBLE},
+    -8,
+     8,
+    { {EqualizerBand::BASS, 0}, {EqualizerBand::TREBLE, 0} } );
+engine->configure( { //other config objects..., eqConfig, ... } );
+
+...
 
 To implement a custom handler for Equalizer Controller extend the `EqualizerController` class:
 
@@ -322,17 +445,6 @@ class MyEqualizerControllerHandler : public aace::alexa::EqualizerController {
         return m_currentBandLevels;
     }
 };
-...
-
-// Configure the Engine
-// For example, 2 supported bands with amplitude gains ranging from -8dB to +8dB, each with a default of 0dB
-auto eqConfig = aace::alexa::config::AlexaConfiguration::createEqualizerControllerConfig(
-    {EqualizerBand::BASS, EqualizerBand::TREBLE},
-    -8,
-     8,
-    { {EqualizerBand::BASS, 0}, {EqualizerBand::TREBLE, 0} } );
-engine->configure( { //other config objects..., eqConfig, ... } );
-
 ...
 
 // Register the platform interface with the Engine
@@ -362,6 +474,19 @@ Alexa sends visual metadata (display card templates) for your device to display.
 * The [Template](https://alexa.design/DevDocRenderTemplate) type provides visuals associated with a user request to accompany Alexa speech.
 * The [PlayerInfo](https://amzn.to/DevDocTemplatePlayerInfo) type provides visuals associated with media playing through the `AudioPlayer` interface. This includes playback control buttons, which must be used with the `PlaybackController` interface.
 
+You can programmatically generate template runtime configuration using the `aace::alexa::config::AlexaConfiguration::createTemplateRuntimeTimeoutConfig()` factory method, or provide the equivalent JSON values in a configuration file.
+
+```
+{
+    "aace.alexa" {
+        "templateRuntimeCapabilityAgent": {
+            "displayCardTTSFinishedTimeout": <TIMEOUT_IN_MS>,
+            "displayCardAudioPlaybackFinishedTimeout": <TIMEOUT_IN_MS>,
+            "displayCardAudioPlaybackStoppedPausedTimeout": <TIMEOUT_IN_MS>
+        }
+}
+```
+
 To implement a custom handler for GUI templates, extend the `TemplateRuntime` class:
 
 ```
@@ -387,12 +512,26 @@ engine->registerPlatformInterface( std::make_shared<MyTemplateRuntime>() );
 
 The External Media Player (EMP) Adapter allows you to declare and use external media application sources in your application. In order to interface with the EMP Adapter, you must use one of the following:
 
-* A media connection client to interface the EMP Adapter to the external app. The Android Sample App supports an example external media connection client called the Media App Command and Control (MACC) client. You can use the MACC client to interface with the Spotify app running on Android. For details about the MACC client, see the Android version of the [Alexa module README](../../platforms/android/modules/alexa#handling-external-media-adapter-with-maccandroidclient).
-* An embedded media app. For information about external embedded media app solutions, please contact your SA or Partner Manager.
+* A media connection client to interface the EMP Adapter to the external app. The Android Sample App supports an example external media connection client called the Media App Command and Control (MACC) client. Use the MACC client to interface with the Spotify app running on Android. For details about the MACC client, see the Android version of the [Alexa module README](../../platforms/android/modules/alexa#handling-external-media-adapter-with-maccandroidclient).
+* An embedded media app. For information about external embedded media app solutions, contact your SA or Partner Manager.
 
-You must register and implement each EMP Adapter (along with its associated external client or library), and on startup, you must run discovery to validate each external media application. This allows AVS to exercise playback control over that source type. The `reportDiscoveredPlayers()` method reports the discovered players. This method can be called at any time during the Engine lifecycle. When the cloud authorizes a specific player, you will get a call to the `authorize()` interface. Both the  `reportDiscoveredPlayers()` method and the `authorize()` method can contain one or more players. 
+***NOTE: If the media app service requires additional customer experience details, incorporate the requirement in your implementation. For example, if the provider requires your application to show the provider's logo in a particular way, modify the implementation to meet the requirement.*** 
 
-You should call two interface methods whenever media application events occur:
+When advised by your SA or Partner Manager, configure the External Media Player Adapter to the device's capabilities. See `aace::alexa::config::AlexaConfiguration::createExternalMediaPlayerConfig` for details on configuring the supported agent, or provide the equivalent JSON values in a configuration file.
+
+```
+{
+    "aace.alexa": {
+        "externalMediaPlayer": {
+            "agent": "<agent>"
+     
+  }
+}
+```
+
+You must register and implement each ExternalMediaAdapter (along with its associated external client or library). After the engine establishes a connection to the Alexa service, you can run discovery to validate each external media application. You can report discovered external media players by calling `reportDiscoveredPlayers()` at any point during runtime. When the Alexa service recognizes the player, you will get a call to the `authorize()` method including the player's authorization status. Both the `reportDiscoveredPlayers()` method and the `authorize()` method can contain one or more players in their JSON payloads. Validating the application enables Alexa to exercise playback control over the registered source type. 
+
+You must call the following interface methods when the media application events occur:
 
 * The `playerEvent()` method informs the cloud of the player event to maintain synchronization.
 * The `playerError()` method informs the cloud of a player error and should be handled in the same way as the `playerEvent()` method. 
@@ -516,15 +655,15 @@ bool play( ContentSelector type, std::string payload ) override {
     ...
 }
 ``` 
-The table below provides details about the supported payload, range, and increment for each `ContentSelector` type (and `Source`):
+The table below provides details about the supported `ContentSelector` types based on `Source` type:
 
-| type (source) | example supported payload | supported range | increment |
+| Source type | Supported content selector(s) |
 |------|---------|---|---|
-| FREQUENCY(FM) | "98.7" | 88.1 - 107.9 | 0.2 |
-| FREQUENCY(AM) | "1050" | 540 - 1700 | 10 |
-| FREQUENCY(FM) | "93.7 HD 2" | 88.1 - 107.9, HD 1-3 | 0.2, 1 |
-| CHANNEL(SXM) | "1" | 1-999 | 1 |
-| PRESET(AM,FM, SXM) | "2" | 1-99 | 1 | 
+| FM | FREQUENCY, PRESET | 
+| AM | FREQUENCY, PRESET | 
+| SXM | CHANNEL, PRESET | 
+
+The ranges and increments for valid frequency, preset, and channel may vary, depending on the region you are in. Contact your partner manager for more detailed information. 
 
 The `play()` method will not be invoked if a source cannot handle the specified `ContentSelector` type.
 

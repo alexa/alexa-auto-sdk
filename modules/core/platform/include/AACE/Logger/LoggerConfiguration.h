@@ -60,7 +60,7 @@ class RuleConfiguration;
 
 class LoggerConfiguration {
 public:
-     /**
+    /**
       * Specifies the severity level of a log message
       * @sa @c aace::logger::LoggerEngineInterface::Level
       */
@@ -89,7 +89,9 @@ public:
      * @param [in] id The id of sink object
      * @param [in] level The log level to be used to filter logs to this sink
      */
-    static std::shared_ptr<aace::core::config::EngineConfiguration> createConsoleSinkConfig( const std::string& id, Level level );
+    static std::shared_ptr<aace::core::config::EngineConfiguration> createConsoleSinkConfig(
+        const std::string& id,
+        Level level);
 
     /**
      * Factory method used to programmatically generate logger configuration data for a syslog sink.
@@ -114,7 +116,9 @@ public:
      * @param [in] id The id of sink object
      * @param [in] level The log level to be used to filter logs to this sink
      */
-    static std::shared_ptr<aace::core::config::EngineConfiguration> createSyslogSinkConfig( const std::string& id, Level level );
+    static std::shared_ptr<aace::core::config::EngineConfiguration> createSyslogSinkConfig(
+        const std::string& id,
+        Level level);
 
     /**
      * Factory method used to programmatically generate logger configuration data for a file sink.
@@ -151,7 +155,14 @@ public:
      * @param [in] maxFiles The maximum number of log files to rotate
      * @param [in] append @c true If the logs should be appended to the existing file, @c false if the file should be overwritten
      */
-    static std::shared_ptr<aace::core::config::EngineConfiguration> createFileSinkConfig( const std::string& id, Level level, const std::string& path, const std::string& prefix = "aace", uint32_t maxSize = 5242880, uint32_t maxFiles = 3, bool append = true );
+    static std::shared_ptr<aace::core::config::EngineConfiguration> createFileSinkConfig(
+        const std::string& id,
+        Level level,
+        const std::string& path,
+        const std::string& prefix = "aace",
+        uint32_t maxSize = 5242880,
+        uint32_t maxFiles = 3,
+        bool append = true);
 
     /**
      * Factory method used to programmatically generate configuration data for a logger rule.
@@ -181,11 +192,16 @@ public:
      * @param [in] tagFilter The tag regex to be used as a filter for this rule
      * @param [in] messageFilter The message regex to be used as a filter for this rule
      */
-    static std::shared_ptr<aace::core::config::EngineConfiguration> createLoggerRuleConfig( const std::string& sink, Level level, const std::string& sourceFilter = "", const std::string& tagFilter = "", const std::string& messageFilter = "" );
+    static std::shared_ptr<aace::core::config::EngineConfiguration> createLoggerRuleConfig(
+        const std::string& sink,
+        Level level,
+        const std::string& sourceFilter = "",
+        const std::string& tagFilter = "",
+        const std::string& messageFilter = "");
 };
 
-} // aace::logger::config
-} // aace::logger
-} // aace
+}  // namespace config
+}  // namespace logger
+}  // namespace aace
 
-#endif // AACE_LOGGER_LOGGER_CONFIGURATION_H
+#endif  // AACE_LOGGER_LOGGER_CONFIGURATION_H

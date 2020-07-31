@@ -39,7 +39,6 @@ namespace config {
  */
 class APLConfiguration {
 public:
-
     /**
      * enum specifying the configurable AlexaPresentation timeout.
      */
@@ -73,12 +72,12 @@ public:
      * @param [in] timeoutList A list of @c AlexaPresentationTimeout type and value pairs
      *
      */
-    static std::shared_ptr<aace::core::config::EngineConfiguration> createAlexaPresentationTimeoutConfig( const std::vector<AlexaPresentationTimeout>& timeoutList );
-
+    static std::shared_ptr<aace::core::config::EngineConfiguration> createAlexaPresentationTimeoutConfig(
+        const std::vector<AlexaPresentationTimeout>& timeoutList);
 };
 
-} // aace::apl::config
-} // aace::apl
-} // aace
+}  // namespace config
+}  // namespace apl
+}  // namespace aace
 
-#endif // AACE_APL_APL_CONFIGURATION_H
+#endif  // AACE_APL_APL_CONFIGURATION_H

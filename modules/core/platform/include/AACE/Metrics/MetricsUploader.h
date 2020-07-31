@@ -31,7 +31,6 @@ namespace metrics {
  */
 class MetricsUploader : public aace::core::PlatformInterface {
 public:
-
     /**
      * Describes the different types a datapoint can be
      */
@@ -55,11 +54,19 @@ public:
      */
     class Datapoint {
     public:
-        Datapoint( DatapointType type, std::string name, std::string value, int count );
-        DatapointType getType() const {return m_type;}
-        std::string getName() const {return m_name;}
-        std::string getValue() const {return m_value;}
-        int getCount() const {return m_count;}
+        Datapoint(DatapointType type, std::string name, std::string value, int count);
+        DatapointType getType() const {
+            return m_type;
+        }
+        std::string getName() const {
+            return m_name;
+        }
+        std::string getValue() const {
+            return m_value;
+        }
+        int getCount() const {
+            return m_count;
+        }
 
     private:
         DatapointType m_type;
@@ -82,10 +89,12 @@ public:
      * 
      * @return Returns true if record was successful and false if not implemented or recording failed
      */
-    virtual bool record( const std::vector<Datapoint>& datapoints, const std::unordered_map<std::string, std::string>& metadata ) = 0;
+    virtual bool record(
+        const std::vector<Datapoint>& datapoints,
+        const std::unordered_map<std::string, std::string>& metadata) = 0;
 };
 
-} // aace::metrics
-} // aace
+}  // namespace metrics
+}  // namespace aace
 
-#endif // AACE_METRICS_METRICS_UPLOADER_H
+#endif  // AACE_METRICS_METRICS_UPLOADER_H

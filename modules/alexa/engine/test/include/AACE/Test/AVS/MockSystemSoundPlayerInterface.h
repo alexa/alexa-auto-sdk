@@ -18,18 +18,17 @@
 
 #include <AVSCommon/SDKInterfaces/SystemSoundPlayerInterface.h>
 
-namespace aace {    
+namespace aace {
 namespace test {
 namespace avs {
 
 class MockSystemSoundPlayerInterface : public alexaClientSDK::avsCommon::sdkInterfaces::SystemSoundPlayerInterface {
 public:
-    MOCK_METHOD1(playTone,
-        std::shared_future<bool>(Tone tone));
+    MOCK_METHOD1(playTone, std::shared_future<bool>(Tone tone));
 };
 
-} // aace::test::avs
-} // aace::test
-} // aace
+}  // namespace avs
+}  // namespace test
+}  // namespace aace
 
-#endif //AACE_TEST_AVS_MOCK_SYSTEM_SOUND_PLAYER_INTERFACE_H
+#endif  //AACE_TEST_AVS_MOCK_SYSTEM_SOUND_PLAYER_INTERFACE_H

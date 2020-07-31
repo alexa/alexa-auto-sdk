@@ -26,6 +26,7 @@
 #include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
 #include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/ExceptionEncounteredSenderInterface.h>
+#include <AVSCommon/SDKInterfaces/FocusManagerInterface.h>
 #include <ContextManager/ContextManager.h>
 #include <Endpoints/EndpointBuilder.h>
 #include <Notifications/NotificationsCapabilityAgent.h>
@@ -43,12 +44,11 @@ namespace aace {
 namespace engine {
 namespace alexa {
 
-class NotificationsEngineImpl :
-    public AudioChannelEngineImpl,
-    public alexaClientSDK::avsCommon::sdkInterfaces::NotificationsObserverInterface {
-
+class NotificationsEngineImpl
+        : public AudioChannelEngineImpl
+        , public alexaClientSDK::avsCommon::sdkInterfaces::NotificationsObserverInterface {
 private:
-    NotificationsEngineImpl( std::shared_ptr<aace::alexa::Notifications> notificationsPlatformInterface );
+    NotificationsEngineImpl(std::shared_ptr<aace::alexa::Notifications> notificationsPlatformInterface);
 
     bool initialize(
         std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> audioOutputChannel,
@@ -56,9 +56,11 @@ private:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::NotificationsAudioFactoryInterface> notificationsAudioFactory,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::NotificationsAudioFactoryInterface>
+            notificationsAudioFactory,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
-        std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager );
+        std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager);
 
 public:
     static std::shared_ptr<NotificationsEngineImpl> create(
@@ -68,9 +70,11 @@ public:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::NotificationsAudioFactoryInterface> notificationsAudioFactory,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::NotificationsAudioFactoryInterface>
+            notificationsAudioFactory,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
-        std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager );
+        std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager);
 
     // NotificationObserverInterface
     void onSetIndicator(alexaClientSDK::avsCommon::avs::IndicatorState state) override;
@@ -81,11 +85,13 @@ protected:
 
 private:
     std::shared_ptr<aace::alexa::Notifications> m_notificationsPlatformInterface;
-    std::shared_ptr<alexaClientSDK::capabilityAgents::notifications::NotificationsCapabilityAgent> m_notificationsCapabilityAgent;
+    std::shared_ptr<alexaClientSDK::capabilityAgents::notifications::NotificationsCapabilityAgent>
+        m_notificationsCapabilityAgent;
+    std::shared_ptr<alexaClientSDK::capabilityAgents::notifications::NotificationRenderer> m_notificationRenderer;
 };
 
-} // aace::engine::alexa
-} // aace::engine
-} // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_ALEXA_NOTIFICATIONS_ENGINE_IMPL_H
+#endif  // AACE_ENGINE_ALEXA_NOTIFICATIONS_ENGINE_IMPL_H

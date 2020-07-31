@@ -41,8 +41,7 @@ std::shared_ptr<SpeechRecognizerHandler> SpeechRecognizerHandler::create(
 }
 
 SpeechRecognizerHandler::SpeechRecognizerHandler(bool wakeworkDetectionEnabled) :
-        aace::alexa::SpeechRecognizer(wakeworkDetectionEnabled),
-        m_shouldStopStreamingFile(false) {
+        aace::alexa::SpeechRecognizer(wakeworkDetectionEnabled), m_shouldStopStreamingFile(false) {
 }
 
 bool SpeechRecognizerHandler::wakewordDetected(const std::string& wakeword) {

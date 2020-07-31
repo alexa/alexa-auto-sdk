@@ -10,8 +10,7 @@ import com.amazon.aace.alexa.AlexaSpeaker;
 import com.amazon.sampleapp.R;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 
-public class AlexaSpeakerHandler extends AlexaSpeaker
-{
+public class AlexaSpeakerHandler extends AlexaSpeaker {
     private static final String TAG = AlexaSpeaker.class.getSimpleName();
 
     private final Activity mActivity;
@@ -21,22 +20,22 @@ public class AlexaSpeakerHandler extends AlexaSpeaker
     private byte mAlexaVolume = 50;
     private byte mAlertsVolume = 50;
 
-    public AlexaSpeakerHandler( Activity activity, LoggerHandler logger ) {
+    public AlexaSpeakerHandler(Activity activity, LoggerHandler logger) {
         mActivity = activity;
         mLogger = logger;
         setupGUI();
     }
 
     @Override
-    public void speakerSettingsChanged( SpeakerType type, boolean local, byte volume, boolean mute )
-    {
-        mLogger.postInfo( TAG, String.format( "speakerSettingsChanged [type=%s,local=%b,volume=%d,mute=%b]", type.toString(), local, volume, mute ));
+    public void speakerSettingsChanged(SpeakerType type, boolean local, byte volume, boolean mute) {
+        mLogger.postInfo(TAG,
+                String.format("speakerSettingsChanged [type=%s,local=%b,volume=%d,mute=%b]", type.toString(), local,
+                        volume, mute));
 
-        if( type == SpeakerType.ALEXA_VOLUME ) {
+        if (type == SpeakerType.ALEXA_VOLUME) {
             mAlexaVolume = volume;
             mIsMuted = mute;
-        }
-        else if( type == SpeakerType.ALERTS_VOLUME ) {
+        } else if (type == SpeakerType.ALERTS_VOLUME) {
             mAlertsVolume = volume;
         }
 
@@ -51,113 +50,103 @@ public class AlexaSpeakerHandler extends AlexaSpeaker
     private SeekBar mAlertsVolumeControl;
     private TextView mMuteButton;
 
-    private void setupGUI()
-    {
-        mAlexaVolumeControl = mActivity.findViewById( R.id.speakerVolume );
+    private void setupGUI() {
+        mAlexaVolumeControl = mActivity.findViewById(R.id.speakerVolume);
 
-        mAlexaVolumeControl.setOnSeekBarChangeListener( new SeekBar.OnSeekBarChangeListener()
-        {
+        mAlexaVolumeControl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onProgressChanged( SeekBar seekBar, int progress, boolean fromUser ) {}
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {}
 
             @Override
-            public void onStartTrackingTouch( SeekBar seekBar ) {}
+            public void onStartTrackingTouch(SeekBar seekBar) {}
 
             @Override
-            public void onStopTrackingTouch( SeekBar seekBar )
-            {
-                if( mIsMuted ) {
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                if (mIsMuted) {
                     mIsMuted = false;
-                    localSetMute( SpeakerType.ALEXA_VOLUME, false );
+                    localSetMute(SpeakerType.ALEXA_VOLUME, false);
                 }
 
-                localSetVolume( SpeakerType.ALEXA_VOLUME, ( byte ) seekBar.getProgress() );
+                localSetVolume(SpeakerType.ALEXA_VOLUME, (byte) seekBar.getProgress());
             }
         });
 
         // Prevent parent view from intercepting touch events
-        mAlexaVolumeControl.setOnTouchListener( new View.OnTouchListener()
-        {
+        mAlexaVolumeControl.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public boolean onTouch( View v, MotionEvent event )
-            {
+            public boolean onTouch(View v, MotionEvent event) {
                 int action = event.getAction();
 
-                switch( action ) {
+                switch (action) {
                     case MotionEvent.ACTION_DOWN:
-                        v.getParent().requestDisallowInterceptTouchEvent( true );
+                        v.getParent().requestDisallowInterceptTouchEvent(true);
                         break;
 
                     case MotionEvent.ACTION_UP:
-                        v.getParent().requestDisallowInterceptTouchEvent( false );
+                        v.getParent().requestDisallowInterceptTouchEvent(false);
                         break;
                 }
 
                 // Handle SeekBar touch events
-                v.onTouchEvent( event );
+                v.onTouchEvent(event);
                 return true;
             }
         });
 
-        mAlertsVolumeControl = mActivity.findViewById( R.id.alertsVolume );
+        mAlertsVolumeControl = mActivity.findViewById(R.id.alertsVolume);
 
-        mAlertsVolumeControl.setOnSeekBarChangeListener( new SeekBar.OnSeekBarChangeListener()
-        {
+        mAlertsVolumeControl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onProgressChanged( SeekBar seekBar, int progress, boolean fromUser ) {}
-
-            @Override
-            public void onStartTrackingTouch( SeekBar seekBar ) {}
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {}
 
             @Override
-            public void onStopTrackingTouch( SeekBar seekBar ) {
-                localSetVolume( SpeakerType.ALERTS_VOLUME, ( byte ) seekBar.getProgress() );
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                localSetVolume(SpeakerType.ALERTS_VOLUME, (byte) seekBar.getProgress());
             }
         });
 
         // Prevent parent view from intercepting touch events
-        mAlertsVolumeControl.setOnTouchListener( new View.OnTouchListener()
-        {
+        mAlertsVolumeControl.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public boolean onTouch( View v, MotionEvent event )
-            {
+            public boolean onTouch(View v, MotionEvent event) {
                 int action = event.getAction();
 
-                switch( action ) {
+                switch (action) {
                     case MotionEvent.ACTION_DOWN:
-                        v.getParent().requestDisallowInterceptTouchEvent( true );
+                        v.getParent().requestDisallowInterceptTouchEvent(true);
                         break;
 
                     case MotionEvent.ACTION_UP:
-                        v.getParent().requestDisallowInterceptTouchEvent( false );
+                        v.getParent().requestDisallowInterceptTouchEvent(false);
                         break;
                 }
 
                 // Handle SeekBar touch events
-                v.onTouchEvent( event );
+                v.onTouchEvent(event);
                 return true;
             }
         });
 
-        mMuteButton = mActivity.findViewById( R.id.muteSpeakerButton );
+        mMuteButton = mActivity.findViewById(R.id.muteSpeakerButton);
 
-        mMuteButton.setOnClickListener( new View.OnClickListener()
-        {
+        mMuteButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick( View v ) {
-                localSetMute( SpeakerType.ALEXA_VOLUME, mIsMuted ? false : true );
+            public void onClick(View v) {
+                localSetMute(SpeakerType.ALEXA_VOLUME, mIsMuted ? false : true);
             }
         });
     }
 
-    private void updateUI()
-    {
-        mActivity.runOnUiThread( new Runnable() {
+    private void updateUI() {
+        mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mMuteButton.setText( mIsMuted ? R.string.volume_unmute : R.string.volume_mute );
-                mAlexaVolumeControl.setProgress( mAlexaVolume );
-                mAlertsVolumeControl.setProgress( mAlertsVolume );
+                mMuteButton.setText(mIsMuted ? R.string.volume_unmute : R.string.volume_mute);
+                mAlexaVolumeControl.setProgress(mAlexaVolume);
+                mAlertsVolumeControl.setProgress(mAlertsVolume);
             }
         });
     }

@@ -31,21 +31,27 @@ namespace alexa {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-AlertsHandler::AlertsHandler(std::weak_ptr<Activity> activity,
-                             std::weak_ptr<logger::LoggerHandler> loggerHandler)
-    : m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
+AlertsHandler::AlertsHandler(std::weak_ptr<Activity> activity, std::weak_ptr<logger::LoggerHandler> loggerHandler) :
+        m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
     // Expects((m_activity != nullptr) && (m_loggerHandler != nullptr));
     // Expects((mediaPlayer != nullptr) && (speaker != nullptr));
     setupUI();
 }
 
-std::weak_ptr<Activity> AlertsHandler::getActivity() { return m_activity; }
+std::weak_ptr<Activity> AlertsHandler::getActivity() {
+    return m_activity;
+}
 
-std::weak_ptr<logger::LoggerHandler> AlertsHandler::getLoggerHandler() { return m_loggerHandler; }
+std::weak_ptr<logger::LoggerHandler> AlertsHandler::getLoggerHandler() {
+    return m_loggerHandler;
+}
 
 // aace::alexa::Alerts interface
 
-void AlertsHandler::alertStateChanged(const std::string &alertToken, Alerts::AlertState state, const std::string &reason) {
+void AlertsHandler::alertStateChanged(
+    const std::string& alertToken,
+    Alerts::AlertState state,
+    const std::string& reason) {
     std::stringstream ss;
     ss << state;
     log(logger::LoggerHandler::Level::INFO, "alertStateChanged:state=" + ss.str() + ",reason=" + reason);
@@ -72,7 +78,7 @@ void AlertsHandler::alertStateChanged(const std::string &alertToken, Alerts::Ale
     return;
 }
 
-void AlertsHandler::alertCreated(const std::string &alertToken, const std::string &detailedInfo) {
+void AlertsHandler::alertCreated(const std::string& alertToken, const std::string& detailedInfo) {
     log(logger::LoggerHandler::Level::INFO, "alertCreated:alertToken=" + alertToken + ",detailedInfo=" + detailedInfo);
     auto activity = m_activity.lock();
     if (!activity) {
@@ -85,7 +91,7 @@ void AlertsHandler::alertCreated(const std::string &alertToken, const std::strin
     });
 }
 
-void AlertsHandler::alertDeleted(const std::string &alertToken) {
+void AlertsHandler::alertDeleted(const std::string& alertToken) {
     log(logger::LoggerHandler::Level::INFO, "alertDeleted:alertToken=" + alertToken);
     auto activity = m_activity.lock();
     if (!activity) {
@@ -100,7 +106,7 @@ void AlertsHandler::alertDeleted(const std::string &alertToken) {
 
 // private
 
-void AlertsHandler::log(logger::LoggerHandler::Level level, const std::string &message) {
+void AlertsHandler::log(logger::LoggerHandler::Level level, const std::string& message) {
     auto loggerHandler = m_loggerHandler.lock();
     if (!loggerHandler) {
         return;
@@ -126,26 +132,26 @@ void AlertsHandler::setupUI() {
     });
 
     // exit the active domain
-    activity->registerObserver(Event::onStopActive, [=](const std::string &) {
+    activity->registerObserver(Event::onStopActive, [=](const std::string&) {
         log(logger::LoggerHandler::Level::VERBOSE, "onStopActive");
         localStop();
         return true;
     });
 
     // localStop
-    activity->registerObserver(Event::onAlertsLocalStop, [=](const std::string &) {
+    activity->registerObserver(Event::onAlertsLocalStop, [=](const std::string&) {
         log(logger::LoggerHandler::Level::VERBOSE, "onAlertsLocalStop");
         localStop();
         return true;
     });
 
     // removeAllAlerts
-    activity->registerObserver(Event::onAlertsRemoveAllAlerts, [=](const std::string &) {
+    activity->registerObserver(Event::onAlertsRemoveAllAlerts, [=](const std::string&) {
         log(logger::LoggerHandler::Level::VERBOSE, "onAlertsRemoveAllAlerts");
         removeAllAlerts();
         return true;
     });
 }
 
-} // namespace alexa
-} // namespace sampleApp
+}  // namespace alexa
+}  // namespace sampleApp

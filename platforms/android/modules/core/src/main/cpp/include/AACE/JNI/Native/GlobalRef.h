@@ -23,125 +23,107 @@ namespace aace {
 namespace jni {
 namespace native {
 
-    template <class T>
-    class GlobalRef {
-    public:
-        GlobalRef() : m_globalRef( nullptr ) {
-        }
+template <class T>
+class GlobalRef {
+public:
+    GlobalRef() : m_globalRef(nullptr) {
+    }
 
-        GlobalRef( JNIEnv* env, T obj ) : m_globalRef( nullptr )
-        {
-            try
-            {
-                ThrowIfNull( obj, "invalidReferenceObect" );
-                m_globalRef = (T) env->NewGlobalRef( obj );
-                ThrowIfJavaEx( env, "newGlobalRefFailed" );
-            }
-            catch( const std::exception& ex ) {
-                AACE_JNI_ERROR("aace.jni.native.GlobalRef","GlobalRef",ex.what());
-            }
+    GlobalRef(JNIEnv* env, T obj) : m_globalRef(nullptr) {
+        try {
+            ThrowIfNull(obj, "invalidReferenceObect");
+            m_globalRef = (T)env->NewGlobalRef(obj);
+            ThrowIfJavaEx(env, "newGlobalRefFailed");
+        } catch (const std::exception& ex) {
+            AACE_JNI_ERROR("aace.jni.native.GlobalRef", "GlobalRef", ex.what());
         }
+    }
 
-        GlobalRef( T obj ) : m_globalRef( nullptr )
-        {
-            try_with_context
-            {
-                ThrowIfNull( obj, "invalidReferenceObect" );
-                m_globalRef = (T) env->NewGlobalRef( obj );
-                ThrowIfJavaEx( env, "newGlobalRefFailed" );
+    GlobalRef(T obj) : m_globalRef(nullptr) {
+        try_with_context {
+            ThrowIfNull(obj, "invalidReferenceObect");
+            m_globalRef = (T)env->NewGlobalRef(obj);
+            ThrowIfJavaEx(env, "newGlobalRefFailed");
+        }
+        catch_with_ex {
+            AACE_JNI_ERROR("aace.jni.native.GlobalRef", "GlobalRef", ex.what());
+        }
+    }
+
+    GlobalRef(const GlobalRef<T>& ref) : m_globalRef(nullptr) {
+        try_with_context {
+            ThrowIfNull(ref.m_globalRef, "invalidReferenceObect");
+            m_globalRef = (T)env->NewGlobalRef(ref.m_globalRef);
+            ThrowIfJavaEx(env, "newGlobalRefFailed");
+        }
+        catch_with_ex {
+            AACE_JNI_ERROR("aace.jni.native.GlobalRef", "GlobalRef", ex.what());
+        }
+    }
+
+    ~GlobalRef() {
+        reset();
+    }
+
+    void reset() {
+        if (m_globalRef != nullptr) {
+            try_with_context {
+                env->DeleteGlobalRef(m_globalRef);
+                ThrowIfJavaEx(env, "deleteGlobalRefFailed");
             }
             catch_with_ex {
-                AACE_JNI_ERROR("aace.jni.native.GlobalRef","GlobalRef",ex.what());
+                AACE_JNI_ERROR("aace.jni.native.GlobalRef", "reset", ex.what());
             }
+
+            m_globalRef = nullptr;
         }
+    }
 
-        GlobalRef( const GlobalRef<T>& ref ) : m_globalRef( nullptr )
-        {
-            try_with_context
-            {
-                ThrowIfNull( ref.m_globalRef, "invalidReferenceObect" );
-                m_globalRef = (T) env->NewGlobalRef( ref.m_globalRef );
-                ThrowIfJavaEx( env, "newGlobalRefFailed" );
-            }
-            catch_with_ex {
-                AACE_JNI_ERROR("aace.jni.native.GlobalRef","GlobalRef",ex.what());
-            }
-        }
+    T get() {
+        return m_globalRef;
+    }
 
-        ~GlobalRef() {
-            reset();
-        }
-
-        void reset()
-        {
-            if( m_globalRef != nullptr )
-            {
-                try_with_context
-                {
-                    env->DeleteGlobalRef( m_globalRef );
-                    ThrowIfJavaEx( env, "deleteGlobalRefFailed" );
-                }
-                catch_with_ex {
-                    AACE_JNI_ERROR("aace.jni.native.GlobalRef","reset",ex.what());
-                }
-
+    // assignment opperator
+    GlobalRef<T>& operator=(const GlobalRef<T>& ref) {
+        try_with_context {
+            if (ref.m_globalRef != nullptr) {
+                m_globalRef = (T)env->NewGlobalRef(ref.m_globalRef);
+                ThrowIfJavaEx(env, "newGlobalRefFailed");
+            } else {
                 m_globalRef = nullptr;
             }
         }
-
-        T get() {
-            return m_globalRef;
+        catch_with_ex {
+            AACE_JNI_ERROR("aace.jni.native.GlobalRef", "operator=", ex.what());
+            m_globalRef = nullptr;
         }
 
-        // assignment opperator
-        GlobalRef<T>& operator= (const GlobalRef<T> &ref)
-        {
-            try_with_context
-            {
-                if( ref.m_globalRef != nullptr )
-                {
-                    m_globalRef = (T) env->NewGlobalRef( ref.m_globalRef );
-                    ThrowIfJavaEx( env, "newGlobalRefFailed" );
-                }
-                else {
-                    m_globalRef = nullptr;
-                }
-            }
-            catch_with_ex {
-                AACE_JNI_ERROR("aace.jni.native.GlobalRef","operator=",ex.what());
+        return *this;
+    }
+
+    GlobalRef<T>& operator=(const T& ref) {
+        try_with_context {
+            if (ref != nullptr) {
+                m_globalRef = (T)env->NewGlobalRef(ref);
+                ThrowIfJavaEx(env, "newGlobalRefFailed");
+            } else {
                 m_globalRef = nullptr;
             }
-
-            return *this;
+        }
+        catch_with_ex {
+            AACE_JNI_ERROR("aace.jni.native.GlobalRef", "operator=", ex.what());
+            m_globalRef = nullptr;
         }
 
-        GlobalRef<T>& operator= (const T &ref)
-        {
-            try_with_context
-            {
-                if( ref != nullptr )
-                {
-                    m_globalRef = (T) env->NewGlobalRef( ref );
-                    ThrowIfJavaEx( env, "newGlobalRefFailed" );
-                }
-                else {
-                    m_globalRef = nullptr;
-                }
-            }
-            catch_with_ex {
-                AACE_JNI_ERROR("aace.jni.native.GlobalRef","operator=",ex.what());
-                m_globalRef = nullptr;
-            }
+        return *this;
+    }
 
-            return *this;
-        }
+private:
+    T m_globalRef;
+};
 
-    private:
-        T m_globalRef;
-    };
+}  // namespace native
+}  // namespace jni
+}  // namespace aace
 
-} // aace::jni::native
-} // aace::jni
-} // aace
-
-#endif // AACE_JNI_NATIVE_GLOBAL_REF_H
+#endif  // AACE_JNI_NATIVE_GLOBAL_REF_H

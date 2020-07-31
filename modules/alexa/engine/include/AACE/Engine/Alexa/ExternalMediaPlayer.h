@@ -49,7 +49,7 @@
 #include "ExternalMediaAdapterRegistrationInterface.h"
 #include "ExternalMediaPlayerInterface.h"
 #include "AuthorizedSender.h"
-// unused 
+// unused
 #include "ExternalMediaPlayerObserverInterface.h"
 
 namespace aace {
@@ -107,23 +107,23 @@ class ExternalMediaPlayer
         , public std::enable_shared_from_this<ExternalMediaPlayer> {
 public:
     // Map of adapter business names to their mediaPlayers.
-    using AdapterMediaPlayerMap =
-        std::unordered_map<std::string, std::shared_ptr<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface>>;
+    using AdapterMediaPlayerMap = std::unordered_map<
+        std::string,
+        std::shared_ptr<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface>>;
 
     // Map of adapter business names to their speakers.
     using AdapterSpeakerMap =
         std::unordered_map<std::string, std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface>>;
 
     // Signature of functions to create an ExternalMediaAdapter.
-    using AdapterCreateFunction =
-        std::shared_ptr<ExternalMediaAdapterInterface> (*)(
-            std::shared_ptr<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface> mediaPlayer,
-            std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface> speaker,
-            std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
-            std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-            std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
-            std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
-            std::shared_ptr<ExternalMediaPlayerInterface> externalMediaPlayer);
+    using AdapterCreateFunction = std::shared_ptr<ExternalMediaAdapterInterface> (*)(
+        std::shared_ptr<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface> mediaPlayer,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface> speaker,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
+        std::shared_ptr<ExternalMediaPlayerInterface> externalMediaPlayer);
 
     // Map of adapter business names to their creation method.
     using AdapterCreationMap = std::unordered_map<std::string, AdapterCreateFunction>;
@@ -161,13 +161,19 @@ public:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter,
-        std::shared_ptr<aace::engine::alexa::ExternalMediaAdapterRegistrationInterface> externalMediaAdapterRegistration);
+        std::shared_ptr<aace::engine::alexa::ExternalMediaAdapterRegistrationInterface>
+            externalMediaAdapterRegistration);
 
     // adapterHandler specific code
     void addAdapterHandler(std::shared_ptr<ExternalMediaAdapterHandlerInterface> adapterHandler);
     void removeAdapterHandler(std::shared_ptr<ExternalMediaAdapterHandlerInterface> adapterHandler);
-    void executeOnFocusChanged(alexaClientSDK::avsCommon::avs::FocusState newFocus);
-    void onFocusChanged(alexaClientSDK::avsCommon::avs::FocusState newFocus) override;
+
+    void executeOnFocusChanged(
+        alexaClientSDK::avsCommon::avs::FocusState newFocus,
+        alexaClientSDK::avsCommon::avs::MixingBehavior behavior);
+    void onFocusChanged(
+        alexaClientSDK::avsCommon::avs::FocusState newFocus,
+        alexaClientSDK::avsCommon::avs::MixingBehavior behavior) override;
 
     /// @name ContextRequesterInterface Functions
     /// @{
@@ -177,8 +183,9 @@ public:
 
     /// @name StateProviderInterface Functions
     /// @{
-    void provideState(const alexaClientSDK::avsCommon::avs::NamespaceAndName& stateProviderName, unsigned int stateRequestToken)
-        override;
+    void provideState(
+        const alexaClientSDK::avsCommon::avs::NamespaceAndName& stateProviderName,
+        unsigned int stateRequestToken) override;
     /// @}
 
     /// @name CapabilityAgent/DirectiveHandlerInterface Functions
@@ -217,13 +224,14 @@ public:
 
     /// @name CapabilityConfigurationInterface Functions
     /// @{
-    std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>> getCapabilityConfigurations() override;
+    std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>>
+    getCapabilityConfigurations() override;
     /// @}
 
     /// @name RenderPlayerInfoCardsProviderInterface Functions
     /// @{
-    void setObserver(
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsObserverInterface> observer) override;
+    void setObserver(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsObserverInterface>
+                         observer) override;
     /// @}
 
     /// @name MediaPropertiesInterface Functions
@@ -236,18 +244,14 @@ public:
      *
      * @param observer The observer to add
      */
-    void addObserver(
-        const std::shared_ptr<aace::engine::alexa::ExternalMediaPlayerObserverInterface>
-            observer);
+    void addObserver(const std::shared_ptr<aace::engine::alexa::ExternalMediaPlayerObserverInterface> observer);
 
     /**
      * Removes an observer from the list of active watchers
      *
      *@param observer The observer to remove
      */
-    void removeObserver(
-        const std::shared_ptr<aace::engine::alexa::ExternalMediaPlayerObserverInterface>
-            observer);
+    void removeObserver(const std::shared_ptr<aace::engine::alexa::ExternalMediaPlayerObserverInterface> observer);
 
     /**
      * Iniitalize the ExternalMediaAdapter.
@@ -288,7 +292,8 @@ private:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter,
-        std::shared_ptr<aace::engine::alexa::ExternalMediaAdapterRegistrationInterface> externalMediaAdapterRegistration);
+        std::shared_ptr<aace::engine::alexa::ExternalMediaAdapterRegistrationInterface>
+            externalMediaAdapterRegistration);
 
     /**
      * This method returns the ExternalMediaPlayer session state registered in the ExternalMediaPlayer namespace.
@@ -384,7 +389,8 @@ private:
     void sendExceptionEncounteredAndReportFailed(
         std::shared_ptr<DirectiveInfo> info,
         const std::string& message,
-        alexaClientSDK::avsCommon::avs::ExceptionErrorType type = alexaClientSDK::avsCommon::avs::ExceptionErrorType::INTERNAL_ERROR);
+        alexaClientSDK::avsCommon::avs::ExceptionErrorType type =
+            alexaClientSDK::avsCommon::avs::ExceptionErrorType::INTERNAL_ERROR);
 
     /**
      * @name Executor Thread Functions
@@ -430,9 +436,7 @@ private:
      * @param The type of the request. Will be NONE for the
      *        handleAuthorizeDiscoveredPlayers case.
      */
-    void handleAuthorizeDiscoveredPlayers(
-        std::shared_ptr<DirectiveInfo> info,
-        RequestType request);
+    void handleAuthorizeDiscoveredPlayers(std::shared_ptr<DirectiveInfo> info, RequestType request);
 
     /**
      * Handler for login directive.
@@ -440,9 +444,7 @@ private:
      * @param info The DirectiveInfo to be processed.
      * @param The type of the request. Will be LOGIN for the handleLogin case.
      */
-    void handleLogin(
-        std::shared_ptr<DirectiveInfo> info,
-        RequestType request);
+    void handleLogin(std::shared_ptr<DirectiveInfo> info, RequestType request);
 
     /**
      * Handler for logout directive.
@@ -450,9 +452,7 @@ private:
      * @param info The DirectiveInfo to be processed.
      * @param The type of the request. Will be LOGOUT for the handleLogout case.
      */
-    void handleLogout(
-        std::shared_ptr<DirectiveInfo> info,
-        RequestType request);
+    void handleLogout(std::shared_ptr<DirectiveInfo> info, RequestType request);
 
     /**
      * Handler for play directive.
@@ -460,9 +460,7 @@ private:
      * @param info The DirectiveInfo to be processed.
      * @param The type of the request. Will be PLAY for the handlePlay case.
      */
-    void handlePlay(
-        std::shared_ptr<DirectiveInfo> info,
-        RequestType request);
+    void handlePlay(std::shared_ptr<DirectiveInfo> info, RequestType request);
 
     /**
      * Handler for play control directive.
@@ -470,9 +468,7 @@ private:
      * @param info The DirectiveInfo to be processed.
      * @param The type of the request. Can be NEXT/PREVIOUS/PAUSE/RESUME... for the handlePlayControl case.
      */
-    void handlePlayControl(
-        std::shared_ptr<DirectiveInfo> info,
-        RequestType request);
+    void handlePlayControl(std::shared_ptr<DirectiveInfo> info, RequestType request);
 
     /**
      * Handler for SetSeekControl  directive.
@@ -480,9 +476,7 @@ private:
      * @param info The DirectiveInfo to be processed.
      * @param The type of the request. RequestType will be SEEK.
      */
-    void handleSeek(
-        std::shared_ptr<DirectiveInfo> info,
-        RequestType request);
+    void handleSeek(std::shared_ptr<DirectiveInfo> info, RequestType request);
 
     /**
      * Handler for AdjustSeekControl  directive.
@@ -490,9 +484,7 @@ private:
      * @param info The DirectiveInfo to be processed.
      * @param The type of the request. RequestType will be ADJUST_SEEK.
      */
-    void handleAdjustSeek(
-        std::shared_ptr<DirectiveInfo> info,
-        RequestType request);
+    void handleAdjustSeek(std::shared_ptr<DirectiveInfo> info, RequestType request);
 
     /**
      * Calls each observer and provides the ObservableSessionProperties for this adapter
@@ -533,8 +525,7 @@ private:
      *
      * @return An instance of the adapter if found, else a nullptr.
      */
-    std::shared_ptr<ExternalMediaAdapterInterface> getAdapterByPlayerId(
-        const std::string& playerId);
+    std::shared_ptr<ExternalMediaAdapterInterface> getAdapterByPlayerId(const std::string& playerId);
 
     /**
      * Helper method to get an adapter handler by playerId.
@@ -543,8 +534,7 @@ private:
      *
      * @return An instance of the adapter handler if found, else a nullptr.
      */
-    std::shared_ptr<ExternalMediaAdapterHandlerInterface> getAdapterHandlerByPlayerId(
-        const std::string& playerId);
+    std::shared_ptr<ExternalMediaAdapterHandlerInterface> getAdapterHandlerByPlayerId(const std::string& playerId);
 
     /**
      * Helper method to get an adapter by localPlayerId.
@@ -553,8 +543,7 @@ private:
      *
      * @return An instance of the adapter if found, else a nullptr.
      */
-    std::shared_ptr<ExternalMediaAdapterInterface>
-    getAdapterByLocalPlayerId(const std::string& playerId);
+    std::shared_ptr<ExternalMediaAdapterInterface> getAdapterByLocalPlayerId(const std::string& playerId);
 
     /**
      * Helper method to test if the player id belongs to registered adapter handler.
@@ -590,8 +579,7 @@ private:
     std::shared_ptr<aace::engine::alexa::ExternalMediaAdapterRegistrationInterface> m_externalMediaAdapterRegistration;
 
     /// The @c m_adapters Map of @c localPlayerId (business names) to adapters.
-    std::map<std::string, std::shared_ptr<ExternalMediaAdapterInterface>>
-        m_adapters;
+    std::map<std::string, std::shared_ptr<ExternalMediaAdapterInterface>> m_adapters;
 
     /// Protects access to @c m_authorizedAdapters.
     std::mutex m_authorizedMutex;
@@ -628,14 +616,13 @@ private:
     std::mutex m_observersMutex;
 
     /// The set of observers watching session and playback state
-    std::unordered_set<
-        std::shared_ptr<aace::engine::alexa::ExternalMediaPlayerObserverInterface>>
-        m_observers;
+    std::unordered_set<std::shared_ptr<aace::engine::alexa::ExternalMediaPlayerObserverInterface>> m_observers;
 
     /// Observer for changes related to RenderPlayerInfoCards.
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsObserverInterface> m_renderPlayerObserver;
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsObserverInterface>
+        m_renderPlayerObserver;
 
-    // adapterHandler specific code    
+    // adapterHandler specific code
     std::unordered_set<std::shared_ptr<ExternalMediaAdapterHandlerInterface>> m_adapterHandlers;
 
     /// The @c FocusManager used to manage usage of the channel.
@@ -674,9 +661,7 @@ private:
     alexaClientSDK::avsCommon::utils::threading::Executor m_executor;
 
     /// typedef of the function pointer to handle AVS directives.
-    typedef void (ExternalMediaPlayer::*DirectiveHandler)(
-        std::shared_ptr<DirectiveInfo> info,
-        RequestType request);
+    typedef void (ExternalMediaPlayer::*DirectiveHandler)(std::shared_ptr<DirectiveInfo> info, RequestType request);
 
     /// The singleton map from a directive to its handler.
     static std::unordered_map<
@@ -685,7 +670,14 @@ private:
         m_directiveToHandlerMap;
 
     /// Set of capability configurations that will get published using the Capabilities API
-    std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>> m_capabilityConfigurations;
+    std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>>
+        m_capabilityConfigurations;
+
+    /// Current ContentType Rendering in the AudioPlayer
+    alexaClientSDK::avsCommon::avs::ContentType m_currentMixability;
+
+    /// Current MixingBehavior for the AudioPlayer.
+    alexaClientSDK::avsCommon::avs::MixingBehavior m_mixingBehavior;
 };
 
 }  // namespace alexa

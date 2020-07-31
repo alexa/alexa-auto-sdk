@@ -48,18 +48,16 @@ protected:
     CarControlHandler(std::weak_ptr<Activity> activity, std::weak_ptr<logger::LoggerHandler> loggerHandler);
 
 public:
-    template <typename... Args> static auto create(Args &&... args) -> std::shared_ptr<CarControlHandler> {
+    template <typename... Args>
+    static auto create(Args&&... args) -> std::shared_ptr<CarControlHandler> {
         return std::shared_ptr<CarControlHandler>(new CarControlHandler(args...));
     }
     auto getActivity() -> std::weak_ptr<Activity>;
     auto getLoggerHandler() -> std::weak_ptr<logger::LoggerHandler>;
 
-    enum class ConfigType {
-        LVC,
-        CAR
-    };
+    enum class ConfigType { LVC, CAR };
 
-// Car Control Platform Interface
+    // Car Control Platform Interface
 public:
     // PowerController
     bool turnPowerControllerOn(const std::string& endpointId) override;
@@ -73,13 +71,19 @@ public:
 
     // RangeController
     bool setRangeControllerValue(const std::string& endpointId, const std::string& controllerId, double value) override;
-    bool adjustRangeControllerValue(const std::string& endpointId, const std::string& controllerId, double delta) override;
-    bool getRangeControllerValue(const std::string& endpointId, const std::string& controllerId, double& value) override;
+    bool adjustRangeControllerValue(const std::string& endpointId, const std::string& controllerId, double delta)
+        override;
+    bool getRangeControllerValue(const std::string& endpointId, const std::string& controllerId, double& value)
+        override;
 
     // ModeController
-    bool setModeControllerValue(const std::string& endpointId, const std::string& controllerId, const std::string& value) override;
+    bool setModeControllerValue(
+        const std::string& endpointId,
+        const std::string& controllerId,
+        const std::string& value) override;
     bool adjustModeControllerValue(const std::string& endpointId, const std::string& controllerId, int delta) override;
-    bool getModeControllerValue(const std::string& endpointId, const std::string& controllerId, std::string& value) override;
+    bool getModeControllerValue(const std::string& endpointId, const std::string& controllerId, std::string& value)
+        override;
 
 public:
     static bool checkConfiguration(const std::vector<json>& jsons, ConfigType type);
@@ -87,12 +91,12 @@ public:
 private:
     std::weak_ptr<View> m_console{};
 
-    auto log(logger::LoggerHandler::Level level, const std::string &message) -> void;
+    auto log(logger::LoggerHandler::Level level, const std::string& message) -> void;
     auto setupUI() -> void;
     auto showMessage(std::string) -> void;
 };
 
-} // namespace carControl
-} // namespace sampleApp
+}  // namespace carControl
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_CARCONTROL_CARCONTROLHANDLER_H
+#endif  // SAMPLEAPP_CARCONTROL_CARCONTROLHANDLER_H

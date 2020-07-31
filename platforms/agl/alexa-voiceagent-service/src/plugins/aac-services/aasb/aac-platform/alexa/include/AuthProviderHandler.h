@@ -40,7 +40,7 @@ public:
     /// @{
     std::string getAuthToken() override;
     AuthState getAuthState() override;
-    void authFailure( const std::string& token ) override;
+    void authFailure(const std::string& token) override;
     /// @}
 
     void onReceivedEvent(const std::string& action, const std::string& payload);

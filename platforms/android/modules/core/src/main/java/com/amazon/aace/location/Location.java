@@ -18,8 +18,7 @@ package com.amazon.aace.location;
 /**
  * Represents a location object and provides accessor methods to its data
  */
-final public class Location
-{
+final public class Location {
     private double m_latitude;
     private double m_longitude;
     private double m_altitude;
@@ -36,7 +35,7 @@ final public class Location
      * @param  altitude A location altitude in meters
      * @param  accuracy A location accuracy in meters
      */
-    public Location( double latitude, double longitude, double altitude, double accuracy ) {
+    public Location(double latitude, double longitude, double altitude, double accuracy) {
         m_latitude = latitude;
         m_longitude = longitude;
         m_altitude = altitude;
@@ -50,8 +49,8 @@ final public class Location
      * @param  longitude A location longitude
      * @param  altitude A location altitude in meters
      */
-    public Location( double latitude, double longitude, double altitude ) {
-        this( latitude, longitude, altitude, UNDEFINED );
+    public Location(double latitude, double longitude, double altitude) {
+        this(latitude, longitude, altitude, UNDEFINED);
     }
 
     /**
@@ -60,8 +59,8 @@ final public class Location
      * @param  latitude A location latitude
      * @param  longitude A location longitude
      */
-    public Location( double latitude, double longitude ) {
-        this( latitude, longitude, UNDEFINED, UNDEFINED );
+    public Location(double latitude, double longitude) {
+        this(latitude, longitude, UNDEFINED, UNDEFINED);
     }
 
     /**
@@ -100,5 +99,3 @@ final public class Location
         return m_accuracy;
     }
 }
-
-

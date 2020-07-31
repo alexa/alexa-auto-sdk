@@ -23,62 +23,58 @@ namespace aace {
 namespace jni {
 namespace audio {
 
-    //
-    // AudioInputProviderHandler
-    //
+//
+// AudioInputProviderHandler
+//
 
-    class AudioInputProviderHandler : public aace::audio::AudioInputProvider {
-    public:
-        AudioInputProviderHandler( jobject obj );
+class AudioInputProviderHandler : public aace::audio::AudioInputProvider {
+public:
+    AudioInputProviderHandler(jobject obj);
 
-        // aace::audio::AudioInputProvider
-        std::shared_ptr<aace::audio::AudioInput> openChannel( const std::string& name, AudioInputType type ) override;
+    // aace::audio::AudioInputProvider
+    std::shared_ptr<aace::audio::AudioInput> openChannel(const std::string& name, AudioInputType type) override;
 
-    private:
-        JObject m_obj;
-    };
+private:
+    JObject m_obj;
+};
 
-    //
-    // AudioInputProviderBinder
-    //
+//
+// AudioInputProviderBinder
+//
 
-    class AudioInputProviderBinder : public aace::jni::core::PlatformInterfaceBinder {
-    public:
-        AudioInputProviderBinder( jobject obj );
+class AudioInputProviderBinder : public aace::jni::core::PlatformInterfaceBinder {
+public:
+    AudioInputProviderBinder(jobject obj);
 
-        std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
-            return m_audioInputProviderHandler;
-        }
+    std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
+        return m_audioInputProviderHandler;
+    }
 
-    private:
-        std::shared_ptr<AudioInputProviderHandler> m_audioInputProviderHandler;
-    };
+private:
+    std::shared_ptr<AudioInputProviderHandler> m_audioInputProviderHandler;
+};
 
-    //
-    // JAudioInputType
-    //
+//
+// JAudioInputType
+//
 
-    class JAudioInputTypeConfig : public EnumConfiguration<AudioInputProviderHandler::AudioInputType> {
-    public:
-        using T = AudioInputProviderHandler::AudioInputType;
+class JAudioInputTypeConfig : public EnumConfiguration<AudioInputProviderHandler::AudioInputType> {
+public:
+    using T = AudioInputProviderHandler::AudioInputType;
 
-        const char* getClassName() override {
-            return "com/amazon/aace/audio/AudioInputProvider$AudioInputType";
-        }
+    const char* getClassName() override {
+        return "com/amazon/aace/audio/AudioInputProvider$AudioInputType";
+    }
 
-        std::vector<std::pair<T,std::string>> getConfiguration() override {
-            return {
-                {T::VOICE,"VOICE"},
-                {T::COMMUNICATION,"COMMUNICATION"},
-                {T::LOOPBACK,"LOOPBACK"}
-            };
-        }
-    };
+    std::vector<std::pair<T, std::string>> getConfiguration() override {
+        return {{T::VOICE, "VOICE"}, {T::COMMUNICATION, "COMMUNICATION"}, {T::LOOPBACK, "LOOPBACK"}};
+    }
+};
 
-    using JAudioInputType = JEnum<AudioInputProviderHandler::AudioInputType,JAudioInputTypeConfig>;
+using JAudioInputType = JEnum<AudioInputProviderHandler::AudioInputType, JAudioInputTypeConfig>;
 
-} // aace::jni::audio
-} // aace::jni
-} // aace
+}  // namespace audio
+}  // namespace jni
+}  // namespace aace
 
-#endif // AACE_JNI_AUDIO_AUDIO_INPUT_PROVIDER_BINDER_H
+#endif  // AACE_JNI_AUDIO_AUDIO_INPUT_PROVIDER_BINDER_H

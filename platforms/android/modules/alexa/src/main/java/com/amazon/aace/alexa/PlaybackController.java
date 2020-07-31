@@ -27,16 +27,13 @@ import com.amazon.aace.core.PlatformInterface;
  *
  * @sa AudioPlayer
  */
-abstract public class PlaybackController extends PlatformInterface
-{
-    public PlaybackController() {
-    }
+abstract public class PlaybackController extends PlatformInterface {
+    public PlaybackController() {}
 
     /**
      * Describes the playback controller button types
      */
-    public enum PlaybackButton
-    {
+    public enum PlaybackButton {
         /**
          * 'Play' button.
          * @hideinitializer
@@ -76,7 +73,7 @@ abstract public class PlaybackController extends PlatformInterface
         /**
          * @internal
          */
-        private PlaybackButton( String name ) {
+        private PlaybackButton(String name) {
             m_name = name;
         }
 
@@ -91,8 +88,7 @@ abstract public class PlaybackController extends PlatformInterface
     /**
      * Describes the playback controller toggle types
      */
-    public enum PlaybackToggle
-    {
+    public enum PlaybackToggle {
         /**
          * 'Shuffle' toggle.
          * @hideinitializer
@@ -127,7 +123,7 @@ abstract public class PlaybackController extends PlatformInterface
         /**
          * @internal
          */
-        private PlaybackToggle( String name ) {
+        private PlaybackToggle(String name) {
             m_name = name;
         }
 
@@ -146,7 +142,7 @@ abstract public class PlaybackController extends PlatformInterface
      * @param  button The playback button type
      */
     public final void buttonPressed(PlaybackButton button) {
-        buttonPressed( getNativeRef(), button );
+        buttonPressed(getNativeRef(), button);
     }
 
     /**
@@ -157,7 +153,7 @@ abstract public class PlaybackController extends PlatformInterface
      * @param  action The playback toggle action
      */
     public final void togglePressed(PlaybackToggle toggle, boolean action) {
-        togglePressed( getNativeRef(), toggle, action );
+        togglePressed(getNativeRef(), toggle, action);
     }
 
     // NativeRef implementation
@@ -165,15 +161,13 @@ abstract public class PlaybackController extends PlatformInterface
         return createBinder();
     }
 
-    final protected void disposeNativeRef( long nativeRef ) {
-        disposeBinder( nativeRef );
+    final protected void disposeNativeRef(long nativeRef) {
+        disposeBinder(nativeRef);
     }
 
     // Native Engine JNI methods
     private native long createBinder();
-    private native void disposeBinder( long nativeRef );
-    private native void buttonPressed( long nativeObject, PlaybackButton button );
-    private native void togglePressed( long nativeObject, PlaybackToggle toggle, boolean action );
+    private native void disposeBinder(long nativeRef);
+    private native void buttonPressed(long nativeObject, PlaybackButton button);
+    private native void togglePressed(long nativeObject, PlaybackToggle toggle, boolean action);
 }
-
-

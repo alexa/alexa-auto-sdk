@@ -19,35 +19,30 @@
 static XAObjectItf engine;
 XAEngineItf engine_itf;
 
-static bool omxal_initialize()
-{
-	XAresult r;
-	XAEngineOption engine_options[] = {
-		(XAuint32) XA_ENGINEOPTION_THREADSAFE,
-		(XAuint32) XA_BOOLEAN_TRUE
-	};
+static bool omxal_initialize() {
+    XAresult r;
+    XAEngineOption engine_options[] = {(XAuint32)XA_ENGINEOPTION_THREADSAFE, (XAuint32)XA_BOOLEAN_TRUE};
 
-	/* Create and realize Engine */
-	r = xaCreateEngine(&engine, 1, engine_options, 0, NULL, NULL);
-	bail_if_error(r);
-	r = (*engine)->Realize(engine, XA_BOOLEAN_FALSE);
-	bail_if_error(r);
+    /* Create and realize Engine */
+    r = xaCreateEngine(&engine, 1, engine_options, 0, NULL, NULL);
+    bail_if_error(r);
+    r = (*engine)->Realize(engine, XA_BOOLEAN_FALSE);
+    bail_if_error(r);
 
-	/* Get interfaces */
-	r = (*engine)->GetInterface(engine, XA_IID_ENGINE, (void *) &engine_itf);
-	bail_if_error(r);
+    /* Get interfaces */
+    r = (*engine)->GetInterface(engine, XA_IID_ENGINE, (void*)&engine_itf);
+    bail_if_error(r);
 
-	return true;
+    return true;
 bail:
-	debug("Status %d", r);
-	return false;
+    debug("Status %d", r);
+    return false;
 }
 
-static void omxal_deinitialize()
-{
-	if (engine) {
-		(*(engine))->Destroy(engine);
-	}
+static void omxal_deinitialize() {
+    if (engine) {
+        (*(engine))->Destroy(engine);
+    }
 }
 
 extern const aal_player_ops_t omxal_player_ops;

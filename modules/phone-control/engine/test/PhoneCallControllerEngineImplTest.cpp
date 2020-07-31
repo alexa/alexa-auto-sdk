@@ -71,6 +71,21 @@ public:
     MOCK_METHOD1( onAuthFailure, void(const std::string& token) );
 };
 
+class DummyAlexaEndpointInterface : public aace::engine::alexa::AlexaEndpointInterface {
+public:
+    std::string getAVSGateway() override {
+        // Not called.
+        return "";
+    }
+    std::string getLWAEndpoint() override {
+        // Not called.
+        return "";
+    }
+    std::string getACMSEndpoint() override {
+        return "https://alexa-comms-mobile-service-na.amazon.com";
+    }
+};
+
 class PhoneCallControllerEngineImplTest : public ::testing::Test {
 public:
     void SetUp() override {
@@ -85,6 +100,7 @@ public:
         m_alexaMockFactory = m_alexaMockFactory = alexa::AlexaTestHelper::createAlexaMockComponentFactory();
         m_mockAuthDelegate = std::make_shared<testing::StrictMock<MockAuthDelegateInterface>>();
         m_deviceInfo = alexaClientSDK::avsCommon::utils::DeviceInfo::create(alexaClientSDK::avsCommon::utils::configuration::ConfigurationNode::getRoot());
+        m_alexaEndpointInterface = std::make_shared<DummyAlexaEndpointInterface>();
 
         EXPECT_CALL(*m_mockAuthDelegate, addAuthObserver(testing::_)).WillOnce(testing::Return());
         EXPECT_CALL(*m_mockAuthDelegate, removeAuthObserver(testing::_)).WillOnce(testing::Return());
@@ -98,7 +114,8 @@ public:
             m_mockMessageSender,
             m_mockFocusManager,
             m_mockAuthDelegate,
-            m_deviceInfo
+            m_deviceInfo,
+            m_alexaEndpointInterface
         );
     }
     void TearDown() override {
@@ -117,6 +134,7 @@ public:
     std::shared_ptr<alexa::AlexaMockComponentFactory> m_alexaMockFactory;
     std::shared_ptr<testing::StrictMock<MockAuthDelegateInterface>> m_mockAuthDelegate;
     std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> m_deviceInfo;
+    std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> m_alexaEndpointInterface;
 };
 
 TEST_F( PhoneCallControllerEngineImplTest, create ) {
@@ -126,56 +144,56 @@ TEST_F( PhoneCallControllerEngineImplTest, create ) {
 TEST_F( PhoneCallControllerEngineImplTest, createWithNullPlatform ) {
     std::shared_ptr<aace::engine::phoneCallController::PhoneCallControllerEngineImpl> engineImpl; 
     engineImpl = aace::engine::phoneCallController::PhoneCallControllerEngineImpl::create(
-        nullptr, m_alexaMockFactory->getEndpointBuilderMock(), m_mockContextManager, m_mockExceptionSender, m_mockMessageSender, m_mockFocusManager, m_mockAuthDelegate, m_deviceInfo );
+        nullptr, m_alexaMockFactory->getEndpointBuilderMock(), m_mockContextManager, m_mockExceptionSender, m_mockMessageSender, m_mockFocusManager, m_mockAuthDelegate, m_deviceInfo, m_alexaEndpointInterface );
     EXPECT_EQ(nullptr, engineImpl);
 }
 
 TEST_F( PhoneCallControllerEngineImplTest, createWithNullCapabilitiesDelegate ) {
     std::shared_ptr<aace::engine::phoneCallController::PhoneCallControllerEngineImpl> engineImpl;
     engineImpl = aace::engine::phoneCallController::PhoneCallControllerEngineImpl::create(
-        m_mockPlatformInterface, nullptr, m_mockContextManager, m_mockExceptionSender, m_mockMessageSender, m_mockFocusManager, m_mockAuthDelegate, m_deviceInfo );
+        m_mockPlatformInterface, nullptr, m_mockContextManager, m_mockExceptionSender, m_mockMessageSender, m_mockFocusManager, m_mockAuthDelegate, m_deviceInfo, m_alexaEndpointInterface );
     EXPECT_EQ(nullptr, engineImpl);
 }
 
 TEST_F( PhoneCallControllerEngineImplTest, createWithNullContextManager ) {
     std::shared_ptr<aace::engine::phoneCallController::PhoneCallControllerEngineImpl> engineImpl;
     engineImpl = aace::engine::phoneCallController::PhoneCallControllerEngineImpl::create(
-        m_mockPlatformInterface, m_alexaMockFactory->getEndpointBuilderMock(), nullptr, m_mockExceptionSender, m_mockMessageSender, m_mockFocusManager, m_mockAuthDelegate, m_deviceInfo );
+        m_mockPlatformInterface, m_alexaMockFactory->getEndpointBuilderMock(), nullptr, m_mockExceptionSender, m_mockMessageSender, m_mockFocusManager, m_mockAuthDelegate, m_deviceInfo, m_alexaEndpointInterface );
     EXPECT_EQ(nullptr, engineImpl);
 }
 
 TEST_F( PhoneCallControllerEngineImplTest, createWithNullExceptionSender ) {
     std::shared_ptr<aace::engine::phoneCallController::PhoneCallControllerEngineImpl> engineImpl;
     engineImpl = aace::engine::phoneCallController::PhoneCallControllerEngineImpl::create(
-        m_mockPlatformInterface, m_alexaMockFactory->getEndpointBuilderMock(), m_mockContextManager, nullptr, m_mockMessageSender, m_mockFocusManager, m_mockAuthDelegate, m_deviceInfo );
+        m_mockPlatformInterface, m_alexaMockFactory->getEndpointBuilderMock(), m_mockContextManager, nullptr, m_mockMessageSender, m_mockFocusManager, m_mockAuthDelegate, m_deviceInfo, m_alexaEndpointInterface );
     EXPECT_EQ(nullptr, engineImpl);
 }
 
 TEST_F( PhoneCallControllerEngineImplTest, createWithNullMessageSender ) {
     std::shared_ptr<aace::engine::phoneCallController::PhoneCallControllerEngineImpl> engineImpl;
     engineImpl = aace::engine::phoneCallController::PhoneCallControllerEngineImpl::create(
-        m_mockPlatformInterface, m_alexaMockFactory->getEndpointBuilderMock(), m_mockContextManager, m_mockExceptionSender, nullptr, m_mockFocusManager, m_mockAuthDelegate, m_deviceInfo );
+        m_mockPlatformInterface, m_alexaMockFactory->getEndpointBuilderMock(), m_mockContextManager, m_mockExceptionSender, nullptr, m_mockFocusManager, m_mockAuthDelegate, m_deviceInfo, m_alexaEndpointInterface );
     EXPECT_EQ(nullptr, engineImpl);
 }
 
 TEST_F( PhoneCallControllerEngineImplTest, createWithNullFocusManager ) {
     std::shared_ptr<aace::engine::phoneCallController::PhoneCallControllerEngineImpl> engineImpl;
     engineImpl = aace::engine::phoneCallController::PhoneCallControllerEngineImpl::create(
-        m_mockPlatformInterface, m_alexaMockFactory->getEndpointBuilderMock(), m_mockContextManager, m_mockExceptionSender, m_mockMessageSender, nullptr, m_mockAuthDelegate, m_deviceInfo );
+        m_mockPlatformInterface, m_alexaMockFactory->getEndpointBuilderMock(), m_mockContextManager, m_mockExceptionSender, m_mockMessageSender, nullptr, m_mockAuthDelegate, m_deviceInfo, m_alexaEndpointInterface );
     EXPECT_EQ(nullptr, engineImpl);
 }
 
 TEST_F( PhoneCallControllerEngineImplTest, createWithNullAuthDelegate ) {
     std::shared_ptr<aace::engine::phoneCallController::PhoneCallControllerEngineImpl> engineImpl;
     engineImpl = aace::engine::phoneCallController::PhoneCallControllerEngineImpl::create(
-        m_mockPlatformInterface, m_alexaMockFactory->getEndpointBuilderMock(), m_mockContextManager, m_mockExceptionSender, m_mockMessageSender, m_mockFocusManager, nullptr, m_deviceInfo );
+        m_mockPlatformInterface, m_alexaMockFactory->getEndpointBuilderMock(), m_mockContextManager, m_mockExceptionSender, m_mockMessageSender, m_mockFocusManager, nullptr, m_deviceInfo, m_alexaEndpointInterface );
     EXPECT_EQ(nullptr, engineImpl);
 }
 
 TEST_F( PhoneCallControllerEngineImplTest, createWithNullDeviceInfo ) {
     std::shared_ptr<aace::engine::phoneCallController::PhoneCallControllerEngineImpl> engineImpl;
     engineImpl = aace::engine::phoneCallController::PhoneCallControllerEngineImpl::create(
-        m_mockPlatformInterface, m_alexaMockFactory->getEndpointBuilderMock(), m_mockContextManager, m_mockExceptionSender, m_mockMessageSender, m_mockFocusManager, m_mockAuthDelegate, nullptr );
+        m_mockPlatformInterface, m_alexaMockFactory->getEndpointBuilderMock(), m_mockContextManager, m_mockExceptionSender, m_mockMessageSender, m_mockFocusManager, m_mockAuthDelegate, nullptr, m_alexaEndpointInterface );
     EXPECT_EQ(nullptr, engineImpl);
 }
 

@@ -34,64 +34,58 @@ static const std::string TAG("aace.metrics.MetricsEngineService");
 // register the service
 REGISTER_SERVICE(MetricsEngineService);
 
-MetricsEngineService::MetricsEngineService( const aace::engine::core::ServiceDescription& description ) : aace::engine::core::EngineService( description ) {
+MetricsEngineService::MetricsEngineService(const aace::engine::core::ServiceDescription& description) :
+        aace::engine::core::EngineService(description) {
 }
 
-bool MetricsEngineService::shutdown()
-{
-    if( m_metricsUploaderEngineImpl != nullptr )
-    {
+bool MetricsEngineService::shutdown() {
+    if (m_metricsUploaderEngineImpl != nullptr) {
         // get the logger service interface
-        auto loggerServiceInterface = getContext()->getServiceInterface<aace::engine::logger::LoggerServiceInterface>( "aace.logger" );
-        ThrowIfNull( loggerServiceInterface, "invalidLoggerServiceInterface" );
+        auto loggerServiceInterface =
+            getContext()->getServiceInterface<aace::engine::logger::LoggerServiceInterface>("aace.logger");
+        ThrowIfNull(loggerServiceInterface, "invalidLoggerServiceInterface");
 
         // remove the metrics uploader from the logger
-        loggerServiceInterface->removeSink( m_metricsUploaderEngineImpl->getId() );
+        loggerServiceInterface->removeSink(m_metricsUploaderEngineImpl->getId());
     }
-    
+
     return true;
 }
 
-bool MetricsEngineService::registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface )
-{
-    try
-    {
-        ReturnIf( registerPlatformInterfaceType<aace::metrics::MetricsUploader>( platformInterface ), true );
+bool MetricsEngineService::registerPlatformInterface(std::shared_ptr<aace::core::PlatformInterface> platformInterface) {
+    try {
+        ReturnIf(registerPlatformInterfaceType<aace::metrics::MetricsUploader>(platformInterface), true);
         return false;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"registerPlatformInterface").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "registerPlatformInterface").d("reason", ex.what()));
         return false;
     }
 }
 
-bool MetricsEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::metrics::MetricsUploader> metricsUploader )
-{
-    try
-    {
-        ThrowIfNotNull( m_metricsUploaderEngineImpl, "platformInterfaceAlreadyRegistered" );
-        
+bool MetricsEngineService::registerPlatformInterfaceType(
+    std::shared_ptr<aace::metrics::MetricsUploader> metricsUploader) {
+    try {
+        ThrowIfNotNull(m_metricsUploaderEngineImpl, "platformInterfaceAlreadyRegistered");
+
         // get the logger service interface
-        auto loggerServiceInterface = getContext()->getServiceInterface<aace::engine::logger::LoggerServiceInterface>( "aace.logger" );
-        ThrowIfNull( loggerServiceInterface, "invalidLoggerServiceInterface" );
-        
+        auto loggerServiceInterface =
+            getContext()->getServiceInterface<aace::engine::logger::LoggerServiceInterface>("aace.logger");
+        ThrowIfNull(loggerServiceInterface, "invalidLoggerServiceInterface");
+
         // create the metrics uploader engine implementation
-        m_metricsUploaderEngineImpl = aace::engine::metrics::MetricsUploaderEngineImpl::create( metricsUploader );
-        ThrowIfNull( m_metricsUploaderEngineImpl, "createMetricsUploaderEngineImplFailed" );
+        m_metricsUploaderEngineImpl = aace::engine::metrics::MetricsUploaderEngineImpl::create(metricsUploader);
+        ThrowIfNull(m_metricsUploaderEngineImpl, "createMetricsUploaderEngineImplFailed");
 
         // add the uploader service impl to the logger service
-        loggerServiceInterface->addSink( m_metricsUploaderEngineImpl );
+        loggerServiceInterface->addSink(m_metricsUploaderEngineImpl);
 
         return true;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"registerPlatformInterfaceType<MetricsUploader>").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "registerPlatformInterfaceType<MetricsUploader>").d("reason", ex.what()));
         return false;
     }
 }
 
-} // aace::engine::metrics
-} // aace::engine
-} // aace
-
-
+}  // namespace metrics
+}  // namespace engine
+}  // namespace aace

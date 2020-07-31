@@ -17,8 +17,7 @@ package com.amazon.aace.audio;
 
 import com.amazon.aace.core.NativeRef;
 
-final public class AudioStream extends NativeRef
-{
+final public class AudioStream extends NativeRef {
     /**
      * Describes the playback state of the platform media player
      */
@@ -48,7 +47,7 @@ final public class AudioStream extends NativeRef
         /**
          * @internal
          */
-        private Encoding( String name ) {
+        private Encoding(String name) {
             m_name = name;
         }
 
@@ -75,7 +74,7 @@ final public class AudioStream extends NativeRef
          * @param  key The property key
          * @param  value The property value
          */
-        public AudioStreamProperty( String key, String value ) {
+        public AudioStreamProperty(String key, String value) {
             mKey = key;
             mValue = value;
         }
@@ -83,12 +82,16 @@ final public class AudioStream extends NativeRef
         /**
          * @return The property key
          */
-        public String getKey() { return mKey; }
+        public String getKey() {
+            return mKey;
+        }
 
         /**
          * @return The property value
          */
-        public String getValue() { return mValue; }
+        public String getValue() {
+            return mValue;
+        }
     }
 
     /**
@@ -99,8 +102,8 @@ final public class AudioStream extends NativeRef
      * @return The number of bytes read, 0 if the end of stream is reached or data is not currently available,
      * or -1 if an error occurred
      */
-    final public int read( byte[] buffer ) {
-        return read( getNativeRef(), buffer, 0, buffer.length );
+    final public int read(byte[] buffer) {
+        return read(getNativeRef(), buffer, 0, buffer.length);
     }
 
     /**
@@ -111,51 +114,51 @@ final public class AudioStream extends NativeRef
      * @return The number of bytes read, 0 if the end of stream is reached or data is not currently available,
      * or -1 if an error occurred
      */
-    final public int read( byte[] data, int offset, int size ) {
-        return read( getNativeRef(), data, offset, size );
+    final public int read(byte[] data, int offset, int size) {
+        return read(getNativeRef(), data, offset, size);
     }
 
     /**
      * @return @c true if the @c AudioStream is closed and no more data is available to read.
      */
     final public boolean isClosed() {
-        return isClosed( getNativeRef() );
+        return isClosed(getNativeRef());
     }
 
     /**
      * @return The @c Encoding type of the data returned by this @c AudioStream.
      */
     final public Encoding getEncoding() {
-        return getEncoding( getNativeRef() );
+        return getEncoding(getNativeRef());
     }
 
     /**
      * @return The @c AudioFormat for this @c AudioStream.
      */
     final public AudioFormat getAudioFormat() {
-        return getAudioFormat( getNativeRef() );
+        return getAudioFormat(getNativeRef());
     }
 
-     /**
+    /**
      * @return List of meta-data properties for this @c AudioStream.
      */
     final public AudioStreamProperty[] getProperties() {
-        return getProperties( getNativeRef() );
+        return getProperties(getNativeRef());
     }
 
     protected long createNativeRef() {
         return 0;
     }
 
-    protected void disposeNativeRef( long nativeRef ) {
-        disposeBinder( nativeRef );
+    protected void disposeNativeRef(long nativeRef) {
+        disposeBinder(nativeRef);
     }
 
     // Native Engine JNI methods
-    private native void disposeBinder( long nativeRef );
-    private native int read( long nativeObject, byte[] data, long offset, long size );
-    private native boolean isClosed( long nativeObject );
-    private native Encoding getEncoding( long nativeObject );
-    private native AudioFormat getAudioFormat( long nativeObject );
-    private native AudioStreamProperty[] getProperties( long nativeObject );
+    private native void disposeBinder(long nativeRef);
+    private native int read(long nativeObject, byte[] data, long offset, long size);
+    private native boolean isClosed(long nativeObject);
+    private native Encoding getEncoding(long nativeObject);
+    private native AudioFormat getAudioFormat(long nativeObject);
+    private native AudioStreamProperty[] getProperties(long nativeObject);
 }

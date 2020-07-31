@@ -31,15 +31,16 @@ namespace alexa {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class TemplateRuntimeHandler : public aace::alexa::TemplateRuntime /* isa PlatformInterface */ {
-  private:
+private:
     std::weak_ptr<Activity> m_activity{};
     std::weak_ptr<logger::LoggerHandler> m_loggerHandler{};
 
-  protected:
+protected:
     TemplateRuntimeHandler(std::weak_ptr<Activity> activity, std::weak_ptr<logger::LoggerHandler> loggerHandler);
 
-  public:
-    template <typename... Args> static auto create(Args &&... args) -> std::shared_ptr<TemplateRuntimeHandler> {
+public:
+    template <typename... Args>
+    static auto create(Args&&... args) -> std::shared_ptr<TemplateRuntimeHandler> {
         return std::shared_ptr<TemplateRuntimeHandler>(new TemplateRuntimeHandler(args...));
     }
     auto getActivity() -> std::weak_ptr<Activity>;
@@ -47,25 +48,29 @@ class TemplateRuntimeHandler : public aace::alexa::TemplateRuntime /* isa Platfo
 
     // aace::alexa::TemplateRuntime interface
 
-    auto renderTemplate(const std::string &payload, FocusState focusState) -> void override;
+    auto renderTemplate(const std::string& payload, FocusState focusState) -> void override;
     auto clearTemplate() -> void override;
-    auto renderPlayerInfo(const std::string &payload, PlayerActivity audioPlayerState, std::chrono::milliseconds offset, FocusState focusState) -> void override;
+    auto renderPlayerInfo(
+        const std::string& payload,
+        PlayerActivity audioPlayerState,
+        std::chrono::milliseconds offset,
+        FocusState focusState) -> void override;
     auto clearPlayerInfo() -> void override;
 
-  private:
+private:
     std::weak_ptr<View> m_console{};
     std::chrono::time_point<std::chrono::system_clock> m_startPlayerInfo{};
     std::chrono::time_point<std::chrono::system_clock> m_startTemplate{};
-    
+
     std::chrono::time_point<std::chrono::steady_clock> m_whenCachedLastpayload{};
     std::string m_lastPayload;
 
-    auto log(logger::LoggerHandler::Level level, const std::string &message) -> void;
+    auto log(logger::LoggerHandler::Level level, const std::string& message) -> void;
     auto setupUI() -> void;
-    auto wasPayloadJustSeen(const std::string &payload) -> bool;
+    auto wasPayloadJustSeen(const std::string& payload) -> bool;
 };
 
-} // namespace alexa
-} // namespace sampleApp
+}  // namespace alexa
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_ALEXA_TEMPLATERUNTIMEHANDLER_H
+#endif  // SAMPLEAPP_ALEXA_TEMPLATERUNTIMEHANDLER_H

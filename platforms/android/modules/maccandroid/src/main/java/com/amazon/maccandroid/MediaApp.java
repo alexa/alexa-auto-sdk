@@ -29,18 +29,16 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Base64;
 
-
 import com.amazon.maccandroid.model.APIConstants;
+import com.amazon.maccandroid.model.PlayerPlaybackInfo;
 import com.amazon.maccandroid.model.errors.CapabilityAgentError;
 import com.amazon.maccandroid.model.state.MediaAppPlaybackState;
-import com.amazon.maccandroid.model.PlayerPlaybackInfo;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class MediaApp extends MediaBrowserCompat.ConnectionCallback {
-
     private static final long MEDIA_SESSION_CONNECTION_TIMEOUT = 3000;
     private static final String VALIDATION_METHOD_SIGNING = "SIGNING_CERTIFICATE";
     private static final String TAG = MediaApp.class.getSimpleName();
@@ -51,7 +49,7 @@ public class MediaApp extends MediaBrowserCompat.ConnectionCallback {
     private final String mClassName;
     private String mSpiVersion;
     private String mPlayerCookie;
-    private List< String > validationData;
+    private List<String> validationData;
     private String validationMethod = null;
 
     private PlayerPlaybackInfo mPlayerPlaybackInfo;
@@ -59,39 +57,39 @@ public class MediaApp extends MediaBrowserCompat.ConnectionCallback {
     private String mSkillToken;
     private Handler mHandler = new Handler();
 
-
     private MediaBrowserCompat mMediaBrowser;
     private MediaControllerCallback mMediaControllerCallback;
     private MediaControllerCompat mMediaController;
     private MediaAppsConnectionListener mMediaAppsConnectionListener;
     private boolean mSessionReady = false;
 
-    public static MediaApp create(Context context, String packageName, String className,
-                                  String spiVersion, String playerCookie) {
+    public static MediaApp create(
+            Context context, String packageName, String className, String spiVersion, String playerCookie) {
         return new MediaApp(context, packageName, className, spiVersion, playerCookie);
     }
 
     // package private for testing
-    /*package*/ MediaApp( Context context, String packageName, String className, String spiVersion,
-                      String playerCookie ) {
+    /*package*/ MediaApp(
+            Context context, String packageName, String className, String spiVersion, String playerCookie) {
         mContext = context;
         mLocalPlayerId = packageName;
         mClassName = className;
         mSpiVersion = spiVersion;
         mPlayerCookie = playerCookie;
-        initValidationData( context );
+        initValidationData(context);
     }
 
     // Package private for testing
-    /*package*/ void initValidationData( Context context ) {
+    /*package*/ void initValidationData(Context context) {
         try {
             validationData = new ArrayList<>();
-            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(mLocalPlayerId, PackageManager.GET_SIGNATURES );
-            for ( Signature signature : packageInfo.signatures ) {
-                validationData.add( Base64.encodeToString( signature.toByteArray(), Base64.NO_WRAP ) );
+            PackageInfo packageInfo =
+                    context.getPackageManager().getPackageInfo(mLocalPlayerId, PackageManager.GET_SIGNATURES);
+            for (Signature signature : packageInfo.signatures) {
+                validationData.add(Base64.encodeToString(signature.toByteArray(), Base64.NO_WRAP));
             }
             validationMethod = VALIDATION_METHOD_SIGNING;
-        } catch ( PackageManager.NameNotFoundException e ) {
+        } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
     }
@@ -111,7 +109,7 @@ public class MediaApp extends MediaBrowserCompat.ConnectionCallback {
         ComponentName componentName = new ComponentName(mLocalPlayerId, mClassName);
         this.mMediaAppsConnectionListener = listener;
 
-        mMediaBrowser = new MediaBrowserCompat(mContext, componentName, this, null );
+        mMediaBrowser = new MediaBrowserCompat(mContext, componentName, this, null);
         mMediaBrowser.connect();
         handleConnectionTimeout();
     }
@@ -120,48 +118,49 @@ public class MediaApp extends MediaBrowserCompat.ConnectionCallback {
     public void onConnected() {
         super.onConnected();
         if (mMediaBrowser == null) {
-            Log.e(TAG, "onConnected mMediaBrowser is null" );
+            Log.e(TAG, "onConnected mMediaBrowser is null");
             return;
         }
 
-        mHandler.removeCallbacksAndMessages( null );
+        mHandler.removeCallbacksAndMessages(null);
 
         MediaSessionCompat.Token token = mMediaBrowser.getSessionToken();
         try {
             mMediaController = new MediaControllerCompat(mContext, token);
             Bundle extras = mMediaController.getExtras();
-            if( extras != null ) {
-                if (extras.containsKey(APIConstants.ExtrasKeys.SPI_VERSION_KEY) ) {
+            if (extras != null) {
+                if (extras.containsKey(APIConstants.ExtrasKeys.SPI_VERSION_KEY)) {
                     mSpiVersion = extras.getString(APIConstants.ExtrasKeys.SPI_VERSION_KEY);
                 }
 
                 if (extras.containsKey(APIConstants.ExtrasKeys.PLAYER_COOKIE_KEY)) {
                     mPlayerCookie = extras.getString(APIConstants.ExtrasKeys.PLAYER_COOKIE_KEY);
                 }
-            } else Log.e( TAG, "MediaControllerCompat extras is null");
+            } else
+                Log.e(TAG, "MediaControllerCompat extras is null");
 
             mSessionReady = true; // mMediaController.isSessionReady();
 
             if (mSessionReady && !doesControllerSupportsRequiredActions(mMediaController)) {
-                Log.i( TAG, "Controller for App " + mLocalPlayerId + " does not support required actions" );
+                Log.i(TAG, "Controller for App " + mLocalPlayerId + " does not support required actions");
                 MediaAppsRepository.getInstance().removeMediaApp(mLocalPlayerId);
             }
 
-            if ( mMediaAppsConnectionListener != null ) {
+            if (mMediaAppsConnectionListener != null) {
                 mMediaAppsConnectionListener.onConnectionSuccessful();
             }
 
             registerCallback();
             refreshPlaybackState();
 
-        } catch ( RemoteException e ) {
+        } catch (RemoteException e) {
             e.printStackTrace();
         }
     }
 
     public void refreshPlaybackState() {
         if (mMediaController == null) {
-            Log.e(TAG, "refreshPlaybackState mMediaController is null" );
+            Log.e(TAG, "refreshPlaybackState mMediaController is null");
             return;
         }
         mMediaControllerCallback.onPlaybackStateChanged(mMediaController.getPlaybackState());
@@ -173,10 +172,10 @@ public class MediaApp extends MediaBrowserCompat.ConnectionCallback {
     @Override
     public void onConnectionFailed() {
         super.onConnectionFailed();
-        mHandler.removeCallbacksAndMessages( null );
-        Log.i( TAG, "onConnectionFailed for App " + mLocalPlayerId);
-        if ( mMediaAppsConnectionListener != null ) {
-            mMediaAppsConnectionListener.onConnectionFailure( CapabilityAgentError.PLAYER_CONNECTION_REJECTED );
+        mHandler.removeCallbacksAndMessages(null);
+        Log.i(TAG, "onConnectionFailed for App " + mLocalPlayerId);
+        if (mMediaAppsConnectionListener != null) {
+            mMediaAppsConnectionListener.onConnectionFailure(CapabilityAgentError.PLAYER_CONNECTION_REJECTED);
         }
         mMediaBrowser = null;
     }
@@ -184,19 +183,19 @@ public class MediaApp extends MediaBrowserCompat.ConnectionCallback {
     @Override
     public void onConnectionSuspended() {
         super.onConnectionSuspended();
-        Log.i( TAG, "onConnectionSuspended for App " + mLocalPlayerId);
+        Log.i(TAG, "onConnectionSuspended for App " + mLocalPlayerId);
     }
 
     private void handleConnectionTimeout() {
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if ( mMediaAppsConnectionListener != null ) {
-                    mMediaAppsConnectionListener.onConnectionFailure( CapabilityAgentError.PLAYER_CONNECTION_TIMEOUT );
+                if (mMediaAppsConnectionListener != null) {
+                    mMediaAppsConnectionListener.onConnectionFailure(CapabilityAgentError.PLAYER_CONNECTION_TIMEOUT);
                 }
                 mMediaController = null;
             }
-        }, MEDIA_SESSION_CONNECTION_TIMEOUT );
+        }, MEDIA_SESSION_CONNECTION_TIMEOUT);
     }
 
     /**
@@ -205,32 +204,32 @@ public class MediaApp extends MediaBrowserCompat.ConnectionCallback {
      * @param controller
      * @return
      */
-    private boolean doesControllerSupportsRequiredActions( MediaControllerCompat controller ) {
+    private boolean doesControllerSupportsRequiredActions(MediaControllerCompat controller) {
         PlaybackStateCompat playbackState = controller.getPlaybackState();
         if (playbackState == null) {
-            Log.e(TAG, "doesControllerSupportsRequiredActions playbackState is null" );
+            Log.e(TAG, "doesControllerSupportsRequiredActions playbackState is null");
             return false;
         }
         long actions = playbackState.getActions();
-        return ( ( actions & PlaybackStateCompat.ACTION_PLAY_FROM_URI ) > 0 )
-                && ( ( actions & PlaybackStateCompat.ACTION_PREPARE_FROM_URI ) > 0 );
+        return ((actions & PlaybackStateCompat.ACTION_PLAY_FROM_URI) > 0)
+                && ((actions & PlaybackStateCompat.ACTION_PREPARE_FROM_URI) > 0);
     }
 
     public void registerCallback() {
         mMediaControllerCallback = new MediaControllerCallback(getLocalPlayerId(), this);
-        mMediaController.registerCallback( mMediaControllerCallback );
+        mMediaController.registerCallback(mMediaControllerCallback);
     }
 
     public void onDestroy() {
         try {
-            if ( mMediaController != null && mMediaControllerCallback != null) {
-                mMediaController.unregisterCallback( mMediaControllerCallback );
+            if (mMediaController != null && mMediaControllerCallback != null) {
+                mMediaController.unregisterCallback(mMediaControllerCallback);
             }
             if (mMediaBrowser != null) {
                 mMediaBrowser.disconnect();
             }
-        } catch( Exception e ) {
-            Log.e( TAG, "Error onDestroy: " + e.getMessage());
+        } catch (Exception e) {
+            Log.e(TAG, "Error onDestroy: " + e.getMessage());
         }
     }
 
@@ -253,7 +252,6 @@ public class MediaApp extends MediaBrowserCompat.ConnectionCallback {
     public String getClassName() {
         return mClassName;
     }
-
 
     public UUID getPlaybackSessionId() {
         return mPlaybackSessionId;
@@ -310,5 +308,8 @@ public class MediaApp extends MediaBrowserCompat.ConnectionCallback {
         return mPlayerCookie;
     }
 
-    public void resetUnauthorizedReported() { if( mMediaControllerCallback != null ) mMediaControllerCallback.resetUnauthorizedReported(); }
+    public void resetUnauthorizedReported() {
+        if (mMediaControllerCallback != null)
+            mMediaControllerCallback.resetUnauthorizedReported();
+    }
 }

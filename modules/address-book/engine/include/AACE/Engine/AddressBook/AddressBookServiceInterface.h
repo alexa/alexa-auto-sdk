@@ -26,17 +26,19 @@ namespace addressBook {
 class AddressBookServiceInterface {
 public:
     // Subscribe to AddressBook Engine
-    virtual void addObserver( std::shared_ptr<AddressBookObserver> observer ) = 0;
+    virtual void addObserver(std::shared_ptr<AddressBookObserver> observer) = 0;
 
     // Remove observer to AddressBook Engine
-    virtual void removeObserver( std::shared_ptr<AddressBookObserver> observer ) = 0;
+    virtual void removeObserver(std::shared_ptr<AddressBookObserver> observer) = 0;
 
     // Engine service to get entries of an address book from AddressBook Engine Service
-    virtual bool getEntries( const std::string& addressBookSourceId, std::weak_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> factory ) = 0;
+    virtual bool getEntries(
+        const std::string& addressBookSourceId,
+        std::weak_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> factory) = 0;
 };
 
-} // aace::engine::addressBook
-} // aace::engine
-} // aace
+}  // namespace addressBook
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_ADDRESS_BOOK_ADDRESS_BOOK_SERVICE_INTERFACE_H
+#endif  // AACE_ENGINE_ADDRESS_BOOK_ADDRESS_BOOK_SERVICE_INTERFACE_H

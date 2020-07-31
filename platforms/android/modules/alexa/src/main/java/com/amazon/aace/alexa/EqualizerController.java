@@ -37,8 +37,7 @@ import com.amazon.aace.core.PlatformInterface;
  * @c com.amazon.aace.alexa.config.AlexaConfiguration.createEqualizerControllerConfig for details
  * on configuring supported bands, default state, and supported decibel ranges.
  */
-abstract public class EqualizerController extends PlatformInterface
-{
+abstract public class EqualizerController extends PlatformInterface {
     public EqualizerController() {}
 
     /**
@@ -46,7 +45,6 @@ abstract public class EqualizerController extends PlatformInterface
      * subset of these.
      */
     public enum EqualizerBand {
-
         /**
          * Bass equalizer band
          * @hideinitializer
@@ -74,7 +72,7 @@ abstract public class EqualizerController extends PlatformInterface
         /**
          * @internal
          */
-        private EqualizerBand( String name ) {
+        private EqualizerBand(String name) {
             mName = name;
         }
 
@@ -101,7 +99,7 @@ abstract public class EqualizerController extends PlatformInterface
          * @param  band The equalizer band
          * @param  level The gain level setting of the band in integer dB
          */
-        public EqualizerBandLevel( EqualizerBand band, int level ) {
+        public EqualizerBandLevel(EqualizerBand band, int level) {
             mBand = band;
             mLevel = level;
         }
@@ -111,14 +109,18 @@ abstract public class EqualizerController extends PlatformInterface
          *
          * @return The equalizer band
          */
-        public EqualizerBand getBand() { return mBand; }
+        public EqualizerBand getBand() {
+            return mBand;
+        }
 
         /**
          * Get the gain level setting of the equalizer band
          *
          * @return The level setting in dB
          */
-        public int getLevel() { return mLevel; }
+        public int getLevel() {
+            return mLevel;
+        }
     }
 
     /**
@@ -131,7 +133,7 @@ abstract public class EqualizerController extends PlatformInterface
      *
      * @param  bandLevels The equalizer bands and their gain settings to apply as integer dB values.
      */
-    public void setBandLevels( EqualizerBandLevel[] bandLevels ) {}
+    public void setBandLevels(EqualizerBandLevel[] bandLevels) {}
 
     /**
      * Retrieves the current equalizer gain settings on the device for each supported band. If
@@ -141,7 +143,9 @@ abstract public class EqualizerController extends PlatformInterface
      * @return An array of the supported equalizer bands and their current gain settings as integer
      *         dB values.
      */
-    public EqualizerBandLevel[] getBandLevels() { return new EqualizerBandLevel[0]; }
+    public EqualizerBandLevel[] getBandLevels() {
+        return new EqualizerBandLevel[0];
+    }
 
     /**
      * Notifies the Engine that gain levels for one or more equalizer bands are being set directly
@@ -151,9 +155,9 @@ abstract public class EqualizerController extends PlatformInterface
      * @param  bandLevels The equalizer bands to change and their gain settings as integer dB
      *         values.
      */
-    public final void localSetBandLevels( EqualizerBandLevel[] bandLevels ) {
-        if ( bandLevels != null ) {
-            localSetBandLevels( getNativeRef(), bandLevels );
+    public final void localSetBandLevels(EqualizerBandLevel[] bandLevels) {
+        if (bandLevels != null) {
+            localSetBandLevels(getNativeRef(), bandLevels);
         }
     }
 
@@ -165,9 +169,9 @@ abstract public class EqualizerController extends PlatformInterface
      * @param  bandAdjustments The equalizer bands to adjust and their relative gain adjustments
      *         as integer dB values.
      */
-    public final void localAdjustBandLevels( EqualizerBandLevel[] bandAdjustments ) {
-        if ( bandAdjustments != null ) {
-            localAdjustBandLevels( getNativeRef(), bandAdjustments );
+    public final void localAdjustBandLevels(EqualizerBandLevel[] bandAdjustments) {
+        if (bandAdjustments != null) {
+            localAdjustBandLevels(getNativeRef(), bandAdjustments);
         }
     }
 
@@ -177,8 +181,8 @@ abstract public class EqualizerController extends PlatformInterface
      *
      * @param  bands The equalizer bands to reset.
      */
-    public final void localResetBands( EqualizerBand[] bands ) {
-        localResetBands( getNativeRef(), bands );
+    public final void localResetBands(EqualizerBand[] bands) {
+        localResetBands(getNativeRef(), bands);
     }
 
     /**
@@ -186,7 +190,7 @@ abstract public class EqualizerController extends PlatformInterface
      * defaults.
      */
     public final void localResetBands() {
-        localResetBands( getNativeRef(), null );
+        localResetBands(getNativeRef(), null);
     }
 
     // NativeRef implementation
@@ -194,16 +198,14 @@ abstract public class EqualizerController extends PlatformInterface
         return createBinder();
     }
 
-    final protected void disposeNativeRef( long nativeRef ) {
-        disposeBinder( nativeRef );
+    final protected void disposeNativeRef(long nativeRef) {
+        disposeBinder(nativeRef);
     }
 
     // Native Engine JNI methods
     private native long createBinder();
-    private native void disposeBinder( long nativeRef );
-    private native void localSetBandLevels( long nativeObject, EqualizerBandLevel[] bandLevels );
-    private native void localAdjustBandLevels( long nativeObject, EqualizerBandLevel[] bandAdjustments );
-    private native void localResetBands( long nativeObject, EqualizerBand[] bands );
+    private native void disposeBinder(long nativeRef);
+    private native void localSetBandLevels(long nativeObject, EqualizerBandLevel[] bandLevels);
+    private native void localAdjustBandLevels(long nativeObject, EqualizerBandLevel[] bandAdjustments);
+    private native void localResetBands(long nativeObject, EqualizerBand[] bands);
 }
-
-

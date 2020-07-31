@@ -21,13 +21,11 @@ import com.amazon.aace.core.PlatformInterface;
  * AuthProvider should be extended to manage access tokens for AVS authorization and report
  * client authorization state to the Engine.
  */
-abstract public class AuthProvider extends PlatformInterface
-{
+abstract public class AuthProvider extends PlatformInterface {
     /**
      * Describes the state of client authorization with AVS
      */
-    public enum AuthState
-    {
+    public enum AuthState {
         /**
          * Authorization has not yet been acquired.
          * @hideinitializer
@@ -57,7 +55,7 @@ abstract public class AuthProvider extends PlatformInterface
         /**
          * @internal
          */
-        private AuthState( String name ) {
+        private AuthState(String name) {
             m_name = name;
         }
 
@@ -72,8 +70,7 @@ abstract public class AuthProvider extends PlatformInterface
     /**
      * Describes an error during an attempt to authorize with AVS
      */
-    public enum AuthError
-    {
+    public enum AuthError {
         /**
          * No error encountered
          * @hideinitializer
@@ -153,7 +150,7 @@ abstract public class AuthProvider extends PlatformInterface
         /**
          * @internal
          */
-        private AuthError( String name ) {
+        private AuthError(String name) {
             m_name = name;
         }
 
@@ -165,8 +162,7 @@ abstract public class AuthProvider extends PlatformInterface
         }
     }
 
-    public AuthProvider() {
-    }
+    public AuthProvider() {}
 
     /**
      * Returns the token used by the platform implementation for authorization with AVS.
@@ -188,13 +184,13 @@ abstract public class AuthProvider extends PlatformInterface
     }
 
     /**
-    * Notifies the platform implementation that the specified access token was used in an 
-    * unauthorized request to AVS. AVS responded to this request with a 403 code 
-    * indicating the token was not valid.
-    *
-    * @param token The access token used in an unauthorized request to AVS
-    */
-    public void authFailure( String token ) {}
+     * Notifies the platform implementation that the specified access token was used in an
+     * unauthorized request to AVS. AVS responded to this request with a 403 code
+     * indicating the token was not valid.
+     *
+     * @param token The access token used in an unauthorized request to AVS
+     */
+    public void authFailure(String token) {}
 
     /**
      * Notifies the Engine of a change in AVS authorization state in the platform implementation
@@ -203,8 +199,8 @@ abstract public class AuthProvider extends PlatformInterface
      *
      * @param  authError The error state of the authorization attempt
      */
-    final public void authStateChange( AuthState authState, AuthError authError ) {
-        authStateChange( getNativeRef(), authState, authError );
+    final public void authStateChange(AuthState authState, AuthError authError) {
+        authStateChange(getNativeRef(), authState, authError);
     }
 
     // NativeRef implementation
@@ -212,14 +208,12 @@ abstract public class AuthProvider extends PlatformInterface
         return createBinder();
     }
 
-    final protected void disposeNativeRef( long nativeRef ) {
-        disposeBinder( nativeRef );
+    final protected void disposeNativeRef(long nativeRef) {
+        disposeBinder(nativeRef);
     }
 
     // Native Engine JNI methods
     private native long createBinder();
-    private native void disposeBinder( long nativeRef );
-    private native void authStateChange( long nativeObject, AuthState authState, AuthError authError );
+    private native void disposeBinder(long nativeRef);
+    private native void authStateChange(long nativeObject, AuthState authState, AuthError authError);
 }
-
-

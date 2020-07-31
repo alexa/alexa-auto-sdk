@@ -28,14 +28,13 @@ struct DeviceConfig {
     std::string name;
     std::string module;
     std::string card;
-    int rate; // sample rate in Hz, e.g. 48000
+    int rate;  // sample rate in Hz, e.g. 48000
     bool shared;
 };
 
 class SystemAudioEngineService
         : public aace::engine::core::EngineService
         , public std::enable_shared_from_this<SystemAudioEngineService> {
-
     // AACE Service Description
     DESCRIBE("aace.systemAudio", VERSION("1.0"), DEPENDS(aace::engine::audio::AudioEngineService))
 

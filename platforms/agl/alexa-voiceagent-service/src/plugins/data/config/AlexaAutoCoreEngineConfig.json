@@ -34,12 +34,12 @@
     "currentLocation": "36.1363,-115.1513"
   },
   "aace.audio.input": {
-    "voice": "hw:ep812ch"
+    "voice": "Default"
   },
   "aace.audio.output": {
-    "tts": "multimedia",
-    "music": "emergency",
-    "alarm": "navigation"
+    "tts": "Speech-Low",
+    "music": "Speech-High",
+    "alarm": "Custom-Low"
   },
   "aace.wakeword": {
     "enabled":true
@@ -59,156 +59,6 @@
         "compactDisc":true,
         "siriusXM":false,
         "dab":false
-    }
-  },
-  "aace.localvoicecontrol": {
-    "enabled":true,
-    "socketRootDirectory":"/opt/"
-  },
-  "aace.localskills": {
-    "aace.carcontrol": {
-        "enabled": true,
-        "endpoints": [
-            {
-                "zone" : "zone.all",
-                "enabled": true,
-                "climate": {
-                    "controlId": "all.climate",
-                    "sync": {
-                      "controllerId": "climate.sync"
-                    },
-                    "recirculate": {
-                      "controllerId": "climate.recirculate"
-                    }
-                },
-                "airconditioner" : {
-                    "controlId": "all.ac",
-                    "mode": {
-                       "controllerId": "mode",
-                       "values" : {
-                          "AUTO": true,
-                          "ECONOMY": true,
-                          "MANUAL": true
-                       }
-                    },
-                    "intensity" : { 
-                       "controllerId": "intensity",
-                       "values" : {
-                         "LOW": true,
-                         "MEDIUM": true,
-                         "HIGH": true
-                       }
-                    }
-                },
-                "heater" : {
-                    "controlId": "all.heater",
-                    "controllerId": "temperature",
-                    "minimum": 60,
-                    "maximum": 90,
-                    "precision": 1,
-                    "unit":  "FAHRENHEIT"
-                },
-                "fan" : {
-                    "controlId": "all.fan",
-                    "controllerId": "speed",
-                    "minimum": 1,
-                    "maximum": 10,
-                    "precision": 1
-                },
-                "vent": {
-                    "controlId": "all.vent",
-                    "positions" : {
-                      "controllerId": "position",
-                      "values" : {
-                        "BODY": true,
-                        "MIX":  true,
-                        "FLOOR": true,
-                        "WINDSHIELD": true
-                      }
-                    }
-                },
-                "window" : {
-                    "controlId": "all.window",
-                    "controllerId": "defroster",
-                    "defrost": true
-                },
-                "lights" : [ 
-                 {
-                    "controlId": "all.ambient.light",
-                    "type": "AMBIENT_LIGHT",
-                    "color" : {
-                      "controllerId": "color",
-                      "values" : {
-                        "WHITE": true,
-                        "RED": true,
-                        "ORANGE": true,
-                        "YELLOW": true,
-                        "GREEN": true,
-                        "BLUE": true,
-                        "INDIGO": true,
-                        "VIOLET": true
-                      }
-                    }
-                  }, 
-                  {
-                    "controlId": "dome.light",
-                    "type": "DOME_LIGHT"
-                  },
-                  {
-                    "controlId": "light",
-                    "type": "LIGHT"
-                  },
-                  {
-                    "controlId": "reading.light",
-                    "type": "READING_LIGHT"
-                  },
-                  {
-                    "controlId": "trunk.light",
-                    "type": "TRUNK_LIGHT"
-                  }
-                ]
-            },
-            {                  
-                "zone" : "zone.back.driver",
-                "enabled": false
-            },
-            {                  
-                "zone" : "zone.back.passenger",
-                "enabled": false
-            },
-            {                  
-                "zone" : "zone.driver",
-                "enabled": false
-            },
-            {                  
-                "zone" : "zone.first.row",
-                "enabled": false
-            },
-            {                  
-                "zone" : "zone.fourth.row",
-                "enabled": false
-            },
-            {                  
-                "zone" : "zone.front",
-                "enabled": false
-            },               
-            {                  
-                "zone" : "zone.passenger",
-                "enabled": false
-            },               
-            {                  
-                "zone" : "zone.rear",
-                "enabled": false
-            },               
-            {                  
-                "zone" : "zone.second.row",
-                "enabled": false
-            },               
-            {                  
-                "zone" : "zone.third.row",
-                "enabled": false
-            }
-        ]
     }
   }
 }

@@ -25,11 +25,11 @@ namespace alexa {
 
 class MockAudioPlayer : public aace::alexa::AudioPlayer {
 public:
-    MOCK_METHOD1( playerActivityChanged, void(PlayerActivity state) );
+    MOCK_METHOD1(playerActivityChanged, void(PlayerActivity state));
 };
 
-} // aace::test::alexa
-} // aace::test
-} // aace
+}  // namespace alexa
+}  // namespace test
+}  // namespace aace
 
-#endif // AACE_TEST_ALEXA_MOCK_AUDIO_PLAYER_H
+#endif  // AACE_TEST_ALEXA_MOCK_AUDIO_PLAYER_H

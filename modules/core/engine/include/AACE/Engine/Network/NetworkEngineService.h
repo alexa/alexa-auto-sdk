@@ -29,12 +29,11 @@ namespace network {
 
 class NetworkEngineService : public aace::engine::core::EngineService {
 public:
-    DESCRIBE("aace.network",VERSION("1.0"),
-        DEPENDS(aace::engine::propertyManager::PropertyManagerEngineService))
+    DESCRIBE("aace.network", VERSION("1.0"), DEPENDS(aace::engine::propertyManager::PropertyManagerEngineService))
 
 private:
-    NetworkEngineService( const aace::engine::core::ServiceDescription& description );
-    
+    NetworkEngineService(const aace::engine::core::ServiceDescription& description);
+
 public:
     virtual ~NetworkEngineService() = default;
     using SetPropertyResultCallback = std::function<void(const std::string&, const std::string&, const std::string&)>;
@@ -43,31 +42,29 @@ public:
         bool& changed,
         bool& async,
         const SetPropertyResultCallback& callbackFunction);
-    std::string getProperty_networkInterface();
-    
+
 protected:
     bool initialize() override;
-    bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) override;
+    bool registerPlatformInterface(std::shared_ptr<aace::core::PlatformInterface> platformInterface) override;
 
 private:
-
     // platform interface registration
     template <class T>
-    bool registerPlatformInterfaceType( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) {
-        std::shared_ptr<T> typedPlatformInterface = std::dynamic_pointer_cast<T>( platformInterface );
-        return typedPlatformInterface != nullptr ? registerPlatformInterfaceType( typedPlatformInterface ) : false;
+    bool registerPlatformInterfaceType(std::shared_ptr<aace::core::PlatformInterface> platformInterface) {
+        std::shared_ptr<T> typedPlatformInterface = std::dynamic_pointer_cast<T>(platformInterface);
+        return typedPlatformInterface != nullptr ? registerPlatformInterfaceType(typedPlatformInterface) : false;
     }
-    
-    bool registerPlatformInterfaceType( std::shared_ptr<aace::network::NetworkInfoProvider> networkInfoProvider );
+
+    bool registerPlatformInterfaceType(std::shared_ptr<aace::network::NetworkInfoProvider> networkInfoProvider);
     bool registerProperties();
-    
+
 private:
     std::shared_ptr<NetworkInfoProviderEngineImpl> m_networkInfoProviderEngineImpl;
     std::shared_ptr<aace::network::NetworkInfoProvider> m_networkInfoProvider;
 };
 
-} // aace::engine::network
-} // aace::engine
-} // aace
+}  // namespace network
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_NETWORK_NETWORK_ENGINE_SERVICE_H
+#endif  // AACE_ENGINE_NETWORK_NETWORK_ENGINE_SERVICE_H

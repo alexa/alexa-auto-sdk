@@ -78,4 +78,6 @@ do_install_append() {
 	# Copy the Mock headers from AVS SDK
 	mkdir -p ${D}${AAC_PREFIX}/include/AVSCommon/SDKInterfaces/test
 	cp -R ${S}/AVSCommon/SDKInterfaces/test/AVSCommon/SDKInterfaces/* ${D}${AAC_PREFIX}/include/AVSCommon/SDKInterfaces/test
+	mkdir -p ${D}${AAC_PREFIX}/include/AVSCommon/SDKInterfaces/test/Settings
+	cp ${S}/Settings/test/Settings/MockSetting.h ${D}${AAC_PREFIX}/include/AVSCommon/SDKInterfaces/test/Settings
 }

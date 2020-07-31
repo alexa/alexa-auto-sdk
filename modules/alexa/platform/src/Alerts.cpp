@@ -18,23 +18,23 @@
 namespace aace {
 namespace alexa {
 
-Alerts::~Alerts() = default; // key function
+Alerts::~Alerts() = default;  // key function
 
 void Alerts::localStop() {
-    if( auto m_alertsEngineInterface_lock = m_alertsEngineInterface.lock() ) {
+    if (auto m_alertsEngineInterface_lock = m_alertsEngineInterface.lock()) {
         m_alertsEngineInterface_lock->onLocalStop();
     }
 }
 
 void Alerts::removeAllAlerts() {
-    if( auto m_alertsEngineInterface_lock = m_alertsEngineInterface.lock() ) {
+    if (auto m_alertsEngineInterface_lock = m_alertsEngineInterface.lock()) {
         m_alertsEngineInterface_lock->removeAllAlerts();
     }
 }
 
-void Alerts::setEngineInterface( std::shared_ptr<aace::alexa::AlertsEngineInterface> alertsEngineInterface ) {
+void Alerts::setEngineInterface(std::shared_ptr<aace::alexa::AlertsEngineInterface> alertsEngineInterface) {
     m_alertsEngineInterface = alertsEngineInterface;
 }
 
-} // aace::alexa
-} // aac
+}  // namespace alexa
+}  // namespace aace

@@ -19,13 +19,12 @@
 namespace aace {
 namespace engine {
 namespace cbl {
-    
+
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.cbl.CBLEngineImpl");
 
-CBLEngineImpl::CBLEngineImpl( std::shared_ptr<aace::cbl::CBL> cblPlatformInterface ) :
-    alexaClientSDK::avsCommon::utils::RequiresShutdown( TAG ),
-    m_cblPlatformInterface( cblPlatformInterface ) {
+CBLEngineImpl::CBLEngineImpl(std::shared_ptr<aace::cbl::CBL> cblPlatformInterface) :
+        alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG), m_cblPlatformInterface(cblPlatformInterface) {
 }
 
 std::shared_ptr<CBLEngineImpl> CBLEngineImpl::create(
@@ -35,189 +34,178 @@ std::shared_ptr<CBLEngineImpl> CBLEngineImpl::create(
     std::chrono::seconds codePairRequestTimeout,
     std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
     std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> localeAssetManager,
-    bool enableUserProfile ) {
-    
+    bool enableUserProfile) {
     std::shared_ptr<CBLEngineImpl> cblEngineImpl = nullptr;
 
-    try 
-    {
-        ThrowIfNull( cblPlatformInterface, "invalidCBLPlatformInterface" );
+    try {
+        ThrowIfNull(cblPlatformInterface, "invalidCBLPlatformInterface");
 
-        cblEngineImpl = std::shared_ptr<CBLEngineImpl>( new CBLEngineImpl( cblPlatformInterface ) );
+        cblEngineImpl = std::shared_ptr<CBLEngineImpl>(new CBLEngineImpl(cblPlatformInterface));
 
-        ThrowIfNot( cblEngineImpl->initialize( customerDataManager, deviceInfo, codePairRequestTimeout, alexaEndpoints, localeAssetManager, enableUserProfile ), "initializeCBLEngineImplFailed" );
+        ThrowIfNot(
+            cblEngineImpl->initialize(
+                customerDataManager,
+                deviceInfo,
+                codePairRequestTimeout,
+                alexaEndpoints,
+                localeAssetManager,
+                enableUserProfile),
+            "initializeCBLEngineImplFailed");
 
         // set the cbb engine interface
-        cblPlatformInterface->setEngineInterface( cblEngineImpl );
+        cblPlatformInterface->setEngineInterface(cblEngineImpl);
 
         return cblEngineImpl;
-    }
-    catch( std::exception& ex )
-    {
-        AACE_ERROR(LX(TAG,"create").d("reason", ex.what()));
-        
-        if( cblEngineImpl != nullptr ) {
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "create").d("reason", ex.what()));
+
+        if (cblEngineImpl != nullptr) {
             cblEngineImpl->shutdown();
         }
-        
+
         return nullptr;
     }
 }
 
-bool CBLEngineImpl::initialize (
+bool CBLEngineImpl::initialize(
     std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> customerDataManager,
     std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
     std::chrono::seconds codePairRequestTimeout,
     std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
     std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> localeAssetManager,
-    bool enableUserProfile ) {
+    bool enableUserProfile) {
+    try {
+        ThrowIfNull(customerDataManager, "invalidCustomerDataManager");
+        ThrowIfNull(deviceInfo, "invalidDeviceInfo");
 
-    try
-    {
-        ThrowIfNull( customerDataManager, "invalidCustomerDataManager" );
-        ThrowIfNull( deviceInfo, "invalidDeviceInfo" );
+        std::shared_ptr<CBLAuthDelegateConfiguration> configuration = CBLAuthDelegateConfiguration::create(
+            deviceInfo, codePairRequestTimeout, alexaEndpoints, localeAssetManager);
+        ThrowIfNull(configuration, "nullCBLAuthDelegateConfiguration");
 
-        std::shared_ptr<CBLAuthDelegateConfiguration> configuration = CBLAuthDelegateConfiguration::create( deviceInfo, codePairRequestTimeout, alexaEndpoints, localeAssetManager );
-        ThrowIfNull( configuration, "nullCBLAuthDelegateConfiguration");
+        m_cblAuthDelegate =
+            CBLAuthDelegate::create(customerDataManager, configuration, shared_from_this(), enableUserProfile);
+        ThrowIfNull(m_cblAuthDelegate, "createCBLAuthDelegateFailed");
 
-        m_cblAuthDelegate = CBLAuthDelegate::create( customerDataManager, configuration, shared_from_this(), enableUserProfile );
-        ThrowIfNull( m_cblAuthDelegate, "createCBLAuthDelegateFailed" );
-        
         return true;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"initialize").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "initialize").d("reason", ex.what()));
         return false;
     }
 }
 
-void CBLEngineImpl::doShutdown()
-{
-    if( m_cblPlatformInterface != nullptr ) {
-        m_cblPlatformInterface->setEngineInterface( nullptr );
+void CBLEngineImpl::doShutdown() {
+    m_cblAuthDelegate.reset();
+
+    if (m_cblPlatformInterface != nullptr) {
+        m_cblPlatformInterface->setEngineInterface(nullptr);
         m_cblPlatformInterface.reset();
     }
 }
 
-void CBLEngineImpl::addAuthObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer )
-{
-    try
-    {
-        ThrowIfNull( m_cblAuthDelegate, "invalidCBLAuthDelegate" );
-        m_cblAuthDelegate->addAuthObserver( observer );
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"addAuthObserver").d("reason", ex.what()));
+void CBLEngineImpl::addAuthObserver(
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer) {
+    try {
+        ThrowIfNull(m_cblAuthDelegate, "invalidCBLAuthDelegate");
+        m_cblAuthDelegate->addAuthObserver(observer);
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "addAuthObserver").d("reason", ex.what()));
     }
 }
 
-void CBLEngineImpl::removeAuthObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer )
-{
-    try
-    {
-        ThrowIfNull( m_cblAuthDelegate, "invalidCBLAuthDelegate" );
-        m_cblAuthDelegate->removeAuthObserver( observer );
+void CBLEngineImpl::removeAuthObserver(
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer) {
+    try {
+        ThrowIfNull(m_cblAuthDelegate, "invalidCBLAuthDelegate");
+        m_cblAuthDelegate->removeAuthObserver(observer);
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "removeAuthObserver").d("reason", ex.what()));
     }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"removeAuthObserver").d("reason", ex.what()));
-    } 
 }
 
-std::string CBLEngineImpl::getAuthToken()
-{
-    try
-    {
-        ThrowIfNull( m_cblAuthDelegate, "invalidCBLAuthDelegate" );
+std::string CBLEngineImpl::getAuthToken() {
+    try {
+        ThrowIfNull(m_cblAuthDelegate, "invalidCBLAuthDelegate");
         return m_cblAuthDelegate->getAuthToken();
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG, "getAuthToken").d("reason",ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "getAuthToken").d("reason", ex.what()));
         return std::string();
     }
 }
 
-void CBLEngineImpl::onAuthFailure( const std::string& token )
-{
-    try
-    {
-        ThrowIfNull( m_cblAuthDelegate, "invalidCBLAuthDelegate" );
-        m_cblAuthDelegate->onAuthFailure( token );
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG, "onAuthFailure").d("reason",ex.what()));
+void CBLEngineImpl::onAuthFailure(const std::string& token) {
+    try {
+        ThrowIfNull(m_cblAuthDelegate, "invalidCBLAuthDelegate");
+        m_cblAuthDelegate->onAuthFailure(token);
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "onAuthFailure").d("reason", ex.what()));
     }
 }
 
-void CBLEngineImpl::cblStateChanged( CBLAuthRequesterInterface::CBLState state, CBLAuthRequesterInterface::CBLStateChangedReason reason, const std::string& url, const std::string& code )
-{
-    if( m_cblPlatformInterface != nullptr ) {
-        m_cblPlatformInterface->cblStateChanged( state, reason, url, code );
+void CBLEngineImpl::cblStateChanged(
+    CBLAuthRequesterInterface::CBLState state,
+    CBLAuthRequesterInterface::CBLStateChangedReason reason,
+    const std::string& url,
+    const std::string& code) {
+    if (m_cblPlatformInterface != nullptr) {
+        m_cblPlatformInterface->cblStateChanged(state, reason, url, code);
     }
 }
 
-void CBLEngineImpl::clearRefreshToken()
-{
-    if( m_cblPlatformInterface != nullptr ) {
+void CBLEngineImpl::clearRefreshToken() {
+    if (m_cblPlatformInterface != nullptr) {
         m_cblPlatformInterface->clearRefreshToken();
     }
 }
-void CBLEngineImpl::setRefreshToken( const std::string& refreshToken )
-{
-    if( m_cblPlatformInterface != nullptr ) {
-        m_cblPlatformInterface->setRefreshToken( refreshToken );
+void CBLEngineImpl::setRefreshToken(const std::string& refreshToken) {
+    if (m_cblPlatformInterface != nullptr) {
+        m_cblPlatformInterface->setRefreshToken(refreshToken);
     }
 }
 
-std::string CBLEngineImpl::getRefreshToken()
-{
-    if( m_cblPlatformInterface != nullptr ) {
+std::string CBLEngineImpl::getRefreshToken() {
+    if (m_cblPlatformInterface != nullptr) {
         return m_cblPlatformInterface->getRefreshToken();
     }
-    
+
     return std::string();
 }
 
-void CBLEngineImpl::setUserProfile( const std::string& name, const std::string& email ) {
-    if( m_cblPlatformInterface != nullptr ) {
-        m_cblPlatformInterface->setUserProfile( name, email );
+void CBLEngineImpl::setUserProfile(const std::string& name, const std::string& email) {
+    if (m_cblPlatformInterface != nullptr) {
+        m_cblPlatformInterface->setUserProfile(name, email);
     }
 }
 
-void CBLEngineImpl::enable()
-{
-    if( m_cblAuthDelegate != nullptr ) {
+void CBLEngineImpl::enable() {
+    if (m_cblAuthDelegate != nullptr) {
         m_cblAuthDelegate->enable();
     }
 }
 
-void CBLEngineImpl::disable()
-{
-    if( m_cblAuthDelegate != nullptr ) {
+void CBLEngineImpl::disable() {
+    if (m_cblAuthDelegate != nullptr) {
         m_cblAuthDelegate->disable();
     }
 }
 
-void CBLEngineImpl::onStart()
-{
-    if( m_cblAuthDelegate != nullptr ) {
+void CBLEngineImpl::onStart() {
+    if (m_cblAuthDelegate != nullptr) {
         m_cblAuthDelegate->start();
     }
 }
 
-void CBLEngineImpl::onCancel()
-{
-    if( m_cblAuthDelegate != nullptr ) {
+void CBLEngineImpl::onCancel() {
+    if (m_cblAuthDelegate != nullptr) {
         m_cblAuthDelegate->cancel();
     }
 }
 
-void CBLEngineImpl::onReset()
-{
-    if( m_cblAuthDelegate != nullptr ) {
+void CBLEngineImpl::onReset() {
+    if (m_cblAuthDelegate != nullptr) {
         m_cblAuthDelegate->reset();
     }
 }
 
-} // aace::engine::cbl
-} // aace::engine
-} // aace
+}  // namespace cbl
+}  // namespace engine
+}  // namespace aace

@@ -25,52 +25,54 @@ namespace aace {
 namespace jni {
 namespace native {
 
-    class JavaField {
-    private:
-        JavaField( const std::string& name, const std::string& signature, jfieldID fieldID );
+class JavaField {
+private:
+    JavaField(const std::string& name, const std::string& signature, jfieldID fieldID);
 
-    public:
-        static std::shared_ptr<JavaField> create( const char* name, const char* signature, jfieldID fieldID );
+public:
+    static std::shared_ptr<JavaField> create(const char* name, const char* signature, jfieldID fieldID);
 
-        jfieldID getFieldID();
+    jfieldID getFieldID();
 
-    private:
-        std::string m_name;
-        std::string m_signature;
-        jfieldID m_fieldID;
-    };
+private:
+    std::string m_name;
+    std::string m_signature;
+    jfieldID m_fieldID;
+};
 
-    using JavaFieldPtr = std::shared_ptr<JavaField>;
+using JavaFieldPtr = std::shared_ptr<JavaField>;
 
-    //
-    // JavaFieldInfo
-    //
+//
+// JavaFieldInfo
+//
 
-    class JavaFieldInfo {
-    public:
-        JavaFieldInfo() = default;
-        JavaFieldInfo( const char* name, const char* signature, bool is_static = false ) : m_name( name ), m_signature( signature ), m_static( is_static ) {}
+class JavaFieldInfo {
+public:
+    JavaFieldInfo() = default;
+    JavaFieldInfo(const char* name, const char* signature, bool is_static = false) :
+            m_name(name), m_signature(signature), m_static(is_static) {
+    }
 
-        const std::string& getName() {
-            return m_name;
-        }
+    const std::string& getName() {
+        return m_name;
+    }
 
-        const std::string& getSignature() {
-            return m_signature;
-        }
+    const std::string& getSignature() {
+        return m_signature;
+    }
 
-        bool isStatic() {
-            return m_static;
-        }
+    bool isStatic() {
+        return m_static;
+    }
 
-    private:
-        std::string m_name;
-        std::string m_signature;
-        bool m_static;
-    };
+private:
+    std::string m_name;
+    std::string m_signature;
+    bool m_static;
+};
 
-} // aace::jni::native
-} // aace::jni
-} // aace
+}  // namespace native
+}  // namespace jni
+}  // namespace aace
 
-#endif // AACE_JNI_NATIVE_JAVA_FIELD_H
+#endif  // AACE_JNI_NATIVE_JAVA_FIELD_H

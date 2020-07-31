@@ -23,13 +23,11 @@ import com.amazon.aace.core.PlatformInterface;
  *
  * @note This interface provides indicators that a notification was received, not the content of the notification.
  */
-public class Notifications extends PlatformInterface
-{
+public class Notifications extends PlatformInterface {
     /**
      * Specifies whether a notification indicator should be rendered on the platform
      */
-    public enum IndicatorState
-    {
+    public enum IndicatorState {
         /**
          * The notification indicator should be turned off
          * @hideinitializer
@@ -54,7 +52,7 @@ public class Notifications extends PlatformInterface
         /**
          * @internal
          */
-        private IndicatorState( String name ) {
+        private IndicatorState(String name) {
             m_name = name;
         }
 
@@ -71,27 +69,23 @@ public class Notifications extends PlatformInterface
      *
      * @param  state The new notification indicator state
      */
-    public void setIndicator( IndicatorState state ) {
-    }
+    public void setIndicator(IndicatorState state) {}
 
     /**
      * Notifies the platform implementation of notification received
      */
-    public void onNotificationReceived() {
-    }
+    public void onNotificationReceived() {}
 
     // NativeRef implementation
     final protected long createNativeRef() {
         return createBinder();
     }
 
-    final protected void disposeNativeRef( long nativeRef ) {
-        disposeBinder( nativeRef );
+    final protected void disposeNativeRef(long nativeRef) {
+        disposeBinder(nativeRef);
     }
 
     // Native Engine JNI methods
     private native long createBinder();
-    private native void disposeBinder( long nativeRef );
+    private native void disposeBinder(long nativeRef);
 }
-
-

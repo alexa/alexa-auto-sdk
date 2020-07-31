@@ -18,27 +18,28 @@
 namespace aace {
 namespace audio {
 
-AudioOutput::~AudioOutput() = default; // key function
+AudioOutput::~AudioOutput() = default;  // key function
 
 int64_t AudioOutput::getNumBytesBuffered() {
     return 0;
 }
 
-void AudioOutput::mediaStateChanged( MediaState state ) {
-    if( auto m_audioOutputEngineInterface_lock = m_audioOutputEngineInterface.lock() ) {
-        m_audioOutputEngineInterface_lock->onMediaStateChanged( state );
-    }
-}
-    
-void AudioOutput::mediaError( MediaError error, const std::string& description ) {
-    if( auto m_audioOutputEngineInterface_lock = m_audioOutputEngineInterface.lock() ) {
-        m_audioOutputEngineInterface_lock->onMediaError( error, description );
+void AudioOutput::mediaStateChanged(MediaState state) {
+    if (auto m_audioOutputEngineInterface_lock = m_audioOutputEngineInterface.lock()) {
+        m_audioOutputEngineInterface_lock->onMediaStateChanged(state);
     }
 }
 
-void AudioOutput::setEngineInterface( std::shared_ptr<aace::audio::AudioOutputEngineInterface> audioOutputEngineInterface ) {
+void AudioOutput::mediaError(MediaError error, const std::string& description) {
+    if (auto m_audioOutputEngineInterface_lock = m_audioOutputEngineInterface.lock()) {
+        m_audioOutputEngineInterface_lock->onMediaError(error, description);
+    }
+}
+
+void AudioOutput::setEngineInterface(
+    std::shared_ptr<aace::audio::AudioOutputEngineInterface> audioOutputEngineInterface) {
     m_audioOutputEngineInterface = audioOutputEngineInterface;
 }
 
-} // aace::audio
-} // aace
+}  // namespace audio
+}  // namespace aace

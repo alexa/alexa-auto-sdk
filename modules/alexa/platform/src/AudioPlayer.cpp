@@ -18,31 +18,28 @@
 namespace aace {
 namespace alexa {
 
-AudioPlayer::~AudioPlayer() = default; // key function
+AudioPlayer::~AudioPlayer() = default;  // key function
 
-int64_t AudioPlayer::getPlayerPosition()
-{
-    if( auto m_audioPlayerEngineInterface_lock = m_audioPlayerEngineInterface.lock() ) {
+int64_t AudioPlayer::getPlayerPosition() {
+    if (auto m_audioPlayerEngineInterface_lock = m_audioPlayerEngineInterface.lock()) {
         return m_audioPlayerEngineInterface_lock->onGetPlayerPosition();
-    }
-    else {
+    } else {
         return TIME_UNKNOWN;
     }
 }
 
-int64_t AudioPlayer::getPlayerDuration()
-{
-    if( auto m_audioPlayerEngineInterface_lock = m_audioPlayerEngineInterface.lock() ) {
+int64_t AudioPlayer::getPlayerDuration() {
+    if (auto m_audioPlayerEngineInterface_lock = m_audioPlayerEngineInterface.lock()) {
         return m_audioPlayerEngineInterface_lock->onGetPlayerDuration();
-    }
-    else {
+    } else {
         return TIME_UNKNOWN;
     }
 }
 
-void AudioPlayer::setEngineInterface( std::shared_ptr<aace::alexa::AudioPlayerEngineInterface> audioPlayerEngineInterface ) {
+void AudioPlayer::setEngineInterface(
+    std::shared_ptr<aace::alexa::AudioPlayerEngineInterface> audioPlayerEngineInterface) {
     m_audioPlayerEngineInterface = audioPlayerEngineInterface;
 }
 
-} // aace::alexa
-} // aac
+}  // namespace alexa
+}  // namespace aace

@@ -17,8 +17,8 @@
 #define SAMPLEAPP_EVENT_H
 
 // C++ Standard Library
-#include <map>    // std::map
-#include <string> // std::string
+#include <map>     // std::map
+#include <string>  // std::string
 
 namespace sampleApp {
 
@@ -111,6 +111,17 @@ enum class Event {
     onAddAddressBookAuto,
     onRemoveAddressBookAuto,
 
+    // Messaging
+    onMessagingEndpointConnection,
+    onMessagingEndpointPermission,
+    onConversationsReport,
+    onSendMessageStatus,
+    onUpdateMessagesStatus,
+    onShowMessagingInfo,
+    onToggleAutomaticResponses,
+
+    // AlexaClient
+    onStopForegroundActivity,
 };
 
 static const std::map<std::string, Event> EventEnumerator{
@@ -156,7 +167,7 @@ static const std::map<std::string, Event> EventEnumerator{
     // PlaybackController
     {"onPlaybackControllerButtonPressed", Event::onPlaybackControllerButtonPressed},
     {"onPlaybackControllerTogglePressed", Event::onPlaybackControllerTogglePressed},
-    
+
     // Audio Player
     {"onGetPlayerPositionAndDuration", Event::onGetPlayerPositionAndDuration},
 
@@ -194,9 +205,17 @@ static const std::map<std::string, Event> EventEnumerator{
     {"onAddAddressBookPhone", Event::onAddAddressBookPhone},
     {"onRemoveAddressBookPhone", Event::onRemoveAddressBookPhone},
     {"onAddAddressBookAuto", Event::onAddAddressBookAuto},
-    {"onRemoveAddressBookAuto", Event::onRemoveAddressBookAuto}
-};
+    {"onRemoveAddressBookAuto", Event::onRemoveAddressBookAuto},
 
-} // namespace sampleApp
+    // Messaging
+    {"onMessagingEndpointConnection", Event::onMessagingEndpointConnection},
+    {"onMessagingEndpointPermission", Event::onMessagingEndpointPermission},
+    {"onConversationsReport", Event::onConversationsReport},
+    {"onSendMessageStatus", Event::onSendMessageStatus},
+    {"onUpdateMessagesStatus", Event::onUpdateMessagesStatus},
+    {"onShowMessagingInfo", Event::onShowMessagingInfo},
+    {"onToggleAutomaticResponses", Event::onToggleAutomaticResponses}};
 
-#endif // SAMPLEAPP_EVENT_H
+}  // namespace sampleApp
+
+#endif  // SAMPLEAPP_EVENT_H

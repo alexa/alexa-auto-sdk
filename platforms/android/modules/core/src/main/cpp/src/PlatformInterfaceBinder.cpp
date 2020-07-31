@@ -23,8 +23,8 @@ namespace aace {
 namespace jni {
 namespace core {
 
-    PlatformInterfaceBinder::~PlatformInterfaceBinder() = default;
+PlatformInterfaceBinder::~PlatformInterfaceBinder() = default;
 
-} // aace::jni::core
-} // aace::jni
-} // aace
+}  // namespace core
+}  // namespace jni
+}  // namespace aace

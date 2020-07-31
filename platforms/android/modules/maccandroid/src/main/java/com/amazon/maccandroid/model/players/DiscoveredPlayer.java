@@ -6,15 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DiscoveredPlayer {
-
     public static List<DiscoveredPlayer> convertMediaApps(List<MediaApp> mediaApps) {
         List<DiscoveredPlayer> discoveredPlayers = new ArrayList<>();
-        for ( MediaApp mediaApp : mediaApps ) {
-            discoveredPlayers.add(new DiscoveredPlayer(
-                    mediaApp.getLocalPlayerId(),
-                    mediaApp.getSpiVersion(),
-                    mediaApp.getValidationData(),
-                    mediaApp.getValidationMethod()));
+        for (MediaApp mediaApp : mediaApps) {
+            discoveredPlayers.add(new DiscoveredPlayer(mediaApp.getLocalPlayerId(), mediaApp.getSpiVersion(),
+                    mediaApp.getValidationData(), mediaApp.getValidationMethod()));
         }
         return discoveredPlayers;
     }
@@ -25,14 +21,13 @@ public class DiscoveredPlayer {
     private final List<String> mValidationData;
     private final String mValidationMethod;
 
-    public DiscoveredPlayer(String localPlayerId, String spiVersion, List<String> validationData,
-                            String validationMethod) {
+    public DiscoveredPlayer(
+            String localPlayerId, String spiVersion, List<String> validationData, String validationMethod) {
         mLocalPlayerId = localPlayerId;
         mSpiVersion = spiVersion;
         mValidationData = validationData;
         mValidationMethod = validationMethod;
     }
-
 
     public String getLocalPlayerId() {
         return mLocalPlayerId;

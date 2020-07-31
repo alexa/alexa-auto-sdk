@@ -18,32 +18,33 @@
 namespace aace {
 namespace alexa {
 
-AlexaSpeaker::~AlexaSpeaker() = default; // key function
+AlexaSpeaker::~AlexaSpeaker() = default;  // key function
 
-void AlexaSpeaker::speakerSettingsChanged( SpeakerType type, bool local, int8_t volume, bool mute ) {
+void AlexaSpeaker::speakerSettingsChanged(SpeakerType type, bool local, int8_t volume, bool mute) {
 }
 
-void AlexaSpeaker::localSetVolume( SpeakerType type, int8_t volume ) {
-    if( auto m_alexaSpeakerEngineInterface_lock = m_alexaSpeakerEngineInterface.lock() ) {
-        m_alexaSpeakerEngineInterface_lock->onLocalSetVolume( type, volume );
+void AlexaSpeaker::localSetVolume(SpeakerType type, int8_t volume) {
+    if (auto m_alexaSpeakerEngineInterface_lock = m_alexaSpeakerEngineInterface.lock()) {
+        m_alexaSpeakerEngineInterface_lock->onLocalSetVolume(type, volume);
     }
 }
 
-void AlexaSpeaker::localAdjustVolume( SpeakerType type, int8_t delta ) {
-    if( auto m_alexaSpeakerEngineInterface_lock = m_alexaSpeakerEngineInterface.lock() ) {
-        m_alexaSpeakerEngineInterface_lock->onLocalAdjustVolume( type, delta );
+void AlexaSpeaker::localAdjustVolume(SpeakerType type, int8_t delta) {
+    if (auto m_alexaSpeakerEngineInterface_lock = m_alexaSpeakerEngineInterface.lock()) {
+        m_alexaSpeakerEngineInterface_lock->onLocalAdjustVolume(type, delta);
     }
 }
 
-void AlexaSpeaker::localSetMute( SpeakerType type, bool mute ) {
-    if( auto m_alexaSpeakerEngineInterface_lock = m_alexaSpeakerEngineInterface.lock() ) {
-        m_alexaSpeakerEngineInterface_lock->onLocalSetMute( type, mute );
+void AlexaSpeaker::localSetMute(SpeakerType type, bool mute) {
+    if (auto m_alexaSpeakerEngineInterface_lock = m_alexaSpeakerEngineInterface.lock()) {
+        m_alexaSpeakerEngineInterface_lock->onLocalSetMute(type, mute);
     }
 }
 
-void AlexaSpeaker::setEngineInterface( std::shared_ptr<aace::alexa::AlexaSpeakerEngineInterface> alexaSpeakerEngineInterface ) {
+void AlexaSpeaker::setEngineInterface(
+    std::shared_ptr<aace::alexa::AlexaSpeakerEngineInterface> alexaSpeakerEngineInterface) {
     m_alexaSpeakerEngineInterface = alexaSpeakerEngineInterface;
 }
 
-} // aace::alexa
-} // aac
+}  // namespace alexa
+}  // namespace aace

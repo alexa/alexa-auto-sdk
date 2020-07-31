@@ -17,7 +17,6 @@
 #include <gmock/gmock.h>
 #include <sstream>
 
-
 #include "AACE/Vehicle/VehicleConfiguration.h"
 
 namespace aace {
@@ -26,9 +25,8 @@ namespace test {
 namespace vehicle {
 
 /// Test harness for @c VehicleConfigurationImpl class
-class VehicleConfigurationImplTest : public ::testing::Test
-{
-  public:
+class VehicleConfigurationImplTest : public ::testing::Test {
+public:
     void SetUp() override {
         /* Empty Setup() for keeping TEST_F uniformity */
     }
@@ -40,7 +38,8 @@ class VehicleConfigurationImplTest : public ::testing::Test
 TEST_F(VehicleConfigurationImplTest, createVehicleInfoConfig) {
     using VehiclePropertyType = aace::vehicle::config::VehicleConfiguration::VehiclePropertyType;
     std::shared_ptr<aace::core::config::EngineConfiguration> testConfiguration, expectedConfiguration;
-    const std::string &temp = "{\n"
+    const std::string& temp =
+        "{\n"
         "    \"aace.vehicle\": {\n"
         "        \"info\": {\n"
         "            \"make\": \"Honda\",\n"
@@ -60,21 +59,20 @@ TEST_F(VehicleConfigurationImplTest, createVehicleInfoConfig) {
         "}";
 
     expectedConfiguration = aace::core::config::StreamConfiguration::create(std::make_shared<std::stringstream>(temp));
-    testConfiguration = aace::vehicle::config::VehicleConfiguration::createVehicleInfoConfig({
-            {VehiclePropertyType::MAKE, "Honda"},
-            {VehiclePropertyType::MODEL, "Odyssey"},
-            {VehiclePropertyType::TRIM, "EX-L"},
-            {VehiclePropertyType::YEAR, "2019"},
-            {VehiclePropertyType::GEOGRAPHY, "US"},
-            {VehiclePropertyType::VERSION, "1.0"},
-            {VehiclePropertyType::OPERATING_SYSTEM, "darwin"},
-            {VehiclePropertyType::HARDWARE_ARCH, "x86_64"},
-            {VehiclePropertyType::LANGUAGE, "en_US"},
-            {VehiclePropertyType::MICROPHONE, "SingleArray"},
-            {VehiclePropertyType::COUNTRY_LIST, "US,GB,IE,CA,DE,AT,IN,JP,AU,NZ,FR"},
-            {VehiclePropertyType::VEHICLE_IDENTIFIER, "123456789a"}
-        });
-    
+    testConfiguration = aace::vehicle::config::VehicleConfiguration::createVehicleInfoConfig(
+        {{VehiclePropertyType::MAKE, "Honda"},
+         {VehiclePropertyType::MODEL, "Odyssey"},
+         {VehiclePropertyType::TRIM, "EX-L"},
+         {VehiclePropertyType::YEAR, "2019"},
+         {VehiclePropertyType::GEOGRAPHY, "US"},
+         {VehiclePropertyType::VERSION, "1.0"},
+         {VehiclePropertyType::OPERATING_SYSTEM, "darwin"},
+         {VehiclePropertyType::HARDWARE_ARCH, "x86_64"},
+         {VehiclePropertyType::LANGUAGE, "en_US"},
+         {VehiclePropertyType::MICROPHONE, "SingleArray"},
+         {VehiclePropertyType::COUNTRY_LIST, "US,GB,IE,CA,DE,AT,IN,JP,AU,NZ,FR"},
+         {VehiclePropertyType::VEHICLE_IDENTIFIER, "123456789a"}});
+
     //Convert to ostringstream for comparing the istream
     std::ostringstream expectedString, actualString;
     expectedString << expectedConfiguration->getStream()->rdbuf();
@@ -87,7 +85,7 @@ TEST_F(VehicleConfigurationImplTest, createVehicleInfoConfig) {
  */
 TEST_F(VehicleConfigurationImplTest, createOperatingCountryConfig) {
     std::shared_ptr<aace::core::config::EngineConfiguration> testConfiguration, expectedConfiguration;
-    const std::string &temp =
+    const std::string& temp =
         "{\n"
         "    \"aace.vehicle\": {\n"
         "        \"operatingCountry\": \"US\"\n"
@@ -95,8 +93,8 @@ TEST_F(VehicleConfigurationImplTest, createOperatingCountryConfig) {
         "}";
 
     expectedConfiguration = aace::core::config::StreamConfiguration::create(std::make_shared<std::stringstream>(temp));
-    testConfiguration = aace::vehicle::config::VehicleConfiguration::createOperatingCountryConfig( "US" );
-    
+    testConfiguration = aace::vehicle::config::VehicleConfiguration::createOperatingCountryConfig("US");
+
     //Convert to ostringstream for comparing the istream
     std::ostringstream expectedString, actualString;
     expectedString << expectedConfiguration->getStream()->rdbuf();
@@ -110,7 +108,8 @@ TEST_F(VehicleConfigurationImplTest, createOperatingCountryConfig) {
 TEST_F(VehicleConfigurationImplTest, createVehicleInfoConfigWithEmptyValueString) {
     using VehiclePropertyType = aace::vehicle::config::VehicleConfiguration::VehiclePropertyType;
     std::shared_ptr<aace::core::config::EngineConfiguration> testConfiguration, expectedConfiguration;
-    const std::string &temp = "{\n"
+    const std::string& temp =
+        "{\n"
         "    \"aace.vehicle\": {\n"
         "        \"info\": {\n"
         "            \"make\": \"Honda\",\n"
@@ -130,21 +129,20 @@ TEST_F(VehicleConfigurationImplTest, createVehicleInfoConfigWithEmptyValueString
         "}";
 
     expectedConfiguration = aace::core::config::StreamConfiguration::create(std::make_shared<std::stringstream>(temp));
-    testConfiguration = aace::vehicle::config::VehicleConfiguration::createVehicleInfoConfig({
-            {VehiclePropertyType::MAKE, "Honda"},
-            {VehiclePropertyType::MODEL, "Odyssey"},
-            {VehiclePropertyType::TRIM, "EX-L"},
-            {VehiclePropertyType::YEAR, "2019"},
-            {VehiclePropertyType::GEOGRAPHY, "US"},
-            {VehiclePropertyType::VERSION, "1.0"},
-            {VehiclePropertyType::OPERATING_SYSTEM, ""},
-            {VehiclePropertyType::HARDWARE_ARCH, "x86_64"},
-            {VehiclePropertyType::LANGUAGE, "en_US"},
-            {VehiclePropertyType::MICROPHONE, "SingleArray"},
-            {VehiclePropertyType::COUNTRY_LIST, "US,GB,IE,CA,DE,AT,IN,JP,AU,NZ,FR"},
-            {VehiclePropertyType::VEHICLE_IDENTIFIER, "123456789a"}
-        });
-    
+    testConfiguration = aace::vehicle::config::VehicleConfiguration::createVehicleInfoConfig(
+        {{VehiclePropertyType::MAKE, "Honda"},
+         {VehiclePropertyType::MODEL, "Odyssey"},
+         {VehiclePropertyType::TRIM, "EX-L"},
+         {VehiclePropertyType::YEAR, "2019"},
+         {VehiclePropertyType::GEOGRAPHY, "US"},
+         {VehiclePropertyType::VERSION, "1.0"},
+         {VehiclePropertyType::OPERATING_SYSTEM, ""},
+         {VehiclePropertyType::HARDWARE_ARCH, "x86_64"},
+         {VehiclePropertyType::LANGUAGE, "en_US"},
+         {VehiclePropertyType::MICROPHONE, "SingleArray"},
+         {VehiclePropertyType::COUNTRY_LIST, "US,GB,IE,CA,DE,AT,IN,JP,AU,NZ,FR"},
+         {VehiclePropertyType::VEHICLE_IDENTIFIER, "123456789a"}});
+
     //Convert to ostringstream for comparing the istream
     std::ostringstream expectedString, actualString;
     expectedString << expectedConfiguration->getStream()->rdbuf();
@@ -158,41 +156,41 @@ TEST_F(VehicleConfigurationImplTest, createVehicleInfoConfigWithEmptyValueString
 TEST_F(VehicleConfigurationImplTest, createVehicleInfoConfigWithPossibleCharsinValueString) {
     using VehiclePropertyType = aace::vehicle::config::VehicleConfiguration::VehiclePropertyType;
     std::shared_ptr<aace::core::config::EngineConfiguration> testConfiguration, expectedConfiguration;
-    const std::string &temp = "{\n"
-                              "    \"aace.vehicle\": {\n"
-                              "        \"info\": {\n"
-                              "            \"make\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
-                              "            \"model\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
-                              "            \"trim\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
-                              "            \"year\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
-                              "            \"geography\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
-                              "            \"version\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
-                              "            \"os\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
-                              "            \"arch\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
-                              "            \"language\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
-                              "            \"microphone\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
-                              "            \"countries\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
-                              "            \"vehicleIdentifier\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\"\n"
-                              "        }\n"
-                              "    }\n"
-                              "}";
+    const std::string& temp =
+        "{\n"
+        "    \"aace.vehicle\": {\n"
+        "        \"info\": {\n"
+        "            \"make\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
+        "            \"model\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
+        "            \"trim\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
+        "            \"year\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
+        "            \"geography\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
+        "            \"version\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
+        "            \"os\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
+        "            \"arch\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
+        "            \"language\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
+        "            \"microphone\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
+        "            \"countries\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
+        "            \"vehicleIdentifier\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\"\n"
+        "        }\n"
+        "    }\n"
+        "}";
 
     expectedConfiguration = aace::core::config::StreamConfiguration::create(std::make_shared<std::stringstream>(temp));
-    testConfiguration = aace::vehicle::config::VehicleConfiguration::createVehicleInfoConfig({
-            {VehiclePropertyType::MAKE, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
-            {VehiclePropertyType::MODEL, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
-            {VehiclePropertyType::TRIM, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
-            {VehiclePropertyType::YEAR, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
-            {VehiclePropertyType::GEOGRAPHY, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
-            {VehiclePropertyType::VERSION, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
-            {VehiclePropertyType::OPERATING_SYSTEM, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
-            {VehiclePropertyType::HARDWARE_ARCH, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
-            {VehiclePropertyType::LANGUAGE, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
-            {VehiclePropertyType::MICROPHONE, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
-            {VehiclePropertyType::COUNTRY_LIST, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
-            {VehiclePropertyType::VEHICLE_IDENTIFIER, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"}
-        });
-    
+    testConfiguration = aace::vehicle::config::VehicleConfiguration::createVehicleInfoConfig(
+        {{VehiclePropertyType::MAKE, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
+         {VehiclePropertyType::MODEL, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
+         {VehiclePropertyType::TRIM, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
+         {VehiclePropertyType::YEAR, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
+         {VehiclePropertyType::GEOGRAPHY, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
+         {VehiclePropertyType::VERSION, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
+         {VehiclePropertyType::OPERATING_SYSTEM, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
+         {VehiclePropertyType::HARDWARE_ARCH, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
+         {VehiclePropertyType::LANGUAGE, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
+         {VehiclePropertyType::MICROPHONE, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
+         {VehiclePropertyType::COUNTRY_LIST, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
+         {VehiclePropertyType::VEHICLE_IDENTIFIER, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"}});
+
     //Convert to ostringstream for comparing the istream
     std::ostringstream expectedString, actualString;
     expectedString << expectedConfiguration->getStream()->rdbuf();
@@ -200,7 +198,7 @@ TEST_F(VehicleConfigurationImplTest, createVehicleInfoConfigWithPossibleCharsinV
     EXPECT_EQ(0, expectedString.str().compare(actualString.str())) << "Error in the Configuration String";
 }
 
-} // aace::engine::test::vehicle
-} // aace::engine::test
-} // aace::engine
-} // aace
+}  // namespace vehicle
+}  // namespace test
+}  // namespace engine
+}  // namespace aace

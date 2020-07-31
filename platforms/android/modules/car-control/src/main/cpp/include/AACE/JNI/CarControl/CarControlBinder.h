@@ -23,64 +23,70 @@ namespace aace {
 namespace jni {
 namespace carControl {
 
-    //
-    // CarControlBinder
-    //
+//
+// CarControlBinder
+//
 
-    class CarControlHandler : public aace::carControl::CarControl {
-    public:
-        CarControlHandler( jobject obj );
+class CarControlHandler : public aace::carControl::CarControl {
+public:
+    CarControlHandler(jobject obj);
 
-        /**
+    /**
          * PowerController
          */
-        bool turnPowerControllerOn(const std::string& endpointId) override;
-        bool turnPowerControllerOff(const std::string& endpointId) override;
-        bool isPowerControllerOn(const std::string& endpointId, bool& isOn) override;
+    bool turnPowerControllerOn(const std::string& endpointId) override;
+    bool turnPowerControllerOff(const std::string& endpointId) override;
+    bool isPowerControllerOn(const std::string& endpointId, bool& isOn) override;
 
-        /**
+    /**
          * ToggleController
          */
-        bool turnToggleControllerOn(const std::string& endpointId, const std::string& controllerId) override;
-        bool turnToggleControllerOff(const std::string& endpointId, const std::string& controllerId) override;
-        bool isToggleControllerOn(const std::string& endpointId, const std::string& controllerId, bool& isOn) override;
+    bool turnToggleControllerOn(const std::string& endpointId, const std::string& controllerId) override;
+    bool turnToggleControllerOff(const std::string& endpointId, const std::string& controllerId) override;
+    bool isToggleControllerOn(const std::string& endpointId, const std::string& controllerId, bool& isOn) override;
 
-        /**
+    /**
          * RangeController
          */
-        bool setRangeControllerValue(const std::string& endpointId, const std::string& controllerId, double value) override;
-        bool adjustRangeControllerValue(const std::string& endpointId, const std::string& controllerId, double delta) override;
-        bool getRangeControllerValue(const std::string& endpointId, const std::string& controllerId, double& value) override;
+    bool setRangeControllerValue(const std::string& endpointId, const std::string& controllerId, double value) override;
+    bool adjustRangeControllerValue(const std::string& endpointId, const std::string& controllerId, double delta)
+        override;
+    bool getRangeControllerValue(const std::string& endpointId, const std::string& controllerId, double& value)
+        override;
 
-        /**
+    /**
          * ModeController
          */
-        bool setModeControllerValue(const std::string& endpointId, const std::string& controllerId, const std::string& value) override;
-        bool adjustModeControllerValue(const std::string& endpointId, const std::string& controllerId, int delta) override;
-        bool getModeControllerValue(const std::string& endpointId, const std::string& controllerId, std::string& value) override;
+    bool setModeControllerValue(
+        const std::string& endpointId,
+        const std::string& controllerId,
+        const std::string& value) override;
+    bool adjustModeControllerValue(const std::string& endpointId, const std::string& controllerId, int delta) override;
+    bool getModeControllerValue(const std::string& endpointId, const std::string& controllerId, std::string& value)
+        override;
 
-    private:
-        JObject m_obj;
-    };
+private:
+    JObject m_obj;
+};
 
-    //
-    // CarControlBinder
-    //
+//
+// CarControlBinder
+//
 
-    class CarControlBinder : public aace::jni::core::PlatformInterfaceBinder {
-    public:
-        CarControlBinder( jobject obj );
+class CarControlBinder : public aace::jni::core::PlatformInterfaceBinder {
+public:
+    CarControlBinder(jobject obj);
 
-        std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
-            return m_carControlHandler;
-        }
+    std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
+        return m_carControlHandler;
+    }
 
-    private:
-        std::shared_ptr<CarControlHandler> m_carControlHandler;
-    };
+private:
+    std::shared_ptr<CarControlHandler> m_carControlHandler;
+};
 
-} // aace::jni::carControl
-} // aace::jni
-} // aace
+}  // namespace carControl
+}  // namespace jni
+}  // namespace aace
 
-#endif // AACE_CAR_CONTROL_CAR_CONTROL_BINDER_H
+#endif  // AACE_CAR_CONTROL_CAR_CONTROL_BINDER_H

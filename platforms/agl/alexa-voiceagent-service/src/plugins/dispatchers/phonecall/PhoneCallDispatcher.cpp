@@ -63,7 +63,6 @@ std::shared_ptr<PhoneCallDispatcher> PhoneCallDispatcher::create(
     std::shared_ptr<ILogger> logger,
     std::shared_ptr<IAASBController> aasbController,
     std::shared_ptr<IAFBApi> api) {
-
     return std::shared_ptr<PhoneCallDispatcher>(new PhoneCallDispatcher(logger, aasbController, api));
 }
 
@@ -71,22 +70,30 @@ PhoneCallDispatcher::PhoneCallDispatcher(
     std::shared_ptr<ILogger> logger,
     std::shared_ptr<IAASBController> aasbController,
     std::shared_ptr<IAFBApi> api) :
-        m_logger(logger),
-        m_aasbController(aasbController),
-        m_api(api) {
+        m_logger(logger), m_aasbController(aasbController), m_api(api) {
 }
 
-void PhoneCallDispatcher::onReceivedDirective(
-    const std::string& action,
-    const std::string& payload) {
-
+void PhoneCallDispatcher::onReceivedDirective(const std::string& action, const std::string& payload) {
     m_logger->log(Level::DEBUG, TAG, "Processing Phone call control directive: " + action);
 
     std::string vshlCapabilityAction = action;
 
     json_object* argsJ = json_object_new_object();
     json_object* actionJ = json_object_new_string(vshlCapabilityAction.c_str());
-    json_object* payloadJ = json_object_new_string(payload.c_str());
+    json_object* payloadJ = NULL;
+
+    if (payload.length()) {
+        payloadJ = json_tokener_parse(payload.c_str());
+    } else {
+        m_logger->log(Level::ERROR, TAG, "Unable to parse payload JSON. Setting to empty string: " + payload);
+        payloadJ = json_object_new_string("");
+    }
+
+    if (!payloadJ) {
+        m_logger->log(Level::ERROR, TAG, "Unable to parse payload JSON: " + payload);
+        return;
+    }
+
     json_object_object_add(argsJ, agl::alexa::JSON_ATTR_ACTION.c_str(), actionJ);
     json_object_object_add(argsJ, agl::alexa::JSON_ATTR_PAYLOAD.c_str(), payloadJ);
 
@@ -102,12 +109,11 @@ void PhoneCallDispatcher::onReceivedDirective(
     m_logger->log(Level::DEBUG, TAG, "Phone call action processing completed");
 }
 
-
 bool PhoneCallDispatcher::subscribeToPhoneCallControlEvents() {
     m_logger->log(Level::INFO, TAG, "Subscribing to phone-call control capabilities");
 
-    json_object *argsJ = json_object_new_object();
-    json_object *actionsJ = json_object_new_array();
+    json_object* argsJ = json_object_new_object();
+    json_object* actionsJ = json_object_new_array();
     json_object_array_add(actionsJ, json_object_new_string(VSHL_CAPABILITY_PHONE_CONNECTION_STATE_CHANGED.c_str()));
     json_object_array_add(actionsJ, json_object_new_string(VSHL_CAPABILITY_PHONE_CALL_STATE_CHANGED.c_str()));
     json_object_array_add(actionsJ, json_object_new_string(VSHL_CAPABILITY_PHONE_CALL_FAILED.c_str()));
@@ -137,38 +143,23 @@ bool PhoneCallDispatcher::subscribeToPhoneCallControlEvents() {
 }
 
 void PhoneCallDispatcher::onConnectionStateChanged(const std::string& payload) {
-    m_aasbController->onReceivedEvent(
-        TOPIC_PHONECALL_CONTROLLER,
-        ACTION_PHONECALL_CONNECTION_STATE_CHANGED,
-        payload);
+    m_aasbController->onReceivedEvent(TOPIC_PHONECALL_CONTROLLER, ACTION_PHONECALL_CONNECTION_STATE_CHANGED, payload);
 }
 
 void PhoneCallDispatcher::onCallStateChanged(const std::string& payload) {
-    m_aasbController->onReceivedEvent(
-        TOPIC_PHONECALL_CONTROLLER,
-        ACTION_PHONECALL_CALL_STATE_CHANGED,
-        payload);
+    m_aasbController->onReceivedEvent(TOPIC_PHONECALL_CONTROLLER, ACTION_PHONECALL_CALL_STATE_CHANGED, payload);
 }
 
 void PhoneCallDispatcher::onCallFailed(const std::string& payload) {
-    m_aasbController->onReceivedEvent(
-        TOPIC_PHONECALL_CONTROLLER,
-        ACTION_PHONECALL_CALL_FAILED,
-        payload);
+    m_aasbController->onReceivedEvent(TOPIC_PHONECALL_CONTROLLER, ACTION_PHONECALL_CALL_FAILED, payload);
 }
 
 void PhoneCallDispatcher::onCallerIdReceived(const std::string& payload) {
-    m_aasbController->onReceivedEvent(
-        TOPIC_PHONECALL_CONTROLLER,
-        ACTION_PHONECALL_CALLER_ID_RECEIVED,
-        payload);
+    m_aasbController->onReceivedEvent(TOPIC_PHONECALL_CONTROLLER, ACTION_PHONECALL_CALLER_ID_RECEIVED, payload);
 }
 
 void PhoneCallDispatcher::onSendDTMFSucceeded(const std::string& payload) {
-    m_aasbController->onReceivedEvent(
-        TOPIC_PHONECALL_CONTROLLER,
-        ACTION_PHONECALL_SEND_DTMF_SUCCEEDED,
-        payload);
+    m_aasbController->onReceivedEvent(TOPIC_PHONECALL_CONTROLLER, ACTION_PHONECALL_SEND_DTMF_SUCCEEDED, payload);
 }
 
 }  // namespace phonecall

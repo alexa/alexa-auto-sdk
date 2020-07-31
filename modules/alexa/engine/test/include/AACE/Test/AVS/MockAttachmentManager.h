@@ -33,14 +33,18 @@ public:
     MOCK_METHOD1(setAttachmentTimeoutMinutes, bool(std::chrono::minutes timeoutMinutes));
     MOCK_METHOD2(
         createWriter,
-        std::unique_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentWriter>(const std::string& attachmentId, alexaClientSDK::avsCommon::utils::sds::WriterPolicy policy));
+        std::unique_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentWriter>(
+            const std::string& attachmentId,
+            alexaClientSDK::avsCommon::utils::sds::WriterPolicy policy));
     MOCK_METHOD2(
         createReader,
-        std::unique_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader>(const std::string& attachmentId, alexaClientSDK::avsCommon::utils::sds::ReaderPolicy policy));
+        std::unique_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader>(
+            const std::string& attachmentId,
+            alexaClientSDK::avsCommon::utils::sds::ReaderPolicy policy));
 };
 
-} // aace::test::avs
-} // aace::test
-} // aace
+}  // namespace avs
+}  // namespace test
+}  // namespace aace
 
-#endif // AACE_TEST_AVS_MOCK_ATTACHMENT_MANAGER_H
+#endif  // AACE_TEST_AVS_MOCK_ATTACHMENT_MANAGER_H

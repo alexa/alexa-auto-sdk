@@ -44,21 +44,23 @@ static const std::string POWER_CONTROLLER("PowerController");
 static const std::string TOGGLE_CONTROLLER("ToggleController");
 static const std::string RANGE_CONTROLLER("RangeController");
 
-CarControlHandler::CarControlHandler(std::weak_ptr<Activity> activity, std::weak_ptr<logger::LoggerHandler> loggerHandler)
-    : m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
+CarControlHandler::CarControlHandler(
+    std::weak_ptr<Activity> activity,
+    std::weak_ptr<logger::LoggerHandler> loggerHandler) :
+        m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
     // Expects((m_activity != nullptr) && (m_loggerHandler != nullptr));
     setupUI();
 }
 
-std::weak_ptr<Activity> CarControlHandler::getActivity() { 
+std::weak_ptr<Activity> CarControlHandler::getActivity() {
     return m_activity;
 }
 
-std::weak_ptr<logger::LoggerHandler> CarControlHandler::getLoggerHandler() { 
+std::weak_ptr<logger::LoggerHandler> CarControlHandler::getLoggerHandler() {
     return m_loggerHandler;
 }
 
-void CarControlHandler::log(logger::LoggerHandler::Level level, const std::string &message) {
+void CarControlHandler::log(logger::LoggerHandler::Level level, const std::string& message) {
     auto loggerHandler = m_loggerHandler.lock();
     if (!loggerHandler) {
         return;
@@ -80,20 +82,20 @@ void CarControlHandler::showMessage(std::string message) {
         console->printRuler();
         console->printLine(message);
         console->printRuler();
-    } 
+    }
 }
 
 // PowerController
 bool CarControlHandler::turnPowerControllerOn(const std::string& endpointId) {
     CarControlDataProvider::getBoolController(endpointId).setValue(true);
-        
+
     std::stringstream logMessage;
-    logMessage << POWER_CONTROLLER << ",endpoint=" << endpointId << ",name=TurnOn"; 
+    logMessage << POWER_CONTROLLER << ",endpoint=" << endpointId << ",name=TurnOn";
     log(logger::LoggerHandler::Level::INFO, logMessage.str());
 
     std::stringstream console;
     console << "Entity   : Power Controller" << std::endl
-            << "Endpoint : " << endpointId   << std::endl
+            << "Endpoint : " << endpointId << std::endl
             << "Action   : Turn on";
     showMessage(console.str());
 
@@ -104,12 +106,12 @@ bool CarControlHandler::turnPowerControllerOff(const std::string& endpointId) {
     CarControlDataProvider::getBoolController(endpointId).setValue(false);
 
     std::stringstream logMessage;
-    logMessage << POWER_CONTROLLER << ",endpoint=" << endpointId << ",name=TurnOff"; 
+    logMessage << POWER_CONTROLLER << ",endpoint=" << endpointId << ",name=TurnOff";
     log(logger::LoggerHandler::Level::INFO, logMessage.str());
 
     std::stringstream console;
     console << "Entity   : Power Controller" << std::endl
-            << "Endpoint : " << endpointId   << std::endl
+            << "Endpoint : " << endpointId << std::endl
             << "Action   : Turn off";
 
     showMessage(console.str());
@@ -119,11 +121,11 @@ bool CarControlHandler::turnPowerControllerOff(const std::string& endpointId) {
 
 bool CarControlHandler::isPowerControllerOn(const std::string& endpointId, bool& isOn) {
     isOn = CarControlDataProvider::getBoolController(endpointId).getValue();
-    
+
     std::stringstream console;
     console << "Entity   : Power Controller" << std::endl
-            << "Endpoint : " << endpointId   << std::endl
-            << "Action   : Query State"      << std::endl
+            << "Endpoint : " << endpointId << std::endl
+            << "Action   : Query State" << std::endl
             << "State    : " << (isOn ? "on" : "off");
     showMessage(console.str());
 
@@ -135,12 +137,12 @@ bool CarControlHandler::turnToggleControllerOn(const std::string& endpointId, co
     CarControlDataProvider::getBoolController(endpointId, controllerId).setValue(true);
 
     std::stringstream logMessage;
-    logMessage << TOGGLE_CONTROLLER << ",endpoint=" << endpointId << ",name=TurnOn,instance=" << controllerId; 
+    logMessage << TOGGLE_CONTROLLER << ",endpoint=" << endpointId << ",name=TurnOn,instance=" << controllerId;
     log(logger::LoggerHandler::Level::INFO, logMessage.str());
 
     std::stringstream console;
     console << "Entity     : Toggle Controller" << std::endl
-            << "Endpoint   : " << endpointId   << std::endl
+            << "Endpoint   : " << endpointId << std::endl
             << "Controller : " << controllerId << std::endl
             << "Action     : Turn on";
     showMessage(console.str());
@@ -152,12 +154,12 @@ bool CarControlHandler::turnToggleControllerOff(const std::string& endpointId, c
     CarControlDataProvider::getBoolController(endpointId, controllerId).setValue(false);
 
     std::stringstream logMessage;
-    logMessage << TOGGLE_CONTROLLER << ",endpoint=" << endpointId << ",name=TurnOff,instance=" << controllerId; 
+    logMessage << TOGGLE_CONTROLLER << ",endpoint=" << endpointId << ",name=TurnOff,instance=" << controllerId;
     log(logger::LoggerHandler::Level::INFO, logMessage.str());
 
     std::stringstream console;
     console << "Entity     : Toggle Controller" << std::endl
-            << "Endpoint   : " << endpointId   << std::endl
+            << "Endpoint   : " << endpointId << std::endl
             << "Controller : " << controllerId << std::endl
             << "Action     : Turn off";
     showMessage(console.str());
@@ -165,14 +167,17 @@ bool CarControlHandler::turnToggleControllerOff(const std::string& endpointId, c
     return true;
 }
 
-bool CarControlHandler::isToggleControllerOn(const std::string& endpointId, const std::string& controllerId, bool& isOn) {
+bool CarControlHandler::isToggleControllerOn(
+    const std::string& endpointId,
+    const std::string& controllerId,
+    bool& isOn) {
     isOn = CarControlDataProvider::getBoolController(endpointId, controllerId).getValue();
 
     std::stringstream console;
     console << "Entity     : Toggle Controller" << std::endl
-            << "Endpoint   : " << endpointId    << std::endl
-            << "Controller : " << controllerId  << std::endl
-            << "Action     : Query State"       << std::endl
+            << "Endpoint   : " << endpointId << std::endl
+            << "Controller : " << controllerId << std::endl
+            << "Action     : Query State" << std::endl
             << "State      : " << (isOn ? "on" : "off");
     showMessage(console.str());
 
@@ -180,62 +185,65 @@ bool CarControlHandler::isToggleControllerOn(const std::string& endpointId, cons
 }
 
 // RangeController
-bool CarControlHandler::setRangeControllerValue(const std::string& endpointId, const std::string& controllerId, double value) {
+bool CarControlHandler::setRangeControllerValue(
+    const std::string& endpointId,
+    const std::string& controllerId,
+    double value) {
     CarControlDataProvider::getRangeController(endpointId, controllerId).setValue(value);
 
     std::stringstream logMessage;
-    logMessage << RANGE_CONTROLLER 
-               << ",endpoint=" << endpointId
-               << ",name=SetRangeValue"
-               << ",instance" << controllerId
-               << ",rangeValue" << value; 
+    logMessage << RANGE_CONTROLLER << ",endpoint=" << endpointId << ",name=SetRangeValue"
+               << ",instance" << controllerId << ",rangeValue" << value;
     log(logger::LoggerHandler::Level::INFO, logMessage.str());
 
     std::stringstream console;
     console << "Entity     : Range Controller" << std::endl
-            << "Endpoint   : " << endpointId   << std::endl
+            << "Endpoint   : " << endpointId << std::endl
             << "Controller : " << controllerId << std::endl
-            << "Action     : Set Value"        << std::endl
+            << "Action     : Set Value" << std::endl
             << "Value      : " << value;
     showMessage(console.str());
 
     return true;
 }
 
-bool CarControlHandler::adjustRangeControllerValue(const std::string& endpointId, const std::string& controllerId, double delta) {
+bool CarControlHandler::adjustRangeControllerValue(
+    const std::string& endpointId,
+    const std::string& controllerId,
+    double delta) {
     auto value = CarControlDataProvider::getRangeController(endpointId, controllerId).getValue();
     CarControlDataProvider::getRangeController(endpointId, controllerId).adjustValue(delta);
     auto valueNew = CarControlDataProvider::getRangeController(endpointId, controllerId).getValue();
 
     std::stringstream logMessage;
-    logMessage << RANGE_CONTROLLER 
-               << ",endpoint=" << endpointId
-               << ",name=AdjustRangeValue"
-               << ",instance" << controllerId
-               << ",rangeValueDelta" << delta; 
+    logMessage << RANGE_CONTROLLER << ",endpoint=" << endpointId << ",name=AdjustRangeValue"
+               << ",instance" << controllerId << ",rangeValueDelta" << delta;
     log(logger::LoggerHandler::Level::INFO, logMessage.str());
 
     std::stringstream console;
     console << "Entity     : Range Controller" << std::endl
-            << "Endpoint   : " << endpointId   << std::endl
+            << "Endpoint   : " << endpointId << std::endl
             << "Controller : " << controllerId << std::endl
-            << "Action     : Adjust Value"     << std::endl
-            << "Value      : " << value        << std::endl
-            << "Delta      : " << delta        << std::endl
+            << "Action     : Adjust Value" << std::endl
+            << "Value      : " << value << std::endl
+            << "Delta      : " << delta << std::endl
             << "New Value  : " << valueNew;
     showMessage(console.str());
 
     return true;
 }
 
-bool CarControlHandler::getRangeControllerValue(const std::string& endpointId, const std::string& controllerId, double& value) {
+bool CarControlHandler::getRangeControllerValue(
+    const std::string& endpointId,
+    const std::string& controllerId,
+    double& value) {
     value = CarControlDataProvider::getRangeController(endpointId, controllerId).getValue();
 
     std::stringstream console;
     console << "Entity     : Range Controller" << std::endl
-            << "Endpoint   : " << endpointId   << std::endl
+            << "Endpoint   : " << endpointId << std::endl
             << "Controller : " << controllerId << std::endl
-            << "Action     : Get Value"        << std::endl
+            << "Action     : Get Value" << std::endl
             << "Value      : " << value;
     showMessage(console.str());
 
@@ -243,62 +251,65 @@ bool CarControlHandler::getRangeControllerValue(const std::string& endpointId, c
 }
 
 // ModeController
-bool CarControlHandler::setModeControllerValue(const std::string& endpointId, const std::string& controllerId, const std::string& value) {
+bool CarControlHandler::setModeControllerValue(
+    const std::string& endpointId,
+    const std::string& controllerId,
+    const std::string& value) {
     CarControlDataProvider::getModeController(endpointId, controllerId).setMode(value);
 
     std::stringstream logMessage;
-    logMessage << MODE_CONTROLLER 
-               << ",endpoint=" << endpointId
-               << ",name=SetMode"
-               << ",instance" << controllerId
-               << ",mode" << value; 
+    logMessage << MODE_CONTROLLER << ",endpoint=" << endpointId << ",name=SetMode"
+               << ",instance" << controllerId << ",mode" << value;
     log(logger::LoggerHandler::Level::INFO, logMessage.str());
 
     std::stringstream console;
-    console << "Entity     : Mode Controller"  << std::endl
-            << "Endpoint   : " << endpointId   << std::endl
+    console << "Entity     : Mode Controller" << std::endl
+            << "Endpoint   : " << endpointId << std::endl
             << "Controller : " << controllerId << std::endl
-            << "Action     : Set Mode"         << std::endl
+            << "Action     : Set Mode" << std::endl
             << "Value      : " << value;
     showMessage(console.str());
 
     return true;
 }
 
-bool CarControlHandler::adjustModeControllerValue(const std::string& endpointId, const std::string& controllerId, int delta) {
+bool CarControlHandler::adjustModeControllerValue(
+    const std::string& endpointId,
+    const std::string& controllerId,
+    int delta) {
     auto value = CarControlDataProvider::getModeController(endpointId, controllerId).getMode();
     CarControlDataProvider::getModeController(endpointId, controllerId).adjustMode(delta);
     auto valueNew = CarControlDataProvider::getModeController(endpointId, controllerId).getMode();
 
     std::stringstream logMessage;
-    logMessage << MODE_CONTROLLER 
-               << ",endpoint=" << endpointId
-               << ",name=AdjustMode"
-               << ",instance" << controllerId
-               << ",modeDelta" << delta; 
+    logMessage << MODE_CONTROLLER << ",endpoint=" << endpointId << ",name=AdjustMode"
+               << ",instance" << controllerId << ",modeDelta" << delta;
     log(logger::LoggerHandler::Level::INFO, logMessage.str());
 
     std::stringstream console;
-    console << "Entity     : Mode Controller"  << std::endl
-            << "Endpoint   : " << endpointId   << std::endl
+    console << "Entity     : Mode Controller" << std::endl
+            << "Endpoint   : " << endpointId << std::endl
             << "Controller : " << controllerId << std::endl
-            << "Action     : Adjust Mode"      << std::endl
-            << "Value      : " << value        << std::endl
-            << "Delta      : " << delta        << std::endl
+            << "Action     : Adjust Mode" << std::endl
+            << "Value      : " << value << std::endl
+            << "Delta      : " << delta << std::endl
             << "New Value  : " << valueNew;
     showMessage(console.str());
 
     return true;
 }
 
-bool CarControlHandler::getModeControllerValue(const std::string& endpointId, const std::string& controllerId, std::string& value) {
+bool CarControlHandler::getModeControllerValue(
+    const std::string& endpointId,
+    const std::string& controllerId,
+    std::string& value) {
     value = CarControlDataProvider::getModeController(endpointId, controllerId).getMode();
 
     std::stringstream console;
-    console << "Entity     : Mode Controller"  << std::endl
-            << "Endpoint   : " << endpointId   << std::endl
+    console << "Entity     : Mode Controller" << std::endl
+            << "Endpoint   : " << endpointId << std::endl
             << "Controller : " << controllerId << std::endl
-            << "Action     : Get Mode"         << std::endl
+            << "Action     : Get Mode" << std::endl
             << "Value      : " << value;
     showMessage(console.str());
 
@@ -307,12 +318,11 @@ bool CarControlHandler::getModeControllerValue(const std::string& endpointId, co
 
 bool CarControlHandler::checkConfiguration(const std::vector<json>& jsons, CarControlHandler::ConfigType type) {
     // Look for car control config
-    for(auto const& j: jsons) {
+    for (auto const& j : jsons) {
         try {
             switch (type) {
                 case ConfigType::LVC:
-                    if (j.find("aace.localVoiceControl") != j.end() && 
-                        j.find("aace.localSkillService") != j.end() ) {
+                    if (j.find("aace.localVoiceControl") != j.end() && j.find("aace.localSkillService") != j.end()) {
                         return true;
                     }
                     break;
@@ -322,12 +332,12 @@ bool CarControlHandler::checkConfiguration(const std::vector<json>& jsons, CarCo
                     }
                     break;
             }
-        } catch (json::exception &e) {
+        } catch (json::exception& e) {
         }
     }
 
     return false;
 }
 
-} // namespace carControl
-} // namespace sampleApp
+}  // namespace carControl
+}  // namespace sampleApp

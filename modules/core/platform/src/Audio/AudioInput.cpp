@@ -18,15 +18,15 @@
 namespace aace {
 namespace audio {
 
-AudioInput::~AudioInput() = default; // key function
+AudioInput::~AudioInput() = default;  // key function
 
-ssize_t AudioInput::write( const int16_t* data, const size_t size ) {
-    return m_audioInputEngineInterface != nullptr ? m_audioInputEngineInterface->write( data, size ) : 0;
+ssize_t AudioInput::write(const int16_t* data, const size_t size) {
+    return m_audioInputEngineInterface != nullptr ? m_audioInputEngineInterface->write(data, size) : 0;
 }
 
-void AudioInput::setEngineInterface( std::shared_ptr<aace::audio::AudioInputEngineInterface> audioInputEngineInterface ) {
+void AudioInput::setEngineInterface(std::shared_ptr<aace::audio::AudioInputEngineInterface> audioInputEngineInterface) {
     m_audioInputEngineInterface = audioInputEngineInterface;
 }
 
-} // aace::audio
-} // aace
+}  // namespace audio
+}  // namespace aace

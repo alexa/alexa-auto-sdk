@@ -25,24 +25,21 @@ static const std::string TAG("EndpointBuilderFactory");
 
 std::shared_ptr<EndpointBuilderFactory> EndpointBuilderFactory::create(
     std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointRegistrationManagerInterface> endpointRegistrationManager,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointRegistrationManagerInterface>
+        endpointRegistrationManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::capabilityAgents::alexa::AlexaInterfaceMessageSender> alexaMessageSender) {
     try {
-        ThrowIfNull( deviceInfo, "nullDeviceInfo" );
-        ThrowIfNull( endpointRegistrationManager, "nullEndpointRegistrationManager" );
-        ThrowIfNull( contextManager, "nullContextManager" );
-        ThrowIfNull( alexaMessageSender, "nullAlexaMessageSender" );
-        ThrowIfNull( exceptionSender, "nullExceptionSender" );
+        ThrowIfNull(deviceInfo, "nullDeviceInfo");
+        ThrowIfNull(endpointRegistrationManager, "nullEndpointRegistrationManager");
+        ThrowIfNull(contextManager, "nullContextManager");
+        ThrowIfNull(alexaMessageSender, "nullAlexaMessageSender");
+        ThrowIfNull(exceptionSender, "nullExceptionSender");
 
         return std::shared_ptr<EndpointBuilderFactory>(new EndpointBuilderFactory(
-            deviceInfo, 
-            endpointRegistrationManager, 
-            contextManager, 
-            exceptionSender, 
-            alexaMessageSender));
-    } catch( std::exception& ex ) {
+            deviceInfo, endpointRegistrationManager, contextManager, exceptionSender, alexaMessageSender));
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG, "createFailed").d("reason", ex.what()));
         return nullptr;
     }
@@ -50,7 +47,8 @@ std::shared_ptr<EndpointBuilderFactory> EndpointBuilderFactory::create(
 
 EndpointBuilderFactory::EndpointBuilderFactory(
     std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointRegistrationManagerInterface> endpointRegistrationManager,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointRegistrationManagerInterface>
+        endpointRegistrationManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::capabilityAgents::alexa::AlexaInterfaceMessageSender> alexaMessageSender) :
@@ -64,11 +62,7 @@ EndpointBuilderFactory::EndpointBuilderFactory(
 
 std::unique_ptr<alexaClientSDK::endpoints::EndpointBuilder> EndpointBuilderFactory::createEndpointBuilder() {
     return alexaClientSDK::endpoints::EndpointBuilder::create(
-        *m_deviceInfo,
-        m_endpointManager,
-        m_contextManager,
-        m_exceptionSender,
-        m_alexaMessageSender);
+        *m_deviceInfo, m_endpointManager, m_contextManager, m_exceptionSender, m_alexaMessageSender);
 }
 
 void EndpointBuilderFactory::doShutdown() {
@@ -78,6 +72,6 @@ void EndpointBuilderFactory::doShutdown() {
     m_alexaMessageSender.reset();
 }
 
-} // aace::engine::alexa
-} // aace::engine
-} // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace

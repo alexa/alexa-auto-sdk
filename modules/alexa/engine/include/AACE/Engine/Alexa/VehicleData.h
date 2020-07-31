@@ -18,6 +18,7 @@
 
 #include <AVSCommon/AVS/CapabilityConfiguration.h>
 #include <AVSCommon/SDKInterfaces/CapabilityConfigurationInterface.h>
+#include <AVSCommon/Utils/Optional.h>
 
 #include "AACE/Engine/Vehicle/VehiclePropertyInterface.h"
 
@@ -77,9 +78,10 @@ private:
      *
      * @param attribute The key of an attribute (analytics, resources, or additional) used in
      *        Alexa.Automotive.VehicleData capability configuration
-     * @return The OEM setting from @c VehicleConfiguration corresponding to the provided key
+     * @return An optional value containing the OEM setting from @c VehicleConfiguration corresponding to the provided 
+     *        key if present, else an uninitialized value
      */
-    static std::string getPropertyByAttribute(
+    static alexaClientSDK::avsCommon::utils::Optional<std::string> getPropertyByAttribute(
         const std::string& attribute,
         const VehiclePropertyMap& vehiclePropertyMap);
 

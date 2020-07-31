@@ -8,7 +8,8 @@ public enum PlayerEvents {
     PlaybackPrevious("PlaybackPrevious"),
     PlaybackNext("PlaybackNext"),
     TrackChanged("TrackChanged"),
-    PlayModeChanged("PlayModeChanged"),;
+    PlayModeChanged("PlayModeChanged"),
+    ;
 
     private final String mName;
 

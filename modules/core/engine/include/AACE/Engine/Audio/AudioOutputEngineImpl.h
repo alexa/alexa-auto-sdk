@@ -25,43 +25,42 @@ namespace aace {
 namespace engine {
 namespace audio {
 
-class AudioOutputEngineImpl :
-    public AudioOutputChannelInterface,
-    public aace::audio::AudioOutputEngineInterface {
-    
+class AudioOutputEngineImpl
+        : public AudioOutputChannelInterface
+        , public aace::audio::AudioOutputEngineInterface {
 public:
-    static std::shared_ptr<AudioOutputEngineImpl> create( std::shared_ptr<aace::audio::AudioOutput> platformAudioOutput );
+    static std::shared_ptr<AudioOutputEngineImpl> create(std::shared_ptr<aace::audio::AudioOutput> platformAudioOutput);
 
 private:
-    AudioOutputEngineImpl( std::shared_ptr<aace::audio::AudioOutput> platformAudioOutput );
+    AudioOutputEngineImpl(std::shared_ptr<aace::audio::AudioOutput> platformAudioOutput);
 
 public:
-
     // AudioOutputChannelInterface
-    bool prepare( std::shared_ptr<aace::audio::AudioStream> stream, bool repeating ) override;
-    bool prepare( const std::string& url, bool repeating ) override;
+    bool prepare(std::shared_ptr<aace::audio::AudioStream> stream, bool repeating) override;
+    bool prepare(const std::string& url, bool repeating) override;
     bool play() override;
     bool stop() override;
     bool pause() override;
     bool resume() override;
     int64_t getPosition() override;
-    bool setPosition( int64_t position ) override;
+    bool setPosition(int64_t position) override;
     int64_t getDuration() override;
     int64_t getNumBytesBuffered() override;
-    bool volumeChanged( float volume ) override;
-    bool mutedStateChanged( MutedState state ) override;
-    void setEngineInterface( std::shared_ptr<aace::audio::AudioOutputEngineInterface> audioOutputEngineInterface ) override;
+    bool volumeChanged(float volume) override;
+    bool mutedStateChanged(MutedState state) override;
+    void setEngineInterface(
+        std::shared_ptr<aace::audio::AudioOutputEngineInterface> audioOutputEngineInterface) override;
 
     // aace::audio::AudioOutputEngineInterface
-    void onMediaStateChanged( MediaState state ) override;
-    void onMediaError( MediaError error, const std::string& description = "" ) override;
+    void onMediaStateChanged(MediaState state) override;
+    void onMediaError(MediaError error, const std::string& description = "") override;
 
 private:
     std::shared_ptr<aace::audio::AudioOutput> m_platformAudioOutput;
 };
 
-}  // audio
-}  // engine
-}  // aace
+}  // namespace audio
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_AUDIO_AUDIO_OUTPUT_CHANNEL_ENGINE_IMPL_H
+#endif  // AACE_ENGINE_AUDIO_AUDIO_OUTPUT_CHANNEL_ENGINE_IMPL_H

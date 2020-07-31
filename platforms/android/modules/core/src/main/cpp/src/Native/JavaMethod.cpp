@@ -23,17 +23,18 @@ namespace aace {
 namespace jni {
 namespace native {
 
-    JavaMethod::JavaMethod( const std::string& name, const std::string& signature, jmethodID methodID ) : m_name( name ), m_signature( signature ), m_methodID( methodID ) {
-    }
+JavaMethod::JavaMethod(const std::string& name, const std::string& signature, jmethodID methodID) :
+        m_name(name), m_signature(signature), m_methodID(methodID) {
+}
 
-    std::shared_ptr<JavaMethod> JavaMethod::create( const char* name, const char* signature, jmethodID methodID ) {
-        return std::shared_ptr<JavaMethod>( new JavaMethod( name, signature, methodID ) );
-    }
+std::shared_ptr<JavaMethod> JavaMethod::create(const char* name, const char* signature, jmethodID methodID) {
+    return std::shared_ptr<JavaMethod>(new JavaMethod(name, signature, methodID));
+}
 
-    jmethodID JavaMethod::getMethodID() {
-        return m_methodID;
-    }
+jmethodID JavaMethod::getMethodID() {
+    return m_methodID;
+}
 
-} // aace::jni::native
-} // aace::jni
-} // aace
+}  // namespace native
+}  // namespace jni
+}  // namespace aace

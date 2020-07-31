@@ -18,29 +18,28 @@ package com.amazon.aace.alexa;
 import com.amazon.aace.core.PlatformInterface;
 
 /**
- * DoNotDisturb should be extended to handle receving state changes from the engine, 
+ * DoNotDisturb should be extended to handle receving state changes from the engine,
  * and for sending state change events for the Do Not Disturb Setting.
- * For more information about Do Not Disturb see the interface overview: 
+ * For more information about Do Not Disturb see the interface overview:
  * https://developer.amazon.com/docs/alexa-voice-service/donotdisturb.html
- */ 
-public class DoNotDisturb extends PlatformInterface
-{
+ */
+public class DoNotDisturb extends PlatformInterface {
     /**
-     * Handle setting of DND directive. 
-     * 
+     * Handle setting of DND directive.
+     *
      * @param doNotDisturb setting state
      * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
-    public void setDoNotDisturb( boolean doNotDisturb ) {}
+    public void setDoNotDisturb(boolean doNotDisturb) {}
 
     /**
      * Notifies the Engine of a platform request to set the DND State
      * @return @c true if the engine implementation successfully sent the event,
      * else @c false
      */
-    final public boolean doNotDisturbChanged( boolean doNotDisturb ) {
-        return doNotDisturbChanged( getNativeRef(), doNotDisturb);
+    final public boolean doNotDisturbChanged(boolean doNotDisturb) {
+        return doNotDisturbChanged(getNativeRef(), doNotDisturb);
     }
 
     // NativeRef implementation
@@ -48,14 +47,12 @@ public class DoNotDisturb extends PlatformInterface
         return createBinder();
     }
 
-    final protected void disposeNativeRef( long nativeRef ) {
-        disposeBinder( nativeRef );
+    final protected void disposeNativeRef(long nativeRef) {
+        disposeBinder(nativeRef);
     }
 
     // Native Engine JNI methods
     private native long createBinder();
-    private native void disposeBinder( long nativeRef );
-    private native boolean doNotDisturbChanged( long nativeObject, boolean doNotDisturb );
+    private native void disposeBinder(long nativeRef);
+    private native boolean doNotDisturbChanged(long nativeObject, boolean doNotDisturb);
 }
-
-

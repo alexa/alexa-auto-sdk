@@ -14,4 +14,5 @@ IMAGE_INSTALL += "\
     aac-module-cbl \
     aac-module-address-book \
     aac-module-car-control \
+    aac-module-messaging \
     "

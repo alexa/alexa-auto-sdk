@@ -24,44 +24,47 @@ namespace aace {
 namespace jni {
 namespace alexa {
 
-    //
-    // JTemplateRuntimeTimeoutType
-    //
+//
+// JTemplateRuntimeTimeoutType
+//
 
-    class JTemplateRuntimeTimeoutTypeConfig : public EnumConfiguration<aace::alexa::config::AlexaConfiguration::TemplateRuntimeTimeoutType> {
-    public:
-        using T = aace::alexa::config::AlexaConfiguration::TemplateRuntimeTimeoutType;
+class JTemplateRuntimeTimeoutTypeConfig
+        : public EnumConfiguration<aace::alexa::config::AlexaConfiguration::TemplateRuntimeTimeoutType> {
+public:
+    using T = aace::alexa::config::AlexaConfiguration::TemplateRuntimeTimeoutType;
 
-        const char* getClassName() override {
-            return "com/amazon/aace/alexa/AlexaConfiguration$TemplateRuntimeTimeoutType";
-        }
+    const char* getClassName() override {
+        return "com/amazon/aace/alexa/AlexaConfiguration$TemplateRuntimeTimeoutType";
+    }
 
-        std::vector<std::pair<T,std::string>> getConfiguration() override {
-            return {
-                {T::DISPLAY_CARD_TTS_FINISHED_TIMEOUT, "DISPLAY_CARD_TTS_FINISHED_TIMEOUT"},
+    std::vector<std::pair<T, std::string>> getConfiguration() override {
+        return {{T::DISPLAY_CARD_TTS_FINISHED_TIMEOUT, "DISPLAY_CARD_TTS_FINISHED_TIMEOUT"},
                 {T::DISPLAY_CARD_AUDIO_PLAYBACK_FINISHED_TIMEOUT, "DISPLAY_CARD_AUDIO_PLAYBACK_FINISHED_TIMEOUT"},
-                {T::DISPLAY_CARD_AUDIO_PLAYBACK_STOPPED_PAUSED_TIMEOUT, "DISPLAY_CARD_AUDIO_PLAYBACK_STOPPED_PAUSED_TIMEOUT"}
-            };
-        }
-    };
+                {T::DISPLAY_CARD_AUDIO_PLAYBACK_STOPPED_PAUSED_TIMEOUT,
+                 "DISPLAY_CARD_AUDIO_PLAYBACK_STOPPED_PAUSED_TIMEOUT"}};
+    }
+};
 
-    using JTemplateRuntimeTimeoutType = JEnum<aace::alexa::config::AlexaConfiguration::TemplateRuntimeTimeoutType,JTemplateRuntimeTimeoutTypeConfig>;
+using JTemplateRuntimeTimeoutType =
+    JEnum<aace::alexa::config::AlexaConfiguration::TemplateRuntimeTimeoutType, JTemplateRuntimeTimeoutTypeConfig>;
 
-    //
-    // JTemplateRuntimeTimeout
-    //
+//
+// JTemplateRuntimeTimeout
+//
 
-    class JTemplateRuntimeTimeout : public JObject {
-    public:
-        JTemplateRuntimeTimeout( jobject obj ) : JObject( obj, "com/amazon/aace/alexa/AlexaConfiguration$TemplateRuntimeTimeout" ) {};
+class JTemplateRuntimeTimeout : public JObject {
+public:
+    JTemplateRuntimeTimeout(jobject obj) :
+            JObject(obj, "com/amazon/aace/alexa/AlexaConfiguration$TemplateRuntimeTimeout"){};
 
-        aace::alexa::config::AlexaConfiguration::TemplateRuntimeTimeout getTemplateRuntimeTimeout();
+    aace::alexa::config::AlexaConfiguration::TemplateRuntimeTimeout getTemplateRuntimeTimeout();
 
-        static std::vector<aace::alexa::config::AlexaConfiguration::TemplateRuntimeTimeout> convert( jobjectArray timeoutArrObj );
-    };
+    static std::vector<aace::alexa::config::AlexaConfiguration::TemplateRuntimeTimeout> convert(
+        jobjectArray timeoutArrObj);
+};
 
-} // aace::jni::alexa
-} // aace::jni
-} // aace
+}  // namespace alexa
+}  // namespace jni
+}  // namespace aace
 
-#endif // AACE_JNI_ALEXA_ALEXA_CONFIGURATION_BINDER_H
+#endif  // AACE_JNI_ALEXA_ALEXA_CONFIGURATION_BINDER_H

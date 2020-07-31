@@ -22,7 +22,6 @@ namespace aace {
 namespace navigation {
 
 class NavigationEngineInterface {
-
 public:
     enum class EventName {
         /*
@@ -176,12 +175,12 @@ public:
          * Navigation failed to start. Send in response to startNavigation() directive.
          */
         NAVIGATION_START_FAILED,
-        
+
         /**
          * List of previous waypoints failed to display. Send in response to showPreviousWaypoints() directive.
          */
         SHOW_PREVIOUS_WAYPOINTS_FAILED,
-        
+
         /**
          * The previous navigation route failed to start. Send in response to navigateToPreviousWaypoint() directive.
          */
@@ -323,22 +322,22 @@ public:
          * Failure caused by an unexpected service or client implementation error
          */
         INTERNAL_SERVICE_ERROR,
-        
+
         /**
          * Failed because the route could not be found
          */
         ROUTE_NOT_FOUND,
-        
+
         /**
          * Failed because there are no previous waypoints available
          */
         NO_PREVIOUS_WAYPOINTS,
-        
+
         /**
          * The operation requested is not supported or implemented
          */
         NOT_SUPPORTED,
-        
+
         /**
          * The operation requested can't be performed now
          */
@@ -353,13 +352,13 @@ public:
 
         SHORTER_DISTANCE
     };
-    
-    virtual void onNavigationEvent( EventName event ) = 0;
-    virtual void onNavigationError( ErrorType type, ErrorCode code, const std::string& description ) = 0;
-    virtual void onShowAlternativeRoutesSucceeded( const std::string& payload ) = 0;
+
+    virtual void onNavigationEvent(EventName event) = 0;
+    virtual void onNavigationError(ErrorType type, ErrorCode code, const std::string& description) = 0;
+    virtual void onShowAlternativeRoutesSucceeded(const std::string& payload) = 0;
 };
 
-} // aace::navigation
-} // aace
+}  // namespace navigation
+}  // namespace aace
 
 #endif

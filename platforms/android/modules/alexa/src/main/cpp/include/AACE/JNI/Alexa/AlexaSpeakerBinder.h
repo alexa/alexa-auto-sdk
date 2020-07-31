@@ -23,65 +23,62 @@ namespace aace {
 namespace jni {
 namespace alexa {
 
-    //
-    // AlexaSpeakerHandler
-    //
+//
+// AlexaSpeakerHandler
+//
 
-    class AlexaSpeakerHandler : public aace::alexa::AlexaSpeaker {
-    public:
-        AlexaSpeakerHandler( jobject obj );
+class AlexaSpeakerHandler : public aace::alexa::AlexaSpeaker {
+public:
+    AlexaSpeakerHandler(jobject obj);
 
-        // aace::alexa::AlexaSpeaker
-        void speakerSettingsChanged( SpeakerType type, bool local, int8_t volume, bool mute ) override;
+    // aace::alexa::AlexaSpeaker
+    void speakerSettingsChanged(SpeakerType type, bool local, int8_t volume, bool mute) override;
 
-    private:
-        JObject m_obj;
-    };
+private:
+    JObject m_obj;
+};
 
-    //
-    // AlexaSpeakerBinder
-    //
+//
+// AlexaSpeakerBinder
+//
 
-    class AlexaSpeakerBinder : public aace::jni::core::PlatformInterfaceBinder {
-    public:
-        AlexaSpeakerBinder( jobject obj );
+class AlexaSpeakerBinder : public aace::jni::core::PlatformInterfaceBinder {
+public:
+    AlexaSpeakerBinder(jobject obj);
 
-        std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
-            return m_alexaSpeakerHandler;
-        }
+    std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
+        return m_alexaSpeakerHandler;
+    }
 
-        std::shared_ptr<AlexaSpeakerHandler> getAlexaSpeaker() {
-            return m_alexaSpeakerHandler;
-        }
+    std::shared_ptr<AlexaSpeakerHandler> getAlexaSpeaker() {
+        return m_alexaSpeakerHandler;
+    }
 
-    private:
-        std::shared_ptr<AlexaSpeakerHandler> m_alexaSpeakerHandler;
-    };
+private:
+    std::shared_ptr<AlexaSpeakerHandler> m_alexaSpeakerHandler;
+};
 
-    //
-    // JSpeakerType
-    //
+//
+// JSpeakerType
+//
 
-    class JSpeakerTypeConfig : public EnumConfiguration<AlexaSpeakerHandler::SpeakerType> {
-    public:
-        using T = AlexaSpeakerHandler::SpeakerType;
+class JSpeakerTypeConfig : public EnumConfiguration<AlexaSpeakerHandler::SpeakerType> {
+public:
+    using T = AlexaSpeakerHandler::SpeakerType;
 
-        const char* getClassName() override {
-            return "com/amazon/aace/alexa/AlexaSpeaker$SpeakerType";
-        }
+    const char* getClassName() override {
+        return "com/amazon/aace/alexa/AlexaSpeaker$SpeakerType";
+    }
 
-        std::vector<std::pair<T,std::string>> getConfiguration() override {
-            return {
-                {T::ALEXA_VOLUME,"ALEXA_VOLUME"},
-                {T::ALERTS_VOLUME,"ALERTS_VOLUME"}
-            };
-        }
-    };
+    std::vector<std::pair<T, std::string>> getConfiguration() override {
+        return {{T::ALEXA_VOLUME, "ALEXA_VOLUME"}, {T::ALERTS_VOLUME, "ALERTS_VOLUME"}};
+    }
+};
 
-    using JSpeakerType = JEnum<AlexaSpeakerHandler::SpeakerType,JSpeakerTypeConfig>;
+using JSpeakerType = JEnum<AlexaSpeakerHandler::SpeakerType, JSpeakerTypeConfig>;
 
-} // aace::alexa
-} // aace::jni
-} // aace
+}  // namespace alexa
+}  // namespace jni
+}  // namespace aace
 
-#endif // AACE_JNI_ALEXA_ALEXA_SPEAKER_BINDER_H
+#endif  // AACE_JNI_ALEXA_ALEXA_SPEAKER_BINDER_H

@@ -65,20 +65,19 @@ public:
      * Used when audio time is unknown or indeterminate.
      */
     static const int64_t TIME_UNKNOWN = -1;
-    
-    enum class MutedState
-    {
+
+    enum class MutedState {
         /**
          * The audio channel state id muted.
          */
         MUTED,
-        
+
         /**
          * The audio channel state id unmuted.
          */
         UNMUTED
     };
-    
+
     virtual ~AudioOutput();
 
     /**
@@ -92,8 +91,8 @@ public:
      * @return @c true if the platform implementation successfully handled the call, 
      * else @c false
      */
-    virtual bool prepare( std::shared_ptr<AudioStream> stream, bool repeating ) = 0;
-    
+    virtual bool prepare(std::shared_ptr<AudioStream> stream, bool repeating) = 0;
+
     /**
      * Notifies the platform implementation to prepare for playback of a
      * URL audio source. After returning @c true, the Engine will call @c play()
@@ -104,7 +103,7 @@ public:
      * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
-    virtual bool prepare( const std::string& url, bool repeating ) = 0;
+    virtual bool prepare(const std::string& url, bool repeating) = 0;
 
     /**
      * Notifies the platform implementation to start playback of the current audio source. After returning @c true,
@@ -168,7 +167,7 @@ public:
      * @return @c true if the platform implementation successfully handled the call, 
      * else @c false
      */
-    virtual bool setPosition( int64_t position ) = 0;
+    virtual bool setPosition(int64_t position) = 0;
 
     /**
      * Returns the duration of the current audio source. If the duration is unknown, then
@@ -194,7 +193,7 @@ public:
      * @return @c true if the platform implementation successfully handled the call, 
      * else @c false
      */
-    virtual bool volumeChanged( float volume ) = 0;
+    virtual bool volumeChanged(float volume) = 0;
 
     /**
      * Notifies the platform implementation to apply a muted state has changed for
@@ -205,7 +204,7 @@ public:
      * @return @c true if the platform implementation successfully handled the call, 
      * else @c false
      */
-    virtual bool mutedStateChanged( MutedState state ) = 0;
+    virtual bool mutedStateChanged(MutedState state) = 0;
 
     /**
      * Notifies the Engine of an audio playback state change in the platform implementation.
@@ -214,8 +213,8 @@ public:
      * @param [in] state The new playback state of the platform media player
      * @sa MediaState
      */
-    void mediaStateChanged( MediaState state );
-    
+    void mediaStateChanged(MediaState state);
+
     /**
      * Notifies the Engine of an error during audio playback
      *
@@ -223,7 +222,7 @@ public:
      * @param [in] description A description of the error
      * @sa MediaError
      */
-    void mediaError( MediaError error, const std::string& description = "" );
+    void mediaError(MediaError error, const std::string& description = "");
 
     /**
      * @internal
@@ -231,7 +230,7 @@ public:
      *
      * Should *never* be called by the platform implementation.
      */
-    void setEngineInterface( std::shared_ptr<aace::audio::AudioOutputEngineInterface> audioOutputEngineInterface );
+    void setEngineInterface(std::shared_ptr<aace::audio::AudioOutputEngineInterface> audioOutputEngineInterface);
 
 private:
     std::weak_ptr<aace::audio::AudioOutputEngineInterface> m_audioOutputEngineInterface;
@@ -249,7 +248,7 @@ inline std::ostream& operator<<(std::ostream& stream, const AudioOutput::MutedSt
     return stream;
 }
 
-} // aace::audio
-} // aace
+}  // namespace audio
+}  // namespace aace
 
-#endif // AACE_AUDIO_AUDIO_OUTPUT_H
+#endif  // AACE_AUDIO_AUDIO_OUTPUT_H

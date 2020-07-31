@@ -25,72 +25,69 @@ namespace aace {
 namespace jni {
 namespace alexa {
 
-    class EqualizerControllerHandler : public aace::alexa::EqualizerController {
-    public:
-        EqualizerControllerHandler( jobject obj );
+class EqualizerControllerHandler : public aace::alexa::EqualizerController {
+public:
+    EqualizerControllerHandler(jobject obj);
 
-        // aace::alexa::EqualizerController
-        void setBandLevels( const std::vector<EqualizerBandLevel>& bandLevels ) override;
-        std::vector<EqualizerBandLevel> getBandLevels() override;
+    // aace::alexa::EqualizerController
+    void setBandLevels(const std::vector<EqualizerBandLevel>& bandLevels) override;
+    std::vector<EqualizerBandLevel> getBandLevels() override;
 
-    private:
-        JObject m_obj;
-    };
+private:
+    JObject m_obj;
+};
 
-    class EqualizerControllerBinder : public aace::jni::core::PlatformInterfaceBinder {
-    public:
-        EqualizerControllerBinder( jobject obj );
+class EqualizerControllerBinder : public aace::jni::core::PlatformInterfaceBinder {
+public:
+    EqualizerControllerBinder(jobject obj);
 
-        std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
-            return m_equalizerControllerHandler;
-        }
+    std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
+        return m_equalizerControllerHandler;
+    }
 
-        std::shared_ptr<EqualizerControllerHandler> getEqualizerController() {
-            return m_equalizerControllerHandler;
-        }
+    std::shared_ptr<EqualizerControllerHandler> getEqualizerController() {
+        return m_equalizerControllerHandler;
+    }
 
-    private:
-        std::shared_ptr<EqualizerControllerHandler> m_equalizerControllerHandler;
-    };
+private:
+    std::shared_ptr<EqualizerControllerHandler> m_equalizerControllerHandler;
+};
 
-    //
-    // JEqualizerBand
-    //
+//
+// JEqualizerBand
+//
 
-    class JEqualizerBandConfig : public EnumConfiguration<EqualizerControllerHandler::EqualizerBand> {
-    public:
-        using T = EqualizerControllerHandler::EqualizerBand;
+class JEqualizerBandConfig : public EnumConfiguration<EqualizerControllerHandler::EqualizerBand> {
+public:
+    using T = EqualizerControllerHandler::EqualizerBand;
 
-        const char* getClassName() override {
-            return "com/amazon/aace/alexa/EqualizerController$EqualizerBand";
-        }
+    const char* getClassName() override {
+        return "com/amazon/aace/alexa/EqualizerController$EqualizerBand";
+    }
 
-        std::vector<std::pair<T,std::string>> getConfiguration() override {
-            return {
-                {T::BASS,"BASS"},
-                {T::MIDRANGE,"MIDRANGE"},
-                {T::TREBLE,"TREBLE"}
-            };
-        }
-    };
+    std::vector<std::pair<T, std::string>> getConfiguration() override {
+        return {{T::BASS, "BASS"}, {T::MIDRANGE, "MIDRANGE"}, {T::TREBLE, "TREBLE"}};
+    }
+};
 
-    using JEqualizerBand = JEnum<EqualizerControllerHandler::EqualizerBand,JEqualizerBandConfig>;
+using JEqualizerBand = JEnum<EqualizerControllerHandler::EqualizerBand, JEqualizerBandConfig>;
 
-    //
-    // JEqualizeBandLevel
-    //
+//
+// JEqualizeBandLevel
+//
 
-    class JEqualizeBandLevel : public JObject {
-    public:
-        JEqualizeBandLevel( jobject obj ) : JObject( obj, "com/amazon/aace/alexa/EqualizerController$EqualizerBandLevel" ) {}
+class JEqualizeBandLevel : public JObject {
+public:
+    JEqualizeBandLevel(jobject obj) : JObject(obj, "com/amazon/aace/alexa/EqualizerController$EqualizerBandLevel") {
+    }
 
-        EqualizerControllerHandler::EqualizerBandLevel getBandLevel();
+    EqualizerControllerHandler::EqualizerBandLevel getBandLevel();
 
-        static std::vector<EqualizerControllerHandler::EqualizerBandLevel> convert( jobjectArray bandLevelsArrObj );
-    };
+    static std::vector<EqualizerControllerHandler::EqualizerBandLevel> convert(jobjectArray bandLevelsArrObj);
+};
 
-} // aace::alexa
-} // aace::jni
-} // aace
+}  // namespace alexa
+}  // namespace jni
+}  // namespace aace
 
-#endif // AACE_JNI_ALEXA_EQUALIZER_CONTROLLER_BINDER_H
+#endif  // AACE_JNI_ALEXA_EQUALIZER_CONTROLLER_BINDER_H

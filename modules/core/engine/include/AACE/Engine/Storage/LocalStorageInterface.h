@@ -26,27 +26,27 @@ namespace storage {
 
 class LocalStorageInterface {
 public:
-    using KeyValuePair = std::pair<std::string,std::string>;
+    using KeyValuePair = std::pair<std::string, std::string>;
 
     virtual ~LocalStorageInterface();
 
 public:
-    virtual bool put( const std::string& table, const std::string& key, const std::string& value ) = 0;
-    virtual std::string get( const std::string& table, const std::string& key ) = 0;
-    virtual std::string get( const std::string& table, const std::string& key, const std::string& defaultValue ) = 0;
-    virtual bool removeKey( const std::string& table, const std::string& key ) = 0;
-    virtual bool removeTable( const std::string& table ) = 0;
-    virtual bool containsKey( const std::string& table, const std::string& key ) = 0;
-    virtual bool containsTable( const std::string& table ) = 0;
-    virtual std::vector<std::string> keys( const std::string& table ) = 0;
-    virtual std::vector<KeyValuePair> list( const std::string& table ) = 0;
+    virtual bool put(const std::string& table, const std::string& key, const std::string& value) = 0;
+    virtual std::string get(const std::string& table, const std::string& key) = 0;
+    virtual std::string get(const std::string& table, const std::string& key, const std::string& defaultValue) = 0;
+    virtual bool removeKey(const std::string& table, const std::string& key) = 0;
+    virtual bool removeTable(const std::string& table) = 0;
+    virtual bool containsKey(const std::string& table, const std::string& key) = 0;
+    virtual bool containsTable(const std::string& table) = 0;
+    virtual std::vector<std::string> keys(const std::string& table) = 0;
+    virtual std::vector<KeyValuePair> list(const std::string& table) = 0;
     virtual bool begin() = 0;
     virtual bool commit() = 0;
     virtual bool cancel() = 0;
 };
 
-} // aace::engine::storage
-} // aace::engine
-} // aace
+}  // namespace storage
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_STORAGE_INTERFACE_LOCAL_STORAGE_INTERFACE_H
+#endif  // AACE_ENGINE_STORAGE_INTERFACE_LOCAL_STORAGE_INTERFACE_H

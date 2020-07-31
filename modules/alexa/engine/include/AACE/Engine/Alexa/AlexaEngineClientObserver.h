@@ -28,25 +28,33 @@ namespace aace {
 namespace engine {
 namespace alexa {
 
-class AlexaEngineClientObserver :
-    public alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface,
-    public alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface {
-    
+class AlexaEngineClientObserver
+        : public alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface
+        , public alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface {
 private:
     AlexaEngineClientObserver() = default;
-    
+
 public:
     static std::shared_ptr<AlexaEngineClientObserver> create();
 
-    bool waitFor( const alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State authState, const std::chrono::seconds duration = std::chrono::seconds( 20 ) );
-    bool waitFor( const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status connectionStatus, const std::chrono::seconds duration = std::chrono::seconds( 20 ) );
+    bool waitFor(
+        const alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State authState,
+        const std::chrono::seconds duration = std::chrono::seconds(20));
+    bool waitFor(
+        const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status connectionStatus,
+        const std::chrono::seconds duration = std::chrono::seconds(20));
 
     // AuthObserverInterface
-    void onAuthStateChange( alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State state, alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error error ) override;
-    
+    void onAuthStateChange(
+        alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State state,
+        alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error error) override;
+
     // ConnectionStatusObserverInterface
-    void onConnectionStatusChanged( const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status status, const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::ChangedReason reason ) override;
-    
+    void onConnectionStatusChanged(
+        const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status status,
+        const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::ChangedReason reason)
+        override;
+
 private:
     /// Internal mutex to serialize access to m_connectionStatus and m_authState states.
     std::mutex m_mutex;
@@ -61,8 +69,8 @@ private:
     alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status m_connectionStatus;
 };
 
-} // aace::engine::alexa
-} // aace::engine
-} // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_ALEXA_ALEXA_ENGINE_CLIENT_OBSERVER_H
+#endif  // AACE_ENGINE_ALEXA_ALEXA_ENGINE_CLIENT_OBSERVER_H

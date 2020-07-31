@@ -29,8 +29,7 @@ using namespace alexaSmartScreenSDK;
 static const std::string TAG("aace.apl.APLEngineImpl");
 
 APLEngineImpl::APLEngineImpl(std::shared_ptr<aace::apl::APL> aplPlatformInterface) :
-        avsCommon::utils::RequiresShutdown(TAG),
-        m_aplPlatformInterface(aplPlatformInterface) {
+        avsCommon::utils::RequiresShutdown(TAG), m_aplPlatformInterface(aplPlatformInterface) {
 }
 
 bool APLEngineImpl::initialize(

@@ -20,13 +20,11 @@ import com.amazon.aace.core.PlatformInterface;
 /**
  * AudioOutputProvider should be extended to provide an audio output source to the Engine.
  */
-abstract public class AudioOutputProvider extends PlatformInterface
-{
+abstract public class AudioOutputProvider extends PlatformInterface {
     /**
      * Specifies the audio input type for an input channel
      */
-    public enum AudioOutputType
-    {
+    public enum AudioOutputType {
         TTS("TTS"),
         MUSIC("MUSIC"),
         NOTIFICATION("NOTIFICATION"),
@@ -43,7 +41,7 @@ abstract public class AudioOutputProvider extends PlatformInterface
         /**
          * @internal
          */
-        AudioOutputType( String name ) {
+        AudioOutputType(String name) {
             m_name = name;
         }
 
@@ -58,23 +56,21 @@ abstract public class AudioOutputProvider extends PlatformInterface
          * @internal
          */
         public char toChar() {
-            return m_name.charAt( 0 );
+            return m_name.charAt(0);
         }
     }
-    
-    abstract public AudioOutput openChannel( String name, AudioOutputType type );
+
+    abstract public AudioOutput openChannel(String name, AudioOutputType type);
 
     final protected long createNativeRef() {
         return createBinder();
     }
 
-    final protected void disposeNativeRef( long nativeRef ) {
-        disposeBinder( nativeRef );
+    final protected void disposeNativeRef(long nativeRef) {
+        disposeBinder(nativeRef);
     }
 
     // Native Engine JNI methods
     private native long createBinder();
-    private native void disposeBinder( long nativeRef );
+    private native void disposeBinder(long nativeRef);
 }
-
-

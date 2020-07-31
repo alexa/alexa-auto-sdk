@@ -456,14 +456,15 @@ public:
      * @param navigation Communicates desired visual display behavior for the app associated with playback.
      * @param preload If true, this Play directive is intended to preload the identified content only but not begin playback.
      */
-    virtual void handlePlay(std::string& playContextToken,
-                            int64_t index,
-                            std::chrono::milliseconds offset,
-                            const std::string& skillToken,
-                            const std::string& playbackSessionId,
-                            const std::string& navigation, // DEFAULT, NONE, FOREGROUND
-                            bool preload,
-                            const alexaClientSDK::avsCommon::avs::PlayRequestor& playRequestor) = 0;
+    virtual void handlePlay(
+        std::string& playContextToken,
+        int64_t index,
+        std::chrono::milliseconds offset,
+        const std::string& skillToken,
+        const std::string& playbackSessionId,
+        const std::string& navigation,  // DEFAULT, NONE, FOREGROUND
+        bool preload,
+        const alexaClientSDK::avsCommon::avs::PlayRequestor& playRequestor) = 0;
 
     /**
      * Method to initiate the different types of play control like PLAY/PAUSE/RESUME/NEXT/...

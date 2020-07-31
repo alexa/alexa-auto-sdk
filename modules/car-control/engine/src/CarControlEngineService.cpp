@@ -13,18 +13,18 @@
  * permissions and limitations under the License.
  */
 
+#include "AACE/Engine/CarControl/CarControlEngineService.h"
+
 #include <string>
 #include <typeinfo>
+#include <unordered_map>
 
 #include "AACE/Alexa/AlexaProperties.h"
 #include "AACE/Engine/Alexa/AlexaComponentInterface.h"
-#include "AACE/Engine/CarControl/CarControlEngineService.h"
 #include "AACE/Engine/CarControl/Endpoint.h"
+#include "AACE/Engine/CarControl/ZoneDefinitions.h"
 #include "AACE/Engine/Core/EngineMacros.h"
 #include "AACE/Engine/Storage/StorageEngineService.h"
-
-#include <nlohmann/json.hpp>
-using json = nlohmann::json;
 
 namespace aace {
 namespace engine {
@@ -51,6 +51,9 @@ static const std::string CONFIG_KEY_ASSETS = "assets";
 static const std::string CONFIG_KEY_DEFAULT_ASSETS_PATH = "defaultAssetsPath";
 /// The key for the 'customAssetsPath' node of configuration
 static const std::string CONFIG_KEY_CUSTOM_ASSETS_PATH = "customAssetsPath";
+
+// The endpoint ID of the internal endpoint created for zones
+static const std::string INTERNAL_ENDPOINT_ID = "_AutoSDKInternalRoot";
 
 // Register the car control service with the Engine
 REGISTER_SERVICE(CarControlEngineService);
@@ -102,9 +105,13 @@ bool CarControlEngineService::configure(std::shared_ptr<std::istream> configurat
             ThrowIfNot(m_assetStore.addDefaultAssets(), "addDefaultAssetsFailed");
         }
 
+        // Translate zones config format from <2.2 to 2.3
+        translateConfigForZones(jconfiguration);
+
         // Construct an object representation of each endpoint in configuration
         if (jconfiguration.contains(CONFIG_KEY_ENDPOINTS) && jconfiguration.at(CONFIG_KEY_ENDPOINTS).is_array()) {
             for (auto& item : jconfiguration.at(CONFIG_KEY_ENDPOINTS).items()) {
+                if (item.value().at("endpointId") == INTERNAL_ENDPOINT_ID) continue;
                 auto endpoint = Endpoint::create(item.value(), m_assetStore);
                 ThrowIfNull(endpoint, "createEndpointFailed");
                 ThrowIfNot(m_endpoints.insert({endpoint->getId(), endpoint}).second, "insertEndpointFailed");
@@ -128,7 +135,7 @@ bool CarControlEngineService::configure(std::shared_ptr<std::istream> configurat
 
 bool CarControlEngineService::setup() {
     try {
-        if (m_carControlEngineImpl != nullptr && !isLocalServiceAvailable()) {
+        if (m_carControlEngineImpl != nullptr) {
             auto alexaComponents =
                 getContext()->getServiceInterface<aace::engine::alexa::AlexaComponentInterface>(AACE_ALEXA_SERVICE_KEY);
             ThrowIfNull(alexaComponents, "nullAlexaComponentInterface");
@@ -147,9 +154,31 @@ bool CarControlEngineService::setup() {
                 description = deviceInfo->getDeviceDescription();
             }
 
+            // Get the IDs for each endpoint used in discovery. Used for translation for ZoneDefinitions
+            std::unordered_map<std::string, std::string> endpointIdMappings;
+
             for (auto& endpoint : m_endpoints) {
                 endpoint.second->build(
                     m_carControlEngineImpl, endpointBuilderFactory, m_assetStore, manufacturerName, description);
+                endpointIdMappings.insert({endpoint.second->getId(), endpoint.second->getDiscoveryId()});
+            }
+
+            // Add ZoneDefinitions capability to a dummy endpoint
+            if (m_zonesCapabilityConfig.contains("configuration")) {
+                auto zoneDefinitions = aace::engine::carControl::ZoneDefinitions::create(
+                    m_zonesCapabilityConfig, m_assetStore, endpointIdMappings);
+                ThrowIfNull(zoneDefinitions, "couldNotConstructZoneDefinitions");
+                auto endpointBuilder = endpointBuilderFactory->createEndpointBuilder();
+                endpointBuilder->withCapabilityConfiguration(zoneDefinitions);
+                endpointBuilder->withDerivedEndpointId(INTERNAL_ENDPOINT_ID);
+                endpointBuilder->withFriendlyName(INTERNAL_ENDPOINT_ID);
+                endpointBuilder->withDescription("Internal reference endpoint");
+                endpointBuilder->withManufacturerName(deviceInfo->getManufacturerName());
+                endpointBuilder->withDisplayCategory({"VEHICLE"});
+                endpointBuilder->withCookies({{"createdBy", "AutoSDK"}});
+                auto endpointId = endpointBuilder->build();
+                ThrowIfNot(endpointId.hasValue(), "couldNotBuildInternalReferenceEndpoint");
+                endpointBuilder.reset();
             }
 
             // The contents of the AssetStore won't be used again, so we can release the memory
@@ -177,7 +206,7 @@ bool CarControlEngineService::registerPlatformInterface(
 bool CarControlEngineService::registerPlatformInterfaceType(
     std::shared_ptr<aace::carControl::CarControl> platformInterface) {
     try {
-        ThrowIfNotNull( m_carControlEngineImpl, "platformInterfaceAlreadyRegistered" );
+        ThrowIfNotNull(m_carControlEngineImpl, "platformInterfaceAlreadyRegistered");
 
         m_carControlEngineImpl = CarControlEngineImpl::create(platformInterface);
         ThrowIfNull(m_carControlEngineImpl, "createCarControlEngineImplFailed");
@@ -210,6 +239,104 @@ bool CarControlEngineService::shutdown() {
     }
 
     return true;
+}
+
+void CarControlEngineService::translateConfigForZones(json& jconfiguration) {
+    try {
+        if (jconfiguration.contains("zones") && jconfiguration.at("zones").is_array()) {
+            // Store each zone definition in a map so 'members' can be updated easily
+            std::unordered_map<std::string, json> zoneMap;
+            auto& zones = jconfiguration.at("zones");
+            for (auto& item : zones.items()) {
+                auto& zone = item.value();
+                // Add 'members' if it's not already there
+                if (!zone.contains("members")) {
+                    zone["members"] = json::array();
+                }
+                ThrowIfNot(zone.contains("zoneId") && zone.at("zoneId").is_string(), "zoneIdNotString");
+                std::string zoneId = zone.at("zoneId");
+                zoneMap.insert({zoneId, zone});
+            }
+            // Remove 'zones' from the top level of configuration
+            jconfiguration.erase("zones");
+
+            // From each endpoint definition, strip 'relationships' and add each ID to corresponding zone definition
+            if (jconfiguration.contains("endpoints") && jconfiguration.at("endpoints").is_array()) {
+                // Store the endpoint definitions to update the configuration after stripping 'relationships'
+                std::vector<json> endpoints;
+                for (auto& item : jconfiguration.at("endpoints").items()) {
+                    auto& endpoint = item.value();
+                    ThrowIfNot(
+                        endpoint.contains("endpointId") && endpoint.at("endpointId").is_string(),
+                        "endpointIdNotString");
+                    std::string endpointId = endpoint.at("endpointId");
+                    if (endpoint.contains("relationships") && endpoint.at("relationships").contains("isMemberOf")) {
+                        auto& isMemberOf = endpoint.at("relationships").at("isMemberOf");
+                        ThrowIfNot(isMemberOf.is_object(), "isMemberOfNotObject");
+                        ThrowIfNot(
+                            isMemberOf.contains("zoneId") && isMemberOf.at("zoneId").is_string(), "zoneIdNotString");
+                        std::string zoneId = isMemberOf.at("zoneId");
+                        auto zoneDefItr = zoneMap.find(zoneId);
+                        ThrowIf(zoneDefItr == zoneMap.end(), "endpointZoneIDNotFound");
+                        json& zoneDef = zoneDefItr->second;
+                        auto& members = zoneDef.at("members");
+                        members.push_back({{"endpointId", endpointId}});
+
+                        endpoint.erase("relationships");
+                    }
+                    endpoints.push_back(endpoint);
+                }
+                // Replace the 'endpoints' in config with the new list
+                jconfiguration.erase("endpoints");
+                jconfiguration["endpoints"] = json::array();
+                for (auto endpoint = endpoints.begin(); endpoint != endpoints.end(); ++endpoint) {
+                    jconfiguration["endpoints"].push_back(*endpoint);
+                }
+
+                // Construct a 'ZoneDefinitions' capability on a dummy endpoint
+
+                json zonesArray = json::array();
+                for (auto zoneDef = zoneMap.begin(); zoneDef != zoneMap.end(); ++zoneDef) {
+                    zonesArray.push_back(zoneDef->second);
+                }
+
+                // clang-format off
+                json capability = {
+                    {"type", "AlexaInterface"},
+                    {"interface", "Alexa.Automotive.ZoneDefinitions"},
+                    {"version", "1.0"},
+                    {"configuration", {
+                        {"zones", zonesArray}
+                    }}
+                };
+                // clang-format on
+                if (jconfiguration.contains("defaultZoneId")) {
+                    capability["configuration"].push_back({"defaultZoneId", jconfiguration["defaultZoneId"]});
+                    jconfiguration.erase("defaultZoneId");
+                }
+                // clang-format off
+
+                // Cache the capability configuration for further translation for the cloud discovery (see ZoneDefinitions.h)
+                m_zonesCapabilityConfig = capability;
+
+                json zoneEndpoint = {
+                    {"endpointId", INTERNAL_ENDPOINT_ID},
+                    {"friendlyName", INTERNAL_ENDPOINT_ID},
+                    {"description", "internal reference endpoint"},
+                    {"cookies", {
+                        {"createdBy", "AutoSDK"}
+                    }},
+                    {"displayCategories", {"VEHICLE"}},
+                    {"capabilities", json::array({capability})}
+                };
+                // clang-format on
+
+                jconfiguration["endpoints"].push_back(zoneEndpoint);
+            }
+        }
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).m("translationFailed").d("reason", ex.what()));
+    }
 }
 
 }  // namespace carControl

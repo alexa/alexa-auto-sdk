@@ -17,30 +17,58 @@
 #include <iostream>
 #include <memory>
 
-
 namespace aace {
 namespace alexa {
 
-LocalMediaSource::LocalMediaSource( Source source ) : m_source( source ) {}
+LocalMediaSource::LocalMediaSource(Source source) : m_source(source) {
+}
 
-LocalMediaSource::~LocalMediaSource() = default; // key function
+LocalMediaSource::~LocalMediaSource() = default;  // key function
 
-LocalMediaSource::LocalMediaSourceState::LocalMediaSourceState() {}
+LocalMediaSource::LocalMediaSourceState::LocalMediaSourceState() {
+}
 
 // default session state
-LocalMediaSource::SessionState::SessionState() : 
-    endpointId(""), loggedIn(false), userName(""), isGuest(false), launched(false), active(false),
-    accessToken(""), tokenRefreshInterval(std::chrono::milliseconds(0)),
-    supportedContentSelectors({}), spiVersion("1.0") {}
+LocalMediaSource::SessionState::SessionState() :
+        endpointId(""),
+        loggedIn(false),
+        userName(""),
+        isGuest(false),
+        launched(false),
+        active(false),
+        accessToken(""),
+        tokenRefreshInterval(std::chrono::milliseconds(0)),
+        supportedContentSelectors({}),
+        spiVersion("1.0") {
+}
 
 // default playback state
 LocalMediaSource::PlaybackState::PlaybackState() :
-    state("IDLE"), supportedOperations({}), trackOffset(0), 
-    shuffleEnabled(false), repeatEnabled(false), favorites(Favorites::NOT_RATED), type("ExternalMediaPlayerMusicItem"), playbackSource(""),
-    playbackSourceId(""), trackName(""), trackId(""), trackNumber(""), artistName(""),
-    artistId(""), albumName(""), albumId(""), tinyURL(""), smallURL(""),
-    mediumURL(""), largeURL(""), coverId(""), mediaProvider(""), mediaType(MediaType::OTHER), 
-    duration(std::chrono::milliseconds(0)) {}
+        state("IDLE"),
+        supportedOperations({}),
+        trackOffset(0),
+        shuffleEnabled(false),
+        repeatEnabled(false),
+        favorites(Favorites::NOT_RATED),
+        type("ExternalMediaPlayerMusicItem"),
+        playbackSource(""),
+        playbackSourceId(""),
+        trackName(""),
+        trackId(""),
+        trackNumber(""),
+        artistName(""),
+        artistId(""),
+        albumName(""),
+        albumId(""),
+        tinyURL(""),
+        smallURL(""),
+        mediumURL(""),
+        largeURL(""),
+        coverId(""),
+        mediaProvider(""),
+        mediaType(MediaType::OTHER),
+        duration(std::chrono::milliseconds(0)) {
+}
 
 LocalMediaSource::Source LocalMediaSource::getSource() {
     return m_source;
@@ -50,27 +78,32 @@ LocalMediaSource::Source LocalMediaSource::getSource() {
 // Engine interface methods
 //
 
-void LocalMediaSource::playerEvent( const std::string& eventName ) {
-    if( auto m_localMediaSourceEngineInterface_lock = m_localMediaSourceEngineInterface.lock() ) {
-        m_localMediaSourceEngineInterface_lock->onPlayerEvent( eventName );
+void LocalMediaSource::playerEvent(const std::string& eventName) {
+    if (auto m_localMediaSourceEngineInterface_lock = m_localMediaSourceEngineInterface.lock()) {
+        m_localMediaSourceEngineInterface_lock->onPlayerEvent(eventName);
     }
 }
 
-void LocalMediaSource::playerError( const std::string& errorName, long code, const std::string& description, bool fatal ) {
-    if( auto m_localMediaSourceEngineInterface_lock = m_localMediaSourceEngineInterface.lock() ) {
-        m_localMediaSourceEngineInterface_lock->onPlayerError( errorName, code, description, fatal );
+void LocalMediaSource::playerError(
+    const std::string& errorName,
+    long code,
+    const std::string& description,
+    bool fatal) {
+    if (auto m_localMediaSourceEngineInterface_lock = m_localMediaSourceEngineInterface.lock()) {
+        m_localMediaSourceEngineInterface_lock->onPlayerError(errorName, code, description, fatal);
     }
 }
 
-void LocalMediaSource::setFocus( bool focusAcquire ) {
-    if( auto m_localMediaSourceEngineInterface_lock = m_localMediaSourceEngineInterface.lock() ) {
-        m_localMediaSourceEngineInterface_lock->onSetFocus( focusAcquire );
+void LocalMediaSource::setFocus(bool focusAcquire) {
+    if (auto m_localMediaSourceEngineInterface_lock = m_localMediaSourceEngineInterface.lock()) {
+        m_localMediaSourceEngineInterface_lock->onSetFocus(focusAcquire);
     }
 }
 
-void LocalMediaSource::setEngineInterface( std::shared_ptr<aace::alexa::LocalMediaSourceEngineInterface> localMediaSourceEngineInterface ) {
+void LocalMediaSource::setEngineInterface(
+    std::shared_ptr<aace::alexa::LocalMediaSourceEngineInterface> localMediaSourceEngineInterface) {
     m_localMediaSourceEngineInterface = localMediaSourceEngineInterface;
 }
 
-} // aace::alexa
-} // aac
+}  // namespace alexa
+}  // namespace aace

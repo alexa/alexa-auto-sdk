@@ -59,30 +59,63 @@ const static float COOR_LONG = -115.173;
 
 class ConfigurationProvider : public IConfigurationProvider {
 public:
-    ConfigurationProvider() {}
-    AudioIOConfiguration getAudioIOConfig() {
-        return mAudioIOConfig; 
+    ConfigurationProvider() {
     }
-    std::string getCertificatesDirectoryPath() { return CERTS_DIR; }
-    std::string getAppsDataDirectory() { return APP_DATA_DIR; }
-    std::string getProductDSN() { return PRODUCT_DSN; }
-    std::string getClientId() { return CLIENT_ID; }
-    std::string getProductId() { return PRODUCT_ID; }
-    std::string getManufacturerName() { return MANUFACTURER_NAME; }
-    std::string getDescription() { return DESCRIPTION; }
-    bool shouldEnablePhoneCallControl() { return true; }
-    bool shouldEnableNavigation() { return true; }
-    bool shouldEnableWakeword() { return true; }
-    bool shouldEnableCBL() { return true; }
-    bool shouldEnableGloriaCard() { return true; }
-    bool shouldEnableGloriaList() { return true; }
-    bool shouldEnableClimateControl() { return true; }
-    std::pair<float, float> getCurrentLocation() { return std::make_pair(COOR_LAT,COOR_LONG); }
-    std::string getCountry() { return COUNTRY; }
+    AudioIOConfiguration getAudioIOConfig() {
+        return mAudioIOConfig;
+    }
+    std::string getCertificatesDirectoryPath() {
+        return CERTS_DIR;
+    }
+    std::string getAppsDataDirectory() {
+        return APP_DATA_DIR;
+    }
+    std::string getProductDSN() {
+        return PRODUCT_DSN;
+    }
+    std::string getClientId() {
+        return CLIENT_ID;
+    }
+    std::string getProductId() {
+        return PRODUCT_ID;
+    }
+    std::string getManufacturerName() {
+        return MANUFACTURER_NAME;
+    }
+    std::string getDescription() {
+        return DESCRIPTION;
+    }
+    bool shouldEnablePhoneCallControl() {
+        return true;
+    }
+    bool shouldEnableNavigation() {
+        return true;
+    }
+    bool shouldEnableWakeword() {
+        return true;
+    }
+    bool shouldEnableCBL() {
+        return true;
+    }
+    bool shouldEnableGloriaCard() {
+        return true;
+    }
+    bool shouldEnableGloriaList() {
+        return true;
+    }
+    bool shouldEnableClimateControl() {
+        return true;
+    }
+    std::pair<float, float> getCurrentLocation() {
+        return std::make_pair(COOR_LAT, COOR_LONG);
+    }
+    std::string getCountry() {
+        return COUNTRY;
+    }
+
 private:
     AudioIOConfiguration mAudioIOConfig;
 };
-
 
 /**
  * Test for @c AASBController
@@ -107,27 +140,28 @@ protected:
 };
 
 bool AASBControllerTest::initialize() {
-    ON_CALL(*mMockEngine, configure(
-        testing::Matcher<std::vector<std::shared_ptr<aace::core::config::EngineConfiguration>>>(testing::_)))
+    ON_CALL(
+        *mMockEngine,
+        configure(testing::Matcher<std::vector<std::shared_ptr<aace::core::config::EngineConfiguration>>>(testing::_)))
         .WillByDefault(testing::Return(true));
-    EXPECT_CALL(*mMockEngine, configure(
-        testing::Matcher<std::vector<std::shared_ptr<aace::core::config::EngineConfiguration>>>(testing::_)))
+    EXPECT_CALL(
+        *mMockEngine,
+        configure(testing::Matcher<std::vector<std::shared_ptr<aace::core::config::EngineConfiguration>>>(testing::_)))
         .Times(1);
-    ON_CALL(*mMockEngine, start())
+    ON_CALL(*mMockEngine, start()).WillByDefault(testing::Return(true));
+    EXPECT_CALL(*mMockEngine, start()).Times(1);
+    ON_CALL(
+        *mMockEngine,
+        registerPlatformInterface(testing::Matcher<std::shared_ptr<aace::core::PlatformInterface>>(testing::_)))
         .WillByDefault(testing::Return(true));
-    EXPECT_CALL(*mMockEngine, start())
-        .Times(1);
-    ON_CALL(*mMockEngine, registerPlatformInterface(
-        testing::Matcher<std::shared_ptr<aace::core::PlatformInterface>>(testing::_)))
-        .WillByDefault(testing::Return(true));
-    EXPECT_CALL(*mMockEngine, registerPlatformInterface(
-        testing::Matcher<std::shared_ptr<aace::core::PlatformInterface>>(testing::_)))
+    EXPECT_CALL(
+        *mMockEngine,
+        registerPlatformInterface(testing::Matcher<std::shared_ptr<aace::core::PlatformInterface>>(testing::_)))
         .Times(13);
     // AASB should register 13 platform interfaces as of now. Change this number as we
     // register more platform interfaces to engine.
 
-    if(!mAASBController->init(std::shared_ptr<IConfigurationProvider>(new ConfigurationProvider())))
-        return false;
+    if (!mAASBController->init(std::shared_ptr<IConfigurationProvider>(new ConfigurationProvider()))) return false;
     return mAASBController->start();
 }
 
@@ -135,7 +169,7 @@ bool AASBControllerTest::initialize() {
  * Test that @c AASBController APIs returns error before it is initialized
  */
 TEST_F(AASBControllerTest, errorsOnCallsBeforeInitialize) {
-    std::vector<int16_t> fakeData {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<int16_t> fakeData{1, 2, 3, 4, 5, 6, 7, 8, 9};
     ASSERT_FALSE(mAASBController->writeAudioSamples(fakeData.data(), fakeData.size()));
 
     EXPECT_CALL(*mMockEngine, setProperty(testing::_, testing::_)).Times(3);

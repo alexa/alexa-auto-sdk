@@ -31,10 +31,10 @@ class AlertsHandler : public aace::alexa::Alerts {
 public:
     /**
      * Creates a new instance of @c AlertsHandler.
-     * 
+     *
      * @param logger An instance of logger.
-     * @param responseDispatcher An object through which the directives for alerts will be sent 
-     *     
+     * @param responseDispatcher An object through which the directives for alerts will be sent
+     *
      */
     static std::shared_ptr<AlertsHandler> create(
         std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
@@ -42,9 +42,10 @@ public:
 
     // aace::alexa::Alerts interface
 
-    auto alertStateChanged(const std::string &alertToken, Alerts::AlertState state, const std::string &reason) -> void override;
-    auto alertCreated(const std::string &alertToken, const std::string &detailedInfo) -> void override;
-    auto alertDeleted(const std::string &alertToken) -> void override;
+    auto alertStateChanged(const std::string& alertToken, Alerts::AlertState state, const std::string& reason)
+        -> void override;
+    auto alertCreated(const std::string& alertToken, const std::string& detailedInfo) -> void override;
+    auto alertDeleted(const std::string& alertToken) -> void override;
 
 private:
     AlertsHandler(

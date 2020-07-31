@@ -28,8 +28,8 @@ namespace carControl {
 class CarControlHandler : public aace::carControl::CarControl {
 public:
     static std::shared_ptr<CarControlHandler> create(
-            std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
-            std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher);
+        std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
+        std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher);
 
     /**
      * PowerController
@@ -49,15 +49,18 @@ public:
      * RangeController
      */
     bool setRangeControllerValue(const std::string& controlId, const std::string& controllerId, double value) override;
-    bool adjustRangeControllerValue(const std::string& controlId, const std::string& controllerId, double delta) override;
+    bool adjustRangeControllerValue(const std::string& controlId, const std::string& controllerId, double delta)
+        override;
     bool getRangeControllerValue(const std::string& controlId, const std::string& controllerId, double& value) override;
 
     /**
      * ModeController
      */
-    bool setModeControllerValue(const std::string& controlId, const std::string& controllerId, const std::string& value) override;
+    bool setModeControllerValue(const std::string& controlId, const std::string& controllerId, const std::string& value)
+        override;
     bool adjustModeControllerValue(const std::string& controlId, const std::string& controllerId, int delta) override;
-    bool getModeControllerValue(const std::string& controlId, const std::string& controllerId, std::string& value) override;
+    bool getModeControllerValue(const std::string& controlId, const std::string& controllerId, std::string& value)
+        override;
 
     /**
      * Process incoming events from AASB client meant for topic @c TOPIC_CARCONTROL
@@ -66,21 +69,25 @@ public:
      * @param payload Data required to process the event. Complex data can be represented
      *      in JSON string.
      */
-    void onReceivedEvent(const std::string &action, const std::string &payload);
+    void onReceivedEvent(const std::string& action, const std::string& payload);
 
 private:
     // Constructor
     CarControlHandler(
-            std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
-            std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher);
+        std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
+        std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher);
 
     // Helper methods
-    bool turnOnOffEndPoint(const std::string& controlId, const std::string& action, const std::string& controllerId = "");
-    bool isEndPointTurnedOn(const std::string& controlId,
-                            bool& isOn,
-                            const std::string& action,
-                            bridge::SyncOverAsync& syncOverAsyncHelper,
-                            const std::string& controllerId = "");
+    bool turnOnOffEndPoint(
+        const std::string& controlId,
+        const std::string& action,
+        const std::string& controllerId = "");
+    bool isEndPointTurnedOn(
+        const std::string& controlId,
+        bool& isOn,
+        const std::string& action,
+        bridge::SyncOverAsync& syncOverAsyncHelper,
+        const std::string& controllerId = "");
 
     // Sync over async calls
     bridge::SyncOverAsync m_callIsPowerControllerOn;
@@ -94,7 +101,7 @@ private:
     std::weak_ptr<aasb::bridge::ResponseDispatcher> m_responseDispatcher;
 };
 
-} // namespace carControl
-} // namespace aasb
+}  // namespace carControl
+}  // namespace aasb
 
-#endif // AASB_LOCALVOICECONTROL_CARCONTROL_HANDLER_H
+#endif  // AASB_LOCALVOICECONTROL_CARCONTROL_HANDLER_H

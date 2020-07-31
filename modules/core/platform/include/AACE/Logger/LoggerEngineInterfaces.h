@@ -29,27 +29,26 @@ namespace logger {
  */
 class LoggerEngineInterface {
 public:
-
     /**
      * Specifies the severity level of a log message
      */
     enum class Level {
-        
+
         /**
          * Verbose log of an event, enabled only for debug builds
          */
         VERBOSE,
-        
+
         /**
          * Log of a normal event. Used in release builds
          */
         INFO,
-        
+
         /**
          * Log of a metric, enabled only for builds with metrics enabled
          */
         METRIC,
-        
+
         /**
          * Log of an event that may indicate a problem
          */
@@ -66,7 +65,7 @@ public:
         CRITICAL
     };
 
-    virtual void log( Level level, const std::string& tag, const std::string& message ) = 0;
+    virtual void log(Level level, const std::string& tag, const std::string& message) = 0;
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const LoggerEngineInterface::Level& level) {
@@ -93,7 +92,7 @@ inline std::ostream& operator<<(std::ostream& stream, const LoggerEngineInterfac
     return stream;
 }
 
-} // aace::logger
-} // aace
+}  // namespace logger
+}  // namespace aace
 
-#endif // AACE_LOGGER_LOGGER_ENGINE_INTERFACES_H
+#endif  // AACE_LOGGER_LOGGER_ENGINE_INTERFACES_H

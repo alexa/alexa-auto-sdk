@@ -31,16 +31,16 @@ namespace alexa {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class DoNotDisturbHandler : public aace::alexa::DoNotDisturb /* isa PlatformInterface */ {
-  private:
+private:
     std::weak_ptr<Activity> m_activity{};
     std::weak_ptr<logger::LoggerHandler> m_loggerHandler{};
 
-  protected:
-    DoNotDisturbHandler(std::weak_ptr<Activity> activity,
-                  std::weak_ptr<logger::LoggerHandler> loggerHandler);
+protected:
+    DoNotDisturbHandler(std::weak_ptr<Activity> activity, std::weak_ptr<logger::LoggerHandler> loggerHandler);
 
-  public:
-    template <typename... Args> static auto create(Args &&... args) -> std::shared_ptr<DoNotDisturbHandler> {
+public:
+    template <typename... Args>
+    static auto create(Args&&... args) -> std::shared_ptr<DoNotDisturbHandler> {
         return std::shared_ptr<DoNotDisturbHandler>(new DoNotDisturbHandler(args...));
     }
     auto getActivity() -> std::weak_ptr<Activity>;
@@ -48,17 +48,17 @@ class DoNotDisturbHandler : public aace::alexa::DoNotDisturb /* isa PlatformInte
 
     // aace::alexa::DoNotDisturb interface
 
-    void setDoNotDisturb( const bool doNotDisturb ) override;
+    void setDoNotDisturb(const bool doNotDisturb) override;
 
-  private:
+private:
     std::weak_ptr<View> m_console{};
     std::weak_ptr<View> m_doNotDisturbStateView{};
 
-    auto log(logger::LoggerHandler::Level level, const std::string &message) -> void;
+    auto log(logger::LoggerHandler::Level level, const std::string& message) -> void;
     auto setupUI() -> void;
 };
 
-} // namespace alexa
-} // namespace sampleApp
+}  // namespace alexa
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_ALEXA_DONOTDISTURBHANDLER_H
+#endif  // SAMPLEAPP_ALEXA_DONOTDISTURBHANDLER_H

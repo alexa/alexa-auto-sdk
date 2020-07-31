@@ -15,16 +15,15 @@
 
 #include "core.h"
 
-static aal_handle_t qsa_recorder_create(const aal_attributes_t *attrs, aal_lpcm_parameters_t *params)
-{
-	if (params != NULL) {
-		aal_audio_parameters_t audio_params;
-		audio_params.stream_type = AAL_STREAM_LPCM;
-		audio_params.lpcm = *params;
+static aal_handle_t qsa_recorder_create(const aal_attributes_t* attrs, aal_lpcm_parameters_t* params) {
+    if (params != NULL) {
+        aal_audio_parameters_t audio_params;
+        audio_params.stream_type = AAL_STREAM_LPCM;
+        audio_params.lpcm = *params;
 
-		return qsa_create_context(SND_PCM_CHANNEL_CAPTURE, attrs, &audio_params);
-	}
-	return qsa_create_context(SND_PCM_CHANNEL_CAPTURE, attrs, NULL);
+        return qsa_create_context(SND_PCM_CHANNEL_CAPTURE, attrs, &audio_params);
+    }
+    return qsa_create_context(SND_PCM_CHANNEL_CAPTURE, attrs, NULL);
 }
 
 // clang-format off

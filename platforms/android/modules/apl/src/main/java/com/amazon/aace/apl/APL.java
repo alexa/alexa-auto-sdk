@@ -18,23 +18,20 @@ package com.amazon.aace.apl;
 import com.amazon.aace.core.PlatformInterface;
 
 /**
- * APL should be extended to handle receiving Alexa Presentation @c RenderDocument and @c ExecuteCommands directives from AVS.
- * These directives contain metadata for rendering or operating on display cards for devices with GUI support.
- * For more information about Alexa Presentation Language (APL) see the interface overview: 
+ * APL should be extended to handle receiving Alexa Presentation @c RenderDocument and @c ExecuteCommands directives
+ * from AVS. These directives contain metadata for rendering or operating on display cards for devices with GUI support.
+ * For more information about Alexa Presentation Language (APL) see the interface overview:
  * https://developer.amazon.com/en-US/docs/alexa/alexa-presentation-language/understand-apl.html
  */
-abstract public class APL extends PlatformInterface
-{
-    public APL() {
-    }
+abstract public class APL extends PlatformInterface {
+    public APL() {}
 
     // aace::apl::APL
 
     /**
      * Enumeration of activity events that could be sent from GUI to @c AlexaPresentation.
      */
-    public enum ActivityEvent
-    {
+    public enum ActivityEvent {
         /**
          * GUI switched to active state.
          * @hideinitializer
@@ -69,7 +66,7 @@ abstract public class APL extends PlatformInterface
         /**
          * @internal
          */
-        private ActivityEvent( String name ) {
+        private ActivityEvent(String name) {
             m_name = name;
         }
 
@@ -83,7 +80,7 @@ abstract public class APL extends PlatformInterface
 
     /**
      * Retrieve the visual context from the platform implementation.
-     * 
+     *
      * @return the current VisualContext payload.
      */
     public String getVisualContext() {
@@ -97,11 +94,12 @@ abstract public class APL extends PlatformInterface
      * @note The payload may contain customer sensitive information and should be used with utmost care.
      * Failure to do so may result in exposing or mishandling of customer data.
      *
-     * @param [in] jsonPayload The payload of the Alexa.Presentation.APL.RenderDocument directive which follows the APL specification.
+     * @param [in] jsonPayload The payload of the Alexa.Presentation.APL.RenderDocument directive which follows the APL
+     *         specification.
      * @param [in] token The APL presentation token associated with this payload.
      * @param [in] windowId The target windowId.
      */
-    public void renderDocument( String jsonPayload, String token, String windowId ) {}
+    public void renderDocument(String jsonPayload, String token, String windowId) {}
 
     /**
      * Notifies the platform implementation when the client should clear the APL display card.
@@ -112,10 +110,11 @@ abstract public class APL extends PlatformInterface
     /**
      * Notifies the platform implementation that an ExecuteCommands directive has been received.
      *
-     * @param [in] jsonPayload The payload of the Alexa.Presentation.APL.ExecuteCommands directive in structured JSON format.
+     * @param [in] jsonPayload The payload of the Alexa.Presentation.APL.ExecuteCommands directive in structured JSON
+     *         format.
      * @param [in] token Directive token used to bind result processing.
      */
-    public void executeCommands( String jsonPayload, String token ) {}
+    public void executeCommands(String jsonPayload, String token) {}
 
     /**
      * Notifies the platform implementation that a command execution sequence should be interrupted.
@@ -126,14 +125,14 @@ abstract public class APL extends PlatformInterface
      * Notifies the Engine to clear the card from the screen and release any focus being held.
      */
     final protected void clearCard() {
-        clearCard( getNativeRef() );
+        clearCard(getNativeRef());
     }
 
     /**
      * Notifies the Engine to clear all pending ExecuteCommands directives and mark them as failed.
      */
     final protected void clearAllExecuteCommands() {
-        clearAllExecuteCommands( getNativeRef() );
+        clearAllExecuteCommands(getNativeRef());
     }
 
     /**
@@ -142,8 +141,8 @@ abstract public class APL extends PlatformInterface
      * @param [in] payload The @c UserEvent event payload. The caller of this
      * function is responsible to pass the payload as it defined by AVS.
      */
-    final protected void sendUserEvent( String payload ) {
-        sendUserEvent( getNativeRef(), payload );
+    final protected void sendUserEvent(String payload) {
+        sendUserEvent(getNativeRef(), payload);
     }
 
     /**
@@ -151,8 +150,8 @@ abstract public class APL extends PlatformInterface
      *
      * @param [in] aplMaxVersion The APL version supported.
      */
-    final protected void setAPLMaxVersion( String aplMaxVersion ) {
-        setAPLMaxVersion( getNativeRef(), aplMaxVersion );
+    final protected void setAPLMaxVersion(String aplMaxVersion) {
+        setAPLMaxVersion(getNativeRef(), aplMaxVersion);
     }
 
     /**
@@ -161,8 +160,8 @@ abstract public class APL extends PlatformInterface
      * @param [in] documentIdleTimeout The timeout in milliseconds.
      * @note Will be reset for every directive received from AVS.
      */
-    final protected void setDocumentIdleTimeout( long documentIdleTimeout ) {
-        setDocumentIdleTimeout( getNativeRef(), documentIdleTimeout );
+    final protected void setDocumentIdleTimeout(long documentIdleTimeout) {
+        setDocumentIdleTimeout(getNativeRef(), documentIdleTimeout);
     }
 
     /**
@@ -172,8 +171,8 @@ abstract public class APL extends PlatformInterface
      * @param [in] result Rendering result (true on executed, false on exception).
      * @param [in] error Error message provided in case result is false.
      */
-    final protected void renderDocumentResult( String token, boolean result, String error ) {
-        renderDocumentResult( getNativeRef(), token, result, error );
+    final protected void renderDocumentResult(String token, boolean result, String error) {
+        renderDocumentResult(getNativeRef(), token, result, error);
     }
 
     /**
@@ -183,8 +182,8 @@ abstract public class APL extends PlatformInterface
      * @param [in] result Rendering result (true on executed, false on exception).
      * @param [in] error Error message provided in case result is false.
      */
-    final protected void executeCommandsResult( String token, boolean result, String error ) {
-        executeCommandsResult( getNativeRef(), token, result, error );
+    final protected void executeCommandsResult(String token, boolean result, String error) {
+        executeCommandsResult(getNativeRef(), token, result, error);
     }
 
     /**
@@ -193,8 +192,8 @@ abstract public class APL extends PlatformInterface
      * @param [in] source The source of the activity event.
      * @param [in] event The activity change event.
      */
-    final protected void processActivityEvent( String token, ActivityEvent event ) {
-        processActivityEvent( getNativeRef(), token, event );
+    final protected void processActivityEvent(String token, ActivityEvent event) {
+        processActivityEvent(getNativeRef(), token, event);
     }
 
     // NativeRef implementation
@@ -202,19 +201,19 @@ abstract public class APL extends PlatformInterface
         return createBinder();
     }
 
-    final protected void disposeNativeRef( long nativeRef ) {
-        disposeBinder( nativeRef );
+    final protected void disposeNativeRef(long nativeRef) {
+        disposeBinder(nativeRef);
     }
 
     // Native Engine JNI methods
     private native long createBinder();
-    private native void disposeBinder( long nativeRef );
-    private native void clearCard( long nativeRef );
-    private native void clearAllExecuteCommands( long nativeRef );
-    private native void sendUserEvent( long nativeRef, String payload );
-    private native void setAPLMaxVersion( long nativeRef, String aplMaxVersion );
-    private native void setDocumentIdleTimeout( long nativeRef, long documentIdleTimeout );
-    private native void renderDocumentResult( long nativeRef, String token, boolean result, String error );
-    private native void executeCommandsResult( long nativeRef, String token, boolean result, String error );
-    private native void processActivityEvent( long nativeRef, String token, ActivityEvent event );
+    private native void disposeBinder(long nativeRef);
+    private native void clearCard(long nativeRef);
+    private native void clearAllExecuteCommands(long nativeRef);
+    private native void sendUserEvent(long nativeRef, String payload);
+    private native void setAPLMaxVersion(long nativeRef, String aplMaxVersion);
+    private native void setDocumentIdleTimeout(long nativeRef, long documentIdleTimeout);
+    private native void renderDocumentResult(long nativeRef, String token, boolean result, String error);
+    private native void executeCommandsResult(long nativeRef, String token, boolean result, String error);
+    private native void processActivityEvent(long nativeRef, String token, ActivityEvent event);
 }

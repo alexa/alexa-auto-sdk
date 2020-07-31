@@ -13,11 +13,13 @@
  * permissions and limitations under the License.
  */
 
-#include <nlohmann/json.hpp>
+#include "AACE/Engine/CarControl/ModeController.h"
 
+#include <AVSCommon/AVS/CapabilitySemantics.h>
 #include <ModeController/ModeControllerAttributeBuilder.h>
 
-#include "AACE/Engine/CarControl/ModeController.h"
+#include <nlohmann/json.hpp>
+
 #include "AACE/Engine/Core/EngineMacros.h"
 
 namespace aace {
@@ -80,6 +82,15 @@ std::shared_ptr<ModeController> ModeController::create(
             }
             attributeBuilder->addMode(value, modeResources);
         }
+
+        if (controllerConfig.contains("semantics")) {
+            auto& semanticsJson = controllerConfig.at("semantics");
+            alexaClientSDK::avsCommon::utils::Optional<alexaClientSDK::avsCommon::avs::CapabilitySemantics> semantics =
+                getSemantics(semanticsJson);
+            ThrowIfNot(semantics.hasValue(), "failedToParseSemanticsConfig");
+            attributeBuilder->withSemantics(semantics.value());
+        }
+
         auto attributes = attributeBuilder->build();
         ThrowIfNot(attributes.hasValue(), "invalidAttributes");
         ThrowIf(attributes.value().modes.empty(), "emptyModes");
@@ -98,8 +109,7 @@ ModeController::ModeController(
     const std::string& interface,
     const std::string& instance,
     ModeControllerAttributes attributes) :
-        PrimitiveController(endpointId, interface, instance),
-        m_attributes(attributes) {
+        PrimitiveController(endpointId, interface, instance), m_attributes(attributes) {
     for (auto item : attributes.modes) {
         m_supportedModes.push_back(item.first);
     }

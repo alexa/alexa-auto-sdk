@@ -24,68 +24,67 @@ namespace network {
 static const std::string TAG("aace.core.NetworkInfoProviderEngineImpl");
 
 std::shared_ptr<NetworkInfoProviderEngineImpl> NetworkInfoProviderEngineImpl::create() {
-    return std::shared_ptr<NetworkInfoProviderEngineImpl>( new NetworkInfoProviderEngineImpl() );
-}
-
-NetworkInfoProviderEngineImpl::NetworkInfoProviderEngineImpl():
-    m_networkInterface("") {
-}
-
-void NetworkInfoProviderEngineImpl::addObserver( std::shared_ptr<NetworkInfoObserver> observer ) {
-    std::lock_guard<std::mutex> lock( m_mutex );
-    m_observers.insert( observer );
-}
-
-void NetworkInfoProviderEngineImpl::removeObserver( std::shared_ptr<NetworkInfoObserver> observer ) {
-    std::lock_guard<std::mutex> lock( m_mutex );
-    m_observers.erase( observer );
-}
-
-void NetworkInfoProviderEngineImpl::networkInfoChanged( NetworkStatus status, int wifiSignalStrength )
-{
-    std::lock_guard<std::mutex> lock( m_mutex );
-
-    for( const auto& next : m_observers ) {
-        next->onNetworkInfoChanged( status, wifiSignalStrength );
+    try {
+        auto networkInfoProviderEngineImpl =
+            std::shared_ptr<NetworkInfoProviderEngineImpl>(new NetworkInfoProviderEngineImpl());
+        ThrowIfNull(networkInfoProviderEngineImpl, "networkInfoProviderEngineImplIsNull");
+        return networkInfoProviderEngineImpl;
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return nullptr;
     }
 }
 
-bool NetworkInfoProviderEngineImpl::setNetworkInterface( const std::string& networkInterface ) {
-    
+void NetworkInfoProviderEngineImpl::addObserver(std::shared_ptr<NetworkInfoObserver> observer) {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_observers.insert(observer);
+}
+
+void NetworkInfoProviderEngineImpl::removeObserver(std::shared_ptr<NetworkInfoObserver> observer) {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_observers.erase(observer);
+}
+
+void NetworkInfoProviderEngineImpl::networkInfoChanged(NetworkStatus status, int wifiSignalStrength) {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    for (const auto& next : m_observers) {
+        next->onNetworkInfoChanged(status, wifiSignalStrength);
+    }
+}
+
+bool NetworkInfoProviderEngineImpl::setNetworkInterface(const std::string& networkInterface) {
     try {
         AACE_INFO(LX(TAG).sensitive("networkInterface", networkInterface));
-        
-        m_networkInterface = networkInterface;
-        
-        std::lock_guard<std::mutex> lock( m_mutex );
-        
+
+        std::lock_guard<std::mutex> lock(m_mutex);
+
         //Notify the begin
-        for( const auto& next : m_observers ) {
-            next->onNetworkInterfaceChangeStatusChanged( m_networkInterface, NetworkInfoObserver::NetworkInterfaceChangeStatus::BEGIN );
+        for (const auto& next : m_observers) {
+            next->onNetworkInterfaceChangeStatusChanged(
+                networkInterface, NetworkInfoObserver::NetworkInterfaceChangeStatus::BEGIN);
         }
-        
+
         //Notify to Change network interface
-        for( const auto& next : m_observers ) {
-            next->onNetworkInterfaceChangeStatusChanged( m_networkInterface, NetworkInfoObserver::NetworkInterfaceChangeStatus::CHANGE );
+        for (const auto& next : m_observers) {
+            next->onNetworkInterfaceChangeStatusChanged(
+                networkInterface, NetworkInfoObserver::NetworkInterfaceChangeStatus::CHANGE);
         }
-        
+
         // Notify Completed
-        for( const auto& next : m_observers ) {
-            next->onNetworkInterfaceChangeStatusChanged( m_networkInterface, NetworkInfoObserver::NetworkInterfaceChangeStatus::COMPLETED );
+        for (const auto& next : m_observers) {
+            next->onNetworkInterfaceChangeStatusChanged(
+                networkInterface, NetworkInfoObserver::NetworkInterfaceChangeStatus::COMPLETED);
         }
-        
+
         return true;
-        
-    } catch( std::exception& ex ) {
+
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
 }
 
-std::string NetworkInfoProviderEngineImpl::getNetworkInterface() {
-    return m_networkInterface;
-}
-
-} // aace::engine::network
-} // aace::engine
-} // aace
+}  // namespace network
+}  // namespace engine
+}  // namespace aace

@@ -31,15 +31,21 @@ namespace alexa {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EqualizerControllerHandler::EqualizerControllerHandler(std::weak_ptr<Activity> activity, std::weak_ptr<logger::LoggerHandler> loggerHandler)
-    : m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
+EqualizerControllerHandler::EqualizerControllerHandler(
+    std::weak_ptr<Activity> activity,
+    std::weak_ptr<logger::LoggerHandler> loggerHandler) :
+        m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
     // Expects((m_activity != nullptr) && (m_loggerHandler != nullptr));
     setupUI();
 }
 
-std::weak_ptr<Activity> EqualizerControllerHandler::getActivity() { return m_activity; }
+std::weak_ptr<Activity> EqualizerControllerHandler::getActivity() {
+    return m_activity;
+}
 
-std::weak_ptr<logger::LoggerHandler> EqualizerControllerHandler::getLoggerHandler() { return m_loggerHandler; }
+std::weak_ptr<logger::LoggerHandler> EqualizerControllerHandler::getLoggerHandler() {
+    return m_loggerHandler;
+}
 
 // aace::alexa::EqualizerController interface
 
@@ -48,10 +54,11 @@ std::vector<EqualizerControllerHandler::EqualizerBandLevel> EqualizerControllerH
     return {};
 }
 
-void EqualizerControllerHandler::setBandLevels(const std::vector<EqualizerControllerHandler::EqualizerBandLevel> &bandLevels) {
+void EqualizerControllerHandler::setBandLevels(
+    const std::vector<EqualizerControllerHandler::EqualizerBandLevel>& bandLevels) {
     std::stringstream ss;
     char character = '{';
-    for (auto &bandLevel : bandLevels) {
+    for (auto& bandLevel : bandLevels) {
         ss << character << bandLevel.first << ':' << bandLevel.second;
         character = ',';
     }
@@ -64,7 +71,7 @@ void EqualizerControllerHandler::setBandLevels(const std::vector<EqualizerContro
     activity->runOnUIThread([=]() {
         if (auto console = m_console.lock()) {
             console->printLine("Set EQ band levels:");
-            for (auto &bandLevel : bandLevels) {
+            for (auto& bandLevel : bandLevels) {
                 console->printLine(bandLevel.first, bandLevel.second);
             }
         }
@@ -73,7 +80,7 @@ void EqualizerControllerHandler::setBandLevels(const std::vector<EqualizerContro
 
 // private
 
-void EqualizerControllerHandler::log(logger::LoggerHandler::Level level, const std::string &message) {
+void EqualizerControllerHandler::log(logger::LoggerHandler::Level level, const std::string& message) {
     auto loggerHandler = m_loggerHandler.lock();
     if (!loggerHandler) {
         return;
@@ -89,23 +96,23 @@ void EqualizerControllerHandler::setupUI() {
     m_console = activity->findViewById("id:console");
 
     // localSetBandLevels
-    activity->registerObserver(Event::onEqualizerControllerLocalSetBandLevels, [=](const std::string &) {
+    activity->registerObserver(Event::onEqualizerControllerLocalSetBandLevels, [=](const std::string&) {
         log(logger::LoggerHandler::Level::VERBOSE, "onEqualizerControllerLocalSetBandLevels");
         return false;
     });
 
     // localAdjustBandLevels
-    activity->registerObserver(Event::onEqualizerControllerLocalAdjustBandLevels, [=](const std::string &) {
+    activity->registerObserver(Event::onEqualizerControllerLocalAdjustBandLevels, [=](const std::string&) {
         log(logger::LoggerHandler::Level::VERBOSE, "onEqualizerControllerLocalAdjustBandLevels");
         return false;
     });
 
     // localResetBands
-    activity->registerObserver(Event::onEqualizerControllerLocalResetBands, [=](const std::string &) {
+    activity->registerObserver(Event::onEqualizerControllerLocalResetBands, [=](const std::string&) {
         log(logger::LoggerHandler::Level::VERBOSE, "onEqualizerControllerLocalResetBands");
         return false;
     });
 }
 
-} // namespace alexa
-} // namespace sampleApp
+}  // namespace alexa
+}  // namespace sampleApp

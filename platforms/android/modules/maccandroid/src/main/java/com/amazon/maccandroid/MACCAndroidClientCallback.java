@@ -31,7 +31,8 @@ public interface MACCAndroidClientCallback {
      * @param skillToken
      * @param playbackSessionId
      */
-    public void onPlayerEvent(String playerId, Set<PlayerEvents> playerEvents, String skillToken, UUID playbackSessionId);
+    public void onPlayerEvent(
+            String playerId, Set<PlayerEvents> playerEvents, String skillToken, UUID playbackSessionId);
 
     /**
      *

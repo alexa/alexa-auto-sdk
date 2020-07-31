@@ -23,25 +23,25 @@ namespace aace {
 namespace jni {
 namespace alexa {
 
-    class SpeechSynthesizerHandler : public aace::alexa::SpeechSynthesizer {
-    public:
-        SpeechSynthesizerHandler();
-    };
+class SpeechSynthesizerHandler : public aace::alexa::SpeechSynthesizer {
+public:
+    SpeechSynthesizerHandler();
+};
 
-    class SpeechSynthesizerBinder : public aace::jni::core::PlatformInterfaceBinder {
-    public:
-        SpeechSynthesizerBinder( jobject obj );
+class SpeechSynthesizerBinder : public aace::jni::core::PlatformInterfaceBinder {
+public:
+    SpeechSynthesizerBinder(jobject obj);
 
-        std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
-            return m_speechSynthesizerHandler;
-        }
+    std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
+        return m_speechSynthesizerHandler;
+    }
 
-    private:
-        std::shared_ptr<SpeechSynthesizerHandler> m_speechSynthesizerHandler;
-    };
+private:
+    std::shared_ptr<SpeechSynthesizerHandler> m_speechSynthesizerHandler;
+};
 
-} // aace::alexa
-} // aace::jni
-} // aace
+}  // namespace alexa
+}  // namespace jni
+}  // namespace aace
 
-#endif // AACE_JNI_ALEXA_SPEECH_SYNTHESIZER_BINDER_H
+#endif  // AACE_JNI_ALEXA_SPEECH_SYNTHESIZER_BINDER_H

@@ -40,7 +40,7 @@ class ServiceDescription;
 
 class EngineService {
 protected:
-    EngineService( const aace::engine::core::ServiceDescription& description );
+    EngineService(const aace::engine::core::ServiceDescription& description);
 
 public:
     using ServiceFactory = std::function<std::shared_ptr<void>()>;
@@ -53,86 +53,83 @@ public:
     const ServiceDescription& getDescription();
 
     template <class T>
-    bool registerServiceFactory( ServiceFactory fn ) {
+    bool registerServiceFactory(ServiceFactory fn) {
         auto key = typeid(T).name();
-        if( m_serviceFactoryMap.find( key ) == m_serviceFactoryMap.end() ) {
+        if (m_serviceFactoryMap.find(key) == m_serviceFactoryMap.end()) {
             m_serviceFactoryMap[key] = fn;
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
-    
+
     template <class T>
     std::shared_ptr<T> getServiceInterface() {
         auto key = typeid(T).name();
-        auto it = m_serviceInterfaceMap.find( key );
-        return it != m_serviceInterfaceMap.end() ? std::static_pointer_cast<T>( it->second.lock() ) : nullptr;
+        auto it = m_serviceInterfaceMap.find(key);
+        return it != m_serviceInterfaceMap.end() ? std::static_pointer_cast<T>(it->second.lock()) : nullptr;
     }
 
 protected:
     virtual bool initialize();
-    virtual bool configure( std::shared_ptr<std::istream> configuration );
+    virtual bool configure(std::shared_ptr<std::istream> configuration);
     virtual bool preRegister();
     virtual bool postRegister();
     virtual bool setup();
     virtual bool start();
     virtual bool stop();
     virtual bool shutdown();
-    virtual bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface );
+    virtual bool registerPlatformInterface(std::shared_ptr<aace::core::PlatformInterface> platformInterface);
 
     std::shared_ptr<aace::engine::core::EngineContext> getContext();
 
     template <class T>
-    std::shared_ptr<T> newFactoryInstance( ServiceFactory defaultFactory ) {
+    std::shared_ptr<T> newFactoryInstance(ServiceFactory defaultFactory) {
         auto key = typeid(T).name();
-        auto it = m_serviceFactoryMap.find( key );
-        if( it != m_serviceFactoryMap.end() ) {
-            return std::static_pointer_cast<T>( it->second() );
-        }
-        else {
-            return std::static_pointer_cast<T>( defaultFactory() );
+        auto it = m_serviceFactoryMap.find(key);
+        if (it != m_serviceFactoryMap.end()) {
+            return std::static_pointer_cast<T>(it->second());
+        } else {
+            return std::static_pointer_cast<T>(defaultFactory());
         }
     }
 
     template <class T>
-    bool registerServiceInterface( std::shared_ptr<T> serviceInterface ) {
+    bool registerServiceInterface(std::shared_ptr<T> serviceInterface) {
         auto key = typeid(T).name();
-        if( m_serviceInterfaceMap.find( key ) == m_serviceInterfaceMap.end() ) {
+        if (m_serviceInterfaceMap.find(key) == m_serviceInterfaceMap.end()) {
             m_serviceInterfaceMap[key] = serviceInterface;
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
 
 private:
-    bool handleInitializeEngineEvent( std::shared_ptr<aace::engine::core::EngineContext> context );
-    bool handleConfigureEngineEvent( std::shared_ptr<std::istream> configuration );
+    bool handleInitializeEngineEvent(std::shared_ptr<aace::engine::core::EngineContext> context);
+    bool handleConfigureEngineEvent(std::shared_ptr<std::istream> configuration);
     bool handlePreRegisterEngineEvent();
     bool handlePostRegisterEngineEvent();
     bool handleSetupEngineEvent();
     bool handleStartEngineEvent();
     bool handleStopEngineEvent();
     bool handleShutdownEngineEvent();
-    bool handleRegisterPlatformInterfaceEngineEvent( std::shared_ptr<aace::core::PlatformInterface> platformInterface );
+    bool handleRegisterPlatformInterfaceEngineEvent(std::shared_ptr<aace::core::PlatformInterface> platformInterface);
 
 private:
     std::shared_ptr<aace::engine::core::EngineContext> m_context;
-    
+
     ServiceDescription m_description;
-    
+
     bool m_initialized;
     bool m_running;
-    
+
     // service factory map
-    std::unordered_map<std::string,ServiceFactory> m_serviceFactoryMap;
-    
+    std::unordered_map<std::string, ServiceFactory> m_serviceFactoryMap;
+
     // service interface map
-    std::unordered_map<std::string,std::weak_ptr<void>> m_serviceInterfaceMap;
-    
+    std::unordered_map<std::string, std::weak_ptr<void>> m_serviceInterfaceMap;
+
     // allow the EngineImpl call private functions in this class
     friend class aace::engine::core::EngineImpl;
 };
@@ -143,19 +140,18 @@ private:
 
 class EngineServiceContext {
 public:
-    EngineServiceContext( std::shared_ptr<EngineService> service ) : m_service( service ) {
-    };
+    EngineServiceContext(std::shared_ptr<EngineService> service) : m_service(service){};
 
     template <class T>
-    bool registerServiceFactory( EngineService::ServiceFactory fn ) {
-        return m_service->registerServiceFactory<T>( fn );
+    bool registerServiceFactory(EngineService::ServiceFactory fn) {
+        return m_service->registerServiceFactory<T>(fn);
     }
-    
+
     template <class T>
     std::shared_ptr<T> getServiceInterface() {
         return m_service->getServiceInterface<T>();
     }
-    
+
 private:
     std::shared_ptr<EngineService> m_service;
 };
@@ -166,28 +162,28 @@ private:
 
 class EngineContext {
 public:
-    virtual std::string getProperty( const std::string& key ) = 0;
-    
-    virtual bool setProperty( const std::string& key, const std::string& value ) = 0;
-    
-    virtual bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) = 0;
-    
+    virtual std::string getProperty(const std::string& key) = 0;
+
+    virtual bool setProperty(const std::string& key, const std::string& value) = 0;
+
+    virtual bool registerPlatformInterface(std::shared_ptr<aace::core::PlatformInterface> platformInterface) = 0;
+
     template <class T>
     std::shared_ptr<EngineServiceContext> getService() {
-        return getService( T::getServiceDescription().getType() );
+        return getService(T::getServiceDescription().getType());
     }
-    
-    virtual std::shared_ptr<EngineServiceContext> getService( const std::string& type ) = 0;
-    
+
+    virtual std::shared_ptr<EngineServiceContext> getService(const std::string& type) = 0;
+
     template <class T>
-    std::shared_ptr<T> getServiceInterface( const std::string& serviceType ) {
-        auto service = getService( serviceType );
+    std::shared_ptr<T> getServiceInterface(const std::string& serviceType) {
+        auto service = getService(serviceType);
         return service != nullptr ? service->getServiceInterface<T>() : nullptr;
     }
 };
 
-} // aace::engine::core
-} // aace::engine
-} // aace
+}  // namespace core
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_CORE_ENGINE_SERVICE_H
+#endif  // AACE_ENGINE_CORE_ENGINE_SERVICE_H

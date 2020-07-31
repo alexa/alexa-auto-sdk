@@ -22,7 +22,7 @@
 #include "AACE/Core/PlatformInterface.h"
 #include "PhoneCallControllerEngineInterfaces.h"
 
-/** @file */ 
+/** @file */
 
 namespace aace {
 namespace phoneCallController {
@@ -41,7 +41,6 @@ protected:
     PhoneCallController() = default;
 
 public:
-
     /**
      * Describes the state of connection to a calling device
      */
@@ -55,7 +54,8 @@ public:
     /**
      * Describes a configuration property of a connected calling device
      */
-    using CallingDeviceConfigurationProperty = aace::phoneCallController::PhoneCallControllerEngineInterface::CallingDeviceConfigurationProperty;
+    using CallingDeviceConfigurationProperty =
+        aace::phoneCallController::PhoneCallControllerEngineInterface::CallingDeviceConfigurationProperty;
 
     /**
      * Describes an error for a failed call
@@ -104,8 +104,8 @@ public:
      * @li address.value (required): The address of the callee.
      *
      * @return @c true if the platform implementation successfully handled the call
-     */ 
-    virtual bool dial( const std::string& payload ) = 0;
+     */
+    virtual bool dial(const std::string& payload) = 0;
 
     /**
      * Notifies the platform implementation to redial the last called phone number.
@@ -123,8 +123,8 @@ public:
      * @li callId (required): A unique identifier for the call
      *
      * @return @c true if the platform implementation successfully handled the call
-     */ 
-    virtual bool redial( const std::string& payload ) = 0;
+     */
+    virtual bool redial(const std::string& payload) = 0;
 
     /**
      * Notifies the platform implementation to answer an inbound call
@@ -137,8 +137,8 @@ public:
      * }
      * @endcode 
      * @li callId (required): The unique identifier for the call to answer
-     */  
-    virtual void answer( const std::string& payload ) = 0;
+     */
+    virtual void answer(const std::string& payload) = 0;
 
     /**
      * Notifies the platform implementation to end an ongoing call or stop inbound or outbound call setup
@@ -152,7 +152,7 @@ public:
      * @endcode 
      * @li callId (required): The unique identifier for the call to be stopped
      */
-    virtual void stop( const std::string& payload ) = 0;
+    virtual void stop(const std::string& payload) = 0;
 
     /**
      * Notifies the platform implementation to send a DTMF signal to the calling device
@@ -167,15 +167,15 @@ public:
      * @endcode 
      * @li callId (required): The unique identifier for the call
      * @li signal (required): The DTMF string to be sent to the calling device associated with the callId
-     */ 
-    virtual void sendDTMF( const std::string& payload ) = 0;
+     */
+    virtual void sendDTMF(const std::string& payload) = 0;
 
     /**
      * Notifies the Engine of a change in connection to a calling device
      * 
      * @param [in] state The state of connection to a calling device
      */
-    void connectionStateChanged( ConnectionState state );
+    void connectionStateChanged(ConnectionState state);
 
     /**
      * Notifies the Engine of a change in the state of an ongoing call
@@ -184,7 +184,7 @@ public:
      * @param [in] callId The unique identifier associated with the call
      * @param [in] callerId The identifier for a contact. May be included for @c CallState::CALL_RECEIVED
      */
-    void callStateChanged( CallState state, const std::string& callId, const std::string& callerId = "" );
+    void callStateChanged(CallState state, const std::string& callId, const std::string& callerId = "");
 
     /**
      * Notifies the Engine of an error related to a call
@@ -193,7 +193,7 @@ public:
      * @param [in] code The error type
      * @param [in] message A description of the error
      */
-    void callFailed( const std::string& callId, CallError code, const std::string& message = "" );
+    void callFailed(const std::string& callId, CallError code, const std::string& message = "");
 
     /**
      * Notifies the Engine that a caller id was received for an inbound call
@@ -201,7 +201,7 @@ public:
      * @param [in] callId The unique identifier for the call associated with the callId
      * @param [in] callerId The caller's identifier or phone number
      */
-    void callerIdReceived( const std::string& callId, const std::string& callerId );
+    void callerIdReceived(const std::string& callId, const std::string& callerId);
 
     /** 
      * Notifies the Engine that sending the DTMF signal succeeded.
@@ -210,7 +210,7 @@ public:
      * 
      * @sa PhoneCallController::sendDTMF
      */
-    void sendDTMFSucceeded( const std::string& callId );
+    void sendDTMFSucceeded(const std::string& callId);
 
     /** 
      * Notifies the Engine that the DTMF signal could not be delivered to the remote party
@@ -221,7 +221,7 @@ public:
      * 
      * @sa PhoneCallController::sendDTMF
      */
-    void sendDTMFFailed( const std::string& callId, DTMFError code, const std::string& message = "" );
+    void sendDTMFFailed(const std::string& callId, DTMFError code, const std::string& message = "");
 
     /**
      * Notifies the Engine of the calling feature configuration of the connected calling device.
@@ -233,7 +233,7 @@ public:
      * 
      * @param [in] configurationMap A map of configuration properties to the boolean state of the properties
      */
-    void deviceConfigurationUpdated( std::unordered_map<CallingDeviceConfigurationProperty, bool> configurationMap );
+    void deviceConfigurationUpdated(std::unordered_map<CallingDeviceConfigurationProperty, bool> configurationMap);
 
     /**
      * Generates a unique identifier for a call
@@ -246,13 +246,13 @@ public:
      * 
      * Should *never* be called by the platform implementation
      */
-    void setEngineInterface( std::shared_ptr<PhoneCallControllerEngineInterface> phoneCallControllerEngineInterface );
+    void setEngineInterface(std::shared_ptr<PhoneCallControllerEngineInterface> phoneCallControllerEngineInterface);
 
 private:
     std::shared_ptr<PhoneCallControllerEngineInterface> m_phoneCallControllerEngineInterface;
 };
 
-} // aace::phoneCallController
-} // aace
+}  // namespace phoneCallController
+}  // namespace aace
 
 #endif

@@ -28,18 +28,18 @@ namespace sampleApp {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class TTY {
-  private:
+private:
     int savefd{-1};
     struct termios savets {};
     enum { RESET, CBREAK } state{RESET};
 
-  public:
+public:
     TTY() = default;
     auto isatty(int fd) -> bool {
-        struct termios ts {};             // TERMinal I/O Structure
-        return (tcgetattr(fd, &ts) >= 0); // true if no error (is a tty)
+        struct termios ts {};              // TERMinal I/O Structure
+        return (tcgetattr(fd, &ts) >= 0);  // true if no error (is a tty)
     }
-    auto cbreak(int fd) -> int { // put the terminal into cbreak mode
+    auto cbreak(int fd) -> int {  // put the terminal into cbreak mode
         if (state == CBREAK) {
             return 0;
         }
@@ -71,7 +71,7 @@ class TTY {
         state = CBREAK;
         return 0;
     }
-    auto reset(int fd) -> int { // reset the terminal
+    auto reset(int fd) -> int {  // reset the terminal
         if (state == RESET) {
             return 0;
         }
@@ -84,6 +84,6 @@ class TTY {
     }
 };
 
-} // namespace sampleApp
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_TTY_H
+#endif  // SAMPLEAPP_TTY_H

@@ -20,8 +20,7 @@ import com.amazon.aace.core.config.EngineConfiguration;
 /**
  * The @c StorageConfiguration class is a factory interface for creating Storage service configuration objects.
  */
-public class StorageConfiguration
-{
+public class StorageConfiguration {
     private static final String TAG = "StorageConfiguration";
 
     /**
@@ -41,16 +40,15 @@ public class StorageConfiguration
      *
      * The database will be created on initialization if it does not already exist.
      */
-    public static EngineConfiguration createLocalStorageConfig( final String localStoragePath )
-    {
+    public static EngineConfiguration createLocalStorageConfig(final String localStoragePath) {
         return new EngineConfiguration() {
             @Override
             protected long createNativeRef() {
-                return createLocalStorageConfigBinder( localStoragePath );
+                return createLocalStorageConfigBinder(localStoragePath);
             }
         };
     }
 
     // Native Engine JNI methods
-    static private native long createLocalStorageConfigBinder( String localStoragePath );
+    static private native long createLocalStorageConfigBinder(String localStoragePath);
 }

@@ -66,8 +66,8 @@ enum class PlayerActivity {
     FINISHED
 };
 
-inline std::ostream& operator<<( std::ostream& stream, const PlayerActivity& activity ) {
-    switch ( activity ) {
+inline std::ostream& operator<<(std::ostream& stream, const PlayerActivity& activity) {
+    switch (activity) {
         case PlayerActivity::IDLE:
             stream << "IDLE";
             break;
@@ -90,7 +90,7 @@ inline std::ostream& operator<<( std::ostream& stream, const PlayerActivity& act
     return stream;
 }
 
-} // aace::alexa
-} // aace
+}  // namespace alexa
+}  // namespace aace
 
-#endif // AACE_ALEXA_PLAYER_ACTIVITY_H
+#endif  // AACE_ALEXA_PLAYER_ACTIVITY_H

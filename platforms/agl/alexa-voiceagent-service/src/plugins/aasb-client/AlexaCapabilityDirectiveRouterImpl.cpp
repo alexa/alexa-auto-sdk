@@ -13,12 +13,11 @@
  * permissions and limitations under the License.
  */
 
-#include "AlexaCapabilityDirectiveRouterImpl.h"
-
 #include <sstream>
-
+#include <json-c/json.h>
 #include <aasb/Consts.h>
 
+#include "AlexaCapabilityDirectiveRouterImpl.h"
 #include "AlexaConsts.h"
 
 namespace agl {
@@ -170,8 +169,8 @@ void AlexaCapabilityDirectiveRouterImpl::onReceivedDirective(
 }
 
 void AlexaCapabilityDirectiveRouterImpl::registerCapabilityDispatcher(
-        const std::string& topic,
-        std::shared_ptr<agl::capability::interfaces::ICapabilityMessageDispatcher> listener) {
+    const std::string& topic,
+    std::shared_ptr<agl::capability::interfaces::ICapabilityMessageDispatcher> listener) {
     m_externalDirectiveListeners[topic] = listener;
 }
 
@@ -322,7 +321,20 @@ void AlexaCapabilityDirectiveRouterImpl::processTemplateRuntimeAction(
 
     json_object* argsJ = json_object_new_object();
     json_object* actionJ = json_object_new_string(vshlCapabilityAction.c_str());
-    json_object* payloadJ = json_object_new_string(payload.c_str());
+    json_object* payloadJ = NULL;
+
+    if (payload.length()) {
+        payloadJ = json_tokener_parse(payload.c_str());
+    } else {
+        m_logger->log(Level::ERROR, TAG, "Unable to parse payload JSON. Setting to empty string: " + payload);
+        payloadJ = json_object_new_string("");
+    }
+
+    if (!payloadJ) {
+        m_logger->log(Level::ERROR, TAG, "Unable to parse payload JSON: " + payload);
+        return;
+    }
+
     json_object_object_add(argsJ, agl::alexa::JSON_ATTR_ACTION.c_str(), actionJ);
     json_object_object_add(argsJ, agl::alexa::JSON_ATTR_PAYLOAD.c_str(), payloadJ);
 
@@ -338,29 +350,48 @@ void AlexaCapabilityDirectiveRouterImpl::processTemplateRuntimeAction(
     m_logger->log(Level::DEBUG, TAG, "Template runtime action processing completed");
 }
 
-void AlexaCapabilityDirectiveRouterImpl::processCBLAction(
-    const std::string& action,
-    const std::string& payload) {
+void AlexaCapabilityDirectiveRouterImpl::processCBLAction(const std::string& action, const std::string& payload) {
     m_logger->log(Level::DEBUG, TAG, "Processing CBL action: " + action);
 
-    json_object* eventDataJ = json_object_new_object();
-    json_object* vaIdJ = json_object_new_string(m_alexaVoiceAgentId.c_str());
+    json_object* payloadJ = NULL;
+    if (payload.length()) {
+        payloadJ = json_tokener_parse(payload.c_str());
+    } else {
+        m_logger->log(Level::ERROR, TAG, "Unable to parse payload JSON. Setting to empty string: " + payload);
+        payloadJ = json_object_new_string("");
+    }
 
+    if (!payloadJ) {
+        m_logger->log(Level::ERROR, TAG, "Unable to parse payload JSON: " + payload);
+        return;
+    }
+
+    // The payload string may already be of the form of a document like
+    // "{ "payload" : { ... } }", the simplest way to handle that is to use
+    // it as the event json_object if that's the case, that way we avoid
+    // having to worry about copying.
+    json_object* eventDataJ = NULL;
+
+    if (json_object_object_get_ex(payloadJ, "payload", NULL)) {
+        eventDataJ = payloadJ;
+    } else {
+        eventDataJ = json_object_new_object();
+        json_object_object_add(eventDataJ, JSON_ATTR_PAYLOAD.c_str(), payloadJ);
+    }
+
+    json_object* vaIdJ = json_object_new_string(m_alexaVoiceAgentId.c_str());
     json_object_object_add(eventDataJ, JSON_ATTR_VOICEAGENT_ID.c_str(), vaIdJ);
 
     int observers = 0;
     if (action == aasb::bridge::ACTION_CBL_CODEPAIR_RECEIVED) {
         m_logger->log(Level::INFO, TAG, "CBL codepair received: " + payload);
-        json_object* payloadJ = json_object_new_string(payload.c_str());
-        json_object_object_add(eventDataJ, JSON_ATTR_PAYLOAD.c_str(), payloadJ);
         observers = m_cblCodePairReceivedEvent->publishEvent(eventDataJ);
     } else if (action == aasb::bridge::ACTION_CBL_CODEPAIR_EXPIRED) {
         m_logger->log(Level::INFO, TAG, "CBL codepair expired: " + payload);
-        json_object* payloadJ = json_object_new_string(payload.c_str());
-        json_object_object_add(eventDataJ, JSON_ATTR_PAYLOAD.c_str(), payloadJ);
         observers = m_cblCodePairExpiredEvent->publishEvent(eventDataJ);
     } else {
         m_logger->log(Level::INFO, TAG, "Unhandled action: " + action);
+        json_object_put(eventDataJ);
     }
 
     std::stringstream logMsg;

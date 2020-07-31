@@ -31,19 +31,25 @@ namespace alexa {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-PlaybackControllerHandler::PlaybackControllerHandler(std::weak_ptr<Activity> activity, std::weak_ptr<logger::LoggerHandler> loggerHandler)
-    : m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
+PlaybackControllerHandler::PlaybackControllerHandler(
+    std::weak_ptr<Activity> activity,
+    std::weak_ptr<logger::LoggerHandler> loggerHandler) :
+        m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
     // Expects((m_activity != nullptr) && (m_loggerHandler != nullptr));
     setupUI();
 }
 
-std::weak_ptr<Activity> PlaybackControllerHandler::getActivity() { return m_activity; }
+std::weak_ptr<Activity> PlaybackControllerHandler::getActivity() {
+    return m_activity;
+}
 
-std::weak_ptr<logger::LoggerHandler> PlaybackControllerHandler::getLoggerHandler() { return m_loggerHandler; }
+std::weak_ptr<logger::LoggerHandler> PlaybackControllerHandler::getLoggerHandler() {
+    return m_loggerHandler;
+}
 
 // private
 
-void PlaybackControllerHandler::log(logger::LoggerHandler::Level level, const std::string &message) {
+void PlaybackControllerHandler::log(logger::LoggerHandler::Level level, const std::string& message) {
     auto loggerHandler = m_loggerHandler.lock();
     if (!loggerHandler) {
         return;
@@ -59,7 +65,7 @@ void PlaybackControllerHandler::setupUI() {
     m_console = activity->findViewById("id:console");
 
     // buttonPressed
-    activity->registerObserver(Event::onPlaybackControllerButtonPressed, [=](const std::string &value) {
+    activity->registerObserver(Event::onPlaybackControllerButtonPressed, [=](const std::string& value) {
         log(logger::LoggerHandler::Level::VERBOSE, "onPlaybackControllerButtonPressed:" + value);
         // clang-format off
         static const std::map<std::string, PlaybackButton> PlaybackButtonEnumerator{
@@ -79,7 +85,7 @@ void PlaybackControllerHandler::setupUI() {
     });
 
     // togglePressed
-    activity->registerObserver(Event::onPlaybackControllerTogglePressed, [=](const std::string &value) {
+    activity->registerObserver(Event::onPlaybackControllerTogglePressed, [=](const std::string& value) {
         log(logger::LoggerHandler::Level::VERBOSE, "onPlaybackControllerTogglePressed:" + value);
         static std::regex r("(.+)/(true|false|1|0)", std::regex::optimize);
         std::smatch sm{};
@@ -103,5 +109,5 @@ void PlaybackControllerHandler::setupUI() {
     });
 }
 
-} // namespace alexa
-} // namespace sampleApp
+}  // namespace alexa
+}  // namespace sampleApp

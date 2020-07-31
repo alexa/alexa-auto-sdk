@@ -24,11 +24,10 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.v4.media.MediaBrowserServiceCompat;
 
-
 import com.amazon.maccandroid.model.APIConstants;
+import com.amazon.maccandroid.model.PackageMetadata;
 import com.amazon.maccandroid.model.errors.CapabilityAgentError;
 import com.amazon.maccandroid.model.players.DiscoveredPlayer;
-import com.amazon.maccandroid.model.PackageMetadata;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,7 +42,6 @@ import java.util.Collection;
 import java.util.List;
 
 public class DiscoverAndReportMediaAppsHandler extends Handler {
-
     private static final String TAG = DiscoverAndReportMediaAppsHandler.class.getSimpleName();
 
     public static final int START_DISCOVERY = 1;
@@ -55,35 +53,35 @@ public class DiscoverAndReportMediaAppsHandler extends Handler {
     private Context mContext;
     private PackageManager mPackageManager;
 
-    DiscoverAndReportMediaAppsHandler( Looper looper, Context context ) {
-        super( looper );
+    DiscoverAndReportMediaAppsHandler(Looper looper, Context context) {
+        super(looper);
         mContext = context;
         mPackageManager = context.getPackageManager();
         Log.d(TAG, "DiscoverAndReportMediaAppsHandler constructor called");
     }
 
     @Override
-    public void handleMessage( Message msg ) {
-        super.handleMessage( msg );
-        switch ( msg.what ) {
+    public void handleMessage(Message msg) {
+        super.handleMessage(msg);
+        switch (msg.what) {
             case START_DISCOVERY: {
-                Log.i(TAG, "START_DISCOVERY " );
+                Log.i(TAG, "START_DISCOVERY ");
                 discoverMediaApps();
                 cleanUpRemovedApps();
                 break;
             }
 
             case REPORT_DISCOVERED_MEDIA_APPS:
-                Log.i(TAG, "REPORT_DISCOVERED_MEDIA_APPS " );
-                Collection<MediaApp> mediaApps = MediaAppsRepository.getInstance().
-                        getDiscoveredMediaApps().values();
+                Log.i(TAG, "REPORT_DISCOVERED_MEDIA_APPS ");
+                Collection<MediaApp> mediaApps = MediaAppsRepository.getInstance().getDiscoveredMediaApps().values();
                 for (MediaApp mediaApp : mediaApps) {
                     if (MediaAppsRepository.getInstance().isAuthorizedApp(mediaApp.getLocalPlayerId())) {
-                        Log.i(TAG, "REPORT_DISCOVERED_MEDIA_APPS | appid: " + mediaApp.getLocalPlayerId() + " is already authorized no need to report again");
+                        Log.i(TAG,
+                                "REPORT_DISCOVERED_MEDIA_APPS | appid: " + mediaApp.getLocalPlayerId()
+                                        + " is already authorized no need to report again");
                         mediaApps.remove(mediaApp);
                     }
-                    Log.i(TAG, "REPORT_DISCOVERED_MEDIA_APPS media apps " +
-                            mediaApp.getLocalPlayerId() );
+                    Log.i(TAG, "REPORT_DISCOVERED_MEDIA_APPS media apps " + mediaApp.getLocalPlayerId());
                 }
                 MediaAppsStateReporter.getInstance().reportDiscoveredPlayers(
                         DiscoveredPlayer.convertMediaApps(new ArrayList<MediaApp>(mediaApps)));
@@ -100,8 +98,9 @@ public class DiscoverAndReportMediaAppsHandler extends Handler {
         MediaAppsRepository appsRepository = MediaAppsRepository.getInstance();
         for (MediaApp app : appsRepository.getAuthorizedMediaApps().values()) {
             if (!appsRepository.isDiscoveredApp(app.getLocalPlayerId())) {
-                Log.i(TAG, "cleanUpRemovedApps | appId: " +
-                        app.getLocalPlayerId() + " is no longer discovered removing app");
+                Log.i(TAG,
+                        "cleanUpRemovedApps | appId: " + app.getLocalPlayerId()
+                                + " is no longer discovered removing app");
                 appsRepository.removeMediaApp(app.getLocalPlayerId());
             }
         }
@@ -111,28 +110,28 @@ public class DiscoverAndReportMediaAppsHandler extends Handler {
      * Discovers MACC compliant media apps on the system.
      */
     public void discoverMediaApps() {
-        //Clear discovered apps so we don't keep apps that could have been uninstalled or changed
+        // Clear discovered apps so we don't keep apps that could have been uninstalled or changed
         MediaAppsRepository.getInstance().clearDiscoveredApps();
 
         // Build an Intent that only has the MediaBrowserService action and query
         // the PackageManager for apps that have services registered that can
         // receive it and get the meta data component associated with it
-        final Intent mediaBrowserIntent =
-                new Intent( MediaBrowserServiceCompat.SERVICE_INTERFACE );
-        final List< ResolveInfo > services =
-                mPackageManager.queryIntentServices( mediaBrowserIntent,
-                        PackageManager.GET_META_DATA );
+        final Intent mediaBrowserIntent = new Intent(MediaBrowserServiceCompat.SERVICE_INTERFACE);
+        final List<ResolveInfo> services =
+                mPackageManager.queryIntentServices(mediaBrowserIntent, PackageManager.GET_META_DATA);
 
-        if (services == null || services.isEmpty()) return;
+        if (services == null || services.isEmpty())
+            return;
 
         Log.i(TAG, "services: " + services);
 
         for (final ResolveInfo resolveInfo : services) {
-            Log.i(TAG, "Discovered app: " + resolveInfo.serviceInfo.packageName + " | meta data: " + resolveInfo.serviceInfo.metaData);
-            if (resolveInfo == null || resolveInfo.serviceInfo == null ||
-                    resolveInfo.serviceInfo.applicationInfo == null ||
-                    resolveInfo.serviceInfo.metaData == null ||
-                    !resolveInfo.serviceInfo.metaData.containsKey(EMP_METADATA_FLAG)) {
+            Log.i(TAG,
+                    "Discovered app: " + resolveInfo.serviceInfo.packageName
+                            + " | meta data: " + resolveInfo.serviceInfo.metaData);
+            if (resolveInfo == null || resolveInfo.serviceInfo == null
+                    || resolveInfo.serviceInfo.applicationInfo == null || resolveInfo.serviceInfo.metaData == null
+                    || !resolveInfo.serviceInfo.metaData.containsKey(EMP_METADATA_FLAG)) {
                 continue;
             }
 
@@ -147,16 +146,16 @@ public class DiscoverAndReportMediaAppsHandler extends Handler {
             }
             // if authorized mediaApp already exists, use it. don't create another new one
             MediaAppsRepository appsRepository = MediaAppsRepository.getInstance();
-            if( appsRepository.isAuthorizedApp(packageName) ) {
-                appsRepository.addDiscoveredMediaApp( appsRepository.getAuthorizedMediaApp( packageName ) );
+            if (appsRepository.isAuthorizedApp(packageName)) {
+                appsRepository.addDiscoveredMediaApp(appsRepository.getAuthorizedMediaApp(packageName));
             } else {
-                MediaApp mediaApp = MediaApp.create(mContext, packageName, className,
-                        appMetaData.getSpiVersion(), appMetaData.getPlayerCookie());
-                    appsRepository.addDiscoveredMediaApp(mediaApp);
+                MediaApp mediaApp = MediaApp.create(
+                        mContext, packageName, className, appMetaData.getSpiVersion(), appMetaData.getPlayerCookie());
+                appsRepository.addDiscoveredMediaApp(mediaApp);
                 mediaApp.connect(new MediaAppsConnectionListener() {
                     @Override
                     public void onConnectionSuccessful() {
-                        Log.i(TAG, "onConnectionSuccessful" );
+                        Log.i(TAG, "onConnectionSuccessful");
                     }
 
                     @Override
@@ -180,8 +179,7 @@ public class DiscoverAndReportMediaAppsHandler extends Handler {
             return null;
         }
 
-        JSONObject empMetaData = getPackageMetaDataFromResourceId(
-                resolveInfo.serviceInfo.packageName, resId);
+        JSONObject empMetaData = getPackageMetaDataFromResourceId(resolveInfo.serviceInfo.packageName, resId);
         Log.i(TAG, "empData: " + empMetaData);
         if (empMetaData == null) {
             Log.i(TAG, "invalid empMetaData provided");
@@ -219,14 +217,12 @@ public class DiscoverAndReportMediaAppsHandler extends Handler {
      */
     private JSONObject getPackageMetaDataFromResourceId(String packageName, int resourceId) {
         try {
-            InputStream resourceInputStream = mPackageManager.
-                    getResourcesForApplication(packageName).openRawResource(resourceId);
-            BufferedReader streamReader = new
-                    BufferedReader(new InputStreamReader(resourceInputStream, "UTF-8"));
+            InputStream resourceInputStream =
+                    mPackageManager.getResourcesForApplication(packageName).openRawResource(resourceId);
+            BufferedReader streamReader = new BufferedReader(new InputStreamReader(resourceInputStream, "UTF-8"));
             StringBuilder responseStrBuilder = new StringBuilder();
             String inputStr;
-            while ((inputStr = streamReader.readLine()) != null)
-                responseStrBuilder.append(inputStr);
+            while ((inputStr = streamReader.readLine()) != null) responseStrBuilder.append(inputStr);
             return new JSONObject(responseStrBuilder.toString());
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();

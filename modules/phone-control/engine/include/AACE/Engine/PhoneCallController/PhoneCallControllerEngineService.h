@@ -26,35 +26,35 @@ namespace engine {
 namespace phoneCallController {
 
 class PhoneCallControllerEngineService : public aace::engine::core::EngineService {
-    DESCRIBE("aace.phoneCallController",VERSION("1.0"),DEPENDS(aace::engine::alexa::AlexaEngineService))
+    DESCRIBE("aace.phoneCallController", VERSION("1.0"), DEPENDS(aace::engine::alexa::AlexaEngineService))
 
 private:
-    PhoneCallControllerEngineService( const aace::engine::core::ServiceDescription& description );
+    PhoneCallControllerEngineService(const aace::engine::core::ServiceDescription& description);
 
 public:
     virtual ~PhoneCallControllerEngineService() = default;
 
 protected:
     bool shutdown() override;
-    bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) override;
+    bool registerPlatformInterface(std::shared_ptr<aace::core::PlatformInterface> platformInterface) override;
 
 private:
     // platform interface registration
     template <class T>
-    bool registerPlatformInterfaceType( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) {
-        std::shared_ptr<T> typedPlatformInterface = std::dynamic_pointer_cast<T>( platformInterface );
-        return typedPlatformInterface != nullptr ? registerPlatformInterfaceType( typedPlatformInterface ) : false;
+    bool registerPlatformInterfaceType(std::shared_ptr<aace::core::PlatformInterface> platformInterface) {
+        std::shared_ptr<T> typedPlatformInterface = std::dynamic_pointer_cast<T>(platformInterface);
+        return typedPlatformInterface != nullptr ? registerPlatformInterfaceType(typedPlatformInterface) : false;
     }
 
-    bool registerPlatformInterfaceType( std::shared_ptr<aace::phoneCallController::PhoneCallController> phoneCallController );
+    bool registerPlatformInterfaceType(
+        std::shared_ptr<aace::phoneCallController::PhoneCallController> phoneCallController);
 
     // engine implementation object references
     std::shared_ptr<aace::engine::phoneCallController::PhoneCallControllerEngineImpl> m_phoneCallControllerEngineImpl;
-
 };
 
-} // aace::engine::phoneCallController
-} // aace::engine
-} // aace
+}  // namespace phoneCallController
+}  // namespace engine
+}  // namespace aace
 
 #endif

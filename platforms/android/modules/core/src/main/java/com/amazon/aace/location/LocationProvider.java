@@ -20,8 +20,7 @@ import com.amazon.aace.core.PlatformInterface;
 /**
  * LocationProvider should be extended to report geolocation to the Engine.
  */
-abstract public class LocationProvider extends PlatformInterface
-{
+abstract public class LocationProvider extends PlatformInterface {
     /**
      * Returns the current geolocation of the device
      *
@@ -43,13 +42,11 @@ abstract public class LocationProvider extends PlatformInterface
         return createBinder();
     }
 
-    final protected void disposeNativeRef( long nativeRef ) {
-        disposeBinder( nativeRef );
+    final protected void disposeNativeRef(long nativeRef) {
+        disposeBinder(nativeRef);
     }
 
     // Native Engine JNI methods
     private native long createBinder();
-    private native void disposeBinder( long nativeRef );
+    private native void disposeBinder(long nativeRef);
 }
-
-

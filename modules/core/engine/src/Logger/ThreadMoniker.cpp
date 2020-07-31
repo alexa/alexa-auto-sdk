@@ -35,6 +35,6 @@ ThreadMoniker::ThreadMoniker() {
     m_moniker = stream.str();
 }
 
-} // aace::engine::logger
-} // aace::engine
-} // aace
+}  // namespace logger
+}  // namespace engine
+}  // namespace aace

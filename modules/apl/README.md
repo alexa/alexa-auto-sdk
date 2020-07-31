@@ -24,6 +24,19 @@ The APL module depends on the [Alexa Smart Screen SDK](https://github.com/alexa/
 
 You can implement APL Rendering for C++ by extending the Sample App and Web View Host from the Smart Screen SDK. See the [SDK GUI API](https://github.com/alexa/alexa-smart-screen-sdk/blob/master/modules/GUI/SDK-GUI-API.md) for details.
 
+### Configure the Engine
+The Alexa Presentation module can be optionally configured with the following Engine setting:
+
+```
+{
+  "alexaPresentationCapabilityAgent": {
+     "displayDocumentInteractionIdleTimeout": <TIMEOUT_IN_MS>
+  }
+}
+```
+The configuration can also be generated programatically using the `aace::apl::config::APLConfiguration::createAlexaPresentationTimeoutConfig()` factory method.
+
+>**Note:** The default value for the configuration timeout is 30 seconds.
 
 ## Registering an APL Handler <a id = "registering-an-apl-handler"></a>
 

@@ -49,14 +49,19 @@ public:
      * @param [in] accuracy A location accuracy in meters
      * @param [in] time The time of measurement. Default is time of construction
      */
-    Location( double latitude, double longitude, double altitude = UNDEFINED, double accuracy = UNDEFINED, std::chrono::system_clock::time_point time = std::chrono::system_clock::now() );
+    Location(
+        double latitude,
+        double longitude,
+        double altitude = UNDEFINED,
+        double accuracy = UNDEFINED,
+        std::chrono::system_clock::time_point time = std::chrono::system_clock::now());
 
     /**
      * Copy constructor for a Location object
      *
      * @param [in] location A Location object to copy
      */
-    Location( const Location& location );
+    Location(const Location& location);
 
     /**
      * Checks if the Location is valid
@@ -64,7 +69,7 @@ public:
      * @return @c true if the location is valid, else @c false
      */
     bool isValid();
-    
+
     /**
      * Location accessor method for latitude
      *
@@ -115,7 +120,7 @@ private:
     std::chrono::system_clock::time_point m_time;
 };
 
-} // aace::location
-} // aace
+}  // namespace location
+}  // namespace aace
 
-#endif // AACE_LOCATION_LOCATION_H
+#endif  // AACE_LOCATION_LOCATION_H

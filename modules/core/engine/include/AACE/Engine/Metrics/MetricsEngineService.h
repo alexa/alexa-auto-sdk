@@ -26,10 +26,10 @@ namespace metrics {
 
 class MetricsEngineService : public aace::engine::core::EngineService {
 public:
-    DESCRIBE("aace.metrics",VERSION("1.0"),DEPENDS(aace::engine::logger::LoggerEngineService))
+    DESCRIBE("aace.metrics", VERSION("1.0"), DEPENDS(aace::engine::logger::LoggerEngineService))
 
 private:
-    MetricsEngineService( const aace::engine::core::ServiceDescription& description );
+    MetricsEngineService(const aace::engine::core::ServiceDescription& description);
 
 public:
     virtual ~MetricsEngineService() = default;
@@ -37,24 +37,24 @@ public:
 protected:
     bool shutdown() override;
 
-    bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) override;
+    bool registerPlatformInterface(std::shared_ptr<aace::core::PlatformInterface> platformInterface) override;
 
 private:
     // platform interface registration
     template <class T>
-    bool registerPlatformInterfaceType( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) {
-        std::shared_ptr<T> typedPlatformInterface = std::dynamic_pointer_cast<T>( platformInterface );
-        return typedPlatformInterface != nullptr ? registerPlatformInterfaceType( typedPlatformInterface ) : false;
+    bool registerPlatformInterfaceType(std::shared_ptr<aace::core::PlatformInterface> platformInterface) {
+        std::shared_ptr<T> typedPlatformInterface = std::dynamic_pointer_cast<T>(platformInterface);
+        return typedPlatformInterface != nullptr ? registerPlatformInterfaceType(typedPlatformInterface) : false;
     }
-    
-    bool registerPlatformInterfaceType( std::shared_ptr<aace::metrics::MetricsUploader> metricsUploader );
+
+    bool registerPlatformInterfaceType(std::shared_ptr<aace::metrics::MetricsUploader> metricsUploader);
 
 private:
     std::shared_ptr<aace::engine::metrics::MetricsUploaderEngineImpl> m_metricsUploaderEngineImpl;
 };
 
-} // aace::engine::metrics
-} // aace::engine
-} // aace
+}  // namespace metrics
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_METRICS_METRICS_ENGINE_SERVICE_H
+#endif  // AACE_ENGINE_METRICS_METRICS_ENGINE_SERVICE_H

@@ -19,6 +19,8 @@
 #include <AVSCommon/SDKInterfaces/AuthDelegateInterface.h>
 #include <AVSCommon/Utils/DeviceInfo.h>
 
+#include <AACE/Engine/Alexa/AlexaEndpointInterface.h>
+
 namespace aace {
 namespace engine {
 namespace phoneCallController {
@@ -50,9 +52,7 @@ struct AlexaAccountInfo {
     AccountProvisionStatus provisionStatus;
 
     /// Constructor
-    AlexaAccountInfo() :
-        directedId( "" ),
-        provisionStatus( AccountProvisionStatus::INVALID ) {
+    AlexaAccountInfo() : directedId(""), provisionStatus(AccountProvisionStatus::INVALID) {
     }
 };
 
@@ -63,8 +63,10 @@ struct AlexaAccountInfo {
  * @param deviceInfo The reference to @c DeviceInfo to get the auth token.
  * @return On successful it returns @c AlexaAccountInfo otherwise if will return the default @c AlexaAccountInfo.
  */
-AlexaAccountInfo getAlexaAccountInfo( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
-        std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo );
+AlexaAccountInfo getAlexaAccountInfo(
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
+    std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
+    std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints);
 
 /**
  * Function to perform the auto provisioning of the account.
@@ -74,12 +76,14 @@ AlexaAccountInfo getAlexaAccountInfo( std::shared_ptr<alexaClientSDK::avsCommon:
  * @param deviceInfo The reference to @c DeviceInfo to get the auth token.
  * @return On successful it returns @c true otherwise if will return the default @c false.
  */
-bool doAccountAutoProvision( const AlexaAccountInfo& alexaAccountInfo, 
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
-        std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo );
+bool doAccountAutoProvision(
+    const AlexaAccountInfo& alexaAccountInfo,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
+    std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
+    std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints);
 
-} // aace::engine::phoneCallController
-} // aace::engine
-} // aace
+}  // namespace phoneCallController
+}  // namespace engine
+}  // namespace aace
 
-#endif //AACE_ENGINE_PHONECALLCONTROLLER_PHONECALLCONTROLLER_REST_AGENT_H
+#endif  //AACE_ENGINE_PHONECALLCONTROLLER_PHONECALLCONTROLLER_REST_AGENT_H

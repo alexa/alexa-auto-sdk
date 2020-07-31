@@ -9,13 +9,12 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
 
 set(HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockAlertsAudioFactoryInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockAlexaInterfaceMessageSenderInternalInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockNotificationsAudioFactoryInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockAttachmentManager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockAudioPlayerInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockAudioPlayerObserverInterface.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockCapabilitiesDelegateInterface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockAuthDelegateInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockConnectionStatusObserver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockCustomerDataManager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockDeviceSettingsManager.h

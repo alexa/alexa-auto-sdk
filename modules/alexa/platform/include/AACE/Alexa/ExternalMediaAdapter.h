@@ -37,13 +37,12 @@ public:
     /**
      * Describes the playback control type
      */
-    enum class PlayControlType
-    {
+    enum class PlayControlType {
         /**
          * pause playback
          */
         PAUSE,
-         /**
+        /**
          * resume playback
          */
         RESUME,
@@ -288,11 +287,11 @@ public:
 
         /// A player may declare arbitrary information for itself.
         std::string playerCookie;
-        
+
         /// The only spiVersion that currently exists is "1.0"
         std::string spiVersion;
     };
-    
+
     /**
      * struct that encapsulates a players playback state.
      */
@@ -432,7 +431,12 @@ public:
      * @return @c true if the platform implementation successfully handled the call, 
      * else @c false
      */
-    virtual bool login( const std::string& localPlayerId, const std::string& accessToken, const std::string& userName, bool forceLogin, std::chrono::milliseconds tokenRefreshInterval ) = 0;
+    virtual bool login(
+        const std::string& localPlayerId,
+        const std::string& accessToken,
+        const std::string& userName,
+        bool forceLogin,
+        std::chrono::milliseconds tokenRefreshInterval) = 0;
 
     /**
      * Directive called after a discovered player initiates the logoutComplete event.
@@ -442,7 +446,7 @@ public:
      * @return @c true if the platform implementation successfully handled the call, 
      * else @c false
      */
-    virtual bool logout( const std::string& localPlayerId ) = 0;
+    virtual bool logout(const std::string& localPlayerId) = 0;
 
     /**
      * Called when the user first calls play for the external media via voice control.
@@ -462,12 +466,26 @@ public:
      * @return @c true if the platform implementation successfully handled the call, 
      * else @c false
      */
-    virtual bool play( const std::string& localPlayerId, const std::string& playContextToken, int64_t index, std::chrono::milliseconds offset, bool preload, Navigation navigation) = 0;
+    virtual bool play(
+        const std::string& localPlayerId,
+        const std::string& playContextToken,
+        int64_t index,
+        std::chrono::milliseconds offset,
+        bool preload,
+        Navigation navigation) = 0;
 
     /**
      * Extra parameters for credentials 
      */
-    virtual bool play( const std::string& localPlayerId, const std::string& playContextToken, int64_t index, std::chrono::milliseconds offset, bool preload, Navigation navigation, const std::string& playbackSessionId, const std::string& skillToken );
+    virtual bool play(
+        const std::string& localPlayerId,
+        const std::string& playContextToken,
+        int64_t index,
+        std::chrono::milliseconds offset,
+        bool preload,
+        Navigation navigation,
+        const std::string& playbackSessionId,
+        const std::string& skillToken);
 
     /**
      * Occurs during playback control via voice interaction or PlaybackController interface
@@ -481,7 +499,7 @@ public:
      * 
      * @sa PlaybackController
      */
-    virtual bool playControl( const std::string& localPlayerId, PlayControlType controlType ) = 0;
+    virtual bool playControl(const std::string& localPlayerId, PlayControlType controlType) = 0;
 
     /**
      * Called when the user invokes media seek via speech.
@@ -493,7 +511,7 @@ public:
      * @return @c true if the platform implementation successfully handled the call, 
      * else @c false
      */
-    virtual bool seek( const std::string& localPlayerId, std::chrono::milliseconds offset ) = 0;
+    virtual bool seek(const std::string& localPlayerId, std::chrono::milliseconds offset) = 0;
 
     /**
      * Called when the user invokes media seek adjustment via speech.
@@ -505,7 +523,7 @@ public:
      * @return @c true if the platform implementation successfully handled the call, 
      * else @c false
      */
-    virtual bool adjustSeek( const std::string& localPlayerId, std::chrono::milliseconds deltaOffset ) = 0;
+    virtual bool adjustSeek(const std::string& localPlayerId, std::chrono::milliseconds deltaOffset) = 0;
 
     /**
      * Called after discovered media players have been reported. Returns a list of reported players and whether they
@@ -521,14 +539,14 @@ public:
      * @return @c true if the platform implementation successfully handled the call, 
      * else @c false
      */
-    virtual bool authorize( const std::vector<AuthorizedPlayerInfo>& authorizedPlayers ) = 0;
+    virtual bool authorize(const std::vector<AuthorizedPlayerInfo>& authorizedPlayers) = 0;
 
     /**
      * This function retrieves the offset of the current track the adapter is handling.
      *
      * @return This returns the offset in milliseconds.
      */
-    virtual std::chrono::milliseconds getOffset( const std::string& localPlayerId );
+    virtual std::chrono::milliseconds getOffset(const std::string& localPlayerId);
 
     /**
      * Must provide the local external media player apps @PlaybackState, and @SessionState information to maintain cloud sync
@@ -539,8 +557,8 @@ public:
      * @return @c true if the platform is able to provide state information for the external 
      * media player, else @c false
      */
-    virtual bool getState( const std::string& localPlayerId, ExternalMediaAdapterState& state ) = 0;
-    
+    virtual bool getState(const std::string& localPlayerId, ExternalMediaAdapterState& state) = 0;
+
     /**
      * Notifies the platform implementation to set the volume of the output channel. The
      * @c volume value should be scaled to fit the needs of the platform.
@@ -550,7 +568,7 @@ public:
      * @return @c true if the platform implementation successfully handled the call, 
      * else @c false
      */
-    virtual bool volumeChanged( float volume ) = 0;
+    virtual bool volumeChanged(float volume) = 0;
 
     /**
      * Notifies the platform implementation to apply a mute state change to
@@ -561,8 +579,8 @@ public:
      * @return @c true if the platform implementation successfully handled the call, 
      * else @c false
      */
-    virtual bool mutedStateChanged( MutedState state ) = 0;
-    
+    virtual bool mutedStateChanged(MutedState state) = 0;
+
     // ExternalMediaAdapterEngineInterface
 
     /**
@@ -570,28 +588,28 @@ public:
      *
      * @param [in] discoveredPlayers contains the discovered player info objects
      */
-    void reportDiscoveredPlayers( const std::vector<DiscoveredPlayerInfo>& discoveredPlayers );
+    void reportDiscoveredPlayers(const std::vector<DiscoveredPlayerInfo>& discoveredPlayers);
 
     /**
      * The device is responsible for requesting an access token when needed. This is typically done immediately upon connection to AVS.
      *
      * @param [in] localPlayerId The opaque token that uniquely identifies the local external player app
      */
-    void requestToken( const std::string& localPlayerId );
+    void requestToken(const std::string& localPlayerId);
 
     /**
      * Should be called on a local external media player login. This will set authorization of the app with AVS.
      *
      * @param [in] localPlayerId The opaque token that uniquely identifies the local external player app
      */
-    void loginComplete( const std::string& localPlayerId );
+    void loginComplete(const std::string& localPlayerId);
 
     /**
      * Should be called on a local external media player logout. This will unset authorization of the app with AVS.
      *
      * @param [in] localPlayerId The opaque token that uniquely identifies the local external player app
      */
-    void logoutComplete( const std::string& localPlayerId );
+    void logoutComplete(const std::string& localPlayerId);
 
     /**
      * Should be called on a local external media player event. This will sync the context with AVS.
@@ -600,7 +618,7 @@ public:
      *
      * @param [in] eventName Canonical event name
      */
-    void playerEvent( const std::string& localPlayerId, const std::string& eventName );
+    void playerEvent(const std::string& localPlayerId, const std::string& eventName);
 
     /**
      * Should be called on a player error.
@@ -615,16 +633,21 @@ public:
      *
      * @param [in] fatal true if the error is fatal
      */
-    void playerError( const std::string& localPlayerId, const std::string& errorName, long code, const std::string& description, bool fatal );
+    void playerError(
+        const std::string& localPlayerId,
+        const std::string& errorName,
+        long code,
+        const std::string& description,
+        bool fatal);
 
     /**
      * Should be called on local external media player events. This will switch the media focus to that context.
      *
      * @param [in] localPlayerId The opaque token that uniquely identifies the local external player app
      */
-    void setFocus( const std::string& localPlayerId );
+    void setFocus(const std::string& localPlayerId);
 
-    void removeDiscoveredPlayer( const std::string& localPlayerId );
+    void removeDiscoveredPlayer(const std::string& localPlayerId);
 
     /**
      * @internal
@@ -632,7 +655,8 @@ public:
      *
      * Should *never* be called by the platform implementation.
      */
-    void setEngineInterface( std::shared_ptr<aace::alexa::ExternalMediaAdapterEngineInterface> externalMediaAdapterEngineInterface );
+    void setEngineInterface(
+        std::shared_ptr<aace::alexa::ExternalMediaAdapterEngineInterface> externalMediaAdapterEngineInterface);
 
 private:
     std::weak_ptr<aace::alexa::ExternalMediaAdapterEngineInterface> m_externalMediaAdapterEngineInterface;
@@ -693,7 +717,9 @@ inline std::ostream& operator<<(std::ostream& stream, const ExternalMediaAdapter
     return stream;
 }
 
-inline std::ostream& operator<<(std::ostream& stream, const ExternalMediaAdapter::SupportedPlaybackOperation& supportedPlaybackOperation) {
+inline std::ostream& operator<<(
+    std::ostream& stream,
+    const ExternalMediaAdapter::SupportedPlaybackOperation& supportedPlaybackOperation) {
     switch (supportedPlaybackOperation) {
         case ExternalMediaAdapter::SupportedPlaybackOperation::PLAY:
             stream << "PLAY";
@@ -804,7 +830,7 @@ inline std::ostream& operator<<(std::ostream& stream, const ExternalMediaAdapter
     return stream;
 }
 
-} // aace::alexa
-} // aace
+}  // namespace alexa
+}  // namespace aace
 
-#endif // AACE_ALEXA_EXTERNAL_MEDIA_ADAPTER_H
+#endif  // AACE_ALEXA_EXTERNAL_MEDIA_ADAPTER_H

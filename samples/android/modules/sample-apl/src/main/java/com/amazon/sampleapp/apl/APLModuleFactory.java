@@ -20,8 +20,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 
 import com.amazon.aace.audio.AudioOutputProvider;
-import com.amazon.aace.core.config.EngineConfiguration;
 import com.amazon.aace.core.PlatformInterface;
+import com.amazon.aace.core.config.EngineConfiguration;
 import com.amazon.sampleapp.apl.APLFragment;
 import com.amazon.sampleapp.apl.R;
 import com.amazon.sampleapp.core.ModuleFactoryInterface;
@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class APLModuleFactory implements ModuleFactoryInterface {
-
     @Override
     public List<EngineConfiguration> getConfiguration(SampleAppContext sampleAppContext) {
         List<EngineConfiguration> list = new ArrayList<>();
@@ -60,5 +59,4 @@ public class APLModuleFactory implements ModuleFactoryInterface {
         list.add(aplHandler);
         return list;
     }
-
 }

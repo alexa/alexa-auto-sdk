@@ -23,40 +23,40 @@ namespace aace {
 namespace jni {
 namespace audio {
 
-    //
-    // AudioInputHandler
-    //
+//
+// AudioInputHandler
+//
 
-    class AudioInputHandler : public aace::audio::AudioInput {
-    public:
-        AudioInputHandler( jobject obj );
+class AudioInputHandler : public aace::audio::AudioInput {
+public:
+    AudioInputHandler(jobject obj);
 
-        // aace::audio::AudioInput
-        bool startAudioInput() override;
-        bool stopAudioInput() override;
+    // aace::audio::AudioInput
+    bool startAudioInput() override;
+    bool stopAudioInput() override;
 
-    private:
-        JObject m_obj;
-    };
+private:
+    JObject m_obj;
+};
 
-    //
-    // AudioInputBinder
-    //
+//
+// AudioInputBinder
+//
 
-    class AudioInputBinder {
-    public:
-        AudioInputBinder( jobject obj );
+class AudioInputBinder {
+public:
+    AudioInputBinder(jobject obj);
 
-        std::shared_ptr<AudioInputHandler> getAudioInputHandler() {
-            return m_audioInputHandler;
-        }
+    std::shared_ptr<AudioInputHandler> getAudioInputHandler() {
+        return m_audioInputHandler;
+    }
 
-    private:
-        std::shared_ptr<AudioInputHandler> m_audioInputHandler;
-    };
+private:
+    std::shared_ptr<AudioInputHandler> m_audioInputHandler;
+};
 
-} // aace::jni::audio
-} // aace::jni
-} // aace
+}  // namespace audio
+}  // namespace jni
+}  // namespace aace
 
-#endif // AACE_JNI_AUDIO_AUDIO_INPUT_BINDER_H
+#endif  // AACE_JNI_AUDIO_AUDIO_INPUT_BINDER_H

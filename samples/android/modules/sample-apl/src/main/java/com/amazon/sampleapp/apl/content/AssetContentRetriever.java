@@ -24,7 +24,6 @@ import java.util.concurrent.Executors;
  * Loads the assets asynchronously on background threads.
  */
 public class AssetContentRetriever implements ContentRetriever {
-
     private static final String TAG = AssetContentRetriever.class.getSimpleName();
 
     private final ExecutorService mExecutor;
@@ -42,9 +41,9 @@ public class AssetContentRetriever implements ContentRetriever {
      * @return instance of {@link AssetContentRetriever}
      */
     public synchronized static AssetContentRetriever create(Context context) {
-            if (instance == null)
-                instance = new AssetContentRetriever(context);
-            return instance;
+        if (instance == null)
+            instance = new AssetContentRetriever(context);
+        return instance;
     }
 
     /**
@@ -67,10 +66,8 @@ public class AssetContentRetriever implements ContentRetriever {
      * @param callback the callback to call.
      */
     @Override
-    public void fetchAsync(final String source,final ContentRetrieverCallback callback) {
-        mExecutor.submit(() -> {
-            loadAssetAsync(source, callback);
-        });
+    public void fetchAsync(final String source, final ContentRetrieverCallback callback) {
+        mExecutor.submit(() -> { loadAssetAsync(source, callback); });
     }
 
     /**
@@ -88,20 +85,14 @@ public class AssetContentRetriever implements ContentRetriever {
      * @throws IOException
      */
     private String loadAsset(String source) throws IOException {
-
         BufferedReader reader = null;
         try {
             if (mContextRef.get() != null) {
                 Context context = mContextRef.get();
-                if(source.indexOf("http") == 0) {
-                    reader = new BufferedReader(
-                            new InputStreamReader(
-                                    new URL(source).openStream()));
-                }
-                else {
-                    reader = new BufferedReader(
-                            new InputStreamReader(
-                                    context.getAssets().open(source)));
+                if (source.indexOf("http") == 0) {
+                    reader = new BufferedReader(new InputStreamReader(new URL(source).openStream()));
+                } else {
+                    reader = new BufferedReader(new InputStreamReader(context.getAssets().open(source)));
                 }
                 String line;
                 StringBuilder result = new StringBuilder();
@@ -130,12 +121,11 @@ public class AssetContentRetriever implements ContentRetriever {
     @WorkerThread
     private void loadAssetAsync(String source, ContentRetrieverCallback callback) {
         try {
-           String content =  loadAsset(source);
-           postResult(callback,  content);
+            String content = loadAsset(source);
+            postResult(callback, content);
         } catch (IOException e) {
             callback.error();
             e.printStackTrace();
-
         }
     }
 
@@ -146,8 +136,6 @@ public class AssetContentRetriever implements ContentRetriever {
      */
     private void postResult(ContentRetrieverCallback callback, String content) {
         Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(() -> {
-            callback.success(content);
-        });
+        handler.post(() -> { callback.success(content); });
     }
 }

@@ -21,16 +21,15 @@
 namespace aace {
 namespace test {
 namespace avs {
-    
+
 struct MockDeviceSettingsManager : alexaClientSDK::settings::DeviceSettingsManager {
 public:
     MockDeviceSettingsManager() : alexaClientSDK::settings::DeviceSettingsManager(nullptr) {
     }
-
 };
-    
-} // aace::test::avs
-} // aace::test
-} // aace
 
-#endif //AACE_TEST_AVS_MOCK_DEVICE_SETTINGS_MANAGER_H
+}  // namespace avs
+}  // namespace test
+}  // namespace aace
+
+#endif  //AACE_TEST_AVS_MOCK_DEVICE_SETTINGS_MANAGER_H

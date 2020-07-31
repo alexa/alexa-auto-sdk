@@ -9,6 +9,7 @@
 
     <feature name="urn:AGL:widget:required-permission">
         <param name="urn:AGL:permission::public:no-htdocs" value="required" />
+        <param name="urn:AGL:permission::public:audio" value="required" />
         <param name="urn:AGL:permission:audio:public:audiostream" value="required" />
         <param name="urn:AGL:permission::public:hidden" value="required" />
         <param name="urn:AGL:permission::system:run-by-default" value="required" />
@@ -23,7 +24,6 @@
     </feature>
 
     <feature name="urn:AGL:widget:required-api">
-        <param name="ahl-4a" value="ws" />
         <param name="vshl-capabilities" value="ws" />
 	  </feature>
 </widget>

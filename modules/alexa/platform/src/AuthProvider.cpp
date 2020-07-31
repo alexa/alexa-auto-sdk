@@ -17,18 +17,19 @@
 
 namespace aace {
 namespace alexa {
-    
-AuthProvider::~AuthProvider() = default; // key function
 
-void AuthProvider::authStateChanged( AuthState authState, AuthError authError ) {
-    if( auto m_authProviderEngineInterface_lock = m_authProviderEngineInterface.lock() ) {
-        m_authProviderEngineInterface_lock->onAuthStateChanged( authState, authError );
+AuthProvider::~AuthProvider() = default;  // key function
+
+void AuthProvider::authStateChanged(AuthState authState, AuthError authError) {
+    if (auto m_authProviderEngineInterface_lock = m_authProviderEngineInterface.lock()) {
+        m_authProviderEngineInterface_lock->onAuthStateChanged(authState, authError);
     }
 }
-    
-void AuthProvider::setEngineInterface( std::shared_ptr<aace::alexa::AuthProviderEngineInterface> authProviderEngineInterface ) {
+
+void AuthProvider::setEngineInterface(
+    std::shared_ptr<aace::alexa::AuthProviderEngineInterface> authProviderEngineInterface) {
     m_authProviderEngineInterface = authProviderEngineInterface;
 }
-    
-} // aace::alexa
-} // aace
+
+}  // namespace alexa
+}  // namespace aace

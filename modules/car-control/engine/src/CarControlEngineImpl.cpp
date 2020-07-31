@@ -14,6 +14,7 @@
  */
 
 #include "AACE/Engine/CarControl/CarControlEngineImpl.h"
+
 #include "AACE/Engine/Core/EngineMacros.h"
 
 namespace aace {
@@ -51,17 +52,17 @@ bool CarControlEngineImpl::isPowerControllerOn(const std::string& endpointId, bo
 
 bool CarControlEngineImpl::turnToggleControllerOn(const std::string& endpointId, const std::string& instance) {
     AACE_DEBUG(LX(TOGGLE_CONTROLLER_TAG)
-                  .sensitive("endpoint", endpointId)
-                  .sensitive("name", "TurnOn")
-                  .sensitive("instance", instance));
+                   .sensitive("endpoint", endpointId)
+                   .sensitive("name", "TurnOn")
+                   .sensitive("instance", instance));
     return m_platformInterface->turnToggleControllerOn(endpointId, instance);
 }
 
 bool CarControlEngineImpl::turnToggleControllerOff(const std::string& endpointId, const std::string& instance) {
     AACE_DEBUG(LX(TOGGLE_CONTROLLER_TAG)
-                  .sensitive("endpoint", endpointId)
-                  .sensitive("name", "TurnOff")
-                  .sensitive("instance", instance));
+                   .sensitive("endpoint", endpointId)
+                   .sensitive("name", "TurnOff")
+                   .sensitive("instance", instance));
     return m_platformInterface->turnToggleControllerOff(endpointId, instance);
 }
 
@@ -77,10 +78,10 @@ bool CarControlEngineImpl::setRangeControllerValue(
     const std::string& instance,
     double value) {
     AACE_DEBUG(LX(RANGE_CONTROLLER_TAG)
-                  .sensitive("endpoint", endpointId)
-                  .sensitive("name", "SetRangeValue")
-                  .sensitive("instance", instance)
-                  .sensitive("rangeValue", value));
+                   .sensitive("endpoint", endpointId)
+                   .sensitive("name", "SetRangeValue")
+                   .sensitive("instance", instance)
+                   .sensitive("rangeValue", value));
     return m_platformInterface->setRangeControllerValue(endpointId, instance, value);
 }
 
@@ -89,10 +90,10 @@ bool CarControlEngineImpl::adjustRangeControllerValue(
     const std::string& instance,
     double delta) {
     AACE_DEBUG(LX(RANGE_CONTROLLER_TAG)
-                  .sensitive("endpoint", endpointId)
-                  .sensitive("name", "AdjustRangeValue")
-                  .sensitive("instance", instance)
-                  .sensitive("rangeValueDelta", delta));
+                   .sensitive("endpoint", endpointId)
+                   .sensitive("name", "AdjustRangeValue")
+                   .sensitive("instance", instance)
+                   .sensitive("rangeValueDelta", delta));
     return m_platformInterface->adjustRangeControllerValue(endpointId, instance, delta);
 }
 
@@ -108,10 +109,10 @@ bool CarControlEngineImpl::setModeControllerValue(
     const std::string& instance,
     const std::string& value) {
     AACE_DEBUG(LX(MODE_CONTROLLER_TAG)
-                  .sensitive("endpoint", endpointId)
-                  .sensitive("name", "SetMode")
-                  .sensitive("instance", instance)
-                  .sensitive("mode", value));
+                   .sensitive("endpoint", endpointId)
+                   .sensitive("name", "SetMode")
+                   .sensitive("instance", instance)
+                   .sensitive("mode", value));
     return m_platformInterface->setModeControllerValue(endpointId, instance, value);
 }
 
@@ -120,10 +121,10 @@ bool CarControlEngineImpl::adjustModeControllerValue(
     const std::string& instance,
     int delta) {
     AACE_DEBUG(LX(MODE_CONTROLLER_TAG)
-                  .sensitive("endpoint", endpointId)
-                  .sensitive("name", "AdjustMode")
-                  .sensitive("instance", instance)
-                  .sensitive("modeDelta", delta));
+                   .sensitive("endpoint", endpointId)
+                   .sensitive("name", "AdjustMode")
+                   .sensitive("instance", instance)
+                   .sensitive("modeDelta", delta));
     return m_platformInterface->adjustModeControllerValue(endpointId, instance, delta);
 }
 

@@ -31,17 +31,22 @@ namespace alexa {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-NotificationsHandler::NotificationsHandler(std::weak_ptr<Activity> activity,
-                                           std::weak_ptr<logger::LoggerHandler> loggerHandler)
-    : m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
+NotificationsHandler::NotificationsHandler(
+    std::weak_ptr<Activity> activity,
+    std::weak_ptr<logger::LoggerHandler> loggerHandler) :
+        m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
     // Expects((m_activity != nullptr) && (m_loggerHandler != nullptr));
     // Expects((mediaPlayer != nullptr) && (speaker != nullptr));
     setupUI();
 }
 
-std::weak_ptr<Activity> NotificationsHandler::getActivity() { return m_activity; }
+std::weak_ptr<Activity> NotificationsHandler::getActivity() {
+    return m_activity;
+}
 
-std::weak_ptr<logger::LoggerHandler> NotificationsHandler::getLoggerHandler() { return m_loggerHandler; }
+std::weak_ptr<logger::LoggerHandler> NotificationsHandler::getLoggerHandler() {
+    return m_loggerHandler;
+}
 
 // aace::alexa::Notifications interface
 
@@ -72,7 +77,7 @@ void NotificationsHandler::onNotificationReceived() {
 
 // private
 
-void NotificationsHandler::log(logger::LoggerHandler::Level level, const std::string &message) {
+void NotificationsHandler::log(logger::LoggerHandler::Level level, const std::string& message) {
     auto loggerHandler = m_loggerHandler.lock();
     if (!loggerHandler) {
         return;
@@ -98,5 +103,5 @@ void NotificationsHandler::setupUI() {
     });
 }
 
-} // namespace alexa
-} // namespace sampleApp
+}  // namespace alexa
+}  // namespace sampleApp

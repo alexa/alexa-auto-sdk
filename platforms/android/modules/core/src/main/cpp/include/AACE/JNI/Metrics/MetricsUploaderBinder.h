@@ -23,62 +23,59 @@ namespace aace {
 namespace jni {
 namespace metrics {
 
-    //
-    // MetricsUploaderHandler
-    //
+//
+// MetricsUploaderHandler
+//
 
-    class MetricsUploaderHandler : public aace::metrics::MetricsUploader {
-    public:
-        MetricsUploaderHandler( jobject obj );
+class MetricsUploaderHandler : public aace::metrics::MetricsUploader {
+public:
+    MetricsUploaderHandler(jobject obj);
 
-        // aace::metrics::MetricsUploader
-        bool record( const std::vector<Datapoint>& datapoints, const std::unordered_map<std::string, std::string>& metadata ) override;
+    // aace::metrics::MetricsUploader
+    bool record(const std::vector<Datapoint>& datapoints, const std::unordered_map<std::string, std::string>& metadata)
+        override;
 
-    private:
-        JObject m_obj;
-    };
+private:
+    JObject m_obj;
+};
 
-    //
-    // MetricsUploaderBinder
-    //
+//
+// MetricsUploaderBinder
+//
 
-    class MetricsUploaderBinder : public aace::jni::core::PlatformInterfaceBinder {
-    public:
-        MetricsUploaderBinder( jobject obj );
+class MetricsUploaderBinder : public aace::jni::core::PlatformInterfaceBinder {
+public:
+    MetricsUploaderBinder(jobject obj);
 
-        std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
-            return m_metricsUploaderHandler;
-        }
+    std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
+        return m_metricsUploaderHandler;
+    }
 
-    private:
-        std::shared_ptr<MetricsUploaderHandler> m_metricsUploaderHandler;
-    };
+private:
+    std::shared_ptr<MetricsUploaderHandler> m_metricsUploaderHandler;
+};
 
-    //
-    // JDatapointType
-    //
+//
+// JDatapointType
+//
 
-    class JDatapointTypeConfig : public EnumConfiguration<MetricsUploaderHandler::DatapointType> {
-    public:
-        using T = MetricsUploaderHandler::DatapointType;
+class JDatapointTypeConfig : public EnumConfiguration<MetricsUploaderHandler::DatapointType> {
+public:
+    using T = MetricsUploaderHandler::DatapointType;
 
-        const char* getClassName() override {
-            return "com/amazon/metricuploadservice/MetricsUploader$DatapointType";
-        }
+    const char* getClassName() override {
+        return "com/amazon/metricuploadservice/MetricsUploader$DatapointType";
+    }
 
-        std::vector<std::pair<T,std::string>> getConfiguration() override {
-            return {
-                {T::TIMER,"TIMER"},
-                {T::STRING,"STRING"},
-                {T::COUNTER,"COUNTER"}
-            };
-        }
-    };
+    std::vector<std::pair<T, std::string>> getConfiguration() override {
+        return {{T::TIMER, "TIMER"}, {T::STRING, "STRING"}, {T::COUNTER, "COUNTER"}};
+    }
+};
 
-    using JDatapointType = JEnum<MetricsUploaderHandler::DatapointType, JDatapointTypeConfig>;
+using JDatapointType = JEnum<MetricsUploaderHandler::DatapointType, JDatapointTypeConfig>;
 
-} // aace::jni::metrics
-} // aace::jni
-} // aace
+}  // namespace metrics
+}  // namespace jni
+}  // namespace aace
 
-#endif // AACE_JNI_METRICS_METRICS_UPLOADER_BINDER_H
+#endif  // AACE_JNI_METRICS_METRICS_UPLOADER_BINDER_H

@@ -25,20 +25,21 @@ namespace sink {
 
 class SyslogSink : public Sink {
 private:
-    SyslogSink( const std::string& id );
-    
+    SyslogSink(const std::string& id);
+
 public:
     virtual ~SyslogSink();
 
-    static std::shared_ptr<SyslogSink> create( const std::string& id );
+    static std::shared_ptr<SyslogSink> create(const std::string& id);
 
 private:
-    void log( Level level, std::chrono::system_clock::time_point time, const char* threadMoniker, const char* text ) override;
+    void log(Level level, std::chrono::system_clock::time_point time, const char* threadMoniker, const char* text)
+        override;
 };
 
-}  // aace::engine::logger::sink
-}  // aace::engine::logger
-}  // aace::engine
-}  // aace
+}  // namespace sink
+}  // namespace logger
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_LOGGER_SINK_SYSLOG_SINK_H
+#endif  // AACE_ENGINE_LOGGER_SINK_SYSLOG_SINK_H

@@ -49,9 +49,9 @@ public:
         ALERTS_VOLUME
     };
 
-    virtual void onLocalSetVolume( SpeakerType type, int8_t volume ) = 0;
-    virtual void onLocalAdjustVolume( SpeakerType type, int8_t delta ) = 0;
-    virtual void onLocalSetMute( SpeakerType type, bool mute ) = 0;
+    virtual void onLocalSetVolume(SpeakerType type, int8_t volume) = 0;
+    virtual void onLocalAdjustVolume(SpeakerType type, int8_t delta) = 0;
+    virtual void onLocalSetMute(SpeakerType type, bool mute) = 0;
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const AlexaSpeakerEngineInterface::SpeakerType& type) {
@@ -75,7 +75,7 @@ public:
      * Describes type of event that initiated the speech request.
      */
     enum class Initiator {
-    
+
         /**
          * Hold-to-talk speech initiator type.
          */
@@ -89,13 +89,17 @@ public:
          */
         WAKEWORD
     };
-    
+
     /*
      * Defines an unspecified value for the speech recognizer's audio index.
      */
     static constexpr uint64_t UNSPECIFIED_INDEX = std::numeric_limits<uint64_t>::max();
 
-    virtual bool onStartCapture( Initiator initiator, uint64_t keywordBegin, uint64_t keywordEnd, const std::string& keyword ) = 0;
+    virtual bool onStartCapture(
+        Initiator initiator,
+        uint64_t keywordBegin,
+        uint64_t keywordEnd,
+        const std::string& keyword) = 0;
     virtual bool onStopCapture() = 0;
     virtual bool enableWakewordDetection() = 0;
     virtual bool disableWakewordDetection() = 0;
@@ -270,34 +274,34 @@ public:
          * The client specified the wrong token type.
          */
         UNSUPPORTED_GRANT_TYPE,
-        
+
         /**
          * Invalid code pair provided in Code-based linking token request.
          */
         INVALID_CODE_PAIR,
-        
+
         /**
          * Waiting for user to authorize the specified code pair.
          */
         AUTHORIZATION_PENDING,
-        
+
         /**
          * Client should slow down in the rate of requests polling for an access token.
          */
         SLOW_DOWN,
-        
+
         /**
          * Internal error in client code.
          */
         INTERNAL_ERROR,
-        
+
         /**
          * Client ID not valid for use with code based linking.
          */
         INVALID_CBL_CLIENT_ID
     };
 
-    virtual void onAuthStateChanged( AuthState state, AuthError error ) = 0;
+    virtual void onAuthStateChanged(AuthState state, AuthError error) = 0;
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const AuthProviderEngineInterface::AuthState& state) {
@@ -365,7 +369,7 @@ inline std::ostream& operator<<(std::ostream& stream, const AuthProviderEngineIn
     }
     return stream;
 }
- 
+
 /**
  * ExternalMediaAdapterEngineInterface
  */
@@ -393,15 +397,20 @@ public:
          */
         std::vector<std::string> validationData;
     };
-    
-    virtual void onReportDiscoveredPlayers( const std::vector<DiscoveredPlayerInfo>& discoveredPlayers ) = 0;
-    virtual void onRequestToken( const std::string& localPlayerId ) = 0;
-    virtual void onLoginComplete( const std::string& localPlayerId ) = 0;
-    virtual void onLogoutComplete( const std::string& localPlayerId ) = 0;
-    virtual void onPlayerEvent( const std::string& localPlayerId, const std::string& eventName ) = 0;
-    virtual void onPlayerError( const std::string& localPlayerId, const std::string& errorName, long code, const std::string& description, bool fatal ) = 0;
-    virtual void onSetFocus( const std::string& playerId ) = 0;
-    virtual void onRemoveDiscoveredPlayer( const std::string& localPlayerId ) = 0;
+
+    virtual void onReportDiscoveredPlayers(const std::vector<DiscoveredPlayerInfo>& discoveredPlayers) = 0;
+    virtual void onRequestToken(const std::string& localPlayerId) = 0;
+    virtual void onLoginComplete(const std::string& localPlayerId) = 0;
+    virtual void onLogoutComplete(const std::string& localPlayerId) = 0;
+    virtual void onPlayerEvent(const std::string& localPlayerId, const std::string& eventName) = 0;
+    virtual void onPlayerError(
+        const std::string& localPlayerId,
+        const std::string& errorName,
+        long code,
+        const std::string& description,
+        bool fatal) = 0;
+    virtual void onSetFocus(const std::string& playerId) = 0;
+    virtual void onRemoveDiscoveredPlayer(const std::string& localPlayerId) = 0;
 };
 
 /**
@@ -409,9 +418,9 @@ public:
  */
 class LocalMediaSourceEngineInterface {
 public:
-    virtual void onPlayerEvent( const std::string& eventName ) = 0;
-    virtual void onPlayerError( const std::string& errorName, long code, const std::string& description, bool fatal ) = 0;
-    virtual void onSetFocus( bool focusAcquire = true ) = 0;
+    virtual void onPlayerEvent(const std::string& eventName) = 0;
+    virtual void onPlayerError(const std::string& errorName, long code, const std::string& description, bool fatal) = 0;
+    virtual void onSetFocus(bool focusAcquire = true) = 0;
 };
 
 /**
@@ -426,7 +435,7 @@ public:
      * @param [in] doNotDisturb The DND Setting value
      * @return true if successful, false if change was rejected
      */
-    virtual bool onDoNotDisturbChanged( const bool doNotDisturb ) = 0;
+    virtual bool onDoNotDisturbChanged(const bool doNotDisturb) = 0;
 };
 
 /**
@@ -434,7 +443,6 @@ public:
  */
 class EqualizerControllerEngineInterface {
 public:
-
     /**
      * Describes the equalizer bands supported by Alexa. The platform implementation may support a subset of these.
      */
@@ -450,8 +458,8 @@ public:
     /**
      * Describes the level of gain of a particular equalizer band as an integer dB value. This is an
      * @c aace::alexa::EqualizerController::EqualizerBand and @c int pair.
-     */ 
-    using EqualizerBandLevel = std::pair<EqualizerBand,int>;
+     */
+    using EqualizerBandLevel = std::pair<EqualizerBand, int>;
 
     /**
      * @internal
@@ -460,7 +468,7 @@ public:
      * 
      * @param [in] bandLevels The equalizer bands to change and their gain settings as integer dB values.
      */
-    virtual void onLocalSetBandLevels( const std::vector<EqualizerBandLevel>& bandLevels ) = 0;
+    virtual void onLocalSetBandLevels(const std::vector<EqualizerBandLevel>& bandLevels) = 0;
 
     /**
      * @internal
@@ -471,7 +479,7 @@ public:
      * @param [in] bandAdjustments The equalizer bands to adjust and their relative gain adjustments as integer dB 
      *             values.
      */
-    virtual void onLocalAdjustBandLevels( const std::vector<EqualizerBandLevel>& bandAdjustments ) = 0;
+    virtual void onLocalAdjustBandLevels(const std::vector<EqualizerBandLevel>& bandAdjustments) = 0;
 
     /**
      * @internal
@@ -479,7 +487,7 @@ public:
      * 
      * @param [in] bands The equalizer bands to reset. Empty @a bands resets all supported equalizer bands.
      */
-    virtual void onLocalResetBands( const std::vector<EqualizerBand>& bands ) = 0;
+    virtual void onLocalResetBands(const std::vector<EqualizerBand>& bands) = 0;
 };
 
 /**
@@ -488,7 +496,7 @@ public:
  * @param band The @c EqualizerBand
  * @return A string representation for the @c EqualizerBand
  */
-inline std::string equalizerBandToString( const EqualizerControllerEngineInterface::EqualizerBand& band ) {
+inline std::string equalizerBandToString(const EqualizerControllerEngineInterface::EqualizerBand& band) {
     switch (band) {
         case EqualizerControllerEngineInterface::EqualizerBand::BASS:
             return "BASS";
@@ -507,7 +515,7 @@ inline std::string equalizerBandToString( const EqualizerControllerEngineInterfa
  * @param band The @c EqualizerBand value to write to the @c ostream
  * @return The @c ostream argument that was written to
  */
-inline std::ostream& operator<<( std::ostream& stream, const EqualizerControllerEngineInterface::EqualizerBand& band ) {
+inline std::ostream& operator<<(std::ostream& stream, const EqualizerControllerEngineInterface::EqualizerBand& band) {
     stream << equalizerBandToString(band);
     return stream;
 }
@@ -548,7 +556,15 @@ public:
     virtual void onDisplayCardCleared() = 0;
 };
 
-} // aace::alexa
-} // aace
+/**
+ * AlexaClientEngineInterface
+ */
+class AlexaClientEngineInterface {
+public:
+    virtual void onStopForegroundActivity() = 0;
+};
 
-#endif // AACE_ALEXA_ALEXA_ENGINE_INTERFACES_H
+}  // namespace alexa
+}  // namespace aace
+
+#endif  // AACE_ALEXA_ALEXA_ENGINE_INTERFACES_H

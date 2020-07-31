@@ -26,12 +26,12 @@ namespace network {
 class NetworkObservableInterface {
 public:
     virtual ~NetworkObservableInterface();
-    virtual void addObserver( std::shared_ptr<NetworkInfoObserver> observer ) = 0;
-    virtual void removeObserver( std::shared_ptr<NetworkInfoObserver> observer ) = 0;
+    virtual void addObserver(std::shared_ptr<NetworkInfoObserver> observer) = 0;
+    virtual void removeObserver(std::shared_ptr<NetworkInfoObserver> observer) = 0;
 };
 
-} // aace::engine::network
-} // aace::engine
-} // aace
+}  // namespace network
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_NETWORK_INTERFACE_NETWORK_OBSERVABLE_INTERFACE_H
+#endif  // AACE_ENGINE_NETWORK_INTERFACE_NETWORK_OBSERVABLE_INTERFACE_H

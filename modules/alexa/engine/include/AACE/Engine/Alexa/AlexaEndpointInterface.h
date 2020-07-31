@@ -27,11 +27,29 @@ public:
     virtual ~AlexaEndpointInterface();
 
 public:
+    /**
+     * Gets the AVS gateway from the engine configuration.
+     * 
+     * @return Returns the AVS endpoint from engine configuration if provided, otherwise default AVS gateway.
+     **/
     virtual std::string getAVSGateway() = 0;
+
+    /**
+     * Gets the LWA endpoint from the engine configuration.
+     * 
+     * @return Returns the LWA endpoint from engine configuration if provided, otherwise default LWA gateway.
+     **/
     virtual std::string getLWAEndpoint() = 0;
+
+    /**
+     * Gets the ACMS endpoint from the engine configuration.
+     * 
+     * @return Returns the ACMS endpoint from engine configuration if provided, otherwise an empty string.
+     **/
+    virtual std::string getACMSEndpoint() = 0;
 };
 
-} // aace::engine::alexa
-} // aace::engine
-} // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace
 #endif

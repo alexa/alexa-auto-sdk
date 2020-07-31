@@ -33,15 +33,21 @@ namespace location {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-LocationProviderHandler::LocationProviderHandler(std::weak_ptr<Activity> activity, std::weak_ptr<logger::LoggerHandler> loggerHandler)
-    : m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
+LocationProviderHandler::LocationProviderHandler(
+    std::weak_ptr<Activity> activity,
+    std::weak_ptr<logger::LoggerHandler> loggerHandler) :
+        m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
     // Expects((m_activity != nullptr) && (m_loggerHandler != nullptr));
     setupUI();
 }
 
-std::weak_ptr<Activity> LocationProviderHandler::getActivity() { return m_activity; }
+std::weak_ptr<Activity> LocationProviderHandler::getActivity() {
+    return m_activity;
+}
 
-std::weak_ptr<logger::LoggerHandler> LocationProviderHandler::getLoggerHandler() { return m_loggerHandler; }
+std::weak_ptr<logger::LoggerHandler> LocationProviderHandler::getLoggerHandler() {
+    return m_loggerHandler;
+}
 
 // aace::location::LocationProvider interface
 
@@ -56,7 +62,7 @@ aace::location::Location LocationProviderHandler::getLocation() {
         }
     }
 
-    if ( latitude == 0.0 && longitude == 0.0 ) {
+    if (latitude == 0.0 && longitude == 0.0) {
         latitude = aace::location::Location::UNDEFINED;
         longitude = aace::location::Location::UNDEFINED;
     }
@@ -69,7 +75,7 @@ aace::location::Location LocationProviderHandler::getLocation() {
 
 // private
 
-void LocationProviderHandler::log(logger::LoggerHandler::Level level, const std::string &message) {
+void LocationProviderHandler::log(logger::LoggerHandler::Level level, const std::string& message) {
     auto loggerHandler = m_loggerHandler.lock();
     if (!loggerHandler) {
         return;
@@ -85,5 +91,5 @@ void LocationProviderHandler::setupUI() {
     m_console = activity->findViewById("id:console");
 }
 
-} // namespace location
-} // namespace sampleApp
+}  // namespace location
+}  // namespace sampleApp

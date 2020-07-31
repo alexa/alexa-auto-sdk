@@ -19,6 +19,7 @@
 #include <iostream>
 #include <sstream>
 #include <unistd.h>
+#include <sys/stat.h>
 
 #include <rapidjson/document.h>
 #include <rapidjson/istreamwrapper.h>
@@ -37,6 +38,9 @@ using Level = agl::common::interfaces::ILogger::Level;
 /// Logging tag for this file.
 static std::string TAG = "agl::alexa::AASBConfigProviderImpl";
 
+/// Directory where user over-ride alexa json configuration may be.
+static std::string ALEXA_CONFIG_FILE_OVERRIDE_DIR = "/etc/xdg/AGL/";
+
 /// File name where alexa json configuration is stored.
 static std::string ALEXA_CONFIG_FILE_NAME = "AlexaAutoCoreEngineConfig.json";
 
@@ -47,7 +51,10 @@ std::shared_ptr<AASBConfigProviderImpl> AASBConfigProviderImpl::create(
     return std::shared_ptr<AASBConfigProviderImpl>(new AASBConfigProviderImpl(logger, api, audio));
 }
 
-AASBConfigProviderImpl::AASBConfigProviderImpl(std::shared_ptr<agl::common::interfaces::ILogger> logger, afb_api_t api, std::shared_ptr<agl::audio::Audio> audio) :
+AASBConfigProviderImpl::AASBConfigProviderImpl(
+    std::shared_ptr<agl::common::interfaces::ILogger> logger,
+    afb_api_t api,
+    std::shared_ptr<agl::audio::Audio> audio) :
         m_logger(logger),
         m_api(api),
         m_audio(audio),
@@ -67,8 +74,7 @@ AASBConfigProviderImpl::AASBConfigProviderImpl(std::shared_ptr<agl::common::inte
         m_enableLocalVoiceControl(false) {
     m_LocalVoiceControlConfiguration = std::unique_ptr<LVCConfiguration>(new LVCConfiguration());
     m_carControlConfiguration = std::unique_ptr<CarControlConfiguration>(new CarControlConfiguration());
-    std::string alexaConfigFile = getDataRootPath() + ALEXA_CONFIG_FILE_NAME;
-    initConfigFromFile(alexaConfigFile);
+    initConfigFromFile(getAlexaConfigPath());
     logCurrentConfiguration();
 }
 
@@ -91,36 +97,29 @@ AASBConfigProviderImpl::AudioIOConfiguration AASBConfigProviderImpl::getAudioIOC
     audioConfig.useGStreamerAudioIO = true;
 
     // Input devices
-    if (!m_voiceInputDevice.empty())
-      audioConfig.voiceInputDevice = m_voiceInputDevice;
+    if (!m_voiceInputDevice.empty()) audioConfig.voiceInputDevice = m_voiceInputDevice;
 
-    if (!m_communicationInputDevice.empty())
-      audioConfig.communicationInputDevice =  m_communicationInputDevice;
+    if (!m_communicationInputDevice.empty()) audioConfig.communicationInputDevice = m_communicationInputDevice;
 
-    if(!m_loopbackInputDevice.empty())
-      audioConfig.loopbackInputDevice =  m_loopbackInputDevice;
+    if (!m_loopbackInputDevice.empty()) audioConfig.loopbackInputDevice = m_loopbackInputDevice;
 
     // Output devices
-    if(!m_ttsOutputDevice.empty())
-      audioConfig.ttsOutputDevice = m_audio->openAHLChannel(m_ttsOutputDevice);
+    if (!m_ttsOutputDevice.empty()) audioConfig.ttsOutputDevice = m_audio->openChannel(m_ttsOutputDevice);
 
-    if(!m_musicOutputDevice.empty())
-      audioConfig.musicOutputDevice = m_audio->openAHLChannel(m_musicOutputDevice);
+    if (!m_musicOutputDevice.empty()) audioConfig.musicOutputDevice = m_audio->openChannel(m_musicOutputDevice);
 
-    if(!m_notificationOutputDevice.empty())
-      audioConfig.notificationOutputDevice = m_audio->openAHLChannel(m_notificationOutputDevice);
+    if (!m_notificationOutputDevice.empty())
+        audioConfig.notificationOutputDevice = m_audio->openChannel(m_notificationOutputDevice);
 
-    if(!m_alarmOutputDevice.empty())
-      audioConfig.alarmOutputDevice = m_audio->openAHLChannel(m_alarmOutputDevice);
+    if (!m_alarmOutputDevice.empty()) audioConfig.alarmOutputDevice = m_audio->openChannel(m_alarmOutputDevice);
 
-    if(!m_earconOutputDevice.empty())
-      audioConfig.earconOutputDevice = m_audio->openAHLChannel(m_earconOutputDevice);
+    if (!m_earconOutputDevice.empty()) audioConfig.earconOutputDevice = m_audio->openChannel(m_earconOutputDevice);
 
-    if(!m_communicationOutputDevice.empty())
-      audioConfig.communicationOutputDevice = m_audio->openAHLChannel(m_communicationOutputDevice);
+    if (!m_communicationOutputDevice.empty())
+        audioConfig.communicationOutputDevice = m_audio->openChannel(m_communicationOutputDevice);
 
-    if(!m_ringtoneOutputDevice.empty())
-      audioConfig.ringtoneOutputDevice = m_audio->openAHLChannel(m_ringtoneOutputDevice);
+    if (!m_ringtoneOutputDevice.empty())
+        audioConfig.ringtoneOutputDevice = m_audio->openChannel(m_ringtoneOutputDevice);
 
     return audioConfig;
 }
@@ -136,7 +135,7 @@ AASBConfigProviderImpl::LVCConfiguration AASBConfigProviderImpl::getLocalVoiceCo
 }
 
 AASBConfigProviderImpl::CarControlConfiguration AASBConfigProviderImpl::getCarControlConfig() {
-    CarControlConfiguration  carControlConfig;
+    CarControlConfiguration carControlConfig;
     carControlConfig.enabled = m_carControlConfiguration->enabled;
     carControlConfig.endpoints = m_carControlConfiguration->endpoints;
     return carControlConfig;
@@ -334,8 +333,7 @@ void AASBConfigProviderImpl::initConfigFromFile(const std::string& fileName) {
                             auto endpointValue = endpoint.GetObject();
                             CarControlConfiguration::Endpoint endpointMember;
                             if (endpointValue.HasMember("enabled") && endpointValue["enabled"].IsBool()) {
-                                if (!endpointValue["enabled"].GetBool())
-                                    continue;
+                                if (!endpointValue["enabled"].GetBool()) continue;
                             }
                             if (endpointValue.HasMember("zone") && endpointValue["zone"].IsString()) {
                                 endpointMember.zone = endpointValue["zone"].GetString();
@@ -344,7 +342,7 @@ void AASBConfigProviderImpl::initConfigFromFile(const std::string& fileName) {
                                 auto climate = endpointValue["climate"].GetObject();
                                 endpointMember.climate.enabled = true;
                                 if (climate.HasMember("controlId") && climate["controlId"].IsString()) {
-                                   endpointMember.climate.controlId = climate["controlId"].GetString();
+                                    endpointMember.climate.controlId = climate["controlId"].GetString();
                                 }
                                 if (climate.HasMember("sync") && climate["sync"].IsObject()) {
                                     auto sync = climate["sync"].GetObject();
@@ -354,12 +352,15 @@ void AASBConfigProviderImpl::initConfigFromFile(const std::string& fileName) {
                                 }
                                 if (climate.HasMember("recirculate") && climate["recirculate"].IsObject()) {
                                     auto recirculate = climate["recirculate"].GetObject();
-                                    if (recirculate.HasMember("controllerId") && recirculate["controllerId"].IsString()) {
-                                        endpointMember.climate.recirculationControllerId = recirculate["controllerId"].GetString();
+                                    if (recirculate.HasMember("controllerId") &&
+                                        recirculate["controllerId"].IsString()) {
+                                        endpointMember.climate.recirculationControllerId =
+                                            recirculate["controllerId"].GetString();
                                     }
                                 }
                             }
-                            if (endpointValue.HasMember("airconditioner") && endpointValue["airconditioner"].IsObject()) {
+                            if (endpointValue.HasMember("airconditioner") &&
+                                endpointValue["airconditioner"].IsObject()) {
                                 auto airConditioner = endpointValue["airconditioner"].GetObject();
                                 endpointMember.airConditioner.enabled = true;
                                 if (airConditioner.HasMember("controlId") && airConditioner["controlId"].IsString()) {
@@ -368,7 +369,8 @@ void AASBConfigProviderImpl::initConfigFromFile(const std::string& fileName) {
                                 if (airConditioner.HasMember("mode") && airConditioner["mode"].IsObject()) {
                                     auto modeConfig = airConditioner["mode"].GetObject();
                                     if (modeConfig.HasMember("controllerId") && modeConfig["controllerId"].IsString()) {
-                                        endpointMember.airConditioner.modeControllerId = modeConfig["controllerId"].GetString();
+                                        endpointMember.airConditioner.modeControllerId =
+                                            modeConfig["controllerId"].GetString();
                                     }
                                     if (modeConfig.HasMember("values") && modeConfig["values"].IsObject()) {
                                         auto valuesConfig = modeConfig["values"].GetObject();
@@ -391,8 +393,10 @@ void AASBConfigProviderImpl::initConfigFromFile(const std::string& fileName) {
                                 }
                                 if (airConditioner.HasMember("intensity") && airConditioner["intensity"].IsObject()) {
                                     auto intensityConfig = airConditioner["intensity"].GetObject();
-                                    if (intensityConfig.HasMember("controllerId") && intensityConfig["controllerId"].IsString()) {
-                                        endpointMember.airConditioner.intensityControllerId = intensityConfig["controllerId"].GetString();
+                                    if (intensityConfig.HasMember("controllerId") &&
+                                        intensityConfig["controllerId"].IsString()) {
+                                        endpointMember.airConditioner.intensityControllerId =
+                                            intensityConfig["controllerId"].GetString();
                                     }
                                     if (intensityConfig.HasMember("values") && intensityConfig["values"].IsObject()) {
                                         auto valuesConfig = intensityConfig["values"].GetObject();
@@ -463,8 +467,10 @@ void AASBConfigProviderImpl::initConfigFromFile(const std::string& fileName) {
                                 }
                                 if (ventConfig.HasMember("positions") && ventConfig["positions"].IsObject()) {
                                     auto positionsConfig = ventConfig["positions"].GetObject();
-                                    if (positionsConfig.HasMember("controllerId") && positionsConfig["controllerId"].IsString()) {
-                                        endpointMember.vent.positionsControllerId = positionsConfig["controllerId"].GetString();
+                                    if (positionsConfig.HasMember("controllerId") &&
+                                        positionsConfig["controllerId"].IsString()) {
+                                        endpointMember.vent.positionsControllerId =
+                                            positionsConfig["controllerId"].GetString();
                                     }
                                     if (positionsConfig.HasMember("values") && positionsConfig["values"].IsObject()) {
                                         auto valuesConfig = positionsConfig["values"].GetObject();
@@ -483,7 +489,8 @@ void AASBConfigProviderImpl::initConfigFromFile(const std::string& fileName) {
                                                 endpointMember.vent.positions.push_back("FLOOR");
                                             }
                                         }
-                                        if (valuesConfig.HasMember("WINDSHIELD") && valuesConfig["WINDSHIELD"].IsBool()) {
+                                        if (valuesConfig.HasMember("WINDSHIELD") &&
+                                            valuesConfig["WINDSHIELD"].IsBool()) {
                                             if (valuesConfig["WINDSHIELD"].GetBool()) {
                                                 endpointMember.vent.positions.push_back("WINDSHIELD");
                                             }
@@ -516,7 +523,8 @@ void AASBConfigProviderImpl::initConfigFromFile(const std::string& fileName) {
                                     }
                                     if (light.HasMember("color") && light["color"].IsObject()) {
                                         auto colorConfig = light["color"].GetObject();
-                                        if (colorConfig.HasMember("controllerId") && colorConfig["controllerId"].IsString()) {
+                                        if (colorConfig.HasMember("controllerId") &&
+                                            colorConfig["controllerId"].IsString()) {
                                             lightMember.colorControllerId = colorConfig["controllerId"].GetString();
                                         }
                                         if (colorConfig.HasMember("values") && colorConfig["values"].IsObject()) {
@@ -636,8 +644,8 @@ void AASBConfigProviderImpl::initConfigFromFile(const std::string& fileName) {
             // Create stream with only vehicle configuration
             rapidjson::Document vehicleDoc;
             vehicleDoc.SetObject();
-            rapidjson::Value aaceVehicleNode( rapidjson::kObjectType );
-            vehicleDoc.AddMember( "aace.vehicle", vehicleConfig, vehicleDoc.GetAllocator() );
+            rapidjson::Value aaceVehicleNode(rapidjson::kObjectType);
+            vehicleDoc.AddMember("aace.vehicle", vehicleConfig, vehicleDoc.GetAllocator());
 
             // Create string to pass to string stream
             rapidjson::StringBuffer buffer;
@@ -658,32 +666,25 @@ void AASBConfigProviderImpl::initConfigFromFile(const std::string& fileName) {
     }
 }
 
-// GetBindingDirPath() method provided by AGL SDK crashes every single time.
-// It turns out that on latest AGL platforms, GetBindingDirPath(afb_api_t) version
-// is supposed to be the correct version. However when we include filescan-utils.h
-// it compiles a version without "afb_api_t" parameter. For now, I have made a
-// copy of this method here which accepts "afb_api_t" parameter.
-// TODO: Fix it
-std::string GetBindingDirectoryPath(afb_api_t api) {
-    // A file description should not be greater than 999.999.999
-    char fd_link[CONTROL_MAXPATH_LEN];
-    char retdir[CONTROL_MAXPATH_LEN];
-    ssize_t len;
-    sprintf(fd_link, "/proc/self/fd/%d", afb_dynapi_rootdir_get_fd(api));
-
-    if ((len = readlink(fd_link, retdir, sizeof(retdir) - 1)) == -1) {
-        perror("lstat");
-        strncpy(retdir, "/tmp", CONTROL_MAXPATH_LEN - 1);
-    } else {
-       retdir[len] = '\0';
-    }
-
-    return std::string(retdir);
+std::string AASBConfigProviderImpl::getDataRootPath() {
+    std::string workDir(getenv("AFM_WORKDIR"));
+    return workDir + "/";
 }
 
-std::string AASBConfigProviderImpl::getDataRootPath() {
-    std::string bindingDir(GetBindingDirectoryPath(m_api));
-    return bindingDir + "/var/config/";
+std::string AASBConfigProviderImpl::getAlexaConfigPath() {
+    struct stat statbuf;
+
+    // Look in over-ride directory first
+    std::string configPath = ALEXA_CONFIG_FILE_OVERRIDE_DIR + ALEXA_CONFIG_FILE_NAME;
+    if (stat(configPath.c_str(), &statbuf) != 0) {
+        // Look in work directory (app-data) next
+        configPath = getDataRootPath() + ALEXA_CONFIG_FILE_NAME;
+        if (stat(configPath.c_str(), &statbuf) != 0) {
+            // Fall back to default version in widget
+            configPath = std::string(GetBindingDirPath(m_api)) + "/var/config/" + ALEXA_CONFIG_FILE_NAME;
+        }
+    }
+    return configPath;
 }
 
 void AASBConfigProviderImpl::logCurrentConfiguration() {
@@ -699,32 +700,24 @@ void AASBConfigProviderImpl::logCurrentConfiguration() {
     m_logger->log(Level::DEBUG, TAG, std::string("Certificate(s) root ") + m_certificatePath);
     m_logger->log(Level::DEBUG, TAG, std::string("Country ") + m_country);
     m_logger->log(Level::DEBUG, TAG, std::string("Current location ") + locationStr.str());
-    m_logger->log(Level::DEBUG, TAG, std::string("Feature: Wakeword: ") +
-        (shouldEnableWakeword() ? "enabled" : "disabled"));
-    m_logger->log(Level::DEBUG, TAG, std::string("Feature: PhoneCall: ") +
-        (shouldEnablePhoneCallControl() ? "enabled" : "disabled"));
-    m_logger->log(Level::DEBUG, TAG, std::string("Feature: Navigation: ") +
-        (shouldEnableNavigation() ? "enabled" : "disabled"));
-    m_logger->log(Level::DEBUG, TAG, std::string("Feature: CBL: ") +
-        (shouldEnableCBL() ? "enabled" : "disabled"));
-    m_logger->log(Level::DEBUG, TAG, std::string("BT Source: ") +
-        (m_bluetooth ? "enabled" : "disabled"));
-    m_logger->log(Level::DEBUG, TAG, std::string("USB Source: ") +
-        (m_usb ? "enabled" : "disabled"));
-    m_logger->log(Level::DEBUG, TAG, std::string("FM Radio: ") +
-        (m_fmRadio ? "enabled" : "disabled"));
-    m_logger->log(Level::DEBUG, TAG, std::string("AM Radio: ") +
-        (m_amRadio ? "enabled" : "disabled"));
-    m_logger->log(Level::DEBUG, TAG, std::string("Satellite Radio: ") +
-        (m_satelliteRadio ? "enabled" : "disabled"));
-    m_logger->log(Level::DEBUG, TAG, std::string("Line In: ") +
-        (m_LineIn ? "enabled" : "disabled"));
-    m_logger->log(Level::DEBUG, TAG, std::string("Compact Disc: ") +
-        (m_compactDisc ? "enabled" : "disabled"));
-    m_logger->log(Level::DEBUG, TAG, std::string("Sirius XM: ") +
-        (m_siriusXM ? "enabled" : "disabled"));
-    m_logger->log(Level::DEBUG, TAG, std::string("DAB: ") +
-        (m_dab ? "enabled" : "disabled"));
+    m_logger->log(
+        Level::DEBUG, TAG, std::string("Feature: Wakeword: ") + (shouldEnableWakeword() ? "enabled" : "disabled"));
+    m_logger->log(
+        Level::DEBUG,
+        TAG,
+        std::string("Feature: PhoneCall: ") + (shouldEnablePhoneCallControl() ? "enabled" : "disabled"));
+    m_logger->log(
+        Level::DEBUG, TAG, std::string("Feature: Navigation: ") + (shouldEnableNavigation() ? "enabled" : "disabled"));
+    m_logger->log(Level::DEBUG, TAG, std::string("Feature: CBL: ") + (shouldEnableCBL() ? "enabled" : "disabled"));
+    m_logger->log(Level::DEBUG, TAG, std::string("BT Source: ") + (m_bluetooth ? "enabled" : "disabled"));
+    m_logger->log(Level::DEBUG, TAG, std::string("USB Source: ") + (m_usb ? "enabled" : "disabled"));
+    m_logger->log(Level::DEBUG, TAG, std::string("FM Radio: ") + (m_fmRadio ? "enabled" : "disabled"));
+    m_logger->log(Level::DEBUG, TAG, std::string("AM Radio: ") + (m_amRadio ? "enabled" : "disabled"));
+    m_logger->log(Level::DEBUG, TAG, std::string("Satellite Radio: ") + (m_satelliteRadio ? "enabled" : "disabled"));
+    m_logger->log(Level::DEBUG, TAG, std::string("Line In: ") + (m_LineIn ? "enabled" : "disabled"));
+    m_logger->log(Level::DEBUG, TAG, std::string("Compact Disc: ") + (m_compactDisc ? "enabled" : "disabled"));
+    m_logger->log(Level::DEBUG, TAG, std::string("Sirius XM: ") + (m_siriusXM ? "enabled" : "disabled"));
+    m_logger->log(Level::DEBUG, TAG, std::string("DAB: ") + (m_dab ? "enabled" : "disabled"));
     m_logger->log(Level::DEBUG, TAG, "**********Alexa-VoiceAgent configuration***********");
 }
 

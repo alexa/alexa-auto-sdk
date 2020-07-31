@@ -31,25 +31,38 @@ namespace network {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-NetworkInfoProviderHandler::NetworkInfoProviderHandler(std::weak_ptr<Activity> activity, std::weak_ptr<logger::LoggerHandler> loggerHandler)
-    : m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)}, m_networkStatus{NetworkStatus::CONNECTED}, m_wifiSignalStrength{100} {
+NetworkInfoProviderHandler::NetworkInfoProviderHandler(
+    std::weak_ptr<Activity> activity,
+    std::weak_ptr<logger::LoggerHandler> loggerHandler) :
+        m_activity{std::move(activity)},
+        m_loggerHandler{std::move(loggerHandler)},
+        m_networkStatus{NetworkStatus::CONNECTED},
+        m_wifiSignalStrength{100} {
     // Expects((m_activity != nullptr) && (m_loggerHandler != nullptr));
     setupUI();
 }
 
-std::weak_ptr<Activity> NetworkInfoProviderHandler::getActivity() { return m_activity; }
+std::weak_ptr<Activity> NetworkInfoProviderHandler::getActivity() {
+    return m_activity;
+}
 
-std::weak_ptr<logger::LoggerHandler> NetworkInfoProviderHandler::getLoggerHandler() { return m_loggerHandler; }
+std::weak_ptr<logger::LoggerHandler> NetworkInfoProviderHandler::getLoggerHandler() {
+    return m_loggerHandler;
+}
 
 // aace::network::NetworkInfoProvider interface
 
-aace::network::NetworkInfoProvider::NetworkStatus NetworkInfoProviderHandler::getNetworkStatus() { return m_networkStatus; }
+aace::network::NetworkInfoProvider::NetworkStatus NetworkInfoProviderHandler::getNetworkStatus() {
+    return m_networkStatus;
+}
 
-int NetworkInfoProviderHandler::getWifiSignalStrength() { return m_wifiSignalStrength; }
+int NetworkInfoProviderHandler::getWifiSignalStrength() {
+    return m_wifiSignalStrength;
+}
 
 // private
 
-void NetworkInfoProviderHandler::log(logger::LoggerHandler::Level level, const std::string &message) {
+void NetworkInfoProviderHandler::log(logger::LoggerHandler::Level level, const std::string& message) {
     auto loggerHandler = m_loggerHandler.lock();
     if (!loggerHandler) {
         return;
@@ -65,7 +78,7 @@ void NetworkInfoProviderHandler::setupUI() {
     m_console = activity->findViewById("id:console");
 
     // networkStatusChanged
-    activity->registerObserver(Event::onNetworkInfoProviderNetworkStatusChanged, [=](const std::string &value) {
+    activity->registerObserver(Event::onNetworkInfoProviderNetworkStatusChanged, [=](const std::string& value) {
         log(logger::LoggerHandler::Level::VERBOSE, "onNetworkInfoProviderNetworkStatusChanged:" + value);
         static std::regex r("([^/]+)(?:/([-+]?\\d+))?", std::regex::optimize);
         std::smatch sm{};
@@ -96,5 +109,5 @@ void NetworkInfoProviderHandler::setupUI() {
     });
 }
 
-} // namespace network
-} // namespace sampleApp
+}  // namespace network
+}  // namespace sampleApp

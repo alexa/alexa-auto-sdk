@@ -27,18 +27,24 @@ namespace engine {
 namespace utils {
 namespace json {
 
-    bool merge( const rapidjson::Document::Object& into, const rapidjson::Document::Object& from, rapidjson::Document::AllocatorType& allocator, const std::string& path = "" );
+bool merge(
+    const rapidjson::Document::Object& into,
+    const rapidjson::Document::Object& from,
+    rapidjson::Document::AllocatorType& allocator,
+    const std::string& path = "");
 
-    std::shared_ptr<rapidjson::Document> parse( std::shared_ptr<std::istream> stream, rapidjson::Type type = rapidjson::kObjectType );
-    std::shared_ptr<rapidjson::Document> parse( const std::string& value, rapidjson::Type type = rapidjson::kObjectType );
+std::shared_ptr<rapidjson::Document> parse(
+    std::shared_ptr<std::istream> stream,
+    rapidjson::Type type = rapidjson::kObjectType);
+std::shared_ptr<rapidjson::Document> parse(const std::string& value, rapidjson::Type type = rapidjson::kObjectType);
 
-    std::string toString( const rapidjson::Document& document, bool prettyPrint = true );
+std::string toString(const rapidjson::Document& document, bool prettyPrint = true);
 
-    std::shared_ptr<std::stringstream> toStream( const rapidjson::Document& document, bool prettyPrint = true );
+std::shared_ptr<std::stringstream> toStream(const rapidjson::Document& document, bool prettyPrint = true);
 
-} // aace::engine::utils::json
-} // aace::engine::utils
-} // aace::engine
-} // aace
+}  // namespace json
+}  // namespace utils
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_UTILS_JSON_H_
+#endif  // AACE_ENGINE_UTILS_JSON_H_

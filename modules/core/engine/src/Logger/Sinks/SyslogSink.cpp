@@ -28,54 +28,59 @@ namespace sink {
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.logger.sink.SyslogSink");
 
-SyslogSink::SyslogSink( const std::string& id ) : Sink( id ) {
-    openlog( nullptr, 0, LOG_USER );
-    setlogmask( LOG_UPTO( LOG_DEBUG ) );
+SyslogSink::SyslogSink(const std::string& id) : Sink(id) {
+    openlog(nullptr, 0, LOG_USER);
+    setlogmask(LOG_UPTO(LOG_DEBUG));
 }
 
 SyslogSink::~SyslogSink() {
     closelog();
 }
 
-std::shared_ptr<SyslogSink> SyslogSink::create( const std::string& id ) {
-    return std::shared_ptr<SyslogSink>( new SyslogSink( id ) );
+std::shared_ptr<SyslogSink> SyslogSink::create(const std::string& id) {
+    return std::shared_ptr<SyslogSink>(new SyslogSink(id));
 }
 
-void SyslogSink::log( Level level, std::chrono::system_clock::time_point time, const char* threadMoniker, const char* text )
-{
+void SyslogSink::log(
+    Level level,
+    std::chrono::system_clock::time_point time,
+    const char* threadMoniker,
+    const char* text) {
     int syslogLevel;
-    
-    switch( level )
-    {
+
+    switch (level) {
         case Level::VERBOSE:
             syslogLevel = LOG_DEBUG;
             break;
-            
+
         case Level::INFO:
             syslogLevel = LOG_INFO;
             break;
-            
+
         case Level::WARN:
             syslogLevel = LOG_WARNING;
             break;
-            
+
         case Level::ERROR:
             syslogLevel = LOG_ERR;
             break;
-            
+
         case Level::CRITICAL:
             syslogLevel = LOG_CRIT;
             break;
-            
+
         case Level::METRIC:
             syslogLevel = LOG_INFO;
             break;
     }
-    
-    syslog( syslogLevel, "%s", LogFormatter::format( level, std::chrono::system_clock::time_point(), threadMoniker, text ).c_str() );
+
+    syslog(
+        syslogLevel,
+        "%s",
+        LogFormatter::format(level, std::chrono::system_clock::time_point(), threadMoniker, text).c_str());
 }
 
-} // aace::engine::logger::sink
-} // aace::engine::logger
-} // aace::engine
-} // aace
+}  // namespace sink
+}  // namespace logger
+}  // namespace engine
+}  // namespace aace

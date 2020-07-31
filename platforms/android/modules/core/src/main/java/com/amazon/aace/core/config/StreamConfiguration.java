@@ -18,34 +18,30 @@ package com.amazon.aace.core.config;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
-final public class StreamConfiguration extends EngineConfiguration
-{
+final public class StreamConfiguration extends EngineConfiguration {
     private ByteArrayOutputStream mByteArray = new ByteArrayOutputStream();
 
-    private StreamConfiguration( InputStream is )
-    {
-        try
-        {
+    private StreamConfiguration(InputStream is) {
+        try {
             byte[] buffer = new byte[1024];
             int size;
 
-            while( (size = is.read( buffer )) > 0 ) {
-                mByteArray.write( buffer );
+            while ((size = is.read(buffer)) > 0) {
+                mByteArray.write(buffer);
             }
-        }
-        catch( Throwable ex ) {
+        } catch (Throwable ex) {
             ex.printStackTrace();
         }
     }
 
-    public static StreamConfiguration create( InputStream is ) {
-        return new StreamConfiguration( is );
+    public static StreamConfiguration create(InputStream is) {
+        return new StreamConfiguration(is);
     }
 
     protected long createNativeRef() {
-        return createBinder( mByteArray.toByteArray() );
+        return createBinder(mByteArray.toByteArray());
     }
 
     // Native Engine JNI methods
-    private native long createBinder( byte[] data );
+    private native long createBinder(byte[] data);
 }

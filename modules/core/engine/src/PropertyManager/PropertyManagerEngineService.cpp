@@ -215,9 +215,8 @@ void PropertyManagerEngineService::setPropertyResultCallback(
         if (m_propertyManagerEngineImpl == nullptr) {
             AACE_WARN(LX(TAG).m("PropertyManager platform interface not registered"));
         } else {
-            aace::engine::utils::string::equal(result, "SUCCEEDED")
-                ? handleSetSuccess(true, fromPlatform, name, value)
-                : handleSetFailed(fromPlatform, name, value);
+            aace::engine::utils::string::equal(result, "SUCCEEDED") ? handleSetSuccess(true, fromPlatform, name, value)
+                                                                    : handleSetFailed(fromPlatform, name, value);
         }
     });
 }

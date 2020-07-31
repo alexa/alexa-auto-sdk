@@ -23,45 +23,46 @@ namespace engine {
 namespace utils {
 namespace string {
 
-bool equal( const std::string& str1, const std::string& str2, bool caseSensitive )
-{
+bool equal(const std::string& str1, const std::string& str2, bool caseSensitive) {
     // return immedieately if the string length is different
-    ReturnIf( str1.size() != str2.size(), false );
-    
+    ReturnIf(str1.size() != str2.size(), false);
+
     // call std::strcmp for case sensitive comparison
-    if( caseSensitive ) {
+    if (caseSensitive) {
         return str1 == str2;
-    }
-    else
-    {
+    } else {
         // iterate through the chars in the two strings
-        for( auto j = 0; j < str1.size(); j++ ) {
-            ReturnIf( std::tolower( str1[j] ) != std::tolower( str2[j] ), false );
+        for (auto j = 0; j < str1.size(); j++) {
+            ReturnIf(std::tolower(str1[j]) != std::tolower(str2[j]), false);
         }
     }
-    
+
     return true;
 }
 
-std::string toLower( const std::string& str ) {
+std::string toLower(const std::string& str) {
     std::string result = str;
-    std::transform( result.begin(), result.end(), result.begin(), [](unsigned char c) -> unsigned char { return static_cast<unsigned char>(std::tolower(c)); } );
+    std::transform(result.begin(), result.end(), result.begin(), [](unsigned char c) -> unsigned char {
+        return static_cast<unsigned char>(std::tolower(c));
+    });
     return result;
 }
 
-std::string toUpper( const std::string& str ) {
+std::string toUpper(const std::string& str) {
     std::string result = str;
-    std::transform( result.begin(), result.end(), result.begin(), [](unsigned char c) -> unsigned char { return static_cast<unsigned char>(std::toupper(c)); } );
+    std::transform(result.begin(), result.end(), result.begin(), [](unsigned char c) -> unsigned char {
+        return static_cast<unsigned char>(std::toupper(c));
+    });
     return result;
 }
 
-std::shared_ptr<std::stringstream> toStream( const std::string& str ) {
+std::shared_ptr<std::stringstream> toStream(const std::string& str) {
     auto stream = std::make_shared<std::stringstream>();
     *stream << str;
     return stream;
 }
 
-} // aace::engine::utils::string
-} // aace::engine::utils
-} // aace::engine
-} // aace
+}  // namespace string
+}  // namespace utils
+}  // namespace engine
+}  // namespace aace

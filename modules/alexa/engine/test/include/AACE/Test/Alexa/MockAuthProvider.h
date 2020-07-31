@@ -25,12 +25,12 @@ namespace alexa {
 
 class MockAuthProvider : public aace::alexa::AuthProvider {
 public:
-    MOCK_METHOD0(getAuthToken,std::string());
-    MOCK_METHOD0(getAuthState,AuthState());
+    MOCK_METHOD0(getAuthToken, std::string());
+    MOCK_METHOD0(getAuthState, AuthState());
 };
 
-} // aace::test::alexa
-} // aace::test
-} // aace
+}  // namespace alexa
+}  // namespace test
+}  // namespace aace
 
-#endif // AACE_TEST_ALEXA_MOCK_AUTH_PROVIDER_H
+#endif  // AACE_TEST_ALEXA_MOCK_AUTH_PROVIDER_H

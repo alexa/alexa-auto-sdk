@@ -25,7 +25,6 @@ namespace alexa {
 
 class AlexaMetrics {
 public:
-    
     /**
      * Enum indicating the location where the metric message was issued
      */
@@ -39,7 +38,6 @@ public:
         PLAYBACK_FINISHED,
         END_OF_SPEECH
     };
-    
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const AlexaMetrics::Location& location) {
@@ -71,15 +69,15 @@ inline std::ostream& operator<<(std::ostream& stream, const AlexaMetrics::Locati
     }
     return stream;
 }
-    
-}  // alexa
-}  // engine
-}  // aace
+
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace
 
 #ifdef AAC_LATENCY_LOGS_ENABLED
 #define ALEXA_METRIC(entry, location) AACE_LOG(AACE_LOG_LEVEL::METRIC, entry.d("Location", location))
-#else // AAC_LATENCY_LOGS_ENABLED
+#else  // AAC_LATENCY_LOGS_ENABLED
 #define ALEXA_METRIC(entry, location)
-#endif // AAC_LATENCY_LOGS_ENABLED
+#endif  // AAC_LATENCY_LOGS_ENABLED
 
-#endif // AACE_ENGINE_ALEXA_ALEXA_METRICS_H
+#endif  // AACE_ENGINE_ALEXA_ALEXA_METRICS_H

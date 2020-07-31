@@ -30,8 +30,8 @@ public:
     virtual bool verify(const std::string& wakeword, const std::chrono::milliseconds& timeout) = 0;
 };
 
-}  // aace::engine:alexa
-}  // aace::engine
-}  // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_ALEXA_INTERFACE_WAKEWORD_VERIFIER_H
+#endif  // AACE_ENGINE_ALEXA_INTERFACE_WAKEWORD_VERIFIER_H

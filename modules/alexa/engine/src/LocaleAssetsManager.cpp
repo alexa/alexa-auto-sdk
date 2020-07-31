@@ -56,8 +56,8 @@ bool LocaleAssetsManager::changeAssets(const Locales& locales, const WakeWords& 
     // Changing assets is not currently supported, however this needs to return true for AVS Device SDK
     //  to function correctly, as it will always call this during the initialization sequence.
     AACE_VERBOSE(LX(__func__)
-                   .d("Locale", alexaClientSDK::settings::toSettingString<Locales>(locales).second)
-                   .d("WakeWords", alexaClientSDK::settings::toSettingString<WakeWords>(wakeWords).second));
+                     .d("Locale", alexaClientSDK::settings::toSettingString<Locales>(locales).second)
+                     .d("WakeWords", alexaClientSDK::settings::toSettingString<WakeWords>(wakeWords).second));
     return true;
 }
 
@@ -66,42 +66,63 @@ void LocaleAssetsManager::cancelOngoingChange() {
 }
 
 bool LocaleAssetsManager::initialize(bool enableWakeWord) {
-    auto settingsConfig = alexaClientSDK::avsCommon::utils::configuration::ConfigurationNode::getRoot()[SETTING_CONFIGURATION_ROOT_KEY];
+    auto settingsConfig =
+        alexaClientSDK::avsCommon::utils::configuration::ConfigurationNode::getRoot()[SETTING_CONFIGURATION_ROOT_KEY];
     if (!settingsConfig) {
-        AACE_ERROR(LX(TAG,"initializeFailed")
-                        .d("reason", "configurationKeyNotFound")
-                        .d("configurationKey", SETTING_CONFIGURATION_ROOT_KEY));
+        AACE_ERROR(LX(TAG, "initializeFailed")
+                       .d("reason", "configurationKeyNotFound")
+                       .d("configurationKey", SETTING_CONFIGURATION_ROOT_KEY));
         return false;
     }
 
     if (!settingsConfig.getStringValues(LOCALES_CONFIGURATION_KEY, &m_supportedLocales)) {
-        AACE_ERROR(LX(TAG,"initializeFailed")
-                        .d("reason", "configurationKeyNotFound")
-                        .d("configurationKey", LOCALES_CONFIGURATION_KEY));
+        AACE_ERROR(LX(TAG, "initializeFailed")
+                       .d("reason", "configurationKeyNotFound")
+                       .d("configurationKey", LOCALES_CONFIGURATION_KEY));
         return false;
     }
 
     if (!settingsConfig.getString(DEFAULT_LOCALE_CONFIGURATION_KEY, &m_defaultLocale)) {
-        AACE_ERROR(
-            LX(TAG,"initializeFailed")
-                .d("reason", "configurationKeyNotFound")
-                .d("configurationKey", SETTING_CONFIGURATION_ROOT_KEY + "." + DEFAULT_LOCALE_CONFIGURATION_KEY));
+        AACE_ERROR(LX(TAG, "initializeFailed")
+                       .d("reason", "configurationKeyNotFound")
+                       .d("configurationKey", SETTING_CONFIGURATION_ROOT_KEY + "." + DEFAULT_LOCALE_CONFIGURATION_KEY));
         return false;
+    }
+    auto combinationArray = settingsConfig.getArray(LOCALE_COMBINATION_CONFIGURATION_KEY);
+    if (combinationArray) {
+        for (std::size_t arrayIndex = 0; arrayIndex < combinationArray.getArraySize(); ++arrayIndex) {
+            auto stringVector =
+                alexaClientSDK::avsCommon::utils::json::jsonUtils::retrieveStringArray<std::vector<std::string>>(
+                    combinationArray[arrayIndex].serialize());
+            // Make sure the combination is more than one locale.
+            if (stringVector.size() <= 1) {
+                AACE_ERROR(LX(TAG).d("reason", "LocaleCombinationSizeError").d("size", stringVector.size()));
+                return false;
+            }
+            // Make sure all the locales in the combination are supported.
+            for (const auto& locale : stringVector) {
+                if (m_supportedLocales.count(locale) == 0) {
+                    AACE_ERROR(LX(TAG).d("reason", "notSupportedLocalesInCombination").d("locale", locale));
+                    return false;
+                }
+            }
+            m_supportedLocalesCombinations.insert(stringVector);
+        }
     }
 
     if (m_supportedLocales.empty()) {
-        AACE_ERROR(LX(TAG,"initializeFailed").d("reason", "noSupportedLocalesInConfiguration"));
+        AACE_ERROR(LX(TAG, "initializeFailed").d("reason", "noSupportedLocalesInConfiguration"));
         return false;
     }
 
     if (m_defaultLocale.empty()) {
-        AACE_ERROR(LX(TAG,"initializeFailed").d("reason", "noDefaultLocaleInConfiguration"));
+        AACE_ERROR(LX(TAG, "initializeFailed").d("reason", "noDefaultLocaleInConfiguration"));
         return false;
     }
 
     // Check if the default is in the supported locales
     if (m_supportedLocales.find(m_defaultLocale) == m_supportedLocales.end()) {
-        AACE_ERROR(LX(TAG,"initializeFailed").d("reason", "defaultLocaleNotInSupportedLocaleList"));
+        AACE_ERROR(LX(TAG, "initializeFailed").d("reason", "defaultLocaleNotInSupportedLocaleList"));
         return false;
     }
 
@@ -109,7 +130,7 @@ bool LocaleAssetsManager::initialize(bool enableWakeWord) {
     if (enableWakeWord) {
         m_supportedWakeWords.insert({DEFAULT_SUPPORTED_WAKEWORD});
     } else {
-        AACE_INFO(LX(TAG,__func__).d("supportedWakeWords", "NONE"));
+        AACE_INFO(LX(TAG, __func__).d("supportedWakeWords", "NONE"));
     }
 
     return true;
@@ -138,7 +159,7 @@ std::set<LocaleAssetsManager::Locale> LocaleAssetsManager::getSupportedLocales()
 }
 
 LocaleAssetsManager::LocaleCombinations LocaleAssetsManager::getSupportedLocaleCombinations() const {
-    return LocaleAssetsManager::LocaleCombinations();
+    return m_supportedLocalesCombinations;
 }
 
 LocaleAssetsManager::Locale LocaleAssetsManager::getDefaultLocale() const {
@@ -148,7 +169,6 @@ LocaleAssetsManager::Locale LocaleAssetsManager::getDefaultLocale() const {
 LocaleAssetsManager::LocaleAssetsManager() : m_defaultLocale{DEFAULT_LOCALE_VALUE} {
 }
 
-}  // alexa
-}  // engine
-}  // aace
-
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace

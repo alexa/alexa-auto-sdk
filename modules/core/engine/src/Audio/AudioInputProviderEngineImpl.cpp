@@ -24,54 +24,54 @@ namespace aace {
 namespace engine {
 namespace audio {
 
-AudioInputProviderEngineImpl::AudioInputProviderEngineImpl( std::shared_ptr<aace::audio::AudioInputProvider> platformAudioInputProviderInterface ) : m_platformAudioInputProviderInterface( platformAudioInputProviderInterface ) {
+AudioInputProviderEngineImpl::AudioInputProviderEngineImpl(
+    std::shared_ptr<aace::audio::AudioInputProvider> platformAudioInputProviderInterface) :
+        m_platformAudioInputProviderInterface(platformAudioInputProviderInterface) {
 }
 
-std::shared_ptr<AudioInputProviderEngineImpl> AudioInputProviderEngineImpl::create( std::shared_ptr<aace::audio::AudioInputProvider> platformAudioInputProviderInterface )
-{
-    try
-    {
-        ThrowIfNull( platformAudioInputProviderInterface, "invalidAudioInputProviderPlatformInterface" );
-        return std::shared_ptr<AudioInputProviderEngineImpl>( new AudioInputProviderEngineImpl( platformAudioInputProviderInterface ) );
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"create").d("reason", ex.what()));
+std::shared_ptr<AudioInputProviderEngineImpl> AudioInputProviderEngineImpl::create(
+    std::shared_ptr<aace::audio::AudioInputProvider> platformAudioInputProviderInterface) {
+    try {
+        ThrowIfNull(platformAudioInputProviderInterface, "invalidAudioInputProviderPlatformInterface");
+        return std::shared_ptr<AudioInputProviderEngineImpl>(
+            new AudioInputProviderEngineImpl(platformAudioInputProviderInterface));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "create").d("reason", ex.what()));
         return nullptr;
     }
 }
 
-std::shared_ptr<AudioInputChannelInterface> AudioInputProviderEngineImpl::openChannel( const std::string& name, aace::audio::AudioInputProvider::AudioInputType audioInputType )
-{
-    try
-    {
-        std::lock_guard<std::mutex> lock( m_mutex );
+std::shared_ptr<AudioInputChannelInterface> AudioInputProviderEngineImpl::openChannel(
+    const std::string& name,
+    aace::audio::AudioInputProvider::AudioInputType audioInputType) {
+    try {
+        std::lock_guard<std::mutex> lock(m_mutex);
 
         // get the audio input instance from the platform
-        auto platformAudioInput = m_platformAudioInputProviderInterface->openChannel( name, audioInputType );
-        ThrowIfNull( platformAudioInput, "invalidPlatformAudioInput" );
+        auto platformAudioInput = m_platformAudioInputProviderInterface->openChannel(name, audioInputType);
+        ThrowIfNull(platformAudioInput, "invalidPlatformAudioInput");
 
         // see if the instance already exists in our map
-        auto it = m_audioInputMap.find( platformAudioInput );
-        ReturnIf( it != m_audioInputMap.end(), it->second );
-        
+        auto it = m_audioInputMap.find(platformAudioInput);
+        ReturnIf(it != m_audioInputMap.end(), it->second);
+
         // create audio input channel engine impl
-        auto audioInputChannel = AudioInputEngineImpl::create( platformAudioInput );
-        ThrowIfNull( audioInputChannel, "invalidAudioInputChannel" );
-    
+        auto audioInputChannel = AudioInputEngineImpl::create(platformAudioInput);
+        ThrowIfNull(audioInputChannel, "invalidAudioInputChannel");
+
         // add the audio input channel to the map
         m_audioInputMap[platformAudioInput] = audioInputChannel;
-    
+
         return audioInputChannel;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"openChannel").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "openChannel").d("reason", ex.what()));
         return nullptr;
     }
 }
-    
+
 bool AudioInputProviderEngineImpl::doShutdown() {
     for (auto const& audioInput : m_audioInputMap) {
-        audioInput.first->setEngineInterface( nullptr );
+        audioInput.first->setEngineInterface(nullptr);
         audioInput.second->doShutdown();
     }
     m_audioInputMap.clear();
@@ -79,6 +79,6 @@ bool AudioInputProviderEngineImpl::doShutdown() {
     return true;
 }
 
-} // aace::engine::audio
-} // aace::engine
-} // aace
+}  // namespace audio
+}  // namespace engine
+}  // namespace aace

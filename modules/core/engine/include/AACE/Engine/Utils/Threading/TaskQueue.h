@@ -206,9 +206,9 @@ auto TaskQueue::pushTo(bool front, Task task, Args&&... args) -> std::future<dec
     return cleanupFuture;
 }
 
-} // aace::engine::utils::threading
-} // aace::engine::utils
-} // aace::engine
-} // aace
+}  // namespace threading
+}  // namespace utils
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_UTILS_THREADING_TASK_QUEUE_H_
+#endif  // AACE_ENGINE_UTILS_THREADING_TASK_QUEUE_H_

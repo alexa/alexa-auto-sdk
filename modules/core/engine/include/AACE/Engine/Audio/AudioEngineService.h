@@ -28,48 +28,50 @@ namespace aace {
 namespace engine {
 namespace audio {
 
-class AudioEngineService :
-    public aace::engine::core::EngineService,
-    public AudioManagerInterface,
-    public std::enable_shared_from_this<AudioEngineService> {
-
+class AudioEngineService
+        : public aace::engine::core::EngineService
+        , public AudioManagerInterface
+        , public std::enable_shared_from_this<AudioEngineService> {
 public:
-    DESCRIBE("aace.audio",VERSION("1.0"))
+    DESCRIBE("aace.audio", VERSION("1.0"))
 
 private:
-    AudioEngineService( const aace::engine::core::ServiceDescription& description );
+    AudioEngineService(const aace::engine::core::ServiceDescription& description);
 
 public:
     virtual ~AudioEngineService() = default;
-    
+
     // AudioManagerInterface
-    std::shared_ptr<AudioInputChannelInterface> openAudioInputChannel( const std::string& name, AudioInputType audioInputType ) override;
-    std::shared_ptr<AudioOutputChannelInterface> openAudioOutputChannel( const std::string& name, AudioOutputType audioOutputType ) override;
+    std::shared_ptr<AudioInputChannelInterface> openAudioInputChannel(
+        const std::string& name,
+        AudioInputType audioInputType) override;
+    std::shared_ptr<AudioOutputChannelInterface> openAudioOutputChannel(
+        const std::string& name,
+        AudioOutputType audioOutputType) override;
 
 protected:
     bool initialize() override;
     bool shutdown() override;
-    bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) override;
-    
-private:
+    bool registerPlatformInterface(std::shared_ptr<aace::core::PlatformInterface> platformInterface) override;
 
+private:
     // platform interface registration
     template <class T>
-    bool registerPlatformInterfaceType( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) {
-        std::shared_ptr<T> typedPlatformInterface = std::dynamic_pointer_cast<T>( platformInterface );
-        return typedPlatformInterface != nullptr ? registerPlatformInterfaceType( typedPlatformInterface ) : false;
+    bool registerPlatformInterfaceType(std::shared_ptr<aace::core::PlatformInterface> platformInterface) {
+        std::shared_ptr<T> typedPlatformInterface = std::dynamic_pointer_cast<T>(platformInterface);
+        return typedPlatformInterface != nullptr ? registerPlatformInterfaceType(typedPlatformInterface) : false;
     }
-    
-    bool registerPlatformInterfaceType( std::shared_ptr<aace::audio::AudioInputProvider> audioInputProvider );
-    bool registerPlatformInterfaceType( std::shared_ptr<aace::audio::AudioOutputProvider> audioOutputProvider );
+
+    bool registerPlatformInterfaceType(std::shared_ptr<aace::audio::AudioInputProvider> audioInputProvider);
+    bool registerPlatformInterfaceType(std::shared_ptr<aace::audio::AudioOutputProvider> audioOutputProvider);
 
 private:
     std::shared_ptr<AudioInputProviderEngineImpl> m_audioInputProvideEngineImpl;
     std::shared_ptr<AudioOutputProviderEngineImpl> m_audioOutputProvideEngineImpl;
 };
 
-} // aace::engine::audio
-} // aace::engine
-} // aace
+}  // namespace audio
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_AUDIO_AUDIO_ENGINE_SERVICE_H
+#endif  // AACE_ENGINE_AUDIO_AUDIO_ENGINE_SERVICE_H

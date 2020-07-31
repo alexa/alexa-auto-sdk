@@ -23,69 +23,67 @@ namespace aace {
 namespace jni {
 namespace network {
 
-    //
-    // NetworkInfoProviderHandler
-    //
+//
+// NetworkInfoProviderHandler
+//
 
-    class NetworkInfoProviderHandler : public aace::network::NetworkInfoProvider {
-    public:
-        NetworkInfoProviderHandler( jobject obj );
+class NetworkInfoProviderHandler : public aace::network::NetworkInfoProvider {
+public:
+    NetworkInfoProviderHandler(jobject obj);
 
-        // aace::network::NetworkInfoProvider
-        NetworkStatus getNetworkStatus() override;
-        int getWifiSignalStrength() override;
+    // aace::network::NetworkInfoProvider
+    NetworkStatus getNetworkStatus() override;
+    int getWifiSignalStrength() override;
 
-    private:
-        JObject m_obj;
-    };
+private:
+    JObject m_obj;
+};
 
-    //
-    // NetworkInfoProviderBinder
-    //
+//
+// NetworkInfoProviderBinder
+//
 
-    class NetworkInfoProviderBinder : public aace::jni::core::PlatformInterfaceBinder {
-    public:
-        NetworkInfoProviderBinder( jobject obj );
+class NetworkInfoProviderBinder : public aace::jni::core::PlatformInterfaceBinder {
+public:
+    NetworkInfoProviderBinder(jobject obj);
 
-        std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
-            return m_networkInfoProviderHandler;
-        }
+    std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
+        return m_networkInfoProviderHandler;
+    }
 
-        std::shared_ptr<NetworkInfoProviderHandler> getNetworkInfoProviderHandler() {
-            return m_networkInfoProviderHandler;
-        }
+    std::shared_ptr<NetworkInfoProviderHandler> getNetworkInfoProviderHandler() {
+        return m_networkInfoProviderHandler;
+    }
 
-    private:
-        std::shared_ptr<NetworkInfoProviderHandler> m_networkInfoProviderHandler;
-    };
+private:
+    std::shared_ptr<NetworkInfoProviderHandler> m_networkInfoProviderHandler;
+};
 
-    //
-    // JNetworkStatus
-    //
+//
+// JNetworkStatus
+//
 
-    class JNetworkStatusConfig : public EnumConfiguration<NetworkInfoProviderHandler::NetworkStatus> {
-    public:
-        using T = NetworkInfoProviderHandler::NetworkStatus;
+class JNetworkStatusConfig : public EnumConfiguration<NetworkInfoProviderHandler::NetworkStatus> {
+public:
+    using T = NetworkInfoProviderHandler::NetworkStatus;
 
-        const char* getClassName() override {
-            return "com/amazon/aace/network/NetworkInfoProvider$NetworkStatus";
-        }
+    const char* getClassName() override {
+        return "com/amazon/aace/network/NetworkInfoProvider$NetworkStatus";
+    }
 
-        std::vector<std::pair<T,std::string>> getConfiguration() override {
-            return {
-                {T::UNKNOWN,"UNKNOWN"},
-                {T::DISCONNECTED,"DISCONNECTED"},
-                {T::DISCONNECTING,"DISCONNECTING"},
-                {T::CONNECTED,"CONNECTED"},
-                {T::CONNECTING,"CONNECTING"}
-            };
-        }
-    };
+    std::vector<std::pair<T, std::string>> getConfiguration() override {
+        return {{T::UNKNOWN, "UNKNOWN"},
+                {T::DISCONNECTED, "DISCONNECTED"},
+                {T::DISCONNECTING, "DISCONNECTING"},
+                {T::CONNECTED, "CONNECTED"},
+                {T::CONNECTING, "CONNECTING"}};
+    }
+};
 
-    using JNetworkStatus = JEnum<NetworkInfoProviderHandler::NetworkStatus,JNetworkStatusConfig>;
+using JNetworkStatus = JEnum<NetworkInfoProviderHandler::NetworkStatus, JNetworkStatusConfig>;
 
-} // aace::jni::network
-} // aace::jni
-} // aace
+}  // namespace network
+}  // namespace jni
+}  // namespace aace
 
-#endif // AACE_JNI_NETWORK_NETWORK_INFO_PROVIDER_BINDER_H
+#endif  // AACE_JNI_NETWORK_NETWORK_INFO_PROVIDER_BINDER_H

@@ -32,6 +32,8 @@
 #include <AVSCommon/SDKInterfaces/AuthDelegateInterface.h>
 #include <AVSCommon/Utils/DeviceInfo.h>
 
+#include <AACE/Engine/Alexa/AlexaEndpointInterface.h>
+
 namespace aace {
 namespace engine {
 namespace addressBook {
@@ -40,33 +42,44 @@ class AddressBookCloudUploaderRESTAgent {
 private:
     AddressBookCloudUploaderRESTAgent(
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
-        std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo
-    );
+        std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo);
+
+    bool initialize(std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints);
 
 public:
     using HTTPResponse = alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse;
 
-    static std::shared_ptr<AddressBookCloudUploaderRESTAgent> create (
+    static std::shared_ptr<AddressBookCloudUploaderRESTAgent> create(
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
-        std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo
-    );
+        std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
+        std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints);
 
     virtual ~AddressBookCloudUploaderRESTAgent() = default;
 
     bool isAccountProvisioned();
 
-    std::string createAndGetCloudAddressBook( const std::string& addressBookSourceId, const std::string& addressBookType );
-    bool getCloudAddressBookId( const std::string& addressBookSourceId, const std::string& addressBookType, std::string& cloudAddressBookId );
-    bool deleteCloudAddressBook( const std::string& cloudAddressBookId );
-    
-    HTTPResponse uploadDocumentToCloud( std::shared_ptr<rapidjson::Document> document, const std::string& cloudAddressBookId );
-    bool parseCreateAddressBookEntryResponse( const HTTPResponse& response, std::queue<std::string>& failedEntries );
-    std::string buildFailedEntriesJson( std::queue<std::string>& failedContact );
+    std::string createAndGetCloudAddressBook(
+        const std::string& addressBookSourceId,
+        const std::string& addressBookType);
+    bool getCloudAddressBookId(
+        const std::string& addressBookSourceId,
+        const std::string& addressBookType,
+        std::string& cloudAddressBookId);
+    bool deleteCloudAddressBook(const std::string& cloudAddressBookId);
 
-    std::string getHTTPErrorString( const HTTPResponse& response );
+    HTTPResponse uploadDocumentToCloud(
+        std::shared_ptr<rapidjson::Document> document,
+        const std::string& cloudAddressBookId);
+    bool parseCreateAddressBookEntryResponse(const HTTPResponse& response, std::queue<std::string>& failedEntries);
+    std::string buildFailedEntriesJson(std::queue<std::string>& failedContact);
+
+    std::string getHTTPErrorString(const HTTPResponse& response);
+
+    /// Resets the internal ACMS REST attributes
+    void reset();
 
 private:
-       enum class CommsProvisionStatus {
+    enum class CommsProvisionStatus {
         /*
          * Invalid state
          */
@@ -94,33 +107,44 @@ private:
         CommsProvisionStatus provisionStatus;
     };
 
-    bool isPceIdValid();
+    void setPceId(const std::string& pceId);
     std::string getPceId();
-    void setPceId( const std::string& pceId );
+    bool isPceIdValid();
 
     AlexaAccountInfo getAlexaAccountInfo();
-    std::string getPceIdFromIdentity( const std::string& commsId );
+    std::string getPceIdFromIdentity(const std::string& commsId);
 
     std::vector<std::string> buildCommonHTTPHeader();
-    bool parseCommonHTTPResponse( const HTTPResponse& response );
+    bool parseCommonHTTPResponse(const HTTPResponse& response);
 
-    HTTPResponse doPost( const std::string& url, const std::vector<std::string> headerLines, const std::string& data, std::chrono::seconds timeout );
-    HTTPResponse doGet( const std::string& url, const std::vector<std::string>& headers );
-    HTTPResponse doDelete( const std::string& url, const std::vector<std::string>& headers );
+    HTTPResponse doPost(
+        const std::string& url,
+        const std::vector<std::string> headerLines,
+        const std::string& data,
+        std::chrono::seconds timeout);
+    HTTPResponse doGet(const std::string& url, const std::vector<std::string>& headers);
+    HTTPResponse doDelete(const std::string& url, const std::vector<std::string>& headers);
 
-    std::string buildCreateAddressBookDataJson( const std::string& addressBookSourceId, const std::string& addressBookType );
-    std::string buildEntriesJsonString( std::shared_ptr<rapidjson::Document> document );
+    std::string buildCreateAddressBookDataJson(
+        const std::string& addressBookSourceId,
+        const std::string& addressBookType);
+    std::string buildEntriesJsonString(std::shared_ptr<rapidjson::Document> document);
 
 private:
     std::string m_pceId;
-    std::string m_addressBookId;
 
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> m_authDelegate;
     std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> m_deviceInfo;
+
+    /// ACMS REST endpoint used for uploading.
+    std::string m_acmsEndpoint;
+
+    /// Mutex to allow serialized access to m_pceId
+    std::mutex m_pceIdMutex;
 };
 
-} // aace::engine::addressBook
-} // aace::engine
-} // aace
+}  // namespace addressBook
+}  // namespace engine
+}  // namespace aace
 
-#endif //AACE_ENGINE_ADDRESS_BOOK_ADDRESSBOOK_CLOUD_UPLOADER_REST_AGENT_H
+#endif  //AACE_ENGINE_ADDRESS_BOOK_ADDRESSBOOK_CLOUD_UPLOADER_REST_AGENT_H

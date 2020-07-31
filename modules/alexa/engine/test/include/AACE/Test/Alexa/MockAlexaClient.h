@@ -25,13 +25,15 @@ namespace alexa {
 
 class MockAlexaClient : public aace::alexa::AlexaClient {
 public:
-    MOCK_METHOD1(dialogStateChanged,void(aace::alexa::AlexaClient::DialogState state));
-    MOCK_METHOD2(authStateChanged,void(aace::alexa::AlexaClient::AuthState, aace::alexa::AlexaClient::AuthError));
-    MOCK_METHOD2(connectionStatusChanged,void(aace::alexa::AlexaClient::ConnectionStatus, aace::alexa::AlexaClient::ConnectionChangedReason));
+    MOCK_METHOD1(dialogStateChanged, void(aace::alexa::AlexaClient::DialogState state));
+    MOCK_METHOD2(authStateChanged, void(aace::alexa::AlexaClient::AuthState, aace::alexa::AlexaClient::AuthError));
+    MOCK_METHOD2(
+        connectionStatusChanged,
+        void(aace::alexa::AlexaClient::ConnectionStatus, aace::alexa::AlexaClient::ConnectionChangedReason));
 };
 
-} // aace::test::alexa
-} // aace::test
-} // aace
+}  // namespace alexa
+}  // namespace test
+}  // namespace aace
 
-#endif // AACE_TEST_ALEXA_MOCK_ALEXA_CLIENT_H
+#endif  // AACE_TEST_ALEXA_MOCK_ALEXA_CLIENT_H

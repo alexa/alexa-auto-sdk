@@ -31,30 +31,33 @@ namespace addressBook {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class AddressBookHandler : public aace::addressBook::AddressBook /* isa PlatformInterface */ {
-  private:
+private:
     std::weak_ptr<Activity> m_activity{};
     std::weak_ptr<logger::LoggerHandler> m_loggerHandler{};
 
-  protected:
+protected:
     AddressBookHandler(std::weak_ptr<Activity> activity, std::weak_ptr<logger::LoggerHandler> loggerHandler);
 
-  public:
-    template <typename... Args> static auto create(Args &&... args) -> std::shared_ptr<AddressBookHandler> {
+public:
+    template <typename... Args>
+    static auto create(Args&&... args) -> std::shared_ptr<AddressBookHandler> {
         return std::shared_ptr<AddressBookHandler>(new AddressBookHandler(args...));
     }
     auto getActivity() -> std::weak_ptr<Activity>;
     auto getLoggerHandler() -> std::weak_ptr<logger::LoggerHandler>;
 
     // AddressBook
-    bool getEntries( const std::string& id, std::weak_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> factory ) override;
+    bool getEntries(
+        const std::string& id,
+        std::weak_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> factory) override;
 
-  private:
+private:
     std::weak_ptr<View> m_console{};
 
     std::vector<struct Contact> m_contacts;
     std::vector<struct NavigationFavorite> m_navigationFavorites;
 
-    auto log(logger::LoggerHandler::Level level, const std::string &message) -> void;
+    auto log(logger::LoggerHandler::Level level, const std::string& message) -> void;
     auto setupUI() -> void;
     auto LoadContactData(const std::string& filepath) -> bool;
     auto LoadNavigationFavoritesData(const std::string& filepath) -> bool;
@@ -98,7 +101,7 @@ struct NavigationFavorite {
     PostalAddress postalAddress;
 };
 
-} // namespace addressBook
-} // namespace sampleApp
+}  // namespace addressBook
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_ADDRESS_BOOK_HANDLER_H
+#endif  // SAMPLEAPP_ADDRESS_BOOK_HANDLER_H

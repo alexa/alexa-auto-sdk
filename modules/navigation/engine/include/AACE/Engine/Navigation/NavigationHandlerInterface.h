@@ -27,17 +27,17 @@ public:
     virtual ~NavigationHandlerInterface() = default;
     virtual void showPreviousWaypoints() = 0;
     virtual void navigateToPreviousWaypoint() = 0;
-    virtual void showAlternativeRoutes( aace::navigation::Navigation::AlternateRouteType alternateRouteType )  = 0;
-    virtual void controlDisplay( aace::navigation::Navigation::ControlDisplay controlDisplay ) = 0;
-    virtual void startNavigation( const std::string& payload ) = 0;
-    virtual void announceManeuver ( const std::string& payload ) = 0;
-    virtual void announceRoadRegulation ( aace::navigation::Navigation::RoadRegulation roadRegulation ) = 0;
+    virtual void showAlternativeRoutes(aace::navigation::Navigation::AlternateRouteType alternateRouteType) = 0;
+    virtual void controlDisplay(aace::navigation::Navigation::ControlDisplay controlDisplay) = 0;
+    virtual void startNavigation(const std::string& payload) = 0;
+    virtual void announceManeuver(const std::string& payload) = 0;
+    virtual void announceRoadRegulation(aace::navigation::Navigation::RoadRegulation roadRegulation) = 0;
     virtual void cancelNavigation() = 0;
     virtual std::string getNavigationState() = 0;
 };
 
-} // aace::engine::navigation
-} // aace::engine
-} // aace
+}  // namespace navigation
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_NAVIGATION_NAVIGATION_OBSERVER_INTERFACE_H
+#endif  // AACE_ENGINE_NAVIGATION_NAVIGATION_OBSERVER_INTERFACE_H

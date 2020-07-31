@@ -32,7 +32,7 @@ class LogEntryBuffer : public std::streambuf {
 public:
     LogEntryBuffer();
 
-    int_type overflow( int_type ch ) override;
+    int_type overflow(int_type ch) override;
     const char* c_str() const;
 
 private:
@@ -41,8 +41,8 @@ private:
     std::unique_ptr<std::vector<char>> m_largeBuffer;
 };
 
-}  // logger
-}  // engine
-}  // aace
+}  // namespace logger
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_LOGGER_LOGENTRYBUFFER_H
+#endif  // AACE_ENGINE_LOGGER_LOGENTRYBUFFER_H

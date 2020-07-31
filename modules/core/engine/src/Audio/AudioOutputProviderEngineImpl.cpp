@@ -24,51 +24,51 @@ namespace aace {
 namespace engine {
 namespace audio {
 
-AudioOutputProviderEngineImpl::AudioOutputProviderEngineImpl( std::shared_ptr<aace::audio::AudioOutputProvider> platformAudioOutputProviderInterface ) : m_platformAudioOutputProviderInterface( platformAudioOutputProviderInterface ) {
+AudioOutputProviderEngineImpl::AudioOutputProviderEngineImpl(
+    std::shared_ptr<aace::audio::AudioOutputProvider> platformAudioOutputProviderInterface) :
+        m_platformAudioOutputProviderInterface(platformAudioOutputProviderInterface) {
 }
 
-std::shared_ptr<AudioOutputProviderEngineImpl> AudioOutputProviderEngineImpl::create( std::shared_ptr<aace::audio::AudioOutputProvider> platformAudioOutputProviderInterface )
-{
-    try
-    {
-        ThrowIfNull( platformAudioOutputProviderInterface, "invalidAudioOutputProviderPlatformInterface" );
-        return std::shared_ptr<AudioOutputProviderEngineImpl>( new AudioOutputProviderEngineImpl( platformAudioOutputProviderInterface ) );
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"create").d("reason", ex.what()));
+std::shared_ptr<AudioOutputProviderEngineImpl> AudioOutputProviderEngineImpl::create(
+    std::shared_ptr<aace::audio::AudioOutputProvider> platformAudioOutputProviderInterface) {
+    try {
+        ThrowIfNull(platformAudioOutputProviderInterface, "invalidAudioOutputProviderPlatformInterface");
+        return std::shared_ptr<AudioOutputProviderEngineImpl>(
+            new AudioOutputProviderEngineImpl(platformAudioOutputProviderInterface));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "create").d("reason", ex.what()));
         return nullptr;
     }
 }
 
-std::shared_ptr<AudioOutputChannelInterface> AudioOutputProviderEngineImpl::openChannel( const std::string& name, aace::audio::AudioOutputProvider::AudioOutputType audioOutputType )
-{
-    try
-    {
+std::shared_ptr<AudioOutputChannelInterface> AudioOutputProviderEngineImpl::openChannel(
+    const std::string& name,
+    aace::audio::AudioOutputProvider::AudioOutputType audioOutputType) {
+    try {
         // get the audio input instance from the platform
-        auto platformAudioOutput = m_platformAudioOutputProviderInterface->openChannel( name, audioOutputType );
-        ThrowIfNull( platformAudioOutput, "invalidPlatformAudioOutput" );
+        auto platformAudioOutput = m_platformAudioOutputProviderInterface->openChannel(name, audioOutputType);
+        ThrowIfNull(platformAudioOutput, "invalidPlatformAudioOutput");
 
         // create audio input channel engine impl
-        auto audioOutputChannel = AudioOutputEngineImpl::create( platformAudioOutput );
-        ThrowIfNull( audioOutputChannel, "invalidAudioOutputChannel" );
+        auto audioOutputChannel = AudioOutputEngineImpl::create(platformAudioOutput);
+        ThrowIfNull(audioOutputChannel, "invalidAudioOutputChannel");
         m_audioOutputMap[platformAudioOutput] = audioOutputChannel;
 
         return audioOutputChannel;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"openChannel").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "openChannel").d("reason", ex.what()));
         return nullptr;
     }
 }
 
 bool AudioOutputProviderEngineImpl::doShutdown() {
     for (auto const& audioOutput : m_audioOutputMap) {
-        audioOutput.first->setEngineInterface( nullptr );
+        audioOutput.first->setEngineInterface(nullptr);
     }
     m_audioOutputMap.clear();
     return true;
 }
 
-} // aace::engine::audio
-} // aace::engine
-} // aace
+}  // namespace audio
+}  // namespace engine
+}  // namespace aace

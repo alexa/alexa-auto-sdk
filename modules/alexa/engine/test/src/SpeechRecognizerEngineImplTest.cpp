@@ -27,56 +27,86 @@
 #include <AACE/Test/Audio/MockAudioOutputChannelInterface.h>
 #include <AACE/Test/Alexa/MockSpeechRecognizer.h>
 
+#include <AVSCommon/SDKInterfaces/test/Settings/MockSetting.h>
+#include <Settings/Types/AlarmVolumeRampTypes.h>
+
 #include <AACE/Engine/Alexa/SpeechRecognizerEngineImpl.h>
 
 using namespace aace::test::alexa;
 using namespace aace::test::audio;
 
+/// A list of test supported wake words.
+static const std::set<std::string> SUPPORTED_WAKE_WORDS = {"ALEXA"};
+
 class SpeechRecognizerEngineImplTest : public ::testing::Test {
 public:
-    void SetUp() override
-    {
+    void SetUp() override {
         m_alexaMockFactory = AlexaTestHelper::createAlexaMockComponentFactory();
-        
+
         // initialize the avs device SDK
-        ASSERT_TRUE( alexaClientSDK::avsCommon::avs::initialization::AlexaClientSDKInit::initialize( { AlexaTestHelper::getAVSConfig() } ) ) << "Initialize AVS Device SDK Failed!";
-        
+        ASSERT_TRUE(alexaClientSDK::avsCommon::avs::initialization::AlexaClientSDKInit::initialize(
+            {AlexaTestHelper::getAVSConfig()}))
+            << "Initialize AVS Device SDK Failed!";
+
         // initialized succeeded
         m_initialized = true;
     }
 
-    void TearDown() override
-    {
-        if( m_initialized )
-        {
+    void TearDown() override {
+        if (m_initialized) {
             m_alexaMockFactory->shutdown();
-        
+
             alexaClientSDK::avsCommon::avs::initialization::AlexaClientSDKInit::uninitialize();
-            
+
             m_initialized = false;
         }
     }
-    
+
 protected:
-    void configure()
-    {
-        if( m_configured == false )
-        {
-            EXPECT_CALL(*m_alexaMockFactory->getAudioManagerMock(),openAudioInputChannel("SpeechRecognizer",aace::audio::AudioInputProvider::AudioInputType::VOICE))
+    void configure() {
+        if (m_configured == false) {
+            EXPECT_CALL(
+                *m_alexaMockFactory->getAudioManagerMock(),
+                openAudioInputChannel("SpeechRecognizer", aace::audio::AudioInputProvider::AudioInputType::VOICE))
                 .WillOnce(testing::Return(m_alexaMockFactory->getAudioInputChannelMock()));
-            EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),addDirectiveHandler(testing::_)).WillOnce(testing::Return(true));
-            EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),doShutdown());
-            
+            EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(), doShutdown());
+            EXPECT_CALL(*m_alexaMockFactory->getDeviceSettingsDelegateMock(), configureWakeWordConfirmationSetting())
+                .WillOnce(::testing::Return(true));
+            EXPECT_CALL(*m_alexaMockFactory->getDeviceSettingsDelegateMock(), configureSpeechConfirmationSetting())
+                .WillOnce(::testing::Return(true));
+            EXPECT_CALL(*m_alexaMockFactory->getDeviceSettingsDelegateMock(), configureLocaleSetting(testing::_))
+                .WillOnce(::testing::Return(true));
+
+            auto mockWakeWordConfirmationSetting = std::make_shared<alexaClientSDK::settings::test::MockSetting<
+                alexaClientSDK::settings::WakeWordConfirmationSetting::ValueType>>(
+                alexaClientSDK::settings::getWakeWordConfirmationDefault());
+            EXPECT_CALL(*m_alexaMockFactory->getDeviceSettingsDelegateMock(), getWakeWordConfirmationSetting())
+                .WillOnce(::testing::Return(mockWakeWordConfirmationSetting));
+
+            auto mockSpeechConfirmationSetting = std::make_shared<alexaClientSDK::settings::test::MockSetting<
+                alexaClientSDK::settings::SpeechConfirmationSetting::ValueType>>(
+                alexaClientSDK::settings::getSpeechConfirmationDefault());
+            EXPECT_CALL(*m_alexaMockFactory->getDeviceSettingsDelegateMock(), getSpeechConfirmationSetting())
+                .WillOnce(::testing::Return(mockSpeechConfirmationSetting));
+
+            auto mockWakeWordsSetting = std::make_shared<
+                alexaClientSDK::settings::test::MockSetting<alexaClientSDK::settings::WakeWordsSetting::ValueType>>(
+                SUPPORTED_WAKE_WORDS);
+            EXPECT_CALL(*m_alexaMockFactory->getDeviceSettingsDelegateMock(), getWakeWordsSetting())
+                .WillOnce(::testing::Return(mockWakeWordsSetting));
+
+            EXPECT_CALL(*m_alexaMockFactory->getWakewordEngineAdapterMock(), initialize(testing::_, testing::_))
+                .WillOnce(::testing::Return(true));
+
             m_configured = true;
         }
     }
-    
-    std::shared_ptr<aace::engine::alexa::SpeechRecognizerEngineImpl> createSpeechRecognizerEngineImpl()
-    {
-        if( m_configured == false ) {
+
+    std::shared_ptr<aace::engine::alexa::SpeechRecognizerEngineImpl> createSpeechRecognizerEngineImpl() {
+        if (m_configured == false) {
             configure();
         }
-        
+
         auto speechRecognizerEngineImpl = aace::engine::alexa::SpeechRecognizerEngineImpl::create(
             m_alexaMockFactory->getSpeechRecognizerMock(),
             m_alexaMockFactory->getEndpointBuilderMock(),
@@ -97,20 +127,19 @@ protected:
             m_alexaMockFactory->getSpeechEncoderMock(),
             m_alexaMockFactory->getWakewordEngineAdapterMock(),
             m_alexaMockFactory->getWakewordVerifierMock());
-        
+
         return speechRecognizerEngineImpl;
     }
-    
-    alexaClientSDK::avsCommon::utils::AudioFormat createAudioFormat()
-    {
+
+    alexaClientSDK::avsCommon::utils::AudioFormat createAudioFormat() {
         alexaClientSDK::avsCommon::utils::AudioFormat format;
-        
+
         format.sampleRateHz = 16000;
         format.sampleSizeInBits = 16;
         format.numChannels = 1;
         format.endianness = alexaClientSDK::avsCommon::utils::AudioFormat::Endianness::LITTLE;
         format.encoding = alexaClientSDK::avsCommon::utils::AudioFormat::Encoding::LPCM;
-    
+
         return format;
     }
 
@@ -122,17 +151,15 @@ private:
     bool m_configured = false;
 };
 
-TEST_F(SpeechRecognizerEngineImplTest, create)
-{
+TEST_F(SpeechRecognizerEngineImplTest, create) {
     auto speechRecognizerEngineImpl = createSpeechRecognizerEngineImpl();
-    ASSERT_NE(speechRecognizerEngineImpl,nullptr) << "SpeechRecognizerEngineImpl pointer expected to be not null";
-    
+    ASSERT_NE(speechRecognizerEngineImpl, nullptr) << "SpeechRecognizerEngineImpl pointer expected to be not null";
+
     speechRecognizerEngineImpl->shutdown();
 }
 
-TEST_F(SpeechRecognizerEngineImplTest,createWithPlatformInterfaceAsNull)
-{
-    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),doShutdown());
+TEST_F(SpeechRecognizerEngineImplTest, createWithPlatformInterfaceAsNull) {
+    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(), doShutdown());
 
     auto speechRecognizerEngineImpl = aace::engine::alexa::SpeechRecognizerEngineImpl::create(
         nullptr,
@@ -154,13 +181,12 @@ TEST_F(SpeechRecognizerEngineImplTest,createWithPlatformInterfaceAsNull)
         m_alexaMockFactory->getSpeechEncoderMock(),
         m_alexaMockFactory->getWakewordEngineAdapterMock(),
         m_alexaMockFactory->getWakewordVerifierMock());
-    
-    ASSERT_EQ(speechRecognizerEngineImpl,nullptr) << "SpeechRecognizerEngineImpl pointer expected to be null";
+
+    ASSERT_EQ(speechRecognizerEngineImpl, nullptr) << "SpeechRecognizerEngineImpl pointer expected to be null";
 }
 
-TEST_F(SpeechRecognizerEngineImplTest, createWithAudioManagerInterfaceAsNull)
-{
-    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),doShutdown());
+TEST_F(SpeechRecognizerEngineImplTest, createWithAudioManagerInterfaceAsNull) {
+    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(), doShutdown());
 
     auto speechRecognizerEngineImpl = aace::engine::alexa::SpeechRecognizerEngineImpl::create(
         m_alexaMockFactory->getSpeechRecognizerMock(),
@@ -182,12 +208,11 @@ TEST_F(SpeechRecognizerEngineImplTest, createWithAudioManagerInterfaceAsNull)
         m_alexaMockFactory->getSpeechEncoderMock(),
         m_alexaMockFactory->getWakewordEngineAdapterMock(),
         m_alexaMockFactory->getWakewordVerifierMock());
-    
-    ASSERT_EQ(speechRecognizerEngineImpl,nullptr) << "SpeechRecognizerEngineImpl pointer expected to be null";
+
+    ASSERT_EQ(speechRecognizerEngineImpl, nullptr) << "SpeechRecognizerEngineImpl pointer expected to be null";
 }
 
-TEST_F(SpeechRecognizerEngineImplTest,createWithDirectiveSequencerAsNull)
-{
+TEST_F(SpeechRecognizerEngineImplTest, createWithDirectiveSequencerAsNull) {
     auto speechRecognizerEngineImpl = aace::engine::alexa::SpeechRecognizerEngineImpl::create(
         m_alexaMockFactory->getSpeechRecognizerMock(),
         m_alexaMockFactory->getEndpointBuilderMock(),
@@ -208,13 +233,12 @@ TEST_F(SpeechRecognizerEngineImplTest,createWithDirectiveSequencerAsNull)
         m_alexaMockFactory->getSpeechEncoderMock(),
         m_alexaMockFactory->getWakewordEngineAdapterMock(),
         m_alexaMockFactory->getWakewordVerifierMock());
-    
-    ASSERT_EQ(speechRecognizerEngineImpl,nullptr) << "SpeechRecognizerEngineImpl pointer expected to be null";
+
+    ASSERT_EQ(speechRecognizerEngineImpl, nullptr) << "SpeechRecognizerEngineImpl pointer expected to be null";
 }
 
-TEST_F(SpeechRecognizerEngineImplTest,createWithMessageSenderAsNull)
-{
-    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),doShutdown());
+TEST_F(SpeechRecognizerEngineImplTest, createWithMessageSenderAsNull) {
+    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(), doShutdown());
 
     auto speechRecognizerEngineImpl = aace::engine::alexa::SpeechRecognizerEngineImpl::create(
         m_alexaMockFactory->getSpeechRecognizerMock(),
@@ -236,13 +260,12 @@ TEST_F(SpeechRecognizerEngineImplTest,createWithMessageSenderAsNull)
         m_alexaMockFactory->getSpeechEncoderMock(),
         m_alexaMockFactory->getWakewordEngineAdapterMock(),
         m_alexaMockFactory->getWakewordVerifierMock());
-    
-    ASSERT_EQ(speechRecognizerEngineImpl,nullptr) << "SpeechRecognizerEngineImpl pointer expected to be null";
+
+    ASSERT_EQ(speechRecognizerEngineImpl, nullptr) << "SpeechRecognizerEngineImpl pointer expected to be null";
 }
 
-TEST_F(SpeechRecognizerEngineImplTest,createWithContextManagerAsNull)
-{
-    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),doShutdown());
+TEST_F(SpeechRecognizerEngineImplTest, createWithContextManagerAsNull) {
+    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(), doShutdown());
 
     auto speechRecognizerEngineImpl = aace::engine::alexa::SpeechRecognizerEngineImpl::create(
         m_alexaMockFactory->getSpeechRecognizerMock(),
@@ -264,13 +287,12 @@ TEST_F(SpeechRecognizerEngineImplTest,createWithContextManagerAsNull)
         m_alexaMockFactory->getSpeechEncoderMock(),
         m_alexaMockFactory->getWakewordEngineAdapterMock(),
         m_alexaMockFactory->getWakewordVerifierMock());
-    
-    ASSERT_EQ(speechRecognizerEngineImpl,nullptr) << "SpeechRecognizerEngineImpl pointer expected to be null";
+
+    ASSERT_EQ(speechRecognizerEngineImpl, nullptr) << "SpeechRecognizerEngineImpl pointer expected to be null";
 }
 
-TEST_F(SpeechRecognizerEngineImplTest,createWithFocusManagerAsNull)
-{
-    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),doShutdown());
+TEST_F(SpeechRecognizerEngineImplTest, createWithFocusManagerAsNull) {
+    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(), doShutdown());
 
     auto speechRecognizerEngineImpl = aace::engine::alexa::SpeechRecognizerEngineImpl::create(
         m_alexaMockFactory->getSpeechRecognizerMock(),
@@ -292,13 +314,12 @@ TEST_F(SpeechRecognizerEngineImplTest,createWithFocusManagerAsNull)
         m_alexaMockFactory->getSpeechEncoderMock(),
         m_alexaMockFactory->getWakewordEngineAdapterMock(),
         m_alexaMockFactory->getWakewordVerifierMock());
-    
-    ASSERT_EQ(speechRecognizerEngineImpl,nullptr) << "SpeechRecognizerEngineImpl pointer expected to be null";
+
+    ASSERT_EQ(speechRecognizerEngineImpl, nullptr) << "SpeechRecognizerEngineImpl pointer expected to be null";
 }
 
-TEST_F(SpeechRecognizerEngineImplTest,createWithDialogUXStateAggregatorAsNull)
-{
-    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),doShutdown());
+TEST_F(SpeechRecognizerEngineImplTest, createWithDialogUXStateAggregatorAsNull) {
+    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(), doShutdown());
 
     auto speechRecognizerEngineImpl = aace::engine::alexa::SpeechRecognizerEngineImpl::create(
         m_alexaMockFactory->getSpeechRecognizerMock(),
@@ -320,13 +341,12 @@ TEST_F(SpeechRecognizerEngineImplTest,createWithDialogUXStateAggregatorAsNull)
         m_alexaMockFactory->getSpeechEncoderMock(),
         m_alexaMockFactory->getWakewordEngineAdapterMock(),
         m_alexaMockFactory->getWakewordVerifierMock());
-    
-    ASSERT_EQ(speechRecognizerEngineImpl,nullptr) << "SpeechRecognizerEngineImpl pointer expected to be null";
+
+    ASSERT_EQ(speechRecognizerEngineImpl, nullptr) << "SpeechRecognizerEngineImpl pointer expected to be null";
 }
 
-TEST_F(SpeechRecognizerEngineImplTest, createWithCapabilitiesDelegateAsNull)
-{
-    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),doShutdown());
+TEST_F(SpeechRecognizerEngineImplTest, createWithCapabilitiesDelegateAsNull) {
+    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(), doShutdown());
 
     auto speechRecognizerEngineImpl = aace::engine::alexa::SpeechRecognizerEngineImpl::create(
         m_alexaMockFactory->getSpeechRecognizerMock(),
@@ -348,13 +368,12 @@ TEST_F(SpeechRecognizerEngineImplTest, createWithCapabilitiesDelegateAsNull)
         m_alexaMockFactory->getSpeechEncoderMock(),
         m_alexaMockFactory->getWakewordEngineAdapterMock(),
         m_alexaMockFactory->getWakewordVerifierMock());
-    
-    ASSERT_EQ(speechRecognizerEngineImpl,nullptr) << "SpeechRecognizerEngineImpl pointer expected to be null";
+
+    ASSERT_EQ(speechRecognizerEngineImpl, nullptr) << "SpeechRecognizerEngineImpl pointer expected to be null";
 }
 
-TEST_F(SpeechRecognizerEngineImplTest,createWithExceptionSenderAsNull)
-{
-    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),doShutdown());
+TEST_F(SpeechRecognizerEngineImplTest, createWithExceptionSenderAsNull) {
+    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(), doShutdown());
 
     auto speechRecognizerEngineImpl = aace::engine::alexa::SpeechRecognizerEngineImpl::create(
         m_alexaMockFactory->getSpeechRecognizerMock(),
@@ -377,12 +396,11 @@ TEST_F(SpeechRecognizerEngineImplTest,createWithExceptionSenderAsNull)
         m_alexaMockFactory->getWakewordEngineAdapterMock(),
         m_alexaMockFactory->getWakewordVerifierMock());
 
-    ASSERT_EQ(speechRecognizerEngineImpl,nullptr) << "SpeechRecognizerEngineImpl pointer expected to be null";
+    ASSERT_EQ(speechRecognizerEngineImpl, nullptr) << "SpeechRecognizerEngineImpl pointer expected to be null";
 }
 
-TEST_F(SpeechRecognizerEngineImplTest,createWithUserInactivityMonitorAsNull)
-{
-    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),doShutdown());
+TEST_F(SpeechRecognizerEngineImplTest, createWithUserInactivityMonitorAsNull) {
+    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(), doShutdown());
 
     auto speechRecognizerEngineImpl = aace::engine::alexa::SpeechRecognizerEngineImpl::create(
         m_alexaMockFactory->getSpeechRecognizerMock(),
@@ -404,6 +422,6 @@ TEST_F(SpeechRecognizerEngineImplTest,createWithUserInactivityMonitorAsNull)
         m_alexaMockFactory->getSpeechEncoderMock(),
         m_alexaMockFactory->getWakewordEngineAdapterMock(),
         m_alexaMockFactory->getWakewordVerifierMock());
-    
-    ASSERT_EQ(speechRecognizerEngineImpl,nullptr) << "SpeechRecognizerEngineImpl pointer expected to be null";
+
+    ASSERT_EQ(speechRecognizerEngineImpl, nullptr) << "SpeechRecognizerEngineImpl pointer expected to be null";
 }

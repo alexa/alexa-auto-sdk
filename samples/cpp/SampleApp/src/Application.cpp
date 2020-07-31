@@ -17,20 +17,20 @@
 
 // C++ Standard Library
 #ifdef __linux__
-#include <linux/limits.h> // PATH_MAX
+#include <linux/limits.h>  // PATH_MAX
 #endif
-#include <algorithm> // std::find, std::for_each
-#include <csignal>   // std::signal and SIG_ERR macro
-#include <cstdlib>   // EXIT_SUCCESS and EXIT_FAILURE macros, std::atexit
+#include <algorithm>  // std::find, std::for_each
+#include <csignal>    // std::signal and SIG_ERR macro
+#include <cstdlib>    // EXIT_SUCCESS and EXIT_FAILURE macros, std::atexit
 // https://llvm.org/docs/CodingStandards.html#include-iostream-is-forbidden
-#include <iostream> // std::clog and std::cout
+#include <iostream>  // std::clog and std::cout
 #include <fstream>
 //
-#include <iomanip> // std::setw
-#include <regex>   // std::regex
-#include <set>     // std::set
-#include <sstream> // std::stringstream
-#include <vector>  // std::vector
+#include <iomanip>  // std::setw
+#include <regex>    // std::regex
+#include <set>      // std::set
+#include <sstream>  // std::stringstream
+#include <vector>   // std::vector
 
 // Guidelines Support Library
 #define GSL_THROW_ON_CONTRACT_VIOLATION
@@ -54,7 +54,9 @@ Application::Application() = default;
 
 #ifdef MONITORAIRPLANEMODEEVENTS
 // Monitors airplane mode events and sends a network status changed event when the airplane mode changes
-void monitorAirplaneModeEvents(std::shared_ptr<Activity> activity, std::shared_ptr<logger::LoggerHandler> loggerHandler) {
+void monitorAirplaneModeEvents(
+    std::shared_ptr<Activity> activity,
+    std::shared_ptr<logger::LoggerHandler> loggerHandler) {
     // # Tested on Linux Ubuntu 16.04 LTS
     // $ rfkill event
     // 1567307554.400006: idx 1 type 1 op 0 soft 0 hard 0
@@ -88,25 +90,26 @@ void monitorAirplaneModeEvents(std::shared_ptr<Activity> activity, std::shared_p
         }
     }
 }
-#endif // MONITORAIRPLANEMODEEVENTS
+#endif  // MONITORAIRPLANEMODEEVENTS
 
 // Parses config files so that handlers can check that required config is passed in
 void parseConfigurations(const std::vector<std::string>& configFilePaths, std::vector<json>& configs) {
-    for(auto const& path: configFilePaths) {
+    for (auto const& path : configFilePaths) {
         try {
             std::ifstream ifs(path);
             json j = json::parse(ifs);
             configs.push_back(j);
-        } catch (std::exception &e) {
+        } catch (std::exception& e) {
         }
     }
 }
 
-void Application::printMenu(std::shared_ptr<ApplicationContext> applicationContext,
-                            std::shared_ptr<aace::core::Engine> engine,
-                            std::shared_ptr<sampleApp::propertyManager::PropertyManagerHandler> propertyManagerHandler,
-                            std::shared_ptr<View> console,
-                            const std::string &id) {
+void Application::printMenu(
+    std::shared_ptr<ApplicationContext> applicationContext,
+    std::shared_ptr<aace::core::Engine> engine,
+    std::shared_ptr<sampleApp::propertyManager::PropertyManagerHandler> propertyManagerHandler,
+    std::shared_ptr<View> console,
+    const std::string& id) {
     // ACTIONS:
     //   AudioFile
     //   GoBack
@@ -154,30 +157,30 @@ void Application::printMenu(std::shared_ptr<ApplicationContext> applicationConte
            << std::endl;
     if (menu.count("item")) {
         unsigned keyMax = 0;
-        for (auto &item : menu.at("item")) {
-            if (item.count("test")) { // optional item.test
+        for (auto& item : menu.at("item")) {
+            if (item.count("test")) {  // optional item.test
                 auto value = item.at("test").get<std::string>();
                 if (!applicationContext->test(value)) {
                     continue;
                 }
             }
-            auto key = item.at("key").get<std::string>(); // required item.key
+            auto key = item.at("key").get<std::string>();  // required item.key
             auto keyLength = key.length();
             if (keyMax < keyLength) {
                 keyMax = keyLength;
             }
         }
         unsigned index = 0;
-        for (auto &item : menu.at("item")) {
-            if (item.count("test")) { // optional item.test
+        for (auto& item : menu.at("item")) {
+            if (item.count("test")) {  // optional item.test
                 auto value = item.at("test").get<std::string>();
                 if (!applicationContext->test(value)) {
                     continue;
                 }
             }
-            auto action = item.at("do").get<std::string>(); // required item.do
-            auto key = item.at("key").get<std::string>();   // required item.key
-            auto name = item.at("name").get<std::string>(); // required item.name
+            auto action = item.at("do").get<std::string>();  // required item.do
+            auto key = item.at("key").get<std::string>();    // required item.key
+            auto name = item.at("name").get<std::string>();  // required item.name
             auto keyLength = key.length();
             auto underline = false;
             if (action == "Select") {
@@ -218,15 +221,16 @@ void Application::printMenu(std::shared_ptr<ApplicationContext> applicationConte
                     underline = (item.count("value") && item.at("value").get<std::string>() == ss.str());
                 }
             } else if (action == "SetProperty") {
-                auto value = item.at("value").get<std::string>(); // required item.value
+                auto value = item.at("value").get<std::string>();  // required item.value
                 static std::regex r("^([^/]+)/(.+)", std::regex::optimize);
                 std::smatch sm{};
                 if (std::regex_match(value, sm, r) || ((sm.size() - 1) == 2)) {
                     underline = (propertyManagerHandler->getProperty(sm[1]) == sm[2]);
                 }
-            } 
+            }
             if (underline) {
-                stream << " [ " + key + " ]  " << std::string(keyMax - keyLength, ' ') << "\e[4m" << name << "\e[0m" << std::endl;
+                stream << " [ " + key + " ]  " << std::string(keyMax - keyLength, ' ') << "\e[4m" << name << "\e[0m"
+                       << std::endl;
             } else {
                 stream << " [ " + key + " ]  " << std::string(keyMax - keyLength, ' ') << name << std::endl;
             }
@@ -248,15 +252,15 @@ void Application::printMenu(std::shared_ptr<ApplicationContext> applicationConte
         int left = balance > 1 ? balance / 2 : 0;
         stream << std::string(left, ' ') << string << std::endl;
     }
-    stream << std::endl;
-    console->print(stream.str());
+    console->printLine(stream.str());
 }
 
-void Application::printMenuText(std::shared_ptr<ApplicationContext> applicationContext,
-                                std::shared_ptr<View> console,
-                                const std::string &menuId,
-                                const std::string &textId,
-                                std::map<std::string, std::string> variables) {
+void Application::printMenuText(
+    std::shared_ptr<ApplicationContext> applicationContext,
+    std::shared_ptr<View> console,
+    const std::string& menuId,
+    const std::string& textId,
+    std::map<std::string, std::string> variables) {
     auto menu = applicationContext->getMenu(menuId);
     if ((menu != nullptr) && menu.count("text")) {
         auto text = menu.at("text");
@@ -267,14 +271,17 @@ void Application::printMenuText(std::shared_ptr<ApplicationContext> applicationC
             text = json::array({text});
         }
         if (text.is_array()) {
-            for (auto &item : text) {
+            for (auto& item : text) {
                 printStringLine(console, item.get<std::string>(), variables);
             }
         }
     }
 }
 
-void Application::printStringLine(std::shared_ptr<View> console, const std::string &string, std::map<std::string, std::string> variables) {
+void Application::printStringLine(
+    std::shared_ptr<View> console,
+    const std::string& string,
+    std::map<std::string, std::string> variables) {
     auto s = string;
     static std::regex r("\\$\\{([a-zA-Z]+)\\}", std::regex::optimize);
     std::smatch sm{};
@@ -325,12 +332,12 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
 
     // Special case for test automation
     if (applicationContext->isTestAutomation()) {
-        activity->registerObserver(Event::onTestAutomationConnect, [&](const std::string &) {
+        activity->registerObserver(Event::onTestAutomationConnect, [&](const std::string&) {
             connected = true;
             activity->notify(Event::onTestAutomationProcess);
             return true;
         });
-        activity->registerObserver(Event::onTestAutomationProcess, [&](const std::string &) {
+        activity->registerObserver(Event::onTestAutomationProcess, [&](const std::string&) {
             if (connected) {
                 auto audioFilePath = applicationContext->popAudioFilePath();
                 if (!audioFilePath.empty()) {
@@ -362,7 +369,7 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     // Create configuration files for --config files path passed from the command line
     std::vector<std::shared_ptr<aace::core::config::EngineConfiguration>> configurationFiles;
     auto configFilePaths = applicationContext->getConfigFilePaths();
-    for (auto &configFilePath : configFilePaths) {
+    for (auto& configFilePath : configFilePaths) {
         auto configurationFile = aace::core::config::ConfigurationFile::create(configFilePath);
         Ensures(configurationFile != nullptr);
         configurationFiles.push_back(configurationFile);
@@ -386,7 +393,8 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     // can also be passed in to the application. This example builds a
     // configuration programatically if one is not passed in to the application.
     // ------------------------------------------------------------------------
-    if (!carControl::CarControlHandler::checkConfiguration(jsonConfigs, carControl::CarControlHandler::ConfigType::CAR)) {
+    if (!carControl::CarControlHandler::checkConfiguration(
+            jsonConfigs, carControl::CarControlHandler::ConfigType::CAR)) {
         console->printRuler();
         console->printLine("Car control configuration was created");
         console->printRuler();
@@ -400,32 +408,33 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     // Initialize values for car control configuration controllers
     carControl::CarControlDataProvider::initialize(configurationFiles);
 
-    if (applicationContext->isAlexaCommsSupported() || applicationContext->isLocalVoiceControlSupported() || applicationContext->isDcmSupported()) {
-        
+    if (applicationContext->isAlexaCommsSupported() || applicationContext->isLocalVoiceControlSupported() ||
+        applicationContext->isDcmSupported()) {
 #ifdef ALEXACOMMS
         // Config file must be specified
         if (!communication::CommunicationHandler::checkConfiguration(jsonConfigs)) {
             console->printRuler();
             console->printLine("Alexa Communications is enabled but no configuration was found.");
             console->printRuler();
-            configError = true; 
+            configError = true;
         }
 #endif
 #ifdef LOCALVOICECONTROL
         // Config file must be specified
-        if (!carControl::CarControlHandler::checkConfiguration(jsonConfigs, carControl::CarControlHandler::ConfigType::LVC)) {
+        if (!carControl::CarControlHandler::checkConfiguration(
+                jsonConfigs, carControl::CarControlHandler::ConfigType::LVC)) {
             console->printRuler();
             console->printLine("Local Voice Control is enabled but no configuration was found.");
             console->printRuler();
-            configError = true; 
+            configError = true;
         }
 #endif
 #ifdef DCM
-        if(!applicationContext->checkDcmConfiguration(jsonConfigs)) {
+        if (!applicationContext->checkDcmConfiguration(jsonConfigs)) {
             console->printRuler();
             console->printLine("DCM is enabled but no configuration was found.");
             console->printRuler();
-            configError = true; 
+            configError = true;
         }
 #endif
 
@@ -433,7 +442,7 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
             if (!engine->shutdown()) {
                 console->printLine("Error: Engine could not be shutdown");
             }
-             
+
             return Status::Failure;
         }
     }
@@ -460,11 +469,10 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     Ensures(defaultAudioInputProvider != nullptr);
     // registering the default audio input provider can fail if another implementation
     // has already been registered by the engine...
-    if(!engine->registerPlatformInterface(defaultAudioInputProvider)){
+    if (!engine->registerPlatformInterface(defaultAudioInputProvider)) {
         defaultAudioInputProvider.reset();
         console->printLine("Default audio input provider will not be registered because audio support is available.");
-    }
-    else {
+    } else {
         // defer setup until after successful registration
         defaultAudioInputProvider->setupUI();
         applicationContext->setAudioFileSupported(true);
@@ -474,11 +482,10 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     Ensures(defaultAudioOutputProvider != nullptr);
     // registering the default audio output provider can fail if another implementation
     // has already been registered by the engine...
-    if(!engine->registerPlatformInterface(defaultAudioOutputProvider)){
+    if (!engine->registerPlatformInterface(defaultAudioOutputProvider)) {
         defaultAudioOutputProvider.reset();
         console->printLine("Default audio output provider will not be registered because audio support is available.");
-    }
-    else {
+    } else {
         // defer setup until after successful registration
         defaultAudioOutputProvider->setupUI();
     }
@@ -520,8 +527,7 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
 
 #ifdef ALEXACOMMS
     // Communications
-    auto communicationHandler =
-        communication::CommunicationHandler::create(activity, loggerHandler);
+    auto communicationHandler = communication::CommunicationHandler::create(activity, loggerHandler);
     Ensures(communicationHandler != nullptr);
     if (!engine->registerPlatformInterface(communicationHandler)) {
         loggerHandler->log(Level::INFO, "Application:Engine", "failed to register communication handler");
@@ -531,28 +537,26 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
         }
         return Status::Failure;
     }
-#endif // ALEXACOMMS
+#endif  // ALEXACOMMS
 
     // Equalizer Controller
     auto equalizerControllerHandler = alexa::EqualizerControllerHandler::create(activity, loggerHandler);
     Ensures(equalizerControllerHandler != nullptr);
     Ensures(engine->registerPlatformInterface(equalizerControllerHandler));
 
-    std::vector<std::pair<aace::alexa::LocalMediaSource::Source, std::shared_ptr<alexa::LocalMediaSourceHandler>>> LocalMediaSources = {
-        { aace::alexa::LocalMediaSource::Source::BLUETOOTH, nullptr },
-        { aace::alexa::LocalMediaSource::Source::USB, nullptr },
-        { aace::alexa::LocalMediaSource::Source::FM_RADIO, nullptr },
-        { aace::alexa::LocalMediaSource::Source::AM_RADIO, nullptr },
-        { aace::alexa::LocalMediaSource::Source::SATELLITE_RADIO, nullptr },
-        { aace::alexa::LocalMediaSource::Source::LINE_IN, nullptr },
-        { aace::alexa::LocalMediaSource::Source::COMPACT_DISC, nullptr },
-        /*{ aace::alexa::LocalMediaSource::Source::SIRIUS_XM, nullptr },*/
-        { aace::alexa::LocalMediaSource::Source::DAB, nullptr }
-    };
+    std::vector<std::pair<aace::alexa::LocalMediaSource::Source, std::shared_ptr<alexa::LocalMediaSourceHandler>>>
+        LocalMediaSources = {{aace::alexa::LocalMediaSource::Source::BLUETOOTH, nullptr},
+                             {aace::alexa::LocalMediaSource::Source::USB, nullptr},
+                             {aace::alexa::LocalMediaSource::Source::FM_RADIO, nullptr},
+                             {aace::alexa::LocalMediaSource::Source::AM_RADIO, nullptr},
+                             {aace::alexa::LocalMediaSource::Source::SATELLITE_RADIO, nullptr},
+                             {aace::alexa::LocalMediaSource::Source::LINE_IN, nullptr},
+                             {aace::alexa::LocalMediaSource::Source::COMPACT_DISC, nullptr},
+                             /*{ aace::alexa::LocalMediaSource::Source::SIRIUS_XM, nullptr },*/
+                             {aace::alexa::LocalMediaSource::Source::DAB, nullptr}};
 
-    for(auto& source : LocalMediaSources) {
-        source.second =
-            alexa::LocalMediaSourceHandler::create(activity, loggerHandler, source.first);
+    for (auto& source : LocalMediaSources) {
+        source.second = alexa::LocalMediaSourceHandler::create(activity, loggerHandler, source.first);
         Ensures(source.second != nullptr);
         Ensures(engine->registerPlatformInterface(source.second));
     }
@@ -561,6 +565,11 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     auto globalPresetHandler = alexa::GlobalPresetHandler::create(activity, loggerHandler);
     Ensures(globalPresetHandler != nullptr);
     Ensures(engine->registerPlatformInterface(globalPresetHandler));
+
+    // Messaging
+    auto messagingHandler = messaging::MessagingHandler::create(activity, loggerHandler);
+    Ensures(messagingHandler != nullptr);
+    Ensures(engine->registerPlatformInterface(messagingHandler));
 
     // Navigation
     auto navigationHandler = navigation::NavigationHandler::create(activity, loggerHandler);
@@ -581,16 +590,16 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     auto playbackControllerHandler = alexa::PlaybackControllerHandler::create(activity, loggerHandler);
     Ensures(playbackControllerHandler != nullptr);
     Ensures(engine->registerPlatformInterface(playbackControllerHandler));
-    
+
     // Property Manager
-    auto propertyManagerHandler = propertyManager::PropertyManagerHandler::create( loggerHandler );
+    auto propertyManagerHandler = propertyManager::PropertyManagerHandler::create(loggerHandler);
     Ensures(propertyManagerHandler != nullptr);
     Ensures(engine->registerPlatformInterface(propertyManagerHandler));
 
     // Speech Recognizer
     // Note : Expects PropertyManager to be not null.
-    auto speechRecognizerHandler =
-        alexa::SpeechRecognizerHandler::create(activity, loggerHandler, propertyManagerHandler, applicationContext->isWakeWordSupported());
+    auto speechRecognizerHandler = alexa::SpeechRecognizerHandler::create(
+        activity, loggerHandler, propertyManagerHandler, applicationContext->isWakeWordSupported());
     Ensures(speechRecognizerHandler != nullptr);
     Ensures(engine->registerPlatformInterface(speechRecognizerHandler));
 
@@ -649,13 +658,14 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     // Start a thread to monitor airplane mode events
     std::thread monitorAirplaneModeEventsThread(monitorAirplaneModeEvents, activity, loggerHandler);
     monitorAirplaneModeEventsThread.detach();
-#endif // MONITORAIRPLANEMODEEVENTS
+#endif  // MONITORAIRPLANEMODEEVENTS
 
 #ifdef ALEXACOMMS
     // Workaround: Enable Phone Connection since it is needed by Alexa Comms. This limitation will go away in the future. Refer to
     // Alexa Comms README for more information.
-    phoneCallControllerHandler->connectionStateChanged(phoneControl::PhoneCallControllerHandler::ConnectionState::CONNECTED);
-#endif // ALEXACOMMS
+    phoneCallControllerHandler->connectionStateChanged(
+        phoneControl::PhoneCallControllerHandler::ConnectionState::CONNECTED);
+#endif  // ALEXACOMMS
 
     // Setup the interactive text based menu system
     setupMenu(applicationContext, engine, propertyManagerHandler, console);
@@ -708,7 +718,7 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     }
 
     // Releases the ownership of the managed objects
-    for (auto &configurationFile : configurationFiles) {
+    for (auto& configurationFile : configurationFiles) {
         configurationFile.reset();
     }
 
@@ -717,12 +727,13 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     return status;
 }
 
-Status Application::runMenu(std::shared_ptr<ApplicationContext> applicationContext,
-                            std::shared_ptr<aace::core::Engine> engine,
-                            std::shared_ptr<sampleApp::propertyManager::PropertyManagerHandler> propertyManagerHandler,
-                            std::shared_ptr<Activity> activity,
-                            std::shared_ptr<View> console,
-                            const std::string &id) {
+Status Application::runMenu(
+    std::shared_ptr<ApplicationContext> applicationContext,
+    std::shared_ptr<aace::core::Engine> engine,
+    std::shared_ptr<sampleApp::propertyManager::PropertyManagerHandler> propertyManagerHandler,
+    std::shared_ptr<Activity> activity,
+    std::shared_ptr<View> console,
+    const std::string& id) {
     auto status = Status::Unknown;
     std::vector<std::string> stack{id};
     auto ptr = applicationContext->getMenuPtr(id);
@@ -738,7 +749,8 @@ Status Application::runMenu(std::shared_ptr<ApplicationContext> applicationConte
         static const unsigned char ESC = '\e';
         static const unsigned char HELP = '?';
         static const unsigned char QUIT = 'q';
-        static const unsigned char STOP = 'x';
+        static const unsigned char STOP_ACTIVE_DOMAIN = 'x';
+        static const unsigned char STOP_FOREGROUND_ACTIVITY = '!';
         static const unsigned char TALK = ' ';
         // clang-format off
         std::map<std::string, std::string> variables{
@@ -750,32 +762,35 @@ Status Application::runMenu(std::shared_ptr<ApplicationContext> applicationConte
         unsigned index = 0;
         // available on all menus
         switch (c) {
-            case DELETE: // nothing
+            case DELETE:  // nothing
                 variables["KEY"] = "delete";
                 break;
-            case ENTER: // nothing
+            case ENTER:  // nothing
                 variables["KEY"] = "enter";
                 break;
-            case ESC: // go back
+            case ESC:  // go back
                 variables["KEY"] = "esc";
                 break;
-            case HELP: // print help
+            case HELP:  // print help
                 variables["KEY"] = std::string({static_cast<char>(HELP)});
                 break;
-            case QUIT: // quit app
+            case QUIT:  // quit app
                 variables["KEY"] = std::string({static_cast<char>(std::toupper(QUIT))});
                 break;
-            case STOP: // exit the active domain
-                variables["KEY"] = std::string({static_cast<char>(std::toupper(STOP))});
+            case STOP_ACTIVE_DOMAIN:  // exit the active domain
+                variables["KEY"] = std::string({static_cast<char>(std::toupper(STOP_ACTIVE_DOMAIN))});
                 break;
-            case TALK: // tap-to-talk convenience
+            case TALK:  // tap-to-talk convenience
                 variables["KEY"] = "space";
+                break;
+            case STOP_FOREGROUND_ACTIVITY:
+                variables["KEY"] = "!";
                 break;
             default:
                 variables["KEY"] = std::string({static_cast<char>(std::toupper(c))});
                 // break range-based for loop
-                for (auto &item : menuPtr->at("item")) {
-                    auto key = item.at("key").get<std::string>(); // required item.key
+                for (auto& item : menuPtr->at("item")) {
+                    auto key = item.at("key").get<std::string>();  // required item.key
                     if ((key == "delete") || (key == "DELETE")) {
                         k = DELETE;
                     } else if ((key == "enter") || (key == "ENTER")) {
@@ -801,33 +816,34 @@ Status Application::runMenu(std::shared_ptr<ApplicationContext> applicationConte
             unsigned char k = '\0';
             unsigned index = 0;
             // break range-based for loop
-            for (auto &item : menuPtr->at("item")) {
-                if (item.count("test")) { // optional item.test
+            for (auto& item : menuPtr->at("item")) {
+                if (item.count("test")) {  // optional item.test
                     auto value = item.at("test").get<std::string>();
                     if (!applicationContext->test(value)) {
                         continue;
                     }
                 }
-                auto key = item.at("key").get<std::string>(); // required item.key
+                auto key = item.at("key").get<std::string>();  // required item.key
                 if (key == "esc" || key == "ESC") {
                     k = ESC;
                 } else {
                     k = key[0];
                 }
                 if (std::tolower(k) == std::tolower(c)) {
-                    if (item.count("note")) { // optional item.note
+                    if (item.count("note")) {  // optional item.note
                         printStringLine(console, "Note: " + item.at("note").get<std::string>(), variables);
                     }
-                    auto action = item.at("do").get<std::string>(); // required item.do
+                    auto action = item.at("do").get<std::string>();  // required item.do
                     if (action.find("notify/") == 0) {
                         auto eventId = action.substr(7);
                         if (EventEnumerator.count(eventId)) {
                             auto event = EventEnumerator.at(eventId);
                             auto value = std::string{};
-                            if (item.count("value")) { // optional item.value
+                            if (item.count("value")) {  // optional item.value
                                 value = item.at("value").get<std::string>();
                             }
-                            if(event == Event::onAddAddressBookPhone || event == Event::onAddAddressBookAuto || event == Event::onLoadNavigationState ) {
+                            if (event == Event::onAddAddressBookPhone || event == Event::onAddAddressBookAuto ||
+                                event == Event::onLoadNavigationState || event == Event::onConversationsReport) {
                                 value = menuDirPath + '/' + value;
                             }
                             activity->notify(event, value);
@@ -837,9 +853,9 @@ Status Application::runMenu(std::shared_ptr<ApplicationContext> applicationConte
                         }
                         break;
                     } else if (action == "AudioFile") {
-                        Ensures(item.count("name") == 1); // required item.name
+                        Ensures(item.count("name") == 1);  // required item.name
                         auto name = item.at("name").get<std::string>();
-                        Ensures(item.count("value") == 1); // required item.value
+                        Ensures(item.count("value") == 1);  // required item.value
                         auto value = item.at("value").get<std::string>();
                         console->printLine(name);
                         auto audioFilePath = menuDirPath + '/' + value;
@@ -848,13 +864,13 @@ Status Application::runMenu(std::shared_ptr<ApplicationContext> applicationConte
                         }
                         break;
                     } else if (action == "GoBack") {
-                        c = ESC; // go back
+                        c = ESC;  // go back
                         break;
                     } else if (action == "GoTo") {
                         auto menuId = std::string{};
-                        auto value = item.at("value"); // required item.value
+                        auto value = item.at("value");  // required item.value
                         if (value.is_object()) {
-                            menuId = value.at("id").get<std::string>(); // required item.id
+                            menuId = value.at("id").get<std::string>();  // required item.id
                         } else {
                             menuId = value.get<std::string>();
                         }
@@ -868,12 +884,12 @@ Status Application::runMenu(std::shared_ptr<ApplicationContext> applicationConte
                         }
                         break;
                     } else if (action == "Help") {
-                        c = HELP; // print help
+                        c = HELP;  // print help
                         break;
                     } else if (action == "Login") {
-                        Ensures(item.count("name") == 1); // required item.name
+                        Ensures(item.count("name") == 1);  // required item.name
                         auto name = item.at("name").get<std::string>();
-                        Ensures(item.count("value") == 1); // required item.value
+                        Ensures(item.count("value") == 1);  // required item.value
                         auto value = item.at("value").get<std::string>();
                         console->printLine(name);
                         auto userConfigFilePath = menuDirPath + '/' + value;
@@ -891,7 +907,7 @@ Status Application::runMenu(std::shared_ptr<ApplicationContext> applicationConte
                         }
                         break;
                     } else if (action == "Quit") {
-                        c = QUIT; // quit app
+                        c = QUIT;  // quit app
                         break;
                     } else if (action == "Restart") {
                         console->printLine("Are you sure you want to restart Y/n?");
@@ -903,23 +919,23 @@ Status Application::runMenu(std::shared_ptr<ApplicationContext> applicationConte
                         break;
                     } else if (action == "Select") {
                         menuPtr->at("index") = index;
-                        c = ESC; // go back
+                        c = ESC;  // go back
                         break;
                     } else if (action == "SetLocale") {
-                        auto value = item.at("value").get<std::string>(); // required item.value
+                        auto value = item.at("value").get<std::string>();  // required item.value
                         propertyManagerHandler->setProperty("aace.alexa.setting.locale", value);
                         console->printLine("aace.alexa.setting.locale =", value);
-                        c = ESC; // go back
+                        c = ESC;  // go back
                         break;
                     } else if (action == "SetTimeZone") {
-                        auto value = item.at("value").get<std::string>(); // required item.value
+                        auto value = item.at("value").get<std::string>();  // required item.value
                         propertyManagerHandler->setProperty("aace.alexa.timezone", value);
                         console->printLine("aace.alexa.timezone =", value);
-                        c = ESC; // go back
+                        c = ESC;  // go back
                         break;
                     } else if (action == "SetLoggerLevel") {
                         // Note: Set level in logger handler (loggerHandler)
-                        auto value = item.at("value").get<std::string>(); // required item.value
+                        auto value = item.at("value").get<std::string>();  // required item.value
                         if (value == "VERBOSE") {
                             applicationContext->setLevel(Level::VERBOSE);
                         } else if (value == "INFO") {
@@ -935,17 +951,17 @@ Status Application::runMenu(std::shared_ptr<ApplicationContext> applicationConte
                         } else {
                             applicationContext->clearLevel();
                         }
-                        c = ESC; // go back
+                        c = ESC;  // go back
                         break;
                     } else if (action == "SetProperty") {
-                        auto value = item.at("value").get<std::string>(); // required item.value
+                        auto value = item.at("value").get<std::string>();  // required item.value
                         static std::regex r("^([^/]+)/(.+)", std::regex::optimize);
                         std::smatch sm{};
                         if (std::regex_match(value, sm, r) || ((sm.size() - 1) == 2)) {
                             propertyManagerHandler->setProperty(sm[1], sm[2]);
                             console->printLine(sm[1], "=", sm[2]);
                         }
-                        c = ESC; // go back
+                        c = ESC;  // go back
                         break;
                     } else {
                         console->printLine("Unknown action:", action);
@@ -957,7 +973,7 @@ Status Application::runMenu(std::shared_ptr<ApplicationContext> applicationConte
             }
             // available on all menus
             switch (c) {
-                case ESC: // go back
+                case ESC:  // go back
                     if (stack.size() > 1) {
                         stack.pop_back();
                         auto menuId = stack.back();
@@ -965,17 +981,20 @@ Status Application::runMenu(std::shared_ptr<ApplicationContext> applicationConte
                         printMenu(applicationContext, engine, propertyManagerHandler, console, menuId);
                     }
                     break;
-                case HELP: // print help
+                case HELP:  // print help
                     printMenu(applicationContext, engine, propertyManagerHandler, console, stack.back());
                     break;
-                case QUIT: // quit app
+                case QUIT:  // quit app
                     status = Status::Success;
                     break;
-                case STOP: // exit the active domain
+                case STOP_ACTIVE_DOMAIN:  // exit the active domain
                     activity->notify(Event::onStopActive);
                     break;
-                case TALK: // tap-to-talk convenience
+                case TALK:  // tap-to-talk convenience
                     activity->notify(Event::onSpeechRecognizerTapToTalk);
+                    break;
+                case STOP_FOREGROUND_ACTIVITY:
+                    activity->notify(Event::onStopForegroundActivity);
                     break;
                 default:
                     break;
@@ -987,15 +1006,31 @@ Status Application::runMenu(std::shared_ptr<ApplicationContext> applicationConte
     }
     return status;
 }
-    
-void Application::setupMenu(std::shared_ptr<ApplicationContext> applicationContext, std::shared_ptr<aace::core::Engine> engine, std::shared_ptr<sampleApp::propertyManager::PropertyManagerHandler> propertyManagerHandler, std::shared_ptr<View> console) {
+
+void Application::setupMenu(
+    std::shared_ptr<ApplicationContext> applicationContext,
+    std::shared_ptr<aace::core::Engine> engine,
+    std::shared_ptr<sampleApp::propertyManager::PropertyManagerHandler> propertyManagerHandler,
+    std::shared_ptr<View> console) {
     // recursive menu registration
-    std::function<std::string(std::shared_ptr<ApplicationContext>, std::shared_ptr<aace::core::Engine>, std::shared_ptr<sampleApp::propertyManager::PropertyManagerHandler>, std::shared_ptr<View>, json &, std::string &)> f;
-    f = [&f](std::shared_ptr<ApplicationContext> applicationContext, std::shared_ptr<aace::core::Engine> engine, std::shared_ptr<sampleApp::propertyManager::PropertyManagerHandler> propertyManagerHandler, std::shared_ptr<View> console, json &menu,
-             std::string &path) {
+    std::function<std::string(
+        std::shared_ptr<ApplicationContext>,
+        std::shared_ptr<aace::core::Engine>,
+        std::shared_ptr<sampleApp::propertyManager::PropertyManagerHandler>,
+        std::shared_ptr<View>,
+        json&,
+        std::string&)>
+        f;
+    f = [&f](
+            std::shared_ptr<ApplicationContext> applicationContext,
+            std::shared_ptr<aace::core::Engine> engine,
+            std::shared_ptr<sampleApp::propertyManager::PropertyManagerHandler> propertyManagerHandler,
+            std::shared_ptr<View> console,
+            json& menu,
+            std::string& path) {
         menu["path"] = path;
-        Ensures(menu.count("id") == 1);                     // required menu.id
-        if (menu.at("id").get<std::string>() == "LOCALE") { // reserved id: LOCALE
+        Ensures(menu.count("id") == 1);                      // required menu.id
+        if (menu.at("id").get<std::string>() == "LOCALE") {  // reserved id: LOCALE
             auto item = json::array();
             auto supportedLocales = propertyManagerHandler->getProperty("aace.alexa.supportedLocales");
             std::istringstream iss{supportedLocales};
@@ -1006,22 +1041,23 @@ void Application::setupMenu(std::shared_ptr<ApplicationContext> applicationConte
                 unsigned char k = '\0';
                 if (count < 10) {
                     k = '1' + index;
-                } else { // Note: 'Q' conflict
+                } else {  // Note: 'Q' conflict
                     k = 'A' + index;
                 }
                 auto key = std::string{static_cast<char>(k)};
                 item.push_back({{"do", "SetLocale"}, {"key", key}, {"name", token}, {"value", token}});
                 index++;
             }
-            if (menu.count("item") && menu.at("item").is_array()) { // optional menu.item array
+            if (menu.count("item") && menu.at("item").is_array()) {  // optional menu.item array
                 item.insert(std::end(item), std::begin(menu.at("item")), std::end(menu.at("item")));
             }
             menu.at("item") = item;
-        } else if (menu.count("item") && menu.at("item").is_array()) { // optional menu.item array
-            for (auto &item : menu.at("item")) {
+        } else if (menu.count("item") && menu.at("item").is_array()) {  // optional menu.item array
+            for (auto& item : menu.at("item")) {
                 if (item.count("do") && item.at("do") == "GoTo") {
                     if (item.count("value") && item.at("value").is_object()) {
-                        item.at("value") = f(applicationContext, engine, propertyManagerHandler, console, item.at("value"), path);
+                        item.at("value") =
+                            f(applicationContext, engine, propertyManagerHandler, console, item.at("value"), path);
                     }
                 }
             }
@@ -1031,7 +1067,7 @@ void Application::setupMenu(std::shared_ptr<ApplicationContext> applicationConte
         return id;
     };
     auto paths = applicationContext->getMenuFilePaths();
-    for (auto &path : paths) {
+    for (auto& path : paths) {
         // read a JSON file
         std::ifstream i(path);
         json menu;
@@ -1043,7 +1079,7 @@ void Application::setupMenu(std::shared_ptr<ApplicationContext> applicationConte
             menu = json::array({menu});
         }
         if (menu.is_array()) {
-            for (auto &item : menu) {
+            for (auto& item : menu) {
                 f(applicationContext, engine, propertyManagerHandler, console, item, path);
             }
         } else {
@@ -1052,4 +1088,4 @@ void Application::setupMenu(std::shared_ptr<ApplicationContext> applicationConte
     }
 }
 
-} // namespace sampleApp
+}  // namespace sampleApp

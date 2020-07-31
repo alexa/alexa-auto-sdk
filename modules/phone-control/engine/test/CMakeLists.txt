@@ -18,6 +18,7 @@ foreach(TEST_SRC ${UNIT_TEST_SRCS})
         PRIVATE
             ${AVS_INCLUDE_DIRS}
             ${CMAKE_SOURCE_DIR}/modules/alexa/engine/test/include
+            ${CMAKE_SOURCE_DIR}/modules/core/engine/test/include
      )
 target_link_libraries(${TEST_NAME} AACEPhoneControlEngine AACEAlexaTestsLib
         GTest::GTest GTest::Main ${GMOCK_LIBRARY} ${GMOCK_MAIN_LIBRARY} ${AVS_AVS_COMMON_LIBRARY})

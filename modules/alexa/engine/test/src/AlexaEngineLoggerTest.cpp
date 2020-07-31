@@ -25,29 +25,28 @@ using namespace aace::test::alexa;
 
 class AlexaEngineLoggerTest : public ::testing::Test {
 public:
-    void SetUp() override
-    {
+    void SetUp() override {
         m_alexaMockFactory = AlexaTestHelper::createAlexaMockComponentFactory();
-        
+
         // initialize the avs device SDK
-        ASSERT_TRUE( alexaClientSDK::avsCommon::avs::initialization::AlexaClientSDKInit::initialize( { AlexaTestHelper::getAVSConfig() } ) ) << "Initialize AVS Device SDK Failed!";
-        
+        ASSERT_TRUE(alexaClientSDK::avsCommon::avs::initialization::AlexaClientSDKInit::initialize(
+            {AlexaTestHelper::getAVSConfig()}))
+            << "Initialize AVS Device SDK Failed!";
+
         // initialized succeeded
         m_initialized = true;
     }
 
-    void TearDown() override
-    {
-        if( m_initialized )
-        {
+    void TearDown() override {
+        if (m_initialized) {
             m_alexaMockFactory->shutdown();
-        
+
             alexaClientSDK::avsCommon::avs::initialization::AlexaClientSDKInit::uninitialize();
-            
+
             m_initialized = false;
         }
     }
-    
+
 protected:
     std::shared_ptr<AlexaMockComponentFactory> m_alexaMockFactory;
 
@@ -55,10 +54,10 @@ private:
     bool m_initialized = false;
 };
 
-TEST_F(AlexaEngineLoggerTest,create)
-{
-    auto alexaEngineLogger = aace::engine::alexa::AlexaEngineLogger::create( alexaClientSDK::avsCommon::utils::logger::Level::DEBUG0 );
-    EXPECT_NE(alexaEngineLogger,nullptr) << "AlexaEngineLogger pointer is null!";
-    
+TEST_F(AlexaEngineLoggerTest, create) {
+    auto alexaEngineLogger =
+        aace::engine::alexa::AlexaEngineLogger::create(alexaClientSDK::avsCommon::utils::logger::Level::DEBUG0);
+    EXPECT_NE(alexaEngineLogger, nullptr) << "AlexaEngineLogger pointer is null!";
+
     alexaEngineLogger->shutdown();
 }

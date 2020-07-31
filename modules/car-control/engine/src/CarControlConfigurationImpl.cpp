@@ -14,6 +14,7 @@
  */
 
 #include "AACE/Engine/CarControl/CarControlConfigurationImpl.h"
+
 #include "AACE/CarControl/CarControlAssets.h"
 #include "AACE/CarControl/CarControlConfiguration.h"
 #include "AACE/Engine/Core/EngineMacros.h"
@@ -26,6 +27,9 @@ using namespace aace::carControl::assets;
 
 /// String to identify log entries originating from this file.
 static const std::string TAG("aace.carControl.config.CarControlConfigurationImpl");
+
+/// "ActionsToDirective" action mapping type
+static const std::string ACTIONS_TO_DIRECTIVE = "ActionsToDirective";
 
 // default Engine constructor
 std::shared_ptr<CarControlConfiguration> CarControlConfiguration::create() {
@@ -56,6 +60,36 @@ std::shared_ptr<std::istream> CarControlConfigurationImpl::getStream() {
     return stream;
 }
 
+CarControlConfiguration& CarControlConfigurationImpl::createEndpoint(const std::string& endpointId) {
+    try {
+        ThrowIf(m_failed, "previouslyFailed");
+        ThrowIf(endpointId == "", "emptyEndpointId");
+        auto& endpoints = m_document["aace.carControl"]["endpoints"];
+        for (const auto& item : endpoints.items()) {
+            const auto& endpoint = item.value();
+            ThrowIf(endpoint["endpointId"] == endpointId, "duplicateEndpoint " + endpointId);
+        }
+
+        // clang-format off
+        json endpoint = {
+            {"endpointId", endpointId},
+            {"endpointResources", {
+                {"friendlyNames", json::array()}
+            }},
+            {"capabilities", json::array()}
+        };
+        // clang-format on
+
+        endpoints.push_back(endpoint);
+        m_allowedOptions = {Option::ENDPOINT};
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("endpointId", endpointId).d("reason", ex.what()));
+        m_failed = true;
+    }
+
+    return *this;
+}
+
 CarControlConfiguration& CarControlConfigurationImpl::createControl(
     const std::string& controlId,
     const std::string& zoneId) {
@@ -64,7 +98,7 @@ CarControlConfiguration& CarControlConfigurationImpl::createControl(
         auto& endpoints = m_document["aace.carControl"]["endpoints"];
         for (const auto& item : endpoints.items()) {
             const auto& endpoint = item.value();
-            ThrowIf(endpoint["endpointId"] == controlId, "duplicateControl " + controlId);
+            ThrowIf(endpoint["endpointId"] == controlId, "duplicateEndpoint " + controlId);
         }
 
         // clang-format off
@@ -195,12 +229,98 @@ CarControlConfiguration& CarControlConfigurationImpl::addToggleController(
         auto& capabilities = endpoint["capabilities"];
         capabilities.push_back(capability);
 
-        m_allowedOptions = {Option::ENDPOINT, Option::CAPABILITY};
+        m_allowedOptions = {Option::ACTION, Option::ENDPOINT, Option::CAPABILITY};
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("controllerId", controllerId).d("reason", ex.what()));
         m_failed = true;
     }
 
+    return *this;
+}
+
+CarControlConfiguration& CarControlConfigurationImpl::addActionTurnOn(const std::vector<std::string>& actions) {
+    try {
+        ThrowIf(m_failed, "previouslyFailed");
+        ThrowIfNot(isOption(Option::ACTION), "actionTurnOnNotAllowed");
+        ThrowIf(actions.empty(), "noActionsSpecified");
+
+        json actionsArray = json::array();
+        for (auto action = actions.begin(); action != actions.end(); ++action) {
+            actionsArray.push_back(*action);
+        }
+
+        // clang-format off
+        json actionMapping = {
+            {"@type", ACTIONS_TO_DIRECTIVE},
+            {"actions", actionsArray},
+            {"directive", {
+                {"name", "TurnOn"},
+                {"payload", json::object()}
+            }}
+        };
+        // clang-format on
+
+        auto& endpoint = m_document["aace.carControl"]["endpoints"].back();
+        auto& capability = endpoint["capabilities"].back();
+        ThrowIfNot(capability["interface"] == "Alexa.ToggleController", "notToggleController");
+        if (!capability.contains("semantics")) {
+            capability["semantics"] = json::object();
+        }
+        auto& semantics = capability["semantics"];
+        if (!semantics.contains("actionMappings")) {
+            semantics["actionMappings"] = json::array();
+        }
+        auto& actionMappings = semantics["actionMappings"];
+        actionMappings.push_back(actionMapping);
+
+        m_allowedOptions = {Option::ACTION, Option::CAPABILITY, Option::ENDPOINT};
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        m_failed = true;
+    }
+    return *this;
+}
+
+CarControlConfiguration& CarControlConfigurationImpl::addActionTurnOff(const std::vector<std::string>& actions) {
+    try {
+        ThrowIf(m_failed, "previouslyFailed");
+        ThrowIfNot(isOption(Option::ACTION), "actionTurnOffNotAllowed");
+        ThrowIf(actions.empty(), "noActionsSpecified");
+
+        json actionsArray = json::array();
+        for (auto action = actions.begin(); action != actions.end(); ++action) {
+            actionsArray.push_back(*action);
+        }
+
+        // clang-format off
+        json actionMapping = {
+            {"@type", ACTIONS_TO_DIRECTIVE},
+            {"actions", actionsArray},
+            {"directive", {
+                {"name", "TurnOff"},
+                {"payload", json::object()}
+            }}
+        };
+        // clang-format on
+
+        auto& endpoint = m_document["aace.carControl"]["endpoints"].back();
+        auto& capability = endpoint["capabilities"].back();
+        ThrowIfNot(capability["interface"] == "Alexa.ToggleController", "notToggleController");
+        if (!capability.contains("semantics")) {
+            capability["semantics"] = json::object();
+        }
+        auto& semantics = capability["semantics"];
+        if (!semantics.contains("actionMappings")) {
+            semantics["actionMappings"] = json::array();
+        }
+        auto& actionMappings = semantics["actionMappings"];
+        actionMappings.push_back(actionMapping);
+
+        m_allowedOptions = {Option::ACTION, Option::CAPABILITY, Option::ENDPOINT};
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        m_failed = true;
+    }
     return *this;
 }
 
@@ -248,7 +368,7 @@ CarControlConfiguration& CarControlConfigurationImpl::addRangeController(
         auto& capabilities = endpoint["capabilities"];
         capabilities.push_back(capability);
 
-        m_allowedOptions = {Option::ENDPOINT, Option::CAPABILITY, Option::PRESET};
+        m_allowedOptions = {Option::ACTION, Option::ENDPOINT, Option::CAPABILITY, Option::PRESET};
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("controllerId", controllerId).d("reason", ex.what()));
         m_failed = true;
@@ -281,12 +401,107 @@ CarControlConfiguration& CarControlConfigurationImpl::addPreset(double value) {
         auto& presets = configuration["presets"];
         presets.push_back(preset);
 
-        m_allowedOptions = {Option::ENDPOINT, Option::PRESET};
+        m_allowedOptions = {Option::ACTION, Option::ENDPOINT, Option::PRESET};
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("value", value).d("reason", ex.what()));
         m_failed = true;
     }
 
+    return *this;
+}
+
+CarControlConfiguration& CarControlConfigurationImpl::addActionSetRange(
+    const std::vector<std::string>& actions,
+    double value) {
+    try {
+        ThrowIf(m_failed, "previouslyFailed");
+        ThrowIfNot(isOption(Option::ACTION), "actionSetRangeNotAllowed");
+        ThrowIf(actions.empty(), "noActionsSpecified");
+
+        json actionsArray = json::array();
+        for (auto action = actions.begin(); action != actions.end(); ++action) {
+            actionsArray.push_back(*action);
+        }
+
+        // clang-format off
+        json actionMapping = {
+            {"@type", ACTIONS_TO_DIRECTIVE},
+            {"actions", actionsArray},
+            {"directive", {
+                {"name", "SetRangeValue"},
+                {"payload", {
+                    {"rangeValue", value}
+                }}
+            }}
+        };
+        // clang-format on
+
+        auto& endpoint = m_document["aace.carControl"]["endpoints"].back();
+        auto& capability = endpoint["capabilities"].back();
+        ThrowIfNot(capability["interface"] == "Alexa.RangeController", "notRangeController");
+        if (!capability.contains("semantics")) {
+            capability["semantics"] = json::object();
+        }
+        auto& semantics = capability["semantics"];
+        if (!semantics.contains("actionMappings")) {
+            semantics["actionMappings"] = json::array();
+        }
+        auto& actionMappings = semantics["actionMappings"];
+        actionMappings.push_back(actionMapping);
+
+        m_allowedOptions = {Option::ACTION, Option::CAPABILITY, Option::ENDPOINT};
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        m_failed = true;
+    }
+    return *this;
+}
+
+CarControlConfiguration& CarControlConfigurationImpl::addActionAdjustRange(
+    const std::vector<std::string>& actions,
+    double delta) {
+    try {
+        ThrowIf(m_failed, "previouslyFailed");
+        ThrowIfNot(isOption(Option::ACTION), "actionAdjustRangeNotAllowed");
+        ThrowIf(actions.empty(), "noActionsSpecified");
+
+        json actionsArray = json::array();
+        for (auto action = actions.begin(); action != actions.end(); ++action) {
+            actionsArray.push_back(*action);
+        }
+
+        // clang-format off
+        json actionMapping = {
+            {"@type", ACTIONS_TO_DIRECTIVE},
+            {"actions", actionsArray},
+            {"directive", {
+                {"name", "AdjustRangeValue"},
+                {"payload", {
+                    {"rangeValueDelta", delta},
+                    {"rangeValueDeltaDefault", false}
+                }}
+            }}
+        };
+        // clang-format on
+
+        auto& endpoint = m_document["aace.carControl"]["endpoints"].back();
+        auto& capability = endpoint["capabilities"].back();
+        ThrowIfNot(capability["interface"] == "Alexa.RangeController", "notRangeController");
+        if (!capability.contains("semantics")) {
+            capability["semantics"] = json::object();
+        }
+        auto& semantics = capability["semantics"];
+        if (!semantics.contains("actionMappings")) {
+            semantics["actionMappings"] = json::array();
+        }
+        auto& actionMappings = semantics["actionMappings"];
+        actionMappings.push_back(actionMapping);
+
+        m_allowedOptions = {Option::ACTION, Option::CAPABILITY, Option::ENDPOINT};
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        m_failed = true;
+    }
     return *this;
 }
 
@@ -325,7 +540,7 @@ CarControlConfiguration& CarControlConfigurationImpl::addModeController(
         auto& capabilities = endpoint["capabilities"];
         capabilities.push_back(capability);
 
-        m_allowedOptions = {Option::ENDPOINT, Option::CAPABILITY, Option::MODE};
+        m_allowedOptions = {Option::ACTION, Option::ENDPOINT, Option::CAPABILITY, Option::MODE};
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("controllerId", controllerId).d("reason", ex.what()));
         m_failed = true;
@@ -358,7 +573,7 @@ CarControlConfiguration& CarControlConfigurationImpl::addValue(const std::string
         auto& supportedModes = configuration["supportedModes"];
         supportedModes.push_back(mode);
 
-        m_allowedOptions = {Option::ENDPOINT, Option::MODE};
+        m_allowedOptions = {Option::ACTION, Option::ENDPOINT, Option::MODE};
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("value", value).d("reason", ex.what()));
         m_failed = true;
@@ -367,9 +582,111 @@ CarControlConfiguration& CarControlConfigurationImpl::addValue(const std::string
     return *this;
 }
 
+CarControlConfiguration& CarControlConfigurationImpl::addActionSetMode(
+    const std::vector<std::string>& actions,
+    const std::string& value) {
+    try {
+        ThrowIf(m_failed, "previouslyFailed");
+        ThrowIfNot(isOption(Option::ACTION), "actionSetModeNotAllowed");
+        ThrowIf(actions.empty(), "noActionsSpecified");
+
+        json actionsArray = json::array();
+        for (auto action = actions.begin(); action != actions.end(); ++action) {
+            actionsArray.push_back(*action);
+        }
+
+        // clang-format off
+        json actionMapping = {
+            {"@type", ACTIONS_TO_DIRECTIVE},
+            {"actions", actionsArray},
+            {"directive", {
+                {"name", "SetMode"},
+                {"payload", {
+                    {"mode", value}
+                }}
+            }}
+        };
+        // clang-format on
+
+        auto& endpoint = m_document["aace.carControl"]["endpoints"].back();
+        auto& capability = endpoint["capabilities"].back();
+        ThrowIfNot(capability["interface"] == "Alexa.ModeController", "notModeController");
+        if (!capability.contains("semantics")) {
+            capability["semantics"] = json::object();
+        }
+        auto& semantics = capability["semantics"];
+        if (!semantics.contains("actionMappings")) {
+            semantics["actionMappings"] = json::array();
+        }
+        auto& actionMappings = semantics["actionMappings"];
+        actionMappings.push_back(actionMapping);
+
+        m_allowedOptions = {Option::ACTION, Option::CAPABILITY, Option::ENDPOINT};
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        m_failed = true;
+    }
+    return *this;
+}
+
+CarControlConfiguration& CarControlConfigurationImpl::addActionAdjustMode(
+    const std::vector<std::string>& actions,
+    int delta) {
+    try {
+        ThrowIf(m_failed, "previouslyFailed");
+        ThrowIfNot(isOption(Option::ACTION), "actionAdjustModeNotAllowed");
+        ThrowIf(actions.empty(), "noActionsSpecified");
+
+        json actionsArray = json::array();
+        for (auto action = actions.begin(); action != actions.end(); ++action) {
+            actionsArray.push_back(*action);
+        }
+
+        // clang-format off
+        json actionMapping = {
+            {"@type", ACTIONS_TO_DIRECTIVE},
+            {"actions", actionsArray},
+            {"directive", {
+                {"name", "AdjustMode"},
+                {"payload", {
+                    {"modeDelta", delta}
+                }}
+            }}
+        };
+        // clang-format on
+
+        auto& endpoint = m_document["aace.carControl"]["endpoints"].back();
+        auto& capability = endpoint["capabilities"].back();
+        ThrowIfNot(capability["interface"] == "Alexa.ModeController", "notModeController");
+        if (!capability.contains("semantics")) {
+            capability["semantics"] = json::object();
+        }
+        auto& semantics = capability["semantics"];
+        if (!semantics.contains("actionMappings")) {
+            semantics["actionMappings"] = json::array();
+        }
+        auto& actionMappings = semantics["actionMappings"];
+        actionMappings.push_back(actionMapping);
+
+        m_allowedOptions = {Option::ACTION, Option::CAPABILITY, Option::ENDPOINT};
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        m_failed = true;
+    }
+    return *this;
+}
+
 CarControlConfiguration& CarControlConfigurationImpl::createZone(const std::string& zoneId) {
     try {
         ThrowIf(m_failed, "previouslyFailed");
+
+        // For compatibility with "default zones" of 2.0.
+        // We remove the "default" zone so it isn't created twice
+        auto index = std::find(m_defaultZones.begin(), m_defaultZones.end(), zoneId);
+        if (index != m_defaultZones.end()) {
+            m_defaultZones.erase(index);
+        }
+
         auto& zones = m_document["aace.carControl"]["zones"];
         for (const auto& item : zones.items()) {
             const auto& zone = item.value();
@@ -392,6 +709,39 @@ CarControlConfiguration& CarControlConfigurationImpl::createZone(const std::stri
         m_failed = true;
     }
 
+    return *this;
+}
+
+CarControlConfiguration& CarControlConfigurationImpl::addMembers(const std::vector<std::string>& endpointIds) {
+    try {
+        ThrowIf(m_failed, "previouslyFailed");
+        ThrowIfNot(isOption(Option::ZONE), "addMembersNotAllowed");
+
+        auto& zone = m_document["aace.carControl"]["zones"].back();
+        if (!zone.contains("members")) {
+            zone["members"] = json::array();
+        }
+        auto& members = zone["members"];
+        for (auto endpointItr = endpointIds.begin(); endpointItr != endpointIds.end(); ++endpointItr) {
+            json endpoint = {{"endpointId", *endpointItr}};
+            members.push_back(endpoint);
+        }
+        m_allowedOptions = {Option::ZONE};
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        m_failed = true;
+    }
+    return *this;
+}
+
+CarControlConfiguration& CarControlConfigurationImpl::setDefaultZone(const std::string& zoneId) {
+    try {
+        ThrowIf(zoneId == "", "zoneIdIsEmpty");
+        m_document["aace.carControl"]["defaultZoneId"] = zoneId;
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        m_failed = true;
+    }
     return *this;
 }
 

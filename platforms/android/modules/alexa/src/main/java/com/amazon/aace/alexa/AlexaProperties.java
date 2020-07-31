@@ -16,7 +16,6 @@
 package com.amazon.aace.alexa;
 
 public class AlexaProperties {
-
     /**
      * This read-only property is used with
      * com.amazon.aace.propertyManager.PropertyManager.getProperty() to check
@@ -29,7 +28,7 @@ public class AlexaProperties {
 
     /**
      * This property is used with
-     * com.amazon.aace.propertyManager.PropertyManager.setProperty() to change  
+     * com.amazon.aace.propertyManager.PropertyManager.setProperty() to change
      * the firmware version that is reported to AVS. The value must be a
      * positive, 32-bit signed integer represented as a string.
      * @hideinitializer
@@ -39,19 +38,30 @@ public class AlexaProperties {
     /**
      * This property is used with
      * com.amazon.aace.propertyManager.PropertyManager.setProperty() to change
-     * the current locale setting for Alexa. The value must be a valid locale  
-     * accepted by AVS. Calling
-     * com.amazon.aace.propertyManager.PropertyManager.getProperty() with the
-     * SUPPORTED_LOCALES property provides the list of supported locales.
+     * the current locale setting for Alexa. The value must be one of the
+     * following:
+     *      @li A valid locale accepted by AVS as a string. E.g. "en-US"
+     *      @li A valid locale pair. The format is a string containing two valid
+     *          locales separated with a forward slash. E.g. "en-US/es-US"
      * @hideinitializer
      */
     public static final String LOCALE = "aace.alexa.setting.locale";
 
     /**
+     * @deprecated
+     * This property will be removed in a future version of Auto SDK.
+     *
      * This read-only property is used with
-     * com.amazon.aace.propertyManager.PropertyManager.getProperty() to see all
-     * AVS-supported locales. The return value is a comma-separated list, 
-     * e.g. "de-DE,en-AU,..."
+     * com.amazon.aace.propertyManager.PropertyManager.getProperty() to get a list
+     * of device supported locales and locale combinations.
+     * E.g. "de-DE,fr-CA,en-CA,en-CA/fr-CA,..."
+     * The list is comma-separated. For locale combinations, the entry in the returned
+     * list is a forward slash-separated locale pair.
+     *
+     * @note Prior to version 2.1 of Auto SDK, this property returned a list of AVS-supported
+     * locales. See the list of AVS-supported locales here:
+     * https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/system.html#locales
+     *
      * @hideinitializer
      */
     public static final String SUPPORTED_LOCALES = "aace.alexa.supportedLocales";
@@ -65,20 +75,20 @@ public class AlexaProperties {
     public static final String COUNTRY_SUPPORTED = "aace.alexa.countrySupported";
 
     /**
-    * This property is used with
-    * com.amazon.aace.propertyManager.PropertyManager.setProperty() to change the 
-    * current timezone setting of the device. The value must be a valid timezone 
-    * accepted by AVS. 
-    * Calling com.amazon.aace.propertyManager.PropertyManager.getProperty()
-    * with the TIMEZONE property provides the current timezone of the device.
-    * @hideinitializer
-    */
+     * This property is used with
+     * com.amazon.aace.propertyManager.PropertyManager.setProperty() to change the
+     * current timezone setting of the device. The value must be a valid timezone
+     * accepted by AVS.
+     * Calling com.amazon.aace.propertyManager.PropertyManager.getProperty()
+     * with the TIMEZONE property provides the current timezone of the device.
+     * @hideinitializer
+     */
     public static final String TIMEZONE = "aace.alexa.timezone";
 
     /**
      * This property is used with
-     * com.amazon.aace.propertyManager.PropertyManager.setProperty() to change 
-     * the current wake word enabled setting. The value must be a boolean 
+     * com.amazon.aace.propertyManager.PropertyManager.setProperty() to change
+     * the current wake word enabled setting. The value must be a boolean
      * represented as a string, i.e. "true" or "false". Call
      * com.amazon.aace.propertyManager.PropertyManager.getProperty() with the
      * WAKEWORD_ENABLED property to check whether wake word is enabled.

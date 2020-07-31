@@ -1,6 +1,6 @@
-From 03d8eab620133e64b38be910e58a7c3643d6a4f4 Mon Sep 17 00:00:00 2001
+From 0407bf382c7c939b04a3731d704b73141d6ff423 Mon Sep 17 00:00:00 2001
 From: Mark Wharton <marwha@amazon.com>
-Date: Mon, 18 Nov 2019 07:14:59 -0800
+Date: Tue, 2 Jun 2020 23:06:18 -0700
 Subject: [PATCH 2/2] Disable SmartScreenCapabilityAgents test
 
 ---
@@ -40,5 +40,5 @@ index 610b1b4..5dcd2ab 100644
 -add_subdirectory("test")
 +# add_subdirectory("test")
 -- 
-2.20.1
+2.21.1 (Apple Git-122.3)
 

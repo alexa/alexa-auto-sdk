@@ -35,7 +35,7 @@ namespace sampleApp {
  * A TaskThread is a thread which reads from a TaskQueue and executes those tasks.
  */
 class TaskThread {
-  public:
+public:
     /**
      * Constructs a TaskThread to read from the given TaskQueue. This does not start the thread.
      *
@@ -60,7 +60,7 @@ class TaskThread {
      */
     bool isShutdown();
 
-  private:
+private:
     /**
      * Loops over the TaskQueue executing all tasks until either the TaskQueue is lost, or the thread is shutdown.
      */
@@ -76,6 +76,6 @@ class TaskThread {
     std::thread m_thread;
 };
 
-} // namespace sampleApp
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_TASKTHREAD_H
+#endif  // SAMPLEAPP_TASKTHREAD_H

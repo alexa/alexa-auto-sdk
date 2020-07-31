@@ -9,7 +9,7 @@ android {
         minSdkVersion 22
         targetSdkVersion 26
         versionCode 1
-        versionName "2.0"
+        versionName "2.3"
 
     }
 
@@ -23,7 +23,7 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir:"${project.rootDir}/../../builder/deploy/aar/", include: ['core*.aar'])
+    compileOnly fileTree(dir:"${project.rootDir}/../../builder/deploy/aar/", include: ['core*.aar'])
     implementation 'com.android.support:appcompat-v7:26.1.0'
     testImplementation 'junit:junit:4.12'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'

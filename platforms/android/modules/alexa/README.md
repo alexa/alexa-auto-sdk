@@ -383,12 +383,16 @@ public class TemplateRuntimeHandler extends TemplateRuntime {
 
 The External Media Player (EMP) Adapter allows you to declare and use external media application sources in your application. In order to interface with the EMP Adapter, you must use one of the following:
 
-* A media connection client to interface the EMP Adapter to the external app. The Android Sample App supports an example external media connection client called the Media App Command and Control (MACC) client. You can use the MACC client to interface with the Spotify app running on Android. 
-* An embedded media app. For information about external embedded media app solutions, please contact your SA or Partner Manager. For more generic details regarding the `ExternalMediaAdapterInterface`, please see the c++ [README](../../../../modules/alexa/README.md). 
+* A media connection client to interface the EMP Adapter to the external app. The Android Sample App supports an example external media connection client called the Media App Command and Control (MACC) client. Use the MACC client to interface with the Spotify app running on Android. 
+An embedded media app. For information about external embedded media app solutions, contact your SA or Partner Manager.
+
+***NOTE: If the media app service requires additional customer experience details, incorporate the requirement in your implementation. For example, if the provider requires your application to show the provider's logo in a particular way, modify the implementation to meet the requirement.*** 
+
+When advised by your SA or Partner Manager, configure the External Media Player Adapter to the device's capabilities. See `com.amazon.aace.alexa.config.AlexaConfiguration.createExternalMediaPlayerConfig()` for details on configuring the supported agent.
 
 An example use case for the MACC client is to interface with the Spotify app running on Android, as described below. 
 
-The following is an example of registering the external media MACCPlayer interface handler:
+The following example shows how to register an ExternalMediaAdapter handler using the MACCAndroidClient:
 
 ```
 mEngine.registerPlatformInterface( new MACCPlayer( this,  mLogger ) );
@@ -677,15 +681,15 @@ public boolean play( ContentSelector type, String payload ) {
     return true;
 }
 ```
-The table below provides details about the supported payload, range, and increment for each `ContentSelector` type (and `Source`):
+The table below provides details about the supported `ContentSelector` types based on `Source` type:
 
-| type (source) | example supported payload | supported range | increment |
+| Source type | Supported content selector(s) |
 |------|---------|---|---|
-| FREQUENCY(FM) | "98.7" | 88.1 - 107.9 | 0.2 |
-| FREQUENCY(AM) | "1050" | 540 - 1700 | 10 |
-| FREQUENCY(FM) | "93.7 HD 2" | 88.1 - 107.9, HD 1-3 | 0.2, 1 |
-| CHANNEL(SXM) | "1" | 1-999 | 1 |
-| PRESET(AM,FM, SXM) | "2" | 1-99 | 1 | 
+| FM | FREQUENCY, PRESET | 
+| AM | FREQUENCY, PRESET | 
+| SXM | CHANNEL, PRESET | 
+
+The ranges and increments for valid frequency, preset, and channel may vary, depending on the region you are in. Contact your partner manager for more detailed information. 
 
 The `play()` method will not be invoked if a source cannot handle the specified `ContentSelector` type.
 

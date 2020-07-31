@@ -31,16 +31,16 @@ namespace alexa {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class AlertsHandler : public aace::alexa::Alerts /* isa PlatformInterface */ {
-  private:
+private:
     std::weak_ptr<Activity> m_activity{};
     std::weak_ptr<logger::LoggerHandler> m_loggerHandler{};
 
-  protected:
-    AlertsHandler(std::weak_ptr<Activity> activity,
-                  std::weak_ptr<logger::LoggerHandler> loggerHandler);
+protected:
+    AlertsHandler(std::weak_ptr<Activity> activity, std::weak_ptr<logger::LoggerHandler> loggerHandler);
 
-  public:
-    template <typename... Args> static auto create(Args &&... args) -> std::shared_ptr<AlertsHandler> {
+public:
+    template <typename... Args>
+    static auto create(Args&&... args) -> std::shared_ptr<AlertsHandler> {
         return std::shared_ptr<AlertsHandler>(new AlertsHandler(args...));
     }
     auto getActivity() -> std::weak_ptr<Activity>;
@@ -48,19 +48,20 @@ class AlertsHandler : public aace::alexa::Alerts /* isa PlatformInterface */ {
 
     // aace::alexa::Alerts interface
 
-    auto alertStateChanged(const std::string &alertToken, Alerts::AlertState state, const std::string &reason) -> void override;
-    auto alertCreated(const std::string &alertToken, const std::string &detailedInfo) -> void override;
-    auto alertDeleted(const std::string &alertToken) -> void override;
+    auto alertStateChanged(const std::string& alertToken, Alerts::AlertState state, const std::string& reason)
+        -> void override;
+    auto alertCreated(const std::string& alertToken, const std::string& detailedInfo) -> void override;
+    auto alertDeleted(const std::string& alertToken) -> void override;
 
-  private:
+private:
     std::weak_ptr<View> m_console{};
     std::weak_ptr<View> m_alertStateView{};
 
-    auto log(logger::LoggerHandler::Level level, const std::string &message) -> void;
+    auto log(logger::LoggerHandler::Level level, const std::string& message) -> void;
     auto setupUI() -> void;
 };
 
-} // namespace alexa
-} // namespace sampleApp
+}  // namespace alexa
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_ALEXA_ALERTSHANDLER_H
+#endif  // SAMPLEAPP_ALEXA_ALERTSHANDLER_H

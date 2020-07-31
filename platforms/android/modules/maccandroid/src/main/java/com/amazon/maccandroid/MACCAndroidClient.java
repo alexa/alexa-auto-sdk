@@ -28,7 +28,6 @@ import com.amazon.maccandroid.model.SupportedOperations;
 import com.amazon.maccandroid.model.errors.CapabilityAgentError;
 import com.amazon.maccandroid.model.players.AuthorizedPlayer;
 import com.amazon.maccandroid.model.players.DiscoveredPlayer;
-import com.amazon.maccandroid.model.PlayerEvents;
 import com.amazon.maccandroid.model.state.ExternalMediaPlayerState;
 
 import java.util.List;
@@ -41,7 +40,6 @@ import java.util.UUID;
  * and reporting of events and states
  */
 public class MACCAndroidClient {
-
     private static final String TAG = MACCAndroidClient.class.getSimpleName();
 
     private final Context mContext;
@@ -59,30 +57,30 @@ public class MACCAndroidClient {
         public void onReceive(Context context, Intent intent) {
             // Checking to make sure intent has the information we need
             Log.i(TAG, "onReceive intent : " + intent);
-            if (intent!= null && intent.getExtras() != null && intent.getExtras().
-                    containsKey(Intent.EXTRA_COMPONENT_NAME)) {
-                final ComponentName componentName = (ComponentName) intent.getExtras().get(
-                        Intent.EXTRA_COMPONENT_NAME);
+            if (intent != null && intent.getExtras() != null
+                    && intent.getExtras().containsKey(Intent.EXTRA_COMPONENT_NAME)) {
+                final ComponentName componentName = (ComponentName) intent.getExtras().get(Intent.EXTRA_COMPONENT_NAME);
                 Log.i(TAG, "Component : " + componentName + " is trying to connect to MACC Android Client");
 
                 if (MediaAppsRepository.getInstance().isAuthorizedApp(componentName.getPackageName())) {
-                    MediaAppsRepository.getInstance().getAuthorizedMediaApps().get(
-                            componentName.getPackageName()).connect(new MediaAppsConnectionListener() {
-                        @Override
-                        public void onConnectionSuccessful() {
-                            Log.i(TAG, "Component : " + componentName + " successfully connected");
-                        }
+                    MediaAppsRepository.getInstance()
+                            .getAuthorizedMediaApps()
+                            .get(componentName.getPackageName())
+                            .connect(new MediaAppsConnectionListener() {
+                                @Override
+                                public void onConnectionSuccessful() {
+                                    Log.i(TAG, "Component : " + componentName + " successfully connected");
+                                }
 
-                        @Override
-                        public void onConnectionFailure(CapabilityAgentError error) {
-                        	Log.i(TAG, "onConnectionFailure");
-                            MediaAppsStateReporter.getInstance().reportError(
-                                    componentName.getPackageName(), error);
-                            MediaAppsRepository.getInstance().removeMediaApp(
-                                    componentName.getPackageName());
-                            runDiscovery();
-                        }
-                    });
+                                @Override
+                                public void onConnectionFailure(CapabilityAgentError error) {
+                                    Log.i(TAG, "onConnectionFailure");
+                                    MediaAppsStateReporter.getInstance().reportError(
+                                            componentName.getPackageName(), error);
+                                    MediaAppsRepository.getInstance().removeMediaApp(componentName.getPackageName());
+                                    runDiscovery();
+                                }
+                            });
                 }
             }
         }
@@ -123,7 +121,7 @@ public class MACCAndroidClient {
     }
 
     public void runDiscovery() {
-        mDiscoverAndReportMediaAppshandler.sendEmptyMessage(DiscoverAndReportMediaAppsHandler.START_DISCOVERY );
+        mDiscoverAndReportMediaAppshandler.sendEmptyMessage(DiscoverAndReportMediaAppsHandler.START_DISCOVERY);
         mDiscoverAndReportMediaAppshandler.sendEmptyMessage(
                 DiscoverAndReportMediaAppsHandler.REPORT_DISCOVERED_MEDIA_APPS);
     }
@@ -183,9 +181,9 @@ public class MACCAndroidClient {
      * @param skillToken skill token of player
      * @param playbackSessionId session id of player
      */
-    void reportPlayerEvents(String playerId, Set<PlayerEvents> playerEvents, String skillToken, UUID playbackSessionId) {
-        mMACCAndroidClientCallback.onPlayerEvent(playerId, playerEvents, skillToken,
-                playbackSessionId);
+    void reportPlayerEvents(
+            String playerId, Set<PlayerEvents> playerEvents, String skillToken, UUID playbackSessionId) {
+        mMACCAndroidClientCallback.onPlayerEvent(playerId, playerEvents, skillToken, playbackSessionId);
     }
 
     /**
@@ -201,7 +199,8 @@ public class MACCAndroidClient {
     }
 
     public void registerCallback(MACCAndroidClientCallback callback) {
-        if (callback == null) throw new IllegalArgumentException("callback cannot be null");
+        if (callback == null)
+            throw new IllegalArgumentException("callback cannot be null");
         mMACCAndroidClientCallback = callback;
     }
 
@@ -212,16 +211,14 @@ public class MACCAndroidClient {
         intentFilter.addAction(Intent.ACTION_PACKAGE_REPLACED);
         intentFilter.addAction(Intent.ACTION_PACKAGE_REMOVED);
         intentFilter.addDataScheme("package");
-        mContext.registerReceiver(mPackageChangedReceiver,intentFilter);
+        mContext.registerReceiver(mPackageChangedReceiver, intentFilter);
     }
 
     public void requestToken(String localPlayerId) {
         mMACCAndroidClientCallback.requestTokenForPlayerId(localPlayerId);
     }
 
-
     public void reportRemovedApp(String localPlayerId) {
         mMACCAndroidClientCallback.onRemovedPlayer(localPlayerId);
-        runDiscovery();
     }
 }

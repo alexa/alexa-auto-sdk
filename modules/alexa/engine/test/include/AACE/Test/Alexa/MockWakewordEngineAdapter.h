@@ -18,22 +18,29 @@
 
 #include <AACE/Engine/Alexa/WakewordEngineAdapter.h>
 
-namespace aace {    
+namespace aace {
 namespace test {
 namespace alexa {
 
 class MockWakewordEngineAdapter : public aace::engine::alexa::WakewordEngineAdapter {
 public:
-    MOCK_METHOD2(initialize,
-        bool(std::shared_ptr<alexaClientSDK::avsCommon::avs::AudioInputStream>& audioInputStream, alexaClientSDK::avsCommon::utils::AudioFormat& audioFormat));
+    MOCK_METHOD2(
+        initialize,
+        bool(
+            std::shared_ptr<alexaClientSDK::avsCommon::avs::AudioInputStream>& audioInputStream,
+            alexaClientSDK::avsCommon::utils::AudioFormat& audioFormat));
     MOCK_METHOD0(enable, bool());
     MOCK_METHOD0(disable, bool());
-    MOCK_METHOD1(addKeyWordObserver, void(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::KeyWordObserverInterface> keyWordObserver));
-    MOCK_METHOD1(removeKeyWordObserver, void(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::KeyWordObserverInterface> keyWordObserver));
+    MOCK_METHOD1(
+        addKeyWordObserver,
+        void(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::KeyWordObserverInterface> keyWordObserver));
+    MOCK_METHOD1(
+        removeKeyWordObserver,
+        void(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::KeyWordObserverInterface> keyWordObserver));
 };
 
-} // aace::test::alexa
-} // aace::test
-} // aace
+}  // namespace alexa
+}  // namespace test
+}  // namespace aace
 
-#endif //AACE_TEST_AVS_MOCK_WAKEWORD_ENGINE_ADAPTER_H
+#endif  //AACE_TEST_AVS_MOCK_WAKEWORD_ENGINE_ADAPTER_H

@@ -19,17 +19,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MediaAppsRepository {
-
     private static MediaAppsRepository sInstance;
     private static final String TAG = MediaAppsRepository.class.getSimpleName();
-    private final Map< String, MediaApp > mDiscoveredMediaApps = new HashMap<>();
-    private final Map< String, MediaApp > mAuthorizedMediaApps = new HashMap<>();
+    private final Map<String, MediaApp> mDiscoveredMediaApps = new HashMap<>();
+    private final Map<String, MediaApp> mAuthorizedMediaApps = new HashMap<>();
 
-    private MediaAppsRepository() {
-    }
+    private MediaAppsRepository() {}
 
     public static MediaAppsRepository getInstance() {
-        if ( sInstance == null ) {
+        if (sInstance == null) {
             sInstance = new MediaAppsRepository();
         }
         return sInstance;
@@ -38,15 +36,16 @@ public class MediaAppsRepository {
     void addDiscoveredMediaApp(MediaApp mediaApp) {
         String playerId = mediaApp.getLocalPlayerId();
         Log.i(TAG, "addDiscoveredMediaApp | " + mediaApp);
-        mDiscoveredMediaApps.put( mediaApp.getLocalPlayerId(), mediaApp );
+        mDiscoveredMediaApps.put(mediaApp.getLocalPlayerId(), mediaApp);
     }
 
     void addAuthorizedMediaApp(MediaApp mediaApp) {
         String playerId = mediaApp.getLocalPlayerId();
-        if ( mAuthorizedMediaApps.get(playerId) == null ) {
+        if (mAuthorizedMediaApps.get(playerId) == null) {
             Log.i(TAG, "addAuthorizedMediaApp | " + mediaApp);
-            mAuthorizedMediaApps.put( mediaApp.getLocalPlayerId(), mediaApp );
-        } else Log.i(TAG, "addAuthorizedMediaApp | " + playerId + "app is already authorized, do not reauthorize");
+            mAuthorizedMediaApps.put(mediaApp.getLocalPlayerId(), mediaApp);
+        } else
+            Log.i(TAG, "addAuthorizedMediaApp | " + playerId + "app is already authorized, do not reauthorize");
     }
 
     MediaApp getDiscoveredMediaApp(String playerId) {
@@ -57,11 +56,11 @@ public class MediaAppsRepository {
         return mAuthorizedMediaApps.get(playerId);
     }
 
-    Map< String, MediaApp > getDiscoveredMediaApps() {
+    Map<String, MediaApp> getDiscoveredMediaApps() {
         return mDiscoveredMediaApps;
     }
 
-    Map <String, MediaApp> getAuthorizedMediaApps() {
+    Map<String, MediaApp> getAuthorizedMediaApps() {
         return mAuthorizedMediaApps;
     }
 

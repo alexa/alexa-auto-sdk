@@ -29,7 +29,7 @@ namespace cbl {
 class CBL : public aace::core::PlatformInterface {
 protected:
     CBL() = default;
-    
+
 public:
     /**
      * Specifies the state of the authorization flow
@@ -91,7 +91,7 @@ public:
          * Code pair has expired and user will need to initiate the authentication process again
          */
         CODE_PAIR_EXPIRED,
-        
+
         /**
          * The refresh token is invalid, revoked, or was issued to a different client.
          */
@@ -108,7 +108,11 @@ public:
     /**
      * Notifies the platform implementation of an authorization flow state change
      */
-    virtual void cblStateChanged( CBLState state, CBLStateChangedReason reason, const std::string& url, const std::string& code ) = 0;
+    virtual void cblStateChanged(
+        CBLState state,
+        CBLStateChangedReason reason,
+        const std::string& url,
+        const std::string& code) = 0;
 
     /**
      * Notifies the platform implementation to clear the refresh token
@@ -118,7 +122,7 @@ public:
     /**
      * Notifies the platform implemnentation to set the refresh token
      */
-    virtual void setRefreshToken( const std::string& refreshToken ) = 0;
+    virtual void setRefreshToken(const std::string& refreshToken) = 0;
 
     /**
      * Returns the refresh token stored by the platform implementation, otherwise return an empty string
@@ -129,10 +133,10 @@ public:
      * Notifies the platform implementation to set the user profile
      * requestUserProfile must be enabled in configuration
      */
-    virtual void setUserProfile( const std::string& name, const std::string& email ) = 0;
+    virtual void setUserProfile(const std::string& name, const std::string& email) = 0;
     /**
      * Notifies the Engine to begin the authorization process
-     */ 
+     */
     void start();
 
     /** 
@@ -151,14 +155,14 @@ public:
      * 
      * Should *never* be called by the platform implementation
      */
-    void setEngineInterface( std::shared_ptr<CBLEngineInterface> cblEngineInterface );
+    void setEngineInterface(std::shared_ptr<CBLEngineInterface> cblEngineInterface);
 
 private:
     std::shared_ptr<CBLEngineInterface> m_cblEngineInterface;
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const CBL::CBLState& state) {
-    switch ( state ) {
+    switch (state) {
         case CBL::CBLState::STARTING:
             stream << "STARTING";
             break;
@@ -182,7 +186,7 @@ inline std::ostream& operator<<(std::ostream& stream, const CBL::CBLState& state
 }
 
 inline std::ostream& operator<<(std::ostream& stream, const CBL::CBLStateChangedReason& reason) {
-    switch ( reason ) {
+    switch (reason) {
         case CBL::CBLStateChangedReason::SUCCESS:
             stream << "SUCCESS";
             break;
@@ -205,7 +209,7 @@ inline std::ostream& operator<<(std::ostream& stream, const CBL::CBLStateChanged
     return stream;
 }
 
-} // aace::cbl
-} // aace
+}  // namespace cbl
+}  // namespace aace
 
-#endif 
+#endif

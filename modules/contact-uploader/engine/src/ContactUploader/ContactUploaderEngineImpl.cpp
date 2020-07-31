@@ -44,35 +44,34 @@ static const int MAX_ALLOWED_PHONENUMBER_CHARACTERS = 100;
 static const std::string EMPTY_STRING = "";
 
 ContactUploaderEngineImpl::ContactUploaderEngineImpl(
-    std::shared_ptr<aace::contactUploader::ContactUploader> contactUploaderPlatformInterface ) : 
-    alexaClientSDK::avsCommon::utils::RequiresShutdown( TAG ),
-    m_contactUploaderPlatformInterface( contactUploaderPlatformInterface ),
-    m_contactUploadState( ContactUploaderInternalState::IDLE ),
-    m_pceId( "" ),
-    m_addressBookId( "" ),
-    m_isStopping( false ),
-    m_isAuthRefreshed( false ),
-    m_deleteAddressBookOnEngineStart( false ) {
+    std::shared_ptr<aace::contactUploader::ContactUploader> contactUploaderPlatformInterface) :
+        alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
+        m_contactUploaderPlatformInterface(contactUploaderPlatformInterface),
+        m_contactUploadState(ContactUploaderInternalState::IDLE),
+        m_pceId(""),
+        m_addressBookId(""),
+        m_isStopping(false),
+        m_isAuthRefreshed(false),
+        m_deleteAddressBookOnEngineStart(false) {
 }
 
 bool ContactUploaderEngineImpl::initialize(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
-    std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo ) {
+    std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo) {
     try {
         m_authDelegate = authDelegate;
         m_deviceInfo = deviceInfo;
 
-        m_authDelegate->addAuthObserver( shared_from_this() );
+        m_authDelegate->addAuthObserver(shared_from_this());
 
-        m_contactUploaderRESTAgent = ContactUploaderRESTAgent::create( m_authDelegate, m_deviceInfo );
-        ThrowIfNull( m_contactUploaderRESTAgent, "nullContactUploaderRESTAgent" );
+        m_contactUploaderRESTAgent = ContactUploaderRESTAgent::create(m_authDelegate, m_deviceInfo);
+        ThrowIfNull(m_contactUploaderRESTAgent, "nullContactUploaderRESTAgent");
 
         m_deleteAddressBookOnEngineStart = true;
         return true;
 
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR( LX(TAG,"initialize").d("reason", ex.what() ) );
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "initialize").d("reason", ex.what()));
         return false;
     }
 }
@@ -80,253 +79,254 @@ bool ContactUploaderEngineImpl::initialize(
 std::shared_ptr<ContactUploaderEngineImpl> ContactUploaderEngineImpl::create(
     std::shared_ptr<aace::contactUploader::ContactUploader> contactUploaderPlatformInterface,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
-    std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo ) {
-
+    std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo) {
     try {
-        ThrowIfNull( authDelegate, "nullAuthDelegateInterface" );
+        ThrowIfNull(authDelegate, "nullAuthDelegateInterface");
 
-        std::shared_ptr<ContactUploaderEngineImpl> contactUploaderEngineImpl = std::shared_ptr<ContactUploaderEngineImpl>( new ContactUploaderEngineImpl( contactUploaderPlatformInterface ) );
+        std::shared_ptr<ContactUploaderEngineImpl> contactUploaderEngineImpl =
+            std::shared_ptr<ContactUploaderEngineImpl>(new ContactUploaderEngineImpl(contactUploaderPlatformInterface));
 
-        ThrowIfNot( contactUploaderEngineImpl->initialize( authDelegate, deviceInfo ), "initializeContactUploaderEngineImplFailed" );
+        ThrowIfNot(
+            contactUploaderEngineImpl->initialize(authDelegate, deviceInfo),
+            "initializeContactUploaderEngineImplFailed");
 
         // set the platform engine interface reference
-        contactUploaderPlatformInterface->setEngineInterface( contactUploaderEngineImpl );
+        contactUploaderPlatformInterface->setEngineInterface(contactUploaderEngineImpl);
 
         return contactUploaderEngineImpl;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR( LX(TAG,"create").d("reason", ex.what() ) );
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "create").d("reason", ex.what()));
         return nullptr;
     }
 }
 
 void ContactUploaderEngineImpl::doShutdown() {
     m_executor.shutdown();
-    if ( m_authDelegate != nullptr ) {
-        m_authDelegate->removeAuthObserver( shared_from_this() );
+    if (m_authDelegate != nullptr) {
+        m_authDelegate->removeAuthObserver(shared_from_this());
     }
-    
-    if( m_contactUploaderPlatformInterface != nullptr ) {
-        m_contactUploaderPlatformInterface->setEngineInterface( nullptr ); 
+
+    if (m_contactUploaderPlatformInterface != nullptr) {
+        m_contactUploaderPlatformInterface->setEngineInterface(nullptr);
     }
 }
 
 // ContactUploaderEngineInterface
 bool ContactUploaderEngineImpl::onAddContactsBegin() {
     try {
-        ThrowIf( isUploadInProgress(), "uploadAlreadyInProgress");
-        ThrowIf( isCancelInProgress(), "cancelInProgress");
-        ThrowIf( isRemoveInProgress(), "removeInProgress");
-        ThrowIfNot( m_isAuthRefreshed, "authTokenNotValid");
+        ThrowIf(isUploadInProgress(), "uploadAlreadyInProgress");
+        ThrowIf(isCancelInProgress(), "cancelInProgress");
+        ThrowIf(isRemoveInProgress(), "removeInProgress");
+        ThrowIfNot(m_isAuthRefreshed, "authTokenNotValid");
 
-        if( !isPceIdValid() ) {
+        if (!isPceIdValid()) {
             // First time fetch pceId
-            ThrowIfNot( fetchPceId(), "fetchPceIdFailed");  
+            ThrowIfNot(fetchPceId(), "fetchPceIdFailed");
         }
 
-        ThrowIfNot( isPceIdValid(), "invalidPceId");
+        ThrowIfNot(isPceIdValid(), "invalidPceId");
 
         auto sourceAddressBookId = m_deviceInfo->getDeviceSerialNumber();
-        AACE_INFO( LX(TAG,"onAddContactsBegin").d("sourceAddressBookId", sourceAddressBookId ) );
+        AACE_INFO(LX(TAG, "onAddContactsBegin").d("sourceAddressBookId", sourceAddressBookId));
 
         m_executor.waitForSubmittedTasks();
 
         // Remove any previous Address book.
-        ThrowIfNot( deleteAddressBook( sourceAddressBookId ),"deleteAddressBookFailed" );
+        ThrowIfNot(deleteAddressBook(sourceAddressBookId), "deleteAddressBookFailed");
 
-        ThrowIfNot( createAddressBook( sourceAddressBookId ),"addressBookCreateFailed" );
+        ThrowIfNot(createAddressBook(sourceAddressBookId), "addressBookCreateFailed");
 
-        emptyContactQueue(); //Empty the queue to remove any stale contants.
-        emptyFailedContactListQueue(); //Empty the queue to remove any stale failed contacts.
+        emptyContactQueue();            //Empty the queue to remove any stale contants.
+        emptyFailedContactListQueue();  //Empty the queue to remove any stale failed contacts.
 
-        setContactUploadProgressState( ContactUploaderInternalState::START_TRIGGERED );
+        setContactUploadProgressState(ContactUploaderInternalState::START_TRIGGERED);
 
         return true;
 
-    } catch( std::exception &ex ) {
-        AACE_ERROR( LX(TAG, "onAddContactsBegin").d("reason", ex.what() ) );
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "onAddContactsBegin").d("reason", ex.what()));
         return false;
     }
 }
 
 bool ContactUploaderEngineImpl::onAddContactsEnd() {
     try {
-        ThrowIfNot( isUploadInProgress(), "noUploadInProgress" );
-        ThrowIf( isCancelInProgress(), "cancelInProgress");
-        ThrowIf( isRemoveInProgress(), "removeInProgress");
+        ThrowIfNot(isUploadInProgress(), "noUploadInProgress");
+        ThrowIf(isCancelInProgress(), "cancelInProgress");
+        ThrowIf(isRemoveInProgress(), "removeInProgress");
 
-        if( m_contactsQueue.size() > 0 ) { //Check for remaining contacts and send.
+        if (m_contactsQueue.size() > 0) {  //Check for remaining contacts and send.
             std::vector<std::string> poppedContacts;
 
-            while( !m_contactsQueue.empty() ) {
-                poppedContacts.insert(poppedContacts.end(), m_contactsQueue.front() );
+            while (!m_contactsQueue.empty()) {
+                poppedContacts.insert(poppedContacts.end(), m_contactsQueue.front());
                 m_contactsQueue.pop();
             }
-            AACE_INFO( LX(TAG,"onAddContactsEnd").d( "uploadLastBatchOfContacts", poppedContacts.size() ) );
+            AACE_INFO(LX(TAG, "onAddContactsEnd").d("uploadLastBatchOfContacts", poppedContacts.size()));
 
             m_executor.waitForSubmittedTasks();
 
-            if( !isCancelInProgress() ) { // Check if Cancel is triggered
-                m_executor.submit( [this, poppedContacts] {
+            if (!isCancelInProgress()) {  // Check if Cancel is triggered
+                m_executor.submit([this, poppedContacts] {
                     notifyToStartAsyncUploadTask();
-                    executeAsyncUploadContactsTask( poppedContacts, true );
+                    executeAsyncUploadContactsTask(poppedContacts, true);
                 });
             }
 
         } else {
-            AACE_INFO( LX(TAG,"onAddContactsEnd").m( "noPendingContactsToUpload" ) );
+            AACE_INFO(LX(TAG, "onAddContactsEnd").m("noPendingContactsToUpload"));
             m_executor.waitForSubmittedTasks();
 
-            if( !isCancelInProgress() ) { // Check if Cancel is triggered
-                auto response = m_contactUploaderRESTAgent->buildFailedContactsJson( m_failedContactQueue );
-                contactsUploaderStatusChanged( ContactUploaderStatus::UPLOAD_CONTACTS_COMPLETED, response );
-                setContactUploadProgressState( ContactUploaderInternalState::IDLE );
+            if (!isCancelInProgress()) {  // Check if Cancel is triggered
+                auto response = m_contactUploaderRESTAgent->buildFailedContactsJson(m_failedContactQueue);
+                contactsUploaderStatusChanged(ContactUploaderStatus::UPLOAD_CONTACTS_COMPLETED, response);
+                setContactUploadProgressState(ContactUploaderInternalState::IDLE);
             }
         }
 
         return true;
 
-    } catch( std::exception &ex ) {
-        AACE_ERROR( LX(TAG, "onAddContactsEnd").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "onAddContactsEnd").d("reason", ex.what()));
         return false;
     }
 }
 
 bool ContactUploaderEngineImpl::onAddContactsCancel() {
     try {
-        ThrowIfNot( isUploadInProgress(), "noUploadInProgress" );
-        ThrowIf( isRemoveInProgress(), "removeInProgress" );
+        ThrowIfNot(isUploadInProgress(), "noUploadInProgress");
+        ThrowIf(isRemoveInProgress(), "removeInProgress");
 
-        if( getContactUploadProgressState() != ContactUploaderInternalState::START_TRIGGERED ) {
-            AACE_INFO( LX(TAG,"onAddContactsCancel").m( "uploadingInProgress" ) );
-            setContactUploadProgressState( ContactUploaderInternalState::CANCEL_TRIGGERED );
+        if (getContactUploadProgressState() != ContactUploaderInternalState::START_TRIGGERED) {
+            AACE_INFO(LX(TAG, "onAddContactsCancel").m("uploadingInProgress"));
+            setContactUploadProgressState(ContactUploaderInternalState::CANCEL_TRIGGERED);
 
             m_executor.waitForSubmittedTasks();
 
-            ThrowIfNot( deleteAddressBook( m_deviceInfo->getDeviceSerialNumber() ), "deleteAddressBookFailed" );
+            ThrowIfNot(deleteAddressBook(m_deviceInfo->getDeviceSerialNumber()), "deleteAddressBookFailed");
 
-            contactsUploaderStatusChanged( ContactUploaderStatus::UPLOAD_CONTACTS_CANCELED, EMPTY_STRING );
-            setContactUploadProgressState( ContactUploaderInternalState::IDLE );
+            contactsUploaderStatusChanged(ContactUploaderStatus::UPLOAD_CONTACTS_CANCELED, EMPTY_STRING);
+            setContactUploadProgressState(ContactUploaderInternalState::IDLE);
 
         } else {
-            AACE_INFO( LX(TAG,"onAddContactsCancel").m( "noUploadingInProgress" ) );
-            contactsUploaderStatusChanged( ContactUploaderStatus::UPLOAD_CONTACTS_CANCELED, EMPTY_STRING );
-            setContactUploadProgressState( ContactUploaderInternalState::IDLE );
+            AACE_INFO(LX(TAG, "onAddContactsCancel").m("noUploadingInProgress"));
+            contactsUploaderStatusChanged(ContactUploaderStatus::UPLOAD_CONTACTS_CANCELED, EMPTY_STRING);
+            setContactUploadProgressState(ContactUploaderInternalState::IDLE);
         }
 
         return true;
 
-    } catch( std::exception &ex ) {
-        AACE_ERROR( LX(TAG, "onAddContactsCancel").d("reason", ex.what() ) );
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "onAddContactsCancel").d("reason", ex.what()));
         return false;
     }
 }
 
-bool ContactUploaderEngineImpl::onAddContact( const std::string& contact ) {
+bool ContactUploaderEngineImpl::onAddContact(const std::string& contact) {
     try {
-        ThrowIfNot( isUploadInProgress(), "noUploadInProgress" );
-        ThrowIf( isCancelInProgress(), "cancelInProgress" );
+        ThrowIfNot(isUploadInProgress(), "noUploadInProgress");
+        ThrowIf(isCancelInProgress(), "cancelInProgress");
 
-        ThrowIfNot( isAddressBookIdValid(), "invalidAddressBookId");
+        ThrowIfNot(isAddressBookIdValid(), "invalidAddressBookId");
 
-        ThrowIfNot( validateContactJson( contact ), "validateContactJsonFailed");
-        m_contactsQueue.push( contact );
+        ThrowIfNot(validateContactJson(contact), "validateContactJsonFailed");
+        m_contactsQueue.push(contact);
 
-        if( m_contactsQueue.size() == MAX_BATCH_SIZE ) {
+        if (m_contactsQueue.size() == MAX_BATCH_SIZE) {
             std::vector<std::string> poppedContacts;
 
-            while( !m_contactsQueue.empty() ) {
-                poppedContacts.insert(poppedContacts.end(), m_contactsQueue.front() );
+            while (!m_contactsQueue.empty()) {
+                poppedContacts.insert(poppedContacts.end(), m_contactsQueue.front());
                 m_contactsQueue.pop();
             }
-            AACE_INFO( LX(TAG,"onAddContact").m( "uploadingBatch" ) );
+            AACE_INFO(LX(TAG, "onAddContact").m("uploadingBatch"));
 
-            //Wait for the previous upload to get finished if any.  
+            //Wait for the previous upload to get finished if any.
             m_executor.waitForSubmittedTasks();
-            
-            if( !isCancelInProgress() ) { // Check if Cancel is triggered.
-                m_executor.submit( [this, poppedContacts] {
+
+            if (!isCancelInProgress()) {  // Check if Cancel is triggered.
+                m_executor.submit([this, poppedContacts] {
                     notifyToStartAsyncUploadTask();
-                    executeAsyncUploadContactsTask( poppedContacts, false );
+                    executeAsyncUploadContactsTask(poppedContacts, false);
                 });
             }
         }
 
         return true;
 
-    } catch( std::exception &ex ) {
-        AACE_ERROR( LX(TAG, "onAddContact").d("reason", ex.what() ) );
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "onAddContact").d("reason", ex.what()));
         return false;
     }
 }
 
 bool ContactUploaderEngineImpl::onRemoveUploadedContacts() {
     try {
-        ThrowIf( isUploadInProgress(), "uploadInProgress" );
-        ThrowIf( isRemoveInProgress(), "removeAlreadyInProgress" );
-        ThrowIf( isCancelInProgress(), "cancelAlreadyInProgress" );
-        ThrowIfNot( m_isAuthRefreshed, "authTokenNotValid");
+        ThrowIf(isUploadInProgress(), "uploadInProgress");
+        ThrowIf(isRemoveInProgress(), "removeAlreadyInProgress");
+        ThrowIf(isCancelInProgress(), "cancelAlreadyInProgress");
+        ThrowIfNot(m_isAuthRefreshed, "authTokenNotValid");
 
-        setContactUploadProgressState( ContactUploaderInternalState::REMOVE_TRIGGERED );
+        setContactUploadProgressState(ContactUploaderInternalState::REMOVE_TRIGGERED);
 
-        if( !isPceIdValid() ) {
-            ThrowIfNot( fetchPceId(), "fetchPceIdFailed");  
+        if (!isPceIdValid()) {
+            ThrowIfNot(fetchPceId(), "fetchPceIdFailed");
         }
 
-        ThrowIfNot( isPceIdValid(), "invalidPceId");
+        ThrowIfNot(isPceIdValid(), "invalidPceId");
 
         auto sourceAddressBookId = m_deviceInfo->getDeviceSerialNumber();
-        AACE_INFO( LX(TAG,"onRemoveUploadedContacts").d( "removeContacts", sourceAddressBookId  ) );
+        AACE_INFO(LX(TAG, "onRemoveUploadedContacts").d("removeContacts", sourceAddressBookId));
 
-        m_executor.submit( [this, sourceAddressBookId] {
-            executeAsyncRemoveAddressBookTask( sourceAddressBookId );
-        });
+        m_executor.submit([this, sourceAddressBookId] { executeAsyncRemoveAddressBookTask(sourceAddressBookId); });
 
         return true;
 
-    } catch( std::exception &ex ) {
-        AACE_ERROR( LX(TAG, "onRemoveUploadedContacts").d("reason", ex.what() ) );
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "onRemoveUploadedContacts").d("reason", ex.what()));
         return false;
     }
 }
 
 void ContactUploaderEngineImpl::emptyContactQueue() {
-    while( !m_contactsQueue.empty() ) {
+    while (!m_contactsQueue.empty()) {
         m_contactsQueue.pop();
     }
 }
 
 void ContactUploaderEngineImpl::emptyFailedContactListQueue() {
-    while( !m_failedContactQueue.empty() ) {
+    while (!m_failedContactQueue.empty()) {
         m_failedContactQueue.pop();
     }
 }
 
-void ContactUploaderEngineImpl::executeAsyncUploadContactsTask( const std::vector<std::string>& poppedContacts, const bool finalBatch ) {
+void ContactUploaderEngineImpl::executeAsyncUploadContactsTask(
+    const std::vector<std::string>& poppedContacts,
+    const bool finalBatch) {
     HTTPResponse httpResponse;
     auto flowState = FlowState::POST;
 
-    while( !isStopping() ) {
+    while (!isStopping()) {
         auto nextFlowState = FlowState::FINISH;
 
-        if( ( isCancelInProgress() || m_executor.isShutdown() ) && flowState != FlowState::FINISH ) {
+        if ((isCancelInProgress() || m_executor.isShutdown()) && flowState != FlowState::FINISH) {
             flowState = FlowState::FINISH;
         }
 
-        AACE_DEBUG( LX(TAG,"executeAsyncUploadContactsTask").d( "flowState", flowState ) );
-        switch( flowState ) {
+        AACE_DEBUG(LX(TAG, "executeAsyncUploadContactsTask").d("flowState", flowState));
+        switch (flowState) {
             case FlowState::POST:
-                nextFlowState = handleUploadContacts( poppedContacts, httpResponse );
+                nextFlowState = handleUploadContacts(poppedContacts, httpResponse);
                 break;
             case FlowState::PARSE:
-                nextFlowState = handleParse( httpResponse );
+                nextFlowState = handleParse(httpResponse);
                 break;
             case FlowState::NOTIFY:
-                nextFlowState = handleNotification( finalBatch );
+                nextFlowState = handleNotification(finalBatch);
                 break;
             case FlowState::ERROR:
                 nextFlowState = handleError();
-                contactsUploaderStatusChanged( ContactUploaderStatus::UPLOAD_CONTACTS_ERROR, EMPTY_STRING );
+                contactsUploaderStatusChanged(ContactUploaderStatus::UPLOAD_CONTACTS_ERROR, EMPTY_STRING);
                 break;
             case FlowState::FINISH:
                 nextFlowState = handleStopping();
@@ -346,67 +346,72 @@ ContactUploaderEngineImpl::FlowState ContactUploaderEngineImpl::handleStopping()
 ContactUploaderEngineImpl::FlowState ContactUploaderEngineImpl::handleError() {
     try {
         emptyFailedContactListQueue();
-        ThrowIfNot( deleteAddressBook( m_deviceInfo->getDeviceSerialNumber() ), "deleteAddressBookFailed" );
+        ThrowIfNot(deleteAddressBook(m_deviceInfo->getDeviceSerialNumber()), "deleteAddressBookFailed");
 
-    } catch( std::exception &ex ) {
-        AACE_ERROR( LX(TAG, "handleError").d("reason", ex.what() ) );
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "handleError").d("reason", ex.what()));
     }
 
     return FlowState::FINISH;
 }
 
-ContactUploaderEngineImpl::FlowState ContactUploaderEngineImpl::handleUploadContacts( const std::vector<std::string>& poppedContacts, HTTPResponse& httpResponse ) {
+ContactUploaderEngineImpl::FlowState ContactUploaderEngineImpl::handleUploadContacts(
+    const std::vector<std::string>& poppedContacts,
+    HTTPResponse& httpResponse) {
     try {
-        httpResponse = m_contactUploaderRESTAgent->uploadContactToAddressBook( poppedContacts, getAddressBookId(), getPceId() );
+        httpResponse =
+            m_contactUploaderRESTAgent->uploadContactToAddressBook(poppedContacts, getAddressBookId(), getPceId());
 
-        switch( httpResponse.code ) {
+        switch (httpResponse.code) {
             case HTTPResponseCode::SUCCESS_OK:
                 return FlowState::PARSE;
             case HTTPResponseCode::HTTP_RESPONSE_CODE_UNDEFINED:
             case HTTPResponseCode::SUCCESS_NO_CONTENT:
             case HTTPResponseCode::REDIRECTION_START_CODE:
             case HTTPResponseCode::REDIRECTION_END_CODE:
-            case HTTPResponseCode::BAD_REQUEST:  
+            case HTTPResponseCode::BAD_REQUEST:
             case HTTPResponseCode::FORBIDDEN:
             case HTTPResponseCode::SERVER_INTERNAL_ERROR:
-                Throw( "handleUploadContactsFailed" + m_contactUploaderRESTAgent->getHTTPErrorString( httpResponse ) );
-                break; 
+                Throw("handleUploadContactsFailed" + m_contactUploaderRESTAgent->getHTTPErrorString(httpResponse));
+                break;
         }
         return FlowState::ERROR;
-    } catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"handleUploadContacts").d("reason", ex.what() ) );
-        return FlowState::ERROR; //Some Exception, return ERROR
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "handleUploadContacts").d("reason", ex.what()));
+        return FlowState::ERROR;  //Some Exception, return ERROR
     }
 }
 
-ContactUploaderEngineImpl::FlowState ContactUploaderEngineImpl::handleParse( const HTTPResponse& httpResponse ) {
+ContactUploaderEngineImpl::FlowState ContactUploaderEngineImpl::handleParse(const HTTPResponse& httpResponse) {
     try {
-        ThrowIfNot( m_contactUploaderRESTAgent->parseCreateAddressBookEntryForFailedStatus( httpResponse, m_failedContactQueue ), "responseJsonParseFailed" );
+        ThrowIfNot(
+            m_contactUploaderRESTAgent->parseCreateAddressBookEntryForFailedStatus(httpResponse, m_failedContactQueue),
+            "responseJsonParseFailed");
         return FlowState::NOTIFY;
-    } catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"handleParse").d("reason", ex.what() ) );
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "handleParse").d("reason", ex.what()));
         return FlowState::FINISH;
     }
 }
 
-ContactUploaderEngineImpl::FlowState ContactUploaderEngineImpl::handleNotification( const bool finalBatch ) {
-    if( !isCancelInProgress() ) {
-        if( ContactUploaderInternalState::START_TRIGGERED == getContactUploadProgressState() ) {
+ContactUploaderEngineImpl::FlowState ContactUploaderEngineImpl::handleNotification(const bool finalBatch) {
+    if (!isCancelInProgress()) {
+        if (ContactUploaderInternalState::START_TRIGGERED == getContactUploadProgressState()) {
             //Notify STARTED for the first batch upload
-            contactsUploaderStatusChanged( ContactUploaderStatus::UPLOAD_CONTACTS_STARTED, EMPTY_STRING );
-            setContactUploadProgressState( ContactUploaderInternalState::UPLOADING );
-        } else if( ContactUploaderInternalState::UPLOADING == getContactUploadProgressState() ) {
+            contactsUploaderStatusChanged(ContactUploaderStatus::UPLOAD_CONTACTS_STARTED, EMPTY_STRING);
+            setContactUploadProgressState(ContactUploaderInternalState::UPLOADING);
+        } else if (ContactUploaderInternalState::UPLOADING == getContactUploadProgressState()) {
             //Notify UPLOADLING for the subsequent batch uploads.
-            contactsUploaderStatusChanged( ContactUploaderStatus::UPLOAD_CONTACTS_UPLOADING, EMPTY_STRING );
+            contactsUploaderStatusChanged(ContactUploaderStatus::UPLOAD_CONTACTS_UPLOADING, EMPTY_STRING);
         }
-        if( finalBatch ) {
-            auto response = m_contactUploaderRESTAgent->buildFailedContactsJson( m_failedContactQueue );
-            contactsUploaderStatusChanged( ContactUploaderStatus::UPLOAD_CONTACTS_COMPLETED, response );
-            setContactUploadProgressState( ContactUploaderInternalState::IDLE );
+        if (finalBatch) {
+            auto response = m_contactUploaderRESTAgent->buildFailedContactsJson(m_failedContactQueue);
+            contactsUploaderStatusChanged(ContactUploaderStatus::UPLOAD_CONTACTS_COMPLETED, response);
+            setContactUploadProgressState(ContactUploaderInternalState::IDLE);
         }
     }
 
-    return( FlowState::FINISH );
+    return (FlowState::FINISH);
 }
 
 bool ContactUploaderEngineImpl::isStopping() {
@@ -419,36 +424,38 @@ void ContactUploaderEngineImpl::notifyToStartAsyncUploadTask() {
     m_isStopping = false;
 }
 
-void ContactUploaderEngineImpl::contactsUploaderStatusChanged( ContactUploaderStatus status, const std::string& info ) {
-    if( m_contactUploaderPlatformInterface != nullptr ) {
-        return m_contactUploaderPlatformInterface->contactsUploaderStatusChanged( status, info );
+void ContactUploaderEngineImpl::contactsUploaderStatusChanged(ContactUploaderStatus status, const std::string& info) {
+    if (m_contactUploaderPlatformInterface != nullptr) {
+        return m_contactUploaderPlatformInterface->contactsUploaderStatusChanged(status, info);
     }
 }
 
-void ContactUploaderEngineImpl::onAuthStateChange( AuthObserverInterface::State newState, AuthObserverInterface::Error error ) {
-    m_isAuthRefreshed = ( alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State::REFRESHED == newState );
-    AACE_DEBUG( LX(TAG,"onAuthStateChange").d( "m_isAuthRefreshed", m_isAuthRefreshed ) );
+void ContactUploaderEngineImpl::onAuthStateChange(
+    AuthObserverInterface::State newState,
+    AuthObserverInterface::Error error) {
+    m_isAuthRefreshed = (alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State::REFRESHED == newState);
+    AACE_DEBUG(LX(TAG, "onAuthStateChange").d("m_isAuthRefreshed", m_isAuthRefreshed));
 
     // Since Engine start, at the first callback of AuthObserverInterface::State::REFRESHED delete previous address book.
-    if( m_deleteAddressBookOnEngineStart &&  m_isAuthRefreshed  ) {
+    if (m_deleteAddressBookOnEngineStart && m_isAuthRefreshed) {
         m_deleteAddressBookOnEngineStart = false;
-        AACE_INFO( LX(TAG,"onAuthStateChange").m( "deletingAddressBookAtFirstAuthStateChange" ) );
+        AACE_INFO(LX(TAG, "onAuthStateChange").m("deletingAddressBookAtFirstAuthStateChange"));
 
         auto alexaAccount = m_contactUploaderRESTAgent->getAlexaAccountInfo();
         // Delete Address book to be done for only the provisioned/auto-provisioned accounts.
-        if( alexaAccount.provisionStatus == CommsProvisionStatus::PROVISIONED || 
-            alexaAccount.provisionStatus == CommsProvisionStatus::AUTO_PROVISIONED ) {
+        if (alexaAccount.provisionStatus == CommsProvisionStatus::PROVISIONED ||
+            alexaAccount.provisionStatus == CommsProvisionStatus::AUTO_PROVISIONED) {
             auto sourceAddressBookId = m_deviceInfo->getDeviceSerialNumber();
             m_executor.waitForSubmittedTasks();
-            m_executor.submit( [this, sourceAddressBookId] {
+            m_executor.submit([this, sourceAddressBookId] {
                 try {
-                    ThrowIfNot( fetchPceId(), "fetchPceIdFailed");
-                    if( isPceIdValid() ) {
-                        deleteAddressBook( sourceAddressBookId );
+                    ThrowIfNot(fetchPceId(), "fetchPceIdFailed");
+                    if (isPceIdValid()) {
+                        deleteAddressBook(sourceAddressBookId);
                     }
                     return;
-                } catch( std::exception& ex ) {
-                    AACE_ERROR(LX(TAG,"onAuthStateChange").d("reason", ex.what() ) );
+                } catch (std::exception& ex) {
+                    AACE_ERROR(LX(TAG, "onAuthStateChange").d("reason", ex.what()));
                     return;
                 }
             });
@@ -457,53 +464,53 @@ void ContactUploaderEngineImpl::onAuthStateChange( AuthObserverInterface::State 
 }
 
 bool ContactUploaderEngineImpl::isUploadInProgress() {
-    std::lock_guard<std::mutex> lock( m_mutex );
-    if( ( m_contactUploadState == ContactUploaderInternalState::START_TRIGGERED ||
-        m_contactUploadState == ContactUploaderInternalState::UPLOADING ) ) {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    if ((m_contactUploadState == ContactUploaderInternalState::START_TRIGGERED ||
+         m_contactUploadState == ContactUploaderInternalState::UPLOADING)) {
         return true;
     }
     return false;
 }
 
 bool ContactUploaderEngineImpl::isCancelInProgress() {
-    std::lock_guard<std::mutex> lock( m_mutex );
-    if( m_contactUploadState == ContactUploaderInternalState::CANCEL_TRIGGERED ) {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    if (m_contactUploadState == ContactUploaderInternalState::CANCEL_TRIGGERED) {
         return true;
     }
     return false;
 }
 
 bool ContactUploaderEngineImpl::isRemoveInProgress() {
-    std::lock_guard<std::mutex> lock( m_mutex );
-    if( m_contactUploadState == ContactUploaderInternalState::REMOVE_TRIGGERED ) {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    if (m_contactUploadState == ContactUploaderInternalState::REMOVE_TRIGGERED) {
         return true;
     }
     return false;
 }
 
-void ContactUploaderEngineImpl::setContactUploadProgressState( ContactUploaderInternalState state ) {
-    std::lock_guard<std::mutex> lock( m_mutex );
+void ContactUploaderEngineImpl::setContactUploadProgressState(ContactUploaderInternalState state) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_contactUploadState = state;
 }
 
 ContactUploaderEngineImpl::ContactUploaderInternalState ContactUploaderEngineImpl::getContactUploadProgressState() {
-    std::lock_guard<std::mutex> lock( m_mutex );
+    std::lock_guard<std::mutex> lock(m_mutex);
     return m_contactUploadState;
 }
 
 bool ContactUploaderEngineImpl::isPceIdValid() {
-    return( !m_pceId.empty() );
+    return (!m_pceId.empty());
 }
 
-void ContactUploaderEngineImpl::setPceId( const std::string& pceId ) {
+void ContactUploaderEngineImpl::setPceId(const std::string& pceId) {
     m_pceId = pceId;
 }
-void ContactUploaderEngineImpl::setAddressBookId( const std::string& addressBookId ) {
+void ContactUploaderEngineImpl::setAddressBookId(const std::string& addressBookId) {
     m_addressBookId = addressBookId;
 }
 
 bool ContactUploaderEngineImpl::isAddressBookIdValid() {
-    return( !m_addressBookId.empty() );
+    return (!m_addressBookId.empty());
 }
 
 std::string ContactUploaderEngineImpl::getPceId() {
@@ -517,139 +524,149 @@ std::string ContactUploaderEngineImpl::getAddressBookId() {
 bool ContactUploaderEngineImpl::fetchPceId() {
     try {
         auto alexaAccount = m_contactUploaderRESTAgent->getAlexaAccountInfo();
-        ThrowIf( alexaAccount.provisionStatus == CommsProvisionStatus::INVALID, "getAlexaAccountDetailsFailed" );
+        ThrowIf(alexaAccount.provisionStatus == CommsProvisionStatus::INVALID, "getAlexaAccountDetailsFailed");
 
-        if( alexaAccount.provisionStatus == CommsProvisionStatus::UNKNOWN || alexaAccount.provisionStatus == CommsProvisionStatus::DEPROVISIONED ) {
+        if (alexaAccount.provisionStatus == CommsProvisionStatus::UNKNOWN ||
+            alexaAccount.provisionStatus == CommsProvisionStatus::DEPROVISIONED) {
             // Auto-provision the account
-            ThrowIfNot( m_contactUploaderRESTAgent->doAccountAutoProvision( alexaAccount.directedId ), "AccountAutoPrvovisionFailed" );
-            alexaAccount = m_contactUploaderRESTAgent->getAlexaAccountInfo(); // get commsId after auto provisioning.
-            ThrowIf( alexaAccount.commsId.empty(), "commsIdEmptyAfterProvisioning" );
+            ThrowIfNot(
+                m_contactUploaderRESTAgent->doAccountAutoProvision(alexaAccount.directedId),
+                "AccountAutoPrvovisionFailed");
+            alexaAccount = m_contactUploaderRESTAgent->getAlexaAccountInfo();  // get commsId after auto provisioning.
+            ThrowIf(alexaAccount.commsId.empty(), "commsIdEmptyAfterProvisioning");
         }
 
-        ThrowIf( alexaAccount.commsId.empty(), "commsIdEmptyForProvisionedAccount" );
+        ThrowIf(alexaAccount.commsId.empty(), "commsIdEmptyForProvisionedAccount");
 
-        auto pceId = m_contactUploaderRESTAgent->getPceId( alexaAccount.commsId );
-        ThrowIf( pceId.empty(), "pceIdEmptyForProvisionedAccount" );
+        auto pceId = m_contactUploaderRESTAgent->getPceId(alexaAccount.commsId);
+        ThrowIf(pceId.empty(), "pceIdEmptyForProvisionedAccount");
 
-        setPceId( pceId );
+        setPceId(pceId);
 
         return true;
 
-    } catch( std::exception& ex ) {
-        AACE_ERROR( LX(TAG,"fetchPceId").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "fetchPceId").d("reason", ex.what()));
         return false;
     }
 }
 
-bool ContactUploaderEngineImpl::createAddressBook( const std::string& sourceAddressBookId ) {
+bool ContactUploaderEngineImpl::createAddressBook(const std::string& sourceAddressBookId) {
     try {
-        auto addressBookId = m_contactUploaderRESTAgent->createAndGetAddressBookId( sourceAddressBookId, getPceId() );
+        auto addressBookId = m_contactUploaderRESTAgent->createAndGetAddressBookId(sourceAddressBookId, getPceId());
 
-        if( addressBookId.empty() ) {
-            Throw( "addressBookIdEmpty" );
+        if (addressBookId.empty()) {
+            Throw("addressBookIdEmpty");
         }
-        setAddressBookId( addressBookId );
+        setAddressBookId(addressBookId);
 
         return true;
 
-    } catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"createAddressBook").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "createAddressBook").d("reason", ex.what()));
         return false;
     }
 }
 
-void ContactUploaderEngineImpl::executeAsyncRemoveAddressBookTask( const std::string& sourceAddressBookId ) {
-
-    contactsUploaderStatusChanged( ContactUploaderStatus::REMOVE_CONTACTS_STARTED, EMPTY_STRING );
+void ContactUploaderEngineImpl::executeAsyncRemoveAddressBookTask(const std::string& sourceAddressBookId) {
+    contactsUploaderStatusChanged(ContactUploaderStatus::REMOVE_CONTACTS_STARTED, EMPTY_STRING);
     try {
-        auto addressBookId = m_contactUploaderRESTAgent->getAddressBookId( sourceAddressBookId, getPceId() );
+        auto addressBookId = m_contactUploaderRESTAgent->getAddressBookId(sourceAddressBookId, getPceId());
 
-        if( !addressBookId.empty() ) {
-            ThrowIfNot( m_contactUploaderRESTAgent->deleteAddressBookId( addressBookId, getPceId() ), "deleteAddressBookIdFailed" ) ;
+        if (!addressBookId.empty()) {
+            ThrowIfNot(
+                m_contactUploaderRESTAgent->deleteAddressBookId(addressBookId, getPceId()),
+                "deleteAddressBookIdFailed");
         }
-        contactsUploaderStatusChanged( ContactUploaderStatus::REMOVE_CONTACTS_COMPLETED, EMPTY_STRING );
+        contactsUploaderStatusChanged(ContactUploaderStatus::REMOVE_CONTACTS_COMPLETED, EMPTY_STRING);
 
-    } catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"executeRemoveAddressBook").d("reason", ex.what() ) );
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "executeRemoveAddressBook").d("reason", ex.what()));
         emptyFailedContactListQueue();
-        contactsUploaderStatusChanged( ContactUploaderStatus::REMOVE_CONTACTS_ERROR, EMPTY_STRING );
+        contactsUploaderStatusChanged(ContactUploaderStatus::REMOVE_CONTACTS_ERROR, EMPTY_STRING);
     }
-    setContactUploadProgressState( ContactUploaderInternalState::IDLE );
+    setContactUploadProgressState(ContactUploaderInternalState::IDLE);
 }
 
-bool ContactUploaderEngineImpl::deleteAddressBook( const std::string& sourceAddressBookId ) {
+bool ContactUploaderEngineImpl::deleteAddressBook(const std::string& sourceAddressBookId) {
     try {
-        auto addressBookId = m_contactUploaderRESTAgent->getAddressBookId( sourceAddressBookId, getPceId() );
+        auto addressBookId = m_contactUploaderRESTAgent->getAddressBookId(sourceAddressBookId, getPceId());
 
-        if( !addressBookId.empty() ) {
-            ThrowIfNot( m_contactUploaderRESTAgent->deleteAddressBookId( addressBookId, getPceId() ), "deleteAddressBookIdFailed" ) ;
+        if (!addressBookId.empty()) {
+            ThrowIfNot(
+                m_contactUploaderRESTAgent->deleteAddressBookId(addressBookId, getPceId()),
+                "deleteAddressBookIdFailed");
         }
         return true;
 
-    } catch( std::exception& ex ) {
-        AACE_ERROR(LX( TAG,"deleteAddressBook" ).d( "reason", ex.what() ) );
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "deleteAddressBook").d("reason", ex.what()));
         return false;
     }
 }
 
-bool ContactUploaderEngineImpl::validateContactJson( const std::string& contact ) {
+bool ContactUploaderEngineImpl::validateContactJson(const std::string& contact) {
     rapidjson::Document document;
-    try { 
-        if( document.Parse( contact.c_str()).HasParseError() ) {
-            Throw( "parseError" );
+    try {
+        if (document.Parse(contact.c_str()).HasParseError()) {
+            Throw("parseError");
         }
-        if( document[ "id" ].IsNull() || document[ "id" ].GetStringLength() == 0 ) {
-            Throw( "contactIdNotValid" );
-        }
-
-        if( document.HasMember( "firstName" ) && document[ "firstName" ].GetStringLength() > MAX_ALLOWED_CHARACTERS ) {
-            Throw( "firstNameNotValid" );
+        if (document["id"].IsNull() || document["id"].GetStringLength() == 0) {
+            Throw("contactIdNotValid");
         }
 
-        if( document.HasMember( "lastName" ) && document[ "lastName" ].GetStringLength() > MAX_ALLOWED_CHARACTERS ) {
-            Throw( "lastNameNotValid" );
+        if (document.HasMember("firstName") && document["firstName"].GetStringLength() > MAX_ALLOWED_CHARACTERS) {
+            Throw("firstNameNotValid");
         }
 
-        if( document.HasMember(  "nickName" ) && document[ "nickName" ].GetStringLength() > MAX_ALLOWED_CHARACTERS ) {
-            Throw( "nickNameNotValid" );
+        if (document.HasMember("lastName") && document["lastName"].GetStringLength() > MAX_ALLOWED_CHARACTERS) {
+            Throw("lastNameNotValid");
         }
 
-        if( document.HasMember(  "company" ) && document[ "company" ].GetStringLength() > MAX_ALLOWED_CHARACTERS ) {
-            Throw( "companyNotValid" );
+        if (document.HasMember("nickName") && document["nickName"].GetStringLength() > MAX_ALLOWED_CHARACTERS) {
+            Throw("nickNameNotValid");
         }
 
-        auto addressess = document.FindMember( "addresses" );
-        if( addressess == document.MemberEnd() ) {
-            Throw( "noAddressesField" );
-        } else if( !addressess->value.IsArray() ) {
-            Throw( "addressesFieldNotArray" );
-        } else if( addressess->value.Size() == 0 ) {
-            Throw( "emptyAddressesField" );
-        } else if( addressess->value.Size() ) {
+        if (document.HasMember("company") && document["company"].GetStringLength() > MAX_ALLOWED_CHARACTERS) {
+            Throw("companyNotValid");
+        }
+
+        auto addressess = document.FindMember("addresses");
+        if (addressess == document.MemberEnd()) {
+            Throw("noAddressesField");
+        } else if (!addressess->value.IsArray()) {
+            Throw("addressesFieldNotArray");
+        } else if (addressess->value.Size() == 0) {
+            Throw("emptyAddressesField");
+        } else if (addressess->value.Size()) {
             int phonenumberCount = 0;
-            for( rapidjson::Value::ConstValueIterator itr = addressess->value.Begin(); itr != addressess->value.End(); itr++ ) {
-                if( (*itr).HasMember( "type" ) && (*itr)[ "type" ].IsString() && strcmp( "phonenumber", (*itr)[ "type" ].GetString() ) == 0 ) {
-                    if( (*itr).HasMember( "value" ) && (*itr)[ "value" ].IsString() && ( (*itr)[ "value" ].GetStringLength() > 0 && (*itr)[ "value" ].GetStringLength() <= MAX_ALLOWED_PHONENUMBER_CHARACTERS ) )  {
+            for (rapidjson::Value::ConstValueIterator itr = addressess->value.Begin(); itr != addressess->value.End();
+                 itr++) {
+                if ((*itr).HasMember("type") && (*itr)["type"].IsString() &&
+                    strcmp("phonenumber", (*itr)["type"].GetString()) == 0) {
+                    if ((*itr).HasMember("value") && (*itr)["value"].IsString() &&
+                        ((*itr)["value"].GetStringLength() > 0 &&
+                         (*itr)["value"].GetStringLength() <= MAX_ALLOWED_PHONENUMBER_CHARACTERS)) {
                         phonenumberCount++;
                     } else {
-                        Throw( "phoneNumberValueNotValid" );
+                        Throw("phoneNumberValueNotValid");
                     }
                 } else {
-                    Throw( "phoneNumberFormatInvalid" );
+                    Throw("phoneNumberFormatInvalid");
                 }
             }
-            if( phonenumberCount > MAX_ALLOWED_PHONENUMBER_PER_CONTACT ) {
-                Throw( "phoneNumberMaxSize" );
+            if (phonenumberCount > MAX_ALLOWED_PHONENUMBER_PER_CONTACT) {
+                Throw("phoneNumberMaxSize");
             }
         }
 
         return true;
-    } catch( std::exception& ex ) {
-        AACE_ERROR(LX( TAG,"validateContactJson" ).d( "reason", ex.what() ) );
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "validateContactJson").d("reason", ex.what()));
         return false;
     }
 }
 
-} // aace::engine::contactUploader
-} // aace::engine
-} // aace
+}  // namespace contactUploader
+}  // namespace engine
+}  // namespace aace

@@ -20,14 +20,12 @@ import com.amazon.aace.core.PlatformInterface;
 /**
  * PhoneCallController should be extended to perform CBL authentication
  */
-abstract public class CBL extends PlatformInterface
-{
+abstract public class CBL extends PlatformInterface {
     /**
      * Specifies the state of the authorization flow
      *
      */
-    public enum CBLState
-    {
+    public enum CBLState {
         /**
          * CBL process is starting
          * @hideinitializer
@@ -72,7 +70,7 @@ abstract public class CBL extends PlatformInterface
         /**
          * @internal
          */
-        private CBLState( String name ) {
+        private CBLState(String name) {
             m_name = name;
         }
 
@@ -88,8 +86,7 @@ abstract public class CBL extends PlatformInterface
      * Specifies the reason for a state change
      * @hideinitializer
      */
-    public enum CBLStateChangedReason
-    {
+    public enum CBLStateChangedReason {
         /**
          * THe CBL state changed successfully
          * @hideinitializer
@@ -134,7 +131,7 @@ abstract public class CBL extends PlatformInterface
         /**
          * @internal
          */
-        private CBLStateChangedReason( String name ) {
+        private CBLStateChangedReason(String name) {
             m_name = name;
         }
 
@@ -146,26 +143,22 @@ abstract public class CBL extends PlatformInterface
         }
     }
 
-    public CBL() {
-    }
+    public CBL() {}
 
     /**
      * Notifies the platform implementation of an authorization flow state change
      */
-    public void cblStateChanged( CBLState state, CBLStateChangedReason reason, String url, String code ) {
-    }
+    public void cblStateChanged(CBLState state, CBLStateChangedReason reason, String url, String code) {}
 
     /**
-    * Notifies the platform implementation to clear the refresh token
-    */
-    public void clearRefreshToken() {
-    }
+     * Notifies the platform implementation to clear the refresh token
+     */
+    public void clearRefreshToken() {}
 
     /**
      * Notifies the platform implementation to set the refresh token
      */
-    public void setRefreshToken( String refreshToken ) {
-    }
+    public void setRefreshToken(String refreshToken) {}
 
     /**
      * Returns the refresh token stored by the platform implementation, otherwise return an empty string
@@ -178,29 +171,27 @@ abstract public class CBL extends PlatformInterface
      * Notifies the platform implementation to set the user profile, this is requested one time after authorization
      * requestUserProfile must be enabled in configuration
      */
-    public void setUserProfile( String name, String email ) {
-    }
-    
+    public void setUserProfile(String name, String email) {}
 
     /**
      * Notifies the Engine to begin the authorization process
      */
     final protected void start() {
-        start( getNativeRef() );
+        start(getNativeRef());
     }
 
     /**
      * Notifies the Engine to cancel the authorization process
      */
     final protected void cancel() {
-        cancel( getNativeRef() );
+        cancel(getNativeRef());
     }
 
     /**
      * Notifies the Engine to reset the authorization state
      */
     final protected void reset() {
-        reset( getNativeRef() );
+        reset(getNativeRef());
     }
 
     // NativeRef implementation
@@ -208,16 +199,16 @@ abstract public class CBL extends PlatformInterface
         return createBinder();
     }
 
-    final protected void disposeNativeRef( long nativeRef ) {
-        disposeBinder( nativeRef );
+    final protected void disposeNativeRef(long nativeRef) {
+        disposeBinder(nativeRef);
     }
 
     // Native Engine JNI methods
     private native long createBinder();
-    private native void disposeBinder( long nativeRef );
-    private native void start( long nativeRef );
-    private native void cancel( long nativeRef );
-    private native void reset( long nativeRef );
+    private native void disposeBinder(long nativeRef);
+    private native void start(long nativeRef);
+    private native void cancel(long nativeRef);
+    private native void reset(long nativeRef);
 }
 
 // END OF FILE

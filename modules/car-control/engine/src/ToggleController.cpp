@@ -12,9 +12,12 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-#include <ToggleController/ToggleControllerAttributeBuilder.h>
 
 #include "AACE/Engine/CarControl/ToggleController.h"
+
+#include <AVSCommon/AVS/CapabilitySemantics.h>
+#include <ToggleController/ToggleControllerAttributeBuilder.h>
+
 #include "AACE/Engine/Core/EngineMacros.h"
 
 namespace aace {
@@ -25,19 +28,19 @@ namespace carControl {
 static const std::string TAG("aace.engine.carControl.ToggleController");
 
 std::shared_ptr<ToggleController> ToggleController::create(
-    const json& j,
+    const json& controllerConfig,
     const std::string& endpointId,
     const std::string& interface,
     const AssetStore& assetStore) {
     try {
-        std::string instance = j.at("instance");
+        std::string instance = controllerConfig.at("instance");
         ThrowIf(instance.empty(), "missingInstance");
 
         auto attributeBuilder =
             alexaClientSDK::capabilityAgents::toggleController::ToggleControllerAttributeBuilder::create();
         alexaClientSDK::avsCommon::avs::CapabilityResources capabilityResources;
 
-        auto& friendlyNames = j.at("capabilityResources").at("friendlyNames");
+        auto& friendlyNames = controllerConfig.at("capabilityResources").at("friendlyNames");
         for (auto& item : friendlyNames.items()) {
             auto& value = item.value().at("value");
             std::string assetId = value.at("assetId");
@@ -47,6 +50,15 @@ std::shared_ptr<ToggleController> ToggleController::create(
             }
         }
         attributeBuilder->withCapabilityResources(capabilityResources);
+
+        if (controllerConfig.contains("semantics")) {
+            auto& semanticsJson = controllerConfig.at("semantics");
+            alexaClientSDK::avsCommon::utils::Optional<alexaClientSDK::avsCommon::avs::CapabilitySemantics> semantics =
+                getSemantics(semanticsJson);
+            ThrowIfNot(semantics.hasValue(), "failedToParseSemanticsConfig");
+            attributeBuilder->withSemantics(semantics.value());
+        }
+
         auto attributes = attributeBuilder->build();
         ThrowIfNot(attributes.hasValue(), "invalidAttributes");
         auto controller = std::shared_ptr<ToggleController>(
@@ -64,8 +76,7 @@ ToggleController::ToggleController(
     const std::string& interface,
     const std::string& instance,
     ToggleControllerAttributes attributes) :
-        PrimitiveController(endpointId, interface, instance),
-        m_attributes(attributes) {
+        PrimitiveController(endpointId, interface, instance), m_attributes(attributes) {
 }
 
 void ToggleController::build(

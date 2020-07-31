@@ -22,6 +22,6 @@ namespace network {
 NetworkObservableInterface::~NetworkObservableInterface() {
 }
 
-} // aace::engine::network
-} // aace::engine
-} // aace
+}  // namespace network
+}  // namespace engine
+}  // namespace aace

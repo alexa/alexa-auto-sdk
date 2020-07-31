@@ -23,25 +23,24 @@ package com.amazon.aace.alexa;
 import com.amazon.aace.core.PlatformInterface;
 
 abstract public class GlobalPreset extends PlatformInterface {
-
-    public GlobalPreset (){}
+    public GlobalPreset() {}
     /**
      * Called after receiving a global preset play directive
      *
      * @param preset The preset integer from the playbackContextToken
      */
-     public void setGlobalPreset( int preset ) {};
+    public void setGlobalPreset(int preset){};
 
     // NativeRef implementation
     final protected long createNativeRef() {
         return createBinder();
     }
 
-    final protected void disposeNativeRef( long nativeRef ) {
-        disposeBinder( nativeRef );
+    final protected void disposeNativeRef(long nativeRef) {
+        disposeBinder(nativeRef);
     }
 
     // Native Engine JNI methods
     private native long createBinder();
-    private native void disposeBinder( long nativeRef );
+    private native void disposeBinder(long nativeRef);
 }

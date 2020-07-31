@@ -31,15 +31,16 @@ namespace network {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class NetworkInfoProviderHandler : public aace::network::NetworkInfoProvider /* isa PlatformInterface */ {
-  private:
+private:
     std::weak_ptr<Activity> m_activity{};
     std::weak_ptr<logger::LoggerHandler> m_loggerHandler{};
 
-  protected:
+protected:
     NetworkInfoProviderHandler(std::weak_ptr<Activity> activity, std::weak_ptr<logger::LoggerHandler> loggerHandler);
 
-  public:
-    template <typename... Args> static auto create(Args &&... args) -> std::shared_ptr<NetworkInfoProviderHandler> {
+public:
+    template <typename... Args>
+    static auto create(Args&&... args) -> std::shared_ptr<NetworkInfoProviderHandler> {
         return std::shared_ptr<NetworkInfoProviderHandler>(new NetworkInfoProviderHandler(args...));
     }
     auto getActivity() -> std::weak_ptr<Activity>;
@@ -50,10 +51,10 @@ class NetworkInfoProviderHandler : public aace::network::NetworkInfoProvider /* 
     auto getNetworkStatus() -> aace::network::NetworkInfoProvider::NetworkStatus override;
     auto getWifiSignalStrength() -> int override;
 
-  private:
+private:
     std::weak_ptr<View> m_console{};
 
-    auto log(logger::LoggerHandler::Level level, const std::string &message) -> void;
+    auto log(logger::LoggerHandler::Level level, const std::string& message) -> void;
     auto setupUI() -> void;
 
     /// Current network status
@@ -63,7 +64,7 @@ class NetworkInfoProviderHandler : public aace::network::NetworkInfoProvider /* 
     int m_wifiSignalStrength;
 };
 
-} // namespace network
-} // namespace sampleApp
+}  // namespace network
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_NETWORK_NETWORKINFOPROVIDERHANDLER_H
+#endif  // SAMPLEAPP_NETWORK_NETWORKINFOPROVIDERHANDLER_H

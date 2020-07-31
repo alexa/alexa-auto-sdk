@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">2.2.1</span>
+   &#160;<span id="projectnumber">2.3.0</span>
    </div>
   </td>
  </tr>
@@ -94,6 +94,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aadf5e36e715105b0c182cab93d3bf427"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:accca664acb40638ec78da0f223f767cb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client.html#accca664acb40638ec78da0f223f767cb">connectionStatusChanged</a> (<a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_connection_status.html">ConnectionStatus</a> status, <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_connection_changed_reason.html">ConnectionChangedReason</a> reason)</td></tr>
 <tr class="separator:accca664acb40638ec78da0f223f767cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5205acb15d66b99404896253611d657f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client.html#a5205acb15d66b99404896253611d657f">stopForegroundActivity</a> ()</td></tr>
+<tr class="separator:a5205acb15d66b99404896253611d657f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client.html">AlexaClient</a> should be extended to handle Alexa state changes on the platform. </p>
@@ -196,12 +198,30 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a5205acb15d66b99404896253611d657f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5205acb15d66b99404896253611d657f">&#9670;&nbsp;</a></span>stopForegroundActivity()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void com.amazon.aace.alexa.AlexaClient.stopForegroundActivity </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Stops the foreground activity if there is one. This acts as a "stop" button that can be used to stop an ongoing activity that has acquired the audio or visual focus. This call will trigger the action to stop all user-observable activities and return immediately </p>
+
+</div>
+</div>
 </div><!-- contents -->
 <html>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 2.2.1 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 2.3.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

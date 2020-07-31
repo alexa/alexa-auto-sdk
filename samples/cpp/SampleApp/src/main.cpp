@@ -23,10 +23,10 @@ using Application = sampleApp::Application;
 using Status = sampleApp::Status;
 
 // C++ Standard Library
-#include <csignal>  // std::signal and SIG_ERR macro
-#include <fstream>  // std::ifstream and std::ifstream::in
-#include <iostream> // std::cerr and std::cout
-#include <memory>   // std::unique_ptr
+#include <csignal>   // std::signal and SIG_ERR macro
+#include <fstream>   // std::ifstream and std::ifstream::in
+#include <iostream>  // std::cerr and std::cout
+#include <memory>    // std::unique_ptr
 
 // Guidelines Support Library
 #define GSL_THROW_ON_CONTRACT_VIOLATION
@@ -34,31 +34,33 @@ using Status = sampleApp::Status;
 
 static sampleApp::TTY tty;
 
-static void cbreakOnExit() { tty.reset(fileno(stdin)); }
+static void cbreakOnExit() {
+    tty.reset(fileno(stdin));
+}
 
 static void cbreakSigCatch(int signal) {
     tty.reset(fileno(stdin));
     std::_Exit(Status::Success);
 }
 
-static void usageExit(std::string &name);
+static void usageExit(std::string& name);
 
-static void errorExit(std::string &name, std::string &&msg) {
+static void errorExit(std::string& name, std::string&& msg) {
     std::cerr << "Error: " << msg << "\n\n";
     usageExit(name);
 }
 
-static void missingArgumentExit(std::string &name, std::string &arg) {
+static void missingArgumentExit(std::string& name, std::string& arg) {
     std::cerr << "Missing Argument: " << arg << "\n\n";
     usageExit(name);
 }
 
-static void unknownArgumentExit(std::string &name, std::string &arg) {
+static void unknownArgumentExit(std::string& name, std::string& arg) {
     std::cerr << "Unknown Argument: " << arg << "\n\n";
     usageExit(name);
 }
 
-static void usageExit(std::string &name) {
+static void usageExit(std::string& name) {
     std::cerr << "Usage: " << name.substr(name.find_last_of('/') + 1)
               << " [option...]\n"
                  "\n"
@@ -74,7 +76,7 @@ static void usageExit(std::string &name) {
                  "\n"
                  "  -l LEVEL\n"
                  "  --level LEVEL\n"
-                 "      Application log level (default none).\n" // Important: do not sort levels
+                 "      Application log level (default none).\n"  // Important: do not sort levels
                  "      VERBOSE:  Verbose log of an event, enabled only for debug builds\n"
                  "      INFO:     Log of a normal event, used in release builds\n"
                  "      METRIC:   Log of a metric, enabled only for builds with metrics enabled\n"
@@ -110,12 +112,13 @@ static void usageExit(std::string &name) {
     exit(Status::Failure);
 }
 
-int main(int argc, const char *argv[]) {
+int main(int argc, const char* argv[]) {
     try {
         auto args = sampleApp::Args(argc, argv);
-        auto c1 = [](const std::string &arg, unsigned char chr = '-') { return arg[0] == chr; };
-        auto c2 = [](const std::string &arg, unsigned char chr = '-', const std::string &str = "") {
-            return ((arg[1] == chr) && (arg[2] == '\0')) || ((arg[1] == '-') && (arg.compare(2, std::string::npos, str) == 0));
+        auto c1 = [](const std::string& arg, unsigned char chr = '-') { return arg[0] == chr; };
+        auto c2 = [](const std::string& arg, unsigned char chr = '-', const std::string& str = "") {
+            return ((arg[1] == chr) && (arg[2] == '\0')) ||
+                   ((arg[1] == '-') && (arg.compare(2, std::string::npos, str) == 0));
         };
         auto list = args.list();
         auto name = args.name();
@@ -149,7 +152,7 @@ int main(int argc, const char *argv[]) {
                         missingArgumentExit(name, arg);
                     }
                     arg = list[i];
-                    const char *level = arg.c_str();
+                    const char* level = arg.c_str();
                     if (strcasecmp(level, "VERBOSE") == 0) {
                         applicationContext->setLevel(Level::VERBOSE);
                     } else if (strcasecmp(level, "INFO") == 0) {
@@ -209,7 +212,8 @@ int main(int argc, const char *argv[]) {
                 } else if (c2(arg, ' ', "single-threaded-ui")) {
                     applicationContext->setSingleThreadedUI(true);
                 } else if (c2(arg, 'w', "wake-word")) {
-                    auto support = applicationContext->isWakeWordSupported() ? "wake word supported" : "wake word not supported";
+                    auto support =
+                        applicationContext->isWakeWordSupported() ? "wake word supported" : "wake word not supported";
                     std::cerr << "--wake-word option is deprecated (" << support << ")\n";
                 } else if (c2(arg, 'h', "help") || c2(arg, '?')) {
                     usageExit(name);
@@ -245,7 +249,7 @@ int main(int argc, const char *argv[]) {
             application.reset();
         } while (status == Status::Restart);
         return status;
-    } catch (std::exception &exception) {
+    } catch (std::exception& exception) {
         std::cerr << "\n" << exception.what() << "\n\n";
     }
     return Status::Failure;

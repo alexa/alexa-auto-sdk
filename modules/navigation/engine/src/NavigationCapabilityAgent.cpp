@@ -32,16 +32,19 @@ static const std::string TAG("aace.navigation.NavigationCapabilityAgent");
 
 /// The namespace for this capability agent.
 static const std::string NAMESPACE{"Navigation"};
-    
+
 /// The StartNavigation directive signature.
 static const alexaClientSDK::avsCommon::avs::NamespaceAndName START_NAVIGATION{NAMESPACE, "StartNavigation"};
 
 /// The ShowPreviousWaypoints directive signature.
-static const alexaClientSDK::avsCommon::avs::NamespaceAndName SHOW_PREVIOUS_WAYPOINTS{NAMESPACE, "ShowPreviousWaypoints"};
+static const alexaClientSDK::avsCommon::avs::NamespaceAndName SHOW_PREVIOUS_WAYPOINTS{NAMESPACE,
+                                                                                      "ShowPreviousWaypoints"};
 
 /// The NavigateToPreviousWaypoint directive signature.
-static const alexaClientSDK::avsCommon::avs::NamespaceAndName NAVIGATE_TO_PREVIOUS_WAYPOINT{NAMESPACE, "NavigateToPreviousWaypoint"};
-    
+static const alexaClientSDK::avsCommon::avs::NamespaceAndName NAVIGATE_TO_PREVIOUS_WAYPOINT{
+    NAMESPACE,
+    "NavigateToPreviousWaypoint"};
+
 /// The CancelNavigation directive signature.
 static const alexaClientSDK::avsCommon::avs::NamespaceAndName CANCEL_NAVIGATION{NAMESPACE, "CancelNavigation"};
 
@@ -62,7 +65,7 @@ static const std::string CAPABILITY_INTERFACE_NAVIGATION_PROVIDER_NAME_KEY = "pr
 static const std::string NAVIGATION_STATE_NAVIGATING = "NAVIGATING";
 static const std::string NAVIGATION_STATE_NOT_NAVIGATING = "NOT_NAVIGATING";
 static const std::string NAVIGATION_STATE_UNKNOWN = "UNKNOWN";
-    
+
 // Waypoint Type accepted values
 static const std::string WAYPOINT_TYPE_SOURCE = "SOURCE";
 static const std::string WAYPOINT_TYPE_INTERIM = "INTERIM";

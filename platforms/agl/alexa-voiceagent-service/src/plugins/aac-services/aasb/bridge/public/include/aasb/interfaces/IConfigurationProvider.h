@@ -53,18 +53,18 @@ public:
         /**
          * Construct the audio io configuration object.
          */
-        AudioIOConfiguration()
-            : useGStreamerAudioIO(false),
-              voiceInputDevice(""),
-              communicationInputDevice(""),
-              loopbackInputDevice(""),
-              ttsOutputDevice(""),
-              musicOutputDevice(""),
-              notificationOutputDevice(""),
-              alarmOutputDevice(""),
-              earconOutputDevice(""),
-              communicationOutputDevice(""),
-              ringtoneOutputDevice("") {
+        AudioIOConfiguration() :
+                useGStreamerAudioIO(false),
+                voiceInputDevice(""),
+                communicationInputDevice(""),
+                loopbackInputDevice(""),
+                ttsOutputDevice(""),
+                musicOutputDevice(""),
+                notificationOutputDevice(""),
+                alarmOutputDevice(""),
+                earconOutputDevice(""),
+                communicationOutputDevice(""),
+                ringtoneOutputDevice("") {
         }
     };
 
@@ -102,7 +102,7 @@ public:
          */
         bool hasSiriusXM;
         /**
-         * DAB. 
+         * DAB.
          */
         bool hasDAB;
 
@@ -131,8 +131,7 @@ public:
         /**
          * Construct the Local Voice Control Configuration object.
          */
-        LVCConfiguration() :
-                socketRootDirectory("") {
+        LVCConfiguration() : socketRootDirectory("") {
         }
     };
 
@@ -157,19 +156,18 @@ public:
 
                 /**
                  * Add sync controller
-                */
+                 */
                 std::string syncControllerId;
 
                 /**
                  * Add recirculation controller
-                */
+                 */
                 std::string recirculationControllerId;
 
                 /*
                  * Climate constructor
                  */
-                Climate() :
-                    enabled(false) {
+                Climate() : enabled(false) {
                 }
             };
 
@@ -207,9 +205,7 @@ public:
                 /**
                  *  Air conditioner constructor
                  */
-                AirConditioner() :
-                    enabled(false) {
-
+                AirConditioner() : enabled(false) {
                 }
             };
 
@@ -252,13 +248,7 @@ public:
                 /**
                  *  Heater
                  */
-                Heater() :
-                    enabled(false),
-                    minimum(60),
-                    maximum(80),
-                    precision(1),
-                    unit("FAHRENHEIT") {
-
+                Heater() : enabled(false), minimum(60), maximum(80), precision(1), unit("FAHRENHEIT") {
                 }
             };
 
@@ -296,12 +286,7 @@ public:
                 /**
                  *  Fan
                  */
-                Fan() :
-                    enabled(false),
-                    minimum(1),
-                    maximum(10),
-                    precision(1) {
-
+                Fan() : enabled(false), minimum(1), maximum(10), precision(1) {
                 }
             };
 
@@ -323,14 +308,13 @@ public:
 
                 /**
                  * Add vent positions
-                */
+                 */
                 std::vector<std::string> positions;
 
                 /**
                  *  Vent
                  */
-                Vent() :
-                    enabled(false) {
+                Vent() : enabled(false) {
                 }
             };
 
@@ -358,10 +342,7 @@ public:
                 /**
                  *  Window
                  */
-                Window() :
-                    enabled(false),
-                    defrost(false) {
-
+                Window() : enabled(false), defrost(false) {
                 }
             };
 
@@ -394,10 +375,7 @@ public:
                 /**
                  *  Light
                  */
-                Light() :
-                    enabled(false),
-                    type("LIGHT") {
-
+                Light() : enabled(false), type("LIGHT") {
                 }
             };
 
@@ -449,8 +427,7 @@ public:
             /*
              * Endpoint constructor
              */
-            Endpoint() :
-                enabled(false), zone("zone.all") {
+            Endpoint() : enabled(false), zone("zone.all") {
             }
         };
 
@@ -464,14 +441,11 @@ public:
          */
         std::vector<Endpoint> endpoints;
 
-
         /**
          * Construct the Car Control Configuration object.
          */
-        CarControlConfiguration() :
-                enabled(false) {
+        CarControlConfiguration() : enabled(false) {
         }
-
     };
 
     /**
@@ -635,7 +609,7 @@ public:
 
     /**
      * Get Vehicle information.
-     * 
+     *
      * @return std::shared_ptr<std::istream> Stream containing JSON value for vehicle information
      */
     virtual std::shared_ptr<std::istream> getVehicleConfig() = 0;

@@ -46,11 +46,12 @@ public:
      * 
      * The database will be created on initialization if it does not already exist.
      */
-    static std::shared_ptr<aace::core::config::EngineConfiguration> createLocalStorageConfig( const std::string& localStoragePath );
+    static std::shared_ptr<aace::core::config::EngineConfiguration> createLocalStorageConfig(
+        const std::string& localStoragePath);
 };
 
-} // aace::storage::config
-} // aace::storage
-} // aace
+}  // namespace config
+}  // namespace storage
+}  // namespace aace
 
-#endif // AACE_STORAGE_STORAGE_CONFIGURATION_H
+#endif  // AACE_STORAGE_STORAGE_CONFIGURATION_H

@@ -18,16 +18,18 @@ package com.amazon.sampleapp.logView;
 import org.json.JSONObject;
 
 public class LogEntry {
-
     private final int mType;
     private final JSONObject mJson;
 
-    public LogEntry( int type, JSONObject json ) {
+    public LogEntry(int type, JSONObject json) {
         mType = type;
         mJson = json;
     }
 
-    public int getType(){ return mType; }
-    public JSONObject getJSON(){ return mJson; }
+    public int getType() {
+        return mType;
+    }
+    public JSONObject getJSON() {
+        return mJson;
+    }
 }
-

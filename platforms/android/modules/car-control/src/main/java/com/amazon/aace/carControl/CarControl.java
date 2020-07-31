@@ -34,7 +34,6 @@ import com.amazon.aace.core.PlatformInterface;
  *      @c endpointId and @c controllerId.
  */
 abstract public class CarControl extends PlatformInterface {
-
     /**
      * CarControl constructor.
      */
@@ -46,7 +45,7 @@ abstract public class CarControl extends PlatformInterface {
      * @param endpointId The unique identifier of the endpoint.
      * @exception Exception The controller cannot be powered on.
      */
-    public void turnPowerControllerOn( String endpointId ) throws Exception {
+    public void turnPowerControllerOn(String endpointId) throws Exception {
         throw new Exception("Invalid");
     }
     /**
@@ -55,7 +54,7 @@ abstract public class CarControl extends PlatformInterface {
      * @param endpointId The unique identifier of the endpoint.
      * @exception Exception The controller cannot be powered off.
      */
-    public void turnPowerControllerOff( String endpointId ) throws Exception {
+    public void turnPowerControllerOff(String endpointId) throws Exception {
         throw new Exception("Invalid");
     }
     /**
@@ -65,7 +64,7 @@ abstract public class CarControl extends PlatformInterface {
      * @exception Exception The power state of the controller identified by @c endpointId cannot be retrieved.
      * @return @c true if the power controller is on.
      */
-    public boolean isPowerControllerOn( String endpointId ) throws Exception {
+    public boolean isPowerControllerOn(String endpointId) throws Exception {
         throw new Exception("Invalid");
     }
 
@@ -76,7 +75,7 @@ abstract public class CarControl extends PlatformInterface {
      * @param controllerId The unique identifier of the controller.
      * @exception Exception The controller cannot be powered on.
      */
-    public void turnToggleControllerOn( String endpointId, String controllerId ) throws Exception {
+    public void turnToggleControllerOn(String endpointId, String controllerId) throws Exception {
         throw new Exception("Invalid");
     }
     /**
@@ -86,7 +85,7 @@ abstract public class CarControl extends PlatformInterface {
      * @param controllerId The unique identifier of the controller.
      * @exception Exception The controller cannot be powered off.
      */
-    public void turnToggleControllerOff( String endpointId, String controllerId ) throws Exception {
+    public void turnToggleControllerOff(String endpointId, String controllerId) throws Exception {
         throw new Exception("Invalid");
     }
     /**
@@ -95,10 +94,11 @@ abstract public class CarControl extends PlatformInterface {
      *
      * @param endpointId The unique identifier of the endpoint.
      * @param controllerId The unique identifier of the controller.
-     * @exception Exception The power state of the controller identified by @c endpointId and @c controllerId cannot be retrieved.
+     * @exception Exception The power state of the controller identified by @c endpointId and @c controllerId cannot be
+     * retrieved.
      * @return @c true if the controller is on.
      */
-    public boolean isToggleControllerOn( String endpointId, String controllerId ) throws Exception { 
+    public boolean isToggleControllerOn(String endpointId, String controllerId) throws Exception {
         throw new Exception("Invalid");
     }
 
@@ -111,11 +111,12 @@ abstract public class CarControl extends PlatformInterface {
      * @param value The new range setting.
      * @exception Exception The range setting of the controller cannot be set.
      */
-    public void setRangeControllerValue( String endpointId, String controllerId, double value ) throws Exception {
+    public void setRangeControllerValue(String endpointId, String controllerId, double value) throws Exception {
         throw new Exception("Invalid");
     }
     /**
-     * Notifies the platform implementation to adjust the range setting of the controller identified by @c endpointId and
+     * Notifies the platform implementation to adjust the range setting of the controller identified by @c endpointId
+     * and
      * @c controllerId.
      *
      * @param endpointId The unique identifier of the endpoint.
@@ -123,7 +124,7 @@ abstract public class CarControl extends PlatformInterface {
      * @param delta The delta by which to adjust the range setting.
      * @exception Exception The range setting of the controller cannot be adjusted.
      */
-    public void adjustRangeControllerValue( String endpointId, String controllerId, double delta ) throws Exception {
+    public void adjustRangeControllerValue(String endpointId, String controllerId, double delta) throws Exception {
         throw new Exception("Invalid");
     }
     /**
@@ -131,10 +132,11 @@ abstract public class CarControl extends PlatformInterface {
      *
      * @param endpointId The unique identifier of the endpoint.
      * @param controllerId The unique identifier of the controller.
-     * @exception Exception The range setting of the controller identified by @c endpointId and @c controllerId cannot be retrieved.
+     * @exception Exception The range setting of the controller identified by @c endpointId and @c controllerId cannot
+     * be retrieved.
      * @return The range setting of the controller.
      */
-    public double getRangeControllerValue( String endpointId, String controllerId ) throws Exception {
+    public double getRangeControllerValue(String endpointId, String controllerId) throws Exception {
         throw new Exception("Invalid");
     }
     /**
@@ -146,7 +148,7 @@ abstract public class CarControl extends PlatformInterface {
      * @param value The new mode to set.
      * @exception Exception The mode of the controller cannot be set.
      */
-    public void setModeControllerValue( String endpointId, String controllerId, String value ) throws Exception {
+    public void setModeControllerValue(String endpointId, String controllerId, String value) throws Exception {
         throw new Exception("Invalid");
     }
     /**
@@ -158,7 +160,7 @@ abstract public class CarControl extends PlatformInterface {
      * @param delta The delta by which to adjust the mode.
      * @exception Exception The mode of the controller cannot be adjusted.
      */
-    public void adjustModeControllerValue( String endpointId, String controllerId, int delta ) throws Exception {
+    public void adjustModeControllerValue(String endpointId, String controllerId, int delta) throws Exception {
         throw new Exception("Invalid");
     }
     /**
@@ -166,10 +168,11 @@ abstract public class CarControl extends PlatformInterface {
      *
      * @param endpointId The unique identifier of the endpoint.
      * @param controllerId The unique identifier of the controller.
-     * @exception Exception The mode of the controller identified by @c endpointId and @c controllerId cannot be retrieved.
+     * @exception Exception The mode of the controller identified by @c endpointId and @c controllerId cannot be
+     * retrieved.
      * @return The mode of the controller.
      */
-    public String getModeControllerValue( String endpointId, String controllerId ) throws Exception { 
+    public String getModeControllerValue(String endpointId, String controllerId) throws Exception {
         throw new Exception("Invalid");
     }
 
@@ -178,12 +181,11 @@ abstract public class CarControl extends PlatformInterface {
         return createBinder();
     }
 
-    final protected void disposeNativeRef( long nativeRef ) {
-        disposeBinder( nativeRef );
+    final protected void disposeNativeRef(long nativeRef) {
+        disposeBinder(nativeRef);
     }
 
     // Native Engine JNI methods
     private native long createBinder();
-    private native void disposeBinder( long nativeRef );
-
+    private native void disposeBinder(long nativeRef);
 }

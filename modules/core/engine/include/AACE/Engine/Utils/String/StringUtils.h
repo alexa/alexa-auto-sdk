@@ -28,22 +28,21 @@ namespace string {
 static const char* TRUE = "true";
 static const char* FALSE = "false";
 
-bool equal( const std::string& str1, const std::string& str2, bool caseSensitive = true );
-std::string toLower( const std::string& str );
-std::string toUpper( const std::string& str );
-std::shared_ptr<std::stringstream> toStream( const std::string& str );
+bool equal(const std::string& str1, const std::string& str2, bool caseSensitive = true);
+std::string toLower(const std::string& str);
+std::string toUpper(const std::string& str);
+std::shared_ptr<std::stringstream> toStream(const std::string& str);
 
 template <typename T>
-std::string from( T value ) {
+std::string from(T value) {
     std::stringstream stream;
     stream << value;
     return stream.str();
 }
 
+}  // namespace string
+}  // namespace utils
+}  // namespace engine
+}  // namespace aace
 
-} // aace::engine::utils::string
-} // aace::engine::utils
-} // aace::engine
-} // aace
-
-#endif // AACE_ENGINE_UTILS_STRING_STRING_UTILS_H_
+#endif  // AACE_ENGINE_UTILS_STRING_STRING_UTILS_H_

@@ -31,135 +31,162 @@ namespace aace {
 namespace engine {
 namespace logger {
 
-std::shared_ptr<EngineLogger> EngineLogger::getInstance()
-{
-    static std::shared_ptr<EngineLogger> s_instance( new EngineLogger() );
+std::shared_ptr<EngineLogger> EngineLogger::getInstance() {
+    static std::shared_ptr<EngineLogger> s_instance(new EngineLogger());
     return s_instance;
 }
 
-EngineLogger::EngineLogger()
-{
+EngineLogger::EngineLogger() {
 #ifdef AAC_DEFAULT_LOGGER_ENABLED
 #ifdef AAC_DEFAULT_LOGGER_SINK
 #if defined AAC_DEFAULT_LOGGER_SINK_CONSOLE
-   auto sink = aace::engine::logger::sink::ConsoleSink::create( "default" );
+    auto sink = aace::engine::logger::sink::ConsoleSink::create("default");
 #elif defined AAC_DEFAULT_LOGGER_SINK_SYSLOG
-   auto sink = aace::engine::logger::sink::SyslogSink::create( "default" );
+    auto sink = aace::engine::logger::sink::SyslogSink::create("default");
 #else
 #error "Unknown logger sink"
 #endif
 
 #ifdef AAC_DEFAULT_LOGGER_LEVEL
 #if defined AAC_DEFAULT_LOGGER_LEVEL_VERBOSE
-    auto rule = aace::engine::logger::sink::Rule::create( Level::VERBOSE,
+    auto rule = aace::engine::logger::sink::Rule::create(
+        Level::VERBOSE,
         aace::engine::logger::sink::Rule::EMPTY,
         aace::engine::logger::sink::Rule::EMPTY,
-        aace::engine::logger::sink::Rule::EMPTY );
+        aace::engine::logger::sink::Rule::EMPTY);
 #elif defined AAC_DEFAULT_LOGGER_LEVEL_INFO
-    auto rule = aace::engine::logger::sink::Rule::create( Level::INFO,
+    auto rule = aace::engine::logger::sink::Rule::create(
+        Level::INFO,
         aace::engine::logger::sink::Rule::EMPTY,
         aace::engine::logger::sink::Rule::EMPTY,
-        aace::engine::logger::sink::Rule::EMPTY );
+        aace::engine::logger::sink::Rule::EMPTY);
 #elif defined AAC_DEFAULT_LOGGER_LEVEL_METRIC
-    auto rule = aace::engine::logger::sink::Rule::create( Level::METRIC,
+    auto rule = aace::engine::logger::sink::Rule::create(
+        Level::METRIC,
         aace::engine::logger::sink::Rule::EMPTY,
         aace::engine::logger::sink::Rule::EMPTY,
-        aace::engine::logger::sink::Rule::EMPTY );
+        aace::engine::logger::sink::Rule::EMPTY);
 #elif defined AAC_DEFAULT_LOGGER_LEVEL_WARN
-    auto rule = aace::engine::logger::sink::Rule::create( Level::WARN,
+    auto rule = aace::engine::logger::sink::Rule::create(
+        Level::WARN,
         aace::engine::logger::sink::Rule::EMPTY,
         aace::engine::logger::sink::Rule::EMPTY,
-        aace::engine::logger::sink::Rule::EMPTY );
+        aace::engine::logger::sink::Rule::EMPTY);
 #elif defined AAC_DEFAULT_LOGGER_LEVEL_ERROR
-    auto rule = aace::engine::logger::sink::Rule::create( Level::ERROR,
+    auto rule = aace::engine::logger::sink::Rule::create(
+        Level::ERROR,
         aace::engine::logger::sink::Rule::EMPTY,
         aace::engine::logger::sink::Rule::EMPTY,
-        aace::engine::logger::sink::Rule::EMPTY );
+        aace::engine::logger::sink::Rule::EMPTY);
 #elif defined AAC_DEFAULT_LOGGER_LEVEL_CRITICAL
-    auto rule = aace::engine::logger::sink::Rule::create( Level::CRITICAL,
+    auto rule = aace::engine::logger::sink::Rule::create(
+        Level::CRITICAL,
         aace::engine::logger::sink::Rule::EMPTY,
         aace::engine::logger::sink::Rule::EMPTY,
-        aace::engine::logger::sink::Rule::EMPTY );
+        aace::engine::logger::sink::Rule::EMPTY);
 #else
 #error "Unknown logger level"
 #endif
 
     // add the default rule to the sink
-    sink->addRule( rule, false );
+    sink->addRule(rule, false);
 
-#endif // AAC_DEFAULT_LOGGER_LEVEL
+#endif  // AAC_DEFAULT_LOGGER_LEVEL
 
     // add the console sink to the logger
-    addSink( sink, false );
+    addSink(sink, false);
 
-#endif // AAC_DEFAULT_LOGGER_SINK
-#endif // AAC_DEFAULT_LOGGER_ENABLED
+#endif  // AAC_DEFAULT_LOGGER_SINK
+#endif  // AAC_DEFAULT_LOGGER_ENABLED
 }
 
-void EngineLogger::addObserver( std::shared_ptr<aace::engine::logger::LogEventObserver> observer ) {
-    std::lock_guard<std::mutex> lock( m_mutex );
-    m_observers.insert( observer );
+void EngineLogger::addObserver(std::shared_ptr<aace::engine::logger::LogEventObserver> observer) {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_observers.insert(observer);
 }
 
-void EngineLogger::removeObserver( std::shared_ptr<aace::engine::logger::LogEventObserver> observer ) {
-    std::lock_guard<std::mutex> lock( m_mutex );
-    m_observers.erase( observer );
+void EngineLogger::removeObserver(std::shared_ptr<aace::engine::logger::LogEventObserver> observer) {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_observers.erase(observer);
 }
 
-void EngineLogger::log( Level level, const LogEntry& entry ) {
-    emit( "AAC", entry.tag(), level, std::chrono::system_clock::now(), ThreadMoniker::getThisThreadMoniker(), entry.c_str() );
+void EngineLogger::log(Level level, const LogEntry& entry) {
+    emit(
+        "AAC",
+        entry.tag(),
+        level,
+        std::chrono::system_clock::now(),
+        ThreadMoniker::getThisThreadMoniker(),
+        entry.c_str());
 }
 
-void EngineLogger::log( const std::string& source, Level level, const LogEntry& entry ) {
-    emit( source, entry.tag(), level, std::chrono::system_clock::now(), ThreadMoniker::getThisThreadMoniker(), entry.c_str() );
+void EngineLogger::log(const std::string& source, Level level, const LogEntry& entry) {
+    emit(
+        source,
+        entry.tag(),
+        level,
+        std::chrono::system_clock::now(),
+        ThreadMoniker::getThisThreadMoniker(),
+        entry.c_str());
 }
 
-void EngineLogger::log( const std::string& source, const std::string& tag, Level level, std::chrono::system_clock::time_point time, const std::string& threadMoniker, const std::string& text ) {
-    emit( source, tag, level, time, threadMoniker, text );
+void EngineLogger::log(
+    const std::string& source,
+    const std::string& tag,
+    Level level,
+    std::chrono::system_clock::time_point time,
+    const std::string& threadMoniker,
+    const std::string& text) {
+    emit(source, tag, level, time, threadMoniker, text);
 }
 
-void EngineLogger::emit( const std::string& source, const std::string& tag, Level level, std::chrono::system_clock::time_point time, const std::string& threadMoniker, const std::string& text )
-{
-    std::lock_guard<std::mutex> lock( m_mutex );
-    
+void EngineLogger::emit(
+    const std::string& source,
+    const std::string& tag,
+    Level level,
+    std::chrono::system_clock::time_point time,
+    const std::string& threadMoniker,
+    const std::string& text) {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     // iterate through each register sink and emit the log entry
-    for( auto it = m_sinkMap.begin(); it != m_sinkMap.end(); it++ ) {
-        it->second->emit( source, tag, level, time, threadMoniker.c_str(), text.c_str() );
+    for (auto it = m_sinkMap.begin(); it != m_sinkMap.end(); it++) {
+        it->second->emit(source, tag, level, time, threadMoniker.c_str(), text.c_str());
     }
-    
+
     // iterate through all of the log event observers and log the message
     // to each observer in the list
-    for( auto next : m_observers ) {
-        next->onLogEvent( level, time, source.c_str(), text.c_str() );
+    for (auto next : m_observers) {
+        next->onLogEvent(level, time, source.c_str(), text.c_str());
     }
 }
 
-bool EngineLogger::addSink( std::shared_ptr<aace::engine::logger::sink::Sink> sink, bool replace )
-{
-    if( replace || m_sinkMap.find( sink->getId() ) == m_sinkMap.end() ) {
+bool EngineLogger::addSink(std::shared_ptr<aace::engine::logger::sink::Sink> sink, bool replace) {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    if (replace || m_sinkMap.find(sink->getId()) == m_sinkMap.end()) {
         m_sinkMap[sink->getId()] = sink;
         return true;
-    }
-    else {
+    } else {
         return false;
     }
 }
 
-std::shared_ptr<aace::engine::logger::sink::Sink> EngineLogger::getSink( const std::string& id ) {
-    return m_sinkMap.find( id ) != m_sinkMap.end() ? m_sinkMap[id] : nullptr;
+std::shared_ptr<aace::engine::logger::sink::Sink> EngineLogger::getSink(const std::string& id) {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    return m_sinkMap.find(id) != m_sinkMap.end() ? m_sinkMap[id] : nullptr;
 }
 
-bool EngineLogger::removeSink( const std::string& id )
-{
-    auto it = m_sinkMap.find( id );
+bool EngineLogger::removeSink(const std::string& id) {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    auto it = m_sinkMap.find(id);
 
-    if( it != m_sinkMap.end() ) {
-        m_sinkMap.erase( it );
+    if (it != m_sinkMap.end()) {
+        m_sinkMap.erase(it);
     }
 
     return true;
 }
 
-} // aace::engine::logger
-} // aace::engine
-} // aace
+}  // namespace logger
+}  // namespace engine
+}  // namespace aace

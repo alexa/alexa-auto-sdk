@@ -30,13 +30,13 @@ private:
     Base64() = default;
 
 public:
-    static bool encode( std::istream& src, std::ostream& dest );
-    static bool decode( std::istream& src, std::ostream& dest );
+    static bool encode(std::istream& src, std::ostream& dest);
+    static bool decode(std::istream& src, std::ostream& dest);
 };
 
-} // aace::engine::utils::encoding
-} // aace::engine::utils
-} // aace::engine
-} // aace
+}  // namespace encoding
+}  // namespace utils
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_UTILS_ENCODING_BASE64_H
+#endif  // AACE_ENGINE_UTILS_ENCODING_BASE64_H

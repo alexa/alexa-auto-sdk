@@ -1,7 +1,13 @@
+set(PROJECT_URL "https://github.com/alexa/alexa-auto-sdk")
+
 function(add_aace_library libname)
     PROJECT_TARGET_ADD(${libname})
-    # Use IMPORTED_LOCATION_RELEASE as a bundled library
+    # Use IMPORTED_LOCATION_* as a bundled library
     get_target_property(imppath ${libname} IMPORTED_LOCATION_RELEASE)
+    if (imppath MATCHES ".*NOTFOUND")
+        get_target_property(imppath ${libname} IMPORTED_LOCATION_DEBUG)
+    endif()
+
     # Set LABELS and IMPORTED_LOCATION for AGL app-templates
     set_target_properties(${libname} PROPERTIES
         LABELS LIBRARY
@@ -68,6 +74,7 @@ add_avs_library(Equalizer ${AAC_HOME}/lib/libEqualizer.so)
 add_avs_library(EqualizerImplementations ${AAC_HOME}/lib/libEqualizerImplementations.so)
 add_avs_library(ExternalMediaPlayer ${AAC_HOME}/lib/libExternalMediaPlayer.so)
 add_avs_library(InteractionModel ${AAC_HOME}/lib/libInteractionModel.so)
+add_avs_library(InterruptModel ${AAC_HOME}/lib/libInterruptModel.so)
 add_avs_library(KWD ${AAC_HOME}/lib/libKWD.so)
 add_avs_library(ModeController ${AAC_HOME}/lib/libModeController.so)
 add_avs_library(MRM ${AAC_HOME}/lib/libMRM.so)
@@ -104,9 +111,8 @@ endif()
 if(EXISTS ${AAC_HOME}/share/cmake/AACELocalVoiceControl.cmake)
     add_aace_library(AACELocalVoiceControlEngine)
     add_aace_library(AACELocalVoiceControlPlatform)
-    add_avs_library(libHybridProxy ${AAC_HOME}/lib/libHybridProxy.so)
     add_avs_library(libahe_logger ${AAC_HOME}/lib/libahe_logger.so)
-    add_avs_library(libahe_platform_interfaces ${AAC_HOME}/lib/libahe_platform_interfaces_ipc.so)
+    add_avs_library(libahe_platform_interfaces_ipc ${AAC_HOME}/lib/libahe_platform_interfaces_ipc.so)
     add_avs_library(libboost_atomic ${AAC_HOME}/lib/libboost_atomic.so.1.68.0)
     add_avs_library(libboost_chrono ${AAC_HOME}/lib/libboost_chrono.so.1.68.0)
     add_avs_library(libboost_date_time ${AAC_HOME}/lib/libboost_date_time.so.1.68.0)

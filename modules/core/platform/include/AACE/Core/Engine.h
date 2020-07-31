@@ -35,11 +35,10 @@ namespace core {
  */
 class Engine {
 public:
-
     static std::shared_ptr<Engine> create();
 
     virtual ~Engine() = default;
-    
+
     /**
      * Sets the Engine configuration to a set of configuration objects
      *
@@ -47,8 +46,9 @@ public:
      * @c std::initializer_list<aace::core::config::EngineConfiguration*>
      * @return @c true if the Engine configuration was successful, else @c false
      */
-    virtual bool configure( std::initializer_list<std::shared_ptr<aace::core::config::EngineConfiguration>> configurationList ) = 0;
-    
+    virtual bool configure(
+        std::initializer_list<std::shared_ptr<aace::core::config::EngineConfiguration>> configurationList) = 0;
+
     /**
      * Sets the Engine configuration to a set of configuration objects
      *
@@ -56,15 +56,15 @@ public:
      * @c std::vector<aace::core::config::EngineConfiguration*>
      * @return @c true if the Engine configuration was successful, else @c false
      */
-    virtual bool configure( std::vector<std::shared_ptr<aace::core::config::EngineConfiguration>> configurationList ) = 0;
-    
+    virtual bool configure(std::vector<std::shared_ptr<aace::core::config::EngineConfiguration>> configurationList) = 0;
+
     /**
      * Sets the Engine configuration to a single configuration object
      *
      * @param [in] configuration An @c aace::core::config::EngineConfiguration object
      * @return @c true if the Engine configuration was successful, else @c false
      */
-    virtual bool configure( std::shared_ptr<aace::core::config::EngineConfiguration> configuration ) = 0;
+    virtual bool configure(std::shared_ptr<aace::core::config::EngineConfiguration> configuration) = 0;
 
     /**
      * Starts the Engine and attempts to establish a connection to AVS
@@ -105,8 +105,8 @@ public:
      * @return @c true if the property value was updated or set to the current
      *         setting, else @c false if an error occured.
      */
-    virtual bool setProperty( const std::string& key, const std::string& value ) = 0;
-    
+    virtual bool setProperty(const std::string& key, const std::string& value) = 0;
+
     /**
      * @note This method is deprecated. Use
      *       aace::propertyManager::PropertyManager::getProperty()
@@ -121,8 +121,8 @@ public:
      * @return The property value as a string, or an empty string if the 
      *        property value was not found
      */
-    virtual std::string getProperty( const std::string& key ) = 0;
-    
+    virtual std::string getProperty(const std::string& key) = 0;
+
     /**
      * Registers a @c PlatformInterface instance with the Engine
      *
@@ -133,7 +133,7 @@ public:
      *
      * @sa aace::core::PlatformInterface 
      */
-    virtual bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) = 0;
+    virtual bool registerPlatformInterface(std::shared_ptr<aace::core::PlatformInterface> platformInterface) = 0;
 
     /**
      * Registers a list of @c PlatformInterface instances with the Engine
@@ -146,10 +146,11 @@ public:
      * @sa aace::core::PlatformInterface 
      * @sa registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface )
      */
-    virtual bool registerPlatformInterface( std::initializer_list<std::shared_ptr<aace::core::PlatformInterface>> platformInterfaceList ) = 0;
+    virtual bool registerPlatformInterface(
+        std::initializer_list<std::shared_ptr<aace::core::PlatformInterface>> platformInterfaceList) = 0;
 };
 
-} // aace::core
-} // aace
+}  // namespace core
+}  // namespace aace
 
-#endif // AACE_CORE_ENGINE_H
+#endif  // AACE_CORE_ENGINE_H

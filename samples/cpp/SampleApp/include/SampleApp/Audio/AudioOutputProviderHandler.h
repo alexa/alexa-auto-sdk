@@ -39,16 +39,19 @@ namespace audio {
 class DefaultAudioOutput;
 
 class AudioOutputProviderHandler : public aace::audio::AudioOutputProvider /* isa PlatformInterface */ {
-  private:
+private:
     std::weak_ptr<Activity> m_activity{};
     std::weak_ptr<logger::LoggerHandler> m_loggerHandler{};
 
-  protected:
-    AudioOutputProviderHandler(std::weak_ptr<Activity> activity,
-                  std::weak_ptr<logger::LoggerHandler> loggerHandler, bool setup = true);
+protected:
+    AudioOutputProviderHandler(
+        std::weak_ptr<Activity> activity,
+        std::weak_ptr<logger::LoggerHandler> loggerHandler,
+        bool setup = true);
 
-  public:
-    template <typename... Args> static auto create(Args &&... args) -> std::shared_ptr<AudioOutputProviderHandler> {
+public:
+    template <typename... Args>
+    static auto create(Args&&... args) -> std::shared_ptr<AudioOutputProviderHandler> {
         return std::shared_ptr<AudioOutputProviderHandler>(new AudioOutputProviderHandler(args...));
     }
     auto getActivity() -> std::weak_ptr<Activity>;
@@ -56,13 +59,13 @@ class AudioOutputProviderHandler : public aace::audio::AudioOutputProvider /* is
     auto setupUI() -> void;
 
     // aace::audio::AudioOutputProvider interface
-    std::shared_ptr<aace::audio::AudioOutput> openChannel( const std::string& name, AudioOutputType type ) override;
+    std::shared_ptr<aace::audio::AudioOutput> openChannel(const std::string& name, AudioOutputType type) override;
 
-  private:
+private:
     std::weak_ptr<View> m_console{};
     std::weak_ptr<View> m_alertStateView{};
 
-    auto log(logger::LoggerHandler::Level level, const std::string &message) -> void;
+    auto log(logger::LoggerHandler::Level level, const std::string& message) -> void;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -71,10 +74,9 @@ class AudioOutputProviderHandler : public aace::audio::AudioOutputProvider /* is
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class DefaultAudioOutput :
-    public aace::audio::AudioOutput,
-    public std::enable_shared_from_this<DefaultAudioOutput> {
-
+class DefaultAudioOutput
+        : public aace::audio::AudioOutput
+        , public std::enable_shared_from_this<DefaultAudioOutput> {
 private:
     DefaultAudioOutput(
         std::weak_ptr<ApplicationContext> applicationContext,
@@ -82,28 +84,29 @@ private:
         const std::string& name,
         std::chrono::milliseconds minPlayDuration = std::chrono::milliseconds(1),
         std::chrono::milliseconds maxPlayDuration = std::chrono::milliseconds(1),
-        bool enableOutput = false );
+        bool enableOutput = false);
 
-    auto log(logger::LoggerHandler::Level level, const std::string &message) -> void;
-    auto writeStreamToFile( std::shared_ptr<aace::audio::AudioStream> stream ) -> void;
+    auto log(logger::LoggerHandler::Level level, const std::string& message) -> void;
+    auto writeStreamToFile(std::shared_ptr<aace::audio::AudioStream> stream) -> void;
 
 public:
-    template <typename... Args> static auto create(Args &&... args) -> std::unique_ptr<DefaultAudioOutput> {
+    template <typename... Args>
+    static auto create(Args&&... args) -> std::unique_ptr<DefaultAudioOutput> {
         return std::unique_ptr<DefaultAudioOutput>(new DefaultAudioOutput(args...));
     }
 
     // aace::audio::AudioOutput
-    bool prepare( std::shared_ptr<aace::audio::AudioStream> stream, bool repeating ) override;
-    bool prepare( const std::string& url, bool repeating ) override;
+    bool prepare(std::shared_ptr<aace::audio::AudioStream> stream, bool repeating) override;
+    bool prepare(const std::string& url, bool repeating) override;
     bool play() override;
     bool stop() override;
     bool pause() override;
     bool resume() override;
     int64_t getPosition() override;
-    bool setPosition( int64_t position ) override;
+    bool setPosition(int64_t position) override;
     int64_t getDuration() override;
-    bool volumeChanged( float volume ) override;
-    bool mutedStateChanged( MutedState state ) override;
+    bool volumeChanged(float volume) override;
+    bool mutedStateChanged(MutedState state) override;
 
 private:
     std::weak_ptr<ApplicationContext> m_applicationContext{};
@@ -124,7 +127,7 @@ private:
     std::mutex m_mutex;
 };
 
-} // namespace audio
-} // namespace sampleApp
+}  // namespace audio
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_AUDIO_AUDIOOUTPUTPROVIDERHANDLER_H
+#endif  // SAMPLEAPP_AUDIO_AUDIOOUTPUTPROVIDERHANDLER_H

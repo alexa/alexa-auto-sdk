@@ -31,15 +31,16 @@ namespace alexa {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class EqualizerControllerHandler : public aace::alexa::EqualizerController /* isa PlatformInterface */ {
-  private:
+private:
     std::weak_ptr<Activity> m_activity{};
     std::weak_ptr<logger::LoggerHandler> m_loggerHandler{};
 
-  protected:
+protected:
     EqualizerControllerHandler(std::weak_ptr<Activity> activity, std::weak_ptr<logger::LoggerHandler> loggerHandler);
 
-  public:
-    template <typename... Args> static auto create(Args &&... args) -> std::shared_ptr<EqualizerControllerHandler> {
+public:
+    template <typename... Args>
+    static auto create(Args&&... args) -> std::shared_ptr<EqualizerControllerHandler> {
         return std::shared_ptr<EqualizerControllerHandler>(new EqualizerControllerHandler(args...));
     }
     auto getActivity() -> std::weak_ptr<Activity>;
@@ -48,16 +49,16 @@ class EqualizerControllerHandler : public aace::alexa::EqualizerController /* is
     // aace::alexa::EqualizerController interface
 
     auto getBandLevels() -> std::vector<EqualizerControllerHandler::EqualizerBandLevel> override;
-    auto setBandLevels(const std::vector<EqualizerControllerHandler::EqualizerBandLevel> &bandLevels) -> void override;
+    auto setBandLevels(const std::vector<EqualizerControllerHandler::EqualizerBandLevel>& bandLevels) -> void override;
 
-  private:
+private:
     std::weak_ptr<View> m_console{};
 
-    auto log(logger::LoggerHandler::Level level, const std::string &message) -> void;
+    auto log(logger::LoggerHandler::Level level, const std::string& message) -> void;
     auto setupUI() -> void;
 };
 
-} // namespace alexa
-} // namespace sampleApp
+}  // namespace alexa
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_ALEXA_EQUALIZERCONTROLLERHANDLER_H
+#endif  // SAMPLEAPP_ALEXA_EQUALIZERCONTROLLERHANDLER_H

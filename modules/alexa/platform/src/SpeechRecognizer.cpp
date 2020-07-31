@@ -18,57 +18,56 @@
 namespace aace {
 namespace alexa {
 
-SpeechRecognizer::SpeechRecognizer( bool wakewordDetectionEnabled ) : m_wakewordDetectionEnabled( wakewordDetectionEnabled ) {
+SpeechRecognizer::SpeechRecognizer(bool wakewordDetectionEnabled) :
+        m_wakewordDetectionEnabled(wakewordDetectionEnabled) {
 }
 
-SpeechRecognizer::~SpeechRecognizer() = default; // key function
+SpeechRecognizer::~SpeechRecognizer() = default;  // key function
 
 bool SpeechRecognizer::holdToTalk() {
-    return startCapture( Initiator::HOLD_TO_TALK );
+    return startCapture(Initiator::HOLD_TO_TALK);
 }
 
 bool SpeechRecognizer::tapToTalk() {
-    return startCapture( Initiator::TAP_TO_TALK );
+    return startCapture(Initiator::TAP_TO_TALK);
 }
 
-bool SpeechRecognizer::startCapture( Initiator initiator, uint64_t keywordBegin, uint64_t keywordEnd, const std::string& keyword ) {
-    if( auto m_speechRecognizerEngineInterface_lock = m_speechRecognizerEngineInterface.lock() ) {
-        return m_speechRecognizerEngineInterface_lock->onStartCapture( initiator, keywordBegin, keywordEnd, keyword );
-    }
-    else {
+bool SpeechRecognizer::startCapture(
+    Initiator initiator,
+    uint64_t keywordBegin,
+    uint64_t keywordEnd,
+    const std::string& keyword) {
+    if (auto m_speechRecognizerEngineInterface_lock = m_speechRecognizerEngineInterface.lock()) {
+        return m_speechRecognizerEngineInterface_lock->onStartCapture(initiator, keywordBegin, keywordEnd, keyword);
+    } else {
         return false;
     }
 }
 
 bool SpeechRecognizer::stopCapture() {
-    if( auto m_speechRecognizerEngineInterface_lock = m_speechRecognizerEngineInterface.lock() ) {
+    if (auto m_speechRecognizerEngineInterface_lock = m_speechRecognizerEngineInterface.lock()) {
         return m_speechRecognizerEngineInterface_lock->onStopCapture();
-    }
-    else {
+    } else {
         return false;
     }
 }
 
-bool SpeechRecognizer::enableWakewordDetection() 
-{
+bool SpeechRecognizer::enableWakewordDetection() {
     m_wakewordDetectionEnabled = true;
 
-    if( auto m_speechRecognizerEngineInterface_lock = m_speechRecognizerEngineInterface.lock() ) {
+    if (auto m_speechRecognizerEngineInterface_lock = m_speechRecognizerEngineInterface.lock()) {
         return m_speechRecognizerEngineInterface_lock->enableWakewordDetection();
-    }
-    else {
+    } else {
         return false;
     }
 }
 
-bool SpeechRecognizer::disableWakewordDetection() 
-{
+bool SpeechRecognizer::disableWakewordDetection() {
     m_wakewordDetectionEnabled = false;
-    
-    if( auto m_speechRecognizerEngineInterface_lock = m_speechRecognizerEngineInterface.lock() ) {
+
+    if (auto m_speechRecognizerEngineInterface_lock = m_speechRecognizerEngineInterface.lock()) {
         return m_speechRecognizerEngineInterface_lock->disableWakewordDetection();
-    }
-    else {
+    } else {
         return false;
     }
 }
@@ -77,16 +76,17 @@ bool SpeechRecognizer::isWakewordDetectionEnabled() {
     return m_wakewordDetectionEnabled;
 }
 
-bool SpeechRecognizer::wakewordDetected( const std::string& wakeword ) {
+bool SpeechRecognizer::wakewordDetected(const std::string& wakeword) {
     return true;
 }
 
 void SpeechRecognizer::endOfSpeechDetected() {
 }
 
-void SpeechRecognizer::setEngineInterface( std::shared_ptr<aace::alexa::SpeechRecognizerEngineInterface> speechRecognizerEngineInterface ) {
+void SpeechRecognizer::setEngineInterface(
+    std::shared_ptr<aace::alexa::SpeechRecognizerEngineInterface> speechRecognizerEngineInterface) {
     m_speechRecognizerEngineInterface = speechRecognizerEngineInterface;
 }
 
-} // aace::alexa
-} // aac
+}  // namespace alexa
+}  // namespace aace

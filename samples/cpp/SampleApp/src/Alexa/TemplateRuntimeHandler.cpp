@@ -33,19 +33,25 @@ namespace alexa {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TemplateRuntimeHandler::TemplateRuntimeHandler(std::weak_ptr<Activity> activity, std::weak_ptr<logger::LoggerHandler> loggerHandler)
-    : m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
+TemplateRuntimeHandler::TemplateRuntimeHandler(
+    std::weak_ptr<Activity> activity,
+    std::weak_ptr<logger::LoggerHandler> loggerHandler) :
+        m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
     // Expects((m_activity != nullptr) && (m_loggerHandler != nullptr));
     setupUI();
 }
 
-std::weak_ptr<Activity> TemplateRuntimeHandler::getActivity() { return m_activity; }
+std::weak_ptr<Activity> TemplateRuntimeHandler::getActivity() {
+    return m_activity;
+}
 
-std::weak_ptr<logger::LoggerHandler> TemplateRuntimeHandler::getLoggerHandler() { return m_loggerHandler; }
+std::weak_ptr<logger::LoggerHandler> TemplateRuntimeHandler::getLoggerHandler() {
+    return m_loggerHandler;
+}
 
 // aace::alexa::TemplateRuntime interface
 
-void TemplateRuntimeHandler::renderTemplate(const std::string &payload, FocusState focusState) {
+void TemplateRuntimeHandler::renderTemplate(const std::string& payload, FocusState focusState) {
     std::stringstream ss;
     ss << "focusState=" << focusState;
     log(logger::LoggerHandler::Level::INFO, "renderTemplate:payload=" + payload + "," + ss.str());
@@ -53,12 +59,12 @@ void TemplateRuntimeHandler::renderTemplate(const std::string &payload, FocusSta
     if (!activity) {
         return;
     }
-    
-    if(wasPayloadJustSeen(payload)) {
+
+    if (wasPayloadJustSeen(payload)) {
         //ignore
         return;
     }
-    
+
     m_startTemplate = std::chrono::system_clock::now();
     activity->runOnUIThread([=]() {
         auto applicationContext = activity->getApplicationContext();
@@ -99,7 +105,11 @@ void TemplateRuntimeHandler::clearTemplate() {
     });
 }
 
-void TemplateRuntimeHandler::renderPlayerInfo(const std::string &payload, PlayerActivity audioPlayerState, std::chrono::milliseconds offset, FocusState focusState) {
+void TemplateRuntimeHandler::renderPlayerInfo(
+    const std::string& payload,
+    PlayerActivity audioPlayerState,
+    std::chrono::milliseconds offset,
+    FocusState focusState) {
     std::stringstream ss;
     ss << "audioPlayerState=" << audioPlayerState << ",offset=" << offset.count() << ",focusState=" << focusState;
     log(logger::LoggerHandler::Level::INFO, "renderPlayerInfo:payload=" + payload + "," + ss.str());
@@ -107,12 +117,12 @@ void TemplateRuntimeHandler::renderPlayerInfo(const std::string &payload, Player
     if (!activity) {
         return;
     }
-    
-    if(wasPayloadJustSeen(payload)) {
+
+    if (wasPayloadJustSeen(payload)) {
         //ignore
         return;
     }
-    
+
     m_startPlayerInfo = std::chrono::system_clock::now();
     activity->runOnUIThread([=]() {
         auto applicationContext = activity->getApplicationContext();
@@ -155,7 +165,7 @@ void TemplateRuntimeHandler::clearPlayerInfo() {
 
 // private
 
-void TemplateRuntimeHandler::log(logger::LoggerHandler::Level level, const std::string &message) {
+void TemplateRuntimeHandler::log(logger::LoggerHandler::Level level, const std::string& message) {
     auto loggerHandler = m_loggerHandler.lock();
     if (!loggerHandler) {
         return;
@@ -171,22 +181,22 @@ void TemplateRuntimeHandler::setupUI() {
     m_console = activity->findViewById("id:console");
 }
 
-bool TemplateRuntimeHandler::wasPayloadJustSeen(const std::string &payload) {
+bool TemplateRuntimeHandler::wasPayloadJustSeen(const std::string& payload) {
     auto elapsed = std::chrono::steady_clock::now() - m_whenCachedLastpayload;
     unsigned milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
 
     const unsigned MIN_MILLISECONDS_ELAPSED_FOR_PRINTING_SAME_RESULT = 1000;
-    if(milliseconds < MIN_MILLISECONDS_ELAPSED_FOR_PRINTING_SAME_RESULT ) {
-        if(m_lastPayload == payload) {
+    if (milliseconds < MIN_MILLISECONDS_ELAPSED_FOR_PRINTING_SAME_RESULT) {
+        if (m_lastPayload == payload) {
             return true;
         }
     }
-    
+
     m_lastPayload = payload;
     m_whenCachedLastpayload = std::chrono::steady_clock::now();
-    
+
     return false;
 }
 
-} // namespace alexa
-} // namespace sampleApp
+}  // namespace alexa
+}  // namespace sampleApp

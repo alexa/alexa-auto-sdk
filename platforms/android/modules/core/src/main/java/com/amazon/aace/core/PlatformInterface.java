@@ -19,5 +19,4 @@ package com.amazon.aace.core;
  * PlatformInterface is the base class for all platform interfaces.
  * It can be extended to create custom platform interfaces.
  */
-abstract public class PlatformInterface extends NativeRef {
-}
+abstract public class PlatformInterface extends NativeRef {}

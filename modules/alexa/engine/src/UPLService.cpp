@@ -27,10 +27,7 @@ std::shared_ptr<UPLService> UPLService::getInstance() {
     return s_instance;
 }
 
-UPLService::UPLService() :
-        m_dialogId{""},
-        m_currentState{DialogState::NONE},
-        m_isOnline(true){
+UPLService::UPLService() : m_dialogId{""}, m_currentState{DialogState::NONE}, m_isOnline(true) {
 }
 
 void UPLService::resetStatesForId(const std::string& dialogId) {
@@ -58,7 +55,9 @@ void UPLService::updateDialogStateForId(const DialogState currentState, const st
 
     //Set online or offline
     m_isOnline = isOnline;
-    AACE_DEBUG(LX(TAG, "Setting UPL Metric to online or offline:").d("dialogRequestId", dialogId).d("connection online", isOnline));
+    AACE_DEBUG(LX(TAG, "Setting UPL Metric to online or offline:")
+                   .d("dialogRequestId", dialogId)
+                   .d("connection online", isOnline));
 
     //Manage state logic based on currentState
     manageStates(currentState, dialogId);
@@ -69,7 +68,7 @@ void UPLService::manageStates(const DialogState currentState, const std::string&
     m_currentState = currentState;
 
     //If current state is the final state (Playback Started), record UPL and reset
-    if(m_currentState ==  DialogState::PLAYBACK_FINISHED) {
+    if (m_currentState == DialogState::PLAYBACK_FINISHED) {
         recordUPL();
         resetStatesForId(dialogId);
     }
@@ -77,23 +76,30 @@ void UPLService::manageStates(const DialogState currentState, const std::string&
 
 void UPLService::recordUPL() {
     //If dialogId is not set, return
-    if(m_dialogId.empty()) {
+    if (m_dialogId.empty()) {
         AACE_CRITICAL(LX(TAG, "DialogId is empty when trying to upload UPL metric").d("connection online", m_isOnline));
         return;
     }
 
     //If Stop Capture or Playback Started were not captured, return
-    if(m_stateToTimeMap.find(DialogState::START_CAPTURE) == m_stateToTimeMap.end() || 
+    if (m_stateToTimeMap.find(DialogState::START_CAPTURE) == m_stateToTimeMap.end() ||
         m_stateToTimeMap.find(DialogState::STOP_CAPTURE) == m_stateToTimeMap.end() ||
         m_stateToTimeMap.find(DialogState::PLAYBACK_STARTED) == m_stateToTimeMap.end() ||
         m_stateToTimeMap.find(DialogState::PLAYBACK_FINISHED) == m_stateToTimeMap.end()) {
-            AACE_CRITICAL(LX(TAG, "One of StartCapture, StopCapture, PlaybackStarted, PlaybackFinished states weren't stored when trying to upload UPL metric:").d("dialogRequestId", m_dialogId).d("connection online", m_isOnline));
-            return;
+        AACE_CRITICAL(LX(TAG,
+                         "One of StartCapture, StopCapture, PlaybackStarted, PlaybackFinished states weren't stored "
+                         "when trying to upload UPL metric:")
+                          .d("dialogRequestId", m_dialogId)
+                          .d("connection online", m_isOnline));
+        return;
     }
 
     //If current state is not Playback Started, return
-    if(m_currentState != DialogState::PLAYBACK_FINISHED) {
-        AACE_CRITICAL(LX(TAG, "Current state is not PlaybackFinished. UPL will only be recorded after PlaybackFinished:").d("dialogRequestId", m_dialogId).d("connection online", m_isOnline));
+    if (m_currentState != DialogState::PLAYBACK_FINISHED) {
+        AACE_CRITICAL(
+            LX(TAG, "Current state is not PlaybackFinished. UPL will only be recorded after PlaybackFinished:")
+                .d("dialogRequestId", m_dialogId)
+                .d("connection online", m_isOnline));
         return;
     }
 
@@ -106,10 +112,11 @@ void UPLService::recordUPL() {
     double userPerceivedLatency = playbackStartedTime - stopCaptureTime;
 
     //If UPL is valid, then create a MetricEvent, add the calculated UPL and record it
-    if(userPerceivedLatency > 0) {
+    if (userPerceivedLatency > 0) {
         std::string programName = m_isOnline ? PROGRAM_NAME : PROGRAM_NAME + DELIMITER + OFFLINE_NAME;
-        std::shared_ptr<aace::engine::metrics::MetricEvent> currentMetric = 
-            std::shared_ptr<aace::engine::metrics::MetricEvent>(new aace::engine::metrics::MetricEvent(programName, SOURCE_NAME));
+        std::shared_ptr<aace::engine::metrics::MetricEvent> currentMetric =
+            std::shared_ptr<aace::engine::metrics::MetricEvent>(
+                new aace::engine::metrics::MetricEvent(programName, SOURCE_NAME));
 
         //Add start capture, stop capture, playback started and playback finished times to metric
         currentMetric->addTimer(START_CAPTURE_TIME_NAME, startCaptureTime);
@@ -122,7 +129,10 @@ void UPLService::recordUPL() {
         currentMetric->addString(DIALOG_REQUEST_ID_NAME, m_dialogId);
         currentMetric->record();
     } else {
-        AACE_CRITICAL(LX(TAG, "UserPerceivedLatency value was not valid (less than 0) when trying to upload UPL metric:").d("dialogRequestId", m_dialogId).d("connection online", m_isOnline));
+        AACE_CRITICAL(
+            LX(TAG, "UserPerceivedLatency value was not valid (less than 0) when trying to upload UPL metric:")
+                .d("dialogRequestId", m_dialogId)
+                .d("connection online", m_isOnline));
     }
 }
 
@@ -133,6 +143,6 @@ double UPLService::getCurrentTimeInMs() {
     return duration;
 }
 
-}  // alexa
-}  // engine
-}  // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace

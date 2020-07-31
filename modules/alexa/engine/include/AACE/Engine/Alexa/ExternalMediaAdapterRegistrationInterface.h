@@ -31,8 +31,8 @@ public:
     virtual std::string getPlayerId() = 0;
 };
 
-} // aace::engine::alexa
-} // aace::engine
-} // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_AACE_EXTERNAL_MEDIA_ADAPTER_REGISTRATION_INTERFACE_H
+#endif  // AACE_ENGINE_AACE_EXTERNAL_MEDIA_ADAPTER_REGISTRATION_INTERFACE_H

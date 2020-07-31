@@ -38,50 +38,61 @@ const std::string MetricsUploaderEngineImpl::HIGH_PRIORITY = "HI";
 static const std::regex metricRegex("^([^:]+):([^:]+):([^:]+):(.+):(NR|HI)");
 static const std::regex dataRegex("([^;=,:]+)=([^;=,:]+);([^;=,:]+);([0-9]+),");
 
-MetricsUploaderEngineImpl::MetricsUploaderEngineImpl( std::shared_ptr<aace::metrics::MetricsUploader> platformMetricsUploaderInterface ) :
-    aace::engine::logger::sink::Sink( TAG ),
-    m_platformMetricsUploaderInterface( platformMetricsUploaderInterface ) {
+// Overly large metric cause regular expression match errors
+static const int METRIC_LENGTH = 10000;
+
+MetricsUploaderEngineImpl::MetricsUploaderEngineImpl(
+    std::shared_ptr<aace::metrics::MetricsUploader> platformMetricsUploaderInterface) :
+        aace::engine::logger::sink::Sink(TAG), m_platformMetricsUploaderInterface(platformMetricsUploaderInterface) {
 }
 
-std::shared_ptr<MetricsUploaderEngineImpl> MetricsUploaderEngineImpl::create( std::shared_ptr<aace::metrics::MetricsUploader> platformMetricsUploaderInterface )
-{
-    try
-    {
-        ThrowIfNull( platformMetricsUploaderInterface, "invalidMetricsUploaderPlatformInterface" );
-        std::shared_ptr<MetricsUploaderEngineImpl> metricsUploaderEngineImpl = std::shared_ptr<MetricsUploaderEngineImpl>( new MetricsUploaderEngineImpl( platformMetricsUploaderInterface ) );
-        
-        ThrowIfNot( metricsUploaderEngineImpl->initialize(), "inializeMetricsUploaderEngineImplFailed" );
-        
+std::shared_ptr<MetricsUploaderEngineImpl> MetricsUploaderEngineImpl::create(
+    std::shared_ptr<aace::metrics::MetricsUploader> platformMetricsUploaderInterface) {
+    try {
+        ThrowIfNull(platformMetricsUploaderInterface, "invalidMetricsUploaderPlatformInterface");
+        std::shared_ptr<MetricsUploaderEngineImpl> metricsUploaderEngineImpl =
+            std::shared_ptr<MetricsUploaderEngineImpl>(new MetricsUploaderEngineImpl(platformMetricsUploaderInterface));
+
+        ThrowIfNot(metricsUploaderEngineImpl->initialize(), "inializeMetricsUploaderEngineImplFailed");
+
         return metricsUploaderEngineImpl;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"create").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "create").d("reason", ex.what()));
         return nullptr;
     }
 }
 
-bool MetricsUploaderEngineImpl::initialize()
-{
-    try
-    {
-        ThrowIfNot( addRule( Level::METRIC, aace::engine::logger::sink::Rule::EMPTY, aace::engine::logger::sink::Rule::EMPTY, aace::engine::logger::sink::Rule::EMPTY ), "addRuleFailed" );
+bool MetricsUploaderEngineImpl::initialize() {
+    try {
+        ThrowIfNot(
+            addRule(
+                Level::METRIC,
+                aace::engine::logger::sink::Rule::EMPTY,
+                aace::engine::logger::sink::Rule::EMPTY,
+                aace::engine::logger::sink::Rule::EMPTY),
+            "addRuleFailed");
         return true;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"initialize").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "initialize").d("reason", ex.what()));
         return false;
     }
 }
 
+// ---------------------------------------------------------------------------
+// DO NOT USE AACE_ MACROS TO LOG IN THIS FUNCTION AS IT WILL LEAD TO DEADLOCK
+// ---------------------------------------------------------------------------
 // aace::engine::logger::sink::Sink
-void MetricsUploaderEngineImpl::log( Level level, std::chrono::system_clock::time_point time, const char* threadMoniker, const char* text )
-{
+void MetricsUploaderEngineImpl::log(
+    Level level,
+    std::chrono::system_clock::time_point time,
+    const char* threadMoniker,
+    const char* text) {
     try {
         //If log is not a Metric log, then return
-        if( level != Level::METRIC ) {
+        if (level != Level::METRIC) {
             return;
         }
-        std::string logMessage = std::string (text);
+        std::string logMessage = std::string(text);
         logMessage.erase(std::remove(logMessage.begin(), logMessage.end(), '\\'), logMessage.end());
 
         //If Metric log is not Recording related, then return
@@ -89,18 +100,22 @@ void MetricsUploaderEngineImpl::log( Level level, std::chrono::system_clock::tim
             return;
         }
 
+        // Large metrics will cause regex to crash so ignore them
+        if (logMessage.size() > METRIC_LENGTH) {
+            return;
+        }
+
         //Parse program, source, datapoints to record metric
         std::smatch metricMatch;
-        if ( std::regex_match(logMessage, metricMatch, metricRegex) ) {
+        if (std::regex_match(logMessage, metricMatch, metricRegex)) {
             //Handle regex groups
             std::string programName = metricMatch[2].str();
             std::string sourceName = metricMatch[3].str();
             std::string datapoints = metricMatch[4].str();
             std::string priority = metricMatch[5].str();
-            
+
             //Validate values are not empty/null
-            if( programName.empty() || sourceName.empty() || datapoints.empty() || priority.empty() ) {
-                AACE_INFO(LX(TAG,"Ignoring metric").m("Missing data"));
+            if (programName.empty() || sourceName.empty() || datapoints.empty() || priority.empty()) {
                 return;
             }
 
@@ -113,7 +128,7 @@ void MetricsUploaderEngineImpl::log( Level level, std::chrono::system_clock::tim
             //Parse each datapoint and add to vector to pass to platform implementation
             std::vector<aace::metrics::MetricsUploader::Datapoint> datapointList;
             std::smatch data_match;
-            while ( std::regex_search(datapoints, data_match, dataRegex) ) {
+            while (std::regex_search(datapoints, data_match, dataRegex)) {
                 //Handle regex groups
                 std::string name = data_match[1].str();
                 std::string value = data_match[2].str();
@@ -122,19 +137,20 @@ void MetricsUploaderEngineImpl::log( Level level, std::chrono::system_clock::tim
 
                 //Define dataType
                 aace::metrics::MetricsUploader::DatapointType dataType;
-                if ( typeStr == TIMER_KEY ) {
+                if (typeStr == TIMER_KEY) {
                     dataType = aace::metrics::MetricsUploader::DatapointType::TIMER;
-                } else if ( typeStr == STRING_KEY ) {
+                } else if (typeStr == STRING_KEY) {
                     dataType = aace::metrics::MetricsUploader::DatapointType::STRING;
-                } else if ( typeStr == COUNTER_KEY ) {
+                } else if (typeStr == COUNTER_KEY) {
                     dataType = aace::metrics::MetricsUploader::DatapointType::COUNTER;
                 } else {
                     //No valid datatype was found
                     return;
                 }
-                
+
                 //Create and add datapoint to list
-                aace::metrics::MetricsUploader::Datapoint curData = aace::metrics::MetricsUploader::Datapoint(dataType, name, value, stoi(countStr));
+                aace::metrics::MetricsUploader::Datapoint curData =
+                    aace::metrics::MetricsUploader::Datapoint(dataType, name, value, stoi(countStr));
                 datapointList.push_back(curData);
 
                 //Set datapoints string equal to next datapoint for parsing until all datapoints parsed
@@ -142,11 +158,11 @@ void MetricsUploaderEngineImpl::log( Level level, std::chrono::system_clock::tim
             }
             m_platformMetricsUploaderInterface->record(datapointList, metadata);
         }
-    } catch( std::exception& ex ) {
+    } catch (std::exception& ex) {
         //Exception occurred
     }
 }
 
-} // aace::engine::metrics
-} // aace::engine
-} // aace
+}  // namespace metrics
+}  // namespace engine
+}  // namespace aace

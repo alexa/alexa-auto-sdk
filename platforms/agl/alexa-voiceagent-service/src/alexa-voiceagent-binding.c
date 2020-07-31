@@ -25,7 +25,6 @@ static CtlSectionT ctrlSections[] = {{.key = "plugins", .loadCB = PluginConfig},
                                      {.key = "onload", .loadCB = OnloadConfig},
                                      {.key = NULL}};
 
-
 static afb_verb_t ctrlApiVerbs[] = {
     {.verb = NULL} /* marker for end of the array */
 };

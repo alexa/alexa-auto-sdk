@@ -53,8 +53,12 @@ public:
      *
      * @return @c true if the platform implementation successfully handled the log event, else @c false
      */
-    virtual bool logEvent( aace::logger::Logger::Level level, std::chrono::system_clock::time_point time, const std::string& source, const std::string& message );
-    
+    virtual bool logEvent(
+        aace::logger::Logger::Level level,
+        std::chrono::system_clock::time_point time,
+        const std::string& source,
+        const std::string& message);
+
     /**
      * Notifies the Engine to use the AAC SDK logger to log a message originating on the platform.
      * The log event will be received by the platform with a call to @c logEvent() from the Engine.
@@ -63,7 +67,7 @@ public:
      * @param [in] tag The log tag
      * @param [in] message The log message
      */
-    void log( Level level, const std::string& tag, const std::string& message );
+    void log(Level level, const std::string& tag, const std::string& message);
 
     /**
      * @internal
@@ -71,13 +75,13 @@ public:
      *
      * Should *never* be called by the platform implementation.
      */
-    void setEngineInterface( std::shared_ptr<aace::logger::LoggerEngineInterface> loggerEngineInterface );
+    void setEngineInterface(std::shared_ptr<aace::logger::LoggerEngineInterface> loggerEngineInterface);
 
 private:
     std::shared_ptr<aace::logger::LoggerEngineInterface> m_loggerEngineInterface;
 };
 
-} // aace::core
-} // aace
+}  // namespace logger
+}  // namespace aace
 
-#endif // AACE_LOGGER_LOGGER_H
+#endif  // AACE_LOGGER_LOGGER_H

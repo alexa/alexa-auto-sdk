@@ -22,20 +22,17 @@ import com.amazon.aace.core.PlatformInterface;
  *
  * @note For observing Alexa dialog state transitions, see @c AlexaClient.dialogStateChanged().
  */
-public class SpeechSynthesizer extends PlatformInterface
-{
+public class SpeechSynthesizer extends PlatformInterface {
     // NativeRef implementation
     final protected long createNativeRef() {
         return createBinder();
     }
 
-    final protected void disposeNativeRef( long nativeRef ) {
-        disposeBinder( nativeRef );
+    final protected void disposeNativeRef(long nativeRef) {
+        disposeBinder(nativeRef);
     }
 
     // Native Engine JNI methods
     private native long createBinder();
-    private native void disposeBinder( long nativeRef );
+    private native void disposeBinder(long nativeRef);
 }
-
-

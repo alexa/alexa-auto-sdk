@@ -16,7 +16,6 @@
 package com.amazon.aace.core;
 
 public class CoreProperties {
-
     /**
      * This property is used with
      * com.amazon.aace.propertyManager.PropertyManager.getProperty() to return
@@ -24,5 +23,4 @@ public class CoreProperties {
      * @hideinitializer
      */
     public static final String VERSION = "aace.core.version";
-
 }

@@ -32,8 +32,8 @@ public:
     MOCK_METHOD0(getStream, std::shared_ptr<std::istream>());
 };
 
-} // aace::test::core
-} // aace::test
-} // aace
+}  // namespace core
+}  // namespace test
+}  // namespace aace
 
-#endif // AACE_ENGINE_TEST_CORE_MOCK_ENGINE_CONFIGURATION_H
+#endif  // AACE_ENGINE_TEST_CORE_MOCK_ENGINE_CONFIGURATION_H

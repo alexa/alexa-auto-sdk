@@ -23,163 +23,153 @@ namespace aace {
 namespace jni {
 namespace phonecontrol {
 
-    //
-    // PhoneCallControllerHandler
-    //
+//
+// PhoneCallControllerHandler
+//
 
-    class PhoneCallControllerHandler : public aace::phoneCallController::PhoneCallController {
-    public:
-        PhoneCallControllerHandler( jobject obj );
+class PhoneCallControllerHandler : public aace::phoneCallController::PhoneCallController {
+public:
+    PhoneCallControllerHandler(jobject obj);
 
-        // aace::phoneCallController::PhoneCallController
-        bool dial( const std::string& payload ) override;
-        bool redial( const std::string& payload ) override;
-        void answer( const std::string& payload ) override;
-        void stop( const std::string& payload ) override;
-        void sendDTMF( const std::string& payload ) override;
+    // aace::phoneCallController::PhoneCallController
+    bool dial(const std::string& payload) override;
+    bool redial(const std::string& payload) override;
+    void answer(const std::string& payload) override;
+    void stop(const std::string& payload) override;
+    void sendDTMF(const std::string& payload) override;
 
-    private:
-        JObject m_obj;
-    };
+private:
+    JObject m_obj;
+};
 
-    //
-    // PhoneCallControllerBinder
-    //
+//
+// PhoneCallControllerBinder
+//
 
-    class PhoneCallControllerBinder : public aace::jni::core::PlatformInterfaceBinder {
-    public: 
-        PhoneCallControllerBinder( jobject obj );
+class PhoneCallControllerBinder : public aace::jni::core::PlatformInterfaceBinder {
+public:
+    PhoneCallControllerBinder(jobject obj);
 
-        std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
-            return m_phoneCallControllerHandler;
-        }
+    std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
+        return m_phoneCallControllerHandler;
+    }
 
-        std::shared_ptr<PhoneCallControllerHandler> getPhoneCallController() {
-            return m_phoneCallControllerHandler;
-        }
+    std::shared_ptr<PhoneCallControllerHandler> getPhoneCallController() {
+        return m_phoneCallControllerHandler;
+    }
 
-    private:
-        std::shared_ptr<PhoneCallControllerHandler> m_phoneCallControllerHandler;
-    };
+private:
+    std::shared_ptr<PhoneCallControllerHandler> m_phoneCallControllerHandler;
+};
 
-    //
-    // JConnectionState
-    //
+//
+// JConnectionState
+//
 
-    class JConnectionStateConfig : public EnumConfiguration<PhoneCallControllerHandler::ConnectionState> {
-    public:
-        using T = PhoneCallControllerHandler::ConnectionState;
+class JConnectionStateConfig : public EnumConfiguration<PhoneCallControllerHandler::ConnectionState> {
+public:
+    using T = PhoneCallControllerHandler::ConnectionState;
 
-        const char* getClassName() override {
-            return "com/amazon/aace/phonecontrol/PhoneCallController$ConnectionState";
-        }
+    const char* getClassName() override {
+        return "com/amazon/aace/phonecontrol/PhoneCallController$ConnectionState";
+    }
 
-        std::vector<std::pair<T, std::string>> getConfiguration() override {
-            return {
-                {T::CONNECTED, "CONNECTED"},
-                {T::DISCONNECTED,"DISCONNECTED"}
-            };
-        }
-    };
+    std::vector<std::pair<T, std::string>> getConfiguration() override {
+        return {{T::CONNECTED, "CONNECTED"}, {T::DISCONNECTED, "DISCONNECTED"}};
+    }
+};
 
-    using JConnectionState = JEnum<PhoneCallControllerHandler::ConnectionState, JConnectionStateConfig>;
+using JConnectionState = JEnum<PhoneCallControllerHandler::ConnectionState, JConnectionStateConfig>;
 
-    //
-    // JCallState
-    //
+//
+// JCallState
+//
 
-    class JCallStateConfig : public EnumConfiguration<PhoneCallControllerHandler::CallState> {
-    public:
-        using T = PhoneCallControllerHandler::CallState;
+class JCallStateConfig : public EnumConfiguration<PhoneCallControllerHandler::CallState> {
+public:
+    using T = PhoneCallControllerHandler::CallState;
 
-        const char* getClassName() override {
-            return "com/amazon/aace/phonecontrol/PhoneCallController$CallState";
-        }
+    const char* getClassName() override {
+        return "com/amazon/aace/phonecontrol/PhoneCallController$CallState";
+    }
 
-        std::vector<std::pair<T,std::string>> getConfiguration() override {
-            return {
-                {T::IDLE, "IDLE"},
+    std::vector<std::pair<T, std::string>> getConfiguration() override {
+        return {{T::IDLE, "IDLE"},
                 {T::DIALING, "DIALING"},
                 {T::OUTBOUND_RINGING, "OUTBOUND_RINGING"},
                 {T::ACTIVE, "ACTIVE"},
                 {T::CALL_RECEIVED, "CALL_RECEIVED"},
-                {T::INBOUND_RINGING, "INBOUND_RINGING"}
-            };
-        }
-    };
+                {T::INBOUND_RINGING, "INBOUND_RINGING"}};
+    }
+};
 
-    using JCallState = JEnum<PhoneCallControllerHandler::CallState, JCallStateConfig>;
+using JCallState = JEnum<PhoneCallControllerHandler::CallState, JCallStateConfig>;
 
-    //
-    // JCallingDeviceConigurationProperty
-    //
+//
+// JCallingDeviceConigurationProperty
+//
 
-    class JCallingDeviceConfigurationPropertyConfig : public EnumConfiguration<PhoneCallControllerHandler::CallingDeviceConfigurationProperty> {
-    public:
-        using T = PhoneCallControllerHandler::CallingDeviceConfigurationProperty;
+class JCallingDeviceConfigurationPropertyConfig
+        : public EnumConfiguration<PhoneCallControllerHandler::CallingDeviceConfigurationProperty> {
+public:
+    using T = PhoneCallControllerHandler::CallingDeviceConfigurationProperty;
 
-        const char* getClassName() override {
-            return "com/amazon/aace/phonecontrol/PhoneCallController$CallingDeviceConfigurationProperty";
-        }
+    const char* getClassName() override {
+        return "com/amazon/aace/phonecontrol/PhoneCallController$CallingDeviceConfigurationProperty";
+    }
 
-        std::vector<std::pair<T,std::string>> getConfiguration() override {
-            return {
-                {T::DTMF_SUPPORTED, "DTMF_SUPPORTED"}
-            };
-        }
-    };
+    std::vector<std::pair<T, std::string>> getConfiguration() override {
+        return {{T::DTMF_SUPPORTED, "DTMF_SUPPORTED"}};
+    }
+};
 
-    using JCallingDeviceConfigurationProperty = JEnum<PhoneCallControllerHandler::CallingDeviceConfigurationProperty, JCallingDeviceConfigurationPropertyConfig>;
+using JCallingDeviceConfigurationProperty =
+    JEnum<PhoneCallControllerHandler::CallingDeviceConfigurationProperty, JCallingDeviceConfigurationPropertyConfig>;
 
-    //
-    // JCallError
-    //
+//
+// JCallError
+//
 
-    class JCallErrorConfig : public EnumConfiguration<PhoneCallControllerHandler::CallError> {
-    public: 
-        using T = PhoneCallControllerHandler::CallError;
+class JCallErrorConfig : public EnumConfiguration<PhoneCallControllerHandler::CallError> {
+public:
+    using T = PhoneCallControllerHandler::CallError;
 
-        const char* getClassName() override {
-            return "com/amazon/aace/phonecontrol/PhoneCallController$CallError";
-        }
+    const char* getClassName() override {
+        return "com/amazon/aace/phonecontrol/PhoneCallController$CallError";
+    }
 
-        std::vector<std::pair<T,std::string>> getConfiguration() override {
-            return {
-                {T::NO_CARRIER, "NO_CARRIER"},
+    std::vector<std::pair<T, std::string>> getConfiguration() override {
+        return {{T::NO_CARRIER, "NO_CARRIER"},
                 {T::BUSY, "BUSY"},
                 {T::NO_ANSWER, "NO_ANSWER"},
                 {T::NO_NUMBER_FOR_REDIAL, "NO_NUMBER_FOR_REDIAL"},
-                {T::OTHER, "OTHER"}
-            };
-        }
-    };
+                {T::OTHER, "OTHER"}};
+    }
+};
 
-    using JCallError = JEnum<PhoneCallControllerHandler::CallError, JCallErrorConfig>;
+using JCallError = JEnum<PhoneCallControllerHandler::CallError, JCallErrorConfig>;
 
-    //
-    // JDTMFError
-    //
+//
+// JDTMFError
+//
 
-    class JDTMFErrorConfig : public EnumConfiguration<PhoneCallControllerHandler::DTMFError> {
-    public:
-        using T = PhoneCallControllerHandler::DTMFError;
+class JDTMFErrorConfig : public EnumConfiguration<PhoneCallControllerHandler::DTMFError> {
+public:
+    using T = PhoneCallControllerHandler::DTMFError;
 
-        const char* getClassName() override {
-            return "com/amazon/aace/phonecontrol/PhoneCallController$DTMFError";
-        }
-        
-        std::vector<std::pair<T,std::string>> getConfiguration() override {
-            return {
-                {T::CALL_NOT_IN_PROGRESS, "CALL_NOT_IN_PROGRES"},
-                {T::DTMF_FAILED, "DTMF_FAILED"}
-            };
-        }
-    };
+    const char* getClassName() override {
+        return "com/amazon/aace/phonecontrol/PhoneCallController$DTMFError";
+    }
 
-    using JDTMFError = JEnum<PhoneCallControllerHandler::DTMFError, JDTMFErrorConfig>;
+    std::vector<std::pair<T, std::string>> getConfiguration() override {
+        return {{T::CALL_NOT_IN_PROGRESS, "CALL_NOT_IN_PROGRES"}, {T::DTMF_FAILED, "DTMF_FAILED"}};
+    }
+};
 
-} // aace::jni::phonecontrol
-} // aace:jni
-} // aace
+using JDTMFError = JEnum<PhoneCallControllerHandler::DTMFError, JDTMFErrorConfig>;
 
-#endif // AACE_JNI_PHONECONTROL_PHONECALLCONTROLLER_BINDER_H
+}  // namespace phonecontrol
+}  // namespace jni
+}  // namespace aace
+
+#endif  // AACE_JNI_PHONECONTROL_PHONECALLCONTROLLER_BINDER_H

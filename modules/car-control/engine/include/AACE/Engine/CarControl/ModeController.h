@@ -16,10 +16,10 @@
 #ifndef AACE_ENGINE_CAR_CONTROL_MODECONTROLLER_H
 #define AACE_ENGINE_CAR_CONTROL_MODECONTROLLER_H
 
-#include <nlohmann/json.hpp>
-
 #include <AVSCommon/SDKInterfaces/ModeController/ModeControllerInterface.h>
 #include <Endpoints/EndpointBuilder.h>
+
+#include <nlohmann/json.hpp>
 
 #include "AACE/Engine/CarControl/PrimitiveController.h"
 

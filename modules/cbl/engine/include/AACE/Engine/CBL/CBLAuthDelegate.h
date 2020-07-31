@@ -46,7 +46,7 @@ public:
         std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> customerDataManager,
         std::shared_ptr<CBLAuthDelegateConfiguration> configuration,
         std::shared_ptr<CBLAuthRequesterInterface> cblAuthRequester,
-        bool enableUserProfile = false );
+        bool enableUserProfile = false);
 
     ~CBLAuthDelegate();
 
@@ -58,8 +58,10 @@ public:
     void reset();
 
     // AuthDelegateInterface
-    void addAuthObserver(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer) override;
-    void removeAuthObserver(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer) override;
+    void addAuthObserver(
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer) override;
+    void removeAuthObserver(
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer) override;
     std::string getAuthToken() override;
     void onAuthFailure(const std::string& token) override;
 
@@ -67,26 +69,19 @@ public:
     void clearData() override;
 
 private:
-    enum class FlowState {
-        STARTING,
-        REQUESTING_CODE_PAIR,
-        REQUESTING_TOKEN,
-        REFRESHING_TOKEN,
-        STOPPING
-    };
+    enum class FlowState { STARTING, REQUESTING_CODE_PAIR, REQUESTING_TOKEN, REFRESHING_TOKEN, STOPPING };
 
     CBLAuthDelegate(
         std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> customerDataManager,
         std::shared_ptr<CBLAuthDelegateConfiguration> configuration,
         std::shared_ptr<CBLAuthRequesterInterface> cblAuthRequester,
-        bool enableUserProfile );
-
+        bool enableUserProfile);
 
     bool initialize();
-    
-    void start( bool explicitAuthorizationRequest );
-    void stop( bool reset = false );
-    
+
+    void start(bool explicitAuthorizationRequest);
+    void stop(bool reset = false);
+
     void handleAuthorizationFlow();
     void handleRequestingUserProfile();
 
@@ -98,7 +93,7 @@ private:
 
     alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse doGet(
         const std::string& url,
-        const std::vector<std::string>& headers );
+        const std::vector<std::string>& headers);
 
     FlowState handleStarting();
     FlowState handleRequestingCodePair();
@@ -112,16 +107,16 @@ private:
     alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse requestUserProfile();
 
     alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error receiveCodePairResponse(
-        const alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse& response );
+        const alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse& response);
 
     alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error receiveTokenResponse(
         const alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse& response,
         bool expiresImmediately);
 
-    void setAuthState( alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State newState );
-    void setAuthError( alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error error );
+    void setAuthState(alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State newState);
+    void setAuthError(alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error error);
 
-    void setRefreshToken( const std::string& refreshToken );
+    void setRefreshToken(const std::string& refreshToken);
     void clearRefreshToken();
 
     bool isStopping();
@@ -160,8 +155,8 @@ private:
     std::string m_scope;
 };
 
-} // aace::engine::cbl
-} // aace::engine
-} // aace
+}  // namespace cbl
+}  // namespace engine
+}  // namespace aace
 
 #endif

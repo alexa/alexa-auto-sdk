@@ -25,16 +25,16 @@ namespace core {
 
 class Version {
 public:
-    Version( uint8_t major = 0, uint8_t minor = 0, uint8_t revision = 0, const std::string& tag = "" );
-    Version( const std::string& str );
-    Version( const Version& version );
-    
+    Version(uint8_t major = 0, uint8_t minor = 0, uint8_t revision = 0, const std::string& tag = "");
+    Version(const std::string& str);
+    Version(const Version& version);
+
     std::string toString();
 
-	bool operator == (const Version& other);
-	bool operator < (const Version& other);
+    bool operator==(const Version& other);
+    bool operator<(const Version& other);
 
-	friend std::ostream& operator << (std::ostream& stream, const Version& version);
+    friend std::ostream& operator<<(std::ostream& stream, const Version& version);
 
 private:
     uint8_t m_major;
@@ -46,14 +46,17 @@ private:
 class ServiceDescription {
 public:
     ServiceDescription() = default;
-    ServiceDescription( const ServiceDescription& desc );
-    ServiceDescription( const std::string& type, const Version& version, std::initializer_list<ServiceDescription> dependencies = {} );
+    ServiceDescription(const ServiceDescription& desc);
+    ServiceDescription(
+        const std::string& type,
+        const Version& version,
+        std::initializer_list<ServiceDescription> dependencies = {});
 
     const std::string& getType() const;
     const Version& getVersion() const;
     const std::vector<ServiceDescription>& getDependencies() const;
-    
-    ServiceDescription v( const Version& version ) const;
+
+    ServiceDescription v(const Version& version) const;
 
 private:
     std::string m_type;
@@ -61,23 +64,24 @@ private:
     std::vector<ServiceDescription> m_dependencies;
 };
 
-} // aace::engine::core
-} // aace::engine
-} // aace
+}  // namespace core
+}  // namespace engine
+}  // namespace aace
 
 // ServiceDescription Macros
 #define SERVICE_REGISTERED_VAR_NAME s_engineService_registered
 
-#define DESCRIBE(type,version,...) \
-public: \
-    static const aace::engine::core::ServiceDescription getServiceDescription() { \
-		return aace::engine::core::ServiceDescription( type, version, { __VA_ARGS__ } ); \
-    } \
-private: \
+#define DESCRIBE(type, version, ...)                                                 \
+public:                                                                              \
+    static const aace::engine::core::ServiceDescription getServiceDescription() {    \
+        return aace::engine::core::ServiceDescription(type, version, {__VA_ARGS__}); \
+    }                                                                                \
+                                                                                     \
+private:                                                                             \
     static const bool SERVICE_REGISTERED_VAR_NAME;
 
-#define DEPENDS(class) class::getServiceDescription()
-#define DEPENDS_V(class,ver) class::getServiceDescription().v(ver)
+#define DEPENDS(class) class ::getServiceDescription()
+#define DEPENDS_V(class, ver) class ::getServiceDescription().v(ver)
 #define VERSION(ver) aace::engine::core::Version(ver)
 
-#endif // AACE_ENGINE_CORE_SERVICE_DESCRIPTION_H
+#endif  // AACE_ENGINE_CORE_SERVICE_DESCRIPTION_H

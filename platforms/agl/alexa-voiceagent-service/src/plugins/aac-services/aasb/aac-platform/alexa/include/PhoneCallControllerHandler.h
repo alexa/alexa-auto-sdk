@@ -36,8 +36,7 @@ namespace phoneCallController {
  * changes are, phone connected/disconnected to device, phone is ringing with inbound call,
  * phone is engaged in conversation etc.
  */
-class PhoneCallControllerHandler : public aace::phoneCallController::PhoneCallController
-{
+class PhoneCallControllerHandler : public aace::phoneCallController::PhoneCallController {
 public:
     /**
      * Creates an instance of @c PhoneCallControllerHandler.
@@ -52,11 +51,11 @@ public:
 
     /// @name aace::phoneCallController::PhoneCallController
     /// @{
-    bool dial(const std::string &payload) override;
-    bool redial(const std::string &payload) override;
-    void answer(const std::string &payload) override;
-    void stop(const std::string &payload) override;
-    void sendDTMF(const std::string &payload) override;
+    bool dial(const std::string& payload) override;
+    bool redial(const std::string& payload) override;
+    void answer(const std::string& payload) override;
+    void stop(const std::string& payload) override;
+    void sendDTMF(const std::string& payload) override;
     /// @}
 
     /**
@@ -78,49 +77,49 @@ private:
 
     /**
      * Notifies the Engine of a change in connection to a calling device
-     * 
+     *
      * @param payload Payload containing data.
      */
     void connectionStateChanged(const std::string& payload);
 
     /**
      * Notifies the Engine of a change in the state of an ongoing call
-     * 
+     *
      * @param payload Payload containing data.
      */
     void callStateChanged(const std::string& payload);
 
     /**
      * Notifies the Engine of an error related to a call
-     * 
+     *
      * @param payload Payload containing data.
      */
     void callFailed(const std::string& payload);
 
     /**
      * Notifies the Engine that a caller id was received for an inbound call
-     * 
+     *
      * @param payload Payload containing data.
      */
     void callerIdReceived(const std::string& payload);
 
-    /** 
+    /**
      * Notifies the Engine that sending the DTMF signal succeeded.
-     * 
+     *
      * @param payload Payload containing data.
      */
     void sendDTMFSucceeded(const std::string& payload);
 
-    /** 
+    /**
      * Notifies the Engine that the DTMF signal could not be delivered to the remote party
-     * 
+     *
      * @param payload Payload containing data.
      */
     void sendDTMFFailed(const std::string& payload);
 
     /**
      * Notifies the Engine of the calling feature configuration of the connected calling device.
-     * 
+     *
      * @param payload Payload containing data.
      */
     void deviceConfigurationUpdated(const std::string& payload);
@@ -132,7 +131,7 @@ private:
     std::weak_ptr<aasb::bridge::ResponseDispatcher> m_responseDispatcher;
 };
 
-}  // phoneCallController
-}  // aasb
+}  // namespace phoneCallController
+}  // namespace aasb
 
 #endif  // AASB_PHONECONTROL_PHONECALLCONTROLLERHANDLER_H

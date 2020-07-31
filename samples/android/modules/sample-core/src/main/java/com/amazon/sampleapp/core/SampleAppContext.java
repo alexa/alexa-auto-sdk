@@ -2,51 +2,25 @@ package com.amazon.sampleapp.core;
 
 import android.app.Activity;
 import android.support.v4.view.ViewPager;
+
 import com.amazon.aace.audio.AudioOutputProvider;
-import java.util.Map;
 
-public class SampleAppContext {
-    private final Activity mActivity;
-    private final ViewPager mViewPager;
-    private final Map<String, String> mData;
-    private AudioOutputProvider mAudioOutputProvider;
+import org.json.JSONObject;
 
-    public static final String CERTS_DIR = "certsDir";
-    public static final String MODEL_DIR = "modelsDir";
-    public static final String PRODUCT_DSN = "productDsn";
-    public static final String APPDATA_DIR = "appDataDir";
-    public static final String JSON = "json";
+public interface SampleAppContext {
+    String CERTS_DIR = "certsDir";
+    String MODEL_DIR = "modelsDir";
+    String PRODUCT_DSN = "productDsn";
+    String APPDATA_DIR = "appDataDir";
+    String JSON = "json";
 
-    public SampleAppContext(Activity activity, Map<String, String> data) {
-        mActivity = activity;
-        mAudioOutputProvider = null;
-        mViewPager = null;
-        mData = data;
-    }
+    Activity getActivity();
 
-    public SampleAppContext(Activity activity, ViewPager viewPager, Map<String, String> data) {
-        mActivity = activity;
-        mViewPager = viewPager;
-        mData = data;
-    }
+    AudioOutputProvider getAudioOutputProvider();
 
-    public Activity getActivity() {
-        return mActivity;
-    }
+    ViewPager getViewPager();
 
-    public AudioOutputProvider getAudioOutputProvider() {
-        return mAudioOutputProvider;
-    }
+    String getData(String key);
 
-    public ViewPager getViewPager() {
-        return mViewPager;
-    }
-
-    public String getData( String key) {
-        return mData.get(key);
-    }
-
-    public void setAudioOutputProvider(AudioOutputProvider outputProvider ) {
-        mAudioOutputProvider = outputProvider;
-    }
+    JSONObject getConfigFromFile(String configAssetName, String configRootKey);
 }

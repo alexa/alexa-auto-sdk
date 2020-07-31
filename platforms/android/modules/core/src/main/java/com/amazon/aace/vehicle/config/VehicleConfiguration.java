@@ -21,104 +21,106 @@ import com.amazon.aace.core.config.EngineConfiguration;
  * The @c VehicleConfiguration class is a factory interface for creating "aace.vehicle" configuration objects.
  */
 public class VehicleConfiguration {
-
     /**
      * Specifies the vehicle properties required in configuration
      */
     public enum VehiclePropertyType {
         /**
          * The make of the vehicle.
-         * 
+         * @note This property is required.
+         *
          * @hideinitializer
          */
-        MAKE("MAKE","make"),
+        MAKE("MAKE", "make"),
 
         /**
          * The model of the vehicle.
-         * 
+         * @note This property is required.
+         *
          * @hideinitializer
          */
-        MODEL("MODEL","model"),
+        MODEL("MODEL", "model"),
 
         /**
          * The model year of the vehicle.
          * A value of this property type must be an integer in the range 1900-2100.
          * Example value: "2019"
-         * 
+         * @note This property is required.
+         *
          * @hideinitializer
          */
-        YEAR("YEAR","year"),
+        YEAR("YEAR", "year"),
 
         /**
          * The trim level of the vehicle, identifying the vehicle's level of equipment or special features.
          * Example values: "Standard", "Sport", "Limited"
-         * 
+         *
          * @hideinitializer
          */
-        TRIM("TRIM","trim"),
+        TRIM("TRIM", "trim"),
 
         /**
-         * The current location (country/region/state/etc.) of the vehicle. 
+         * The current location (country/region/state/etc.) of the vehicle.
          * Example values: "US", "US-North", "WA"
-         * 
+         *
          * @hideinitializer
          */
-        GEOGRAPHY("GEOGRAPHY","geography"),
+        GEOGRAPHY("GEOGRAPHY", "geography"),
 
         /**
          * The client software version.
          * Example value: "2.2.1X"
-         * 
+         *
          * @hideinitializer
          */
-        VERSION("VERSION","version"),
+        VERSION("VERSION", "version"),
 
         /**
          * The operating system used by the vehicle's infotainment system.
          * Example value: "AndroidOreo_8.1"
-         * 
+         *
          * @hideinitializer
          */
-        OPERATING_SYSTEM("OPERATING_SYSTEM","os"),
+        OPERATING_SYSTEM("OPERATING_SYSTEM", "os"),
 
         /**
          * The hardware architecture used by the vehicle.
          * Example value: "x86_64"
-         * 
+         *
          * @hideinitializer
          */
-        HARDWARE_ARCH("HARDWARE_ARCH","arch"),
+        HARDWARE_ARCH("HARDWARE_ARCH", "arch"),
 
         /**
          * The language or locale selected for Alexa by the vehicle owner.
          * Example values: "en-US", "fr-CA"
-         * 
+         *
          * @hideinitializer
          */
-        LANGUAGE("LANGUAGE","language"),
+        LANGUAGE("LANGUAGE", "language"),
 
         /**
          * The type and arrangement of microphone used by the vehicle.
          * Example value: "7 mic array, centrally mounted"
-         * 
+         *
          * @hideinitializer
          */
-        MICROPHONE("MICROPHONE","microphone"),
+        MICROPHONE("MICROPHONE", "microphone"),
 
         /**
          * A comma-separated list of supported countries (ISO country codes).
          * Example value: "US,CA"
-         * 
+         *
          * @hideinitializer
          */
-        COUNTRY_LIST("COUNTRY_LIST","countries"),
+        COUNTRY_LIST("COUNTRY_LIST", "countries"),
 
         /**
          * The automaker's identifier for the vehicle.
-         * 
+         *
          * @hideinitializer
          */
-        VEHICLE_IDENTIFIER("VEHICLE_IDENTIFIER","vehicleIdentifier");
+        VEHICLE_IDENTIFIER("VEHICLE_IDENTIFIER", "vehicleIdentifier");
 
         /**
          * @internal
@@ -133,7 +135,7 @@ public class VehicleConfiguration {
         /**
          * Type used to identify a vehicle property type and value pair
          */
-        VehiclePropertyType( String name, String key ) {
+        VehiclePropertyType(String name, String key) {
             mName = name;
             mKey = key;
         }
@@ -157,13 +159,17 @@ public class VehicleConfiguration {
         private VehiclePropertyType mType;
         private String mValue;
 
-        public VehicleProperty( VehiclePropertyType type, String value ) {
+        public VehicleProperty(VehiclePropertyType type, String value) {
             mType = type;
             mValue = value;
         }
 
-        public VehiclePropertyType getType() { return mType; }
-        public String getValue() { return mValue; }
+        public VehiclePropertyType getType() {
+            return mType;
+        }
+        public String getValue() {
+            return mValue;
+        }
     }
 
     /**
@@ -195,12 +201,11 @@ public class VehicleConfiguration {
      *
      * @param propertyList A list of @c VehicleProperty type and value pairs
      */
-    public static EngineConfiguration createVehicleInfoConfig( final VehicleProperty[] propertyList )
-    {
+    public static EngineConfiguration createVehicleInfoConfig(final VehicleProperty[] propertyList) {
         return new EngineConfiguration() {
             @Override
             protected long createNativeRef() {
-                return createVehicleInfoConfigBinder( propertyList );
+                return createVehicleInfoConfigBinder(propertyList);
             }
         };
     }
@@ -220,17 +225,16 @@ public class VehicleConfiguration {
      *
      * @param operatingCountry A 2-letter ISO country code
      */
-    public static EngineConfiguration createOperatingCountryConfig( final String operatingCountry )
-    {
+    public static EngineConfiguration createOperatingCountryConfig(final String operatingCountry) {
         return new EngineConfiguration() {
             @Override
             protected long createNativeRef() {
-                return createOperatingCountryConfigBinder( operatingCountry );
+                return createOperatingCountryConfigBinder(operatingCountry);
             }
         };
     }
 
     // Native Engine JNI methods
-    static private native long createVehicleInfoConfigBinder( VehicleProperty[] propertyList );
-    static private native long createOperatingCountryConfigBinder( String operatingCountry );
+    static private native long createVehicleInfoConfigBinder(VehicleProperty[] propertyList);
+    static private native long createOperatingCountryConfigBinder(String operatingCountry);
 }

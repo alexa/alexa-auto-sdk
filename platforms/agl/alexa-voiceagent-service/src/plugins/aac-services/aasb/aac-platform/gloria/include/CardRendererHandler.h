@@ -46,7 +46,7 @@ private:
     std::weak_ptr<aasb::bridge::ResponseDispatcher> m_responseDispatcher;
 };
 
-}  // namespace alexa
+}  // namespace gloria
 }  // namespace aasb
 
 #endif  // AASB_ALEXA_CARDRENDERER_HANDLER_H

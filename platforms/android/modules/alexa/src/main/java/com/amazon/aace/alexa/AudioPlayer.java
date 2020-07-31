@@ -31,13 +31,11 @@ import com.amazon.aace.core.PlatformInterface;
  *
  * @sa TemplateRuntime.renderPlayerInfo()
  */
-public class AudioPlayer extends PlatformInterface
-{
+public class AudioPlayer extends PlatformInterface {
     /**
      * Specifies the state of audio playback activity
      */
-    public enum PlayerActivity
-    {
+    public enum PlayerActivity {
         /**
          * Audio playback has not yet begun.
          * @hideinitializer
@@ -82,7 +80,7 @@ public class AudioPlayer extends PlatformInterface
         /**
          * @internal
          */
-        private PlayerActivity( String name ) {
+        private PlayerActivity(String name) {
             m_name = name;
         }
 
@@ -104,19 +102,18 @@ public class AudioPlayer extends PlatformInterface
      *
      * @param  state The new playback state
      */
-    public void playerActivityChanged( PlayerActivity state ) {
-    }
+    public void playerActivityChanged(PlayerActivity state) {}
 
     /**
      * Returns the current playback position of the audio player.
      * If the audio source is not playing, the most recent position played
      * will be returned.
      *
-     * @return The audio player's playback position in milliseconds, 
+     * @return The audio player's playback position in milliseconds,
      * or @c TIME_UNKNOWN if the current media position is unknown or invalid.
      */
     final public long getPlayerPosition() {
-        return getPlayerPosition( getNativeRef() );
+        return getPlayerPosition(getNativeRef());
     }
 
     /**
@@ -126,7 +123,7 @@ public class AudioPlayer extends PlatformInterface
      * or @c TIME_UNKNOWN if the current media position is unknown or invalid.
      */
     final public long getPlayerDuration() {
-        return getPlayerDuration( getNativeRef() );
+        return getPlayerDuration(getNativeRef());
     }
 
     // NativeRef implementation
@@ -134,15 +131,13 @@ public class AudioPlayer extends PlatformInterface
         return createBinder();
     }
 
-    final protected void disposeNativeRef( long nativeRef ) {
-        disposeBinder( nativeRef );
+    final protected void disposeNativeRef(long nativeRef) {
+        disposeBinder(nativeRef);
     }
 
     // Native Engine JNI methods
     private native long createBinder();
-    private native void disposeBinder( long nativeRef );
-    private native long getPlayerPosition( long nativeRef );
-    private native long getPlayerDuration( long nativeRef );
+    private native void disposeBinder(long nativeRef);
+    private native long getPlayerPosition(long nativeRef);
+    private native long getPlayerDuration(long nativeRef);
 }
-
-

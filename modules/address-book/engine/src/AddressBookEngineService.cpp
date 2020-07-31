@@ -35,18 +35,18 @@ static const std::string TAG("aace.addressBook.addressBookEngineService");
 // register the service
 REGISTER_SERVICE(AddressBookEngineService);
 
-AddressBookEngineService::AddressBookEngineService( const aace::engine::core::ServiceDescription& description ) : aace::engine::core::EngineService( description ) {
+AddressBookEngineService::AddressBookEngineService(const aace::engine::core::ServiceDescription& description) :
+        aace::engine::core::EngineService(description) {
 }
 
 AddressBookEngineService::~AddressBookEngineService() = default;
 
-bool AddressBookEngineService::shutdown()
-{
-    if( m_addressBookCloudUploader != nullptr ){
+bool AddressBookEngineService::shutdown() {
+    if (m_addressBookCloudUploader != nullptr) {
         m_addressBookCloudUploader->shutdown();
         m_addressBookCloudUploader.reset();
     }
-    if( m_addressBookEngineImpl != nullptr ) {
+    if (m_addressBookEngineImpl != nullptr) {
         m_addressBookEngineImpl->shutdown();
         m_addressBookEngineImpl.reset();
     }
@@ -54,55 +54,71 @@ bool AddressBookEngineService::shutdown()
     return true;
 }
 
-bool AddressBookEngineService::registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) {
+bool AddressBookEngineService::registerPlatformInterface(
+    std::shared_ptr<aace::core::PlatformInterface> platformInterface) {
     try {
-        ReturnIf( registerPlatformInterfaceType<aace::addressBook::AddressBook>( platformInterface ), true );
+        ReturnIf(registerPlatformInterfaceType<aace::addressBook::AddressBook>(platformInterface), true);
         return false;
-    } catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"registerPlatformInterface").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "registerPlatformInterface").d("reason", ex.what()));
         return false;
     }
 }
 
-bool AddressBookEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::addressBook::AddressBook> platformInterface ) {
+bool AddressBookEngineService::registerPlatformInterfaceType(
+    std::shared_ptr<aace::addressBook::AddressBook> platformInterface) {
     try {
-        AACE_INFO(LX(TAG,"registerPlatformInterfaceType"));
-        ThrowIfNotNull( m_addressBookEngineImpl, "platformInterfaceAlreadyRegistered" );
+        AACE_INFO(LX(TAG, "registerPlatformInterfaceType"));
+        ThrowIfNotNull(m_addressBookEngineImpl, "platformInterfaceAlreadyRegistered");
 
-        m_addressBookEngineImpl = AddressBookEngineImpl::create( platformInterface );
-        ThrowIfNull( m_addressBookEngineImpl, "createAddressBookEngineImplFailed" );
+        auto alexaComponents =
+            getContext()->getServiceInterface<aace::engine::alexa::AlexaComponentInterface>("aace.alexa");
+        ThrowIfNull(alexaComponents, "invalidAlexaComponentInterface");
 
-        ThrowIfNot( registerServiceInterface<AddressBookServiceInterface>( m_addressBookEngineImpl ), "registerAddressBookServiceInterfaceFailed" );
+        m_addressBookEngineImpl = AddressBookEngineImpl::create(platformInterface);
+        ThrowIfNull(m_addressBookEngineImpl, "createAddressBookEngineImplFailed");
 
-        auto alexaComponentInterface = getContext()->getServiceInterface<aace::engine::alexa::AlexaComponentInterface>( "aace.alexa" );
-        ThrowIfNull( alexaComponentInterface, "alexaComponentInterfaceInvalid" );
+        ThrowIfNot(
+            registerServiceInterface<AddressBookServiceInterface>(m_addressBookEngineImpl),
+            "registerAddressBookServiceInterfaceFailed");
+
+        auto alexaComponentInterface =
+            getContext()->getServiceInterface<aace::engine::alexa::AlexaComponentInterface>("aace.alexa");
+        ThrowIfNull(alexaComponentInterface, "alexaComponentInterfaceInvalid");
 
         auto authDelegate = alexaComponentInterface->getAuthDelegate();
-        ThrowIfNull( authDelegate, "authDeleteInterfaceInvalid" );
+        ThrowIfNull(authDelegate, "authDeleteInterfaceInvalid");
 
         auto deviceInfo = alexaComponentInterface->getDeviceInfo();
-        ThrowIfNull( deviceInfo, "deviceInfoInvalid" );
+        ThrowIfNull(deviceInfo, "deviceInfoInvalid");
 
-        auto networkProvider = getContext()->getServiceInterface<aace::network::NetworkInfoProvider>( "aace.network" );
+        auto networkProvider = getContext()->getServiceInterface<aace::network::NetworkInfoProvider>("aace.network");
 
         // get the initial network status from the network provider - if the network provider is not
         // available then we always treat the network status as CONNECTED
-        auto networkStatus = networkProvider != nullptr ? networkProvider->getNetworkStatus() : aace::network::NetworkInfoProvider::NetworkStatus::CONNECTED;
+        auto networkStatus = networkProvider != nullptr ? networkProvider->getNetworkStatus()
+                                                        : aace::network::NetworkInfoProvider::NetworkStatus::CONNECTED;
 
-        auto networkObserver = getContext()->getServiceInterface<aace::engine::network::NetworkObservableInterface>( "aace.network" );
+        auto networkObserver =
+            getContext()->getServiceInterface<aace::engine::network::NetworkObservableInterface>("aace.network");
 
-        m_addressBookCloudUploader = aace::engine::addressBook::AddressBookCloudUploader::create( m_addressBookEngineImpl, authDelegate, deviceInfo, networkStatus, networkObserver );
-        ThrowIfNull( m_addressBookCloudUploader, "createAddressBookCloudUploaderFailed" );
+        auto alexaEndpoints =
+            getContext()->getServiceInterface<aace::engine::alexa::AlexaEndpointInterface>("aace.alexa");
+        ThrowIfNull(alexaEndpoints, "alexaEndpointsInvalid");
+
+        m_addressBookCloudUploader = aace::engine::addressBook::AddressBookCloudUploader::create(
+            m_addressBookEngineImpl, authDelegate, deviceInfo, networkStatus, networkObserver, alexaEndpoints);
+        ThrowIfNull(m_addressBookCloudUploader, "createAddressBookCloudUploaderFailed");
 
         // set the engine interface reference
-        platformInterface->setEngineInterface( m_addressBookEngineImpl );
+        platformInterface->setEngineInterface(m_addressBookEngineImpl);
         return true;
-    } catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"registerPlatformInterfaceType<aace::addressBook::AddressBook>").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "registerPlatformInterfaceType<aace::addressBook::AddressBook>").d("reason", ex.what()));
         return false;
     }
 }
 
-} // aace::engine::addressBook
-} // aace::engine
-} // aace
+}  // namespace addressBook
+}  // namespace engine
+}  // namespace aace

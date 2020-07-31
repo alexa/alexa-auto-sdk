@@ -19,33 +19,42 @@
 namespace aace {
 namespace engine {
 namespace alexa {
-    
+
 std::shared_ptr<AlexaEngineClientObserver> AlexaEngineClientObserver::create() {
-    return std::shared_ptr<AlexaEngineClientObserver>( new AlexaEngineClientObserver() );
+    return std::shared_ptr<AlexaEngineClientObserver>(new AlexaEngineClientObserver());
 }
-    
-bool AlexaEngineClientObserver::waitFor( const alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State authState, const std::chrono::seconds duration ) {
+
+bool AlexaEngineClientObserver::waitFor(
+    const alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State authState,
+    const std::chrono::seconds duration) {
     std::unique_lock<std::mutex> lock(m_mutex);
     return m_trigger.wait_for(lock, duration, [this, authState]() { return authState == m_authState; });
 }
 
-bool AlexaEngineClientObserver::waitFor( const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status connectionStatus, const std::chrono::seconds duration ) {
+bool AlexaEngineClientObserver::waitFor(
+    const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status connectionStatus,
+    const std::chrono::seconds duration) {
     std::unique_lock<std::mutex> lock(m_mutex);
-    return m_trigger.wait_for(lock, duration, [this, connectionStatus]() { return connectionStatus == m_connectionStatus; });
+    return m_trigger.wait_for(
+        lock, duration, [this, connectionStatus]() { return connectionStatus == m_connectionStatus; });
 }
 
-void AlexaEngineClientObserver::onAuthStateChange( alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State state, alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error error ) {
+void AlexaEngineClientObserver::onAuthStateChange(
+    alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State state,
+    alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error error) {
     std::lock_guard<std::mutex> lock{m_mutex};
     m_authState = state;
     m_trigger.notify_all();
 }
 
-void AlexaEngineClientObserver::onConnectionStatusChanged( const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status status, const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::ChangedReason reason ) {
+void AlexaEngineClientObserver::onConnectionStatusChanged(
+    const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status status,
+    const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::ChangedReason reason) {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_connectionStatus = status;
     m_trigger.notify_all();
 }
 
-} // aace::engine::alexa
-} // aace::engine
-} // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace

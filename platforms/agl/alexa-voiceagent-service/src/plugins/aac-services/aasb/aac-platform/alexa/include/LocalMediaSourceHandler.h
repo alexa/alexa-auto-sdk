@@ -57,9 +57,7 @@ public:
     void onReceivedEvent(const std::string& action, const std::string& payload);
 
 private:
-    LocalMediaSourceHandler(
-        Source source,
-        std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher);
+    LocalMediaSourceHandler(Source source, std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher);
 
     void updateState();
 

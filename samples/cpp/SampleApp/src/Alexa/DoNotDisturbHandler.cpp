@@ -31,26 +31,31 @@ namespace alexa {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-DoNotDisturbHandler::DoNotDisturbHandler(std::weak_ptr<Activity> activity,
-                             std::weak_ptr<logger::LoggerHandler> loggerHandler)
-    : m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
+DoNotDisturbHandler::DoNotDisturbHandler(
+    std::weak_ptr<Activity> activity,
+    std::weak_ptr<logger::LoggerHandler> loggerHandler) :
+        m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
     // Expects((m_activity != nullptr) && (m_loggerHandler != nullptr));
     // Expects((mediaPlayer != nullptr) && (speaker != nullptr));
     setupUI();
 }
 
-std::weak_ptr<Activity> DoNotDisturbHandler::getActivity() { return m_activity; }
+std::weak_ptr<Activity> DoNotDisturbHandler::getActivity() {
+    return m_activity;
+}
 
-std::weak_ptr<logger::LoggerHandler> DoNotDisturbHandler::getLoggerHandler() { return m_loggerHandler; }
+std::weak_ptr<logger::LoggerHandler> DoNotDisturbHandler::getLoggerHandler() {
+    return m_loggerHandler;
+}
 
 // aace::alexa::DoNotDisturb interface
 
-void DoNotDisturbHandler::setDoNotDisturb( const bool doNotDisturb ){
-   std::stringstream ss;
+void DoNotDisturbHandler::setDoNotDisturb(const bool doNotDisturb) {
+    std::stringstream ss;
     ss << doNotDisturb;
     log(logger::LoggerHandler::Level::INFO, ss.str());
     auto activity = m_activity.lock();
-    if (activity) {    
+    if (activity) {
         auto text = ss.str();
         activity->runOnUIThread([=]() {
             if (auto doNotDisturbStateView = m_doNotDisturbStateView.lock()) {
@@ -68,7 +73,7 @@ void DoNotDisturbHandler::setDoNotDisturb( const bool doNotDisturb ){
 
 // private
 
-void DoNotDisturbHandler::log(logger::LoggerHandler::Level level, const std::string &message) {
+void DoNotDisturbHandler::log(logger::LoggerHandler::Level level, const std::string& message) {
     auto loggerHandler = m_loggerHandler.lock();
     if (!loggerHandler) {
         return;
@@ -94,8 +99,8 @@ void DoNotDisturbHandler::setupUI() {
     });
 
     // doNotDisturbOn
-    activity->registerObserver(Event::onDoNotDisturbOn, [=](const std::string &) {
-        log(logger::LoggerHandler::Level::VERBOSE, "onDoNotDisturbOn ") ;
+    activity->registerObserver(Event::onDoNotDisturbOn, [=](const std::string&) {
+        log(logger::LoggerHandler::Level::VERBOSE, "onDoNotDisturbOn ");
         activity->runOnUIThread([=]() {
             if (auto console = m_console.lock()) {
                 console->printRuler();
@@ -103,12 +108,12 @@ void DoNotDisturbHandler::setupUI() {
                 console->printRuler();
             }
         });
-        return doNotDisturbChanged( true );
+        return doNotDisturbChanged(true);
     });
 
     // doNotDisturbOff
-    activity->registerObserver(Event::onDoNotDisturbOff, [=](const std::string &) {
-        log(logger::LoggerHandler::Level::VERBOSE, "onDoNotDisturbOff" );
+    activity->registerObserver(Event::onDoNotDisturbOff, [=](const std::string&) {
+        log(logger::LoggerHandler::Level::VERBOSE, "onDoNotDisturbOff");
         activity->runOnUIThread([=]() {
             if (auto console = m_console.lock()) {
                 console->printRuler();
@@ -116,9 +121,9 @@ void DoNotDisturbHandler::setupUI() {
                 console->printRuler();
             }
         });
-        return doNotDisturbChanged( false );
+        return doNotDisturbChanged(false);
     });
 }
 
-} // namespace alexa
-} // namespace sampleApp
+}  // namespace alexa
+}  // namespace sampleApp

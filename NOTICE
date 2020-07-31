@@ -7,14 +7,16 @@ ALEXA AUTO SDK COMPONENTS
 The following Alexa Auto SDK components are licensed under the Apache License, Version 2.0 (the "License"):
 
 builder
-extensions/experimental/gstreamer
+extensions/experimental/system-audio
+extensions/loopback-detector
 modules/address-book
 modules/alexa
 modules/apl
-Modules/car-control
+modules/car-control
 modules/cbl
 modules/contact-uploader
 modules/core
+modules/messaging
 modules/navigation
 modules/phone-control
 platforms/agl

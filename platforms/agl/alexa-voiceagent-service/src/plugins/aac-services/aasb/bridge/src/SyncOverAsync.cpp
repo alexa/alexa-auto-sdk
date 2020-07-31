@@ -27,20 +27,18 @@ namespace bridge {
 
 const std::string TAG = "aasb::bridge::SyncOverAsync";
 
-
 SyncOverAsync::SyncOverAsync(
-        std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
-        std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher,
-        std::chrono::microseconds waitDuration) :
-        m_logger(logger),
-        m_responseDispatcher(responseDispatcher),
-        m_waitDuration(waitDuration) {
-
+    std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
+    std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher,
+    std::chrono::microseconds waitDuration) :
+        m_logger(logger), m_responseDispatcher(responseDispatcher), m_waitDuration(waitDuration) {
 }
 
 bool SyncOverAsync::makeCallAndWaitForResponse(
-        const std::string& topic, const std::string& action, const std::string& payload,
-        std::string& response) {
+    const std::string& topic,
+    const std::string& action,
+    const std::string& payload,
+    std::string& response) {
     m_logger->log(Level::VERBOSE, TAG, "Making async call for topic " + topic + " action " + action);
 
     auto responseDispatcher = m_responseDispatcher.lock();

@@ -4,7 +4,6 @@
     "productId" : "<YOUR DEVICE'S PRODUCT ID>"
   },
   "metrics" : {
-    "amazonId" : "<YOUR DEVICE'S AMAZON ID>",
-    "stage" : "<YOUR STAGING ENVIRONMENT: Beta, Gamma, Prod>"
+    "amazonId" : "<YOUR DEVICE'S AMAZON ID>"
   }
 }

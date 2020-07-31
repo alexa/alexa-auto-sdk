@@ -23,99 +23,96 @@ namespace aace {
 namespace jni {
 namespace cbl {
 
-    //
-    // CBLHandler
-    //
+//
+// CBLHandler
+//
 
-    class CBLHandler : public aace::cbl::CBL {
-    public:
-        CBLHandler( jobject obj );
+class CBLHandler : public aace::cbl::CBL {
+public:
+    CBLHandler(jobject obj);
 
-        // aace::cbl::CBL
-        void cblStateChanged( CBLState state, CBLStateChangedReason reason, const std::string& url, const std::string& code ) override;
-        void clearRefreshToken() override;
-        void setRefreshToken( const std::string& refreshToken ) override;
-        std::string getRefreshToken() override;
-        void setUserProfile( const std::string& name, const std::string& email ) override;
+    // aace::cbl::CBL
+    void cblStateChanged(CBLState state, CBLStateChangedReason reason, const std::string& url, const std::string& code)
+        override;
+    void clearRefreshToken() override;
+    void setRefreshToken(const std::string& refreshToken) override;
+    std::string getRefreshToken() override;
+    void setUserProfile(const std::string& name, const std::string& email) override;
 
-    private:
-        JObject m_obj;
-    };
+private:
+    JObject m_obj;
+};
 
-    //
-    // CBLBinder
-    //
+//
+// CBLBinder
+//
 
-    class CBLBinder : public aace::jni::core::PlatformInterfaceBinder {
-    public:
-        CBLBinder( jobject obj );
+class CBLBinder : public aace::jni::core::PlatformInterfaceBinder {
+public:
+    CBLBinder(jobject obj);
 
-        std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
-            return m_cblHandler;
-        }
+    std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
+        return m_cblHandler;
+    }
 
-        std::shared_ptr<CBLHandler> getCBL() {
-            return m_cblHandler;
-        }
+    std::shared_ptr<CBLHandler> getCBL() {
+        return m_cblHandler;
+    }
 
-    private: 
-        std::shared_ptr<CBLHandler> m_cblHandler;
-    };
+private:
+    std::shared_ptr<CBLHandler> m_cblHandler;
+};
 
-    //
-    // JCBLState
-    //
+//
+// JCBLState
+//
 
-    class JCBLStateConfig : public EnumConfiguration<CBLHandler::CBLState> {
-    public:
-        using T = CBLHandler::CBLState;
+class JCBLStateConfig : public EnumConfiguration<CBLHandler::CBLState> {
+public:
+    using T = CBLHandler::CBLState;
 
-        const char* getClassName() override {
-            return "com/amazon/aace/cbl/CBL$CBLState";
-        }
+    const char* getClassName() override {
+        return "com/amazon/aace/cbl/CBL$CBLState";
+    }
 
-        std::vector<std::pair<T,std::string>> getConfiguration() override {
-            return {
-                {T::STARTING,"STARTING"},
-                {T::REQUESTING_CODE_PAIR,"REQUESTING_CODE_PAIR"},
-                {T::CODE_PAIR_RECEIVED,"CODE_PAIR_RECEIVED"},
-                {T::REFRESHING_TOKEN,"REFRESHING_TOKEN"},
-                {T::REQUESTING_TOKEN,"REQUESTING_TOKEN"},
-                {T::STOPPING,"STOPPING"}
-            };
-        }
-    };
+    std::vector<std::pair<T, std::string>> getConfiguration() override {
+        return {{T::STARTING, "STARTING"},
+                {T::REQUESTING_CODE_PAIR, "REQUESTING_CODE_PAIR"},
+                {T::CODE_PAIR_RECEIVED, "CODE_PAIR_RECEIVED"},
+                {T::REFRESHING_TOKEN, "REFRESHING_TOKEN"},
+                {T::REQUESTING_TOKEN, "REQUESTING_TOKEN"},
+                {T::STOPPING, "STOPPING"}};
+    }
+};
 
-    using JCBLState = JEnum<CBLHandler::CBLState, JCBLStateConfig>;
+using JCBLState = JEnum<CBLHandler::CBLState, JCBLStateConfig>;
 
-    //
-    // JCBLStateChangedReason
-    //
+//
+// JCBLStateChangedReason
+//
 
-    class JCBLStateChangedReasonConfig : public EnumConfiguration<CBLHandler::CBLStateChangedReason> {
-    public:
-        using T = CBLHandler::CBLStateChangedReason;
+class JCBLStateChangedReasonConfig : public EnumConfiguration<CBLHandler::CBLStateChangedReason> {
+public:
+    using T = CBLHandler::CBLStateChangedReason;
 
-        const char* getClassName() override {
-            return "com/amazon/aace/cbl/CBL$CBLStateChangedReason";
-        }
+    const char* getClassName() override {
+        return "com/amazon/aace/cbl/CBL$CBLStateChangedReason";
+    }
 
-        std::vector<std::pair<T,std::string>> getConfiguration() override {
-            return {
-                {T::SUCCESS,"SUCCESS"},
-                {T::ERROR,"ERROR"},
-                {T::TIMEOUT,"TIMEOUT"},
-                {T::CODE_PAIR_EXPIRED,"CODE_PAIR_EXPIRED"},
-                {T::AUTHORIZATION_EXPIRED,"AUTHORIZATION_EXPIRED"},
-                {T::NONE,"NONE"}
-            };
-        }
-    };
+    std::vector<std::pair<T, std::string>> getConfiguration() override {
+        return {{T::SUCCESS, "SUCCESS"},
+                {T::ERROR, "ERROR"},
+                {T::TIMEOUT, "TIMEOUT"},
+                {T::CODE_PAIR_EXPIRED, "CODE_PAIR_EXPIRED"},
+                {T::AUTHORIZATION_EXPIRED, "AUTHORIZATION_EXPIRED"},
+                {T::NONE, "NONE"}};
+    }
+};
 
-    using JCBLStateChangedReason = JEnum<CBLHandler::CBLStateChangedReason, JCBLStateChangedReasonConfig>;
+using JCBLStateChangedReason = JEnum<CBLHandler::CBLStateChangedReason, JCBLStateChangedReasonConfig>;
 
-} // aace::jni::cbl
-} // aace::jni
-} // aace
+}  // namespace cbl
+}  // namespace jni
+}  // namespace aace
 
-#endif // AACE_JNI_CBL_CBL_BINDER_H
+#endif  // AACE_JNI_CBL_CBL_BINDER_H

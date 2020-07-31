@@ -39,7 +39,7 @@ namespace alexa {
  * Device equalizer settings are configurable. See 
  * @c aace::alexa::config::AlexaConfiguration::createEqualizerControllerConfig for details on configuring supported 
  * bands, default state, and supported decibel ranges.
- */ 
+ */
 class EqualizerController : public aace::core::PlatformInterface {
 protected:
     EqualizerController() = default;
@@ -59,7 +59,7 @@ public:
      * @c aace::alexa::EqualizerController::EqualizerBand and @c int pair.
      * 
      * @sa aace::alexa::EqualizerControllerEngineInterface::EqualizerBandLevel
-     */ 
+     */
     using EqualizerBandLevel = aace::alexa::EqualizerControllerEngineInterface::EqualizerBandLevel;
 
     /**
@@ -71,7 +71,7 @@ public:
      * 
      * @param [in] bandLevels The equalizer bands and their gain settings to apply as integer dB values.
      */
-    virtual void setBandLevels( const std::vector<EqualizerBandLevel>& bandLevels ) = 0;
+    virtual void setBandLevels(const std::vector<EqualizerBandLevel>& bandLevels) = 0;
 
     /**
      * Retrieves the current equalizer gain settings on the device for each supported band. If unsupported band levels 
@@ -87,7 +87,7 @@ public:
      * 
      * @param [in] bandLevels The equalizer bands to change and their gain settings as integer dB values.
      */
-    void localSetBandLevels( const std::vector<EqualizerBandLevel>& bandLevels );
+    void localSetBandLevels(const std::vector<EqualizerBandLevel>& bandLevels);
 
     /**
      * Notifies the Engine that relative adjustments to equalizer band gain levels are being made directly on the 
@@ -97,14 +97,14 @@ public:
      * @param [in] bandAdjustments The equalizer bands to adjust and their relative gain adjustments as integer dB 
      *             values.
      */
-    void localAdjustBandLevels( const std::vector<EqualizerBandLevel>& bandAdjustments );
+    void localAdjustBandLevels(const std::vector<EqualizerBandLevel>& bandAdjustments);
 
     /**
      * Notifies the Engine that the gain levels for the equalizer bands are being reset to their defaults.
      * 
      * @param [in] bands The equalizer bands to reset. Empty @a bands resets all supported equalizer bands.
      */
-    void localResetBands( const std::vector<EqualizerBand>& bands = {} );
+    void localResetBands(const std::vector<EqualizerBand>& bands = {});
 
     /**
      * @internal
@@ -112,8 +112,8 @@ public:
      *
      * Should *never* be called by the platform implementation.
      */
-    void setEngineInterface( 
-        std::shared_ptr<aace::alexa::EqualizerControllerEngineInterface> equalizerControllerEngineInterface );
+    void setEngineInterface(
+        std::shared_ptr<aace::alexa::EqualizerControllerEngineInterface> equalizerControllerEngineInterface);
 
 private:
     /**
@@ -123,7 +123,7 @@ private:
     std::weak_ptr<aace::alexa::EqualizerControllerEngineInterface> m_equalizerControllerEngineInterface;
 };
 
-} // aace::alexa
-} // aace
+}  // namespace alexa
+}  // namespace aace
 
-#endif // AACE_ALEXA_EQUALIZER_CONTROLLER_H
+#endif  // AACE_ALEXA_EQUALIZER_CONTROLLER_H

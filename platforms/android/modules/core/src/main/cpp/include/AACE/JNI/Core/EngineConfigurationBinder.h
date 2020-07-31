@@ -23,22 +23,22 @@ namespace jni {
 namespace core {
 namespace config {
 
-    class EngineConfigurationBinder {
-    public:
-        EngineConfigurationBinder( std::shared_ptr<aace::core::config::EngineConfiguration> config ) : m_config( config ) {
-        }
-        
-        std::shared_ptr<aace::core::config::EngineConfiguration> getConfig() {
-            return m_config;
-        }
+class EngineConfigurationBinder {
+public:
+    EngineConfigurationBinder(std::shared_ptr<aace::core::config::EngineConfiguration> config) : m_config(config) {
+    }
 
-    private:
-        std::shared_ptr<aace::core::config::EngineConfiguration> m_config;
-    };
+    std::shared_ptr<aace::core::config::EngineConfiguration> getConfig() {
+        return m_config;
+    }
 
-} // aace::jni::core::config
-} // aace::jni::core
-} // aace::jni
-} // aace
+private:
+    std::shared_ptr<aace::core::config::EngineConfiguration> m_config;
+};
 
-#endif // AACE_JNI_CORE_CONFIG_ENGINE_CONFIGURATION_BINDER_H
+}  // namespace config
+}  // namespace core
+}  // namespace jni
+}  // namespace aace
+
+#endif  // AACE_JNI_CORE_CONFIG_ENGINE_CONFIGURATION_BINDER_H

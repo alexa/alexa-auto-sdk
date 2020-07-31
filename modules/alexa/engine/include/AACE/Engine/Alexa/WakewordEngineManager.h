@@ -28,12 +28,9 @@ namespace alexa {
 
 class WakewordEngineManager {
 public:
-    enum class AdapterType {
-        PRIMARY,
-        SECONDARY
-    };
+    enum class AdapterType { PRIMARY, SECONDARY };
 
-    using WakewordEngineAdapterFactory = std::function<std::shared_ptr<WakewordEngineAdapter>(const AdapterType &type)>;
+    using WakewordEngineAdapterFactory = std::function<std::shared_ptr<WakewordEngineAdapter>(const AdapterType& type)>;
 
     WakewordEngineManager() = default;
     ~WakewordEngineManager() = default;
@@ -47,7 +44,7 @@ public:
      * @return returns @c true on successful registration, otherwise @false.
      * 
      */
-    bool registerFactory(const std::string &name, WakewordEngineAdapterFactory factory);
+    bool registerFactory(const std::string& name, WakewordEngineAdapterFactory factory);
 
     /**
      * Create the @c WakewordEngineAdapter
@@ -58,14 +55,14 @@ public:
      * @return returns @c true on successful registration, otherwise @false.
      * 
      */
-    std::shared_ptr<WakewordEngineAdapter> createAdapter(const AdapterType &type, const std::string &name = "");
+    std::shared_ptr<WakewordEngineAdapter> createAdapter(const AdapterType& type, const std::string& name = "");
 
 private:
     std::unordered_map<std::string, WakewordEngineAdapterFactory> m_factoryMap;
 };
 
-}  // aace::engine:alexa
-}  // aace::engine
-}  // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_ALEXA_INTERFACE_WAKEWORD_ENGINE_MANAGER_H
+#endif  // AACE_ENGINE_ALEXA_INTERFACE_WAKEWORD_ENGINE_MANAGER_H

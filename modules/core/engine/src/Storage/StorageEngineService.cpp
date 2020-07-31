@@ -33,53 +33,50 @@ static const std::string TAG("aace.storage.StorageEngineService");
 // register the service
 REGISTER_SERVICE(StorageEngineService)
 
-StorageEngineService::StorageEngineService( const aace::engine::core::ServiceDescription& description ) : aace::engine::core::EngineService( description ) {
+StorageEngineService::StorageEngineService(const aace::engine::core::ServiceDescription& description) :
+        aace::engine::core::EngineService(description) {
 }
 
-bool StorageEngineService::configure( std::shared_ptr<std::istream> configuration )
-{
-    try
-    {
-        auto document = aace::engine::utils::json::parse( configuration );
-        ThrowIfNull( document, "parseConfigurationStreamFailed" );
-        
+bool StorageEngineService::configure(std::shared_ptr<std::istream> configuration) {
+    try {
+        auto document = aace::engine::utils::json::parse(configuration);
+        ThrowIfNull(document, "parseConfigurationStreamFailed");
+
         auto storageConfigRoot = document->GetObject();
 
-        if( storageConfigRoot.HasMember( "localStoragePath" ) && storageConfigRoot["localStoragePath"].IsString() )
-        {
-            ThrowIfNotNull( m_localStorage, "localStorageAlreadyConfigured" );
-        
+        if (storageConfigRoot.HasMember("localStoragePath") && storageConfigRoot["localStoragePath"].IsString()) {
+            ThrowIfNotNull(m_localStorage, "localStorageAlreadyConfigured");
+
             // create the local storage storage
             auto localStoragePath = storageConfigRoot["localStoragePath"].GetString();
-            std::string type = storageConfigRoot.HasMember( "storageType" ) && storageConfigRoot["storageType"].IsString() ? storageConfigRoot["storageType"].GetString() : "sqlite";
+            std::string type = storageConfigRoot.HasMember("storageType") && storageConfigRoot["storageType"].IsString()
+                                   ? storageConfigRoot["storageType"].GetString()
+                                   : "sqlite";
 
-            if( type == "sqlite" ) {
-                m_localStorage = SQLiteStorage::create( localStoragePath );
-            }
-            else if( type == "json" ) {
-            #ifdef DEBUG
-                m_localStorage = JSONStorage::create( localStoragePath );
-            #else
-                Throw( "debugStorageTypeSpecified:" + type );
-            #endif
-            }
-            else {
-                Throw( "invalidStorageType:" + type );
+            if (type == "sqlite") {
+                m_localStorage = SQLiteStorage::create(localStoragePath);
+            } else if (type == "json") {
+#ifdef DEBUG
+                m_localStorage = JSONStorage::create(localStoragePath);
+#else
+                Throw("debugStorageTypeSpecified:" + type);
+#endif
+            } else {
+                Throw("invalidStorageType:" + type);
             }
         }
 
         // register the local storage interface
-        ThrowIfNull( m_localStorage, "localStorageNotConfigured" );
-        registerServiceInterface<LocalStorageInterface>( m_localStorage );
+        ThrowIfNull(m_localStorage, "localStorageNotConfigured");
+        registerServiceInterface<LocalStorageInterface>(m_localStorage);
 
         return true;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"configure").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "configure").d("reason", ex.what()));
         return false;
     }
 }
 
-} // aace::engine::storage
-} // aace::engine
-} // aace
+}  // namespace storage
+}  // namespace engine
+}  // namespace aace

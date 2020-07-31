@@ -32,26 +32,40 @@ public class ViewHolderTrafficDetailsTemplate extends RecyclerView.ViewHolder {
     private final ImageView mCurrentTrafficConditionsIcon;
     private final ImageView mBackgroundImage;
 
-    public ViewHolderTrafficDetailsTemplate(View v ) {
-        super( v );
-        mMainTitle = v.findViewById( R.id.mainTitle );
-        mSubTitle = v.findViewById( R.id.subTitle );
-        mLabel = v.findViewById( R.id.label );
-        mAddress = v.findViewById( R.id.address );
-        mTravelDistance = v.findViewById( R.id.travelDistance );
-        mTravelTime = v.findViewById( R.id.travelTime );
-        mCurrentTrafficConditionsIcon = v.findViewById( R.id.currentTrafficConditionsIcon );
-        mBackgroundImage = v.findViewById( R.id.backgroundImage );
+    public ViewHolderTrafficDetailsTemplate(View v) {
+        super(v);
+        mMainTitle = v.findViewById(R.id.mainTitle);
+        mSubTitle = v.findViewById(R.id.subTitle);
+        mLabel = v.findViewById(R.id.label);
+        mAddress = v.findViewById(R.id.address);
+        mTravelDistance = v.findViewById(R.id.travelDistance);
+        mTravelTime = v.findViewById(R.id.travelTime);
+        mCurrentTrafficConditionsIcon = v.findViewById(R.id.currentTrafficConditionsIcon);
+        mBackgroundImage = v.findViewById(R.id.backgroundImage);
     }
 
-    public TextView getMainTitle() { return mMainTitle; }
-    public TextView getSubTitle() { return mSubTitle; }
-    public TextView getLabel() { return mLabel; }
-    public TextView getAddress() { return mAddress; }
-    public TextView getTravelDistance() { return mTravelDistance; }
-    public TextView getTravelTime() { return mTravelTime; }
-    public ImageView getCurrentTrafficConditionsIcon() { return mCurrentTrafficConditionsIcon; }
-    public ImageView getBackgroundImage() { return mBackgroundImage; }
+    public TextView getMainTitle() {
+        return mMainTitle;
+    }
+    public TextView getSubTitle() {
+        return mSubTitle;
+    }
+    public TextView getLabel() {
+        return mLabel;
+    }
+    public TextView getAddress() {
+        return mAddress;
+    }
+    public TextView getTravelDistance() {
+        return mTravelDistance;
+    }
+    public TextView getTravelTime() {
+        return mTravelTime;
+    }
+    public ImageView getCurrentTrafficConditionsIcon() {
+        return mCurrentTrafficConditionsIcon;
+    }
+    public ImageView getBackgroundImage() {
+        return mBackgroundImage;
+    }
 }
-
-

@@ -23,15 +23,17 @@ namespace aace {
 namespace engine {
 namespace logger {
 
-class LogEntryStream : private LogEntryBuffer, public std::ostream {
+class LogEntryStream
+        : private LogEntryBuffer
+        , public std::ostream {
 public:
     LogEntryStream();
 
     const char* c_str() const;
 };
 
-}  // logger
-}  // engine
-}  // aace
+}  // namespace logger
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_LOGGER_LOGENTRYSTREAM_H
+#endif  // AACE_ENGINE_LOGGER_LOGENTRYSTREAM_H

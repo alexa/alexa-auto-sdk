@@ -45,12 +45,12 @@ public:
         IDLE,
 
         /**
-         * Alexa is currently listening.
+         * Alexa is listening.
          */
         LISTENING,
 
         /**
-         * Alexa is currently expecting a response from the user.
+         * Alexa is expecting a response from the user.
          */
         EXPECTING,
 
@@ -71,11 +71,12 @@ public:
      *
      * @param [in] state The new Alexa dialog state
      *
-     * @note It is the responsibility of the platform implementation to provide a familiar Alexa experience for the user.
+     * @note The platform implementation is responsible for providing a familiar Alexa experience for the user.
      * See the AVS UX Attention System guidelines for recommendations on communicating 
      * Alexa attention states: https://developer.amazon.com/docs/alexa-voice-service/ux-design-attention.html#implement
      */
-    virtual void dialogStateChanged( DialogState state ) {}
+    virtual void dialogStateChanged(DialogState state) {
+    }
 
     using AuthState = aace::alexa::AuthProviderEngineInterface::AuthState;
     using AuthError = aace::alexa::AuthProviderEngineInterface::AuthError;
@@ -86,10 +87,11 @@ public:
      * @param [in] state The new authorization state
      * @param [in] error The error state of the authorization attempt
      */
-    virtual void authStateChanged( AuthState state, AuthError error ) {}
+    virtual void authStateChanged(AuthState state, AuthError error) {
+    }
 
     /**
-     * Describes the status of an AVS connection
+     * Describes the AVS connection status
      */
     enum class ConnectionStatus {
 
@@ -160,17 +162,17 @@ public:
         INVALID_AUTH,
 
         /**
-         * There was a timeout sending a ping request.
+         * A ping request timed out.
          */
         PING_TIMEDOUT,
 
         /**
-         * There was a timeout writing to AVS.
+         * A write request to AVS timed out.
          */
         WRITE_TIMEDOUT,
 
         /**
-         * There was a timeout reading from AVS.
+         * A read request from AVS timed out.
          */
         READ_TIMEDOUT,
 
@@ -204,9 +206,28 @@ public:
      * Notifies the platform implementation of an AVS connection status change
      *
      * @param [in] status The new AVS connection status
-     * @param [in] reason The reason for the status change
+     * @param [in] reason The reason for the AVS connection status change
      */
-    virtual void connectionStatusChanged( ConnectionStatus status, ConnectionChangedReason reason ) {}
+    virtual void connectionStatusChanged(ConnectionStatus status, ConnectionChangedReason reason) {
+    }
+
+    /**
+     * Stops the foreground activity if there is one. This acts as a "stop" button that you use to stop
+     * an ongoing activity that has acquired the audio or visual focus. This call stops all user-observable
+     * activities and returns immediately.
+     */
+    void stopForegroundActivity();
+
+    /**
+     * @internal
+     * Sets the Engine interface delegate.
+     *
+     * This is for the use of Auto SDK. Do not call this from the platform implementation.
+     */
+    void setEngineInterface(std::shared_ptr<aace::alexa::AlexaClientEngineInterface> alexaClientEngineInterface);
+
+private:
+    std::weak_ptr<aace::alexa::AlexaClientEngineInterface> m_alexaClientEngineInterface;
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const AlexaClient::DialogState& state) {
@@ -302,7 +323,7 @@ inline std::ostream& operator<<(std::ostream& stream, const AlexaClient::Connect
     return stream;
 }
 
-} // aace::alexa
-} // aace
+}  // namespace alexa
+}  // namespace aace
 
-#endif // AACE_ALEXA_ALEXA_CLIENT_H
+#endif  // AACE_ALEXA_ALEXA_CLIENT_H

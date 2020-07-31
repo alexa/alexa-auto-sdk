@@ -16,10 +16,10 @@
 #ifndef AACE_ENGINE_CAR_CONTROL_TOGGLECONTROLLER_H
 #define AACE_ENGINE_CAR_CONTROL_TOGGLECONTROLLER_H
 
-#include <nlohmann/json.hpp>
-
 #include <AVSCommon/SDKInterfaces/ToggleController/ToggleControllerInterface.h>
 #include <Endpoints/EndpointBuilder.h>
+
+#include <nlohmann/json.hpp>
 
 #include "AACE/Engine/CarControl/PrimitiveController.h"
 

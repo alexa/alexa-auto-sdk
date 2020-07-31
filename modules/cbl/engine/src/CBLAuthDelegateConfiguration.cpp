@@ -66,30 +66,28 @@ std::shared_ptr<CBLAuthDelegateConfiguration> CBLAuthDelegateConfiguration::crea
     std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
     std::chrono::seconds codePairRequestTimeout,
     std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
-    std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> localeAssetManager ) {
-    
+    std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> localeAssetManager) {
     try {
-        AACE_DEBUG(LX(TAG,"create"));
-        std::shared_ptr<CBLAuthDelegateConfiguration> configuration = std::shared_ptr<CBLAuthDelegateConfiguration>( new CBLAuthDelegateConfiguration() );
-        ThrowIfNull( configuration, "CBLAuthDelegateConfigurationInvalid" );
+        AACE_DEBUG(LX(TAG, "create"));
+        std::shared_ptr<CBLAuthDelegateConfiguration> configuration =
+            std::shared_ptr<CBLAuthDelegateConfiguration>(new CBLAuthDelegateConfiguration());
+        ThrowIfNull(configuration, "CBLAuthDelegateConfigurationInvalid");
 
-        configuration->initialize( deviceInfo, codePairRequestTimeout, alexaEndpoints, localeAssetManager );
+        configuration->initialize(deviceInfo, codePairRequestTimeout, alexaEndpoints, localeAssetManager);
         return configuration;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"create").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "create").d("reason", ex.what()));
         return nullptr;
     }
 }
 
 bool CBLAuthDelegateConfiguration::initialize(
-        std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
-        std::chrono::seconds codePairRequestTimeout,
-        std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
-        std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> localeAssetManager ) {
-
+    std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
+    std::chrono::seconds codePairRequestTimeout,
+    std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
+    std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> localeAssetManager) {
     try {
-        AACE_DEBUG(LX(TAG,"init"));
+        AACE_DEBUG(LX(TAG, "init"));
 
         m_deviceInfo = deviceInfo;
         m_requestTimeout = DEFAULT_REQUEST_TIMEOUT;
@@ -98,16 +96,14 @@ bool CBLAuthDelegateConfiguration::initialize(
         m_alexaEndpoints = alexaEndpoints;
         m_localeAssetManager = localeAssetManager;
 
-        if (initScopeData() == false ) {
-            Throw( "initScopeDataFailed" );
+        if (initScopeData() == false) {
+            Throw("initScopeDataFailed");
         }
         return true;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"initialize").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "initialize").d("reason", ex.what()));
         return false;
     }
-    
 }
 
 std::string CBLAuthDelegateConfiguration::getClientId() const {
@@ -161,34 +157,34 @@ std::string CBLAuthDelegateConfiguration::getDefaultLocale() const {
 
 bool CBLAuthDelegateConfiguration::initScopeData() {
     try {
-        AACE_DEBUG(LX(TAG,"initScopeData"));
+        AACE_DEBUG(LX(TAG, "initScopeData"));
 
         Document scopeData;
         scopeData.SetObject();
         auto& allocator = scopeData.GetAllocator();
         Value productInstanceAttributes(kObjectType);
-        productInstanceAttributes.AddMember(JSON_KEY_DEVICE_SERIAL_NUMBER, Value( getDeviceSerialNumber().c_str(), allocator ), allocator);
+        productInstanceAttributes.AddMember(
+            JSON_KEY_DEVICE_SERIAL_NUMBER, Value(getDeviceSerialNumber().c_str(), allocator), allocator);
         Value alexaColonAll(kObjectType);
-        alexaColonAll.AddMember(JSON_KEY_PRODUCT_ID, Value( getProductId().c_str(), allocator ), allocator);
+        alexaColonAll.AddMember(JSON_KEY_PRODUCT_ID, Value(getProductId().c_str(), allocator), allocator);
         alexaColonAll.AddMember(JSON_KEY_PRODUCT_INSTANCE_ATTRIBUTES, productInstanceAttributes, allocator);
         scopeData.AddMember(JSON_KEY_ALEXA_ALL, alexaColonAll, allocator);
 
         StringBuffer buffer;
         Writer<StringBuffer> writer(buffer);
 
-        ThrowIfNot( scopeData.Accept(writer), "acceptFailed" );
+        ThrowIfNot(scopeData.Accept(writer), "acceptFailed");
 
         m_scopeData = buffer.GetString();
-        AACE_DEBUG(LX(TAG,"initScopeDataSucceeded").sensitive("scopeData", m_scopeData));
+        AACE_DEBUG(LX(TAG, "initScopeDataSucceeded").sensitive("scopeData", m_scopeData));
 
         return true;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"initScopeData").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "initScopeData").d("reason", ex.what()));
         return false;
     }
 }
 
-} // aace::engine::cbl
-} // aace::engine
-} // aace
+}  // namespace cbl
+}  // namespace engine
+}  // namespace aace

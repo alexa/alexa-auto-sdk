@@ -38,7 +38,7 @@ namespace alexa {
  */
 class SpeechRecognizer : public aace::core::PlatformInterface {
 protected:
-    SpeechRecognizer( bool wakewordDetectionEnabled = true );
+    SpeechRecognizer(bool wakewordDetectionEnabled = true);
 
 public:
     virtual ~SpeechRecognizer();
@@ -95,7 +95,11 @@ public:
      * initator type is @c WAKEWORD, otherwise should be set to an empty string.
      * @return @c true if the Engine successfully started a recognize event, else @c false
      */
-    bool startCapture( Initiator initiator, uint64_t keywordBegin = UNSPECIFIED_INDEX, uint64_t keywordEnd = UNSPECIFIED_INDEX, const std::string& keyword = "" );
+    bool startCapture(
+        Initiator initiator,
+        uint64_t keywordBegin = UNSPECIFIED_INDEX,
+        uint64_t keywordEnd = UNSPECIFIED_INDEX,
+        const std::string& keyword = "");
 
     /**
      * Notifies the Engine to terminate the current recognize event. The Engine will call @c stopAudioInput()
@@ -143,7 +147,7 @@ public:
      * @return @c true if the Engine should initiate a recognize event, @c false
      * if the Engine should ignore the invocation
      */
-    virtual bool wakewordDetected( const std::string& wakeword );
+    virtual bool wakewordDetected(const std::string& wakeword);
 
     /**
      * Notifies the platform implementation when end of 
@@ -157,7 +161,8 @@ public:
      *
      * Should *never* be called by the platform implementation
      */
-    void setEngineInterface( std::shared_ptr<aace::alexa::SpeechRecognizerEngineInterface> speechRecognizerEngineInterface );
+    void setEngineInterface(
+        std::shared_ptr<aace::alexa::SpeechRecognizerEngineInterface> speechRecognizerEngineInterface);
 
 private:
     std::weak_ptr<aace::alexa::SpeechRecognizerEngineInterface> m_speechRecognizerEngineInterface;
@@ -165,7 +170,7 @@ private:
     bool m_wakewordDetectionEnabled;
 };
 
-} // aace::alexa
-} // aace
+}  // namespace alexa
+}  // namespace aace
 
-#endif // AACE_ALEXA_SPEECH_RECOGNIZER_H
+#endif  // AACE_ALEXA_SPEECH_RECOGNIZER_H

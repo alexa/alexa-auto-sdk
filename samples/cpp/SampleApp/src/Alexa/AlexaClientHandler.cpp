@@ -31,15 +31,21 @@ namespace alexa {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-AlexaClientHandler::AlexaClientHandler(std::weak_ptr<Activity> activity, std::weak_ptr<logger::LoggerHandler> loggerHandler)
-    : m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
+AlexaClientHandler::AlexaClientHandler(
+    std::weak_ptr<Activity> activity,
+    std::weak_ptr<logger::LoggerHandler> loggerHandler) :
+        m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
     // Expects((m_activity != nullptr) && (m_loggerHandler != nullptr));
     setupUI();
 }
 
-std::weak_ptr<Activity> AlexaClientHandler::getActivity() { return m_activity; }
+std::weak_ptr<Activity> AlexaClientHandler::getActivity() {
+    return m_activity;
+}
 
-std::weak_ptr<logger::LoggerHandler> AlexaClientHandler::getLoggerHandler() { return m_loggerHandler; }
+std::weak_ptr<logger::LoggerHandler> AlexaClientHandler::getLoggerHandler() {
+    return m_loggerHandler;
+}
 
 // aace::alexa::AlexaClient interface
 
@@ -87,7 +93,9 @@ void AlexaClientHandler::authStateChanged(AlexaClient::AuthState state, AlexaCli
     });
 }
 
-void AlexaClientHandler::connectionStatusChanged(AlexaClient::ConnectionStatus status, AlexaClient::ConnectionChangedReason reason) {
+void AlexaClientHandler::connectionStatusChanged(
+    AlexaClient::ConnectionStatus status,
+    AlexaClient::ConnectionChangedReason reason) {
     std::stringstream ss;
     ss << status << '/' << reason;
     log(logger::LoggerHandler::Level::INFO, ss.str());
@@ -116,7 +124,7 @@ void AlexaClientHandler::connectionStatusChanged(AlexaClient::ConnectionStatus s
 
 // private
 
-void AlexaClientHandler::log(logger::LoggerHandler::Level level, const std::string &message) {
+void AlexaClientHandler::log(logger::LoggerHandler::Level level, const std::string& message) {
     auto loggerHandler = m_loggerHandler.lock();
     if (!loggerHandler) {
         return;
@@ -135,6 +143,12 @@ void AlexaClientHandler::setupUI() {
     m_authStateView = activity->findViewById("id:AuthState");
     m_connectionStatusView = activity->findViewById("id:ConnectionStatus");
     m_dialogStateView = activity->findViewById("id:DialogState");
+
+    activity->registerObserver(Event::onStopForegroundActivity, [=](const std::string&) {
+        log(logger::LoggerHandler::Level::INFO, "onStopForegroundActivity");
+        stopForegroundActivity();
+        return true;
+    });
 
     // initial text views
     activity->runOnUIThread([=]() {
@@ -156,5 +170,5 @@ void AlexaClientHandler::setupUI() {
     });
 }
 
-} // namespace alexa
-} // namespace sampleApp
+}  // namespace alexa
+}  // namespace sampleApp

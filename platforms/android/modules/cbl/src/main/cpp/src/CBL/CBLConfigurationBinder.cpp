@@ -21,37 +21,33 @@
 static const char TAG[] = "aace.jni.cbl.config.CBLConfigurationBinder";
 
 // JNI
-extern "C"
-{
-    JNIEXPORT jlong JNICALL
-    Java_com_amazon_aace_cbl_config_CBLConfiguration_createCBLConfigBinder( JNIEnv * env, jobject obj, jint seconds)
-    {
-        try
-        {
-            auto config = aace::cbl::config::CBLConfiguration::createCBLConfig( seconds );
-            ThrowIfNull( config, "createCBLConfigFailed" );
+extern "C" {
+JNIEXPORT jlong JNICALL
+Java_com_amazon_aace_cbl_config_CBLConfiguration_createCBLConfigBinder(JNIEnv* env, jobject obj, jint seconds) {
+    try {
+        auto config = aace::cbl::config::CBLConfiguration::createCBLConfig(seconds);
+        ThrowIfNull(config, "createCBLConfigFailed");
 
-            return reinterpret_cast<long>( new aace::jni::core::config::EngineConfigurationBinder( config ) );
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_cbl_config_CBLConfiguration_createCBLConfigBinder",ex.what());
-            return 0;
-        }
+        return reinterpret_cast<long>(new aace::jni::core::config::EngineConfigurationBinder(config));
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_cbl_config_CBLConfiguration_createCBLConfigBinder", ex.what());
+        return 0;
     }
+}
 
-    JNIEXPORT jlong JNICALL
-    Java_com_amazon_aace_cbl_config_CBLConfiguration_createCBLUserProfileConfigBinder( JNIEnv * env, jobject obj, jboolean enableUserProfile )
-    {
-        try
-        {
-            auto config = aace::cbl::config::CBLConfiguration::createCBLUserProfileConfig( enableUserProfile );
-            ThrowIfNull( config, "createCBLUserProfileConfig" );
+JNIEXPORT jlong JNICALL Java_com_amazon_aace_cbl_config_CBLConfiguration_createCBLUserProfileConfigBinder(
+    JNIEnv* env,
+    jobject obj,
+    jboolean enableUserProfile) {
+    try {
+        auto config = aace::cbl::config::CBLConfiguration::createCBLUserProfileConfig(enableUserProfile);
+        ThrowIfNull(config, "createCBLUserProfileConfig");
 
-            return reinterpret_cast<long>( new aace::jni::core::config::EngineConfigurationBinder( config ) );
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_cbl_config_CBLConfiguration_createCBLUserProfileConfigBinder",ex.what());
-            return 0;
-        }
+        return reinterpret_cast<long>(new aace::jni::core::config::EngineConfigurationBinder(config));
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(
+            TAG, "Java_com_amazon_aace_cbl_config_CBLConfiguration_createCBLUserProfileConfigBinder", ex.what());
+        return 0;
     }
+}
 }

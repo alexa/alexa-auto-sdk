@@ -17,8 +17,8 @@
 #define SAMPLEAPP_STATUS_H
 
 // C++ Standard Library
-#include <cstdlib>  // EXIT_SUCCESS and EXIT_FAILURE macros
-#include <iostream> // std::ostream
+#include <cstdlib>   // EXIT_SUCCESS and EXIT_FAILURE macros
+#include <iostream>  // std::ostream
 
 namespace sampleApp {
 
@@ -33,7 +33,7 @@ namespace sampleApp {
 
 enum Status { Success = EXIT_SUCCESS, Failure = EXIT_FAILURE, Restart, Unknown };
 
-inline std::ostream &operator<<(std::ostream &stream, const Status &status) {
+inline std::ostream& operator<<(std::ostream& stream, const Status& status) {
     switch (status) {
         case Status::Success:
             stream << "Success";
@@ -51,6 +51,6 @@ inline std::ostream &operator<<(std::ostream &stream, const Status &status) {
     return stream;
 }
 
-} // namespace sampleApp
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_STATUS_H
+#endif  // SAMPLEAPP_STATUS_H

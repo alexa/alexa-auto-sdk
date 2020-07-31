@@ -23,18 +23,18 @@ namespace aace {
 namespace jni {
 namespace core {
 
-    class PlatformInterfaceBinder {
-    protected:
-        PlatformInterfaceBinder() = default;
+class PlatformInterfaceBinder {
+protected:
+    PlatformInterfaceBinder() = default;
 
-    public:
-        virtual ~PlatformInterfaceBinder();
+public:
+    virtual ~PlatformInterfaceBinder();
 
-        virtual std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() = 0;
-    };
+    virtual std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() = 0;
+};
 
-}  // aace::jni::core
-}  // aace::jni
-}  // aace
+}  // namespace core
+}  // namespace jni
+}  // namespace aace
 
-#endif // AACE_JNI_CORE_PLATFORM_INTERFACE_BINDER_H
+#endif  // AACE_JNI_CORE_PLATFORM_INTERFACE_BINDER_H

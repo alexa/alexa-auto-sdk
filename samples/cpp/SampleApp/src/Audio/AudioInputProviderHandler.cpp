@@ -33,9 +33,11 @@ namespace audio {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-AudioInputProviderHandler::AudioInputProviderHandler(std::weak_ptr<Activity> activity,
-                             std::weak_ptr<logger::LoggerHandler> loggerHandler, bool setup)
-    : m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
+AudioInputProviderHandler::AudioInputProviderHandler(
+    std::weak_ptr<Activity> activity,
+    std::weak_ptr<logger::LoggerHandler> loggerHandler,
+    bool setup) :
+        m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
     // Expects((m_activity != nullptr) && (m_loggerHandler != nullptr));
     // Expects((mediaPlayer != nullptr) && (speaker != nullptr));
     if (setup) {
@@ -43,30 +45,33 @@ AudioInputProviderHandler::AudioInputProviderHandler(std::weak_ptr<Activity> act
     }
 }
 
-std::weak_ptr<Activity> AudioInputProviderHandler::getActivity() { return m_activity; }
+std::weak_ptr<Activity> AudioInputProviderHandler::getActivity() {
+    return m_activity;
+}
 
-std::weak_ptr<logger::LoggerHandler> AudioInputProviderHandler::getLoggerHandler() { return m_loggerHandler; }
+std::weak_ptr<logger::LoggerHandler> AudioInputProviderHandler::getLoggerHandler() {
+    return m_loggerHandler;
+}
 
 // aace::audio::AudioInputProvider interface
 
-std::shared_ptr<aace::audio::AudioInput> AudioInputProviderHandler::openChannel( const std::string& name, AudioInputType type )
-{
-    if( type == AudioInputType::VOICE || type == AudioInputType::COMMUNICATION )
-    {
-        if( m_sharedAudioInput == nullptr ) {
+std::shared_ptr<aace::audio::AudioInput> AudioInputProviderHandler::openChannel(
+    const std::string& name,
+    AudioInputType type) {
+    if (type == AudioInputType::VOICE || type == AudioInputType::COMMUNICATION) {
+        if (m_sharedAudioInput == nullptr) {
             m_sharedAudioInput = DefaultAudioInput::create();
         }
 
         return m_sharedAudioInput;
-    }
-    else {
+    } else {
         return nullptr;
     }
 }
 
 // private
 
-void AudioInputProviderHandler::log(logger::LoggerHandler::Level level, const std::string &message) {
+void AudioInputProviderHandler::log(logger::LoggerHandler::Level level, const std::string& message) {
     auto loggerHandler = m_loggerHandler.lock();
     if (!loggerHandler) {
         return;
@@ -80,13 +85,12 @@ void AudioInputProviderHandler::setupUI() {
         return;
     }
     m_console = activity->findViewById("id:console");
-    activity->registerObserver(Event::onSpeechRecognizerStartStreamingAudioFile, [=](const std::string &value) {
+    activity->registerObserver(Event::onSpeechRecognizerStartStreamingAudioFile, [=](const std::string& value) {
         log(logger::LoggerHandler::Level::VERBOSE, "onSpeechRecognizerStartStreamingAudioFile:" + value);
-        m_sharedAudioInput->setStream( FileAudioStream::create(value) );
+        m_sharedAudioInput->setStream(FileAudioStream::create(value));
         return true;
     });
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -96,45 +100,38 @@ void AudioInputProviderHandler::setupUI() {
 
 #define NUM_SAMPLES 160
 
-bool DefaultAudioInput::setStream( std::shared_ptr<aace::audio::AudioStream> stream )
-{
-    if( m_stream != nullptr ) {
+bool DefaultAudioInput::setStream(std::shared_ptr<aace::audio::AudioStream> stream) {
+    if (m_stream != nullptr) {
         return false;
     }
     m_stream = stream;
     return true;
 }
 
-bool DefaultAudioInput::startAudioInput()
-{
+bool DefaultAudioInput::startAudioInput() {
     int16_t buffer[NUM_SAMPLES] = {0};
     size_t bsize = NUM_SAMPLES * 2;
 
     m_running = true;
 
-    m_executer.submit([=]()
-    {
-        while( m_running )
-        {
-            if( m_stream != nullptr )
-            {
-                if( m_stream->isClosed() ) {
+    m_executer.submit([=]() {
+        while (m_running) {
+            if (m_stream != nullptr) {
+                if (m_stream->isClosed()) {
                     m_stream.reset();
-                    std::memset( (char *) buffer, 0, bsize );
-                }
-                else
-                {
-                    ssize_t count = m_stream->read( (char *) buffer, bsize );
-                    if( count < bsize ) {
-                        std::memset( ((char *) buffer) + count, 0, bsize - count );
+                    std::memset((char*)buffer, 0, bsize);
+                } else {
+                    ssize_t count = m_stream->read((char*)buffer, bsize);
+                    if (count < bsize) {
+                        std::memset(((char*)buffer) + count, 0, bsize - count);
                     }
                 }
             }
 
-            write( buffer, NUM_SAMPLES );
+            write(buffer, NUM_SAMPLES);
 
             // sleep
-            std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     });
 
@@ -152,47 +149,44 @@ bool DefaultAudioInput::stopAudioInput() {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::shared_ptr<FileAudioStream> FileAudioStream::create( const std::string& path )
-{
-    auto stream = std::shared_ptr<FileAudioStream>( new FileAudioStream() );
+std::shared_ptr<FileAudioStream> FileAudioStream::create(const std::string& path) {
+    auto stream = std::shared_ptr<FileAudioStream>(new FileAudioStream());
 
-    stream->open( path );
+    stream->open(path);
 
     return stream;
 }
 
-bool FileAudioStream::open( const std::string& path )
-{
-    m_stream = std::ifstream( path, std::ios::binary );
+bool FileAudioStream::open(const std::string& path) {
+    m_stream = std::ifstream(path, std::ios::binary);
 
     return m_stream.is_open();
 }
 
-ssize_t FileAudioStream::read( char* data, const size_t size )
-{
-        if( m_stream.eof() ) {
-            m_closed = true;
-            return 0;
-        }
+ssize_t FileAudioStream::read(char* data, const size_t size) {
+    if (m_stream.eof()) {
+        m_closed = true;
+        return 0;
+    }
 
-        // read the data from the stream
-        m_stream.read( data, size );
-        if( m_stream.bad() ) {
-            m_closed = true;
-            return 0;
-        }
+    // read the data from the stream
+    m_stream.read(data, size);
+    if (m_stream.bad()) {
+        m_closed = true;
+        return 0;
+    }
 
-        // get the number of bytes read
-        ssize_t count = m_stream.gcount();
+    // get the number of bytes read
+    ssize_t count = m_stream.gcount();
 
-        m_stream.tellg(); // Don't remove otherwise the ReseourceStream used for Alerts/Timers won't work as expected.
+    m_stream.tellg();  // Don't remove otherwise the ReseourceStream used for Alerts/Timers won't work as expected.
 
-        return count;
+    return count;
 }
 
 bool FileAudioStream::isClosed() {
     return m_closed;
 }
 
-} // namespace audio
-} // namespace sampleApp
+}  // namespace audio
+}  // namespace sampleApp

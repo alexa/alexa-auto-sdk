@@ -48,12 +48,14 @@ public:
     /**
      * Notifies the observer for a change in network status.
      */
-    virtual void onNetworkInfoChanged( NetworkStatus status, int wifiSignalStrength ) = 0;
+    virtual void onNetworkInfoChanged(NetworkStatus status, int wifiSignalStrength) = 0;
 
     /**
      * Notifies the observer about status of network inteface change.
      */
-    virtual void onNetworkInterfaceChangeStatusChanged( const std::string& networkInterface, NetworkInterfaceChangeStatus status ) = 0;
+    virtual void onNetworkInterfaceChangeStatusChanged(
+        const std::string& networkInterface,
+        NetworkInterfaceChangeStatus status) = 0;
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const NetworkInfoObserver::NetworkInterfaceChangeStatus& status) {
@@ -71,8 +73,8 @@ inline std::ostream& operator<<(std::ostream& stream, const NetworkInfoObserver:
     return stream;
 }
 
-} // aace::engine::network
-} // aace::engine
-} // aace
+}  // namespace network
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_NETWORK_NETWORK_INFO_OBSERVER_H
+#endif  // AACE_ENGINE_NETWORK_NETWORK_INFO_OBSERVER_H

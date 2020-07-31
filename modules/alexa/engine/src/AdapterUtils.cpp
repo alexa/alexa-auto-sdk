@@ -49,14 +49,18 @@ alexaClientSDK::avsCommon::utils::RetryTimer& sessionRetryTimer() {
     return SESSION_RETRY_TIMER;
 }
 
-const NamespaceAndName CHANGE_REPORT("Alexa", "ChangeReport"); // Note: not in ExternalMediaPlayer 1.1
+const NamespaceAndName CHANGE_REPORT("Alexa", "ChangeReport");  // Note: not in ExternalMediaPlayer 1.1
 const NamespaceAndName REQUEST_TOKEN("ExternalMediaPlayer", "RequestToken");
 const NamespaceAndName LOGIN("ExternalMediaPlayer", "Login");
 const NamespaceAndName LOGOUT("ExternalMediaPlayer", "Logout");
 const NamespaceAndName PLAYER_EVENT("ExternalMediaPlayer", "PlayerEvent");
-const NamespaceAndName PLAYER_ERROR_EVENT("ExternalMediaPlayer", "PlayerError"); // Note: rename PLAYER_ERROR in ExternalMediaPlayer 1.1
+const NamespaceAndName PLAYER_ERROR_EVENT(
+    "ExternalMediaPlayer",
+    "PlayerError");  // Note: rename PLAYER_ERROR in ExternalMediaPlayer 1.1
 //#ifdef EXTERNALMEDIAPLAYER_1_1
-const NamespaceAndName PLAYER_ERROR("ExternalMediaPlayer", "PlayerError"); // Note: rename PLAYER_ERROR in ExternalMediaPlayer 1.1
+const NamespaceAndName PLAYER_ERROR(
+    "ExternalMediaPlayer",
+    "PlayerError");  // Note: rename PLAYER_ERROR in ExternalMediaPlayer 1.1
 const NamespaceAndName REPORT_DISCOVERED_PLAYERS("ExternalMediaPlayer", "ReportDiscoveredPlayers");
 const NamespaceAndName AUTHORIZATION_COMPLETE("ExternalMediaPlayer", "AuthorizationComplete");
 //#endif
@@ -161,6 +165,6 @@ bool buildDefaultPlayerState(rapidjson::Value* document, rapidjson::Document::Al
     return true;
 }
 
-}  // alexa
-}  // engine
-}  // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace

@@ -18,17 +18,20 @@
 
 #include <AVSCommon/SDKInterfaces/Audio/NotificationsAudioFactoryInterface.h>
 
-namespace aace {    
+namespace aace {
 namespace test {
 namespace avs {
 
-class MockNotificationsAudioFactoryInterface : public alexaClientSDK::avsCommon::sdkInterfaces::audio::NotificationsAudioFactoryInterface {
+class MockNotificationsAudioFactoryInterface
+        : public alexaClientSDK::avsCommon::sdkInterfaces::audio::NotificationsAudioFactoryInterface {
 public:
-    MOCK_CONST_METHOD0(notificationDefault, std::function<std::unique_ptr<std::istream>()>());
+    MOCK_CONST_METHOD0(
+        notificationDefault,
+        std::function<std::pair<std::unique_ptr<std::istream>, const alexaClientSDK::avsCommon::utils::MediaType>()>());
 };
 
-} // aace::test::avs
-} // aace::test
-} // aace
+}  // namespace avs
+}  // namespace test
+}  // namespace aace
 
-#endif //AACE_TEST_AVS_MOCK_NOTIFICATIONS_AUDIO_FACTORY_INTERFACE_H
+#endif  //AACE_TEST_AVS_MOCK_NOTIFICATIONS_AUDIO_FACTORY_INTERFACE_H

@@ -33,21 +33,34 @@ namespace sampleApp {
 
 const std::string View::m_ruler = "\n" + std::string(80, '#') + "\n";
 
-View::View(const std::string &id) : m_id{std::move(id)} {}
+View::View(const std::string& id) : m_id{std::move(id)} {
+}
 
-std::shared_ptr<View> View::create(const std::string &id) { return std::shared_ptr<View>(new View(id)); }
+std::shared_ptr<View> View::create(const std::string& id) {
+    return std::shared_ptr<View>(new View(id));
+}
 
-void View::clear(const Type type) {}
+void View::clear(const Type type) {
+}
 
-std::string View::getId() { return m_id; }
+std::string View::getId() {
+    return m_id;
+}
 
-std::string View::getText() { return m_text; }
+std::string View::getText() {
+    return m_text;
+}
 
-void View::set(const std::string &, const Type type) {}
+void View::set(const std::string&, const Type type) {
+}
 
-void View::setId(const std::string &id) { m_id = id; }
+void View::setId(const std::string& id) {
+    m_id = id;
+}
 
-void View::setText(const std::string &text) { m_text = text; }
+void View::setText(const std::string& text) {
+    m_text = text;
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -55,9 +68,12 @@ void View::setText(const std::string &text) { m_text = text; }
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ContentView::ContentView(const std::string &id) : View{id} {}
+ContentView::ContentView(const std::string& id) : View{id} {
+}
 
-std::shared_ptr<ContentView> ContentView::create(const std::string &id) { return std::shared_ptr<ContentView>(new ContentView(id)); }
+std::shared_ptr<ContentView> ContentView::create(const std::string& id) {
+    return std::shared_ptr<ContentView>(new ContentView(id));
+}
 
 void ContentView::clear(const Type type) {
     switch (type) {
@@ -75,7 +91,7 @@ void ContentView::clear(const Type type) {
     }
 }
 
-void ContentView::set(const std::string &string, const Type type) {
+void ContentView::set(const std::string& string, const Type type) {
     static const unsigned menuColumns = 80;
     auto titleRuler = std::string(menuColumns, '#');
     std::stringstream stream;
@@ -93,7 +109,7 @@ void ContentView::set(const std::string &string, const Type type) {
                     stream << std::endl;
                     stream << url << "?cbl-code=" << code << std::endl;
                 }
-            } catch (std::exception &e) {
+            } catch (std::exception& e) {
                 stream << "CBLCode parser error" << e.what() << std::endl;
             }
             break;
@@ -104,7 +120,7 @@ void ContentView::set(const std::string &string, const Type type) {
                 if (object.count("message")) {
                     stream << object.at("message").get<std::string>() << std::endl;
                 }
-            } catch (std::exception &e) {
+            } catch (std::exception& e) {
                 stream << "CBLCodeExpired parser error" << e.what() << std::endl;
             }
             break;
@@ -115,7 +131,7 @@ void ContentView::set(const std::string &string, const Type type) {
                 if (object.count("message")) {
                     stream << object.at("message").get<std::string>() << std::endl;
                 }
-            } catch (std::exception &e) {
+            } catch (std::exception& e) {
                 stream << "CBLAuthorizationExpired parser error" << e.what() << std::endl;
             }
             break;
@@ -127,7 +143,7 @@ void ContentView::set(const std::string &string, const Type type) {
                 if (object.count("displayName")) {
                     stream << "Display Name: " << object.at("displayName").get<std::string>() << std::endl;
                 }
-            } catch (std::exception &e) {
+            } catch (std::exception& e) {
                 stream << "CommunicationCallDisplayInfo parser error" << e.what() << std::endl;
             }
             break;
@@ -145,18 +161,21 @@ void ContentView::set(const std::string &string, const Type type) {
                     }
                 }
                 if (object.count("waypoints")) {
-                    auto waypoints = object.at("waypoints"); {
+                    auto waypoints = object.at("waypoints");
+                    {
                         for (json waypoint : waypoints) {
                             stream << "Address:   " << waypoint.at("address").get<std::string>() << std::endl;
                             if (waypoint.count("coordinate")) {
                                 auto coordinate = waypoint.at("coordinate");
-                                stream << "Latitude:  " << coordinate.at("latitudeInDegrees").get<double>() << std::endl;
-                                stream << "Longitude: " << coordinate.at("longitudeInDegrees").get<double>() << std::endl;
+                                stream << "Latitude:  " << coordinate.at("latitudeInDegrees").get<double>()
+                                       << std::endl;
+                                stream << "Longitude: " << coordinate.at("longitudeInDegrees").get<double>()
+                                       << std::endl;
                             }
                         }
                     }
                 }
-            } catch (std::exception &e) {
+            } catch (std::exception& e) {
                 stream << "Navigation parser error" << e.what() << std::endl;
             }
             break;
@@ -176,7 +195,7 @@ void ContentView::set(const std::string &string, const Type type) {
                         stream << object.at("title").get<std::string>() << std::endl;
                     }
                     stream << std::endl;
-                } 
+                }
 
                 // clang-format off
                 static const std::map<std::string, Type> TemplateTypeEnumerator{
@@ -209,7 +228,7 @@ void ContentView::set(const std::string &string, const Type type) {
                         break;
                     case Type::ListTemplate1:
                         if (object.count("listItems") && object.at("listItems").is_array()) {
-                            for (auto &item : object.at("listItems")) {
+                            for (auto& item : object.at("listItems")) {
                                 if (item.count("leftTextField")) {
                                     stream << item.at("leftTextField").get<std::string>() << " ";
                                 }
@@ -222,29 +241,34 @@ void ContentView::set(const std::string &string, const Type type) {
                         break;
                     case Type::WeatherTemplate:
                         if (object.count("currentWeather")) {
-                            stream << "Current Weather:  " << object.at("currentWeather").get<std::string>() << std::endl;
+                            stream << "Current Weather:  " << object.at("currentWeather").get<std::string>()
+                                   << std::endl;
                         }
                         if (object.count("description")) {
                             stream << "Description:      " << object.at("description").get<std::string>() << std::endl;
                         }
                         if (object.count("highTemperature")) {
-                            stream << "High Temperature: " << object.at("highTemperature").at("value").get<std::string>() << std::endl;
+                            stream << "High Temperature: "
+                                   << object.at("highTemperature").at("value").get<std::string>() << std::endl;
                         }
                         if (object.count("lowTemperature")) {
-                            stream << "Low Temperature:  " << object.at("lowTemperature").at("value").get<std::string>() << std::endl;
+                            stream << "Low Temperature:  " << object.at("lowTemperature").at("value").get<std::string>()
+                                   << std::endl;
                         }
                         if (object.count("weatherForecast") && object.at("weatherForecast").is_array()) {
                             stream << std::endl << "Weather Forecast: " << std::endl;
-                            for (auto &item : object.at("weatherForecast")) {
-                                stream << item.at("date").get<std::string>() << ", " << item.at("day").get<std::string>() << ", "
-                                       << item.at("highTemperature").get<std::string>() << " - " << item.at("lowTemperature").get<std::string>() << ", "
+                            for (auto& item : object.at("weatherForecast")) {
+                                stream << item.at("date").get<std::string>() << ", "
+                                       << item.at("day").get<std::string>() << ", "
+                                       << item.at("highTemperature").get<std::string>() << " - "
+                                       << item.at("lowTemperature").get<std::string>() << ", "
                                        << item.at("image").at("contentDescription").get<std::string>() << std::endl;
                             }
                         }
                         break;
                     case Type::LocalSearchListTemplate1:
                         if (object.count("listItems") && object.at("listItems").is_array()) {
-                            for (auto &item : object.at("listItems")) {
+                            for (auto& item : object.at("listItems")) {
                                 if (item.count("leftTextField")) {
                                     stream << item.at("leftTextField").get<std::string>() << " ";
                                 }
@@ -260,7 +284,7 @@ void ContentView::set(const std::string &string, const Type type) {
                         break;
                     case Type::LocalSearchListTemplate2:
                         if (object.count("pointOfInterests") && object.at("pointOfInterests").is_array()) {
-                            for (auto &poi : object.at("pointOfInterests")) {
+                            for (auto& poi : object.at("pointOfInterests")) {
                                 if (poi.count("title")) {
                                     auto title = poi.at("title");
                                     if (title.count("mainTitle")) {
@@ -325,7 +349,7 @@ void ContentView::set(const std::string &string, const Type type) {
                     default:
                         break;
                 }
-            } catch (std::exception &e) {
+            } catch (std::exception& e) {
                 stream << "Template parser error" << e.what() << std::endl;
             }
             break;
@@ -363,15 +387,15 @@ void ContentView::set(const std::string &string, const Type type) {
                         }
                     }
                 }
-            } catch (std::exception &e) {
+            } catch (std::exception& e) {
                 stream << "PlayerInfo parser error" << e.what() << std::endl;
             }
             break;
         default:
             break;
     }
-    stream << std::endl << titleRuler << std::endl << std::endl;
-    print(stream.str());
+    stream << std::endl << titleRuler << std::endl;
+    printLine(stream.str());
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -380,12 +404,15 @@ void ContentView::set(const std::string &string, const Type type) {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TextView::TextView(const std::string &id) : View{id} {}
-
-std::shared_ptr<TextView> TextView::create(const std::string &id) { return std::shared_ptr<TextView>(new TextView(id)); }
-
-void TextView::setText(const std::string &text) {
-    View::setText(text); // i.e. ncurses
+TextView::TextView(const std::string& id) : View{id} {
 }
 
-} // namespace sampleApp
+std::shared_ptr<TextView> TextView::create(const std::string& id) {
+    return std::shared_ptr<TextView>(new TextView(id));
+}
+
+void TextView::setText(const std::string& text) {
+    View::setText(text);  // i.e. ncurses
+}
+
+}  // namespace sampleApp

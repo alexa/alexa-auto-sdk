@@ -39,7 +39,7 @@ public:
      * Destructor.
      */
     virtual ~UPLService() = default;
-    
+
     /**
      * An enum class to represent the state of the Dialog Request received from AVS.
      */
@@ -79,7 +79,7 @@ private:
      * Record the user perceived latency based on the STOP_CAPTURE and PLAYBACK_STARTED state information.
      */
     void recordUPL();
-    
+
     /**
      * Manage the current state that AVS is in processing the directive. 
      *
@@ -115,8 +115,8 @@ private:
     bool m_isOnline;
 };
 
-}  // alexa
-}  // engine
-}  // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace
 
 #endif  // AACE_ENGINE_METRICS_UPL_SERVICE_H

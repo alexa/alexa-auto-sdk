@@ -25,14 +25,14 @@ namespace alexa {
 
 class MockTemplateRuntime : public aace::alexa::TemplateRuntime {
 public:
-    MOCK_METHOD1(renderTemplate,void(const std::string& payload));
-    MOCK_METHOD0(clearTemplate,void());
-    MOCK_METHOD1(renderPlayerInfo,void(const std::string& payload));
-    MOCK_METHOD0(clearPlayerInfo,void());
+    MOCK_METHOD1(renderTemplate, void(const std::string& payload));
+    MOCK_METHOD0(clearTemplate, void());
+    MOCK_METHOD1(renderPlayerInfo, void(const std::string& payload));
+    MOCK_METHOD0(clearPlayerInfo, void());
 };
 
-} // aace::test::alexa
-} // aace::test
-} // aace
+}  // namespace alexa
+}  // namespace test
+}  // namespace aace
 
-#endif // AACE_TEST_ALEXA_MOCK_TEMPLATE_RUNTIME_H
+#endif  // AACE_TEST_ALEXA_MOCK_TEMPLATE_RUNTIME_H

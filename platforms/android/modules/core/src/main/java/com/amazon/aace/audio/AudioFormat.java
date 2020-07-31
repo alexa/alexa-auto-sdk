@@ -15,8 +15,7 @@
 
 package com.amazon.aace.audio;
 
-final public class AudioFormat
-{
+final public class AudioFormat {
     private Encoding mEncoding;
     private SampleFormat mSampleFormat;
     private Layout mLayout;
@@ -54,7 +53,7 @@ final public class AudioFormat
         /**
          * @internal
          */
-        private Encoding( String name ) {
+        private Encoding(String name) {
             m_name = name;
         }
 
@@ -80,7 +79,7 @@ final public class AudioFormat
         /**
          * @internal
          */
-        private SampleFormat( String name ) {
+        private SampleFormat(String name) {
             m_name = name;
         }
 
@@ -96,7 +95,7 @@ final public class AudioFormat
         UNKNOWN("UNKNOWN"),
         NON_INTERLEAVED("NON_INTERLEAVED"),
         INTERLEAVED("INTERLEAVED");
-         
+
         /**
          * @internal
          */
@@ -105,7 +104,7 @@ final public class AudioFormat
         /**
          * @internal
          */
-        private Layout( String name ) {
+        private Layout(String name) {
             m_name = name;
         }
 
@@ -115,7 +114,7 @@ final public class AudioFormat
         public String toString() {
             return m_name;
         }
-   }
+    }
 
     public enum Endianness {
         UNKNOWN("UNKNOWN"),
@@ -130,7 +129,7 @@ final public class AudioFormat
         /**
          * @internal
          */
-        private Endianness( String name ) {
+        private Endianness(String name) {
             m_name = name;
         }
 
@@ -142,7 +141,8 @@ final public class AudioFormat
         }
     }
 
-    public AudioFormat( Encoding encoding, SampleFormat sampleFormat, Layout layout, Endianness endianness, int sampleRate, int sampleSize, int channels ) {
+    public AudioFormat(Encoding encoding, SampleFormat sampleFormat, Layout layout, Endianness endianness,
+            int sampleRate, int sampleSize, int channels) {
         mEncoding = encoding;
         mSampleFormat = sampleFormat;
         mLayout = layout;

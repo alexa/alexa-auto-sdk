@@ -1,7 +1,6 @@
 package com.amazon.maccandroid.model.Directive;
 
 public class PlayControlDirective extends Directive {
-
     private final String mType;
 
     public PlayControlDirective(String playerId, String type) {
@@ -15,6 +14,7 @@ public class PlayControlDirective extends Directive {
 
     @Override
     public String toString() {
-        return "PlayControlDirective: " + "| mType: " + mType;
+        return "PlayControlDirective: "
+                + "| mType: " + mType;
     }
 }

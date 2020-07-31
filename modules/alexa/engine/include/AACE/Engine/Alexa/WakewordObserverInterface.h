@@ -24,11 +24,11 @@ namespace alexa {
 class WakewordObserverInterface {
 public:
     virtual ~WakewordObserverInterface() = default;
-    virtual void wakewordDetected( std::string keyword ) = 0;
+    virtual void wakewordDetected(std::string keyword) = 0;
 };
 
-} // aace::engine::alexa
-} // aace::engine
-} // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_ALEXA_INTERFACE_WAKEWORD_OBSERVER_INTERFACE_H
+#endif  // AACE_ENGINE_ALEXA_INTERFACE_WAKEWORD_OBSERVER_INTERFACE_H

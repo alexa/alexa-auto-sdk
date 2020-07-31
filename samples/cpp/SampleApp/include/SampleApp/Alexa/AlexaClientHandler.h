@@ -31,15 +31,16 @@ namespace alexa {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class AlexaClientHandler : public aace::alexa::AlexaClient /* isa PlatformInterface */ {
-  private:
+private:
     std::weak_ptr<Activity> m_activity{};
     std::weak_ptr<logger::LoggerHandler> m_loggerHandler{};
 
-  protected:
+protected:
     AlexaClientHandler(std::weak_ptr<Activity> activity, std::weak_ptr<logger::LoggerHandler> loggerHandler);
 
-  public:
-    template <typename... Args> static auto create(Args &&... args) -> std::shared_ptr<AlexaClientHandler> {
+public:
+    template <typename... Args>
+    static auto create(Args&&... args) -> std::shared_ptr<AlexaClientHandler> {
         return std::shared_ptr<AlexaClientHandler>(new AlexaClientHandler(args...));
     }
     auto getActivity() -> std::weak_ptr<Activity>;
@@ -49,19 +50,20 @@ class AlexaClientHandler : public aace::alexa::AlexaClient /* isa PlatformInterf
 
     auto dialogStateChanged(AlexaClient::DialogState state) -> void override;
     auto authStateChanged(AlexaClient::AuthState state, AlexaClient::AuthError error) -> void override;
-    auto connectionStatusChanged(AlexaClient::ConnectionStatus status, AlexaClient::ConnectionChangedReason reason) -> void override;
+    auto connectionStatusChanged(AlexaClient::ConnectionStatus status, AlexaClient::ConnectionChangedReason reason)
+        -> void override;
 
-  private:
+private:
     std::weak_ptr<View> m_console{};
     std::weak_ptr<View> m_authStateView{};
     std::weak_ptr<View> m_connectionStatusView{};
     std::weak_ptr<View> m_dialogStateView{};
 
-    auto log(logger::LoggerHandler::Level level, const std::string &message) -> void;
+    auto log(logger::LoggerHandler::Level level, const std::string& message) -> void;
     auto setupUI() -> void;
 };
 
-} // namespace alexa
-} // namespace sampleApp
+}  // namespace alexa
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_ALEXA_ALEXACLIENTHANDLER_H
+#endif  // SAMPLEAPP_ALEXA_ALEXACLIENTHANDLER_H

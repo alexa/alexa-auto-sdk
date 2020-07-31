@@ -35,8 +35,7 @@ import com.amazon.aace.core.NativeRef;
  * audio formats recommended by AVS for a familiar Alexa experience:
  * https://developer.amazon.com/docs/alexa-voice-service/recommended-media-support.html
  */
-abstract public class AudioOutput extends NativeRef
-{
+abstract public class AudioOutput extends NativeRef {
     /**
      * Describes an error during a media playback operation
      */
@@ -75,7 +74,7 @@ abstract public class AudioOutput extends NativeRef
         /**
          * @internal
          */
-        private MediaError( String name ) {
+        private MediaError(String name) {
             m_name = name;
         }
 
@@ -115,7 +114,7 @@ abstract public class AudioOutput extends NativeRef
         /**
          * @internal
          */
-        private MediaState( String name ) {
+        private MediaState(String name) {
             m_name = name;
         }
 
@@ -148,7 +147,7 @@ abstract public class AudioOutput extends NativeRef
         /**
          * @internal
          */
-        private MutedState( String name ) {
+        private MutedState(String name) {
             m_name = name;
         }
 
@@ -167,16 +166,17 @@ abstract public class AudioOutput extends NativeRef
 
     /**
      * Notifies the platform implementation to prepare for playback of an audio stream source.
-     * Audio data will be available to stream from the Engine via @c read(). After returning @c true, the Engine will call
+     * Audio data will be available to stream from the Engine via @c read(). After returning @c true, the Engine will
+     * call
      * @c play() to initiate audio playback.
      *
      * @param  stream The audio stream to prepare
      * @param  repeating @c true if the audio should repeat
-    *
+     *
      * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
-    public boolean prepare( AudioStream stream, boolean repeating ) {
+    public boolean prepare(AudioStream stream, boolean repeating) {
         return false;
     }
 
@@ -190,13 +190,13 @@ abstract public class AudioOutput extends NativeRef
      * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
-    public boolean prepare( String url, boolean repeating ) {
+    public boolean prepare(String url, boolean repeating) {
         return false;
     }
 
     /**
-     * Notifies the platform implementation to start playback of the current audio source. After returning @c true, 
-     * the platform implementation must call @c mediaStateChanged() with @c MediaState.PLAYING when the media player 
+     * Notifies the platform implementation to start playback of the current audio source. After returning @c true,
+     * the platform implementation must call @c mediaStateChanged() with @c MediaState.PLAYING when the media player
      * begins playing the audio or @c mediaError() if an error occurs.
      *
      * @return @c true if the platform implementation successfully handled the call,
@@ -207,10 +207,10 @@ abstract public class AudioOutput extends NativeRef
     }
 
     /**
-     * Notifies the platform implementation to stop playback of the current audio source. After returning @c true, 
-     * the platform implementation must call @c mediaStateChanged() with @c MediaState.STOPPED when the media player 
+     * Notifies the platform implementation to stop playback of the current audio source. After returning @c true,
+     * the platform implementation must call @c mediaStateChanged() with @c MediaState.STOPPED when the media player
      * stops playing the audio or @c mediaError() if an error occurs.
-     * 
+     *
      * A subsequent call to @c play() will be preceded by calls to @c prepare() and @c setPosition().
      *
      * @return @c true if the platform implementation successfully handled the call,
@@ -221,9 +221,10 @@ abstract public class AudioOutput extends NativeRef
     }
 
     /**
-     * Notifies the platform implementation to pause playback of the current audio source. After returning @c true, the platform implementation must call @c mediaStateChanged() with @c MediaState.STOPPED when the media player pauses the audio or @c mediaError() if an error occurs.
-     * A subsequent call to @c resume() will not be preceded by calls to @c prepare()
-     * and @c setPosition().
+     * Notifies the platform implementation to pause playback of the current audio source. After returning @c true, the
+     * platform implementation must call @c mediaStateChanged() with @c MediaState.STOPPED when the media player pauses
+     * the audio or @c mediaError() if an error occurs. A subsequent call to @c resume() will not be preceded by calls
+     * to @c prepare() and @c setPosition().
      *
      * @return @c true if the platform implementation successfully handled the call,
      * else @c false
@@ -233,7 +234,9 @@ abstract public class AudioOutput extends NativeRef
     }
 
     /**
-     * Notifies the platform implementation to resume playback of the current audio source. After returning @c true, the platform implementation must call @c mediaStateChanged() with @c MediaState.PLAYING when the media player resumes the audio or @c mediaError() if an error occurs.
+     * Notifies the platform implementation to resume playback of the current audio source. After returning @c true, the
+     * platform implementation must call @c mediaStateChanged() with @c MediaState.PLAYING when the media player resumes
+     * the audio or @c mediaError() if an error occurs.
      *
      * @return @c true if the platform implementation successfully handled the call,
      * else @c false
@@ -247,7 +250,7 @@ abstract public class AudioOutput extends NativeRef
      * If the audio source is not playing, the most recent position played
      * should be returned.
      *
-     * @return The platform media player's playback position in milliseconds, 
+     * @return The platform media player's playback position in milliseconds,
      * or @c TIME_UNKNOWN if the current media position is unknown or invalid.
      */
     public long getPosition() {
@@ -263,7 +266,7 @@ abstract public class AudioOutput extends NativeRef
      * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
-    public boolean setPosition( long position ) {
+    public boolean setPosition(long position) {
         return false;
     }
 
@@ -292,10 +295,10 @@ abstract public class AudioOutput extends NativeRef
      *
      * @param [in] volume The volume to set on the output channel. @c volume
      * is in the range [0,1].
-     * @return @c true if the platform implementation successfully handled the call, 
+     * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
-    public boolean volumeChanged( float volume ) {
+    public boolean volumeChanged(float volume) {
         return false;
     }
 
@@ -305,10 +308,10 @@ abstract public class AudioOutput extends NativeRef
      *
      * @param [in] state The muted state to apply to the output channel. @c MutedState::MUTED when
      * the output channel be muted, @c MutedState::UNMUTED when unmuted
-     * @return @c true if the platform implementation successfully handled the call, 
+     * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
-    public boolean mutedStateChanged( MutedState state ) {
+    public boolean mutedStateChanged(MutedState state) {
         return false;
     }
 
@@ -321,10 +324,10 @@ abstract public class AudioOutput extends NativeRef
      *
      * @sa MediaError
      */
-    protected void mediaError( MediaError type, String error ) {
-        mediaError( getNativeRef(), type, error);
-        if ( mMediaStateListener != null ) {
-            mMediaStateListener.mediaError( type, error );
+    protected void mediaError(MediaError type, String error) {
+        mediaError(getNativeRef(), type, error);
+        if (mMediaStateListener != null) {
+            mMediaStateListener.mediaError(type, error);
         }
     }
 
@@ -336,10 +339,10 @@ abstract public class AudioOutput extends NativeRef
      *
      * @sa MediaState
      */
-    protected void mediaStateChanged( MediaState state ) {
-        mediaStateChanged( getNativeRef(), state );
-        if ( mMediaStateListener != null ) {
-            mMediaStateListener.mediaStateChanged( state );
+    protected void mediaStateChanged(MediaState state) {
+        mediaStateChanged(getNativeRef(), state);
+        if (mMediaStateListener != null) {
+            mMediaStateListener.mediaStateChanged(state);
         }
     }
 
@@ -347,24 +350,24 @@ abstract public class AudioOutput extends NativeRef
         return createBinder();
     }
 
-    protected void disposeNativeRef( long nativeRef ) {
-        disposeBinder( nativeRef );
+    protected void disposeNativeRef(long nativeRef) {
+        disposeBinder(nativeRef);
     }
 
     // Native Engine JNI methods
     private native long createBinder();
-    private native void disposeBinder( long nativeRef );
-    private native void mediaError( long nativeObject, MediaError type, String error );
-    private native void mediaStateChanged( long nativeObject, MediaState state );
+    private native void disposeBinder(long nativeRef);
+    private native void mediaError(long nativeObject, MediaError type, String error);
+    private native void mediaStateChanged(long nativeObject, MediaState state);
 
     // MediaStateListener
 
     public interface MediaStateListener {
-        void mediaError( MediaError type, String error );
-        void mediaStateChanged( MediaState state );
+        void mediaError(MediaError type, String error);
+        void mediaStateChanged(MediaState state);
     }
 
-    public void setMediaStateListener( MediaStateListener listener ) {
+    public void setMediaStateListener(MediaStateListener listener) {
         mMediaStateListener = listener;
     }
 

@@ -24,79 +24,81 @@ namespace aace {
 namespace jni {
 namespace audio {
 
-    //
-    // AudioInputProviderBinder
-    //
+//
+// AudioInputProviderBinder
+//
 
-    AudioInputProviderBinder::AudioInputProviderBinder( jobject obj ) {
-        m_audioInputProviderHandler = std::make_shared<AudioInputProviderHandler>( obj );
+AudioInputProviderBinder::AudioInputProviderBinder(jobject obj) {
+    m_audioInputProviderHandler = std::make_shared<AudioInputProviderHandler>(obj);
+}
+
+//
+// AudioInputProviderHandler
+//
+
+AudioInputProviderHandler::AudioInputProviderHandler(jobject obj) :
+        m_obj(obj, "com/amazon/aace/audio/AudioInputProvider") {
+}
+
+std::shared_ptr<aace::audio::AudioInput> AudioInputProviderHandler::openChannel(
+    const std::string& name,
+    AudioInputType type) {
+    try_with_context {
+        jobject audioInputTypeObj;
+        ThrowIfNot(JAudioInputType::checkType(type, &audioInputTypeObj), "invalidAudioInputType");
+
+        jobject result = nullptr;
+        ThrowIfNot(
+            m_obj.invoke(
+                "openChannel",
+                "(Ljava/lang/String;Lcom/amazon/aace/audio/AudioInputProvider$AudioInputType;)Lcom/amazon/aace/audio/"
+                "AudioInput;",
+                &result,
+                JString(name).get(),
+                audioInputTypeObj),
+            "invokeMethodFailed");
+        ThrowIfNull(result, "invalidLocation");
+
+        // create an audio input JObject
+        JObject audioInputObj(result, "com/amazon/aace/audio/AudioInput");
+        ThrowIfJavaEx(env, "invalidAudioInputObj");
+
+        // get the audio input binder native ref
+        jlong nativeRef;
+        ThrowIfNot(audioInputObj.invoke("getNativeRef", "()J", &nativeRef), "invokeMethodFailed");
+
+        // cast the native ref to an audio input ptr
+        auto audioInputBinder = reinterpret_cast<AudioInputBinder*>(nativeRef);
+        ThrowIfNull(audioInputBinder, "invalidAudioInputBinder");
+
+        // get the audio input handler from the binder
+        return audioInputBinder->getAudioInputHandler();
     }
-
-    //
-    // AudioInputProviderHandler
-    //
-
-    AudioInputProviderHandler::AudioInputProviderHandler( jobject obj ) : m_obj( obj, "com/amazon/aace/audio/AudioInputProvider" ) {
-    }
-
-    std::shared_ptr<aace::audio::AudioInput> AudioInputProviderHandler::openChannel( const std::string& name, AudioInputType type )
-    {
-        try_with_context
-        {
-            jobject audioInputTypeObj;
-            ThrowIfNot( JAudioInputType::checkType( type, &audioInputTypeObj ), "invalidAudioInputType" );
-
-            jobject result = nullptr;
-            ThrowIfNot( m_obj.invoke( "openChannel", "(Ljava/lang/String;Lcom/amazon/aace/audio/AudioInputProvider$AudioInputType;)Lcom/amazon/aace/audio/AudioInput;", &result, JString(name).get(), audioInputTypeObj ), "invokeMethodFailed" );
-            ThrowIfNull( result, "invalidLocation" );
-
-            // create an audio input JObject
-            JObject audioInputObj( result, "com/amazon/aace/audio/AudioInput" );
-            ThrowIfJavaEx( env, "invalidAudioInputObj" );
-
-            // get the audio input binder native ref
-            jlong nativeRef;
-            ThrowIfNot( audioInputObj.invoke( "getNativeRef", "()J", &nativeRef ), "invokeMethodFailed" );
-
-            // cast the native ref to an audio input ptr
-            auto audioInputBinder = reinterpret_cast<AudioInputBinder *>( nativeRef );
-            ThrowIfNull( audioInputBinder, "invalidAudioInputBinder" );
-
-            // get the audio input handler from the binder
-            return audioInputBinder->getAudioInputHandler();
-        }
-        catch_with_ex {
-            AACE_JNI_ERROR(TAG,"openChannel",ex.what());
-            return nullptr;
-        }
-    }
-
-} // aace::jni::audio
-} // aace::jni
-} // aace
-
-#define AUDIO_INPUT_PROVIDER_BINDER(ref) reinterpret_cast<aace::jni::audio::AudioInputProviderBinder *>( ref )
-
-extern "C"
-{
-    JNIEXPORT jlong JNICALL
-    Java_com_amazon_aace_audio_AudioInputProvider_createBinder( JNIEnv* env, jobject obj )  {
-        return reinterpret_cast<long>( new aace::jni::audio::AudioInputProviderBinder( obj ) );
-    }
-
-    JNIEXPORT void JNICALL
-    Java_com_amazon_aace_audio_AudioInputProvider_disposeBinder( JNIEnv* env, jobject /* this */, jlong ref )
-    {
-        try
-        {
-            auto audioInputProviderBinder = AUDIO_INPUT_PROVIDER_BINDER(ref);
-            ThrowIfNull( audioInputProviderBinder, "invalidAudioInputProviderBinder" );
-            delete audioInputProviderBinder;
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_audio_AudioInputProvider_disposeBinder",ex.what());
-        }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "openChannel", ex.what());
+        return nullptr;
     }
 }
 
+}  // namespace audio
+}  // namespace jni
+}  // namespace aace
 
+#define AUDIO_INPUT_PROVIDER_BINDER(ref) reinterpret_cast<aace::jni::audio::AudioInputProviderBinder*>(ref)
+
+extern "C" {
+JNIEXPORT jlong JNICALL Java_com_amazon_aace_audio_AudioInputProvider_createBinder(JNIEnv* env, jobject obj) {
+    return reinterpret_cast<long>(new aace::jni::audio::AudioInputProviderBinder(obj));
+}
+
+JNIEXPORT void JNICALL
+Java_com_amazon_aace_audio_AudioInputProvider_disposeBinder(JNIEnv* env, jobject /* this */, jlong ref) {
+    try {
+        auto audioInputProviderBinder = AUDIO_INPUT_PROVIDER_BINDER(ref);
+        ThrowIfNull(audioInputProviderBinder, "invalidAudioInputProviderBinder");
+        delete audioInputProviderBinder;
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_audio_AudioInputProvider_disposeBinder", ex.what());
+    }
+}
+}

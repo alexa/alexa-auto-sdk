@@ -38,8 +38,8 @@ const std::string& ThreadMoniker::getThisThreadMoniker() {
     return m_threadMoniker.m_moniker;
 }
 
-}  // logger
-}  // engine
-}  // aace
+}  // namespace logger
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_LOGGER_THREADMONIKER_H
+#endif  // AACE_ENGINE_LOGGER_THREADMONIKER_H

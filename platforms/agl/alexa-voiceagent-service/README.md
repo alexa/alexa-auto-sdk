@@ -11,7 +11,7 @@ The Automotive Grade Linux (AGL) Alexa Voice Agent is Alexa client software that
 * [Building the AGL Voice Agent](#building-the-agl-alexa-voice-agent)
 * [Installing and Running the AGL Alexa Voice Agent](#installing-and-running-the-agl-alexa-voice-agent)
 * [Authorizing with the Alexa Voice Service (AVS)](#authorizing-with-the-alexa-voice-service-avs)
-* [Release Notes](#v220-release-notes)
+* [Known Issues](#ki)
 
 ## Overview <a id ="overview"></a>
 
@@ -43,7 +43,7 @@ The Alexa Auto SDK System Audio extension, which is included automatically by th
 
 ## Setting up the AGL Alexa Voice Agent <a id ="setting-up-the-agl-alexa-voice-agent"></a>
 
-To use the Android Sample App, you need an [Amazon Developer](https://developer.amazon.com/docs/app-submission/manage-account-and-permissions.html#create-a-developer-account/) account.
+To use the Alexa Voice Agent, you need an [Amazon Developer](https://developer.amazon.com/docs/app-submission/manage-account-and-permissions.html#create-a-developer-account/) account.
 
 ### Registered Product and Security Profile
 
@@ -58,15 +58,25 @@ When you follow the instructions to [set up your security profile](https://devel
 
 ### Alexa Auto SDK Build Dependencies
 
-The AGL Alexa Voice Agent depends on the Auto SDK. You must install the AGL SDK toolchain prior to building the Alexa Auto SDK. See the [Alexa Auto SDK Builder](../../../builder/README.md) instructions to build the Alexa Auto SDK binaries for your [AGL target](../../../builder/meta-aac-builder/conf/machine/aglarm64.conf). Currently, only the [ARM64](../../../builder/meta-aac-builder/conf/machine/aglarm64.conf) target is supported, and the binding is tested on the [R-CAR M3 board](https://www.renesas.com/us/en/solutions/automotive/soc/r-car-m3.html).
+The AGL Alexa Voice Agent depends on the Auto SDK. You must install the AGL SDK toolchain prior to building the Alexa Auto SDK. See the [Alexa Auto SDK Builder](../../../builder/README.md) instructions to build the Alexa Auto SDK binaries for your [AGL target](../../../builder/meta-aac-builder/conf/machine/aglarm64.conf). Currently, only the [ARM64](../../../builder/meta-aac-builder/conf/machine/aglarm64.conf) target is supported, and the binding is tested on the [R-CAR M3 reference board](https://www.renesas.com/us/en/solutions/automotive/soc/r-car-m3.html) and the Raspberry Pi 4.
 
-For example, if you have installed the following toolchain:
+It is recommended to [build an AGL image](https://docs.automotivelinux.org/docs/en/master/getting_started/) for the target device that will be used. The AGL build will generate both an image and a toolchain for that target platform. AGL version Itchy Icefish supports building some versions of the Alexa Voice Agent and wakeword. So it is recommended to build with those components.
+
+For example, you can specify the Alexa Voice Agent and wakeword as follows:
 
 ```
-https://iot.bzh/download/public/2019/AGL_Images/m3ulcb/latest/sdk/poky-agl-glibc-x86_64-agl-demo-platform-crosssdk-aarch64-toolchain-7.99.1.sh
+source meta-agl/scripts/aglsetup.sh -m m3ulcb -b build agl-demo agl-devel agl-voiceagent-alexa agl-voiceagent-alexa-wakeword
 ```
 
-which is installed by default under `/opt/agl-sdk/7.99.1-aarch64`, then you would need to provide the `AGL_SDK` path by passing: `-DAGL_SDK=/opt/agl-sdk/7.99.1-aarch64`
+  >**Important!** To build the Alexa wakeword you will need to download the appropriate package from the [developer portal](https://developer.amazon.com/alexa/console/avs/preview/resources/details/Auto%20SDK%20Amazonlite%20Extension). The version of the Alexa Auto SDK supported by AGL may not always be the latest publicly available version available on github.
+
+For example, the generated toolchain will have a structure similar to this one:
+
+```
+https://download.automotivelinux.org/AGL/release/icefish/latest/raspberrypi4/deploy/sdk/poky-agl-glibc-x86_64-agl-demo-platform-crosssdk-aarch64-toolchain-9.0.0.sh
+```
+
+and will be installed by default under `/opt/agl-sdk/9.0.2-aarch64`, then you would need to provide the `AGL_SDK` path by passing: `-DAGL_SDK=/opt/agl-sdk/9.0.2-aarch64`
 
 from the command line when you run the build command.
 
@@ -92,255 +102,18 @@ The Alexa Voice Agent binding supports a JSON configuration file (`AlexaAutoCore
 2. Leave the `"libcurlUtils"` node populated with its default values. 
 3. Leave the `"deviceSettings"` node populated with its default value, or change the default `"locale"` and `"timezone"` to match your location values.
 4. Update the `"aace.vehicle"` node with your vehicle information, if necessary.
-5. In the `"aace.audio.input"` node, set `"voice"` to the Advanced  Linux Sound Architecture (ALSA) name for your audio subsystem. (The `"hw:ep812ch"` role maps to Microchip's mic array.)
-6. In the `"aace.audio.output"` node:
-    * Set `"tts"` to `"multimedia"`.
-    * Set `"music"` to `"emergency"`.
-    * Set `"notification"` to `"notification"`.
-    * Set `"alarm"` to `"navigation"`.
-    * Set `"earcon"` to `"earcon"`.
-    * Set `"communication"` to `"communication"`.
-    * Set `"ringtone"` to `"ringtone"`.
-7. Leave the `"aace.wakeword"` and `"aace.cbl"` `"enabled"` parameters set to their default (`true`) settings.
+5. In the `"aace.audio.input"` node, set `"voice"` to the Advanced Linux Sound Architecture (ALSA) name for your audio input device. The `"Default"` value will use the default microphone device. You may pass a different device by using the format "hw:1,0")
+6. In the `"aace.audio.output"` node, leave the defaults values as specified. However, please refer to the [AGL pipewire](https://docs.automotivelinux.org/docs/en/master/apis_services/reference/audio/audio/pipewire.html) documentation to understand additional available roles.
+    * Set `"tts"` to `"Speech-Low"`.
+    * Set `"music"` to `"Speech-High"`.
+    * Set `"alarm"` to `"Custom-Low"`.
+7. If Amazon wakeword is required, leave the `"aace.wakeword"` `"enabled"` parameter set to (`true`).
 8. To configure support for Local Media Sources (LMS), make these updates in the `"aace.localmediasource"` node:
     * Set `"enabled"` to `"true"`.
     * For each media source that you want to enable, set the corresponding parameter in the `"sources"` node to `"true"`.
-9. If desired, [configure the AGL Alexa Voice Agent for Car Control](#configuring-the-agl-alexa-voice-agent-for-car-control).
-
-    >**Note:** In order for your application to support car control, you must compile the Auto SDK with the optional Local Voice Control (LVC) extension before configuring the AGL Alexa Voice Agent for car control. After you compile the Auto SDK with the LVC extension, you can configure the AGL Alexa Voice Agent to support hybrid car control functionality. 
+    * For each media source that is enabled, you need to make sure that the [voice high capabilities](https://gerrit.automotivelinux.org/gerrit/admin/repos/apps/agl-service-voice-high-capabilities) messages are implemented otherwise the Alexa Voice Agent will not listen to utterances.
+9. If desired, [configure the AGL Alexa Voice Agent for Car Control](#configuring-the-agl-alexa-voice-agent-for-car-control).   
   
-### Configuring the AGL Alexa Voice Agent for Car Control <a id = "configuring-the-agl-alexa-voice-agent-for-car-control-(lvc)"></a>
-
-The AGL Alexa Voice agent supports hybrid car control functionality and requires the LVC extension. The LVC extension is available by request. Please [contact your Amazon Solutions Architect (SA)](../../../NEED_HELP.md#requesting-additional-functionality-whitelisting) for more information about how to obtain the LVC extension.
-
-  >**Important!** For hybrid car control support, you must configure the system to automatically start LVC during system startup. The LVC binaries are installed under `/opt/LVC`, and a start script is provided under `/opt/LVC/start-lvc.sh`.
-
-The AGL Alexa Voice agent supports a custom vehicle-control experience comprised of the following elements:
-
-* **The concept of endpoint control:** Different components or "endpoints" in the vehicle can be controlled separately. Endpoints are identified by the names of the component they control (e.g. "fan", "vent", or "heater"), which allows the user to target the selected endpoint by voice.
-* **The concept of zone:** Each endpoint belongs to a "zone" or to the entire vehicle ("zone.all"). A zone is identified by its name (e.g. "driver", "front" or "all"). The AGL Alexa Voice Agent supports the following predefined zones: `"zone.all"`, `"zone.driver"`, `"zone.passenger"`, `"zone.back.driver"`, `"zone.back.passenger"`, `"zone.first.row"`, `"zone.second.row"`, `"zone.third.row"`, `"zone.fourth.row"`, `"zone.front"`, `"zone.rear"`.
-    
-* **A simple set of control capabilities:** You make an endpoint controllable when you include a `"controlId"` (associated with an enabled zone) and define controllers and associated values for that control in the [`AlexaAutoCoreEngineConfig.json`](./src/plugins/data/config/AlexaAutoCoreEngineConfig.json) file.
-    
-By modifying the appropriate sections of the [`AlexaAutoCoreEngineConfig.json`](./src/plugins/data/config/AlexaAutoCoreEngineConfig.json) file, you can build a custom configuration that defines endpoints, with their associated zones and controllers, to match the specific vehicle you wish to control using the AGL Alexa Voice Agent:
-
-1. Update the `"aace.localvoicecontrol"` node:
-          *  Set `"enabled'` to `true`.
-          *  Set `"socketRootDirectory"` to the same path where the LVC extension is installed (the default path is "`/opt/"`).
- 
-2. In the `"aace.localskills"` node, configure the `"aace.carcontrol"` settings:
-      *  Set `"enabled"` to `true`.
-      *  Under `endpoints`, configure the zones and associated controls for your vehicle.
-           * For each zone that you want to include in the car control configuration:
-               * Set `"enabled"` to `true`.
-           * For each endpoint (component) that you want to make controllable for this zone:
-               * Specify a `"controlId"` that maps the endpoint to the zone. For example, to include a heater control for the `"zone.driver"` zone, set the `"heater"` `"controlId"` to `"driver.heater"`.
-               <br>**Each `"controlId"` must be unique across the car control configuration.**
-       
-               * Set the `"controllerId"`(s) and (if applicable) `"values"` for the controllers associated with the control.
-               >**Note:** Each control inherits the functionality to be turned on or off ("Alexa turn on/off the heater/AC/light/fan/vent") in addition to the functionality provided by the controller.
-               
-               * For each zone that you want to exclude from the car control configuration, make sure that `"enabled"` is set to `false`.
-
-               >**Note:** The `AlexaAutoCoreEngineConfig.json` file includes a default configuration for `"zone.all"` which you can modify as you like. To configure other zones, you must build out configurations for those zones in a similar fashion and make sure the `"enabled"` parameter is set to `true` for all zones you want to include in your AGL Alexa Voice Agent car control configuration.
-
-<details><summary>Example passenger zone definition (click to expand or collapse)</summary>
-<p>
-
-```
-{                  
-    "zone" : "zone.passenger",
-    "enabled": true
-    "airconditioner" : {
-        "controlId": "passenger.ac",
-        "mode": {
-           "controllerId": "mode",
-           "values" : {
-              "AUTO": true,
-              "ECONOMY": true,
-              "MANUAL": true
-           }
-        },
-        "intensity" : { 
-           "controllerId": "intensity",
-           "values" : {
-             "LOW": true,
-             "MEDIUM": true,
-             "HIGH": true
-           }
-        }
-    },
-    "heater" : {
-        "controlId": "passenger.heater",
-        "controllerId": "temperature",
-        "minimum": 60,
-        "maximum": 90,
-        "precision": 1,
-        "unit":  "FAHRENHEIT"
-    },
-    "fan" : {
-        "controlId": "passenger.fan",
-        "controllerId": "speed",
-        "minimum": 1,
-        "maximum": 10,
-        "precision": 1
-    },
-    "vent": {
-        "controlId": "all.vent",
-        "positions" : {
-          "controllerId": "position",
-          "values" : {
-            "BODY": true,
-            "MIX":  false,
-            "FLOOR": false,
-            "WINDSHIELD":  false
-          }
-        }
-    },
-    "lights" : [ 
-      {
-        "controlId": "reading.light",
-        "type": "READING_LIGHT"
-      }
-    ]
-
-}   
-        
-```
-</p>
-</details>
-<br>
-
-The table below lists the endpoints and associated controllers and values (if any) that you can define in the [`AlexaAutoCoreEngineConfig.json`](./src/plugins/data/config/AlexaAutoCoreEngineConfig.json) file.
-
-* If a controller does not have an associated list of values, simply specify a `"controllerId"` comprised of the endpoint and the controller. For example, to include a climate recirculation control, set the `"controllerId"` for `"recirculate"` to `"climate.recirculate"`.
-
-* For the `"lights"` endpoint, specify a  `"controlId"` that maps the control to the type of light, and set the `"type"` value to that type. For example, to include a dome light control, set `"controlId"` to `"dome.light"` and `"type"` to `"DOME_LIGHT"`. Optionally, you can also specify a light color by setting the `"color"` controller. If you specify a color, the user can make requests such as "Alexa, turn the dome light to blue." If you don't specify a `"color"`, the user can still ask Alexa to turn the light on or off; for example: "Alexa, turn the dome light on".
-
-<table style="width: 100%">
-  <colgroup>
-    <col width="20%">
-    <col width="20%">
-    <col width="20%">
-    <col width="40%">
-  </colgroup>
-  <table body>
-  <thead>
-    <tr>
-      <th>Control</th>
-      <th>Controllers</th>
-      <th>Values</th>
-      <th>Example Utterance</th>
-    </tr>
-  </thead>
-  <tr>
-    <td markdown="span">"climate"</td>
-    <td markdown="span">"sync"
-    <br> "recirculate"</td>
-    <td markdown="span">
-    <td markdown="span">"Alexa, turn climate sync off"
-    <br>
-    <br>"Alexa, turn on recirculation"</td>
-  </tr>
-  <tr>
-    <td markdown="span">"airconditioner"</td>
-    <td markdown="span">"mode"
-    <br>
-    <br>
-    <br>
-    <br>"intensity"
-    <br>
-    <br>
-    <br></td>
-    <td markdown="span">"AUTO": true or false
-    <br>"ECONOMY": true or false
-    <br>"MANUAL": true or false
-    <br>
-    <br>"LOW": true or false
-    <br>"MEDIUM": true or false
-    <br>"HIGH": true or false</td>
-    <td markdown="span">"Alexa, turn the AC on"
-    <br>
-    <br>"Alexa, set the AC to economy"
-    <br>
-    <br>"Alexa, set the AC to high"</td>
-  </tr>
-  <tr>
-    <td markdown="span">"heater"</td>
-    <td markdown="span">"temperature"
-    <td markdown="span">"minimum": minimum temperature setting
-    <br>"maximum": maximum temperature setting
-    <br>"precison": number of degrees by which the temperature is adjusted when users ask Alexa to increase or decrease the temperature
-    <br>"unit": "FAHRENHEIT" or "CELSIUS"
-    <td markdown="span">"Alexa, turn the heater off"
-    <br>
-    <br>"Alexa, turn up the heater"</td>
-  </tr>
-  <tr>
-    <td markdown="span">"fan"</td>
-    <td markdown="span">"speed"
-    <td markdown="span">"minimum": minimum value for fan speed
-    <br>"maximum": maximum value for fan speed
-    <br>"precision": the number by which users can adjust fan speed when asking Alexa to increase or decrease the fan
-    <td markdown="span">"Alexa, turn the fan on"
-    <br>
-    <br>"Alexa, set the fan to maximum"
-    <br>
-    <br>"Alexa, increase the fan by 1"</td>
-</tr>
-  <tr>
-    <td markdown="span">"vent"</td>
-    <td markdown="span">"positions"
-    <td markdown="span">"BODY": true or false
-    <br>"MIX": true or false
-    <br>"FLOOR": true or false
-    <br>"WINDSHIELD": true or false
-    <td markdown="span">"Alexa, set the vent to floor"
-</td>
-  </tr>
-  <tr>
-    <td markdown="span">"window"</td>
-    <td markdown="span">"defroster"</td>
-    <td>"defrost": true or false</td>
-    <td markdown="span">"Alexa, turn the defroster off"</td>
-   </tr
-  <tr>
-    <td markdown="span">"lights"
-    <td markdown="type">"type"
-    <br>
-    <br>
-    <br>
-    <br>
-    <br> "color"
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <td markdown="AMBIENT_LIGHT"
-    <br> "DOME_LIGHT"
-    <br> "LIGHT"
-    <br> "READING_LIGHT"
-    <br> "TRUNK_LIGHT"
-    <br>
-    <br> "WHITE"
-    <br>"RED"
-    <br>"ORANGE"
-    <br>"YELLOW"
-    <br>"GREEN"
-    <br>"BLUE"
-    <br>"INDIGO"
-    <br>"VIOLET"</td>
-    <td markdown="span">"Alexa, turn the reading light on"
-    <br>
-    <br>"Alexa, set the dome light to blue"</td>
-  </tr>
-  </table body>
-  </table>
-
 ## Building the AGL Alexa Voice Agent <a id="building-the-agl-alexa-voice-agent"></a>
 
 >**Prerequisite**: Install the AGL SDK, preferably the latest stable release from [IOT.bzh AGL artifacts](https://iot.bzh/download/public/2019/AGL_Images/m3ulcb/latest/). The AGL SDK contains [application framework libraries](http://docs.automotivelinux.org/docs/en/master/apis_services/reference/af-binder/reference-v3/func-api.html) that are required to make inter-binding calls and publish AGL events.
@@ -370,24 +143,5 @@ To access the Alexa Voice Service (AVS) your product must acquire [Login with Am
 3. Click the **Subscribe to CBL Events** button to display a URL and code in the event box of the page.
 4. Navigate to the URL, enter the code, and agree to authorize your product. This will move the Alexa Voice Agent binding to the `CONNECTED and AUTHORIZED` state, and it will be ready to accept user utterances.
 
-## v2.2.0 Release Notes <a id="v220-release-notes"></a>
-
-### Supported Features
-
-* Car Control (requires LVC extension)
-* Local Media Services
-* TTS Responses
-* Alexa cards
-* Phone call control
-* Navigation
-* Online Music Playback
-* Playback Controller
-
-### Resolved Issues
-* Playback controls are now supported for local media sources.
-* Adjusting volume by delta now works as expected.
-* Fixed an issue where, after repeated barge-ins, the AGL Alexa voice agent no longer played TTS responses. 
-
-### Known Issues	
-* The Alexa voice agent supports timers and alarms, however, in order to implement them you must assign them an audio role different than the ones you assign to TTS and music. Auto SDK v2.2.0 supports AGL v7.99, which provides only two functioning audio roles: “emergency” and “multimedia”. Since you must assign these roles to TTS and music in order to support those functionalities, no additional audio roles remain to be assigned to alarms and timers.
+## Known Issues	<a id = "ki"></a>
 * There is no way to log out after authorizing with AVS. Restart the Alexa Voice Agent to authorize again.

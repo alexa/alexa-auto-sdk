@@ -22,6 +22,7 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/CarControl/PrimitiveController.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/CarControl/RangeController.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/CarControl/ToggleController.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/CarControl/ZoneDefinitions.h
 )
 
 source_group("Header Files" FILES ${HEADERS})
@@ -39,6 +40,7 @@ add_library(AACECarControlEngine SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/PrimitiveController.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/RangeController.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ToggleController.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ZoneDefinitions.cpp
 )
 
 find_path(NLOHMANN_INCLUDE_DIR nlohmann/json.hpp

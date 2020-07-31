@@ -43,8 +43,7 @@ public class ModeController {
         index += delta;
         if (index < 0) {
             index = 0;
-        } else
-        if (index >= modes.size()) {
+        } else if (index >= modes.size()) {
             index = modes.size() - 1;
         }
     }

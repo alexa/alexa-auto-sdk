@@ -44,7 +44,7 @@ public:
      * @return The current location
      */
     virtual aace::location::Location getLocation() = 0;
-    
+
     /**
      * Returns the ISO country code for the current geolocation of the device. If no country can
      * be determined, this method should return an empty string.
@@ -54,7 +54,7 @@ public:
     virtual std::string getCountry();
 };
 
-} // aace::location
-} // aace
+}  // namespace location
+}  // namespace aace
 
-#endif // AACE_LOCATION_LOCATION_PROVIDER_H
+#endif  // AACE_LOCATION_LOCATION_PROVIDER_H

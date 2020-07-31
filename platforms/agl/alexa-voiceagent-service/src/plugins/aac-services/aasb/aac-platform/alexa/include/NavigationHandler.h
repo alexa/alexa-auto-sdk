@@ -31,8 +31,7 @@ namespace navigation {
  * AASB clients will be notified, through @c IAlexaCapabilityDirectiveListener, about the
  * directives to set new destination for navigation and for cancelling navigation.
  */
-class NavigationHandler : public aace::navigation::Navigation
-{
+class NavigationHandler : public aace::navigation::Navigation {
 public:
     /**
      * Creates an instance of @c NavigationHandler.
@@ -49,13 +48,13 @@ public:
     /// @{
     void showPreviousWaypoints() override;
     void navigateToPreviousWaypoint() override;
-    void showAlternativeRoutes( AlternateRouteType alternateRouteType ) override;
-    void controlDisplay( ControlDisplay controlDisplay ) override;
+    void showAlternativeRoutes(AlternateRouteType alternateRouteType) override;
+    void controlDisplay(ControlDisplay controlDisplay) override;
     bool cancelNavigation() override;
     std::string getNavigationState() override;
-    void startNavigation( const std::string& payload ) override;
-    void announceManeuver( const std::string& payload ) override;
-    void announceRoadRegulation( RoadRegulation roadRegulation ) override;
+    void startNavigation(const std::string& payload) override;
+    void announceManeuver(const std::string& payload) override;
+    void announceRoadRegulation(RoadRegulation roadRegulation) override;
     /// @}
 
 private:
@@ -81,7 +80,7 @@ private:
     std::string m_navigationState;
 };
 
-} // navigation
-} // aasb
+}  // namespace navigation
+}  // namespace aasb
 
-#endif // AASB_NAVIGATION_NAVIGATIONHANDLER_H
+#endif  // AASB_NAVIGATION_NAVIGATIONHANDLER_H

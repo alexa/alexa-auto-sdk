@@ -34,16 +34,17 @@ class AddressBookEntity;
 
 using AddressBookType = aace::addressBook::AddressBook::AddressBookType;
 
-class AddressBookEngineImpl :
-    public AddressBookServiceInterface,
-    public aace::addressBook::AddressBookEngineInterface,
-    public alexaClientSDK::avsCommon::utils::RequiresShutdown,
-    public std::enable_shared_from_this<AddressBookEngineImpl> {
+class AddressBookEngineImpl
+        : public AddressBookServiceInterface
+        , public aace::addressBook::AddressBookEngineInterface
+        , public alexaClientSDK::avsCommon::utils::RequiresShutdown
+        , public std::enable_shared_from_this<AddressBookEngineImpl> {
 private:
-    AddressBookEngineImpl( std::shared_ptr<aace::addressBook::AddressBook> platfromInterface );
+    AddressBookEngineImpl(std::shared_ptr<aace::addressBook::AddressBook> platfromInterface);
 
 public:
-    static std::shared_ptr<AddressBookEngineImpl> create( std::shared_ptr<aace::addressBook::AddressBook> platfromInterface );
+    static std::shared_ptr<AddressBookEngineImpl> create(
+        std::shared_ptr<aace::addressBook::AddressBook> platfromInterface);
 
 protected:
     void doShutdown() override;
@@ -53,22 +54,25 @@ private:
 
 public:
     //AddressBookServiceInterface
-    void addObserver( std::shared_ptr<AddressBookObserver> observer ) override;
-    void removeObserver( std::shared_ptr<AddressBookObserver> observer ) override;
-    bool getEntries( const std::string& addressBookSourceId, std::weak_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> factory ) override;
+    void addObserver(std::shared_ptr<AddressBookObserver> observer) override;
+    void removeObserver(std::shared_ptr<AddressBookObserver> observer) override;
+    bool getEntries(
+        const std::string& addressBookSourceId,
+        std::weak_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> factory) override;
 
     // AddressBookEngineInterface
-    bool onAddAddressBook( const std::string& addressBookSourceId, const std::string& name, const AddressBookType type ) override;
-    bool onRemoveAddressBook( const std::string& addressBookSourceId ) override;
+    bool onAddAddressBook(const std::string& addressBookSourceId, const std::string& name, const AddressBookType type)
+        override;
+    bool onRemoveAddressBook(const std::string& addressBookSourceId) override;
 
 private:
     std::mutex m_mutex;
-    std::unordered_map<std::string,std::shared_ptr<AddressBookEntity>> m_addressBookEntities;
+    std::unordered_map<std::string, std::shared_ptr<AddressBookEntity>> m_addressBookEntities;
     std::unordered_set<std::shared_ptr<AddressBookObserver>> m_observers;
 };
 
-} // aace::engine::addressBook
-} // aace::engine
-} // aace
+}  // namespace addressBook
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_ADDRESS_BOOK_ADDRESS_BOOK_ENGINE_IMPL_H
+#endif  // AACE_ENGINE_ADDRESS_BOOK_ADDRESS_BOOK_ENGINE_IMPL_H

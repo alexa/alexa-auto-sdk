@@ -28,69 +28,62 @@ namespace aace {
 namespace jni {
 namespace native {
 
-    ThreadContext::ThreadContext() : m_env( nullptr ), m_detatch( false )
-    {
-        if( g_javaVM != nullptr )
-        {
-            m_detatch = g_javaVM->GetEnv( (void**) &m_env, JNI_VERSION_1_6 ) == JNI_EDETACHED;
+ThreadContext::ThreadContext() : m_env(nullptr), m_detatch(false) {
+    if (g_javaVM != nullptr) {
+        m_detatch = g_javaVM->GetEnv((void**)&m_env, JNI_VERSION_1_6) == JNI_EDETACHED;
 
-            if( m_detatch ) {
-                g_javaVM->AttachCurrentThread( &m_env, nullptr );
-            }
+        if (m_detatch) {
+            g_javaVM->AttachCurrentThread(&m_env, nullptr);
         }
     }
+}
 
-    ThreadContext::~ThreadContext()
-    {
-        if( g_javaVM != nullptr && m_env != nullptr && m_detatch ) {
-            g_javaVM->DetachCurrentThread();
-        }
+ThreadContext::~ThreadContext() {
+    if (g_javaVM != nullptr && m_env != nullptr && m_detatch) {
+        g_javaVM->DetachCurrentThread();
     }
+}
 
-    JNIEnv* ThreadContext::getEnv() {
-        return m_env;
-    }
+JNIEnv* ThreadContext::getEnv() {
+    return m_env;
+}
 
-    bool ThreadContext::isValid() {
-        return m_env != nullptr;
-    }
+bool ThreadContext::isValid() {
+    return m_env != nullptr;
+}
 
-} // aace::jni::native
-} // aace::jni
-} // aace
+}  // namespace native
+}  // namespace jni
+}  // namespace aace
 
-extern "C"
-{
-    jint JNI_OnLoad( JavaVM* vm, void* reserved )
-    {
-        try
-        {
-            JNIEnv* env;
+extern "C" {
+jint JNI_OnLoad(JavaVM* vm, void* reserved) {
+    try {
+        JNIEnv* env;
 
-            // validate the JNI version
-            ThrowIfNot( vm->GetEnv( reinterpret_cast<void**>( &env ), JNI_VERSION_1_6 ) == JNI_OK, "GetEnvFailed" );
+        // validate the JNI version
+        ThrowIfNot(vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) == JNI_OK, "GetEnvFailed");
 
-            // save the jvm reference
-            g_javaVM = vm;
+        // save the jvm reference
+        g_javaVM = vm;
 
-            // find the reference to the class loader from main thread so we
-            // can use it to load classes at any time. We have to call this after
-            // we set the global vm reference...
-            if (!g_initializeClassLoaderAttempted) {
-                ThrowIfNot( aace::jni::native::JavaClass::initializeClassLoader(), "initializeClassLoaderFailed" );
-                g_initializeClassLoaderAttempted = true;
-            }
-
-            return JNI_VERSION_1_6;
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_CRITICAL(TAG,"JNI_OnLoad",ex.what());
-            g_javaVM = nullptr;
+        // find the reference to the class loader from main thread so we
+        // can use it to load classes at any time. We have to call this after
+        // we set the global vm reference...
+        if (!g_initializeClassLoaderAttempted) {
+            ThrowIfNot(aace::jni::native::JavaClass::initializeClassLoader(), "initializeClassLoaderFailed");
             g_initializeClassLoaderAttempted = true;
-            return -1;
         }
-    }
 
-    void JNI_OnUnload( JavaVM *vm, void *reserved ) {
+        return JNI_VERSION_1_6;
+    } catch (const std::exception& ex) {
+        AACE_JNI_CRITICAL(TAG, "JNI_OnLoad", ex.what());
+        g_javaVM = nullptr;
+        g_initializeClassLoaderAttempted = true;
+        return -1;
     }
+}
+
+void JNI_OnUnload(JavaVM* vm, void* reserved) {
+}
 }

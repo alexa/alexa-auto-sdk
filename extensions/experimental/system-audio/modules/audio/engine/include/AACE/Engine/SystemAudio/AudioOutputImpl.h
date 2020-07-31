@@ -36,12 +36,16 @@ public:
     ~AudioOutputImpl();
 
     // Factory
-    static std::unique_ptr<AudioOutputImpl> create(int moduleId, const std::string& deviceName, const std::string& name = "");
+    static std::unique_ptr<AudioOutputImpl> create(
+        int moduleId,
+        const std::string& deviceName,
+        const std::string& name = "");
 
     // AAL callbacks
     void onStart();
     void onStop(aal_status_t reason);
     void onDataRequested();
+    void onAlmostDone();
 
     // aace::audio::AudioOutput
     bool prepare(std::shared_ptr<aace::audio::AudioStream> stream, bool repeating) override;
@@ -87,11 +91,17 @@ private:
     std::vector<std::string> parsePlaylistUrl(const std::string& url);
 
     enum class State {
-        Created, Initialized,
-        Preparing, Prepared,
-        Starting, Started,
-        Pausing, Paused, Resuming,
-        Stopping, Stopped,
+        Created,
+        Initialized,
+        Preparing,
+        Prepared,
+        Starting,
+        Started,
+        Pausing,
+        Paused,
+        Resuming,
+        Stopping,
+        Stopped,
         Faulted
     };
     friend std::ostream& operator<<(std::ostream& stream, State state);

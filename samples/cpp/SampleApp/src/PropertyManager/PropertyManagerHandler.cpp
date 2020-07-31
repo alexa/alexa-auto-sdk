@@ -33,21 +33,26 @@ namespace propertyManager {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-PropertyManagerHandler::PropertyManagerHandler(std::weak_ptr<logger::LoggerHandler> loggerHandler)
-    : m_loggerHandler{std::move(loggerHandler)} {
+PropertyManagerHandler::PropertyManagerHandler(std::weak_ptr<logger::LoggerHandler> loggerHandler) :
+        m_loggerHandler{std::move(loggerHandler)} {
     // Expects(m_loggerHandler != nullptr);
 }
 
-std::weak_ptr<logger::LoggerHandler> PropertyManagerHandler::getLoggerHandler() { return m_loggerHandler; }
+std::weak_ptr<logger::LoggerHandler> PropertyManagerHandler::getLoggerHandler() {
+    return m_loggerHandler;
+}
 
 // aace::propertyManager::PropertyManager interface
-void PropertyManagerHandler::propertyChanged( const std::string& key, const std::string& newValue ) {
+void PropertyManagerHandler::propertyChanged(const std::string& key, const std::string& newValue) {
     std::stringstream ss;
     ss << "propertyChanged:key=" << key << ",new value=" << newValue;
     log(logger::LoggerHandler::Level::INFO, ss.str());
 }
-    
-void PropertyManagerHandler::propertyStateChanged(const std::string &name, const std::string &value, PropertyState state) {
+
+void PropertyManagerHandler::propertyStateChanged(
+    const std::string& name,
+    const std::string& value,
+    PropertyState state) {
     std::stringstream ss;
     ss << "propertyStateChanged:name=" << name << ",value=" << value << ",state=" << state;
     log(logger::LoggerHandler::Level::INFO, ss.str());
@@ -55,7 +60,7 @@ void PropertyManagerHandler::propertyStateChanged(const std::string &name, const
 
 // private
 
-void PropertyManagerHandler::log(logger::LoggerHandler::Level level, const std::string &message) {
+void PropertyManagerHandler::log(logger::LoggerHandler::Level level, const std::string& message) {
     auto loggerHandler = m_loggerHandler.lock();
     if (!loggerHandler) {
         return;
@@ -63,5 +68,5 @@ void PropertyManagerHandler::log(logger::LoggerHandler::Level level, const std::
     loggerHandler->log(level, "PropertyManagerHandler", message);
 }
 
-} // namespace propertyManager
-} // namespace sampleApp
+}  // namespace propertyManager
+}  // namespace sampleApp

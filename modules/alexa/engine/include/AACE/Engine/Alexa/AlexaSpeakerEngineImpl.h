@@ -26,35 +26,34 @@ namespace aace {
 namespace engine {
 namespace alexa {
 
-class AlexaSpeakerEngineImpl :
-    public aace::alexa::AlexaSpeakerEngineInterface,
-    public alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerObserverInterface,
-    public alexaClientSDK::avsCommon::utils::RequiresShutdown,
-    public std::enable_shared_from_this<AlexaSpeakerEngineImpl> {
-    
+class AlexaSpeakerEngineImpl
+        : public aace::alexa::AlexaSpeakerEngineInterface
+        , public alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerObserverInterface
+        , public alexaClientSDK::avsCommon::utils::RequiresShutdown
+        , public std::enable_shared_from_this<AlexaSpeakerEngineImpl> {
 private:
-    AlexaSpeakerEngineImpl( std::shared_ptr<aace::alexa::AlexaSpeaker> alexaSpeakerPlatformInterface );
+    AlexaSpeakerEngineImpl(std::shared_ptr<aace::alexa::AlexaSpeaker> alexaSpeakerPlatformInterface);
 
-    bool initialize( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager );
+    bool initialize(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager);
 
-    alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::Type convert( SpeakerType type );
-    SpeakerType convert( alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::Type type );
+    alexaClientSDK::avsCommon::sdkInterfaces::ChannelVolumeInterface::Type convert(SpeakerType type);
+    SpeakerType convert(alexaClientSDK::avsCommon::sdkInterfaces::ChannelVolumeInterface::Type type);
 
 public:
     static std::shared_ptr<AlexaSpeakerEngineImpl> create(
         std::shared_ptr<aace::alexa::AlexaSpeaker> alexaSpeakerPlatformInterface,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager );
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager);
 
     // aace::alexa::AlexaSpeakerEngineInterface
-    void onLocalSetVolume( SpeakerType type, int8_t volume ) override;
-    void onLocalAdjustVolume( SpeakerType type, int8_t delta ) override;
-    void onLocalSetMute( SpeakerType type, bool mute ) override;
-    
+    void onLocalSetVolume(SpeakerType type, int8_t volume) override;
+    void onLocalAdjustVolume(SpeakerType type, int8_t delta) override;
+    void onLocalSetMute(SpeakerType type, bool mute) override;
+
     // alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerObserverInterface
     void onSpeakerSettingsChanged(
         const Source& source,
-        const alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::Type& type,
-        const alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::SpeakerSettings& settings ) override;
+        const alexaClientSDK::avsCommon::sdkInterfaces::ChannelVolumeInterface::Type& type,
+        const alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::SpeakerSettings& settings) override;
 
 protected:
     virtual void doShutdown() override;
@@ -64,8 +63,8 @@ private:
     std::weak_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> m_speakerManager;
 };
 
-} // aace::engine::alexa
-} // aace::engine
-} // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_ALEXA_ALEXA_SPEAKER_ENGINE_IMPL_H
+#endif  // AACE_ENGINE_ALEXA_ALEXA_SPEAKER_ENGINE_IMPL_H

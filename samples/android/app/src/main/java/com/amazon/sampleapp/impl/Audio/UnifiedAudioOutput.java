@@ -16,13 +16,17 @@
 package com.amazon.sampleapp.impl.Audio;
 
 import android.content.Context;
+import android.media.AudioManager;
 import android.os.Handler;
+import android.util.Log;
 
 import com.amazon.aace.alexa.AlexaClient;
 import com.amazon.aace.audio.AudioFormat;
 import com.amazon.aace.audio.AudioOutput;
+import com.amazon.aace.audio.AudioOutputProvider;
 import com.amazon.aace.audio.AudioStream;
 import com.amazon.sampleapp.impl.AlexaClient.AuthStateObserver;
+import com.amazon.sampleapp.impl.EqualizerController.EqualizerControllerHandler;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 
 /**
@@ -32,53 +36,76 @@ import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 public class UnifiedAudioOutput extends AudioOutput implements AuthStateObserver, AudioOutput.MediaStateListener {
     private final Context mContext;
     private final LoggerHandler mLogger;
-    private String mName;
-    private final int mStreamType;
+    private final String mName;
+    private final AudioOutputProvider.AudioOutputType mAudioOutputType;
 
     private Float mVolume;
     private MutedState mMutedState;
 
     private Handler mHandler;
     private AudioOutput mInner;
+    private EqualizerControllerHandler mEqualizerControllerHandler;
 
-    UnifiedAudioOutput(Context context, LoggerHandler logger, String name, int streamType) {
+    UnifiedAudioOutput(Context context, LoggerHandler logger, String name,
+            AudioOutputProvider.AudioOutputType audioOutputType,
+            EqualizerControllerHandler equalizerControllerHandler) {
         mContext = context;
         mLogger = logger;
         mName = name;
-        mStreamType = streamType;
+        mAudioOutputType = audioOutputType;
         mHandler = new Handler(); // constructor should be called by a thread with associated looper
+        mEqualizerControllerHandler = equalizerControllerHandler;
+    }
+
+    private static int intoStreamType(AudioOutputProvider.AudioOutputType type) {
+        switch (type) {
+            case NOTIFICATION:
+            case ALARM:
+                return AudioManager.STREAM_NOTIFICATION;
+            case RINGTONE:
+                return AudioManager.STREAM_RING;
+            case COMMUNICATION:
+            case EARCON:
+                return AudioManager.STREAM_VOICE_CALL;
+            case MUSIC:
+            default:
+                return AudioManager.STREAM_MUSIC;
+        }
     }
 
     @Override
     public boolean prepare(AudioStream stream, boolean repeating) {
-        if (mInner instanceof Releasable) {
-            ((Releasable)mInner).release();
-        }
-        if (stream.getAudioFormat().getEncoding() == AudioFormat.Encoding.LPCM) {
-            mInner = new RawAudioOutputHandler(mLogger, mName, mStreamType);
-            mInner.setMediaStateListener(this);
-        } else {
-            mInner = new AudioOutputHandler(mContext, mLogger, mName, mHandler);
-            mInner.setMediaStateListener(this);
-        }
-
-        boolean ok = mInner.prepare(stream, repeating);
-        if (ok) {
-            applyVolumeSettings(mInner);
-        }
-        return ok;
+        return prepare(stream, null, repeating);
     }
 
     @Override
     public boolean prepare(String url, boolean repeating) {
+        return prepare(null, url, repeating);
+    }
+
+    private boolean prepare(AudioStream stream, String url, boolean repeating) {
         if (mInner instanceof Releasable) {
-            ((Releasable)mInner).release();
+            ((Releasable) mInner).release();
         }
-        mInner = new AudioOutputHandler(mContext, mLogger, mName, mHandler);
+        if (stream != null && stream.getAudioFormat().getEncoding() == AudioFormat.Encoding.LPCM) {
+            mInner = new RawAudioOutputHandler(mLogger, mName, intoStreamType(mAudioOutputType));
+        } else {
+            mInner = new AudioOutputHandler(mContext, mLogger, mName, mHandler);
+        }
         mInner.setMediaStateListener(this);
-        boolean ok = mInner.prepare(url, repeating);
+
+        boolean ok;
+        if (stream != null) {
+            ok = mInner.prepare(stream, repeating);
+        } else {
+            ok = mInner.prepare(url, repeating);
+        }
         if (ok) {
             applyVolumeSettings(mInner);
+            if (mAudioOutputType == AudioOutputProvider.AudioOutputType.MUSIC) {
+                mEqualizerControllerHandler.setEqualizerEventListener(
+                        (EqualizerControllerHandler.EqualizerProvider) mInner);
+            }
         }
         return ok;
     }
@@ -99,7 +126,10 @@ public class UnifiedAudioOutput extends AudioOutput implements AuthStateObserver
 
     @Override
     public boolean stop() {
-        return mInner.stop();
+        if (mInner != null) {
+            return mInner.stop();
+        }
+        return true;
     }
 
     @Override
@@ -114,7 +144,10 @@ public class UnifiedAudioOutput extends AudioOutput implements AuthStateObserver
 
     @Override
     public long getPosition() {
-        return mInner.getPosition();
+        if (mInner != null) {
+            return mInner.getPosition();
+        }
+        return TIME_UNKNOWN;
     }
 
     @Override
@@ -165,12 +198,12 @@ public class UnifiedAudioOutput extends AudioOutput implements AuthStateObserver
     // AudioOutput.MediaStateListener
 
     @Override
-    public void mediaError( MediaError type, String error ) {
+    public void mediaError(MediaError type, String error) {
         super.mediaError(type, error);
     }
 
     @Override
-    public void mediaStateChanged( MediaState state ) {
-        super.mediaStateChanged( state );
+    public void mediaStateChanged(MediaState state) {
+        super.mediaStateChanged(state);
     }
 }

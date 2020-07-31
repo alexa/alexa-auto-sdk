@@ -23,21 +23,20 @@
 namespace aace {
 namespace test {
 namespace avs {
-    
+
 struct MockSpeechConfirmationSetting : alexaClientSDK::settings::SpeechConfirmationSetting {
 public:
-    MockSpeechConfirmationSetting() : alexaClientSDK::settings::SpeechConfirmationSetting{alexaClientSDK::settings::SpeechConfirmationSettingType::NONE} {
+    MockSpeechConfirmationSetting() :
+            alexaClientSDK::settings::SpeechConfirmationSetting{
+                alexaClientSDK::settings::SpeechConfirmationSettingType::NONE} {
     }
-    MOCK_METHOD1(setLocalChange,
-                 SetSettingResult(const MockSpeechConfirmationSetting::ValueType& value));
-    MOCK_METHOD1(setAvsChange,
-                 bool(const MockSpeechConfirmationSetting::ValueType& value));
-    MOCK_METHOD1(clearData,
-                 bool(const MockSpeechConfirmationSetting::ValueType& value));
+    MOCK_METHOD1(setLocalChange, SetSettingResult(const MockSpeechConfirmationSetting::ValueType& value));
+    MOCK_METHOD1(setAvsChange, bool(const MockSpeechConfirmationSetting::ValueType& value));
+    MOCK_METHOD1(clearData, bool(const MockSpeechConfirmationSetting::ValueType& value));
 };
-    
-} // aace::test::avs
-} // aace::test
-} // aace
 
-#endif //AACE_TEST_AVS_MOCK_SPEECH_CONFIRMATION_SETTING_H
+}  // namespace avs
+}  // namespace test
+}  // namespace aace
+
+#endif  //AACE_TEST_AVS_MOCK_SPEECH_CONFIRMATION_SETTING_H

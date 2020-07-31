@@ -7,7 +7,7 @@ android {
         minSdkVersion 22
         targetSdkVersion 28
         versionCode 1
-        versionName "2.1"
+        versionName "2.3"
     }
 
     buildTypes {
@@ -30,7 +30,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.2'
+        classpath 'com.android.tools.build:gradle:3.6.2'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -46,7 +46,7 @@ allprojects {
 dependencies {
     implementation fileTree(include: ['*.jar','*.aar'], dir: 'src/main/libs')
     implementation fileTree(include: ['*.jar','*.aar'], dir: '../../app/src/main/libs')
-    implementation fileTree(dir: "${project.rootDir}/../../../../builder/deploy/aar", include: ['core*.aar', 'apl*.aar'])
+    compileOnly fileTree(dir: "${project.rootDir}/../../../../builder/deploy/aar", include: ['core*.aar', 'apl*.aar'])
     implementation fileTree(dir: "${project.rootDir}/../../../../samples/android/modules/sample-core/build/outputs/aar", include: ['*.aar'])
     implementation 'com.android.support:appcompat-v7:28+'
     implementation 'com.android.support:design:28+'

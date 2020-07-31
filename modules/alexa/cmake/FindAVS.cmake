@@ -9,7 +9,7 @@
 #    cp AutoCoreEngineSDK/cmake/FindAVS.cmake WakeWordEngines/cmake
 # 3. Update AVS_VERSION when upgrading to a new version
 
-set(AVS_VERSION 1.17)
+set(AVS_VERSION 1.19)
 
 find_path(AVS_COMMON_INCLUDE_DIR AVSCommon)
 
@@ -41,6 +41,7 @@ find_library(AVS_ENDPOINTS_LIBRARY Endpoints)
 find_library(AVS_EQUALIZER_LIBRARY Equalizer)
 find_library(AVS_EQUALIZER_IMPLEMENTATIONS_LIBRARY EqualizerImplementations)
 find_library(AVS_INTERACTION_MODEL_LIBRARY InteractionModel)
+find_library(AVS_INTERRUPT_MODEL_LIBRARY InterruptModel)
 find_library(AVS_MRM_LIBRARY MRM)
 find_library(AVS_NOTIFICATIONS_LIBRARY Notifications)
 find_library(AVS_OPUS_ENCODER_CONTEXT_LIBRARY OpusEncoderContext)
@@ -78,6 +79,7 @@ set(AVS_LIBRARIES
     ${AVS_EQUALIZER_IMPLEMENTATIONS_LIBRARY}
     ${AVS_EXTERNAL_MEDIA_PLAYER_LIBRARY}
     ${AVS_INTERACTION_MODEL_LIBRARY}
+    ${AVS_INTERRUPT_MODEL_LIBRARY}
     ${AVS_MRM_LIBRARY}
     ${AVS_NOTIFICATIONS_LIBRARY}
     ${AVS_OPUS_ENCODER_CONTEXT_LIBRARY}

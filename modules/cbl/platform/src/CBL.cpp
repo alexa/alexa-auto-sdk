@@ -20,27 +20,27 @@ namespace cbl {
 
 CBL::~CBL() = default;
 
-void CBL::setEngineInterface( std::shared_ptr<CBLEngineInterface> cblEngineInterface ) {
+void CBL::setEngineInterface(std::shared_ptr<CBLEngineInterface> cblEngineInterface) {
     m_cblEngineInterface = cblEngineInterface;
 }
 
 void CBL::start() {
-    if( m_cblEngineInterface != nullptr ) {
+    if (m_cblEngineInterface != nullptr) {
         m_cblEngineInterface->onStart();
     }
 }
 
 void CBL::cancel() {
-    if( m_cblEngineInterface != nullptr ) {
+    if (m_cblEngineInterface != nullptr) {
         m_cblEngineInterface->onCancel();
     }
 }
 
 void CBL::reset() {
-    if( m_cblEngineInterface != nullptr ) {
+    if (m_cblEngineInterface != nullptr) {
         m_cblEngineInterface->onReset();
     }
 }
 
-} // aace::cbl
-} // aace
+}  // namespace cbl
+}  // namespace aace

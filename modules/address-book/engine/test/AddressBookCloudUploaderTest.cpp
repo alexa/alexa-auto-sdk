@@ -26,8 +26,8 @@ namespace aace {
 namespace test {
 namespace unit {
 
-/// Timeout when waiting for futures to be set.
-static std::chrono::milliseconds TIMEOUT(3000);
+/// Plenty of timeout to wait for HTTP timeouts
+static std::chrono::seconds TIMEOUT(10);
 
 /// Mock token to be returned by @c getAuthToken
 static const std::string AUTH_TOKEN = "MockAuthToken";
@@ -65,8 +65,22 @@ public:
         bool(const std::string& id, std::weak_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> factory));
 };
 
-// clang-format off
+class DummyAlexaEndpointInterface : public aace::engine::alexa::AlexaEndpointInterface {
+public:
+    std::string getAVSGateway() override {
+        // Not called.
+        return "";
+    }
+    std::string getLWAEndpoint() override {
+        // Not called.
+        return "";
+    }
+    std::string getACMSEndpoint() override {
+        return "https://alexa-comms-mobile-service-na.amazon.com";
+    }
+};
 
+// clang-format off
 static const std::string CAPABILITIES_CONFIG_JSON =
     "{"
     "    \"deviceInfo\":{"
@@ -77,7 +91,6 @@ static const std::string CAPABILITIES_CONFIG_JSON =
     "        \"description\":\"MockDescription\""
     "    }"
     " }";
-
 // clang-format on
 
 class AddressBookCloudUploaderTest : public ::testing::Test {
@@ -89,6 +102,7 @@ public:
         m_mockAuthDelegate = std::make_shared<testing::StrictMock<MockAuthDelegateInterface>>();
         m_mockNetworkObservableInterface = std::make_shared<testing::StrictMock<MockNetworkObservableInterface>>();
         m_mockAddressBookServiceInterface = std::make_shared<testing::StrictMock<MockAddressBookServiceInterface>>();
+        m_alexaEndpointInterface = std::make_shared<DummyAlexaEndpointInterface>();
 
         // create device info
         auto deviceInfo = alexaClientSDK::avsCommon::utils::DeviceInfo::create(
@@ -111,7 +125,8 @@ public:
             m_mockAuthDelegate,
             std::move(deviceInfo),
             aace::network::NetworkInfoProvider::NetworkStatus::CONNECTED,
-            m_mockNetworkObservableInterface);
+            m_mockNetworkObservableInterface,
+            m_alexaEndpointInterface);
     }
 
     void TearDown() override {
@@ -128,6 +143,7 @@ public:
     std::shared_ptr<testing::StrictMock<MockAuthDelegateInterface>> m_mockAuthDelegate;
     std::shared_ptr<testing::StrictMock<MockNetworkObservableInterface>> m_mockNetworkObservableInterface;
     std::shared_ptr<testing::StrictMock<MockAddressBookServiceInterface>> m_mockAddressBookServiceInterface;
+    std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> m_alexaEndpointInterface;
 };
 
 TEST_F(AddressBookCloudUploaderTest, create) {

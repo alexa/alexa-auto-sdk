@@ -18,8 +18,7 @@
 namespace aace {
 namespace alexa {
 
-SpeechSynthesizer::~SpeechSynthesizer() = default; // key function
+SpeechSynthesizer::~SpeechSynthesizer() = default;  // key function
 
-} // aace::alexa
-} // aac
-
+}  // namespace alexa
+}  // namespace aace

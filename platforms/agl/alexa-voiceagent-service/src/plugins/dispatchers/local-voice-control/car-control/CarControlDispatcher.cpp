@@ -49,7 +49,6 @@ std::shared_ptr<CarControlDispatcher> CarControlDispatcher::create(
     std::shared_ptr<ILogger> logger,
     std::shared_ptr<IAASBController> aasbController,
     std::shared_ptr<IAFBApi> api) {
-
     return std::shared_ptr<CarControlDispatcher>(new CarControlDispatcher(logger, aasbController, api));
 }
 
@@ -57,22 +56,30 @@ CarControlDispatcher::CarControlDispatcher(
     std::shared_ptr<ILogger> logger,
     std::shared_ptr<IAASBController> aasbController,
     std::shared_ptr<IAFBApi> api) :
-        m_logger(logger),
-        m_aasbController(aasbController),
-        m_api(api) {
+        m_logger(logger), m_aasbController(aasbController), m_api(api) {
 }
 
-void CarControlDispatcher::onReceivedDirective(
-    const std::string& action,
-    const std::string& payload) {
-
+void CarControlDispatcher::onReceivedDirective(const std::string& action, const std::string& payload) {
     m_logger->log(Level::DEBUG, TAG, "Processing carcontrol directive: " + action);
 
     std::string vshlCapabilityAction = action;
 
     json_object* argsJ = json_object_new_object();
     json_object* actionJ = json_object_new_string(vshlCapabilityAction.c_str());
-    json_object* payloadJ = json_object_new_string(payload.c_str());
+    json_object* payloadJ = NULL;
+
+    if (payload.length()) {
+        payloadJ = json_tokener_parse(payload.c_str());
+    } else {
+        m_logger->log(Level::ERROR, TAG, "Unable to parse payload JSON. Setting to empty string: " + payload);
+        payloadJ = json_object_new_string("");
+    }
+
+    if (!payloadJ) {
+        m_logger->log(Level::ERROR, TAG, "Unable to parse payload JSON: " + payload);
+        return;
+    }
+
     json_object_object_add(argsJ, agl::alexa::JSON_ATTR_ACTION.c_str(), actionJ);
     json_object_object_add(argsJ, agl::alexa::JSON_ATTR_PAYLOAD.c_str(), payloadJ);
 
@@ -91,12 +98,16 @@ void CarControlDispatcher::onReceivedDirective(
 bool CarControlDispatcher::subscribeToCarControlEvents() {
     m_logger->log(Level::INFO, TAG, "Subscribing to carcontrol capabilities");
 
-    json_object *argsJ = json_object_new_object();
-    json_object *actionsJ = json_object_new_array();
-    json_object_array_add(actionsJ, json_object_new_string(aasb::bridge::ACTION_CARCONTROL_IS_POWER_CONTROLLER_ON_RESPONSE.c_str()));
-    json_object_array_add(actionsJ, json_object_new_string(aasb::bridge::ACTION_CARCONTROL_IS_TOGGLE_CONTROLLER_ON_RESPONSE.c_str()));
-    json_object_array_add(actionsJ, json_object_new_string(aasb::bridge::ACTION_CARCONTROL_GET_MODE_CONTROLLER_VALUE_RESPONSE.c_str()));
-    json_object_array_add(actionsJ, json_object_new_string(aasb::bridge::ACTION_CARCONTROL_GET_RANGE_CONTROLLER_VALUE_RESPONSE.c_str()));
+    json_object* argsJ = json_object_new_object();
+    json_object* actionsJ = json_object_new_array();
+    json_object_array_add(
+        actionsJ, json_object_new_string(aasb::bridge::ACTION_CARCONTROL_IS_POWER_CONTROLLER_ON_RESPONSE.c_str()));
+    json_object_array_add(
+        actionsJ, json_object_new_string(aasb::bridge::ACTION_CARCONTROL_IS_TOGGLE_CONTROLLER_ON_RESPONSE.c_str()));
+    json_object_array_add(
+        actionsJ, json_object_new_string(aasb::bridge::ACTION_CARCONTROL_GET_MODE_CONTROLLER_VALUE_RESPONSE.c_str()));
+    json_object_array_add(
+        actionsJ, json_object_new_string(aasb::bridge::ACTION_CARCONTROL_GET_RANGE_CONTROLLER_VALUE_RESPONSE.c_str()));
 
     json_object_object_add(argsJ, agl::alexa::JSON_ATTR_ACTIONS.c_str(), actionsJ);
 
@@ -121,31 +132,19 @@ bool CarControlDispatcher::subscribeToCarControlEvents() {
 }
 
 void CarControlDispatcher::onIsPowerControllerOnResponse(const std::string& payload) {
-    m_aasbController->onReceivedEvent(
-        TOPIC_CARCONTROL,
-        ACTION_CARCONTROL_IS_POWER_CONTROLLER_ON_RESPONSE,
-        payload);
+    m_aasbController->onReceivedEvent(TOPIC_CARCONTROL, ACTION_CARCONTROL_IS_POWER_CONTROLLER_ON_RESPONSE, payload);
 }
 
 void CarControlDispatcher::onIsToggleControllerOnResponse(const std::string& payload) {
-    m_aasbController->onReceivedEvent(
-        TOPIC_CARCONTROL,
-        ACTION_CARCONTROL_IS_TOGGLE_CONTROLLER_ON_RESPONSE,
-        payload);
+    m_aasbController->onReceivedEvent(TOPIC_CARCONTROL, ACTION_CARCONTROL_IS_TOGGLE_CONTROLLER_ON_RESPONSE, payload);
 }
 
 void CarControlDispatcher::onGetModeControllerValueResponse(const std::string& payload) {
-    m_aasbController->onReceivedEvent(
-        TOPIC_CARCONTROL,
-        ACTION_CARCONTROL_GET_MODE_CONTROLLER_VALUE_RESPONSE,
-        payload);
+    m_aasbController->onReceivedEvent(TOPIC_CARCONTROL, ACTION_CARCONTROL_GET_MODE_CONTROLLER_VALUE_RESPONSE, payload);
 }
 
 void CarControlDispatcher::onGetRangeControllerValueResponse(const std::string& payload) {
-    m_aasbController->onReceivedEvent(
-        TOPIC_CARCONTROL,
-        ACTION_CARCONTROL_GET_RANGE_CONTROLLER_VALUE_RESPONSE,
-        payload);
+    m_aasbController->onReceivedEvent(TOPIC_CARCONTROL, ACTION_CARCONTROL_GET_RANGE_CONTROLLER_VALUE_RESPONSE, payload);
 }
 
 }  // namespace carControl

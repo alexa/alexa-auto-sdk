@@ -1,22 +1,22 @@
-From a83eb080de78b67eaea75129604b4bf5cc80db58 Mon Sep 17 00:00:00 2001
+From 53bc04c1813581546077d563147045b9856a65d5 Mon Sep 17 00:00:00 2001
 From: Mark Wharton <marwha@amazon.com>
-Date: Mon, 18 Nov 2019 04:52:22 -0800
-Subject: [PATCH] Smart Screen SDK for Alexa Auto SDK
+Date: Tue, 2 Jun 2020 23:04:54 -0700
+Subject: [PATCH 1/2] Smart Screen SDK for Alexa Auto SDK
 
 ---
  modules/Alexa/CMakeLists.txt | 12 ++++++------
  1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/modules/Alexa/CMakeLists.txt b/modules/Alexa/CMakeLists.txt
-index ae86f86..98c985e 100644
+index cb8629a..eb2c52f 100644
 --- a/modules/Alexa/CMakeLists.txt
 +++ b/modules/Alexa/CMakeLists.txt
 @@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
  project(AlexaModule LANGUAGES CXX)
  
  find_package(PkgConfig)
--pkg_check_modules(ASDK REQUIRED AlexaClientSDK=1.15.0)
-+pkg_check_modules(ASDK REQUIRED AlexaClientSDK=1.17.0)
+-pkg_check_modules(ASDK REQUIRED AlexaClientSDK=1.19.0)
++pkg_check_modules(ASDK REQUIRED AlexaClientSDK=1.19.1)
  
  include(build/BuildDefaults.cmake)
  include(tools/Testing.cmake)
@@ -40,5 +40,5 @@ index ae86f86..98c985e 100644
  # Create .pc pkg-config file
  include(build/cmake/GeneratePkgConfig.cmake)
 -- 
-2.20.1
+2.21.1 (Apple Git-122.3)
 

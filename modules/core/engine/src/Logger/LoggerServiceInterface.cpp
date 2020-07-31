@@ -18,10 +18,10 @@
 namespace aace {
 namespace engine {
 namespace logger {
-    
+
 LoggerServiceInterface::~LoggerServiceInterface() {
 }
-    
-} // aace::engine::logger
-} // aace::engine
-} // aace
+
+}  // namespace logger
+}  // namespace engine
+}  // namespace aace

@@ -72,9 +72,9 @@ private:
     std::thread m_thread;
 };
 
-} // aace::engine::utils::threading
-} // aace::engine::utils
-} // aace::engine
-} // aace
+}  // namespace threading
+}  // namespace utils
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_UTILS_THREADING_TASK_THREAD_H_
+#endif  // AACE_ENGINE_UTILS_THREADING_TASK_THREAD_H_

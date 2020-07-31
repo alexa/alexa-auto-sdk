@@ -29,7 +29,7 @@ namespace alexa {
  * and for sending state change events for the Do Not Disturb Setting.
  * For more information about Do Not Disturb see the interface overview: 
  * https://developer.amazon.com/docs/alexa-voice-service/donotdisturb.html
- */    
+ */
 class DoNotDisturb : public aace::core::PlatformInterface {
 protected:
     DoNotDisturb() = default;
@@ -42,7 +42,7 @@ public:
      * 
      * @param [in] doNotDisturb setting state
      */
-    virtual void setDoNotDisturb( const bool doNotDisturb ) = 0;
+    virtual void setDoNotDisturb(const bool doNotDisturb) = 0;
 
     /**
      * Notifies the Engine of a platform request to set the DND State
@@ -50,7 +50,7 @@ public:
      * @param [in] doNotDisturb setting state
      * @return true if successful, false if change was rejected
      */
-    bool doNotDisturbChanged( const bool doNotDisturb );
+    bool doNotDisturbChanged(const bool doNotDisturb);
 
     /**
      * @internal
@@ -58,12 +58,13 @@ public:
      *
      * Should *never* be called by the platform implementation.
      */
-    void setEngineInterface( std::shared_ptr<aace::alexa::DoNotDisturbEngineInterface> doNotDisturbEngineInterface );
-private: 
+    void setEngineInterface(std::shared_ptr<aace::alexa::DoNotDisturbEngineInterface> doNotDisturbEngineInterface);
+
+private:
     std::weak_ptr<aace::alexa::DoNotDisturbEngineInterface> m_doNotDisturbEngineInterface;
 };
 
-} // aace::alexa
-} // aace
+}  // namespace alexa
+}  // namespace aace
 
-#endif // AACE_ALEXA_DO_NOT_DISTURB_H
+#endif  // AACE_ALEXA_DO_NOT_DISTURB_H

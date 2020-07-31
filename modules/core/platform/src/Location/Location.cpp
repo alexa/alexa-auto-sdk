@@ -21,22 +21,27 @@ namespace aace {
 namespace location {
 
 Location::Location() :
-    m_latitude( UNDEFINED ),
-    m_longitude( UNDEFINED ),
-    m_altitude( UNDEFINED ),
-    m_accuracy( UNDEFINED ),
-    m_time( std::chrono::system_clock::now() ) {
+        m_latitude(UNDEFINED),
+        m_longitude(UNDEFINED),
+        m_altitude(UNDEFINED),
+        m_accuracy(UNDEFINED),
+        m_time(std::chrono::system_clock::now()) {
 }
 
-Location::Location( double latitude, double longitude, double altitude, double accuracy, std::chrono::system_clock::time_point time ) {
+Location::Location(
+    double latitude,
+    double longitude,
+    double altitude,
+    double accuracy,
+    std::chrono::system_clock::time_point time) {
     m_latitude = (latitude >= -90 && latitude <= 90) ? latitude : UNDEFINED;
     m_longitude = (longitude >= -180 && longitude <= 180) ? longitude : UNDEFINED;
     m_altitude = altitude >= 0 ? altitude : UNDEFINED;
-    m_accuracy = accuracy >=0 ? accuracy : UNDEFINED;
+    m_accuracy = accuracy >= 0 ? accuracy : UNDEFINED;
     m_time = time;
 }
 
-Location::Location( const Location& location ) {
+Location::Location(const Location& location) {
     m_latitude = location.m_latitude;
     m_longitude = location.m_longitude;
     m_accuracy = location.m_accuracy;
@@ -68,15 +73,14 @@ std::chrono::system_clock::time_point Location::getTime() {
     return m_time;
 }
 
-std::string Location::getTimeAsString()
-{
+std::string Location::getTimeAsString() {
     char buffer[30];
-    const time_t tt = std::chrono::system_clock::to_time_t( m_time );
-    std::tm tm = *std::gmtime( &tt );
-    std::size_t size = std::strftime( buffer, 30, "%FT%T+00:00", &tm );
+    const time_t tt = std::chrono::system_clock::to_time_t(m_time);
+    std::tm tm = *std::gmtime(&tt);
+    std::size_t size = std::strftime(buffer, 30, "%FT%T+00:00", &tm);
 
-    return std::string( buffer, size );
+    return std::string(buffer, size);
 }
 
-} // aace::location
-} // aace
+}  // namespace location
+}  // namespace aace

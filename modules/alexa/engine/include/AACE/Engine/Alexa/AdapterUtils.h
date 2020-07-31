@@ -24,15 +24,15 @@
 #include "AVSCommon/AVS/NamespaceAndName.h"
 #include "ExternalMediaAdapterInterface.h"
 #include "AVSCommon/Utils/RetryTimer.h"
-  
+
 namespace aace {
 namespace engine {
-namespace alexa {  
+namespace alexa {
 
 /// Enumeration class for events sent by adapters to AVS.
 enum class AdapterEvent {
     /// ChangeReport event sent after adapter's initialization succeeds/fails.
-    CHANGE_REPORT, // Note: not in ExternalMediaPlayer 1.1
+    CHANGE_REPORT,  // Note: not in ExternalMediaPlayer 1.1
 
     /// Event to request token from third party.
     REQUEST_TOKEN,
@@ -47,7 +47,7 @@ enum class AdapterEvent {
     PLAYER_EVENT,
 
     /// PlayerErrorEvent to report all errors from the adapters.
-    PLAYER_ERROR_EVENT, // Note: rename PLAYER_ERROR in ExternalMediaPlayer 1.1
+    PLAYER_ERROR_EVENT,  // Note: rename PLAYER_ERROR in ExternalMediaPlayer 1.1
 
     // adapter handler specific code
     /// PlayerError event to report all errors from the adapters.
@@ -65,12 +65,13 @@ enum class AdapterEvent {
 alexaClientSDK::avsCommon::utils::RetryTimer& sessionRetryTimer();
 
 // The NamespaceAndName for events sent from the adapter to AVS.
-extern const alexaClientSDK::avsCommon::avs::NamespaceAndName CHANGE_REPORT; // Note: not in ExternalMediaPlayer 1.1
+extern const alexaClientSDK::avsCommon::avs::NamespaceAndName CHANGE_REPORT;  // Note: not in ExternalMediaPlayer 1.1
 extern const alexaClientSDK::avsCommon::avs::NamespaceAndName REQUEST_TOKEN;
 extern const alexaClientSDK::avsCommon::avs::NamespaceAndName LOGIN;
 extern const alexaClientSDK::avsCommon::avs::NamespaceAndName LOGOUT;
 extern const alexaClientSDK::avsCommon::avs::NamespaceAndName PLAYER_EVENT;
-extern const alexaClientSDK::avsCommon::avs::NamespaceAndName PLAYER_ERROR_EVENT; // Note: rename PLAYER_ERROR in ExternalMediaPlayer 1.1
+extern const alexaClientSDK::avsCommon::avs::NamespaceAndName
+    PLAYER_ERROR_EVENT;  // Note: rename PLAYER_ERROR in ExternalMediaPlayer 1.1
 
 // adapter handler specific code ( unused )
 // extern const alexaClientSDK::avsCommon::avs::NamespaceAndName REPORT_DISCOVERED_PLAYERS;
@@ -124,9 +125,9 @@ rapidjson::Value buildSessionState(
  */
 bool buildDefaultPlayerState(rapidjson::Value* document, rapidjson::Document::AllocatorType& allocator);
 
-}  // alexa
-}  // engine
-}  // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace
 
 #endif  // end
 // AACE_ENGINE_ALEXA_ADAPTERUTILS_H_

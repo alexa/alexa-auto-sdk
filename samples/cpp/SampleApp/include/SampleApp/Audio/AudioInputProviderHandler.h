@@ -37,16 +37,19 @@ namespace audio {
 class DefaultAudioInput;
 
 class AudioInputProviderHandler : public aace::audio::AudioInputProvider /* isa PlatformInterface */ {
-  private:
+private:
     std::weak_ptr<Activity> m_activity{};
     std::weak_ptr<logger::LoggerHandler> m_loggerHandler{};
 
-  protected:
-    AudioInputProviderHandler(std::weak_ptr<Activity> activity,
-                  std::weak_ptr<logger::LoggerHandler> loggerHandler, bool setup = true);
+protected:
+    AudioInputProviderHandler(
+        std::weak_ptr<Activity> activity,
+        std::weak_ptr<logger::LoggerHandler> loggerHandler,
+        bool setup = true);
 
-  public:
-    template <typename... Args> static auto create(Args &&... args) -> std::shared_ptr<AudioInputProviderHandler> {
+public:
+    template <typename... Args>
+    static auto create(Args&&... args) -> std::shared_ptr<AudioInputProviderHandler> {
         return std::shared_ptr<AudioInputProviderHandler>(new AudioInputProviderHandler(args...));
     }
     auto getActivity() -> std::weak_ptr<Activity>;
@@ -54,13 +57,13 @@ class AudioInputProviderHandler : public aace::audio::AudioInputProvider /* isa 
     auto setupUI() -> void;
 
     // aace::audio::AudioInputProvider interface
-    std::shared_ptr<aace::audio::AudioInput> openChannel( const std::string& name, AudioInputType type ) override;
+    std::shared_ptr<aace::audio::AudioInput> openChannel(const std::string& name, AudioInputType type) override;
 
-  private:
+private:
     std::weak_ptr<View> m_console{};
     std::weak_ptr<View> m_alertStateView{};
 
-    auto log(logger::LoggerHandler::Level level, const std::string &message) -> void;
+    auto log(logger::LoggerHandler::Level level, const std::string& message) -> void;
 
     std::shared_ptr<DefaultAudioInput> m_sharedAudioInput;
 };
@@ -76,11 +79,12 @@ private:
     DefaultAudioInput() = default;
 
 public:
-    template <typename... Args> static auto create(Args &&... args) -> std::shared_ptr<DefaultAudioInput> {
+    template <typename... Args>
+    static auto create(Args&&... args) -> std::shared_ptr<DefaultAudioInput> {
         return std::shared_ptr<DefaultAudioInput>(new DefaultAudioInput(args...));
     }
 
-    bool setStream( std::shared_ptr<aace::audio::AudioStream> stream );
+    bool setStream(std::shared_ptr<aace::audio::AudioStream> stream);
 
     // aace::audio::AudioInput
     bool startAudioInput() override;
@@ -104,12 +108,12 @@ private:
     FileAudioStream() = default;
 
 public:
-    static std::shared_ptr<FileAudioStream> create( const std::string& path  );
+    static std::shared_ptr<FileAudioStream> create(const std::string& path);
 
-    bool open( const std::string& path );
+    bool open(const std::string& path);
 
     // aace::audio::AudioStream
-    ssize_t read( char* data, const size_t size ) override;
+    ssize_t read(char* data, const size_t size) override;
     bool isClosed() override;
 
 private:
@@ -117,7 +121,7 @@ private:
     bool m_closed;
 };
 
-} // namespace audio
-} // namespace sampleApp
+}  // namespace audio
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_AUDIO_AUDIOINPUTPROVIDERHANDLER_H
+#endif  // SAMPLEAPP_AUDIO_AUDIOINPUTPROVIDERHANDLER_H

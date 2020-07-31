@@ -27,90 +27,94 @@ namespace aace {
 namespace jni {
 namespace vehicle {
 
-    //
-    // JVehicleProperty
-    //
+//
+// JVehicleProperty
+//
 
-    VehicleProperty JVehicleProperty::getVehicleProperty()
-    {
-        try_with_context
-        {
-            jobject propertyTypeObj;
-            ThrowIfNot( invoke( "getType", "()Lcom/amazon/aace/vehicle/config/VehicleConfiguration$VehiclePropertyType;", &propertyTypeObj ), "invokeMethodFailed" );
+VehicleProperty JVehicleProperty::getVehicleProperty() {
+    try_with_context {
+        jobject propertyTypeObj;
+        ThrowIfNot(
+            invoke(
+                "getType",
+                "()Lcom/amazon/aace/vehicle/config/VehicleConfiguration$VehiclePropertyType;",
+                &propertyTypeObj),
+            "invokeMethodFailed");
 
-            VehiclePropertyType checkedPropertyTypeObj;
-            ThrowIfNot( JVehiclePropertyType::checkType( propertyTypeObj, &checkedPropertyTypeObj ), "invalidPropertyType" );
+        VehiclePropertyType checkedPropertyTypeObj;
+        ThrowIfNot(JVehiclePropertyType::checkType(propertyTypeObj, &checkedPropertyTypeObj), "invalidPropertyType");
 
-            jstring propertyValueObj;
-            ThrowIfNot( invoke( "getValue", "()Ljava/lang/String;", &propertyValueObj ), "invokeMethodFailed" );
+        jstring propertyValueObj;
+        ThrowIfNot(invoke("getValue", "()Ljava/lang/String;", &propertyValueObj), "invokeMethodFailed");
 
-            return { checkedPropertyTypeObj, JString(propertyValueObj).toStdStr() };
-        }
-        catch_with_ex {
-            AACE_JNI_ERROR(TAG,"getVehicleProperty",ex.what());
-            return {};
-        }
+        return {checkedPropertyTypeObj, JString(propertyValueObj).toStdStr()};
     }
-
-    std::vector<VehicleProperty> JVehicleProperty::convert( jobjectArray vehiclePropertyArrObj )
-    {
-        try_with_context
-        {
-            // convert java vehicle property
-            std::vector<VehicleProperty> vehicleProperties;
-            JObjectArray arr( vehiclePropertyArrObj );
-            jobject next;
-
-            for( int j = 0; j < arr.size(); j++ ) {
-                ThrowIfNot( arr.getAt( j, &next ), "getArrayValueFailed" );
-                vehicleProperties.push_back( aace::jni::vehicle::JVehicleProperty( next ).getVehicleProperty() );
-            }
-
-            return vehicleProperties;
-        }
-        catch_with_ex {
-            AACE_JNI_ERROR(TAG,"convert",ex.what());
-            return {};
-        }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "getVehicleProperty", ex.what());
+        return {};
     }
+}
 
-} // aace::jni::vehicle
-} // aace:jni
-} // aace
+std::vector<VehicleProperty> JVehicleProperty::convert(jobjectArray vehiclePropertyArrObj) {
+    try_with_context {
+        // convert java vehicle property
+        std::vector<VehicleProperty> vehicleProperties;
+        JObjectArray arr(vehiclePropertyArrObj);
+        jobject next;
+
+        for (int j = 0; j < arr.size(); j++) {
+            ThrowIfNot(arr.getAt(j, &next), "getArrayValueFailed");
+            vehicleProperties.push_back(aace::jni::vehicle::JVehicleProperty(next).getVehicleProperty());
+        }
+
+        return vehicleProperties;
+    }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "convert", ex.what());
+        return {};
+    }
+}
+
+}  // namespace vehicle
+}  // namespace jni
+}  // namespace aace
 
 // JNI
 
-extern "C"
-{
-    JNIEXPORT jlong JNICALL
-    Java_com_amazon_aace_vehicle_config_VehicleConfiguration_createVehicleInfoConfigBinder( JNIEnv * env, jobject obj, jobjectArray arr )
-    {
-        try 
-        {
-            auto config = aace::vehicle::config::VehicleConfiguration::createVehicleInfoConfig( aace::jni::vehicle::JVehicleProperty::convert( arr ) );
-            ThrowIfNull( config, "createVehicleInfoConfigBinderFailed" );
+extern "C" {
+JNIEXPORT jlong JNICALL Java_com_amazon_aace_vehicle_config_VehicleConfiguration_createVehicleInfoConfigBinder(
+    JNIEnv* env,
+    jobject obj,
+    jobjectArray arr) {
+    try {
+        auto config = aace::vehicle::config::VehicleConfiguration::createVehicleInfoConfig(
+            aace::jni::vehicle::JVehicleProperty::convert(arr));
+        ThrowIfNull(config, "createVehicleInfoConfigBinderFailed");
 
-            return reinterpret_cast<long>( new aace::jni::core::config::EngineConfigurationBinder( config ) );
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_vehicle_config_VehicleConfiguration_createVehicleInfoConfigBinder",ex.what());
-            return 0;
-        }
+        return reinterpret_cast<long>(new aace::jni::core::config::EngineConfigurationBinder(config));
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(
+            TAG, "Java_com_amazon_aace_vehicle_config_VehicleConfiguration_createVehicleInfoConfigBinder", ex.what());
+        return 0;
     }
+}
 
-    JNIEXPORT jlong JNICALL
-    Java_com_amazon_aace_vehicle_config_VehicleConfiguration_createOperatingCountryConfigBinder( JNIEnv * env, jobject obj, jstring operatingCountry )
-    {
-        try
-        {
-            auto config = aace::vehicle::config::VehicleConfiguration::createOperatingCountryConfig( JString(operatingCountry).toStdStr() );
-            ThrowIfNull( config, "createOperatingCountryConfigFailed" );
+JNIEXPORT jlong JNICALL Java_com_amazon_aace_vehicle_config_VehicleConfiguration_createOperatingCountryConfigBinder(
+    JNIEnv* env,
+    jobject obj,
+    jstring operatingCountry) {
+    try {
+        auto config = aace::vehicle::config::VehicleConfiguration::createOperatingCountryConfig(
+            JString(operatingCountry).toStdStr());
+        ThrowIfNull(config, "createOperatingCountryConfigFailed");
 
-            return reinterpret_cast<long>( new aace::jni::core::config::EngineConfigurationBinder( config ) );
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_vehicle_config_VehicleConfiguration_createOperatingCountryConfigBinder",ex.what());
-            return 0;
-        }
+        return reinterpret_cast<long>(new aace::jni::core::config::EngineConfigurationBinder(config));
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(
+            TAG,
+            "Java_com_amazon_aace_vehicle_config_VehicleConfiguration_createOperatingCountryConfigBinder",
+            ex.what());
+        return 0;
     }
+}
 }

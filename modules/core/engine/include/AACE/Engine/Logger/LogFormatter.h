@@ -30,11 +30,15 @@ public:
     // EngineLogger::Level alias
     using Level = aace::logger::LoggerEngineInterface::Level;
 
-    static std::string format( Level level, std::chrono::system_clock::time_point time, const char* threadMoniker, const char* text );
+    static std::string format(
+        Level level,
+        std::chrono::system_clock::time_point time,
+        const char* threadMoniker,
+        const char* text);
 };
 
-}  // logger
-}  // engine
-}  // aace
+}  // namespace logger
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_LOGGER_LOG_FORMATTER_H
+#endif  // AACE_ENGINE_LOGGER_LOG_FORMATTER_H

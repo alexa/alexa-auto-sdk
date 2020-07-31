@@ -88,9 +88,17 @@ public:
     ~Endpoint();
 
     /**
-     * Get the configured endpoint ID for this endpoint
+     * Get the configured endpoint ID for this endpoint.
      */
     std::string getId();
+
+    /**
+     * Get the endpoint ID sent in discovery for this endpoint.
+     * @note This ID is not necessarily different than the configured ID, but it may also be an ID derived from client 
+     *       ID, product ID, DSN, and configured endpoint ID.
+     * @note This ID is not initialized until @c build().
+     */
+    std::string getDiscoveryId();
 
     /**
      * Constructs the AVS SDK representation of the endpoint for registration with the endpoint registration manager,
@@ -125,6 +133,9 @@ private:
 
     /// The configured endpoint ID for this endpoint
     std::string m_endpointId;
+
+    /// The endpoint ID sent in discovery for this endpoint.
+    std::string m_discoveryEndpointId;
 
     /// A list of all asset IDs used to identify this endpoint's friendly names
     std::vector<std::string> m_assetIds;

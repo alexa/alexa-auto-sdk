@@ -30,13 +30,11 @@ import com.amazon.aace.core.PlatformInterface;
  *
  * @sa Speaker
  */
-abstract public class ExternalMediaAdapter extends PlatformInterface
-{
+abstract public class ExternalMediaAdapter extends PlatformInterface {
     /**
      * Describes the playback control type
      */
-    public enum PlayControlType
-    {
+    public enum PlayControlType {
         /**
          * resume playback
          */
@@ -111,7 +109,7 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
         /**
          * @internal
          */
-        private PlayControlType( String name ) {
+        private PlayControlType(String name) {
             m_name = name;
         }
 
@@ -126,8 +124,7 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
     /**
      * Supported playback control types reportable by the external media player app
      */
-    public enum SupportedPlaybackOperation
-    {
+    public enum SupportedPlaybackOperation {
         /*
          * Play is supported (voice only)
          */
@@ -205,7 +202,7 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
         /**
          * @internal
          */
-        private SupportedPlaybackOperation( String name ) {
+        private SupportedPlaybackOperation(String name) {
             m_name = name;
         }
 
@@ -220,8 +217,7 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
     /**
      * Favorites song status
      */
-    public enum Favorites
-    {
+    public enum Favorites {
         /**
          * song is favorited
          */
@@ -243,7 +239,7 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
         /**
          * @internal
          */
-        private Favorites( String name ) {
+        private Favorites(String name) {
             m_name = name;
         }
 
@@ -258,8 +254,7 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
     /**
      * Type of the current media source
      */
-    public enum MediaType
-    {
+    public enum MediaType {
         /**
          * A single song source
          */
@@ -293,7 +288,7 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
         /**
          * @internal
          */
-        private MediaType( String name ) {
+        private MediaType(String name) {
             m_name = name;
         }
 
@@ -308,8 +303,7 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
     /**
      * Type of navigation when external media player app is first invoked via AVS
      */
-    public enum Navigation
-    {
+    public enum Navigation {
         /**
          * Source dependant behavior
          */
@@ -331,7 +325,7 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
         /**
          * @internal
          */
-        private Navigation( String name ) {
+        private Navigation(String name) {
             m_name = name;
         }
 
@@ -351,13 +345,15 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
         public String localPlayerId;
         /// The only spiVersion that currently exists is "1.0"
         public String spiVersion;
-        /** Validation method :
+        /**
+         * Validation method :
          *  1. "SIGNING_CERTIFICATE"
          *  2. "GENERATED_CERTIFICATE"
          *  3. "NONE"
          */
         public String validationMethod;
-        /** Validation data :
+        /**
+         * Validation data :
          *  1. Device platform issued app signing certificate. A list of certificates may be
          *  attached.
          *  2. In some cases validation is performed locally. The certificate is trasmitted as
@@ -381,8 +377,7 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
     /**
      * struct that represents the session state of a player.
      */
-    static public class SessionState
-    {
+    static public class SessionState {
         /// The unique device endpoint.
         public String endpointId;
 
@@ -423,8 +418,7 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
     /**
      * struct that encapsulates a players playback state.
      */
-    static public class PlaybackState
-    {
+    static public class PlaybackState {
         /// The state of the default player - IDLE/STOPPED/PLAYING...
         public String state;
 
@@ -510,15 +504,13 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
     /**
      * Class that encapsulates an player session and playback state.
      */
-    static public class ExternalMediaAdapterState
-    {
+    static public class ExternalMediaAdapterState {
         /// Variable to hold the session state.
         public SessionState sessionState;
 
         /// Variable to hold the playback state.
         public PlaybackState playbackState;
     }
-
 
     /**
      * Directive called after a discovered player initiates the loginComplete event.
@@ -536,11 +528,8 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
      * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
-    public boolean login( String localPlayerId,
-                          String accessToken,
-                          String userName,
-                          boolean forceLogin,
-                          long tokenRefreshInterval ) {
+    public boolean login(
+            String localPlayerId, String accessToken, String userName, boolean forceLogin, long tokenRefreshInterval) {
         return false;
     }
 
@@ -552,7 +541,7 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
      * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
-    public boolean logout( String localPlayerId ) {
+    public boolean logout(String localPlayerId) {
         return false;
     }
 
@@ -575,12 +564,8 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
      * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
-    public boolean play( String localPlayerId,
-                         String playContextToken,
-                         long index,
-                         long offset,
-                         boolean preload,
-                         Navigation navigation ) {
+    public boolean play(String localPlayerId, String playContextToken, long index, long offset, boolean preload,
+            Navigation navigation) {
         return false;
     }
 
@@ -596,7 +581,7 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
      * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
-    public boolean playControl( String localPlayerId, PlayControlType playControlType ) {
+    public boolean playControl(String localPlayerId, PlayControlType playControlType) {
         return false;
     }
 
@@ -610,7 +595,7 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
      * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
-    public boolean seek( String localPlayerId, long offset ) {
+    public boolean seek(String localPlayerId, long offset) {
         return false;
     }
 
@@ -624,7 +609,7 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
      * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
-    public boolean adjustSeek( String localPlayerId, long deltaOffset ) {
+    public boolean adjustSeek(String localPlayerId, long deltaOffset) {
         return false;
     }
 
@@ -644,7 +629,7 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
      * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
-    public boolean authorize( AuthorizedPlayerInfo[] authorizedPlayers ) {
+    public boolean authorize(AuthorizedPlayerInfo[] authorizedPlayers) {
         return false;
     }
 
@@ -663,11 +648,11 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
      *
      * @param localPlayerId The opaque token that uniquely identifies the local external player app
      * @param state The @c ExternalMediaAdapterState to be initialized by the platform
-     * 
-     * @return @c true if the platform is able to provide state information for the external 
+     *
+     * @return @c true if the platform is able to provide state information for the external
      * media player, else @c false
      */
-    public boolean getState(  String localPlayerId, ExternalMediaAdapterState state ) {
+    public boolean getState(String localPlayerId, ExternalMediaAdapterState state) {
         return false;
     }
 
@@ -680,7 +665,7 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
      * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
-    public boolean volumeChanged( float volume ) {
+    public boolean volumeChanged(float volume) {
         return false;
     }
 
@@ -692,7 +677,7 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
      * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
-    public boolean mutedStateChanged( MutedState state ) {
+    public boolean mutedStateChanged(MutedState state) {
         return false;
     }
 
@@ -701,8 +686,8 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
      *
      * @param discoveredPlayers contains the discovered player info objects
      */
-    final public void reportDiscoveredPlayers( DiscoveredPlayerInfo[] discoveredPlayers ) {
-        reportDiscoveredPlayers( getNativeRef(), discoveredPlayers );
+    final public void reportDiscoveredPlayers(DiscoveredPlayerInfo[] discoveredPlayers) {
+        reportDiscoveredPlayers(getNativeRef(), discoveredPlayers);
     }
 
     /**
@@ -711,8 +696,8 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
      *
      * @param localPlayerId The opaque token that uniquely identifies the local external player app
      */
-    final public void requestToken( String localPlayerId ) {
-        requestToken( getNativeRef(), localPlayerId );
+    final public void requestToken(String localPlayerId) {
+        requestToken(getNativeRef(), localPlayerId);
     }
 
     /**
@@ -721,8 +706,8 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
      *
      * @param localPlayerId The opaque token that uniquely identifies the local external player app
      */
-    final public void loginComplete( String localPlayerId ) {
-        loginComplete( getNativeRef(), localPlayerId );
+    final public void loginComplete(String localPlayerId) {
+        loginComplete(getNativeRef(), localPlayerId);
     }
 
     /**
@@ -731,8 +716,8 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
      *
      * @param localPlayerId The opaque token that uniquely identifies the local external player app
      */
-    final public void logoutComplete( String localPlayerId ) {
-        logoutComplete( getNativeRef(), localPlayerId );
+    final public void logoutComplete(String localPlayerId) {
+        logoutComplete(getNativeRef(), localPlayerId);
     }
 
     /**
@@ -742,8 +727,8 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
      *
      * @param eventName Canonical event name
      */
-    final public void playerEvent( String localPlayerId, String eventName ) {
-        playerEvent( getNativeRef(), localPlayerId, eventName );
+    final public void playerEvent(String localPlayerId, String eventName) {
+        playerEvent(getNativeRef(), localPlayerId, eventName);
     }
 
     /**
@@ -759,12 +744,9 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
      *
      * @param fatal true if the error is fatal
      */
-    final public void playerError( String localPlayerId,
-                                   String errorName,
-                                   long code,
-                                   String description,
-                                   boolean fatal ) {
-        playerError( getNativeRef(), localPlayerId, errorName, code, description, fatal );
+    final public void playerError(
+            String localPlayerId, String errorName, long code, String description, boolean fatal) {
+        playerError(getNativeRef(), localPlayerId, errorName, code, description, fatal);
     }
 
     /**
@@ -773,8 +755,8 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
      *
      * @param localPlayerId The opaque token that uniquely identifies the local external player app
      */
-    final public void setFocus( String localPlayerId ) {
-        setFocus( getNativeRef(), localPlayerId );
+    final public void setFocus(String localPlayerId) {
+        setFocus(getNativeRef(), localPlayerId);
     }
 
     /**
@@ -783,8 +765,8 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
      *
      * @param localPlayerId The opaque token that uniquely identifies the local external player app
      */
-    final public void removeDiscoveredPlayer( String localPlayerId ) {
-        removeDiscoveredPlayer( getNativeRef(), localPlayerId );
+    final public void removeDiscoveredPlayer(String localPlayerId) {
+        removeDiscoveredPlayer(getNativeRef(), localPlayerId);
     }
 
     // NativeRef implementation
@@ -792,23 +774,20 @@ abstract public class ExternalMediaAdapter extends PlatformInterface
         return createBinder();
     }
 
-    final protected void disposeNativeRef( long nativeRef ) {
-        disposeBinder( nativeRef );
+    final protected void disposeNativeRef(long nativeRef) {
+        disposeBinder(nativeRef);
     }
 
     // Native Engine JNI methods
     private native long createBinder();
-    private native void disposeBinder( long nativeRef );
-    private native void reportDiscoveredPlayers( long nativeObject,
-                                                 DiscoveredPlayerInfo[] discoveredPlayers );
-    private native void requestToken( long nativeObject, String localPlayerId );
-    private native void loginComplete( long nativeObject, String localPlayerId );
-    private native void logoutComplete( long nativeObject, String localPlayerId );
-    private native void playerEvent( long nativeObject, String localPlayerId, String eventName );
-    private native void playerError( long nativeObject, String localPlayerId, String errorName,
-                                     long code, String description, boolean fatal );
-    private native void setFocus( long nativeObject, String localPlayerId );
-    private native void removeDiscoveredPlayer( long nativeObject, String localPlayerId );
+    private native void disposeBinder(long nativeRef);
+    private native void reportDiscoveredPlayers(long nativeObject, DiscoveredPlayerInfo[] discoveredPlayers);
+    private native void requestToken(long nativeObject, String localPlayerId);
+    private native void loginComplete(long nativeObject, String localPlayerId);
+    private native void logoutComplete(long nativeObject, String localPlayerId);
+    private native void playerEvent(long nativeObject, String localPlayerId, String eventName);
+    private native void playerError(
+            long nativeObject, String localPlayerId, String errorName, long code, String description, boolean fatal);
+    private native void setFocus(long nativeObject, String localPlayerId);
+    private native void removeDiscoveredPlayer(long nativeObject, String localPlayerId);
 }
-
-

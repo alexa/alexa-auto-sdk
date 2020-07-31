@@ -28,56 +28,51 @@ using namespace aace::test::alexa;
 
 class PlaybackControllerEngineImplTest : public ::testing::Test {
 public:
-    void SetUp() override
-    {
+    void SetUp() override {
         m_alexaMockFactory = AlexaTestHelper::createAlexaMockComponentFactory();
-        
+
         // initialize the avs device SDK
-        ASSERT_TRUE( alexaClientSDK::avsCommon::avs::initialization::AlexaClientSDKInit::initialize( { AlexaTestHelper::getAVSConfig() } ) ) << "Initialize AVS Device SDK Failed!";
-        
+        ASSERT_TRUE(alexaClientSDK::avsCommon::avs::initialization::AlexaClientSDKInit::initialize(
+            {AlexaTestHelper::getAVSConfig()}))
+            << "Initialize AVS Device SDK Failed!";
+
         // initialized succeeded
         m_initialized = true;
     }
 
-    void TearDown() override
-    {
-        if( m_initialized )
-        {
+    void TearDown() override {
+        if (m_initialized) {
             m_alexaMockFactory->shutdown();
-        
+
             alexaClientSDK::avsCommon::avs::initialization::AlexaClientSDKInit::uninitialize();
-            
+
             m_initialized = false;
         }
     }
-    
+
 protected:
-    void configure()
-    {
-        if( m_configured == false )
-        {
-            
+    void configure() {
+        if (m_configured == false) {
             m_configured = true;
         }
     }
-    
-    std::shared_ptr<aace::engine::alexa::PlaybackControllerEngineImpl> createPlaybackControllerEngineImpl()
-    {
-        if( m_configured == false ) {
+
+    std::shared_ptr<aace::engine::alexa::PlaybackControllerEngineImpl> createPlaybackControllerEngineImpl() {
+        if (m_configured == false) {
             configure();
         }
-        
+
         auto playbackControllerEngineImpl = aace::engine::alexa::PlaybackControllerEngineImpl::create(
             m_alexaMockFactory->getPlaybackControllerMock(),
             m_alexaMockFactory->getEndpointBuilderMock(),
             m_alexaMockFactory->getMessageSenderInterfaceMock(),
             m_alexaMockFactory->getContextManagerInterfaceMock(),
             m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
-            m_alexaMockFactory->getFocusManagerInterfaceMock() );
-        
+            m_alexaMockFactory->getFocusManagerInterfaceMock());
+
         return playbackControllerEngineImpl;
     }
-    
+
 protected:
     std::shared_ptr<AlexaMockComponentFactory> m_alexaMockFactory;
 
@@ -86,75 +81,69 @@ private:
     bool m_configured = false;
 };
 
-TEST_F(PlaybackControllerEngineImplTest, create)
-{
+TEST_F(PlaybackControllerEngineImplTest, create) {
     auto playbackControllerEngineImpl = createPlaybackControllerEngineImpl();
-    ASSERT_NE(playbackControllerEngineImpl,nullptr) << "PlaybackControllerEngineImpl pointer expected to be not null!";
-    
+    ASSERT_NE(playbackControllerEngineImpl, nullptr) << "PlaybackControllerEngineImpl pointer expected to be not null!";
+
     playbackControllerEngineImpl->shutdown();
 }
 
-TEST_F(PlaybackControllerEngineImplTest,createWithPlatformInterfaceAsNull)
-{
+TEST_F(PlaybackControllerEngineImplTest, createWithPlatformInterfaceAsNull) {
     auto playbackControllerEngineImpl = aace::engine::alexa::PlaybackControllerEngineImpl::create(
-       nullptr,
+        nullptr,
         m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
-        m_alexaMockFactory->getFocusManagerInterfaceMock() );
-    
-    ASSERT_EQ(playbackControllerEngineImpl,nullptr) << "PlaybackControllerEngineImpl pointer expected to be null";
+        m_alexaMockFactory->getFocusManagerInterfaceMock());
+
+    ASSERT_EQ(playbackControllerEngineImpl, nullptr) << "PlaybackControllerEngineImpl pointer expected to be null";
 }
 
-TEST_F(PlaybackControllerEngineImplTest,createWithMessageSenderAsNull)
-{
+TEST_F(PlaybackControllerEngineImplTest, createWithMessageSenderAsNull) {
     auto playbackControllerEngineImpl = aace::engine::alexa::PlaybackControllerEngineImpl::create(
         m_alexaMockFactory->getPlaybackControllerMock(),
         m_alexaMockFactory->getEndpointBuilderMock(),
         nullptr,
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
-        m_alexaMockFactory->getFocusManagerInterfaceMock() );
-    
-    ASSERT_EQ(playbackControllerEngineImpl,nullptr) << "PlaybackControllerEngineImpl pointer expected to be null";
+        m_alexaMockFactory->getFocusManagerInterfaceMock());
+
+    ASSERT_EQ(playbackControllerEngineImpl, nullptr) << "PlaybackControllerEngineImpl pointer expected to be null";
 }
 
-TEST_F(PlaybackControllerEngineImplTest,createWithContextManagerAsNull)
-{
+TEST_F(PlaybackControllerEngineImplTest, createWithContextManagerAsNull) {
     auto playbackControllerEngineImpl = aace::engine::alexa::PlaybackControllerEngineImpl::create(
         m_alexaMockFactory->getPlaybackControllerMock(),
         m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
         nullptr,
         m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
-        m_alexaMockFactory->getFocusManagerInterfaceMock() );
-    
-    ASSERT_EQ(playbackControllerEngineImpl,nullptr) << "PlaybackControllerEngineImpl pointer expected to be null";
+        m_alexaMockFactory->getFocusManagerInterfaceMock());
+
+    ASSERT_EQ(playbackControllerEngineImpl, nullptr) << "PlaybackControllerEngineImpl pointer expected to be null";
 }
 
-TEST_F(PlaybackControllerEngineImplTest, createWithCapabilitiesDelegateAsNull)
-{
+TEST_F(PlaybackControllerEngineImplTest, createWithCapabilitiesDelegateAsNull) {
     auto playbackControllerEngineImpl = aace::engine::alexa::PlaybackControllerEngineImpl::create(
         m_alexaMockFactory->getPlaybackControllerMock(),
         m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         nullptr,
-        m_alexaMockFactory->getFocusManagerInterfaceMock() );
-    
-    ASSERT_EQ(playbackControllerEngineImpl,nullptr) << "PlaybackControllerEngineImpl pointer expected to be null";
+        m_alexaMockFactory->getFocusManagerInterfaceMock());
+
+    ASSERT_EQ(playbackControllerEngineImpl, nullptr) << "PlaybackControllerEngineImpl pointer expected to be null";
 }
 
-TEST_F(PlaybackControllerEngineImplTest,createWithFocusManagerAsNull)
-{
+TEST_F(PlaybackControllerEngineImplTest, createWithFocusManagerAsNull) {
     auto playbackControllerEngineImpl = aace::engine::alexa::PlaybackControllerEngineImpl::create(
         m_alexaMockFactory->getPlaybackControllerMock(),
         m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
-        nullptr );
-    
-    ASSERT_EQ(playbackControllerEngineImpl,nullptr) << "PlaybackControllerEngineImpl pointer expected to be null";
+        nullptr);
+
+    ASSERT_EQ(playbackControllerEngineImpl, nullptr) << "PlaybackControllerEngineImpl pointer expected to be null";
 }

@@ -23,59 +23,55 @@ namespace aace {
 namespace jni {
 namespace alexa {
 
-    class SpeechRecognizerHandler : public aace::alexa::SpeechRecognizer {
-    public:
-        SpeechRecognizerHandler( jobject obj, bool wakewordDetectionEnabled );
+class SpeechRecognizerHandler : public aace::alexa::SpeechRecognizer {
+public:
+    SpeechRecognizerHandler(jobject obj, bool wakewordDetectionEnabled);
 
-        // aace::alexa::SpeechRecognizer
-        bool wakewordDetected( const std::string & wakeword ) override;
-        void endOfSpeechDetected() override;
+    // aace::alexa::SpeechRecognizer
+    bool wakewordDetected(const std::string& wakeword) override;
+    void endOfSpeechDetected() override;
 
-    private:
-        JObject m_obj;
-    };
+private:
+    JObject m_obj;
+};
 
-    class SpeechRecognizerBinder : public aace::jni::core::PlatformInterfaceBinder {
-    public:
-        SpeechRecognizerBinder( jobject obj, bool wakewordDetectionEnabled );
+class SpeechRecognizerBinder : public aace::jni::core::PlatformInterfaceBinder {
+public:
+    SpeechRecognizerBinder(jobject obj, bool wakewordDetectionEnabled);
 
-        std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
-            return m_speechRecognizerHandler;
-        }
+    std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
+        return m_speechRecognizerHandler;
+    }
 
-        std::shared_ptr<SpeechRecognizerHandler> getSpeechRecognizer() {
-            return m_speechRecognizerHandler;
-        }
+    std::shared_ptr<SpeechRecognizerHandler> getSpeechRecognizer() {
+        return m_speechRecognizerHandler;
+    }
 
-    private:
-        std::shared_ptr<SpeechRecognizerHandler> m_speechRecognizerHandler;
-    };
+private:
+    std::shared_ptr<SpeechRecognizerHandler> m_speechRecognizerHandler;
+};
 
-    //
-    // JInitiator
-    //
+//
+// JInitiator
+//
 
-    class JInitiatorConfig : public EnumConfiguration<SpeechRecognizerHandler::Initiator> {
-    public:
-        using T = SpeechRecognizerHandler::Initiator;
+class JInitiatorConfig : public EnumConfiguration<SpeechRecognizerHandler::Initiator> {
+public:
+    using T = SpeechRecognizerHandler::Initiator;
 
-        const char* getClassName() override {
-            return "com/amazon/aace/alexa/SpeechRecognizer$Initiator";
-        }
+    const char* getClassName() override {
+        return "com/amazon/aace/alexa/SpeechRecognizer$Initiator";
+    }
 
-        std::vector<std::pair<T,std::string>> getConfiguration() override {
-            return {
-                {T::HOLD_TO_TALK,"HOLD_TO_TALK"},
-                {T::TAP_TO_TALK,"TAP_TO_TALK"},
-                {T::WAKEWORD,"WAKEWORD"}
-            };
-        }
-    };
+    std::vector<std::pair<T, std::string>> getConfiguration() override {
+        return {{T::HOLD_TO_TALK, "HOLD_TO_TALK"}, {T::TAP_TO_TALK, "TAP_TO_TALK"}, {T::WAKEWORD, "WAKEWORD"}};
+    }
+};
 
-    using JInitiator = JEnum<SpeechRecognizerHandler::Initiator,JInitiatorConfig>;
+using JInitiator = JEnum<SpeechRecognizerHandler::Initiator, JInitiatorConfig>;
 
-} // aace::alexa
-} // aace::jni
-} // aace
+}  // namespace alexa
+}  // namespace jni
+}  // namespace aace
 
-#endif // AACE_JNI_ALEXA_SPEECH_RECOGNIZER_BINDER_H
+#endif  // AACE_JNI_ALEXA_SPEECH_RECOGNIZER_BINDER_H

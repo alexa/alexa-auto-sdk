@@ -28,23 +28,24 @@ public:
 
     using MutedState = aace::audio::AudioOutput::MutedState;
 
-    virtual bool prepare( std::shared_ptr<aace::audio::AudioStream> stream, bool repeating ) = 0;
-    virtual bool prepare( const std::string& url, bool repeating ) = 0;
+    virtual bool prepare(std::shared_ptr<aace::audio::AudioStream> stream, bool repeating) = 0;
+    virtual bool prepare(const std::string& url, bool repeating) = 0;
     virtual bool play() = 0;
     virtual bool stop() = 0;
     virtual bool pause() = 0;
     virtual bool resume() = 0;
     virtual int64_t getPosition() = 0;
-    virtual bool setPosition( int64_t position ) = 0;
+    virtual bool setPosition(int64_t position) = 0;
     virtual int64_t getDuration() = 0;
     virtual int64_t getNumBytesBuffered() = 0;
-    virtual bool volumeChanged( float volume ) = 0;
-    virtual bool mutedStateChanged( MutedState state ) = 0;
-    virtual void setEngineInterface( std::shared_ptr<aace::audio::AudioOutputEngineInterface> audioOutputEngineInterface ) = 0;
+    virtual bool volumeChanged(float volume) = 0;
+    virtual bool mutedStateChanged(MutedState state) = 0;
+    virtual void setEngineInterface(
+        std::shared_ptr<aace::audio::AudioOutputEngineInterface> audioOutputEngineInterface) = 0;
 };
 
-} // audio
-} // engine
-} // aace
+}  // namespace audio
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_AUDIO_AUDIO_OUTPUT_CHANNEL_INTERFACE_H
+#endif  // AACE_ENGINE_AUDIO_AUDIO_OUTPUT_CHANNEL_INTERFACE_H

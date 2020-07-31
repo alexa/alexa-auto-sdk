@@ -31,17 +31,22 @@ namespace alexa {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-AudioPlayerHandler::AudioPlayerHandler(std::weak_ptr<Activity> activity,
-                                       std::weak_ptr<logger::LoggerHandler> loggerHandler)
-    : m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
+AudioPlayerHandler::AudioPlayerHandler(
+    std::weak_ptr<Activity> activity,
+    std::weak_ptr<logger::LoggerHandler> loggerHandler) :
+        m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
     // Expects((m_activity != nullptr) && (m_loggerHandler != nullptr));
     // Expects((mediaPlayer != nullptr) && (speaker != nullptr));
     setupUI();
 }
 
-std::weak_ptr<Activity> AudioPlayerHandler::getActivity() { return m_activity; }
+std::weak_ptr<Activity> AudioPlayerHandler::getActivity() {
+    return m_activity;
+}
 
-std::weak_ptr<logger::LoggerHandler> AudioPlayerHandler::getLoggerHandler() { return m_loggerHandler; }
+std::weak_ptr<logger::LoggerHandler> AudioPlayerHandler::getLoggerHandler() {
+    return m_loggerHandler;
+}
 
 // aace::alexa::AudioPlayer interface
 
@@ -63,7 +68,7 @@ void AudioPlayerHandler::playerActivityChanged(AudioPlayer::PlayerActivity state
 
 // private
 
-void AudioPlayerHandler::log(logger::LoggerHandler::Level level, const std::string &message) {
+void AudioPlayerHandler::log(logger::LoggerHandler::Level level, const std::string& message) {
     auto loggerHandler = m_loggerHandler.lock();
     if (!loggerHandler) {
         return;
@@ -78,16 +83,16 @@ void AudioPlayerHandler::setupUI() {
     }
     m_console = activity->findViewById("id:console");
 
-    activity->registerObserver(Event::onGetPlayerPositionAndDuration, [=](const std::string &value) {
-
+    activity->registerObserver(Event::onGetPlayerPositionAndDuration, [=](const std::string& value) {
         log(logger::LoggerHandler::Level::VERBOSE, "onGetPlayerPositionAndDuration:");
-        
+
         auto playerPosition = getPlayerPosition();
         auto playerDuration = getPlayerDuration();
 
         activity->runOnUIThread([=]() {
             if (auto console = m_console.lock()) {
-                console->printLine("Player Position: " + std::to_string(playerPosition) + " / " + std::to_string(playerDuration));
+                console->printLine(
+                    "Player Position: " + std::to_string(playerPosition) + " / " + std::to_string(playerDuration));
             }
         });
 
@@ -95,5 +100,5 @@ void AudioPlayerHandler::setupUI() {
     });
 }
 
-} // namespace alexa
-} // namespace sampleApp
+}  // namespace alexa
+}  // namespace sampleApp

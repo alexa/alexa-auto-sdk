@@ -62,7 +62,7 @@ static const std::string ALEXA_CONFIG =
     "        }"
     "    }"
     "}";
-    
+
 static const std::string AVS_DEVICE_SDK_CONFIG =
     "{"
     "    \"cblAuthDelegate\":{"
@@ -87,7 +87,9 @@ static const std::string AVS_DEVICE_SDK_CONFIG =
     "    },"
     "    \"deviceSettings\":{"
     "        \"databaseFilePath\":\"settings.db\","
-    "        \"locales\":[\"en-US\",\"en-GB\",\"de-DE\",\"en-IN\",\"en-CA\",\"ja-JP\",\"en-AU\",\"fr-FR\",\"it-IT\",\"es-ES\",\"es-MX\",\"fr-CA\",\"es-US\", \"hi-IN\", \"pt-BR\"],"
+    "        "
+    "\"locales\":[\"en-US\",\"en-GB\",\"de-DE\",\"en-IN\",\"en-CA\",\"ja-JP\",\"en-AU\",\"fr-FR\",\"it-IT\",\"es-ES\","
+    "\"es-MX\",\"fr-CA\",\"es-US\", \"hi-IN\", \"pt-BR\"],"
     "        \"defaultLocale\":\"en-US\","
     "        \"localeCombinations\":[[\"en-CA\", \"fr-CA\"],[\"fr-CA\", \"en-CA\"]],"
     "        \"defaultTimezone\":\"America/Vancouver\""
@@ -103,16 +105,15 @@ static const std::string AVS_DEVICE_SDK_CONFIG =
     "    }"
     "}";
 
-
-std::shared_ptr<aace::core::config::EngineConfiguration> AlexaTestHelper::createAlexaConfiguration( bool withExpectCall )
-{
+std::shared_ptr<aace::core::config::EngineConfiguration> AlexaTestHelper::createAlexaConfiguration(
+    bool withExpectCall) {
     auto configuration = std::make_shared<aace::test::core::MockEngineConfiguration>();
-    auto stream = std::make_shared<std::stringstream>( ALEXA_CONFIG );
-    
-    if( withExpectCall ) {
-        EXPECT_CALL( *configuration.get(), getStream() ).WillOnce( testing::Return( stream ) );
+    auto stream = std::make_shared<std::stringstream>(ALEXA_CONFIG);
+
+    if (withExpectCall) {
+        EXPECT_CALL(*configuration.get(), getStream()).WillOnce(testing::Return(stream));
     }
-    
+
     return configuration;
 }
 
@@ -121,10 +122,9 @@ std::shared_ptr<AlexaMockComponentFactory> AlexaTestHelper::createAlexaMockCompo
 }
 
 std::shared_ptr<std::istream> AlexaTestHelper::getAVSConfig() {
-    return std::make_shared<std::stringstream>( AVS_DEVICE_SDK_CONFIG );
+    return std::make_shared<std::stringstream>(AVS_DEVICE_SDK_CONFIG);
 }
 
-
-} // aace::test::alexa
-} // aace::test
-} // aace
+}  // namespace alexa
+}  // namespace test
+}  // namespace aace

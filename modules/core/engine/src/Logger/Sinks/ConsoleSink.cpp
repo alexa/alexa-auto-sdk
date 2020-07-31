@@ -27,19 +27,22 @@ namespace sink {
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.logger.sink.ConsoleSink");
 
-ConsoleSink::ConsoleSink( const std::string& id ) : Sink( id ) {
+ConsoleSink::ConsoleSink(const std::string& id) : Sink(id) {
 }
 
-std::shared_ptr<ConsoleSink> ConsoleSink::create( const std::string& id ) {
-    return std::shared_ptr<ConsoleSink>( new ConsoleSink( id ) );
+std::shared_ptr<ConsoleSink> ConsoleSink::create(const std::string& id) {
+    return std::shared_ptr<ConsoleSink>(new ConsoleSink(id));
 }
 
-void ConsoleSink::log( Level level, std::chrono::system_clock::time_point time, const char* threadMoniker, const char* text ) {
-    std::cout << aace::engine::logger::LogFormatter::format( level, time, threadMoniker, text ) << std::endl;
+void ConsoleSink::log(
+    Level level,
+    std::chrono::system_clock::time_point time,
+    const char* threadMoniker,
+    const char* text) {
+    std::cout << aace::engine::logger::LogFormatter::format(level, time, threadMoniker, text) << std::endl;
 }
 
-} // aace::engine::logger::sink
-} // aace::engine::logger
-} // aace::engine
-} // aace
-
+}  // namespace sink
+}  // namespace logger
+}  // namespace engine
+}  // namespace aace

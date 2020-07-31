@@ -34,49 +34,42 @@ using namespace aace::test::audio;
 
 class TemplateRuntimeEngineImplTest : public ::testing::Test {
 public:
-    void SetUp() override
-    {
+    void SetUp() override {
         m_alexaMockFactory = AlexaTestHelper::createAlexaMockComponentFactory();
-        
+
         // initialize the avs device SDK
-        ASSERT_TRUE( alexaClientSDK::avsCommon::avs::initialization::AlexaClientSDKInit::initialize( { AlexaTestHelper::getAVSConfig() } ) ) << "Initialize AVS Device SDK Failed!";
-        
+        ASSERT_TRUE(alexaClientSDK::avsCommon::avs::initialization::AlexaClientSDKInit::initialize(
+            {AlexaTestHelper::getAVSConfig()}))
+            << "Initialize AVS Device SDK Failed!";
+
         // initialized succeeded
         m_initialized = true;
     }
 
-    void TearDown() override
-    {
-        if( m_initialized )
-        {
+    void TearDown() override {
+        if (m_initialized) {
             m_alexaMockFactory->shutdown();
-        
+
             alexaClientSDK::avsCommon::avs::initialization::AlexaClientSDKInit::uninitialize();
-            
+
             m_initialized = false;
         }
     }
-    
+
 protected:
-    void configure()
-    {
-        if( m_configured == false )
-        {
-            EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),addDirectiveHandler(testing::_)).WillOnce(testing::Return(true));
-            EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),doShutdown());
-            EXPECT_CALL(*m_alexaMockFactory->getAudioPlayerInterfaceMock(),addObserver(testing::_));
-            EXPECT_CALL(*m_alexaMockFactory->getAudioPlayerInterfaceMock(),removeObserver(testing::_));
-            
+    void configure() {
+        if (m_configured == false) {
+            EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(), doShutdown());
+
             m_configured = true;
         }
     }
-    
-    std::shared_ptr<aace::engine::alexa::TemplateRuntimeEngineImpl> createTemplateRuntimeEngineImpl()
-    {
-        if( m_configured == false ) {
+
+    std::shared_ptr<aace::engine::alexa::TemplateRuntimeEngineImpl> createTemplateRuntimeEngineImpl() {
+        if (m_configured == false) {
             configure();
         }
-        
+
         auto templateRuntimeEngineImpl = aace::engine::alexa::TemplateRuntimeEngineImpl::create(
             m_alexaMockFactory->getTemplateRuntimeMock(),
             m_alexaMockFactory->getEndpointBuilderMock(),
@@ -84,33 +77,32 @@ protected:
             m_alexaMockFactory->getFocusManagerInterfaceMock(),
             m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
             m_alexaMockFactory->getDialogUXStateAggregatorMock(),
-            m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock() );
-        
+            m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock());
+
         return templateRuntimeEngineImpl;
     }
-    
-    std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>> m_playerInfoInterfaceMock;
-    
+
+    std::unordered_set<
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>>
+        m_playerInfoInterfaceMock;
+
 protected:
     std::shared_ptr<AlexaMockComponentFactory> m_alexaMockFactory;
 
 private:
     bool m_initialized = false;
     bool m_configured = false;
-    
 };
 
-TEST_F(TemplateRuntimeEngineImplTest, create)
-{
+TEST_F(TemplateRuntimeEngineImplTest, create) {
     auto templateRuntimeEngineImpl = createTemplateRuntimeEngineImpl();
-    ASSERT_NE(templateRuntimeEngineImpl,nullptr) << "TemplateRuntimeEngineImpl pointer expected to be not null";
-    
+    ASSERT_NE(templateRuntimeEngineImpl, nullptr) << "TemplateRuntimeEngineImpl pointer expected to be not null";
+
     templateRuntimeEngineImpl->shutdown();
 }
 
-TEST_F(TemplateRuntimeEngineImplTest,createWithPlatformInterfaceAsNull)
-{
-    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),doShutdown());
+TEST_F(TemplateRuntimeEngineImplTest, createWithPlatformInterfaceAsNull) {
+    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(), doShutdown());
 
     auto templateRuntimeEngineImpl = aace::engine::alexa::TemplateRuntimeEngineImpl::create(
         nullptr,
@@ -119,13 +111,12 @@ TEST_F(TemplateRuntimeEngineImplTest,createWithPlatformInterfaceAsNull)
         m_alexaMockFactory->getFocusManagerInterfaceMock(),
         m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getDialogUXStateAggregatorMock(),
-        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock() );
- 
-    ASSERT_EQ(templateRuntimeEngineImpl,nullptr) << "TemplateRuntimeEngineImpl pointer expected to be null";
+        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock());
+
+    ASSERT_EQ(templateRuntimeEngineImpl, nullptr) << "TemplateRuntimeEngineImpl pointer expected to be null";
 }
 
-TEST_F(TemplateRuntimeEngineImplTest,createWithDirectiveSequencerAsNull)
-{
+TEST_F(TemplateRuntimeEngineImplTest, createWithDirectiveSequencerAsNull) {
     auto templateRuntimeEngineImpl = aace::engine::alexa::TemplateRuntimeEngineImpl::create(
         m_alexaMockFactory->getTemplateRuntimeMock(),
         nullptr,
@@ -133,14 +124,13 @@ TEST_F(TemplateRuntimeEngineImplTest,createWithDirectiveSequencerAsNull)
         m_alexaMockFactory->getFocusManagerInterfaceMock(),
         m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getDialogUXStateAggregatorMock(),
-        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock() );
-    
-    ASSERT_EQ(templateRuntimeEngineImpl,nullptr) << "TemplateRuntimeEngineImpl pointer expected to be null";
+        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock());
+
+    ASSERT_EQ(templateRuntimeEngineImpl, nullptr) << "TemplateRuntimeEngineImpl pointer expected to be null";
 }
 
-TEST_F(TemplateRuntimeEngineImplTest,createWithFocusManagerAsNull)
-{
-    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),doShutdown());
+TEST_F(TemplateRuntimeEngineImplTest, createWithFocusManagerAsNull) {
+    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(), doShutdown());
 
     auto templateRuntimeEngineImpl = aace::engine::alexa::TemplateRuntimeEngineImpl::create(
         m_alexaMockFactory->getTemplateRuntimeMock(),
@@ -149,14 +139,13 @@ TEST_F(TemplateRuntimeEngineImplTest,createWithFocusManagerAsNull)
         nullptr,
         m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getDialogUXStateAggregatorMock(),
-        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock() );
-    
-    ASSERT_EQ(templateRuntimeEngineImpl,nullptr) << "TemplateRuntimeEngineImpl pointer expected to be null";
+        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock());
+
+    ASSERT_EQ(templateRuntimeEngineImpl, nullptr) << "TemplateRuntimeEngineImpl pointer expected to be null";
 }
 
-TEST_F(TemplateRuntimeEngineImplTest, createWithCapabilitiesDelegateAsNull)
-{
-    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),doShutdown());
+TEST_F(TemplateRuntimeEngineImplTest, createWithCapabilitiesDelegateAsNull) {
+    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(), doShutdown());
 
     auto templateRuntimeEngineImpl = aace::engine::alexa::TemplateRuntimeEngineImpl::create(
         m_alexaMockFactory->getTemplateRuntimeMock(),
@@ -165,14 +154,13 @@ TEST_F(TemplateRuntimeEngineImplTest, createWithCapabilitiesDelegateAsNull)
         m_alexaMockFactory->getFocusManagerInterfaceMock(),
         nullptr,
         m_alexaMockFactory->getDialogUXStateAggregatorMock(),
-        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock() );
-    
-    ASSERT_EQ(templateRuntimeEngineImpl,nullptr) << "TemplateRuntimeEngineImpl pointer expected to be null";
+        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock());
+
+    ASSERT_EQ(templateRuntimeEngineImpl, nullptr) << "TemplateRuntimeEngineImpl pointer expected to be null";
 }
 
-TEST_F(TemplateRuntimeEngineImplTest,createWithDialogUXStateAggregatorAsNull)
-{
-    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),doShutdown());
+TEST_F(TemplateRuntimeEngineImplTest, createWithDialogUXStateAggregatorAsNull) {
+    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(), doShutdown());
 
     auto templateRuntimeEngineImpl = aace::engine::alexa::TemplateRuntimeEngineImpl::create(
         m_alexaMockFactory->getTemplateRuntimeMock(),
@@ -181,14 +169,13 @@ TEST_F(TemplateRuntimeEngineImplTest,createWithDialogUXStateAggregatorAsNull)
         m_alexaMockFactory->getFocusManagerInterfaceMock(),
         m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         nullptr,
-        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock() );
-    
-    ASSERT_EQ(templateRuntimeEngineImpl,nullptr) << "TemplateRuntimeEngineImpl pointer expected to be null";
+        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock());
+
+    ASSERT_EQ(templateRuntimeEngineImpl, nullptr) << "TemplateRuntimeEngineImpl pointer expected to be null";
 }
 
-TEST_F(TemplateRuntimeEngineImplTest,createWithExceptionSenderAsNull)
-{
-    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),doShutdown());
+TEST_F(TemplateRuntimeEngineImplTest, createWithExceptionSenderAsNull) {
+    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(), doShutdown());
 
     auto templateRuntimeEngineImpl = aace::engine::alexa::TemplateRuntimeEngineImpl::create(
         m_alexaMockFactory->getTemplateRuntimeMock(),
@@ -197,26 +184,29 @@ TEST_F(TemplateRuntimeEngineImplTest,createWithExceptionSenderAsNull)
         m_alexaMockFactory->getFocusManagerInterfaceMock(),
         m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getDialogUXStateAggregatorMock(),
-        nullptr );
-    
-    ASSERT_EQ(templateRuntimeEngineImpl,nullptr) << "TemplateRuntimeEngineImpl pointer expected to be null";
+        nullptr);
+
+    ASSERT_EQ(templateRuntimeEngineImpl, nullptr) << "TemplateRuntimeEngineImpl pointer expected to be null";
 }
 
-TEST_F(TemplateRuntimeEngineImplTest,validateTemplateRuntimeCallbacks)
-{
+TEST_F(TemplateRuntimeEngineImplTest, validateTemplateRuntimeCallbacks) {
     auto templateRuntimeEngineImpl = createTemplateRuntimeEngineImpl();
-    ASSERT_NE(templateRuntimeEngineImpl,nullptr) << "TemplateRuntimeEngineImpl pointer expected to be not null";
-    
-    EXPECT_CALL(*m_alexaMockFactory->getTemplateRuntimeMock(),renderTemplate(testing::StrEq("TEMPLATE_PAYLOAD")));
-    templateRuntimeEngineImpl->renderTemplateCard( "TEMPLATE_PAYLOAD", alexaClientSDK::avsCommon::avs::FocusState::FOREGROUND );
+    ASSERT_NE(templateRuntimeEngineImpl, nullptr) << "TemplateRuntimeEngineImpl pointer expected to be not null";
 
-    EXPECT_CALL(*m_alexaMockFactory->getTemplateRuntimeMock(),clearTemplate());
+    EXPECT_CALL(*m_alexaMockFactory->getTemplateRuntimeMock(), renderTemplate(testing::StrEq("TEMPLATE_PAYLOAD")));
+    templateRuntimeEngineImpl->renderTemplateCard(
+        "TEMPLATE_PAYLOAD", alexaClientSDK::avsCommon::avs::FocusState::FOREGROUND);
+
+    EXPECT_CALL(*m_alexaMockFactory->getTemplateRuntimeMock(), clearTemplate());
     templateRuntimeEngineImpl->clearTemplateCard();
 
-    EXPECT_CALL(*m_alexaMockFactory->getTemplateRuntimeMock(),renderPlayerInfo(testing::StrEq("PLAYER_INFO_PAYLOAD")));
-    templateRuntimeEngineImpl->renderPlayerInfoCard( "PLAYER_INFO_PAYLOAD", alexaClientSDK::avsCommon::sdkInterfaces::TemplateRuntimeObserverInterface::AudioPlayerInfo(), alexaClientSDK::avsCommon::avs::FocusState::FOREGROUND );
+    EXPECT_CALL(*m_alexaMockFactory->getTemplateRuntimeMock(), renderPlayerInfo(testing::StrEq("PLAYER_INFO_PAYLOAD")));
+    templateRuntimeEngineImpl->renderPlayerInfoCard(
+        "PLAYER_INFO_PAYLOAD",
+        alexaClientSDK::avsCommon::sdkInterfaces::TemplateRuntimeObserverInterface::AudioPlayerInfo(),
+        alexaClientSDK::avsCommon::avs::FocusState::FOREGROUND);
 
-    EXPECT_CALL(*m_alexaMockFactory->getTemplateRuntimeMock(),clearPlayerInfo());
+    EXPECT_CALL(*m_alexaMockFactory->getTemplateRuntimeMock(), clearPlayerInfo());
     templateRuntimeEngineImpl->clearPlayerInfoCard();
 
     templateRuntimeEngineImpl->shutdown();

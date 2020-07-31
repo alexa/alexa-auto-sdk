@@ -16,7 +16,6 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-
 #include <AACE/Test/Alexa/AlexaTestHelper.h>
 #include <AACE/Engine/Alexa/AuthProviderEngineImpl.h>
 
@@ -31,27 +30,24 @@ public:
     void TearDown() override {
         m_alexaMockFactory->shutdown();
     }
-    
+
 protected:
     std::shared_ptr<aace::engine::alexa::AuthProviderEngineImpl> createAuthProviderEngineImpl() {
-        return aace::engine::alexa::AuthProviderEngineImpl::create( m_alexaMockFactory->getAuthProviderMock() );
+        return aace::engine::alexa::AuthProviderEngineImpl::create(m_alexaMockFactory->getAuthProviderMock());
     }
-    
+
 protected:
     std::shared_ptr<AlexaMockComponentFactory> m_alexaMockFactory;
 };
 
-TEST_F(AuthProviderEngineImplTest,create)
-{
+TEST_F(AuthProviderEngineImplTest, create) {
     auto authProviderEngineImpl = createAuthProviderEngineImpl();
-    ASSERT_NE(authProviderEngineImpl,nullptr) << "AuthProviderEngineImpl pointer is null!";
-    
+    ASSERT_NE(authProviderEngineImpl, nullptr) << "AuthProviderEngineImpl pointer is null!";
+
     authProviderEngineImpl->shutdown();
 }
 
-TEST_F(AuthProviderEngineImplTest,createWithPlatformInterfaceAsNull)
-{
-    auto authProviderEngineImpl = aace::engine::alexa::AuthProviderEngineImpl::create( nullptr );
-    ASSERT_EQ(authProviderEngineImpl,nullptr) << "AuthProviderEngineImpl pointer expected to be null!";
+TEST_F(AuthProviderEngineImplTest, createWithPlatformInterfaceAsNull) {
+    auto authProviderEngineImpl = aace::engine::alexa::AuthProviderEngineImpl::create(nullptr);
+    ASSERT_EQ(authProviderEngineImpl, nullptr) << "AuthProviderEngineImpl pointer expected to be null!";
 }
-

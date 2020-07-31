@@ -23,60 +23,56 @@ namespace aace {
 namespace jni {
 namespace alexa {
 
-    class NotificationsHandler : public aace::alexa::Notifications {
-    public:
-        NotificationsHandler( jobject obj );
+class NotificationsHandler : public aace::alexa::Notifications {
+public:
+    NotificationsHandler(jobject obj);
 
-        // aace::alexa::Notifications
-        void setIndicator( IndicatorState state ) override;
+    // aace::alexa::Notifications
+    void setIndicator(IndicatorState state) override;
 
-        void onNotificationReceived() override;
+    void onNotificationReceived() override;
 
-    private:
-        JObject m_obj;
-    };
+private:
+    JObject m_obj;
+};
 
-    class NotificationsBinder : public aace::jni::core::PlatformInterfaceBinder {
-    public:
-        NotificationsBinder( jobject obj );
+class NotificationsBinder : public aace::jni::core::PlatformInterfaceBinder {
+public:
+    NotificationsBinder(jobject obj);
 
-        std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
-            return m_notificationsHandler;
-        }
+    std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
+        return m_notificationsHandler;
+    }
 
-        std::shared_ptr<NotificationsHandler> getNotifications() {
-            return m_notificationsHandler;
-        }
+    std::shared_ptr<NotificationsHandler> getNotifications() {
+        return m_notificationsHandler;
+    }
 
-    private:
-        std::shared_ptr<NotificationsHandler> m_notificationsHandler;
-    };
+private:
+    std::shared_ptr<NotificationsHandler> m_notificationsHandler;
+};
 
-    //
-    // JIndicatorStateConfig
-    //
+//
+// JIndicatorStateConfig
+//
 
-    class JIndicatorStateConfig : public EnumConfiguration<NotificationsHandler::IndicatorState> {
-    public:
-        using T = NotificationsHandler::IndicatorState;
+class JIndicatorStateConfig : public EnumConfiguration<NotificationsHandler::IndicatorState> {
+public:
+    using T = NotificationsHandler::IndicatorState;
 
-        const char* getClassName() override {
-            return "com/amazon/aace/alexa/Notifications$IndicatorState";
-        }
+    const char* getClassName() override {
+        return "com/amazon/aace/alexa/Notifications$IndicatorState";
+    }
 
-        std::vector<std::pair<T,std::string>> getConfiguration() override {
-            return {
-                {T::OFF,"OFF"},
-                {T::ON,"ON"},
-                {T::UNKNOWN,"UNKNOWN"}
-            };
-        }
-    };
+    std::vector<std::pair<T, std::string>> getConfiguration() override {
+        return {{T::OFF, "OFF"}, {T::ON, "ON"}, {T::UNKNOWN, "UNKNOWN"}};
+    }
+};
 
-    using JIndicatorState = JEnum<NotificationsHandler::IndicatorState,JIndicatorStateConfig>;
+using JIndicatorState = JEnum<NotificationsHandler::IndicatorState, JIndicatorStateConfig>;
 
-} // aace::alexa
-} // aace::jni
-} // aace
+}  // namespace alexa
+}  // namespace jni
+}  // namespace aace
 
-#endif // AACE_JNI_ALEXA_NOTIFICATIONS_BINDER_H
+#endif  // AACE_JNI_ALEXA_NOTIFICATIONS_BINDER_H

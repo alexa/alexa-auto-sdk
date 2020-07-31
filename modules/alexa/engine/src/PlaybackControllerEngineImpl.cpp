@@ -23,9 +23,10 @@ namespace alexa {
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.PlaybackControllerEngineImpl");
 
-PlaybackControllerEngineImpl::PlaybackControllerEngineImpl( std::shared_ptr<aace::alexa::PlaybackController> playbackControllerPlatformInterface ) :
-    alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
-    m_playbackControllerPlatformInterface( playbackControllerPlatformInterface ) {
+PlaybackControllerEngineImpl::PlaybackControllerEngineImpl(
+    std::shared_ptr<aace::alexa::PlaybackController> playbackControllerPlatformInterface) :
+        alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
+        m_playbackControllerPlatformInterface(playbackControllerPlatformInterface) {
 }
 
 bool PlaybackControllerEngineImpl::initialize(
@@ -33,23 +34,23 @@ bool PlaybackControllerEngineImpl::initialize(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager ) {
-    
-    try
-    {
-        m_playbackControllerCapabilityAgent = alexaClientSDK::capabilityAgents::playbackController::PlaybackController::create( contextManager, messageSender, focusManager );
-        ThrowIfNull( m_playbackControllerCapabilityAgent, "couldNotCreateCapabilityAgent" );
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager) {
+    try {
+        m_playbackControllerCapabilityAgent =
+            alexaClientSDK::capabilityAgents::playbackController::PlaybackController::create(
+                contextManager, messageSender, focusManager);
+        ThrowIfNull(m_playbackControllerCapabilityAgent, "couldNotCreateCapabilityAgent");
 
-        m_playbackRouter = alexaClientSDK::capabilityAgents::playbackController::PlaybackRouter::create( m_playbackControllerCapabilityAgent );
-        ThrowIfNull( m_playbackRouter, "couldNotCreatePlaybackRouter" );
+        m_playbackRouter = alexaClientSDK::capabilityAgents::playbackController::PlaybackRouter::create(
+            m_playbackControllerCapabilityAgent);
+        ThrowIfNull(m_playbackRouter, "couldNotCreatePlaybackRouter");
 
         // register capability configuration with the default endpoint
-        defaultEndpointBuilder->withCapabilityConfiguration( m_playbackControllerCapabilityAgent );
+        defaultEndpointBuilder->withCapabilityConfiguration(m_playbackControllerCapabilityAgent);
 
         return true;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"initialize").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "initialize").d("reason", ex.what()));
         return false;
     }
 }
@@ -60,60 +61,61 @@ std::shared_ptr<PlaybackControllerEngineImpl> PlaybackControllerEngineImpl::crea
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager ) {
-
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager) {
     std::shared_ptr<PlaybackControllerEngineImpl> playbackControllerEngineImpl = nullptr;
 
-    try
-    {
-        ThrowIfNull( playbackControllerPlatformInterface, "invalidPlaybackControllerPlatformInterface" );
-        ThrowIfNull( defaultEndpointBuilder, "invalidDefaultEndpointBuilder" );
-        ThrowIfNull( messageSender, "invalidMessageSender" );
-        ThrowIfNull( contextManager, "invalidContextManager" );
-        ThrowIfNull( capabilitiesDelegate, "invalidCapabilitiesDelegate" );
-        ThrowIfNull( focusManager, "invalidFocusManager" );
+    try {
+        ThrowIfNull(playbackControllerPlatformInterface, "invalidPlaybackControllerPlatformInterface");
+        ThrowIfNull(defaultEndpointBuilder, "invalidDefaultEndpointBuilder");
+        ThrowIfNull(messageSender, "invalidMessageSender");
+        ThrowIfNull(contextManager, "invalidContextManager");
+        ThrowIfNull(capabilitiesDelegate, "invalidCapabilitiesDelegate");
+        ThrowIfNull(focusManager, "invalidFocusManager");
 
-        playbackControllerEngineImpl = std::shared_ptr<PlaybackControllerEngineImpl>( new PlaybackControllerEngineImpl( playbackControllerPlatformInterface ) );
+        playbackControllerEngineImpl = std::shared_ptr<PlaybackControllerEngineImpl>(
+            new PlaybackControllerEngineImpl(playbackControllerPlatformInterface));
 
-        ThrowIfNot( playbackControllerEngineImpl->initialize( defaultEndpointBuilder, messageSender, contextManager, capabilitiesDelegate, focusManager ), "initializePlaybackControllerEngineImplFailed" );
+        ThrowIfNot(
+            playbackControllerEngineImpl->initialize(
+                defaultEndpointBuilder, messageSender, contextManager, capabilitiesDelegate, focusManager),
+            "initializePlaybackControllerEngineImplFailed");
 
         // set the platform engine interface reference
-        playbackControllerPlatformInterface->setEngineInterface( playbackControllerEngineImpl );
+        playbackControllerPlatformInterface->setEngineInterface(playbackControllerEngineImpl);
 
         return playbackControllerEngineImpl;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"create").d("reason", ex.what()));
-        if( playbackControllerEngineImpl != nullptr ) {
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "create").d("reason", ex.what()));
+        if (playbackControllerEngineImpl != nullptr) {
             playbackControllerEngineImpl->shutdown();
         }
         return nullptr;
     }
 }
 
-void PlaybackControllerEngineImpl::doShutdown()
-{
-    if( m_playbackRouter != nullptr ) {
+void PlaybackControllerEngineImpl::doShutdown() {
+    if (m_playbackRouter != nullptr) {
         m_playbackRouter->shutdown();
     }
 
-    if( m_playbackControllerCapabilityAgent != nullptr ) {
+    if (m_playbackControllerCapabilityAgent != nullptr) {
         m_playbackControllerCapabilityAgent->shutdown();
     }
 }
 
-std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> PlaybackControllerEngineImpl::getPlaybackRouter() {
+std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> PlaybackControllerEngineImpl::
+    getPlaybackRouter() {
     return m_playbackRouter;
 }
-    
+
 void PlaybackControllerEngineImpl::onButtonPressed(PlaybackButton button) {
-    m_playbackRouter->buttonPressed(static_cast<alexaClientSDK::avsCommon::avs::PlaybackButton>( button ));
+    m_playbackRouter->buttonPressed(static_cast<alexaClientSDK::avsCommon::avs::PlaybackButton>(button));
 }
 
 void PlaybackControllerEngineImpl::onTogglePressed(PlaybackToggle toggle, bool action) {
-    m_playbackRouter->togglePressed(static_cast<alexaClientSDK::avsCommon::avs::PlaybackToggle>( toggle ), action);
+    m_playbackRouter->togglePressed(static_cast<alexaClientSDK::avsCommon::avs::PlaybackToggle>(toggle), action);
 }
-    
-} // aace::engine::alexa
-} // aace::engine
-} // aace
+
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace

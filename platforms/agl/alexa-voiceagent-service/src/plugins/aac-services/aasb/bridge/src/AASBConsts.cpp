@@ -310,6 +310,6 @@ const std::string VALUE_PLAYERACTIVITY_PLAYING = "playing";
 const std::string VALUE_PLAYERACTIVITY_STOPPED = "stopped`";
 const std::string VALUE_PLAYERACTIVITY_PAUSED = "paused";
 const std::string VALUE_PLAYERACTIVITY_BUFFER_UNDERRUN = "bufferUnderrun";
-const std::string VALUE_PLAYERACTIVITY_FINISHED = "finished";      	
+const std::string VALUE_PLAYERACTIVITY_FINISHED = "finished";
 }  // namespace bridge
 }  // namespace aasb

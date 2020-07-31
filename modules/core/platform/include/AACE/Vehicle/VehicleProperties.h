@@ -29,8 +29,8 @@ namespace property {
  */
 static const std::string OPERATING_COUNTRY = "aace.vehicle.operatingCountry";
 
-} // aace::vehicle::property
-} // aace::vehicle
-} // aace
+}  // namespace property
+}  // namespace vehicle
+}  // namespace aace
 
-#endif // AACE_VEHICLE_PROPERTY_VEHICLE_PROPERTIES_H
+#endif  // AACE_VEHICLE_PROPERTY_VEHICLE_PROPERTIES_H

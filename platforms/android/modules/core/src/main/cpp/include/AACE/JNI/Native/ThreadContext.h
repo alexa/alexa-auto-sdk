@@ -22,22 +22,22 @@ namespace aace {
 namespace jni {
 namespace native {
 
-    class ThreadContext {
-    public:
-        ThreadContext();
-        ~ThreadContext();
+class ThreadContext {
+public:
+    ThreadContext();
+    ~ThreadContext();
 
-        bool isValid();
+    bool isValid();
 
-        JNIEnv* getEnv();
+    JNIEnv* getEnv();
 
-    private:
-        JNIEnv* m_env;
-        bool m_detatch;
-    };
+private:
+    JNIEnv* m_env;
+    bool m_detatch;
+};
 
-} // aace::jni::native
-} // aace::jni
-} // aace
+}  // namespace native
+}  // namespace jni
+}  // namespace aace
 
-#endif // AACE_JNI_NATIVE_THREAD_CONTEXT_H
+#endif  // AACE_JNI_NATIVE_THREAD_CONTEXT_H

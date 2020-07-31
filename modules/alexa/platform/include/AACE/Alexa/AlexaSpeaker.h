@@ -54,7 +54,7 @@ public:
      * @param [in] mute The mute setting of the Speaker. @c true when the Speaker is muted,
      * else @c false.
      */
-    virtual void speakerSettingsChanged( SpeakerType type, bool local, int8_t volume, bool mute );
+    virtual void speakerSettingsChanged(SpeakerType type, bool local, int8_t volume, bool mute);
 
     /**
      * Notifies the Engine of a volume change event
@@ -66,8 +66,8 @@ public:
      * @param [in] volume The new volume setting of the Speaker. The @c volume reported
      * must be scaled to the range [0,100].
      */
-    void localSetVolume( SpeakerType type, int8_t volume );
-    
+    void localSetVolume(SpeakerType type, int8_t volume);
+
     /**
      * Notifies the Engine of a relative adjustment to the volume setting of the Speaker, 
      * originating on the platform.
@@ -79,8 +79,8 @@ public:
      * @param [in] delta The volume adjustment to apply to the Speaker. @c delta is
      * in the range [-100, 100].
      */
-    void localAdjustVolume( SpeakerType type, int8_t delta );
-    
+    void localAdjustVolume(SpeakerType type, int8_t delta);
+
     /**
      * Notifies the Engine of a mute setting change event
      * originating on the platform, such as a user pressing a "mute" button.
@@ -91,7 +91,7 @@ public:
      * @param [in] mute The new mute setting of the Speaker. @c true when the Speaker is muted,
      * else @c false
      */
-    void localSetMute( SpeakerType type, bool mute );
+    void localSetMute(SpeakerType type, bool mute);
 
     /**
      * @internal
@@ -99,13 +99,13 @@ public:
      *
      * Should *never* be called by the platform implementation.
      */
-    void setEngineInterface( std::shared_ptr<aace::alexa::AlexaSpeakerEngineInterface> alexaSpeakerEngineInterface );
+    void setEngineInterface(std::shared_ptr<aace::alexa::AlexaSpeakerEngineInterface> alexaSpeakerEngineInterface);
 
 private:
     std::weak_ptr<aace::alexa::AlexaSpeakerEngineInterface> m_alexaSpeakerEngineInterface;
 };
 
-} // aace::alexa
-} // aace
+}  // namespace alexa
+}  // namespace aace
 
-#endif // AACE_ALEXA_ALEXA_SPEAKER_H
+#endif  // AACE_ALEXA_ALEXA_SPEAKER_H

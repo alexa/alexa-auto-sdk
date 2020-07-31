@@ -33,7 +33,6 @@ namespace systemAudio {
 static const std::string TAG("aace.systemAudio.AudioOutputImpl");
 
 static constexpr size_t READ_BUFFER_SIZE = 4096;
-static constexpr std::chrono::milliseconds NEXT_READ_PERIOD(100);
 
 std::ostream& operator<<(std::ostream& stream, AudioOutputImpl::State state) {
     switch (state) {
@@ -98,7 +97,11 @@ static aal_listener_t aalListener = {
         auto self = static_cast<AudioOutputImpl*>(user_data);
         self->onStop(reason);
     },
-    .on_almost_done = nullptr,
+    .on_almost_done = [](void* user_data) {
+        ReturnIf(!user_data);
+        auto self = static_cast<AudioOutputImpl*>(user_data);
+        self->onAlmostDone();
+    },
     .on_data = nullptr,
     .on_data_requested = [](void* user_data) {
         ReturnIf(!user_data);
@@ -109,7 +112,7 @@ static aal_listener_t aalListener = {
 // clang-format on
 
 AudioOutputImpl::AudioOutputImpl(const int moduleId, const std::string& deviceName, const std::string& name) :
-    m_moduleId(moduleId), m_name(name), m_deviceName(deviceName) {
+        m_moduleId(moduleId), m_name(name), m_deviceName(deviceName) {
 }
 
 AudioOutputImpl::~AudioOutputImpl() {
@@ -126,7 +129,9 @@ AudioOutputImpl::~AudioOutputImpl() {
 }
 
 std::unique_ptr<AudioOutputImpl> AudioOutputImpl::create(
-    const int moduleId, const std::string& deviceName, const std::string& name) {
+    const int moduleId,
+    const std::string& deviceName,
+    const std::string& name) {
     try {
         auto audioOutput = std::unique_ptr<AudioOutputImpl>(new AudioOutputImpl(moduleId, deviceName, name));
 
@@ -187,24 +192,34 @@ bool AudioOutputImpl::writeStreamToPipeline() {
     try {
         ThrowIfNull(m_currentStream, "invalidAudioStream");
 
+        constexpr std::chrono::milliseconds RETRY_INTERVAL(100);
         char buffer[READ_BUFFER_SIZE];
-        auto size = m_currentStream->read(buffer, READ_BUFFER_SIZE);
+        ssize_t size;
 
-        // throw an error if the read failed
-        ThrowIf(size < 0, "readFromStreamFailed");
-
-        if (size > 0) {
-            // write the data to the player's pipeline
-            ThrowIf(aal_player_write(m_player, buffer, size) < 0, "writeToPipelineFailed");
-        } else {
+        while (m_streaming) {
+            size = m_currentStream->read(buffer, READ_BUFFER_SIZE);
+            ThrowIf(size < 0, "readFromStreamFailed");
+            if (size > 0) {
+                break;
+            }
             if (m_currentStream->isClosed()) {
                 aal_player_notify_end_of_stream(m_player);
                 return false;
-            } else {
-                // if we didn't read any data and the stream is not closed, then
-                // sleep some mount of time before next read
-                std::this_thread::sleep_for(NEXT_READ_PERIOD);
             }
+            // if we didn't read any data and the stream is not closed, then
+            // sleep some mount of time before next read
+            std::this_thread::sleep_for(RETRY_INTERVAL);
+        }
+
+        // write the data to the player's pipeline
+        while (m_streaming) {
+            int written = aal_player_write(m_player, buffer, size);
+            ThrowIf(written < 0, "writeToPipelineFailed");
+            if (written > 0) {
+                ThrowIf(written != size, "writeToPipelinePartially");
+                break;
+            }
+            std::this_thread::sleep_for(RETRY_INTERVAL);
         }
 
         return true;
@@ -225,7 +240,7 @@ void AudioOutputImpl::onStart() {
 void AudioOutputImpl::executeOnStart() {
     AACE_VERBOSE(LXT);
     if (checkState({State::Started})) {
-        return; // repeated start
+        return;  // repeated start
     }
     if (!checkState({
             State::Starting,  // the first starting
@@ -240,6 +255,11 @@ void AudioOutputImpl::executeOnStart() {
 
 void AudioOutputImpl::onStop(aal_status_t reason) {
     m_executor.submit([this, reason] { executeOnStop(reason); });
+}
+
+void AudioOutputImpl::onAlmostDone() {
+    int64_t almostDonePosition = aal_player_get_position(m_player);
+    m_executor.submit([this, almostDonePosition] { m_currentPosition = almostDonePosition; });
 }
 
 void AudioOutputImpl::executeOnStop(aal_status_t reason) {
@@ -268,13 +288,13 @@ void AudioOutputImpl::executeOnStop(aal_status_t reason) {
                     preparePlayer(m_mediaQueue.front(), nullptr);
                     if (m_player) {
                         aal_player_play(m_player);
-                        return; // no state change
+                        return;  // no state change
                     }
                 } else if (m_repeating && !m_mediaUrl.empty()) {
                     // play the URL again
                     if (prepareLocked(m_mediaUrl, nullptr, m_repeating)) {
                         aal_player_play(m_player);
-                        return; // no state change
+                        return;  // no state change
                     }
                 }
             }
@@ -328,10 +348,10 @@ bool AudioOutputImpl::prepare(std::shared_ptr<aace::audio::AudioStream> stream, 
 
 bool AudioOutputImpl::executePrepare(std::shared_ptr<aace::audio::AudioStream> stream, bool repeating) {
     if (!checkState({
-                        State::Initialized,  // new one
-                        State::Stopped,      // completed
-                        State::Faulted,      // failed last time
-                    })) {
+            State::Initialized,  // new one
+            State::Stopped,      // completed
+            State::Faulted,      // failed last time
+        })) {
         AACE_WARN(LXT.d("reason", "suspicious state change").d("state", m_state));
     }
 
@@ -396,57 +416,80 @@ bool AudioOutputImpl::executePrepare(const std::string& url, bool repeating) {
     return succeeded;
 }
 
-std::vector<std::string> AudioOutputImpl::parsePlaylistUrl(const std::string& url) {
-    using alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPContentFetcherFactory;
-    using alexaClientSDK::avsCommon::utils::playlistParser::PlaylistEntry;
-    using alexaClientSDK::avsCommon::utils::playlistParser::PlaylistParserObserverInterface;
-    using alexaClientSDK::playlistParser::PlaylistParser;
-    using alexaClientSDK::avsCommon::utils::playlistParser::PlaylistParseResult;
-    const auto PLAYLIST_TIMEOUT = std::chrono::seconds(10);
+using alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPContentFetcherFactory;
+using alexaClientSDK::avsCommon::utils::playlistParser::PlaylistEntry;
+using alexaClientSDK::avsCommon::utils::playlistParser::PlaylistParseResult;
+using alexaClientSDK::avsCommon::utils::playlistParser::PlaylistParserObserverInterface;
+using alexaClientSDK::playlistParser::PlaylistParser;
 
-    auto fetcherFactory = std::make_shared<HTTPContentFetcherFactory>();
-    auto parser = PlaylistParser::create(fetcherFactory);
-
-    struct PlaylistParserObserver : public PlaylistParserObserverInterface {
-        std::vector<std::string> entries;
-        std::promise<std::vector<std::string>> promise;
-        void onPlaylistEntryParsed(int requestId, PlaylistEntry playlistEntry) override {
-            if (playlistEntry.parseResult == PlaylistParseResult::STILL_ONGOING) {
-                entries.emplace_back(playlistEntry.url);
-            } else if (playlistEntry.parseResult == PlaylistParseResult::FINISHED) {
-                entries.emplace_back(playlistEntry.url);
-                promise.set_value(entries);
-            } else if (playlistEntry.parseResult == PlaylistParseResult::ERROR) {
+struct PlaylistParserObserver : public PlaylistParserObserverInterface {
+    std::vector<std::string> entries;
+    std::promise<std::vector<std::string>> promise;
+    std::promise<std::vector<std::string>> fallbackPromise;
+    void onPlaylistEntryParsed(int requestId, PlaylistEntry playlistEntry) override {
+        if (playlistEntry.parseResult == PlaylistParseResult::STILL_ONGOING) {
+            entries.emplace_back(playlistEntry.url);
+            if (entries.size() == 1) {
+                // We got the first entry. Use it as the fallback solution.
+                fallbackPromise.set_value(entries);
+            }
+        } else if (playlistEntry.parseResult == PlaylistParseResult::FINISHED) {
+            entries.emplace_back(playlistEntry.url);
+            promise.set_value(entries);
+        } else if (playlistEntry.parseResult == PlaylistParseResult::ERROR) {
+            if (entries.empty()) {
                 try {
                     throw std::runtime_error("error occurred while parsing playlist");
                 } catch (...) {
                     // store anything thrown in the promise
                     promise.set_exception(std::current_exception());
                 }
+            } else {
+                // We got some entries. Ignore the final error result.
+                promise.set_value(entries);
             }
         }
-    };
+    }
+};
+
+std::vector<std::string> AudioOutputImpl::parsePlaylistUrl(const std::string& url) {
+    auto fetcherFactory = std::make_shared<HTTPContentFetcherFactory>();
+    auto parser = PlaylistParser::create(fetcherFactory);
     auto observer = std::make_shared<PlaylistParserObserver>();
+
     if (parser->parsePlaylist(url, observer) == PlaylistParser::START_FAILURE) {
         AACE_ERROR(LXT.d("reason", "failed to start playlist parser"));
-        return std::vector<std::string>{url};
+        return {url};
     }
-    auto future = observer->promise.get_future();
-    if (future.wait_for(PLAYLIST_TIMEOUT) != std::future_status::ready) {
-        AACE_ERROR(LXT.d("reason", "parsing playlist timeout"));
-        return std::vector<std::string>{url};
-    }
+
     try {
-        auto result = future.get();  // return the first successfully parsed entry
+        const auto PLAYLIST_TIMEOUT = std::chrono::seconds(10);
+        auto future = observer->promise.get_future();
+        if (future.wait_for(PLAYLIST_TIMEOUT) == std::future_status::ready) {
+            parser->shutdown();
+            return future.get();  // return successfully parsed entries
+        }
+
+        AACE_ERROR(LXT.d("reason", "parsing playlist timeout"));
         parser->shutdown();
-        return result;
+
+        auto fallbackFuture = observer->fallbackPromise.get_future();
+        if (fallbackFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+            AACE_INFO(LXT.m("use what we got so far"));
+            return fallbackFuture.get();
+        }
+
+        return {url};
     } catch (const std::exception& e) {
         AACE_ERROR(LXT.d("reason", e.what()));
-        return std::vector<std::string>{url};
+        return {url};
     }
 }
 
-bool AudioOutputImpl::prepareLocked(const std::string& url, std::shared_ptr<aace::audio::AudioStream> stream, bool repeating) {
+bool AudioOutputImpl::prepareLocked(
+    const std::string& url,
+    std::shared_ptr<aace::audio::AudioStream> stream,
+    bool repeating) {
     bool succeeded;
     try {
         AACE_INFO(LXT.sensitive("url", url).d("repeating", repeating));
@@ -456,7 +499,8 @@ bool AudioOutputImpl::prepareLocked(const std::string& url, std::shared_ptr<aace
         if (stream) {  // Source is audio stream
             preparePlayer(url, stream);
         } else {
-            static std::regex regex_playlist(R"(^(http|https):\/\/.+\.(ashx|m3u|pls)(\?.*)?$)", std::regex::optimize | std::regex::icase);
+            static std::regex regex_playlist(
+                R"(^(http|https):\/\/.+\.(ashx|m3u|pls)(\?.*)?$)", std::regex::optimize | std::regex::icase);
             if (std::regex_match(url, regex_playlist)) {
                 auto entries = parsePlaylistUrl(url);
                 std::copy(entries.begin(), entries.end(), std::back_inserter(m_mediaQueue));
@@ -516,8 +560,8 @@ void AudioOutputImpl::preparePlayer(const std::string& url, std::shared_ptr<aace
         aal_audio_parameters_t audio_params;
         audio_params.stream_type = AAL_STREAM_LPCM;
         audio_params.lpcm = {.sample_format = AAL_SAMPLE_FORMAT_S16LE,
-            .channels = af.getNumChannels(),
-            .sample_rate = (int)af.getSampleRate()};
+                             .channels = af.getNumChannels(),
+                             .sample_rate = (int)af.getSampleRate()};
 
         m_player = aal_player_create(&attr, &audio_params);
     } else {

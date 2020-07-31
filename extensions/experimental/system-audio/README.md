@@ -21,6 +21,8 @@ Currently the System Audio extension supports:
 * [GStreamer](https://gstreamer.freedesktop.org/) tested with:
   * Generic Linux (Ubuntu 18.04)
       >**Note:** You'll need extra GStreamer plugins to play content from Amazon Music (which uses HLS) and other Music Service Providers. Installing plugins such as `gst-plugins-good1.0`, `gst-plugins-bad1.0`, and `gst-plugins-ugly1.0` is recommended.
+  
+    **Note:** GStreamer on Poky Linux for iMX8 does not support Audible or Amazon Music playback.
 
   * [Automotive Grade Linux](https://www.automotivelinux.org/) with 4A framework support (FF or GG)
 * [OpenMAX AL](https://www.khronos.org/openmaxal) *(Encoded audio playback only)* tested with:

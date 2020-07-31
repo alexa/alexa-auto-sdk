@@ -26,83 +26,79 @@ namespace aace {
 namespace jni {
 namespace alexa {
 
-    //
-    // PlaybackControllerBinder
-    //
+//
+// PlaybackControllerBinder
+//
 
-    PlaybackControllerBinder::PlaybackControllerBinder( jobject obj ) {
-        m_playbackControllerHandler = std::make_shared<PlaybackControllerHandler>();
-    }
+PlaybackControllerBinder::PlaybackControllerBinder(jobject obj) {
+    m_playbackControllerHandler = std::make_shared<PlaybackControllerHandler>();
+}
 
-    //
-    // PlaybackControllerHandler
-    //
+//
+// PlaybackControllerHandler
+//
 
-    PlaybackControllerHandler::PlaybackControllerHandler() {
-    }
+PlaybackControllerHandler::PlaybackControllerHandler() {
+}
 
-} // aace::alexa
-} // aace::jni
-} // aace
+}  // namespace alexa
+}  // namespace jni
+}  // namespace aace
 
-#define PLAYBACK_CONTROLLER_BINDER(ref) reinterpret_cast<aace::jni::alexa::PlaybackControllerBinder *>( ref )
+#define PLAYBACK_CONTROLLER_BINDER(ref) reinterpret_cast<aace::jni::alexa::PlaybackControllerBinder*>(ref)
 
-extern "C"
-{
-    JNIEXPORT jlong JNICALL
-    Java_com_amazon_aace_alexa_PlaybackController_createBinder( JNIEnv* env, jobject obj ) {
-        return reinterpret_cast<long>( new aace::jni::alexa::PlaybackControllerBinder( obj ) );
-    }
+extern "C" {
+JNIEXPORT jlong JNICALL Java_com_amazon_aace_alexa_PlaybackController_createBinder(JNIEnv* env, jobject obj) {
+    return reinterpret_cast<long>(new aace::jni::alexa::PlaybackControllerBinder(obj));
+}
 
-    JNIEXPORT void JNICALL
-    Java_com_amazon_aace_alexa_PlaybackController_disposeBinder( JNIEnv* env, jobject /* this */, jlong ref )
-    {
-        try
-        {
-            auto playbackControllerBinder = PLAYBACK_CONTROLLER_BINDER(ref);
-            ThrowIfNull( playbackControllerBinder, "invalidPlaybackControllerBinder" );
-            delete playbackControllerBinder;
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_alexa_PlaybackController_disposeBinder",ex.what());
-        }
-    }
-
-    JNIEXPORT void JNICALL
-    Java_com_amazon_aace_alexa_PlaybackController_buttonPressed( JNIEnv* env, jobject /* this */, jlong ref, jobject playbackButton )
-    {
-        try
-        {
-            auto playbackControllerBinder = PLAYBACK_CONTROLLER_BINDER(ref);
-            ThrowIfNull( playbackControllerBinder, "invalidPlaybackControllerBinder" );
-
-            PlaybackButton buttonType;
-            ThrowIfNot( aace::jni::alexa::JPlaybackButton::checkType( playbackButton, &buttonType ), "invalidPlaybackButtonType" );
-
-            playbackControllerBinder->getPlaybackController()->buttonPressed( buttonType );
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_alexa_PlaybackController_buttonPressed",ex.what());
-        }
-    }
-
-    JNIEXPORT void JNICALL
-    Java_com_amazon_aace_alexa_PlaybackController_togglePressed( JNIEnv* env, jobject /* this */, jlong ref, jobject playbackToggle, jboolean action )
-    {
-        try
-        {
-            auto playbackControllerBinder = PLAYBACK_CONTROLLER_BINDER(ref);
-            ThrowIfNull( playbackControllerBinder, "invalidPlaybackControllerBinder" );
-
-            PlaybackToggle toggleType;
-            ThrowIfNot( aace::jni::alexa::JPlaybackToggle::checkType( playbackToggle, &toggleType ), "invalidPlaybackToggleType" );
-
-            playbackControllerBinder->getPlaybackController()->togglePressed( toggleType, action );
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_alexa_PlaybackController_togglePressed",ex.what());
-        }
+JNIEXPORT void JNICALL
+Java_com_amazon_aace_alexa_PlaybackController_disposeBinder(JNIEnv* env, jobject /* this */, jlong ref) {
+    try {
+        auto playbackControllerBinder = PLAYBACK_CONTROLLER_BINDER(ref);
+        ThrowIfNull(playbackControllerBinder, "invalidPlaybackControllerBinder");
+        delete playbackControllerBinder;
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_alexa_PlaybackController_disposeBinder", ex.what());
     }
 }
 
+JNIEXPORT void JNICALL Java_com_amazon_aace_alexa_PlaybackController_buttonPressed(
+    JNIEnv* env,
+    jobject /* this */,
+    jlong ref,
+    jobject playbackButton) {
+    try {
+        auto playbackControllerBinder = PLAYBACK_CONTROLLER_BINDER(ref);
+        ThrowIfNull(playbackControllerBinder, "invalidPlaybackControllerBinder");
 
+        PlaybackButton buttonType;
+        ThrowIfNot(
+            aace::jni::alexa::JPlaybackButton::checkType(playbackButton, &buttonType), "invalidPlaybackButtonType");
+
+        playbackControllerBinder->getPlaybackController()->buttonPressed(buttonType);
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_alexa_PlaybackController_buttonPressed", ex.what());
+    }
+}
+
+JNIEXPORT void JNICALL Java_com_amazon_aace_alexa_PlaybackController_togglePressed(
+    JNIEnv* env,
+    jobject /* this */,
+    jlong ref,
+    jobject playbackToggle,
+    jboolean action) {
+    try {
+        auto playbackControllerBinder = PLAYBACK_CONTROLLER_BINDER(ref);
+        ThrowIfNull(playbackControllerBinder, "invalidPlaybackControllerBinder");
+
+        PlaybackToggle toggleType;
+        ThrowIfNot(
+            aace::jni::alexa::JPlaybackToggle::checkType(playbackToggle, &toggleType), "invalidPlaybackToggleType");
+
+        playbackControllerBinder->getPlaybackController()->togglePressed(toggleType, action);
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_alexa_PlaybackController_togglePressed", ex.what());
+    }
+}
+}

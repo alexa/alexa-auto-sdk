@@ -31,23 +31,36 @@ class ViewHolderRenderPlayerInfo extends RecyclerView.ViewHolder {
     private final ImageView mPartnerLogo;
     private final ImageView mArt;
 
-    public ViewHolderRenderPlayerInfo(View v ) {
-        super( v );
-        mHeader = v.findViewById( R.id.header );
-        mHeaderSubtext1 = v.findViewById( R.id.headerSubtext1 );
+    public ViewHolderRenderPlayerInfo(View v) {
+        super(v);
+        mHeader = v.findViewById(R.id.header);
+        mHeaderSubtext1 = v.findViewById(R.id.headerSubtext1);
         mTitle = v.findViewById(R.id.title);
-        mTitleSubtext1 = v.findViewById( R.id.titleSubtext1 );
-        mTitleSubtext2 = v.findViewById( R.id.titleSubtext2 );
-        mPartnerLogo = v.findViewById( R.id.partnerLogo );
-        mArt = v.findViewById( R.id.art );
+        mTitleSubtext1 = v.findViewById(R.id.titleSubtext1);
+        mTitleSubtext2 = v.findViewById(R.id.titleSubtext2);
+        mPartnerLogo = v.findViewById(R.id.partnerLogo);
+        mArt = v.findViewById(R.id.art);
     }
 
-    public TextView getHeader() { return mHeader; }
-    public TextView getHeaderSubtext1() { return mHeaderSubtext1; }
-    public TextView getTitle() { return mTitle; }
-    public TextView getTitleSubtext1() { return mTitleSubtext1; }
-    public TextView getTitleSubtext2() { return mTitleSubtext2; }
-    public ImageView getPartnerLogo() { return mPartnerLogo; }
-    public ImageView getArt() { return mArt; }
+    public TextView getHeader() {
+        return mHeader;
+    }
+    public TextView getHeaderSubtext1() {
+        return mHeaderSubtext1;
+    }
+    public TextView getTitle() {
+        return mTitle;
+    }
+    public TextView getTitleSubtext1() {
+        return mTitleSubtext1;
+    }
+    public TextView getTitleSubtext2() {
+        return mTitleSubtext2;
+    }
+    public ImageView getPartnerLogo() {
+        return mPartnerLogo;
+    }
+    public ImageView getArt() {
+        return mArt;
+    }
 }
-

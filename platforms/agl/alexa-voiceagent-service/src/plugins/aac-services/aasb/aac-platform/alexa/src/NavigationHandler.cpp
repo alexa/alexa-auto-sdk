@@ -45,9 +45,7 @@ std::shared_ptr<NavigationHandler> NavigationHandler::create(
 NavigationHandler::NavigationHandler(
     std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
     std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher) :
-        m_navigationState(""),
-        m_logger(logger),
-        m_responseDispatcher(responseDispatcher) {
+        m_navigationState(""), m_logger(logger), m_responseDispatcher(responseDispatcher) {
     m_navigationState = createNavigationState("NOT_NAVIGATING");
 }
 
@@ -59,11 +57,11 @@ void NavigationHandler::navigateToPreviousWaypoint() {
     m_logger->log(Level::WARN, TAG, "navigateToPreviousWaypoint not implemented");
 }
 
-void NavigationHandler::showAlternativeRoutes( AlternateRouteType alternateRouteType ) {
+void NavigationHandler::showAlternativeRoutes(AlternateRouteType alternateRouteType) {
     m_logger->log(Level::WARN, TAG, "showAlternativeRoutes not implemented");
 }
 
-void NavigationHandler::controlDisplay( ControlDisplay controlDisplay ) {
+void NavigationHandler::controlDisplay(ControlDisplay controlDisplay) {
     m_logger->log(Level::WARN, TAG, "controlDisplay not implemented");
 }
 
@@ -88,7 +86,7 @@ std::string NavigationHandler::getNavigationState() {
     return m_navigationState;
 }
 
-void NavigationHandler::startNavigation( const std::string& payload ) {
+void NavigationHandler::startNavigation(const std::string& payload) {
     m_logger->log(Level::VERBOSE, TAG, "startNavigation");
 
     auto responseDispatcher = m_responseDispatcher.lock();
@@ -101,11 +99,11 @@ void NavigationHandler::startNavigation( const std::string& payload ) {
     m_navigationState = createNavigationState("NAVIGATING");
 }
 
-void NavigationHandler::announceManeuver( const std::string& payload ) {
+void NavigationHandler::announceManeuver(const std::string& payload) {
     m_logger->log(Level::WARN, TAG, "announceManeuver not implemented");
 }
 
-void NavigationHandler::announceRoadRegulation( RoadRegulation roadRegulation ) {
+void NavigationHandler::announceRoadRegulation(RoadRegulation roadRegulation) {
     m_logger->log(Level::WARN, TAG, "announceRoadRegulation not implemented");
 }
 
@@ -114,24 +112,15 @@ std::string NavigationHandler::createNavigationState(std::string state) {
     document.SetObject();
 
     // Add state
-    document.AddMember(
-        "state",
-        rapidjson::Value().SetString(state.c_str(), state.length()),
-        document.GetAllocator());
+    document.AddMember("state", rapidjson::Value().SetString(state.c_str(), state.length()), document.GetAllocator());
 
     // Add waypoints
     rapidjson::Value wayPoints(rapidjson::kArrayType);
-    document.AddMember(
-        "waypoints",
-        wayPoints,
-        document.GetAllocator());
+    document.AddMember("waypoints", wayPoints, document.GetAllocator());
 
     // Add shapes
     rapidjson::Value shapes(rapidjson::kArrayType);
-    document.AddMember(
-        "shapes",
-        shapes,
-        document.GetAllocator());
+    document.AddMember("shapes", shapes, document.GetAllocator());
 
     // create event string
     rapidjson::StringBuffer buffer;
@@ -141,5 +130,5 @@ std::string NavigationHandler::createNavigationState(std::string state) {
     return buffer.GetString();
 }
 
-}  // phoneCallController
-}  // aasb
+}  // namespace navigation
+}  // namespace aasb

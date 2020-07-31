@@ -27,9 +27,9 @@
 using json = nlohmann::json;
 
 namespace {
-    constexpr char CONTACTS_ID[] = "0001";
-    constexpr char NAVIGATION_FAVORITES_ID[] = "0002";
-};
+constexpr char CONTACTS_ID[] = "0001";
+constexpr char NAVIGATION_FAVORITES_ID[] = "0002";
+};  // namespace
 
 namespace sampleApp {
 namespace addressBook {
@@ -43,7 +43,6 @@ void from_json(const json& j, Name& p) {
     j.at("firstName").get_to(p.firstName);
     j.at("lastName").get_to(p.lastName);
     j.at("nickName").get_to(p.nickName);
-
 }
 
 void from_json(const json& j, PostalAddress& p) {
@@ -65,7 +64,7 @@ void from_json(const json& j, PostalAddress& p) {
 void from_json(const json& j, Contact& p) {
     j.at("id").get_to(p.id);
     j.at("name").get_to(p.name);
-    if(j.count("phoneNumbers") > 0) {
+    if (j.count("phoneNumbers") > 0) {
         j.at("phoneNumbers").get_to(p.phoneNumbers);
     }
 }
@@ -82,21 +81,27 @@ void from_json(const json& j, NavigationFavorite& p) {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-AddressBookHandler::AddressBookHandler(std::weak_ptr<Activity> activity, std::weak_ptr<logger::LoggerHandler> loggerHandler)
-    : m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
+AddressBookHandler::AddressBookHandler(
+    std::weak_ptr<Activity> activity,
+    std::weak_ptr<logger::LoggerHandler> loggerHandler) :
+        m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
     // Expects((m_activity != nullptr) && (m_loggerHandler != nullptr));
     setupUI();
 }
 
-std::weak_ptr<Activity> AddressBookHandler::getActivity() { return m_activity; }
+std::weak_ptr<Activity> AddressBookHandler::getActivity() {
+    return m_activity;
+}
 
-std::weak_ptr<logger::LoggerHandler> AddressBookHandler::getLoggerHandler() { return m_loggerHandler; }
+std::weak_ptr<logger::LoggerHandler> AddressBookHandler::getLoggerHandler() {
+    return m_loggerHandler;
+}
 
 // aace::location::LocationProvider interface
 
 // private
 
-void AddressBookHandler::log(logger::LoggerHandler::Level level, const std::string &message) {
+void AddressBookHandler::log(logger::LoggerHandler::Level level, const std::string& message) {
     auto loggerHandler = m_loggerHandler.lock();
     if (!loggerHandler) {
         return;
@@ -111,32 +116,32 @@ void AddressBookHandler::setupUI() {
     }
     m_console = activity->findViewById("id:console");
 
-    activity->registerObserver(Event::onAddAddressBookPhone, [=](const std::string &value) {
+    activity->registerObserver(Event::onAddAddressBookPhone, [=](const std::string& value) {
         log(logger::LoggerHandler::Level::VERBOSE, "onAddAddressBookPhone");
-        if(!LoadContactData(value)) {
+        if (!LoadContactData(value)) {
             return false;
         }
-        return addAddressBook( CONTACTS_ID, "PhoneBook", aace::addressBook::AddressBook::AddressBookType::CONTACT );
+        return addAddressBook(CONTACTS_ID, "PhoneBook", aace::addressBook::AddressBook::AddressBookType::CONTACT);
     });
 
-    activity->registerObserver(Event::onRemoveAddressBookPhone, [=](const std::string &) {
+    activity->registerObserver(Event::onRemoveAddressBookPhone, [=](const std::string&) {
         log(logger::LoggerHandler::Level::VERBOSE, "onRemoveAddressBookPhone");
-        return removeAddressBook( CONTACTS_ID );
+        return removeAddressBook(CONTACTS_ID);
     });
 
-    activity->registerObserver(Event::onAddAddressBookAuto, [=](const std::string &value) {
+    activity->registerObserver(Event::onAddAddressBookAuto, [=](const std::string& value) {
         log(logger::LoggerHandler::Level::VERBOSE, "onAddAddressBookAuto");
-        if(!LoadNavigationFavoritesData(value)) {
+        if (!LoadNavigationFavoritesData(value)) {
             return false;
         }
-        return addAddressBook( NAVIGATION_FAVORITES_ID, "AutoBook", aace::addressBook::AddressBook::AddressBookType::NAVIGATION );
+        return addAddressBook(
+            NAVIGATION_FAVORITES_ID, "AutoBook", aace::addressBook::AddressBook::AddressBookType::NAVIGATION);
     });
 
-    activity->registerObserver(Event::onRemoveAddressBookAuto, [=](const std::string &) {
+    activity->registerObserver(Event::onRemoveAddressBookAuto, [=](const std::string&) {
         log(logger::LoggerHandler::Level::VERBOSE, "onRemoveAddressBookAuto");
-        return removeAddressBook( NAVIGATION_FAVORITES_ID );
+        return removeAddressBook(NAVIGATION_FAVORITES_ID);
     });
-
 }
 
 bool AddressBookHandler::LoadContactData(const std::string& filepath) {
@@ -144,7 +149,7 @@ bool AddressBookHandler::LoadContactData(const std::string& filepath) {
 
     std::ifstream i(filepath);
 
-    if(!i) {
+    if (!i) {
         log(logger::LoggerHandler::Level::ERROR, "Cannot find file when loading contact data: " + filepath);
         return false;
     }
@@ -174,7 +179,7 @@ bool AddressBookHandler::LoadNavigationFavoritesData(const std::string& filepath
 
     std::ifstream i(filepath);
 
-    if(!i) {
+    if (!i) {
         log(logger::LoggerHandler::Level::ERROR, "Cannot find file when loading navigation favorite data: " + filepath);
         return false;
     }
@@ -199,19 +204,21 @@ bool AddressBookHandler::LoadNavigationFavoritesData(const std::string& filepath
     return false;
 }
 
-bool AddressBookHandler::getEntries( const std::string& addressBookId, std::weak_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> contactFactory ) {
-    if ( auto factory = contactFactory.lock() ) {
-        if(addressBookId == CONTACTS_ID) {
-            for(auto&& contact : m_contacts) {
+bool AddressBookHandler::getEntries(
+    const std::string& addressBookId,
+    std::weak_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> contactFactory) {
+    if (auto factory = contactFactory.lock()) {
+        if (addressBookId == CONTACTS_ID) {
+            for (auto&& contact : m_contacts) {
                 auto& name = contact.name;
                 factory->addName(contact.id, name.firstName, name.lastName, name.nickName);
-                for(auto&& phone : contact.phoneNumbers) {
+                for (auto&& phone : contact.phoneNumbers) {
                     factory->addPhone(contact.id, phone.label, phone.number);
                 }
             }
             return true;
-        } else if(addressBookId == NAVIGATION_FAVORITES_ID) {
-            for(auto&& navigationFavorite : m_navigationFavorites) {
+        } else if (addressBookId == NAVIGATION_FAVORITES_ID) {
+            for (auto&& navigationFavorite : m_navigationFavorites) {
                 auto& name = navigationFavorite.name;
                 factory->addName(navigationFavorite.id, name.firstName);
                 auto& address = navigationFavorite.postalAddress;
@@ -238,5 +245,5 @@ bool AddressBookHandler::getEntries( const std::string& addressBookId, std::weak
     return false;
 }
 
-} // namespace addressBook
-} // namespace sampleApp
+}  // namespace addressBook
+}  // namespace sampleApp

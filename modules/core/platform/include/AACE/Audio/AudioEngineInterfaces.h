@@ -25,7 +25,7 @@ namespace audio {
 
 class AudioInputEngineInterface {
 public:
-    virtual ssize_t write( const int16_t* data, const size_t size ) = 0;
+    virtual ssize_t write(const int16_t* data, const size_t size) = 0;
 };
 
 class AudioOutputEngineInterface {
@@ -60,7 +60,7 @@ public:
          */
         MEDIA_ERROR_INTERNAL_DEVICE_ERROR
     };
-    
+
     /**
      * Describes the playback state of the platform audio channel
      */
@@ -83,8 +83,8 @@ public:
     };
 
     // media player interface
-    virtual void onMediaStateChanged( MediaState state ) = 0;
-    virtual void onMediaError( MediaError error, const std::string& description ) = 0;
+    virtual void onMediaStateChanged(MediaState state) = 0;
+    virtual void onMediaError(MediaError error, const std::string& description) = 0;
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const AudioOutputEngineInterface::MediaState& state) {
@@ -123,7 +123,7 @@ inline std::ostream& operator<<(std::ostream& stream, const AudioOutputEngineInt
     return stream;
 }
 
-} // aace::audio
-} // aace
+}  // namespace audio
+}  // namespace aace
 
-#endif // AACE_AUDIO_AUDIO_INTERFACES_H
+#endif  // AACE_AUDIO_AUDIO_INTERFACES_H

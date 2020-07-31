@@ -21,7 +21,8 @@ namespace propertyManager {
 PropertyManager::~PropertyManager() = default;
 
 bool PropertyManager::setProperty(const std::string& name, const std::string& value) {
-    return m_propertyManagerEngineInterface != nullptr ? m_propertyManagerEngineInterface->onSetProperty(name, value) : false;
+    return m_propertyManagerEngineInterface != nullptr ? m_propertyManagerEngineInterface->onSetProperty(name, value)
+                                                       : false;
 }
 
 std::string PropertyManager::getProperty(const std::string& name) {

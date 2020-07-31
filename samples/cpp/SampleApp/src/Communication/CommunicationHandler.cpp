@@ -31,22 +31,27 @@ namespace communication {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-CommunicationHandler::CommunicationHandler(std::weak_ptr<Activity> activity,
-                                           std::weak_ptr<logger::LoggerHandler> loggerHandler)
-    : m_activity{std::move(activity)}
-    , m_loggerHandler{std::move(loggerHandler)}
-    , m_callDisplayInfo{""}
-    , m_callState{CallState::NONE} {
+CommunicationHandler::CommunicationHandler(
+    std::weak_ptr<Activity> activity,
+    std::weak_ptr<logger::LoggerHandler> loggerHandler) :
+        m_activity{std::move(activity)},
+        m_loggerHandler{std::move(loggerHandler)},
+        m_callDisplayInfo{""},
+        m_callState{CallState::NONE} {
     setupUI();
 }
 
-std::weak_ptr<Activity> CommunicationHandler::getActivity() { return m_activity; }
+std::weak_ptr<Activity> CommunicationHandler::getActivity() {
+    return m_activity;
+}
 
-std::weak_ptr<logger::LoggerHandler> CommunicationHandler::getLoggerHandler() { return m_loggerHandler; }
+std::weak_ptr<logger::LoggerHandler> CommunicationHandler::getLoggerHandler() {
+    return m_loggerHandler;
+}
 
 // aace::communication::AlexaComms interface
 
-void CommunicationHandler::callDisplayInfo(const std::string &displayInfo) {
+void CommunicationHandler::callDisplayInfo(const std::string& displayInfo) {
     log(logger::LoggerHandler::Level::VERBOSE, "callDisplayInfo:" + displayInfo);
     // Update call display info
     if (auto activity = m_activity.lock()) {
@@ -65,7 +70,9 @@ void CommunicationHandler::callStateChanged(CallState state) {
     // Update call state
     if (auto console = m_console.lock()) {
         console->printRuler();
-        console->printLine("Communication call state changed from " + callStateToString(m_callState) + " to " + callStateToString(state));
+        console->printLine(
+            "Communication call state changed from " + callStateToString(m_callState) + " to " +
+            callStateToString(state));
         console->printRuler();
     }
     m_callState = state;
@@ -79,7 +86,7 @@ void CommunicationHandler::setupUI() {
     m_console = activity->findViewById("id:console");
 
     // onCommunicationAcceptCall
-    activity->registerObserver(Event::onCommunicationAcceptCall, [=](const std::string &value) {
+    activity->registerObserver(Event::onCommunicationAcceptCall, [=](const std::string& value) {
         log(logger::LoggerHandler::Level::VERBOSE, "onCommunicationAcceptCall");
 
         if (m_callState == CallState::INBOUND_RINGING) {
@@ -107,7 +114,7 @@ void CommunicationHandler::setupUI() {
     });
 
     // onCommunicationStopCall
-    activity->registerObserver(Event::onCommunicationStopCall, [=](const std::string &value) {
+    activity->registerObserver(Event::onCommunicationStopCall, [=](const std::string& value) {
         log(logger::LoggerHandler::Level::VERBOSE, "onCommunicationStopCall");
 
         stopCall();
@@ -121,21 +128,21 @@ void CommunicationHandler::setupUI() {
     });
 
     // onCommunicationShowDisplayInfo
-    activity->registerObserver(Event::onCommunicationShowDisplayInfo, [=](const std::string &value) {
+    activity->registerObserver(Event::onCommunicationShowDisplayInfo, [=](const std::string& value) {
         log(logger::LoggerHandler::Level::VERBOSE, "onCommunicationShowDisplayInfo");
         showDisplayInfo();
         return true;
     });
 
     // onCommunicationShowState
-    activity->registerObserver(Event::onCommunicationShowState, [=](const std::string &value) {
+    activity->registerObserver(Event::onCommunicationShowState, [=](const std::string& value) {
         log(logger::LoggerHandler::Level::VERBOSE, "onCommunicationShowState");
         showState();
         return true;
     });
 }
 
-void CommunicationHandler::log(logger::LoggerHandler::Level level, const std::string &message) {
+void CommunicationHandler::log(logger::LoggerHandler::Level level, const std::string& message) {
     auto loggerHandler = m_loggerHandler.lock();
     if (!loggerHandler) {
         return;
@@ -173,18 +180,18 @@ std::string CommunicationHandler::callStateToString(CallState state) {
 
 bool CommunicationHandler::checkConfiguration(const std::vector<json>& configs) {
     // Look for comms config
-    for(auto const& j: configs) {
+    for (auto const& j : configs) {
         try {
             auto obj = j.at("aace.alexa").at("avsDeviceSDK").at("communications");
             if (obj.is_object()) {
                 return true;
             }
-        } catch (json::exception &e) {
+        } catch (json::exception& e) {
         }
     }
 
     return false;
 }
 
-} // namespace communication
-} // namespace sampleApp
+}  // namespace communication
+}  // namespace sampleApp

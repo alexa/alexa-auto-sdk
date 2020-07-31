@@ -20,25 +20,25 @@
 #include <Settings/SettingInterface.h>
 #include <Settings/WakeWordConfirmationSettingType.h>
 
-namespace aace {    
+namespace aace {
 namespace test {
 namespace avs {
 
-
 struct MockWakeWordConfirmationSetting : alexaClientSDK::settings::WakeWordConfirmationSetting {
 public:
-    MockWakeWordConfirmationSetting() : alexaClientSDK::settings::WakeWordConfirmationSetting{alexaClientSDK::settings::WakeWordConfirmationSettingType::NONE} {
+    MockWakeWordConfirmationSetting() :
+            alexaClientSDK::settings::WakeWordConfirmationSetting{
+                alexaClientSDK::settings::WakeWordConfirmationSettingType::NONE} {
     }
-    MOCK_METHOD1(setLocalChange,
+    MOCK_METHOD1(
+        setLocalChange,
         SetSettingResult(const alexaClientSDK::settings::WakeWordConfirmationSetting::ValueType& value));
-    MOCK_METHOD1(setAvsChange,
-        bool(const alexaClientSDK::settings::WakeWordConfirmationSetting::ValueType& value));
-    MOCK_METHOD1(clearData,
-        bool(const alexaClientSDK::settings::WakeWordConfirmationSetting::ValueType& value));
+    MOCK_METHOD1(setAvsChange, bool(const alexaClientSDK::settings::WakeWordConfirmationSetting::ValueType& value));
+    MOCK_METHOD1(clearData, bool(const alexaClientSDK::settings::WakeWordConfirmationSetting::ValueType& value));
 };
 
-} // aace::test::avs
-} // aace::test
-} // aace
+}  // namespace avs
+}  // namespace test
+}  // namespace aace
 
-#endif //AACE_TEST_AVS_MOCK_WAKEWORD_CONFIRMATION_SETTING_H
+#endif  //AACE_TEST_AVS_MOCK_WAKEWORD_CONFIRMATION_SETTING_H

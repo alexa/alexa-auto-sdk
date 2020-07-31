@@ -18,7 +18,7 @@
 namespace aace {
 namespace core {
 
-PlatformInterface::~PlatformInterface() = default; // key function
+PlatformInterface::~PlatformInterface() = default;  // key function
 
-} // aace::core
-} // aace
+}  // namespace core
+}  // namespace aace

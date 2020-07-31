@@ -23,13 +23,17 @@ namespace aace {
 namespace engine {
 namespace core {
 
-ServiceDescription::ServiceDescription( const ServiceDescription& desc ) {
+ServiceDescription::ServiceDescription(const ServiceDescription& desc) {
     m_type = desc.m_type;
     m_version = desc.m_version;
     m_dependencies = desc.m_dependencies;
 }
 
-ServiceDescription::ServiceDescription( const std::string& type, const Version& version, std::initializer_list<ServiceDescription> dependencies ) : m_type( type ), m_version( version ), m_dependencies( dependencies ) {
+ServiceDescription::ServiceDescription(
+    const std::string& type,
+    const Version& version,
+    std::initializer_list<ServiceDescription> dependencies) :
+        m_type(type), m_version(version), m_dependencies(dependencies) {
 }
 
 const std::string& ServiceDescription::getType() const {
@@ -44,10 +48,9 @@ const std::vector<ServiceDescription>& ServiceDescription::getDependencies() con
     return m_dependencies;
 }
 
-ServiceDescription ServiceDescription::v( const Version& version ) const
-{
+ServiceDescription ServiceDescription::v(const Version& version) const {
     ServiceDescription desc = *this;
-    
+
     desc.m_version = version;
 
     return desc;
@@ -57,53 +60,52 @@ ServiceDescription ServiceDescription::v( const Version& version ) const
 // Version
 //
 
-Version::Version( uint8_t major, uint8_t minor, uint8_t revision, const std::string& tag ) : m_major( major ), m_minor( minor ), m_revision( revision ), m_tag( tag ) {
+Version::Version(uint8_t major, uint8_t minor, uint8_t revision, const std::string& tag) :
+        m_major(major), m_minor(minor), m_revision(revision), m_tag(tag) {
 }
 
-Version::Version( const std::string& version ) : m_major( 0 ), m_minor( 0 ), m_revision( 0 )
-{
-    char tag[65] = { 0 };
+Version::Version(const std::string& version) : m_major(0), m_minor(0), m_revision(0) {
+    char tag[65] = {0};
 
-    std::sscanf( version.c_str(), "%2" SCNu8 ".%2" SCNu8 ".%2" SCNu8 "-%64s", &m_major, &m_minor, &m_revision, tag );
-    
+    std::sscanf(version.c_str(), "%2" SCNu8 ".%2" SCNu8 ".%2" SCNu8 "-%64s", &m_major, &m_minor, &m_revision, tag);
+
     m_tag = tag;
 }
 
-Version::Version( const Version& version ) {
+Version::Version(const Version& version) {
     m_major = version.m_major;
     m_minor = version.m_minor;
     m_revision = version.m_revision;
     m_tag = version.m_tag;
 }
 
-std::string Version::toString()
-{
+std::string Version::toString() {
     std::stringstream ss;
-    
+
     ss << *this;
-    
+
     return ss.str();
 }
 
-bool Version::operator == (const Version& other) {
+bool Version::operator==(const Version& other) {
     return m_major == other.m_major && m_minor == other.m_minor && m_revision == other.m_revision;
 }
 
-bool Version::operator < (const Version& other) {
+bool Version::operator<(const Version& other) {
     return m_major < other.m_major || m_minor < other.m_minor || m_revision < other.m_revision;
 }
 
-std::ostream& operator << (std::ostream &stream, const Version& version)
-{
-    stream << std::to_string(version.m_major) << "." << std::to_string(version.m_minor) << "." << std::to_string(version.m_revision);
-    
-    if( version.m_tag.empty() == false ) {
+std::ostream& operator<<(std::ostream& stream, const Version& version) {
+    stream << std::to_string(version.m_major) << "." << std::to_string(version.m_minor) << "."
+           << std::to_string(version.m_revision);
+
+    if (version.m_tag.empty() == false) {
         stream << "-" << version.m_tag;
     }
 
     return stream;
 }
 
-} // aace::engine::core
-} // aace::engine
-} // aace
+}  // namespace core
+}  // namespace engine
+}  // namespace aace

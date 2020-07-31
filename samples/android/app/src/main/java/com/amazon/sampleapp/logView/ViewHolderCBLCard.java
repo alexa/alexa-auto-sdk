@@ -31,24 +31,25 @@ public class ViewHolderCBLCard extends RecyclerView.ViewHolder {
     private final TextView mCode;
     private final Context mContext;
 
-    public ViewHolderCBLCard( View v, Context context ) {
-        super( v );
+    public ViewHolderCBLCard(View v, Context context) {
+        super(v);
         mContext = context;
-        mMessage = v.findViewById( R.id.message );
-        mCode = v.findViewById( R.id.code );
+        mMessage = v.findViewById(R.id.message);
+        mCode = v.findViewById(R.id.code);
     }
 
-    public void setMessage( String url ) {
+    public void setMessage(String url) {
         String pre = "Go to ";
         String post = " on your smartphone, computer, or tablet and enter this code:";
 
-        final SpannableStringBuilder sb = new SpannableStringBuilder( pre + url + post );
-        final ForegroundColorSpan fcs = new ForegroundColorSpan( ContextCompat.getColor( mContext, R.color.cblCode ) );
-        sb.setSpan( fcs, pre.length(), pre.length() + url.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE );
+        final SpannableStringBuilder sb = new SpannableStringBuilder(pre + url + post);
+        final ForegroundColorSpan fcs = new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.cblCode));
+        sb.setSpan(fcs, pre.length(), pre.length() + url.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
 
-        mMessage.setText( sb );
+        mMessage.setText(sb);
     }
 
-    public void setCode( String newCode ) { mCode.setText( newCode ); }
-
+    public void setCode(String newCode) {
+        mCode.setText(newCode);
+    }
 }

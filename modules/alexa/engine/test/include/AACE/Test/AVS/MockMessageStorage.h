@@ -18,7 +18,7 @@
 
 #include <CertifiedSender/CertifiedSender.h>
 
-namespace aace {    
+namespace aace {
 namespace test {
 namespace avs {
 
@@ -34,8 +34,8 @@ public:
     MOCK_METHOD0(clearDatabase, bool());
 };
 
-} // aace::test::avs
-} // aace::test
-} // aace
+}  // namespace avs
+}  // namespace test
+}  // namespace aace
 
-#endif //AACE_TEST_AVS_MOCK_MESSAGE_STORAGE_H
+#endif  //AACE_TEST_AVS_MOCK_MESSAGE_STORAGE_H

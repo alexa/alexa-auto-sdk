@@ -25,23 +25,25 @@ namespace audio {
 
 class MockAudioOutputChannelInterface : public aace::engine::audio::AudioOutputChannelInterface {
 public:
-    MOCK_METHOD2(prepare,bool(std::shared_ptr<aace::audio::AudioStream> stream, bool repeating));
-    MOCK_METHOD2(prepare,bool(const std::string& url, bool repeating));
-    MOCK_METHOD0(play,bool());
-    MOCK_METHOD0(stop,bool());
-    MOCK_METHOD0(pause,bool());
-    MOCK_METHOD0(resume,bool());
-    MOCK_METHOD0(getPosition,int64_t());
-    MOCK_METHOD1(setPosition,bool(int64_t position));
-    MOCK_METHOD0(getDuration,int64_t());
-    MOCK_METHOD0(getNumBytesBuffered,int64_t());
-    MOCK_METHOD1(volumeChanged,bool(float volume));
-    MOCK_METHOD1(mutedStateChanged,bool(MutedState state));
-    MOCK_METHOD1(setEngineInterface,void(std::shared_ptr<aace::audio::AudioOutputEngineInterface> audioOutputEngineInterface));
+    MOCK_METHOD2(prepare, bool(std::shared_ptr<aace::audio::AudioStream> stream, bool repeating));
+    MOCK_METHOD2(prepare, bool(const std::string& url, bool repeating));
+    MOCK_METHOD0(play, bool());
+    MOCK_METHOD0(stop, bool());
+    MOCK_METHOD0(pause, bool());
+    MOCK_METHOD0(resume, bool());
+    MOCK_METHOD0(getPosition, int64_t());
+    MOCK_METHOD1(setPosition, bool(int64_t position));
+    MOCK_METHOD0(getDuration, int64_t());
+    MOCK_METHOD0(getNumBytesBuffered, int64_t());
+    MOCK_METHOD1(volumeChanged, bool(float volume));
+    MOCK_METHOD1(mutedStateChanged, bool(MutedState state));
+    MOCK_METHOD1(
+        setEngineInterface,
+        void(std::shared_ptr<aace::audio::AudioOutputEngineInterface> audioOutputEngineInterface));
 };
 
-} // aace::test::audio
-} // aace::test
-} // aace
+}  // namespace audio
+}  // namespace test
+}  // namespace aace
 
-#endif // AACE_ENGINE_TEST_AUDIO_MOCK_AUDIO_OUTPUT_CHANNEL_INTERFACE_H
+#endif  // AACE_ENGINE_TEST_AUDIO_MOCK_AUDIO_OUTPUT_CHANNEL_INTERFACE_H

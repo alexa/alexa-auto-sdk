@@ -17,8 +17,8 @@
 #define SAMPLEAPP_ARGS_H
 
 // C++ Standard Library
-#include <string> // std::string
-#include <vector> // std::vector
+#include <string>  // std::string
+#include <vector>  // std::vector
 
 namespace sampleApp {
 
@@ -29,21 +29,29 @@ namespace sampleApp {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class Args {
-  private:
+private:
     std::string m_name{};
     std::vector<std::string> m_list{};
 
-  public:
-    Args(int argc, const char *argv[])
-        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-        : m_name{argv[0]}, m_list{argv + 1, argv + argc} {}
+public:
+    Args(int argc, const char* argv[])
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+            :
+            m_name{argv[0]}, m_list{argv + 1, argv + argc} {
+    }
     Args(std::initializer_list<std::string> args)
-        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-        : m_name{*args.begin()}, m_list{args.begin() + 1, args.end()} {}
-    auto name() const -> std::string { return m_name; }
-    auto list() const -> std::vector<std::string> { return m_list; }
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+            :
+            m_name{*args.begin()}, m_list{args.begin() + 1, args.end()} {
+    }
+    auto name() const -> std::string {
+        return m_name;
+    }
+    auto list() const -> std::vector<std::string> {
+        return m_list;
+    }
 };
 
-} // namespace sampleApp
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_ARGS_H
+#endif  // SAMPLEAPP_ARGS_H

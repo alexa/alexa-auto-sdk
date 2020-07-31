@@ -23,95 +23,85 @@ namespace aace {
 namespace jni {
 namespace audio {
 
-    //
-    // AudioInputBinder
-    //
+//
+// AudioInputBinder
+//
 
-    AudioInputBinder::AudioInputBinder( jobject obj ) {
-        m_audioInputHandler = std::make_shared<AudioInputHandler>( obj );
+AudioInputBinder::AudioInputBinder(jobject obj) {
+    m_audioInputHandler = std::make_shared<AudioInputHandler>(obj);
+}
+
+//
+// AudioInputHandler
+//
+
+AudioInputHandler::AudioInputHandler(jobject obj) : m_obj(obj, "com/amazon/aace/audio/AudioInput") {
+}
+
+bool AudioInputHandler::startAudioInput() {
+    try_with_context {
+        jboolean result;
+        ThrowIfNot(m_obj.invoke("startAudioInput", "()Z", &result), "invokeMethodFailed");
+        return result;
     }
-
-    //
-    // AudioInputHandler
-    //
-
-    AudioInputHandler::AudioInputHandler( jobject obj ) : m_obj( obj, "com/amazon/aace/audio/AudioInput" ) {
-    }
-
-    bool AudioInputHandler::startAudioInput()
-    {
-        try_with_context
-        {
-            jboolean result;
-            ThrowIfNot( m_obj.invoke( "startAudioInput", "()Z", &result ), "invokeMethodFailed" );
-            return result;
-        }
-        catch_with_ex {
-            AACE_JNI_ERROR(TAG,"startAudioInput",ex.what());
-            return false;
-        }
-    }
-
-    bool AudioInputHandler::stopAudioInput()
-    {
-        try_with_context
-        {
-            jboolean result;
-            ThrowIfNot( m_obj.invoke( "stopAudioInput", "()Z", &result ), "invokeMethodFailed" );
-            return result;
-        }
-        catch_with_ex {
-            AACE_JNI_ERROR(TAG,"stopAudioInput",ex.what());
-            return false;
-        }
-    }
-
-} // aace::jni::audio
-} // aace::jni
-} // aace
-
-#define AUDIO_INPUT_BINDER(ref) reinterpret_cast<aace::jni::audio::AudioInputBinder *>( ref )
-
-extern "C"
-{
-    JNIEXPORT jlong JNICALL
-    Java_com_amazon_aace_audio_AudioInput_createBinder( JNIEnv* env, jobject obj )  {
-        return reinterpret_cast<long>( new aace::jni::audio::AudioInputBinder( obj ) );
-    }
-
-    JNIEXPORT void JNICALL
-    Java_com_amazon_aace_audio_AudioInput_disposeBinder( JNIEnv* env, jobject /* this */, jlong ref )
-    {
-        try
-        {
-            auto audioInputBinder = AUDIO_INPUT_BINDER(ref);
-            ThrowIfNull( audioInputBinder, "invalidAudioInputBinder" );
-            delete audioInputBinder;
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_audio_AudioInput_disposeBinder",ex.what());
-        }
-    }
-
-    JNIEXPORT jlong JNICALL
-    Java_com_amazon_aace_audio_AudioInput_write( JNIEnv* env, jobject /* this */, jlong ref, jbyteArray data, jlong offset, jlong size )
-    {
-        try
-        {
-            auto audioInputBinder = AUDIO_INPUT_BINDER(ref);
-            ThrowIfNull( audioInputBinder, "invalidAudioInputBinder" );
-
-            JByteArray arr( data );
-
-            jint count = audioInputBinder->getAudioInputHandler()->write( (int16_t *) arr.ptr(offset), size / 2 );
-
-            return count * 2;
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_audio_AudioInput_write",ex.what());
-            return 0;
-        }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "startAudioInput", ex.what());
+        return false;
     }
 }
 
+bool AudioInputHandler::stopAudioInput() {
+    try_with_context {
+        jboolean result;
+        ThrowIfNot(m_obj.invoke("stopAudioInput", "()Z", &result), "invokeMethodFailed");
+        return result;
+    }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "stopAudioInput", ex.what());
+        return false;
+    }
+}
 
+}  // namespace audio
+}  // namespace jni
+}  // namespace aace
+
+#define AUDIO_INPUT_BINDER(ref) reinterpret_cast<aace::jni::audio::AudioInputBinder*>(ref)
+
+extern "C" {
+JNIEXPORT jlong JNICALL Java_com_amazon_aace_audio_AudioInput_createBinder(JNIEnv* env, jobject obj) {
+    return reinterpret_cast<long>(new aace::jni::audio::AudioInputBinder(obj));
+}
+
+JNIEXPORT void JNICALL Java_com_amazon_aace_audio_AudioInput_disposeBinder(JNIEnv* env, jobject /* this */, jlong ref) {
+    try {
+        auto audioInputBinder = AUDIO_INPUT_BINDER(ref);
+        ThrowIfNull(audioInputBinder, "invalidAudioInputBinder");
+        delete audioInputBinder;
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_audio_AudioInput_disposeBinder", ex.what());
+    }
+}
+
+JNIEXPORT jlong JNICALL Java_com_amazon_aace_audio_AudioInput_write(
+    JNIEnv* env,
+    jobject /* this */,
+    jlong ref,
+    jbyteArray data,
+    jlong offset,
+    jlong size) {
+    try {
+        auto audioInputBinder = AUDIO_INPUT_BINDER(ref);
+        ThrowIfNull(audioInputBinder, "invalidAudioInputBinder");
+
+        JByteArray arr(data);
+
+        jint count = audioInputBinder->getAudioInputHandler()->write((int16_t*)arr.ptr(offset), size / 2);
+
+        return count * 2;
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_audio_AudioInput_write", ex.what());
+        return 0;
+    }
+}
+}

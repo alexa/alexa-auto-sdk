@@ -28,20 +28,26 @@ namespace audio {
 
 class AudioOutputProviderEngineImpl {
 public:
-    static std::shared_ptr<AudioOutputProviderEngineImpl> create( std::shared_ptr<aace::audio::AudioOutputProvider> platformAudioOutputProviderInterface );
+    static std::shared_ptr<AudioOutputProviderEngineImpl> create(
+        std::shared_ptr<aace::audio::AudioOutputProvider> platformAudioOutputProviderInterface);
 
-    std::shared_ptr<AudioOutputChannelInterface> openChannel( const std::string& name, aace::audio::AudioOutputProvider::AudioOutputType audioOutputType );
+    std::shared_ptr<AudioOutputChannelInterface> openChannel(
+        const std::string& name,
+        aace::audio::AudioOutputProvider::AudioOutputType audioOutputType);
     bool doShutdown();
 
 private:
-    AudioOutputProviderEngineImpl( std::shared_ptr<aace::audio::AudioOutputProvider> platformAudioOutputProviderInterface );
-    std::unordered_map<std::shared_ptr<aace::audio::AudioOutput>,std::shared_ptr<AudioOutputChannelInterface>> m_audioOutputMap;
+    AudioOutputProviderEngineImpl(
+        std::shared_ptr<aace::audio::AudioOutputProvider> platformAudioOutputProviderInterface);
+    std::unordered_map<std::shared_ptr<aace::audio::AudioOutput>, std::shared_ptr<AudioOutputChannelInterface>>
+        m_audioOutputMap;
+
 private:
     std::shared_ptr<aace::audio::AudioOutputProvider> m_platformAudioOutputProviderInterface;
 };
 
-}  // audio
-}  // engine
-}  // aace
+}  // namespace audio
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_AUDIO_AUDIO_OUTPUT_PROVIDER_ENGINE_IMPL_H
+#endif  // AACE_ENGINE_AUDIO_AUDIO_OUTPUT_PROVIDER_ENGINE_IMPL_H

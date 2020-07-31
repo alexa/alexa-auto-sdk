@@ -7,6 +7,7 @@ var searchData=
   ['senduserevent',['sendUserEvent',['../classcom_1_1amazon_1_1aace_1_1apl_1_1_a_p_l.html#a596b08f65e81293660be6b9b0b1e13b9',1,'com::amazon::aace::apl::APL']]],
   ['setaplmaxversion',['setAPLMaxVersion',['../classcom_1_1amazon_1_1aace_1_1apl_1_1_a_p_l.html#a52b6f421255ee73cfef5b3c5e73073fc',1,'com::amazon::aace::apl::APL']]],
   ['setbandlevels',['setBandLevels',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_equalizer_controller.html#a3acad44f203be8b5a06f426d0c9db7fd',1,'com::amazon::aace::alexa::EqualizerController']]],
+  ['setdefaultzone',['setDefaultZone',['../classcom_1_1amazon_1_1aace_1_1car_control_1_1_car_control_configuration.html#a7752ec6e67fa0d52955ea4003a71bbaa',1,'com::amazon::aace::carControl::CarControlConfiguration']]],
   ['setdocumentidletimeout',['setDocumentIdleTimeout',['../classcom_1_1amazon_1_1aace_1_1apl_1_1_a_p_l.html#a7084448c30820248b04950c804452cbe',1,'com::amazon::aace::apl::APL']]],
   ['setdonotdisturb',['setDoNotDisturb',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_do_not_disturb.html#a74e1edf1651fc21b67eef08e447d135f',1,'com::amazon::aace::alexa::DoNotDisturb']]],
   ['setfocus',['setFocus',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter.html#adcf544d90c89515cd2de3af216ee53cf',1,'com.amazon.aace.alexa.ExternalMediaAdapter.setFocus()'],['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source.html#a20a6fa8f3826b39e7f19d74a761a0ed6',1,'com.amazon.aace.alexa.LocalMediaSource.setFocus(boolean focusAcquire)'],['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source.html#a41d4aad196e6ea9eb5e41287426fb7de',1,'com.amazon.aace.alexa.LocalMediaSource.setFocus()']]],
@@ -23,5 +24,6 @@ var searchData=
   ['startcapture',['startCapture',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a5c85bfc150b64cc2389c4a036fa6c367',1,'com::amazon::aace::alexa::SpeechRecognizer']]],
   ['startnavigation',['startNavigation',['../classcom_1_1amazon_1_1aace_1_1navigation_1_1_navigation.html#a93fd177c707c9075348883824c7dcc0b',1,'com::amazon::aace::navigation::Navigation']]],
   ['stop',['stop',['../classcom_1_1amazon_1_1aace_1_1audio_1_1_audio_output.html#a93328cd0e726f19b596a18343418082c',1,'com.amazon.aace.audio.AudioOutput.stop()'],['../classcom_1_1amazon_1_1aace_1_1core_1_1_engine.html#af3f1799a40b40389cdb3c03a4b518c28',1,'com.amazon.aace.core.Engine.stop()'],['../classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a6b16e1f163c1ba5732cca98e507f0220',1,'com.amazon.aace.phonecontrol.PhoneCallController.stop()']]],
-  ['stopcapture',['stopCapture',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a9c043bac65f630eed854a2e48182144c',1,'com::amazon::aace::alexa::SpeechRecognizer']]]
+  ['stopcapture',['stopCapture',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a9c043bac65f630eed854a2e48182144c',1,'com::amazon::aace::alexa::SpeechRecognizer']]],
+  ['stopforegroundactivity',['stopForegroundActivity',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client.html#a5205acb15d66b99404896253611d657f',1,'com::amazon::aace::alexa::AlexaClient']]]
 ];

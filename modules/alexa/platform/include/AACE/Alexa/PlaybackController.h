@@ -35,7 +35,7 @@ namespace alexa {
  * playback control buttons should be enabled on screen with a player info display card.
  *
  * @sa AudioPlayer
- */  
+ */
 class PlaybackController : public aace::core::PlatformInterface {
 protected:
     PlaybackController() = default;
@@ -76,13 +76,14 @@ public:
      *
      * Should *never* be called by the platform implementation.
      */
-    void setEngineInterface( std::shared_ptr<aace::alexa::PlaybackControllerEngineInterface> playbackControllerEngineInterface );
+    void setEngineInterface(
+        std::shared_ptr<aace::alexa::PlaybackControllerEngineInterface> playbackControllerEngineInterface);
 
 private:
     std::weak_ptr<aace::alexa::PlaybackControllerEngineInterface> m_playbackControllerEngineInterface;
 };
 
-} // aace::alexa
-} // aace
+}  // namespace alexa
+}  // namespace aace
 
-#endif // AACE_ALEXA_PLAYBACK_CONTROLLER_H
+#endif  // AACE_ALEXA_PLAYBACK_CONTROLLER_H

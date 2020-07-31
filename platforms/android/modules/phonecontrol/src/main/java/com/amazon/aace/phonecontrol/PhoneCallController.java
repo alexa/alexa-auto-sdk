@@ -15,8 +15,9 @@
 
 package com.amazon.aace.phonecontrol;
 
-import java.util.HashMap;
 import com.amazon.aace.core.PlatformInterface;
+
+import java.util.HashMap;
 
 /**
  * PhoneCallController should be extended to allow a user to use Alexa to interact with a calling device
@@ -27,15 +28,13 @@ import com.amazon.aace.core.PlatformInterface;
  * The platform implementation is responsible for managing the lifecycle and user experience of a call session
  * and connection to the calling device.
  */
-abstract public class PhoneCallController extends PlatformInterface
-{
+abstract public class PhoneCallController extends PlatformInterface {
     /**
      * Describes the state of connection to a calling device
      *
      * @sa PhoneCallController::connectionStateChanged
      */
-    public enum ConnectionState
-    {
+    public enum ConnectionState {
         /**
          * A calling device is connected.
          * @hideinitializer
@@ -55,7 +54,7 @@ abstract public class PhoneCallController extends PlatformInterface
         /**
          * @internal
          */
-        private ConnectionState( String name ) {
+        private ConnectionState(String name) {
             m_name = name;
         }
 
@@ -72,8 +71,7 @@ abstract public class PhoneCallController extends PlatformInterface
      *
      * @sa PhoneCallController::callStateChanged
      */
-    public enum CallState 
-    {
+    public enum CallState {
         /**
          * The call is not in an active state.
          * The following are possible transitions to IDLE state:
@@ -132,7 +130,7 @@ abstract public class PhoneCallController extends PlatformInterface
         /**
          * @internal
          */
-        private CallState( String name ) {
+        private CallState(String name) {
             m_name = name;
         }
 
@@ -148,8 +146,7 @@ abstract public class PhoneCallController extends PlatformInterface
      * Describes a configuration property of a connected calling device.
      * Configure properties with @c PhoneCallController::deviceConfigurationUpdated
      */
-    public enum CallingDeviceConfigurationProperty
-    {
+    public enum CallingDeviceConfigurationProperty {
         /**
          * Whether the device supports DTMF signaling.
          * Set @c true to indicate support for DTMF.
@@ -169,7 +166,7 @@ abstract public class PhoneCallController extends PlatformInterface
         /**
          * @internal
          */
-        private CallingDeviceConfigurationProperty( String name ) {
+        private CallingDeviceConfigurationProperty(String name) {
             m_name = name;
         }
 
@@ -186,8 +183,7 @@ abstract public class PhoneCallController extends PlatformInterface
      *
      * @sa PhoneCallController::callFailed
      */
-    public enum CallError 
-    {
+    public enum CallError {
         /**
          * No carrier is available on the calling device.
          *
@@ -231,7 +227,7 @@ abstract public class PhoneCallController extends PlatformInterface
         /**
          * @internal
          */
-        private CallError( String name ) {
+        private CallError(String name) {
             m_name = name;
         }
 
@@ -248,8 +244,7 @@ abstract public class PhoneCallController extends PlatformInterface
      *
      * @sa PhoneCallController::sendDTMFFailed
      */
-    public enum DTMFError
-    {
+    public enum DTMFError {
         /**
          * There is no active call through which a DTMF signal can be sent.
          *
@@ -271,7 +266,7 @@ abstract public class PhoneCallController extends PlatformInterface
         /**
          * @internal
          */
-        private DTMFError( String name ) {
+        private DTMFError(String name) {
             m_name = name;
         }
 
@@ -283,8 +278,7 @@ abstract public class PhoneCallController extends PlatformInterface
         }
     }
 
-    public PhoneCallController() {
-    }
+    public PhoneCallController() {}
 
     /**
      * Notifies the platform implementation to initiate an outgoing phone call
@@ -317,12 +311,13 @@ abstract public class PhoneCallController extends PlatformInterface
      * @li callee.defaultContactAddress (required): The default address to use for calling the callee
      * @li callee.alternativeContactAddresses (optional): An array of alternate addresses for the callee
      * @li address.protocol (required): The protocol for this address of the callee. One of PSTN, SIP, H.323
-     * @li address.format (optional): The format for this address of the callee. One of E.164, E.163, E.123, MICROSOFT, DIN5008, RAW
+     * @li address.format (optional): The format for this address of the callee. One of E.164, E.163, E.123, MICROSOFT,
+     * DIN5008, RAW
      * @li address.value (required): The address of the callee.
      *
      * @return @c true if the platform implementation successfully handled the call
      */
-    public boolean dial( String payload ) {
+    public boolean dial(String payload) {
         return false;
     }
 
@@ -343,7 +338,7 @@ abstract public class PhoneCallController extends PlatformInterface
      *
      * @return @c true if the platform implementation successfully handled the call
      */
-    public boolean redial( String payload ) {
+    public boolean redial(String payload) {
         return false;
     }
 
@@ -359,7 +354,7 @@ abstract public class PhoneCallController extends PlatformInterface
      * @endcode
      * @li callId (required): The unique identifier for the call to answer
      */
-    public void answer( String payload ) {}
+    public void answer(String payload) {}
 
     /**
      * Notifies the platform implementation to end an ongoing call or stop inbound or outbound call setup
@@ -373,7 +368,7 @@ abstract public class PhoneCallController extends PlatformInterface
      * @endcode
      * @li callId (required): The unique identifier for the call to be stopped
      */
-    public void stop( String payload ) {}
+    public void stop(String payload) {}
 
     /**
      * Notifies the platform implementation to send a DTMF signal to the calling device
@@ -389,15 +384,15 @@ abstract public class PhoneCallController extends PlatformInterface
      * @li callId (required): The unique identifier for the call
      * @li signal (required): The DTMF string to be sent to the calling device associated with the callId
      */
-    public void sendDTMF( String payload ) {}
+    public void sendDTMF(String payload) {}
 
     /**
      * Notifies the Engine of a change in connection to a calling device
      *
      * @param  state The state of connection to a calling device
      */
-    final protected void connectionStateChanged( ConnectionState state ) {
-        connectionStateChanged( getNativeRef(), state );
+    final protected void connectionStateChanged(ConnectionState state) {
+        connectionStateChanged(getNativeRef(), state);
     }
 
     /**
@@ -406,8 +401,8 @@ abstract public class PhoneCallController extends PlatformInterface
      * @param  state The state of the call
      * @param  callId The unique identifier associated with the call
      */
-    final protected void callStateChanged( CallState state, String callId ) {
-        callStateChanged( getNativeRef(), state, callId, "" );
+    final protected void callStateChanged(CallState state, String callId) {
+        callStateChanged(getNativeRef(), state, callId, "");
     }
 
     /**
@@ -417,8 +412,8 @@ abstract public class PhoneCallController extends PlatformInterface
      * @param  callId The unique identifier associated with the call
      * @param  callerId The identifier for a contact. May be included for @c CallState::CALL_RECEIVED
      */
-    final protected void callStateChanged( CallState state, String callId, String callerId ) {
-        callStateChanged( getNativeRef(), state, callId, callerId );
+    final protected void callStateChanged(CallState state, String callId, String callerId) {
+        callStateChanged(getNativeRef(), state, callId, callerId);
     }
 
     /**
@@ -427,8 +422,8 @@ abstract public class PhoneCallController extends PlatformInterface
      * @param  callId The unique identifier for the call associated with the error
      * @param  code The error type
      */
-    final protected void callFailed( String callId, CallError code ) {
-        callFailed( getNativeRef(), callId, code, "" );
+    final protected void callFailed(String callId, CallError code) {
+        callFailed(getNativeRef(), callId, code, "");
     }
 
     /**
@@ -438,8 +433,8 @@ abstract public class PhoneCallController extends PlatformInterface
      * @param  code The error type
      * @param  message A description of the error
      */
-    final protected void callFailed( String callId, CallError code, String message ) {
-        callFailed( getNativeRef(), callId, code, message );
+    final protected void callFailed(String callId, CallError code, String message) {
+        callFailed(getNativeRef(), callId, code, message);
     }
 
     /**
@@ -448,8 +443,8 @@ abstract public class PhoneCallController extends PlatformInterface
      * @param  callId The unique identifier for the call associated with the callId
      * @param  callerId The caller's identifier or phone number
      */
-    final protected void callerIdReceived( String callId, String callerId ) {
-        callerIdReceived( getNativeRef(), callId, callerId );
+    final protected void callerIdReceived(String callId, String callerId) {
+        callerIdReceived(getNativeRef(), callId, callerId);
     }
 
     /**
@@ -459,8 +454,8 @@ abstract public class PhoneCallController extends PlatformInterface
      *
      * @sa PhoneCallController::sendDTMF
      */
-    final protected void sendDTMFSucceeded( String callId ) {
-        sendDTMFSucceeded( getNativeRef(), callId );
+    final protected void sendDTMFSucceeded(String callId) {
+        sendDTMFSucceeded(getNativeRef(), callId);
     }
 
     /**
@@ -471,8 +466,8 @@ abstract public class PhoneCallController extends PlatformInterface
      *
      * @sa PhoneCallController::sendDTMF
      */
-    final protected void sendDTMFFailed( String callId, DTMFError code ) {
-        sendDTMFFailed( getNativeRef(), callId, code, "" );
+    final protected void sendDTMFFailed(String callId, DTMFError code) {
+        sendDTMFFailed(getNativeRef(), callId, code, "");
     }
 
     /**
@@ -484,8 +479,8 @@ abstract public class PhoneCallController extends PlatformInterface
      *
      * @sa PhoneCallController::sendDTMF
      */
-    final protected void sendDTMFFailed( String callId, DTMFError code, String message ) {
-        sendDTMFFailed( getNativeRef(), callId, code, message);
+    final protected void sendDTMFFailed(String callId, DTMFError code, String message) {
+        sendDTMFFailed(getNativeRef(), callId, code, message);
     }
 
     /**
@@ -498,24 +493,26 @@ abstract public class PhoneCallController extends PlatformInterface
      *
      * @param configurationMap A map of configuration properties to the boolean state of the properties
      */
-    final protected void deviceConfigurationUpdated( HashMap<CallingDeviceConfigurationProperty, Boolean> configurationMap ) {
-        CallingDeviceConfigurationProperty[] configurations = new CallingDeviceConfigurationProperty[configurationMap.size()];
+    final protected void deviceConfigurationUpdated(
+            HashMap<CallingDeviceConfigurationProperty, Boolean> configurationMap) {
+        CallingDeviceConfigurationProperty[] configurations =
+                new CallingDeviceConfigurationProperty[configurationMap.size()];
         boolean[] configurationValues = new boolean[configurationMap.size()];
 
         int index = 0;
-        for ( CallingDeviceConfigurationProperty key : configurationMap.keySet() ) {
+        for (CallingDeviceConfigurationProperty key : configurationMap.keySet()) {
             configurations[index] = key;
-            configurationValues[index] = configurationMap.get( key );
+            configurationValues[index] = configurationMap.get(key);
             index++;
         }
-        deviceConfigurationUpdated( getNativeRef(), configurations, configurationValues );
+        deviceConfigurationUpdated(getNativeRef(), configurations, configurationValues);
     }
 
     /**
      * Generates a unique identifier for a call
      */
     final protected String createCallId() {
-        return createCallId( getNativeRef() );
+        return createCallId(getNativeRef());
     }
 
     // NativeRef implementation
@@ -523,21 +520,22 @@ abstract public class PhoneCallController extends PlatformInterface
         return createBinder();
     }
 
-    final protected void disposeNativeRef( long nativeRef ) {
-        disposeBinder( nativeRef );
+    final protected void disposeNativeRef(long nativeRef) {
+        disposeBinder(nativeRef);
     }
 
     // Native Engine JNI methods
     private native long createBinder();
-    private native void disposeBinder( long nativeRef );
-    private native void connectionStateChanged( long nativeRef, ConnectionState state );
-    private native void callStateChanged( long nativeRef, CallState state, String callId, String callerId );
-    private native void callFailed( long nativeRef, String callId, CallError code, String message );
-    private native void callerIdReceived( long nativeRef, String callId, String callerId );
-    private native void sendDTMFSucceeded( long nativeRef, String callId );
-    private native void sendDTMFFailed( long nativeRef, String callId, DTMFError code, String message );
-    private native void deviceConfigurationUpdated( long nativeRef, CallingDeviceConfigurationProperty[] configurations, boolean[] configurationValues );
-    private native String createCallId( long nativeRef );
+    private native void disposeBinder(long nativeRef);
+    private native void connectionStateChanged(long nativeRef, ConnectionState state);
+    private native void callStateChanged(long nativeRef, CallState state, String callId, String callerId);
+    private native void callFailed(long nativeRef, String callId, CallError code, String message);
+    private native void callerIdReceived(long nativeRef, String callId, String callerId);
+    private native void sendDTMFSucceeded(long nativeRef, String callId);
+    private native void sendDTMFFailed(long nativeRef, String callId, DTMFError code, String message);
+    private native void deviceConfigurationUpdated(
+            long nativeRef, CallingDeviceConfigurationProperty[] configurations, boolean[] configurationValues);
+    private native String createCallId(long nativeRef);
 }
 
 // END OF FILE

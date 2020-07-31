@@ -22,40 +22,40 @@ namespace aace {
 namespace test {
 namespace avs {
 
-class MockAlexaInterfaceMessageSenderInternalInterface : public alexaClientSDK::capabilityAgents::alexa::AlexaInterfaceMessageSenderInternalInterface {
+class MockAlexaInterfaceMessageSenderInternalInterface
+        : public alexaClientSDK::capabilityAgents::alexa::AlexaInterfaceMessageSenderInternalInterface {
 public:
     MOCK_METHOD3(
-                 sendStateReportEvent,
-                 bool(
-                      const std::string& instance,
-                      const std::string& correlationToken,
-                      const alexaClientSDK::avsCommon::avs::AVSMessageEndpoint& endpoint));
+        sendStateReportEvent,
+        bool(
+            const std::string& instance,
+            const std::string& correlationToken,
+            const alexaClientSDK::avsCommon::avs::AVSMessageEndpoint& endpoint));
     MOCK_METHOD4(
-                 sendResponseEvent,
-                 bool(
-                      const std::string& instance,
-                      const std::string& correlationToken,
-                      const alexaClientSDK::avsCommon::avs::AVSMessageEndpoint& endpoint,
-                      const std::string& jsonPayload));
+        sendResponseEvent,
+        bool(
+            const std::string& instance,
+            const std::string& correlationToken,
+            const alexaClientSDK::avsCommon::avs::AVSMessageEndpoint& endpoint,
+            const std::string& jsonPayload));
     MOCK_METHOD5(
-                 sendErrorResponseEvent,
-                 bool(
-                      const std::string& instance,
-                      const std::string& correlationToken,
-                      const alexaClientSDK::avsCommon::avs::AVSMessageEndpoint& endpoint,
-                      const ErrorResponseType errorType,
-                      const std::string& errorMessage));
+        sendErrorResponseEvent,
+        bool(
+            const std::string& instance,
+            const std::string& correlationToken,
+            const alexaClientSDK::avsCommon::avs::AVSMessageEndpoint& endpoint,
+            const ErrorResponseType errorType,
+            const std::string& errorMessage));
     MOCK_METHOD3(
-                 sendDeferredResponseEvent,
-                 bool(const std::string& instance, const std::string& correlationToken, const int estimatedDeferralInSeconds));
+        sendDeferredResponseEvent,
+        bool(const std::string& instance, const std::string& correlationToken, const int estimatedDeferralInSeconds));
     MOCK_METHOD1(
-                 alexaResponseTypeToErrorType,
-                 ErrorResponseType(const alexaClientSDK::avsCommon::avs::AlexaResponseType& responseType));
+        alexaResponseTypeToErrorType,
+        ErrorResponseType(const alexaClientSDK::avsCommon::avs::AlexaResponseType& responseType));
 };
 
-} // aace::test::avs
-} // aace::test
-} // aace
+}  // namespace avs
+}  // namespace test
+}  // namespace aace
 
-#endif //AACE_TEST_AVS_MOCK_ALEXA_INTERFACE_MESSAGE_SENDER_INTERNAL_INTERFACE_H
-
+#endif  //AACE_TEST_AVS_MOCK_ALEXA_INTERFACE_MESSAGE_SENDER_INTERNAL_INTERFACE_H

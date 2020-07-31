@@ -31,28 +31,27 @@ static const std::string TAG("aace.network.NetworkEngineService");
 // register the service
 REGISTER_SERVICE(NetworkEngineService);
 
-NetworkEngineService::NetworkEngineService( const aace::engine::core::ServiceDescription& description ) : aace::engine::core::EngineService( description ) {
+NetworkEngineService::NetworkEngineService(const aace::engine::core::ServiceDescription& description) :
+        aace::engine::core::EngineService(description) {
 }
 
 bool NetworkEngineService::initialize() {
-    
     try {
-        ThrowIfNot( registerProperties(), "registerPropertiesFailed" );
+        ThrowIfNot(registerProperties(), "registerPropertiesFailed");
         return true;
-    }
-    catch (std::exception& ex) {
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
-    
 }
-    
+
 bool NetworkEngineService::registerProperties() {
-    
     try {
         // get the property engine service interface from the property manager service
-        auto propertyManager = getContext()->getServiceInterface<aace::engine::propertyManager::PropertyManagerServiceInterface>("aace.propertyManager");
-        ThrowIfNull( propertyManager, "nullPropertyManagerServiceInterface" );
+        auto propertyManager =
+            getContext()->getServiceInterface<aace::engine::propertyManager::PropertyManagerServiceInterface>(
+                "aace.propertyManager");
+        ThrowIfNull(propertyManager, "nullPropertyManagerServiceInterface");
 
         propertyManager->registerProperty(aace::engine::propertyManager::PropertyDescription(
             aace::network::property::NETWORK_INTERFACE,
@@ -63,51 +62,47 @@ bool NetworkEngineService::registerProperties() {
                 std::placeholders::_2,
                 std::placeholders::_3,
                 std::placeholders::_4),
-            std::bind(&NetworkEngineService::getProperty_networkInterface, this)));
+            nullptr));
         return true;
-    }
-    catch (std::exception& ex) {
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
 }
-bool NetworkEngineService::registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface )
-{
-    try
-    {
-        ReturnIf( registerPlatformInterfaceType<aace::network::NetworkInfoProvider>( platformInterface ), true );
+bool NetworkEngineService::registerPlatformInterface(std::shared_ptr<aace::core::PlatformInterface> platformInterface) {
+    try {
+        ReturnIf(registerPlatformInterfaceType<aace::network::NetworkInfoProvider>(platformInterface), true);
         return false;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"registerPlatformInterface").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "registerPlatformInterface").d("reason", ex.what()));
         return false;
     }
 }
 
-bool NetworkEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::network::NetworkInfoProvider> networkInfoProvider )
-{
-    try
-    {
-        ThrowIfNotNull( m_networkInfoProviderEngineImpl, "platformInterfaceAlreadyRegistered" );
-        
+bool NetworkEngineService::registerPlatformInterfaceType(
+    std::shared_ptr<aace::network::NetworkInfoProvider> networkInfoProvider) {
+    try {
+        ThrowIfNotNull(m_networkInfoProviderEngineImpl, "platformInterfaceAlreadyRegistered");
+
         // create the engine implementation
         m_networkInfoProviderEngineImpl = NetworkInfoProviderEngineImpl::create();
-        ThrowIfNull( m_networkInfoProviderEngineImpl, "createNetworkInfoProviderEngineImplFailed" );
-        
+        ThrowIfNull(m_networkInfoProviderEngineImpl, "createNetworkInfoProviderEngineImplFailed");
+
         // create the network observable interface
-        ThrowIfNot( registerServiceInterface<NetworkObservableInterface>( m_networkInfoProviderEngineImpl ), "registerNetworkObservableInterfaceFailed" );
+        ThrowIfNot(
+            registerServiceInterface<NetworkObservableInterface>(m_networkInfoProviderEngineImpl),
+            "registerNetworkObservableInterfaceFailed");
 
         // save a reference to the newtork info provider
         m_networkInfoProvider = networkInfoProvider;
-        registerServiceInterface<aace::network::NetworkInfoProvider>( m_networkInfoProvider );
+        registerServiceInterface<aace::network::NetworkInfoProvider>(m_networkInfoProvider);
 
         // set the network infor provider engine interface reference
-        m_networkInfoProvider->setEngineInterface( m_networkInfoProviderEngineImpl );
-  
+        m_networkInfoProvider->setEngineInterface(m_networkInfoProviderEngineImpl);
+
         return true;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"registerPlatformInterfaceType<NetworkInfoProvider>").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "registerPlatformInterfaceType<NetworkInfoProvider>").d("reason", ex.what()));
         return false;
     }
 }
@@ -117,36 +112,17 @@ bool NetworkEngineService::setProperty_networkInterface(
     bool& changed,
     bool& async,
     const SetPropertyResultCallback& callbackFunction) {
-    try
-    {
-        AACE_INFO(LX(TAG).sensitive("value",value));
-        ReturnIf( aace::engine::utils::string::equal(value, getProperty_networkInterface() ), true );
-        ThrowIfNot( m_networkInfoProviderEngineImpl->setNetworkInterface( value ), "setNetworkInterfaceFailed" );
+    try {
+        AACE_INFO(LX(TAG).sensitive("value", value));
+        ThrowIfNot(m_networkInfoProviderEngineImpl->setNetworkInterface(value), "setNetworkInterfaceFailed");
         changed = true;
         return true;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("value",value));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("value", value));
         return false;
     }
 }
 
-std::string NetworkEngineService::getProperty_networkInterface()
-{
-    try
-    {
-        AACE_INFO(LX(TAG));
-        return m_networkInfoProviderEngineImpl->getNetworkInterface();
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
-        return "";
-    }
-    
-    return std::string();
-}
-
-} // aace::engine::network
-} // aace::engine
-} // aace
-
+}  // namespace network
+}  // namespace engine
+}  // namespace aace

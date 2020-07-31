@@ -29,7 +29,7 @@
 namespace aace {
 namespace test {
 namespace unit {
-    
+
 static std::chrono::milliseconds TIMEOUT(1000);
 
 static const std::string NAMESPACE{"Navigation"};
@@ -38,7 +38,7 @@ static const std::string UNKNOWN_DIRECTIVE{"Unknown"};
 
 static const alexaClientSDK::avsCommon::avs::NamespaceAndName STARTNAVIGATION{NAMESPACE, "StartNavigation"};
 static const alexaClientSDK::avsCommon::avs::NamespaceAndName CANCELNAVIGATION{NAMESPACE, "CancelNavigation"};
-    
+
 static const std::string MESSAGE_ID("messageId");
 
 class TestNavigationHandler : public aace::engine::navigation::NavigationHandlerInterface {
@@ -58,24 +58,27 @@ class NavigationCapabilityAgentTest : public ::testing::Test {
 public:
     void SetUp() override {
         m_alexaMockFactory = alexa::AlexaTestHelper::createAlexaMockComponentFactory();
-        m_mockExceptionSender = std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockExceptionEncounteredSender>>();
-        m_mockDirectiveHandlerResult = std::unique_ptr<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockDirectiveHandlerResult>>();
+        m_mockExceptionSender = std::make_shared<
+            testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockExceptionEncounteredSender>>();
+        m_mockDirectiveHandlerResult = std::unique_ptr<
+            testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockDirectiveHandlerResult>>();
         m_testNavigationHandler = std::make_shared<testing::StrictMock<TestNavigationHandler>>();
-        m_mockContextManager = std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockContextManager>>(); 
+        m_mockContextManager =
+            std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockContextManager>>();
         m_mockNavigationProviderName = "HERE";
 
         m_capAgent = aace::engine::navigation::NavigationCapabilityAgent::create(
-             m_testNavigationHandler,
-             m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
-             m_alexaMockFactory->getMessageSenderInterfaceMock(),
-             m_alexaMockFactory->getContextManagerInterfaceMock(),
-             m_mockNavigationProviderName );
+            m_testNavigationHandler,
+            m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
+            m_alexaMockFactory->getMessageSenderInterfaceMock(),
+            m_alexaMockFactory->getContextManagerInterfaceMock(),
+            m_mockNavigationProviderName);
     }
     void TearDown() override {
         m_capAgent->shutdown();
     }
 
-     /**
+    /**
      * Utility function to generate direcive payloads
      */
     const std::string generatePayload(
@@ -87,24 +90,25 @@ public:
     void wakeOnSetCompleted();
 
     NavigationCapabilityAgentTest() :
-        m_wakeSetCompletedPromise{},
-        m_wakeSetCompletedFuture{m_wakeSetCompletedPromise.get_future()} {
+            m_wakeSetCompletedPromise{}, m_wakeSetCompletedFuture{m_wakeSetCompletedPromise.get_future()} {
     }
 
     std::promise<void> m_wakeSetCompletedPromise;
     std::future<void> m_wakeSetCompletedFuture;
 
     std::shared_ptr<aace::engine::navigation::NavigationCapabilityAgent> m_capAgent;
-    std::shared_ptr<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockExceptionEncounteredSender>> m_mockExceptionSender;
-    std::unique_ptr<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockDirectiveHandlerResult>> m_mockDirectiveHandlerResult;
+    std::shared_ptr<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockExceptionEncounteredSender>>
+        m_mockExceptionSender;
+    std::unique_ptr<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockDirectiveHandlerResult>>
+        m_mockDirectiveHandlerResult;
     std::shared_ptr<testing::StrictMock<TestNavigationHandler>> m_testNavigationHandler;
     // a context manager
-    std::shared_ptr<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockContextManager>> m_mockContextManager; 
+    std::shared_ptr<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockContextManager>>
+        m_mockContextManager;
     // provider name
     std::string m_mockNavigationProviderName;
     std::shared_ptr<alexa::AlexaMockComponentFactory> m_alexaMockFactory;
 };
-
 
 const std::string NavigationCapabilityAgentTest::generatePayload(
     long latitudeInDegrees,
@@ -112,34 +116,43 @@ const std::string NavigationCapabilityAgentTest::generatePayload(
     std::string singleLineDisplayAddress,
     std::string multiLineDisplayAddress,
     std::string name) {
-
     std::string stringLatitudeInDegrees = std::to_string(latitudeInDegrees);
     std::string stringLongitudeInDegrees = std::to_string(longitudeInDegrees);
 
     const std::string payload =
 
-    "{"
+        "{"
         "\"transportationMode\":\"NAVIGATING\","
         "\"waypoints\":[ {"
-                "\"type\":\"SOURCE\","
-                "\"address\": {"
-                    "\"addressLine1\": \"" + singleLineDisplayAddress +"\","
-                    "\"addressLine2\": \"" + multiLineDisplayAddress +"\"," //Address line 2
-                    "\"addressLine3\": \"DUMMY ADDRESS 3\"," //Address line 3
-                    "\"city\": \"DUMMY TEST\"," //city
-                    "\"districtOrCounty\": \"DUMMY DISTRICT\"," //district or county
-                    "\"stateOrRegion\": \"DUMMY STATE\"," // state or region
-                    "\"countryCode\": \"DUMMY COUNTRY\"," //3 letter country code
-                    "\"postalCode\": \"DUMMY POSTAL CODE\""
-                "},"
-                "\"coordinate\":["
-                    "\"" + stringLatitudeInDegrees + "\","
-                    "\"" + stringLongitudeInDegrees + "\""
-                "],"
-                "\"name\": \"" + name +"\""
+        "\"type\":\"SOURCE\","
+        "\"address\": {"
+        "\"addressLine1\": \"" +
+        singleLineDisplayAddress +
+        "\","
+        "\"addressLine2\": \"" +
+        multiLineDisplayAddress +
+        "\","                                        //Address line 2
+        "\"addressLine3\": \"DUMMY ADDRESS 3\","     //Address line 3
+        "\"city\": \"DUMMY TEST\","                  //city
+        "\"districtOrCounty\": \"DUMMY DISTRICT\","  //district or county
+        "\"stateOrRegion\": \"DUMMY STATE\","        // state or region
+        "\"countryCode\": \"DUMMY COUNTRY\","        //3 letter country code
+        "\"postalCode\": \"DUMMY POSTAL CODE\""
+        "},"
+        "\"coordinate\":["
+        "\"" +
+        stringLatitudeInDegrees +
+        "\","
+        "\"" +
+        stringLongitudeInDegrees +
+        "\""
+        "],"
+        "\"name\": \"" +
+        name +
+        "\""
         "}"
-    "]"
-"}";
+        "]"
+        "}";
     return payload;
 }
 
@@ -158,7 +171,7 @@ TEST_F(NavigationCapabilityAgentTest, createWithNullExceptionSender) {
         nullptr,
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
         m_mockContextManager,
-        m_mockNavigationProviderName );
+        m_mockNavigationProviderName);
     EXPECT_EQ(nullptr, capAgent);
 }
 
@@ -174,37 +187,44 @@ TEST_F(NavigationCapabilityAgentTest, createWithNullContextManager) {
 }
 
 TEST_F(NavigationCapabilityAgentTest, testUnknownDirective) {
-    auto attachmentManager = std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::avs::attachment::test::MockAttachmentManager>>();
-    auto avsMessageHeader = std::make_shared<alexaClientSDK::avsCommon::avs::AVSMessageHeader>(NAMESPACE, UNKNOWN_DIRECTIVE, MESSAGE_ID);
+    auto attachmentManager = std::make_shared<
+        testing::StrictMock<alexaClientSDK::avsCommon::avs::attachment::test::MockAttachmentManager>>();
+    auto avsMessageHeader =
+        std::make_shared<alexaClientSDK::avsCommon::avs::AVSMessageHeader>(NAMESPACE, UNKNOWN_DIRECTIVE, MESSAGE_ID);
     std::shared_ptr<alexaClientSDK::avsCommon::avs::AVSDirective> directive =
         alexaClientSDK::avsCommon::avs::AVSDirective::create("", avsMessageHeader, "", attachmentManager, "");
-    
-//    EXPECT_CALL(*m_mockExceptionSender, sendExceptionEncountered(testing::_,testing::_, testing::_)).Times(testing::Exactly(1));
-    
+
+    //    EXPECT_CALL(*m_mockExceptionSender, sendExceptionEncountered(testing::_,testing::_, testing::_)).Times(testing::Exactly(1));
+
     m_capAgent->CapabilityAgent::preHandleDirective(directive, std::move(m_mockDirectiveHandlerResult));
     m_capAgent->CapabilityAgent::handleDirective(MESSAGE_ID);
     m_wakeSetCompletedFuture.wait_for(TIMEOUT);
 }
 
 TEST_F(NavigationCapabilityAgentTest, testSetDestinationDirective) {
-    auto attachmentManager = std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::avs::attachment::test::MockAttachmentManager>>();
-    auto avsMessageHeader = std::make_shared<alexaClientSDK::avsCommon::avs::AVSMessageHeader>( STARTNAVIGATION.nameSpace, STARTNAVIGATION.name, MESSAGE_ID );
-    std::string MockPayload = generatePayload(0.0, 0.0, "fake single line address", "fake multi-line adress", "fake name");
+    auto attachmentManager = std::make_shared<
+        testing::StrictMock<alexaClientSDK::avsCommon::avs::attachment::test::MockAttachmentManager>>();
+    auto avsMessageHeader = std::make_shared<alexaClientSDK::avsCommon::avs::AVSMessageHeader>(
+        STARTNAVIGATION.nameSpace, STARTNAVIGATION.name, MESSAGE_ID);
+    std::string MockPayload =
+        generatePayload(0.0, 0.0, "fake single line address", "fake multi-line adress", "fake name");
     std::shared_ptr<alexaClientSDK::avsCommon::avs::AVSDirective> directive =
-        alexaClientSDK::avsCommon::avs::AVSDirective::create( "", avsMessageHeader, MockPayload, attachmentManager, "" );
-    
-    EXPECT_CALL(*m_testNavigationHandler, startNavigation( MockPayload )).Times(testing::Exactly(1));
-    
+        alexaClientSDK::avsCommon::avs::AVSDirective::create("", avsMessageHeader, MockPayload, attachmentManager, "");
+
+    EXPECT_CALL(*m_testNavigationHandler, startNavigation(MockPayload)).Times(testing::Exactly(1));
+
     m_capAgent->CapabilityAgent::preHandleDirective(directive, std::move(m_mockDirectiveHandlerResult));
     m_capAgent->CapabilityAgent::handleDirective(MESSAGE_ID);
     m_wakeSetCompletedFuture.wait_for(TIMEOUT);
 }
 
 TEST_F(NavigationCapabilityAgentTest, testCancelNavigationDirective) {
-    auto attachmentManager = std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::avs::attachment::test::MockAttachmentManager>>();
-    auto avsMessageHeader = std::make_shared<alexaClientSDK::avsCommon::avs::AVSMessageHeader>( CANCELNAVIGATION.nameSpace, CANCELNAVIGATION.name, MESSAGE_ID );
+    auto attachmentManager = std::make_shared<
+        testing::StrictMock<alexaClientSDK::avsCommon::avs::attachment::test::MockAttachmentManager>>();
+    auto avsMessageHeader = std::make_shared<alexaClientSDK::avsCommon::avs::AVSMessageHeader>(
+        CANCELNAVIGATION.nameSpace, CANCELNAVIGATION.name, MESSAGE_ID);
     std::shared_ptr<alexaClientSDK::avsCommon::avs::AVSDirective> directive =
-        alexaClientSDK::avsCommon::avs::AVSDirective::create( "", avsMessageHeader, "", attachmentManager, "" );
+        alexaClientSDK::avsCommon::avs::AVSDirective::create("", avsMessageHeader, "", attachmentManager, "");
 
     EXPECT_CALL(*m_testNavigationHandler, cancelNavigation()).Times(testing::Exactly(1));
 
@@ -213,6 +233,6 @@ TEST_F(NavigationCapabilityAgentTest, testCancelNavigationDirective) {
     m_wakeSetCompletedFuture.wait_for(TIMEOUT);
 }
 
-} //unit
-} //test
-} //aace
+}  // namespace unit
+}  // namespace test
+}  // namespace aace

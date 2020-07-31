@@ -29,11 +29,11 @@ unique_ptr<AFBEventImpl> AFBEventImpl::create(
     return unique_ptr<AFBEventImpl>(new AFBEventImpl(logger, api, eventName));
 }
 
-AFBEventImpl::AFBEventImpl(shared_ptr<agl::common::interfaces::ILogger> logger, afb_api_t api, const string& eventName) :
-        mLogger(logger),
-        mAfbApi(api),
-        mEventName(eventName),
-        mAfbEvent(nullptr) {
+AFBEventImpl::AFBEventImpl(
+    shared_ptr<agl::common::interfaces::ILogger> logger,
+    afb_api_t api,
+    const string& eventName) :
+        mLogger(logger), mAfbApi(api), mEventName(eventName), mAfbEvent(nullptr) {
 }
 
 AFBEventImpl::~AFBEventImpl() {

@@ -23,24 +23,25 @@ namespace aace {
 namespace jni {
 namespace addressbook {
 
-    //
-    // IAddressBookEntriesFactoryBinder
-    //
+//
+// IAddressBookEntriesFactoryBinder
+//
 
-    class IAddressBookEntriesFactoryBinder {
-    public:
-        IAddressBookEntriesFactoryBinder( std::shared_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> factory );
+class IAddressBookEntriesFactoryBinder {
+public:
+    IAddressBookEntriesFactoryBinder(
+        std::shared_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> factory);
 
-        std::shared_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> getIAddressBookEntriesFactory() {
-            return m_factory;
-        }
+    std::shared_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> getIAddressBookEntriesFactory() {
+        return m_factory;
+    }
 
-    private:
-        std::shared_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> m_factory;
-    };
+private:
+    std::shared_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> m_factory;
+};
 
-} // aace::jni::addressbook
-} // aace::jni
-} // aace
+}  // namespace addressbook
+}  // namespace jni
+}  // namespace aace
 
-#endif // AACE_JNI_ADDRESSBOOK_I_ADDRESS_BOOK_ENTRIES_FACTORY_BINDER_H
+#endif  // AACE_JNI_ADDRESSBOOK_I_ADDRESS_BOOK_ENTRIES_FACTORY_BINDER_H

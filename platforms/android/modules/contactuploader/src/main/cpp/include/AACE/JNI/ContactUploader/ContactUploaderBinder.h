@@ -23,70 +23,68 @@ namespace aace {
 namespace jni {
 namespace contactuploader {
 
-    //
-    // ContactUploaderHandler
-    //
+//
+// ContactUploaderHandler
+//
 
-    class ContactUploaderHandler : public aace::contactUploader::ContactUploader {
-    public:
-        ContactUploaderHandler( jobject obj );
+class ContactUploaderHandler : public aace::contactUploader::ContactUploader {
+public:
+    ContactUploaderHandler(jobject obj);
 
-        // aace::contactUploader::ContactUploader
-        void contactsUploaderStatusChanged( ContactUploaderStatus status, const std::string& info ) override;
+    // aace::contactUploader::ContactUploader
+    void contactsUploaderStatusChanged(ContactUploaderStatus status, const std::string& info) override;
 
-    private:
-        JObject m_obj;
-    };
+private:
+    JObject m_obj;
+};
 
-    //
-    // ContactUploaderBinder
-    //
+//
+// ContactUploaderBinder
+//
 
-    class ContactUploaderBinder : public aace::jni::core::PlatformInterfaceBinder {
-    public:
-        ContactUploaderBinder( jobject obj );
+class ContactUploaderBinder : public aace::jni::core::PlatformInterfaceBinder {
+public:
+    ContactUploaderBinder(jobject obj);
 
-        std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
-            return m_contactUploaderHandler;
-        }
+    std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
+        return m_contactUploaderHandler;
+    }
 
-        std::shared_ptr<ContactUploaderHandler> getContactUploader() {
-            return m_contactUploaderHandler;
-        }
+    std::shared_ptr<ContactUploaderHandler> getContactUploader() {
+        return m_contactUploaderHandler;
+    }
 
-    private:
-        std::shared_ptr<ContactUploaderHandler> m_contactUploaderHandler;
-    };
+private:
+    std::shared_ptr<ContactUploaderHandler> m_contactUploaderHandler;
+};
 
-    //
-    // JContactUploaderStatus
-    //
+//
+// JContactUploaderStatus
+//
 
-    class JContactUploaderStatusConfig : public EnumConfiguration<ContactUploaderHandler::ContactUploaderStatus> {
-    public:
-        using T = ContactUploaderHandler::ContactUploaderStatus;
+class JContactUploaderStatusConfig : public EnumConfiguration<ContactUploaderHandler::ContactUploaderStatus> {
+public:
+    using T = ContactUploaderHandler::ContactUploaderStatus;
 
-        const char* getClassName() override {
-            return "com/amazon/aace/contactuploader/ContactUploader$ContactUploaderStatus";
-        }
+    const char* getClassName() override {
+        return "com/amazon/aace/contactuploader/ContactUploader$ContactUploaderStatus";
+    }
 
-        std::vector<std::pair<T, std::string>> getConfiguration() override {
-            return {
-                {T::UPLOAD_CONTACTS_STARTED,"UPLOAD_CONTACTS_STARTED"},
-                {T::UPLOAD_CONTACTS_UPLOADING,"UPLOAD_CONTACTS_UPLOADING"},
-                {T::UPLOAD_CONTACTS_COMPLETED,"UPLOAD_CONTACTS_COMPLETED"},
-                {T::UPLOAD_CONTACTS_CANCELED,"UPLOAD_CONTACTS_CANCELED"},
-                {T::REMOVE_CONTACTS_STARTED,"REMOVE_CONTACTS_STARTED"},
-                {T::REMOVE_CONTACTS_COMPLETED,"REMOVE_CONTACTS_COMPLETED"},
-                {T::REMOVE_CONTACTS_ERROR,"REMOVE_CONTACTS_ERROR"},
-                {T::UNKNOWN_ERROR,"UNKNOWN_ERROR"}
-            };
-        }
-    };
+    std::vector<std::pair<T, std::string>> getConfiguration() override {
+        return {{T::UPLOAD_CONTACTS_STARTED, "UPLOAD_CONTACTS_STARTED"},
+                {T::UPLOAD_CONTACTS_UPLOADING, "UPLOAD_CONTACTS_UPLOADING"},
+                {T::UPLOAD_CONTACTS_COMPLETED, "UPLOAD_CONTACTS_COMPLETED"},
+                {T::UPLOAD_CONTACTS_CANCELED, "UPLOAD_CONTACTS_CANCELED"},
+                {T::REMOVE_CONTACTS_STARTED, "REMOVE_CONTACTS_STARTED"},
+                {T::REMOVE_CONTACTS_COMPLETED, "REMOVE_CONTACTS_COMPLETED"},
+                {T::REMOVE_CONTACTS_ERROR, "REMOVE_CONTACTS_ERROR"},
+                {T::UNKNOWN_ERROR, "UNKNOWN_ERROR"}};
+    }
+};
 
-    using JContactUploaderStatus = JEnum<ContactUploaderHandler::ContactUploaderStatus, JContactUploaderStatusConfig>;
+using JContactUploaderStatus = JEnum<ContactUploaderHandler::ContactUploaderStatus, JContactUploaderStatusConfig>;
 
-} // aace::jni::contactuploader
-} // aace:jni
-} // aace
-#endif //AACE_JNI_CONTACTUPLOADER_CONTACTUPLOADER_BINDER_H
+}  // namespace contactuploader
+}  // namespace jni
+}  // namespace aace
+#endif  //AACE_JNI_CONTACTUPLOADER_CONTACTUPLOADER_BINDER_H

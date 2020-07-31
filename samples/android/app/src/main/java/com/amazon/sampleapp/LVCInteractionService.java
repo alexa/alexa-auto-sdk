@@ -31,7 +31,7 @@ import android.util.Log;
 
 import com.amazon.alexalve.ILVCClient;
 import com.amazon.alexalve.ILVCService;
-import com.amazon.sampleapp.core.FileUtils;
+import com.amazon.sampleapp.FileUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,7 +43,6 @@ import java.io.File;
  * provides handlers for bi-directional communication with LVC
  */
 public class LVCInteractionService extends Service {
-
     private static final String TAG = "LVC_" + LVCInteractionService.class.getSimpleName();
 
     private static final String LVC_SERVICE_ACTION = "com.amazon.alexalve.LocalVoiceControlService";
@@ -113,7 +112,6 @@ public class LVCInteractionService extends Service {
     }
 
     private void sendAHEInitSuccess(String result) {
-
         Intent intent = new Intent();
         intent.setAction(LVC_RECEIVER_INTENT);
         intent.putExtra(LVC_RECEIVER_CONFIGURATION, result);
@@ -172,7 +170,6 @@ public class LVCInteractionService extends Service {
      * LVC service
      */
     private ILVCClient mLVCClient = new ILVCClient.Stub() {
-
         @Override
         public String getConfiguration() {
             Log.i(TAG, "Configuration requested from LVC Service");
@@ -218,7 +215,8 @@ public class LVCInteractionService extends Service {
                 //          "volumeAdjustmentStepValue": "<Device volume adjustment step value>"
                 //     }
                 //  }
-                JSONObject customVolumeConfig = FileUtils.getConfigFromSDCard("CustomVolume.json", "CustomVolume");
+                JSONObject customVolumeConfig =
+                        FileUtils.getOptionalConfigFromSDCard("CustomVolume.json", "CustomVolume");
                 if (customVolumeConfig != null) {
                     config.put("CustomVolume", customVolumeConfig);
                 }
@@ -248,7 +246,6 @@ public class LVCInteractionService extends Service {
         public void onStop() {
             Log.i(TAG, "onStop from LVC service");
         }
-
     };
 
     /**

@@ -32,27 +32,32 @@ namespace alexa {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-SpeechRecognizerHandler::SpeechRecognizerHandler(std::weak_ptr<Activity> activity,
-                                                 std::weak_ptr<logger::LoggerHandler> loggerHandler,
-                                                 std::weak_ptr<propertyManager::PropertyManagerHandler> propertyManagerHandler,
-                                                 //std::shared_ptr<sampleApp::AudioInputManager> platformAudioCapture,
-                                                 bool wakewordDetectionEnabled)
-    : aace::alexa::SpeechRecognizer{wakewordDetectionEnabled}
-    , m_activity{std::move(activity)}
-    , m_loggerHandler{std::move(loggerHandler)}
-    , m_propertyManagerHandler{std::move(propertyManagerHandler)}{
+SpeechRecognizerHandler::SpeechRecognizerHandler(
+    std::weak_ptr<Activity> activity,
+    std::weak_ptr<logger::LoggerHandler> loggerHandler,
+    std::weak_ptr<propertyManager::PropertyManagerHandler> propertyManagerHandler,
+    //std::shared_ptr<sampleApp::AudioInputManager> platformAudioCapture,
+    bool wakewordDetectionEnabled) :
+        aace::alexa::SpeechRecognizer{wakewordDetectionEnabled},
+        m_activity{std::move(activity)},
+        m_loggerHandler{std::move(loggerHandler)},
+        m_propertyManagerHandler{std::move(propertyManagerHandler)} {
     // Expects((m_activity != nullptr) && (m_loggerHandler != nullptr));
     // Expects(m_platformAudioCapture != nullptr);
     setupUI();
 }
 
-std::weak_ptr<Activity> SpeechRecognizerHandler::getActivity() { return m_activity; }
+std::weak_ptr<Activity> SpeechRecognizerHandler::getActivity() {
+    return m_activity;
+}
 
-std::weak_ptr<logger::LoggerHandler> SpeechRecognizerHandler::getLoggerHandler() { return m_loggerHandler; }
+std::weak_ptr<logger::LoggerHandler> SpeechRecognizerHandler::getLoggerHandler() {
+    return m_loggerHandler;
+}
 
 // aace::alexa::SpeechRecognizer interface
 
-bool SpeechRecognizerHandler::wakewordDetected(const std::string &wakeword) {
+bool SpeechRecognizerHandler::wakewordDetected(const std::string& wakeword) {
     log(logger::LoggerHandler::Level::INFO, "wakewordDetected:wakeword=" + wakeword);
     auto activity = m_activity.lock();
     if (!activity) {
@@ -81,7 +86,7 @@ void SpeechRecognizerHandler::endOfSpeechDetected() {
 
 // private
 
-void SpeechRecognizerHandler::log(logger::LoggerHandler::Level level, const std::string &message) {
+void SpeechRecognizerHandler::log(logger::LoggerHandler::Level level, const std::string& message) {
     auto loggerHandler = m_loggerHandler.lock();
     if (!loggerHandler) {
         return;
@@ -97,19 +102,19 @@ void SpeechRecognizerHandler::setupUI() {
     m_console = activity->findViewById("id:console");
 
     // holdToTalk
-    activity->registerObserver(Event::onSpeechRecognizerHoldToTalk, [=](const std::string &) {
+    activity->registerObserver(Event::onSpeechRecognizerHoldToTalk, [=](const std::string&) {
         log(logger::LoggerHandler::Level::VERBOSE, "onSpeechRecognizerHoldToTalk");
         return holdToTalk();
     });
 
     // tapToTalk
-    activity->registerObserver(Event::onSpeechRecognizerTapToTalk, [=](const std::string &value) {
+    activity->registerObserver(Event::onSpeechRecognizerTapToTalk, [=](const std::string& value) {
         log(logger::LoggerHandler::Level::VERBOSE, "onSpeechRecognizerTapToTalk:" + value);
         return tapToTalk();
     });
 
     // startCapture
-    activity->registerObserver(Event::onSpeechRecognizerStartCapture, [=](const std::string &value) {
+    activity->registerObserver(Event::onSpeechRecognizerStartCapture, [=](const std::string& value) {
         log(logger::LoggerHandler::Level::VERBOSE, "onSpeechRecognizerStartCapture:" + value);
         // clang-format off
         static const std::map<std::string, Initiator> InitiatorEnumerator{
@@ -124,42 +129,41 @@ void SpeechRecognizerHandler::setupUI() {
     });
 
     // stopCapture
-    activity->registerObserver(Event::onSpeechRecognizerStopCapture, [=](const std::string &) {
+    activity->registerObserver(Event::onSpeechRecognizerStopCapture, [=](const std::string&) {
         log(logger::LoggerHandler::Level::VERBOSE, "onSpeechRecognizerStopCapture");
         return stopCapture();
     });
 
     // enableWakewordDetection
-    activity->registerObserver(Event::onSpeechRecognizerEnableWakewordDetection, [=](const std::string &) {
+    activity->registerObserver(Event::onSpeechRecognizerEnableWakewordDetection, [=](const std::string&) {
         log(logger::LoggerHandler::Level::VERBOSE, "onSpeechRecognizerEnableWakewordDetection");
         auto propertyManagerHandler = m_propertyManagerHandler.lock();
-        if(propertyManagerHandler == nullptr) {
+        if (propertyManagerHandler == nullptr) {
             log(logger::LoggerHandler::Level::ERROR, "nullPropertyManagerHandler");
             return false;
         }
-        if(propertyManagerHandler->setProperty(aace::alexa::property::WAKEWORD_ENABLED,"true" )) {
+        if (propertyManagerHandler->setProperty(aace::alexa::property::WAKEWORD_ENABLED, "true")) {
             return true;
         }
         log(logger::LoggerHandler::Level::ERROR, "Enable Wakeword Detection failed");
         return false;
-        
     });
 
     // disableWakewordDetection
-    activity->registerObserver(Event::onSpeechRecognizerDisableWakewordDetection, [=](const std::string &) {
+    activity->registerObserver(Event::onSpeechRecognizerDisableWakewordDetection, [=](const std::string&) {
         log(logger::LoggerHandler::Level::VERBOSE, "onSpeechRecognizerDisableWakewordDetection");
         auto propertyManagerHandler = m_propertyManagerHandler.lock();
-        if(propertyManagerHandler == nullptr) {
+        if (propertyManagerHandler == nullptr) {
             log(logger::LoggerHandler::Level::ERROR, "nullPropertyManagerHandler");
             return false;
         }
-        if(propertyManagerHandler->setProperty(aace::alexa::property::WAKEWORD_ENABLED,"false" )) {
+        if (propertyManagerHandler->setProperty(aace::alexa::property::WAKEWORD_ENABLED, "false")) {
             return true;
         }
         log(logger::LoggerHandler::Level::ERROR, "Disable Wakeword Detection failed");
-        return false;   
+        return false;
     });
 }
 
-} // namespace alexa
-} // namespace sampleApp
+}  // namespace alexa
+}  // namespace sampleApp

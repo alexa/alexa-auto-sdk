@@ -25,13 +25,13 @@ namespace audio {
 
 class MockAudioInputChannelInterface : public aace::engine::audio::AudioInputChannelInterface {
 public:
-    MOCK_METHOD1(start,ChannelId(AudioWriteCallback callback));
-    MOCK_METHOD1(stop,bool(ChannelId id));
+    MOCK_METHOD1(start, ChannelId(AudioWriteCallback callback));
+    MOCK_METHOD1(stop, bool(ChannelId id));
     MOCK_METHOD0(doShutdown, void());
 };
 
-} // aace::test::audio
-} // aace::test
-} // aace
+}  // namespace audio
+}  // namespace test
+}  // namespace aace
 
-#endif // AACE_ENGINE_TEST_AUDIO_MOCK_AUDIO_INPUT_CHANNEL_INTERFACE_H
+#endif  // AACE_ENGINE_TEST_AUDIO_MOCK_AUDIO_INPUT_CHANNEL_INTERFACE_H

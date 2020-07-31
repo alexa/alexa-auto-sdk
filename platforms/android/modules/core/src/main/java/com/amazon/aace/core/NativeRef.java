@@ -15,49 +15,43 @@
 
 package com.amazon.aace.core;
 
-abstract public class NativeRef
-{
+abstract public class NativeRef {
     private long mNativeRef = 0;
     private boolean mInitialized = false;
 
-    protected NativeRef() {
-    }
+    protected NativeRef() {}
 
     @Override
     public void finalize() {
-        //dispose the native reference when GC is called
+        // dispose the native reference when GC is called
         dispose();
     }
 
-    final public void dispose()
-    {
-        if( mNativeRef != 0 ) {
-            disposeNativeRef( mNativeRef );
+    final public void dispose() {
+        if (mNativeRef != 0) {
+            disposeNativeRef(mNativeRef);
             mNativeRef = 0;
         }
     }
 
-    final public long getNativeRef()
-    {
-        if( mInitialized == false ) {
+    final public long getNativeRef() {
+        if (mInitialized == false) {
             mNativeRef = createNativeRef();
             mInitialized = mNativeRef != 0;
         }
         return mNativeRef;
     }
 
-    final protected void setNativeRef( long nativeRef ) throws RuntimeException 
-    {
-        if( mNativeRef == 0 ) {
+    final protected void setNativeRef(long nativeRef) throws RuntimeException {
+        if (mNativeRef == 0) {
             mNativeRef = nativeRef;
             mInitialized = mNativeRef != 0;
-        }
-        else {
-            throw new RuntimeException( "NativeRef already set" );
+        } else {
+            throw new RuntimeException("NativeRef already set");
         }
     }
 
     // abstract interface methods
     abstract protected long createNativeRef();
-    abstract protected void disposeNativeRef( long nativeRef );
+    abstract protected void disposeNativeRef(long nativeRef);
 }

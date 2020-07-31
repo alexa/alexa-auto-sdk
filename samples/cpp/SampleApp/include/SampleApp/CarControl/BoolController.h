@@ -30,7 +30,6 @@ namespace carControl {
  * provides a way to save and retrieve that state.
  */
 class BoolController {
-
 private:
     bool m_value = false;
 
@@ -40,15 +39,14 @@ public:
 
     void setValue(bool value) {
         m_value = value;
-    }  
+    }
 
     bool getValue() {
         return m_value;
     }
-
 };
 
-} // namespace carControl
-} // namespace sampleApp
+}  // namespace carControl
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_CARCONTROL_BOOLCONTROLLER_H
+#endif  // SAMPLEAPP_CARCONTROL_BOOLCONTROLLER_H

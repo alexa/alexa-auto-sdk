@@ -33,6 +33,7 @@ public:
     MOCK_METHOD0(open, bool());
     MOCK_METHOD0(close, void());
     MOCK_METHOD3(storeSetting, bool(const std::string& key, const std::string& value, SettingStatus status));
+    MOCK_METHOD1(storeSettings, bool(const std::vector<std::tuple<std::string, std::string, SettingStatus>>& data));
     MOCK_METHOD1(loadSetting, SettingStatusAndValue(const std::string& key));
     MOCK_METHOD1(deleteSetting, bool(const std::string& key));
     MOCK_METHOD2(updateSettingStatus, bool(const std::string& key, alexaClientSDK::settings::SettingStatus status));

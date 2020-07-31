@@ -32,13 +32,13 @@ public:
 
     static constexpr ChannelId INVALID_CHANNEL = std::numeric_limits<int32_t>::min();
 
-    virtual ChannelId start( AudioWriteCallback callback ) = 0;
-    virtual bool stop( ChannelId id ) = 0;
+    virtual ChannelId start(AudioWriteCallback callback) = 0;
+    virtual bool stop(ChannelId id) = 0;
     virtual void doShutdown() = 0;
 };
 
-} // audio
-} // engine
-} // aace
+}  // namespace audio
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_AUDIO_AUDIO_INPUT_CHANNEL_INTERFACE_H
+#endif  // AACE_ENGINE_AUDIO_AUDIO_INPUT_CHANNEL_INTERFACE_H

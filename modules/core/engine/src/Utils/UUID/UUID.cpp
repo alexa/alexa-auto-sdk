@@ -65,12 +65,10 @@ static const std::string generateHexWithReplacement(
     unsigned int numDigits,
     uint8_t replacementBits,
     unsigned short numReplacementBits) {
-    
-    try
-    {
-        ThrowIf( numReplacementBits > MAX_NUM_REPLACEMENT_BITS, "replacingMoreBitsThanProvided" );
-        ThrowIf( numReplacementBits > (numDigits * BITS_IN_HEX_DIGIT), "replacingMoreBitsThanGenerated" );
-    
+    try {
+        ThrowIf(numReplacementBits > MAX_NUM_REPLACEMENT_BITS, "replacingMoreBitsThanProvided");
+        ThrowIf(numReplacementBits > (numDigits * BITS_IN_HEX_DIGIT), "replacingMoreBitsThanGenerated");
+
         // Makes assumption that 1 digit = 4 bits.
         std::vector<uint8_t> bytes(ceil(numDigits / 2.0));
         std::generate(bytes.begin(), bytes.end(), std::ref(ibe));
@@ -90,12 +88,10 @@ static const std::string generateHexWithReplacement(
         bytesText.resize(numDigits);
 
         return bytesText;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"generateHexWithReplacement").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "generateHexWithReplacement").d("reason", ex.what()));
         return std::string();
     }
-    
 }
 
 /**
@@ -136,7 +132,7 @@ const std::string generateUUID() {
     return uuidText.str();
 }
 
-} // aace::engine::utils::uuid
-} // aace::engine::utils
-} // aace::engine
-} // aace
+}  // namespace uuid
+}  // namespace utils
+}  // namespace engine
+}  // namespace aace

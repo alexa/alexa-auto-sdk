@@ -39,16 +39,14 @@ class ContactUploaderRESTAgent {
 private:
     ContactUploaderRESTAgent(
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
-        std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo
-    );
+        std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo);
 
 public:
     using HTTPResponse = alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse;
 
-    static std::shared_ptr<ContactUploaderRESTAgent> create (
+    static std::shared_ptr<ContactUploaderRESTAgent> create(
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
-        std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo
-    );
+        std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo);
 
     virtual ~ContactUploaderRESTAgent() = default;
 
@@ -82,37 +80,46 @@ public:
     };
 
     AlexaAccountInfo getAlexaAccountInfo();
-    std::string getPceId( const std::string& commsId );
+    std::string getPceId(const std::string& commsId);
 
-    std::string createAndGetAddressBookId( const std::string& sourceAddressBookId, const std::string& pceId );
-    std::string getAddressBookId( const std::string& sourceAddressBookId, const std::string& pceId );
-    bool deleteAddressBookId( const std::string& addressBookId, const std::string& pceId );
-    bool doAccountAutoProvision( const std::string& directedId );
+    std::string createAndGetAddressBookId(const std::string& sourceAddressBookId, const std::string& pceId);
+    std::string getAddressBookId(const std::string& sourceAddressBookId, const std::string& pceId);
+    bool deleteAddressBookId(const std::string& addressBookId, const std::string& pceId);
+    bool doAccountAutoProvision(const std::string& directedId);
 
-    HTTPResponse uploadContactToAddressBook( const std::vector<std::string>& poppedContacts, const std::string& addressBookId, const std::string& pceId );
-    bool parseCreateAddressBookEntryForFailedStatus( const HTTPResponse& response, std::queue<std::string>& failedResponse );
-    std::string buildFailedContactsJson( std::queue<std::string>& failedContact );
+    HTTPResponse uploadContactToAddressBook(
+        const std::vector<std::string>& poppedContacts,
+        const std::string& addressBookId,
+        const std::string& pceId);
+    bool parseCreateAddressBookEntryForFailedStatus(
+        const HTTPResponse& response,
+        std::queue<std::string>& failedResponse);
+    std::string buildFailedContactsJson(std::queue<std::string>& failedContact);
 
-    std::string getHTTPErrorString( const HTTPResponse& response );
+    std::string getHTTPErrorString(const HTTPResponse& response);
 
 private:
     std::vector<std::string> buildCommonHTTPHeader();
-    bool parseCommonHTTPResponse( const HTTPResponse& response );
+    bool parseCommonHTTPResponse(const HTTPResponse& response);
 
-    HTTPResponse doPost( const std::string& url, const std::vector<std::string> headerLines, const std::string& data, std::chrono::seconds timeout );
-    HTTPResponse doGet( const std::string& url, const std::vector<std::string>& headers );
-    HTTPResponse doDelete( const std::string& url, const std::vector<std::string>& headers );
+    HTTPResponse doPost(
+        const std::string& url,
+        const std::vector<std::string> headerLines,
+        const std::string& data,
+        std::chrono::seconds timeout);
+    HTTPResponse doGet(const std::string& url, const std::vector<std::string>& headers);
+    HTTPResponse doDelete(const std::string& url, const std::vector<std::string>& headers);
 
-    std::string buildCreateAddressBookDataJson( const std::string& sourceAddressBookId );
-    std::string buildContactsJson( const std::vector<std::string>& contacts );
+    std::string buildCreateAddressBookDataJson(const std::string& sourceAddressBookId);
+    std::string buildContactsJson(const std::vector<std::string>& contacts);
     std::string buildAutoAccountProvisionJson();
 
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> m_authDelegate;
     std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> m_deviceInfo;
 };
 
-} // aace::engine::contactUploader
-} // aace::engine
-} // aace
+}  // namespace contactUploader
+}  // namespace engine
+}  // namespace aace
 
 #endif

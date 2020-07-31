@@ -30,7 +30,7 @@ public class AddressBookHandler extends AddressBook {
 
     private static final String sContactsSourceId = "0001";
     private static final String sNavigationFavoritesSourceId = "0002";
-    private static final String[] sSourceIds = { sContactsSourceId, sNavigationFavoritesSourceId };
+    private static final String[] sSourceIds = {sContactsSourceId, sNavigationFavoritesSourceId};
 
     private final String mContactsDataPath;
     private final String mNavigationFavoritesDataPath;
@@ -44,10 +44,8 @@ public class AddressBookHandler extends AddressBook {
     private final Activity mActivity;
     private final LoggerHandler mLogger;
 
-    public AddressBookHandler(final Activity activity,
-                              final LoggerHandler logger,
-                              final String contactsDataPath,
-                              final String navigationFavoritesDataPath) {
+    public AddressBookHandler(final Activity activity, final LoggerHandler logger, final String contactsDataPath,
+            final String navigationFavoritesDataPath) {
         mActivity = activity;
         mLogger = logger;
         mContactsDataPath = contactsDataPath;
@@ -63,16 +61,16 @@ public class AddressBookHandler extends AddressBook {
         mContactsUploadView = mActivity.findViewById(R.id.contacts_uploader);
         mContactsUploadAccessStatus = mContactsUploadView.findViewById(R.id.access_to_contacts);
 
-        View switchItem = mActivity.findViewById( R.id.toggle_contacts_upload );
-        ( (TextView) switchItem.findViewById( R.id.text ) ).setText( R.string.permit_upload);
-        SwitchCompat contactUploadSwitch = switchItem.findViewById( R.id.drawerSwitch );
-        contactUploadSwitch.setChecked( false );
+        View switchItem = mActivity.findViewById(R.id.toggle_contacts_upload);
+        ((TextView) switchItem.findViewById(R.id.text)).setText(R.string.permit_upload);
+        SwitchCompat contactUploadSwitch = switchItem.findViewById(R.id.drawerSwitch);
+        contactUploadSwitch.setChecked(false);
 
         // sets the listener on the phone connection toggle controller
         contactUploadSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked) {
+                if (isChecked) {
                     showPermissionDialogToAccessContacts();
                 } else {
                     mContactsUploadAccessStatus.setText(R.string.denied_access_to_contacts);
@@ -82,10 +80,10 @@ public class AddressBookHandler extends AddressBook {
         });
     }
 
-    private void setToggleToUnchecked(int resNum){
-        View switchItem = mActivity.findViewById( resNum );
-        SwitchCompat contactUploadSwitch = switchItem.findViewById( R.id.drawerSwitch );
-        contactUploadSwitch.setChecked( false );
+    private void setToggleToUnchecked(int resNum) {
+        View switchItem = mActivity.findViewById(resNum);
+        SwitchCompat contactUploadSwitch = switchItem.findViewById(R.id.drawerSwitch);
+        contactUploadSwitch.setChecked(false);
     }
 
     private void showPermissionDialogToAccessContacts() {
@@ -101,7 +99,7 @@ public class AddressBookHandler extends AddressBook {
                     case DialogInterface.BUTTON_NEGATIVE:
                         mContactsUploadAccessStatus.setText(R.string.denied_access_to_contacts);
 
-                        setToggleToUnchecked( R.id.toggle_contacts_upload );
+                        setToggleToUnchecked(R.id.toggle_contacts_upload);
                         break;
                 }
             }
@@ -110,7 +108,7 @@ public class AddressBookHandler extends AddressBook {
         final DialogInterface.OnCancelListener cancelListener = new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
-                setToggleToUnchecked( R.id.toggle_contacts_upload );
+                setToggleToUnchecked(R.id.toggle_contacts_upload);
             }
         };
 
@@ -125,19 +123,20 @@ public class AddressBookHandler extends AddressBook {
 
     private void initNavigationFavoritesUI() {
         mNavigationFavoritesUploadView = mActivity.findViewById(R.id.navigation_favorites_uploader);
-        mNavigationFavoritesUploadAccessStatus = mNavigationFavoritesUploadView.findViewById(R.id.access_to_navigation_favorites);
-        //mContactsUploadAccessStatus.setVisibility(View.VISIBLE);
+        mNavigationFavoritesUploadAccessStatus =
+                mNavigationFavoritesUploadView.findViewById(R.id.access_to_navigation_favorites);
+        // mContactsUploadAccessStatus.setVisibility(View.VISIBLE);
 
-        View switchItem = mActivity.findViewById( R.id.toggle_navigation_favorites_upload );
-        ( (TextView) switchItem.findViewById( R.id.text ) ).setText( R.string.permit_upload);
-        SwitchCompat navigationFavoritesUploadSwitch = switchItem.findViewById( R.id.drawerSwitch );
-        navigationFavoritesUploadSwitch.setChecked( false );
+        View switchItem = mActivity.findViewById(R.id.toggle_navigation_favorites_upload);
+        ((TextView) switchItem.findViewById(R.id.text)).setText(R.string.permit_upload);
+        SwitchCompat navigationFavoritesUploadSwitch = switchItem.findViewById(R.id.drawerSwitch);
+        navigationFavoritesUploadSwitch.setChecked(false);
 
         // sets the listener on the phone connection toggle controller
         navigationFavoritesUploadSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked) {
+                if (isChecked) {
                     showPermissionDialogToAccessNavigationFavorites();
                 } else {
                     mNavigationFavoritesUploadAccessStatus.setText(R.string.denied_access_to_navigation_favorites);
@@ -169,7 +168,7 @@ public class AddressBookHandler extends AddressBook {
         final DialogInterface.OnCancelListener cancelListener = new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
-                setToggleToUnchecked( R.id.toggle_navigation_favorites_upload );
+                setToggleToUnchecked(R.id.toggle_navigation_favorites_upload);
             }
         };
 
@@ -182,7 +181,8 @@ public class AddressBookHandler extends AddressBook {
                 .show();
     }
 
-    private boolean parseNameFromContact(String id, JSONObject contact, IAddressBookEntriesFactory factory) throws JSONException {
+    private boolean parseNameFromContact(String id, JSONObject contact, IAddressBookEntriesFactory factory)
+            throws JSONException {
         JSONObject fullname = contact.getJSONObject("name");
         String firstname = fullname.getString("firstName");
         String lastname = fullname.getString("lastName");
@@ -190,8 +190,9 @@ public class AddressBookHandler extends AddressBook {
         return factory.addName(id, firstname, lastname, nickname);
     }
 
-    private boolean parsePhoneNumbers(String id, JSONObject contact, IAddressBookEntriesFactory factory) throws JSONException {
-        if(contact.has("phoneNumbers")) {
+    private boolean parsePhoneNumbers(String id, JSONObject contact, IAddressBookEntriesFactory factory)
+            throws JSONException {
+        if (contact.has("phoneNumbers")) {
             JSONArray phoneNumbers = contact.getJSONArray("phoneNumbers");
             for (int j = 0; j < phoneNumbers.length(); ++j) {
                 JSONObject phoneNumber = phoneNumbers.getJSONObject(j);
@@ -199,7 +200,7 @@ public class AddressBookHandler extends AddressBook {
                 String label = phoneNumber.getString("label");
                 String number = phoneNumber.getString("number");
 
-                if( !factory.addPhone(id, label, number) ) {
+                if (!factory.addPhone(id, label, number)) {
                     return false;
                 }
             }
@@ -207,7 +208,8 @@ public class AddressBookHandler extends AddressBook {
         return true;
     }
 
-    private boolean parsePostalAddress(String id, JSONObject contact, IAddressBookEntriesFactory factory) throws JSONException {
+    private boolean parsePostalAddress(String id, JSONObject contact, IAddressBookEntriesFactory factory)
+            throws JSONException {
         JSONObject postalAddress = contact.getJSONObject("postalAddress");
         String label = postalAddress.getString("label");
         String addressLine1 = postalAddress.getString("addressLine1");
@@ -221,19 +223,18 @@ public class AddressBookHandler extends AddressBook {
         double latitudeInDegrees = postalAddress.getDouble("latitudeInDegrees");
         double longitudeInDegrees = postalAddress.getDouble("longitudeInDegrees");
         double accuracyInMeters = postalAddress.getDouble("accuracyInMeters");
-        return factory.addPostalAddress( id, label, addressLine1, addressLine2, addressLine3, city,
-                stateOrRegion, districtOrCounty, postalCode, country, latitudeInDegrees,
-                longitudeInDegrees, accuracyInMeters);
+        return factory.addPostalAddress(id, label, addressLine1, addressLine2, addressLine3, city, stateOrRegion,
+                districtOrCounty, postalCode, country, latitudeInDegrees, longitudeInDegrees, accuracyInMeters);
     }
 
-    private JSONObject parseFileAsJSONObject(String filePath) throws IOException, JSONException{
-        mLogger.postInfo( sTag, String.format( "parsing JSON from %s", filePath ) );
-        File file = new File( filePath );
+    private JSONObject parseFileAsJSONObject(String filePath) throws IOException, JSONException {
+        mLogger.postInfo(sTag, String.format("parsing JSON from %s", filePath));
+        File file = new File(filePath);
         FileInputStream is = new FileInputStream(file);
-        byte[] buffer = new byte[ is.available() ];
-        is.read( buffer );
-        String json = new String( buffer, "UTF-8" );
-        JSONObject obj = new JSONObject( json );
+        byte[] buffer = new byte[is.available()];
+        is.read(buffer);
+        String json = new String(buffer, "UTF-8");
+        JSONObject obj = new JSONObject(json);
         return obj;
     }
 
@@ -241,24 +242,24 @@ public class AddressBookHandler extends AddressBook {
         try {
             JSONObject json = parseFileAsJSONObject(filename);
             JSONArray contacts = json.getJSONArray("contacts");
-            for(int i = 0; i < contacts.length(); ++i ) {
+            for (int i = 0; i < contacts.length(); ++i) {
                 JSONObject contact = contacts.getJSONObject(i);
                 String id = contact.getString("id");
-                if( !parseNameFromContact( id, contact, factory ) ) {
-                    mLogger.postError( sTag, String.format( "parseNameFromContact returned false" ) );
+                if (!parseNameFromContact(id, contact, factory)) {
+                    mLogger.postError(sTag, String.format("parseNameFromContact returned false"));
                     return false;
                 }
 
-                if( !parsePhoneNumbers( id, contact, factory ) ) {
-                    mLogger.postError( sTag, String.format( "parsePhoneNumbers returned false" ) );
+                if (!parsePhoneNumbers(id, contact, factory)) {
+                    mLogger.postError(sTag, String.format("parsePhoneNumbers returned false"));
                     return false;
                 }
             }
-        } catch ( IOException e ) {
-            mLogger.postError( sTag, String.format( "Cannot read %s from assets directory. Error: %s",
-                    filename, e.getMessage() ) );
-        } catch ( JSONException e ) {
-            mLogger.postError( sTag, String.format( "Cannot create json object. Error: %s", e.getMessage() ) );
+        } catch (IOException e) {
+            mLogger.postError(
+                    sTag, String.format("Cannot read %s from assets directory. Error: %s", filename, e.getMessage()));
+        } catch (JSONException e) {
+            mLogger.postError(sTag, String.format("Cannot create json object. Error: %s", e.getMessage()));
         }
 
         return true;
@@ -268,24 +269,24 @@ public class AddressBookHandler extends AddressBook {
         try {
             JSONObject json = parseFileAsJSONObject(filename);
             JSONArray navigationFavorites = json.getJSONArray("navigationFavorites");
-            for(int i = 0; i < navigationFavorites.length(); ++i ) {
+            for (int i = 0; i < navigationFavorites.length(); ++i) {
                 JSONObject navigationFavorite = navigationFavorites.getJSONObject(i);
                 String id = navigationFavorite.getString("id");
-                if( !parseNameFromContact( id, navigationFavorite, factory ) ) {
-                    mLogger.postError( sTag, String.format( "parseNameFromNavigation returned false" ) );
+                if (!parseNameFromContact(id, navigationFavorite, factory)) {
+                    mLogger.postError(sTag, String.format("parseNameFromNavigation returned false"));
                     return false;
                 }
 
-                if( !parsePostalAddress( id, navigationFavorite, factory ) ) {
-                    mLogger.postError( sTag, String.format( "parsePostalAddress returned false" ) );
+                if (!parsePostalAddress(id, navigationFavorite, factory)) {
+                    mLogger.postError(sTag, String.format("parsePostalAddress returned false"));
                     return false;
                 }
             }
-        } catch ( IOException e ) {
-            mLogger.postError( sTag, String.format( "Cannot read %s from assets directory. Error: %s",
-                    filename, e.getMessage() ) );
-        } catch ( JSONException e ) {
-            mLogger.postError( sTag, String.format( "Cannot create json object. Error: %s", e.getMessage() ) );
+        } catch (IOException e) {
+            mLogger.postError(
+                    sTag, String.format("Cannot read %s from assets directory. Error: %s", filename, e.getMessage()));
+        } catch (JSONException e) {
+            mLogger.postError(sTag, String.format("Cannot create json object. Error: %s", e.getMessage()));
         }
 
         return true;
@@ -294,19 +295,20 @@ public class AddressBookHandler extends AddressBook {
     @Override
     public boolean getEntries(String contactsSourceId, IAddressBookEntriesFactory factory) {
         boolean success = false;
-        if( contactsSourceId.equals( sContactsSourceId ) ) {
-            success = parseFileAsContacts( mContactsDataPath, factory );
-        } else if( contactsSourceId.equals( sNavigationFavoritesSourceId ) ) {
-            success = parseFileAsNavigationFavorites( mNavigationFavoritesDataPath, factory );
+        if (contactsSourceId.equals(sContactsSourceId)) {
+            success = parseFileAsContacts(mContactsDataPath, factory);
+        } else if (contactsSourceId.equals(sNavigationFavoritesSourceId)) {
+            success = parseFileAsNavigationFavorites(mNavigationFavoritesDataPath, factory);
         }
 
-        mLogger.postInfo( sTag, String.format( "success status of adding contacts with ID: (%s): (%b)", contactsSourceId, success ));
+        mLogger.postInfo(sTag,
+                String.format("success status of adding contacts with ID: (%s): (%b)", contactsSourceId, success));
         return success;
     }
 
     public void removeAllAddressBooks() {
-        for ( String id : sSourceIds ) {
-            removeAddressBook( id );
+        for (String id : sSourceIds) {
+            removeAddressBook(id);
         }
     }
 }

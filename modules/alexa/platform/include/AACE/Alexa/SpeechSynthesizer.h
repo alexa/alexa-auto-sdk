@@ -40,7 +40,7 @@ public:
     virtual ~SpeechSynthesizer();
 };
 
-} // aace::alexa
-} // aace
+}  // namespace alexa
+}  // namespace aace
 
-#endif // AACE_ALEXA_SPEECH_SYNTHESIZER_H
+#endif  // AACE_ALEXA_SPEECH_SYNTHESIZER_H

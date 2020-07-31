@@ -51,8 +51,8 @@ enum class FocusState {
     NONE
 };
 
-inline std::ostream& operator<<( std::ostream& stream, const FocusState& state ) {
-    switch ( state ) {
+inline std::ostream& operator<<(std::ostream& stream, const FocusState& state) {
+    switch (state) {
         case FocusState::FOREGROUND:
             stream << "FOREGROUND";
             break;
@@ -66,7 +66,7 @@ inline std::ostream& operator<<( std::ostream& stream, const FocusState& state )
     return stream;
 }
 
-} // aace::alexa
-} // aace
+}  // namespace alexa
+}  // namespace aace
 
-#endif // AACE_ALEXA_FOCUS_STATE_H
+#endif  // AACE_ALEXA_FOCUS_STATE_H

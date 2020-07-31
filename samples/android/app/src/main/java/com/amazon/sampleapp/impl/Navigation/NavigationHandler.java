@@ -37,17 +37,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.*;
 import java.lang.*;
+import java.text.*;
 import java.time.*;
-import java.text.*;
+import java.util.*;
+import java.util.ArrayList;
 import java.util.Date;
-import java.text.*;
-
 
 public class NavigationHandler extends Navigation {
-
     private static String sTag = "Navigation";
     private static String sNavigationStateFilename = "NavigationState.json";
     private final Activity mActivity;
@@ -58,8 +55,7 @@ public class NavigationHandler extends Navigation {
     private List<String> mPreviousDestinations = new ArrayList<>();
     private static final int MAXIMUM_WAYPOINTS_IN_PREVIOUS_DESTINATION_LIST = 5;
 
-    public NavigationHandler(final Activity activity,
-                             final LoggerHandler logger) {
+    public NavigationHandler(final Activity activity, final LoggerHandler logger) {
         mActivity = activity;
         mLogger = logger;
 
@@ -71,35 +67,33 @@ public class NavigationHandler extends Navigation {
         // initial UI setup when the app boots up
 
         // Switch to toggle nav context loaded state
-        View switchItem = mActivity.findViewById( R.id.toggle_load_nav_state_file );
-        ( (TextView) switchItem.findViewById( R.id.text ) ).setText( R.string.load_navigation_state_file);
-        mNavigationStateUploadSwitch = switchItem.findViewById( R.id.drawerSwitch );
-        mNavigationStateUploadSwitch.setChecked( false );
+        View switchItem = mActivity.findViewById(R.id.toggle_load_nav_state_file);
+        ((TextView) switchItem.findViewById(R.id.text)).setText(R.string.load_navigation_state_file);
+        mNavigationStateUploadSwitch = switchItem.findViewById(R.id.drawerSwitch);
+        mNavigationStateUploadSwitch.setChecked(false);
 
         // sets the listener on the navigation toggle controller
         mNavigationStateUploadSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                View switchItem = mActivity.findViewById( R.id.navigation );
-                TextView fileStatus = switchItem.findViewById( R.id.navigation_state_file_status);
-                if(isChecked) {
+                View switchItem = mActivity.findViewById(R.id.navigation);
+                TextView fileStatus = switchItem.findViewById(R.id.navigation_state_file_status);
+                if (isChecked) {
                     isOverrideActive = true;
-                    if(loadNavigationState()) {
-                        fileStatus.setText( R.string.navigation_state_file_loaded );
+                    if (loadNavigationState()) {
+                        fileStatus.setText(R.string.navigation_state_file_loaded);
                     } else {
-                        fileStatus.setText( R.string.navigation_state_file_error );
-                        mActivity.runOnUiThread(
-                                new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        mNavigationStateUploadSwitch.setChecked( false );
-                                    }
-                                }
-                        );
+                        fileStatus.setText(R.string.navigation_state_file_error);
+                        mActivity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mNavigationStateUploadSwitch.setChecked(false);
+                            }
+                        });
                     }
                 } else {
                     unloadNavigationState();
-                    fileStatus.setText( R.string.navigation_state_file_not_loaded );
+                    fileStatus.setText(R.string.navigation_state_file_not_loaded);
                 }
             }
         });
@@ -112,21 +106,22 @@ public class NavigationHandler extends Navigation {
         synchronized (m_currentNavigationState) {
             m_currentNavigationState = "";
         }
-        return  true;
+        return true;
     }
 
-    /* 
-     * Loads navigation state from the NavigationState.json file 
+    /*
+     * Loads navigation state from the NavigationState.json file
      * Format as documented for getNavigationState() in "Navigation.h"
      * If there is no explicit request to load navigation state from NavigationState.json file,
      * the navigation state is populated everytime startNavigation() is called.
      */
     private boolean loadNavigationState() {
         synchronized (m_currentNavigationState) {
-            String navigationStateRootFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/NavigationState.json";
-            File rootNavigationStateFile = new File( navigationStateRootFileName );
+            String navigationStateRootFileName =
+                    Environment.getExternalStorageDirectory().getAbsolutePath() + "/NavigationState.json";
+            File rootNavigationStateFile = new File(navigationStateRootFileName);
             StringBuilder text = new StringBuilder();
-            if ( rootNavigationStateFile.exists() ) {
+            if (rootNavigationStateFile.exists()) {
                 try {
                     BufferedReader br = new BufferedReader(new FileReader(rootNavigationStateFile));
                     String line;
@@ -160,56 +155,54 @@ public class NavigationHandler extends Navigation {
 
     @Override
     public String getNavigationState() {
-        mLogger.postInfo(sTag, "getNavigationState" );
+        mLogger.postInfo(sTag, "getNavigationState");
         return m_currentNavigationState;
     }
 
     @Override
     public boolean cancelNavigation() {
-        mLogger.postInfo( sTag, "Cancel Navigation");
-        mActivity.runOnUiThread(
-            new Runnable() {
-                @Override
-                public void run() {
-                    mNavigationStateUploadSwitch.setChecked( false );
-                }
+        mLogger.postInfo(sTag, "Cancel Navigation");
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mNavigationStateUploadSwitch.setChecked(false);
             }
-        );
+        });
 
         return unloadNavigationState();
     }
 
     @Override
-    public void startNavigation( String payload ) {
+    public void startNavigation(String payload) {
         try {
-            mLogger.postInfo( sTag, "StartNavigation payload " + payload );
+            mLogger.postInfo(sTag, "StartNavigation payload " + payload);
 
-             //Log payload
-            JSONObject template = getStartNavigationJSONPayload( payload, true );
-            mLogger.postJSONTemplate( sTag, template.toString( 4 ) );
+            // Log payload
+            JSONObject template = getStartNavigationJSONPayload(payload, true);
+            mLogger.postJSONTemplate(sTag, template.toString(4));
 
             // Check to use NavigationState.json for navigation state
-            if ( !isOverrideActive ) {
+            if (!isOverrideActive) {
                 JSONObject navigationState = new JSONObject(payload);
                 JSONObject currentState = new JSONObject();
-                currentState.put( "state", "NAVIGATING" );
-                currentState.put( "waypoints", navigationState.getJSONArray("waypoints" ) );
-                currentState.put( "shapes", new JSONArray() );
+                currentState.put("state", "NAVIGATING");
+                currentState.put("waypoints", navigationState.getJSONArray("waypoints"));
+                currentState.put("shapes", new JSONArray());
                 m_currentNavigationState = currentState.toString();
             }
 
             isOverrideActive = false;
 
-            //Updating Previous Destinations List
-            updatePreviousDestinations( payload );
+            // Updating Previous Destinations List
+            updatePreviousDestinations(payload);
 
             // Log display card
-            mLogger.postDisplayCard( template, LogRecyclerViewAdapter.START_NAVIGATION_TEMPLATE );
-            navigationEvent( EventName.NAVIGATION_STARTED );
+            mLogger.postDisplayCard(template, LogRecyclerViewAdapter.START_NAVIGATION_TEMPLATE);
+            navigationEvent(EventName.NAVIGATION_STARTED);
 
-        } catch ( JSONException e ) {
-            mLogger.postError( sTag, e.getMessage() );
-            navigationError( ErrorType.NAVIGATION_START_FAILED, ErrorCode.INTERNAL_SERVICE_ERROR, "" );
+        } catch (JSONException e) {
+            mLogger.postError(sTag, e.getMessage());
+            navigationError(ErrorType.NAVIGATION_START_FAILED, ErrorCode.INTERNAL_SERVICE_ERROR, "");
         }
     }
 
@@ -218,95 +211,96 @@ public class NavigationHandler extends Navigation {
         try {
             JSONArray wayPoints = new JSONArray();
             JSONObject document = new JSONObject();
-            JSONObject payloadJSON = new JSONObject( payload );
-            JSONArray waypoints = payloadJSON.getJSONArray( "waypoints" );
-            for ( int i = 0; i < waypoints.length(); i++ ) {
-                JSONObject point = waypoints.getJSONObject( i );
-                JSONObject entry = parseWaypoint( point );
+            JSONObject payloadJSON = new JSONObject(payload);
+            JSONArray waypoints = payloadJSON.getJSONArray("waypoints");
+            for (int i = 0; i < waypoints.length(); i++) {
+                JSONObject point = waypoints.getJSONObject(i);
+                JSONObject entry = parseWaypoint(point);
 
-                if ( isDestinationRequired && point.getString( "type").equals("DESTINATION") ) {
-                    document.put( "destination" , entry );
-                }
-                else if ( point.getString( "type" ).equals( "INTERIM" ) ) {
-                    wayPoints.put( entry );
+                if (isDestinationRequired && point.getString("type").equals("DESTINATION")) {
+                    document.put("destination", entry);
+                } else if (point.getString("type").equals("INTERIM")) {
+                    wayPoints.put(entry);
                 }
             }
-            document.put( "waypoints", wayPoints );
+            document.put("waypoints", wayPoints);
             return document;
-        } catch ( JSONException e ) {
-            mLogger.postError( sTag, e.getMessage() );
+        } catch (JSONException e) {
+            mLogger.postError(sTag, e.getMessage());
             return null;
         }
     }
 
     // Add destination to PreviousDestinations list. Maintains a size cap for list.
-    void updatePreviousDestinations( String payload ) {
+    void updatePreviousDestinations(String payload) {
         try {
             JSONObject payloadJSON = new JSONObject(payload);
-            JSONArray waypoints = payloadJSON.getJSONArray( "waypoints" );
+            JSONArray waypoints = payloadJSON.getJSONArray("waypoints");
 
-            for ( int j = waypoints.length() - 1; j >= 0; j-- ) {
-                mPreviousDestinations.add( 0,waypoints.get( j ).toString() );
+            for (int j = waypoints.length() - 1; j >= 0; j--) {
+                mPreviousDestinations.add(0, waypoints.get(j).toString());
             }
-            if ( mPreviousDestinations.size() > MAXIMUM_WAYPOINTS_IN_PREVIOUS_DESTINATION_LIST ) {
-                mPreviousDestinations.subList( MAXIMUM_WAYPOINTS_IN_PREVIOUS_DESTINATION_LIST, mPreviousDestinations.size() ).clear();
+            if (mPreviousDestinations.size() > MAXIMUM_WAYPOINTS_IN_PREVIOUS_DESTINATION_LIST) {
+                mPreviousDestinations
+                        .subList(MAXIMUM_WAYPOINTS_IN_PREVIOUS_DESTINATION_LIST, mPreviousDestinations.size())
+                        .clear();
             }
-        } catch ( JSONException e ) {
-            mLogger.postError( sTag, e.getMessage() );
+        } catch (JSONException e) {
+            mLogger.postError(sTag, e.getMessage());
         }
     }
 
     @Override
     public void navigateToPreviousWaypoint() {
-        mLogger.postInfo( sTag, "navigateToPreviousWaypoint:" );
+        mLogger.postInfo(sTag, "navigateToPreviousWaypoint:");
         try {
-            if ( mPreviousDestinations.size() == 0 ) {
-                mLogger.postError( sTag, "previousDestinations list empty" );
-                navigationError( ErrorType.PREVIOUS_NAVIGATION_START_FAILED, ErrorCode.NO_PREVIOUS_WAYPOINTS, "" );
+            if (mPreviousDestinations.size() == 0) {
+                mLogger.postError(sTag, "previousDestinations list empty");
+                navigationError(ErrorType.PREVIOUS_NAVIGATION_START_FAILED, ErrorCode.NO_PREVIOUS_WAYPOINTS, "");
                 return;
             }
 
             // Construct navigation JSONObject from most recent destination
-            JSONObject previousWaypoint = new JSONObject( mPreviousDestinations.get(0) );
+            JSONObject previousWaypoint = new JSONObject(mPreviousDestinations.get(0));
             JSONObject template = new JSONObject();
-            JSONObject entry = parseWaypoint( previousWaypoint );
-            template.put( "waypoint", entry );
+            JSONObject entry = parseWaypoint(previousWaypoint);
+            template.put("waypoint", entry);
 
-            mLogger.postInfo( sTag, "navigateToPreviousWaypoints payload: " + template.toString() );
+            mLogger.postInfo(sTag, "navigateToPreviousWaypoints payload: " + template.toString());
 
             // Log payload
-            mLogger.postJSONTemplate( sTag, template.toString( 4 ) );
+            mLogger.postJSONTemplate(sTag, template.toString(4));
 
             // Log display card
-            mLogger.postDisplayCard( template, LogRecyclerViewAdapter.START_NAVIGATION_TEMPLATE );
-            navigationEvent( EventName.PREVIOUS_NAVIGATION_STARTED );
+            mLogger.postDisplayCard(template, LogRecyclerViewAdapter.START_NAVIGATION_TEMPLATE);
+            navigationEvent(EventName.PREVIOUS_NAVIGATION_STARTED);
 
-        } catch ( JSONException e ) {
-            mLogger.postError( sTag, e.getMessage() );
-            navigationError( ErrorType.PREVIOUS_NAVIGATION_START_FAILED, ErrorCode.INTERNAL_SERVICE_ERROR, "" );
+        } catch (JSONException e) {
+            mLogger.postError(sTag, e.getMessage());
+            navigationError(ErrorType.PREVIOUS_NAVIGATION_START_FAILED, ErrorCode.INTERNAL_SERVICE_ERROR, "");
         }
     }
 
     @Override
     public void showPreviousWaypoints() {
         try {
-            mLogger.postInfo( sTag, "showPreviousWaypoints:" );
-            if ( mPreviousDestinations.size() == 0 ) {
-                mLogger.postError( sTag, "previousDestinations list empty" );
-                navigationError( ErrorType.PREVIOUS_NAVIGATION_START_FAILED, ErrorCode.NO_PREVIOUS_WAYPOINTS, "" );
+            mLogger.postInfo(sTag, "showPreviousWaypoints:");
+            if (mPreviousDestinations.size() == 0) {
+                mLogger.postError(sTag, "previousDestinations list empty");
+                navigationError(ErrorType.PREVIOUS_NAVIGATION_START_FAILED, ErrorCode.NO_PREVIOUS_WAYPOINTS, "");
                 return;
             }
 
             JSONObject template = getPreviousWaypointsJSON();
             // Log payload
-            mLogger.postJSONTemplate( sTag, template.toString( 4 ) );
+            mLogger.postJSONTemplate(sTag, template.toString(4));
 
             // Log display card
-            mLogger.postDisplayCard( template, LogRecyclerViewAdapter.PREVIOUS_WAYPOINTS_TEMPLATE );
-            navigationEvent( EventName.PREVIOUS_WAYPOINTS_SHOWN );
-        } catch ( JSONException e ) {
-            mLogger.postError( sTag, e.getMessage() );
-            navigationError( ErrorType.SHOW_PREVIOUS_WAYPOINTS_FAILED, ErrorCode.INTERNAL_SERVICE_ERROR, "" );
+            mLogger.postDisplayCard(template, LogRecyclerViewAdapter.PREVIOUS_WAYPOINTS_TEMPLATE);
+            navigationEvent(EventName.PREVIOUS_WAYPOINTS_SHOWN);
+        } catch (JSONException e) {
+            mLogger.postError(sTag, e.getMessage());
+            navigationError(ErrorType.SHOW_PREVIOUS_WAYPOINTS_FAILED, ErrorCode.INTERNAL_SERVICE_ERROR, "");
         }
     }
 
@@ -316,73 +310,75 @@ public class NavigationHandler extends Navigation {
             JSONArray wayPoints = new JSONArray();
             JSONObject document = new JSONObject();
 
-            for ( int i = 0; i < mPreviousDestinations.size(); i++ ) {
-                JSONObject point = new JSONObject( mPreviousDestinations.get(i) );
-                JSONObject entry = parseWaypoint( point );
+            for (int i = 0; i < mPreviousDestinations.size(); i++) {
+                JSONObject point = new JSONObject(mPreviousDestinations.get(i));
+                JSONObject entry = parseWaypoint(point);
                 wayPoints.put(entry);
             }
             document.put("waypoints", wayPoints);
             return document;
-        } catch ( JSONException e ) {
-            mLogger.postError( sTag, e.getMessage() );
+        } catch (JSONException e) {
+            mLogger.postError(sTag, e.getMessage());
             return null;
         }
     }
 
-    private JSONObject parseWaypoint( JSONObject point ) {
+    private JSONObject parseWaypoint(JSONObject point) {
         try {
             JSONObject entry = new JSONObject();
             JSONObject coordinate = new JSONObject();
 
             String address = "";
-            if ( point.has( "address" ) ) {
-                address = constructAddressString( point.getJSONObject( "address" ) );
+            if (point.has("address")) {
+                address = constructAddressString(point.getJSONObject("address"));
             }
-            entry.put( "address", address );
-            coordinate.put( "latitudeInDegrees", point.getJSONArray("coordinate").getDouble(0) );
-            coordinate.put( "longitudeInDegrees", point.getJSONArray("coordinate").getDouble(1) );
-            entry.put( "name", point.has("name") ? point.getString("name") : "" );
-            entry.put( "coordinate" , coordinate ) ;
+            entry.put("address", address);
+            coordinate.put("latitudeInDegrees", point.getJSONArray("coordinate").getDouble(0));
+            coordinate.put("longitudeInDegrees", point.getJSONArray("coordinate").getDouble(1));
+            entry.put("name", point.has("name") ? point.getString("name") : "");
+            entry.put("coordinate", coordinate);
 
             return entry;
-        } catch ( JSONException e ) {
-            mLogger.postError( sTag, e.getMessage() );
+        } catch (JSONException e) {
+            mLogger.postError(sTag, e.getMessage());
             return null;
         }
     }
 
-    private String constructAddressString( JSONObject address ) {
+    private String constructAddressString(JSONObject address) {
         try {
-            String city = address.has( "city" ) ? address.getString( "city" ) : "";
-            String addressLine1 = address.has( "addressLine1" ) ? address.getString( "addressLine1" ) : "";
-            String addressLine2 = address.has( "addressLine2" ) ? address.getString( "addressLine2" ) : "";
-            String addressLine3 = address.has( "addressLine3" ) ? address.getString( "addressLine3" ) : "";
-            String stateOrRegion = address.has( "stateOrRegion" ) ? address.getString( "stateOrRegion" ) : "";
-            String postalCode = address.has( "postalCode" ) ? address.getString( "postalCode" ) : "";
+            String city = address.has("city") ? address.getString("city") : "";
+            String addressLine1 = address.has("addressLine1") ? address.getString("addressLine1") : "";
+            String addressLine2 = address.has("addressLine2") ? address.getString("addressLine2") : "";
+            String addressLine3 = address.has("addressLine3") ? address.getString("addressLine3") : "";
+            String stateOrRegion = address.has("stateOrRegion") ? address.getString("stateOrRegion") : "";
+            String postalCode = address.has("postalCode") ? address.getString("postalCode") : "";
 
-            return addressLine1 + " " + addressLine2 + " " + addressLine3 + " " + city + " " + stateOrRegion + " " + postalCode;
-        } catch ( JSONException e ) {
-            mLogger.postError( sTag, e.getMessage() );
+            return addressLine1 + " " + addressLine2 + " " + addressLine3 + " " + city + " " + stateOrRegion + " "
+                    + postalCode;
+        } catch (JSONException e) {
+            mLogger.postError(sTag, e.getMessage());
             return null;
         }
     }
 
     @Override
-    public void showAlternativeRoutes( AlternateRouteType alternateRouteType ) {
-        mLogger.postInfo(sTag, "Alternate route shown. Type: " + alternateRouteType.name() );
+    public void showAlternativeRoutes(AlternateRouteType alternateRouteType) {
+        mLogger.postInfo(sTag, "Alternate route shown. Type: " + alternateRouteType.name());
 
         // Sending back an example payload
-        String payload = "{\"inquiryType\": \"" + alternateRouteType.name() + "\", \"alternateRoute\": {\"labels\": [\"US-101 N\"], \"savings\": [{\"type\":\"TIME\", \"amount\": \"12.0\", \"unit\": \"MINUTE\"}]}}";
-        showAlternativeRoutesSucceeded( payload );
+        String payload = "{\"inquiryType\": \"" + alternateRouteType.name()
+                + "\", \"alternateRoute\": {\"labels\": [\"US-101 N\"], \"savings\": [{\"type\":\"TIME\", \"amount\": \"12.0\", \"unit\": \"MINUTE\"}]}}";
+        showAlternativeRoutesSucceeded(payload);
     }
 
     @Override
-    public void controlDisplay( ControlDisplay controlDisplay ) {
-        mLogger.postInfo(sTag, "Map interaction successful. Operation: " + controlDisplay.name() );
+    public void controlDisplay(ControlDisplay controlDisplay) {
+        mLogger.postInfo(sTag, "Map interaction successful. Operation: " + controlDisplay.name());
 
         // Create EventName based on ControlDisplay sent
         EventName eventName = null;
-        switch ( controlDisplay ) {
+        switch (controlDisplay) {
             case SHOW_ROUTE_OVERVIEW:
                 eventName = EventName.ROUTE_OVERVIEW_SHOWN;
                 break;
@@ -432,52 +428,47 @@ public class NavigationHandler extends Navigation {
                 eventName = EventName.ROUTE_GUIDANCE_UNMUTED;
                 break;
             default:
-                mLogger.postError(sTag, "controlDisplay : invalidcontrolDisplay " );  
-                break;  
+                mLogger.postError(sTag, "controlDisplay : invalidcontrolDisplay ");
+                break;
         }
 
-        navigationEvent( eventName );
+        navigationEvent(eventName);
     }
 
     @Override
-    public void announceManeuver( String payload ) {
-        mLogger.postInfo(sTag, "announceManeuver payload: " + payload );
+    public void announceManeuver(String payload) {
+        mLogger.postInfo(sTag, "announceManeuver payload: " + payload);
 
         try {
-            JSONObject announceManeueverPayload = new JSONObject( payload );
-            String type = announceManeueverPayload.getString( "type" );
+            JSONObject announceManeueverPayload = new JSONObject(payload);
+            String type = announceManeueverPayload.getString("type");
 
             EventName eventName;
-            if ( type .equals( "TURN" ) ) {
+            if (type.equals("TURN")) {
                 eventName = EventName.TURN_GUIDANCE_ANNOUNCED;
-            }
-            else if ( type.equals( "EXIT" ) ) {
+            } else if (type.equals("EXIT")) {
                 eventName = EventName.EXIT_GUIDANCE_ANNOUNCED;
-            }
-            else if ( type.equals( "ENTER" ) ) {
+            } else if (type.equals("ENTER")) {
                 eventName = EventName.ENTER_GUIDANCE_ANNOUNCED;
-            }
-            else if ( type.equals( "MERGE" ) ) {
+            } else if (type.equals("MERGE")) {
                 eventName = EventName.MERGE_GUIDANCE_ANNOUNCED;
-            }
-            else if ( type.equals( "LANE" ) ) {
+            } else if (type.equals("LANE")) {
                 eventName = EventName.LANE_GUIDANCE_ANNOUNCED;
-            }
-            else {
-                mLogger.postError(sTag, "announceManeuver:invalidManueverTypeValue" );
+            } else {
+                mLogger.postError(sTag, "announceManeuver:invalidManueverTypeValue");
                 return;
             }
-            navigationEvent( eventName );
-        } catch ( JSONException e ) {
-            mLogger.postError( sTag, e.getMessage() );
+            navigationEvent(eventName);
+        } catch (JSONException e) {
+            mLogger.postError(sTag, e.getMessage());
         }
     }
 
     @Override
     public void announceRoadRegulation(RoadRegulation roadRegulation) {
-        mLogger.postInfo(sTag, "Announcing road regulation. Type: " + roadRegulation.name() );
+        mLogger.postInfo(sTag, "Announcing road regulation. Type: " + roadRegulation.name());
         EventName eventName;
-        switch( roadRegulation ) {
+        switch (roadRegulation) {
             case CARPOOL_RULES:
                 eventName = EventName.CARPOOL_RULES_REGULATION_ANNOUNCED;
                 break;
@@ -485,9 +476,9 @@ public class NavigationHandler extends Navigation {
                 eventName = EventName.SPEED_LIMIT_REGULATION_ANNOUNCED;
                 break;
             default:
-                mLogger.postError(sTag, "announceRoadRegulation:invalidRoadRegulationValue" );
+                mLogger.postError(sTag, "announceRoadRegulation:invalidRoadRegulationValue");
                 return;
         }
-        navigationEvent( eventName );
+        navigationEvent(eventName);
     }
 }

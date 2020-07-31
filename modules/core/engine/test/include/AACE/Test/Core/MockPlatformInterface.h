@@ -30,8 +30,8 @@ public:
     }
 };
 
-} // aace::test::core
-} // aace::test
-} // aace
+}  // namespace core
+}  // namespace test
+}  // namespace aace
 
-#endif // AACE_ENGINE_TEST_CORE_MOCK_PLATFORM_INTERFACE_H
+#endif  // AACE_ENGINE_TEST_CORE_MOCK_PLATFORM_INTERFACE_H

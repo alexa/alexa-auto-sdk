@@ -29,45 +29,46 @@ namespace aace {
 namespace engine {
 namespace core {
 
-class EngineImpl :
-    public aace::core::Engine,
-    public aace::engine::core::EngineContext,
-    public std::enable_shared_from_this<EngineImpl> {
-    
+class EngineImpl
+        : public aace::core::Engine
+        , public aace::engine::core::EngineContext
+        , public std::enable_shared_from_this<EngineImpl> {
 private:
     EngineImpl() = default;
 
 public:
     virtual ~EngineImpl();
-    
+
     // Engine
-    bool configure( std::shared_ptr<aace::core::config::EngineConfiguration> configuration ) override;
-    bool configure( std::vector<std::shared_ptr<aace::core::config::EngineConfiguration>> configurationList ) override;
-    bool configure( std::initializer_list<std::shared_ptr<aace::core::config::EngineConfiguration>> configurationList ) override;
-    bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) override;
-    bool registerPlatformInterface( std::initializer_list<std::shared_ptr<aace::core::PlatformInterface>> platformInterfaceList ) override;
+    bool configure(std::shared_ptr<aace::core::config::EngineConfiguration> configuration) override;
+    bool configure(std::vector<std::shared_ptr<aace::core::config::EngineConfiguration>> configurationList) override;
+    bool configure(
+        std::initializer_list<std::shared_ptr<aace::core::config::EngineConfiguration>> configurationList) override;
+    bool registerPlatformInterface(std::shared_ptr<aace::core::PlatformInterface> platformInterface) override;
+    bool registerPlatformInterface(
+        std::initializer_list<std::shared_ptr<aace::core::PlatformInterface>> platformInterfaceList) override;
     bool start() override;
     bool stop() override;
     bool shutdown() override;
-    bool setProperty( const std::string& name, const std::string& value ) override;
-    std::string getProperty( const std::string& name ) override;
+    bool setProperty(const std::string& name, const std::string& value) override;
+    std::string getProperty(const std::string& name) override;
 
     // create the engine
     static std::shared_ptr<EngineImpl> create();
     std::string getProperty_version();
-    
+
 protected:
-    std::shared_ptr<EngineServiceContext> getService( const std::string& type ) override;
+    std::shared_ptr<EngineServiceContext> getService(const std::string& type) override;
 
 private:
     bool initialize();
     bool checkServices();
 
-    std::shared_ptr<EngineService> getServiceFromPropertyKey( const std::string& key );
+    std::shared_ptr<EngineService> getServiceFromPropertyKey(const std::string& key);
     bool registerProperties();
 
 private:
-    std::unordered_map<std::string,std::shared_ptr<EngineService>> m_registeredServiceMap;
+    std::unordered_map<std::string, std::shared_ptr<EngineService>> m_registeredServiceMap;
     std::vector<std::shared_ptr<EngineService>> m_orderedServiceList;
 
     // engine flags
@@ -77,8 +78,8 @@ private:
     bool m_setup = false;
 };
 
-} // aace::engine::core
-} // aace::engine
-} // aace
+}  // namespace core
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_CORE_ENGINE_IMPL_H
+#endif  // AACE_ENGINE_CORE_ENGINE_IMPL_H

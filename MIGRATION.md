@@ -1,25 +1,172 @@
 # Alexa Auto SDK Migration Guide
 
-This guide outlines the changes you will need to make to migrate from Auto SDK v2.0 to later versions of the Auto SDK.
+This guide outlines the changes you need to make to migrate from Auto SDK v2.0 to later versions of the Auto SDK.
 
->**Note:** If you are upgrading more than one version, you must include the changes in all the relevant sections of this guide. For example, if you are migrating from Auto SDK v2.0 to Auto SDK v2.2, you must include the changes described under [Migrating from Auto SDK v2.0 to v2.1](#migrating-from-auto-sdk-v20-to-v21) as well as the changes described under [Migrating from Auto SDK v2.1 to v2.2](#migrating-from-auto-sdk-v21-to-v22).
+>**Note:** If you upgrade more than one version, you must include the changes in all the relevant sections of this guide. For example, if you migrate from Auto SDK v2.0 to Auto SDK v2.2, you must include the changes described under [Migrating from Auto SDK v2.0 to v2.1](#migrating-from-auto-sdk-v20-to-v21) as well as the changes described under [Migrating from Auto SDK v2.1 to v2.2](#migrating-from-auto-sdk-v21-to-v22).
 
 **Table of Contents**
 
-* [Migrating from Auto SDK v2.2 to v2.2.1](#migrating-from-auto-sdk-v22-to-v221)
-  * [TemplateRuntime Enhancements](#templateruntime-enhancements)
-    * [renderTemplate](#templateruntime-rendertemplate)
-    * [renderPlayerInfo](#templateruntime-renderplayerinfo)
-    * [Sample Apps](#templateruntime-sampleapps)
-* [Migrating from Auto SDK v2.1 to v2.2](#migrating-from-auto-sdk-v21-to-v22)
-  * [Implementing the Property Manager Interface](#implementing-the-property-manager-interface)
-  * [Car Control Changes](#car-control-changes)
-* [Migrating from Auto SDK v2.0 to v2.1](#migrating-from-auto-sdk-v20-to-v21)
-  * [Build Changes](#build-changes)
-  * [Engine Configuration File Updates](#engine-configuration-file-updates)
-  * [Navigation Enhancements](#navigation-enhancements)
-  * [Car Control Source File Relocation](#car-control-source-file-relocation)
-  * [Code-Based Linking (CBL) Handler in Sample Apps](#code-based-linking-cbl-handler-in-the-sample-apps)
+* [Alexa Auto SDK Migration Guide](#alexa-auto-sdk-migration-guide)
+  * [Migrating from Auto SDK v2.2.1 to v2.3.0](#migrating-from-auto-sdk-v221-to-v230)
+    * [Car Control Enhancements and Breaking Changes](#car-control-enhancements-and-breaking-changes)
+    * [Language Model Packaging](#language-model-packing)
+    * [Android](#android-updates)
+      * [Gradle](#android-gradle)
+      * [Sample App](#android-sample-overrides)
+    * [Clang Formatting](#clang-formatting)
+  * [Migrating from Auto SDK v2.2 to v2.2.1](#migrating-from-auto-sdk-v22-to-v221)
+    * [TemplateRuntime Enhancements](#templateruntime-enhancements)
+      * [renderTemplate](#templateruntime-rendertemplate)
+      * [renderPlayerInfo](#templateruntime-renderplayerinfo)
+      * [Sample Apps](#templateruntime-sampleapps)
+  * [Migrating from Auto SDK v2.1 to v2.2](#migrating-from-auto-sdk-v21-to-v22)
+    * [Implementing the Property Manager Interface](#implementing-the-property-manager-interface)
+    * [Car Control Changes](#car-control-changes)
+      * [New Asset ID Prefix](#new-asset-id-prefix)
+      * [Specifying the Path to Custom Car Control Assets](#specifying-the-path-to-custom-car-control-assets)
+      * [Car Control Config Builder Asset Methods](#car-control-config-builder-asset-methods)
+  * [Migrating from Auto SDK v2.0 to v2.1](#migrating-from-auto-sdk-v20-to-v21)
+    * [Build Changes](#build-changes)
+    * [Engine Configuration File Updates](#engine-configuration-file-updates)
+    * [Navigation Enhancements](#navigation-enhancements)
+      * [What's New](#whats-new)
+      * [Implementing the New Navigation Features](#implementing-the-new-navigation-features)
+      * [New TemplateRuntime Interface Version](#new-templateruntime-interface-version)
+    * [Car Control Source File Relocation](#car-control-source-file-relocation)
+    * [Code-Based-Linking (CBL) Handler in the Sample Apps](#code-based-linking-cbl-handler-in-the-sample-apps)
+
+## Migrating from Auto SDK v2.2.1 to v2.3.0 <a id = "migrating-from-auto-sdk-v221-to-v230"></a>
+
+This section outlines the changes you will need to make to migrate from Auto SDK v2.2.1 to Auto SDK v2.3.
+
+### Car Control Enhancements and Breaking Changes <a id = "car-control-enhancements-and-breaking-changes"></a>
+
+Read the updated Car Control module README (for [C++ platforms](./modules/car-control/README.md) or [Android](./platforms/android/modules/car-control/README.md)) to get a complete understanding of all supported features and the current format of the "aace.carControl" configuration schema. Read the updated API documentation for the `CarControlConfiguration` builder class (for [C++ platforms](./modules/car-control/platform/include/AACE/CarControl/CarControlConfiguration.h) or [Android](./platforms/android/modules/car-control/src/main/java/com/amazon/aace/carControl/CarControlConfiguration.java)) if you construct your configuration programmatically. The changes to the "aace.carControl" configuration for v2.3 are backward-compatible, meaning your previous configuration (regardless of whether it was file-based or built programmatically with the `CarControlConfiguration` class) will still compile and produce a valid configuration to input to Auto SDK. However, several updates are recommended to ensure expected behavior, even if you do not want new features.
+
+#### 1. Zones configuration schema update 
+
+Prior to v2.3, to assign an endpoint to exactly one zone, you would specify an "isMemberOf" relationship in the definition of the endpoint and specify no information about endpoints in the zone definition.
+
+```jsonc
+{
+    "endpointId": "all.fan",
+    "endpointResources": {
+        "friendlyNames": [
+            {
+                "@type": "asset",
+                "value": {
+                    "assetId": "Alexa.Automotive.DeviceName.Fan"
+                }
+            }
+        ]
+    },
+    "capabilities": [
+        ...
+    ],
+    "relationships": {
+        "isMemberOf": {
+            "zoneId": "zone.all"
+        }
+    }
+}
+
+...
+
+{
+    "zoneId": "zone.all",
+    "zoneResources": {
+        "friendlyNames": [
+            {
+                "@type": "asset",
+                "value": {
+                    "assetId": "Alexa.Automotive.Location.All"
+                }
+            }
+        ]
+    }
+}
+```
+
+In 2.3, the "isMemberOf" relationship is removed from endpoint definitions so that endpoints need not belong to zones and the zone definition can be the source of truth for all its member endpoints. The zone definition now includes a list of member endpoints:
+
+```jsonc
+{
+    "endpointId": "all.fan",
+    "endpointResources": {
+        "friendlyNames": [
+            {
+                "@type": "asset",
+                "value": {
+                    "assetId": "Alexa.Automotive.DeviceName.Fan"
+                }
+            }
+        ]
+    },
+    "capabilities": [
+        ...
+    ]
+}
+
+...
+
+{
+    "zoneId": "zone.all",
+    "zoneResources": {
+        "friendlyNames": [
+            {
+                "@type": "asset",
+                "value": {
+                    "assetId": "Alexa.Automotive.Location.All"
+                }
+            }
+        ]
+    },
+    "members" : [
+      {
+        "endpointId": "all.fan"
+      },
+      ...
+    ]
+}
+```
+You should update your configuration accordingly. The Auto SDK Engine translates the old format to the new format internally, but this will be deprecated in later versions. When updating to the new format, you must *not* combine usage of the "isMemberOf" format with the "members" list format. Fully migrate all definitions in your configuration.
+
+#### 2. Deprecated implicit creation of zone definitions
+
+If you construct your configuration programmatically with the `CarControlConfiguration` builder class, your implementation prior to v2.3 might not have explicitly specified definitions for the set of zones considered "official", but you still used them in your endpoint configurations anyway. The builder class added these definitions to the "aace.carControl" configuration automatically without requiring you to call `CarControlConfiguration::createZone()`. In v2.3, `CarControlConfiguration` still includes this logic for the old "official" zones, but it does not implicitly create any new zones, and it is recommended to define every zone you use by calling `CarControlConfiguration::createZone()`. Implicit zone definitions will be removed in a later version.
+
+#### 3. New default zone feature
+
+Specifying a "default" zone ID is an optional new feature, but it is highly recommended that you use it. See the Car Control module README for details about why this feature is important.
+
+#### 4. Deprecated "DriverSeat" and related assets in favor of zones
+
+Prior to v2.3, the default automotive catalog of assets introduced several asset IDs so that online-only systems could mock zones support for heaters on seat endpoints. The asset IDs are the following: `Alexa.Automotive.DeviceName.DriverSeat`, `Alexa.Automotive.DeviceName.LeftSeat`, `Alexa.Automotive.DeviceName.PassengerSeat`, `Alexa.Automotive.DeviceName.RightSeat`.
+
+ Now that the cloud supports zones, you must stop using these asset IDs and properly model the endpoints using zones so that Alexa resolves user utterance intents as expected. These assets will be removed in a later version of Auto SDK. See the Car Control module README for sample configuration.
+
+#### 5. New default assets
+
+The Car Control module is updated to include many new assets in the default automotive catalog to support a wider range of utterances. If you previously defined custom assets to support any of the features introduced to the v2.3 assets, it is recommended that you use the new default assets instead of your previous custom ones. See the Car Control module README for details about assets.
+
+#### 6. Reset your account when changing from 2.2 to 2.3 configuration
+
+It is a known issue that you cannot delete any previously configured endpoint IDs associated with your customer account in the cloud. When upgrading your configuration from v2.2 to v2.3, contact your SA or Partner Manager for help to reset your account's endpoint database in the cloud. This is especially important if you are updating to use new features. It is also recommended that your v2.3 configuration follows the configuration sample of supported features shown in the Car Control README. Refer to this document for reference.
+
+### Language Model Packaging<a id = "language-model-packing"></a>
+
+Language models for the Local Voice Control extension are now decoupled from the LVC.sh (Linux) binaries. If you use the Local Voice Control extension, you must install the language models to successfully migrate to v2.3.0. Download the language model tar files. Installation instructions are provided in the Local Voice Control extension.
+
+### Android<a id = "android-updates"></a>
+
+#### Gradle<a id = "android-gradle"></a>
+The gradle plugin has been updated to v3.6.2. This requires gradle v5.6.4 or above in order to build the Auto SDK for Android targets.
+
+#### Sample App<a id = "android-sample-overrides"></a>
+The Android sample app supports overriding the client configuration by pushing a file named app_config.json to the /sdcard folder on the device. If the /sdcard/app_config.json file existed on the device before you migrate to v2.3.0, the file overrides the client configuration included in the v2.3.0 Android sample app APK.
+
+### Clang Formatting<a id = "clang-formatting"></a>
+Auto SDK code has been formatted with `clang-format` version 9.0.0. This may lead to merge conflicts if changes have been made to v2.2.1 source code files and you migrate to v2.3.
 
 ## Migrating from Auto SDK v2.2 to v2.2.1 <a id = "migrating-from-auto-sdk-v22-to-v221"></a>
 This section outlines the changes you will need to make to migrate from Auto SDK v2.2 to Auto SDK v2.2.1.
@@ -44,7 +191,7 @@ The new renderTemplate method provides visual metadata associated with a user re
 
 **Parameters**
 - `payload` Renderable template metadata in structured JSON format
-- `focusState` The **FocusState** of the channel used by TemplateRuntime interface
+- `focusState` The `FocusState` of the channel used by TemplateRuntime interface
   - `FOREGROUND` Represents the highest focus a Channel can have
   - `BACKGROUND` Represents the intermediate level focus a Channel can have
 
@@ -465,6 +612,7 @@ If you want to continue using the `AuthProvider` interface, we recommend that yo
 
 ```
 void AuthProviderHandler::authFailure( const std::string& token ) {
-        // handle user de-authorize scenario ```
+        // handle user de-authorize scenario 
+```
 </p>
 </details>

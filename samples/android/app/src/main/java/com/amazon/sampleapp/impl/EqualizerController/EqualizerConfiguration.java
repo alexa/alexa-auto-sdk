@@ -25,7 +25,6 @@ import java.util.Arrays;
  * {@link com.amazon.aace.alexa.config.AlexaConfiguration#createEqualizerControllerConfig }
  */
 public class EqualizerConfiguration {
-
     /**
      * The absolute gain in integer dB that represents the minimum level for an equalizer band
      */
@@ -43,10 +42,7 @@ public class EqualizerConfiguration {
      * supported.
      */
     private static final EqualizerBand[] SUPPORTED_BANDS = {
-            EqualizerBand.BASS,
-            EqualizerBand.MIDRANGE,
-            EqualizerBand.TREBLE
-    };
+            EqualizerBand.BASS, EqualizerBand.MIDRANGE, EqualizerBand.TREBLE};
 
     /**
      * The default or "reset" gain in integer dB of each supported equalizer band
@@ -55,25 +51,26 @@ public class EqualizerConfiguration {
      * supported band must have a default setting if the EQ default setting config is provided. The
      * settings here are arbitrary and for example. Un-configured defaults to 0dB for each band.
      */
-    private static final EqualizerBandLevel[] DEFAULT_BAND_LEVELS = {
-            new EqualizerBandLevel( EqualizerBand.BASS, 0 ),
-            new EqualizerBandLevel( EqualizerBand.MIDRANGE, 0 ),
-            new EqualizerBandLevel( EqualizerBand.TREBLE, 0 )
-    };
+    private static final EqualizerBandLevel[] DEFAULT_BAND_LEVELS = {new EqualizerBandLevel(EqualizerBand.BASS, 0),
+            new EqualizerBandLevel(EqualizerBand.MIDRANGE, 0), new EqualizerBandLevel(EqualizerBand.TREBLE, 0)};
 
     /**
      * Get the absolute gain representing the minimum level for an equalizer band
      *
      * @return The minimum level in integer dB
      */
-    public static int getMinBandLevel() { return MIN_BAND_LEVEL; }
+    public static int getMinBandLevel() {
+        return MIN_BAND_LEVEL;
+    }
 
     /**
      * Get the absolute gain representing the maximum level for an equalizer band
      *
      * @return The minimum level in integer dB
      */
-    public static int getMaxBandLevel() { return MAX_BAND_LEVEL; }
+    public static int getMaxBandLevel() {
+        return MAX_BAND_LEVEL;
+    }
 
     /**
      * Get the supported equalizer bands
@@ -81,7 +78,7 @@ public class EqualizerConfiguration {
      * @return An array of supported equalizer bands
      */
     public static EqualizerBand[] getSupportedBands() {
-        return Arrays.copyOf( SUPPORTED_BANDS, SUPPORTED_BANDS.length );
+        return Arrays.copyOf(SUPPORTED_BANDS, SUPPORTED_BANDS.length);
     }
 
     /**
@@ -91,6 +88,6 @@ public class EqualizerConfiguration {
      *         integer dB
      */
     public static EqualizerBandLevel[] getDefaultBandLevels() {
-        return Arrays.copyOf( DEFAULT_BAND_LEVELS, DEFAULT_BAND_LEVELS.length );
+        return Arrays.copyOf(DEFAULT_BAND_LEVELS, DEFAULT_BAND_LEVELS.length);
     }
 }

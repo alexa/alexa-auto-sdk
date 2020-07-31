@@ -19,7 +19,7 @@
 #include <AVSCommon/SDKInterfaces/AVSConnectionManagerInterface.h>
 #include <ACL/Transport/MessageRouterInterface.h>
 
-namespace aace {    
+namespace aace {
 namespace test {
 namespace avs {
 
@@ -38,10 +38,12 @@ public:
     MOCK_METHOD1(setObserver, void(std::shared_ptr<alexaClientSDK::acl::MessageRouterObserverInterface> observer));
     MOCK_METHOD1(setAVSGateway, void(const std::string& avsGateway));
     MOCK_METHOD0(getAVSGateway, std::string());
+    MOCK_METHOD0(onWakeConnectionRetry, void());
+    MOCK_METHOD0(onWakeVerifyConnectivity, void());
 };
 
-} // aace::test::avs
-} // aace::test
-} // aace
+}  // namespace avs
+}  // namespace test
+}  // namespace aace
 
-#endif // AACE_TEST_AVS_MOCK_MESSAGE_ROUTER_H
+#endif  // AACE_TEST_AVS_MOCK_MESSAGE_ROUTER_H

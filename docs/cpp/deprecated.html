@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">2.2.1</span>
+   &#160;<span id="projectnumber">2.3.0</span>
    </div>
   </td>
  </tr>
@@ -65,17 +65,23 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><dl class="reflist">
-<dt><a class="anchor" id="_deprecated000002"></a>Member <a class="el" href="classaace_1_1alexa_1_1_template_runtime.html#a1afe1f3ac8d283d81d83cc86c87ae630">aace::alexa::TemplateRuntime::renderPlayerInfo</a>  (const std::string &amp;payload)</dt>
+<dt><a class="anchor" id="_deprecated000001"></a>Member <a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a08aee7c879ef040c17d32bd9a781a940">aace::alexa::config::AlexaConfiguration::createSettingsConfig</a>  (const std::string &amp;databaseFilePath, const std::string &amp;locale="en-US")</dt>
+<dd>Use <code><a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a8e556b5044008752d356c6e72b095df5">AlexaConfiguration::createDeviceSettingsConfig()</a></code>. </dd>
+<dt><a class="anchor" id="_deprecated000004"></a>Member <a class="el" href="classaace_1_1alexa_1_1_template_runtime.html#a1afe1f3ac8d283d81d83cc86c87ae630">aace::alexa::TemplateRuntime::renderPlayerInfo</a>  (const std::string &amp;payload)</dt>
 <dd>Use <code><a class="el" href="classaace_1_1alexa_1_1_template_runtime.html#a43b20a5021af05074ed7fb5bc6b04171">renderPlayerInfo( const std::string&amp; payload, PlayerActivity audioPlayerState, std::chrono::milliseconds offset, FocusState focusState )</a></code>. </dd>
-<dt><a class="anchor" id="_deprecated000001"></a>Member <a class="el" href="classaace_1_1alexa_1_1_template_runtime.html#a8641f59365ad4d927674a1893e4bad2a">aace::alexa::TemplateRuntime::renderTemplate</a>  (const std::string &amp;payload)</dt>
-<dd>Use <code><a class="el" href="classaace_1_1alexa_1_1_template_runtime.html#a0aed566472c6db7b8749aa1f85aac143">renderTemplate( const std::string&amp; payload, FocusState focusState )</a></code>.</dd>
+<dt><a class="anchor" id="_deprecated000003"></a>Member <a class="el" href="classaace_1_1alexa_1_1_template_runtime.html#a8641f59365ad4d927674a1893e4bad2a">aace::alexa::TemplateRuntime::renderTemplate</a>  (const std::string &amp;payload)</dt>
+<dd>Use <code><a class="el" href="classaace_1_1alexa_1_1_template_runtime.html#a0aed566472c6db7b8749aa1f85aac143">renderTemplate( const std::string&amp; payload, FocusState focusState )</a></code>. </dd>
+<dt><a class="anchor" id="_deprecated000006"></a>Member <a class="el" href="classaace_1_1car_control_1_1config_1_1_car_control_configuration.html#a0a9236ba93a3b3c0c1e85900f40af697">aace::carControl::config::CarControlConfiguration::createControl</a>  (const std::string &amp;controlId, const std::string &amp;zoneId=zone::ALL)=0</dt>
+<dd>Use <code><a class="el" href="classaace_1_1car_control_1_1config_1_1_car_control_configuration.html#ad5854625364fa4390d96712dc4eff550">CarControlConfiguration::createEndpoint()</a></code>. </dd>
+<dt><a class="anchor" id="_deprecated000005"></a>Namespace <a class="el" href="namespaceaace_1_1car_control_1_1config_1_1zone.html">aace::carControl::config::zone</a>  </dt>
+<dd>Define your own zone IDs rather than using these constants. For every zone ID you use, create the corresponding zone definition with <code>createZone()</code>. Implicit creation of the 'default' zones listed here may be removed in a future version.</dd>
 </dl>
 </div></div><!-- contents -->
 <html>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 2.2.1 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 2.3.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

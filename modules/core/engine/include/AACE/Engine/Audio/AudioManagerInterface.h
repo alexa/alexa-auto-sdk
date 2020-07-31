@@ -32,12 +32,16 @@ public:
     using AudioInputType = aace::audio::AudioInputProvider::AudioInputType;
     using AudioOutputType = aace::audio::AudioOutputProvider::AudioOutputType;
 
-    virtual std::shared_ptr<AudioInputChannelInterface> openAudioInputChannel( const std::string& name, AudioInputType audioInputType ) = 0;
-    virtual std::shared_ptr<AudioOutputChannelInterface> openAudioOutputChannel( const std::string& name, AudioOutputType audioOutputType ) = 0;
+    virtual std::shared_ptr<AudioInputChannelInterface> openAudioInputChannel(
+        const std::string& name,
+        AudioInputType audioInputType) = 0;
+    virtual std::shared_ptr<AudioOutputChannelInterface> openAudioOutputChannel(
+        const std::string& name,
+        AudioOutputType audioOutputType) = 0;
 };
 
-}  // audio
-}  // engine
-}  // aace
+}  // namespace audio
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_AUDIO_AUDIO_MANAGER_INTERFACE_H
+#endif  // AACE_ENGINE_AUDIO_AUDIO_MANAGER_INTERFACE_H

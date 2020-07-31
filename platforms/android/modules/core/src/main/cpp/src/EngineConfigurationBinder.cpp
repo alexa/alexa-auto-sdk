@@ -22,62 +22,52 @@
 // String to identify log entries originating from this file.
 static const char TAG[] = "aace.jni.core.config.EngineConfigurationBinder";
 
-#define ENGINE_CONFIGURATION_BINDER(ref) reinterpret_cast<aace::jni::core::config::EngineConfigurationBinder *>( ref )
+#define ENGINE_CONFIGURATION_BINDER(ref) reinterpret_cast<aace::jni::core::config::EngineConfigurationBinder*>(ref)
 
-extern "C"
-{
-    JNIEXPORT jlong JNICALL
-    Java_com_amazon_aace_core_config_ConfigurationFile_createBinder( JNIEnv* env, jobject obj, jstring path )
-    {
-        try
-        {
-            auto config = aace::core::config::ConfigurationFile::create( JString(path).toStdStr() );
-            ThrowIfNull( config, "createConfigurationFileFailed" );
+extern "C" {
+JNIEXPORT jlong JNICALL
+Java_com_amazon_aace_core_config_ConfigurationFile_createBinder(JNIEnv* env, jobject obj, jstring path) {
+    try {
+        auto config = aace::core::config::ConfigurationFile::create(JString(path).toStdStr());
+        ThrowIfNull(config, "createConfigurationFileFailed");
 
-            return reinterpret_cast<long>( new aace::jni::core::config::EngineConfigurationBinder( config ) );
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_core_config_ConfigurationFile_createBinder",ex.what());
-            return 0;
-        }
+        return reinterpret_cast<long>(new aace::jni::core::config::EngineConfigurationBinder(config));
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_core_config_ConfigurationFile_createBinder", ex.what());
+        return 0;
     }
+}
 
-    JNIEXPORT jlong JNICALL
-    Java_com_amazon_aace_core_config_StreamConfiguration_createBinder( JNIEnv* env, jobject obj, jbyteArray data )
-    {
-        try
-        {
-            auto stream = std::make_shared<std::stringstream>();
+JNIEXPORT jlong JNICALL
+Java_com_amazon_aace_core_config_StreamConfiguration_createBinder(JNIEnv* env, jobject obj, jbyteArray data) {
+    try {
+        auto stream = std::make_shared<std::stringstream>();
 
-            // wrap the byte array data
-            JByteArray arr( data );
+        // wrap the byte array data
+        JByteArray arr(data);
 
-            // copy the data to the stream
-            stream->write( (char *) arr.ptr(), arr.size() );
+        // copy the data to the stream
+        stream->write((char*)arr.ptr(), arr.size());
 
-            // create the stream configuration
-            auto config = aace::core::config::StreamConfiguration::create( stream );
-            ThrowIfNull( config, "createStreamConfigurationFailed" );
+        // create the stream configuration
+        auto config = aace::core::config::StreamConfiguration::create(stream);
+        ThrowIfNull(config, "createStreamConfigurationFailed");
 
-            return reinterpret_cast<long>( new aace::jni::core::config::EngineConfigurationBinder( config ) );
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_core_config_StreamConfiguration_createBinder",ex.what());
-            return 0;
-        }
+        return reinterpret_cast<long>(new aace::jni::core::config::EngineConfigurationBinder(config));
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_core_config_StreamConfiguration_createBinder", ex.what());
+        return 0;
     }
+}
 
-    JNIEXPORT void JNICALL
-    Java_com_amazon_aace_core_config_EngineConfiguration_disposeBinder( JNIEnv* env, jobject /* this */, jlong cptr )
-    {
-        try
-        {
-            auto binder = ENGINE_CONFIGURATION_BINDER(cptr);
-            ThrowIfNull( binder, "invalidBinder" );
-            delete binder;
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_core_EngineConfiguration_disposeBinder",ex.what());
-        }
+JNIEXPORT void JNICALL
+Java_com_amazon_aace_core_config_EngineConfiguration_disposeBinder(JNIEnv* env, jobject /* this */, jlong cptr) {
+    try {
+        auto binder = ENGINE_CONFIGURATION_BINDER(cptr);
+        ThrowIfNull(binder, "invalidBinder");
+        delete binder;
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_core_EngineConfiguration_disposeBinder", ex.what());
     }
+}
 }

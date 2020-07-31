@@ -11,20 +11,21 @@ The [Alexa Auto SDK](./OVERVIEW.md) contains essential client-side software requ
 2. Install the built package on your [target hardware](./builder/README.md#supported-target-platforms).
 3. Create and configure an instance of the Engine. For details, see the [C++](./modules/core/README.md#creating-the-engine) or [Android](./platforms/android/modules/core/README.md#creating-the-engine) Core module documentation.
     
-4. Extend the Auto SDK interfaces by creating a custom handler for each interface that you want to implement and registering the handler with the Engine. The Auto SDK modules provide platform interfaces and runtime Engine support for a variety of different capabilities:
+4. Extend the Auto SDK interfaces by creating a custom handler for each interface that you want to implement and registering the handler with the Engine. The Auto SDK modules provide platform interfaces and runtime Engine support for different capabilities:
 
-     * **Core** (for [C++](./modules/core/README.md) or [Android](./platforms/android/modules/core/README.md)) - enables you to implement core features such as system audio input and output integration,logging, location, and network information. The services are used by components in other modules and are required by the Alexa Auto SDK.
+     * **Core** (for [C++](./modules/core/README.md) or [Android](./platforms/android/modules/core/README.md)) - enables you to implement core features such as system audio input and output integration, logging, location, and network information. The services are used by components in other modules and are required by the Alexa Auto SDK.
      * **Alexa** (for [C++](./modules/alexa/README.md) or [Android](./platforms/android/modules/alexa/README.md)) - enables you to implement Alexa features, including speech input and output, Alexa audio playback management, authorization,  equalizer control, template and state rendering, local media sources, alerts, notifications, and Do Not Disturb (DND)). 
      * **Navigation** (for [C++](./modules/navigation/README.md) or [Android](./platforms/android/modules/navigation/README.md)) - enables Alexa to interface with the onboard navigation system.
      * **Phone Call Controller** (for [C++](./modules/phone-control/README.md) or [Android](./platforms/android/modules/phonecontrol/README.md)) - enables Alexa to interface with the onboard telephony system.
-     * **Address Book** (for [C++](./modules/address-book/README.md) or [Android](./platforms/android/modules/addressbook/README.md)) - enables you to augment the communications and navigation capabilities of Alexa with user data such as phone contacts and/or navigation favorites
+     * **Address Book** (for [C++](./modules/address-book/README.md) or [Android](./platforms/android/modules/addressbook/README.md)) - enables you to augment the communications and navigation capabilities of Alexa with user data such as phone contacts and/or navigation favorites.
      * **CBL** (for [C++](./modules/cbl/README.md) or [Android](./platforms/android/modules/cbl/README.md)) - enables you to implement the Code-Based Linking (CBL) mechanism of acquiring Login with Amazon (LWA) access tokens.
      *  **Alexa Presentation Language (APL)** (for [C++](./modules/apl/README.md) or [Android](./platforms/android/modules/apl/README.md)) - enables your application to support APL directives and events for devices with graphical user interface (GUI) support. 
      *  **Car Control** (for [C++](./modules/car-control/README.md) or [Android](./platforms/android/modules/car-control/README.md)) - enables your application to build a custom vehicle-control experience that allows the user to voice-control vehicle features using Alexa.
+     *  **Messaging** (for [C++](./modules/car-control/README.md) or [Android](./platforms/android/modules/messaging/README.md)) - enables your application to interface with the Short Message Service (SMS) capabilities of a connected phone using Alexa.
 5. Start the Engine using the `start()` command.
 6. Use the Sample App ([C++](./samples/cpp/README.md) or [Android](./samples/android/README.md)) to see how the Auto SDK works and to test end-to-end functionality. 
 
-[Additional functionality](./OVERVIEW.md#optional-extensions) (for example, AmazonLite Wake Word, Alexa Communications, Local Voice Control (LVC), Device Client Metrics (DCM), and Voice Chrome for Android) is available with [help from your Amazon Solutions Architect (SA) or Partner Manager](./NEED_HELP.md#requesting-additional-functionality-whitelisting).
+[Additional functionality](./OVERVIEW.md#optional-extensions) (for example, Car Control, SMS, AmazonLite Wake Word, Alexa Communications, Local Voice Control (LVC), Device Client Metrics (DCM), and Voice Chrome for Android) is available with [help from your Amazon Solutions Architect (SA) or Partner Manager](./NEED_HELP.md#requesting-additional-functionality-whitelisting).
 
 ## Release Notes and Known Issues <a id="relnotesknownissues"></a>
 
@@ -44,3 +45,13 @@ For Auto SDK API documentation, see the interface reference documentation:
 
 For UX design requirements, recommendations, and best practices, see the [Alexa Automotive design documentation](https://developer.amazon.com/docs/alexa-auto/about-this-guide.html).
 
+## Important Considerations <a id="important-considerations"></a>
+
+### Security Best Practices <a id="security-best-practices"></a>
+
+All Alexa products are required to follow the [Security Best Practices for Alexa](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/avs-security-reqs.html). When building an Alexa experience using the Alexa Auto SDK, additionally adhere to the following security principles:
+
+* Protect configuration files for the Auto SDK Engine from tampering and inspection.
+* Protect configuration parameters, such as those found in Auto SDK Engine configuration files, from tampering and inspection, including but not limited to the following: SQLite database files, Unix Domain Sockets, wake word models, and metrics sink files.
+* Protect components used for the Local Voice Control (LVC) extension, including associated LVC language model packages (Linux) and APKs (Android), from tampering and inspection, including but not limited to the following: Unix Domain Sockets, model directories, skill and service executables, prompts and assets JSON files, and all files configuring these components. 
+* Follow additional SDK security best practices outlined [here](https://developer.amazon.com/en-US/docs/alexa/avs-device-sdk/overview.html#security-best-practices).

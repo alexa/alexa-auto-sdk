@@ -10,11 +10,11 @@ import org.robolectric.annotation.RealObject;
 
 @Implements(JobInfo.Builder.class)
 public class ShadowJobInfo {
-    @RealObject protected JobInfo.Builder jobInfoBuilder;
+    @RealObject
+    protected JobInfo.Builder jobInfoBuilder;
     protected JobInfo jobInfo;
 
-    public void __constructor__(int jobid, JobService jobService) {
-    }
+    public void __constructor__(int jobid, JobService jobService) {}
 
     @Implementation
     public JobInfo.Builder setPriority(int priority) {

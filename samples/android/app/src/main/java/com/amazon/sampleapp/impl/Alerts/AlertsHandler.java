@@ -24,62 +24,59 @@ import com.amazon.sampleapp.R;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 
 public class AlertsHandler extends Alerts {
-
     private static final String sTag = "Alerts";
 
     private final Activity mActivity;
     private final LoggerHandler mLogger;
     private TextView mStateText;
 
-    public AlertsHandler( Activity activity,
-                          LoggerHandler logger ) {
+    public AlertsHandler(Activity activity, LoggerHandler logger) {
         mActivity = activity;
         mLogger = logger;
         setupGUI();
     }
 
     @Override
-    public void alertStateChanged( final String alertToken,
-                                   final AlertState state,
-                                   final String reason ) {
-        mLogger.postInfo( sTag, String.format( "Alert State Changed. STATE: %s, REASON: %s, TOKEN: %s",
-                state, reason, alertToken ) );
-        mActivity.runOnUiThread( new Runnable() {
+    public void alertStateChanged(final String alertToken, final AlertState state, final String reason) {
+        mLogger.postInfo(sTag,
+                String.format("Alert State Changed. STATE: %s, REASON: %s, TOKEN: %s", state, reason, alertToken));
+        mActivity.runOnUiThread(new Runnable() {
             @Override
-            public void run() { mStateText.setText( state != null ? state.toString() : "" ); }
+            public void run() {
+                mStateText.setText(state != null ? state.toString() : "");
+            }
         });
     }
 
     @Override
-    public void alertCreated( String alertToken, String detailedInfo ) {
-        mLogger.postInfo(sTag, String.format( "Alert Created. TOKEN: %s, Detailed Info payload: %s", alertToken, detailedInfo ) );
+    public void alertCreated(String alertToken, String detailedInfo) {
+        mLogger.postInfo(
+                sTag, String.format("Alert Created. TOKEN: %s, Detailed Info payload: %s", alertToken, detailedInfo));
     }
 
     @Override
-    public void alertDeleted( String alertToken ) {
-        mLogger.postInfo(sTag, String.format( "Alert Deleted. TOKEN: %s", alertToken ) );
+    public void alertDeleted(String alertToken) {
+        mLogger.postInfo(sTag, String.format("Alert Deleted. TOKEN: %s", alertToken));
     }
 
     private void onLocalStop() {
-        mLogger.postInfo( sTag, "Stopping active alert" );
+        mLogger.postInfo(sTag, "Stopping active alert");
         super.localStop();
     }
 
-    private void onRemoveAllAlerts( ) {
-        mLogger.postInfo( sTag, "Removing all pending alerts from storage" );
+    private void onRemoveAllAlerts() {
+        mLogger.postInfo(sTag, "Removing all pending alerts from storage");
         super.removeAllAlerts();
     }
 
     private void setupGUI() {
+        mStateText = mActivity.findViewById(R.id.alertState);
 
-        mStateText = mActivity.findViewById( R.id.alertState );
-
-        mActivity.findViewById( R.id.stopAlertButton ).setOnClickListener(
-            new View.OnClickListener() {
-                @Override
-                public void onClick( View v ) { onLocalStop(); }
+        mActivity.findViewById(R.id.stopAlertButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onLocalStop();
             }
-        );
-
+        });
     }
 }

@@ -67,6 +67,6 @@ const char* LogEntryBuffer::c_str() const {
     return m_base;
 }
 
-} // aace::engine::logger
-} // aace::engine
-} // aace
+}  // namespace logger
+}  // namespace engine
+}  // namespace aace

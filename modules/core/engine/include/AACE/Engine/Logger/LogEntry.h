@@ -26,21 +26,21 @@ namespace logger {
 
 class LogEntry {
 public:
-    LogEntry( const std::string& tag, const char* event );
-    LogEntry( const std::string& tag, const std::string& event );
+    LogEntry(const std::string& tag, const char* event);
+    LogEntry(const std::string& tag, const std::string& event);
 
-    LogEntry& d( const char* key, const char* value);
-    LogEntry& d( const char* key, const std::string& value);
-    LogEntry& d( const char* key, bool value);
-
-    template <typename ValueType>
-    inline LogEntry& d( const char* key, const ValueType& value );
+    LogEntry& d(const char* key, const char* value);
+    LogEntry& d(const char* key, const std::string& value);
+    LogEntry& d(const char* key, bool value);
 
     template <typename ValueType>
-    inline LogEntry& sensitive( const char* key, const ValueType& value );
+    inline LogEntry& d(const char* key, const ValueType& value);
 
-    LogEntry& m( const char* message );
-    LogEntry& m( const std::string& message );
+    template <typename ValueType>
+    inline LogEntry& sensitive(const char* key, const ValueType& value);
+
+    LogEntry& m(const char* message);
+    LogEntry& m(const std::string& message);
 
     const std::string& tag() const;
     const char* c_str() const;
@@ -48,7 +48,7 @@ public:
 private:
     void prefixKeyValuePair();
     void prefixMessage();
-    void appendEscapedString( const char* in );
+    void appendEscapedString(const char* in);
 
     // Character used to separate @c key from @c value text in metadata.
     static const char KEY_VALUE_SEPARATOR = '=';
@@ -82,8 +82,8 @@ LogEntry& LogEntry::sensitive(const char* key, const ValueType& value) {
 }
 #endif
 
-}  // logger
-}  // engine
-}  // aace
+}  // namespace logger
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_LOGGER_LOGENTRY_H
+#endif  // AACE_ENGINE_LOGGER_LOGENTRY_H

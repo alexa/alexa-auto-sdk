@@ -63,7 +63,7 @@ public:
      * @param [in] status The connection status of the WiFi network
      * @param [in] wifiSignalStrength The RSSI of the WiFi connection
      */
-    void networkStatusChanged( NetworkStatus status, int wifiSignalStrength );
+    void networkStatusChanged(NetworkStatus status, int wifiSignalStrength);
 
     /**
      * @internal
@@ -71,13 +71,13 @@ public:
      *
      * Should *never* be called by the platform implementation.
      */
-    void setEngineInterface( std::shared_ptr<NetworkInfoProviderEngineInterface> networkInfoProviderEngineInterface );
+    void setEngineInterface(std::shared_ptr<NetworkInfoProviderEngineInterface> networkInfoProviderEngineInterface);
 
 private:
     std::shared_ptr<NetworkInfoProviderEngineInterface> m_networkInfoProviderEngineInterface;
 };
 
-} // aace::network
-} // aace
+}  // namespace network
+}  // namespace aace
 
-#endif // AACE_NETWORK_NETWORK_INFO_PROVIDER_H
+#endif  // AACE_NETWORK_NETWORK_INFO_PROVIDER_H

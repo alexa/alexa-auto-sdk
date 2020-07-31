@@ -39,221 +39,243 @@ static const std::string DEFAULT_PLAYERCOOKIE_PAYLOAD = R"(
     }
 )";
 
-LocalMediaSourceEngineImpl::LocalMediaSourceEngineImpl( std::shared_ptr<aace::alexa::LocalMediaSource> platformLocalMediaSource, const std::string& localPlayerId, std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender, std::shared_ptr<FocusHandlerInterface> focusHandler ) :
-    aace::engine::alexa::ExternalMediaAdapterHandler( discoveredPlayerSender, focusHandler ),
-    m_platformLocalMediaSource( platformLocalMediaSource ),
-    m_localPlayerId( localPlayerId ),
-    m_contentSelectorNameMap{{"frequency", ContentSelector::FREQUENCY}, {"channel", ContentSelector::CHANNEL}, {"preset", ContentSelector::PRESET}} {
+LocalMediaSourceEngineImpl::LocalMediaSourceEngineImpl(
+    std::shared_ptr<aace::alexa::LocalMediaSource> platformLocalMediaSource,
+    const std::string& localPlayerId,
+    std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender,
+    std::shared_ptr<FocusHandlerInterface> focusHandler) :
+        aace::engine::alexa::ExternalMediaAdapterHandler(discoveredPlayerSender, focusHandler),
+        m_platformLocalMediaSource(platformLocalMediaSource),
+        m_localPlayerId(localPlayerId),
+        m_contentSelectorNameMap{{"frequency", ContentSelector::FREQUENCY},
+                                 {"channel", ContentSelector::CHANNEL},
+                                 {"preset", ContentSelector::PRESET}} {
 }
 
-std::shared_ptr<LocalMediaSourceEngineImpl> LocalMediaSourceEngineImpl::create( std::shared_ptr<aace::alexa::LocalMediaSource> platformLocalMediaSource, const std::string& localPlayerId, std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender, std::shared_ptr<FocusHandlerInterface> focusHandler, std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender, std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager )
-{
+std::shared_ptr<LocalMediaSourceEngineImpl> LocalMediaSourceEngineImpl::create(
+    std::shared_ptr<aace::alexa::LocalMediaSource> platformLocalMediaSource,
+    const std::string& localPlayerId,
+    std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender,
+    std::shared_ptr<FocusHandlerInterface> focusHandler,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager) {
     std::shared_ptr<LocalMediaSourceEngineImpl> localMediaSourceEngineImpl = nullptr;
 
-    try
-    {
-        ThrowIfNull( platformLocalMediaSource, "invalidPlatformLocalMediaSource" );
-        ThrowIf( localPlayerId.empty(), "invalidPlayerId" );
-        ThrowIfNull( discoveredPlayerSender, "invalidDiscoveredPlayerSender" );
-        ThrowIfNull( focusHandler, "invalidFocusHandler" );
-        
+    try {
+        ThrowIfNull(platformLocalMediaSource, "invalidPlatformLocalMediaSource");
+        ThrowIf(localPlayerId.empty(), "invalidPlayerId");
+        ThrowIfNull(discoveredPlayerSender, "invalidDiscoveredPlayerSender");
+        ThrowIfNull(focusHandler, "invalidFocusHandler");
+
         // create the external media adapter engine implementation
-        localMediaSourceEngineImpl = std::shared_ptr<LocalMediaSourceEngineImpl>( new LocalMediaSourceEngineImpl( platformLocalMediaSource, localPlayerId, discoveredPlayerSender, focusHandler ) );
-        ThrowIfNot( localMediaSourceEngineImpl->initialize( messageSender, speakerManager ), "initializeLocalMediaSourceEngineImplFailed" );
+        localMediaSourceEngineImpl = std::shared_ptr<LocalMediaSourceEngineImpl>(new LocalMediaSourceEngineImpl(
+            platformLocalMediaSource, localPlayerId, discoveredPlayerSender, focusHandler));
+        ThrowIfNot(
+            localMediaSourceEngineImpl->initialize(messageSender, speakerManager),
+            "initializeLocalMediaSourceEngineImplFailed");
 
         // register the platforms engine interface
-        platformLocalMediaSource->setEngineInterface( localMediaSourceEngineImpl );
+        platformLocalMediaSource->setEngineInterface(localMediaSourceEngineImpl);
 
         return localMediaSourceEngineImpl;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"create").d("reason", ex.what()));
-        if( localMediaSourceEngineImpl != nullptr ) {
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "create").d("reason", ex.what()));
+        if (localMediaSourceEngineImpl != nullptr) {
             localMediaSourceEngineImpl->shutdown();
         }
         return nullptr;
     }
 }
 
-bool LocalMediaSourceEngineImpl::initialize( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender, std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager )
-{
-    try
-    {
-        ThrowIfNull( messageSender, "invalidMessageSender" );
+bool LocalMediaSourceEngineImpl::initialize(
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager) {
+    try {
+        ThrowIfNull(messageSender, "invalidMessageSender");
         m_messageSender = messageSender;
-        
+
         // initialize the adapter handler
-        ThrowIfNot( initializeAdapterHandler( speakerManager ), "initializeAdapterHandlerFailed" );
-        
+        ThrowIfNot(initializeAdapterHandler(speakerManager), "initializeAdapterHandlerFailed");
+
         // report the player as discovered
         aace::alexa::ExternalMediaAdapter::DiscoveredPlayerInfo info;
-        
+
         info.localPlayerId = m_localPlayerId;
         info.spiVersion = "1.0";
         info.validationMethod = VALIDATION_NONE;
-        info.validationData.push_back( "None" );
-        
-        reportDiscoveredPlayers( { info } );
-        
+        info.validationData.push_back("None");
+
+        reportDiscoveredPlayers({info});
+
         return true;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"initialize").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "initialize").d("reason", ex.what()));
         return false;
     }
 }
 
-bool LocalMediaSourceEngineImpl::handleAuthorization( const std::vector<aace::alexa::ExternalMediaAdapter::AuthorizedPlayerInfo>& authorizedPlayerList )
-{
-    try
-    {
+bool LocalMediaSourceEngineImpl::handleAuthorization(
+    const std::vector<aace::alexa::ExternalMediaAdapter::AuthorizedPlayerInfo>& authorizedPlayerList) {
+    try {
         AACE_VERBOSE(LX(TAG));
 
         // validate the authorized player list has exactly one player
-        ThrowIf( authorizedPlayerList.size() != 1, "invalidAuthorizedPlayerList" );
-        
+        ThrowIf(authorizedPlayerList.size() != 1, "invalidAuthorizedPlayerList");
+
         // assume authorization will always return true for a registered local media source
         return true;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"handleAuthorization").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "handleAuthorization").d("reason", ex.what()));
         return false;
     }
 }
 
-bool LocalMediaSourceEngineImpl::handleLogin( const std::string& localPlayerId, const std::string& accessToken, const std::string& userName, bool forceLogin, std::chrono::milliseconds tokenRefreshInterval )
-{
-    try
-    {
+bool LocalMediaSourceEngineImpl::handleLogin(
+    const std::string& localPlayerId,
+    const std::string& accessToken,
+    const std::string& userName,
+    bool forceLogin,
+    std::chrono::milliseconds tokenRefreshInterval) {
+    try {
         AACE_VERBOSE(LX(TAG));
 
-        Throw( "unsupportedLocalMediaSourceOperation" );
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"handleLogin").d("reason", ex.what()).d("playerId", localPlayerId).d("userName", userName).d("forceLogin", forceLogin));
+        Throw("unsupportedLocalMediaSourceOperation");
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "handleLogin")
+                       .d("reason", ex.what())
+                       .d("playerId", localPlayerId)
+                       .d("userName", userName)
+                       .d("forceLogin", forceLogin));
         return false;
     }
 }
 
-bool LocalMediaSourceEngineImpl::handleLogout( const std::string& localPlayerId )
-{
-    try
-    {
+bool LocalMediaSourceEngineImpl::handleLogout(const std::string& localPlayerId) {
+    try {
         AACE_VERBOSE(LX(TAG));
 
-        Throw( "unsupportedLocalMediaSourceOperation" );
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"handleLogout").d("reason", ex.what()).d("playerId", localPlayerId));
+        Throw("unsupportedLocalMediaSourceOperation");
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "handleLogout").d("reason", ex.what()).d("playerId", localPlayerId));
         return false;
     }
 }
 
-bool LocalMediaSourceEngineImpl::handlePlay( const std::string& localPlayerId, const std::string& playContextToken, int64_t index, std::chrono::milliseconds offset, bool preload, aace::alexa::ExternalMediaAdapter::Navigation navigation, const std::string& playbackSessionId, const std::string& skillToken )
-{
-    try
-    {
+bool LocalMediaSourceEngineImpl::handlePlay(
+    const std::string& localPlayerId,
+    const std::string& playContextToken,
+    int64_t index,
+    std::chrono::milliseconds offset,
+    bool preload,
+    aace::alexa::ExternalMediaAdapter::Navigation navigation,
+    const std::string& playbackSessionId,
+    const std::string& skillToken) {
+    try {
         AACE_VERBOSE(LX(TAG));
 
         // For Local Media sources localPlayerId, index, offset, preload, and navigation are currently unused
 
-        size_t separatorIndex = playContextToken.find(CONTENT_SELECTOR_SEPARATOR); // ":"
-        
-        std::string contentSelectorName = playContextToken.substr(0,separatorIndex); //  i.e."frequency"
-        std::transform(contentSelectorName.begin(), contentSelectorName.end(), contentSelectorName.begin(), ::tolower); // enforce lower case
+        size_t separatorIndex = playContextToken.find(CONTENT_SELECTOR_SEPARATOR);  // ":"
 
-        std::unordered_map<std::string,ContentSelector>::const_iterator foundIt = m_contentSelectorNameMap.find ( contentSelectorName );
-        ThrowIfNot(foundIt != m_contentSelectorNameMap.end(), "getContentSelectorFromNameFailed"  );
+        std::string contentSelectorName = playContextToken.substr(0, separatorIndex);  //  i.e."frequency"
+        std::transform(
+            contentSelectorName.begin(),
+            contentSelectorName.end(),
+            contentSelectorName.begin(),
+            ::tolower);  // enforce lower case
+
+        std::unordered_map<std::string, ContentSelector>::const_iterator foundIt =
+            m_contentSelectorNameMap.find(contentSelectorName);
+        ThrowIfNot(foundIt != m_contentSelectorNameMap.end(), "getContentSelectorFromNameFailed");
         ContentSelector contentSelector = foundIt->second;
-        
-        std::string selectionPayload = playContextToken.substr(separatorIndex + 1); //  i.e."98.7"
 
-        ThrowIfNot( m_platformLocalMediaSource->play( contentSelector, selectionPayload ), "platformMediaAdapterPlayFailed" );
+        std::string selectionPayload = playContextToken.substr(separatorIndex + 1);  //  i.e."98.7"
+
+        ThrowIfNot(
+            m_platformLocalMediaSource->play(contentSelector, selectionPayload), "platformMediaAdapterPlayFailed");
         // set focus on successful play
-        ThrowIfNot( setFocus( m_localPlayerId, true ), "setFocusFailed" );
+        ThrowIfNot(setFocus(m_localPlayerId, true), "setFocusFailed");
         return true;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"handlePlay").d("reason", ex.what()).d("playerId", localPlayerId).d("preload", preload));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "handlePlay").d("reason", ex.what()).d("playerId", localPlayerId).d("preload", preload));
         // unset focus if playback fails
         try {
-            ThrowIfNot( setFocus( m_localPlayerId, false ), "setFocusFailed" );
-        } catch( std::exception& ex ) {
-            AACE_ERROR(LX(TAG,"setFocus").d("reason", ex.what()));
+            ThrowIfNot(setFocus(m_localPlayerId, false), "setFocusFailed");
+        } catch (std::exception& ex) {
+            AACE_ERROR(LX(TAG, "setFocus").d("reason", ex.what()));
         }
         return false;
     }
 }
 
-bool LocalMediaSourceEngineImpl::handlePlayControl( const std::string& localPlayerId, aace::alexa::ExternalMediaAdapter::PlayControlType playControlType )
-{
-    try
-    {
+bool LocalMediaSourceEngineImpl::handlePlayControl(
+    const std::string& localPlayerId,
+    aace::alexa::ExternalMediaAdapter::PlayControlType playControlType) {
+    try {
         AACE_VERBOSE(LX(TAG));
 
-        ThrowIfNot( m_platformLocalMediaSource->playControl( playControlType ), "platformMediaAdapterPlayControlFailed" );
+        ThrowIfNot(m_platformLocalMediaSource->playControl(playControlType), "platformMediaAdapterPlayControlFailed");
         // set focus on successful RESUME control
-        if ( playControlType == aace::alexa::ExternalMediaAdapter::PlayControlType::RESUME ) ThrowIfNot( setFocus( m_localPlayerId, true ), "setFocusFailed" );
+        if (playControlType == aace::alexa::ExternalMediaAdapter::PlayControlType::RESUME)
+            ThrowIfNot(setFocus(m_localPlayerId, true), "setFocusFailed");
         return true;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"handlePlayControl").d("reason", ex.what()).d("playerId", localPlayerId).d("playControlType", playControlType));
-        if ( playControlType ==  aace::alexa::ExternalMediaAdapter::PlayControlType::RESUME ) {
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "handlePlayControl")
+                       .d("reason", ex.what())
+                       .d("playerId", localPlayerId)
+                       .d("playControlType", playControlType));
+        if (playControlType == aace::alexa::ExternalMediaAdapter::PlayControlType::RESUME) {
             // unset focus if playback fails
             try {
-                ThrowIfNot( setFocus( m_localPlayerId, false ), "setFocusFailed" );
-            } catch( std::exception& ex ) {
-                AACE_ERROR(LX(TAG,"setFocus").d("reason", ex.what()));
+                ThrowIfNot(setFocus(m_localPlayerId, false), "setFocusFailed");
+            } catch (std::exception& ex) {
+                AACE_ERROR(LX(TAG, "setFocus").d("reason", ex.what()));
             }
         }
         return false;
     }
 }
 
-bool LocalMediaSourceEngineImpl::handleSeek( const std::string& localPlayerId, std::chrono::milliseconds offset )
-{
-    try
-    {
-        AACE_VERBOSE(LX(TAG).d("localPlayerId",localPlayerId));
+bool LocalMediaSourceEngineImpl::handleSeek(const std::string& localPlayerId, std::chrono::milliseconds offset) {
+    try {
+        AACE_VERBOSE(LX(TAG).d("localPlayerId", localPlayerId));
 
-        ThrowIfNot( m_platformLocalMediaSource->seek( offset ), "platformMediaAdapterSeekFailed" );
-    
+        ThrowIfNot(m_platformLocalMediaSource->seek(offset), "platformMediaAdapterSeekFailed");
+
         return true;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"handleSeek").d("reason", ex.what()).d("playerId", localPlayerId));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "handleSeek").d("reason", ex.what()).d("playerId", localPlayerId));
         return false;
     }
 }
 
-bool LocalMediaSourceEngineImpl::handleAdjustSeek( const std::string& localPlayerId, std::chrono::milliseconds deltaOffset )
-{
-    try
-    {
-        AACE_VERBOSE(LX(TAG).d("localPlayerId",localPlayerId));
+bool LocalMediaSourceEngineImpl::handleAdjustSeek(
+    const std::string& localPlayerId,
+    std::chrono::milliseconds deltaOffset) {
+    try {
+        AACE_VERBOSE(LX(TAG).d("localPlayerId", localPlayerId));
 
-        ThrowIfNot( m_platformLocalMediaSource->adjustSeek( deltaOffset ), "platformMediaAdapterAdjustSeekFailed" );
-    
+        ThrowIfNot(m_platformLocalMediaSource->adjustSeek(deltaOffset), "platformMediaAdapterAdjustSeekFailed");
+
         return true;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"adjustSeek").d("reason", ex.what()).d("playerId", localPlayerId));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "adjustSeek").d("reason", ex.what()).d("playerId", localPlayerId));
         return false;
     }
 }
 
-bool LocalMediaSourceEngineImpl::handleGetAdapterState( const std::string& localPlayerId, aace::engine::alexa::AdapterState& state )
-{
-    try
-    {
+bool LocalMediaSourceEngineImpl::handleGetAdapterState(
+    const std::string& localPlayerId,
+    aace::engine::alexa::AdapterState& state) {
+    try {
         auto platformState = m_platformLocalMediaSource->getState();
         auto platformSource = m_platformLocalMediaSource->getSource();
-        
+
         // session state
-        if( platformState.sessionState.spiVersion.empty() == false ) {
+        if (platformState.sessionState.spiVersion.empty() == false) {
             state.sessionState.spiVersion = platformState.sessionState.spiVersion;
         }
-        state.sessionState.playerId = getPlayerId( platformSource );
+        state.sessionState.playerId = getPlayerId(platformSource);
         state.sessionState.endpointId = platformState.sessionState.endpointId;
         state.sessionState.loggedIn = platformState.sessionState.loggedIn;
         state.sessionState.userName = platformState.sessionState.userName;
@@ -267,8 +289,8 @@ bool LocalMediaSourceEngineImpl::handleGetAdapterState( const std::string& local
         rapidjson::Document document;
         document.Parse<0>(DEFAULT_PLAYERCOOKIE_PAYLOAD.c_str());
         rapidjson::Document::AllocatorType& allocator = document.GetAllocator();
-        for( auto next : platformState.sessionState.supportedContentSelectors ) {
-            switch( next ) {
+        for (auto next : platformState.sessionState.supportedContentSelectors) {
+            switch (next) {
                 case aace::alexa::LocalMediaSource::ContentSelector::FREQUENCY:
                     document["capabilities"].AddMember("playFrequency", "1.0", allocator);
                     break;
@@ -286,12 +308,13 @@ bool LocalMediaSourceEngineImpl::handleGetAdapterState( const std::string& local
         state.sessionState.playerCookie = strbuf.GetString();
 
         // playback state
-        state.playbackState.playerId = getPlayerId( platformSource );
+        state.playbackState.playerId = getPlayerId(platformSource);
         state.playbackState.state = platformState.playbackState.state;
         state.playbackState.trackOffset = platformState.playbackState.trackOffset;
         state.playbackState.shuffleEnabled = platformState.playbackState.shuffleEnabled;
         state.playbackState.repeatEnabled = platformState.playbackState.repeatEnabled;
-        state.playbackState.favorites = static_cast<aace::engine::alexa::Favorites>( platformState.playbackState.favorites );
+        state.playbackState.favorites =
+            static_cast<aace::engine::alexa::Favorites>(platformState.playbackState.favorites);
         state.playbackState.type = platformState.playbackState.type;
         state.playbackState.playbackSource = platformState.playbackState.playbackSource;
         state.playbackState.playbackSourceId = platformState.playbackState.playbackSourceId;
@@ -308,143 +331,139 @@ bool LocalMediaSourceEngineImpl::handleGetAdapterState( const std::string& local
         state.playbackState.largeURL = platformState.playbackState.largeURL;
         state.playbackState.coverId = platformState.playbackState.coverId;
         state.playbackState.mediaProvider = platformState.playbackState.mediaProvider;
-        state.playbackState.mediaType = static_cast<aace::engine::alexa::MediaType>( platformState.playbackState.mediaType );
+        state.playbackState.mediaType =
+            static_cast<aace::engine::alexa::MediaType>(platformState.playbackState.mediaType);
         state.playbackState.duration = platformState.playbackState.duration;
-        
+
         // convert AAC SupportedPlaybackOperation to AVS SupportedPlaybackOperation
         using avsSupportedPlaybackOperation = aace::engine::alexa::SupportedPlaybackOperation;
 
-        for( auto nextOp : platformState.playbackState.supportedOperations ) {
-            switch( nextOp ) {
+        for (auto nextOp : platformState.playbackState.supportedOperations) {
+            switch (nextOp) {
                 case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::PLAY:
-                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::PLAY );
+                    state.playbackState.supportedOperations.insert(avsSupportedPlaybackOperation::PLAY);
                     break;
                 case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::PAUSE:
-                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::PAUSE );
+                    state.playbackState.supportedOperations.insert(avsSupportedPlaybackOperation::PAUSE);
                     break;
                 case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::STOP:
-                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::STOP );
+                    state.playbackState.supportedOperations.insert(avsSupportedPlaybackOperation::STOP);
                     break;
                 case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::NEXT:
-                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::NEXT );
+                    state.playbackState.supportedOperations.insert(avsSupportedPlaybackOperation::NEXT);
                     break;
                 case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::PREVIOUS:
-                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::PREVIOUS );
+                    state.playbackState.supportedOperations.insert(avsSupportedPlaybackOperation::PREVIOUS);
                     break;
                 case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::START_OVER:
-                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::START_OVER );
+                    state.playbackState.supportedOperations.insert(avsSupportedPlaybackOperation::START_OVER);
                     break;
                 case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::FAST_FORWARD:
-                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::FAST_FORWARD );
+                    state.playbackState.supportedOperations.insert(avsSupportedPlaybackOperation::FAST_FORWARD);
                     break;
                 case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::REWIND:
-                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::REWIND );
+                    state.playbackState.supportedOperations.insert(avsSupportedPlaybackOperation::REWIND);
                     break;
                 case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::ENABLE_REPEAT:
-                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::ENABLE_REPEAT );
+                    state.playbackState.supportedOperations.insert(avsSupportedPlaybackOperation::ENABLE_REPEAT);
                     break;
                 case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::ENABLE_REPEAT_ONE:
-                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::ENABLE_REPEAT_ONE );
+                    state.playbackState.supportedOperations.insert(avsSupportedPlaybackOperation::ENABLE_REPEAT_ONE);
                     break;
                 case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::DISABLE_REPEAT:
-                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::DISABLE_REPEAT );
+                    state.playbackState.supportedOperations.insert(avsSupportedPlaybackOperation::DISABLE_REPEAT);
                     break;
                 case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::ENABLE_SHUFFLE:
-                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::ENABLE_SHUFFLE );
+                    state.playbackState.supportedOperations.insert(avsSupportedPlaybackOperation::ENABLE_SHUFFLE);
                     break;
                 case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::DISABLE_SHUFFLE:
-                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::DISABLE_SHUFFLE );
+                    state.playbackState.supportedOperations.insert(avsSupportedPlaybackOperation::DISABLE_SHUFFLE);
                     break;
                 case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::FAVORITE:
-                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::FAVORITE );
+                    state.playbackState.supportedOperations.insert(avsSupportedPlaybackOperation::FAVORITE);
                     break;
                 case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::UNFAVORITE:
-                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::UNFAVORITE );
+                    state.playbackState.supportedOperations.insert(avsSupportedPlaybackOperation::UNFAVORITE);
                     break;
                 case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::SEEK:
-                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::SEEK );
+                    state.playbackState.supportedOperations.insert(avsSupportedPlaybackOperation::SEEK);
                     break;
                 case aace::alexa::ExternalMediaAdapter::SupportedPlaybackOperation::ADJUST_SEEK:
-                    state.playbackState.supportedOperations.insert( avsSupportedPlaybackOperation::ADJUST_SEEK );
+                    state.playbackState.supportedOperations.insert(avsSupportedPlaybackOperation::ADJUST_SEEK);
                     break;
                 default:
                     AACE_VERBOSE(LX(TAG).m("Unexpected SupportedPlaybackOperation"));
                     break;
             }
         }
-        
+
         return true;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"handleGetAdapterState").d("reason", ex.what()).d("playerId", localPlayerId));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "handleGetAdapterState").d("reason", ex.what()).d("playerId", localPlayerId));
         return false;
     }
 }
 
-std::chrono::milliseconds LocalMediaSourceEngineImpl::handleGetOffset( const std::string& localPlayerId )
-{
+std::chrono::milliseconds LocalMediaSourceEngineImpl::handleGetOffset(const std::string& localPlayerId) {
     return std::chrono::milliseconds::zero();
 }
 
-std::string LocalMediaSourceEngineImpl::getPlayerId( Source source) {
-    switch( source )
-    {
+std::string LocalMediaSourceEngineImpl::getPlayerId(Source source) {
+    switch (source) {
         case Source::AM_RADIO:
             return "AM_RADIO";
-            
+
         case Source::FM_RADIO:
             return "FM_RADIO";
-            
+
         case Source::BLUETOOTH:
             return "BLUETOOTH";
-            
+
         case Source::COMPACT_DISC:
             return "COMPACT_DISC";
-            
+
         case Source::LINE_IN:
             return "LINE_IN";
-            
+
         case Source::SATELLITE_RADIO:
             return "SATELLITE_RADIO";
-    
+
         case Source::USB:
             return "USB";
-        
+
         case Source::SIRIUS_XM:
             return "SIRIUS_XM";
 
         case Source::DAB:
             return "DAB";
-    
+
         default:
-            throw( "invalidLocalMediaSource" );
+            throw("invalidLocalMediaSource");
     }
 }
 
-bool LocalMediaSourceEngineImpl::handleSetVolume( int8_t volume )
-{
-    try
-    {
-        ThrowIfNot( m_platformLocalMediaSource->volumeChanged( (float) volume / MAX_SPEAKER_VOLUME ), "platformLocalMediaSourceVolumeChangedFailed" );
+bool LocalMediaSourceEngineImpl::handleSetVolume(int8_t volume) {
+    try {
+        ThrowIfNot(
+            m_platformLocalMediaSource->volumeChanged((float)volume / MAX_SPEAKER_VOLUME),
+            "platformLocalMediaSourceVolumeChangedFailed");
         return true;
-    }
-    catch( std::exception& ex ) {
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
 }
 
-bool LocalMediaSourceEngineImpl::handleSetMute( bool mute )
-{
-    try
-    {
-        ThrowIfNot( m_platformLocalMediaSource->mutedStateChanged( mute ?
-            aace::alexa::ExternalMediaAdapter::MutedState::MUTED :
-            aace::alexa::ExternalMediaAdapter::MutedState::UNMUTED ), "platformLocalMediaSourceMutedStateChangedFailed" );
+bool LocalMediaSourceEngineImpl::handleSetMute(bool mute) {
+    try {
+        ThrowIfNot(
+            m_platformLocalMediaSource->mutedStateChanged(
+                mute ? aace::alexa::ExternalMediaAdapter::MutedState::MUTED
+                     : aace::alexa::ExternalMediaAdapter::MutedState::UNMUTED),
+            "platformLocalMediaSourceMutedStateChangedFailed");
 
         return true;
-    }
-    catch( std::exception& ex ) {
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()).d("mute", mute));
         return false;
     }
@@ -454,69 +473,80 @@ bool LocalMediaSourceEngineImpl::handleSetMute( bool mute )
 // aace::alexa::LocalMediaSourceEngineInterface
 //
 
-void LocalMediaSourceEngineImpl::onPlayerEvent( const std::string& eventName )
-{
-    try
-    {
-        AACE_VERBOSE(LX(TAG).d("eventName",eventName));
+void LocalMediaSourceEngineImpl::onPlayerEvent(const std::string& eventName) {
+    try {
+        AACE_VERBOSE(LX(TAG).d("eventName", eventName));
 
-        auto event = createExternalMediaPlayerEvent( m_localPlayerId, "PlayerEvent", true, [eventName](rapidjson::Value::Object& payload, rapidjson::Value::AllocatorType& allocator) {
-            payload.AddMember( "eventName", rapidjson::Value().SetString( eventName.c_str(), eventName.length() ), allocator );
-        });
-        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>( event );
+        auto event = createExternalMediaPlayerEvent(
+            m_localPlayerId,
+            "PlayerEvent",
+            true,
+            [eventName](rapidjson::Value::Object& payload, rapidjson::Value::AllocatorType& allocator) {
+                payload.AddMember(
+                    "eventName", rapidjson::Value().SetString(eventName.c_str(), eventName.length()), allocator);
+            });
+        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event);
 
         auto m_messageSender_lock = m_messageSender.lock();
-        ThrowIfNull( m_messageSender_lock, "invalidMessageSender" );
-        
-        m_messageSender_lock->sendMessage( request );
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"onPlayerEvent").d("reason", ex.what()).d("eventName", eventName));
+        ThrowIfNull(m_messageSender_lock, "invalidMessageSender");
+
+        m_messageSender_lock->sendMessage(request);
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "onPlayerEvent").d("reason", ex.what()).d("eventName", eventName));
     }
 }
 
-void LocalMediaSourceEngineImpl::onPlayerError( const std::string& errorName, long code, const std::string& description, bool fatal )
-{
-    try
-    {
-        AACE_VERBOSE(LX(TAG).d("errorName",errorName).d("code",code).d("description",description).d("fatal",fatal));
+void LocalMediaSourceEngineImpl::onPlayerError(
+    const std::string& errorName,
+    long code,
+    const std::string& description,
+    bool fatal) {
+    try {
+        AACE_VERBOSE(LX(TAG).d("errorName", errorName).d("code", code).d("description", description).d("fatal", fatal));
 
-        auto event = createExternalMediaPlayerEvent( m_localPlayerId, "PlayerError", true, [errorName,code,description,fatal](rapidjson::Value::Object& payload, rapidjson::Value::AllocatorType& allocator) {
-            payload.AddMember( "errorName", rapidjson::Value().SetString( errorName.c_str(), errorName.length() ), allocator );
-            payload.AddMember( "code", rapidjson::Value().SetInt64( code ), allocator );
-            payload.AddMember( "description", rapidjson::Value().SetString( description.c_str(), description.length() ), allocator );
-            payload.AddMember( "fatal", rapidjson::Value().SetBool( fatal ), allocator );
-        });
-        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>( event );
+        auto event = createExternalMediaPlayerEvent(
+            m_localPlayerId,
+            "PlayerError",
+            true,
+            [errorName, code, description, fatal](
+                rapidjson::Value::Object& payload, rapidjson::Value::AllocatorType& allocator) {
+                payload.AddMember(
+                    "errorName", rapidjson::Value().SetString(errorName.c_str(), errorName.length()), allocator);
+                payload.AddMember("code", rapidjson::Value().SetInt64(code), allocator);
+                payload.AddMember(
+                    "description", rapidjson::Value().SetString(description.c_str(), description.length()), allocator);
+                payload.AddMember("fatal", rapidjson::Value().SetBool(fatal), allocator);
+            });
+        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event);
 
         auto m_messageSender_lock = m_messageSender.lock();
-        ThrowIfNull( m_messageSender_lock, "invalidMessageSender" );
-        
-        m_messageSender_lock->sendMessage( request );
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"onPlayerError").d("reason", ex.what()).d("errorName", errorName).d("code", code).d("description", description).d("fatal", fatal));
+        ThrowIfNull(m_messageSender_lock, "invalidMessageSender");
+
+        m_messageSender_lock->sendMessage(request);
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "onPlayerError")
+                       .d("reason", ex.what())
+                       .d("errorName", errorName)
+                       .d("code", code)
+                       .d("description", description)
+                       .d("fatal", fatal));
     }
 }
 
-void LocalMediaSourceEngineImpl::onSetFocus( bool focusAcquire )
-{
-    try
-    {
-        ThrowIfNot( setFocus( m_localPlayerId, focusAcquire ), "setFocusFailed" );
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"onSetFocus").d("reason", ex.what()));
+void LocalMediaSourceEngineImpl::onSetFocus(bool focusAcquire) {
+    try {
+        ThrowIfNot(setFocus(m_localPlayerId, focusAcquire), "setFocusFailed");
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "onSetFocus").d("reason", ex.what()));
     }
 }
 
 // alexaClientSDK::avsCommon::utils::RequiresShutdown
-void LocalMediaSourceEngineImpl::doShutdown()
-{
+void LocalMediaSourceEngineImpl::doShutdown() {
     AACE_VERBOSE(LX(TAG));
 
-    if( m_platformLocalMediaSource != nullptr ) {
-        m_platformLocalMediaSource->setEngineInterface( nullptr );
+    if (m_platformLocalMediaSource != nullptr) {
+        m_platformLocalMediaSource->setEngineInterface(nullptr);
         m_platformLocalMediaSource.reset();
     }
 
@@ -524,6 +554,6 @@ void LocalMediaSourceEngineImpl::doShutdown()
     ExternalMediaAdapterHandler::doShutdown();
 }
 
-} // aace::engine::alexa
-} // aace::engine
-} // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace

@@ -25,29 +25,29 @@ namespace engine {
 namespace navigation {
 
 class NavigationEngineService : public aace::engine::core::EngineService {
-    DESCRIBE("aace.navigation",VERSION("1.0"),DEPENDS(aace::engine::alexa::AlexaEngineService))
+    DESCRIBE("aace.navigation", VERSION("1.0"), DEPENDS(aace::engine::alexa::AlexaEngineService))
 
 private:
-    NavigationEngineService( const aace::engine::core::ServiceDescription& description );
+    NavigationEngineService(const aace::engine::core::ServiceDescription& description);
 
 public:
     virtual ~NavigationEngineService() = default;
 
 protected:
-    bool configure( std::shared_ptr<std::istream> configuration ) override;
-    
+    bool configure(std::shared_ptr<std::istream> configuration) override;
+
     bool shutdown() override;
-    bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) override;
-    
+    bool registerPlatformInterface(std::shared_ptr<aace::core::PlatformInterface> platformInterface) override;
+
 private:
     // platform interface registration
     template <class T>
-    bool registerPlatformInterfaceType( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) {
-        std::shared_ptr<T> typedPlatformInterface = std::dynamic_pointer_cast<T>( platformInterface );
-        return typedPlatformInterface != nullptr ? registerPlatformInterfaceType( typedPlatformInterface ) : false;
+    bool registerPlatformInterfaceType(std::shared_ptr<aace::core::PlatformInterface> platformInterface) {
+        std::shared_ptr<T> typedPlatformInterface = std::dynamic_pointer_cast<T>(platformInterface);
+        return typedPlatformInterface != nullptr ? registerPlatformInterfaceType(typedPlatformInterface) : false;
     }
 
-    bool registerPlatformInterfaceType( std::shared_ptr<aace::navigation::Navigation> navigation );
+    bool registerPlatformInterfaceType(std::shared_ptr<aace::navigation::Navigation> navigation);
 
     // engine implementation object references
     std::shared_ptr<aace::engine::navigation::NavigationEngineImpl> m_navigationEngineImpl;
@@ -56,8 +56,8 @@ private:
     std::string m_navigationProviderName;
 };
 
-} // aace::engine::navigation
-} // aace::engine
-} // aace
+}  // namespace navigation
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_NAVIGATION_NAVIGATION_ENGINE_SERVICE_H
+#endif  // AACE_ENGINE_NAVIGATION_NAVIGATION_ENGINE_SERVICE_H

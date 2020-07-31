@@ -28,7 +28,6 @@ namespace network {
  */
 class NetworkInfoProviderEngineInterface {
 public:
-
     /**
      * Describes the status of network connectivity
      */
@@ -56,7 +55,7 @@ public:
         CONNECTING
     };
 
-    virtual void networkInfoChanged( NetworkStatus status, int wifiSignalStrength ) = 0;
+    virtual void networkInfoChanged(NetworkStatus status, int wifiSignalStrength) = 0;
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const NetworkInfoProviderEngineInterface::NetworkStatus& status) {
@@ -80,7 +79,7 @@ inline std::ostream& operator<<(std::ostream& stream, const NetworkInfoProviderE
     return stream;
 }
 
-} // aace::network
-} // aace
+}  // namespace network
+}  // namespace aace
 
-#endif // AACE_NETWORK_NETWORK_ENGINE_INTERFACES_H
+#endif  // AACE_NETWORK_NETWORK_ENGINE_INTERFACES_H

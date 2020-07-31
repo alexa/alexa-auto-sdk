@@ -23,80 +23,76 @@ namespace aace {
 namespace jni {
 namespace alexa {
 
-    class PlaybackControllerHandler : public aace::alexa::PlaybackController {
-    public:
-        PlaybackControllerHandler();
-    };
+class PlaybackControllerHandler : public aace::alexa::PlaybackController {
+public:
+    PlaybackControllerHandler();
+};
 
-    class PlaybackControllerBinder : public aace::jni::core::PlatformInterfaceBinder {
-    public:
-        PlaybackControllerBinder( jobject obj );
+class PlaybackControllerBinder : public aace::jni::core::PlatformInterfaceBinder {
+public:
+    PlaybackControllerBinder(jobject obj);
 
-        std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
-            return m_playbackControllerHandler;
-        }
+    std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
+        return m_playbackControllerHandler;
+    }
 
-        std::shared_ptr<PlaybackControllerHandler> getPlaybackController() {
-            return m_playbackControllerHandler;
-        }
+    std::shared_ptr<PlaybackControllerHandler> getPlaybackController() {
+        return m_playbackControllerHandler;
+    }
 
-    private:
-        std::shared_ptr<PlaybackControllerHandler> m_playbackControllerHandler;
-    };
+private:
+    std::shared_ptr<PlaybackControllerHandler> m_playbackControllerHandler;
+};
 
-    //
-    // JPlaybackButton
-    //
+//
+// JPlaybackButton
+//
 
-    class JPlaybackButtonConfig : public EnumConfiguration<PlaybackControllerHandler::PlaybackButton> {
-    public:
-        using T = PlaybackControllerHandler::PlaybackButton;
+class JPlaybackButtonConfig : public EnumConfiguration<PlaybackControllerHandler::PlaybackButton> {
+public:
+    using T = PlaybackControllerHandler::PlaybackButton;
 
-        const char* getClassName() override {
-            return "com/amazon/aace/alexa/PlaybackController$PlaybackButton";
-        }
+    const char* getClassName() override {
+        return "com/amazon/aace/alexa/PlaybackController$PlaybackButton";
+    }
 
-        std::vector<std::pair<T,std::string>> getConfiguration() override {
-            return {
-                {T::PLAY,"PLAY"},
-                {T::PAUSE,"PAUSE"},
-                {T::NEXT,"NEXT"},
-                {T::PREVIOUS,"PREVIOUS"},
-                {T::SKIP_FORWARD,"SKIP_FORWARD"},
-                {T::SKIP_BACKWARD,"SKIP_BACKWARD"}
-            };
-        }
-    };
+    std::vector<std::pair<T, std::string>> getConfiguration() override {
+        return {{T::PLAY, "PLAY"},
+                {T::PAUSE, "PAUSE"},
+                {T::NEXT, "NEXT"},
+                {T::PREVIOUS, "PREVIOUS"},
+                {T::SKIP_FORWARD, "SKIP_FORWARD"},
+                {T::SKIP_BACKWARD, "SKIP_BACKWARD"}};
+    }
+};
 
-    using JPlaybackButton = JEnum<PlaybackControllerHandler::PlaybackButton,JPlaybackButtonConfig>;
+using JPlaybackButton = JEnum<PlaybackControllerHandler::PlaybackButton, JPlaybackButtonConfig>;
 
-    //
-    // JPlaybackToggle
-    //
+//
+// JPlaybackToggle
+//
 
-    class JPlaybackToggleConfig : public EnumConfiguration<PlaybackControllerHandler::PlaybackToggle> {
-    public:
-        using T = PlaybackControllerHandler::PlaybackToggle;
+class JPlaybackToggleConfig : public EnumConfiguration<PlaybackControllerHandler::PlaybackToggle> {
+public:
+    using T = PlaybackControllerHandler::PlaybackToggle;
 
-        const char* getClassName() override {
-            return "com/amazon/aace/alexa/PlaybackController$PlaybackToggle";
-        }
+    const char* getClassName() override {
+        return "com/amazon/aace/alexa/PlaybackController$PlaybackToggle";
+    }
 
-        std::vector<std::pair<T,std::string>> getConfiguration() override {
-            return {
-                {T::SHUFFLE,"SHUFFLE"},
-                {T::LOOP,"LOOP"},
-                {T::REPEAT,"REPEAT"},
-                {T::THUMBS_UP,"THUMBS_UP"},
-                {T::THUMBS_DOWN,"THUMBS_DOWN"}
-            };
-        }
-    };
+    std::vector<std::pair<T, std::string>> getConfiguration() override {
+        return {{T::SHUFFLE, "SHUFFLE"},
+                {T::LOOP, "LOOP"},
+                {T::REPEAT, "REPEAT"},
+                {T::THUMBS_UP, "THUMBS_UP"},
+                {T::THUMBS_DOWN, "THUMBS_DOWN"}};
+    }
+};
 
-    using JPlaybackToggle = JEnum<PlaybackControllerHandler::PlaybackToggle,JPlaybackToggleConfig>;
+using JPlaybackToggle = JEnum<PlaybackControllerHandler::PlaybackToggle, JPlaybackToggleConfig>;
 
-} // aace::alexa
-} // aace::jni
-} // aace
+}  // namespace alexa
+}  // namespace jni
+}  // namespace aace
 
-#endif // AACE_JNI_ALEXA_PLAYBACK_CONTROLLER_BINDER_H
+#endif  // AACE_JNI_ALEXA_PLAYBACK_CONTROLLER_BINDER_H

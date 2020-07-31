@@ -74,12 +74,15 @@ private:
     /// Set with the supported locales.
     std::set<Locale> m_supportedLocales;
 
+    /// Vector with the supported localesCombinations.
+    LocaleCombinations m_supportedLocalesCombinations;
+
     /// The default locale.
     Locale m_defaultLocale;
 };
 
-}  // alexa
-}  // engine
-}  // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace
 
 #endif  // ALEXA_CLIENT_SDK_SAMPLEAPP_INCLUDE_SAMPLEAPP_LOCALEASSETSMANAGER_H_

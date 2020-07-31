@@ -21,17 +21,16 @@ import android.os.Message;
 import com.amazon.aace.alexa.AudioPlayer;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 
-public class AudioPlayerHandler extends AudioPlayer
-{
+public class AudioPlayerHandler extends AudioPlayer {
     private static String TAG = AudioPlayerHandler.class.getSimpleName();
     private LoggerHandler mLogger = null;
 
-    public AudioPlayerHandler( LoggerHandler logger ) {
+    public AudioPlayerHandler(LoggerHandler logger) {
         mLogger = logger;
     }
 
     @Override
     public void playerActivityChanged(AudioPlayer.PlayerActivity state) {
-        mLogger.postInfo( TAG, String.format( "playerActivityChanged: %s", state.toString() ) );
+        mLogger.postInfo(TAG, String.format("playerActivityChanged: %s", state.toString()));
     }
 }

@@ -34,9 +34,9 @@ namespace uuid {
  */
 const std::string generateUUID();
 
-} // aace::engine::utils::uuid
-} // aace::engine::utils
-} // aace::engine
-} // aace
+}  // namespace uuid
+}  // namespace utils
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_UTILS_UUID_H_
+#endif  // AACE_ENGINE_UTILS_UUID_H_

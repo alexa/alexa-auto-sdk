@@ -18,10 +18,10 @@
 namespace aace {
 namespace engine {
 namespace alexa {
-    
+
 AlexaEndpointInterface::~AlexaEndpointInterface() {
 }
-    
-} // aace::engine::alexa
-} // aace::engine
-} // aace
+
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace

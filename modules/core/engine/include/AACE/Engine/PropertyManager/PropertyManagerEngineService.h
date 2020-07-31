@@ -75,7 +75,7 @@ private:
     // Notifies all the listeners about the property change by calling
     // propertyChanged() on every PropertyListenerInterface.
     void notifyPropertyChangeListeners(const std::string& key, const std::string& propertyValue);
-            
+
     // Notifies the platform and listeners about a successful set property
     // operation. Expects m_propertyManagerEngineImpl to be not null.
     void handleSetSuccess(
@@ -83,7 +83,7 @@ private:
         const bool& fromPlatform,
         const std::string& name,
         const std::string& value);
-            
+
     // Notifies the platform about a failed set property operation
     // Expects m_propertyManagerEngineImpl to be not null.
     void handleSetFailed(const bool& fromPlatform, const std::string& name, const std::string& value);

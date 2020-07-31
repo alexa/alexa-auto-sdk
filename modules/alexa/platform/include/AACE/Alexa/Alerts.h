@@ -88,12 +88,12 @@ public:
          * The alert has encountered an error.
          */
         ERROR,
-        
+
         /**
         * The alert has been deleted.
         */
         DELETED,
-        
+
         /**
         * The alert has been scheduled to trigger at a future time.
         */
@@ -107,7 +107,7 @@ public:
      * @param [in] state The new alert state
      * @param [in] reason The reason for the state change
      */
-    virtual void alertStateChanged( const std::string& alertToken, AlertState state, const std::string& reason ) = 0;
+    virtual void alertStateChanged(const std::string& alertToken, AlertState state, const std::string& reason) = 0;
 
     /**
      * Notifies the platform implementation of an alert created, with detailed alert info. 
@@ -123,20 +123,20 @@ public:
      * type The type of the alert ( ALERT, REMINDER, TIMER ).
      * label The label of the TIMER, description for REMINDER, or empty string for ALARM.
      */
-    virtual void alertCreated( const std::string& alertToken, const std::string& detailedInfo ) = 0;
+    virtual void alertCreated(const std::string& alertToken, const std::string& detailedInfo) = 0;
 
     /**
      * Notifies the platform implementation of an alert deleted, with the alertToken.
      *
      * @param [in] alertToken The AVS token of the alert.
      */
-    virtual void alertDeleted( const std::string& alertToken ) = 0;
+    virtual void alertDeleted(const std::string& alertToken) = 0;
 
     /**
      * Notifies the Engine of a platform request to stop any active alert, such as when a user presses a physical 'stop' button.
      */
     void localStop();
-    
+
     /**
      * Notifies the Engine of a platform request to clear the user's
      * pending alerts from local storage. This may be useful for a scenario in which a user's pending alerts should not go 
@@ -151,7 +151,7 @@ public:
      *
      * Should *never* be called by the platform implementation.
      */
-    void setEngineInterface( std::shared_ptr<aace::alexa::AlertsEngineInterface> alertsEngineInterface );
+    void setEngineInterface(std::shared_ptr<aace::alexa::AlertsEngineInterface> alertsEngineInterface);
 
 private:
     std::weak_ptr<aace::alexa::AlertsEngineInterface> m_alertsEngineInterface;
@@ -196,7 +196,7 @@ inline std::ostream& operator<<(std::ostream& stream, const Alerts::AlertState& 
     return stream;
 }
 
-} // aace::alexa
-} // aace
+}  // namespace alexa
+}  // namespace aace
 
-#endif // AACE_ALEXA_ALERTS_H
+#endif  // AACE_ALEXA_ALERTS_H

@@ -38,27 +38,43 @@ class PlayerInfo;
 
 class ExternalMediaAdapterHandlerInterface : public alexaClientSDK::avsCommon::utils::RequiresShutdown {
 public:
-    ExternalMediaAdapterHandlerInterface( const std::string& name );
+    ExternalMediaAdapterHandlerInterface(const std::string& name);
     virtual ~ExternalMediaAdapterHandlerInterface() = default;
 
 public:
-    virtual std::vector<aace::engine::alexa::PlayerInfo> authorizeDiscoveredPlayers( const std::vector<aace::engine::alexa::PlayerInfo>& authorizedPlayerList ) = 0;
-    virtual bool login( const std::string& playerId, const std::string& accessToken, const std::string& userName, bool forceLogin, std::chrono::milliseconds tokenRefreshInterval ) = 0;
-    virtual bool logout( const std::string& playerId ) = 0;
-    virtual bool play( const std::string& playerId, const std::string& playContextToken, int64_t index, std::chrono::milliseconds offset, const std::string& skillToken, const std::string& playbackSessionId, const std::string& navigation, bool preload, const alexaClientSDK::avsCommon::avs::PlayRequestor& playRequestor ) = 0;
-    virtual bool playControl( const std::string& playerId, aace::engine::alexa::RequestType requestType ) = 0;
-    virtual bool seek( const std::string& playerId, std::chrono::milliseconds offset ) = 0;
-    virtual bool adjustSeek( const std::string& playerId, std::chrono::milliseconds deltaOffset ) = 0;
-    virtual std::vector<aace::engine::alexa::AdapterState> getAdapterStates( bool all = true ) = 0;
-    virtual std::chrono::milliseconds getOffset( const std::string& playerId ) = 0;
+    virtual std::vector<aace::engine::alexa::PlayerInfo> authorizeDiscoveredPlayers(
+        const std::vector<aace::engine::alexa::PlayerInfo>& authorizedPlayerList) = 0;
+    virtual bool login(
+        const std::string& playerId,
+        const std::string& accessToken,
+        const std::string& userName,
+        bool forceLogin,
+        std::chrono::milliseconds tokenRefreshInterval) = 0;
+    virtual bool logout(const std::string& playerId) = 0;
+    virtual bool play(
+        const std::string& playerId,
+        const std::string& playContextToken,
+        int64_t index,
+        std::chrono::milliseconds offset,
+        const std::string& skillToken,
+        const std::string& playbackSessionId,
+        const std::string& navigation,
+        bool preload,
+        const alexaClientSDK::avsCommon::avs::PlayRequestor& playRequestor) = 0;
+    virtual bool playControl(const std::string& playerId, aace::engine::alexa::RequestType requestType) = 0;
+    virtual bool seek(const std::string& playerId, std::chrono::milliseconds offset) = 0;
+    virtual bool adjustSeek(const std::string& playerId, std::chrono::milliseconds deltaOffset) = 0;
+    virtual std::vector<aace::engine::alexa::AdapterState> getAdapterStates(bool all = true) = 0;
+    virtual std::chrono::milliseconds getOffset(const std::string& playerId) = 0;
 };
 
-inline ExternalMediaAdapterHandlerInterface::ExternalMediaAdapterHandlerInterface( const std::string& name ) : alexaClientSDK::avsCommon::utils::RequiresShutdown( name ) {
+inline ExternalMediaAdapterHandlerInterface::ExternalMediaAdapterHandlerInterface(const std::string& name) :
+        alexaClientSDK::avsCommon::utils::RequiresShutdown(name) {
 }
 
 class PlayerInfo {
 public:
-    PlayerInfo( const std::string& localPlayerId = "", const std::string& spiVersion = "", bool authorized = false );
+    PlayerInfo(const std::string& localPlayerId = "", const std::string& spiVersion = "", bool authorized = false);
 
 public:
     std::string localPlayerId;
@@ -69,11 +85,12 @@ public:
     bool authorized;
 };
 
-inline PlayerInfo::PlayerInfo( const std::string& localPlayerId, const std::string& spiVersion, bool authorized ) : localPlayerId( localPlayerId ), spiVersion( spiVersion ), authorized( authorized ) {
+inline PlayerInfo::PlayerInfo(const std::string& localPlayerId, const std::string& spiVersion, bool authorized) :
+        localPlayerId(localPlayerId), spiVersion(spiVersion), authorized(authorized) {
 }
 
-} // aace::engine::alexa
-} // aace::engine
-} // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_ALEXA_EXTERNAL_MEDIA_ADAPTER_HANDLER_INTERFACE_H
+#endif  // AACE_ENGINE_ALEXA_EXTERNAL_MEDIA_ADAPTER_HANDLER_INTERFACE_H

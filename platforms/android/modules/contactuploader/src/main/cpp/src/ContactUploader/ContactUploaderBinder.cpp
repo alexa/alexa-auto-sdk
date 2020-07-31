@@ -25,140 +25,131 @@ namespace aace {
 namespace jni {
 namespace contactuploader {
 
-    //
-    // ContactUploaderBinder
-    //
+//
+// ContactUploaderBinder
+//
 
-    ContactUploaderBinder::ContactUploaderBinder( jobject obj ) {
-        m_contactUploaderHandler = std::make_shared<ContactUploaderHandler>( obj );
+ContactUploaderBinder::ContactUploaderBinder(jobject obj) {
+    m_contactUploaderHandler = std::make_shared<ContactUploaderHandler>(obj);
+}
+
+//
+// ContactUploaderHandler
+//
+
+ContactUploaderHandler::ContactUploaderHandler(jobject obj) :
+        ContactUploader(), m_obj(obj, "com/amazon/aace/contactuploader/ContactUploader") {
+}
+
+void ContactUploaderHandler::contactsUploaderStatusChanged(ContactUploaderStatus status, const std::string& info) {
+    try_with_context {
+        jobject statusObj;
+
+        ThrowIfNot(JContactUploaderStatus::checkType(status, &statusObj), "invalidStatus");
+        ThrowIfNot(
+            m_obj.invoke<void>(
+                "contactsUploaderStatusChanged",
+                "(Lcom/amazon/aace/contactuploader/ContactUploader$ContactUploaderStatus;Ljava/lang/String;)V",
+                nullptr,
+                statusObj,
+                JString(info).get()),
+            "invokeFailed");
     }
-
-    //
-    // ContactUploaderHandler
-    //
-
-    ContactUploaderHandler::ContactUploaderHandler( jobject obj ) : ContactUploader(), m_obj( obj, "com/amazon/aace/contactuploader/ContactUploader" ) {
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "contactsUploaderStatusChanged", ex.what());
     }
+}
 
-    void ContactUploaderHandler::contactsUploaderStatusChanged( ContactUploaderStatus status, const std::string& info )
-    {
-        try_with_context
-        {
-            jobject statusObj;
+}  // namespace contactuploader
+}  // namespace jni
+}  // namespace aace
 
-            ThrowIfNot( JContactUploaderStatus::checkType( status, &statusObj ), "invalidStatus" );
-            ThrowIfNot( m_obj.invoke<void>( "contactsUploaderStatusChanged", "(Lcom/amazon/aace/contactuploader/ContactUploader$ContactUploaderStatus;Ljava/lang/String;)V", nullptr, statusObj, JString(info).get() ), "invokeFailed" );
-        }
-        catch_with_ex {
-            AACE_JNI_ERROR(TAG,"contactsUploaderStatusChanged",ex.what());
-        }
+#define CONTACT_UPLOADER_BINDER(ref) reinterpret_cast<aace::jni::contactuploader::ContactUploaderBinder*>(ref)
+
+extern "C" {
+JNIEXPORT jlong JNICALL Java_com_amazon_aace_contactuploader_ContactUploader_createBinder(JNIEnv* env, jobject obj) {
+    return reinterpret_cast<long>(new aace::jni::contactuploader::ContactUploaderBinder(obj));
+}
+
+JNIEXPORT void JNICALL
+Java_com_amazon_aace_contactuploader_ContactUploader_disposeBinder(JNIEnv* env, jobject /* this */, jlong ref) {
+    try {
+        auto contactUploaderBinder = CONTACT_UPLOADER_BINDER(ref);
+        ThrowIfNull(contactUploaderBinder, "invalidContactUploaderBinder");
+
+        delete contactUploaderBinder;
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_contactuploader_ContactUploader_disposeBinder", ex.what());
     }
+}
 
-} // aace::jni::contactuploader
-} // aace::jni
-} // aace
+JNIEXPORT jboolean JNICALL
+Java_com_amazon_aace_contactuploader_ContactUploader_addContactsBegin(JNIEnv* env, jobject /* this */, jlong ref) {
+    try {
+        auto contactUploaderBinder = CONTACT_UPLOADER_BINDER(ref);
+        ThrowIfNull(contactUploaderBinder, "invalidContactUploaderBinder");
 
-#define CONTACT_UPLOADER_BINDER(ref) reinterpret_cast<aace::jni::contactuploader::ContactUploaderBinder *>( ref )
-
-extern "C"
-{
-    JNIEXPORT jlong JNICALL
-    Java_com_amazon_aace_contactuploader_ContactUploader_createBinder( JNIEnv* env, jobject obj )  {
-        return reinterpret_cast<long>( new aace::jni::contactuploader::ContactUploaderBinder( obj ) );
+        return contactUploaderBinder->getContactUploader()->addContactsBegin();
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_contactuploader_ContactUploader_addContactsBegin", ex.what());
+        return false;
     }
+}
 
-    JNIEXPORT void JNICALL
-    Java_com_amazon_aace_contactuploader_ContactUploader_disposeBinder( JNIEnv* env, jobject /* this */, jlong ref )
-    {
-        try
-        {
-            auto contactUploaderBinder = CONTACT_UPLOADER_BINDER(ref);
-            ThrowIfNull( contactUploaderBinder, "invalidContactUploaderBinder" );
+JNIEXPORT jboolean JNICALL
+Java_com_amazon_aace_contactuploader_ContactUploader_addContactsEnd(JNIEnv* env, jobject /* this */, jlong ref) {
+    try {
+        auto contactUploaderBinder = CONTACT_UPLOADER_BINDER(ref);
+        ThrowIfNull(contactUploaderBinder, "invalidContactUploaderBinder");
 
-            delete contactUploaderBinder;
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_contactuploader_ContactUploader_disposeBinder",ex.what());
-        }
+        return contactUploaderBinder->getContactUploader()->addContactsEnd();
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_contactuploader_ContactUploader_addContactsEnd", ex.what());
+        return false;
     }
-    
-    JNIEXPORT jboolean JNICALL
-    Java_com_amazon_aace_contactuploader_ContactUploader_addContactsBegin( JNIEnv* env, jobject /* this */, jlong ref )
-    {
-        try
-        {
-            auto contactUploaderBinder = CONTACT_UPLOADER_BINDER(ref);
-            ThrowIfNull( contactUploaderBinder, "invalidContactUploaderBinder" );
+}
 
-            return contactUploaderBinder->getContactUploader()->addContactsBegin();
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_contactuploader_ContactUploader_addContactsBegin",ex.what());
-            return false;
-        }
+JNIEXPORT jboolean JNICALL
+Java_com_amazon_aace_contactuploader_ContactUploader_addContactsCancel(JNIEnv* env, jobject /* this */, jlong ref) {
+    try {
+        auto contactUploaderBinder = CONTACT_UPLOADER_BINDER(ref);
+        ThrowIfNull(contactUploaderBinder, "invalidContactUploaderBinder");
+
+        return contactUploaderBinder->getContactUploader()->addContactsCancel();
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_contactuploader_ContactUploader_addContactsCancel", ex.what());
+        return false;
     }
+}
 
-    JNIEXPORT jboolean JNICALL
-    Java_com_amazon_aace_contactuploader_ContactUploader_addContactsEnd( JNIEnv* env, jobject /* this */, jlong ref )
-    {
-        try
-        {
-            auto contactUploaderBinder = CONTACT_UPLOADER_BINDER(ref);
-            ThrowIfNull( contactUploaderBinder, "invalidContactUploaderBinder" );
+JNIEXPORT jboolean JNICALL Java_com_amazon_aace_contactuploader_ContactUploader_addContact(
+    JNIEnv* env,
+    jobject /* this */,
+    jlong ref,
+    jstring contact) {
+    try {
+        auto contactUploaderBinder = CONTACT_UPLOADER_BINDER(ref);
+        ThrowIfNull(contactUploaderBinder, "invalidContactUploaderBinder");
 
-            return contactUploaderBinder->getContactUploader()->addContactsEnd();
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_contactuploader_ContactUploader_addContactsEnd",ex.what());
-            return false;
-        }
+        return contactUploaderBinder->getContactUploader()->addContact(JString(contact).toStdStr());
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_contactuploader_ContactUploader_addContact", ex.what());
+        return false;
     }
+}
 
-    JNIEXPORT jboolean JNICALL
-    Java_com_amazon_aace_contactuploader_ContactUploader_addContactsCancel( JNIEnv* env, jobject /* this */, jlong ref )
-    {
-        try
-        {
-            auto contactUploaderBinder = CONTACT_UPLOADER_BINDER(ref);
-            ThrowIfNull( contactUploaderBinder, "invalidContactUploaderBinder" );
+JNIEXPORT jboolean JNICALL Java_com_amazon_aace_contactuploader_ContactUploader_removeUploadedContacts(
+    JNIEnv* env,
+    jobject /* this */,
+    jlong ref) {
+    try {
+        auto contactUploaderBinder = CONTACT_UPLOADER_BINDER(ref);
+        ThrowIfNull(contactUploaderBinder, "invalidContactUploaderBinder");
 
-            return contactUploaderBinder->getContactUploader()->addContactsCancel();
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_contactuploader_ContactUploader_addContactsCancel",ex.what());
-            return false;
-        }
+        return contactUploaderBinder->getContactUploader()->removeUploadedContacts();
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_contactuploader_ContactUploader_removeUploadedContacts", ex.what());
+        return false;
     }
-
-    JNIEXPORT jboolean JNICALL
-    Java_com_amazon_aace_contactuploader_ContactUploader_addContact( JNIEnv* env, jobject /* this */, jlong ref, jstring contact )
-    {
-        try
-        {
-            auto contactUploaderBinder = CONTACT_UPLOADER_BINDER(ref);
-            ThrowIfNull( contactUploaderBinder, "invalidContactUploaderBinder" );
-
-            return contactUploaderBinder->getContactUploader()->addContact( JString(contact).toStdStr() );
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_contactuploader_ContactUploader_addContact",ex.what());
-            return false;
-        }
-    }
-
-    JNIEXPORT jboolean JNICALL
-    Java_com_amazon_aace_contactuploader_ContactUploader_removeUploadedContacts( JNIEnv* env, jobject /* this */, jlong ref )
-    {
-        try
-        {
-            auto contactUploaderBinder = CONTACT_UPLOADER_BINDER(ref);
-            ThrowIfNull( contactUploaderBinder, "invalidContactUploaderBinder" );
-
-            return contactUploaderBinder->getContactUploader()->removeUploadedContacts();
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_contactuploader_ContactUploader_removeUploadedContacts",ex.what());
-            return false;
-        }
-    }
+}
 }

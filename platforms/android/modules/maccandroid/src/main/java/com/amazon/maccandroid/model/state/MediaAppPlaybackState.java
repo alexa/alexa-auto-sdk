@@ -27,7 +27,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class MediaAppPlaybackState {
-
     private static final String EXTERNAL_MEDIA_PLAYER_TYPE = "ExternalMediaPlayerMusicItem";
     private static final String MEDIA_TYPE_TRACK = "TRACK";
     private static final String MEDIA_TYPE_AD = "AD";
@@ -55,7 +54,6 @@ public class MediaAppPlaybackState {
         }
         PlaybackStateCompat playBackState = app.getPlayerPlaybackInfo().getPlaybackState();
 
-
         mPlaybackState = getExternalMediaPlayerState(app.getPlayerPlaybackInfo().getPlaybackState().getState());
         mSupportedOperations = supportedOperations.getSupportedOperations(app);
         mPositionMilliseconds = getPositionMilliseconds(playBackState);
@@ -64,7 +62,6 @@ public class MediaAppPlaybackState {
         mFavourite = getFavorite(app.getPlayerPlaybackInfo().getMetadata());
         MediaMetadataCompat metadata = app.getPlayerPlaybackInfo().getMetadata();
         mMediaAppMetaData = metadata == null ? new MediaAppMetaData() : new MediaAppMetaData(metadata);
-
     }
 
     private PlayBackStateFields.favorite getFavorite(MediaMetadataCompat metadata) {
@@ -91,16 +88,15 @@ public class MediaAppPlaybackState {
             case PlaybackStateCompat.REPEAT_MODE_ONE:
                 return PlayBackStateFields.repeat.ONE_REPEATED;
             case PlaybackStateCompat.REPEAT_MODE_NONE:
-//            case PlaybackStateCompat.REPEAT_MODE_INVALID:
-//                return PlayBackStateFields.repeat.NOT_REPEATED;
-
+                //            case PlaybackStateCompat.REPEAT_MODE_INVALID:
+                //                return PlayBackStateFields.repeat.NOT_REPEATED;
         }
         return PlayBackStateFields.repeat.NOT_REPEATED;
     }
 
     private PlayBackStateFields.shuffle getShuffleEnabled(int shuffleMode) {
-        if(shuffleMode == PlaybackStateCompat.SHUFFLE_MODE_ALL ||
-                shuffleMode == PlaybackStateCompat.SHUFFLE_MODE_GROUP) {
+        if (shuffleMode == PlaybackStateCompat.SHUFFLE_MODE_ALL
+                || shuffleMode == PlaybackStateCompat.SHUFFLE_MODE_GROUP) {
             return PlayBackStateFields.shuffle.SHUFFLED;
         } else {
             return PlayBackStateFields.shuffle.NOT_SHUFFLED;
@@ -109,14 +105,15 @@ public class MediaAppPlaybackState {
 
     private long getPositionMilliseconds(PlaybackStateCompat playbackState) {
         if (playbackState.getLastPositionUpdateTime() > 0) {
-            return (long) (playbackState.getPosition() + playbackState.getPlaybackSpeed() *
-                    (SystemClock.elapsedRealtime() - playbackState.getLastPositionUpdateTime()));
+            return (long) (playbackState.getPosition()
+                    + playbackState.getPlaybackSpeed()
+                            * (SystemClock.elapsedRealtime() - playbackState.getLastPositionUpdateTime()));
         }
         return 0;
     }
 
     private PlayBackStateFields.State getExternalMediaPlayerState(int state) {
-        switch(state) {
+        switch (state) {
             case PlaybackStateCompat.STATE_NONE:
                 return PlayBackStateFields.State.IDLE;
             case PlaybackStateCompat.STATE_PLAYING:

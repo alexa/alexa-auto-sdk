@@ -18,7 +18,7 @@
 
 #include <AVSCommon/SDKInterfaces/AudioPlayerInterface.h>
 
-namespace aace {    
+namespace aace {
 namespace test {
 namespace avs {
 
@@ -27,8 +27,8 @@ public:
     MOCK_METHOD2(receive, void(const std::string& contextId, const std::string& message));
 };
 
-} // aace::test::avs
-} // aace::test
-} // aace
+}  // namespace avs
+}  // namespace test
+}  // namespace aace
 
-#endif // AACE_TEST_AVS_MOCK_MESSAGE_OBSERVER_H
+#endif  // AACE_TEST_AVS_MOCK_MESSAGE_OBSERVER_H

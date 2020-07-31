@@ -25,190 +25,169 @@ namespace aace {
 namespace jni {
 namespace alexa {
 
-    //
-    // SpeechRecognizerBinder
-    //
+//
+// SpeechRecognizerBinder
+//
 
-    SpeechRecognizerBinder::SpeechRecognizerBinder( jobject obj, bool wakewordDetectionEnabled ) {
-        m_speechRecognizerHandler = std::make_shared<SpeechRecognizerHandler>( obj, wakewordDetectionEnabled );
+SpeechRecognizerBinder::SpeechRecognizerBinder(jobject obj, bool wakewordDetectionEnabled) {
+    m_speechRecognizerHandler = std::make_shared<SpeechRecognizerHandler>(obj, wakewordDetectionEnabled);
+}
+
+//
+// SpeechRecognizerHandler
+//
+
+SpeechRecognizerHandler::SpeechRecognizerHandler(jobject obj, bool wakewordDetectionEnabled) :
+        SpeechRecognizer(wakewordDetectionEnabled), m_obj(obj, "com/amazon/aace/alexa/SpeechRecognizer") {
+}
+
+bool SpeechRecognizerHandler::wakewordDetected(const std::string& wakeword) {
+    try_with_context {
+        jboolean result;
+        ThrowIfNot(
+            m_obj.invoke("wakewordDetected", "(Ljava/lang/String;)Z", &result, JString(wakeword).get()),
+            "invokeFailed");
+        return result;
     }
-
-    //
-    // SpeechRecognizerHandler
-    //
-
-    SpeechRecognizerHandler::SpeechRecognizerHandler( jobject obj, bool wakewordDetectionEnabled ) : SpeechRecognizer( wakewordDetectionEnabled ), m_obj( obj, "com/amazon/aace/alexa/SpeechRecognizer" ) {
-    }
-
-    bool SpeechRecognizerHandler::wakewordDetected( const std::string& wakeword )
-    {
-        try_with_context
-        {
-            jboolean result;
-            ThrowIfNot( m_obj.invoke( "wakewordDetected", "(Ljava/lang/String;)Z", &result, JString(wakeword).get() ), "invokeFailed" );
-            return result;
-        }
-        catch_with_ex {
-            AACE_JNI_ERROR(TAG,"wakewordDetected",ex.what());
-            return false;
-        }
-    }
-
-    void SpeechRecognizerHandler::endOfSpeechDetected()
-    {
-        try_with_context
-        {
-            ThrowIfNot( m_obj.invoke<void>( "endOfSpeechDetected", "()V", nullptr ), "invokeFailed" );
-        }
-        catch_with_ex {
-            AACE_JNI_ERROR(TAG,"endOfSpeechDetected",ex.what());
-        }
-    }
-
-} // aace::alexa
-} // aace::jni
-} // aace
-
-#define SPEECH_RECOGNIZER_BINDER(ref) reinterpret_cast<aace::jni::alexa::SpeechRecognizerBinder *>( ref )
-
-extern "C"
-{
-    JNIEXPORT jlong JNICALL
-    Java_com_amazon_aace_alexa_SpeechRecognizer_createBinder( JNIEnv* env, jobject obj, jboolean wakewordDetectionEnabled )  {
-        return reinterpret_cast<long>( new aace::jni::alexa::SpeechRecognizerBinder( obj, wakewordDetectionEnabled ) );
-    }
-    
-    JNIEXPORT void JNICALL
-    Java_com_amazon_aace_alexa_SpeechRecognizer_disposeBinder( JNIEnv* env, jobject /* this */, jlong ref )
-    {
-        try
-        {
-            auto speechRecognizerBinder = SPEECH_RECOGNIZER_BINDER(ref);
-            ThrowIfNull( speechRecognizerBinder, "invalidSpeechRecognizerBinder" );
-            delete speechRecognizerBinder;
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aaced_alexa_SpeechRecognizer_disposeBinder",ex.what());
-        }
-    }
-
-    JNIEXPORT jboolean JNICALL
-    Java_com_amazon_aace_alexa_SpeechRecognizer_holdToTalk( JNIEnv* env, jobject /* this */, jlong ref )
-    {
-        try
-        {
-            auto speechRecognizerBinder = SPEECH_RECOGNIZER_BINDER(ref);
-            ThrowIfNull( speechRecognizerBinder, "invalidSpeechRecognizerBinder" );
-
-            return speechRecognizerBinder->getSpeechRecognizer()->holdToTalk();
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_alexa_SpeechRecognizer_holdToTalk",ex.what());
-            return false;
-        }
-    }
-    
-    JNIEXPORT jboolean JNICALL
-    Java_com_amazon_aace_alexa_SpeechRecognizer_tapToTalk( JNIEnv* env, jobject /* this */, jlong ref )
-    {
-        try
-        {
-            auto speechRecognizerBinder = SPEECH_RECOGNIZER_BINDER(ref);
-            ThrowIfNull( speechRecognizerBinder, "invalidSpeechRecognizerBinder" );
-
-            return speechRecognizerBinder->getSpeechRecognizer()->tapToTalk();
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_alexa_SpeechRecognizer_tapToTalk",ex.what());
-            return false;
-        }
-    }
-    
-    JNIEXPORT jboolean JNICALL
-    Java_com_amazon_aace_alexa_SpeechRecognizer_startCapture( JNIEnv* env, jobject /* this */, jlong ref, jobject initiator, jlong keywordBegin, jlong keywordEnd, jstring keyword )
-    {
-        try
-        {
-            auto speechRecognizerBinder = SPEECH_RECOGNIZER_BINDER(ref);
-            ThrowIfNull( speechRecognizerBinder, "invalidSpeechRecognizerBinder" );
-
-            Initiator initiatorType;
-            ThrowIfNot( aace::jni::alexa::JInitiator::checkType( initiator, &initiatorType ), "invalidInitiatorType" );
-
-            return speechRecognizerBinder->getSpeechRecognizer()->startCapture( initiatorType,
-                                                                                keywordBegin < 0 ? aace::jni::alexa::SpeechRecognizerHandler::UNSPECIFIED_INDEX : keywordBegin,
-                                                                                keywordEnd < 0 ? aace::jni::alexa::SpeechRecognizerHandler::UNSPECIFIED_INDEX : keywordEnd,
-                                                                                JString(keyword).toStdStr() );
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_alexa_SpeechRecognizer_startCapture",ex.what());
-            return false;
-        }
-    }
-    
-    JNIEXPORT jboolean JNICALL
-    Java_com_amazon_aace_alexa_SpeechRecognizer_stopCapture( JNIEnv* env, jobject /* this */, jlong ref )
-    {
-        try
-        {
-            auto speechRecognizerBinder = SPEECH_RECOGNIZER_BINDER(ref);
-            ThrowIfNull( speechRecognizerBinder, "invalidSpeechRecognizerBinder" );
-
-            return speechRecognizerBinder->getSpeechRecognizer()->stopCapture();
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_alexa_SpeechRecognizer_stopCapture",ex.what());
-            return false;
-        }
-    }
-    
-    JNIEXPORT jboolean JNICALL
-    Java_com_amazon_aace_alexa_SpeechRecognizer_enableWakewordDetection( JNIEnv* env, jobject /* this */, jlong ref )
-    {
-        try
-        {
-            auto speechRecognizerBinder = SPEECH_RECOGNIZER_BINDER(ref);
-            ThrowIfNull( speechRecognizerBinder, "invalidSpeechRecognizerBinder" );
-
-            return speechRecognizerBinder->getSpeechRecognizer()->enableWakewordDetection();
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_alexa_SpeechRecognizer_enableWakewordDetection",ex.what());
-            return false;
-        }
-    }
-    
-    JNIEXPORT jboolean JNICALL
-    Java_com_amazon_aace_alexa_SpeechRecognizer_disableWakewordDetection( JNIEnv* env, jobject /* this */, jlong ref )
-    {
-        try
-        {
-            auto speechRecognizerBinder = SPEECH_RECOGNIZER_BINDER(ref);
-            ThrowIfNull( speechRecognizerBinder, "invalidSpeechRecognizerBinder" );
-
-            return speechRecognizerBinder->getSpeechRecognizer()->disableWakewordDetection();
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_alexa_SpeechRecognizer_disableWakewordDetection",ex.what());
-            return false;
-        }
-    }
-    
-    JNIEXPORT jboolean JNICALL
-    Java_com_amazon_aace_alexa_SpeechRecognizer_isWakewordDetectionEnabled( JNIEnv* env, jobject /* this */, jlong ref )
-    {
-        try
-        {
-            auto speechRecognizerBinder = SPEECH_RECOGNIZER_BINDER(ref);
-            ThrowIfNull( speechRecognizerBinder, "invalidSpeechRecognizerBinder" );
-
-            return speechRecognizerBinder->getSpeechRecognizer()->isWakewordDetectionEnabled();
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_alexa_SpeechRecognizer_isWakewordDetectionEnabled",ex.what());
-            return false;
-        }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "wakewordDetected", ex.what());
+        return false;
     }
 }
 
+void SpeechRecognizerHandler::endOfSpeechDetected() {
+    try_with_context {
+        ThrowIfNot(m_obj.invoke<void>("endOfSpeechDetected", "()V", nullptr), "invokeFailed");
+    }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "endOfSpeechDetected", ex.what());
+    }
+}
 
+}  // namespace alexa
+}  // namespace jni
+}  // namespace aace
+
+#define SPEECH_RECOGNIZER_BINDER(ref) reinterpret_cast<aace::jni::alexa::SpeechRecognizerBinder*>(ref)
+
+extern "C" {
+JNIEXPORT jlong JNICALL
+Java_com_amazon_aace_alexa_SpeechRecognizer_createBinder(JNIEnv* env, jobject obj, jboolean wakewordDetectionEnabled) {
+    return reinterpret_cast<long>(new aace::jni::alexa::SpeechRecognizerBinder(obj, wakewordDetectionEnabled));
+}
+
+JNIEXPORT void JNICALL
+Java_com_amazon_aace_alexa_SpeechRecognizer_disposeBinder(JNIEnv* env, jobject /* this */, jlong ref) {
+    try {
+        auto speechRecognizerBinder = SPEECH_RECOGNIZER_BINDER(ref);
+        ThrowIfNull(speechRecognizerBinder, "invalidSpeechRecognizerBinder");
+        delete speechRecognizerBinder;
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aaced_alexa_SpeechRecognizer_disposeBinder", ex.what());
+    }
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_amazon_aace_alexa_SpeechRecognizer_holdToTalk(JNIEnv* env, jobject /* this */, jlong ref) {
+    try {
+        auto speechRecognizerBinder = SPEECH_RECOGNIZER_BINDER(ref);
+        ThrowIfNull(speechRecognizerBinder, "invalidSpeechRecognizerBinder");
+
+        return speechRecognizerBinder->getSpeechRecognizer()->holdToTalk();
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_alexa_SpeechRecognizer_holdToTalk", ex.what());
+        return false;
+    }
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_amazon_aace_alexa_SpeechRecognizer_tapToTalk(JNIEnv* env, jobject /* this */, jlong ref) {
+    try {
+        auto speechRecognizerBinder = SPEECH_RECOGNIZER_BINDER(ref);
+        ThrowIfNull(speechRecognizerBinder, "invalidSpeechRecognizerBinder");
+
+        return speechRecognizerBinder->getSpeechRecognizer()->tapToTalk();
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_alexa_SpeechRecognizer_tapToTalk", ex.what());
+        return false;
+    }
+}
+
+JNIEXPORT jboolean JNICALL Java_com_amazon_aace_alexa_SpeechRecognizer_startCapture(
+    JNIEnv* env,
+    jobject /* this */,
+    jlong ref,
+    jobject initiator,
+    jlong keywordBegin,
+    jlong keywordEnd,
+    jstring keyword) {
+    try {
+        auto speechRecognizerBinder = SPEECH_RECOGNIZER_BINDER(ref);
+        ThrowIfNull(speechRecognizerBinder, "invalidSpeechRecognizerBinder");
+
+        Initiator initiatorType;
+        ThrowIfNot(aace::jni::alexa::JInitiator::checkType(initiator, &initiatorType), "invalidInitiatorType");
+
+        return speechRecognizerBinder->getSpeechRecognizer()->startCapture(
+            initiatorType,
+            keywordBegin < 0 ? aace::jni::alexa::SpeechRecognizerHandler::UNSPECIFIED_INDEX : keywordBegin,
+            keywordEnd < 0 ? aace::jni::alexa::SpeechRecognizerHandler::UNSPECIFIED_INDEX : keywordEnd,
+            JString(keyword).toStdStr());
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_alexa_SpeechRecognizer_startCapture", ex.what());
+        return false;
+    }
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_amazon_aace_alexa_SpeechRecognizer_stopCapture(JNIEnv* env, jobject /* this */, jlong ref) {
+    try {
+        auto speechRecognizerBinder = SPEECH_RECOGNIZER_BINDER(ref);
+        ThrowIfNull(speechRecognizerBinder, "invalidSpeechRecognizerBinder");
+
+        return speechRecognizerBinder->getSpeechRecognizer()->stopCapture();
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_alexa_SpeechRecognizer_stopCapture", ex.what());
+        return false;
+    }
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_amazon_aace_alexa_SpeechRecognizer_enableWakewordDetection(JNIEnv* env, jobject /* this */, jlong ref) {
+    try {
+        auto speechRecognizerBinder = SPEECH_RECOGNIZER_BINDER(ref);
+        ThrowIfNull(speechRecognizerBinder, "invalidSpeechRecognizerBinder");
+
+        return speechRecognizerBinder->getSpeechRecognizer()->enableWakewordDetection();
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_alexa_SpeechRecognizer_enableWakewordDetection", ex.what());
+        return false;
+    }
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_amazon_aace_alexa_SpeechRecognizer_disableWakewordDetection(JNIEnv* env, jobject /* this */, jlong ref) {
+    try {
+        auto speechRecognizerBinder = SPEECH_RECOGNIZER_BINDER(ref);
+        ThrowIfNull(speechRecognizerBinder, "invalidSpeechRecognizerBinder");
+
+        return speechRecognizerBinder->getSpeechRecognizer()->disableWakewordDetection();
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_alexa_SpeechRecognizer_disableWakewordDetection", ex.what());
+        return false;
+    }
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_amazon_aace_alexa_SpeechRecognizer_isWakewordDetectionEnabled(JNIEnv* env, jobject /* this */, jlong ref) {
+    try {
+        auto speechRecognizerBinder = SPEECH_RECOGNIZER_BINDER(ref);
+        ThrowIfNull(speechRecognizerBinder, "invalidSpeechRecognizerBinder");
+
+        return speechRecognizerBinder->getSpeechRecognizer()->isWakewordDetectionEnabled();
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_alexa_SpeechRecognizer_isWakewordDetectionEnabled", ex.what());
+        return false;
+    }
+}
+}

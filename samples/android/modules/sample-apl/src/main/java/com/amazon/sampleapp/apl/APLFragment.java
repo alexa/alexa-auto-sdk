@@ -49,5 +49,4 @@ public class APLFragment extends Fragment {
         View view = inflater.inflate(R.layout.apl_view, container, false);
         return view;
     }
-
 }

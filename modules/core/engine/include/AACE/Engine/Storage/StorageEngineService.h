@@ -25,23 +25,23 @@ namespace storage {
 
 class StorageEngineService : public aace::engine::core::EngineService {
 public:
-    DESCRIBE("aace.storage",VERSION("1.0"))
+    DESCRIBE("aace.storage", VERSION("1.0"))
 
 private:
-    StorageEngineService( const aace::engine::core::ServiceDescription& description );
+    StorageEngineService(const aace::engine::core::ServiceDescription& description);
 
 public:
     virtual ~StorageEngineService() = default;
 
 protected:
-    bool configure( std::shared_ptr<std::istream> configuration ) override;
+    bool configure(std::shared_ptr<std::istream> configuration) override;
 
 private:
     std::shared_ptr<LocalStorageInterface> m_localStorage;
 };
 
-} // aace::engine::storage
-} // aace::engine
-} // aace
+}  // namespace storage
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_STORAGE_STORAGE_ENGINE_SERVICE_H
+#endif  // AACE_ENGINE_STORAGE_STORAGE_ENGINE_SERVICE_H

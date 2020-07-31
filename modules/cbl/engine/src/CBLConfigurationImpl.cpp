@@ -23,30 +23,29 @@ namespace config {
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.cbl.config.CBLConfiguationImpl");
 
-std::shared_ptr<aace::core::config::EngineConfiguration> CBLConfiguration::createCBLConfig( const int seconds )
-{
-    rapidjson::Document document( rapidjson::kObjectType );
-    rapidjson::Value aaceCBLNode( rapidjson::kObjectType );
-    
-    aaceCBLNode.AddMember( "requestTimeout", rapidjson::Value().SetInt( seconds ), document.GetAllocator() );
+std::shared_ptr<aace::core::config::EngineConfiguration> CBLConfiguration::createCBLConfig(const int seconds) {
+    rapidjson::Document document(rapidjson::kObjectType);
+    rapidjson::Value aaceCBLNode(rapidjson::kObjectType);
 
-    document.AddMember( "aace.cbl", aaceCBLNode, document.GetAllocator() );
+    aaceCBLNode.AddMember("requestTimeout", rapidjson::Value().SetInt(seconds), document.GetAllocator());
 
-    return aace::core::config::StreamConfiguration::create( aace::engine::utils::json::toStream( document ) );
+    document.AddMember("aace.cbl", aaceCBLNode, document.GetAllocator());
+
+    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document));
 }
 
-std::shared_ptr<aace::core::config::EngineConfiguration> CBLConfiguration::createCBLUserProfileConfig( bool enableUserProfile )
-{
-    rapidjson::Document document( rapidjson::kObjectType );
-    rapidjson::Value aaceCBLNode( rapidjson::kObjectType );
+std::shared_ptr<aace::core::config::EngineConfiguration> CBLConfiguration::createCBLUserProfileConfig(
+    bool enableUserProfile) {
+    rapidjson::Document document(rapidjson::kObjectType);
+    rapidjson::Value aaceCBLNode(rapidjson::kObjectType);
 
-    aaceCBLNode.AddMember( "enableUserProfile", rapidjson::Value().SetBool(enableUserProfile), document.GetAllocator() );
+    aaceCBLNode.AddMember("enableUserProfile", rapidjson::Value().SetBool(enableUserProfile), document.GetAllocator());
 
-    document.AddMember( "aace.cbl", aaceCBLNode, document.GetAllocator() );
+    document.AddMember("aace.cbl", aaceCBLNode, document.GetAllocator());
 
-    return aace::core::config::StreamConfiguration::create( aace::engine::utils::json::toStream( document ) );
+    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document));
 }
 
-} // aace::engine::cbl
-} // aace::engine
-} // aace
+}  // namespace config
+}  // namespace cbl
+}  // namespace aace

@@ -43,7 +43,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class NetworkInfoProviderHandler extends NetworkInfoProvider {
-
     private static final String sTag = "NetworkInfoProvider";
 
     private final Activity mActivity;
@@ -55,13 +54,14 @@ public class NetworkInfoProviderHandler extends NetworkInfoProvider {
     private TextView mNetworkStatusText;
     private View mInterfaceEntry;
     private EditText mInterfaceText;
+    private TextView mSetInterfaceButton;
 
     private NetworkStatus mStatus;
 
     // List of Network Connection observers
     private Set<NetworkConnectionObserver> mObservers;
 
-    public NetworkInfoProviderHandler( Activity activity, LoggerHandler logger, Engine engine ) {
+    public NetworkInfoProviderHandler(Activity activity, LoggerHandler logger, Engine engine) {
         mActivity = activity;
         mLogger = logger;
         mEngine = engine;
@@ -76,10 +76,10 @@ public class NetworkInfoProviderHandler extends NetworkInfoProvider {
         // Note: >=API 24 should use NetworkCallback to receive network change updates
         // instead of CONNECTIVITY_ACTION
         mReceiver = new NetworkChangeReceiver();
-        context.registerReceiver( mReceiver, new IntentFilter( ConnectivityManager.CONNECTIVITY_ACTION ) );
+        context.registerReceiver(mReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
-        mWifiManager = ( WifiManager ) context.getSystemService( Context.WIFI_SERVICE );
-        mConnectivityManager = ( ConnectivityManager ) context.getSystemService( Context.CONNECTIVITY_SERVICE );
+        mWifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        mConnectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
         updateNetworkStatus();
     }
@@ -90,116 +90,123 @@ public class NetworkInfoProviderHandler extends NetworkInfoProvider {
     }
 
     @Override
-    public int getWifiSignalStrength() { return mWifiManager.getConnectionInfo().getRssi(); }
+    public int getWifiSignalStrength() {
+        return mWifiManager.getConnectionInfo().getRssi();
+    }
 
     public class NetworkChangeReceiver extends BroadcastReceiver {
-
         @Override
-        public void onReceive( final Context context, final Intent intent )
-        {
-            if ( mConnectivityManager != null ) {
+        public void onReceive(final Context context, final Intent intent) {
+            if (mConnectivityManager != null) {
                 updateNetworkStatus();
                 int rssi = mWifiManager.getConnectionInfo().getRssi();
 
-                mLogger.postInfo( sTag, String.format( "Network status changed. STATUS: %s, RSSI: %s",
-                        mStatus, rssi ) );
-                updateGUI( mStatus );
-                networkStatusChanged( mStatus, rssi );
-                notifyConnectionStatusObservers( mStatus );
+                mLogger.postInfo(sTag, String.format("Network status changed. STATUS: %s, RSSI: %s", mStatus, rssi));
+                updateGUI(mStatus);
+                networkStatusChanged(mStatus, rssi);
+                notifyConnectionStatusObservers(mStatus);
             }
         }
     }
 
-    public void unregister() { mActivity.getApplicationContext().unregisterReceiver( mReceiver ); }
+    public void unregister() {
+        mActivity.getApplicationContext().unregisterReceiver(mReceiver);
+    }
 
-    private void showAlertDialog( String message ) {
+    private void showAlertDialog(String message) {
         AlertDialog alertDialog = new AlertDialog.Builder(mActivity).create();
-        alertDialog.setMessage( message );
+        alertDialog.setMessage(message);
 
-        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
         alertDialog.show();
     }
 
     private void setupGUI() {
-        mNetworkStatusText = mActivity.findViewById( R.id.networkStatus );
+        mNetworkStatusText = mActivity.findViewById(R.id.networkStatus);
 
-        mInterfaceEntry = mActivity.findViewById( R.id.networkInterface);
-        mInterfaceText = mActivity.findViewById( R.id.networkInterfaceText );
+        mInterfaceEntry = mActivity.findViewById(R.id.networkInterface);
+        mInterfaceText = mActivity.findViewById(R.id.networkInterfaceText);
+        mSetInterfaceButton = mActivity.findViewById(R.id.setNetworkInterfaceButton);
 
         // Switch to toggle network interface selection
-        View interfaceToggle = mActivity.findViewById( R.id.toggleNetworkInterface );
-        ( (TextView) interfaceToggle.findViewById( R.id.text ) ).setText( R.string.select_network_interface);
-        SwitchCompat interfaceSwitch = interfaceToggle.findViewById( R.id.drawerSwitch );
-        interfaceSwitch.setChecked( false );
-
+        View interfaceToggle = mActivity.findViewById(R.id.toggleNetworkInterface);
+        ((TextView) interfaceToggle.findViewById(R.id.text)).setText(R.string.select_network_interface);
+        SwitchCompat interfaceSwitch = interfaceToggle.findViewById(R.id.drawerSwitch);
+        interfaceSwitch.setChecked(false);
 
         RadioGroup radioGroup = (RadioGroup) mActivity.findViewById(R.id.radioGroupNetworkInterface);
-        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
-        {
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if( checkedId == R.id.radioWifi ) {
-                    showAlertDialog( mActivity.getString( R.string.wlan0_message) );
+                if (checkedId == R.id.radioUsingConfig) {
+                    mInterfaceText.setText(R.string.using_config_text);
+                    mInterfaceText.setEnabled(false);
+                    mSetInterfaceButton.setEnabled(false);
+                    startSetNetworkInterfaceAsyncTask("",
+                            mActivity.getString(
+                                    R.string.using_config_message)); // Set empty string to use value from config.
+                } else if (checkedId == R.id.radioWifi) {
                     mInterfaceText.setText("wlan0");
                     mInterfaceText.setEnabled(false);
-                } else if( checkedId == R.id.radioMobileData ) {
-                    showAlertDialog( mActivity.getString( R.string.rmnet0_message) );
+                    mSetInterfaceButton.setEnabled(false);
+                    startSetNetworkInterfaceAsyncTask(
+                            mInterfaceText.getText().toString(), mActivity.getString(R.string.wlan0_message));
+                } else if (checkedId == R.id.radioMobileData) {
                     mInterfaceText.setText("rmnet0");
                     mInterfaceText.setEnabled(false);
+                    mSetInterfaceButton.setEnabled(false);
+                    startSetNetworkInterfaceAsyncTask(
+                            mInterfaceText.getText().toString(), mActivity.getString(R.string.rmnet0_message));
                 } else {
                     // R.id.radioManualEntry
                     mInterfaceText.setEnabled(true);
+                    mSetInterfaceButton.setEnabled(true);
                 }
             }
         });
 
-        interfaceSwitch.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
+        interfaceSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged( CompoundButton buttonView, boolean isChecked ) {
-                if ( isChecked ) {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
                     showAlertDialog("This feature best verified on devices with two or more network interfaces!");
-                    mInterfaceEntry.setVisibility( View.VISIBLE );
-                    mInterfaceText.setText( getNetworkInterface() );
+                    mInterfaceEntry.setVisibility(View.VISIBLE);
                 } else {
-                    mInterfaceEntry.setVisibility( View.GONE );
-                    setNetworkInterfaceAsyncTask handler = new setNetworkInterfaceAsyncTask();
-                    handler.execute(""); // Set empty string to reset to default
+                    mInterfaceEntry.setVisibility(View.GONE);
+                    startSetNetworkInterfaceAsyncTask("",
+                            mActivity.getString(R.string.using_config_message)); // Set empty string to reset to default
                 }
             }
         });
 
         // Button to set network interface.
-        mActivity.findViewById( R.id.setNetworkInterfaceButton ).setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick( View v ) {
-                        setNetworkInterfaceAsyncTask handler = new setNetworkInterfaceAsyncTask();
-                        String interfaceText = mInterfaceText.getText().toString();
-                        handler.execute(interfaceText);
-                    }
-                }
-        );
+        mSetInterfaceButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String interfaceText = mInterfaceText.getText().toString();
+                startSetNetworkInterfaceAsyncTask(interfaceText, "");
+            }
+        });
     }
 
-    private void updateGUI( final NetworkInfoProvider.NetworkStatus status ) {
-        mActivity.runOnUiThread( new Runnable() {
+    private void updateGUI(final NetworkInfoProvider.NetworkStatus status) {
+        mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mNetworkStatusText.setText( status != null ? status.toString() : "" );
+                mNetworkStatusText.setText(status != null ? status.toString() : "");
             }
-        } );
+        });
     }
 
     private void updateNetworkStatus() {
         NetworkInfo activeNetwork = mConnectivityManager.getActiveNetworkInfo();
-        if ( activeNetwork != null ) {
+        if (activeNetwork != null) {
             NetworkInfo.State state = activeNetwork.getState();
-            switch ( state ) {
+            switch (state) {
                 case CONNECTED:
                     mStatus = NetworkStatus.CONNECTED;
                     break;
@@ -223,49 +230,52 @@ public class NetworkInfoProviderHandler extends NetworkInfoProvider {
     }
 
     // Connection State Observable methods
-    public void registerNetworkConnectionObserver( NetworkConnectionObserver observer ) {
-        if ( observer == null ) return;
-        mObservers.add( observer );
-        observer.onConnectionStatusChanged( mStatus );
+    public void registerNetworkConnectionObserver(NetworkConnectionObserver observer) {
+        if (observer == null)
+            return;
+        mObservers.add(observer);
+        observer.onConnectionStatusChanged(mStatus);
     }
 
-    private void notifyConnectionStatusObservers( NetworkStatus status ){
-        for ( NetworkConnectionObserver observer : mObservers ) {
-            observer.onConnectionStatusChanged( status );
+    private void notifyConnectionStatusObservers(NetworkStatus status) {
+        for (NetworkConnectionObserver observer : mObservers) {
+            observer.onConnectionStatusChanged(status);
         }
     }
 
-    private boolean setNetworkInterface( String interfaceText ){
-        return mEngine.setProperty(NetworkProperties.NETWORK_INTERFACE, interfaceText );
+    private boolean setNetworkInterface(String interfaceText) {
+        return mEngine.setProperty(NetworkProperties.NETWORK_INTERFACE, interfaceText);
     }
 
-    private String getNetworkInterface(){
-        return mEngine.getProperty(NetworkProperties.NETWORK_INTERFACE );
+    private void startSetNetworkInterfaceAsyncTask(String interfaceText, String alertSecondaryMessage) {
+        setNetworkInterfaceAsyncTask handler = new setNetworkInterfaceAsyncTask();
+        handler.execute(interfaceText, alertSecondaryMessage);
     }
 
     private class setNetworkInterfaceAsyncTask extends AsyncTask<String, String, String> {
-
         private String result;
 
         @Override
-        protected String doInBackground( String... params ) {
-            if( !setNetworkInterface( params[0] ) ) {
-                result = "Failed to change the network interface to '" + params[0] + "'";;
+        protected String doInBackground(String... params) {
+            if (!setNetworkInterface(params[0])) {
+                result = "Failed to change the network interface to '" + params[0] + "'";
+                ;
             } else {
-                if( !params[0].isEmpty() ) {
+                if (!params[0].isEmpty() && !params[1].isEmpty()) {
+                    result = "Network interface successfully changed to '" + params[0] + "'"
+                            + "\n" + params[1];
+                } else if (!params[0].isEmpty()) {
                     result = "Network interface successfully changed to '" + params[0] + "'";
                 } else {
-                    result = "Network interface successfully reset to default!";
+                    result = params[1];
                 }
             }
             return result;
         }
 
         @Override
-        protected void onPostExecute( String result ) {
-            showAlertDialog( result );
+        protected void onPostExecute(String result) {
+            showAlertDialog(result);
         }
-
     }
-
 }

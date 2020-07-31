@@ -18,23 +18,24 @@
 namespace aace {
 namespace alexa {
 
-PlaybackController::~PlaybackController() = default; // key function
+PlaybackController::~PlaybackController() = default;  // key function
 
 void PlaybackController::buttonPressed(PlaybackButton button) {
-    if( auto m_playbackControllerEngineInterface_lock = m_playbackControllerEngineInterface.lock() ) {
+    if (auto m_playbackControllerEngineInterface_lock = m_playbackControllerEngineInterface.lock()) {
         m_playbackControllerEngineInterface_lock->onButtonPressed(button);
     }
 }
 
 void PlaybackController::togglePressed(PlaybackToggle toggle, bool action) {
-    if( auto m_playbackControllerEngineInterface_lock = m_playbackControllerEngineInterface.lock() ) {
+    if (auto m_playbackControllerEngineInterface_lock = m_playbackControllerEngineInterface.lock()) {
         m_playbackControllerEngineInterface_lock->onTogglePressed(toggle, action);
     }
 }
 
-void PlaybackController::setEngineInterface( std::shared_ptr<aace::alexa::PlaybackControllerEngineInterface> playbackControllerEngineInterface ) {
+void PlaybackController::setEngineInterface(
+    std::shared_ptr<aace::alexa::PlaybackControllerEngineInterface> playbackControllerEngineInterface) {
     m_playbackControllerEngineInterface = playbackControllerEngineInterface;
 }
 
-} // aace::alexa
-} // aac
+}  // namespace alexa
+}  // namespace aace

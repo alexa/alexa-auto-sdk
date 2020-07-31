@@ -23,80 +23,72 @@ namespace aace {
 namespace jni {
 namespace native {
 
-    JavaObject::JavaObject( jobject obj, const char* className )
-    {
-        try_with_context
-        {
-            m_class = JavaClass::find( className );
-            ThrowIfNull( m_class, "invalidJavaClass" );
+JavaObject::JavaObject(jobject obj, const char* className) {
+    try_with_context {
+        m_class = JavaClass::find(className);
+        ThrowIfNull(m_class, "invalidJavaClass");
 
-            // sanity check the obj to make sure it is the specified type
-            ThrowIfNot( m_class->isObjectInstance( obj ), "invalidObjectInstanceForClass" );
+        // sanity check the obj to make sure it is the specified type
+        ThrowIfNot(m_class->isObjectInstance(obj), "invalidObjectInstanceForClass");
 
-            // assign the global object ref
-            m_globalObjRef = obj;
-        }
-        catch_with_ex {
-            AACE_JNI_ERROR(TAG,"JavaObject",ex.what());
-        }
+        // assign the global object ref
+        m_globalObjRef = obj;
     }
-
-    JavaObject::JavaObject( const char* className )
-    {
-        try_with_context
-        {
-            m_class = JavaClass::find( className );
-            ThrowIfNull( m_class, "invalidJavaClass" );
-
-            // attempt to create a new object with the default constructor
-            jobject obj = m_class->newInstance( "()V");
-            ThrowIfNull( obj, "createNewObjectInstanceFailed" );
-
-            // assign the global object ref
-            m_globalObjRef = obj;
-            
-            // delete local object ref
-            env->DeleteLocalRef( obj );
-        }
-        catch_with_ex {
-            AACE_JNI_ERROR(TAG,"JavaObject",ex.what());
-        }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "JavaObject", ex.what());
     }
+}
 
-    std::shared_ptr<JavaClass> JavaObject::getClass() {
-        return m_class;
+JavaObject::JavaObject(const char* className) {
+    try_with_context {
+        m_class = JavaClass::find(className);
+        ThrowIfNull(m_class, "invalidJavaClass");
+
+        // attempt to create a new object with the default constructor
+        jobject obj = m_class->newInstance("()V");
+        ThrowIfNull(obj, "createNewObjectInstanceFailed");
+
+        // assign the global object ref
+        m_globalObjRef = obj;
+
+        // delete local object ref
+        env->DeleteLocalRef(obj);
     }
-
-    JavaMethodPtr JavaObject::getMethod( const char* name, const char* signature )
-    {
-        try_with_context
-        {
-            ThrowIfNull( m_class, "invalidJavaClass" );
-            return m_class->getMethod( name, signature );
-        }
-        catch_with_ex {
-            AACE_JNI_ERROR(TAG,"getMethod",ex.what());
-            return nullptr;
-        }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "JavaObject", ex.what());
     }
+}
 
-    JavaFieldPtr JavaObject::getField( const char* name, const char* signature )
-    {
-        try_with_context
-        {
-            ThrowIfNull( m_class, "invalidJavaClass" );
-            return m_class->getField( name, signature );
-        }
-        catch_with_ex {
-            AACE_JNI_ERROR(TAG,"getField",ex.what());
-            return nullptr;
-        }
+std::shared_ptr<JavaClass> JavaObject::getClass() {
+    return m_class;
+}
+
+JavaMethodPtr JavaObject::getMethod(const char* name, const char* signature) {
+    try_with_context {
+        ThrowIfNull(m_class, "invalidJavaClass");
+        return m_class->getMethod(name, signature);
     }
-
-    jobject JavaObject::get() {
-        return m_globalObjRef.get();
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "getMethod", ex.what());
+        return nullptr;
     }
+}
 
-} // aace::jni::native
-} // aace::jni
-} // aace
+JavaFieldPtr JavaObject::getField(const char* name, const char* signature) {
+    try_with_context {
+        ThrowIfNull(m_class, "invalidJavaClass");
+        return m_class->getField(name, signature);
+    }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "getField", ex.what());
+        return nullptr;
+    }
+}
+
+jobject JavaObject::get() {
+    return m_globalObjRef.get();
+}
+
+}  // namespace native
+}  // namespace jni
+}  // namespace aace

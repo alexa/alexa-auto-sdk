@@ -33,19 +33,27 @@ namespace cbl {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-CBLHandler::CBLHandler(std::weak_ptr<Activity> activity, std::weak_ptr<logger::LoggerHandler> loggerHandler)
-    : m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
+CBLHandler::CBLHandler(std::weak_ptr<Activity> activity, std::weak_ptr<logger::LoggerHandler> loggerHandler) :
+        m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
     // Expects((m_activity != nullptr) && (m_loggerHandler != nullptr));
     setupUI();
 }
 
-std::weak_ptr<Activity> CBLHandler::getActivity() { return m_activity; }
+std::weak_ptr<Activity> CBLHandler::getActivity() {
+    return m_activity;
+}
 
-std::weak_ptr<logger::LoggerHandler> CBLHandler::getLoggerHandler() { return m_loggerHandler; }
+std::weak_ptr<logger::LoggerHandler> CBLHandler::getLoggerHandler() {
+    return m_loggerHandler;
+}
 
 // aace::cbl::CBL interface
 
-void CBLHandler::cblStateChanged(CBLState state, CBLStateChangedReason reason, const std::string &url, const std::string &code) {
+void CBLHandler::cblStateChanged(
+    CBLState state,
+    CBLStateChangedReason reason,
+    const std::string& url,
+    const std::string& code) {
     std::stringstream ss;
     ss << "cblStateChanged:state=" << state << ",reason=" << reason << ",url=" << url << ",code=" << code;
     log(logger::LoggerHandler::Level::INFO, ss.str());
@@ -108,27 +116,25 @@ std::string CBLHandler::getRefreshToken() {
     return m_applicationContext->getRefreshToken();
 }
 
-void CBLHandler::setRefreshToken(const std::string &refreshToken) {
+void CBLHandler::setRefreshToken(const std::string& refreshToken) {
     // IMPORTANT: YOUR PRODUCT IS RESPONSIBLE FOR STORING THE REFRESH TOKEN SECURELY.
     // FOR SECURITY REASONS, AUTHENTICATION IS NOT PRESERVED IN THE C++ SAMPLE APP.
     Ensures(m_applicationContext != nullptr);
     m_applicationContext->setRefreshToken(refreshToken);
 }
 
-void CBLHandler::setUserProfile(const std::string &name, const std::string& email) {
+void CBLHandler::setUserProfile(const std::string& name, const std::string& email) {
     std::stringstream ss;
     ss << "setUserProfile:name=" << name << ",email=" << email;
     log(logger::LoggerHandler::Level::INFO, ss.str());
 
     auto activity = m_activity.lock();
-    activity->runOnUIThread([=]() {
-        showMessage("Welcome " + name + ", " + email);
-    });
+    activity->runOnUIThread([=]() { showMessage("Welcome " + name + ", " + email); });
 }
 
 // private
 
-void CBLHandler::log(logger::LoggerHandler::Level level, const std::string &message) {
+void CBLHandler::log(logger::LoggerHandler::Level level, const std::string& message) {
     auto loggerHandler = m_loggerHandler.lock();
     if (!loggerHandler) {
         return;
@@ -136,7 +142,7 @@ void CBLHandler::log(logger::LoggerHandler::Level level, const std::string &mess
     loggerHandler->log(level, "CBLHandler", message);
 }
 
-void CBLHandler::showMessage(const std::string &message) {
+void CBLHandler::showMessage(const std::string& message) {
     if (auto console = m_console.lock()) {
         console->printRuler();
         console->printLine(message);
@@ -153,7 +159,7 @@ void CBLHandler::setupUI() {
     m_console = activity->findViewById("id:console");
 
     // start
-    activity->registerObserver(Event::onCBLStart, [=](const std::string &) {
+    activity->registerObserver(Event::onCBLStart, [=](const std::string&) {
         log(logger::LoggerHandler::Level::VERBOSE, "onCBLStart");
         if (m_applicationContext->hasRefreshToken()) {
             showMessage("You already have your refresh token");
@@ -169,7 +175,7 @@ void CBLHandler::setupUI() {
     });
 
     // cancel
-    activity->registerObserver(Event::onCBLCancel, [=](const std::string &) {
+    activity->registerObserver(Event::onCBLCancel, [=](const std::string&) {
         log(logger::LoggerHandler::Level::VERBOSE, "onCBLCancel");
         if (m_applicationContext->hasRefreshToken()) {
             showMessage("You already have your refresh token");
@@ -185,7 +191,7 @@ void CBLHandler::setupUI() {
     });
 
     // reset
-    activity->registerObserver(Event::onCBLReset, [=](const std::string &) {
+    activity->registerObserver(Event::onCBLReset, [=](const std::string&) {
         log(logger::LoggerHandler::Level::VERBOSE, "onCBLReset");
         if (!m_applicationContext->hasRefreshToken()) {
             showMessage("You do not have a refresh token");
@@ -201,5 +207,5 @@ void CBLHandler::setupUI() {
     });
 }
 
-} // namespace cbl
-} // namespace sampleApp
+}  // namespace cbl
+}  // namespace sampleApp

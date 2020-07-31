@@ -26,33 +26,32 @@
 
 #include "LocalStorageInterface.h"
 
-
 namespace aace {
 namespace engine {
 namespace storage {
 
 class JSONStorage : public LocalStorageInterface {
 public:
-    static std::shared_ptr<JSONStorage> create( const std::string& path );
+    static std::shared_ptr<JSONStorage> create(const std::string& path);
 
     virtual ~JSONStorage();
 
 private:
-    JSONStorage( const std::string& path );
+    JSONStorage(const std::string& path);
 
     bool initialize();
     bool write();
-    
+
 public:
-    bool put( const std::string& table, const std::string& key, const std::string& value ) override;
-    std::string get( const std::string& table, const std::string& key ) override;
-    std::string get( const std::string& table, const std::string& key, const std::string& defaultValue ) override;
-    bool removeKey( const std::string& table, const std::string& key ) override;
-    bool removeTable( const std::string& table ) override;
-    bool containsKey( const std::string& table, const std::string& key ) override;
-    bool containsTable( const std::string& table ) override;
-    std::vector<std::string> keys( const std::string& table ) override;
-    std::vector<KeyValuePair> list( const std::string& table ) override;
+    bool put(const std::string& table, const std::string& key, const std::string& value) override;
+    std::string get(const std::string& table, const std::string& key) override;
+    std::string get(const std::string& table, const std::string& key, const std::string& defaultValue) override;
+    bool removeKey(const std::string& table, const std::string& key) override;
+    bool removeTable(const std::string& table) override;
+    bool containsKey(const std::string& table, const std::string& key) override;
+    bool containsTable(const std::string& table) override;
+    std::vector<std::string> keys(const std::string& table) override;
+    std::vector<KeyValuePair> list(const std::string& table) override;
     bool begin() override;
     bool commit() override;
     bool cancel() override;
@@ -65,11 +64,10 @@ private:
 
     std::mutex m_mutex;
     std::condition_variable m_notifyTransactionComplete;
-
 };
 
-} // aace::engine::storage
-} // aace::engine
-} // aace
+}  // namespace storage
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_STORAGE_JSON_STORAGE_H
+#endif  // AACE_ENGINE_STORAGE_JSON_STORAGE_H

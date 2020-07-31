@@ -3,6 +3,7 @@
 
     <!-- Actions -->
     <string name="action_tap_to_talk">Tap to Talk</string>
+    <string name="action_stop">Stop</string>
     <string name="action_drawer">Toggle Drawer</string>
 
     <!-- Logger -->
@@ -12,6 +13,21 @@
     <string name="log_switch_cards">DISPLAY CARDS</string>
     <string name="log_switch_template">JSON TEMPLATES</string>
     <string name="log_clear">CLEAR LOG</string>
+
+    <!-- Messaging -->
+    <string name="messaging">MESSAGING</string>
+    <string name="messaging_connection_switch">ENABLE CONNECTION</string>
+    <string name="messaging_info">DISPLAY INFO</string>
+    <string name="messaging_permissions">CONFIGURE MESSAGING</string>
+    <string name="messaging_upload">UPLOAD CONVERSATIONS</string>
+    <string name="messaging_send_succeeded">SEND SUCCEEDED</string>
+    <string name="messaging_send_failed">SEND FAILED</string>
+    <string name="messaging_update_succeeded">UPDATE SUCCEEDED</string>
+    <string name="messaging_update_failed">UPDATE FAILED</string>
+    <string name="messaging_send_permission">Allow sending messages</string>
+    <string name="messaging_read_permission">Allow reading messages</string>
+    <string name="messaging_configure_title">Configure Messaging</string>
+    <string name="messaging_automatic_responses">Automatic responses</string>
 
     <!-- Phone Call Controller -->
     <string name="phone_call_controller">PHONE CALL CONTROLLER</string>
@@ -112,11 +128,14 @@
     <string name="select_network_interface">SELECT NETWORK INTERFACE</string>
     <string name="interface_name">NETWORK INTERFACE (IP Address or Interface Name)</string>
     <string name="interface_set">CHANGE INTERFACE</string>
+    <string name="using_config">Using from config</string>
     <string name="wifi">Wifi</string>
     <string name="mobile_data">Mobile Data</string>
-    <string name="manual_entry">Manual Entry/IP Entry</string>
-    <string name="wlan0_message">Generally Wifi network interface is \'wlan0\', if not, edit manually</string>
-    <string name="rmnet0_message">Generally Mobile Data network interface is \'rmnet0\', if not, edit manually</string>
+    <string name="manual_entry">Manual/IP Addr Entry</string>
+    <string name="using_config_text">Using config, if provided</string>
+    <string name="using_config_message">Using/falling back to network interface from config, if provided</string>
+    <string name="wlan0_message">Note: Usually Wifi network interface is \'wlan0\', if not, use \'Manual Entry\'</string>
+    <string name="rmnet0_message">Note: Usually Mobile Data network interface is \'rmnet0\', if not, use \'Manual Entry\'</string>
 
     <!-- Speaker Volume -->
     <string name="volume">VOLUME</string>
@@ -182,4 +201,7 @@
     <string name="doNotDisturb">DO NOT DISTURB</string>
     <string name="do_not_disturb_switch">DND ACTIVE</string>
     <string name="preference_do_not_disturb">DO NOT DISTURB KEY</string>
+
+    <!-- Shutdown -->
+    <string name="callOnDestroy">DESTROY MAIN APP TASK</string>
 </resources>

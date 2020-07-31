@@ -99,8 +99,7 @@ const std::string TAG = "aasb::alexa::AASBControllerImpl";
 const std::string INPUT_CHANNEL_NAME = "Input";
 
 AASBControllerImpl::AASBControllerImpl() :
-        m_engine(NULL),
-        m_responseDispatcher{std::make_shared<ResponseDispatcher>()} {
+        m_engine(NULL), m_responseDispatcher{std::make_shared<ResponseDispatcher>()} {
 }
 
 void AASBControllerImpl::setMockEngine(std::shared_ptr<aace::core::Engine> engine) {
@@ -229,7 +228,7 @@ bool AASBControllerImpl::start() {
 
     if (m_config->shouldEnablePhoneCallControl()) {
         m_phoneCallControllerHandler =
-                aasb::phoneCallController::PhoneCallControllerHandler::create(m_logger, m_responseDispatcher);
+            aasb::phoneCallController::PhoneCallControllerHandler::create(m_logger, m_responseDispatcher);
         if (!m_engine->registerPlatformInterface(m_phoneCallControllerHandler)) {
             AASB_ERROR("Failed to register phonecall control handler");
             return false;
@@ -244,7 +243,7 @@ bool AASBControllerImpl::start() {
         }
 
         m_locationProviderHandler =
-                aasb::location::LocationProviderHandler::create(m_logger, m_config, m_responseDispatcher);
+            aasb::location::LocationProviderHandler::create(m_logger, m_config, m_responseDispatcher);
         if (!m_engine->registerPlatformInterface(m_locationProviderHandler)) {
             AASB_ERROR("Failed to register location provider handler");
             return false;
@@ -312,7 +311,11 @@ bool AASBControllerImpl::configureEngine() {
     std::vector<std::shared_ptr<aace::core::config::EngineConfiguration>> engineConfigurations;
 
     engineConfigurations.push_back(AlexaConfiguration::createDeviceInfoConfig(
-        m_config->getProductDSN(), m_config->getClientId(), m_config->getProductId(), m_config->getManufacturerName(), m_config->getDescription()));
+        m_config->getProductDSN(),
+        m_config->getClientId(),
+        m_config->getProductId(),
+        m_config->getManufacturerName(),
+        m_config->getDescription()));
 
     engineConfigurations.push_back(AlexaConfiguration::createCurlConfig(m_config->getCertificatesDirectoryPath()));
 
@@ -336,25 +339,43 @@ bool AASBControllerImpl::configureEngine() {
     engineConfigurations.push_back(AlexaConfiguration::createCapabilitiesDelegateConfig(capabilitiesDelegate));
 
     std::string localStoragePath = appDataDir + "/localStorage.db";
-    engineConfigurations.push_back(aace::storage::config::StorageConfiguration::createLocalStorageConfig(localStoragePath));
+    engineConfigurations.push_back(
+        aace::storage::config::StorageConfiguration::createLocalStorageConfig(localStoragePath));
 
     auto deviceSettingsConfig = m_config->getDeviceSettingsConfig();
     auto defaultLocale = deviceSettingsConfig.defaultLocale.empty() ? "en-US" : deviceSettingsConfig.defaultLocale;
-    auto defaultTimezone = deviceSettingsConfig.defaultTimezone.empty()  ? "America/Vancouver" : deviceSettingsConfig.defaultTimezone;
+    auto defaultTimezone =
+        deviceSettingsConfig.defaultTimezone.empty() ? "America/Vancouver" : deviceSettingsConfig.defaultTimezone;
     std::string deviceSettingsDbPath = appDataDir + "/deviceSettings.db";
-    std::vector<std::string> locales = {"en-US","en-GB","de-DE","en-IN","en-CA","ja-JP","en-AU","fr-FR","it-IT","es-ES","es-MX","fr-CA", "es-US", "hi-IN", "pt-BR"};
+    std::vector<std::string> locales = {"en-US",
+                                        "en-GB",
+                                        "de-DE",
+                                        "en-IN",
+                                        "en-CA",
+                                        "ja-JP",
+                                        "en-AU",
+                                        "fr-FR",
+                                        "it-IT",
+                                        "es-ES",
+                                        "es-MX",
+                                        "fr-CA",
+                                        "es-US",
+                                        "hi-IN",
+                                        "pt-BR"};
+    std::vector<std::vector<std::string>> localeCombinations = {};
 
     if (!deviceSettingsConfig.locales.empty()) {
         locales = deviceSettingsConfig.locales;
     }
 
-    engineConfigurations.push_back(AlexaConfiguration::createDeviceSettingsConfig(deviceSettingsDbPath, locales, defaultLocale, defaultTimezone));
+    engineConfigurations.push_back(AlexaConfiguration::createDeviceSettingsConfig(
+        deviceSettingsDbPath, locales, defaultLocale, defaultTimezone, localeCombinations));
 
-    #if 0
+#if 0
     std::string externalStorageDir = m_config->getExternalStorageDirectory();
     std::string avsEndPointPath = externalStorageDir + "/aace.json";
     engineConfigurations.push_back(aace::core::config::ConfigurationFile::create(avsEndPointPath));
-    #endif
+#endif
 
     // Pass Vehicle information
     engineConfigurations.push_back(aace::core::config::StreamConfiguration::create(m_config->getVehicleConfig()));
@@ -362,7 +383,7 @@ bool AASBControllerImpl::configureEngine() {
     // m_logger is not available until after AAC engine is started, so log to std::cerr if neeeded
     if (m_config->shouldEnableCarControl()) {
         // Climate control
-        auto carControlConfig = m_config->getCarControlConfig();            
+        auto carControlConfig = m_config->getCarControlConfig();
         auto carControlEngineConfiguration = aace::carControl::config::CarControlConfiguration::create();
         for (auto const& endpoint : carControlConfig.endpoints) {
             std::string zone = endpoint.zone;
@@ -387,7 +408,8 @@ bool AASBControllerImpl::configureEngine() {
                     .addPowerController(true);
                 // Mode ModeController
                 if (!endpoint.airConditioner.modeValues.empty()) {
-                    carControlEngineConfiguration->addModeController(endpoint.airConditioner.modeControllerId, true, false)
+                    carControlEngineConfiguration
+                        ->addModeController(endpoint.airConditioner.modeControllerId, true, false)
                         .addAssetId(aace::carControl::assets::alexa::setting::MODE);
                     for (auto const& value : endpoint.airConditioner.modeValues) {
                         if (VALUE_CARCONTROL_AC_MODE_MANUAL == value) {
@@ -406,9 +428,10 @@ bool AASBControllerImpl::configureEngine() {
                 }
                 // Intensity ModeController
                 if (!endpoint.airConditioner.intensityValues.empty()) {
-                    carControlEngineConfiguration->addModeController(endpoint.airConditioner.intensityControllerId, true, true)
+                    carControlEngineConfiguration
+                        ->addModeController(endpoint.airConditioner.intensityControllerId, true, true)
                         .addAssetId(aace::carControl::assets::alexa::setting::INTENSITY);
-                    for (auto const& value: endpoint.airConditioner.intensityValues) {
+                    for (auto const& value : endpoint.airConditioner.intensityValues) {
                         if (VALUE_CARCONTROL_AC_INTENSITY_LOW == value) {
                             carControlEngineConfiguration->addValue(VALUE_CARCONTROL_AC_INTENSITY_LOW)
                                 .addAssetId(aace::carControl::assets::alexa::value::LOW)
@@ -439,27 +462,29 @@ bool AASBControllerImpl::configureEngine() {
                 // range controller will fail
                 double mid = (endpoint.heater.maximum - endpoint.heater.minimum) / endpoint.heater.precision;
                 int midInt = mid / 2;
-                double medium = endpoint.heater.minimum + midInt * endpoint.heater.precision; 
+                double medium = endpoint.heater.minimum + midInt * endpoint.heater.precision;
 
                 carControlEngineConfiguration->createControl(endpoint.heater.controlId, zone)
                     .addAssetId(aace::carControl::assets::alexa::device::HEATER)
                     .addAssetId(aace::carControl::assets::alexa::device::COOLER)
                     .addPowerController(true)
-                    .addRangeController(endpoint.heater.controllerId, true, 
-                                        endpoint.heater.minimum, 
-                                        endpoint.heater.maximum, 
-                                        endpoint.heater.precision,
-                                        unit)
-                        .addAssetId(aace::carControl::assets::alexa::setting::TEMPERATURE)
-                        .addAssetId(aace::carControl::assets::alexa::setting::HEAT)
-                        .addPreset(endpoint.heater.minimum)
-                            .addAssetId(aace::carControl::assets::alexa::value::LOW)
-                            .addAssetId(aace::carControl::assets::alexa::value::MINIMUM)
-                        .addPreset(medium)
-                            .addAssetId(aace::carControl::assets::alexa::value::MEDIUM)
-                        .addPreset(endpoint.heater.maximum)
-                            .addAssetId(aace::carControl::assets::alexa::value::HIGH)
-                            .addAssetId(aace::carControl::assets::alexa::value::MAXIMUM);
+                    .addRangeController(
+                        endpoint.heater.controllerId,
+                        true,
+                        endpoint.heater.minimum,
+                        endpoint.heater.maximum,
+                        endpoint.heater.precision,
+                        unit)
+                    .addAssetId(aace::carControl::assets::alexa::setting::TEMPERATURE)
+                    .addAssetId(aace::carControl::assets::alexa::setting::HEAT)
+                    .addPreset(endpoint.heater.minimum)
+                    .addAssetId(aace::carControl::assets::alexa::value::LOW)
+                    .addAssetId(aace::carControl::assets::alexa::value::MINIMUM)
+                    .addPreset(medium)
+                    .addAssetId(aace::carControl::assets::alexa::value::MEDIUM)
+                    .addPreset(endpoint.heater.maximum)
+                    .addAssetId(aace::carControl::assets::alexa::value::HIGH)
+                    .addAssetId(aace::carControl::assets::alexa::value::MAXIMUM);
             }
             // Fan
             if (endpoint.fan.enabled) {
@@ -472,19 +497,21 @@ bool AASBControllerImpl::configureEngine() {
                 carControlEngineConfiguration->createControl(endpoint.fan.controlId, zone)
                     .addAssetId(aace::carControl::assets::alexa::device::FAN)
                     .addPowerController(true)
-                    .addRangeController(endpoint.fan.controllerId, true, 
-                                        endpoint.fan.minimum,
-                                        endpoint.fan.maximum,
-                                        endpoint.fan.precision)
-                        .addAssetId(aace::carControl::assets::alexa::setting::FAN_SPEED)
-                        .addPreset(endpoint.fan.minimum)
-                            .addAssetId(aace::carControl::assets::alexa::value::LOW)
-                            .addAssetId(aace::carControl::assets::alexa::value::MINIMUM)
-                        .addPreset(medium)
-                            .addAssetId(aace::carControl::assets::alexa::value::MEDIUM)
-                        .addPreset(endpoint.fan.maximum)
-                            .addAssetId(aace::carControl::assets::alexa::value::HIGH)
-                            .addAssetId(aace::carControl::assets::alexa::value::MAXIMUM);
+                    .addRangeController(
+                        endpoint.fan.controllerId,
+                        true,
+                        endpoint.fan.minimum,
+                        endpoint.fan.maximum,
+                        endpoint.fan.precision)
+                    .addAssetId(aace::carControl::assets::alexa::setting::FAN_SPEED)
+                    .addPreset(endpoint.fan.minimum)
+                    .addAssetId(aace::carControl::assets::alexa::value::LOW)
+                    .addAssetId(aace::carControl::assets::alexa::value::MINIMUM)
+                    .addPreset(medium)
+                    .addAssetId(aace::carControl::assets::alexa::value::MEDIUM)
+                    .addPreset(endpoint.fan.maximum)
+                    .addAssetId(aace::carControl::assets::alexa::value::HIGH)
+                    .addAssetId(aace::carControl::assets::alexa::value::MAXIMUM);
             }
 
             // Vent
@@ -493,7 +520,7 @@ bool AASBControllerImpl::configureEngine() {
                     .addAssetId(aace::carControl::assets::alexa::device::VENT)
                     .addPowerController(true)
                     .addModeController(endpoint.vent.positionsControllerId, true, true)
-                        .addAssetId(aace::carControl::assets::alexa::setting::POSITION);
+                    .addAssetId(aace::carControl::assets::alexa::setting::POSITION);
 
                 for (auto position : endpoint.vent.positions) {
                     if (VALUE_CARCONTROL_VENT_POSITION_BODY == position) {
@@ -520,23 +547,24 @@ bool AASBControllerImpl::configureEngine() {
                     .addAssetId(aace::carControl::assets::alexa::device::WINDSHIELD)
                     .addAssetId(aace::carControl::assets::alexa::device::WINDOW)
                     .addToggleController(endpoint.window.controllerId, true)
-                        .addAssetId(aace::carControl::assets::alexa::setting::DEFROST)
-                        .addAssetId(aace::carControl::assets::alexa::setting::DEFOG);
+                    .addAssetId(aace::carControl::assets::alexa::setting::DEFROST);
             }
 
             // Light
             if (!endpoint.lights.empty()) {
-                for (auto const& light: endpoint.lights) {
+                for (auto const& light : endpoint.lights) {
                     carControlEngineConfiguration->createControl(light.controlId, zone);
                     if (light.type == VALUE_CARCONTROL_LIGHT_TYPE_AMBIENT_LIGHT) {
-                        carControlEngineConfiguration->addAssetId(aace::carControl::assets::alexa::device::AMBIENT_LIGHT);
+                        carControlEngineConfiguration->addAssetId(
+                            aace::carControl::assets::alexa::device::AMBIENT_LIGHT);
                     } else if (light.type == VALUE_CARCONTROL_LIGHT_TYPE_DOME_LIGHT) {
                         carControlEngineConfiguration->addAssetId(aace::carControl::assets::alexa::device::DOME_LIGHT);
                         carControlEngineConfiguration->addAssetId(aace::carControl::assets::alexa::device::CABIN_LIGHT);
                     } else if (light.type == VALUE_CARCONTROL_LIGHT_TYPE_LIGHT) {
                         carControlEngineConfiguration->addAssetId(aace::carControl::assets::alexa::device::LIGHT);
                     } else if (light.type == VALUE_CARCONTROL_LIGHT_TYPE_READING_LIGHT) {
-                        carControlEngineConfiguration->addAssetId(aace::carControl::assets::alexa::device::READING_LIGHT);
+                        carControlEngineConfiguration->addAssetId(
+                            aace::carControl::assets::alexa::device::READING_LIGHT);
                     } else if (light.type == VALUE_CARCONTROL_LIGHT_TYPE_TRUNK_LIGHT) {
                         carControlEngineConfiguration->addAssetId(aace::carControl::assets::alexa::device::TRUNK_LIGHT);
                     }
@@ -546,7 +574,7 @@ bool AASBControllerImpl::configureEngine() {
                     if (!light.colors.empty()) {
                         carControlEngineConfiguration->addModeController(light.colorControllerId, true, true)
                             .addAssetId(aace::carControl::assets::alexa::setting::COLOR);
-                        for (auto const& color: light.colors) {
+                        for (auto const& color : light.colors) {
                             if (VALUE_CARCONTROL_LIGHT_COLOR_WHITE == color) {
                                 carControlEngineConfiguration->addValue(VALUE_CARCONTROL_LIGHT_COLOR_WHITE)
                                     .addAssetId(aace::carControl::assets::alexa::color::WHITE);
@@ -574,7 +602,7 @@ bool AASBControllerImpl::configureEngine() {
                             } else {
                                 std::cerr << TAG << ":Received Unknown Light Color " << color << std::endl;
                             }
-                        } 
+                        }
                     }
                 }
             }
@@ -586,20 +614,18 @@ bool AASBControllerImpl::configureEngine() {
 #ifdef ENABLE_AAC_LOCAL_VOICE_CONTROL
     if (m_config->shouldEnableLocalVoiceControl()) {
         auto lvcConfig = m_config->getLocalVoiceControlConfig();
-        engineConfigurations.push_back(
-                aace::localVoiceControl::config::LocalVoiceControlConfiguration::createIPCConfig(
-                        lvcConfig.socketRootDirectory + "/LVC/data",
-                        aace::localVoiceControl::config::LocalVoiceControlConfiguration::SocketPermission::OWNER,
-                        lvcConfig.socketRootDirectory + "/LVC/data",
-                        aace::localVoiceControl::config::LocalVoiceControlConfiguration::SocketPermission::OWNER,
-                        "127.0.0.1",
-                        lvcConfig.socketRootDirectory + "/LVC/data"));
+        engineConfigurations.push_back(aace::localVoiceControl::config::LocalVoiceControlConfiguration::createIPCConfig(
+            lvcConfig.socketRootDirectory + "/LVC/data",
+            aace::localVoiceControl::config::LocalVoiceControlConfiguration::SocketPermission::OWNER,
+            lvcConfig.socketRootDirectory + "/LVC/data",
+            aace::localVoiceControl::config::LocalVoiceControlConfiguration::SocketPermission::OWNER,
+            "127.0.0.1",
+            lvcConfig.socketRootDirectory + "/LVC/data"));
 #ifdef ENABLE_AAC_LOCAL_SKILLS
         const std::string lssPath = lvcConfig.socketRootDirectory + "/LVC/data/lss.socket";
 
         engineConfigurations.push_back(
-                aace::localSkillService::config::LocalSkillServiceConfiguration::createLocalSkillServiceConfig(
-                        lssPath));
+            aace::localSkillService::config::LocalSkillServiceConfiguration::createLocalSkillServiceConfig(lssPath));
 #endif
     }
 #endif
@@ -608,31 +634,44 @@ bool AASBControllerImpl::configureEngine() {
     IConfigurationProvider::AudioIOConfiguration audioConfig = m_config->getAudioIOConfig();
     if (audioConfig.useGStreamerAudioIO) {
         // Audio Input configuration
-        rapidjson::Document document( rapidjson::kObjectType );
-        rapidjson::Value aaceGStreamerElement( rapidjson::kObjectType );
-        rapidjson::Value audioInputProviderElement( rapidjson::kObjectType );
-        rapidjson::Value audioInputDevicesElement( rapidjson::kObjectType );
-        rapidjson::Value audioInputTypesElement( rapidjson::kObjectType );
+        rapidjson::Document document(rapidjson::kObjectType);
+        rapidjson::Value aaceGStreamerElement(rapidjson::kObjectType);
+        rapidjson::Value audioInputProviderElement(rapidjson::kObjectType);
+        rapidjson::Value audioInputDevicesElement(rapidjson::kObjectType);
+        rapidjson::Value audioInputTypesElement(rapidjson::kObjectType);
 
         audioInputProviderElement.AddMember("enabled", rapidjson::Value().SetBool(true), document.GetAllocator());
 
         if (!audioConfig.voiceInputDevice.empty()) {
-            rapidjson::Value audioInputVoiceDeviceElement( rapidjson::kObjectType );
-            audioInputVoiceDeviceElement.AddMember("card", rapidjson::Value().SetString( audioConfig.voiceInputDevice.c_str(), audioConfig.voiceInputDevice.length() ), document.GetAllocator());
+            rapidjson::Value audioInputVoiceDeviceElement(rapidjson::kObjectType);
+            audioInputVoiceDeviceElement.AddMember(
+                "card",
+                rapidjson::Value().SetString(
+                    audioConfig.voiceInputDevice.c_str(), audioConfig.voiceInputDevice.length()),
+                document.GetAllocator());
             audioInputDevicesElement.AddMember("voice", audioInputVoiceDeviceElement, document.GetAllocator());
             audioInputTypesElement.AddMember("VOICE", "voice", document.GetAllocator());
         }
 
         if (!audioConfig.communicationInputDevice.empty()) {
-            rapidjson::Value audioInputCommunicationDeviceElement( rapidjson::kObjectType );
-            audioInputCommunicationDeviceElement.AddMember("card", rapidjson::Value().SetString( audioConfig.communicationInputDevice.c_str(), audioConfig.communicationInputDevice.length() ), document.GetAllocator());
-            audioInputDevicesElement.AddMember("communication", audioInputCommunicationDeviceElement, document.GetAllocator());
+            rapidjson::Value audioInputCommunicationDeviceElement(rapidjson::kObjectType);
+            audioInputCommunicationDeviceElement.AddMember(
+                "card",
+                rapidjson::Value().SetString(
+                    audioConfig.communicationInputDevice.c_str(), audioConfig.communicationInputDevice.length()),
+                document.GetAllocator());
+            audioInputDevicesElement.AddMember(
+                "communication", audioInputCommunicationDeviceElement, document.GetAllocator());
             audioInputTypesElement.AddMember("COMMUNICATION", "communication", document.GetAllocator());
         }
 
         if (!audioConfig.loopbackInputDevice.empty()) {
-            rapidjson::Value audioInputLoopbackDeviceElement( rapidjson::kObjectType );
-            audioInputLoopbackDeviceElement.AddMember("card", rapidjson::Value().SetString( audioConfig.loopbackInputDevice.c_str(), audioConfig.loopbackInputDevice.length() ), document.GetAllocator());
+            rapidjson::Value audioInputLoopbackDeviceElement(rapidjson::kObjectType);
+            audioInputLoopbackDeviceElement.AddMember(
+                "card",
+                rapidjson::Value().SetString(
+                    audioConfig.loopbackInputDevice.c_str(), audioConfig.loopbackInputDevice.length()),
+                document.GetAllocator());
             audioInputDevicesElement.AddMember("loopback", audioInputLoopbackDeviceElement, document.GetAllocator());
             audioInputTypesElement.AddMember("LOOPBACK", "loopback", document.GetAllocator());
         }
@@ -642,57 +681,84 @@ bool AASBControllerImpl::configureEngine() {
         aaceGStreamerElement.AddMember("AudioInputProvider", audioInputProviderElement, document.GetAllocator());
 
         // Audio Output configuration
-        rapidjson::Value audioOutputProviderElement( rapidjson::kObjectType );
-        rapidjson::Value audioOutputDevicesElement( rapidjson::kObjectType );
-        rapidjson::Value audioOutputTypesElement( rapidjson::kObjectType );
+        rapidjson::Value audioOutputProviderElement(rapidjson::kObjectType);
+        rapidjson::Value audioOutputDevicesElement(rapidjson::kObjectType);
+        rapidjson::Value audioOutputTypesElement(rapidjson::kObjectType);
 
         audioOutputProviderElement.AddMember("enabled", rapidjson::Value().SetBool(true), document.GetAllocator());
 
         if (!audioConfig.ttsOutputDevice.empty()) {
-            rapidjson::Value audioOutputDeviceElement( rapidjson::kObjectType );
-            audioOutputDeviceElement.AddMember("card", rapidjson::Value().SetString( audioConfig.ttsOutputDevice.c_str(), audioConfig.ttsOutputDevice.length() ), document.GetAllocator());
+            rapidjson::Value audioOutputDeviceElement(rapidjson::kObjectType);
+            audioOutputDeviceElement.AddMember(
+                "card",
+                rapidjson::Value().SetString(audioConfig.ttsOutputDevice.c_str(), audioConfig.ttsOutputDevice.length()),
+                document.GetAllocator());
             audioOutputDevicesElement.AddMember("tts", audioOutputDeviceElement, document.GetAllocator());
             audioOutputTypesElement.AddMember("TTS", "tts", document.GetAllocator());
         }
 
         if (!audioConfig.musicOutputDevice.empty()) {
-            rapidjson::Value audioOutputDeviceElement( rapidjson::kObjectType );
-            audioOutputDeviceElement.AddMember("card", rapidjson::Value().SetString( audioConfig.musicOutputDevice.c_str(), audioConfig.musicOutputDevice.length() ), document.GetAllocator());
+            rapidjson::Value audioOutputDeviceElement(rapidjson::kObjectType);
+            audioOutputDeviceElement.AddMember(
+                "card",
+                rapidjson::Value().SetString(
+                    audioConfig.musicOutputDevice.c_str(), audioConfig.musicOutputDevice.length()),
+                document.GetAllocator());
             audioOutputDevicesElement.AddMember("music", audioOutputDeviceElement, document.GetAllocator());
             audioOutputTypesElement.AddMember("MUSIC", "music", document.GetAllocator());
         }
 
         if (!audioConfig.notificationOutputDevice.empty()) {
-            rapidjson::Value audioOutputDeviceElement( rapidjson::kObjectType );
-            audioOutputDeviceElement.AddMember("card", rapidjson::Value().SetString( audioConfig.notificationOutputDevice.c_str(), audioConfig.notificationOutputDevice.length() ), document.GetAllocator());
+            rapidjson::Value audioOutputDeviceElement(rapidjson::kObjectType);
+            audioOutputDeviceElement.AddMember(
+                "card",
+                rapidjson::Value().SetString(
+                    audioConfig.notificationOutputDevice.c_str(), audioConfig.notificationOutputDevice.length()),
+                document.GetAllocator());
             audioOutputDevicesElement.AddMember("notification", audioOutputDeviceElement, document.GetAllocator());
             audioOutputTypesElement.AddMember("NOTIFICATION", "notification", document.GetAllocator());
         }
 
         if (!audioConfig.alarmOutputDevice.empty()) {
-            rapidjson::Value audioOutputDeviceElement( rapidjson::kObjectType );
-            audioOutputDeviceElement.AddMember("card", rapidjson::Value().SetString( audioConfig.alarmOutputDevice.c_str(), audioConfig.alarmOutputDevice.length() ), document.GetAllocator());
+            rapidjson::Value audioOutputDeviceElement(rapidjson::kObjectType);
+            audioOutputDeviceElement.AddMember(
+                "card",
+                rapidjson::Value().SetString(
+                    audioConfig.alarmOutputDevice.c_str(), audioConfig.alarmOutputDevice.length()),
+                document.GetAllocator());
             audioOutputDevicesElement.AddMember("alarm", audioOutputDeviceElement, document.GetAllocator());
             audioOutputTypesElement.AddMember("ALARM", "alarm", document.GetAllocator());
         }
 
         if (!audioConfig.earconOutputDevice.empty()) {
-            rapidjson::Value audioOutputDeviceElement( rapidjson::kObjectType );
-            audioOutputDeviceElement.AddMember("card", rapidjson::Value().SetString( audioConfig.earconOutputDevice.c_str(), audioConfig.earconOutputDevice.length() ), document.GetAllocator());
+            rapidjson::Value audioOutputDeviceElement(rapidjson::kObjectType);
+            audioOutputDeviceElement.AddMember(
+                "card",
+                rapidjson::Value().SetString(
+                    audioConfig.earconOutputDevice.c_str(), audioConfig.earconOutputDevice.length()),
+                document.GetAllocator());
             audioOutputDevicesElement.AddMember("earcon", audioOutputDeviceElement, document.GetAllocator());
             audioOutputTypesElement.AddMember("EARCON", "earcon", document.GetAllocator());
         }
 
         if (!audioConfig.communicationOutputDevice.empty()) {
-            rapidjson::Value audioOutputDeviceElement( rapidjson::kObjectType );
-            audioOutputDeviceElement.AddMember("card", rapidjson::Value().SetString( audioConfig.communicationOutputDevice.c_str(), audioConfig.communicationOutputDevice.length() ), document.GetAllocator());
+            rapidjson::Value audioOutputDeviceElement(rapidjson::kObjectType);
+            audioOutputDeviceElement.AddMember(
+                "card",
+                rapidjson::Value().SetString(
+                    audioConfig.communicationOutputDevice.c_str(), audioConfig.communicationOutputDevice.length()),
+                document.GetAllocator());
             audioOutputDevicesElement.AddMember("communication", audioOutputDeviceElement, document.GetAllocator());
             audioOutputTypesElement.AddMember("COMMUNICATION", "communication", document.GetAllocator());
         }
 
         if (!audioConfig.ringtoneOutputDevice.empty()) {
-            rapidjson::Value audioOutputDeviceElement( rapidjson::kObjectType );
-            audioOutputDeviceElement.AddMember("card", rapidjson::Value().SetString( audioConfig.ringtoneOutputDevice.c_str(), audioConfig.ringtoneOutputDevice.length() ), document.GetAllocator());
+            rapidjson::Value audioOutputDeviceElement(rapidjson::kObjectType);
+            audioOutputDeviceElement.AddMember(
+                "card",
+                rapidjson::Value().SetString(
+                    audioConfig.ringtoneOutputDevice.c_str(), audioConfig.ringtoneOutputDevice.length()),
+                document.GetAllocator());
             audioOutputDevicesElement.AddMember("ringtone", audioOutputDeviceElement, document.GetAllocator());
             audioOutputTypesElement.AddMember("RINGTONE", "ringtone", document.GetAllocator());
         }
@@ -701,12 +767,12 @@ bool AASBControllerImpl::configureEngine() {
         audioOutputProviderElement.AddMember("types", audioOutputTypesElement, document.GetAllocator());
         aaceGStreamerElement.AddMember("AudioOutputProvider", audioOutputProviderElement, document.GetAllocator());
 
-        document.AddMember( "aace.systemAudio", aaceGStreamerElement, document.GetAllocator() );
+        document.AddMember("aace.systemAudio", aaceGStreamerElement, document.GetAllocator());
 
         engineConfigurations.push_back(
             aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document)));
-    }    
-#endif    
+    }
+#endif
     return m_engine->configure(engineConfigurations);
 }
 
@@ -806,8 +872,7 @@ void AASBControllerImpl::onReceivedEvent(
 
 bool AASBControllerImpl::registerAudioPlayerCapability() {
     if (!m_engine->registerPlatformInterface(
-            m_audioPlayerHandler =
-                aasb::alexa::AudioPlayerHandler::create(m_logger))) {
+            m_audioPlayerHandler = aasb::alexa::AudioPlayerHandler::create(m_logger))) {
         AASB_ERROR("Failed to register audio player handler");
         return false;
     }
@@ -817,8 +882,7 @@ bool AASBControllerImpl::registerAudioPlayerCapability() {
 
 bool AASBControllerImpl::registerSpeechSynthesizerCapability() {
     if (!m_engine->registerPlatformInterface(
-            m_speechSynthesizerHandler =
-                aasb::alexa::SpeechSynthesizerHandler::create())) {
+            m_speechSynthesizerHandler = aasb::alexa::SpeechSynthesizerHandler::create())) {
         AASB_ERROR("Failed to register speech synthesizer handler");
         return false;
     }
@@ -835,8 +899,9 @@ bool AASBControllerImpl::registerSpeechRecognizerCapability() {
     }
 #endif
 
-    if (!m_engine->registerPlatformInterface(m_speechRecognizer =
-        aasb::alexa::SpeechRecognizerHandler::create(wakeWordEnabled, m_logger, m_responseDispatcher))) {
+    if (!m_engine->registerPlatformInterface(
+            m_speechRecognizer =
+                aasb::alexa::SpeechRecognizerHandler::create(wakeWordEnabled, m_logger, m_responseDispatcher))) {
         AASB_ERROR("Failed to register speech recognizer handler");
         return false;
     }
@@ -919,7 +984,7 @@ bool AASBControllerImpl::registerLocalMediaSourceCapability(
             return false;
         }
     }
- 
+
     if (localMediaSourceConfig.hasDAB) {
         AASB_INFO("Registering DAB source");
         if (!m_engine->registerPlatformInterface(m_LocalMediaSourceHandlerManager->getDABSource())) {

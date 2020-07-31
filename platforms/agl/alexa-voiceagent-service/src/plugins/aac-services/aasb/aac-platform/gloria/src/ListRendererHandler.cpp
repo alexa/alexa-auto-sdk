@@ -36,8 +36,7 @@ const std::string TAG = "aasb::gloria::ListRendererHandler";
 std::shared_ptr<ListRendererHandler> ListRendererHandler::create(
     std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
     std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher) {
-    auto handler =
-        std::shared_ptr<ListRendererHandler>(new ListRendererHandler(responseDispatcher));
+    auto handler = std::shared_ptr<ListRendererHandler>(new ListRendererHandler(responseDispatcher));
 
     handler->m_logger = logger;
     return handler;
@@ -48,11 +47,11 @@ ListRendererHandler::ListRendererHandler(std::weak_ptr<aasb::bridge::ResponseDis
 }
 
 void ListRendererHandler::handleDirective(
-        const std::string& ns,
-        const std::string& name,
-        const std::string& messageId,
-        const std::string& dialogRequestId,
-        const std::string& payload) {
+    const std::string& ns,
+    const std::string& name,
+    const std::string& messageId,
+    const std::string& dialogRequestId,
+    const std::string& payload) {
     m_logger->log(Level::INFO, TAG, __FUNCTION__ + payload);
 
     auto responseDispatcher = m_responseDispatcher.lock();
@@ -91,13 +90,11 @@ void ListRendererHandler::handleDirective(
 
     // create event string
     rapidjson::StringBuffer buffer;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer( buffer );
-    document.Accept( writer );
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+    document.Accept(writer);
 
     responseDispatcher->sendDirective(
-        TOPIC_GLORIA_LISTRENDERER,
-        ACTION_GLORIA_LISTRENDERER_HANDLE_DIRECTIVE,
-        buffer.GetString());
+        TOPIC_GLORIA_LISTRENDERER, ACTION_GLORIA_LISTRENDERER_HANDLE_DIRECTIVE, buffer.GetString());
 }
 
 void ListRendererHandler::onReceivedEvent(const std::string& action, const std::string& payload) {
@@ -123,21 +120,24 @@ void ListRendererHandler::sendEvent(const std::string& payload) {
 
     std::string ns, name, eventPayload;
 
-    if (root.HasMember(JSON_ATTR_GLORIA_LISTRENDERER_NAMESPACE.c_str()) && root[JSON_ATTR_GLORIA_LISTRENDERER_NAMESPACE.c_str()].IsString()) {
+    if (root.HasMember(JSON_ATTR_GLORIA_LISTRENDERER_NAMESPACE.c_str()) &&
+        root[JSON_ATTR_GLORIA_LISTRENDERER_NAMESPACE.c_str()].IsString()) {
         ns = root[JSON_ATTR_GLORIA_LISTRENDERER_NAMESPACE.c_str()].GetString();
     } else {
         m_logger->log(Level::WARN, TAG, "sendEvent: gloria list renderer namespace not found.");
         return;
     }
 
-    if (root.HasMember(JSON_ATTR_GLORIA_LISTRENDERER_NAME.c_str()) && root[JSON_ATTR_GLORIA_LISTRENDERER_NAME.c_str()].IsString()) {
+    if (root.HasMember(JSON_ATTR_GLORIA_LISTRENDERER_NAME.c_str()) &&
+        root[JSON_ATTR_GLORIA_LISTRENDERER_NAME.c_str()].IsString()) {
         name = root[JSON_ATTR_GLORIA_LISTRENDERER_NAME.c_str()].GetString();
     } else {
         m_logger->log(Level::WARN, TAG, "sendEvent: gloria list renderer name not found.");
         return;
     }
 
-    if (root.HasMember(JSON_ATTR_GLORIA_LISTRENDERER_PAYLOAD.c_str()) && root[JSON_ATTR_GLORIA_LISTRENDERER_PAYLOAD.c_str()].IsString()) {
+    if (root.HasMember(JSON_ATTR_GLORIA_LISTRENDERER_PAYLOAD.c_str()) &&
+        root[JSON_ATTR_GLORIA_LISTRENDERER_PAYLOAD.c_str()].IsString()) {
         eventPayload = root[JSON_ATTR_GLORIA_LISTRENDERER_PAYLOAD.c_str()].GetString();
     } else {
         m_logger->log(Level::WARN, TAG, "sendEvent: gloria list renderer payload not found.");
@@ -150,7 +150,6 @@ void ListRendererHandler::sendEvent(const std::string& payload) {
 void ListRendererHandler::renderedListStateChanged(const std::string& payload) {
     ListRenderer::renderedListStateChanged(payload);
 }
-
 
 }  // namespace gloria
 }  // namespace aasb

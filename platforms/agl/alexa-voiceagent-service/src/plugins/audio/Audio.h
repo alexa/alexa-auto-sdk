@@ -22,8 +22,8 @@
 #include "interfaces/utilities/logging/ILogger.h"
 
 extern "C" {
-	#define AFB_BINDING_VERSION 3
-	#include <afb/afb-binding.h>
+#define AFB_BINDING_VERSION 3
+#include <afb/afb-binding.h>
 };
 
 namespace agl {
@@ -31,27 +31,24 @@ namespace audio {
 
 class Audio {
 public:
-	static shared_ptr<Audio> create(
-		std::shared_ptr<agl::common::interfaces::ILogger> logger,
-		shared_ptr<agl::common::interfaces::IAFBApi> api);
+    static shared_ptr<Audio> create(
+        std::shared_ptr<agl::common::interfaces::ILogger> logger,
+        shared_ptr<agl::common::interfaces::IAFBApi> api);
 
-	std::string openAHLChannel(const std::string &role);
-	bool setAHLChannelVolume(const std::string &role, int volume);
+    std::string openChannel(const std::string& role);
+    bool setChannelVolume(const std::string& role, int volume);
 
 private:
-	Audio(std::shared_ptr<agl::common::interfaces::ILogger> logger,
-		  shared_ptr<agl::common::interfaces::IAFBApi> api);
-
-	bool callAHL(const std::string &role, json_object *request, json_object **response);
+    Audio(std::shared_ptr<agl::common::interfaces::ILogger> logger, shared_ptr<agl::common::interfaces::IAFBApi> api);
 
     // Logger.
     std::shared_ptr<agl::common::interfaces::ILogger> m_logger;
 
-	// AFB API object for events pub/sub, and for calling other AGL services.
+    // AFB API object for events pub/sub, and for calling other AGL services.
     std::shared_ptr<agl::common::interfaces::IAFBApi> m_api;
 };
 
-}
-}
+}  // namespace audio
+}  // namespace agl
 
-#endif // AGL_AUDIO_AUDIO_H_
+#endif  // AGL_AUDIO_AUDIO_H_

@@ -34,7 +34,8 @@ public:
 
     /// @name aace::cbl::CBL Functions
     /// @{
-    void cblStateChanged(CBLState state, CBLStateChangedReason reason, const std::string& url, const std::string& code) override;
+    void cblStateChanged(CBLState state, CBLStateChangedReason reason, const std::string& url, const std::string& code)
+        override;
     void clearRefreshToken() override;
     void setRefreshToken(const std::string& refreshToken) override;
     std::string getRefreshToken() override;
@@ -44,9 +45,10 @@ public:
     void onReceivedEvent(const std::string& action, const std::string& payload);
 
 private:
-    CBLHandler(std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
-               std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher,
-               std::string refresh_token_file);
+    CBLHandler(
+        std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
+        std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher,
+        std::string refresh_token_file);
 
     std::string convertCBLStateToString(CBLState state);
     std::string convertCBLStateChangedReasonToString(CBLStateChangedReason reason);

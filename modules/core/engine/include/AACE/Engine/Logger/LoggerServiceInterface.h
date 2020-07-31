@@ -29,12 +29,12 @@ public:
     virtual ~LoggerServiceInterface();
 
 public:
-    virtual bool addSink( std::shared_ptr<aace::engine::logger::sink::Sink> sink ) = 0;
-    virtual bool removeSink( const std::string& id ) = 0;
+    virtual bool addSink(std::shared_ptr<aace::engine::logger::sink::Sink> sink) = 0;
+    virtual bool removeSink(const std::string& id) = 0;
 };
 
-}  // aace::engine:logger
-}  // aace::engine
-}  // aace
+}  // namespace logger
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_LOGGER_LOGGER_SERVICE_INTERFACE_H
+#endif  // AACE_ENGINE_LOGGER_LOGGER_SERVICE_INTERFACE_H

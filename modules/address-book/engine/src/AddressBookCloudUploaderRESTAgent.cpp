@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-#include <rapidjson/prettywriter.h> 
+#include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
 
 #include <AACE/Engine/Core/EngineMacros.h>
@@ -50,7 +50,7 @@ static const std::string COLON_SEPARATOR = ":";
 /// Space Separator for HTTP
 static const std::string SPACE_SEPARATOR = " ";
 
-/// The HTTP header to pass the Content-Type as application/json 
+/// The HTTP header to pass the Content-Type as application/json
 static const std::string CONTENT_TYPE_APPLICATION_JSON = "content-type: application/json";
 
 /// Default value for ACCEPT_PFM HTTP header
@@ -60,22 +60,22 @@ const std::string DEFAULT_PFM = "US";
 const std::string DEFAULT_USER_AGENT_VALUE = "AutoSDK/AddressBook/1.0";
 
 /// Address Book Type to be used for Contacts as defined @c ACMS
-const std::string AUTO_SDK_CONTACT_ADDRESS_BOOK_TYPE ="automotive";
+const std::string AUTO_SDK_CONTACT_ADDRESS_BOOK_TYPE = "automotive";
 
 /// Address Book Type to be used for Navigation Address as defined @c ACMS
-const std::string AUTO_SDK_NAVIGATION_ADDRESS_ADDRESS_BOOK_TYPE ="automotivePostalAddress";
+const std::string AUTO_SDK_NAVIGATION_ADDRESS_ADDRESS_BOOK_TYPE = "automotivePostalAddress";
 
 /// Default value for the Address Book Name @c ACMS
-const std::string AUTO_SDK_DEFAULT_ADDRESS_BOOK_NAME ="AutoSDK";
+const std::string AUTO_SDK_DEFAULT_ADDRESS_BOOK_NAME = "AutoSDK";
 
 /// Default value for the HTTP request timeout.
 static const std::chrono::seconds DEFAULT_HTTP_TIMEOUT = std::chrono::seconds(60);
 
 /// Default value for the HTTP retry on Network Error.
-static const int  HTTP_RETRY_COUNT = 3;
+static const int HTTP_RETRY_COUNT = 3;
 
-// ACMS End Point 
-static const std::string ACMS_ENDPOINT = "https://alexa-comms-mobile-service-na.amazon.com";
+/// REST URL to upload the address book
+static const std::string DEFAULT_ACMS_ENDPOINT = "https://alexa-comms-mobile-service-na.amazon.com";
 
 /// Path suffix for ACMS URL accounts
 static const std::string ACCOUNTS_PATH = "accounts";
@@ -99,29 +99,46 @@ static const std::string GET_INDENTITY_V2_QUERY = "/identities?includeUserName=f
 static const std::string GET_ADDRESS_BOOK_QUERY = "?addressBookSourceIds=";
 
 AddressBookCloudUploaderRESTAgent::AddressBookCloudUploaderRESTAgent(
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
-        std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo ):
-    m_authDelegate( authDelegate ),
-    m_deviceInfo( deviceInfo ) {
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
+    std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo) :
+        m_authDelegate(authDelegate), m_deviceInfo(deviceInfo), m_acmsEndpoint(DEFAULT_ACMS_ENDPOINT) {
 }
 
 std::shared_ptr<AddressBookCloudUploaderRESTAgent> AddressBookCloudUploaderRESTAgent::create(
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
-        std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo ) {
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
+    std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
+    std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints) {
     try {
-        std::shared_ptr<AddressBookCloudUploaderRESTAgent> addressBookCloudRESTAgent = std::shared_ptr<AddressBookCloudUploaderRESTAgent>( new AddressBookCloudUploaderRESTAgent( authDelegate, deviceInfo ) );
+        std::shared_ptr<AddressBookCloudUploaderRESTAgent> addressBookCloudRESTAgent =
+            std::shared_ptr<AddressBookCloudUploaderRESTAgent>(
+                new AddressBookCloudUploaderRESTAgent(authDelegate, deviceInfo));
+        ThrowIfNot(
+            addressBookCloudRESTAgent->initialize(alexaEndpoints), "initializeAddressBookCloudUploaderRESTAgentFailed");
+
         return addressBookCloudRESTAgent;
-    } catch( std::exception& ex ) {
-        AACE_ERROR( LX(TAG,"create").d("reason", ex.what() ) );
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "create").d("reason", ex.what()));
         return nullptr;
     }
 }
 
+bool AddressBookCloudUploaderRESTAgent::initialize(
+    std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints) {
+    auto acmsendpoint = alexaEndpoints->getACMSEndpoint();
+    if (!acmsendpoint.empty()) {
+        m_acmsEndpoint = acmsendpoint;
+        AACE_INFO(LX(TAG).m("usingACMSEndpointFromConfiguration"));
+        AACE_DEBUG(LX(TAG).d("acmsEndpoint", m_acmsEndpoint));
+    }
+
+    return true;
+}
+
 bool AddressBookCloudUploaderRESTAgent::isAccountProvisioned() {
-    if( !isPceIdValid() ) {
+    if (!isPceIdValid()) {
         auto alexaAccount = getAlexaAccountInfo();
-        if( !alexaAccount.commsId.empty() ) {
-            m_pceId = getPceIdFromIdentity( alexaAccount.commsId );
+        if (!alexaAccount.commsId.empty()) {
+            setPceId(getPceIdFromIdentity(alexaAccount.commsId));
         }
     }
     return isPceIdValid();
@@ -130,84 +147,94 @@ bool AddressBookCloudUploaderRESTAgent::isAccountProvisioned() {
 std::vector<std::string> AddressBookCloudUploaderRESTAgent::buildCommonHTTPHeader() {
     std::vector<std::string> httpHeaderData;
     std::string requestUUID = alexaClientSDK::avsCommon::utils::uuidGeneration::generateUUID();
-    httpHeaderData = {
-        AUTHORIZATION_HTTP_HEADER + COLON_SEPARATOR + SPACE_SEPARATOR + AUTHORIZATION_HTTP_HEADER_POSTFIX + SPACE_SEPARATOR + m_authDelegate->getAuthToken(),
-        ACCEPT_PFM + COLON_SEPARATOR + SPACE_SEPARATOR + DEFAULT_PFM,
-        X_AMZN_REQUESTID + COLON_SEPARATOR + SPACE_SEPARATOR + requestUUID,
-        X_AZN_CLIENTID + COLON_SEPARATOR + SPACE_SEPARATOR + m_deviceInfo->getDeviceSerialNumber(),
-        USER_AGENT + COLON_SEPARATOR + SPACE_SEPARATOR + DEFAULT_USER_AGENT_VALUE
-    };
+    httpHeaderData = {AUTHORIZATION_HTTP_HEADER + COLON_SEPARATOR + SPACE_SEPARATOR +
+                          AUTHORIZATION_HTTP_HEADER_POSTFIX + SPACE_SEPARATOR + m_authDelegate->getAuthToken(),
+                      ACCEPT_PFM + COLON_SEPARATOR + SPACE_SEPARATOR + DEFAULT_PFM,
+                      X_AMZN_REQUESTID + COLON_SEPARATOR + SPACE_SEPARATOR + requestUUID,
+                      X_AZN_CLIENTID + COLON_SEPARATOR + SPACE_SEPARATOR + m_deviceInfo->getDeviceSerialNumber(),
+                      USER_AGENT + COLON_SEPARATOR + SPACE_SEPARATOR + DEFAULT_USER_AGENT_VALUE};
 
     return httpHeaderData;
 }
 
-bool AddressBookCloudUploaderRESTAgent::parseCommonHTTPResponse( const HTTPResponse& response ) {
-    if( HTTPResponseCode::SUCCESS_OK == response.code ) {
+bool AddressBookCloudUploaderRESTAgent::parseCommonHTTPResponse(const HTTPResponse& response) {
+    if (HTTPResponseCode::SUCCESS_OK == response.code) {
         return true;
     }
     return false;
 }
 
-AddressBookCloudUploaderRESTAgent::HTTPResponse AddressBookCloudUploaderRESTAgent::doPost( const std::string& url, const std::vector<std::string> headerLines, const std::string& data, std::chrono::seconds timeout ) {
+AddressBookCloudUploaderRESTAgent::HTTPResponse AddressBookCloudUploaderRESTAgent::doPost(
+    const std::string& url,
+    const std::vector<std::string> headerLines,
+    const std::string& data,
+    std::chrono::seconds timeout) {
     try {
         // Creating the HttpPost on every doPost is by design to ensure that curl in libcurlUtils uses the
         // latest provided curl options.
         auto httpPost = alexaClientSDK::avsCommon::utils::libcurlUtils::HttpPost::create();
-        ThrowIfNull( httpPost, "nullHttpPost" );
+        ThrowIfNull(httpPost, "nullHttpPost");
 
-        return httpPost->doPost( url, headerLines, data, timeout );
-    } catch( std::exception& ex ) {
-        AACE_ERROR( LX(TAG,"doPost").d("reason", ex.what() ) );
+        return httpPost->doPost(url, headerLines, data, timeout);
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "doPost").d("reason", ex.what()));
         return AddressBookCloudUploaderRESTAgent::HTTPResponse();
     }
 }
 
-AddressBookCloudUploaderRESTAgent::HTTPResponse AddressBookCloudUploaderRESTAgent::doGet( const std::string& url, const std::vector<std::string>& headers ) {
+AddressBookCloudUploaderRESTAgent::HTTPResponse AddressBookCloudUploaderRESTAgent::doGet(
+    const std::string& url,
+    const std::vector<std::string>& headers) {
     try {
         // Creating the HttpGet on every doGet is by design to ensure that curl in libcurlUtils uses the
         // latest provided curl options.
         auto httpGet = alexaClientSDK::avsCommon::utils::libcurlUtils::HttpGet::create();
-        ThrowIfNull( httpGet, "nullHttpGet" );
+        ThrowIfNull(httpGet, "nullHttpGet");
 
-        return httpGet->doGet( url, headers, DEFAULT_HTTP_TIMEOUT );
-    } catch( std::exception& ex ) {
-        AACE_ERROR( LX(TAG,"doGet").d("reason", ex.what() ) );
+        return httpGet->doGet(url, headers, DEFAULT_HTTP_TIMEOUT);
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "doGet").d("reason", ex.what()));
         return AddressBookCloudUploaderRESTAgent::HTTPResponse();
     }
 }
 
-AddressBookCloudUploaderRESTAgent::HTTPResponse AddressBookCloudUploaderRESTAgent::doDelete( const std::string& url, const std::vector<std::string>& headers ) {
+AddressBookCloudUploaderRESTAgent::HTTPResponse AddressBookCloudUploaderRESTAgent::doDelete(
+    const std::string& url,
+    const std::vector<std::string>& headers) {
     try {
         // Creating the HttpDelete on every doDelete is by design to ensure that curl in libcurlUtils uses the
         // latest provided curl options.
         auto httpDelete = alexaClientSDK::avsCommon::utils::libcurlUtils::HttpDelete::create();
-        ThrowIfNull( httpDelete, "nullHttpDelete" );
+        ThrowIfNull(httpDelete, "nullHttpDelete");
 
-        return httpDelete->doDelete( url, headers, DEFAULT_HTTP_TIMEOUT );
-    } catch( std::exception& ex ) {
-        AACE_ERROR( LX(TAG,"doDelete").d("reason", ex.what() ) );
+        return httpDelete->doDelete(url, headers, DEFAULT_HTTP_TIMEOUT);
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "doDelete").d("reason", ex.what()));
         return AddressBookCloudUploaderRESTAgent::HTTPResponse();
     }
 }
 
-std::string AddressBookCloudUploaderRESTAgent::getHTTPErrorString( const HTTPResponse& response ) {
-    switch( response.code ) {
-    case HTTPResponseCode::SUCCESS_NO_CONTENT:
-        return ".successWithNoContent";
-    case HTTPResponseCode::BAD_REQUEST:
-       return ".badRequest";
-    case HTTPResponseCode::FORBIDDEN:
-        return ".authenticationFailed";
-    case HTTPResponseCode::SERVER_INTERNAL_ERROR:
-        return ".internalServiceError";
-    default:
-        return ".httpRequestFailed ";
+std::string AddressBookCloudUploaderRESTAgent::getHTTPErrorString(const HTTPResponse& response) {
+    switch (response.code) {
+        case HTTPResponseCode::SUCCESS_NO_CONTENT:
+            return ".successWithNoContent";
+        case HTTPResponseCode::BAD_REQUEST:
+            return ".badRequest";
+        case HTTPResponseCode::FORBIDDEN:
+            return ".authenticationFailed";
+        case HTTPResponseCode::SERVER_INTERNAL_ERROR:
+            return ".internalServiceError";
+        default:
+            return ".httpRequestFailed ";
     }
 }
 
+void AddressBookCloudUploaderRESTAgent::reset() {
+    setPceId("");
+}
 
 bool AddressBookCloudUploaderRESTAgent::isPceIdValid() {
-    return( !m_pceId.empty() );
+    return (!getPceId().empty());
 }
 
 AddressBookCloudUploaderRESTAgent::AlexaAccountInfo AddressBookCloudUploaderRESTAgent::getAlexaAccountInfo() {
@@ -221,63 +248,61 @@ AddressBookCloudUploaderRESTAgent::AlexaAccountInfo AddressBookCloudUploaderREST
 
     auto httpHeaderData = buildCommonHTTPHeader();
     bool validFlag = false;
-    try { 
-        for( int retry = 0; retry < HTTP_RETRY_COUNT; retry++ ) {
-            httpResponse = doGet( 
-                ACMS_ENDPOINT + FORWARD_SLASH + ACCOUNTS_PATH, 
-                httpHeaderData );
-
-            if( parseCommonHTTPResponse( httpResponse ) ) {
+    try {
+        auto url = m_acmsEndpoint + FORWARD_SLASH + ACCOUNTS_PATH;
+        for (int retry = 0; retry < HTTP_RETRY_COUNT; retry++) {
+            httpResponse = doGet(url, httpHeaderData);
+            if (parseCommonHTTPResponse(httpResponse)) {
                 validFlag = true;
                 break;
             }
         }
-        ThrowIfNot( validFlag, "httpDoGetFailed" + getHTTPErrorString( httpResponse ) );
+        ThrowIfNot(validFlag, "httpDoGetFailed" + getHTTPErrorString(httpResponse));
 
-        if( document.Parse(httpResponse.body.c_str()).HasParseError() ) {
-            Throw( "jsonParseError" );
+        if (document.Parse(httpResponse.body.c_str()).HasParseError()) {
+            Throw("jsonParseError");
         }
-        if( !document.IsArray() ) {
-            Throw( "jsonResponseNotValidArray" );
+        if (!document.IsArray()) {
+            Throw("jsonResponseNotValidArray");
         }
 
-        for( rapidjson::Value::ConstValueIterator itr = document.Begin(); itr != document.End(); itr++ ) {
-            if( (*itr)[ "signedInUser" ].IsBool() && (*itr)[ "signedInUser" ].GetBool() ) {
-                if( (*itr).HasMember( "commsId" ) ) {
-                    if( (*itr)[ "commsId" ].IsString() ) {
-                        alexaAccount.commsId = (*itr)[ "commsId" ].GetString();
+        for (rapidjson::Value::ConstValueIterator itr = document.Begin(); itr != document.End(); itr++) {
+            if ((*itr)["signedInUser"].IsBool() && (*itr)["signedInUser"].GetBool()) {
+                if ((*itr).HasMember("commsId")) {
+                    if ((*itr)["commsId"].IsString()) {
+                        alexaAccount.commsId = (*itr)["commsId"].GetString();
                     }
                 } else {
-                    Throw( "commsIdNotPresent" );
+                    Throw("commsIdNotPresent");
                 }
 
-                if( (*itr).HasMember( "commsProvisionStatus" ) ) {
-                    if( (*itr)[ "commsProvisionStatus" ].IsString() ) {
-                        auto tempCommsProvisionStatus = (*itr)[ "commsProvisionStatus" ].GetString();
-                        if( strcmp("UNKNOWN", tempCommsProvisionStatus ) == 0 ) {
+                if ((*itr).HasMember("commsProvisionStatus")) {
+                    if ((*itr)["commsProvisionStatus"].IsString()) {
+                        auto tempCommsProvisionStatus = (*itr)["commsProvisionStatus"].GetString();
+                        if (strcmp("UNKNOWN", tempCommsProvisionStatus) == 0) {
                             alexaAccount.provisionStatus = CommsProvisionStatus::UNKNOWN;
-                        } else if( strcmp("PROVISIONED", tempCommsProvisionStatus ) == 0 ) {
+                        } else if (strcmp("PROVISIONED", tempCommsProvisionStatus) == 0) {
                             alexaAccount.provisionStatus = CommsProvisionStatus::PROVISIONED;
-                        } else if( strcmp("DEPROVISIONED", tempCommsProvisionStatus ) == 0 ) {
+                        } else if (strcmp("DEPROVISIONED", tempCommsProvisionStatus) == 0) {
                             alexaAccount.provisionStatus = CommsProvisionStatus::DEPROVISIONED;
-                        } else if( strcmp("AUTO_PROVISIONED", tempCommsProvisionStatus ) == 0 ) {
+                        } else if (strcmp("AUTO_PROVISIONED", tempCommsProvisionStatus) == 0) {
                             alexaAccount.provisionStatus = CommsProvisionStatus::AUTO_PROVISIONED;
                         }
                     }
                 } else {
-                    Throw( "commsProvisionStatusNotValid" );
+                    Throw("commsProvisionStatusNotValid");
                 }
-                break; // Found the signed in user, so break.
+                break;  // Found the signed in user, so break.
             }
         }
         return alexaAccount;
-    } catch( std::exception& ex ) {
-        AACE_ERROR( LX(TAG,"getAlexaAccountInfo").d("reason", ex.what() ) );
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "getAlexaAccountInfo").d("reason", ex.what()));
         return alexaAccount;
     }
 }
 
-std::string AddressBookCloudUploaderRESTAgent::getPceIdFromIdentity( const std::string& commsId ) {
+std::string AddressBookCloudUploaderRESTAgent::getPceIdFromIdentity(const std::string& commsId) {
     AddressBookCloudUploaderRESTAgent::HTTPResponse httpResponse;
     rapidjson::Document document;
     std::string pceId = "";
@@ -285,235 +310,253 @@ std::string AddressBookCloudUploaderRESTAgent::getPceIdFromIdentity( const std::
 
     auto httpHeaderData = buildCommonHTTPHeader();
 
-    try { 
-        for( int retry = 0; retry < HTTP_RETRY_COUNT; retry++ ) {
-            httpResponse = doGet( 
-                ACMS_ENDPOINT + FORWARD_SLASH + USERS_PATH + FORWARD_SLASH + commsId + GET_INDENTITY_V2_QUERY,
-                httpHeaderData );
-
-            if( parseCommonHTTPResponse( httpResponse ) ) {
+    try {
+        auto url = m_acmsEndpoint + FORWARD_SLASH + USERS_PATH + FORWARD_SLASH + commsId + GET_INDENTITY_V2_QUERY;
+        for (int retry = 0; retry < HTTP_RETRY_COUNT; retry++) {
+            httpResponse = doGet(url, httpHeaderData);
+            if (parseCommonHTTPResponse(httpResponse)) {
                 validFlag = true;
                 break;
-            } 
+            }
         }
 
-        ThrowIfNot( validFlag, "httpDoGetFailed" + getHTTPErrorString( httpResponse ) );
+        ThrowIfNot(validFlag, "httpDoGetFailed" + getHTTPErrorString(httpResponse));
 
-        if( document.Parse(httpResponse.body.c_str()).HasParseError() ) {
-            Throw( "jsonParseError" );
+        if (document.Parse(httpResponse.body.c_str()).HasParseError()) {
+            Throw("jsonParseError");
         }
 
-        auto it = document.FindMember( "pceId" );
-        if( it != document.MemberEnd() && it->value.IsString() ) {
+        auto it = document.FindMember("pceId");
+        if (it != document.MemberEnd() && it->value.IsString()) {
             pceId = it->value.GetString();
         } else {
-             Throw( "notValidPceId" );
+            Throw("notValidPceId");
         }
         return pceId;
-    } catch( std::exception& ex ) {
-        AACE_ERROR( LX(TAG,"getPceIdFromIdentity").d("reason", ex.what() ) );
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "getPceIdFromIdentity").d("reason", ex.what()));
         return "";
     }
 }
 
-std::string AddressBookCloudUploaderRESTAgent::createAndGetCloudAddressBook( const std::string& addressBookSourceId, const std::string& addressBookType ) {
+std::string AddressBookCloudUploaderRESTAgent::createAndGetCloudAddressBook(
+    const std::string& addressBookSourceId,
+    const std::string& addressBookType) {
     AddressBookCloudUploaderRESTAgent::HTTPResponse httpResponse;
     rapidjson::Document document;
     std::string addressBookId = "";
     bool validFlag = false;
 
     auto httpHeaderData = buildCommonHTTPHeader();
-    httpHeaderData.insert( httpHeaderData.end(), CONTENT_TYPE_APPLICATION_JSON );
-    auto addressDataJson = buildCreateAddressBookDataJson( addressBookSourceId, addressBookType );
+    httpHeaderData.insert(httpHeaderData.end(), CONTENT_TYPE_APPLICATION_JSON);
+    auto addressDataJson = buildCreateAddressBookDataJson(addressBookSourceId, addressBookType);
 
     try {
-        for( int retry = 0; retry < HTTP_RETRY_COUNT; retry++ ) {
-        httpResponse = doPost(
-            ACMS_ENDPOINT + FORWARD_SLASH + USERS_PATH + FORWARD_SLASH + m_pceId + FORWARD_SLASH + ADDRESSBOOK_PATH,
-            httpHeaderData, addressDataJson, DEFAULT_HTTP_TIMEOUT );
-
-            if( parseCommonHTTPResponse( httpResponse ) ) {
+        auto url =
+            m_acmsEndpoint + FORWARD_SLASH + USERS_PATH + FORWARD_SLASH + getPceId() + FORWARD_SLASH + ADDRESSBOOK_PATH;
+        for (int retry = 0; retry < HTTP_RETRY_COUNT; retry++) {
+            httpResponse = doPost(url, httpHeaderData, addressDataJson, DEFAULT_HTTP_TIMEOUT);
+            if (parseCommonHTTPResponse(httpResponse)) {
                 validFlag = true;
                 break;
             }
         }
 
-        ThrowIfNot( validFlag, "httpDoPostFailed" + getHTTPErrorString( httpResponse ) );
+        ThrowIfNot(validFlag, "httpDoPostFailed" + getHTTPErrorString(httpResponse));
 
-        if( document.Parse( httpResponse.body.c_str()).HasParseError() ) {
-            Throw( "jsonParseError" );
+        if (document.Parse(httpResponse.body.c_str()).HasParseError()) {
+            Throw("jsonParseError");
         }
 
-        auto it = document.FindMember( "addressBookId" );
-        if( it != document.MemberEnd() && it->value.IsString() ) {
+        auto it = document.FindMember("addressBookId");
+        if (it != document.MemberEnd() && it->value.IsString()) {
             addressBookId = it->value.GetString();
         } else {
-            Throw( "notValidAddressBookId" );
+            Throw("notValidAddressBookId");
         }
 
         return addressBookId;
-    } catch( std::exception& ex ) {
-        AACE_ERROR( LX(TAG,"createAndGetCloudAddressBook").d("reason", ex.what() ) );
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "createAndGetCloudAddressBook").d("reason", ex.what()));
         return "";
     }
 }
 
-std::string AddressBookCloudUploaderRESTAgent::buildCreateAddressBookDataJson( const std::string& addressBookSourceId, const std::string& addressBookType ) {
+std::string AddressBookCloudUploaderRESTAgent::buildCreateAddressBookDataJson(
+    const std::string& addressBookSourceId,
+    const std::string& addressBookType) {
     rapidjson::Document document;
     document.SetObject();
 
-    document.AddMember( "addressBookSourceId", rapidjson::Value().SetString( addressBookSourceId.c_str(), addressBookSourceId.length() ), document.GetAllocator() );
-    document.AddMember( "addressBookName", rapidjson::Value().SetString( AUTO_SDK_DEFAULT_ADDRESS_BOOK_NAME.c_str(), AUTO_SDK_DEFAULT_ADDRESS_BOOK_NAME.length() ) , document.GetAllocator() );
-    document.AddMember( "addressBookType", rapidjson::Value().SetString( addressBookType.c_str(), addressBookType.length() )  , document.GetAllocator() );
+    document.AddMember(
+        "addressBookSourceId",
+        rapidjson::Value().SetString(addressBookSourceId.c_str(), addressBookSourceId.length()),
+        document.GetAllocator());
+    document.AddMember(
+        "addressBookName",
+        rapidjson::Value().SetString(
+            AUTO_SDK_DEFAULT_ADDRESS_BOOK_NAME.c_str(), AUTO_SDK_DEFAULT_ADDRESS_BOOK_NAME.length()),
+        document.GetAllocator());
+    document.AddMember(
+        "addressBookType",
+        rapidjson::Value().SetString(addressBookType.c_str(), addressBookType.length()),
+        document.GetAllocator());
 
     // create event string
     rapidjson::StringBuffer buffer;
     rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
 
     document.Accept(writer);
-    return( std::string( buffer.GetString() ) );
+    return (std::string(buffer.GetString()));
 }
 
-bool AddressBookCloudUploaderRESTAgent::getCloudAddressBookId( const std::string& addressBookSourceId, const std::string& addressBookType, std::string& cloudAddressBookId ) {
+bool AddressBookCloudUploaderRESTAgent::getCloudAddressBookId(
+    const std::string& addressBookSourceId,
+    const std::string& addressBookType,
+    std::string& cloudAddressBookId) {
     AddressBookCloudUploaderRESTAgent::HTTPResponse httpResponse;
     rapidjson::Document document;
     bool validFlag = false;
 
     auto httpHeaderData = buildCommonHTTPHeader();
-    try { 
-        for( int retry = 0; retry < HTTP_RETRY_COUNT; retry++ ) {
-            httpResponse = doGet(
-                ACMS_ENDPOINT + FORWARD_SLASH + USERS_PATH + FORWARD_SLASH + m_pceId + FORWARD_SLASH + ADDRESSBOOK_PATH + GET_ADDRESS_BOOK_QUERY + addressBookSourceId,
-                httpHeaderData );
-
-            if( parseCommonHTTPResponse( httpResponse ) ) {
+    try {
+        auto url = m_acmsEndpoint + FORWARD_SLASH + USERS_PATH + FORWARD_SLASH + getPceId() + FORWARD_SLASH +
+                   ADDRESSBOOK_PATH + GET_ADDRESS_BOOK_QUERY + addressBookSourceId;
+        for (int retry = 0; retry < HTTP_RETRY_COUNT; retry++) {
+            httpResponse = doGet(url, httpHeaderData);
+            if (parseCommonHTTPResponse(httpResponse)) {
                 validFlag = true;
                 break;
             }
         }
-        ThrowIfNot( validFlag, "httpDoGetFailed" + getHTTPErrorString( httpResponse ) );
+        ThrowIfNot(validFlag, "httpDoGetFailed" + getHTTPErrorString(httpResponse));
 
-        if( document.Parse( httpResponse.body.c_str() ).HasParseError() ) {
-            Throw( "jsonParseError" );
+        if (document.Parse(httpResponse.body.c_str()).HasParseError()) {
+            Throw("jsonParseError");
         }
 
-        auto addressBooks = document.FindMember( "addressBooks" );
-        if( addressBooks != document.MemberEnd() && addressBooks->value.IsArray() ) {
-            if( addressBooks->value.Size() >= 1 ) {
-                for( rapidjson::Value::ConstValueIterator itr = addressBooks->value.Begin(); itr != addressBooks->value.End(); itr++ ) {
-                    if( (*itr)[ "addressBookType" ].IsString() && ( strcmp( addressBookType.c_str(), (*itr)[ "addressBookType" ].GetString() ) == 0 ) ) {
-                        cloudAddressBookId = (*itr)[ "addressBookId" ].GetString();
+        auto addressBooks = document.FindMember("addressBooks");
+        if (addressBooks != document.MemberEnd() && addressBooks->value.IsArray()) {
+            if (addressBooks->value.Size() >= 1) {
+                for (rapidjson::Value::ConstValueIterator itr = addressBooks->value.Begin();
+                     itr != addressBooks->value.End();
+                     itr++) {
+                    if ((*itr)["addressBookType"].IsString() &&
+                        (strcmp(addressBookType.c_str(), (*itr)["addressBookType"].GetString()) == 0)) {
+                        cloudAddressBookId = (*itr)["addressBookId"].GetString();
                         break;
                     }
                 }
             }
         } else {
-            Throw( "addressBooksNotValid" );
+            Throw("addressBooksNotValid");
         }
         return true;
-    } catch( std::exception& ex ) {
-        AACE_ERROR( LX(TAG,"getCloudAddressBookId").d("reason", ex.what() ) );
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "getCloudAddressBookId").d("reason", ex.what()));
         return false;
     }
 }
 
-AddressBookCloudUploaderRESTAgent::HTTPResponse AddressBookCloudUploaderRESTAgent::uploadDocumentToCloud( std::shared_ptr<rapidjson::Document> document, const std::string& cloudAddressBookId  ) {
+AddressBookCloudUploaderRESTAgent::HTTPResponse AddressBookCloudUploaderRESTAgent::uploadDocumentToCloud(
+    std::shared_ptr<rapidjson::Document> document,
+    const std::string& cloudAddressBookId) {
     AddressBookCloudUploaderRESTAgent::HTTPResponse httpResponse;
 
     auto httpHeaderData = buildCommonHTTPHeader();
-    httpHeaderData.insert( httpHeaderData.end(), CONTENT_TYPE_APPLICATION_JSON );
-    
-    auto entriesJson = buildEntriesJsonString( document );
+    httpHeaderData.insert(httpHeaderData.end(), CONTENT_TYPE_APPLICATION_JSON);
 
-    for( int retryCount = 0; retryCount < HTTP_RETRY_COUNT; retryCount++ ) {
-        httpResponse = doPost(
-            ACMS_ENDPOINT + FORWARD_SLASH + USERS_PATH + FORWARD_SLASH + m_pceId + FORWARD_SLASH + ADDRESSBOOK_PATH + FORWARD_SLASH + cloudAddressBookId + FORWARD_SLASH + ENTRIES_PATH,
-            httpHeaderData, entriesJson, DEFAULT_HTTP_TIMEOUT );
+    auto entriesJson = buildEntriesJsonString(document);
 
-        switch( httpResponse.code ) {
+    auto url = m_acmsEndpoint + FORWARD_SLASH + USERS_PATH + FORWARD_SLASH + getPceId() + FORWARD_SLASH +
+               ADDRESSBOOK_PATH + FORWARD_SLASH + cloudAddressBookId + FORWARD_SLASH + ENTRIES_PATH;
+    for (int retryCount = 0; retryCount < HTTP_RETRY_COUNT; retryCount++) {
+        httpResponse = doPost(url, httpHeaderData, entriesJson, DEFAULT_HTTP_TIMEOUT);
+        switch (httpResponse.code) {
             case HTTPResponseCode::SUCCESS_OK:
                 return httpResponse;
             case HTTPResponseCode::HTTP_RESPONSE_CODE_UNDEFINED:
             case HTTPResponseCode::SUCCESS_NO_CONTENT:
             case HTTPResponseCode::REDIRECTION_START_CODE:
             case HTTPResponseCode::REDIRECTION_END_CODE:
-            case HTTPResponseCode::BAD_REQUEST:  
+            case HTTPResponseCode::BAD_REQUEST:
             case HTTPResponseCode::FORBIDDEN:
             case HTTPResponseCode::SERVER_INTERNAL_ERROR:
-                break; //Retry
+                break;  //Retry
         }
     }
 
     return httpResponse;
 }
 
-std::string AddressBookCloudUploaderRESTAgent::buildEntriesJsonString( std::shared_ptr<rapidjson::Document> document ) {
-    try {    
+std::string AddressBookCloudUploaderRESTAgent::buildEntriesJsonString(std::shared_ptr<rapidjson::Document> document) {
+    try {
         rapidjson::StringBuffer buffer;
-        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer( buffer );
+        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
 
-        document->Accept( writer );
+        document->Accept(writer);
 
-        return std::string( buffer.GetString() );
-    } catch( std::exception& ex ) {
-        AACE_ERROR( LX(TAG,"buildEntriesJsonString").d("reason", ex.what() ) );
+        return std::string(buffer.GetString());
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "buildEntriesJsonString").d("reason", ex.what()));
         return "";
     }
-
 }
 
-bool AddressBookCloudUploaderRESTAgent::parseCreateAddressBookEntryResponse( const HTTPResponse& response, std::queue<std::string>& failedEntries  ) {
+bool AddressBookCloudUploaderRESTAgent::parseCreateAddressBookEntryResponse(
+    const HTTPResponse& response,
+    std::queue<std::string>& failedEntries) {
     rapidjson::Document document;
     try {
-        if( document.Parse( response.body.c_str() ).HasParseError() ) {
-            Throw( "jsonParseError" );
+        if (document.Parse(response.body.c_str()).HasParseError()) {
+            Throw("jsonParseError");
         }
 
-        auto references = document.FindMember( "references" );
-        if( references != document.MemberEnd() && references->value.IsArray() && references->value.Size() > 0 ) {
-            for( rapidjson::Value::ConstValueIterator itr = references->value.Begin(); itr != references->value.End(); itr++ ){
-                if( (*itr)[ "status" ].IsString() ) {
-                    if( strcmp( "FAILURE", (*itr)[ "status" ].GetString() ) == 0 ) {
-                        failedEntries.push( (*itr)[ "entrySourceId" ].GetString() );
+        auto references = document.FindMember("references");
+        if (references != document.MemberEnd() && references->value.IsArray() && references->value.Size() > 0) {
+            for (rapidjson::Value::ConstValueIterator itr = references->value.Begin(); itr != references->value.End();
+                 itr++) {
+                if ((*itr)["status"].IsString()) {
+                    if (strcmp("FAILURE", (*itr)["status"].GetString()) == 0) {
+                        failedEntries.push((*itr)["entrySourceId"].GetString());
                     }
                 }
             }
         } else {
-            Throw( "referencesNotFound" );
+            Throw("referencesNotFound");
         }
         return true;
-    } catch( std::exception& ex ) {
-        AACE_ERROR( LX(TAG,"parseCreateAddressBookEntryResponse").d("reason", ex.what() ) );
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "parseCreateAddressBookEntryResponse").d("reason", ex.what()));
         return false;
     }
 }
 
-bool AddressBookCloudUploaderRESTAgent::deleteCloudAddressBook( const std::string& addressBookId ) {
+bool AddressBookCloudUploaderRESTAgent::deleteCloudAddressBook(const std::string& addressBookId) {
     AddressBookCloudUploaderRESTAgent::HTTPResponse httpResponse;
     rapidjson::Document document;
     bool validFlag = false;
 
     auto httpHeaderData = buildCommonHTTPHeader();
-    try { 
-        for( int retry = 0; retry < HTTP_RETRY_COUNT; retry++ ) {
-            httpResponse = doDelete(
-                ACMS_ENDPOINT + FORWARD_SLASH + USERS_PATH + FORWARD_SLASH + m_pceId + FORWARD_SLASH + ADDRESSBOOK_PATH + FORWARD_SLASH + addressBookId,
-                httpHeaderData );
-
-            if( parseCommonHTTPResponse( httpResponse ) ) {
+    try {
+        auto url = m_acmsEndpoint + FORWARD_SLASH + USERS_PATH + FORWARD_SLASH + getPceId() + FORWARD_SLASH +
+                   ADDRESSBOOK_PATH + FORWARD_SLASH + addressBookId;
+        for (int retry = 0; retry < HTTP_RETRY_COUNT; retry++) {
+            httpResponse = doDelete(url, httpHeaderData);
+            if (parseCommonHTTPResponse(httpResponse)) {
                 validFlag = true;
                 break;
             }
         }
-        ThrowIfNot( validFlag, "httpDoDeleteFailed" + getHTTPErrorString( httpResponse ) );
+        ThrowIfNot(validFlag, "httpDoDeleteFailed" + getHTTPErrorString(httpResponse));
         return true;
-    } catch( std::exception& ex ) {
-        AACE_ERROR( LX(TAG,"deleteCloudAddressBook").d("reason", ex.what() ) );
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "deleteCloudAddressBook").d("reason", ex.what()));
         return false;
     }
 }
 
-std::string AddressBookCloudUploaderRESTAgent::buildFailedEntriesJson( std::queue<std::string>& failedList ) {
+std::string AddressBookCloudUploaderRESTAgent::buildFailedEntriesJson(std::queue<std::string>& failedList) {
     rapidjson::Document document;
     document.SetObject();
 
@@ -523,26 +566,37 @@ std::string AddressBookCloudUploaderRESTAgent::buildFailedEntriesJson( std::queu
     rapidjson::Value failedContact;
     failedContact.SetObject();
 
-    while( !failedList.empty() ) {
+    while (!failedList.empty()) {
         auto tempContact = failedList.front();
         failedList.pop();
 
-        failedContact.AddMember( "id", rapidjson::Value().SetString( tempContact.c_str(), tempContact.length() ), document.GetAllocator() );
-        failedContact.AddMember( "reason", "Failed to Upload", document.GetAllocator() );
+        failedContact.AddMember(
+            "id", rapidjson::Value().SetString(tempContact.c_str(), tempContact.length()), document.GetAllocator());
+        failedContact.AddMember("reason", "Failed to Upload", document.GetAllocator());
 
-        failedContacts.PushBack( failedContact, document.GetAllocator() );
+        failedContacts.PushBack(failedContact, document.GetAllocator());
     }
 
-    document.AddMember( "failedContact", failedContacts, document.GetAllocator() );
+    document.AddMember("failedContact", failedContacts, document.GetAllocator());
 
     // create event string
     rapidjson::StringBuffer buffer;
     rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
 
     document.Accept(writer);
-    return( std::string( buffer.GetString() ) );
+    return (std::string(buffer.GetString()));
 }
 
-} // aace::engine::addressBook
-} // aace::engine
-} // aace
+void AddressBookCloudUploaderRESTAgent::setPceId(const std::string& pceId) {
+    std::lock_guard<std::mutex> guard(m_pceIdMutex);
+    m_pceId = pceId;
+}
+
+std::string AddressBookCloudUploaderRESTAgent::getPceId() {
+    std::lock_guard<std::mutex> guard(m_pceIdMutex);
+    return m_pceId;
+}
+
+}  // namespace addressBook
+}  // namespace engine
+}  // namespace aace

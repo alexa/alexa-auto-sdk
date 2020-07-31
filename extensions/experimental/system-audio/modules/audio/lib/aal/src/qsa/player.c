@@ -15,103 +15,127 @@
 
 #include "core.h"
 
-static aal_handle_t qsa_player_create(const aal_attributes_t *attrs, aal_audio_parameters_t *params)
-{
-	if (attrs->uri && !IS_EMPTY_STRING(attrs->uri)) {
-		debug("URI is not supported, stream only");
-		return NULL;
-	}
-	return qsa_create_context(SND_PCM_CHANNEL_PLAYBACK, attrs, params);
+static aal_handle_t qsa_player_create(const aal_attributes_t* attrs, aal_audio_parameters_t* params) {
+    if (attrs->uri && !IS_EMPTY_STRING(attrs->uri)) {
+        debug("URI is not supported, stream only");
+        return NULL;
+    }
+    return qsa_create_context(SND_PCM_CHANNEL_PLAYBACK, attrs, params);
 }
 
-static void qsa_player_pause(aal_handle_t handle)
-{
-	aal_qsa_context_t *ctx = (aal_qsa_context_t *) handle;
+static void qsa_player_pause(aal_handle_t handle) {
+    aal_qsa_context_t* ctx = (aal_qsa_context_t*)handle;
 
-	debug("Request pause");
-	pthread_mutex_lock(&ctx->lock);
-	ctx->stop_requested = true;
-	pthread_mutex_unlock(&ctx->lock);
+    debug("Request pause");
+    pthread_mutex_lock(&ctx->lock);
+    ctx->stop_requested = true;
+    pthread_mutex_unlock(&ctx->lock);
 }
 
-int64_t qsa_player_get_position(aal_handle_t handle)
-{
-	aal_qsa_context_t *ctx = (aal_qsa_context_t *) handle;
+int64_t qsa_player_get_position(aal_handle_t handle) {
+    aal_qsa_context_t* ctx = (aal_qsa_context_t*)handle;
 
-	pthread_mutex_lock(&ctx->lock);
-	struct timeval stime = ctx->status.stime;
-	pthread_mutex_unlock(&ctx->lock);
+    pthread_mutex_lock(&ctx->lock);
+    struct timeval stime = ctx->status.stime;
+    pthread_mutex_unlock(&ctx->lock);
 
-	struct timeval now;
-	gettimeofday(&now, NULL);
+    struct timeval now;
+    gettimeofday(&now, NULL);
 
-	int64_t seconds = (now.tv_sec - stime.tv_sec);
-	int64_t micros = (seconds * 1000000 + now.tv_usec - stime.tv_usec);
+    int64_t seconds = (now.tv_sec - stime.tv_sec);
+    int64_t micros = (seconds * 1000000 + now.tv_usec - stime.tv_usec);
 
-	debug("qsa_player_get_position = %d", micros);
-	return micros / 1000;
+    debug("qsa_player_get_position = %d", micros);
+    return micros / 1000;
 }
 
-int64_t qsa_player_get_duration(aal_handle_t handle)
-{
-	debug("player_get_duration not supported");
-	return -1;
+int64_t qsa_player_get_duration(aal_handle_t handle) {
+    debug("player_get_duration not supported");
+    return -1;
 }
 
-int64_t qsa_player_get_num_bytes_buffered(aal_handle_t handle)
-{
-	aal_qsa_context_t *ctx = (aal_qsa_context_t *) handle;
+int64_t qsa_player_get_num_bytes_buffered(aal_handle_t handle) {
+    aal_qsa_context_t* ctx = (aal_qsa_context_t*)handle;
 
-	pthread_mutex_lock(&ctx->lock);
-	int32_t count = ctx->status.count;
-	pthread_mutex_unlock(&ctx->lock);
-	debug("qsa_player_get_num_bytes_buffered = %d", count);
+    pthread_mutex_lock(&ctx->lock);
+    int32_t count = ctx->status.count;
+    pthread_mutex_unlock(&ctx->lock);
+    debug("qsa_player_get_num_bytes_buffered = %d", count);
 
-	return count;
+    return count;
 }
 
-void qsa_player_seek(aal_handle_t handle, int64_t position)
-{
-	debug("player_seek not supported");
+void qsa_player_seek(aal_handle_t handle, int64_t position) {
+    debug("player_seek not supported");
 }
 
-void qsa_player_set_volume(aal_handle_t handle, double volume)
-{
-	debug("player_set_volume not supported");
+static bool player_set_volume(aal_qsa_context_t* ctx, double volume) {
+    int r;
+
+    r = snd_mixer_group_read(ctx->mixer_handle, &ctx->mixer_group);
+    bail_if_error(r);
+
+    uint32_t target_volume = ctx->mixer_group.min + (uint32_t)((ctx->mixer_group.max - ctx->mixer_group.min) * volume);
+
+    ctx->mixer_group.volume.names.front_left = target_volume;
+    ctx->mixer_group.volume.names.front_right = target_volume;
+    ctx->mixer_group.volume.names.front_center = target_volume;
+    ctx->mixer_group.volume.names.rear_left = target_volume;
+    ctx->mixer_group.volume.names.rear_right = target_volume;
+    ctx->mixer_group.volume.names.woofer = target_volume;
+
+    r = snd_mixer_group_write(ctx->mixer_handle, &ctx->mixer_group);
+    bail_if_error(r);
+    return true;
+
+bail:
+    debug("failed to set volume");
+    return false;
 }
 
-void qsa_player_set_mute(aal_handle_t handle, bool mute)
-{
-	debug("player_set_mute not supported");
+void qsa_player_set_volume(aal_handle_t handle, double volume) {
+    aal_qsa_context_t* ctx = (aal_qsa_context_t*)handle;
+
+    if (player_set_volume(ctx, volume)) {
+        ctx->saved_volume = volume;
+    }
 }
 
-static ssize_t qsa_player_write(aal_handle_t handle, const char *data, const size_t size)
-{
-	aal_qsa_context_t *ctx = (aal_qsa_context_t *) handle;
-	ssize_t written;
+void qsa_player_set_mute(aal_handle_t handle, bool mute) {
+    aal_qsa_context_t* ctx = (aal_qsa_context_t*)handle;
 
-	debug("Write %ld bytes into buffer", size);
-	pthread_mutex_lock(&ctx->lock);
-	/* All or nothing */
-	if (ringbuf_bytes_free(ctx->write_buffer) < size) {
-		debug("Not enough space for write buffer");
-		written = 0;
-	} else {
-		ringbuf_memcpy_into(ctx->write_buffer, data, size);
-		written = size;
-	}
-	pthread_mutex_unlock(&ctx->lock);
-
-	return written;
+    if (mute) {
+        player_set_volume(ctx, 0.0);
+    } else {
+        player_set_volume(ctx, ctx->saved_volume);
+    }
 }
 
-static void qsa_player_notify_end_of_stream(aal_handle_t handle)
-{
-	aal_qsa_context_t *ctx = (aal_qsa_context_t *) handle;
+static ssize_t qsa_player_write(aal_handle_t handle, const char* data, const size_t size) {
+    aal_qsa_context_t* ctx = (aal_qsa_context_t*)handle;
+    ssize_t written;
 
-	pthread_mutex_lock(&ctx->lock);
-	ctx->eos = true;
-	pthread_mutex_unlock(&ctx->lock);
+    debug("Write %ld bytes into buffer", size);
+    pthread_mutex_lock(&ctx->lock);
+    /* All or nothing */
+    if (ringbuf_bytes_free(ctx->write_buffer) < size) {
+        debug("Not enough space for write buffer");
+        written = 0;
+    } else {
+        ringbuf_memcpy_into(ctx->write_buffer, data, size);
+        written = size;
+    }
+    pthread_mutex_unlock(&ctx->lock);
+
+    return written;
+}
+
+static void qsa_player_notify_end_of_stream(aal_handle_t handle) {
+    aal_qsa_context_t* ctx = (aal_qsa_context_t*)handle;
+
+    pthread_mutex_lock(&ctx->lock);
+    ctx->eos = true;
+    pthread_mutex_unlock(&ctx->lock);
 }
 
 // clang-format off

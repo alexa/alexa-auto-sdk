@@ -24,10 +24,12 @@ import com.amazon.sampleapp.R;
 public class ViewHolderCBLExpiredCard extends RecyclerView.ViewHolder {
     private final TextView mMessage;
 
-    public ViewHolderCBLExpiredCard( View v ) {
+    public ViewHolderCBLExpiredCard(View v) {
         super(v);
-        mMessage = v.findViewById( R.id.message );
+        mMessage = v.findViewById(R.id.message);
     }
 
-    public void setMessage( String message ) { mMessage.setText( message ); }
+    public void setMessage(String message) {
+        mMessage.setText(message);
+    }
 }

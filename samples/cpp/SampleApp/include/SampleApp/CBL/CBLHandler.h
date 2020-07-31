@@ -23,7 +23,7 @@
 
 namespace sampleApp {
 
-class ApplicationContext; // forward declare
+class ApplicationContext;  // forward declare
 
 namespace cbl {
 
@@ -34,15 +34,16 @@ namespace cbl {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class CBLHandler : public aace::cbl::CBL /* isa PlatformInterface */ {
-  private:
+private:
     std::weak_ptr<Activity> m_activity{};
     std::weak_ptr<logger::LoggerHandler> m_loggerHandler{};
 
-  protected:
+protected:
     CBLHandler(std::weak_ptr<Activity> activity, std::weak_ptr<logger::LoggerHandler> loggerHandler);
 
-  public:
-    template <typename... Args> static auto create(Args &&... args) -> std::shared_ptr<CBLHandler> {
+public:
+    template <typename... Args>
+    static auto create(Args&&... args) -> std::shared_ptr<CBLHandler> {
         return std::shared_ptr<CBLHandler>(new CBLHandler(args...));
     }
     auto getActivity() -> std::weak_ptr<Activity>;
@@ -50,25 +51,26 @@ class CBLHandler : public aace::cbl::CBL /* isa PlatformInterface */ {
 
     // aace::cbl::CBL interface
 
-    auto cblStateChanged(CBLState state, CBLStateChangedReason reason, const std::string &url, const std::string &code) -> void override;
+    auto cblStateChanged(CBLState state, CBLStateChangedReason reason, const std::string& url, const std::string& code)
+        -> void override;
     auto clearRefreshToken() -> void override;
-    auto setUserProfile( const std::string& name, const std::string& email ) -> void override;
+    auto setUserProfile(const std::string& name, const std::string& email) -> void override;
 
-  private:
+private:
     auto getRefreshToken() -> std::string override;
-    auto setRefreshToken(const std::string &refreshToken) -> void override;
+    auto setRefreshToken(const std::string& refreshToken) -> void override;
 
-  private:
+private:
     std::shared_ptr<ApplicationContext> m_applicationContext{};
     std::weak_ptr<View> m_console{};
     bool m_busy{};
 
-    auto log(logger::LoggerHandler::Level level, const std::string &message) -> void;
-    auto showMessage(const std::string &message) -> void;
+    auto log(logger::LoggerHandler::Level level, const std::string& message) -> void;
+    auto showMessage(const std::string& message) -> void;
     auto setupUI() -> void;
 };
 
-} // namespace cbl
-} // namespace sampleApp
+}  // namespace cbl
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_CBL_CBLHANDLER_H
+#endif  // SAMPLEAPP_CBL_CBLHANDLER_H

@@ -14,6 +14,7 @@
  */
 
 #include "AACE/Engine/CarControl/PowerController.h"
+
 #include "AACE/Engine/Core/EngineMacros.h"
 
 namespace aace {

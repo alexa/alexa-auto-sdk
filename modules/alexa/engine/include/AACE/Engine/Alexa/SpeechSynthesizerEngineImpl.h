@@ -43,7 +43,7 @@ namespace alexa {
 
 class SpeechSynthesizerEngineImpl : public AudioChannelEngineImpl {
 private:
-    SpeechSynthesizerEngineImpl( std::shared_ptr<aace::alexa::SpeechSynthesizer> speechSynthesizerPlatformInterface );
+    SpeechSynthesizerEngineImpl(std::shared_ptr<aace::alexa::SpeechSynthesizer> speechSynthesizerPlatformInterface);
 
     bool initialize(
         std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> audioOutputChannel,
@@ -56,7 +56,7 @@ private:
         std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender );
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender);
 
 public:
     static std::shared_ptr<SpeechSynthesizerEngineImpl> create(
@@ -71,23 +71,28 @@ public:
         std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender );
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender);
+
+    std::shared_ptr<alexaClientSDK::capabilityAgents::speechSynthesizer::SpeechSynthesizer>
+    getSpeechSynthesizerCapabilityAgent() {
+        return m_speechSynthesizerCapabilityAgent;
+    }
 
 protected:
     virtual void doShutdown() override;
-    
-    void handlePrePlaybackStarted( SourceId id ) override;
-    void handlePrePlaybackFinished( SourceId id ) override;
+
+    void handlePrePlaybackStarted(SourceId id) override;
+    void handlePrePlaybackFinished(SourceId id) override;
 
 private:
     std::shared_ptr<aace::alexa::SpeechSynthesizer> m_speechSynthesizerPlatformInterface;
-    std::shared_ptr<alexaClientSDK::capabilityAgents::speechSynthesizer::SpeechSynthesizer> m_speechSynthesizerCapabilityAgent;
+    std::shared_ptr<alexaClientSDK::capabilityAgents::speechSynthesizer::SpeechSynthesizer>
+        m_speechSynthesizerCapabilityAgent;
     std::weak_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> m_directiveSequencer;
 };
 
-} // aace::engine::alexa
-} // aace::engine
-} // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_ALEXA_SPEECH_SYNTHESIZER_ENGINE_IMPL_H
-
+#endif  // AACE_ENGINE_ALEXA_SPEECH_SYNTHESIZER_ENGINE_IMPL_H

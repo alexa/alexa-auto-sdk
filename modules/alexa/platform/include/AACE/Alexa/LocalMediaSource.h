@@ -96,7 +96,7 @@ public:
         */
         PRESET
     };
-    
+
     /// @sa ExternalMediaAdapterState
     using PlayControlType = ExternalMediaAdapter::PlayControlType;
     using MutedState = ExternalMediaAdapter::MutedState;
@@ -146,11 +146,11 @@ public:
 
         /// Array of content selector types supported by the player
         std::vector<ContentSelector> supportedContentSelectors;
-        
+
         /// The only spiVersion that currently exists is "1.0"
         std::string spiVersion;
     };
-    
+
     /**
      * struct that encapsulates a players playback state.
      */
@@ -254,7 +254,7 @@ public:
     };
 
 protected:
-    LocalMediaSource( Source source );
+    LocalMediaSource(Source source);
 
 public:
     virtual ~LocalMediaSource();
@@ -269,7 +269,7 @@ public:
      * @return @c true if the platform implementation successfully handled the call, 
      * else @c false
      */
-    virtual bool play( ContentSelector contentSelectorType, const std::string& payload ) = 0;
+    virtual bool play(ContentSelector contentSelectorType, const std::string& payload) = 0;
 
     /**
      * Occurs during playback control via voice interaction or PlaybackController interface
@@ -281,7 +281,7 @@ public:
      *
      * @sa PlaybackController
      */
-    virtual bool playControl( PlayControlType controlType ) = 0;
+    virtual bool playControl(PlayControlType controlType) = 0;
 
     /**
      * Called when the user invokes media seek via speech.
@@ -291,7 +291,7 @@ public:
      * @return @c true if the platform implementation successfully handled the call, 
      * else @c false
      */
-    virtual bool seek( std::chrono::milliseconds offset ) = 0;
+    virtual bool seek(std::chrono::milliseconds offset) = 0;
 
     /**
      * Called when the user invokes media seek adjustment via speech.
@@ -301,13 +301,13 @@ public:
      * @return @c true if the platform implementation successfully handled the call, 
      * else @c false
      */
-    virtual bool adjustSeek( std::chrono::milliseconds deltaOffset ) = 0;
+    virtual bool adjustSeek(std::chrono::milliseconds deltaOffset) = 0;
 
     /**
      * Must provide the local media source @PlaybackState, and @SessionState information to maintain cloud sync
      */
     virtual LocalMediaSourceState getState() = 0;
-    
+
     /**
      * Notifies the platform implementation to set the volume of the output channel. The
      * @c volume value should be scaled to fit the needs of the platform.
@@ -317,7 +317,7 @@ public:
      * @return @c true if the platform implementation successfully handled the call, 
      * else @c false
      */
-    virtual bool volumeChanged( float volume ) = 0;
+    virtual bool volumeChanged(float volume) = 0;
 
     /**
      * Notifies the platform implementation to apply a muted state has changed for
@@ -328,13 +328,13 @@ public:
      * @return @c true if the platform implementation successfully handled the call, 
      * else @c false
      */
-    virtual bool mutedStateChanged( MutedState state ) = 0;
+    virtual bool mutedStateChanged(MutedState state) = 0;
 
     /**
      * Return the source type the interface registered with
      */
     Source getSource();
-    
+
     // LocalMediaSourceEngineInterface
 
     /**
@@ -342,7 +342,7 @@ public:
      *
      * @param [in] eventName Canonical event name
      */
-    void playerEvent( const std::string& eventName );
+    void playerEvent(const std::string& eventName);
 
     /**
      * Should be called on a local media source player error.
@@ -355,12 +355,12 @@ public:
      *
      * @param [in] fatal true if the error is fatal
      */
-    void playerError( const std::string& errorName, long code, const std::string& description, bool fatal );
+    void playerError(const std::string& errorName, long code, const std::string& description, bool fatal);
 
     /**
      * Should be called on local media source player events. This will switch the media focus to that context.
      */
-    void setFocus( bool focusAcquire = true );
+    void setFocus(bool focusAcquire = true);
 
     /**
      * @internal
@@ -368,13 +368,13 @@ public:
      *
      * Should *never* be called by the platform implementation.
      */
-    void setEngineInterface( std::shared_ptr<aace::alexa::LocalMediaSourceEngineInterface> localMediaSourceEngineInterface );
+    void setEngineInterface(
+        std::shared_ptr<aace::alexa::LocalMediaSourceEngineInterface> localMediaSourceEngineInterface);
 
 private:
     std::weak_ptr<aace::alexa::LocalMediaSourceEngineInterface> m_localMediaSourceEngineInterface;
-    
-    Source m_source;
 
+    Source m_source;
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const LocalMediaSource::Source& source) {
@@ -424,8 +424,8 @@ inline std::ostream& operator<<(std::ostream& stream, const LocalMediaSource::Co
     }
     return stream;
 }
-    
-} // aace::alexa
-} // aace
 
-#endif // AACE_ALEXA_LOCAL_MEDIA_SOURCE_H
+}  // namespace alexa
+}  // namespace aace
+
+#endif  // AACE_ALEXA_LOCAL_MEDIA_SOURCE_H

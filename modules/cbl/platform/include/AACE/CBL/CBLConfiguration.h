@@ -23,7 +23,7 @@
 namespace aace {
 namespace cbl {
 namespace config {
- 
+
 /**
  * The @c CBLConfiguration class is a factory interface for creating CBL service configuration objects.
  */
@@ -46,7 +46,7 @@ public:
      * 
      * The default configuration of 60 seconds will be overriden with this value when configured.
      */
-    static std::shared_ptr<aace::core::config::EngineConfiguration> createCBLConfig( const int seconds );
+    static std::shared_ptr<aace::core::config::EngineConfiguration> createCBLConfig(const int seconds);
 
     /**
      * Factory method used to programmatically generate cbl configuration data.
@@ -63,11 +63,11 @@ public:
      *
      * @param [in] enableUserProfile Enable functionality to request user profile
      */
-    static std::shared_ptr<aace::core::config::EngineConfiguration> createCBLUserProfileConfig( bool enableUserProfile );
+    static std::shared_ptr<aace::core::config::EngineConfiguration> createCBLUserProfileConfig(bool enableUserProfile);
 };
 
-} // aace::cbl::config
-} // aace::cbl
-} // aace
+}  // namespace config
+}  // namespace cbl
+}  // namespace aace
 
 #endif

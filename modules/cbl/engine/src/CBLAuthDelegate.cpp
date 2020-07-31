@@ -161,10 +161,9 @@ static AuthObserverInterface::Error getErrorCode(const std::string& error) {
             if (it != g_nameToErrorMap.end()) {
                 return it->second;
             }
-            Throw( "unknowError" );
+            Throw("unknowError");
         }
-    }
-    catch( std::exception& ex ) {
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return AuthObserverInterface::Error::UNKNOWN_ERROR;
     }
@@ -239,18 +238,17 @@ static AuthObserverInterface::Error mapHTTPCodeToError(long code) {
 AuthObserverInterface::Error parseLWAResponse(
     const alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse& response,
     rapidjson::Document* document) {
-
     try {
-        ThrowIfNull( document, "nullDocument" );
+        ThrowIfNull(document, "nullDocument");
 
         auto result = mapHTTPCodeToError(response.code);
 
         if (document->Parse(response.body.c_str()).HasParseError()) {
             AACE_ERROR(LX(TAG)
-                .d("reason", "parseJsonFailed")
-                .d("position", document->GetErrorOffset())
-                .d("error", GetParseError_En(document->GetParseError()))
-                .sensitive("body", response.body));
+                           .d("reason", "parseJsonFailed")
+                           .d("position", document->GetErrorOffset())
+                           .d("error", GetParseError_En(document->GetParseError()))
+                           .sensitive("body", response.body));
             if (AuthObserverInterface::Error::SUCCESS == result) {
                 result = AuthObserverInterface::Error::UNKNOWN_ERROR;
             }
@@ -270,8 +268,7 @@ AuthObserverInterface::Error parseLWAResponse(
         }
 
         return result;
-    }
-    catch( std::exception& ex ) {
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return AuthObserverInterface::Error::INTERNAL_ERROR;
     }
@@ -281,19 +278,18 @@ std::shared_ptr<CBLAuthDelegate> CBLAuthDelegate::create(
     std::shared_ptr<CustomerDataManager> customerDataManager,
     std::shared_ptr<CBLAuthDelegateConfiguration> configuration,
     std::shared_ptr<CBLAuthRequesterInterface> cblAuthRequester,
-    bool enableUserProfile ) {
-
+    bool enableUserProfile) {
     try {
         AACE_DEBUG(LX(TAG));
 
-        ThrowIfNull( customerDataManager, "nullDataManager" );
-        ThrowIfNull( configuration, "nullCBLAuthDelegateConfiguration");
-        ThrowIfNull( cblAuthRequester, "nullCBLAuthRequester");
+        ThrowIfNull(customerDataManager, "nullDataManager");
+        ThrowIfNull(configuration, "nullCBLAuthDelegateConfiguration");
+        ThrowIfNull(cblAuthRequester, "nullCBLAuthRequester");
 
-        std::shared_ptr<CBLAuthDelegate> cblAuthDelegate = std::shared_ptr<CBLAuthDelegate>( new CBLAuthDelegate( customerDataManager, configuration, cblAuthRequester, enableUserProfile ) );
+        std::shared_ptr<CBLAuthDelegate> cblAuthDelegate = std::shared_ptr<CBLAuthDelegate>(
+            new CBLAuthDelegate(customerDataManager, configuration, cblAuthRequester, enableUserProfile));
         return cblAuthDelegate;
-    } 
-    catch( std::exception& ex ) {
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return nullptr;
     }
@@ -309,14 +305,13 @@ void CBLAuthDelegate::addAuthObserver(std::shared_ptr<AuthObserverInterface> obs
         AACE_DEBUG(LX(TAG).d("observer", observer.get()));
 
         std::lock_guard<std::mutex> lock(m_mutex);
-        ThrowIfNull( observer, "nullObserver" );
+        ThrowIfNull(observer, "nullObserver");
 
-        if( m_observers.insert(observer).second == false ) {
-            Throw( "observerAlreadyAdded");
+        if (m_observers.insert(observer).second == false) {
+            Throw("observerAlreadyAdded");
         }
         observer->onAuthStateChange(m_authState, m_authError);
-    }
-    catch( std::exception& ex ) {
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
     }
 }
@@ -325,13 +320,12 @@ void CBLAuthDelegate::removeAuthObserver(std::shared_ptr<AuthObserverInterface> 
     try {
         AACE_DEBUG(LX(TAG).d("observer", observer.get()));
 
-        ThrowIfNull( observer, "nullObserver");
+        ThrowIfNull(observer, "nullObserver");
 
-        if( m_observers.erase(observer) == 0 ) {
-            Throw( "observerNotAdded");
+        if (m_observers.erase(observer) == 0) {
+            Throw("observerNotAdded");
         }
-    }
-    catch( std::exception& ex ) {
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
     }
 }
@@ -341,7 +335,7 @@ std::string CBLAuthDelegate::getAuthToken() {
 }
 
 void CBLAuthDelegate::onAuthFailure(const std::string& token) {
-    AACE_DEBUG(LX(TAG).sensitive("token",token));
+    AACE_DEBUG(LX(TAG).sensitive("token", token));
     std::lock_guard<std::mutex> lock(m_mutex);
     if (token.empty() || token == m_accessToken) {
         m_authFailureReported = true;
@@ -351,7 +345,7 @@ void CBLAuthDelegate::onAuthFailure(const std::string& token) {
 
 void CBLAuthDelegate::clearData() {
     AACE_DEBUG(LX(TAG));
-    stop( true );
+    stop(true);
     m_cblAuthRequester->clearRefreshToken();
 }
 
@@ -359,7 +353,7 @@ CBLAuthDelegate::CBLAuthDelegate(
     std::shared_ptr<CustomerDataManager> customerDataManager,
     std::shared_ptr<CBLAuthDelegateConfiguration> configuration,
     std::shared_ptr<CBLAuthRequesterInterface> cblAuthRequester,
-    bool enableUserProfile ) :
+    bool enableUserProfile) :
         CustomerDataHandler{customerDataManager},
         m_cblAuthRequester{cblAuthRequester},
         m_configuration{configuration},
@@ -373,52 +367,45 @@ CBLAuthDelegate::CBLAuthDelegate(
         m_threadActive{false},
         m_stateChangeReason{CBLAuthRequesterInterface::CBLStateChangedReason::NONE},
         m_enableUserProfile{enableUserProfile} {
-        
     AACE_DEBUG(LX(TAG));
 
-    if( m_enableUserProfile ) {
+    if (m_enableUserProfile) {
         m_scope = POST_VALUE_ALEXA_ALL + " profile";
     } else {
         m_scope = POST_VALUE_ALEXA_ALL;
     }
 }
 
-void CBLAuthDelegate::start( bool explicitAuthorizationRequest )
-{
-    try
-    {
-        AACE_DEBUG(LX(TAG).d("explicitAuthorizationRequest",explicitAuthorizationRequest));
+void CBLAuthDelegate::start(bool explicitAuthorizationRequest) {
+    try {
+        AACE_DEBUG(LX(TAG).d("explicitAuthorizationRequest", explicitAuthorizationRequest));
 
-        std::lock_guard<std::mutex> lock( m_mutex );
-        
+        std::lock_guard<std::mutex> lock(m_mutex);
+
         // don't need to start the authorization flow if the client is already authorized, or the
         // request is implicit and the refresh token is invalid (empty)
-        if( m_authState != AuthObserverInterface::State::REFRESHED && (explicitAuthorizationRequest || m_cblAuthRequester->getRefreshToken().empty() == false) )
-        {
-            if( m_threadActive == false )
-            {
+        if (m_authState != AuthObserverInterface::State::REFRESHED &&
+            (explicitAuthorizationRequest || m_cblAuthRequester->getRefreshToken().empty() == false)) {
+            if (m_threadActive == false) {
                 m_isStopping = false;
                 m_explicitAuthorizationRequest = explicitAuthorizationRequest;
 
-                if( m_authorizationFlowThread.joinable() ) {
+                if (m_authorizationFlowThread.joinable()) {
                     m_authorizationFlowThread.join();
                 }
-                
+
                 m_threadActive = true;
-                m_authorizationFlowThread = std::thread( &CBLAuthDelegate::handleAuthorizationFlow, this );
+                m_authorizationFlowThread = std::thread(&CBLAuthDelegate::handleAuthorizationFlow, this);
             }
         }
-    }
-    catch( std::exception& ex ) {
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
     }
 }
 
-void CBLAuthDelegate::stop( bool reset )
-{
-    try
-    {
-        AACE_DEBUG(LX(TAG).d("reset",reset));
+void CBLAuthDelegate::stop(bool reset) {
+    try {
+        AACE_DEBUG(LX(TAG).d("reset", reset));
         /* auto nextState = */ handleStopping();
 
         m_wake.notify_one();
@@ -427,13 +414,12 @@ void CBLAuthDelegate::stop( bool reset )
         }
 
         m_threadActive = false;
-        if( reset ) {
+        if (reset) {
             m_accessToken.clear();
             clearRefreshToken();
             setAuthState(AuthObserverInterface::State::UNINITIALIZED);
         }
-    }
-    catch( std::exception& ex ) {
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
     }
 }
@@ -466,33 +452,35 @@ void CBLAuthDelegate::handleAuthorizationFlow() {
 }
 
 alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse CBLAuthDelegate::doPost(
-        const std::string& url,
-        const std::vector<std::string> headerLines,
-        const std::vector<std::pair<std::string, std::string>>& data,
-        std::chrono::seconds timeout) {
+    const std::string& url,
+    const std::vector<std::string> headerLines,
+    const std::vector<std::pair<std::string, std::string>>& data,
+    std::chrono::seconds timeout) {
     try {
         // Creating the HttpPost on every doPost is by design to ensure that curl in libcurlUtils uses the
         // latest provided curl options.
         auto httpPost = HttpPost::create();
-        ThrowIfNull( httpPost, "nullHttpPost" );
+        ThrowIfNull(httpPost, "nullHttpPost");
 
-        return httpPost->doPost( url, headerLines, data, timeout );
-    } catch( std::exception& ex ) {
-        AACE_ERROR( LX(TAG).d("reason", ex.what() ) );
+        return httpPost->doPost(url, headerLines, data, timeout);
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse();
     }
 }
 
-alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse CBLAuthDelegate::doGet( const std::string& url, const std::vector<std::string>& headers ) {
+alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse CBLAuthDelegate::doGet(
+    const std::string& url,
+    const std::vector<std::string>& headers) {
     try {
         // Creating the HttpGet on every doGet is by design to ensure that curl in libcurlUtils uses the
         // latest provided curl options.
         auto httpGet = alexaClientSDK::avsCommon::utils::libcurlUtils::HttpGet::create();
-        ThrowIfNull( httpGet, "nullHttpGet" );
+        ThrowIfNull(httpGet, "nullHttpGet");
 
-        return httpGet->doGet( url, headers, m_configuration->getRequestTimeout() );
-    } catch( std::exception& ex ) {
-        AACE_ERROR( LX(TAG).d("reason", ex.what() ) );
+        return httpGet->doGet(url, headers, m_configuration->getRequestTimeout());
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse();
     }
 }
@@ -500,13 +488,13 @@ alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse CBLAuthDelegate::do
 CBLAuthDelegate::FlowState CBLAuthDelegate::handleStarting() {
     try {
         AACE_DEBUG(LX(TAG));
-        m_cblAuthRequester->cblStateChanged(CBLAuthRequesterInterface::CBLState::STARTING, CBLAuthRequesterInterface::CBLStateChangedReason::NONE);
-        if( m_cblAuthRequester->getRefreshToken() != std::string() ) {
+        m_cblAuthRequester->cblStateChanged(
+            CBLAuthRequesterInterface::CBLState::STARTING, CBLAuthRequesterInterface::CBLStateChangedReason::NONE);
+        if (m_cblAuthRequester->getRefreshToken() != std::string()) {
             return FlowState::REFRESHING_TOKEN;
         }
         return FlowState::REQUESTING_CODE_PAIR;
-    }
-    catch( std::exception& ex ) {
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return FlowState::STOPPING;
     }
@@ -515,12 +503,14 @@ CBLAuthDelegate::FlowState CBLAuthDelegate::handleStarting() {
 CBLAuthDelegate::FlowState CBLAuthDelegate::handleRequestingCodePair() {
     try {
         AACE_DEBUG(LX(TAG));
-        m_cblAuthRequester->cblStateChanged(CBLAuthRequesterInterface::CBLState::REQUESTING_CODE_PAIR, CBLAuthRequesterInterface::CBLStateChangedReason::SUCCESS);
+        m_cblAuthRequester->cblStateChanged(
+            CBLAuthRequesterInterface::CBLState::REQUESTING_CODE_PAIR,
+            CBLAuthRequesterInterface::CBLStateChangedReason::SUCCESS);
 
         m_retryCount = 0;
-        std::chrono::steady_clock::time_point codePairRequestTimeout = std::chrono::steady_clock::now() + m_configuration->getCodePairRequestTimeout();
+        std::chrono::steady_clock::time_point codePairRequestTimeout =
+            std::chrono::steady_clock::now() + m_configuration->getCodePairRequestTimeout();
         while (!isStopping()) {
-
             if (std::chrono::steady_clock::now() >= codePairRequestTimeout) {
                 m_stateChangeReason = CBLAuthRequesterInterface::CBLStateChangedReason::TIMEOUT;
                 return FlowState::STOPPING;
@@ -556,8 +546,7 @@ CBLAuthDelegate::FlowState CBLAuthDelegate::handleRequestingCodePair() {
 
         m_stateChangeReason = CBLAuthRequesterInterface::CBLStateChangedReason::SUCCESS;
         return FlowState::STOPPING;
-    }
-    catch( std::exception& ex ) {
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return FlowState::STOPPING;
     }
@@ -566,7 +555,9 @@ CBLAuthDelegate::FlowState CBLAuthDelegate::handleRequestingCodePair() {
 CBLAuthDelegate::FlowState CBLAuthDelegate::handleRequestingToken() {
     try {
         AACE_DEBUG(LX(TAG));
-        m_cblAuthRequester->cblStateChanged(CBLAuthRequesterInterface::CBLState::REQUESTING_TOKEN, CBLAuthRequesterInterface::CBLStateChangedReason::NONE);
+        m_cblAuthRequester->cblStateChanged(
+            CBLAuthRequesterInterface::CBLState::REQUESTING_TOKEN,
+            CBLAuthRequesterInterface::CBLStateChangedReason::NONE);
 
         auto interval = MIN_TOKEN_REQUEST_INTERVAL;
 
@@ -580,7 +571,7 @@ CBLAuthDelegate::FlowState CBLAuthDelegate::handleRequestingToken() {
             auto result = receiveTokenResponse(requestToken(), true);
             switch (result) {
                 case AuthObserverInterface::Error::SUCCESS:
-                    if(m_enableUserProfile) {
+                    if (m_enableUserProfile) {
                         handleRequestingUserProfile();
                     }
                     m_newRefreshToken = true;
@@ -595,15 +586,12 @@ CBLAuthDelegate::FlowState CBLAuthDelegate::handleRequestingToken() {
                     interval = std::min(interval * TOKEN_REQUEST_SLOW_DOWN_FACTOR, MAX_TOKEN_REQUEST_INTERVAL);
                     break;
                 case AuthObserverInterface::Error::AUTHORIZATION_EXPIRED:
-                    if( m_explicitAuthorizationRequest )
-                    {
+                    if (m_explicitAuthorizationRequest) {
                         // we don't want to loop continuosly in code pair requesting state
                         // so reset the explicit authorization request flag
                         m_explicitAuthorizationRequest = false;
                         return FlowState::REQUESTING_CODE_PAIR;
-                    }
-                    else
-                    {
+                    } else {
                         setAuthState(AuthObserverInterface::State::UNRECOVERABLE_ERROR);
                         m_stateChangeReason = CBLAuthRequesterInterface::CBLStateChangedReason::AUTHORIZATION_EXPIRED;
                         return FlowState::STOPPING;
@@ -628,8 +616,7 @@ CBLAuthDelegate::FlowState CBLAuthDelegate::handleRequestingToken() {
 
         m_stateChangeReason = CBLAuthRequesterInterface::CBLStateChangedReason::SUCCESS;
         return FlowState::STOPPING;
-    }
-    catch( std::exception& ex ) {
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return FlowState::STOPPING;
     }
@@ -638,7 +625,9 @@ CBLAuthDelegate::FlowState CBLAuthDelegate::handleRequestingToken() {
 CBLAuthDelegate::FlowState CBLAuthDelegate::handleRefreshingToken() {
     try {
         AACE_DEBUG(LX(TAG));
-        m_cblAuthRequester->cblStateChanged(CBLAuthRequesterInterface::CBLState::REFRESHING_TOKEN, CBLAuthRequesterInterface::CBLStateChangedReason::NONE);
+        m_cblAuthRequester->cblStateChanged(
+            CBLAuthRequesterInterface::CBLState::REFRESHING_TOKEN,
+            CBLAuthRequesterInterface::CBLStateChangedReason::NONE);
 
         m_retryCount = 0;
 
@@ -654,7 +643,7 @@ CBLAuthDelegate::FlowState CBLAuthDelegate::handleRefreshingToken() {
             if (m_isStopping) {
                 break;
             }
-            
+
             auto nextState = m_authState;
             if (isAboutToExpire && !m_authFailureReported) {
                 m_accessToken.clear();
@@ -686,17 +675,15 @@ CBLAuthDelegate::FlowState CBLAuthDelegate::handleRefreshingToken() {
                         return FlowState::REQUESTING_CODE_PAIR;
                     case AuthObserverInterface::Error::AUTHORIZATION_EXPIRED:
                         clearRefreshToken();
-                        if( m_explicitAuthorizationRequest )
-                        {
+                        if (m_explicitAuthorizationRequest) {
                             // we don't want to loop continuosly in code pair requesting state
                             // so reset the explicit authorization request flag
                             m_explicitAuthorizationRequest = false;
                             return FlowState::REQUESTING_CODE_PAIR;
-                        }
-                        else
-                        {
+                        } else {
                             setAuthState(AuthObserverInterface::State::UNRECOVERABLE_ERROR);
-                            m_stateChangeReason = CBLAuthRequesterInterface::CBLStateChangedReason::AUTHORIZATION_EXPIRED;
+                            m_stateChangeReason =
+                                CBLAuthRequesterInterface::CBLStateChangedReason::AUTHORIZATION_EXPIRED;
                             return FlowState::STOPPING;
                         }
                     case AuthObserverInterface::Error::INVALID_REQUEST:
@@ -721,8 +708,7 @@ CBLAuthDelegate::FlowState CBLAuthDelegate::handleRefreshingToken() {
 
         m_stateChangeReason = CBLAuthRequesterInterface::CBLStateChangedReason::SUCCESS;
         return FlowState::STOPPING;
-    }
-    catch( std::exception& ex ) {
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return FlowState::STOPPING;
     }
@@ -736,8 +722,7 @@ CBLAuthDelegate::FlowState CBLAuthDelegate::handleStopping() {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_isStopping = true;
         return FlowState::STOPPING;
-    }
-    catch( std::exception& ex ) {
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return FlowState::STOPPING;
     }
@@ -748,7 +733,7 @@ void CBLAuthDelegate::handleRequestingUserProfile() {
         AACE_DEBUG(LX(TAG));
 
         auto response = requestUserProfile();
-        ThrowIfNot(response.code == HTTPResponseCode::SUCCESS_OK,"Error making request");
+        ThrowIfNot(response.code == HTTPResponseCode::SUCCESS_OK, "Error making request");
 
         std::string name;
         std::string email;
@@ -758,21 +743,20 @@ void CBLAuthDelegate::handleRequestingUserProfile() {
 
         auto root = document.GetObject();
 
-        if( root.HasMember( "name" ) && root["name"].IsString() ) {
+        if (root.HasMember("name") && root["name"].IsString()) {
             name = root["name"].GetString();
         }
-        ThrowIf( name.empty(), "Missing name in response payload" );
+        ThrowIf(name.empty(), "Missing name in response payload");
 
-        if( root.HasMember( "email" ) && root["email"].IsString() ) {
+        if (root.HasMember("email") && root["email"].IsString()) {
             email = root["email"].GetString();
         }
-        ThrowIf( email.empty(), "Missing email in response payload" );
+        ThrowIf(email.empty(), "Missing email in response payload");
 
-        AACE_DEBUG(LX(TAG).d("name",name).d("email",email));
-        m_cblAuthRequester->setUserProfile( name, email );
+        AACE_DEBUG(LX(TAG).d("name", name).d("email", email));
+        m_cblAuthRequester->setUserProfile(name, email);
 
-    }
-    catch( std::exception& ex ) {
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
     }
 }
@@ -786,7 +770,8 @@ HTTPResponse CBLAuthDelegate::requestCodePair() {
         {POST_KEY_SCOPE, m_scope},
         {POST_KEY_SCOPE_DATA, m_configuration->getScopeData()},
     };
-    const std::vector<std::string> headerLines = {HEADER_LINE_URLENCODED,HEADER_LINE_LANGUAGE_PREFIX + m_configuration->getDefaultLocale()};
+    const std::vector<std::string> headerLines = {HEADER_LINE_URLENCODED,
+                                                  HEADER_LINE_LANGUAGE_PREFIX + m_configuration->getDefaultLocale()};
 
     return doPost(
         m_configuration->getRequestCodePairUrl(), headerLines, postData, m_configuration->getRequestTimeout());
@@ -802,8 +787,7 @@ alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse CBLAuthDelegate::re
 
     m_requestTime = std::chrono::steady_clock::now();
 
-    return doPost(
-        m_configuration->getRequestTokenUrl(), headerLines, postData, m_configuration->getRequestTimeout());
+    return doPost(m_configuration->getRequestTokenUrl(), headerLines, postData, m_configuration->getRequestTimeout());
 }
 
 alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse CBLAuthDelegate::requestRefresh() {
@@ -830,10 +814,8 @@ alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse CBLAuthDelegate::re
 
 alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse CBLAuthDelegate::requestUserProfile() {
     AACE_DEBUG(LX(TAG));
-    const std::vector<std::string> getHeaderData = {
-        HOST_HEADER_DATA_USER_PROFILE,
-        BEARER_HEADER_DATA_USER_PROFILE + m_accessToken
-    };
+    const std::vector<std::string> getHeaderData = {HOST_HEADER_DATA_USER_PROFILE,
+                                                    BEARER_HEADER_DATA_USER_PROFILE + m_accessToken};
 
     return doGet(USER_PROFILE_DEFAULT_ENDPOINT, getHeaderData);
 }
@@ -881,22 +863,25 @@ AuthObserverInterface::Error CBLAuthDelegate::receiveCodePairResponse(const HTTP
 
         if (m_userCode.empty() || m_deviceCode.empty() || verificationUri.empty() || 0 == expiresInSeconds) {
             AACE_ERROR(LX(TAG)
-                            .d("reason", "missing or InvalidResponseProperty")
-                            .d("user_code", m_userCode)
-                            .sensitive("device_code", m_deviceCode)
-                            .d("verification_uri", verificationUri)
-                            .d("expiresIn", expiresInSeconds)
-                            .d("interval", intervalSeconds));
+                           .d("reason", "missing or InvalidResponseProperty")
+                           .d("user_code", m_userCode)
+                           .sensitive("device_code", m_deviceCode)
+                           .d("verification_uri", verificationUri)
+                           .d("expiresIn", expiresInSeconds)
+                           .d("interval", intervalSeconds));
             return AuthObserverInterface::Error::UNKNOWN_ERROR;
         }
 
         m_codePairExpirationTime = std::chrono::steady_clock::now() + std::chrono::seconds(expiresInSeconds);
 
-        m_cblAuthRequester->cblStateChanged(CBLAuthRequesterInterface::CBLState::CODE_PAIR_RECEIVED, CBLAuthRequesterInterface::CBLStateChangedReason::SUCCESS, verificationUri, m_userCode);
+        m_cblAuthRequester->cblStateChanged(
+            CBLAuthRequesterInterface::CBLState::CODE_PAIR_RECEIVED,
+            CBLAuthRequesterInterface::CBLStateChangedReason::SUCCESS,
+            verificationUri,
+            m_userCode);
 
         return result;
-    }
-    catch( std::exception& ex ) {
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return AuthObserverInterface::Error::UNKNOWN_ERROR;
     }
@@ -905,7 +890,6 @@ AuthObserverInterface::Error CBLAuthDelegate::receiveCodePairResponse(const HTTP
 AuthObserverInterface::Error CBLAuthDelegate::receiveTokenResponse(
     const alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse& response,
     bool expiresImmediately) {
-
     try {
         AACE_DEBUG(LX(TAG).d("code", response.code).sensitive("body", response.body));
 
@@ -944,11 +928,11 @@ AuthObserverInterface::Error CBLAuthDelegate::receiveTokenResponse(
 
         if (accessToken.empty() || refreshToken.empty() || tokenType != JSON_VALUE_BEARER || 0 == expiresInSeconds) {
             AACE_ERROR(LX(TAG)
-                            .d("reason", "missing or InvalidResponseProperty")
-                            .sensitive("access_token", accessToken)
-                            .d("refresh_token", refreshToken)
-                            .d("token_type", tokenType)
-                            .d("expiresIn", expiresInSeconds));
+                           .d("reason", "missing or InvalidResponseProperty")
+                           .sensitive("access_token", accessToken)
+                           .d("refresh_token", refreshToken)
+                           .d("token_type", tokenType)
+                           .d("expiresIn", expiresInSeconds));
             return AuthObserverInterface::Error::UNKNOWN_ERROR;
         }
 
@@ -965,8 +949,7 @@ AuthObserverInterface::Error CBLAuthDelegate::receiveTokenResponse(
         }
 
         return AuthObserverInterface::Error::SUCCESS;
-    }
-    catch( std::exception& ex ) {
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return AuthObserverInterface::Error::UNKNOWN_ERROR;
     }
@@ -988,8 +971,7 @@ void CBLAuthDelegate::setAuthState(AuthObserverInterface::State newAuthState) {
                 observer->onAuthStateChange(m_authState, m_authError);
             }
         }
-    }
-    catch( std::exception& ex ) {
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
     }
 }
@@ -1000,15 +982,14 @@ void CBLAuthDelegate::setAuthError(AuthObserverInterface::Error authError) {
 
         std::lock_guard<std::mutex> lock(m_mutex);
         m_authError = authError;
-    }
-    catch( std::exception& ex ) {
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
     }
 }
 
 void CBLAuthDelegate::setRefreshToken(const std::string& refreshToken) {
-    if( refreshToken != m_refreshToken ) {
-        m_cblAuthRequester->setRefreshToken( refreshToken );
+    if (refreshToken != m_refreshToken) {
+        m_cblAuthRequester->setRefreshToken(refreshToken);
     }
 }
 
@@ -1025,7 +1006,7 @@ bool CBLAuthDelegate::isStopping() {
 }
 
 void CBLAuthDelegate::enable() {
-    start( false );
+    start(false);
 }
 
 void CBLAuthDelegate::disable() {
@@ -1033,21 +1014,21 @@ void CBLAuthDelegate::disable() {
 }
 
 void CBLAuthDelegate::start() {
-    start( true );
+    start(true);
 }
 
 void CBLAuthDelegate::cancel() {
-    if( m_flowState != FlowState::REFRESHING_TOKEN && m_flowState != FlowState::STOPPING ) {
+    if (m_flowState != FlowState::REFRESHING_TOKEN && m_flowState != FlowState::STOPPING) {
         stop();
     }
 }
 
 void CBLAuthDelegate::reset() {
-    if( m_flowState == FlowState::REFRESHING_TOKEN ) {
-        stop( true );
+    if (m_flowState == FlowState::REFRESHING_TOKEN) {
+        stop(true);
     }
 }
 
-} // aace::engine::cbl
-} // aace::engine
-} // aace
+}  // namespace cbl
+}  // namespace engine
+}  // namespace aace

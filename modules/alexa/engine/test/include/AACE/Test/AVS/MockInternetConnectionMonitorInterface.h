@@ -22,16 +22,19 @@ namespace aace {
 namespace test {
 namespace avs {
 
-class MockInternetConnectionMonitorInterface : public alexaClientSDK::avsCommon::sdkInterfaces::InternetConnectionMonitorInterface {
+class MockInternetConnectionMonitorInterface
+        : public alexaClientSDK::avsCommon::sdkInterfaces::InternetConnectionMonitorInterface {
 public:
-    MOCK_METHOD1(addInternetConnectionObserver,
-                 void(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::InternetConnectionObserverInterface> observer));
-    MOCK_METHOD1(removeInternetConnectionObserver,
-                 void(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::InternetConnectionObserverInterface> observer));
+    MOCK_METHOD1(
+        addInternetConnectionObserver,
+        void(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::InternetConnectionObserverInterface> observer));
+    MOCK_METHOD1(
+        removeInternetConnectionObserver,
+        void(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::InternetConnectionObserverInterface> observer));
 };
 
-} // aace::test::avs
-} // aace::test
-} // aace
+}  // namespace avs
+}  // namespace test
+}  // namespace aace
 
-#endif //AACE_TEST_AVS_MOCK_INTERNET_CONNECTION_MONITOR_INTERFACE_H
+#endif  //AACE_TEST_AVS_MOCK_INTERNET_CONNECTION_MONITOR_INTERFACE_H

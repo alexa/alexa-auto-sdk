@@ -33,30 +33,34 @@ namespace sink {
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.logger.sink.FileSink");
 
-FileSink::FileSink( const std::string& id ) : Sink( id ) {
+FileSink::FileSink(const std::string& id) : Sink(id) {
 }
 
-std::shared_ptr<FileSink> FileSink::create( const std::string& id, const std::string& path, const std::string& prefix, uint32_t maxSize, uint32_t maxFiles, bool append )
-{
-    try
-    {
+std::shared_ptr<FileSink> FileSink::create(
+    const std::string& id,
+    const std::string& path,
+    const std::string& prefix,
+    uint32_t maxSize,
+    uint32_t maxFiles,
+    bool append) {
+    try {
         struct stat info;
 
         // check to make sure the path is valid
-        ThrowIf( stat( path.c_str(), &info ) != 0, "invalidPath" );
-        ThrowIf( (info.st_mode & S_IFDIR) == 0, "invalidPath" );
+        ThrowIf(stat(path.c_str(), &info) != 0, "invalidPath");
+        ThrowIf((info.st_mode & S_IFDIR) == 0, "invalidPath");
 
         // create the file sink
-        auto sink = std::shared_ptr<FileSink>( new FileSink( id ) );
-        
+        auto sink = std::shared_ptr<FileSink>(new FileSink(id));
+
         sink->m_path = path;
         sink->m_prefix = prefix;
         sink->m_maxSize = maxSize;
         sink->m_maxFiles = maxFiles;
         sink->m_append = append;
-        
+
         // append path separator if necessary
-        if( sink->m_path[sink->m_path.length() - 1] != '/' ) {
+        if (sink->m_path[sink->m_path.length() - 1] != '/') {
             sink->m_path += '/';
         }
 
@@ -64,44 +68,43 @@ std::shared_ptr<FileSink> FileSink::create( const std::string& id, const std::st
         sink->m_filename = sink->m_path + sink->m_prefix + ".log";
 
         // create the log file stream
-        sink->m_stream = std::make_shared<std::ofstream>( sink->m_filename, append ? std::ios::out : std::ios::out | std::ios::trunc );
-        ThrowIfNot( sink->m_stream->is_open(), "openStreamFailed");
-        
+        sink->m_stream =
+            std::make_shared<std::ofstream>(sink->m_filename, append ? std::ios::out : std::ios::out | std::ios::trunc);
+        ThrowIfNot(sink->m_stream->is_open(), "openStreamFailed");
+
         // enbale the sink
         sink->m_enabled = true;
-        
+
         return sink;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"create").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "create").d("reason", ex.what()));
         return nullptr;
     }
 }
 
-void FileSink::log( Level level, std::chrono::system_clock::time_point time, const char* threadMoniker, const char* text )
-{
-    if( m_enabled )
-    {
-        try
-        {
-            std::string log = aace::engine::logger::LogFormatter::format( level, time, threadMoniker, text );
-            
+void FileSink::log(
+    Level level,
+    std::chrono::system_clock::time_point time,
+    const char* threadMoniker,
+    const char* text) {
+    if (m_enabled) {
+        try {
+            std::string log = aace::engine::logger::LogFormatter::format(level, time, threadMoniker, text);
+
             // check if the log file needs to be rotated
-            if( (long) m_stream->tellp() + log.length() + 1 > m_maxSize ) {
-                ThrowIfNot( rotateLog(), "rotateLogFailed" );
+            if ((long)m_stream->tellp() + log.length() + 1 > m_maxSize) {
+                ThrowIfNot(rotateLog(), "rotateLogFailed");
             }
-            
+
             // log the event to file stream
             *m_stream << log << std::endl;
-        }
-        catch( std::exception& ex )
-        {
+        } catch (std::exception& ex) {
             // disable the sink so that the error message doesn't cause the logger to
             // get caught in an infinite loop.. ok if another sink handles the event!
             m_enabled = false;
-            
+
             // log the error
-            AACE_ERROR(LX(TAG,"log").d("reason", ex.what()));
+            AACE_ERROR(LX(TAG, "log").d("reason", ex.what()));
         }
     }
 }
@@ -110,55 +113,48 @@ void FileSink::flush() {
     m_stream->flush();
 }
 
-bool FileSink::rotateLog()
-{
-    try
-    {
+bool FileSink::rotateLog() {
+    try {
         // close the current log stream
         m_stream->close();
 
-        for( int j = m_maxFiles; j > 0; j-- )
-        {
-            std::string src = j > 1 ? m_filename + '.' + std::to_string( j - 1 ) : m_filename;
-            std::string target = m_filename + '.' + std::to_string( j );
-            
+        for (int j = m_maxFiles; j > 0; j--) {
+            std::string src = j > 1 ? m_filename + '.' + std::to_string(j - 1) : m_filename;
+            std::string target = m_filename + '.' + std::to_string(j);
+
             // remove the target file if it exists
-            if( exists( target ) ) {
-                ThrowIf( std::remove( target.c_str() ) != 0, "rotateLogFailed" );
+            if (exists(target)) {
+                ThrowIf(std::remove(target.c_str()) != 0, "rotateLogFailed");
             }
-            
-            if( exists( src ) ) {
-                ThrowIf( std::rename( src.c_str(), target.c_str() ) != 0, "rotateLogFailed" );
+
+            if (exists(src)) {
+                ThrowIf(std::rename(src.c_str(), target.c_str()) != 0, "rotateLogFailed");
             }
         }
-        
-        m_stream = std::make_shared<std::ofstream>( m_filename, std::ios::out | std::ios::trunc );
-        ThrowIfNot( m_stream->is_open(), "openStreamFailed" );
-        
+
+        m_stream = std::make_shared<std::ofstream>(m_filename, std::ios::out | std::ios::trunc);
+        ThrowIfNot(m_stream->is_open(), "openStreamFailed");
+
         return true;
-    }
-    catch( std::exception& ex )
-    {
+    } catch (std::exception& ex) {
         // disable the sink so that the error message doesn't cause the logger to
         // get caught in an infinite loop.. ok if another sink handles the event!
         m_enabled = false;
-        
+
         // log the error
-        AACE_ERROR(LX(TAG,"rotateLog").d("reason", ex.what()));
-        
+        AACE_ERROR(LX(TAG, "rotateLog").d("reason", ex.what()));
+
         return false;
     }
 }
 
-bool FileSink::exists( const std::string& filename )
-{
+bool FileSink::exists(const std::string& filename) {
     struct stat info;
-    
-    return stat( filename.c_str(), &info ) == 0 && (info.st_mode & S_IFDIR) == 0;
+
+    return stat(filename.c_str(), &info) == 0 && (info.st_mode & S_IFDIR) == 0;
 }
 
-} // aace::engine::logger::sink
-} // aace::engine::logger
-} // aace::engine
-} // aace
-
+}  // namespace sink
+}  // namespace logger
+}  // namespace engine
+}  // namespace aace

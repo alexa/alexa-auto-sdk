@@ -33,15 +33,15 @@ static const std::string DEFAULT_CONFIG =
     "    }"
     "}";
 
-std::shared_ptr<aace::core::config::EngineConfiguration> CoreTestHelper::createDefaultConfiguration( bool withExpectCall )
-{
+std::shared_ptr<aace::core::config::EngineConfiguration> CoreTestHelper::createDefaultConfiguration(
+    bool withExpectCall) {
     auto configuration = std::make_shared<MockEngineConfiguration>();
-    auto stream = std::make_shared<std::stringstream>( DEFAULT_CONFIG );
-    
-    if( withExpectCall ) {
-        EXPECT_CALL( *configuration.get(), getStream() ).WillOnce( testing::Return( stream ) );
+    auto stream = std::make_shared<std::stringstream>(DEFAULT_CONFIG);
+
+    if (withExpectCall) {
+        EXPECT_CALL(*configuration.get(), getStream()).WillOnce(testing::Return(stream));
     }
-    
+
     return configuration;
 }
 
@@ -49,6 +49,6 @@ std::shared_ptr<aace::core::PlatformInterface> CoreTestHelper::createDefaultPlat
     return std::make_shared<MockPlatformInterface>();
 }
 
-} // aace::test::core
-} // aace::test
-} // aace
+}  // namespace core
+}  // namespace test
+}  // namespace aace

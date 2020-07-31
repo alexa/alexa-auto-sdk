@@ -21,21 +21,21 @@
 static const char TAG[] = "aace.jni.storage.config.StorageConfigurationBinder";
 
 // JNI
-extern "C"
-{
-    JNIEXPORT jlong JNICALL
-    Java_com_amazon_aace_storage_config_StorageConfiguration_createLocalStorageConfigBinder( JNIEnv* env, jobject obj, jstring localStoragePath )
-    {
-        try
-        {
-            auto config = aace::storage::config::StorageConfiguration::createLocalStorageConfig( JString(localStoragePath).toStdStr() );
-            ThrowIfNull( config, "createLocalStorageConfigFailed" );
+extern "C" {
+JNIEXPORT jlong JNICALL Java_com_amazon_aace_storage_config_StorageConfiguration_createLocalStorageConfigBinder(
+    JNIEnv* env,
+    jobject obj,
+    jstring localStoragePath) {
+    try {
+        auto config =
+            aace::storage::config::StorageConfiguration::createLocalStorageConfig(JString(localStoragePath).toStdStr());
+        ThrowIfNull(config, "createLocalStorageConfigFailed");
 
-            return reinterpret_cast<long>( new aace::jni::core::config::EngineConfigurationBinder( config ) );
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_storage_config_StorageConfiguration_createLocalStorageConfigBinder",ex.what());
-            return 0;
-        }
+        return reinterpret_cast<long>(new aace::jni::core::config::EngineConfigurationBinder(config));
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(
+            TAG, "Java_com_amazon_aace_storage_config_StorageConfiguration_createLocalStorageConfigBinder", ex.what());
+        return 0;
     }
+}
 }

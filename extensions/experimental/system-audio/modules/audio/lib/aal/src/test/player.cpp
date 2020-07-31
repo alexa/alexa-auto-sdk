@@ -153,7 +153,7 @@ TEST(Interactive, DISABLED_Player) {
                 if (r > 0) {
                     LOG("Write to player %ld", r);
                     ssize_t w = aal_player_write(handle, buffer, r);
-                    if (w != (ssize_t) r) {
+                    if (w != (ssize_t)r) {
                         LOG("aal_player_write failed written=%ld vs size=%ld", w, r);
                         // Will retry...
                     }
@@ -188,11 +188,18 @@ TEST(Interactive, DISABLED_Player) {
         }
     } t{};
 
-    const aal_listener_t listener = {
-        .on_start = TestCase::on_start, .on_stop = TestCase::on_stop, .on_almost_done = nullptr, .on_data = nullptr, .on_data_requested = TestCase::on_data_requested};
+    const aal_listener_t listener = {.on_start = TestCase::on_start,
+                                     .on_stop = TestCase::on_stop,
+                                     .on_almost_done = nullptr,
+                                     .on_data = nullptr,
+                                     .on_data_requested = TestCase::on_data_requested};
 
-    aal_attributes_t attr = {
-        .name = "SampleApp", .device = nullptr, .uri = nullptr, .listener = &listener, .user_data = &t, .module_id = param_module_id};
+    aal_attributes_t attr = {.name = "SampleApp",
+                             .device = nullptr,
+                             .uri = nullptr,
+                             .listener = &listener,
+                             .user_data = &t,
+                             .module_id = param_module_id};
 
     if (strncmp(param_audio_file.c_str(), "stream://", 9) == 0) {
         /* Create Player in stream mode */
@@ -282,11 +289,11 @@ TEST(StressTest, RepeatedStops) {
         }
     } t;
 
-    aal_listener_t listener = {
-        .on_start = TestCase::on_start,
-        .on_stop = TestCase::on_stop,
-        .on_almost_done = nullptr, .on_data = nullptr, .on_data_requested = nullptr
-    };
+    aal_listener_t listener = {.on_start = TestCase::on_start,
+                               .on_stop = TestCase::on_stop,
+                               .on_almost_done = nullptr,
+                               .on_data = nullptr,
+                               .on_data_requested = nullptr};
 
     const aal_attributes_t attr = {.name = "RepeatedStops",
                                    .device = param_device.empty() ? nullptr : param_device.c_str(),
@@ -322,67 +329,66 @@ TEST(StressTest, RepeatedStops) {
     }
 }
 
-
 TEST(FunctionalTest, CreateWithFile) {
-	aal_attributes_t attr = {.name = "AudioParameters",
-				 .device = param_device.empty() ? nullptr : param_device.c_str(),
-				 .uri = param_audio_file.c_str(),
-				 .listener = nullptr,
-				 .user_data = nullptr,
-				 .module_id = param_module_id};
+    aal_attributes_t attr = {.name = "AudioParameters",
+                             .device = param_device.empty() ? nullptr : param_device.c_str(),
+                             .uri = param_audio_file.c_str(),
+                             .listener = nullptr,
+                             .user_data = nullptr,
+                             .module_id = param_module_id};
 
-	ASSERT_FALSE(param_audio_file.empty());
+    ASSERT_FALSE(param_audio_file.empty());
 
-	{ // Can play file without specifying any audio parameters
-		aal_handle_t player = aal_player_create(&attr, nullptr);
-		ASSERT_NE(player, nullptr);
-		aal_player_play(player);
-		std::this_thread::sleep_for(std::chrono::milliseconds(std::chrono::seconds(5)));
-		aal_player_stop(player);
-		aal_player_destroy(player);
-	}
-	{ // Cannot play file with AAL_STREAM_LPCM parameter
-		aal_audio_parameters_t audio_params;
-		audio_params.stream_type = AAL_STREAM_LPCM;
+    {  // Can play file without specifying any audio parameters
+        aal_handle_t player = aal_player_create(&attr, nullptr);
+        ASSERT_NE(player, nullptr);
+        aal_player_play(player);
+        std::this_thread::sleep_for(std::chrono::milliseconds(std::chrono::seconds(5)));
+        aal_player_stop(player);
+        aal_player_destroy(player);
+    }
+    {  // Cannot play file with AAL_STREAM_LPCM parameter
+        aal_audio_parameters_t audio_params;
+        audio_params.stream_type = AAL_STREAM_LPCM;
 
-		aal_handle_t player = aal_player_create(&attr, &audio_params);
-		ASSERT_EQ(player, nullptr);
-	}
+        aal_handle_t player = aal_player_create(&attr, &audio_params);
+        ASSERT_EQ(player, nullptr);
+    }
 }
 
 TEST(FunctionalTest, CreateWithStream) {
-	aal_attributes_t attr = {.name = "AudioParameters",
-				 .device = param_device.empty() ? nullptr : param_device.c_str(),
-				 .uri = "",
-				 .listener = nullptr,
-				 .user_data = nullptr,
-				 .module_id = param_module_id};
-	{  // Can play without parameters
-		aal_handle_t player = aal_player_create(&attr, nullptr);
-		ASSERT_NE(player, nullptr);
-		aal_player_destroy(player);
-	}
-	{  // Can play with LPCM parameters
-		aal_audio_parameters_t audio_params;
-		audio_params.stream_type = AAL_STREAM_LPCM;
-		audio_params.lpcm = {.sample_format = AAL_SAMPLE_FORMAT_DEFAULT, .channels = 0, .sample_rate = 0};
+    aal_attributes_t attr = {.name = "AudioParameters",
+                             .device = param_device.empty() ? nullptr : param_device.c_str(),
+                             .uri = "",
+                             .listener = nullptr,
+                             .user_data = nullptr,
+                             .module_id = param_module_id};
+    {  // Can play without parameters
+        aal_handle_t player = aal_player_create(&attr, nullptr);
+        ASSERT_NE(player, nullptr);
+        aal_player_destroy(player);
+    }
+    {  // Can play with LPCM parameters
+        aal_audio_parameters_t audio_params;
+        audio_params.stream_type = AAL_STREAM_LPCM;
+        audio_params.lpcm = {.sample_format = AAL_SAMPLE_FORMAT_DEFAULT, .channels = 0, .sample_rate = 0};
 
-		for (auto channel_count : {1, 2}) {
-			audio_params.lpcm.channels = channel_count;
-			for (auto sample_rate : {16000, 32000, 44100, 48000}) {
-				audio_params.lpcm.sample_rate = sample_rate;
+        for (auto channel_count : {1, 2}) {
+            audio_params.lpcm.channels = channel_count;
+            for (auto sample_rate : {16000, 32000, 44100, 48000}) {
+                audio_params.lpcm.sample_rate = sample_rate;
 
-				aal_handle_t player = aal_player_create(&attr, &audio_params);
-				ASSERT_NE(player, nullptr);
-				aal_player_destroy(player);
-			}
-		}
-	}
-	{ // Cannot play with non-LPCM stream
-		aal_audio_parameters_t audio_params;
-		audio_params.stream_type = AAL_STREAM_UNKNOWN;
+                aal_handle_t player = aal_player_create(&attr, &audio_params);
+                ASSERT_NE(player, nullptr);
+                aal_player_destroy(player);
+            }
+        }
+    }
+    {  // Cannot play with non-LPCM stream
+        aal_audio_parameters_t audio_params;
+        audio_params.stream_type = AAL_STREAM_UNKNOWN;
 
-		aal_handle_t player = aal_player_create(&attr, &audio_params);
-		ASSERT_EQ(player, nullptr);
-	}
+        aal_handle_t player = aal_player_create(&attr, &audio_params);
+        ASSERT_EQ(player, nullptr);
+    }
 }

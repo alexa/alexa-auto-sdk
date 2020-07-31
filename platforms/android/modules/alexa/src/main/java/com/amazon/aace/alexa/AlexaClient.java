@@ -20,13 +20,11 @@ import com.amazon.aace.core.PlatformInterface;
 /**
  * AlexaClient should be extended to handle Alexa state changes on the platform.
  */
-abstract public class AlexaClient extends PlatformInterface
-{
+abstract public class AlexaClient extends PlatformInterface {
     /**
      * Describes the state of Alexa dialog interaction
      */
-    public enum DialogState
-    {
+    public enum DialogState {
         /**
          * Alexa is idle and ready for an interaction.
          * @hideinitializer
@@ -62,7 +60,7 @@ abstract public class AlexaClient extends PlatformInterface
         /**
          * @internal
          */
-        private DialogState( String name ) {
+        private DialogState(String name) {
             m_name = name;
         }
 
@@ -77,8 +75,7 @@ abstract public class AlexaClient extends PlatformInterface
     /**
      * Describes the state of client authorization with AVS
      */
-    public enum AuthState
-    {
+    public enum AuthState {
         /**
          * Authorization has not yet been acquired.
          * @hideinitializer
@@ -108,7 +105,7 @@ abstract public class AlexaClient extends PlatformInterface
         /**
          * @internal
          */
-        private AuthState( String name ) {
+        private AuthState(String name) {
             m_name = name;
         }
 
@@ -123,8 +120,7 @@ abstract public class AlexaClient extends PlatformInterface
     /**
      * Describes an error during an attempt to authorize with AVS
      */
-    public enum AuthError
-    {
+    public enum AuthError {
         /**
          * No error encountered
          * @hideinitializer
@@ -204,7 +200,7 @@ abstract public class AlexaClient extends PlatformInterface
         /**
          * @internal
          */
-        private AuthError( String name ) {
+        private AuthError(String name) {
             m_name = name;
         }
 
@@ -219,8 +215,7 @@ abstract public class AlexaClient extends PlatformInterface
     /**
      * Describes the status of an AVS connection
      */
-    public enum ConnectionStatus
-    {
+    public enum ConnectionStatus {
         /**
          * Not connected to AVS
          * @hideinitializer
@@ -245,7 +240,7 @@ abstract public class AlexaClient extends PlatformInterface
         /**
          * @internal
          */
-        private ConnectionStatus( String name ) {
+        private ConnectionStatus(String name) {
             m_name = name;
         }
 
@@ -260,8 +255,7 @@ abstract public class AlexaClient extends PlatformInterface
     /**
      * Describes the reason for a change in AVS connection status
      */
-    public enum ConnectionChangedReason
-    {
+    public enum ConnectionChangedReason {
         /**
          * No reason specified.
          * @hideinitializer
@@ -356,7 +350,7 @@ abstract public class AlexaClient extends PlatformInterface
         /**
          * @internal
          */
-        private ConnectionChangedReason( String name ) {
+        private ConnectionChangedReason(String name) {
             m_name = name;
         }
 
@@ -373,12 +367,11 @@ abstract public class AlexaClient extends PlatformInterface
      *
      * @param  state The new Alexa dialog state
      *
-     * @note It is the responsibility of the platform implementation to provide a familiar Alexa experience for the user.
-     * See the AVS UX Attention System guidelines for recommendations on communicating
-     * Alexa attention states: https://developer.amazon.com/docs/alexa-voice-service/ux-design-attention.html#implement
+     * @note It is the responsibility of the platform implementation to provide a familiar Alexa experience for the
+     * user. See the AVS UX Attention System guidelines for recommendations on communicating Alexa attention states:
+     * https://developer.amazon.com/docs/alexa-voice-service/ux-design-attention.html#implement
      */
-    public void dialogStateChanged( DialogState state ) {
-    }
+    public void dialogStateChanged(DialogState state) {}
 
     /**
      * Notifies the platform implementation of an AVS authorization state change
@@ -387,8 +380,7 @@ abstract public class AlexaClient extends PlatformInterface
      *
      * @param  error The error state of the authorization attempt
      */
-    public void authStateChanged( AuthState state, AuthError error ) {
-    }
+    public void authStateChanged(AuthState state, AuthError error) {}
 
     /**
      * Notifies the platform implementation of an AVS connection status change
@@ -397,21 +389,29 @@ abstract public class AlexaClient extends PlatformInterface
      *
      * @param  reason The reason for the status change
      */
-    public void connectionStatusChanged( ConnectionStatus status, ConnectionChangedReason reason ) {
+    public void connectionStatusChanged(ConnectionStatus status, ConnectionChangedReason reason) {}
+
+    /**
+     * Stops the foreground activity if there is one. This acts as a "stop" button that can be used to stop
+     * an ongoing activity that has acquired the audio or visual focus. This call will trigger the action
+     * to stop all user-observable activities and return immediately
+     */
+    public void stopForegroundActivity() {
+        stopForegroundActivity(getNativeRef());
     }
+
+    private native long stopForegroundActivity(long nativeObject);
 
     // NativeRef implementation
     final protected long createNativeRef() {
         return createBinder();
     }
 
-    final protected void disposeNativeRef( long nativeRef ) {
-        disposeBinder( nativeRef );
+    final protected void disposeNativeRef(long nativeRef) {
+        disposeBinder(nativeRef);
     }
 
     // Native Engine JNI methods
     private native long createBinder();
-    private native void disposeBinder( long nativeRef );
+    private native void disposeBinder(long nativeRef);
 }
-
-

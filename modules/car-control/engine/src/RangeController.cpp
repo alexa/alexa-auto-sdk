@@ -13,9 +13,11 @@
  * permissions and limitations under the License.
  */
 
+#include "AACE/Engine/CarControl/RangeController.h"
+
+#include <AVSCommon/AVS/CapabilitySemantics.h>
 #include <RangeController/RangeControllerAttributeBuilder.h>
 
-#include "AACE/Engine/CarControl/RangeController.h"
 #include "AACE/Engine/Core/EngineMacros.h"
 
 namespace aace {
@@ -79,6 +81,15 @@ std::shared_ptr<RangeController> RangeController::create(
             auto unitOfMeasure = configuration.at("unitOfMeasure");
             attributeBuilder->withUnitOfMeasure(unitOfMeasure);
         }
+
+        if (controllerConfig.contains("semantics")) {
+            auto& semanticsJson = controllerConfig.at("semantics");
+            alexaClientSDK::avsCommon::utils::Optional<alexaClientSDK::avsCommon::avs::CapabilitySemantics> semantics =
+                getSemantics(semanticsJson);
+            ThrowIfNot(semantics.hasValue(), "failedToParseSemanticsConfig");
+            attributeBuilder->withSemantics(semantics.value());
+        }
+
         auto attributes = attributeBuilder->build();
         ThrowIfNot(attributes.hasValue(), "invalidAttributes");
 

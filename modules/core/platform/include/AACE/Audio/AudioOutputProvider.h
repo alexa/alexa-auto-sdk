@@ -26,23 +26,15 @@ namespace audio {
 
 class AudioOutputProvider : public aace::core::PlatformInterface {
 public:
-    enum class AudioOutputType {
-        TTS,
-        MUSIC,
-        NOTIFICATION,
-        ALARM,
-        EARCON,
-        COMMUNICATION,
-        RINGTONE
-    };
+    enum class AudioOutputType { TTS, MUSIC, NOTIFICATION, ALARM, EARCON, COMMUNICATION, RINGTONE };
 
 protected:
     AudioOutputProvider() = default;
 
 public:
     virtual ~AudioOutputProvider();
-    
-    virtual std::shared_ptr<AudioOutput> openChannel( const std::string& name, AudioOutputType type ) = 0;
+
+    virtual std::shared_ptr<AudioOutput> openChannel(const std::string& name, AudioOutputType type) = 0;
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const AudioOutputProvider::AudioOutputType& audioOutputType) {
@@ -72,7 +64,7 @@ inline std::ostream& operator<<(std::ostream& stream, const AudioOutputProvider:
     return stream;
 }
 
-} // aace::audio
-} // aace
+}  // namespace audio
+}  // namespace aace
 
-#endif // AACE_AUDIO_AUDIO_OUTPUT_PROVIDER_H
+#endif  // AACE_AUDIO_AUDIO_OUTPUT_PROVIDER_H

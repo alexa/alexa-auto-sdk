@@ -23,11 +23,10 @@ namespace aace {
 namespace test {
 namespace alexa {
 
-class MockPlaybackController : public aace::alexa::PlaybackController {
-};
+class MockPlaybackController : public aace::alexa::PlaybackController {};
 
-} // aace::test::alexa
-} // aace::test
-} // aace
+}  // namespace alexa
+}  // namespace test
+}  // namespace aace
 
-#endif // AACE_TEST_ALEXA_MOCK_PLAYBACK_CONTROLLER_H
+#endif  // AACE_TEST_ALEXA_MOCK_PLAYBACK_CONTROLLER_H

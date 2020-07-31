@@ -35,7 +35,7 @@ namespace sampleApp {
  * An Executor is used to run callable types asynchronously.
  */
 class Executor {
-  public:
+public:
     /**
      * Constructs an Executor.
      */
@@ -54,7 +54,8 @@ class Executor {
      * @param args The arguments to call the task with.
      * @returns A @c std::future for the return value of the task.
      */
-    template <typename Task, typename... Args> auto submit(Task task, Args &&... args) -> std::future<decltype(task(args...))>;
+    template <typename Task, typename... Args>
+    auto submit(Task task, Args&&... args) -> std::future<decltype(task(args...))>;
 
     /**
      * Submits a callable type (function, lambda expression, bind expression, or another function object) to the front
@@ -65,7 +66,8 @@ class Executor {
      * @param args The arguments to call the task with.
      * @returns A @c std::future for the return value of the task.
      */
-    template <typename Task, typename... Args> auto submitToFront(Task task, Args &&... args) -> std::future<decltype(task(args...))>;
+    template <typename Task, typename... Args>
+    auto submitToFront(Task task, Args&&... args) -> std::future<decltype(task(args...))>;
 
     /**
      * Wait for any previously submitted tasks to complete.
@@ -78,7 +80,7 @@ class Executor {
     /// Returns whether or not the executor is shutdown.
     bool isShutdown();
 
-  private:
+private:
     /// The queue of tasks to execute.
     std::shared_ptr<TaskQueue> m_taskQueue;
 
@@ -86,14 +88,16 @@ class Executor {
     std::unique_ptr<TaskThread> m_taskThread;
 };
 
-template <typename Task, typename... Args> auto Executor::submit(Task task, Args &&... args) -> std::future<decltype(task(args...))> {
+template <typename Task, typename... Args>
+auto Executor::submit(Task task, Args&&... args) -> std::future<decltype(task(args...))> {
     return m_taskQueue->push(task, std::forward<Args>(args)...);
 }
 
-template <typename Task, typename... Args> auto Executor::submitToFront(Task task, Args &&... args) -> std::future<decltype(task(args...))> {
+template <typename Task, typename... Args>
+auto Executor::submitToFront(Task task, Args&&... args) -> std::future<decltype(task(args...))> {
     return m_taskQueue->pushToFront(task, std::forward<Args>(args)...);
 }
 
-} // namespace sampleApp
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_EXECUTOR_H
+#endif  // SAMPLEAPP_EXECUTOR_H

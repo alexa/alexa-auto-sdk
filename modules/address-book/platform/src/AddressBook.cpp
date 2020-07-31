@@ -12,33 +12,36 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
- 
+
 #include <AACE/AddressBook/AddressBook.h>
 #include <AACE/AddressBook/AddressBookEngineInterface.h>
 
 namespace aace {
 namespace addressBook {
 
-AddressBook::~AddressBook() = default; 
+AddressBook::~AddressBook() = default;
 
 // Engine Interface
-void AddressBook::setEngineInterface( std::shared_ptr<aace::addressBook::AddressBookEngineInterface> engineInterface ) {
+void AddressBook::setEngineInterface(std::shared_ptr<aace::addressBook::AddressBookEngineInterface> engineInterface) {
     m_engineInterface = engineInterface;
 }
 
-bool AddressBook::addAddressBook( const std::string& addressBookSourceId,  const std::string& name,  AddressBookType type ) {
-    if( m_engineInterface != nullptr ) {
-        return m_engineInterface->onAddAddressBook( addressBookSourceId, name, type );
+bool AddressBook::addAddressBook(
+    const std::string& addressBookSourceId,
+    const std::string& name,
+    AddressBookType type) {
+    if (m_engineInterface != nullptr) {
+        return m_engineInterface->onAddAddressBook(addressBookSourceId, name, type);
     }
     return false;
 }
 
-bool AddressBook::removeAddressBook( const std::string& addressBookSourceId ) {
-    if( m_engineInterface != nullptr ) {
-        return m_engineInterface->onRemoveAddressBook( addressBookSourceId );
+bool AddressBook::removeAddressBook(const std::string& addressBookSourceId) {
+    if (m_engineInterface != nullptr) {
+        return m_engineInterface->onRemoveAddressBook(addressBookSourceId);
     }
     return false;
 }
 
-} // aace::addressBook
-} // aace
+}  // namespace addressBook
+}  // namespace aace

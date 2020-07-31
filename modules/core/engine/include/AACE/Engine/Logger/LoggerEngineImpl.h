@@ -31,21 +31,29 @@ namespace aace {
 namespace engine {
 namespace logger {
 
-class LoggerEngineImpl : public aace::logger::LoggerEngineInterface, public LogEventObserver {
+class LoggerEngineImpl
+        : public aace::logger::LoggerEngineInterface
+        , public LogEventObserver {
 public:
     virtual ~LoggerEngineImpl() = default;
 
-    static std::shared_ptr<LoggerEngineImpl> create( std::shared_ptr<aace::logger::Logger> platformLoggerInterface, std::shared_ptr<aace::engine::logger::EngineLogger> logger );
+    static std::shared_ptr<LoggerEngineImpl> create(
+        std::shared_ptr<aace::logger::Logger> platformLoggerInterface,
+        std::shared_ptr<aace::engine::logger::EngineLogger> logger);
 
 private:
-    LoggerEngineImpl( std::shared_ptr<aace::logger::Logger> platformLoggerInterface );
+    LoggerEngineImpl(std::shared_ptr<aace::logger::Logger> platformLoggerInterface);
 
 public:
     // LogEventObserver
-    virtual bool onLogEvent( LogEventObserver::Level level, std::chrono::system_clock::time_point time, const char* source, const char* text ) override;
-    
+    virtual bool onLogEvent(
+        LogEventObserver::Level level,
+        std::chrono::system_clock::time_point time,
+        const char* source,
+        const char* text) override;
+
     // LoggerEngineInterface
-    virtual void log( aace::logger::Logger::Level level, const std::string& tag, const std::string& message ) override;
+    virtual void log(aace::logger::Logger::Level level, const std::string& tag, const std::string& message) override;
 
 private:
     std::shared_ptr<aace::logger::Logger> m_platformLoggerInterface;
@@ -54,8 +62,8 @@ private:
     aace::engine::utils::threading::Executor m_executor;
 };
 
-}  // logger
-}  // engine
-}  // aace
+}  // namespace logger
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_LOGGER_LOGGER_ENGINE_IMPL_H
+#endif  // AACE_ENGINE_LOGGER_LOGGER_ENGINE_IMPL_H

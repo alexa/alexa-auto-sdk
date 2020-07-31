@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">2.2.1</span>
+   &#160;<span id="projectnumber">2.3.0</span>
    </div>
   </td>
  </tr>
@@ -88,6 +88,10 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:a92aa3b5155a650a13c26c9d4a08a1216"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a51647ddc0fd88c8b3e088ca5d728c1fd"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1config_1_1_engine_configuration.html">EngineConfiguration</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1config_1_1_alexa_configuration.html#a51647ddc0fd88c8b3e088ca5d728c1fd">createCurlConfig</a> (final String certsPath, final String iface)</td></tr>
 <tr class="separator:a51647ddc0fd88c8b3e088ca5d728c1fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a174a365624dba9cef2db7803a352c916"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1config_1_1_engine_configuration.html">EngineConfiguration</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1config_1_1_alexa_configuration.html#a174a365624dba9cef2db7803a352c916">createDeviceSettingsConfig</a> (final String databaseFilePath, final String[] locales, final String defaultLocale, final String defaultTimezone, final String[][] localeCombinations)</td></tr>
+<tr class="separator:a174a365624dba9cef2db7803a352c916"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1dcfef5d114ac663f3031214b45cc5ab"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1config_1_1_engine_configuration.html">EngineConfiguration</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1config_1_1_alexa_configuration.html#a1dcfef5d114ac663f3031214b45cc5ab">createDeviceSettingsConfig</a> (final String databaseFilePath)</td></tr>
+<tr class="separator:a1dcfef5d114ac663f3031214b45cc5ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae9758eba28e24ac7bf3685bd5ee6bec1"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1config_1_1_engine_configuration.html">EngineConfiguration</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1config_1_1_alexa_configuration.html#ae9758eba28e24ac7bf3685bd5ee6bec1">createDeviceSettingsConfig</a> (final String databaseFilePath, final String[] locales, final String defaultLocale, final String defaultTimezone)</td></tr>
 <tr class="separator:ae9758eba28e24ac7bf3685bd5ee6bec1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af676c898b520c02267d33579cdb37765"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1config_1_1_engine_configuration.html">EngineConfiguration</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1config_1_1_alexa_configuration.html#af676c898b520c02267d33579cdb37765">createSettingsConfig</a> (final String databaseFilePath, final String locale)</td></tr>
@@ -391,8 +395,106 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a174a365624dba9cef2db7803a352c916"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a174a365624dba9cef2db7803a352c916">&#9670;&nbsp;</a></span>createDeviceSettingsConfig() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1config_1_1_engine_configuration.html">EngineConfiguration</a> com.amazon.aace.alexa.config.AlexaConfiguration.createDeviceSettingsConfig </td>
+          <td>(</td>
+          <td class="paramtype">final String&#160;</td>
+          <td class="paramname"><em>databaseFilePath</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">final String []&#160;</td>
+          <td class="paramname"><em>locales</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">final String&#160;</td>
+          <td class="paramname"><em>defaultLocale</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">final String&#160;</td>
+          <td class="paramname"><em>defaultTimezone</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">final String&#160;</td>
+          <td class="paramname"><em>localeCombinations</em>[][]&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Factory method used to programmatically generate device settings configuration data. The data generated by this method is equivalent to providing the following JSON values in a configuration file:</p>
+<div class="fragment"><div class="line">{</div><div class="line">  &quot;deviceSettings&quot;: {</div><div class="line">    &quot;databaseFilePath&quot;: &quot;&lt;SQLITE_DATABASE_FILE_PATH&gt;&quot;,</div><div class="line">    &quot;locales&quot;: [&lt;LIST_OF_LOCALE_STRINGS&gt;],</div><div class="line">    &quot;defaultLocale&quot;: &quot;&lt;DEFAULT_LOCALE_STRING&gt;&quot;,</div><div class="line">    &quot;localeCombinations&quot;: [[&lt;LOCALE_STRING_PAIR&gt;]],</div><div class="line">    &quot;defaultTimezone&quot;: &quot;&lt;TIMEZONE&gt;&quot;</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">databaseFilePath</td><td>The file path to the SQLite database used to store persistent settings data. The database will be created on initialization if it does not already exist. </td></tr>
+    <tr><td class="paramname">locales</td><td>A list of locales supported by the device. </td></tr>
+    <tr><td class="paramname">defaultLocale</td><td>The default locale setting on the device. </td></tr>
+    <tr><td class="paramname">defaultTimezone</td><td>The default timezone setting on the device. For accepted values, refer to the accepted timezones here: <a href="https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/system.html#timezonechanged">https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/system.html#timezonechanged</a> </td></tr>
+    <tr><td class="paramname">localeCombinations</td><td>A list of locale combinations supported by the device for dual-locale mode. The permitted combinations are [["en-CA","fr-CA"],["fr-CA","en-CA"],["en-US","es-US"], ["es-US","en-US"],["en-IN","hi-IN"],["hi-IN","en-IN"]]. Any locale specified in this list must also be specified in the <em>locales</em> list. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a1dcfef5d114ac663f3031214b45cc5ab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1dcfef5d114ac663f3031214b45cc5ab">&#9670;&nbsp;</a></span>createDeviceSettingsConfig() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1config_1_1_engine_configuration.html">EngineConfiguration</a> com.amazon.aace.alexa.config.AlexaConfiguration.createDeviceSettingsConfig </td>
+          <td>(</td>
+          <td class="paramtype">final String&#160;</td>
+          <td class="paramname"><em>databaseFilePath</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Factory method used to programmatically generate device settings configuration data. The data generated by this method is equivalent to providing the following JSON values in a configuration file:</p>
+<div class="fragment"><div class="line">{</div><div class="line">  &quot;deviceSettings&quot;: {</div><div class="line">    &quot;databaseFilePath&quot;: &quot;&lt;SQLITE_DATABASE_FILE_PATH&gt;&quot;,</div><div class="line">    &quot;locales&quot;: [</div><div class="line">        &quot;en-US&quot;,</div><div class="line">        &quot;en-GB&quot;,</div><div class="line">        &quot;de-DE&quot;,</div><div class="line">        &quot;en-IN&quot;,</div><div class="line">        &quot;en-CA&quot;,</div><div class="line">        &quot;ja-JP&quot;,</div><div class="line">        &quot;en-AU&quot;,</div><div class="line">        &quot;fr-FR&quot;,</div><div class="line">        &quot;it-IT&quot;,</div><div class="line">        &quot;es-ES&quot;,</div><div class="line">        &quot;es-MX&quot;,</div><div class="line">        &quot;fr-CA&quot;,</div><div class="line">        &quot;es-US&quot;,</div><div class="line">        &quot;hi-IN&quot;,</div><div class="line">        &quot;pt-BR&quot;</div><div class="line">    ],</div><div class="line">    &quot;defaultLocale&quot;: &quot;en-US&quot;,</div><div class="line">    &quot;localeCombinations&quot;: [</div><div class="line">        [&quot;en-CA&quot;,&quot;fr-CA&quot;],</div><div class="line">        [&quot;fr-CA&quot;,&quot;en-CA&quot;],</div><div class="line">        [&quot;en-US&quot;,&quot;es-US&quot;],</div><div class="line">        [&quot;es-US&quot;,&quot;en-US&quot;],</div><div class="line">        [&quot;en-IN&quot;,&quot;hi-IN&quot;],</div><div class="line">        [&quot;hi-IN&quot;,&quot;en-IN&quot;]</div><div class="line">    ],</div><div class="line">    &quot;defaultTimezone&quot;: &quot;America/Vancouver&quot;</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">databaseFilePath</td><td>The file path to the SQLite database used to store persistent settings data. The database will be created on initialization if it does not already exist. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="ae9758eba28e24ac7bf3685bd5ee6bec1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae9758eba28e24ac7bf3685bd5ee6bec1">&#9670;&nbsp;</a></span>createDeviceSettingsConfig()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ae9758eba28e24ac7bf3685bd5ee6bec1">&#9670;&nbsp;</a></span>createDeviceSettingsConfig() <span class="overload">[3/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -437,12 +539,12 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Factory method used to programmatically generate device settings configuration data. The data generated by this method is equivalent to providing the following JSON values in a configuration file:</p>
-<div class="fragment"><div class="line">{</div><div class="line">  &quot;deviceSettings&quot;: {</div><div class="line">    &quot;databaseFilePath&quot;: &quot;&lt;SQLITE_DATABASE_FILE_PATH&gt;&quot;,</div><div class="line">    &quot;locales&quot;: [&lt;LIST_OF_LOCALE_STRINGS&gt;],</div><div class="line">    &quot;defaultLocale&quot;: &quot;&lt;DEFAULT_LOCALE&gt;&quot;,</div><div class="line">    &quot;localeCombinations&quot;: [[&lt;LOCAL_STRING_PAIR&gt;]],</div><div class="line">    &quot;defaultTimezone&quot;: &quot;&lt;TIMEZONE&gt;&quot;        </div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+<div class="fragment"><div class="line">{</div><div class="line">  &quot;deviceSettings&quot;: {</div><div class="line">    &quot;databaseFilePath&quot;: &quot;&lt;SQLITE_DATABASE_FILE_PATH&gt;&quot;,</div><div class="line">    &quot;locales&quot;: [&lt;LIST_OF_LOCALE_STRINGS&gt;],</div><div class="line">    &quot;defaultLocale&quot;: &quot;&lt;DEFAULT_LOCALE_STRING&gt;&quot;,</div><div class="line">    &quot;defaultTimezone&quot;: &quot;&lt;TIMEZONE&gt;&quot;</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">databaseFilePath</td><td>The file path to the SQLite database used to store persistent settings data. The database will be created on initialization if it does not already exist. </td></tr>
-    <tr><td class="paramname">locales</td><td>The current list of supportable locales on the client. Defaults to ["en-US","en-GB","de-DE", "en-IN","en-CA","ja-JP","en-AU","fr-FR","it-IT","es-ES","es-MX","fr-CA","es-US", "hi-IN", "pt-BR"]. </td></tr>
-    <tr><td class="paramname">defaultLocale</td><td>The current default locale setting on the client. Defaults to "en-US". </td></tr>
-    <tr><td class="paramname">defaultTimezone</td><td>The current default timezone setting on the client. Defaults to "America/Vancouver". </td></tr>
+    <tr><td class="paramname">locales</td><td>A list of locales supported by the device. The default is ["en-US","en-GB","de-DE", "en-IN","en-CA","ja-JP","en-AU","fr-FR","it-IT","es-ES","es-MX","fr-CA","es-US", "hi-IN", "pt-BR"]. </td></tr>
+    <tr><td class="paramname">defaultLocale</td><td>The default locale setting on the device. The default is "en-US". </td></tr>
+    <tr><td class="paramname">defaultTimezone</td><td>The default timezone setting on the device. The default is "America/Vancouver". For accepted values, refer to the accepted timezones here: <a href="https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/system.html#timezonechanged">https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/system.html#timezonechanged</a> </td></tr>
   </table>
   </dd>
 </dl>
@@ -482,7 +584,7 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Deprecated and will be removed after version 2.1.</p>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000002">Deprecated:</a></b></dt><dd>Use <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1config_1_1_alexa_configuration.html#a174a365624dba9cef2db7803a352c916">AlexaConfiguration.createDeviceSettingsConfig()</a></code>.</dd></dl>
 <p>Factory method used to programmatically generate settings configuration data. The data generated by this method is equivalent to providing the following JSON values in a configuration file:</p>
 <div class="fragment"><div class="line">{</div><div class="line">  &quot;settings&quot;: {</div><div class="line">    &quot;databaseFilePath&quot;: &quot;&lt;SQLITE_DATABASE_FILE_PATH&gt;&quot;,</div><div class="line">    &quot;defaultAVSClientSettings&quot;: {</div><div class="line">       &quot;locale&quot;: &quot;&lt;LOCALE&gt;&quot;</div><div class="line">    }</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -517,7 +619,7 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Deprecated and will be removed after version 2.1.</p>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000003">Deprecated:</a></b></dt><dd>Use <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1config_1_1_alexa_configuration.html#a174a365624dba9cef2db7803a352c916">AlexaConfiguration.createDeviceSettingsConfig()</a></code>.</dd></dl>
 <p>Factory method used to programmatically generate settings configuration data. The data generated by this method is equivalent to providing the following JSON values in a configuration file:</p>
 <div class="fragment"><div class="line">{</div><div class="line">  &quot;settings&quot;: {</div><div class="line">    &quot;databaseFilePath&quot;: &quot;&lt;SQLITE_DATABASE_FILE_PATH&gt;&quot;,</div><div class="line">    &quot;defaultAVSClientSettings&quot;: {</div><div class="line">       &quot;locale&quot;: &quot;&lt;LOCALE&gt;&quot;</div><div class="line">    }</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -805,7 +907,7 @@ Static Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 2.2.1 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 2.3.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

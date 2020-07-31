@@ -27,7 +27,7 @@ AudioFormat::AudioFormat(
     Endianness endianness,
     uint32_t sampleRate,
     uint8_t sampleSize,
-    uint8_t channels ) :
+    uint8_t channels) :
         m_encoding{encoding},
         m_sampleFormat{sampleFormat},
         m_layout{layout},
@@ -65,5 +65,5 @@ uint8_t AudioFormat::getNumChannels() {
     return m_channels;
 }
 
-} // aace::audio
-} // aace
+}  // namespace audio
+}  // namespace aace

@@ -31,7 +31,7 @@ namespace config {
 
 class CarControlConfigurationImpl : public CarControlConfiguration {
 private:
-    enum class Option { CAPABILITY, ENDPOINT, MODE, PRESET, ZONE };
+    enum class Option { CAPABILITY, ENDPOINT, MODE, PRESET, ZONE, ACTION };
 
     bool addUniqueAssetId(json& friendlyNames, const std::string& assetId);
     void createDefaultZone(const std::string& zoneId);
@@ -43,12 +43,14 @@ public:
     // CarControlConfiguration
     std::shared_ptr<std::istream> getStream() override;
 
-    // Generic
+    CarControlConfiguration& createEndpoint(const std::string& endpointId) override;
     CarControlConfiguration& createControl(const std::string& controlId, const std::string& zoneId = zone::ALL)
         override;
     CarControlConfiguration& addAssetId(const std::string& assetId) override;
     CarControlConfiguration& addPowerController(bool retrievable) override;
     CarControlConfiguration& addToggleController(const std::string& controllerId, bool retrievable) override;
+    CarControlConfiguration& addActionTurnOn(const std::vector<std::string>& actions) override;
+    CarControlConfiguration& addActionTurnOff(const std::vector<std::string>& actions) override;
     CarControlConfiguration& addRangeController(
         const std::string& controllerId,
         bool retrievable,
@@ -57,11 +59,18 @@ public:
         double precision,
         const std::string& unit = "") override;
     CarControlConfiguration& addPreset(double value) override;
+    CarControlConfiguration& addActionSetRange(const std::vector<std::string>& actions, double value) override;
+    CarControlConfiguration& addActionAdjustRange(const std::vector<std::string>& actions, double delta) override;
     CarControlConfiguration& addModeController(const std::string& controllerId, bool retrievable, bool ordered)
         override;
     CarControlConfiguration& addValue(const std::string& value) override;
+    CarControlConfiguration& addActionSetMode(const std::vector<std::string>& actions, const std::string& value)
+        override;
+    CarControlConfiguration& addActionAdjustMode(const std::vector<std::string>& actions, int delta) override;
 
     CarControlConfiguration& createZone(const std::string& zoneId) override;
+    CarControlConfiguration& addMembers(const std::vector<std::string>& endpointIds) override;
+    CarControlConfiguration& setDefaultZone(const std::string& zoneId) override;
     CarControlConfiguration& addDefaultAssetsPath(const std::string& path) override;
     CarControlConfiguration& addCustomAssetsPath(const std::string& path) override;
 

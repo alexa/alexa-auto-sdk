@@ -23,23 +23,23 @@ namespace aace {
 namespace engine {
 namespace audio {
 
-AudioOutputEngineImpl::AudioOutputEngineImpl( std::shared_ptr<aace::audio::AudioOutput> platformAudioOutput ) : m_platformAudioOutput( platformAudioOutput ) {
+AudioOutputEngineImpl::AudioOutputEngineImpl(std::shared_ptr<aace::audio::AudioOutput> platformAudioOutput) :
+        m_platformAudioOutput(platformAudioOutput) {
 }
 
-std::shared_ptr<AudioOutputEngineImpl> AudioOutputEngineImpl::create( std::shared_ptr<aace::audio::AudioOutput> platformAudioOutput )
-{
-    try
-    {
-        ThrowIfNull( platformAudioOutput, "invalidAudioOutputPlatformInterface" );
-        
-        auto audioOutputEngineImpl = std::shared_ptr<AudioOutputEngineImpl>( new AudioOutputEngineImpl( platformAudioOutput ) );
-        
+std::shared_ptr<AudioOutputEngineImpl> AudioOutputEngineImpl::create(
+    std::shared_ptr<aace::audio::AudioOutput> platformAudioOutput) {
+    try {
+        ThrowIfNull(platformAudioOutput, "invalidAudioOutputPlatformInterface");
+
+        auto audioOutputEngineImpl =
+            std::shared_ptr<AudioOutputEngineImpl>(new AudioOutputEngineImpl(platformAudioOutput));
+
         // set the platform engine interface reference
-        platformAudioOutput->setEngineInterface( audioOutputEngineImpl );
-        
+        platformAudioOutput->setEngineInterface(audioOutputEngineImpl);
+
         return audioOutputEngineImpl;
-    }
-    catch( std::exception& ex ) {
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return nullptr;
     }
@@ -49,97 +49,73 @@ std::shared_ptr<AudioOutputEngineImpl> AudioOutputEngineImpl::create( std::share
 // AudioOutputChannelInterface
 //
 
-bool AudioOutputEngineImpl::prepare( std::shared_ptr<aace::audio::AudioStream> stream, bool repeating )
-{
-    try
-    {
-        return m_platformAudioOutput->prepare( stream, repeating );
-    }
-    catch( std::exception& ex ) {
+bool AudioOutputEngineImpl::prepare(std::shared_ptr<aace::audio::AudioStream> stream, bool repeating) {
+    try {
+        return m_platformAudioOutput->prepare(stream, repeating);
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
 }
 
-bool AudioOutputEngineImpl::prepare( const std::string& url, bool repeating )
-{
-    try
-    {
-        return m_platformAudioOutput->prepare( url, repeating );
-    }
-    catch( std::exception& ex ) {
+bool AudioOutputEngineImpl::prepare(const std::string& url, bool repeating) {
+    try {
+        return m_platformAudioOutput->prepare(url, repeating);
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
 }
 
-bool AudioOutputEngineImpl::play()
-{
-    try
-    {
+bool AudioOutputEngineImpl::play() {
+    try {
         return m_platformAudioOutput->play();
-    }
-    catch( std::exception& ex ) {
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
 }
 
-bool AudioOutputEngineImpl::stop()
-{
-    try
-    {
+bool AudioOutputEngineImpl::stop() {
+    try {
         return m_platformAudioOutput->stop();
-    }
-    catch( std::exception& ex ) {
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
 }
 
-bool AudioOutputEngineImpl::pause()
-{
-    try
-    {
+bool AudioOutputEngineImpl::pause() {
+    try {
         return m_platformAudioOutput->pause();
-    }
-    catch( std::exception& ex ) {
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
 }
 
-bool AudioOutputEngineImpl::resume()
-{
-    try
-    {
+bool AudioOutputEngineImpl::resume() {
+    try {
         return m_platformAudioOutput->resume();
-    }
-    catch( std::exception& ex ) {
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
 }
 
-int64_t AudioOutputEngineImpl::getPosition()
-{
-    try
-    {
+int64_t AudioOutputEngineImpl::getPosition() {
+    try {
         return m_platformAudioOutput->getPosition();
-    }
-    catch( std::exception& ex ) {
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
 }
 
-bool AudioOutputEngineImpl::setPosition( int64_t position )
-{
-    try
-    {
-        return m_platformAudioOutput->setPosition( position );
-    }
-    catch( std::exception& ex ) {
+bool AudioOutputEngineImpl::setPosition(int64_t position) {
+    try {
+        return m_platformAudioOutput->setPosition(position);
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
@@ -154,72 +130,58 @@ int64_t AudioOutputEngineImpl::getDuration() {
     }
 }
 
-int64_t AudioOutputEngineImpl::getNumBytesBuffered()
-{
-    try
-    {
+int64_t AudioOutputEngineImpl::getNumBytesBuffered() {
+    try {
         return m_platformAudioOutput->getNumBytesBuffered();
-    }
-    catch( std::exception& ex ) {
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return 0;
     }
 }
 
-bool AudioOutputEngineImpl::volumeChanged( float volume )
-{
-    try
-    {
-        return m_platformAudioOutput->volumeChanged( volume );
-    }
-    catch( std::exception& ex ) {
+bool AudioOutputEngineImpl::volumeChanged(float volume) {
+    try {
+        return m_platformAudioOutput->volumeChanged(volume);
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
 }
 
-bool AudioOutputEngineImpl::mutedStateChanged( MutedState state )
-{
-    try
-    {
-        return m_platformAudioOutput->mutedStateChanged( state );
-    }
-    catch( std::exception& ex ) {
+bool AudioOutputEngineImpl::mutedStateChanged(MutedState state) {
+    try {
+        return m_platformAudioOutput->mutedStateChanged(state);
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
 }
 
-void AudioOutputEngineImpl::setEngineInterface( std::shared_ptr<aace::audio::AudioOutputEngineInterface> audioOutputEngineInterface ) {
-    m_platformAudioOutput->setEngineInterface( audioOutputEngineInterface );
+void AudioOutputEngineImpl::setEngineInterface(
+    std::shared_ptr<aace::audio::AudioOutputEngineInterface> audioOutputEngineInterface) {
+    m_platformAudioOutput->setEngineInterface(audioOutputEngineInterface);
 }
 
 //
 // aace::audio::AudioOutputEngineInterface
 //
 
-void AudioOutputEngineImpl::onMediaStateChanged( MediaState state )
-{
-    try
-    {
-        Throw( "unhandledMethod" );
-    }
-    catch( std::exception& ex ) {
+void AudioOutputEngineImpl::onMediaStateChanged(MediaState state) {
+    try {
+        Throw("unhandledMethod");
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
     }
 }
 
-void AudioOutputEngineImpl::onMediaError( MediaError error, const std::string& description )
-{
-    try
-    {
-        Throw( "unhandledMethod" );
-    }
-    catch( std::exception& ex ) {
+void AudioOutputEngineImpl::onMediaError(MediaError error, const std::string& description) {
+    try {
+        Throw("unhandledMethod");
+    } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
     }
 }
 
-} // aace::engine::audio
-} // aace::engine
-} // aace
+}  // namespace audio
+}  // namespace engine
+}  // namespace aace

@@ -10,7 +10,7 @@ The purpose of the Android Sample App is to provide useful example code to help 
 * [Running the Android Sample App](#running-the-android-sample-app)
 * [Using the Android Sample App](#using-the-android-sample-app)
 * [Debugging Notes](#debugging-notes)
-* [Release Notes](#v221-release-notes)
+* [Known Issues](#ki)
 
 ## Prerequisites<a id="prerequisites"></a>
 
@@ -81,7 +81,7 @@ The pre-built platform AARs for the default Auto SDK modules and the core-sample
 The Sample App builder scripts are configured to use JCenter to always pull the latest release artifacts during compilation. To run the builder scripts, issue the following command:
 
 ```
-$ gradle assembleRemoteRelease
+$ ./gradlew assembleRemoteRelease
 ```
 
 Alternatively, you can manually download the platform AARs and core-sample AAR from the [JCenter repo](https://jcenter.bintray.com/com/amazon/alexa/aace/) to
@@ -104,7 +104,7 @@ If you do not use the pre-built platform AARs and core-sample AAR, you must buil
 Once you have generated the platform AARs and the core-sample AAR, issue the following command to run the builder scripts:
 
 ``` 
-$ gradle assembleLocalRelease
+$ ./gradlew assembleLocalRelease
 ```
 Alternatively, you can follow the steps to [configure the project in Android Studio](#configure-the-project-in-android-studio).
 
@@ -256,38 +256,17 @@ aac-module-core/0.99.0-r0/src/engine/src/ ${AAC_SDK_HOME}/modules/core/engine/sr
 
 > **Note**: If the LLDB window isn't visible in the debug tab, select **Run** -> **Edit Configurations** -> **Debugger** and change the `Debug Type` to `Native`.
 
-## v2.2.1 Release Notes <a id = "v221-release-notes"></a>
+## Known Issues <a id = "ki"></a>
 
-See [CHANGELOG](../../CHANGELOG.md) for more general information about the v2.2.1 release.
-
-### Enhancements
-* Introduces additional TemplateRuntime platform interface features that you can integrate in your application to enrich the user's experience with Now Playing cards for AudioPlayer and ExternalMediaPlayer implementations.
-
-### Resolved Issues
-No resolved issues.
-
-### Known Issues
-* On the Android Sample App, media playback gets into "No Content Playing" state where all GUI playback control breaks, when pressing next after force closing an external media app.
-* All previous known issues listed below.
-
-## v2.2.0 Release Notes<a id="v220-release-notes"></a>
-
-### Enhancements
-* Added a **TimeZone** option to the menu. The list of available timezone options is updated every time there is a change from the Alexa companion app.
-
-
-### Resolved Issues
-* Fixed an issue where the GUI did not accurately reflect the states of the Navigation Favorites and Navigation State controls across app relaunch.
-* Fixed an issue where clicking the **Cancel Login** button to cancel login in the Android Sample App returned a “Cancelling CBL flow” message, but CBL authentication was not cancelled.
-  
-### Known Issues
-* When you upgrade the Auto SDK Android Sample App from v.2.1 to v2.2, an `INTERNAL_SERVICE_EXCEPTION` is displayed. Functionality is not impacted, and you can ignore the error.
+* In the Alexa companion app, if you change the timezone of the device to a value already listed in the sample app timezone drop down, the timezone field of the sample app is not updated to the new value until the app is restarted.
+* After you forcibly close an external media app and then press the "next" playback button, the media playback gets into a "no content playing" state in which all GUI playback control buttons no longer work. 
 * Alexa Presentation Language (APL) rendering does not support ssmlToSpeech and ssmlToText transformers. Therefore, some skills, like Jeopardy, will not provide the expected user experience.
-* The Android Sample App goes into listening mode when calling 911, as Alexa prompts users to say "Alexa, Cancel" to stop. This is due to the fact that the Android platform does not provide audio loopback to cancel out self triggers. See the [Loopback Detector README](../../extensions/loopback-detector/README.md) for an example of how to use the Auto SDK with the AmazonLite wake word to cancel out self references.
-* The `AudioOutput.prepare()` method implementation in `AudioOutputHandler` blocks returning until it reads the full audio attachment from the Engine on the caller's thread. It should not do this and instead should return quickly and read the attachment on a separate thread.
-* A generic error TTS is returned when the user initiates offline contact calling before uploading contacts to the cloud on the Android Sample App with the optional Local Voice Control extension.
-* Display card rendering is not adaptable to a variety of screen sizes.
+* The sample app goes into listening mode when calling 911, as Alexa prompts the user to say "Alexa, Cancel" to stop. This is due to the Android platform not providing audio loopback to cancel out self triggers. See the [Loopback Detector README](../../extensions/loopback-detector/README.md) for an example of using the Auto SDK with the AmazonLite wake word to cancel out self references.
+* The `AudioOutput.prepare()` method implementation in `AudioOutputHandler` blocks returning until it reads the full audio attachment from the Engine on the caller's thread. If working properly, the implementation returns quickly and reads the attachment on a separate thread.
+* A generic error TTS is returned when the user initiates offline contact calling before uploading contacts to the cloud on the sample app with the optional Local Voice Control extension.
 * Particular sections of the Flash Briefing do not resume properly from a paused state. Attempting to play after pause in some cases may restart the media playback.
-* The Sample App does not implement managing inter-app audio focus, so other apps will not recognize its audio playback appropriately.
+* Display card rendering is not adaptable to a variety of screen sizes.
+* The sample app does not implement managing inter-app audio focus. As a result, other apps do not recognize its audio playback appropriately.
 * Alexa dialog playback may stop abruptly when switching between Wi-Fi and mobile data.
-* The Sample App disconnects from AVS after remaining idle for some time and takes a while to reconnect.
+* The sample app disconnects from AVS after remaining idle for some time and takes a while to reconnect.
+* Music service provider logos in the SVG format are not rendered during the music playback.

@@ -709,6 +709,13 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical">
+
+                            <RadioButton
+                                android:id="@+id/radioUsingConfig"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:checked="true"
+                                android:text="@string/using_config" />
                             <RadioButton android:id="@+id/radioWifi"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -732,13 +739,15 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp">
 
-                <EditText
-                    android:id="@+id/networkInterfaceText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:inputType="text" />
+                    <EditText
+                        android:id="@+id/networkInterfaceText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:enabled="false"
+                        android:inputType="text"
+                        android:text="@string/using_config_text" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -747,17 +756,19 @@
                     android:layout_marginBottom="4dp"
                     android:text="@string/interface_name"
                     android:textSize="12sp" />
-                <TextView
-                    style="@style/button"
-                    android:id="@+id/setNetworkInterfaceButton"
-                    android:text="@string/interface_set"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="4dp" />
+
+                    <TextView
+                        android:id="@+id/setNetworkInterfaceButton"
+                        style="@style/button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="4dp"
+                        android:enabled="false"
+                        android:text="@string/interface_set" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -1163,6 +1174,127 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp" />
+
+        <!-- Messaging -->
+        <LinearLayout
+            android:id="@+id/messaging"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="8dp"
+            android:background="@color/drawerSection"
+            android:orientation="vertical"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
+
+            <!-- Header -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="@string/messaging"
+                android:textColor="@color/drawerHeader"
+                android:textSize="18sp" />
+
+            <!-- Enable Messaging Connection Switch -->
+            <include
+                android:id="@+id/toggleMessagingConnection"
+                layout="@layout/drawer_switch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal" />
+
+            <!-- Messaging UI config -->
+            <LinearLayout
+                android:id="@+id/messagingConfig"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="8dp"
+                android:background="@color/drawerSection"
+                android:orientation="vertical"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp">
+
+                <!-- Configuration Button-->
+                <TextView
+                    android:id="@+id/messagingConfiguration"
+                    style="@style/button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="@string/messaging_permissions" />
+
+                <!-- Send Conversations Report Button -->
+                <TextView
+                    android:id="@+id/displayInfo"
+                    style="@style/button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="@string/messaging_info" />
+
+                <!-- Send Conversations Report Button -->
+                <TextView
+                    android:id="@+id/conversationsReport"
+                    style="@style/button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="@string/messaging_upload" />
+
+                <!-- Send Message Succeeded Button -->
+                <TextView
+                    android:id="@+id/sendMessageSucceeded"
+                    style="@style/button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="@string/messaging_send_succeeded" />
+
+                <!-- Send Message Failed Button -->
+                <TextView
+                    android:id="@+id/sendMessageFailed"
+                    style="@style/button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="@string/messaging_send_failed" />
+
+                <!-- Update Status Succeeded Button -->
+                <TextView
+                    android:id="@+id/updateMessagesStatusSucceeded"
+                    style="@style/button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="@string/messaging_update_succeeded" />
+
+                <!-- Update Status Failed Button -->
+                <TextView
+                    android:id="@+id/updateMessagesStatusFailed"
+                    style="@style/button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="@string/messaging_update_failed" />
+
+            </LinearLayout>
+        </LinearLayout>
 
         <!-- Phone Call Controller -->
         <LinearLayout
@@ -1612,6 +1744,39 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center|center_horizontal" />
+        </LinearLayout>
+
+        <!-- callOnDestroy -->
+        <LinearLayout
+            android:id="@+id/callOnDestroy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="8dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:background="@color/drawerSection">
+
+            <!-- Header -->
+            <TextView
+                android:id="@+id/callOnDestroy_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/callOnDestroy"
+                android:textColor="@color/drawerHeader"
+                android:layout_marginBottom="4dp"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/callOnDestroy_button"
+                style="@style/button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/callOnDestroy" />
         </LinearLayout>
     </LinearLayout>
 

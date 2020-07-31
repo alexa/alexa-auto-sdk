@@ -13,9 +13,6 @@
  * permissions and limitations under the License.
  */
 
-#include <AVSCommon/AVS/EndpointResources.h>
-#include <Endpoints/EndpointBuilder.h>
-
 #include <AACE/Engine/CarControl/AssetStore.h>
 #include <AACE/Engine/CarControl/CapabilityController.h>
 #include <AACE/Engine/CarControl/Endpoint.h>
@@ -24,6 +21,8 @@
 #include <AACE/Engine/CarControl/RangeController.h>
 #include <AACE/Engine/CarControl/ToggleController.h>
 #include <AACE/Engine/Core/EngineMacros.h>
+#include <AVSCommon/AVS/EndpointResources.h>
+#include <Endpoints/EndpointBuilder.h>
 
 namespace aace {
 namespace engine {
@@ -60,7 +59,6 @@ static const std::string CONFIG_KEY_ASSET_ID = "assetId";
 static const std::string CONFIG_KEY_CAPABILITIES = "capabilities";
 /// The 'interface' configuration key
 static const std::string CONFIG_KEY_INTERFACE = "interface";
-
 
 /// The display category for the endpoint in the companion app
 static const std::string DISPLAY_CATEGORY = "VEHICLE";
@@ -106,7 +104,7 @@ std::shared_ptr<Endpoint> Endpoint::create(const json& endpointConfig, const Ass
                 ThrowIfNull(controller, "createToggleControllerFailed");
             } else if (interface == CAPABILITY_RANGE_CONTROLLER) {
                 controller = RangeController::create(capabilityConfig, endpointId, interface, assetStore);
-                ThrowIfNull(controller, "createToggleControllerFailed");
+                ThrowIfNull(controller, "createRangeControllerFailed");
             } else if (interface == CAPABILITY_MODE_CONTROLLER) {
                 controller = ModeController::create(capabilityConfig, endpointId, interface, assetStore);
                 ThrowIfNull(controller, "createModeControllerFailed");
@@ -131,8 +129,7 @@ bool Endpoint::addController(const std::string& id, std::shared_ptr<CapabilityCo
 }
 
 Endpoint::Endpoint(const std::string endpointId, const std::vector<std::string>& assetIds) :
-        m_endpointId{endpointId},
-        m_assetIds{assetIds} {
+        m_endpointId{endpointId}, m_assetIds{assetIds} {
 }
 
 Endpoint::~Endpoint() {
@@ -142,6 +139,10 @@ Endpoint::~Endpoint() {
 
 std::string Endpoint::getId() {
     return m_endpointId;
+}
+
+std::string Endpoint::getDiscoveryId() {
+    return m_discoveryEndpointId;
 }
 
 bool Endpoint::build(
@@ -175,6 +176,7 @@ bool Endpoint::build(
         }
         auto endpointId = endpointBuilder->build();
         ThrowIfNot(endpointId.hasValue(), "couldNotBuildEndpoint");
+        m_discoveryEndpointId = endpointId.value();
         endpointBuilder.reset();
         return true;
     } catch (std::exception& ex) {

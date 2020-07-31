@@ -33,13 +33,13 @@ namespace config {
  * Base class for providing JSON configuration data to the Engine.
  */
 class EngineConfiguration {
-    public:
-        virtual ~EngineConfiguration() = default;
+public:
+    virtual ~EngineConfiguration() = default;
 
-        /**
+    /**
          * @return A pointer to a @c std::istream object containing the JSON configuration data
          */
-        virtual std::shared_ptr<std::istream> getStream() = 0;
+    virtual std::shared_ptr<std::istream> getStream() = 0;
 };
 
 /**
@@ -48,25 +48,25 @@ class EngineConfiguration {
  * by the other configuration objects.
  */
 class StreamConfiguration : public EngineConfiguration {
-    private:
-        StreamConfiguration() = default;
+private:
+    StreamConfiguration() = default;
 
-    public:
-        /**
+public:
+    /**
          * Creates a new instance of @c StreamConfiguration by providing the input stream
          * containing JSON data
          *
          * @param [in] stream The input stream
          */
-        static std::shared_ptr<StreamConfiguration> create( std::shared_ptr<std::istream> stream );
+    static std::shared_ptr<StreamConfiguration> create(std::shared_ptr<std::istream> stream);
 
-        /**
+    /**
          * @return A pointer to a @c std::istream object containing the JSON configuration data
          */
-        std::shared_ptr<std::istream> getStream() override;
-        
-    private:
-        std::shared_ptr<std::istream> m_stream;
+    std::shared_ptr<std::istream> getStream() override;
+
+private:
+    std::shared_ptr<std::istream> m_stream;
 };
 
 /**
@@ -75,29 +75,29 @@ class StreamConfiguration : public EngineConfiguration {
  * by the other configuration objects.
  */
 class ConfigurationFile : public EngineConfiguration {
-    private:
-        ConfigurationFile() = default;
+private:
+    ConfigurationFile() = default;
 
-    public:
-        /**
+public:
+    /**
          * Creates a new instance of @c ConfigurationFile by providing the path to a configuration file
          * containing JSON data.
          *
          * @param [in] configFilePath The path to the configuration file
          */
-        static std::shared_ptr<ConfigurationFile> create( const std::string& configFilePath );
-        
-        /**
+    static std::shared_ptr<ConfigurationFile> create(const std::string& configFilePath);
+
+    /**
          * @return A pointer to a @c std::istream object containing the JSON configuration data
          */
-        std::shared_ptr<std::istream> getStream() override;
-        
-    private:
-        std::shared_ptr<std::istream> m_stream;
+    std::shared_ptr<std::istream> getStream() override;
+
+private:
+    std::shared_ptr<std::istream> m_stream;
 };
 
-} // aace::core::config
-} // aace::core
-} // aace
+}  // namespace config
+}  // namespace core
+}  // namespace aace
 
-#endif // AACE_CORE_CONFIG_ENGINE_CONFIGURATION_H
+#endif  // AACE_CORE_CONFIG_ENGINE_CONFIGURATION_H

@@ -141,6 +141,6 @@ void LogEntry::appendEscapedString(const char* in) {
     }
 }
 
-} // aace::engine::logger
-} // aace::engine
-} // aace
+}  // namespace logger
+}  // namespace engine
+}  // namespace aace

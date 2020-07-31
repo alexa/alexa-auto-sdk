@@ -26,12 +26,13 @@ namespace core {
 
 class CoreTestHelper {
 public:
-    static std::shared_ptr<aace::core::config::EngineConfiguration> createDefaultConfiguration( bool withExpectCall = true );
+    static std::shared_ptr<aace::core::config::EngineConfiguration> createDefaultConfiguration(
+        bool withExpectCall = true);
     static std::shared_ptr<aace::core::PlatformInterface> createDefaultPlatformInterface();
 };
 
-} // aace::test::core
-} // aace::test
-} // aace
+}  // namespace core
+}  // namespace test
+}  // namespace aace
 
-#endif // AACE_ENGINE_TEST_CORE_TEST_HELPER_H
+#endif  // AACE_ENGINE_TEST_CORE_TEST_HELPER_H

@@ -41,39 +41,39 @@ protected:
 
 public:
     virtual ~Notifications();
-    
+
     /**
      * Specifies whether a notification indicator should be rendered on the platform
      */
     enum class IndicatorState {
 
-      /**
+        /**
        * The notification indicator should be turned off
        */
-      OFF = 0,
+        OFF = 0,
 
-      /**
+        /**
        * The notification indicator should be turned on
        */
-      ON = 1,
+        ON = 1,
 
-      /**
+        /**
        * The notification indicator state is unknown.
        */
-      UNKNOWN
+        UNKNOWN
     };
-    
+
     /**
      * Notifies the platform implementation of whether a notification indicator should be rendered
      *
      * @param [in] state The new notification indicator state
      */
-    virtual void setIndicator( IndicatorState state ) = 0;
+    virtual void setIndicator(IndicatorState state) = 0;
 
     /**
      * Notifies the platform implementation of notification received
      */
-    virtual void onNotificationReceived() {};
+    virtual void onNotificationReceived(){};
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const Notifications::IndicatorState& state) {
@@ -91,7 +91,7 @@ inline std::ostream& operator<<(std::ostream& stream, const Notifications::Indic
     return stream;
 }
 
-} // aace::alexa
-} // aace
+}  // namespace alexa
+}  // namespace aace
 
-#endif // AACE_ALEXA_NOTIFICATIONS_H
+#endif  // AACE_ALEXA_NOTIFICATIONS_H

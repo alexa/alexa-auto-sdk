@@ -1,4 +1,8 @@
+---
 BasedOnStyle: Google
+ColumnLimit: 120
+IndentWidth: 4
+---
 Language: Cpp
 AccessModifierOffset: -4
 AlignAfterOpenBracket: AlwaysBreak
@@ -8,9 +12,14 @@ BinPackArguments: false
 BinPackParameters: false
 BreakBeforeInheritanceComma: true
 BreakConstructorInitializers: AfterColon
-ColumnLimit: 120
 ConstructorInitializerIndentWidth: 8
 DerivePointerAlignment: false
-IndentWidth: 4
 PenaltyReturnTypeOnItsOwnLine: 20000
+ReflowComments: false
 SortIncludes: false
+---
+Language: Java
+BreakAfterJavaFieldAnnotations: true
+ContinuationIndentWidth: 8
+JavaImportGroups: ['android', 'androidx', 'com', 'junit', 'net', 'org', 'java', 'javax']
+---

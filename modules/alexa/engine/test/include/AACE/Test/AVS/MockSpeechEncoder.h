@@ -18,17 +18,18 @@
 
 #include <AACE/Engine/Alexa/SpeechRecognizerEngineImpl.h>
 
-namespace aace {    
+namespace aace {
 namespace test {
 namespace avs {
 
 struct MockSpeechEncoder : public alexaClientSDK::speechencoder::SpeechEncoder {
 public:
-    MockSpeechEncoder(const std::shared_ptr<alexaClientSDK::speechencoder::EncoderContext>& encoder) : alexaClientSDK::speechencoder::SpeechEncoder(encoder) {};
+    MockSpeechEncoder(const std::shared_ptr<alexaClientSDK::speechencoder::EncoderContext>& encoder) :
+            alexaClientSDK::speechencoder::SpeechEncoder(encoder){};
 };
 
-} // aace::test::avs
-} // aace::test
-} // aace
+}  // namespace avs
+}  // namespace test
+}  // namespace aace
 
-#endif //AACE_TEST_AVS_MOCK_SPEECH_ENCODER_H
+#endif  //AACE_TEST_AVS_MOCK_SPEECH_ENCODER_H

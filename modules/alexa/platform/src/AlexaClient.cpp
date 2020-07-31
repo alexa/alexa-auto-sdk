@@ -18,8 +18,18 @@
 namespace aace {
 namespace alexa {
 
-AlexaClient::~AlexaClient() = default; // key function
+AlexaClient::~AlexaClient() = default;  // key function
 
-} // aace::alexa
-} // aac
+void AlexaClient::setEngineInterface(
+    std::shared_ptr<aace::alexa::AlexaClientEngineInterface> alexaClientEngineInterface) {
+    m_alexaClientEngineInterface = alexaClientEngineInterface;
+}
 
+void AlexaClient::stopForegroundActivity() {
+    if (auto m_alexaClientEngineInterface_lock = m_alexaClientEngineInterface.lock()) {
+        m_alexaClientEngineInterface_lock->onStopForegroundActivity();
+    }
+}
+
+}  // namespace alexa
+}  // namespace aace

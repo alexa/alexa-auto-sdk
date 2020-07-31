@@ -17,12 +17,12 @@
 #define SAMPLEAPP_VIEWS_H
 
 // C++ Standard Library
-#include <iostream> // std::clog
-#include <memory>   // std::shared_ptr
-#include <mutex>    // std::mutex etc.
-#include <sstream>  // std::stringstream
-#include <string>   // std::string
-#include <vector>   // std::vector
+#include <iostream>  // std::clog
+#include <memory>    // std::shared_ptr
+#include <mutex>     // std::mutex etc.
+#include <sstream>   // std::stringstream
+#include <string>    // std::string
+#include <vector>    // std::vector
 
 namespace sampleApp {
 
@@ -33,15 +33,15 @@ namespace sampleApp {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class View {
-  private:
+private:
     std::string m_id{};
     std::string m_text{};
     static const std::string m_ruler;
 
-  protected:
-    View(const std::string &id);
+protected:
+    View(const std::string& id);
 
-  public:
+public:
     virtual ~View() = default;
 
     enum class Type {
@@ -71,38 +71,45 @@ class View {
         // TemplateRuntime/RenderPlayerInfo
         PlayerInfo
     };
-    static std::shared_ptr<View> create(const std::string &id);
-    template <typename... Args> void print(Args &&... args) {
+    static std::shared_ptr<View> create(const std::string& id);
+    template <typename... Args>
+    void print(Args&&... args) {
         std::stringstream stream;
         print(stream, args...);
     }
-    template <typename Head> void print(std::stringstream &stream, Head head) {
-        stream << head << std::flush;
-        std::clog << stream.str();
+    template <typename Head>
+    void print(std::stringstream& stream, Head head) {
+        std::clog << head << stream.str();  // keep it buffered on purpose
     }
-    template <typename Head, typename... Tail> void print(std::stringstream &stream, Head head, Tail... tail) {
+    template <typename Head, typename... Tail>
+    void print(std::stringstream& stream, Head head, Tail... tail) {
         stream << head << ' ';
         print(stream, tail...);
     }
-    template <typename... Args> void printLine(Args &&... args) {
+    template <typename... Args>
+    void printLine(Args&&... args) {
         std::stringstream stream;
         printLine(stream, args...);
     }
-    template <typename Head> void printLine(std::stringstream &stream, Head head) {
+    template <typename Head>
+    void printLine(std::stringstream& stream, Head head) {
         stream << head << std::endl;
-        std::clog << stream.str();
+        std::clog << stream.str() << std::flush;  // make it line-buffered
     }
-    template <typename Head, typename... Tail> void printLine(std::stringstream &stream, Head head, Tail... tail) {
+    template <typename Head, typename... Tail>
+    void printLine(std::stringstream& stream, Head head, Tail... tail) {
         stream << head << ' ';
         printLine(stream, tail...);
     }
-    void printRuler() { printLine(m_ruler); }
+    void printRuler() {
+        printLine(m_ruler);
+    }
     virtual auto clear(Type type) -> void;
     virtual auto getId() -> std::string;
     virtual auto getText() -> std::string;
-    virtual auto set(const std::string &string, Type type) -> void;
-    virtual auto setId(const std::string &id) -> void;
-    virtual auto setText(const std::string &text) -> void;
+    virtual auto set(const std::string& string, Type type) -> void;
+    virtual auto setId(const std::string& id) -> void;
+    virtual auto setText(const std::string& text) -> void;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -112,13 +119,13 @@ class View {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class ContentView : public View {
-  protected:
-    ContentView(const std::string &id);
+protected:
+    ContentView(const std::string& id);
 
-  public:
-    static std::shared_ptr<ContentView> create(const std::string &id);
+public:
+    static std::shared_ptr<ContentView> create(const std::string& id);
     auto clear(Type type) -> void override;
-    auto set(const std::string &string, Type type) -> void override;
+    auto set(const std::string& string, Type type) -> void override;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -128,14 +135,14 @@ class ContentView : public View {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class TextView : public View {
-  protected:
-    TextView(const std::string &id);
+protected:
+    TextView(const std::string& id);
 
-  public:
-    static std::shared_ptr<TextView> create(const std::string &id);
-    auto setText(const std::string &text) -> void override;
+public:
+    static std::shared_ptr<TextView> create(const std::string& id);
+    auto setText(const std::string& text) -> void override;
 };
 
-} // namespace sampleApp
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_VIEWS_H
+#endif  // SAMPLEAPP_VIEWS_H

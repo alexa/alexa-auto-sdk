@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">2.2.1</span>
+   &#160;<span id="projectnumber">2.3.0</span>
    </div>
   </td>
  </tr>
@@ -143,6 +143,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a6b469f0511ffdea1083044f0fe9f421e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a70491bf5bb02e0fce4d8fcf2bc206261"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_alexa_client.html#a70491bf5bb02e0fce4d8fcf2bc206261">connectionStatusChanged</a> (<a class="el" href="classaace_1_1alexa_1_1_alexa_client.html#a375451d4d9cb626701ac8cbaa02ffbe2">ConnectionStatus</a> status, <a class="el" href="classaace_1_1alexa_1_1_alexa_client.html#a05af151f4b7fdd47b9ea56e504074e05">ConnectionChangedReason</a> reason)</td></tr>
 <tr class="separator:a70491bf5bb02e0fce4d8fcf2bc206261"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ac8bb84af2126339c7bf685d3540bac"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_alexa_client.html#a5ac8bb84af2126339c7bf685d3540bac">stopForegroundActivity</a> ()</td></tr>
+<tr class="separator:a5ac8bb84af2126339c7bf685d3540bac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classaace_1_1alexa_1_1_alexa_client.html">AlexaClient</a> should be extended to handle Alexa state changes on the platform. </p>
@@ -170,9 +172,9 @@ Public Member Functions</h2></td></tr>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a5f3b9fc09843bc68b5bb9f0ed6b8586eaa5daf7f2ebbba4975d61dab1c40188c7"></a>IDLE&#160;</td><td class="fielddoc"><p>Alexa is idle and ready for an interaction. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a5f3b9fc09843bc68b5bb9f0ed6b8586eac0ff938e396e72c225bd66562b80a77e"></a>LISTENING&#160;</td><td class="fielddoc"><p>Alexa is currently listening. </p>
+<tr><td class="fieldname"><a id="a5f3b9fc09843bc68b5bb9f0ed6b8586eac0ff938e396e72c225bd66562b80a77e"></a>LISTENING&#160;</td><td class="fielddoc"><p>Alexa is listening. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a5f3b9fc09843bc68b5bb9f0ed6b8586eabd416d769c9ba62060c04ae8455e98d2"></a>EXPECTING&#160;</td><td class="fielddoc"><p>Alexa is currently expecting a response from the user. </p>
+<tr><td class="fieldname"><a id="a5f3b9fc09843bc68b5bb9f0ed6b8586eabd416d769c9ba62060c04ae8455e98d2"></a>EXPECTING&#160;</td><td class="fielddoc"><p>Alexa is expecting a response from the user. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="a5f3b9fc09843bc68b5bb9f0ed6b8586ea18004389aa6f827c608aad2441a2bc53"></a>THINKING&#160;</td><td class="fielddoc"><p>A user request has completed, and no more user input is being accepted. Alexa is waiting for a response from AVS. </p>
 </td></tr>
@@ -201,7 +203,7 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Describes the status of an AVS connection </p>
+<p>Describes the AVS connection status </p>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a375451d4d9cb626701ac8cbaa02ffbe2a99c8ce56e7ab246445d3b134724428f3"></a>DISCONNECTED&#160;</td><td class="fielddoc"><p>Not connected to AVS </p>
 </td></tr>
@@ -252,11 +254,11 @@ Public Member Functions</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><a id="a05af151f4b7fdd47b9ea56e504074e05aabd298f8599f681c645d152c354f24de"></a>INVALID_AUTH&#160;</td><td class="fielddoc"><p>The provided access credentials were invalid. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a05af151f4b7fdd47b9ea56e504074e05a2e03079aa2f230632487842f6cce997a"></a>PING_TIMEDOUT&#160;</td><td class="fielddoc"><p>There was a timeout sending a ping request. </p>
+<tr><td class="fieldname"><a id="a05af151f4b7fdd47b9ea56e504074e05a2e03079aa2f230632487842f6cce997a"></a>PING_TIMEDOUT&#160;</td><td class="fielddoc"><p>A ping request timed out. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a05af151f4b7fdd47b9ea56e504074e05a97af85d432104a37a1d183a76f05ad98"></a>WRITE_TIMEDOUT&#160;</td><td class="fielddoc"><p>There was a timeout writing to AVS. </p>
+<tr><td class="fieldname"><a id="a05af151f4b7fdd47b9ea56e504074e05a97af85d432104a37a1d183a76f05ad98"></a>WRITE_TIMEDOUT&#160;</td><td class="fielddoc"><p>A write request to AVS timed out. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a05af151f4b7fdd47b9ea56e504074e05acc3d4fecdd44cc6a7090ead5bcdc89a0"></a>READ_TIMEDOUT&#160;</td><td class="fielddoc"><p>There was a timeout reading from AVS. </p>
+<tr><td class="fieldname"><a id="a05af151f4b7fdd47b9ea56e504074e05acc3d4fecdd44cc6a7090ead5bcdc89a0"></a>READ_TIMEDOUT&#160;</td><td class="fielddoc"><p>A read request from AVS timed out. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="a05af151f4b7fdd47b9ea56e504074e05aafb0ae7bf77c6f70390d3658d3e12033"></a>FAILURE_PROTOCOL_ERROR&#160;</td><td class="fielddoc"><p>There was an underlying protocol error. </p>
 </td></tr>
@@ -303,7 +305,7 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section note"><dt>Note</dt><dd>It is the responsibility of the platform implementation to provide a familiar Alexa experience for the user. See the AVS UX Attention System guidelines for recommendations on communicating Alexa attention states: <a href="https://developer.amazon.com/docs/alexa-voice-service/ux-design-attention.html#implement">https://developer.amazon.com/docs/alexa-voice-service/ux-design-attention.html#implement</a> </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>The platform implementation is responsible for providing a familiar Alexa experience for the user. See the AVS UX Attention System guidelines for recommendations on communicating Alexa attention states: <a href="https://developer.amazon.com/docs/alexa-voice-service/ux-design-attention.html#implement">https://developer.amazon.com/docs/alexa-voice-service/ux-design-attention.html#implement</a> </dd></dl>
 
 </div>
 </div>
@@ -388,10 +390,28 @@ Public Member Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">status</td><td>The new AVS connection status </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">reason</td><td>The reason for the status change </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">reason</td><td>The reason for the AVS connection status change </td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="a5ac8bb84af2126339c7bf685d3540bac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5ac8bb84af2126339c7bf685d3540bac">&#9670;&nbsp;</a></span>stopForegroundActivity()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void aace::alexa::AlexaClient::stopForegroundActivity </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Stops the foreground activity if there is one. This acts as a "stop" button that you use to stop an ongoing activity that has acquired the audio or visual focus. This call stops all user-observable activities and returns immediately. </p>
 
 </div>
 </div>
@@ -400,7 +420,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 2.2.1 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 2.3.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

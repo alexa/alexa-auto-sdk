@@ -22,7 +22,7 @@
 
 namespace aace {
 namespace core {
-  /**
+/**
    * PlatformInterface is the base class for all platform interfaces.
    * It can be extended to create custom platform interfaces.
    */
@@ -34,7 +34,7 @@ public:
     virtual ~PlatformInterface();
 };
 
-} // aace::core
-} // aace
+}  // namespace core
+}  // namespace aace
 
-#endif // AACE_CORE_PLATFORM_INTERFACE_H
+#endif  // AACE_CORE_PLATFORM_INTERFACE_H

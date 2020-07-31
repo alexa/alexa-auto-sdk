@@ -23,65 +23,62 @@ namespace aace {
 namespace jni {
 namespace propertyManager {
 
-    //
-    // PropertyManagerHandler
-    //
+//
+// PropertyManagerHandler
+//
 
-    class PropertyManagerHandler : public aace::propertyManager::PropertyManager {
-    public:
-        PropertyManagerHandler( jobject obj );
+class PropertyManagerHandler : public aace::propertyManager::PropertyManager {
+public:
+    PropertyManagerHandler(jobject obj);
 
-        // aace::propertyManager::PropertyManager
-        void propertyChanged( const std::string& name, const std::string& newValue) override; 
-        void propertyStateChanged( const std::string& name, const std::string& value, const PropertyState state ) override; 
+    // aace::propertyManager::PropertyManager
+    void propertyChanged(const std::string& name, const std::string& newValue) override;
+    void propertyStateChanged(const std::string& name, const std::string& value, const PropertyState state) override;
 
-    private:
-        JObject m_obj;
-    };
+private:
+    JObject m_obj;
+};
 
-    //
-    // PropertyManagerBinder
-    //
+//
+// PropertyManagerBinder
+//
 
-    class PropertyManagerBinder : public aace::jni::core::PlatformInterfaceBinder {
-    public:
-        PropertyManagerBinder( jobject obj );
+class PropertyManagerBinder : public aace::jni::core::PlatformInterfaceBinder {
+public:
+    PropertyManagerBinder(jobject obj);
 
-        std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
-            return m_propertyManagerHandler;
-        }
+    std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
+        return m_propertyManagerHandler;
+    }
 
-        std::shared_ptr<PropertyManagerHandler> getPropertyManager() {
-            return m_propertyManagerHandler;
-        }
+    std::shared_ptr<PropertyManagerHandler> getPropertyManager() {
+        return m_propertyManagerHandler;
+    }
 
-    private: 
-        std::shared_ptr<PropertyManagerHandler> m_propertyManagerHandler;
-    };
+private:
+    std::shared_ptr<PropertyManagerHandler> m_propertyManagerHandler;
+};
 
-    //
-    // JPropertyState
-    //
+//
+// JPropertyState
+//
 
-    class JPropertyStateConfig : public EnumConfiguration<PropertyManagerHandler::PropertyState> {
-    public:
-        using T = PropertyManagerHandler::PropertyState;
+class JPropertyStateConfig : public EnumConfiguration<PropertyManagerHandler::PropertyState> {
+public:
+    using T = PropertyManagerHandler::PropertyState;
 
-        const char* getClassName() override {
-            return "com/amazon/aace/propertyManager/PropertyManager$PropertyState";
-        }
+    const char* getClassName() override {
+        return "com/amazon/aace/propertyManager/PropertyManager$PropertyState";
+    }
 
-        std::vector<std::pair<T,std::string>> getConfiguration() override {
-            return {
-                {T::SUCCEEDED,"SUCCEEDED"},
-                {T::FAILED,"FAILED"}
-            };
-        }
-    };
-    using JPropertyState = JEnum<PropertyManagerHandler::PropertyState, JPropertyStateConfig>;
+    std::vector<std::pair<T, std::string>> getConfiguration() override {
+        return {{T::SUCCEEDED, "SUCCEEDED"}, {T::FAILED, "FAILED"}};
+    }
+};
+using JPropertyState = JEnum<PropertyManagerHandler::PropertyState, JPropertyStateConfig>;
 
-} // aace::jni::propertyManager
-} // aace::jni
-} // aace
+}  // namespace propertyManager
+}  // namespace jni
+}  // namespace aace
 
-#endif // AACE_JNI_PROPERTY_MANAGER_PROPERTY_MANAGER_BINDER_H
+#endif  // AACE_JNI_PROPERTY_MANAGER_PROPERTY_MANAGER_BINDER_H

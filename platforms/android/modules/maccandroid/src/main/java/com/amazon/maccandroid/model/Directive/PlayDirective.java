@@ -1,6 +1,6 @@
 package com.amazon.maccandroid.model.Directive;
 
-public class PlayDirective extends Directive{
+public class PlayDirective extends Directive {
     private final String mToken;
     private final long mIndex;
     private final long mOffest;
@@ -18,8 +18,8 @@ public class PlayDirective extends Directive{
 
     @Override
     public String toString() {
-        return "PlayDirective | mtoken: " + mToken + " | mIndex: " + mIndex +  " | mOffset: " + mOffest + " | mPreload: " + mPreload + " | mNavigation: " + mNavigation;
-
+        return "PlayDirective | mtoken: " + mToken + " | mIndex: " + mIndex + " | mOffset: " + mOffest
+                + " | mPreload: " + mPreload + " | mNavigation: " + mNavigation;
     }
 
     public String getToken() {

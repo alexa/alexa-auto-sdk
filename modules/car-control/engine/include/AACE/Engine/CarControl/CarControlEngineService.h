@@ -17,6 +17,7 @@
 #define AACE_ENGINE_CAR_CONTROL_CAR_CONTROL_ENGINE_SERVICE_H
 
 #include <memory>
+#include <nlohmann/json.hpp>
 #include <unordered_map>
 
 #include "AACE/CarControl/CarControl.h"
@@ -29,12 +30,13 @@ namespace aace {
 namespace engine {
 namespace carControl {
 
+using json = nlohmann::json;
+
 class CarControlEngineService
         : public aace::engine::core::EngineService
         , public std::enable_shared_from_this<CarControlEngineService> {
 public:
-    DESCRIBE("aace.carControl", VERSION("1.0"),
-             DEPENDS(aace::engine::storage::StorageEngineService))
+    DESCRIBE("aace.carControl", VERSION("1.0"), DEPENDS(aace::engine::storage::StorageEngineService))
 public:
     virtual ~CarControlEngineService();
 
@@ -67,6 +69,15 @@ protected:
     CarControlEngineService(const aace::engine::core::ServiceDescription& description);
 
 private:
+    /**
+     * A utility method to translate configuration from the 2.2 format using 
+     * 'relationships' for zones to the 2.3 format using an 
+     * 'Alexa.Automotive.ZoneDefinitions' capability
+     * 
+     * @param [in, out] jconfiguration The old format configuration to update
+     */
+    void translateConfigForZones(json& jconfiguration);
+
     template <class T>
     bool registerPlatformInterfaceType(std::shared_ptr<aace::core::PlatformInterface> platformInterface) {
         std::shared_ptr<T> typedPlatformInterface = std::dynamic_pointer_cast<T>(platformInterface);
@@ -88,6 +99,9 @@ private:
 
     /// Whether the @c CarControlEngineService has been configured
     bool m_configured = false;
+
+    /// The capability configuration for the Alexa.Automotive.ZoneDefinitions capability generated at translation time
+    json m_zonesCapabilityConfig;
 };
 
 }  // namespace carControl

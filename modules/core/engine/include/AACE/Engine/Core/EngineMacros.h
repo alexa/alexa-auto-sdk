@@ -19,48 +19,88 @@
 #include "AACE/Engine/Core/EngineServiceManager.h"
 #include "AACE/Engine/Logger/EngineLogger.h"
 
-#define VA_NUM_ARGS(...) VA_NUM_ARGS_IMPL(__VA_ARGS__, 5,4,3,2,1)
-#define VA_NUM_ARGS_IMPL(_1,_2,_3,_4,_5,N,...) N
+#define VA_NUM_ARGS(...) VA_NUM_ARGS_IMPL(__VA_ARGS__, 5, 4, 3, 2, 1)
+#define VA_NUM_ARGS_IMPL(_1, _2, _3, _4, _5, N, ...) N
 #define macro_dispatcher(func, ...) macro_dispatcher_(func, VA_NUM_ARGS(__VA_ARGS__))
 #define macro_dispatcher_(func, nargs) macro_dispatcher__(func, nargs)
-#define macro_dispatcher__(func, nargs) func ## nargs
+#define macro_dispatcher__(func, nargs) func##nargs
 
 // exceptions
 #define Throw(reason) throw std::runtime_error(reason)
-#define ThrowIf(arg,reason) do { if(arg){throw std::runtime_error(reason);} } while (false)
-#define ThrowIfNot(arg,reason) do { if(!(arg)){throw std::runtime_error(reason);} } while (false)
-#define ThrowIfNull(arg,reason) do { if((arg)==nullptr){throw std::runtime_error(reason);} } while (false)
-#define ThrowIfNotNull(arg,reason) do { if((arg)!=nullptr){throw std::runtime_error(reason);} } while (false)
+#define ThrowIf(arg, reason)                  \
+    do {                                      \
+        if (arg) {                            \
+            throw std::runtime_error(reason); \
+        }                                     \
+    } while (false)
+#define ThrowIfNot(arg, reason)               \
+    do {                                      \
+        if (!(arg)) {                         \
+            throw std::runtime_error(reason); \
+        }                                     \
+    } while (false)
+#define ThrowIfNull(arg, reason)              \
+    do {                                      \
+        if ((arg) == nullptr) {               \
+            throw std::runtime_error(reason); \
+        }                                     \
+    } while (false)
+#define ThrowIfNotNull(arg, reason)           \
+    do {                                      \
+        if ((arg) != nullptr) {               \
+            throw std::runtime_error(reason); \
+        }                                     \
+    } while (false)
 
 #define ReturnIf(...) macro_dispatcher(ReturnIf, __VA_ARGS__)(__VA_ARGS__)
-#define ReturnIf1(arg) do { if(arg){return;} } while(false)
-#define ReturnIf2(arg,result) do { if(arg){return(result);} } while(false)
+#define ReturnIf1(arg) \
+    do {               \
+        if (arg) {     \
+            return;    \
+        }              \
+    } while (false)
+#define ReturnIf2(arg, result) \
+    do {                       \
+        if (arg) {             \
+            return (result);   \
+        }                      \
+    } while (false)
 
 #define ReturnIfNot(...) macro_dispatcher(ReturnIfNot, __VA_ARGS__)(__VA_ARGS__)
-#define ReturnIfNot1(arg) do { if(!(arg)){return;} } while(false)
-#define ReturnIfNot2(arg, result) do { if(!(arg)){return(result);} } while(false)
+#define ReturnIfNot1(arg) \
+    do {                  \
+        if (!(arg)) {     \
+            return;       \
+        }                 \
+    } while (false)
+#define ReturnIfNot2(arg, result) \
+    do {                          \
+        if (!(arg)) {             \
+            return (result);      \
+        }                         \
+    } while (false)
 
 // logging
 #define AACE_LOGGER (aace::engine::logger::EngineLogger::getInstance())
 #define AACE_LOG_LEVEL aace::engine::logger::EngineLogger::Level
-#define AACE_LOG(level, entry)                                   \
-    do {                                                         \
-        AACE_LOGGER->log(level, entry);                          \
+#define AACE_LOG(level, entry)          \
+    do {                                \
+        AACE_LOGGER->log(level, entry); \
     } while (false)
 
 #ifdef AACE_DEBUG_LOG_ENABLED
 #define AACE_DEBUG(entry) AACE_LOG(AACE_LOG_LEVEL::VERBOSE, entry)
 #define AACE_VERBOSE(entry) AACE_LOG(AACE_LOG_LEVEL::VERBOSE, entry)
-#else // AACE_DEBUG_LOG_ENABLED
+#else  // AACE_DEBUG_LOG_ENABLED
 #define AACE_DEBUG(entry)
 #define AACE_VERBOSE(entry)
-#endif // AACE_DEBUG_LOG_ENABLED
+#endif  // AACE_DEBUG_LOG_ENABLED
 
 #ifdef AAC_LATENCY_LOGS_ENABLED
 #define AACE_METRIC(entry) AACE_LOG(AACE_LOG_LEVEL::METRIC, entry)
-#else // AAC_LATENCY_LOGS_ENABLED
+#else  // AAC_LATENCY_LOGS_ENABLED
 #define AACE_METRIC(entry)
-#endif // AAC_LATENCY_LOGS_ENABLED
+#endif  // AAC_LATENCY_LOGS_ENABLED
 
 #define AACE_INFO(entry) AACE_LOG(AACE_LOG_LEVEL::INFO, entry)
 #define AACE_WARN(entry) AACE_LOG(AACE_LOG_LEVEL::WARN, entry)
@@ -69,10 +109,9 @@
 
 // creates a log event for the aace logger
 #define LX(...) macro_dispatcher(LX, __VA_ARGS__)(__VA_ARGS__)
-#define LX1(tag) aace::engine::logger::LogEntry(tag,__func__)
-#define LX2(tag,event) aace::engine::logger::LogEntry(tag,event)
+#define LX1(tag) aace::engine::logger::LogEntry(tag, __func__)
+#define LX2(tag, event) aace::engine::logger::LogEntry(tag, event)
 
-#define DX aace::engine::logger::LogEntry(__FILE__,__func__)
+#define DX aace::engine::logger::LogEntry(__FILE__, __func__)
 
-
-#endif // AACE_ENGINE_CORE_ENGINE_EXCEPTIONS_H
+#endif  // AACE_ENGINE_CORE_ENGINE_EXCEPTIONS_H

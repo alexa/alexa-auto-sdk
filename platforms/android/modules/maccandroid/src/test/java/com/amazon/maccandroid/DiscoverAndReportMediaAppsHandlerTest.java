@@ -1,5 +1,7 @@
 package com.amazon.maccandroid;
 
+import static org.junit.Assert.assertEquals;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -26,12 +28,11 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-
 public class DiscoverAndReportMediaAppsHandlerTest {
     private static final String JAVA_VERSION_PROPERTY = "java.version";
     public static final String COM_AMAZON_TEST_MACC_APP = "com.amazon.testMaccApp";
-    public static final String COM_AMAZON_TEST_MACC_APP_TEST_SERVICE_TEST_MEDIA_BROWSER_SERVICE = "com.amazon.testMaccApp.testService.TestMediaBrowserService";
+    public static final String COM_AMAZON_TEST_MACC_APP_TEST_SERVICE_TEST_MEDIA_BROWSER_SERVICE =
+            "com.amazon.testMaccApp.testService.TestMediaBrowserService";
 
     private DiscoverAndReportMediaAppsHandler mClassToTest;
     private Context mMockContext;
@@ -70,22 +71,20 @@ public class DiscoverAndReportMediaAppsHandlerTest {
         mockSignatures[0] = Mockito.mock(Signature.class);
         mMockPackageInfo.signatures = mockSignatures;
         Mockito.when(mMockContext.getPackageManager()).thenReturn(mMockPackageManager);
-        Mockito.when(mMockPackageManager.getPackageInfo(Mockito.anyString(), Mockito.anyInt())).
-                thenReturn(mMockPackageInfo);
+        Mockito.when(mMockPackageManager.getPackageInfo(Mockito.anyString(), Mockito.anyInt()))
+                .thenReturn(mMockPackageInfo);
     }
 
     @After
-    public void tearDown() throws Exception {
-    }
+    public void tearDown() throws Exception {}
 
     @Test
-    public void handleMessage() {
-    }
+    public void handleMessage() {}
 
     @Test
     public void discoverMediaApps() {
-        Mockito.when(mMockPackageManager.queryIntentServices(Mockito.any(Intent.class),
-                Mockito.anyInt())).thenReturn(mMockResolveInfo);
+        Mockito.when(mMockPackageManager.queryIntentServices(Mockito.any(Intent.class), Mockito.anyInt()))
+                .thenReturn(mMockResolveInfo);
         mClassToTest.discoverMediaApps();
         assertEquals(COM_AMAZON_TEST_MACC_APP,
                 MediaAppsRepository.getInstance().getDiscoveredMediaApp(COM_AMAZON_TEST_MACC_APP).getLocalPlayerId());

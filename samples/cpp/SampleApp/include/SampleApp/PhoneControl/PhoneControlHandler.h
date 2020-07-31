@@ -35,15 +35,16 @@ namespace phoneControl {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class PhoneCallControllerHandler : public aace::phoneCallController::PhoneCallController /* isa PlatformInterface */ {
-  private:
+private:
     std::weak_ptr<Activity> m_activity{};
     std::weak_ptr<logger::LoggerHandler> m_loggerHandler{};
 
-  protected:
+protected:
     PhoneCallControllerHandler(std::weak_ptr<Activity> activity, std::weak_ptr<logger::LoggerHandler> loggerHandler);
 
-  public:
-    template <typename... Args> static auto create(Args &&... args) -> std::shared_ptr<PhoneCallControllerHandler> {
+public:
+    template <typename... Args>
+    static auto create(Args&&... args) -> std::shared_ptr<PhoneCallControllerHandler> {
         return std::shared_ptr<PhoneCallControllerHandler>(new PhoneCallControllerHandler(args...));
     }
     auto getActivity() -> std::weak_ptr<Activity>;
@@ -51,31 +52,31 @@ class PhoneCallControllerHandler : public aace::phoneCallController::PhoneCallCo
 
     // aace::phoneCallController::PhoneCallController interface
 
-    auto dial(const std::string &payload) -> bool override;
-    auto redial(const std::string &payload) -> bool override;
-    auto answer(const std::string &payload) -> void override;
-    auto stop(const std::string &payload) -> void override;
-    auto sendDTMF(const std::string &payload) -> void override;
+    auto dial(const std::string& payload) -> bool override;
+    auto redial(const std::string& payload) -> bool override;
+    auto answer(const std::string& payload) -> void override;
+    auto stop(const std::string& payload) -> void override;
+    auto sendDTMF(const std::string& payload) -> void override;
 
-  public:
+public:
     /**
      * Helper method to display the current payload data.
      */
     void showPayload();
 
-  private:
+private:
     void createCall();
-    void updateCallId(const std::string &payload);
-    void updateCallerId(const std::string &value);
-    void updatePayload(const std::string &payload = "");
-    std::string getPhoneNumber(const json &payload);
-    std::string getCallId(const json &payload);
+    void updateCallId(const std::string& payload);
+    void updateCallerId(const std::string& value);
+    void updatePayload(const std::string& payload = "");
+    std::string getPhoneNumber(const json& payload);
+    std::string getCallId(const json& payload);
     std::string callStateToString();
 
-  private:
+private:
     std::weak_ptr<View> m_console{};
 
-    auto log(logger::LoggerHandler::Level level, const std::string &message) -> void;
+    auto log(logger::LoggerHandler::Level level, const std::string& message) -> void;
     auto setupUI() -> void;
 
     /// Payload for current call incoming or outgoing
@@ -91,7 +92,7 @@ class PhoneCallControllerHandler : public aace::phoneCallController::PhoneCallCo
     std::string m_callError;
 };
 
-} // namespace phoneControl
-} // namespace sampleApp
+}  // namespace phoneControl
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_PHONECONTROL_PHONECONTROLHANDLER_H
+#endif  // SAMPLEAPP_PHONECONTROL_PHONECONTROLHANDLER_H

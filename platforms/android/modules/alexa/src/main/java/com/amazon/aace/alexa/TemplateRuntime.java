@@ -25,13 +25,11 @@ import com.amazon.aace.core.PlatformInterface;
  * for the platform device type. For screen-specific design guidance, see the AVS UX Design Overview:
  * https://developer.amazon.com/docs/alexa-voice-service/ux-design-overview.html#displaycards
  */
-abstract public class TemplateRuntime extends PlatformInterface
-{
+abstract public class TemplateRuntime extends PlatformInterface {
     /**
      * An enum class used to specify the levels of focus that a Channel can have.
      */
-    public enum FocusState
-    {
+    public enum FocusState {
         /**
          * Represents the highest focus a Channel can have.
          * @hideinitializer
@@ -58,7 +56,7 @@ abstract public class TemplateRuntime extends PlatformInterface
         /**
          * @internal
          */
-        private FocusState( String name ) {
+        private FocusState(String name) {
             m_name = name;
         }
 
@@ -73,8 +71,7 @@ abstract public class TemplateRuntime extends PlatformInterface
     /**
      * An enum class used to specify audio player state for TemplateRuntime.
      */
-    public enum PlayerActivity
-    {
+    public enum PlayerActivity {
         /**
          * Audio playback has not yet begun.
          * @hideinitializer
@@ -119,7 +116,7 @@ abstract public class TemplateRuntime extends PlatformInterface
         /**
          * @internal
          */
-        private PlayerActivity( String name ) {
+        private PlayerActivity(String name) {
             m_name = name;
         }
 
@@ -131,8 +128,7 @@ abstract public class TemplateRuntime extends PlatformInterface
         }
     }
 
-    public TemplateRuntime() {
-    }
+    public TemplateRuntime() {}
 
     /**
      * @deprecated
@@ -146,7 +142,7 @@ abstract public class TemplateRuntime extends PlatformInterface
      *
      * @param [in] payload Renderable template metadata in structured JSON format
      */
-    public void renderTemplate( String payload ) {}
+    public void renderTemplate(String payload) {}
 
     /**
      * Provides visual metadata associated with a user request to Alexa.
@@ -158,8 +154,8 @@ abstract public class TemplateRuntime extends PlatformInterface
      * @param [in] payload Renderable template metadata in structured JSON format
      * @param [in] focusState The @c FocusState of the channel used by TemplateRuntime interface
      */
-    public void renderTemplate( String payload, FocusState focusState )  {
-        renderTemplate( payload );
+    public void renderTemplate(String payload, FocusState focusState) {
+        renderTemplate(payload);
     }
 
     /**
@@ -176,7 +172,7 @@ abstract public class TemplateRuntime extends PlatformInterface
      * @sa PlaybackController
      * @sa AudioPlayer
      */
-    public void renderPlayerInfo( String payload ) {}
+    public void renderPlayerInfo(String payload) {}
 
     /**
      * Provides visual metadata associated with a user request to Alexa for audio playback.
@@ -194,8 +190,8 @@ abstract public class TemplateRuntime extends PlatformInterface
      * @sa PlaybackController
      * @sa AudioPlayer
      */
-    public void renderPlayerInfo( String payload, PlayerActivity audioPlayerState, long offset, FocusState focusState ) {
-        renderPlayerInfo( payload );
+    public void renderPlayerInfo(String payload, PlayerActivity audioPlayerState, long offset, FocusState focusState) {
+        renderPlayerInfo(payload);
     }
 
     /**
@@ -213,7 +209,7 @@ abstract public class TemplateRuntime extends PlatformInterface
      * this notification, the @c TemplateRuntime will release the visual channel.
      */
     public final void displayCardCleared() {
-        displayCardCleared( getNativeRef() );
+        displayCardCleared(getNativeRef());
     }
 
     // NativeRef implementation
@@ -221,12 +217,12 @@ abstract public class TemplateRuntime extends PlatformInterface
         return createBinder();
     }
 
-    final protected void disposeNativeRef( long nativeRef ) {
-        disposeBinder( nativeRef );
+    final protected void disposeNativeRef(long nativeRef) {
+        disposeBinder(nativeRef);
     }
 
     // Native Engine JNI methods
     private native long createBinder();
-    private native void disposeBinder( long nativeRef );
-    private native void displayCardCleared( long nativeRef );
+    private native void disposeBinder(long nativeRef);
+    private native void displayCardCleared(long nativeRef);
 }

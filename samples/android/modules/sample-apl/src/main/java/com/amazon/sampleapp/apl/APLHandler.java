@@ -54,7 +54,6 @@ import java.util.concurrent.Executors;
  * APL document data from the AUto SDK and passed it to the APL rendering engine.
  */
 public class APLHandler extends APL {
-
     private static final String sTag = "APLHandler";
 
     private final Activity mActivity;
@@ -83,9 +82,9 @@ public class APLHandler extends APL {
     public String getVisualContext() {
         try {
             JSONObject context = new JSONObject()
-                    .put("token", mToken)
-                    .put("version", mVersion)
-                    .put("componentsVisibleOnScreen", new JSONArray().put(mVisualContext));
+                                         .put("token", mToken)
+                                         .put("version", mVersion)
+                                         .put("componentsVisibleOnScreen", new JSONArray().put(mVisualContext));
 
             Log.i(sTag, "Visual context requested: " + context.toString());
             return context.toString();
@@ -178,10 +177,7 @@ public class APLHandler extends APL {
                 }
             } catch (Exception e) {
                 Log.e(sTag, "executeCommands failed. token: " + mToken + " error: " + e.getMessage());
-                mExecutor.submit(() -> {
-                    executeCommandsResult(mToken, false, e.getMessage());
-                });
-
+                mExecutor.submit(() -> { executeCommandsResult(mToken, false, e.getMessage()); });
             }
         });
     }
@@ -233,8 +229,7 @@ public class APLHandler extends APL {
      * @return an APLOptions object.
      */
     private APLOptions createAPLOptions(String doc) {
-        return APLOptionsBuilder
-                .create("APLSampleApp configuration", "1.0")
+        return APLOptionsBuilder.create("APLSampleApp configuration", "1.0")
                 .allowOpenUrl(true)
                 .openUrlCallback(createOpenURLCallback())
                 .dataRetrieverProvider(() -> new IDataRetriever() {
@@ -246,8 +241,7 @@ public class APLHandler extends APL {
                     }
 
                     @Override
-                    public void cancelAll() {
-                    }
+                    public void cancelAll() {}
                 })
                 .ttsPlayerProvider(mPlayer)
                 .sendEventCallback((args, components, sources) -> {
@@ -300,17 +294,11 @@ public class APLHandler extends APL {
                             break;
                         default:
                             vpMode = ViewportMode.kViewportModeAuto;
-
                     }
 
-                    specifications.add(new Scaling.ViewportSpecification(
-                            spec.getInt("minWidth"),
-                            spec.getInt("maxWidth"),
-                            spec.getInt("minHeight"),
-                            spec.getInt("maxHeight"),
-                            spec.getString("shape").equals("ROUND"),
-                            vpMode
-                    ));
+                    specifications.add(new Scaling.ViewportSpecification(spec.getInt("minWidth"),
+                            spec.getInt("maxWidth"), spec.getInt("minHeight"), spec.getInt("maxHeight"),
+                            spec.getString("shape").equals("ROUND"), vpMode));
                 }
                 scaling = new Scaling(10, specifications);
             }
@@ -359,5 +347,4 @@ public class APLHandler extends APL {
             }
         };
     }
-
 }

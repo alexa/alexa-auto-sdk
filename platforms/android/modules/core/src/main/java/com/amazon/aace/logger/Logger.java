@@ -22,13 +22,11 @@ import java.nio.charset.StandardCharsets;
 /**
  * Logger should be extended handle log events from the AAC SDK.
  */
-abstract public class Logger extends PlatformInterface
-{
+abstract public class Logger extends PlatformInterface {
     /**
      * Specifies the severity level of a log message
      */
-    public enum Level
-    {
+    public enum Level {
         /**
          * Verbose log of an event, enabled only for debug builds
          * @hideinitializer
@@ -68,7 +66,7 @@ abstract public class Logger extends PlatformInterface
         /**
          * @internal
          */
-        Level( String name ) {
+        Level(String name) {
             m_name = name;
         }
 
@@ -83,7 +81,7 @@ abstract public class Logger extends PlatformInterface
          * @internal
          */
         public char toChar() {
-            return m_name.charAt( 0 );
+            return m_name.charAt(0);
         }
     }
 
@@ -100,11 +98,11 @@ abstract public class Logger extends PlatformInterface
      *
      * @return @c true if the platform implementation successfully handled the log event, else @c false
      */
-    public boolean logEvent( Level level, long time, String source, String message ) {
+    public boolean logEvent(Level level, long time, String source, String message) {
         return false;
     }
 
-    public boolean logEvent( Level level, long time, String source, byte[] message ) {
+    public boolean logEvent(Level level, long time, String source, byte[] message) {
         return logEvent(level, time, source, new String(message, StandardCharsets.UTF_8));
     }
 
@@ -118,8 +116,8 @@ abstract public class Logger extends PlatformInterface
      *
      * @param  message The log message
      */
-    public void log( Level level, String tag, String message ) {
-        log( getNativeRef(), level, tag, message );
+    public void log(Level level, String tag, String message) {
+        log(getNativeRef(), level, tag, message);
     }
 
     // NativeRef implementation
@@ -127,13 +125,13 @@ abstract public class Logger extends PlatformInterface
         return createBinder();
     }
 
-    final protected void disposeNativeRef( long nativeRef ) {
-        disposeBinder( nativeRef );
+    final protected void disposeNativeRef(long nativeRef) {
+        disposeBinder(nativeRef);
     }
 
     // Native Engine JNI methods
     private native long createBinder();
-    private native void disposeBinder( long nativeRef );
-    private native void log( long nativeRef, Level level, String tag, String message );
+    private native void disposeBinder(long nativeRef);
+    private native void log(long nativeRef, Level level, String tag, String message);
 }
 // END OF FILE

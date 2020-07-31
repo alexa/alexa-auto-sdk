@@ -29,15 +29,11 @@ protected:
     AudioInputProvider() = default;
 
 public:
-    enum class AudioInputType {
-        VOICE,
-        COMMUNICATION,
-        LOOPBACK
-    };
+    enum class AudioInputType { VOICE, COMMUNICATION, LOOPBACK };
 
     virtual ~AudioInputProvider();
 
-    virtual std::shared_ptr<AudioInput> openChannel( const std::string& name, AudioInputType type ) = 0;
+    virtual std::shared_ptr<AudioInput> openChannel(const std::string& name, AudioInputType type) = 0;
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const AudioInputProvider::AudioInputType& audioInputType) {
@@ -55,7 +51,7 @@ inline std::ostream& operator<<(std::ostream& stream, const AudioInputProvider::
     return stream;
 }
 
-} // aace::audio
-} // aace
+}  // namespace audio
+}  // namespace aace
 
-#endif // AACE_AUDIO_AUDIO_INPUT_PROVIDER_H
+#endif  // AACE_AUDIO_AUDIO_INPUT_PROVIDER_H

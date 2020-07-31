@@ -27,21 +27,18 @@ class AddressBookEntity;
 class AddressBookObserver {
 public:
     // Notifies the observer when an address book is added by platform
-    virtual bool addressBookAdded( std::shared_ptr<AddressBookEntity> addressBookEntity ) = 0;
+    virtual bool addressBookAdded(std::shared_ptr<AddressBookEntity> addressBookEntity) = 0;
 
     // Notifies the observer when an address book is removed by platform
-    virtual bool addressBookRemoved( std::shared_ptr<AddressBookEntity> addressBookEntity ) = 0;
+    virtual bool addressBookRemoved(std::shared_ptr<AddressBookEntity> addressBookEntity) = 0;
 };
 
 using AddressBookType = aace::addressBook::AddressBook::AddressBookType;
 
 class AddressBookEntity {
 public:
-    AddressBookEntity( const std::string& addressBookSourceId,  const std::string& name,  AddressBookType type ) : 
-        m_addressBookSourceId( addressBookSourceId ), 
-        m_name( name ), 
-        m_type( type ) {
-
+    AddressBookEntity(const std::string& addressBookSourceId, const std::string& name, AddressBookType type) :
+            m_addressBookSourceId(addressBookSourceId), m_name(name), m_type(type) {
     }
     enum class AddressType {
         /// Phone Numbers
@@ -60,7 +57,7 @@ public:
     }
 
     std::string toJSONAddressBookType() {
-        switch ( m_type ) {
+        switch (m_type) {
             case AddressBookType::CONTACT:
                 return "automotive";
             case AddressBookType::NAVIGATION:
@@ -73,13 +70,12 @@ public:
         return m_type;
     }
 
-    bool isAddressTypeSupported( AddressType type ) {
-        if( AddressType::PHONE == type ) {
+    bool isAddressTypeSupported(AddressType type) {
+        if (AddressType::PHONE == type) {
             return AddressBookType::CONTACT == m_type;
-        } else if( AddressType::POSTALADDRESS == type ) {
+        } else if (AddressType::POSTALADDRESS == type) {
             return AddressBookType::NAVIGATION == m_type;
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -90,8 +86,8 @@ private:
     AddressBookType m_type;
 };
 
-inline std::ostream& operator<<( std::ostream& stream, const AddressBookEntity::AddressType& type ) {
-    switch( type ) {
+inline std::ostream& operator<<(std::ostream& stream, const AddressBookEntity::AddressType& type) {
+    switch (type) {
         case AddressBookEntity::AddressType::PHONE:
             stream << "PHONE";
             break;
@@ -102,8 +98,8 @@ inline std::ostream& operator<<( std::ostream& stream, const AddressBookEntity::
     return stream;
 }
 
-} // aace::engine::addressBook
-} // aace::engine
-} // aace
+}  // namespace addressBook
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_ADDRESS_BOOK_ADDRESS_BOOK_ENGINE_IMPL_H
+#endif  // AACE_ENGINE_ADDRESS_BOOK_ADDRESS_BOOK_ENGINE_IMPL_H

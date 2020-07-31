@@ -20,28 +20,28 @@ namespace alexa {
 
 EqualizerController::~EqualizerController() = default;
 
-void EqualizerController::localSetBandLevels( const std::vector<EqualizerBandLevel>& bandLevels ) {
-    if( auto m_equalizerControllerEngineInterface_lock = m_equalizerControllerEngineInterface.lock() ) {
-        m_equalizerControllerEngineInterface_lock->onLocalSetBandLevels( bandLevels );
+void EqualizerController::localSetBandLevels(const std::vector<EqualizerBandLevel>& bandLevels) {
+    if (auto m_equalizerControllerEngineInterface_lock = m_equalizerControllerEngineInterface.lock()) {
+        m_equalizerControllerEngineInterface_lock->onLocalSetBandLevels(bandLevels);
     }
 }
 
-void EqualizerController::localAdjustBandLevels( const std::vector<EqualizerBandLevel>& bandAdjustments ) {
-    if( auto m_equalizerControllerEngineInterface_lock = m_equalizerControllerEngineInterface.lock() ) {
-        m_equalizerControllerEngineInterface_lock->onLocalAdjustBandLevels( bandAdjustments );
+void EqualizerController::localAdjustBandLevels(const std::vector<EqualizerBandLevel>& bandAdjustments) {
+    if (auto m_equalizerControllerEngineInterface_lock = m_equalizerControllerEngineInterface.lock()) {
+        m_equalizerControllerEngineInterface_lock->onLocalAdjustBandLevels(bandAdjustments);
     }
 }
 
-void EqualizerController::localResetBands( const std::vector<EqualizerBand>& bands ) {
-    if( auto m_equalizerControllerEngineInterface_lock = m_equalizerControllerEngineInterface.lock() ) {
-        m_equalizerControllerEngineInterface_lock->onLocalResetBands( bands );
+void EqualizerController::localResetBands(const std::vector<EqualizerBand>& bands) {
+    if (auto m_equalizerControllerEngineInterface_lock = m_equalizerControllerEngineInterface.lock()) {
+        m_equalizerControllerEngineInterface_lock->onLocalResetBands(bands);
     }
 }
 
-void EqualizerController::setEngineInterface( 
-        std::shared_ptr<aace::alexa::EqualizerControllerEngineInterface> equalizerControllerEngineInterface ) {
+void EqualizerController::setEngineInterface(
+    std::shared_ptr<aace::alexa::EqualizerControllerEngineInterface> equalizerControllerEngineInterface) {
     m_equalizerControllerEngineInterface = equalizerControllerEngineInterface;
 }
 
-} // aace::alexa
-} // aace
+}  // namespace alexa
+}  // namespace aace

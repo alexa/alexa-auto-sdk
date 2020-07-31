@@ -36,7 +36,7 @@ public:
 };
 
 }  // namespace interfaces
-}  // namespace common
+}  // namespace capability
 }  // namespace agl
 
 #endif  // AGL_CAPABILITY_MESSAGE_DISPATCHER_H_

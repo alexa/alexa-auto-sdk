@@ -49,7 +49,7 @@ public:
     AudioIOConfiguration getAudioIOConfig() override;
     LVCConfiguration getLocalVoiceControlConfig() override;
     CarControlConfiguration getCarControlConfig() override;
-    DeviceSettingsConfiguration getDeviceSettingsConfig() override; 
+    DeviceSettingsConfiguration getDeviceSettingsConfig() override;
 
     std::string getCertificatesDirectoryPath() override;
     std::string getAppsDataDirectory() override;
@@ -70,14 +70,17 @@ public:
     bool shouldEnableGloriaList() override;
     bool shouldEnableCarControl() override;
     bool shouldEnableLocalVoiceControl() override;
-    
+
     // TODO: Remove them once Location provider is properly implemented.
     std::pair<float, float> getCurrentLocation() override;
     std::string getCountry() override;
     /// @}
 
 private:
-    AASBConfigProviderImpl(std::shared_ptr<agl::common::interfaces::ILogger> logger, afb_api_t api, std::shared_ptr<agl::audio::Audio> audio);
+    AASBConfigProviderImpl(
+        std::shared_ptr<agl::common::interfaces::ILogger> logger,
+        afb_api_t api,
+        std::shared_ptr<agl::audio::Audio> audio);
 
     /**
      * Initialize the configuration object from given file path containing
@@ -92,6 +95,11 @@ private:
      * resides.
      */
     std::string getDataRootPath();
+
+    /**
+     * Provides the path where alexa json config resides.
+     */
+    std::string getAlexaConfigPath();
 
     /**
      * Logs the current configuration loaded by this object.

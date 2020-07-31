@@ -8,7 +8,6 @@ package com.amazon.sampleapp.apl.content;
  * Interface for defining retrieval of documents.
  */
 public interface ContentRetriever {
-
     /**
      * Fetches the content and calls the callback when data is available.
      * @param source the source asset, file or url to load.
@@ -20,8 +19,7 @@ public interface ContentRetriever {
      * @param source the source asset, file or url to load.
      * @param callback the callback to call.
      */
-    void fetchAsync(String source,
-               ContentRetrieverCallback callback);
+    void fetchAsync(String source, ContentRetrieverCallback callback);
 
     /**
      * Cancels all the pending tasks.
@@ -33,5 +31,3 @@ public interface ContentRetriever {
      */
     void cancelAll();
 }
-
-

@@ -23,20 +23,20 @@ namespace aace {
 namespace jni {
 namespace core {
 
-    class EngineBinder {
-    public:
-        EngineBinder();
+class EngineBinder {
+public:
+    EngineBinder();
 
-        std::shared_ptr<aace::core::Engine> getEngine() {
-            return m_engine;
-        }
-        
-    private:
-        std::shared_ptr<aace::core::Engine> m_engine;
-    };
+    std::shared_ptr<aace::core::Engine> getEngine() {
+        return m_engine;
+    }
 
-}  // aace::jni::core
-}  // aace::jni
-}  // aace
+private:
+    std::shared_ptr<aace::core::Engine> m_engine;
+};
 
-#endif // AACE_JNI_CORE_ENGINE_BINDER_H
+}  // namespace core
+}  // namespace jni
+}  // namespace aace
+
+#endif  // AACE_JNI_CORE_ENGINE_BINDER_H

@@ -29,32 +29,34 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
     private static final String sTag = "CLI";
     private final WeakReference<ImageView> mImage;
 
-    public DownloadImageTask( ImageView image ) { mImage = new WeakReference<>( image ); }
+    public DownloadImageTask(ImageView image) {
+        mImage = new WeakReference<>(image);
+    }
 
-    protected Bitmap doInBackground( String... urls ) {
-        String urlDisplay = urls[ 0 ];
+    protected Bitmap doInBackground(String... urls) {
+        String urlDisplay = urls[0];
         Bitmap mIcon11 = null;
 
-        try ( InputStream in = new java.net.URL( urlDisplay ).openStream() ) {
-            mIcon11 = BitmapFactory.decodeStream( in );
-        } catch ( IOException e ) {
+        try (InputStream in = new java.net.URL(urlDisplay).openStream()) {
+            mIcon11 = BitmapFactory.decodeStream(in);
+        } catch (IOException e) {
             String exceptionMessage = "";
             if (e.getMessage() == null) {
                 exceptionMessage = "Exception occured. Cannot display message";
-            }
-            else {
+            } else {
                 exceptionMessage = e.getMessage();
             }
-            Log.e( sTag, exceptionMessage );
+            Log.e(sTag, exceptionMessage);
         }
 
         return mIcon11;
     }
 
-    protected void onPostExecute( Bitmap result )
-    {
+    protected void onPostExecute(Bitmap result) {
         try {
             mImage.get().setImageBitmap(result);
-        } catch ( Exception e ) { Log.e( sTag, e.getMessage() ); }
+        } catch (Exception e) {
+            Log.e(sTag, e.getMessage());
+        }
     }
 }

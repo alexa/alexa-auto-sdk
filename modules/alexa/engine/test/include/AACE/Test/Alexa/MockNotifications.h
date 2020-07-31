@@ -24,12 +24,12 @@ namespace test {
 namespace alexa {
 
 class MockNotifications : public aace::alexa::Notifications {
- public:
-    MOCK_METHOD1(setIndicator,void(IndicatorState state));
+public:
+    MOCK_METHOD1(setIndicator, void(IndicatorState state));
 };
 
-} // aace::test::alexa
-} // aace::test
-} // aace
+}  // namespace alexa
+}  // namespace test
+}  // namespace aace
 
-#endif // AACE_TEST_ALEXA_MOCK_NOTIFICATIONS_H
+#endif  // AACE_TEST_ALEXA_MOCK_NOTIFICATIONS_H

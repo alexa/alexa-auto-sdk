@@ -28,19 +28,18 @@ namespace aace {
 namespace engine {
 namespace alexa {
 
-class PlaybackControllerEngineImpl :
-    public aace::alexa::PlaybackControllerEngineInterface,
-    public alexaClientSDK::avsCommon::utils::RequiresShutdown {
-    
+class PlaybackControllerEngineImpl
+        : public aace::alexa::PlaybackControllerEngineInterface
+        , public alexaClientSDK::avsCommon::utils::RequiresShutdown {
 private:
-    PlaybackControllerEngineImpl( std::shared_ptr<aace::alexa::PlaybackController> playbackControllerPlatformInterface );
+    PlaybackControllerEngineImpl(std::shared_ptr<aace::alexa::PlaybackController> playbackControllerPlatformInterface);
 
     bool initialize(
         std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager );
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager);
 
 public:
     static std::shared_ptr<PlaybackControllerEngineImpl> create(
@@ -50,24 +49,25 @@ public:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager);
-    
+
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> getPlaybackRouter();
 
 protected:
     void onButtonPressed(PlaybackButton button) override;
 
     void onTogglePressed(PlaybackToggle toggle, bool action) override;
- 
+
     void doShutdown() override;
 
 private:
     std::shared_ptr<aace::alexa::PlaybackController> m_playbackControllerPlatformInterface;
-    std::shared_ptr<alexaClientSDK::capabilityAgents::playbackController::PlaybackController> m_playbackControllerCapabilityAgent;
+    std::shared_ptr<alexaClientSDK::capabilityAgents::playbackController::PlaybackController>
+        m_playbackControllerCapabilityAgent;
     std::shared_ptr<alexaClientSDK::capabilityAgents::playbackController::PlaybackRouter> m_playbackRouter;
 };
 
-} // aace::engine::alexa
-} // aace::engine
-} // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_ALEXA_PLAYBACK_CONTROLLER_ENGINE_IMPL_H
+#endif  // AACE_ENGINE_ALEXA_PLAYBACK_CONTROLLER_ENGINE_IMPL_H

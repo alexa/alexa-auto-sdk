@@ -25,6 +25,7 @@
 #include <AVSCommon/AVS/ExceptionEncounteredSender.h>
 #include <AVSCommon/SDKInterfaces/AuthDelegateInterface.h>
 #include <AVSCommon/SDKInterfaces/AVSGatewayAssignerInterface.h>
+#include <AVSCommon/SDKInterfaces/AVSGatewayManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
 #include <AVSCommon/SDKInterfaces/DialogUXStateObserverInterface.h>
 #include <AVSCommon/SDKInterfaces/DirectiveSequencerInterface.h>
@@ -34,6 +35,8 @@
 #include <ContextManager/ContextManager.h>
 #include <Endpoints/EndpointBuilder.h>
 #include <RegistrationManager/RegistrationManager.h>
+#include <Settings/Storage/DeviceSettingStorageInterface.h>
+#include <SpeechSynthesizer/SpeechSynthesizer.h>
 
 #include "EndpointBuilderFactory.h"
 #include "ExternalMediaPlayer.h"
@@ -45,32 +48,45 @@ namespace alexa {
 class AlexaComponentInterface {
 public:
     virtual ~AlexaComponentInterface();
+
 public:
     virtual std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentManager> getAttachmentManager() = 0;
     virtual std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> getAudioFocusManager() = 0;
     virtual std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> getAuthDelegate() = 0;
-    virtual std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSGatewayAssignerInterface> getAVSGatewayAssigner() = 0;
-    virtual std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> getCapabilitiesDelegate() = 0;
-    virtual std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSConnectionManagerInterface> getConnectionManager() = 0;
+    virtual std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSGatewayAssignerInterface>
+    getAVSGatewayAssigner() = 0;
+    virtual std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSGatewayManagerInterface>
+    getAVSGatewayManager() = 0;
+    virtual std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface>
+    getCapabilitiesDelegate() = 0;
+    virtual std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSConnectionManagerInterface>
+    getConnectionManager() = 0;
     virtual std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> getContextManager() = 0;
     virtual std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> getCustomerDataManager() = 0;
     virtual std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> getDefaultEndpointBuilder() = 0;
     virtual std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> getDeviceInfo() = 0;
+    virtual std::shared_ptr<alexaClientSDK::settings::storage::DeviceSettingStorageInterface>
+    getDeviceSettingStorage() = 0;
     virtual std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> getDialogUXStateAggregator() = 0;
-    virtual std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> getDirectiveSequencer() = 0;
+    virtual std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface>
+    getDirectiveSequencer() = 0;
     virtual std::shared_ptr<aace::engine::alexa::EndpointBuilderFactory> getEndpointBuilderFactory() = 0;
-    virtual std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> getExceptionEncounteredSender() = 0;
+    virtual std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface>
+    getExceptionEncounteredSender() = 0;
     virtual std::shared_ptr<aace::engine::alexa::ExternalMediaPlayer> getExternalMediaPlayer() = 0;
     virtual std::shared_ptr<alexaClientSDK::adsl::MessageInterpreter> getMessageInterpreter() = 0;
     virtual std::shared_ptr<alexaClientSDK::acl::MessageRouterInterface> getMessageRouter() = 0;
     virtual std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> getMessageSender() = 0;
     virtual std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> getSpeakerManager() = 0;
+    virtual std::shared_ptr<alexaClientSDK::capabilityAgents::speechSynthesizer::SpeechSynthesizer>
+    getSpeechSynthesizer() = 0;
     virtual std::shared_ptr<alexaClientSDK::acl::TransportFactoryInterface> getTransportFactory() = 0;
-    virtual std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> getVisualFocusManager() = 0;
+    virtual std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface>
+    getVisualFocusManager() = 0;
 };
 
-}  // aace::engine:alexa
-}  // aace::engine
-}  // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_ALEXA_INTERFACE_ALEXA_COMPONENT_INTERFACE_H
+#endif  // AACE_ENGINE_ALEXA_INTERFACE_ALEXA_COMPONENT_INTERFACE_H

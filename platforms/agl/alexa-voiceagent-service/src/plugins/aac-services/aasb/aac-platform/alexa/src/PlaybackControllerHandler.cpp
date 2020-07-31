@@ -41,7 +41,6 @@ std::shared_ptr<PlaybackControllerHandler> PlaybackControllerHandler::create(
 
 PlaybackControllerHandler::PlaybackControllerHandler(std::shared_ptr<aasb::core::logger::LoggerHandler> logger) :
         m_logger(logger) {
-
 }
 
 void PlaybackControllerHandler::onReceivedEvent(const std::string& action, const std::string& payload) {
@@ -60,7 +59,7 @@ void PlaybackControllerHandler::buttonPressed(const std::string& jsonPayload) {
     auto root = document.GetObject();
 
     if (root.HasMember(JSON_ATTR_PLAYBACK_BUTTON_TYPE.c_str()) &&
-         root[JSON_ATTR_PLAYBACK_BUTTON_TYPE.c_str()].IsString()) {
+        root[JSON_ATTR_PLAYBACK_BUTTON_TYPE.c_str()].IsString()) {
         std::string buttonTypeStr = root[JSON_ATTR_PLAYBACK_BUTTON_TYPE.c_str()].GetString();
 
         if (buttonTypeStr == VALUE_PLAYBACK_BUTTON_PLAY) {
@@ -92,7 +91,7 @@ void PlaybackControllerHandler::togglePressed(const std::string& payload) {
     bool selected = false;
 
     if (root.HasMember(JSON_ATTR_PLAYBACK_TOGGLE_TYPE.c_str()) &&
-         root[JSON_ATTR_PLAYBACK_TOGGLE_TYPE.c_str()].IsString()) {
+        root[JSON_ATTR_PLAYBACK_TOGGLE_TYPE.c_str()].IsString()) {
         std::string toggleTypeStr = root[JSON_ATTR_PLAYBACK_TOGGLE_TYPE.c_str()].GetString();
 
         if (toggleTypeStr == VALUE_PLAYBACK_TOGGLE_SHUFFLE) {
@@ -115,7 +114,7 @@ void PlaybackControllerHandler::togglePressed(const std::string& payload) {
     }
 
     if (root.HasMember(JSON_ATTR_PLAYBACK_TOGGLE_SELECTED.c_str()) &&
-         root[JSON_ATTR_PLAYBACK_TOGGLE_SELECTED.c_str()].IsBool()) {
+        root[JSON_ATTR_PLAYBACK_TOGGLE_SELECTED.c_str()].IsBool()) {
         selected = root[JSON_ATTR_PLAYBACK_TOGGLE_SELECTED.c_str()].GetBool();
     } else {
         m_logger->log(Level::WARN, TAG, "togglePressed: toggle selected attribute not found");
@@ -125,5 +124,5 @@ void PlaybackControllerHandler::togglePressed(const std::string& payload) {
     PlaybackController::togglePressed(toggle, selected);
 }
 
-}
-}
+}  // namespace alexa
+}  // namespace aasb

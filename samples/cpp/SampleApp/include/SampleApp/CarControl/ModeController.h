@@ -31,7 +31,6 @@ namespace carControl {
  * query, set, and adjust mode.
  */
 class ModeController {
-
 private:
     int m_index = 0;
     std::vector<std::string> m_modes;
@@ -42,7 +41,7 @@ public:
 
     void addMode(std::string mode) {
         m_modes.push_back(mode);
-    }  
+    }
 
     std::string getMode() {
         return m_modes[m_index];
@@ -59,7 +58,6 @@ public:
         }
 
         return false;
-
     }
 
     /**
@@ -69,8 +67,7 @@ public:
         m_index += delta;
         if (m_index < 0) {
             m_index = 0;
-        } else
-        if (m_index >= m_modes.size()) {
+        } else if (m_index >= m_modes.size()) {
             m_index = m_modes.size() - 1;
         }
     }
@@ -80,7 +77,7 @@ public:
     }
 };
 
-} // namespace carControl
-} // namespace sampleApp
+}  // namespace carControl
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_CARCONTROL_MODECONTROLLER_H
+#endif  // SAMPLEAPP_CARCONTROL_MODECONTROLLER_H

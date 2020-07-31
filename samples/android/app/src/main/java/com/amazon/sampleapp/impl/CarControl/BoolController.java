@@ -21,11 +21,9 @@ package com.amazon.sampleapp.impl.CarControl;
  * provides a way to save and retrieve that state.
  */
 public class BoolController {
-
     private boolean m_value = false;
 
-    public BoolController() {
-    }
+    public BoolController() {}
 
     public void setValue(boolean value) {
         m_value = value;

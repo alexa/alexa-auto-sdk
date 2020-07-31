@@ -18,10 +18,9 @@
 
 #include <AACE/Engine/Alexa/AlexaEngineClientObserver.h>
 
-class AlexaEngineClientObserverTest : public ::testing::Test {
-};
+class AlexaEngineClientObserverTest : public ::testing::Test {};
 
-TEST_F(AlexaEngineClientObserverTest,create) {
+TEST_F(AlexaEngineClientObserverTest, create) {
     auto alexaEngineClientObserver = aace::engine::alexa::AlexaEngineClientObserver::create();
-    EXPECT_NE(nullptr,alexaEngineClientObserver) << "PlaybackControllerEngineImpl pointer is null";
+    EXPECT_NE(nullptr, alexaEngineClientObserver) << "PlaybackControllerEngineImpl pointer is null";
 }

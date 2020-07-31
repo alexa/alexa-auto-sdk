@@ -18,15 +18,14 @@
 namespace aace {
 namespace core {
 namespace config {
-    
+
 //
 // StreamConfiguration
 //
 
-std::shared_ptr<StreamConfiguration> StreamConfiguration::create( std::shared_ptr<std::istream> stream )
-{
-    auto config = std::shared_ptr<StreamConfiguration>( new StreamConfiguration() );
-    
+std::shared_ptr<StreamConfiguration> StreamConfiguration::create(std::shared_ptr<std::istream> stream) {
+    auto config = std::shared_ptr<StreamConfiguration>(new StreamConfiguration());
+
     config->m_stream = stream;
 
     return config;
@@ -39,12 +38,11 @@ std::shared_ptr<std::istream> StreamConfiguration::getStream() {
 //
 // ConfigurationFile
 //
-    
-std::shared_ptr<ConfigurationFile> ConfigurationFile::create( const std::string& configFilePath )
-{
-    auto config = std::shared_ptr<ConfigurationFile>( new ConfigurationFile() );
-    
-    config->m_stream = std::make_shared<std::ifstream>( configFilePath );
+
+std::shared_ptr<ConfigurationFile> ConfigurationFile::create(const std::string& configFilePath) {
+    auto config = std::shared_ptr<ConfigurationFile>(new ConfigurationFile());
+
+    config->m_stream = std::make_shared<std::ifstream>(configFilePath);
 
     return config;
 }
@@ -53,6 +51,6 @@ std::shared_ptr<std::istream> ConfigurationFile::getStream() {
     return m_stream;
 }
 
-} // aace::core::config
-} // aace::core
-} // aace
+}  // namespace config
+}  // namespace core
+}  // namespace aace

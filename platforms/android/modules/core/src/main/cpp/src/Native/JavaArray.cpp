@@ -23,77 +23,69 @@ namespace aace {
 namespace jni {
 namespace native {
 
-    //
-    // JavaObjectArray
-    //
+//
+// JavaObjectArray
+//
 
-    JavaObjectArray::JavaObjectArray( jsize size, JavaClassPtr elementClass, jobject initialValue )
-    {
-        try_with_context
-        {
-            jobjectArray arr = env->NewObjectArray( size, elementClass->get(), initialValue );
-            ThrowIfJavaEx( env, "newObjectArrayFailed" );
-            ThrowIfNot( set( arr ), "setFailed" );
-            // delete local array ref
-            env->DeleteLocalRef(arr);
-        }
-        catch_with_ex {
-            AACE_JNI_ERROR(TAG,"JavaObjectArray",ex.what());
-        }
+JavaObjectArray::JavaObjectArray(jsize size, JavaClassPtr elementClass, jobject initialValue) {
+    try_with_context {
+        jobjectArray arr = env->NewObjectArray(size, elementClass->get(), initialValue);
+        ThrowIfJavaEx(env, "newObjectArrayFailed");
+        ThrowIfNot(set(arr), "setFailed");
+        // delete local array ref
+        env->DeleteLocalRef(arr);
     }
-
-    JavaObjectArray::JavaObjectArray( jsize size, const char* className, jobject initialValue )
-    {
-        try_with_context
-        {
-            JavaClassPtr elementClass = JavaClass::find( className );
-            ThrowIfNull( elementClass, "invalidClassName" );
-
-            jobjectArray arr = env->NewObjectArray( size, elementClass->get(), initialValue );
-            ThrowIfJavaEx( env, "newObjectArrayFailed" );
-            ThrowIfNot( set( arr ), "setFailed" );
-            // delete local array ref
-            env->DeleteLocalRef(arr);
-        }
-        catch_with_ex {
-            AACE_JNI_ERROR(TAG,"JavaObjectArray",ex.what());
-        }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "JavaObjectArray", ex.what());
     }
+}
 
-    bool JavaObjectArray::getAt( int index, jobject* value )
-    {
-        try_with_context
-        {
-            ThrowIfNot( index < size() && index >= 0, "indexOutOfRange" );
+JavaObjectArray::JavaObjectArray(jsize size, const char* className, jobject initialValue) {
+    try_with_context {
+        JavaClassPtr elementClass = JavaClass::find(className);
+        ThrowIfNull(elementClass, "invalidClassName");
 
-            *value = env->GetObjectArrayElement( get(), index );
-            ThrowIfJavaEx( env, "getObjectArrayElementFailed" );
-
-            return true;
-        }
-        catch_with_ex {
-            AACE_JNI_ERROR(TAG,"JavaObjectArray:getAt",ex.what());
-            return false;
-        }
+        jobjectArray arr = env->NewObjectArray(size, elementClass->get(), initialValue);
+        ThrowIfJavaEx(env, "newObjectArrayFailed");
+        ThrowIfNot(set(arr), "setFailed");
+        // delete local array ref
+        env->DeleteLocalRef(arr);
     }
-
-    bool JavaObjectArray::setAt( int index, const jobject value )
-    {
-        try_with_context
-        {
-            ThrowIfNot( index < size() && index >= 0, "indexOutOfRange" );
-
-            env->SetObjectArrayElement( get(), index, value );
-            ThrowIfJavaEx( env, "setObjectArrayElementFailed" );
-
-            return true;
-        }
-        catch_with_ex {
-            AACE_JNI_ERROR(TAG,"JavaObjectArray:setAt",ex.what());
-            return false;
-        }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "JavaObjectArray", ex.what());
     }
+}
 
-} // aace::jni::native
-} // aace::jni
-} // aace
+bool JavaObjectArray::getAt(int index, jobject* value) {
+    try_with_context {
+        ThrowIfNot(index < size() && index >= 0, "indexOutOfRange");
+
+        *value = env->GetObjectArrayElement(get(), index);
+        ThrowIfJavaEx(env, "getObjectArrayElementFailed");
+
+        return true;
+    }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "JavaObjectArray:getAt", ex.what());
+        return false;
+    }
+}
+
+bool JavaObjectArray::setAt(int index, const jobject value) {
+    try_with_context {
+        ThrowIfNot(index < size() && index >= 0, "indexOutOfRange");
+
+        env->SetObjectArrayElement(get(), index, value);
+        ThrowIfJavaEx(env, "setObjectArrayElementFailed");
+
+        return true;
+    }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "JavaObjectArray:setAt", ex.what());
+        return false;
+    }
+}
+
+}  // namespace native
+}  // namespace jni
+}  // namespace aace

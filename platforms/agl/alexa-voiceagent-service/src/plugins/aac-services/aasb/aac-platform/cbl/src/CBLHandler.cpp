@@ -44,18 +44,18 @@ std::shared_ptr<CBLHandler> CBLHandler::create(
     return cblHandler;
 }
 
-CBLHandler::CBLHandler(std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
-                       std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher,
-                       std::string refresh_token_file) :
+CBLHandler::CBLHandler(
+    std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
+    std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher,
+    std::string refresh_token_file) :
         m_logger(logger), m_responseDispatcher(responseDispatcher), m_refresh_token_file(refresh_token_file) {
     loadRefreshTokenFromFile();
 }
 
 void CBLHandler::loadRefreshTokenFromFile() {
     std::ifstream file(m_refresh_token_file, std::ifstream::in);
-    if(file.is_open()) {
-        m_RefreshToken = std::string((std::istreambuf_iterator<char>(file)),
-                                     (std::istreambuf_iterator<char>()));
+    if (file.is_open()) {
+        m_RefreshToken = std::string((std::istreambuf_iterator<char>(file)), (std::istreambuf_iterator<char>()));
         file.close();
     } else {
         m_RefreshToken = "";
@@ -63,12 +63,16 @@ void CBLHandler::loadRefreshTokenFromFile() {
     }
 }
 
-void CBLHandler::cblStateChanged(CBLState state, CBLStateChangedReason reason, const std::string& url, const std::string& code) {
+void CBLHandler::cblStateChanged(
+    CBLState state,
+    CBLStateChangedReason reason,
+    const std::string& url,
+    const std::string& code) {
     std::string info = std::string(": CBLState: ") + std::string(convertCBLStateToString(state)) +
                        std::string(": CBLStateChangedReason: ") +
-                       std::string(convertCBLStateChangedReasonToString(reason) +
-                       std::string(": url: ") + url +
-                       std::string(": code: ") + code);
+                       std::string(
+                           convertCBLStateChangedReasonToString(reason) + std::string(": url: ") + url +
+                           std::string(": code: ") + code);
 
     m_logger->log(Level::INFO, TAG, info);
 
@@ -79,27 +83,24 @@ void CBLHandler::cblStateChanged(CBLState state, CBLStateChangedReason reason, c
             rapidjson::Value payloadElement;
 
             payloadElement.SetObject();
-            payloadElement.AddMember("url", rapidjson::Value().SetString(url.c_str(), url.length()), document.GetAllocator());
-            payloadElement.AddMember("code", rapidjson::Value().SetString(code.c_str(), code.length()), document.GetAllocator());
+            payloadElement.AddMember(
+                "url", rapidjson::Value().SetString(url.c_str(), url.length()), document.GetAllocator());
+            payloadElement.AddMember(
+                "code", rapidjson::Value().SetString(code.c_str(), code.length()), document.GetAllocator());
 
             document.AddMember("payload", payloadElement, document.GetAllocator());
 
             // create event string
             rapidjson::StringBuffer buffer;
-            rapidjson::PrettyWriter<rapidjson::StringBuffer> writer( buffer );
+            rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
 
-            document.Accept( writer );
+            document.Accept(writer);
 
             responseDispatcher->sendDirective(
-                aasb::bridge::TOPIC_CBL,
-                aasb::bridge::ACTION_CBL_CODEPAIR_RECEIVED,
-                buffer.GetString());
+                aasb::bridge::TOPIC_CBL, aasb::bridge::ACTION_CBL_CODEPAIR_RECEIVED, buffer.GetString());
         } else if ((state == CBLState::STOPPING) && (reason == CBLStateChangedReason::CODE_PAIR_EXPIRED)) {
             m_logger->log(Level::WARN, TAG, "The code has expired. Retry to generate a new code.");
-            responseDispatcher->sendDirective(
-                aasb::bridge::TOPIC_CBL,
-                aasb::bridge::ACTION_CBL_CODEPAIR_EXPIRED,
-                "");
+            responseDispatcher->sendDirective(aasb::bridge::TOPIC_CBL, aasb::bridge::ACTION_CBL_CODEPAIR_EXPIRED, "");
         }
     }
 }
@@ -127,10 +128,7 @@ void CBLHandler::setUserProfile(const std::string& name, const std::string& emai
     m_logger->log(Level::VERBOSE, TAG, "setUserProfile" + name + "email" + email);
     if (auto responseDispatcher = m_responseDispatcher.lock()) {
         if (!name.empty()) {
-            responseDispatcher->sendDirective(
-                    aasb::bridge::TOPIC_CBL,
-                    aasb::bridge::ACTION_CBL_SET_PROFILE_NAME,
-                    name);
+            responseDispatcher->sendDirective(aasb::bridge::TOPIC_CBL, aasb::bridge::ACTION_CBL_SET_PROFILE_NAME, name);
         }
     }
 }
@@ -191,7 +189,7 @@ void CBLHandler::setRefreshTokenInternal(const std::string& refreshToken) {
     m_RefreshToken = refreshToken;
 
     std::ofstream file(m_refresh_token_file, std::ofstream::trunc);
-    if(file.is_open()) {
+    if (file.is_open()) {
         file << refreshToken;
         file.close();
     } else {
@@ -210,7 +208,7 @@ void CBLHandler::clearRefreshTokenInternal() {
     m_RefreshToken.clear();
 
     // Remove refresh token file
-    if(remove(m_refresh_token_file.c_str()) != 0) {
+    if (remove(m_refresh_token_file.c_str()) != 0) {
         m_logger->log(Level::ERROR, TAG, "clearRefreshTokenInternal: Error clearing refresh token file");
     }
 }

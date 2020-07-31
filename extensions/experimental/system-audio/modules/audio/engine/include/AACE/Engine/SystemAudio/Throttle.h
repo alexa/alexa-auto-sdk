@@ -41,9 +41,7 @@ public:
     using OutputFunc = std::function<void(const T* data, size_t length)>;
 
     explicit Throttle(size_t frag_size, std::chrono::milliseconds frag_interval, OutputFunc output) :
-            m_frag_size{frag_size},
-            m_frag_interval{frag_interval},
-            m_output{std::move(output)} {
+            m_frag_size{frag_size}, m_frag_interval{frag_interval}, m_output{std::move(output)} {
     }
 
     ~Throttle() {

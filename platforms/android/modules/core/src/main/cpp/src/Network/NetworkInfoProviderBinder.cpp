@@ -25,93 +25,90 @@ namespace aace {
 namespace jni {
 namespace network {
 
-    //
-    // NetworkInfoProviderBinder
-    //
+//
+// NetworkInfoProviderBinder
+//
 
-    NetworkInfoProviderBinder::NetworkInfoProviderBinder( jobject obj ) {
-        m_networkInfoProviderHandler = std::make_shared<NetworkInfoProviderHandler>( obj );
+NetworkInfoProviderBinder::NetworkInfoProviderBinder(jobject obj) {
+    m_networkInfoProviderHandler = std::make_shared<NetworkInfoProviderHandler>(obj);
+}
+
+//
+// NetworkInfoProviderHandler
+//
+
+NetworkInfoProviderHandler::NetworkInfoProviderHandler(jobject obj) :
+        m_obj(obj, "com/amazon/aace/network/NetworkInfoProvider") {
+}
+
+NetworkStatus NetworkInfoProviderHandler::getNetworkStatus() {
+    try_with_context {
+        jobject statusObj;
+        ThrowIfNot(
+            m_obj.invoke(
+                "getNetworkStatus", "()Lcom/amazon/aace/network/NetworkInfoProvider$NetworkStatus;", &statusObj),
+            "invokeFailed");
+
+        return JNetworkStatus::from(statusObj, NetworkStatus::UNKNOWN);
     }
-
-    //
-    // NetworkInfoProviderHandler
-    //
-
-    NetworkInfoProviderHandler::NetworkInfoProviderHandler( jobject obj ) : m_obj( obj, "com/amazon/aace/network/NetworkInfoProvider" ) {
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "getNetworkStatus", ex.what());
+        return NetworkStatus::UNKNOWN;
     }
+}
 
-    NetworkStatus NetworkInfoProviderHandler::getNetworkStatus()
-    {
-        try_with_context
-        {
-            jobject statusObj;
-            ThrowIfNot( m_obj.invoke( "getNetworkStatus", "()Lcom/amazon/aace/network/NetworkInfoProvider$NetworkStatus;", &statusObj ), "invokeFailed" );
+int NetworkInfoProviderHandler::getWifiSignalStrength() {
+    try_with_context {
+        jint wifiSignalStrength;
+        ThrowIfNot(m_obj.invoke("getWifiSignalStrength", "()I", &wifiSignalStrength), "invokeFailed");
 
-            return JNetworkStatus::from( statusObj, NetworkStatus::UNKNOWN );
-        }
-        catch_with_ex {
-            AACE_JNI_ERROR(TAG,"getNetworkStatus",ex.what());
-            return NetworkStatus::UNKNOWN;
-        }
+        return static_cast<int>(wifiSignalStrength);
     }
-
-    int NetworkInfoProviderHandler::getWifiSignalStrength()
-    {
-        try_with_context
-        {
-            jint wifiSignalStrength;
-            ThrowIfNot( m_obj.invoke( "getWifiSignalStrength", "()I", &wifiSignalStrength ), "invokeFailed" );
-
-            return static_cast<int>( wifiSignalStrength );
-        }
-        catch_with_ex {
-            AACE_JNI_ERROR(TAG,"getWifiSignalStrength",ex.what());
-            return 0;
-        }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "getWifiSignalStrength", ex.what());
+        return 0;
     }
+}
 
-} // aace::jni::network
-} // aace::jni
-} // aace
+}  // namespace network
+}  // namespace jni
+}  // namespace aace
 
-#define NETWORK_INFO_PROVIDER_BINDER(ref) reinterpret_cast<aace::jni::network::NetworkInfoProviderBinder *>( ref )
+#define NETWORK_INFO_PROVIDER_BINDER(ref) reinterpret_cast<aace::jni::network::NetworkInfoProviderBinder*>(ref)
 
-extern "C"
-{
-    JNIEXPORT jlong JNICALL
-    Java_com_amazon_aace_network_NetworkInfoProvider_createBinder( JNIEnv* env, jobject obj )  {
-        return reinterpret_cast<long>( new aace::jni::network::NetworkInfoProviderBinder( obj ) );
+extern "C" {
+JNIEXPORT jlong JNICALL Java_com_amazon_aace_network_NetworkInfoProvider_createBinder(JNIEnv* env, jobject obj) {
+    return reinterpret_cast<long>(new aace::jni::network::NetworkInfoProviderBinder(obj));
+}
+
+JNIEXPORT void JNICALL
+Java_com_amazon_aace_network_NetworkInfoProvider_disposeBinder(JNIEnv* env, jobject /* this */, jlong ref) {
+    try {
+        auto networkInfoProviderBinder = NETWORK_INFO_PROVIDER_BINDER(ref);
+        ThrowIfNull(networkInfoProviderBinder, "invalidNetworkInfoProviderBinder");
+        delete networkInfoProviderBinder;
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_network_NetworkInfoProvider_disposeBinder", ex.what());
     }
+}
 
-    JNIEXPORT void JNICALL
-    Java_com_amazon_aace_network_NetworkInfoProvider_disposeBinder( JNIEnv* env, jobject /* this */, jlong ref )
-    {
-        try
-        {
-            auto networkInfoProviderBinder = NETWORK_INFO_PROVIDER_BINDER(ref);
-            ThrowIfNull( networkInfoProviderBinder, "invalidNetworkInfoProviderBinder" );
-            delete networkInfoProviderBinder;
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_network_NetworkInfoProvider_disposeBinder",ex.what());
-        }
+JNIEXPORT void JNICALL Java_com_amazon_aace_network_NetworkInfoProvider_networkStatusChanged(
+    JNIEnv* env,
+    jobject /* this */,
+    jlong ref,
+    jobject status,
+    jint wifiSignalStrength) {
+    try {
+        auto networkInfoProviderBinder = NETWORK_INFO_PROVIDER_BINDER(ref);
+        ThrowIfNull(networkInfoProviderBinder, "invalidNetworkInfoProviderBinder");
+
+        NetworkStatus statusType;
+        ThrowIfNot(aace::jni::network::JNetworkStatus::checkType(status, &statusType), "invalidNetworkStatusType");
+
+        networkInfoProviderBinder->getNetworkInfoProviderHandler()->networkStatusChanged(
+            statusType, static_cast<int>(wifiSignalStrength));
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_network_NetworkInfoProvider_networkStatusChanged", ex.what());
     }
-
-    JNIEXPORT void JNICALL
-    Java_com_amazon_aace_network_NetworkInfoProvider_networkStatusChanged( JNIEnv* env , jobject /* this */, jlong ref, jobject status, jint wifiSignalStrength )
-    {
-        try
-        {
-            auto networkInfoProviderBinder = NETWORK_INFO_PROVIDER_BINDER(ref);
-            ThrowIfNull( networkInfoProviderBinder, "invalidNetworkInfoProviderBinder" );
-
-            NetworkStatus statusType;
-            ThrowIfNot( aace::jni::network::JNetworkStatus::checkType( status, &statusType ), "invalidNetworkStatusType" );
-
-            networkInfoProviderBinder->getNetworkInfoProviderHandler()->networkStatusChanged( statusType, static_cast<int>( wifiSignalStrength ) );
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_network_NetworkInfoProvider_networkStatusChanged",ex.what());
-        }
-    }
+}
 }

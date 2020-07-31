@@ -22,14 +22,12 @@ namespace alexa {
 const std::string TAG = "aasb::alexa::SpeechSynthesizerHandler";
 
 std::shared_ptr<SpeechSynthesizerHandler> SpeechSynthesizerHandler::create() {
-    auto speechSynthesizerHandler = std::shared_ptr<SpeechSynthesizerHandler>(
-        new SpeechSynthesizerHandler());
+    auto speechSynthesizerHandler = std::shared_ptr<SpeechSynthesizerHandler>(new SpeechSynthesizerHandler());
 
     return speechSynthesizerHandler;
 }
 
-SpeechSynthesizerHandler::SpeechSynthesizerHandler() :
-        aace::alexa::SpeechSynthesizer() {
+SpeechSynthesizerHandler::SpeechSynthesizerHandler() : aace::alexa::SpeechSynthesizer() {
 }
 
 }  // namespace alexa

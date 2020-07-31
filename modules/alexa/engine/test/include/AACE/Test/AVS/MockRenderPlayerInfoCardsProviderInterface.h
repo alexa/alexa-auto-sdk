@@ -18,21 +18,24 @@
 
 #include <AVSCommon/SDKInterfaces/RenderPlayerInfoCardsObserverInterface.h>
 
-namespace aace {    
+namespace aace {
 namespace test {
 namespace avs {
 
-class MockRenderPlayerInfoCardsProviderInterface : public alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsObserverInterface {
+class MockRenderPlayerInfoCardsProviderInterface
+        : public alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsObserverInterface {
 public:
-    MOCK_METHOD1(setObserver,
-        bool(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsObserverInterface> observer));
-    MOCK_METHOD2(onRenderPlayerCardsInfoChanged,
+    MOCK_METHOD1(
+        setObserver,
+        bool(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsObserverInterface>
+                 observer));
+    MOCK_METHOD2(
+        onRenderPlayerCardsInfoChanged,
         void(alexaClientSDK::avsCommon::avs::PlayerActivity state, const Context& context));
-
 };
 
-} // aace::test::avs
-} // aace::test
-} // aace
+}  // namespace avs
+}  // namespace test
+}  // namespace aace
 
-#endif //AACE_TEST_AVS_MOCK_RENDER_PLAYER_INFO_CARDS_PROVIDER_INTERFACE_H
+#endif  //AACE_TEST_AVS_MOCK_RENDER_PLAYER_INFO_CARDS_PROVIDER_INTERFACE_H

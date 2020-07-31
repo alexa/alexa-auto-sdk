@@ -35,13 +35,21 @@ namespace logger {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-LoggerHandler::LoggerHandler(std::weak_ptr<Activity> activity) : m_activity{std::move(activity)} { setupUI(); }
+LoggerHandler::LoggerHandler(std::weak_ptr<Activity> activity) : m_activity{std::move(activity)} {
+    setupUI();
+}
 
-std::weak_ptr<Activity> LoggerHandler::getActivity() { return m_activity; }
+std::weak_ptr<Activity> LoggerHandler::getActivity() {
+    return m_activity;
+}
 
 // aace::logger::Logger interface
 
-bool LoggerHandler::logEvent(Logger::Level level, std::chrono::system_clock::time_point time, const std::string &source, const std::string &message) {
+bool LoggerHandler::logEvent(
+    Logger::Level level,
+    std::chrono::system_clock::time_point time,
+    const std::string& source,
+    const std::string& message) {
     if (m_applicationContext->isLogEnabled() && (level >= m_applicationContext->getLevel())) {
         if (auto console = m_console.lock()) {
             std::string key{};
@@ -87,7 +95,7 @@ void LoggerHandler::setupUI() {
     m_console = activity->findViewById("id:console");
 
     // log
-    activity->registerObserver(Event::onLoggerLog, [=](const std::string &value) {
+    activity->registerObserver(Event::onLoggerLog, [=](const std::string& value) {
         log(logger::LoggerHandler::Level::VERBOSE, "LoggerHandler", "onLoggerLog:" + value);
         static std::regex r("(.+)/(.+)/(.+)", std::regex::optimize);
         std::smatch sm{};
@@ -112,5 +120,5 @@ void LoggerHandler::setupUI() {
     });
 }
 
-} // namespace logger
-} // namespace sampleApp
+}  // namespace logger
+}  // namespace sampleApp

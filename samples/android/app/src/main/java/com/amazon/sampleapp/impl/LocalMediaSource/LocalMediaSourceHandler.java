@@ -7,8 +7,7 @@ import com.amazon.aace.audio.AudioOutput;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 import com.amazon.sampleapp.impl.PlaybackController.PlaybackControllerHandler;
 
-public abstract class LocalMediaSourceHandler extends LocalMediaSource
-{
+public abstract class LocalMediaSourceHandler extends LocalMediaSource {
     private static final String sTag = LocalMediaSourceHandler.class.getSimpleName();
 
     private final LoggerHandler mLogger;
@@ -17,15 +16,17 @@ public abstract class LocalMediaSourceHandler extends LocalMediaSource
     private AudioOutput.MutedState mMutedState = AudioOutput.MutedState.UNMUTED;
     private final PlaybackControllerHandler mPlaybackController;
 
-    protected LocalMediaSourceHandler( Context context, LoggerHandler logger, Source type, PlaybackControllerHandler playbackControllerHandler ) {
-        super( type );
+    protected LocalMediaSourceHandler(
+            Context context, LoggerHandler logger, Source type, PlaybackControllerHandler playbackControllerHandler) {
+        super(type);
         mPlaybackController = playbackControllerHandler;
         mLogger = logger;
     }
 
     @Override
-    public boolean play( ContentSelector selector, String payload ) {
-        mLogger.postInfo( sTag, String.format( "play [source=%s,selector=%s,payload=%s]", getSource(), selector.toString(), payload));
+    public boolean play(ContentSelector selector, String payload) {
+        mLogger.postInfo(sTag,
+                String.format("play [source=%s,selector=%s,payload=%s]", getSource(), selector.toString(), payload));
         setPlaybackState("PLAYING");
         mPlaybackController.hidePlayerInfoControls();
         mPlaybackController.setPlayerInfo("mock", "mock", getSource().toString());
@@ -33,11 +34,12 @@ public abstract class LocalMediaSourceHandler extends LocalMediaSource
     }
 
     @Override
-    public boolean playControl( PlayControlType controlType ) {
-        mLogger.postInfo( sTag, String.format( "playControl [source=%s,controlType=%s]", getSource(), controlType.toString()));
+    public boolean playControl(PlayControlType controlType) {
+        mLogger.postInfo(
+                sTag, String.format("playControl [source=%s,controlType=%s]", getSource(), controlType.toString()));
         mPlaybackController.hidePlayerInfoControls();
         mPlaybackController.setPlayerInfo("mock", "mock", getSource().toString());
-        switch( controlType ) {
+        switch (controlType) {
             case STOP:
                 setPlaybackState("STOPPED");
                 mPlaybackController.stop();
@@ -58,21 +60,19 @@ public abstract class LocalMediaSourceHandler extends LocalMediaSource
     }
 
     @Override
-    public boolean seek( long offset ) {
-        mLogger.postInfo( sTag, String.format( "seek [source=%s,offset=%d]", getSource(), offset));
+    public boolean seek(long offset) {
+        mLogger.postInfo(sTag, String.format("seek [source=%s,offset=%d]", getSource(), offset));
         return true;
-
     }
 
     @Override
-    public boolean adjustSeek( long deltaOffset ) {
-        mLogger.postInfo( sTag, String.format( "adjustSeek [source=%s,deltaOffset=%d]", getSource(), deltaOffset));
+    public boolean adjustSeek(long deltaOffset) {
+        mLogger.postInfo(sTag, String.format("adjustSeek [source=%s,deltaOffset=%d]", getSource(), deltaOffset));
         return true;
     }
 
     @Override
     public LocalMediaSourceState getState() {
-
         LocalMediaSourceState stateToReturn = new LocalMediaSourceState();
         stateToReturn.playbackState = new PlaybackState();
         stateToReturn.playbackState.state = getSourcePlaybackState();
@@ -83,10 +83,11 @@ public abstract class LocalMediaSourceHandler extends LocalMediaSource
     }
 
     @Override
-    public boolean volumeChanged( float volume ) {
-        mLogger.postInfo( sTag, String.format( "volumeChanged [source=%s,oldVolume=%2f,newVolume=%2f]", getSource(), mVolume, volume ) );
+    public boolean volumeChanged(float volume) {
+        mLogger.postInfo(sTag,
+                String.format("volumeChanged [source=%s,oldVolume=%2f,newVolume=%2f]", getSource(), mVolume, volume));
 
-        if( mVolume != volume ) {
+        if (mVolume != volume) {
             mVolume = volume;
         }
 
@@ -94,10 +95,12 @@ public abstract class LocalMediaSourceHandler extends LocalMediaSource
     }
 
     @Override
-    public boolean mutedStateChanged( AudioOutput.MutedState state ) {
-        mLogger.postInfo( sTag, String.format( "mutedStateChanged [source=%s,oldState=%s,newState=%s]", getSource(), mMutedState.toString(), state.toString() ) );
+    public boolean mutedStateChanged(AudioOutput.MutedState state) {
+        mLogger.postInfo(sTag,
+                String.format("mutedStateChanged [source=%s,oldState=%s,newState=%s]", getSource(),
+                        mMutedState.toString(), state.toString()));
 
-        if( state != mMutedState ) {
+        if (state != mMutedState) {
             mMutedState = state;
         }
 
@@ -116,6 +119,5 @@ public abstract class LocalMediaSourceHandler extends LocalMediaSource
         return "IDLE";
     }
 
-    protected void setPlaybackState( String state) {
-    }
+    protected void setPlaybackState(String state) {}
 }

@@ -23,22 +23,21 @@ namespace propertyManager {
 
 class PropertyManagerEngineInterface {
 public:
-    
     /**
      * Describes the state of a property change.
      */
     enum class PropertyState {
-        
+
         /**
          * The property change was successful.
          */
         SUCCEEDED,
-        
+
         /**
          * The property change failed.
          */
         FAILED,
-        
+
     };
     virtual bool onSetProperty(const std::string& name, const std::string& value) = 0;
     virtual std::string onGetProperty(const std::string& name) = 0;

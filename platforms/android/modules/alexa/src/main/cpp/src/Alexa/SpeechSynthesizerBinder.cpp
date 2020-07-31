@@ -23,55 +23,49 @@ namespace aace {
 namespace jni {
 namespace alexa {
 
-    //
-    // SpeechSynthesizerBinder
-    //
+//
+// SpeechSynthesizerBinder
+//
 
-    SpeechSynthesizerBinder::SpeechSynthesizerBinder( jobject obj ) {
-        m_speechSynthesizerHandler = std::make_shared<SpeechSynthesizerHandler>();
-    }
+SpeechSynthesizerBinder::SpeechSynthesizerBinder(jobject obj) {
+    m_speechSynthesizerHandler = std::make_shared<SpeechSynthesizerHandler>();
+}
 
-    //
-    // SpeechSynthesizerHandler
-    //
+//
+// SpeechSynthesizerHandler
+//
 
-    SpeechSynthesizerHandler::SpeechSynthesizerHandler() {
-    }
+SpeechSynthesizerHandler::SpeechSynthesizerHandler() {
+}
 
-} // aace::alexa
-} // aace::jni
-} // aace
+}  // namespace alexa
+}  // namespace jni
+}  // namespace aace
 
-#define SPEECH_SYNTHESIZER_BINDER(ref) reinterpret_cast<aace::jni::alexa::SpeechSynthesizerBinder *>( ref )
+#define SPEECH_SYNTHESIZER_BINDER(ref) reinterpret_cast<aace::jni::alexa::SpeechSynthesizerBinder*>(ref)
 
-extern "C"
-{
-    JNIEXPORT jlong JNICALL
-    Java_com_amazon_aace_alexa_SpeechSynthesizer_createBinder( JNIEnv* env, jobject obj, jlong mediaPlayerRef, jlong speakeRef )
-    {
-        try
-        {
-            return reinterpret_cast<long>( new aace::jni::alexa::SpeechSynthesizerBinder( obj ) );
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_alexa_SpeechSynthesizer_createBinder",ex.what());
-            return 0;
-        }
-    }
-
-    JNIEXPORT void JNICALL
-    Java_com_amazon_aace_alexa_SpeechSynthesizer_disposeBinder( JNIEnv* env, jobject /* this */, jlong ref )
-    {
-        try
-        {
-            auto speechSynthesizerBinder = SPEECH_SYNTHESIZER_BINDER(ref);
-            ThrowIfNull( speechSynthesizerBinder, "invalidNotificationsBinder" );
-            delete speechSynthesizerBinder;
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_alexa_SpeechSynthesizer_disposeBinder",ex.what());
-        }
+extern "C" {
+JNIEXPORT jlong JNICALL Java_com_amazon_aace_alexa_SpeechSynthesizer_createBinder(
+    JNIEnv* env,
+    jobject obj,
+    jlong mediaPlayerRef,
+    jlong speakeRef) {
+    try {
+        return reinterpret_cast<long>(new aace::jni::alexa::SpeechSynthesizerBinder(obj));
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_alexa_SpeechSynthesizer_createBinder", ex.what());
+        return 0;
     }
 }
 
-
+JNIEXPORT void JNICALL
+Java_com_amazon_aace_alexa_SpeechSynthesizer_disposeBinder(JNIEnv* env, jobject /* this */, jlong ref) {
+    try {
+        auto speechSynthesizerBinder = SPEECH_SYNTHESIZER_BINDER(ref);
+        ThrowIfNull(speechSynthesizerBinder, "invalidNotificationsBinder");
+        delete speechSynthesizerBinder;
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_alexa_SpeechSynthesizer_disposeBinder", ex.what());
+    }
+}
+}

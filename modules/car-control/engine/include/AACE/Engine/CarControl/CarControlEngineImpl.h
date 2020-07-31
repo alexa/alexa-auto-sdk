@@ -16,10 +16,10 @@
 #ifndef AACE_ENGINE_CAR_CONTROL_CAR_CONTROL_ENGINE_IMPL_H
 #define AACE_ENGINE_CAR_CONTROL_CAR_CONTROL_ENGINE_IMPL_H
 
+#include <AVSCommon/Utils/RequiresShutdown.h>
+
 #include <memory>
 #include <utility>
-
-#include <AVSCommon/Utils/RequiresShutdown.h>
 
 #include "AACE/CarControl/CarControl.h"
 #include "AACE/Engine/CarControl/CarControlServiceInterface.h"

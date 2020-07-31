@@ -23,35 +23,35 @@ namespace aace {
 namespace jni {
 namespace alexa {
 
-    class DoNotDisturbHandler : public aace::alexa::DoNotDisturb {
-    public:
-        DoNotDisturbHandler( jobject obj );
+class DoNotDisturbHandler : public aace::alexa::DoNotDisturb {
+public:
+    DoNotDisturbHandler(jobject obj);
 
-        // aace::alexa::DoNotDisturb
-        void setDoNotDisturb( const bool doNotDisturb ) override;
+    // aace::alexa::DoNotDisturb
+    void setDoNotDisturb(const bool doNotDisturb) override;
 
-    private:
-        JObject m_obj;
-    };
+private:
+    JObject m_obj;
+};
 
-    class DoNotDisturbBinder : public aace::jni::core::PlatformInterfaceBinder {
-    public:
-        DoNotDisturbBinder( jobject obj );
+class DoNotDisturbBinder : public aace::jni::core::PlatformInterfaceBinder {
+public:
+    DoNotDisturbBinder(jobject obj);
 
-        std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
-            return m_doNotDisturbHandler;
-        }
+    std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
+        return m_doNotDisturbHandler;
+    }
 
-        std::shared_ptr<DoNotDisturbHandler> getDoNotDisturb() {
-            return m_doNotDisturbHandler;
-        }
+    std::shared_ptr<DoNotDisturbHandler> getDoNotDisturb() {
+        return m_doNotDisturbHandler;
+    }
 
-    private:
-        std::shared_ptr<DoNotDisturbHandler> m_doNotDisturbHandler;
-    };
+private:
+    std::shared_ptr<DoNotDisturbHandler> m_doNotDisturbHandler;
+};
 
-} // aace::alexa
-} // aace::jni
-} // aace
+}  // namespace alexa
+}  // namespace jni
+}  // namespace aace
 
-#endif // AACE_JNI_ALEXA_DO_NOT_DISTURB_BINDER_H
+#endif  // AACE_JNI_ALEXA_DO_NOT_DISTURB_BINDER_H

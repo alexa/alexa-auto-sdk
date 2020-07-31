@@ -21,7 +21,6 @@ import com.amazon.aace.core.config.EngineConfiguration;
  * A factory interface for creating APL configuration objects.
  */
 public class APLConfiguration {
-
     private static final String TAG = "APLConfiguration";
 
     public enum AlexaPresentationTimeoutType {
@@ -29,7 +28,8 @@ public class APLConfiguration {
          *  RenderDocument timeout in ms for display card timeout.
          *  @hideinitializer
          */
-        DISPLAY_DOCUMENT_INTERACTION_IDLE_TIMEOUT ( "DISPLAY_DOCUMENT_INTERACTION_IDLE_TIMEOUT","displayCardAudioPlaybackStoppedPausedTimeout" );
+        DISPLAY_DOCUMENT_INTERACTION_IDLE_TIMEOUT(
+                "DISPLAY_DOCUMENT_INTERACTION_IDLE_TIMEOUT", "displayCardAudioPlaybackStoppedPausedTimeout");
 
         /**
          * @internal
@@ -44,7 +44,7 @@ public class APLConfiguration {
         /**
          * Type used to identify a AlexaPresentation configuration type and value pair.
          */
-        AlexaPresentationTimeoutType( String name, String key ) {
+        AlexaPresentationTimeoutType(String name, String key) {
             mName = name;
             mKey = key;
         }
@@ -62,20 +62,23 @@ public class APLConfiguration {
         public String getKey() {
             return mKey;
         }
-
     }
 
     public static class AlexaPresentationTimeout {
         private AlexaPresentationTimeoutType mType;
         private int mValue;
 
-        public AlexaPresentationTimeout( AlexaPresentationTimeoutType type, int value ) {
+        public AlexaPresentationTimeout(AlexaPresentationTimeoutType type, int value) {
             mType = type;
             mValue = value;
         }
 
-        public AlexaPresentationTimeoutType getType() { return mType; }
-        public int getValue() { return mValue; }
+        public AlexaPresentationTimeoutType getType() {
+            return mType;
+        }
+        public int getValue() {
+            return mValue;
+        }
     }
 
     /**
@@ -96,15 +99,16 @@ public class APLConfiguration {
      * @param timeoutList A list of @c AlexaPresentationTimeout type and value pairs.
      *
      */
-    public static EngineConfiguration createAlexaPresentationTimeoutConfig( final AlexaPresentationTimeout[] timeoutList ) {
+    public static EngineConfiguration createAlexaPresentationTimeoutConfig(
+            final AlexaPresentationTimeout[] timeoutList) {
         return new EngineConfiguration() {
             @Override
             protected long createNativeRef() {
-                return createAlexaPresentationTimeoutConfigBinder( timeoutList );
+                return createAlexaPresentationTimeoutConfigBinder(timeoutList);
             }
         };
     }
 
     // Native Engine JNI methods
-    static private native long createAlexaPresentationTimeoutConfigBinder( AlexaPresentationTimeout[] timeoutList );
+    static private native long createAlexaPresentationTimeoutConfigBinder(AlexaPresentationTimeout[] timeoutList);
 }

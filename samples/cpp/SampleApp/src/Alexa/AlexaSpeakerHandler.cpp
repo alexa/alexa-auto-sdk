@@ -17,7 +17,7 @@
 
 // C++ Standard Library
 #include <sstream>
-#include <regex>   // std::regex
+#include <regex>  // std::regex
 
 // Guidelines Support Library
 #define GSL_THROW_ON_CONTRACT_VIOLATION
@@ -32,26 +32,36 @@ namespace alexa {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-AlexaSpeakerHandler::AlexaSpeakerHandler(std::weak_ptr<Activity> activity, std::weak_ptr<logger::LoggerHandler> loggerHandler)
-    : m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
+AlexaSpeakerHandler::AlexaSpeakerHandler(
+    std::weak_ptr<Activity> activity,
+    std::weak_ptr<logger::LoggerHandler> loggerHandler) :
+        m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)} {
     // Expects((m_activity != nullptr) && (m_loggerHandler != nullptr));
     setupUI();
 }
 
-std::weak_ptr<Activity> AlexaSpeakerHandler::getActivity() { return m_activity; }
+std::weak_ptr<Activity> AlexaSpeakerHandler::getActivity() {
+    return m_activity;
+}
 
-std::weak_ptr<logger::LoggerHandler> AlexaSpeakerHandler::getLoggerHandler() { return m_loggerHandler; }
+std::weak_ptr<logger::LoggerHandler> AlexaSpeakerHandler::getLoggerHandler() {
+    return m_loggerHandler;
+}
 
 // aace::alexa::AlexaSpeaker interface
-void AlexaSpeakerHandler::speakerSettingsChanged( aace::alexa::AlexaSpeaker::SpeakerType type, bool local, int8_t volume, bool mute ) {
+void AlexaSpeakerHandler::speakerSettingsChanged(
+    aace::alexa::AlexaSpeaker::SpeakerType type,
+    bool local,
+    int8_t volume,
+    bool mute) {
     std::stringstream ss;
-    ss << "[type="<<type<<",local="<<local<<",volume="<<static_cast<int>(volume)<<",mute="<<mute<<"]";
-    log(logger::LoggerHandler::Level::INFO, "speakerSettingsChanged"+ ss.str());
+    ss << "[type=" << type << ",local=" << local << ",volume=" << static_cast<int>(volume) << ",mute=" << mute << "]";
+    log(logger::LoggerHandler::Level::INFO, "speakerSettingsChanged" + ss.str());
 }
 
 // private
 
-void AlexaSpeakerHandler::log(logger::LoggerHandler::Level level, const std::string &message) {
+void AlexaSpeakerHandler::log(logger::LoggerHandler::Level level, const std::string& message) {
     auto loggerHandler = m_loggerHandler.lock();
     if (!loggerHandler) {
         return;
@@ -65,8 +75,8 @@ void AlexaSpeakerHandler::setupUI() {
         return;
     }
     m_console = activity->findViewById("id:console");
-    
-    activity->registerObserver(Event::onAudioManagerSpeaker, [=](const std::string &value) {
+
+    activity->registerObserver(Event::onAudioManagerSpeaker, [=](const std::string& value) {
         log(logger::LoggerHandler::Level::VERBOSE, "onAudioManagerSpeaker:" + value);
         static std::regex value_regex("(.+)/(.+)/(.+)", std::regex::optimize);
         std::smatch value_match{};
@@ -89,7 +99,7 @@ void AlexaSpeakerHandler::setupUI() {
                         // Iterate over the map using c++11 range based for loop
                         for (std::pair<std::string, SpeakerType> el : identityMap) {
                             console->print(el.first + " ");
-	                    }
+                        }
                         console->printLine("");
                         console->printRuler();
                     }
@@ -102,38 +112,36 @@ void AlexaSpeakerHandler::setupUI() {
                     if (auto console = m_console.lock()) {
                         std::stringstream message;
                         message << "Entity  : Volume" << std::endl
-                                << "Speaker : "       << identity << std::endl
-                                << "Action  : Mute"   << std::endl
-                                << "Value   : "       << std::boolalpha << value << std::noboolalpha; 
+                                << "Speaker : " << identity << std::endl
+                                << "Action  : Mute" << std::endl
+                                << "Value   : " << std::boolalpha << value << std::noboolalpha;
 
                         console->printRuler();
                         console->printLine(message.str());
                         console->printRuler();
                     }
-                }
-                else if (paramName == "volume") {
+                } else if (paramName == "volume") {
                     std::stringstream message;
                     int value = std::stoi(paramValue);
                     if ((paramValue[0] == '+') || (paramValue[0] == '-')) {
                         localAdjustVolume(type, value);
                         if (auto console = m_console.lock()) {
-                            message << "Entity  : Volume"        << std::endl
-                                    << "Speaker : "              << identity << std::endl
+                            message << "Entity  : Volume" << std::endl
+                                    << "Speaker : " << identity << std::endl
                                     << "Action  : Adjust Volume" << std::endl
-                                    << "Value   : "              << paramValue; 
+                                    << "Value   : " << paramValue;
 
                             console->printRuler();
                             console->printLine(message.str());
                             console->printRuler();
                         }
-                    }
-                    else {
+                    } else {
                         localSetVolume(type, value);
                         if (auto console = m_console.lock()) {
-                            message << "Entity  : Volume"     << std::endl
-                                    << "Speaker : "           << identity << std::endl
+                            message << "Entity  : Volume" << std::endl
+                                    << "Speaker : " << identity << std::endl
                                     << "Action  : Set Volume" << std::endl
-                                    << "Value   : "           << paramValue;
+                                    << "Value   : " << paramValue;
 
                             console->printRuler();
                             console->printLine(message.str());
@@ -154,5 +162,5 @@ void AlexaSpeakerHandler::setupUI() {
     });
 }
 
-} // namespace alexa
-} // namespace sampleApp
+}  // namespace alexa
+}  // namespace sampleApp

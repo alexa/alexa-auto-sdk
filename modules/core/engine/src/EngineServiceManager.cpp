@@ -25,29 +25,28 @@ static const std::string TAG("aace.core.EngineServiceManager");
 
 std::shared_ptr<EngineServiceManager> EngineServiceManager::s_instance;
 
-std::shared_ptr<EngineServiceManager> EngineServiceManager::getInstance()
-{
-    if( s_instance == nullptr ) {
-        s_instance = std::shared_ptr<EngineServiceManager>( new EngineServiceManager() );
+std::shared_ptr<EngineServiceManager> EngineServiceManager::getInstance() {
+    if (s_instance == nullptr) {
+        s_instance = std::shared_ptr<EngineServiceManager>(new EngineServiceManager());
     }
 
     return s_instance;
 }
 
-bool EngineServiceManager::registerService( const ServiceDescription& description, std::function<std::shared_ptr<EngineService>(const ServiceDescription&)> constructor )
-{
-    try
-    {
+bool EngineServiceManager::registerService(
+    const ServiceDescription& description,
+    std::function<std::shared_ptr<EngineService>(const ServiceDescription&)> constructor) {
+    try {
         auto type = description.getType();
-    
-        ThrowIfNot( getInstance()->m_serviceMap.find( type ) == getInstance()->m_serviceMap.end(), "serviceAlreadyRegistered" );
-    
-        getInstance()->m_serviceMap[type] = ServiceFactory::create( description, constructor );
+
+        ThrowIfNot(
+            getInstance()->m_serviceMap.find(type) == getInstance()->m_serviceMap.end(), "serviceAlreadyRegistered");
+
+        getInstance()->m_serviceMap[type] = ServiceFactory::create(description, constructor);
 
         return true;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"registerService").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "registerService").d("reason", ex.what()));
         return false;
     }
 }
@@ -55,7 +54,7 @@ bool EngineServiceManager::registerService( const ServiceDescription& descriptio
 EngineServiceManager::ServiceMap::iterator EngineServiceManager::registryBegin() {
     return getInstance()->m_serviceMap.begin();
 }
-    
+
 EngineServiceManager::ServiceMap::iterator EngineServiceManager::registryEnd() {
     return getInstance()->m_serviceMap.end();
 }
@@ -64,10 +63,11 @@ EngineServiceManager::ServiceMap::iterator EngineServiceManager::registryEnd() {
 // ServiceFactory
 //
 
-std::shared_ptr<ServiceFactory> ServiceFactory::create( const ServiceDescription& description, std::function<std::shared_ptr<EngineService>(const ServiceDescription&)> constructor )
-{
-    auto factory = std::shared_ptr<ServiceFactory>( new ServiceFactory() );
-    
+std::shared_ptr<ServiceFactory> ServiceFactory::create(
+    const ServiceDescription& description,
+    std::function<std::shared_ptr<EngineService>(const ServiceDescription&)> constructor) {
+    auto factory = std::shared_ptr<ServiceFactory>(new ServiceFactory());
+
     factory->m_description = description;
     factory->m_constructor = constructor;
 
@@ -75,9 +75,9 @@ std::shared_ptr<ServiceFactory> ServiceFactory::create( const ServiceDescription
 }
 
 std::shared_ptr<EngineService> ServiceFactory::newInstance() {
-    return m_constructor( m_description );
+    return m_constructor(m_description);
 }
 
-} // aace::engine::core
-} // aace::engine
-} // aace
+}  // namespace core
+}  // namespace engine
+}  // namespace aace

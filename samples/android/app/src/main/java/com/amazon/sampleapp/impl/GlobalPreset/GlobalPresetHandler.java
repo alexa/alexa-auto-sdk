@@ -1,18 +1,16 @@
 package com.amazon.sampleapp.impl.GlobalPreset;
 
-import com.amazon.aace.alexa.GlobalPreset;
-
 import android.content.Context;
+
+import com.amazon.aace.alexa.GlobalPreset;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 
-
 public class GlobalPresetHandler extends com.amazon.aace.alexa.GlobalPreset {
-
     private static final String TAG = GlobalPresetHandler.class.getSimpleName();
 
     private final LoggerHandler mLogger;
 
-    public GlobalPresetHandler( Context context, LoggerHandler logger) {
+    public GlobalPresetHandler(Context context, LoggerHandler logger) {
         mLogger = logger;
     }
 

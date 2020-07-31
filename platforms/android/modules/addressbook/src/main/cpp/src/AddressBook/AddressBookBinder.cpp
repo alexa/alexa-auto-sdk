@@ -26,108 +26,118 @@ namespace aace {
 namespace jni {
 namespace addressbook {
 
-    //
-    // AddressBookBinder
-    //
+//
+// AddressBookBinder
+//
 
-    AddressBookBinder::AddressBookBinder( jobject obj ) {
-        m_addressBookHandler = std::make_shared<AddressBookHandler>( obj );
+AddressBookBinder::AddressBookBinder(jobject obj) {
+    m_addressBookHandler = std::make_shared<AddressBookHandler>(obj);
+}
+
+//
+// AddressBookHandler
+//
+
+AddressBookHandler::AddressBookHandler(jobject obj) :
+        AddressBook(), m_obj(obj, "com/amazon/aace/addressbook/AddressBook") {
+}
+
+bool AddressBookHandler::getEntries(
+    const std::string& addressBookSourceId,
+    std::weak_ptr<IAddressBookEntriesFactory> factory) {
+    try_with_context {
+        JObject javaIAddressBookEntriesFactory("com/amazon/aace/addressbook/IAddressBookEntriesFactory");
+        ThrowIfJavaEx(env, "createIAddressBookEntriesFactoryFailed");
+
+        // create the IAddressBookEntriesFactory binder
+        auto factorySharedRef = factory.lock();
+        if (factorySharedRef) {
+            long iAddressBookEntriesFactoryBinder =
+                reinterpret_cast<long>(new IAddressBookEntriesFactoryBinder(factorySharedRef));
+
+            // set the java audio stream object native ref to the audio stream binder
+            javaIAddressBookEntriesFactory.invoke<void>(
+                "setNativeRef", "(J)V", nullptr, iAddressBookEntriesFactoryBinder);
+        } else {
+            Throw("invalidFactory");
+        }
+
+        jboolean result;
+        ThrowIfNot(
+            m_obj.invoke(
+                "getEntries",
+                "(Ljava/lang/String;Lcom/amazon/aace/addressbook/IAddressBookEntriesFactory;)Z",
+                &result,
+                JString(addressBookSourceId).get(),
+                javaIAddressBookEntriesFactory.get()),
+            "invokeFailed");
+        return result;
     }
-
-    //
-    // AddressBookHandler
-    //
-
-    AddressBookHandler::AddressBookHandler( jobject obj ) : AddressBook(), m_obj( obj, "com/amazon/aace/addressbook/AddressBook" ) {
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "getEntries", ex.what());
+        return false;
     }
+}
 
-    bool AddressBookHandler::getEntries( const std::string& addressBookSourceId, std::weak_ptr<IAddressBookEntriesFactory> factory ) {
-        try_with_context
-        {
-            JObject javaIAddressBookEntriesFactory( "com/amazon/aace/addressbook/IAddressBookEntriesFactory" );
-            ThrowIfJavaEx( env, "createIAddressBookEntriesFactoryFailed" );
+}  // namespace addressbook
+}  // namespace jni
+}  // namespace aace
 
-            // create the IAddressBookEntriesFactory binder
-            auto factorySharedRef = factory.lock();
-            if( factorySharedRef ) {
-                long iAddressBookEntriesFactoryBinder = reinterpret_cast<long>( new IAddressBookEntriesFactoryBinder( factorySharedRef ) );
+#define ADDRESS_BOOK_BINDER(ref) reinterpret_cast<aace::jni::addressbook::AddressBookBinder*>(ref)
 
-                // set the java audio stream object native ref to the audio stream binder
-                javaIAddressBookEntriesFactory.invoke<void>( "setNativeRef", "(J)V", nullptr, iAddressBookEntriesFactoryBinder );
-            } else {
-                Throw("invalidFactory");
-            }
+extern "C" {
+JNIEXPORT jlong JNICALL Java_com_amazon_aace_addressbook_AddressBook_createBinder(JNIEnv* env, jobject obj) {
+    return reinterpret_cast<long>(new aace::jni::addressbook::AddressBookBinder(obj));
+}
 
-            jboolean result;
-            ThrowIfNot( m_obj.invoke( "getEntries", "(Ljava/lang/String;Lcom/amazon/aace/addressbook/IAddressBookEntriesFactory;)Z", &result, JString(addressBookSourceId).get(), javaIAddressBookEntriesFactory.get() ), "invokeFailed" );
-            return result;
-        }
-        catch_with_ex {
-            AACE_JNI_ERROR(TAG,"getEntries",ex.what());
-            return false;
-        }
+JNIEXPORT void JNICALL
+Java_com_amazon_aace_addressbook_AddressBook_disposeBinder(JNIEnv* env, jobject /* this */, jlong ref) {
+    try {
+        auto addressBookBinder = ADDRESS_BOOK_BINDER(ref);
+        ThrowIfNull(addressBookBinder, "invalidAddressBookBinder");
+
+        delete addressBookBinder;
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_addressbook_AddressBook_disposeBinder", ex.what());
     }
+}
 
-} // aace::jni::addressbook
-} // aace::jni
-} // aace
+JNIEXPORT jboolean JNICALL Java_com_amazon_aace_addressbook_AddressBook_addAddressBook(
+    JNIEnv* env,
+    jobject /* this */,
+    jlong ref,
+    jstring addressBookSourceId,
+    jstring name,
+    jobject type) {
+    try {
+        auto addressBookBinder = ADDRESS_BOOK_BINDER(ref);
+        ThrowIfNull(addressBookBinder, "invalidAddressBookBinder");
 
-#define ADDRESS_BOOK_BINDER(ref) reinterpret_cast<aace::jni::addressbook::AddressBookBinder *>( ref )
+        AddressBookType addressBookType;
+        ThrowIfNot(
+            aace::jni::addressbook::JAddressBookType::checkType(type, &addressBookType), "invalidAddressBookType");
 
-extern "C"
-{
-    JNIEXPORT jlong JNICALL
-    Java_com_amazon_aace_addressbook_AddressBook_createBinder( JNIEnv* env, jobject obj )  {
-        return reinterpret_cast<long>( new aace::jni::addressbook::AddressBookBinder( obj ) );
+        return addressBookBinder->getAddressBook()->addAddressBook(
+            JString(addressBookSourceId).toStdStr(), JString(name).toStdStr(), addressBookType);
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_addressbook_AddressBook_addAddressBook", ex.what());
+        return false;
     }
+}
 
-    JNIEXPORT void JNICALL
-    Java_com_amazon_aace_addressbook_AddressBook_disposeBinder( JNIEnv* env, jobject /* this */, jlong ref )
-    {
-        try
-        {
-            auto addressBookBinder = ADDRESS_BOOK_BINDER(ref);
-            ThrowIfNull( addressBookBinder, "invalidAddressBookBinder" );
+JNIEXPORT jboolean JNICALL Java_com_amazon_aace_addressbook_AddressBook_removeAddressBook(
+    JNIEnv* env,
+    jobject /* this */,
+    jlong ref,
+    jstring addressBookSourceId) {
+    try {
+        auto addressBookBinder = ADDRESS_BOOK_BINDER(ref);
+        ThrowIfNull(addressBookBinder, "invalidAddressBookBinder");
 
-            delete addressBookBinder;
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_addressbook_AddressBook_disposeBinder",ex.what());
-        }
+        return addressBookBinder->getAddressBook()->removeAddressBook(JString(addressBookSourceId).toStdStr());
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_addressbook_AddressBook_removeAddressBook", ex.what());
+        return false;
     }
-    
-    JNIEXPORT jboolean JNICALL
-    Java_com_amazon_aace_addressbook_AddressBook_addAddressBook( JNIEnv* env, jobject /* this */, jlong ref, jstring addressBookSourceId, jstring name, jobject type )
-    {
-        try
-        {
-            auto addressBookBinder = ADDRESS_BOOK_BINDER(ref);
-            ThrowIfNull( addressBookBinder, "invalidAddressBookBinder" );
-
-            AddressBookType addressBookType;
-            ThrowIfNot( aace::jni::addressbook::JAddressBookType::checkType( type, &addressBookType ), "invalidAddressBookType" );
-
-            return addressBookBinder->getAddressBook()->addAddressBook( JString(addressBookSourceId).toStdStr(), JString(name).toStdStr(), addressBookType );
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_addressbook_AddressBook_addAddressBook",ex.what());
-            return false;
-        }
-    }
-
-    JNIEXPORT jboolean JNICALL
-    Java_com_amazon_aace_addressbook_AddressBook_removeAddressBook( JNIEnv* env, jobject /* this */, jlong ref, jstring addressBookSourceId )
-    {
-        try
-        {
-            auto addressBookBinder = ADDRESS_BOOK_BINDER(ref);
-            ThrowIfNull( addressBookBinder, "invalidAddressBookBinder" );
-
-            return addressBookBinder->getAddressBook()->removeAddressBook( JString(addressBookSourceId).toStdStr() );
-        }
-        catch( const std::exception& ex ) {
-            AACE_JNI_ERROR(TAG,"Java_com_amazon_aace_addressbook_AddressBook_removeAddressBook",ex.what());
-            return false;
-        }
-    }
+}
 }

@@ -37,7 +37,7 @@
 #ifdef ENABLE_AAC_GLORIA
 #include "CardRendererHandler.h"
 #include "ListRendererHandler.h"
-#endif // ENABLE_AAC_GLORIA
+#endif  // ENABLE_AAC_GLORIA
 #include "LocationProviderHandler.h"
 #include "LoggerHandler.h"
 #include "NetworkInfoProviderHandler.h"
@@ -146,7 +146,7 @@ public:
      *
      * @param wakeWordEnable -  true to enable or false to disable
      */
-     bool setWakeWordEnable(bool wakeWordEnable) override;
+    bool setWakeWordEnable(bool wakeWordEnable) override;
 
     /**
      * set mock engine instance for testing (must be used only by test).
@@ -216,7 +216,7 @@ private:
 
     // Gloria List Renderer
     std::shared_ptr<aasb::gloria::ListRendererHandler> m_gloriaListHandler;
-#endif //ENABLE_AAC_GLORIA
+#endif  // ENABLE_AAC_GLORIA
 
     // Car Control Handler
     std::shared_ptr<aasb::carControl::CarControlHandler> m_carControlHandler;

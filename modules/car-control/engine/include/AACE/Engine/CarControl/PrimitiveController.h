@@ -16,13 +16,19 @@
 #ifndef AACE_ENGINE_CAR_CONTROL_PRIMITIVE_CONTROLLER_H
 #define AACE_ENGINE_CAR_CONTROL_PRIMITIVE_CONTROLLER_H
 
-#include <vector>
-
 #include <AACE/Engine/CarControl/CapabilityController.h>
+#include <AVSCommon/AVS/CapabilitySemantics.h>
+#include <AVSCommon/Utils/Optional.h>
+
+#include <nlohmann/json.hpp>
+#include <vector>
 
 namespace aace {
 namespace engine {
 namespace carControl {
+
+using CapabilitySemantics = alexaClientSDK::avsCommon::avs::CapabilitySemantics;
+using json = nlohmann::json;
 
 /**
  * Base class for a primitive capability controller, (e.g. ModeController, RangeController, ToggleController)
@@ -46,6 +52,14 @@ public:
      * Get the name of this capability controller instance
      */
     std::string getInstance();
+
+    /**
+     * Utility method to create a @c CapabilitySemantics from a 'semantics' node of a capability definition JSON
+     * 
+     * @param semantics The 'semantics' node of the capability definition JSON
+     * @return An @c Optional @c CapabilitySemantics with an empty value if the object cannot be constructed due to parsing error
+     */
+    static alexaClientSDK::avsCommon::utils::Optional<CapabilitySemantics> getSemantics(const json& semantics);
 
 private:
     /// The name of this capability controller instance

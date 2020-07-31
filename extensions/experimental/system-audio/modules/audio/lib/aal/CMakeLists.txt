@@ -12,6 +12,10 @@ if(ENABLE_GSTREAMER)
 	add_definitions(-DCONFIG_GSTREAMER)
 	add_definitions(-DUSE_GLOOP)
 	add_definitions(-DUSE_FAKEMUTE)
+	if (USE_PIPEWIRE)
+		add_definitions(-DUSE_PIPEWIRE)
+		message(STATUS "Pipewire enabled")
+	endif()
 	list(APPEND AAL_MODULE_SRC
 		src/gstreamer/core.c
 		src/gstreamer/player.c

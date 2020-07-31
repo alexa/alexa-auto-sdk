@@ -35,28 +35,28 @@ namespace communication {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class CommunicationHandler : public aace::communication::AlexaComms /* isa PlatformInterface */ {
-  private:
+private:
     std::weak_ptr<Activity> m_activity{};
     std::weak_ptr<logger::LoggerHandler> m_loggerHandler{};
 
-  protected:
-    CommunicationHandler(std::weak_ptr<Activity> activity,
-                         std::weak_ptr<logger::LoggerHandler> loggerHandler);
+protected:
+    CommunicationHandler(std::weak_ptr<Activity> activity, std::weak_ptr<logger::LoggerHandler> loggerHandler);
 
-  public:
-    template <typename... Args> static auto create(Args &&... args) -> std::shared_ptr<CommunicationHandler> {
+public:
+    template <typename... Args>
+    static auto create(Args&&... args) -> std::shared_ptr<CommunicationHandler> {
         return std::shared_ptr<CommunicationHandler>(new CommunicationHandler(args...));
     }
     auto getActivity() -> std::weak_ptr<Activity>;
     auto getLoggerHandler() -> std::weak_ptr<logger::LoggerHandler>;
 
     // aace::communication::AlexaComms interface
-    auto callDisplayInfo(const std::string &displayInfo) -> void override;
+    auto callDisplayInfo(const std::string& displayInfo) -> void override;
     auto callStateChanged(CallState state) -> void override;
 
     static bool checkConfiguration(const std::vector<json>& jsons);
 
-  protected:
+protected:
     /**
      * Helper method to display the state and display info.
      */
@@ -64,10 +64,10 @@ class CommunicationHandler : public aace::communication::AlexaComms /* isa Platf
     auto showState() -> void;
     auto callStateToString(CallState state) -> std::string;
 
-  private:
+private:
     std::weak_ptr<View> m_console{};
 
-    auto log(logger::LoggerHandler::Level level, const std::string &message) -> void;
+    auto log(logger::LoggerHandler::Level level, const std::string& message) -> void;
     auto setupUI() -> void;
 
     /// Call display info
@@ -77,7 +77,7 @@ class CommunicationHandler : public aace::communication::AlexaComms /* isa Platf
     CallState m_callState;
 };
 
-} // namespace communication
-} // namespace sampleApp
+}  // namespace communication
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_COMMUNICATIONS_COMMUNICATIONS_HANDLER_H
+#endif  // SAMPLEAPP_COMMUNICATIONS_COMMUNICATIONS_HANDLER_H

@@ -43,19 +43,22 @@ AlertsHandler::AlertsHandler(
         m_logger(logger), m_responseDispatcher(responseDispatcher) {
 }
 
-void AlertsHandler::alertStateChanged(const std::string &alertToken, Alerts::AlertState state, const std::string &reason) {
+void AlertsHandler::alertStateChanged(
+    const std::string& alertToken,
+    Alerts::AlertState state,
+    const std::string& reason) {
     std::stringstream ss;
     ss << state;
     m_logger->log(Level::INFO, TAG, "alertChanged: " + alertToken + " state: " + ss.str() + " reason: " + reason);
 }
 
-void AlertsHandler::alertCreated(const std::string &alertToken, const std::string &detailedInfo) {
+void AlertsHandler::alertCreated(const std::string& alertToken, const std::string& detailedInfo) {
     m_logger->log(Level::INFO, TAG, "alertCreated: " + alertToken + " info: " + detailedInfo);
 }
 
-void AlertsHandler::alertDeleted(const std::string &alertToken) {
+void AlertsHandler::alertDeleted(const std::string& alertToken) {
     m_logger->log(Level::INFO, TAG, "alertDeleted: " + alertToken);
 }
 
-} // namespace alexa
-} // namespace aasb
+}  // namespace alexa
+}  // namespace aasb

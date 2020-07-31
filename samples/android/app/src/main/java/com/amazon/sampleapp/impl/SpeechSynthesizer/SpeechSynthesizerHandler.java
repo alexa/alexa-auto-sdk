@@ -17,5 +17,4 @@ package com.amazon.sampleapp.impl.SpeechSynthesizer;
 
 import com.amazon.aace.alexa.SpeechSynthesizer;
 
-public class SpeechSynthesizerHandler extends SpeechSynthesizer {
-}
+public class SpeechSynthesizerHandler extends SpeechSynthesizer {}

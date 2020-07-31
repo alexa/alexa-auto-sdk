@@ -25,69 +25,71 @@ namespace aace {
 namespace jni {
 namespace logger {
 
-    //
-    // LoggerHandler
-    //
+//
+// LoggerHandler
+//
 
-    class LoggerHandler : public aace::logger::Logger {
-    public:
-        LoggerHandler( jobject obj );
+class LoggerHandler : public aace::logger::Logger {
+public:
+    LoggerHandler(jobject obj);
 
-        // aace::logger::Logger
-        bool logEvent( Level level, std::chrono::system_clock::time_point time, const std::string &source, const std::string &message ) override;
+    // aace::logger::Logger
+    bool logEvent(
+        Level level,
+        std::chrono::system_clock::time_point time,
+        const std::string& source,
+        const std::string& message) override;
 
-    private:
-        JObject m_obj;
-    };
+private:
+    JObject m_obj;
+};
 
-    //
-    // LoggerBinder
-    //
+//
+// LoggerBinder
+//
 
-    class LoggerBinder : public aace::jni::core::PlatformInterfaceBinder {
-    public:
-        LoggerBinder( jobject obj );
+class LoggerBinder : public aace::jni::core::PlatformInterfaceBinder {
+public:
+    LoggerBinder(jobject obj);
 
-        std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
-            return m_loggerHandler;
-        }
+    std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
+        return m_loggerHandler;
+    }
 
-        std::shared_ptr<LoggerHandler> getLoggerHandler() {
-            return m_loggerHandler;
-        }
+    std::shared_ptr<LoggerHandler> getLoggerHandler() {
+        return m_loggerHandler;
+    }
 
-    private:
-        std::shared_ptr<LoggerHandler> m_loggerHandler;
-    };
+private:
+    std::shared_ptr<LoggerHandler> m_loggerHandler;
+};
 
-    //
-    // JLogLevel
-    //
+//
+// JLogLevel
+//
 
-    class JLogLevelConfig : public EnumConfiguration<LoggerHandler::Level> {
-    public:
-        using T = LoggerHandler::Level;
+class JLogLevelConfig : public EnumConfiguration<LoggerHandler::Level> {
+public:
+    using T = LoggerHandler::Level;
 
-        const char* getClassName() override {
-            return "com/amazon/aace/logger/Logger$Level";
-        }
+    const char* getClassName() override {
+        return "com/amazon/aace/logger/Logger$Level";
+    }
 
-        std::vector<std::pair<T,std::string>> getConfiguration() override {
-            return {
-                {T::VERBOSE,"VERBOSE"},
-                {T::INFO,"INFO"},
-                {T::METRIC,"METRIC"},
-                {T::WARN,"WARN"},
-                {T::ERROR,"ERROR"},
-                {T::CRITICAL,"CRITICAL"}
-            };
-        }
-    };
+    std::vector<std::pair<T, std::string>> getConfiguration() override {
+        return {{T::VERBOSE, "VERBOSE"},
+                {T::INFO, "INFO"},
+                {T::METRIC, "METRIC"},
+                {T::WARN, "WARN"},
+                {T::ERROR, "ERROR"},
+                {T::CRITICAL, "CRITICAL"}};
+    }
+};
 
-    using JLogLevel = JEnum<LoggerHandler::Level,JLogLevelConfig>;
+using JLogLevel = JEnum<LoggerHandler::Level, JLogLevelConfig>;
 
-} // aace::jni::logger
-} // aace::jni
-} // aace
+}  // namespace logger
+}  // namespace jni
+}  // namespace aace
 
-#endif // AACE_JNI_LOGGER_LOGGER_BINDER_H
+#endif  // AACE_JNI_LOGGER_LOGGER_BINDER_H

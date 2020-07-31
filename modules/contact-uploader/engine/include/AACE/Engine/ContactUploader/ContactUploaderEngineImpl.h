@@ -34,26 +34,24 @@ namespace aace {
 namespace engine {
 namespace contactUploader {
 
-class ContactUploaderEngineImpl : 
-    public aace::contactUploader::ContactUploaderEngineInterface,
-    public alexaClientSDK::avsCommon::utils::RequiresShutdown,
-    public alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface,
-    public std::enable_shared_from_this<ContactUploaderEngineImpl> {
-
+class ContactUploaderEngineImpl
+        : public aace::contactUploader::ContactUploaderEngineInterface
+        , public alexaClientSDK::avsCommon::utils::RequiresShutdown
+        , public alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface
+        , public std::enable_shared_from_this<ContactUploaderEngineImpl> {
 private:
-    ContactUploaderEngineImpl( std::shared_ptr<aace::contactUploader::ContactUploader> contactUploaderPlatformInterface );
+    ContactUploaderEngineImpl(std::shared_ptr<aace::contactUploader::ContactUploader> contactUploaderPlatformInterface);
 
     bool initialize(
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
-        std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo
-    );
+        std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo);
 
 public:
     static std::shared_ptr<ContactUploaderEngineImpl> create(
         std::shared_ptr<aace::contactUploader::ContactUploader> contactUploaderPlatformInterface,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
-        std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo );
-    
+        std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo);
+
     using HTTPResponse = ContactUploaderRESTAgent::HTTPResponse;
     using AlexaAccountInfo = ContactUploaderRESTAgent::AlexaAccountInfo;
     using CommsProvisionStatus = ContactUploaderRESTAgent::CommsProvisionStatus;
@@ -62,15 +60,17 @@ public:
     bool onAddContactsBegin() override;
     bool onAddContactsEnd() override;
     bool onAddContactsCancel() override;
-    bool onAddContact( const std::string& contact ) override;
+    bool onAddContact(const std::string& contact) override;
     bool onRemoveUploadedContacts() override;
 
     using ContactUploaderStatus = aace::contactUploader::ContactUploaderEngineInterface::ContactUploaderStatus;
 
-    void contactsUploaderStatusChanged( ContactUploaderStatus status, const std::string& info );
+    void contactsUploaderStatusChanged(ContactUploaderStatus status, const std::string& info);
 
     // AuthObserverInterface
-    void onAuthStateChange( alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State state, alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error error ) override;
+    void onAuthStateChange(
+        alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State state,
+        alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error error) override;
 
 protected:
     void doShutdown() override;
@@ -80,36 +80,30 @@ private:
     std::shared_ptr<ContactUploaderRESTAgent> m_contactUploaderRESTAgent;
 
     bool fetchPceId();
-    bool createAddressBook( const std::string& sourceAddressBookId );
-    bool deleteAddressBook( const std::string& sourceAddressBookId );
-    bool validateContactJson( const std::string& contact );
+    bool createAddressBook(const std::string& sourceAddressBookId);
+    bool deleteAddressBook(const std::string& sourceAddressBookId);
+    bool validateContactJson(const std::string& contact);
 
     void emptyContactQueue();
     void emptyFailedContactListQueue();
-    void executeAsyncUploadContactsTask( const std::vector<std::string>& poppedContacts, const bool finalBatch );
-    void executeAsyncRemoveAddressBookTask( const std::string& sourceAddressBookId );
+    void executeAsyncUploadContactsTask(const std::vector<std::string>& poppedContacts, const bool finalBatch);
+    void executeAsyncRemoveAddressBookTask(const std::string& sourceAddressBookId);
 
     bool isPceIdValid();
     std::string getPceId();
-    void setPceId( const std::string& pceId );
+    void setPceId(const std::string& pceId);
 
     bool isAddressBookIdValid();
     std::string getAddressBookId();
-    void setAddressBookId( const std::string& pceId );
+    void setAddressBookId(const std::string& pceId);
 
-   enum class ContactUploaderInternalState {
-        IDLE,
-        START_TRIGGERED,
-        UPLOADING,
-        CANCEL_TRIGGERED,
-        REMOVE_TRIGGERED   
-    };
+    enum class ContactUploaderInternalState { IDLE, START_TRIGGERED, UPLOADING, CANCEL_TRIGGERED, REMOVE_TRIGGERED };
     ContactUploaderInternalState m_contactUploadState;
 
     bool isUploadInProgress();
     bool isCancelInProgress();
     bool isRemoveInProgress();
-    void setContactUploadProgressState( ContactUploaderInternalState state );
+    void setContactUploadProgressState(ContactUploaderInternalState state);
     ContactUploaderInternalState getContactUploadProgressState();
 
     friend std::ostream& operator<<(std::ostream& stream, const ContactUploaderInternalState& state);
@@ -118,17 +112,11 @@ private:
     void notifyToStartAsyncUploadTask();
     void resetCanceledState();
 
-    enum class FlowState {
-        POST,
-        PARSE,
-        NOTIFY,
-        ERROR,
-        FINISH
-    };
+    enum class FlowState { POST, PARSE, NOTIFY, ERROR, FINISH };
 
-    FlowState handleUploadContacts( const std::vector<std::string>& poppedContacts, HTTPResponse& httpResponse );
-    FlowState handleParse( const HTTPResponse& httpResponse );
-    FlowState handleNotification( const bool finalBatch );
+    FlowState handleUploadContacts(const std::vector<std::string>& poppedContacts, HTTPResponse& httpResponse);
+    FlowState handleParse(const HTTPResponse& httpResponse);
+    FlowState handleNotification(const bool finalBatch);
     FlowState handleError();
     FlowState handleStopping();
 
@@ -166,7 +154,7 @@ private:
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const ContactUploaderEngineImpl::FlowState& state) {
-    switch( state ) {
+    switch (state) {
         case ContactUploaderEngineImpl::FlowState::POST:
             stream << "POST";
             break;
@@ -186,8 +174,10 @@ inline std::ostream& operator<<(std::ostream& stream, const ContactUploaderEngin
     return stream;
 }
 
-inline std::ostream& operator<<(std::ostream& stream, const ContactUploaderEngineImpl::ContactUploaderInternalState& state) {
-    switch( state ) {
+inline std::ostream& operator<<(
+    std::ostream& stream,
+    const ContactUploaderEngineImpl::ContactUploaderInternalState& state) {
+    switch (state) {
         case ContactUploaderEngineImpl::ContactUploaderInternalState::IDLE:
             stream << "IDLE";
             break;
@@ -207,8 +197,8 @@ inline std::ostream& operator<<(std::ostream& stream, const ContactUploaderEngin
     return stream;
 }
 
-} // aace::engine::contactUploader
-} // aace::engine
-} // aace
+}  // namespace contactUploader
+}  // namespace engine
+}  // namespace aace
 
 #endif

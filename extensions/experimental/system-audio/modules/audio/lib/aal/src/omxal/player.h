@@ -19,17 +19,17 @@
 #include "core.h"
 
 typedef struct {
-	COMMON_CONTEXT;
+    COMMON_CONTEXT;
 
-	char *file_path;
-	XAObjectItf output_mix;
-	XAObjectItf player;
-	XAPlayItf play_itf;
-	XASeekItf seek_itf;
-	XAVolumeItf volume_itf;
-	XAConfigExtensionsItf config_itf;
-	XAPrefetchStatusItf prefetch_status_itf;
-	XAStreamInformationItf stream_info_itf;
+    char* file_path;
+    XAObjectItf output_mix;
+    XAObjectItf player;
+    XAPlayItf play_itf;
+    XASeekItf seek_itf;
+    XAVolumeItf volume_itf;
+    XAConfigExtensionsItf config_itf;
+    XAPrefetchStatusItf prefetch_status_itf;
+    XAStreamInformationItf stream_info_itf;
 } aal_omxal_player_context_t;
 
-#endif // __AAL_OMXAL_PLAYER_H_
+#endif  // __AAL_OMXAL_PLAYER_H_

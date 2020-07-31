@@ -46,12 +46,10 @@ std::shared_ptr<PhoneCallControllerHandler> PhoneCallControllerHandler::create(
 PhoneCallControllerHandler::PhoneCallControllerHandler(
     std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
     std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher) :
-        m_logger(logger),
-        m_responseDispatcher(responseDispatcher) {
-
+        m_logger(logger), m_responseDispatcher(responseDispatcher) {
 }
 
-bool PhoneCallControllerHandler::dial(const std::string &payload) {
+bool PhoneCallControllerHandler::dial(const std::string& payload) {
     m_logger->log(Level::VERBOSE, TAG, "dial");
 
     auto responseDispatcher = m_responseDispatcher.lock();
@@ -64,7 +62,7 @@ bool PhoneCallControllerHandler::dial(const std::string &payload) {
     return true;
 }
 
-bool PhoneCallControllerHandler::redial(const std::string &payload) {
+bool PhoneCallControllerHandler::redial(const std::string& payload) {
     m_logger->log(Level::VERBOSE, TAG, "redial");
 
     auto responseDispatcher = m_responseDispatcher.lock();
@@ -77,7 +75,7 @@ bool PhoneCallControllerHandler::redial(const std::string &payload) {
     return true;
 }
 
-void PhoneCallControllerHandler::answer(const std::string &payload) {
+void PhoneCallControllerHandler::answer(const std::string& payload) {
     m_logger->log(Level::VERBOSE, TAG, "answer");
 
     auto responseDispatcher = m_responseDispatcher.lock();
@@ -89,7 +87,7 @@ void PhoneCallControllerHandler::answer(const std::string &payload) {
     responseDispatcher->sendDirective(TOPIC_PHONECALL_CONTROLLER, ACTION_PHONECALL_ANSWER, payload);
 }
 
-void PhoneCallControllerHandler::stop(const std::string &payload) {
+void PhoneCallControllerHandler::stop(const std::string& payload) {
     m_logger->log(Level::VERBOSE, TAG, "stop");
 
     auto responseDispatcher = m_responseDispatcher.lock();
@@ -101,7 +99,7 @@ void PhoneCallControllerHandler::stop(const std::string &payload) {
     responseDispatcher->sendDirective(TOPIC_PHONECALL_CONTROLLER, ACTION_PHONECALL_STOP, payload);
 }
 
-void PhoneCallControllerHandler::sendDTMF(const std::string &payload) {
+void PhoneCallControllerHandler::sendDTMF(const std::string& payload) {
     m_logger->log(Level::VERBOSE, TAG, "sendDTMF");
 
     auto responseDispatcher = m_responseDispatcher.lock();
@@ -337,5 +335,5 @@ void PhoneCallControllerHandler::deviceConfigurationUpdated(const std::string& p
     // TODO: Implement device configuration updated
 }
 
-}  // phoneCallController
-}  // aasb
+}  // namespace phoneCallController
+}  // namespace aasb

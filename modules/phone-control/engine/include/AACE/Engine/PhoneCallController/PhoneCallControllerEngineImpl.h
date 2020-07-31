@@ -25,6 +25,7 @@
 #include <AVSCommon/Utils/DeviceInfo.h>
 #include <Endpoints/EndpointBuilder.h>
 
+#include <AACE/Engine/Alexa/AlexaEndpointInterface.h>
 #include <AACE/PhoneCallController/PhoneCallController.h>
 #include <AACE/PhoneCallController/PhoneCallControllerEngineInterfaces.h>
 #include "PhoneCallControllerCapabilityAgent.h"
@@ -34,56 +35,62 @@ namespace aace {
 namespace engine {
 namespace phoneCallController {
 
-class PhoneCallControllerEngineImpl :
-    public PhoneCallControllerInterface,
-    public aace::phoneCallController::PhoneCallControllerEngineInterface,
-    public alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface,
-    public alexaClientSDK::avsCommon::utils::RequiresShutdown,
-    public std::enable_shared_from_this<PhoneCallControllerEngineImpl> {
-
+class PhoneCallControllerEngineImpl
+        : public PhoneCallControllerInterface
+        , public aace::phoneCallController::PhoneCallControllerEngineInterface
+        , public alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface
+        , public alexaClientSDK::avsCommon::utils::RequiresShutdown
+        , public std::enable_shared_from_this<PhoneCallControllerEngineImpl> {
 private:
-    PhoneCallControllerEngineImpl ( std::shared_ptr<aace::phoneCallController::PhoneCallController> phoneCallControllerPlatformInterface );
+    PhoneCallControllerEngineImpl(
+        std::shared_ptr<aace::phoneCallController::PhoneCallController> phoneCallControllerPlatformInterface);
 
-    bool initialize (
+    bool initialize(
         std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
-        std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo );
+        std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
+        std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints);
 
 public:
-    static std::shared_ptr<PhoneCallControllerEngineImpl> create (
-        std::shared_ptr<aace::phoneCallController::PhoneCallController> phoneCallControllerPlatformInterface, 
+    static std::shared_ptr<PhoneCallControllerEngineImpl> create(
+        std::shared_ptr<aace::phoneCallController::PhoneCallController> phoneCallControllerPlatformInterface,
         std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
-        std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo );
+        std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
+        std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints);
 
     // PhoneCallControllerEngineInterface
-    void onConnectionStateChanged( ConnectionState state  ) override;
-    void onCallStateChanged ( CallState state, const std::string& callId, const std::string& callerId ) override;
-    void onCallFailed( const std::string& callId, CallError code, const std::string& message ) override;
-    void onCallerIdReceived( const std::string& callId, const std::string& callerId ) override;
-    void onSendDTMFSucceeded( const std::string& callId) override;
-    void onSendDTMFFailed( const std::string& callId, DTMFError code, const std::string& message ) override;
-    void onDeviceConfigurationUpdated( std::unordered_map<PhoneCallControllerEngineInterface::CallingDeviceConfigurationProperty, bool> configurationMap ) override;
+    void onConnectionStateChanged(ConnectionState state) override;
+    void onCallStateChanged(CallState state, const std::string& callId, const std::string& callerId) override;
+    void onCallFailed(const std::string& callId, CallError code, const std::string& message) override;
+    void onCallerIdReceived(const std::string& callId, const std::string& callerId) override;
+    void onSendDTMFSucceeded(const std::string& callId) override;
+    void onSendDTMFFailed(const std::string& callId, DTMFError code, const std::string& message) override;
+    void onDeviceConfigurationUpdated(
+        std::unordered_map<PhoneCallControllerEngineInterface::CallingDeviceConfigurationProperty, bool>
+            configurationMap) override;
     std::string onCreateCallId() override;
 
     // PhoneCallControllerInterface
-    bool dial( const std::string& payload ) override;
-    bool redial( const std::string& payload ) override;
-    void answer( const std::string& payload ) override;
-    void stop( const std::string& payload ) override;
-    void playRingtone( const std::string& payload ) override;
-    void sendDTMF( const std::string& payload ) override;
+    bool dial(const std::string& payload) override;
+    bool redial(const std::string& payload) override;
+    void answer(const std::string& payload) override;
+    void stop(const std::string& payload) override;
+    void playRingtone(const std::string& payload) override;
+    void sendDTMF(const std::string& payload) override;
 
     // AuthObserverInterface
-    void onAuthStateChange( alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State state, alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error error ) override;
+    void onAuthStateChange(
+        alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State state,
+        alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error error) override;
 
 protected:
     void doShutdown() override;
@@ -119,12 +126,15 @@ private:
     /// Condition variable used to network retries in @c autoProvisioningThread
     std::condition_variable m_waitNetworkRetry;
 
+    /// Used for getting the ACMS endpoint.
+    std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> m_alexaEndpoints;
+
     /// Thread for auto provisioning.
     std::thread m_autoProvisioningThread;
 };
 
-} // aace::engine::phoneCallController
-} // aace::engine
-} // aace
+}  // namespace phoneCallController
+}  // namespace engine
+}  // namespace aace
 
 #endif

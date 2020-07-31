@@ -18,11 +18,12 @@
 
 #include <AVSCommon/SDKInterfaces/ConnectionStatusObserverInterface.h>
 
-namespace aace {    
+namespace aace {
 namespace test {
 namespace avs {
 
-class MockConnectionStatusObserver : public alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface {
+class MockConnectionStatusObserver
+        : public alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface {
 public:
     MockConnectionStatusObserver() {
     }
@@ -33,8 +34,8 @@ public:
             ConnectionStatusObserverInterface::ChangedReason reason));
 };
 
-} // aace::test::avs
-} // aace::test
-} // aace
+}  // namespace avs
+}  // namespace test
+}  // namespace aace
 
-#endif //AACE_TEST_AVS_MOCK_CONECTION_STATUS_OBSERVER_H
+#endif  //AACE_TEST_AVS_MOCK_CONECTION_STATUS_OBSERVER_H

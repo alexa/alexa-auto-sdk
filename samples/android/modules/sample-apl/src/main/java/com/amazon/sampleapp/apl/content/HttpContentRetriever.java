@@ -22,11 +22,9 @@ import javax.net.ssl.HttpsURLConnection;
  * Asynchronously makes http calls
  */
 public class HttpContentRetriever implements ContentRetriever {
-
     private static final String TAG = HttpContentRetriever.class.getSimpleName();
     private final static int READ_TIMEOUT = 3000;
     private static HttpContentRetriever instance;
-
 
     /**
      * The executor service thread pool.
@@ -38,14 +36,11 @@ public class HttpContentRetriever implements ContentRetriever {
      */
     private static final String HTTP_METHOD_GET = "GET";
 
-
     /**
      * Constructor for the http content retriever.
      * Initializes the executor service
      */
-    private HttpContentRetriever() {
-
-    }
+    private HttpContentRetriever() {}
 
     /**
      * static method to create an instance of {@link HttpContentRetriever}
@@ -97,7 +92,6 @@ public class HttpContentRetriever implements ContentRetriever {
             Log.e(TAG, "IOException is getting the document " + e);
             e.printStackTrace();
         }
-
     }
 
     private String loadDocument(String url) throws IOException {
@@ -108,7 +102,7 @@ public class HttpContentRetriever implements ContentRetriever {
 
         try {
             connection = createHttpConnection(new URL(url));
-            //disable caching on the
+            // disable caching on the
             connection.setUseCaches(false);
             connection.setDefaultUseCaches(false);
             int responseCode = connection.getResponseCode();
@@ -119,9 +113,7 @@ public class HttpContentRetriever implements ContentRetriever {
             // Retrieve the response body as an InputStream.
             stream = connection.getInputStream();
 
-            reader = new BufferedReader(
-                    new InputStreamReader(
-                            stream));
+            reader = new BufferedReader(new InputStreamReader(stream));
             String line;
             while ((line = reader.readLine()) != null) {
                 result.append(line);
@@ -140,7 +132,6 @@ public class HttpContentRetriever implements ContentRetriever {
                 connection.disconnect();
             }
         }
-
     }
 
     /**
@@ -164,9 +155,6 @@ public class HttpContentRetriever implements ContentRetriever {
 
     private void postResult(ContentRetrieverCallback callback, String content) {
         Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(() -> {
-            callback.success(content);
-        });
+        handler.post(() -> { callback.success(content); });
     }
-
 }

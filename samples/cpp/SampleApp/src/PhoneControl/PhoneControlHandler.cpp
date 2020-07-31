@@ -31,18 +31,27 @@ namespace phoneControl {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-PhoneCallControllerHandler::PhoneCallControllerHandler(std::weak_ptr<Activity> activity, std::weak_ptr<logger::LoggerHandler> loggerHandler)
-    : m_activity{std::move(activity)}, m_loggerHandler{std::move(loggerHandler)}, m_callState{CallState::IDLE}, m_callError{} {
+PhoneCallControllerHandler::PhoneCallControllerHandler(
+    std::weak_ptr<Activity> activity,
+    std::weak_ptr<logger::LoggerHandler> loggerHandler) :
+        m_activity{std::move(activity)},
+        m_loggerHandler{std::move(loggerHandler)},
+        m_callState{CallState::IDLE},
+        m_callError{} {
     setupUI();
 }
 
-std::weak_ptr<Activity> PhoneCallControllerHandler::getActivity() { return m_activity; }
+std::weak_ptr<Activity> PhoneCallControllerHandler::getActivity() {
+    return m_activity;
+}
 
-std::weak_ptr<logger::LoggerHandler> PhoneCallControllerHandler::getLoggerHandler() { return m_loggerHandler; }
+std::weak_ptr<logger::LoggerHandler> PhoneCallControllerHandler::getLoggerHandler() {
+    return m_loggerHandler;
+}
 
 // aace::phoneCallController::PhoneCallController interface
 
-bool PhoneCallControllerHandler::dial(const std::string &payload) {
+bool PhoneCallControllerHandler::dial(const std::string& payload) {
     log(logger::LoggerHandler::Level::INFO, "dial:payload=" + payload);
     auto activity = m_activity.lock();
     if (!activity) {
@@ -74,7 +83,7 @@ bool PhoneCallControllerHandler::dial(const std::string &payload) {
     return true;
 }
 
-bool PhoneCallControllerHandler::redial(const std::string &payload) {
+bool PhoneCallControllerHandler::redial(const std::string& payload) {
     log(logger::LoggerHandler::Level::INFO, "redial:payload=" + payload);
     auto activity = m_activity.lock();
     if (!activity) {
@@ -105,7 +114,7 @@ bool PhoneCallControllerHandler::redial(const std::string &payload) {
                     json redialPayload = json::parse(payload);
                     auto callId = redialPayload["callId"];
                     callFailed(callId, CallError::NO_NUMBER_FOR_REDIAL);
-                } catch (std::exception &e) {
+                } catch (std::exception& e) {
                     console->printLine("Failed to get call id from redial");
                 }
                 console->printRuler();
@@ -116,7 +125,7 @@ bool PhoneCallControllerHandler::redial(const std::string &payload) {
     return true;
 }
 
-void PhoneCallControllerHandler::answer(const std::string &payload) {
+void PhoneCallControllerHandler::answer(const std::string& payload) {
     log(logger::LoggerHandler::Level::INFO, "answer:payload=" + payload);
     auto activity = m_activity.lock();
     if (!activity) {
@@ -140,7 +149,7 @@ void PhoneCallControllerHandler::answer(const std::string &payload) {
     });
 }
 
-void PhoneCallControllerHandler::stop(const std::string &payload) {
+void PhoneCallControllerHandler::stop(const std::string& payload) {
     log(logger::LoggerHandler::Level::INFO, "stop:payload=" + payload);
     auto activity = m_activity.lock();
     if (!activity) {
@@ -162,7 +171,7 @@ void PhoneCallControllerHandler::stop(const std::string &payload) {
     });
 }
 
-void PhoneCallControllerHandler::sendDTMF(const std::string &payload) {
+void PhoneCallControllerHandler::sendDTMF(const std::string& payload) {
     log(logger::LoggerHandler::Level::INFO, "sendDTMF:payload=" + payload);
     auto activity = m_activity.lock();
     if (!activity) {
@@ -184,7 +193,7 @@ void PhoneCallControllerHandler::sendDTMF(const std::string &payload) {
 
 // private
 
-void PhoneCallControllerHandler::log(logger::LoggerHandler::Level level, const std::string &message) {
+void PhoneCallControllerHandler::log(logger::LoggerHandler::Level level, const std::string& message) {
     auto loggerHandler = m_loggerHandler.lock();
     if (!loggerHandler) {
         return;
@@ -200,7 +209,7 @@ void PhoneCallControllerHandler::setupUI() {
     m_console = activity->findViewById("id:console");
 
     // connectionStateChanged
-    activity->registerObserver(Event::onPhoneCallControllerConnectionStateChanged, [=](const std::string &value) {
+    activity->registerObserver(Event::onPhoneCallControllerConnectionStateChanged, [=](const std::string& value) {
         log(logger::LoggerHandler::Level::VERBOSE, "onPhoneCallControllerConnectionStateChanged:" + value);
         // clang-format off
         static const std::map<std::string, ConnectionState> ConnectionStateEnumerator{
@@ -240,12 +249,13 @@ void PhoneCallControllerHandler::setupUI() {
     });
 
     // callStateChanged
-    activity->registerObserver(Event::onPhoneCallControllerCallStateChanged, [=](const std::string &value) {
+    activity->registerObserver(Event::onPhoneCallControllerCallStateChanged, [=](const std::string& value) {
         log(logger::LoggerHandler::Level::VERBOSE, "onPhoneCallControllerCallStateChanged:" + value);
         static std::regex r("([^/]+)(?:/([^/]+)(?:/([^/]*))?)?", std::regex::optimize);
         std::smatch sm{};
         if (!std::regex_match(value, sm, r)) {
-            log(logger::LoggerHandler::Level::ERROR, "onPhoneCallControllerCallStateChanged incorrect format for value: " + value);
+            log(logger::LoggerHandler::Level::ERROR,
+                "onPhoneCallControllerCallStateChanged incorrect format for value: " + value);
             return false;
         }
         // clang-format off
@@ -263,7 +273,8 @@ void PhoneCallControllerHandler::setupUI() {
         std::string callStateStr = sm[1];
 
         if (CallStateEnumerator.count(callStateStr) == 0) {
-            log(logger::LoggerHandler::Level::ERROR, "onPhoneCallControllerCallStateChanged invalid call state passed: " + callStateStr);
+            log(logger::LoggerHandler::Level::ERROR,
+                "onPhoneCallControllerCallStateChanged invalid call state passed: " + callStateStr);
             return false;
         }
 
@@ -271,7 +282,8 @@ void PhoneCallControllerHandler::setupUI() {
 
         // Create a new call
         if (m_currentCall.empty() || callState == CallState::INBOUND_RINGING) {
-            log(logger::LoggerHandler::Level::INFO, "onPhoneCallControllerCallStateChanged created call payload since it was not available");
+            log(logger::LoggerHandler::Level::INFO,
+                "onPhoneCallControllerCallStateChanged created call payload since it was not available");
             createCall();
         }
 
@@ -310,12 +322,13 @@ void PhoneCallControllerHandler::setupUI() {
             console->printRuler();
         }
 
-        log(logger::LoggerHandler::Level::VERBOSE, "Changing call state. State: " + callStateStr + " CallId: " + callId + " CallerId: " + callerId);
+        log(logger::LoggerHandler::Level::VERBOSE,
+            "Changing call state. State: " + callStateStr + " CallId: " + callId + " CallerId: " + callerId);
         return true;
     });
 
     // callFailed
-    activity->registerObserver(Event::onPhoneCallControllerCallFailed, [=](const std::string &value) {
+    activity->registerObserver(Event::onPhoneCallControllerCallFailed, [=](const std::string& value) {
         log(logger::LoggerHandler::Level::VERBOSE, "onPhoneCallControllerCallFailed:" + value);
 
         // clang-format off
@@ -377,7 +390,7 @@ void PhoneCallControllerHandler::setupUI() {
     });
 
     // callerIdReceived
-    activity->registerObserver(Event::onPhoneCallControllerCallerIdReceived, [=](const std::string &value) {
+    activity->registerObserver(Event::onPhoneCallControllerCallerIdReceived, [=](const std::string& value) {
         log(logger::LoggerHandler::Level::VERBOSE, "onPhoneCallControllerCallerIdReceived:" + value);
         static std::regex r("(.+)/(.+)", std::regex::optimize);
         std::smatch sm{};
@@ -389,14 +402,14 @@ void PhoneCallControllerHandler::setupUI() {
     });
 
     // sendDTMFSucceeded
-    activity->registerObserver(Event::onPhoneCallControllerSendDTMFSucceeded, [=](const std::string &value) {
+    activity->registerObserver(Event::onPhoneCallControllerSendDTMFSucceeded, [=](const std::string& value) {
         log(logger::LoggerHandler::Level::VERBOSE, "onPhoneCallControllerSendDTMFSucceeded:" + value);
         sendDTMFSucceeded(value);
         return true;
     });
 
     // sendDTMFFailed
-    activity->registerObserver(Event::onPhoneCallControllerSendDTMFFailed, [=](const std::string &value) {
+    activity->registerObserver(Event::onPhoneCallControllerSendDTMFFailed, [=](const std::string& value) {
         log(logger::LoggerHandler::Level::VERBOSE, "onPhoneCallControllerSendDTMFFailed:" + value);
 
         /// Regular expression for call state
@@ -420,14 +433,14 @@ void PhoneCallControllerHandler::setupUI() {
     });
 
     // Show payload
-    activity->registerObserver(Event::onPhoneCallControllerShowPayload, [=](const std::string &value) {
+    activity->registerObserver(Event::onPhoneCallControllerShowPayload, [=](const std::string& value) {
         log(logger::LoggerHandler::Level::VERBOSE, "onPhoneCallControllerShowPayload:");
         showPayload();
         return true;
     });
 }
 
-std::string PhoneCallControllerHandler::getPhoneNumber(const json &payload) {
+std::string PhoneCallControllerHandler::getPhoneNumber(const json& payload) {
     if (!payload.empty()) {
         return payload["callee"]["defaultContactAddress"]["value"];
     }
@@ -435,7 +448,7 @@ std::string PhoneCallControllerHandler::getPhoneNumber(const json &payload) {
     return "";
 }
 
-std::string PhoneCallControllerHandler::getCallId(const json &payload) {
+std::string PhoneCallControllerHandler::getCallId(const json& payload) {
     if (!payload.empty()) {
         return payload["callId"];
     }
@@ -443,23 +456,23 @@ std::string PhoneCallControllerHandler::getCallId(const json &payload) {
     return "";
 }
 
-void PhoneCallControllerHandler::updateCallId(const std::string &payload) {
+void PhoneCallControllerHandler::updateCallId(const std::string& payload) {
     if (!m_currentCall.empty()) {
         try {
             json updated = json::parse(payload);
             m_currentCall["callId"] = updated["callId"];
-        } catch (std::exception &e) {
+        } catch (std::exception& e) {
             m_currentCall["callId"] = payload;
         }
     }
 }
 
-void PhoneCallControllerHandler::updateCallerId(const std::string &payload) {
+void PhoneCallControllerHandler::updateCallerId(const std::string& payload) {
     if (!m_currentCall.empty()) {
         try {
             json updated = json::parse(payload);
             m_currentCall["callerId"] = updated["callerId"];
-        } catch (std::exception &e) {
+        } catch (std::exception& e) {
             m_currentCall["callerId"] = payload;
         }
     }
@@ -504,7 +517,7 @@ void PhoneCallControllerHandler::createCall() {
     m_currentCall["callee"]["details"] = "Mobile";
 }
 
-void PhoneCallControllerHandler::updatePayload(const std::string &payload) {
+void PhoneCallControllerHandler::updatePayload(const std::string& payload) {
     try {
         if (!payload.empty()) {
             auto j = json::parse(payload);
@@ -512,10 +525,10 @@ void PhoneCallControllerHandler::updatePayload(const std::string &payload) {
         } else {
             m_currentCall = {};
         }
-    } catch (std::exception &e) {
+    } catch (std::exception& e) {
         log(logger::LoggerHandler::Level::ERROR, "PhoneCallController failed to parse JSON payload: " + payload);
     }
 }
 
-} // namespace phoneControl
-} // namespace sampleApp
+}  // namespace phoneControl
+}  // namespace sampleApp

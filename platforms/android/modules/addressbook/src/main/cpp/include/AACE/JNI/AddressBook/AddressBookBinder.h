@@ -23,64 +23,61 @@ namespace aace {
 namespace jni {
 namespace addressbook {
 
-    //
-    // AddressBookHandler
-    //
+//
+// AddressBookHandler
+//
 
-    class AddressBookHandler : public aace::addressBook::AddressBook {
-    public:
-        AddressBookHandler( jobject obj );
+class AddressBookHandler : public aace::addressBook::AddressBook {
+public:
+    AddressBookHandler(jobject obj);
 
-        // aace::addressBook::AddressBook
-        bool getEntries( const std::string& addressBookSourceId, std::weak_ptr<IAddressBookEntriesFactory> factory ) override;
+    // aace::addressBook::AddressBook
+    bool getEntries(const std::string& addressBookSourceId, std::weak_ptr<IAddressBookEntriesFactory> factory) override;
 
-    private:
-        JObject m_obj;
-    };
+private:
+    JObject m_obj;
+};
 
-    //
-    // AddressBookBinder
-    //
+//
+// AddressBookBinder
+//
 
-    class AddressBookBinder : public aace::jni::core::PlatformInterfaceBinder {
-    public:
-        AddressBookBinder( jobject obj );
+class AddressBookBinder : public aace::jni::core::PlatformInterfaceBinder {
+public:
+    AddressBookBinder(jobject obj);
 
-        std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
-            return m_addressBookHandler;
-        }
+    std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
+        return m_addressBookHandler;
+    }
 
-        std::shared_ptr<AddressBookHandler> getAddressBook() {
-            return m_addressBookHandler;
-        }
+    std::shared_ptr<AddressBookHandler> getAddressBook() {
+        return m_addressBookHandler;
+    }
 
-    private:
-        std::shared_ptr<AddressBookHandler> m_addressBookHandler;
-    };
+private:
+    std::shared_ptr<AddressBookHandler> m_addressBookHandler;
+};
 
-    //
-    // JAddressBookType
-    //
+//
+// JAddressBookType
+//
 
-    class JAddressBookTypeConfig : public EnumConfiguration<AddressBookHandler::AddressBookType> {
-    public:
-        using T = AddressBookHandler::AddressBookType;
+class JAddressBookTypeConfig : public EnumConfiguration<AddressBookHandler::AddressBookType> {
+public:
+    using T = AddressBookHandler::AddressBookType;
 
-        const char* getClassName() override {
-            return "com/amazon/aace/addressbook/AddressBook$AddressBookType";
-        }
+    const char* getClassName() override {
+        return "com/amazon/aace/addressbook/AddressBook$AddressBookType";
+    }
 
-        std::vector<std::pair<T, std::string>> getConfiguration() override {
-            return {
-                {T::CONTACT,"CONTACT"},
-                {T::NAVIGATION,"NAVIGATION"}
-            };
-        }
-    };
+    std::vector<std::pair<T, std::string>> getConfiguration() override {
+        return {{T::CONTACT, "CONTACT"}, {T::NAVIGATION, "NAVIGATION"}};
+    }
+};
 
-    using JAddressBookType = JEnum<AddressBookHandler::AddressBookType, JAddressBookTypeConfig>;
+using JAddressBookType = JEnum<AddressBookHandler::AddressBookType, JAddressBookTypeConfig>;
 
-} // aace::jni::addressbook
-} // aace:jni
-} // aace
-#endif //AACE_JNI_ADDRESSBOOK_ADDRESSBOOK_BINDER_H
+}  // namespace addressbook
+}  // namespace jni
+}  // namespace aace
+#endif  //AACE_JNI_ADDRESSBOOK_ADDRESSBOOK_BINDER_H

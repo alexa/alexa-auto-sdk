@@ -22,9 +22,7 @@ import com.amazon.apl.android.Content;
  *
  */
 public class AssetContentCallback extends Content.Callback {
-
-    private static final String CLOUDFRONT_LOCATION_PREFIX =
-            "https://d2na8397m465mh.cloudfront.net/packages/";
+    private static final String CLOUDFRONT_LOCATION_PREFIX = "https://d2na8397m465mh.cloudfront.net/packages/";
     private static final String CLOUDFRONT_LOCATION_SUFFIX = "/document.json";
 
     /**
@@ -33,8 +31,7 @@ public class AssetContentCallback extends Content.Callback {
      * @param context instance Android {@link Context}
      * @param data    associated with the template.
      */
-    public AssetContentCallback(Context context,
-                                String data) {
+    public AssetContentCallback(Context context, String data) {
         this(context, data, false);
     }
 
@@ -60,14 +57,11 @@ public class AssetContentCallback extends Content.Callback {
      * @param isSynchronous whether to load the template synchronously or asynchronously,
      *                      defaults to asynchronous loading.
      */
-    public AssetContentCallback(Context context,
-                                String data,
-                                boolean isSynchronous) {
+    public AssetContentCallback(Context context, String data, boolean isSynchronous) {
         mContentRetriever = AssetContentRetriever.create(context);
         mData = data;
         mIsSynchronous = isSynchronous;
     }
-
 
     /**
      * Implements {@link Content.Callback} method.
@@ -79,10 +73,8 @@ public class AssetContentCallback extends Content.Callback {
      */
     @Override
     public void onPackageRequest(final Content content, final Content.ImportRequest request) {
-
-        String url = TextUtils.isEmpty(request.source) ?
-                getDefaultPackageUrl(request.packageName, request.version) :
-                request.source;
+        String url = TextUtils.isEmpty(request.source) ? getDefaultPackageUrl(request.packageName, request.version)
+                                                       : request.source;
 
         if (TextUtils.isEmpty(url)) {
             Log.e(TAG, "Empty url, cannot fetch package");
@@ -92,7 +84,7 @@ public class AssetContentCallback extends Content.Callback {
         mContentRetriever.fetchAsync(url, new ContentRetrieverCallback() {
             @Override
             public void success(String data) {
-                Log.d(TAG, "successfully loaded package: " +  request.packageName);
+                Log.d(TAG, "successfully loaded package: " + request.packageName);
                 try {
                     content.addPackage(request, data);
                 } catch (Content.ContentException e) {
@@ -108,9 +100,7 @@ public class AssetContentCallback extends Content.Callback {
         });
     }
 
-    public interface CompleteCallback {
-        void onComplete(Content content);
-    }
+    public interface CompleteCallback { void onComplete(Content content); }
 
     public void addCompleteCallback(CompleteCallback callback) {
         mCallback = callback;
@@ -121,7 +111,7 @@ public class AssetContentCallback extends Content.Callback {
      */
     @Override
     public void onComplete(Content content) {
-        if(mCallback != null) {
+        if (mCallback != null) {
             mCallback.onComplete(content);
         }
     }
@@ -141,11 +131,10 @@ public class AssetContentCallback extends Content.Callback {
      * @return the build file name
      */
     private String buildSource(Content.ImportRequest request) {
-        if(request.source != null && request.source.length() > 0) {
+        if (request.source != null && request.source.length() > 0) {
             return request.source;
         }
-        String importDir = (request.version != null && request.version.startsWith("1.1"))
-                ? "imports-1.1/" : "imports/";
+        String importDir = (request.version != null && request.version.startsWith("1.1")) ? "imports-1.1/" : "imports/";
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(importDir).append(request.packageName).append(".").append(FILE_EXTENSION);
         return stringBuilder.toString();

@@ -27,13 +27,14 @@ namespace alexa {
 
 class AlexaTestHelper {
 public:
-    static std::shared_ptr<aace::core::config::EngineConfiguration> createAlexaConfiguration( bool withExpectCall = true );
+    static std::shared_ptr<aace::core::config::EngineConfiguration> createAlexaConfiguration(
+        bool withExpectCall = true);
     static std::shared_ptr<AlexaMockComponentFactory> createAlexaMockComponentFactory();
     static std::shared_ptr<std::istream> getAVSConfig();
 };
 
-} // aace::test::alexa
-} // aace::test
-} // aace
+}  // namespace alexa
+}  // namespace test
+}  // namespace aace
 
-#endif // AACE_ENGINE_TEST_ALEXA_TEST_HELPER_H
+#endif  // AACE_ENGINE_TEST_ALEXA_TEST_HELPER_H

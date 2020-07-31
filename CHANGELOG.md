@@ -1,6 +1,75 @@
 # Change Log
-
 ___
+## v2.3.0 released on 2020-07-31
+
+### Enhancements
+* Added a new [Messaging module](./modules/messaging/README.md) that provides support for Short Message Service (SMS) to allow a user to send, reply to, and read messages through Alexa.
+* Added support for zones to car control for online-only devices so the customer can target endpoints by location (e.g., “set the front fan to 7”). This feature was supported only with the Local Voice Control (LVC) extension, and endpoints belonged to exactly one zone. The features for online-only and LVC devices are at parity and now include assigning an endpoint to multiple zones and setting a default zone. Endpoints in the default zone take higher priority than endpoints not in the default zone when no zone is specified in an utterance.
+* Added support for “semantics” for car control to enable “open”, “close”, “raise”, and “lower” utterances to control endpoints.
+* Added a method to the 'AlexaClient' platform interface to stop foreground-focused Alexa activity on the device (e.g., locally canceling ongoing TTS when the user selects a list item or presses a cancel button).
+* Added support for Dynamic Language Switching. Previously, Alexa could only understand and respond in one language at a time. Now Alexa supports two languages at once and automatically detects the user's spoken language and responds in the same language as the utterance. The supported locale pairs are the following:
+    * [ "en-US", "es-US" ]
+    * [ "es-US", "en-US" ]
+    * [ "en-IN", "hi-IN" ]
+    * [ "hi-IN", "en-IN" ]
+    * [ "en-CA", "fr-CA" ]
+    * [ "fr-CA", "en-CA" ]
+
+  **Note:** Dynamic Language Switching works online only. For hybrid systems using the LVC extension, offline Alexa understands and responds in the language of the primary locale.
+* Updated radio tuning increments for “AM_RADIO” and “FM_RADIO” Local Media Source types to support the en_IN locale.
+* Alexa Voice Agent now supports AGL Itchy Icefish v9.0.2.
+* Language models for the Local Voice Control extension are now decoupled from the LVC.sh (Linux) binary.
+
+### Resolved Issues
+* Fixed an issue in which navigation road regulation and maneuver events resulted in “INVALID_REQUEST_EXCEPTION" or "INTERNAL_SERVICE_EXCEPTION" error logs.
+* Fixed several failing car control utterances including those for offline AC controls and those using the words “my” or “lights.”
+* Fixed an issue in External Media Player that caused the “NEXT” play control request to be issued twice for ExternalMediaAdapter (e.g., MACC) and LocalMediaSource platform interface handlers. 
+* Fixed an issue in which the Engine did not stop music playback after user logout.
+* Fixed an issue that caused Spotify to play at an increased and unsteady rate on QNX.
+* Fixed an issue with the  `--use-mbedtls` build option that caused a crash in the Android sample app at startup.
+* Fixed an issue in the Engine metrics implementation in which regular expression matching with a large number of data points caused a crash.
+* Fixed an issue in MACC in which players removed while the Engine was running (such as by the uninstallation of a linked MACC-compliant app) could not be rediscovered properly and used again, even if the player was restored (such as by the reinstallation of the app and user login). Previously, the rediscovery logic left insufficient time to process the player removal event before trying to discover players again, resulting in a loop. Now the rediscovery step runs at 5-minute intervals. 
+* Fixed an issue with the Engine's SQLite local storage database in which concurrent access to the database caused a crash.
+* Fixed various memory leaks and intermittent crashes caused by race conditions at Engine shutdown.
+* Fixed an issue on Android API 25 in which a large number of emitted logs could cause a crash due to a JNI local reference table overflow.
+* Fixed an issue in which you experienced unexpected results if the local timezone of your device differed from the timezone configured through the Alexa companion app.
+### Known Issues
+* General
+    * A user barging in when music is playing sometimes hears the Alexa response to the barge-in request and the music at the same time if System Audio extension is used.
+    * If the "locales" field of the "deviceSettings" node of the Alexa module configuration JSON is not specified, the Engine automatically declares support for the following locale combinations:
+        ["en-US", "es-US"],
+        ["es-US", "en-US"],
+        ["en-IN", "hi-IN"],
+        ["hi-IN", "en-IN"],
+        ["fr-CA", "en-CA"],
+        ["en-CA", "fr-CA"].
+    
+      The Engine does not declare support for locale combinations if the "locales" field is assigned an empty value.
+
+* Car Control
+    * For car control, there is a limit of two Device Serial Numbers (DSN) per account or Customer ID (CID). Limit the number of devices for testing with a single account accordingly. If you use the Android sample app, be sure to configure a specific DSN.
+    * It can take up to 20 seconds from the time of user login to the time Alexa is available to accept utterances. The cloud uses this time to ingest the car control endpoint configurations sent by Auto SDK after login.
+    * If you configure the Auto SDK Engine and connect to Alexa using a set of endpoint configurations, you cannot delete any endpoint in a set in the cloud. For example, after you configure set A with endpoints 1, 2, and 3, if you change your car control configuration during development to set B with endpoints 2, 3, and 4, endpoint 1 from set A remains in the cloud and might interfere with resolving the correct endpoint ID for your utterances. However, any endpoint configurations with matching IDs override previous configurations. For example, the configuration of endpoint 2 in set B replaces endpoint 2 in set A. During development, limit configuration changes to create only supersets of previous endpoint configurations. Work with your Solutions Architect or Partner Manager to produce the correct configuration on the first try.
+    * Car control utterances that are variations of supported utterances but do not follow the supported utterance patterns return errors. Examples include “please turn on the light in the car” instead of the supported “turn on the light“, and ”put on the defroster“ or “defrost the windshield” instead of the supported ”turn on the defroster”.  
+    * The air conditioner endpoint supports only Power Controller and Mode Controller capabilities, not Range Controller for numeric settings.
+
+* Communications
+    * A user request to send an SMS to an Alexa contact results in an Alexa-to-Alexa message instead. However ‘send message’ instead ‘send SMS’ to a contact works.
+    * When using LVC in online mode, users can redial a call when the phone connection state is OFF.
+    * DTMF utterances that include the letters "A", "B", "C", or "D" (for example "press A" or "dial 3*#B") are ignored.
+    * Calling numbers such as 1-800-xxx-xxxx by using utterances such as “Alexa call one eight double oh...” may return unexpected results. Similarly, when you call numbers by using utterances that include "triple," "hundred," and "thousand," or press special characters such as # or * by saying "Alexa press *#", you may experience unexpected results. We recommend that your client application ignore special characters, dots, and non-numeric characters when requesting Alexa to call or press digits.
+    * A user playing any skill with extended multi-turn dialogs (such as Jeopardy or Skyrim) cannot use voice to accept or reject incoming Alexa-to-Alexa calls.
+
+* Entertainment
+    * A user playing notifications while music is playing hears the music for a split second between the end of one notification and the start of the next.
+    * The user must enunciate “line-in” in utterances targeting the “LINE_IN” Local Media Source type in order for Alexa to recognize the intent.
+    * When an external player authorization is in progress at the exact moment of shutdown, a very rare race condition might occur, causing the Engine to crash.
+    * On QNX, when a portion of music on Spotify is skipped, either by the user saying "Skip forward" or by the user skipping to a different song, the volume is reset to the default level.
+
+* Authentication
+    * The CBL module uses a backoff when refreshing the access token after expiry. If the internet is disconnected when the refresh is attempted, it could take up to a minute to refresh the token when the internet connection is restored.
+    * If you log out and log in, the client-side Do Not Disturb (DND) state may not be synchronized with the Alexa cloud.
+
 ## v2.2.1 released on 2020-05-29
 
 ### Enhancements
@@ -15,7 +84,6 @@ ___
 ### Known Issues
 * On the Android Sample App, media playback gets into "No Content Playing" state where all GUI playback control breaks, when pressing next after force closing an external media app.
 * Playback controls in the C++ Sample App Playback Controller Menu are static text items and do not change visual state (e.g. add/remove, hilite, select) based on audio player metadata.
-* Sometimes asking Alexa to repeat a song, or a playlist, does not produce the expected result.
 
 ## v2.2.0 released on 2020-04-15
 

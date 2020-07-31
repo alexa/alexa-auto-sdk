@@ -20,13 +20,11 @@ import com.amazon.aace.core.PlatformInterface;
 /**
  * AlexaSpeaker is the interface for setting the Alexa volume and mute controls.
  */
-abstract public class AlexaSpeaker extends PlatformInterface
-{
+abstract public class AlexaSpeaker extends PlatformInterface {
     /**
      * Describes the state of Alexa dialog interaction
      */
-    public enum SpeakerType
-    {
+    public enum SpeakerType {
         /**
          * The Speaker type that is controlled locally by the platform
          * @hideinitializer
@@ -47,7 +45,7 @@ abstract public class AlexaSpeaker extends PlatformInterface
         /**
          * @internal
          */
-        private SpeakerType( String name ) {
+        private SpeakerType(String name) {
             m_name = name;
         }
 
@@ -62,11 +60,11 @@ abstract public class AlexaSpeaker extends PlatformInterface
     /**
      * Notifies the platform implementation that the speaker settings have changed for
      * a specific speaker type.
-     * 
+     *
      * @note Calling @c AlexaSpeaker::localSetVolume,
      * @c AlexaSpeaker::localAdjustVolume, or @c AlexaSpeaker::localSetMute from inside this
      * function will cause deadlock.
-     * 
+     *
      * @param [in] type The type of Alexa speaker being set.
      * @param [in] local @c true if the change originated from calling @c AlexaSpeaker::localSetVolume,
      * @c AlexaSpeaker::localAdjustVolume, or @c AlexaSpeaker::localSetMute.
@@ -75,8 +73,7 @@ abstract public class AlexaSpeaker extends PlatformInterface
      * @param [in] mute The mute setting of the Speaker. @c true when the Speaker is muted,
      * else @c false.
      */
-    public void speakerSettingsChanged( SpeakerType type, boolean local, byte volume, boolean mute ) {
-    }
+    public void speakerSettingsChanged(SpeakerType type, boolean local, byte volume, boolean mute) {}
 
     /**
      * Notifies the Engine of a volume change event
@@ -88,12 +85,12 @@ abstract public class AlexaSpeaker extends PlatformInterface
      * @param [in] volume The new volume setting of the Speaker. The @c volume reported
      * must be scaled to the range [0,100].
      */
-    public final void localSetVolume( SpeakerType type, byte volume ) {
-        localSetVolume( getNativeRef(), type, volume );
+    public final void localSetVolume(SpeakerType type, byte volume) {
+        localSetVolume(getNativeRef(), type, volume);
     }
 
     /**
-     * Notifies the Engine of a relative adjustment to the volume setting of the Speaker, 
+     * Notifies the Engine of a relative adjustment to the volume setting of the Speaker,
      * originating on the platform.
      * The @c delta value is relative to the current volume setting and is positive to
      * increase volume or negative to reduce volume.
@@ -103,8 +100,8 @@ abstract public class AlexaSpeaker extends PlatformInterface
      * @param [in] delta The volume adjustment to apply to the Speaker. @c delta is
      * in the range [-100, 100].
      */
-    public final void localAdjustVolume( SpeakerType type, byte delta ) {
-        localAdjustVolume( getNativeRef(), type, delta );
+    public final void localAdjustVolume(SpeakerType type, byte delta) {
+        localAdjustVolume(getNativeRef(), type, delta);
     }
 
     /**
@@ -117,8 +114,8 @@ abstract public class AlexaSpeaker extends PlatformInterface
      * @param [in] mute The new mute setting of the Speaker. @c true when the Speaker is muted,
      * else @c false
      */
-    public final void localSetMute( SpeakerType type, boolean mute ) {
-        localSetMute( getNativeRef(), type, mute );
+    public final void localSetMute(SpeakerType type, boolean mute) {
+        localSetMute(getNativeRef(), type, mute);
     }
 
     // NativeRef implementation
@@ -126,16 +123,14 @@ abstract public class AlexaSpeaker extends PlatformInterface
         return createBinder();
     }
 
-    final protected void disposeNativeRef( long nativeRef ) {
-        disposeBinder( nativeRef );
+    final protected void disposeNativeRef(long nativeRef) {
+        disposeBinder(nativeRef);
     }
 
     // Native Engine JNI methods
     private native long createBinder();
-    private native void disposeBinder( long nativeRef );
-    private native void localSetVolume( long nativeRef, SpeakerType type, byte volume );
-    private native void localAdjustVolume( long nativeRef, SpeakerType type, byte delta );
-    private native void localSetMute( long nativeRef, SpeakerType type, boolean mute );
+    private native void disposeBinder(long nativeRef);
+    private native void localSetVolume(long nativeRef, SpeakerType type, byte volume);
+    private native void localAdjustVolume(long nativeRef, SpeakerType type, byte delta);
+    private native void localSetMute(long nativeRef, SpeakerType type, boolean mute);
 }
-
-

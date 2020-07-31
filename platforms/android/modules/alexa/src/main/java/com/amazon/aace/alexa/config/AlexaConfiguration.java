@@ -15,15 +15,14 @@
 
 package com.amazon.aace.alexa.config;
 
-import com.amazon.aace.core.config.EngineConfiguration;
 import com.amazon.aace.alexa.EqualizerController.EqualizerBand;
 import com.amazon.aace.alexa.EqualizerController.EqualizerBandLevel;
+import com.amazon.aace.core.config.EngineConfiguration;
 
 /**
  * A factory interface for creating Alexa configuration objects
  */
 public class AlexaConfiguration {
-
     private static final String TAG = "AlexaConfiguration";
 
     /**
@@ -54,19 +53,20 @@ public class AlexaConfiguration {
      *
      * @param  description The description of the product
      */
-    public static EngineConfiguration createDeviceInfoConfig( final String deviceSerialNumber, final String clientId, final String productId, final String manufacturerName, final String description )
-    {
+    public static EngineConfiguration createDeviceInfoConfig(final String deviceSerialNumber, final String clientId,
+            final String productId, final String manufacturerName, final String description) {
         return new EngineConfiguration() {
             @Override
             protected long createNativeRef() {
-                return createDeviceInfoConfigBinder( deviceSerialNumber, clientId, productId, manufacturerName, description );
+                return createDeviceInfoConfigBinder(
+                        deviceSerialNumber, clientId, productId, manufacturerName, description);
             }
         };
     }
 
     // Native Engine JNI methods
-    static private native long createDeviceInfoConfigBinder( String deviceSerialNumber, String clientId, String productId, String manufacturerName, String description );
-
+    static private native long createDeviceInfoConfigBinder(
+            String deviceSerialNumber, String clientId, String productId, String manufacturerName, String description);
 
     /**
      * Factory method used to programmatically generate alerts configuration data.
@@ -85,18 +85,17 @@ public class AlexaConfiguration {
      * @param  databaseFilePath The file path to the SQLite database used to store persistent alerts data.
      * The database will be created on initialization if it does not already exist.
      */
-    public static EngineConfiguration createAlertsConfig( final String databaseFilePath )
-    {
+    public static EngineConfiguration createAlertsConfig(final String databaseFilePath) {
         return new EngineConfiguration() {
             @Override
             protected long createNativeRef() {
-                return createAlertsConfigBinder( databaseFilePath );
+                return createAlertsConfigBinder(databaseFilePath);
             }
         };
     }
 
     // Native Engine JNI methods
-    static private native long createAlertsConfigBinder( String databaseFilePath );
+    static private native long createAlertsConfigBinder(String databaseFilePath);
 
     /**
      * Factory method used to programmatically generate notifications configuration data.
@@ -115,18 +114,17 @@ public class AlexaConfiguration {
      * @param  databaseFilePath The file path to the SQLite database used to store persistent notifications data.
      * The database will be created on initialization if it does not already exist.
      */
-    public static EngineConfiguration createNotificationsConfig( final String databaseFilePath )
-    {
+    public static EngineConfiguration createNotificationsConfig(final String databaseFilePath) {
         return new EngineConfiguration() {
             @Override
             protected long createNativeRef() {
-                return createNotificationsConfigBinder( databaseFilePath );
+                return createNotificationsConfigBinder(databaseFilePath);
             }
         };
     }
 
     // Native Engine JNI methods
-    static private native long createNotificationsConfigBinder( String databaseFilePath );
+    static private native long createNotificationsConfigBinder(String databaseFilePath);
 
     /**
      * Factory method used to programmatically generate certified sender configuration data.
@@ -145,18 +143,17 @@ public class AlexaConfiguration {
      * @param  databaseFilePath The file path to the SQLite database used to store persistent certified sender data.
      * The database will be created on initialization if it does not already exist.
      */
-    public static EngineConfiguration createCertifiedSenderConfig( final String databaseFilePath )
-    {
+    public static EngineConfiguration createCertifiedSenderConfig(final String databaseFilePath) {
         return new EngineConfiguration() {
             @Override
             protected long createNativeRef() {
-                return createCertifiedSenderConfigBinder( databaseFilePath );
+                return createCertifiedSenderConfigBinder(databaseFilePath);
             }
         };
     }
 
     // Native Engine JNI methods
-    static private native long createCertifiedSenderConfigBinder( String databaseFilePath );
+    static private native long createCertifiedSenderConfigBinder(String databaseFilePath);
 
     /**
      * Factory method used to programmatically generate capabilities delegate configuration data.
@@ -175,18 +172,17 @@ public class AlexaConfiguration {
      * @param  databaseFilePath The file path to the SQLite database used to store device capabilities.
      * The database will be created on initialization if it does not already exist.
      */
-    public static EngineConfiguration createCapabilitiesDelegateConfig( final String databaseFilePath )
-    {
+    public static EngineConfiguration createCapabilitiesDelegateConfig(final String databaseFilePath) {
         return new EngineConfiguration() {
             @Override
             protected long createNativeRef() {
-                return createCapabilitiesDelegateConfigBinder( databaseFilePath );
+                return createCapabilitiesDelegateConfigBinder(databaseFilePath);
             }
         };
     }
 
     // Native Engine JNI methods
-    static private native long createCapabilitiesDelegateConfigBinder( String databaseFilePath );
+    static private native long createCapabilitiesDelegateConfigBinder(String databaseFilePath);
 
     /**
      * Factory method used to programmatically generate CURL configuration data.
@@ -205,8 +201,8 @@ public class AlexaConfiguration {
      *
      * @param  certsPath The file path to the directory holding CA certificates
      */
-    public static EngineConfiguration createCurlConfig( String certsPath ) {
-        return createCurlConfig( certsPath, null );
+    public static EngineConfiguration createCurlConfig(String certsPath) {
+        return createCurlConfig(certsPath, null);
     }
 
     /**
@@ -230,18 +226,17 @@ public class AlexaConfiguration {
      * @param  iface The interface used for outgoing network interface.
      * This can be an network interface name, an IP address or a host name.
      */
-    public static EngineConfiguration createCurlConfig( final String certsPath, final String iface  )
-    {
+    public static EngineConfiguration createCurlConfig(final String certsPath, final String iface) {
         return new EngineConfiguration() {
             @Override
             protected long createNativeRef() {
-                return createCurlConfigBinder( certsPath, iface );
+                return createCurlConfigBinder(certsPath, iface);
             }
         };
     }
 
     // Native Engine JNI methods
-    static private native long createCurlConfigBinder( String certsPath, String iface );
+    static private native long createCurlConfigBinder(String certsPath, String iface);
 
     /**
      * Factory method used to programmatically generate device settings configuration data.
@@ -253,51 +248,142 @@ public class AlexaConfiguration {
      *   "deviceSettings": {
      *     "databaseFilePath": "<SQLITE_DATABASE_FILE_PATH>",
      *     "locales": [<LIST_OF_LOCALE_STRINGS>],
-     *     "defaultLocale": "<DEFAULT_LOCALE>",
-     *     "localeCombinations": [[<LOCAL_STRING_PAIR>]],
-     *     "defaultTimezone": "<TIMEZONE>"        
+     *     "defaultLocale": "<DEFAULT_LOCALE_STRING>",
+     *     "localeCombinations": [[<LOCALE_STRING_PAIR>]],
+     *     "defaultTimezone": "<TIMEZONE>"
      *   }
      * }
      * @endcode
      *
      * @param databaseFilePath The file path to the SQLite database used to store persistent settings data.
-     * The database will be created on initialization if it does not already exist.
-     * @param locales The current list of supportable locales on the client. Defaults to ["en-US","en-GB","de-DE",
-     *          "en-IN","en-CA","ja-JP","en-AU","fr-FR","it-IT","es-ES","es-MX","fr-CA","es-US", "hi-IN", "pt-BR"].
-     * @param defaultLocale The current default locale setting on the client. Defaults to "en-US".
-     * @param defaultTimezone The current default timezone setting on the client. Defaults to "America/Vancouver".
+     *        The database will be created on initialization if it does not already exist.
+     * @param locales A list of locales supported by the device.
+     * @param defaultLocale The default locale setting on the device.
+     * @param defaultTimezone The default timezone setting on the device. For accepted values, refer to the accepted
+     *        timezones here:
+     *        https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/system.html#timezonechanged
+     * @param localeCombinations A list of locale combinations supported by the device for dual-locale mode.
+     *        The permitted combinations are [["en-CA","fr-CA"],["fr-CA","en-CA"],["en-US","es-US"],
+     *        ["es-US","en-US"],["en-IN","hi-IN"],["hi-IN","en-IN"]]. Any locale specified in this list must also
+     *        be specified in the @a locales list.
      */
-    public static EngineConfiguration createDeviceSettingsConfig( final String databaseFilePath, final String[] locales, 
-        final String defaultLocale, final String defaultTimezone ) {
+    public static EngineConfiguration createDeviceSettingsConfig(final String databaseFilePath, final String[] locales,
+            final String defaultLocale, final String defaultTimezone, final String[][] localeCombinations) {
         return new EngineConfiguration() {
             @Override
             protected long createNativeRef() {
-                return createDeviceSettingsConfigBinder( databaseFilePath, locales, defaultLocale, defaultTimezone );
+                return createDeviceSettingsConfigBinder(
+                        databaseFilePath, locales, defaultLocale, defaultTimezone, localeCombinations);
             }
         };
     }
 
-    // use all defaults
-    public static EngineConfiguration createDeviceSettingsConfig( final String databaseFilePath ) {
+    /**
+     * Factory method used to programmatically generate device settings configuration data.
+     * The data generated by this method is equivalent to providing the following JSON
+     * values in a configuration file:
+     *
+     * @code{.json}
+     * {
+     *   "deviceSettings": {
+     *   	"databaseFilePath": "<SQLITE_DATABASE_FILE_PATH>",
+     *   	"locales": [
+     *   		"en-US",
+     *   		"en-GB",
+     *   		"de-DE",
+     *   		"en-IN",
+     *   		"en-CA",
+     *   		"ja-JP",
+     *   		"en-AU",
+     *   		"fr-FR",
+     *   		"it-IT",
+     *   		"es-ES",
+     *   		"es-MX",
+     *   		"fr-CA",
+     *   		"es-US",
+     *   		"hi-IN",
+     *   		"pt-BR"
+     *   	],
+     *   	"defaultLocale": "en-US",
+     *   	"localeCombinations": [
+     *   		["en-CA","fr-CA"],
+     *   		["fr-CA","en-CA"],
+     *   		["en-US","es-US"],
+     *   		["es-US","en-US"],
+     *   		["en-IN","hi-IN"],
+     *   		["hi-IN","en-IN"]
+     *   	],
+     *   	"defaultTimezone": "America/Vancouver"
+     * }
+     * @endcode
+     *
+     * @param databaseFilePath The file path to the SQLite database used to store persistent settings data.
+     *        The database will be created on initialization if it does not already exist.
+     */
+    public static EngineConfiguration createDeviceSettingsConfig(final String databaseFilePath) {
         return new EngineConfiguration() {
             @Override
             protected long createNativeRef() {
-                return createDeviceSettingsConfigBinder( databaseFilePath, new String[]{"en-US","en-GB","de-DE","en-IN","en-CA","ja-JP","en-AU","fr-FR","it-IT","es-ES","es-MX","fr-CA","es-US", "hi-IN", "pt-BR"}, "en-US", "America/Vancouver");
+                return createDeviceSettingsConfigBinder(databaseFilePath,
+                        new String[] {"en-US", "en-GB", "de-DE", "en-IN", "en-CA", "ja-JP", "en-AU", "fr-FR", "it-IT",
+                                "es-ES", "es-MX", "fr-CA", "es-US", "hi-IN", "pt-BR"},
+                        "en-US", "America/Vancouver",
+                        new String[][] {{"en-CA", "fr-CA"}, {"fr-CA", "en-CA"}, {"en-US", "es-US"}, {"es-US", "en-US"},
+                                {"en-IN", "hi-IN"}, {"hi-IN", "en-IN"}});
+            }
+        };
+    }
+
+    /**
+     * Factory method used to programmatically generate device settings configuration data.
+     * The data generated by this method is equivalent to providing the following JSON
+     * values in a configuration file:
+     *
+     * @code{.json}
+     * {
+     *   "deviceSettings": {
+     *     "databaseFilePath": "<SQLITE_DATABASE_FILE_PATH>",
+     *     "locales": [<LIST_OF_LOCALE_STRINGS>],
+     *     "defaultLocale": "<DEFAULT_LOCALE_STRING>",
+     *     "defaultTimezone": "<TIMEZONE>"
+     *   }
+     * }
+     * @endcode
+     *
+     * @param databaseFilePath The file path to the SQLite database used to store persistent settings data.
+     *        The database will be created on initialization if it does not already exist.
+     * @param locales A list of locales supported by the device. The default is ["en-US","en-GB","de-DE",
+     *        "en-IN","en-CA","ja-JP","en-AU","fr-FR","it-IT","es-ES","es-MX","fr-CA","es-US", "hi-IN", "pt-BR"].
+     * @param defaultLocale The default locale setting on the device. The default is "en-US".
+     * @param defaultTimezone The default timezone setting on the device. The default is "America/Vancouver".
+     *        For accepted values, refer to the accepted timezones here:
+     *        https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/system.html#timezonechanged
+     */
+    public static EngineConfiguration createDeviceSettingsConfig(final String databaseFilePath, final String[] locales,
+            final String defaultLocale, final String defaultTimezone) {
+        return new EngineConfiguration() {
+            @Override
+            protected long createNativeRef() {
+                return createDeviceSettingsConfigBinder(databaseFilePath, locales, defaultLocale, defaultTimezone);
             }
         };
     }
 
     // Native Engine JNI methods
-    static private native long createDeviceSettingsConfigBinder( String databaseFilePath, String[] locales, String defaultLocale, String defaultTimezone );
+    static private native long createDeviceSettingsConfigBinder(String databaseFilePath, String[] locales,
+            String defaultLocale, String defaultTimezone, String[][] localeCombinations);
+    static private native long createDeviceSettingsConfigBinder(
+            String databaseFilePath, String[] locales, String defaultLocale, String defaultTimezone);
 
     /**
-     * Deprecated and will be removed after version 2.1.
-     * 
+     * @deprecated
+     * Use @c AlexaConfiguration.createDeviceSettingsConfig().
+     *
      * Factory method used to programmatically generate settings configuration data.
      * The data generated by this method is equivalent to providing the following JSON
      * values in a configuration file:
      *
-     * @code    {.json}
+     * @code{.json}
      * {
      *   "settings": {
      *     "databaseFilePath": "<SQLITE_DATABASE_FILE_PATH>",
@@ -313,27 +399,27 @@ public class AlexaConfiguration {
      *
      * @param  locale The current locale setting on the client
      */
-    public static EngineConfiguration createSettingsConfig( final String databaseFilePath, final String locale )
-    {
+    public static EngineConfiguration createSettingsConfig(final String databaseFilePath, final String locale) {
         return new EngineConfiguration() {
             @Override
             protected long createNativeRef() {
-                return createSettingsConfigBinder( databaseFilePath, locale );
+                return createSettingsConfigBinder(databaseFilePath, locale);
             }
         };
     }
 
     // Native Engine JNI methods
-    static private native long createSettingsConfigBinder( String databaseFilePath, String locale );
+    static private native long createSettingsConfigBinder(String databaseFilePath, String locale);
 
     /**
-     * Deprecated and will be removed after version 2.1.
+     * @deprecated
+     * Use @c AlexaConfiguration.createDeviceSettingsConfig().
      *
      * Factory method used to programmatically generate settings configuration data.
      * The data generated by this method is equivalent to providing the following JSON
      * values in a configuration file:
      *
-     * @code    {.json}
+     * @code{.json}
      * {
      *   "settings": {
      *     "databaseFilePath": "<SQLITE_DATABASE_FILE_PATH>",
@@ -349,8 +435,8 @@ public class AlexaConfiguration {
      *
      * @param  locale The current locale setting on the client
      */
-    public static EngineConfiguration createSettingsConfig( String databaseFilePath ) {
-        return AlexaConfiguration.createSettingsConfig( databaseFilePath, "en-US" );
+    public static EngineConfiguration createSettingsConfig(String databaseFilePath) {
+        return AlexaConfiguration.createSettingsConfig(databaseFilePath, "en-US");
     }
 
     /**
@@ -370,18 +456,17 @@ public class AlexaConfiguration {
      * @param  databaseFilePath The file path to the SQLite database used to store persistent misc storage data.
      * The database will be created on initialization if it does not already exist.
      */
-    public static EngineConfiguration createMiscStorageConfig( final String databaseFilePath )
-    {
+    public static EngineConfiguration createMiscStorageConfig(final String databaseFilePath) {
         return new EngineConfiguration() {
             @Override
             protected long createNativeRef() {
-                return createMiscStorageConfigBinder( databaseFilePath );
+                return createMiscStorageConfigBinder(databaseFilePath);
             }
         };
     }
 
     // Native Engine JNI methods
-    static private native long createMiscStorageConfigBinder( String databaseFilePath );
+    static private native long createMiscStorageConfigBinder(String databaseFilePath);
 
     /**
      * Factory method used to programmatically generate speaker manager configuration data.
@@ -400,18 +485,17 @@ public class AlexaConfiguration {
      *
      * @param enabled Enable or disable the speaker manager (default is enabled)
      */
-    public static EngineConfiguration createSpeakerManagerConfig( final boolean enabled )
-    {
+    public static EngineConfiguration createSpeakerManagerConfig(final boolean enabled) {
         return new EngineConfiguration() {
             @Override
             protected long createNativeRef() {
-                return createSpeakerManagerConfigBinder( enabled );
+                return createSpeakerManagerConfigBinder(enabled);
             }
         };
     }
 
     // Native Engine JNI methods
-    static private native long createSpeakerManagerConfigBinder( boolean enabled );
+    static private native long createSpeakerManagerConfigBinder(boolean enabled);
 
     /**
      * Factory method used to programmatically generate system configuration data.
@@ -430,18 +514,17 @@ public class AlexaConfiguration {
      *
      * @param  firmwareVersion The firmware version of the client device
      */
-    public static EngineConfiguration createSystemConfig( final int firmwareVersion )
-    {
+    public static EngineConfiguration createSystemConfig(final int firmwareVersion) {
         return new EngineConfiguration() {
             @Override
             protected long createNativeRef() {
-                return createSystemConfigBinder( firmwareVersion );
+                return createSystemConfigBinder(firmwareVersion);
             }
         };
     }
 
     // Native Engine JNI methods
-    static private native long createSystemConfigBinder( int firmwareVersion );
+    static private native long createSystemConfigBinder(int firmwareVersion);
 
     /**
      * Factory method used to programmatically generate encoder configuration data.
@@ -462,37 +545,38 @@ public class AlexaConfiguration {
      *
      * @param encoderName The encoder codec name to be used
      */
-    public static EngineConfiguration createSpeechRecognizerConfig( final String encoderName )
-    {
+    public static EngineConfiguration createSpeechRecognizerConfig(final String encoderName) {
         return new EngineConfiguration() {
             @Override
             protected long createNativeRef() {
-                return createSpeechRecognizerConfigBinder( encoderName );
+                return createSpeechRecognizerConfigBinder(encoderName);
             }
         };
     }
 
     // Native Engine JNI methods
-    static private native long createSpeechRecognizerConfigBinder( String encoderName );
+    static private native long createSpeechRecognizerConfigBinder(String encoderName);
 
     public enum TemplateRuntimeTimeoutType {
         /**
          *  Display card timeout in milli seconds when Alexa completes TTS.
          *  @hideinitializer
          */
-        DISPLAY_CARD_TTS_FINISHED_TIMEOUT ( "DISPLAY_CARD_TTS_FINISHED_TIMEOUT","displayCardTTSFinishedTimeout" ),
+        DISPLAY_CARD_TTS_FINISHED_TIMEOUT("DISPLAY_CARD_TTS_FINISHED_TIMEOUT", "displayCardTTSFinishedTimeout"),
 
         /**
          *  Display card timeout in milli seconds when AudioPlayback Completes.
          *  @hideinitializer
          */
-        DISPLAY_CARD_AUDIO_PLAYBACK_FINISHED_TIMEOUT ( "DISPLAY_CARD_AUDIO_PLAYBACK_FINISHED_TIMEOUT","displayCardAudioPlaybackFinishedTimeout" ),
+        DISPLAY_CARD_AUDIO_PLAYBACK_FINISHED_TIMEOUT(
+                "DISPLAY_CARD_AUDIO_PLAYBACK_FINISHED_TIMEOUT", "displayCardAudioPlaybackFinishedTimeout"),
 
         /**
          *  Display card timeout in milli seconds when AudioPlayback is Stopped or Paused.
          *  @hideinitializer
          */
-        DISPLAY_CARD_AUDIO_PLAYBACK_STOPPED_PAUSED_TIMEOUT ( "DISPLAY_CARD_AUDIO_PLAYBACK_STOPPED_PAUSED_TIMEOUT","displayCardAudioPlaybackStoppedPausedTimeout" );
+        DISPLAY_CARD_AUDIO_PLAYBACK_STOPPED_PAUSED_TIMEOUT(
+                "DISPLAY_CARD_AUDIO_PLAYBACK_STOPPED_PAUSED_TIMEOUT", "displayCardAudioPlaybackStoppedPausedTimeout");
 
         /**
          * @internal
@@ -507,7 +591,7 @@ public class AlexaConfiguration {
         /**
          * Type used to identify a TemplateRuntime configuration type and value pair
          */
-        TemplateRuntimeTimeoutType( String name, String key ) {
+        TemplateRuntimeTimeoutType(String name, String key) {
             mName = name;
             mKey = key;
         }
@@ -525,30 +609,35 @@ public class AlexaConfiguration {
         public String getKey() {
             return mKey;
         }
-
     }
 
     public static class TemplateRuntimeTimeout {
         private TemplateRuntimeTimeoutType mType;
         private int mValue;
 
-        public TemplateRuntimeTimeout( TemplateRuntimeTimeoutType type, int value ) {
+        public TemplateRuntimeTimeout(TemplateRuntimeTimeoutType type, int value) {
             mType = type;
             mValue = value;
         }
 
-        public TemplateRuntimeTimeoutType getType() { return mType; }
-        public int getValue() { return mValue; }
+        public TemplateRuntimeTimeoutType getType() {
+            return mType;
+        }
+        public int getValue() {
+            return mValue;
+        }
     }
 
     /**
      * Factory method used to programmatically generate template runtime configuration data.
      * This is an optional configuration. Following are the accepted keys and their description.
-     * - displayCardTTSFinishedTimeout If present, specifies the values in milli seconds to control the timeout of display card at the Alexa Speech.
-     * - displayCardAudioPlaybackFinishedTimeout If present, specifies the values in milli seconds to control the timeout of display card at the FINISHED state of AudioPlayback.
-     * - displayCardAudioPlaybackStoppedPausedTimeout If present, specifies the values in milli seconds to control the timeout of display card at STOP or PAUSE state of AudioPlayback.
-     * The data generated by this method is equivalent to providing the following JSON
-     * values in a configuration file:
+     * - displayCardTTSFinishedTimeout If present, specifies the values in milli seconds to control the timeout of
+     * display card at the Alexa Speech.
+     * - displayCardAudioPlaybackFinishedTimeout If present, specifies the values in milli seconds to control the
+     * timeout of display card at the FINISHED state of AudioPlayback.
+     * - displayCardAudioPlaybackStoppedPausedTimeout If present, specifies the values in milli seconds to control the
+     * timeout of display card at STOP or PAUSE state of AudioPlayback. The data generated by this method is equivalent
+     * to providing the following JSON values in a configuration file:
      *
      * @code{.json}
      * {
@@ -563,17 +652,17 @@ public class AlexaConfiguration {
      * @param timeoutList A list of @c TemplateRuntimeTimeout type and value pairs
      *
      */
-    public static EngineConfiguration createTemplateRuntimeTimeoutConfig( final TemplateRuntimeTimeout[] timeoutList ) {
+    public static EngineConfiguration createTemplateRuntimeTimeoutConfig(final TemplateRuntimeTimeout[] timeoutList) {
         return new EngineConfiguration() {
             @Override
             protected long createNativeRef() {
-                return createTemplateRuntimeTimeoutConfigBinder( timeoutList );
+                return createTemplateRuntimeTimeoutConfigBinder(timeoutList);
             }
         };
     }
 
     // Native Engine JNI methods
-    static private native long createTemplateRuntimeTimeoutConfigBinder( TemplateRuntimeTimeout[] timeoutList );
+    static private native long createTemplateRuntimeTimeoutConfigBinder(TemplateRuntimeTimeout[] timeoutList);
 
     /**
      * Factory method used to programmatically generate equalizer controller configuration data.
@@ -636,21 +725,19 @@ public class AlexaConfiguration {
      *         the "equalizer.defaultState.bands" config branch. Null @a defaultBandLevels omits
      *         the config branch.
      */
-    public static EngineConfiguration createEqualizerControllerConfig( final EqualizerBand[] supportedBands,
-                                                                       final int minLevel, final int maxLevel,
-                                                                       final EqualizerBandLevel[] defaultBandLevels ) {
-       return new EngineConfiguration() {
+    public static EngineConfiguration createEqualizerControllerConfig(final EqualizerBand[] supportedBands,
+            final int minLevel, final int maxLevel, final EqualizerBandLevel[] defaultBandLevels) {
+        return new EngineConfiguration() {
             @Override
             protected long createNativeRef() {
-                return createEqualizerControllerConfigBinder( supportedBands, minLevel, maxLevel, defaultBandLevels );
+                return createEqualizerControllerConfigBinder(supportedBands, minLevel, maxLevel, defaultBandLevels);
             }
-       };
+        };
     }
 
     // Native Engine JNI methods
-    static private native long createEqualizerControllerConfigBinder( EqualizerBand[] supportedBands,
-                                                                      int minLevel, int maxLevel,
-                                                                      EqualizerBandLevel[] defaultBandLevels );
+    static private native long createEqualizerControllerConfigBinder(
+            EqualizerBand[] supportedBands, int minLevel, int maxLevel, EqualizerBandLevel[] defaultBandLevels);
 
     /**
      * Factory method used to programmatically generate external media player configuration data.
@@ -669,17 +756,15 @@ public class AlexaConfiguration {
      *
      * @param [in] agent The external media player agent
      */
-    public static EngineConfiguration createExternalMediaPlayerConfig( final String agent )
-    {
+    public static EngineConfiguration createExternalMediaPlayerConfig(final String agent) {
         return new EngineConfiguration() {
             @Override
             protected long createNativeRef() {
-                return createExternalMediaPlayerConfigBinder( agent );
+                return createExternalMediaPlayerConfigBinder(agent);
             }
         };
     }
 
     // Native Engine JNI methods
-    static private native long createExternalMediaPlayerConfigBinder( String agent );
-
+    static private native long createExternalMediaPlayerConfigBinder(String agent);
 }

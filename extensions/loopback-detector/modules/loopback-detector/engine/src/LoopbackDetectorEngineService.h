@@ -28,7 +28,6 @@ namespace engine {
 namespace loopbackDetector {
 
 class LoopbackDetectorEngineService : public core::EngineService {
-
     // AACE Service Definition
     DESCRIBE("aace.loopbackDetector", VERSION("1.0"), DEPENDS(alexa::AlexaEngineService))
 

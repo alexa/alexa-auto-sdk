@@ -30,8 +30,7 @@ const std::string TAG = "aasb::gloria::CardRendererHandler";
 std::shared_ptr<CardRendererHandler> CardRendererHandler::create(
     std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
     std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher) {
-    auto handler =
-        std::shared_ptr<CardRendererHandler>(new CardRendererHandler(responseDispatcher));
+    auto handler = std::shared_ptr<CardRendererHandler>(new CardRendererHandler(responseDispatcher));
 
     handler->m_logger = logger;
     return handler;

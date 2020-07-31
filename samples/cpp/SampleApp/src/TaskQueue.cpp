@@ -23,7 +23,8 @@ namespace sampleApp {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TaskQueue::TaskQueue() : m_shutdown{false} {}
+TaskQueue::TaskQueue() : m_shutdown{false} {
+}
 
 std::unique_ptr<std::function<void()>> TaskQueue::pop() {
     std::unique_lock<std::mutex> queueLock{m_queueMutex};
@@ -51,6 +52,8 @@ void TaskQueue::shutdown() {
     m_queueChanged.notify_all();
 }
 
-bool TaskQueue::isShutdown() { return m_shutdown; }
+bool TaskQueue::isShutdown() {
+    return m_shutdown;
+}
 
-} // namespace sampleApp
+}  // namespace sampleApp

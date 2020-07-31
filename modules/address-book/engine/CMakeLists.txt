@@ -39,9 +39,9 @@ target_include_directories(AACEAddressBookEngine
 target_link_libraries(AACEAddressBookEngine
     PUBLIC
         AACEAddressBookPlatform
+        AACEAlexaEngine
         AACECoreEngine
     PRIVATE
-        AACEAlexaEngine
         ${AVS_AVS_COMMON_LIBRARY}
         ${CURL_LIBRARIES}
 )

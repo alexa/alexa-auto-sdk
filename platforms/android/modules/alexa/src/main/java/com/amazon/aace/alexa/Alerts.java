@@ -21,13 +21,11 @@ import com.amazon.aace.core.PlatformInterface;
  * Alerts should be extended to handle alerts (e.g. timers, alarms, reminders) from AVS.
  * The platform implementation is responsible for rendering visual cues for an active alert.
  */
-public class Alerts extends PlatformInterface
-{
+public class Alerts extends PlatformInterface {
     /**
      * Specifies the state of an alert
      */
-    public enum AlertState
-    {
+    public enum AlertState {
         /**
          * The alert is ready to activate and is waiting for channel focus.
          * @hideinitializer
@@ -92,7 +90,7 @@ public class Alerts extends PlatformInterface
         /**
          * @internal
          */
-        private AlertState( String name ) {
+        private AlertState(String name) {
             m_name = name;
         }
 
@@ -113,8 +111,7 @@ public class Alerts extends PlatformInterface
      *
      * @param  reason The reason for the state change
      */
-    public void alertStateChanged( String alertToken, AlertState state, String reason ) {
-    }
+    public void alertStateChanged(String alertToken, AlertState state, String reason) {}
 
     /**
      * Notifies the platform implementation of an alert created, with detailed alert info.
@@ -130,32 +127,31 @@ public class Alerts extends PlatformInterface
      * type The type of the alert ( ALERT, REMINDER, TIMER ).
      * label The label of the TIMER, description for REMINDER, or empty string for ALARM.
      */
-    public void alertCreated( String alertToken, String detailedInfo ) {
-    }
+    public void alertCreated(String alertToken, String detailedInfo) {}
 
     /**
      * Notifies the platform implementation of an alert deleted, with alert token.
      *
      * @param alertToken The AVS token of the alert.
      */
-    public void alertDeleted( String alertToken ) {
-    }
+    public void alertDeleted(String alertToken) {}
 
     /**
-     * Notifies the Engine of a platform request to stop any active alert, such as when a user presses a physical 'stop' button.
+     * Notifies the Engine of a platform request to stop any active alert, such as when a user presses a physical 'stop'
+     * button.
      */
     final public void localStop() {
-        localStop( getNativeRef() );
+        localStop(getNativeRef());
     }
 
     /**
      * Notifies the Engine of a platform request to clear the user's
      * pending alerts from storage. This may be useful for a scenario in which a user's pending alerts should not go
-     * off after he logs out of the application. This does not clear the user's pending alerts from the Alexa cloud since it
-     * does not support a local 'Remove all alerts' feature.
+     * off after he logs out of the application. This does not clear the user's pending alerts from the Alexa cloud
+     * since it does not support a local 'Remove all alerts' feature.
      */
     final public void removeAllAlerts() {
-        removeAllAlerts( getNativeRef() );
+        removeAllAlerts(getNativeRef());
     }
 
     // NativeRef implementation
@@ -163,15 +159,13 @@ public class Alerts extends PlatformInterface
         return createBinder();
     }
 
-    final protected void disposeNativeRef( long nativeRef ) {
-        disposeBinder( nativeRef );
+    final protected void disposeNativeRef(long nativeRef) {
+        disposeBinder(nativeRef);
     }
 
     // Native Engine JNI methods
     private native long createBinder();
-    private native void disposeBinder( long nativeRef );
-    private native void localStop( long nativeObject );
-    private native void removeAllAlerts( long nativeObject );
+    private native void disposeBinder(long nativeRef);
+    private native void localStop(long nativeObject);
+    private native void removeAllAlerts(long nativeObject);
 }
-
-

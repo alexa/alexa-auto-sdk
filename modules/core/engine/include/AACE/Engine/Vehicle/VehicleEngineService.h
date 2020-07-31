@@ -37,9 +37,11 @@ class VehicleEngineService
         , public VehiclePropertyInterface
         , public std::enable_shared_from_this<VehicleEngineService> {
 public:
-    DESCRIBE("aace.vehicle",VERSION("1.0"),
-             DEPENDS(aace::engine::storage::StorageEngineService),
-             DEPENDS(aace::engine::propertyManager::PropertyManagerEngineService))
+    DESCRIBE(
+        "aace.vehicle",
+        VERSION("1.0"),
+        DEPENDS(aace::engine::storage::StorageEngineService),
+        DEPENDS(aace::engine::propertyManager::PropertyManagerEngineService))
 
 public:
     /// Aliases for readability
@@ -53,9 +55,9 @@ private:
 
 public:
     virtual ~VehicleEngineService() = default;
-    
+
     using SetPropertyResultCallback = std::function<void(const std::string&, const std::string&, const std::string&)>;
-            
+
     /// @name VehiclePropertyInterface methods
     /// @{
     std::string getVehicleProperty(VehiclePropertyType type) override;
@@ -65,7 +67,7 @@ public:
 
     /// Emit vehicle metric
     void record(bool full);
-    
+
     bool setProperty_operatingCountry(
         const std::string& value,
         bool& changed,
@@ -81,13 +83,20 @@ protected:
     bool configure(std::shared_ptr<std::istream> configuration) override;
     /// @}
 
-    bool checkVehicleConfigProperty(rapidjson::Value& root, const char* key, bool warnIfMissing = true);
-
-    std::string getVehicleConfigProperty(
+    /**
+     * Checks the root document for the presence of 'configKey' and updates 'propertyMap' at 'propertyKey' if the value
+     * is present. No default values are inserted if the key is not present.
+     * 
+     * @param [in] root The root document
+     * @param [in] configKey The key in the config document 
+     * @param [in] propertyKey The key for the map
+     * @param [out] propertyMap The map that will be updated if the key is present
+     */
+    void getVehicleConfigProperty(
         rapidjson::Value& root,
-        const char* key,
-        const char* defaultValue = "",
-        bool warnIfMissing = true);
+        const char* configKey,
+        VehiclePropertyType propertyKey,
+        std::unordered_map<VehiclePropertyType, std::string, EnumHash>& propertyMap);
 
     /**
      * Gets the attribute described by the specified @c VehiclePropertyType as a string. The value returned corresponds
@@ -100,7 +109,7 @@ private:
     bool registerProperties();
 
 private:
-    std::unordered_map<VehiclePropertyType,std::string,EnumHash> m_vehiclePropertyMap;
+    std::unordered_map<VehiclePropertyType, std::string, EnumHash> m_vehiclePropertyMap;
     std::string m_operatingCountry;
     /// Record empty metric flag
     bool m_recordEmpty;

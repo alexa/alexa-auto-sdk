@@ -48,6 +48,10 @@ The APL module (for [C++](./modules/apl/README.md) or [Android](./platforms/andr
 
 >**Note:** APL rendering on the Android Sample App requires a component that is available by [request from your Amazon Solutions Architect (SA) or Partner Manager](./NEED_HELP.md#requesting-additional-functionality-whitelisting).
 
+### Messaging Module 
+
+The Messaging module (for [C++](./modules/messaging/README.md) or [Android](./platforms/android/modules/messaging/README.md)) includes platform interfaces and runtime Engine support for Short Message Service (SMS) capabilities of Alexa such as sending and reading text messages.
+
 ## Optional Extensions <a id ="optional-extensions"> </a>
 The following extensions to the Alexa Auto SDK are available by request. Please contact your Amazon Solutions Architect (SA) or Partner Manager for more information.
 

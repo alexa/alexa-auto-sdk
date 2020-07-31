@@ -24,42 +24,44 @@ namespace aace {
 namespace jni {
 namespace apl {
 
-    //
-    // JAlexaPresentationTimeoutType
-    //
+//
+// JAlexaPresentationTimeoutType
+//
 
-    class JAlexaPresentationTimeoutTypeConfig : public EnumConfiguration<aace::apl::config::APLConfiguration::AlexaPresentationTimeoutType> {
-    public:
-        using T = aace::apl::config::APLConfiguration::AlexaPresentationTimeoutType;
+class JAlexaPresentationTimeoutTypeConfig
+        : public EnumConfiguration<aace::apl::config::APLConfiguration::AlexaPresentationTimeoutType> {
+public:
+    using T = aace::apl::config::APLConfiguration::AlexaPresentationTimeoutType;
 
-        const char* getClassName() override {
-            return "com/amazon/aace/apl/APLConfiguration$AlexaPresentationTimeoutType";
-        }
+    const char* getClassName() override {
+        return "com/amazon/aace/apl/APLConfiguration$AlexaPresentationTimeoutType";
+    }
 
-        std::vector<std::pair<T,std::string>> getConfiguration() override {
-            return {
-                {T::DISPLAY_DOCUMENT_INTERACTION_IDLE_TIMEOUT, "DISPLAY_DOCUMENT_INTERACTION_IDLE_TIMEOUT"}
-            };
-        }
-    };
+    std::vector<std::pair<T, std::string>> getConfiguration() override {
+        return {{T::DISPLAY_DOCUMENT_INTERACTION_IDLE_TIMEOUT, "DISPLAY_DOCUMENT_INTERACTION_IDLE_TIMEOUT"}};
+    }
+};
 
-    using JAlexaPresentationTimeoutType = JEnum<aace::apl::config::APLConfiguration::AlexaPresentationTimeoutType,JAlexaPresentationTimeoutTypeConfig>;
+using JAlexaPresentationTimeoutType =
+    JEnum<aace::apl::config::APLConfiguration::AlexaPresentationTimeoutType, JAlexaPresentationTimeoutTypeConfig>;
 
-    //
-    // JAlexaPresentationTimeout
-    //
+//
+// JAlexaPresentationTimeout
+//
 
-    class JAlexaPresentationTimeout : public JObject {
-    public:
-        JAlexaPresentationTimeout( jobject obj ) : JObject( obj, "com/amazon/aace/apl/APLConfiguration$AlexaPresentationTimeout" ) {};
+class JAlexaPresentationTimeout : public JObject {
+public:
+    JAlexaPresentationTimeout(jobject obj) :
+            JObject(obj, "com/amazon/aace/apl/APLConfiguration$AlexaPresentationTimeout"){};
 
-        aace::apl::config::APLConfiguration::AlexaPresentationTimeout getAlexaPresentationTimeout();
+    aace::apl::config::APLConfiguration::AlexaPresentationTimeout getAlexaPresentationTimeout();
 
-        static std::vector<aace::apl::config::APLConfiguration::AlexaPresentationTimeout> convert( jobjectArray timeoutArrObj );
-    };
+    static std::vector<aace::apl::config::APLConfiguration::AlexaPresentationTimeout> convert(
+        jobjectArray timeoutArrObj);
+};
 
-} // aace::jni::apl
-} // aace::jni
-} // aace
+}  // namespace apl
+}  // namespace jni
+}  // namespace aace
 
-#endif // AACE_JNI_APL_APL_CONFIGURATION_BINDER_H
+#endif  // AACE_JNI_APL_APL_CONFIGURATION_BINDER_H

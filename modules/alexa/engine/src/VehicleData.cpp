@@ -89,12 +89,16 @@ std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityCon
     return m_capabilityConfigurations;
 }
 
-std::string VehicleData::getPropertyByAttribute(
+alexaClientSDK::avsCommon::utils::Optional<std::string> VehicleData::getPropertyByAttribute(
     const std::string& attribute,
     const VehiclePropertyMap& vehiclePropertyMap) {
+    alexaClientSDK::avsCommon::utils::Optional<std::string> value;
     auto propertyType = s_attributeToVehiclePropertyMap[attribute];
     auto it = vehiclePropertyMap.find(propertyType);
-    return it != vehiclePropertyMap.end() ? it->second : "";
+    if (it != vehiclePropertyMap.end()) {
+        value.set(it->second);
+    }
+    return value;
 }
 
 std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration> VehicleData::
@@ -105,63 +109,67 @@ std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration> Vehicle
 
         rapidjson::Document payload(rapidjson::kObjectType);
         auto& allocator = payload.GetAllocator();
+        rapidjson::Value resourcesObject(rapidjson::kObjectType);
+
+        auto make = getPropertyByAttribute(VEHICLEDATA_ATTRIBUTE_MAKE, vehiclePropertyMap);
+        ThrowIfNot(make.hasValue(), "missingRequiredMakeAttribute");
+        resourcesObject.AddMember(
+            VEHICLEDATA_ATTRIBUTE_MAKE, getTextResourceObject(make.value(), allocator), allocator);
+
+        auto model = getPropertyByAttribute(VEHICLEDATA_ATTRIBUTE_MODEL, vehiclePropertyMap);
+        ThrowIfNot(model.hasValue(), "missingRequiredModelAttribute");
+        resourcesObject.AddMember(
+            VEHICLEDATA_ATTRIBUTE_MODEL, getTextResourceObject(model.value(), allocator), allocator);
+
+        auto trim = getPropertyByAttribute(VEHICLEDATA_ATTRIBUTE_TRIM, vehiclePropertyMap);
+        if (trim.hasValue()) {
+            resourcesObject.AddMember(
+                VEHICLEDATA_ATTRIBUTE_TRIM, getTextResourceObject(trim.value(), allocator), allocator);
+        }
+
+        payload.AddMember("resources", resourcesObject, allocator);
+
+        auto year = getPropertyByAttribute(VEHICLEDATA_ATTRIBUTE_YEAR, vehiclePropertyMap);
+        ThrowIfNot(year.hasValue(), "missingRequiredYearAttribute");
+        ThrowIf(year.value() == "", "yearAttributeIsEmpty");
+        payload.AddMember(VEHICLEDATA_ATTRIBUTE_YEAR, (int64_t)std::stol(year.value()), allocator);
 
         bool includeAnalyticsSegments = false;
         rapidjson::Value analyticsObject(rapidjson::kObjectType);
         rapidjson::Value analyticsSegmentsArray(rapidjson::kArrayType);
 
         auto os = getPropertyByAttribute(VEHICLEDATA_ATTRIBUTE_OS, vehiclePropertyMap);
-        if (os != "") {
+        if (os.hasValue()) {
             analyticsSegmentsArray.PushBack(
-                getAnalyticsObject(
-                    VEHICLEDATA_ATTRIBUTE_OS,
-                    os,
-                    allocator),
-                allocator);
+                getAnalyticsObject(VEHICLEDATA_ATTRIBUTE_OS, os.value(), allocator), allocator);
             includeAnalyticsSegments = true;
         }
 
         auto arch = getPropertyByAttribute(VEHICLEDATA_ATTRIBUTE_ARCH, vehiclePropertyMap);
-        if (arch != "") {
+        if (arch.hasValue()) {
             analyticsSegmentsArray.PushBack(
-                getAnalyticsObject(
-                    VEHICLEDATA_ATTRIBUTE_ARCH,
-                    arch,
-                    allocator),
-                allocator);
+                getAnalyticsObject(VEHICLEDATA_ATTRIBUTE_ARCH, arch.value(), allocator), allocator);
             includeAnalyticsSegments = true;
         }
 
         auto microphone = getPropertyByAttribute(VEHICLEDATA_ATTRIBUTE_MIC, vehiclePropertyMap);
-        if (microphone != "") {
+        if (microphone.hasValue()) {
             analyticsSegmentsArray.PushBack(
-                getAnalyticsObject(
-                    VEHICLEDATA_ATTRIBUTE_MIC,
-                    microphone,
-                    allocator),
-                allocator);
+                getAnalyticsObject(VEHICLEDATA_ATTRIBUTE_MIC, microphone.value(), allocator), allocator);
             includeAnalyticsSegments = true;
         }
 
         auto geography = getPropertyByAttribute(VEHICLEDATA_ATTRIBUTE_GEOGRAPHY, vehiclePropertyMap);
-        if (geography != "") {   
+        if (geography.hasValue()) {
             analyticsSegmentsArray.PushBack(
-                getAnalyticsObject(
-                    VEHICLEDATA_ATTRIBUTE_GEOGRAPHY,
-                    geography,
-                    allocator),
-                allocator);
+                getAnalyticsObject(VEHICLEDATA_ATTRIBUTE_GEOGRAPHY, geography.value(), allocator), allocator);
             includeAnalyticsSegments = true;
         }
 
         auto version = getPropertyByAttribute(VEHICLEDATA_ATTRIBUTE_VERSION, vehiclePropertyMap);
-        if (version != "") {
+        if (version.hasValue()) {
             analyticsSegmentsArray.PushBack(
-                getAnalyticsObject(
-                    VEHICLEDATA_ATTRIBUTE_VERSION,
-                    version,
-                    allocator),
-                allocator);
+                getAnalyticsObject(VEHICLEDATA_ATTRIBUTE_VERSION, version.value(), allocator), allocator);
             includeAnalyticsSegments = true;
         }
 
@@ -169,45 +177,8 @@ std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration> Vehicle
             analyticsObject.AddMember("segments", analyticsSegmentsArray, allocator);
             payload.AddMember("analytics", analyticsObject, allocator);
         } else {
-            AACE_DEBUG(LX(TAG,"skippingEmptyAnalyticsSegments"));
+            AACE_DEBUG(LX(TAG, "skippingEmptyAnalyticsSegments"));
         }
-
-        auto make = getPropertyByAttribute(VEHICLEDATA_ATTRIBUTE_MAKE, vehiclePropertyMap);
-        if (make == "") {
-            AACE_WARN(LX(TAG,"requiredAttributeMakeIsEmpty"));
-        }
-        rapidjson::Value resourcesObject(rapidjson::kObjectType);
-        resourcesObject.AddMember(
-            VEHICLEDATA_ATTRIBUTE_MAKE,
-            getTextResourceObject(make, allocator),
-            allocator);
-
-        auto model = getPropertyByAttribute(VEHICLEDATA_ATTRIBUTE_MODEL, vehiclePropertyMap);
-        if (model == "") {
-            AACE_WARN(LX(TAG,"requiredAttributeModelIsEmpty"));
-        }
-        resourcesObject.AddMember(
-            VEHICLEDATA_ATTRIBUTE_MODEL,
-            getTextResourceObject(model, allocator),
-            allocator);
-
-        auto trim = getPropertyByAttribute(VEHICLEDATA_ATTRIBUTE_TRIM, vehiclePropertyMap);
-        if (trim == "") {
-            AACE_WARN(LX(TAG,"requiredAttributeTrimIsEmpty"));
-        }
-        resourcesObject.AddMember(
-            VEHICLEDATA_ATTRIBUTE_TRIM,
-            getTextResourceObject(trim, allocator),
-            allocator);
-
-        payload.AddMember("resources", resourcesObject, allocator);
-
-        auto year = getPropertyByAttribute(VEHICLEDATA_ATTRIBUTE_YEAR, vehiclePropertyMap);
-        ThrowIf(year == "", "missingRequiredYearAttribute");
-        payload.AddMember(
-            VEHICLEDATA_ATTRIBUTE_YEAR,
-            (int64_t)std::stol(year),
-            allocator);
 
         // Finish the RapidJSON doc
         rapidjson::StringBuffer buffer;

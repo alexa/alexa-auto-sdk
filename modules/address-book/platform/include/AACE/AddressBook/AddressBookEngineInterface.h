@@ -12,7 +12,7 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
- 
+
 #ifndef AACE_ADDRESS_BOOK_ADDRESS_BOOK_ENGINE_INTERFACE_H
 #define AACE_ADDRESS_BOOK_ADDRESS_BOOK_ENGINE_INTERFACE_H
 
@@ -24,12 +24,15 @@ namespace addressBook {
 class AddressBookEngineInterface {
 public:
     using AddressBookType = aace::addressBook::AddressBook::AddressBookType;
-    
-    virtual bool onAddAddressBook( const std::string& addressBookSourceId,  const std::string& name, const AddressBookType type ) = 0;
-    virtual bool onRemoveAddressBook( const std::string& addressBookSourceId ) = 0;
+
+    virtual bool onAddAddressBook(
+        const std::string& addressBookSourceId,
+        const std::string& name,
+        const AddressBookType type) = 0;
+    virtual bool onRemoveAddressBook(const std::string& addressBookSourceId) = 0;
 };
 
-} // aace::addressBook
-} // aace
+}  // namespace addressBook
+}  // namespace aace
 
-#endif // AACE_ADDRESS_BOOK_ADDRESS_BOOK_INTERFACE_H
+#endif  // AACE_ADDRESS_BOOK_ADDRESS_BOOK_INTERFACE_H

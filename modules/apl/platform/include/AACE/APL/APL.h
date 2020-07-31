@@ -60,7 +60,10 @@ public:
      * @param [in] token The APL presentation token associated with this payload.
      * @param [in] windowId The target windowId.
      */
-    virtual void renderDocument(const std::string& jsonPayload, const std::string& token, const std::string& windowId) = 0;
+    virtual void renderDocument(
+        const std::string& jsonPayload,
+        const std::string& token,
+        const std::string& windowId) = 0;
 
     /**
      * Notifies the platform implementation when the client should clear the APL display card.

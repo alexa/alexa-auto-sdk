@@ -27,13 +27,15 @@ static const std::string TAG("aace.phoneCallController.PhoneCallControllerEngine
 // register the service
 REGISTER_SERVICE(PhoneCallControllerEngineService);
 
-PhoneCallControllerEngineService::PhoneCallControllerEngineService( const aace::engine::core::ServiceDescription& description ) : aace::engine::core::EngineService( description ) {
+PhoneCallControllerEngineService::PhoneCallControllerEngineService(
+    const aace::engine::core::ServiceDescription& description) :
+        aace::engine::core::EngineService(description) {
 }
 
 bool PhoneCallControllerEngineService::shutdown() {
     AACE_INFO(LX(TAG));
 
-    if ( m_phoneCallControllerEngineImpl != nullptr ) {
+    if (m_phoneCallControllerEngineImpl != nullptr) {
         m_phoneCallControllerEngineImpl->shutdown();
         m_phoneCallControllerEngineImpl.reset();
     }
@@ -41,58 +43,71 @@ bool PhoneCallControllerEngineService::shutdown() {
     return true;
 }
 
-bool PhoneCallControllerEngineService::registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) {
+bool PhoneCallControllerEngineService::registerPlatformInterface(
+    std::shared_ptr<aace::core::PlatformInterface> platformInterface) {
     try {
-        ReturnIf( registerPlatformInterfaceType<aace::phoneCallController::PhoneCallController>( platformInterface ), true );
+        ReturnIf(
+            registerPlatformInterfaceType<aace::phoneCallController::PhoneCallController>(platformInterface), true);
         return false;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"registerPlatformInterface").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "registerPlatformInterface").d("reason", ex.what()));
         return false;
     }
 }
 
-bool PhoneCallControllerEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::phoneCallController::PhoneCallController> phoneCallController )
-{
-    try
-    {
-        ThrowIfNotNull( m_phoneCallControllerEngineImpl, "platformInterfaceAlreadyRegistered" );
+bool PhoneCallControllerEngineService::registerPlatformInterfaceType(
+    std::shared_ptr<aace::phoneCallController::PhoneCallController> phoneCallController) {
+    try {
+        ThrowIfNotNull(m_phoneCallControllerEngineImpl, "platformInterfaceAlreadyRegistered");
 
-        auto alexaComponents = getContext()->getServiceInterface<aace::engine::alexa::AlexaComponentInterface>( "aace.alexa" );
-        ThrowIfNull( alexaComponents, "invalidAlexaComponentInterface" );
+        auto alexaComponents =
+            getContext()->getServiceInterface<aace::engine::alexa::AlexaComponentInterface>("aace.alexa");
+        ThrowIfNull(alexaComponents, "invalidAlexaComponentInterface");
 
         auto defaultEndpointBuilder = alexaComponents->getDefaultEndpointBuilder();
-        ThrowIfNull( defaultEndpointBuilder, "defaultEndpointBuilderInvalid" );
+        ThrowIfNull(defaultEndpointBuilder, "defaultEndpointBuilderInvalid");
 
         auto exceptionSender = alexaComponents->getExceptionEncounteredSender();
-        ThrowIfNull( exceptionSender, "exceptionSenderInvalid" );
+        ThrowIfNull(exceptionSender, "exceptionSenderInvalid");
 
         auto messageSender = alexaComponents->getMessageSender();
-        ThrowIfNull( messageSender, "messageSenderInvalid" );
+        ThrowIfNull(messageSender, "messageSenderInvalid");
 
         auto contextManager = alexaComponents->getContextManager();
-        ThrowIfNull( contextManager, "contextManagerInvalid" );
+        ThrowIfNull(contextManager, "contextManagerInvalid");
 
         auto focusManager = alexaComponents->getAudioFocusManager();
-        ThrowIfNull( focusManager, "focusManagerInvalid" );
+        ThrowIfNull(focusManager, "focusManagerInvalid");
 
         auto authDelegate = alexaComponents->getAuthDelegate();
-        ThrowIfNull( authDelegate, "authDelegateInvalid" );
+        ThrowIfNull(authDelegate, "authDelegateInvalid");
 
         auto deviceInfo = alexaComponents->getDeviceInfo();
-        ThrowIfNull( deviceInfo, "deviceInfoInvalid" );
+        ThrowIfNull(deviceInfo, "deviceInfoInvalid");
 
-        m_phoneCallControllerEngineImpl = aace::engine::phoneCallController::PhoneCallControllerEngineImpl::create( phoneCallController, defaultEndpointBuilder, contextManager, exceptionSender, messageSender, focusManager, authDelegate, deviceInfo );
-        ThrowIfNull( m_phoneCallControllerEngineImpl, "createPhoneCallControllerEngineImplFailed" );
+        auto alexaEndpoints =
+            getContext()->getServiceInterface<aace::engine::alexa::AlexaEndpointInterface>("aace.alexa");
+        ThrowIfNull(alexaEndpoints, "alexaEndpointsInvalid");
+
+        m_phoneCallControllerEngineImpl = aace::engine::phoneCallController::PhoneCallControllerEngineImpl::create(
+            phoneCallController,
+            defaultEndpointBuilder,
+            contextManager,
+            exceptionSender,
+            messageSender,
+            focusManager,
+            authDelegate,
+            deviceInfo,
+            alexaEndpoints);
+        ThrowIfNull(m_phoneCallControllerEngineImpl, "createPhoneCallControllerEngineImplFailed");
 
         return true;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"registerPlatformInterfaceType<PhoneCallController>").d("reason", ex.what()));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "registerPlatformInterfaceType<PhoneCallController>").d("reason", ex.what()));
         return false;
     }
 }
 
-} // aace::engine::phoneCallController
-} // aace::engine
-} // aace
+}  // namespace phoneCallController
+}  // namespace engine
+}  // namespace aace

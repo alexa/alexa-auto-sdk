@@ -30,28 +30,30 @@ namespace propertyManager {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class PropertyManagerHandler : public aace::propertyManager::PropertyManager /* isa PlatformInterface */ {
-  private:
+private:
     std::weak_ptr<logger::LoggerHandler> m_loggerHandler{};
 
-  protected:
+protected:
     PropertyManagerHandler(std::weak_ptr<logger::LoggerHandler> loggerHandler);
 
-  public:
-    template <typename... Args> static auto create(Args &&... args) -> std::shared_ptr<PropertyManagerHandler> {
+public:
+    template <typename... Args>
+    static auto create(Args&&... args) -> std::shared_ptr<PropertyManagerHandler> {
         return std::shared_ptr<PropertyManagerHandler>(new PropertyManagerHandler(args...));
     }
     auto getLoggerHandler() -> std::weak_ptr<logger::LoggerHandler>;
 
     // aace::propertyManager::PropertyManager interface
-    auto propertyChanged( const std::string& key, const std::string& newValue ) -> void override;
-    auto propertyStateChanged(const std::string& name, const std::string& value, const PropertyState state) -> void override;
+    auto propertyChanged(const std::string& key, const std::string& newValue) -> void override;
+    auto propertyStateChanged(const std::string& name, const std::string& value, const PropertyState state)
+        -> void override;
 
-  private:
-    auto log(logger::LoggerHandler::Level level, const std::string &message) -> void;
-    std::weak_ptr<View> m_console{};    
+private:
+    auto log(logger::LoggerHandler::Level level, const std::string& message) -> void;
+    std::weak_ptr<View> m_console{};
 };
 
-} // namespace propertyManager
-} // namespace sampleApp
+}  // namespace propertyManager
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_PROPERTY_MANAGER_PROPERTYMANAGERHANDLER_H
+#endif  // SAMPLEAPP_PROPERTY_MANAGER_PROPERTYMANAGERHANDLER_H

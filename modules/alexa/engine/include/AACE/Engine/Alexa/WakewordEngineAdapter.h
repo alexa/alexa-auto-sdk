@@ -28,9 +28,8 @@ namespace alexa {
  * WakewordEngineAdapter is engine interface for supporting the Wakeword Engine Integration 
  * with the Auto SDK 
  * 
- */ 
-class WakewordEngineAdapter  {
-
+ */
+class WakewordEngineAdapter {
 public:
     /**
      * Constructor.
@@ -50,7 +49,9 @@ public:
      * 
      **/
 
-    virtual bool initialize( std::shared_ptr<alexaClientSDK::avsCommon::avs::AudioInputStream>& audioInputStream, alexaClientSDK::avsCommon::utils::AudioFormat& audioFormat ) = 0;
+    virtual bool initialize(
+        std::shared_ptr<alexaClientSDK::avsCommon::avs::AudioInputStream>& audioInputStream,
+        alexaClientSDK::avsCommon::utils::AudioFormat& audioFormat) = 0;
 
     /**
      * Enables the Wakeword detection in the Wakeword Engine.
@@ -71,14 +72,16 @@ public:
      *
      * @param keyWordObserver The observer to add.
      */
-    virtual void addKeyWordObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::KeyWordObserverInterface> keyWordObserver ) = 0;
+    virtual void addKeyWordObserver(
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::KeyWordObserverInterface> keyWordObserver) = 0;
 
     /**
      * Removes the specified observer to the list of observers to notify of key word detection events.
      *
      * @param keyWordObserver The observer to remove.
      */
-    virtual void removeKeyWordObserver( std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::KeyWordObserverInterface> keyWordObserver ) = 0;
+    virtual void removeKeyWordObserver(
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::KeyWordObserverInterface> keyWordObserver) = 0;
 
     /**
      * Destructor.
@@ -86,9 +89,8 @@ public:
     virtual ~WakewordEngineAdapter() = default;
 };
 
-} // aace::engine::alexa
-} // aace::engine
-} // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_ALEXA_WAKEWORD_ENGINE_ADAPTER_H
-
+#endif  // AACE_ENGINE_ALEXA_WAKEWORD_ENGINE_ADAPTER_H

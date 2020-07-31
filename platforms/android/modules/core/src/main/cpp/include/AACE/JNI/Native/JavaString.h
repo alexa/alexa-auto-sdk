@@ -25,27 +25,27 @@ namespace aace {
 namespace jni {
 namespace native {
 
-    class JavaString {
-    public:
-        JavaString();
-        JavaString( jobject jstr );
-        JavaString( jstring jstr );
-        JavaString( const std::string& str );
-        JavaString( const char* str );
-        ~JavaString();
+class JavaString {
+public:
+    JavaString();
+    JavaString(jobject jstr);
+    JavaString(jstring jstr);
+    JavaString(const std::string& str);
+    JavaString(const char* str);
+    ~JavaString();
 
-        jstring get();
+    jstring get();
 
-        std::string toStdStr();
-        const char* toCStr();
+    std::string toStdStr();
+    const char* toCStr();
 
-    private:
-        GlobalRef<jstring> m_ref;
-        const char* m_cstr;
-    };
+private:
+    GlobalRef<jstring> m_ref;
+    const char* m_cstr;
+};
 
-} // aace::jni::native
-} // aace::jni
-} // aace
+}  // namespace native
+}  // namespace jni
+}  // namespace aace
 
-#endif // AACE_JNI_NATIVE_JAVA_STRING_H
+#endif  // AACE_JNI_NATIVE_JAVA_STRING_H

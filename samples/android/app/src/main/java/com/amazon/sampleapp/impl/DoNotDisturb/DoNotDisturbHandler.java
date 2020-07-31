@@ -23,15 +23,14 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
-import com.amazon.aace.alexa.DoNotDisturb;
-import com.amazon.aace.alexa.AlexaClient.AuthState;
 import com.amazon.aace.alexa.AlexaClient.AuthError;
+import com.amazon.aace.alexa.AlexaClient.AuthState;
+import com.amazon.aace.alexa.DoNotDisturb;
 import com.amazon.sampleapp.R;
 import com.amazon.sampleapp.impl.AlexaClient.AuthStateObserver;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 
 public class DoNotDisturbHandler extends DoNotDisturb implements AuthStateObserver {
-
     private static final String sTag = "DoNotDisturb";
 
     private final Activity mActivity;
@@ -40,23 +39,22 @@ public class DoNotDisturbHandler extends DoNotDisturb implements AuthStateObserv
     private final SharedPreferences mPreferences;
     private final CompoundButton.OnCheckedChangeListener mCheckedChangeListener;
 
-    public DoNotDisturbHandler( Activity activity,
-                                LoggerHandler logger ) {
+    public DoNotDisturbHandler(Activity activity, LoggerHandler logger) {
         mActivity = activity;
         mLogger = logger;
-        mPreferences = activity.getSharedPreferences(
-                activity.getString( R.string.preference_file_key ), Context.MODE_PRIVATE );
+        mPreferences =
+                activity.getSharedPreferences(activity.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
         mCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if( doNotDisturbChanged( isChecked ) ) {
+                if (doNotDisturbChanged(isChecked)) {
                     SharedPreferences.Editor editor = mPreferences.edit();
                     editor.putBoolean(mActivity.getString(R.string.preference_do_not_disturb), isChecked);
                     editor.apply();
                     mLogger.postInfo(sTag, String.format("doNotDisturbChanged ACTIVE: %s", isChecked));
                 } else {
-                    mDoNotDisturbSwitch.setChecked( !isChecked );
+                    mDoNotDisturbSwitch.setChecked(!isChecked);
                     mLogger.postError(sTag, String.format("doNotDisturbChanged Failed"));
                 }
             }
@@ -66,13 +64,13 @@ public class DoNotDisturbHandler extends DoNotDisturb implements AuthStateObserv
     }
 
     @Override
-    public void onAuthStateChanged( AuthState authState, AuthError authError )  {
-        mActivity.runOnUiThread( new Runnable() {
+    public void onAuthStateChanged(AuthState authState, AuthError authError) {
+        mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if ( authState == AuthState.REFRESHED ) {
+                if (authState == AuthState.REFRESHED) {
                     // enable listener and toggle
-                    mDoNotDisturbSwitch.setOnCheckedChangeListener( mCheckedChangeListener );
+                    mDoNotDisturbSwitch.setOnCheckedChangeListener(mCheckedChangeListener);
                     mDoNotDisturbSwitch.setEnabled(true);
                 } else {
                     // disable toggle when not connected
@@ -83,27 +81,28 @@ public class DoNotDisturbHandler extends DoNotDisturb implements AuthStateObserv
     }
 
     @Override
-    public void setDoNotDisturb( final boolean doNotDisturb ) {
-        mLogger.postInfo( sTag, String.format( "setDoNotDisturb ACTIVE: %s", doNotDisturb ) );
-        mActivity.runOnUiThread( new Runnable() {
+    public void setDoNotDisturb(final boolean doNotDisturb) {
+        mLogger.postInfo(sTag, String.format("setDoNotDisturb ACTIVE: %s", doNotDisturb));
+        mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 // do not trigger check change listener
-                mDoNotDisturbSwitch.setOnCheckedChangeListener( null );
-                mDoNotDisturbSwitch.setChecked( doNotDisturb );
+                mDoNotDisturbSwitch.setOnCheckedChangeListener(null);
+                mDoNotDisturbSwitch.setChecked(doNotDisturb);
                 SharedPreferences.Editor editor = mPreferences.edit();
                 editor.putBoolean(mActivity.getString(R.string.preference_do_not_disturb), doNotDisturb);
                 editor.apply();
-                mDoNotDisturbSwitch.setOnCheckedChangeListener( mCheckedChangeListener );
+                mDoNotDisturbSwitch.setOnCheckedChangeListener(mCheckedChangeListener);
             }
         });
     }
 
     private void setupGUI() {
-        View switchItem = mActivity.findViewById( R.id.toggle_do_not_disturb );
-        ( (TextView) switchItem.findViewById( R.id.text ) ).setText( R.string.do_not_disturb_switch );
-        mDoNotDisturbSwitch = switchItem.findViewById( R.id.drawerSwitch );
+        View switchItem = mActivity.findViewById(R.id.toggle_do_not_disturb);
+        ((TextView) switchItem.findViewById(R.id.text)).setText(R.string.do_not_disturb_switch);
+        mDoNotDisturbSwitch = switchItem.findViewById(R.id.drawerSwitch);
         // init value
-        mDoNotDisturbSwitch.setChecked( mPreferences.getBoolean( mActivity.getString( R.string.preference_do_not_disturb ), false) );
+        mDoNotDisturbSwitch.setChecked(
+                mPreferences.getBoolean(mActivity.getString(R.string.preference_do_not_disturb), false));
     }
 }

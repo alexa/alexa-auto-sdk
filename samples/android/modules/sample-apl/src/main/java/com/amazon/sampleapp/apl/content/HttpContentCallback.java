@@ -14,13 +14,11 @@ import com.amazon.apl.android.Content;
  * Loads the contents from a web server asynchronously.
  */
 public class HttpContentCallback extends Content.Callback {
-
     private static final String TAG = HttpContentCallback.class.getSimpleName();
     private final ContentRetriever mContentRetriever;
     private final String mData;
     private final boolean mIsSynchoronous;
     private CompleteCallback mCallback;
-
 
     /**
      * Constructor for {@link HttpContentCallback} class.
@@ -39,19 +37,17 @@ public class HttpContentCallback extends Content.Callback {
      *                      defaults to asynchronous loading
      **/
     @VisibleForTesting
-    public HttpContentCallback(String data,
-                               boolean isSynchronous) {
+    public HttpContentCallback(String data, boolean isSynchronous) {
         mContentRetriever = HttpContentRetriever.create();
         mData = data;
         mIsSynchoronous = isSynchronous;
     }
 
-
     /**
      * @inheritDoc
      */
     @Override
-    public void onPackageRequest(final Content content,  Content.ImportRequest request) {
+    public void onPackageRequest(final Content content, Content.ImportRequest request) {
         String url = buildSource(request);
         if (url == null || TextUtils.isEmpty(url)) {
             Log.e(TAG, "Url is null");
@@ -71,7 +67,6 @@ public class HttpContentCallback extends Content.Callback {
                     }
                 });
             }
-
         }
     }
 
@@ -84,9 +79,7 @@ public class HttpContentCallback extends Content.Callback {
         content.addData(dataId, mData.toString());
     }
 
-    public interface CompleteCallback {
-        void onComplete(Content content);
-    }
+    public interface CompleteCallback { void onComplete(Content content); }
 
     public void addCompleteCallback(CompleteCallback callback) {
         mCallback = callback;
@@ -98,8 +91,6 @@ public class HttpContentCallback extends Content.Callback {
             mCallback.onComplete(content);
         }
     }
-
-
 
     /**
      * Builds the http url from the {@link Content.ImportRequest}.

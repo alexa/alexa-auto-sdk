@@ -23,11 +23,15 @@ namespace sampleApp {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Executor::Executor() : m_taskQueue{std::make_shared<TaskQueue>()}, m_taskThread{std::unique_ptr<TaskThread>(new TaskThread(m_taskQueue))} {
+Executor::Executor() :
+        m_taskQueue{std::make_shared<TaskQueue>()},
+        m_taskThread{std::unique_ptr<TaskThread>(new TaskThread(m_taskQueue))} {
     m_taskThread->start();
 }
 
-Executor::~Executor() { shutdown(); }
+Executor::~Executor() {
+    shutdown();
+}
 
 void Executor::waitForSubmittedTasks() {
     std::promise<void> flushedPromise;
@@ -42,6 +46,8 @@ void Executor::shutdown() {
     m_taskThread.reset();
 }
 
-bool Executor::isShutdown() { return m_taskQueue->isShutdown(); }
+bool Executor::isShutdown() {
+    return m_taskQueue->isShutdown();
+}
 
-} // namespace sampleApp
+}  // namespace sampleApp

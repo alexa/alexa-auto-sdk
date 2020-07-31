@@ -38,7 +38,8 @@
         android:maxLines="1"
         android:ellipsize="end"
         android:textColor="@color/cardListItemContent"
-        android:textSize="40sp"
+        android:textSize="30sp"
+        android:layout_marginRight="2dp"
         app:layout_constraintStart_toEndOf="@+id/image"
         app:layout_constraintTop_toTopOf="@+id/index" />
 
@@ -46,9 +47,20 @@
         android:id="@+id/ratingImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="15dp"
+        android:layout_marginLeft="10dp"
         app:layout_constraintStart_toEndOf="@+id/mainTitle"
         app:layout_constraintBottom_toBottomOf="@+id/mainTitle"/>
+
+    <TextView
+        android:id="@+id/ratingReviewCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif"
+        android:textColor="@color/cardListItemContent"
+        android:layout_marginLeft="5dp"
+        app:layout_constraintStart_toEndOf="@+id/ratingImage"
+        app:layout_constraintBottom_toBottomOf="@+id/ratingImage" />
 
     <ImageView
         android:id="@+id/ratingProviderImage"
@@ -56,6 +68,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@+id/ratingImage"
         app:layout_constraintTop_toTopOf="@+id/mainTitle"/>
+
 
     <TextView
         android:id="@+id/subTitle"
@@ -100,16 +113,6 @@
         android:textSize="14sp"
         app:layout_constraintTop_toBottomOf="@+id/currentStatus"
         app:layout_constraintStart_toEndOf="@+id/provider" />
-
-    <TextView
-        android:id="@+id/ratingReviewCount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif"
-        android:textColor="@color/cardListItemContent"
-        android:textSize="14sp"
-        app:layout_constraintTop_toBottomOf="@+id/currentStatus"
-        app:layout_constraintStart_toEndOf="@+id/ratingValue" />
 
     <TextView
         android:id="@+id/address"

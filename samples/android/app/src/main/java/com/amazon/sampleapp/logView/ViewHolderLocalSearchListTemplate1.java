@@ -27,20 +27,22 @@ class ViewHolderLocalSearchListTemplate1 extends RecyclerView.ViewHolder {
     private final LinearLayout mListContainer;
     private final LayoutInflater mInf;
 
-    public ViewHolderLocalSearchListTemplate1( View v, LayoutInflater inf ) {
-        super( v );
-        mListContainer = v.findViewById( R.id.listContainer );
+    public ViewHolderLocalSearchListTemplate1(View v, LayoutInflater inf) {
+        super(v);
+        mListContainer = v.findViewById(R.id.listContainer);
         mInf = inf;
     }
 
-    public void insertListItem( String index, String dist, String name, String address ) {
-        View listItem = mInf.inflate( R.layout.card_local_search_list_template1_item, mListContainer, false );
-        ( ( TextView ) listItem.findViewById( R.id.index ) ).setText( index );
-        ( ( TextView ) listItem.findViewById( R.id.dist ) ).setText( dist );
-        ( ( TextView ) listItem.findViewById( R.id.name ) ).setText( name );
-        ( ( TextView ) listItem.findViewById( R.id.address ) ).setText( address );
-        mListContainer.addView( listItem );
+    public void insertListItem(String index, String dist, String name, String address) {
+        View listItem = mInf.inflate(R.layout.card_local_search_list_template1_item, mListContainer, false);
+        ((TextView) listItem.findViewById(R.id.index)).setText(index);
+        ((TextView) listItem.findViewById(R.id.dist)).setText(dist);
+        ((TextView) listItem.findViewById(R.id.name)).setText(name);
+        ((TextView) listItem.findViewById(R.id.address)).setText(address);
+        mListContainer.addView(listItem);
     }
 
-    public void clearList() { mListContainer.removeAllViews(); }
+    public void clearList() {
+        mListContainer.removeAllViews();
+    }
 }

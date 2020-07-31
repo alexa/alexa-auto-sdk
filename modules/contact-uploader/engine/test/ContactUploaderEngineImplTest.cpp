@@ -27,15 +27,18 @@ namespace unit {
 
 class MockContactUploaderPlatformInterface : public aace::contactUploader::ContactUploader {
 public:
-    MOCK_METHOD2(contactsUploaderStatusChanged, void( ContactUploaderStatus status, const std::string& info ) );
+    MOCK_METHOD2(contactsUploaderStatusChanged, void(ContactUploaderStatus status, const std::string& info));
 };
 
-class MockAuthDelegateInterface : public alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface
-{
+class MockAuthDelegateInterface : public alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface {
 public:
-    MOCK_METHOD1(addAuthObserver, void(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer));
-    MOCK_METHOD1(removeAuthObserver, void(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer));
-    MOCK_METHOD0(getAuthToken,std::string() );
+    MOCK_METHOD1(
+        addAuthObserver,
+        void(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer));
+    MOCK_METHOD1(
+        removeAuthObserver,
+        void(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer));
+    MOCK_METHOD0(getAuthToken, std::string());
     MOCK_METHOD1(onAuthFailure, void(const std::string& token));
 };
 

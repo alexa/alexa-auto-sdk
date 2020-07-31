@@ -25,7 +25,7 @@
 
 namespace sampleApp {
 
-class ApplicationContext; // forward declare
+class ApplicationContext;  // forward declare
 
 namespace logger {
 
@@ -36,23 +36,28 @@ namespace logger {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class LoggerHandler : public aace::logger::Logger /* isa PlatformInterface */ {
-  private:
+private:
     std::weak_ptr<Activity> m_activity{};
 
-  protected:
+protected:
     LoggerHandler(std::weak_ptr<Activity> activity);
 
-  public:
-    template <typename... Args> static auto create(Args &&... args) -> std::shared_ptr<LoggerHandler> {
+public:
+    template <typename... Args>
+    static auto create(Args&&... args) -> std::shared_ptr<LoggerHandler> {
         return std::shared_ptr<LoggerHandler>(new LoggerHandler(args...));
     }
     auto getActivity() -> std::weak_ptr<Activity>;
 
     // aace::logger::Logger interface
 
-    auto logEvent(Logger::Level level, std::chrono::system_clock::time_point time, const std::string &source, const std::string &message) -> bool override;
+    auto logEvent(
+        Logger::Level level,
+        std::chrono::system_clock::time_point time,
+        const std::string& source,
+        const std::string& message) -> bool override;
 
-  private:
+private:
     std::shared_ptr<ApplicationContext> m_applicationContext{};
     std::weak_ptr<View> m_console{};
 
@@ -65,7 +70,7 @@ class LoggerHandler : public aace::logger::Logger /* isa PlatformInterface */ {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-inline std::ostream &operator<<(std::ostream &stream, const LoggerHandler::Level &level) {
+inline std::ostream& operator<<(std::ostream& stream, const LoggerHandler::Level& level) {
     using Level = LoggerHandler::Level;
     switch (level) {
         case Level::VERBOSE:
@@ -90,7 +95,7 @@ inline std::ostream &operator<<(std::ostream &stream, const LoggerHandler::Level
     return stream;
 }
 
-} // namespace logger
-} // namespace sampleApp
+}  // namespace logger
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_LOGGER_LOGGERHANDLER_H
+#endif  // SAMPLEAPP_LOGGER_LOGGERHANDLER_H

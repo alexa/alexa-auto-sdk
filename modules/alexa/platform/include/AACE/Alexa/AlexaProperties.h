@@ -41,17 +41,28 @@ static const std::string FIRMWARE_VERSION = "aace.alexa.system.firmwareVersion";
 /**
  * This property is used with
  * aace::propertyManager::PropertyManager::setProperty() to change the current
- * locale setting for AVS. The value must be a valid locale accepted by AVS.
- * Calling aace::propertyManager::PropertyManager::getProperty() with the
- * SUPPORTED_LOCALES property provides the list of supported locales.
+ * locale setting for Alexa. The value must be one of the following:
+ *      @li A valid locale accepted by AVS as a string. E.g. "en-US"
+ *      @li A valid locale pair. The format is a string containing two valid
+ *          locales separated with a forward slash. E.g. "en-US/es-US"
  */
 static const std::string LOCALE = "aace.alexa.setting.locale";
 
 /**
+ * @deprecated
+ * This property will be removed in a future version of Auto SDK.
+ *
  * This read-only property is used with
- * aace::propertyManager::PropertyManager::getProperty() to see all 
- * AVS-supported locales. The return value is a comma-separated list, 
- * e.g. "de-DE,en-AU,..."
+ * aace::propertyManager::PropertyManager::getProperty() to get a list 
+ * of device supported locales and locale combinations.
+ * E.g. "de-DE,fr-CA,en-CA,en-CA/fr-CA,..." 
+ * The list is comma-separated. For locale combinations, the entry in the returned 
+ * list is a forward slash-separated locale pair.
+ * 
+ * @note Prior to version 2.1 of Auto SDK, this property returned a list of AVS-supported
+ * locales. See the list of AVS-supported locales here: 
+ * https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/system.html#locales
+ *
  */
 static const std::string SUPPORTED_LOCALES = "aace.alexa.supportedLocales";
 
@@ -81,8 +92,8 @@ static const std::string WAKEWORD_ENABLED = "aace.alexa.wakewordEnabled";
  */
 static const std::string TIMEZONE = "aace.alexa.timezone";
 
-} // aace::alexa::property
-} // aace::alexa
-} // aace
+}  // namespace property
+}  // namespace alexa
+}  // namespace aace
 
-#endif // AACE_ALEXA_PROPERTY_ALEXA_PROPERTIES_H
+#endif  // AACE_ALEXA_PROPERTY_ALEXA_PROPERTIES_H

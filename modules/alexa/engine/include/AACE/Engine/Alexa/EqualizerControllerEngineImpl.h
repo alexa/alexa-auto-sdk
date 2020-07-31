@@ -40,13 +40,12 @@ namespace engine {
 namespace alexa {
 
 /// EqualizerController Engine implementation
-class EqualizerControllerEngineImpl :
-    public aace::alexa::EqualizerControllerEngineInterface,
-    public alexaClientSDK::avsCommon::sdkInterfaces::audio::EqualizerInterface,
-    public alexaClientSDK::avsCommon::sdkInterfaces::audio::EqualizerStorageInterface,
-    public alexaClientSDK::avsCommon::utils::RequiresShutdown,
-    public std::enable_shared_from_this<EqualizerControllerEngineImpl> {
-    
+class EqualizerControllerEngineImpl
+        : public aace::alexa::EqualizerControllerEngineInterface
+        , public alexaClientSDK::avsCommon::sdkInterfaces::audio::EqualizerInterface
+        , public alexaClientSDK::avsCommon::sdkInterfaces::audio::EqualizerStorageInterface
+        , public alexaClientSDK::avsCommon::utils::RequiresShutdown
+        , public std::enable_shared_from_this<EqualizerControllerEngineImpl> {
 public:
     /**
      * Factory method to create an EqualizerControllerEngineImpl instance
@@ -66,26 +65,27 @@ public:
         std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> customerDataManager,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> 
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface>
             exceptionEncounteredSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender );
-    
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender);
+
     // EqualizerInterface functions
-    virtual void setEqualizerBandLevels( 
-        alexaClientSDK::avsCommon::sdkInterfaces::audio::EqualizerBandLevelMap bandLevels ) override;
+    virtual void setEqualizerBandLevels(
+        alexaClientSDK::avsCommon::sdkInterfaces::audio::EqualizerBandLevelMap bandLevels) override;
     virtual int getMinimumBandLevel() override;
     virtual int getMaximumBandLevel() override;
 
     // EqualizerControllerEngineInterface functions
-    void onLocalSetBandLevels( const std::vector<EqualizerBandLevel>& bandLevels ) override;
-    void onLocalAdjustBandLevels( const std::vector<EqualizerBandLevel>& bandAdjustments ) override;
-    void onLocalResetBands( const std::vector<EqualizerBand>& bands ) override;
+    void onLocalSetBandLevels(const std::vector<EqualizerBandLevel>& bandLevels) override;
+    void onLocalAdjustBandLevels(const std::vector<EqualizerBandLevel>& bandAdjustments) override;
+    void onLocalResetBands(const std::vector<EqualizerBand>& bands) override;
 
     // EqualizerStorageInterface functions
-    virtual void saveState( const alexaClientSDK::avsCommon::sdkInterfaces::audio::EqualizerState& state ) override;
-    virtual alexaClientSDK::avsCommon::utils::error::SuccessResult
-        <alexaClientSDK::avsCommon::sdkInterfaces::audio::EqualizerState> loadState() override;
+    virtual void saveState(const alexaClientSDK::avsCommon::sdkInterfaces::audio::EqualizerState& state) override;
+    virtual alexaClientSDK::avsCommon::utils::error::SuccessResult<
+        alexaClientSDK::avsCommon::sdkInterfaces::audio::EqualizerState>
+    loadState() override;
     virtual void clear() override;
 
 protected:
@@ -98,7 +98,7 @@ private:
      * 
      * @param equalizerPlatformInterface The associated @c EqualizerController platform interface instance
      */
-    EqualizerControllerEngineImpl( std::shared_ptr<aace::alexa::EqualizerController> equalizerPlatformInterface );
+    EqualizerControllerEngineImpl(std::shared_ptr<aace::alexa::EqualizerController> equalizerPlatformInterface);
 
     /**
      * Initialize the @c EqualizerControllerEngineImpl instance
@@ -116,17 +116,17 @@ private:
         std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> customerDataManager,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> 
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface>
             exceptionEncounteredSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender );
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender);
 
     /**
      * Truncate the band level setting for @a bandLevel to the configured min/max range
      * 
      * @return The truncated level
-     */ 
-    int truncateBandLevel( const EqualizerBandLevel& bandLevel );
+     */
+    int truncateBandLevel(const EqualizerBandLevel& bandLevel);
 
     /**
      * Convert @c std::vector<EqualizerBandLevel> to 
@@ -136,17 +136,17 @@ private:
      * @param [in] bandLevels The band level vector to convert
      * @return The converted band level map
      */
-    inline alexaClientSDK::avsCommon::sdkInterfaces::audio::EqualizerBandLevelMap convertAndTruncateBandLevels( 
-            const std::vector<EqualizerBandLevel>& bandLevels ) {
+    inline alexaClientSDK::avsCommon::sdkInterfaces::audio::EqualizerBandLevelMap convertAndTruncateBandLevels(
+        const std::vector<EqualizerBandLevel>& bandLevels) {
         alexaClientSDK::avsCommon::sdkInterfaces::audio::EqualizerBandLevelMap newMap;
-        for( const auto& bandLevel : bandLevels ) {
+        for (const auto& bandLevel : bandLevels) {
             auto band = convertBand(bandLevel.first);
             int level = truncateBandLevel(bandLevel);
             newMap[band] = level;
         }
         return newMap;
     }
-    
+
     /**
      * Convert @c std::vector<EqualizerBandLevel> to 
      * @c alexaClientSDK::avsCommon::sdkInterfaces::audio::EqualizerBandLevelMap
@@ -154,31 +154,31 @@ private:
      * @param [in] bandLevels The band level vector to convert
      * @return The converted band level map
      */
-    inline alexaClientSDK::avsCommon::sdkInterfaces::audio::EqualizerBandLevelMap convertBandLevels( 
-            const std::vector<EqualizerBandLevel>& bandLevels ) {
+    inline alexaClientSDK::avsCommon::sdkInterfaces::audio::EqualizerBandLevelMap convertBandLevels(
+        const std::vector<EqualizerBandLevel>& bandLevels) {
         alexaClientSDK::avsCommon::sdkInterfaces::audio::EqualizerBandLevelMap newMap;
-        for( const auto& bandLevel : bandLevels ) {
+        for (const auto& bandLevel : bandLevels) {
             newMap[convertBand(bandLevel.first)] = bandLevel.second;
         }
         return newMap;
     }
-    
+
     /**
      * Convert @c alexaClientSDK::avsCommon::sdkInterfaces::audio::EqualizerBandLevelMap to 
      * @c std::vector<EqualizerBandLevel> 
      * 
      * @return The converted band level vector
      */
-    inline std::vector<EqualizerBandLevel> convertBandLevels( 
-            const alexaClientSDK::avsCommon::sdkInterfaces::audio::EqualizerBandLevelMap& bandLevels ) {
+    inline std::vector<EqualizerBandLevel> convertBandLevels(
+        const alexaClientSDK::avsCommon::sdkInterfaces::audio::EqualizerBandLevelMap& bandLevels) {
         std::vector<EqualizerBandLevel> newBandLevels;
-        for( const auto& bandLevel : bandLevels ) {
-            EqualizerControllerEngineInterface::EqualizerBand band = convertBand( bandLevel.first );
+        for (const auto& bandLevel : bandLevels) {
+            EqualizerControllerEngineInterface::EqualizerBand band = convertBand(bandLevel.first);
             newBandLevels.push_back({band, bandLevel.second});
         }
         return newBandLevels;
     }
-    
+
     /**
      * Convert @c alexaClientSDK::avsCommon::sdkInterfaces::audio::EqualizerBand to 
      * @c EqualizerControllerEngineInterface::EqualizerBand
@@ -186,9 +186,9 @@ private:
      * @param [in] band The band to convert
      * @return The converted band
      */
-    inline EqualizerControllerEngineInterface::EqualizerBand convertBand( 
-            const alexaClientSDK::avsCommon::sdkInterfaces::audio::EqualizerBand& band ) {
-        switch( band ) {
+    inline EqualizerControllerEngineInterface::EqualizerBand convertBand(
+        const alexaClientSDK::avsCommon::sdkInterfaces::audio::EqualizerBand& band) {
+        switch (band) {
             case alexaClientSDK::avsCommon::sdkInterfaces::audio::EqualizerBand::BASS:
                 return EqualizerControllerEngineInterface::EqualizerBand::BASS;
             case alexaClientSDK::avsCommon::sdkInterfaces::audio::EqualizerBand::MIDRANGE:
@@ -205,9 +205,9 @@ private:
      * @param [in] band The band to convert
      * @return The converted band
      */
-    inline alexaClientSDK::avsCommon::sdkInterfaces::audio::EqualizerBand convertBand( 
-            const EqualizerControllerEngineInterface::EqualizerBand& band ) {
-        switch( band ) {
+    inline alexaClientSDK::avsCommon::sdkInterfaces::audio::EqualizerBand convertBand(
+        const EqualizerControllerEngineInterface::EqualizerBand& band) {
+        switch (band) {
             case EqualizerControllerEngineInterface::EqualizerBand::BASS:
                 return alexaClientSDK::avsCommon::sdkInterfaces::audio::EqualizerBand::BASS;
             case EqualizerControllerEngineInterface::EqualizerBand::MIDRANGE:
@@ -223,10 +223,9 @@ private:
      * @param bandLevels The band level vector
      * @return A string representation of the band levels
      */
-    inline std::string bandLevelsToString( 
-            const std::vector<EqualizerBandLevel>& bandLevels ) {
+    inline std::string bandLevelsToString(const std::vector<EqualizerBandLevel>& bandLevels) {
         std::string stateString;
-        for( const auto& bandLevel : bandLevels ) {
+        for (const auto& bandLevel : bandLevels) {
             EqualizerControllerEngineInterface::EqualizerBand band = bandLevel.first;
             int level = bandLevel.second;
             stateString += equalizerBandToString(band) + ":" + std::to_string(level) + " ";
@@ -239,17 +238,16 @@ private:
 
     /// The equalizer controller capability agent
     std::shared_ptr<alexaClientSDK::capabilityAgents::equalizer::EqualizerCapabilityAgent> m_equalizerCapabilityAgent;
-    
+
     /// The @c EqualizerController component used for all equalizer state manipulations and notifications
     std::shared_ptr<alexaClientSDK::equalizer::EqualizerController> m_equalizerController;
 
     /// The component for providing equalizer capabilities and configuration settings
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::EqualizerConfigurationInterface> m_configuration;
-
 };
 
-} // aace::engine::alexa
-} // aace::engine
-} // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_ALEXA_EQUALIZER_CONTROLLER_ENGINE_IMPL_H
+#endif  // AACE_ENGINE_ALEXA_EQUALIZER_CONTROLLER_ENGINE_IMPL_H

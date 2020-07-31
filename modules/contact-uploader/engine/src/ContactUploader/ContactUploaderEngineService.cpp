@@ -27,57 +27,60 @@ static const std::string TAG("aace.contactuploader.ContactUploaderEngineService"
 // register the service
 REGISTER_SERVICE(ContactUploaderEngineService);
 
-ContactUploaderEngineService::ContactUploaderEngineService( const aace::engine::core::ServiceDescription& description ) : aace::engine::core::EngineService( description ) {
+ContactUploaderEngineService::ContactUploaderEngineService(const aace::engine::core::ServiceDescription& description) :
+        aace::engine::core::EngineService(description) {
 }
 
 bool ContactUploaderEngineService::shutdown() {
-    if( m_contactUploaderEngineImpl != nullptr ) {
+    if (m_contactUploaderEngineImpl != nullptr) {
         m_contactUploaderEngineImpl->shutdown();
         m_contactUploaderEngineImpl.reset();
-    } 
+    }
     return true;
 }
 
-bool ContactUploaderEngineService::registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) {
+bool ContactUploaderEngineService::registerPlatformInterface(
+    std::shared_ptr<aace::core::PlatformInterface> platformInterface) {
     try {
-        ReturnIf( registerPlatformInterfaceType<aace::contactUploader::ContactUploader>( platformInterface ), true );
+        ReturnIf(registerPlatformInterfaceType<aace::contactUploader::ContactUploader>(platformInterface), true);
         return false;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"registerPlatformInterface").d("reason", ex.what() ) );
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "registerPlatformInterface").d("reason", ex.what()));
         return false;
     }
 }
 
-bool ContactUploaderEngineService::registerPlatformInterfaceType( std::shared_ptr<aace::contactUploader::ContactUploader> contactUploader ) {
+bool ContactUploaderEngineService::registerPlatformInterfaceType(
+    std::shared_ptr<aace::contactUploader::ContactUploader> contactUploader) {
     std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo;
     try {
-        ThrowIfNotNull( m_contactUploaderEngineImpl, "platformInterfaceAlreadyRegistered" );
+        ThrowIfNotNull(m_contactUploaderEngineImpl, "platformInterfaceAlreadyRegistered");
 
         // Get the Alexa component interface which exposes all service interfaces
-        auto alexaComponentInterface = getContext()->getServiceInterface<aace::engine::alexa::AlexaComponentInterface>( "aace.alexa" );
-        ThrowIfNull( alexaComponentInterface, "alexaComponentInterfaceInValid" );
+        auto alexaComponentInterface =
+            getContext()->getServiceInterface<aace::engine::alexa::AlexaComponentInterface>("aace.alexa");
+        ThrowIfNull(alexaComponentInterface, "alexaComponentInterfaceInValid");
 
         auto authDelegate = alexaComponentInterface->getAuthDelegate();
-        ThrowIfNull( authDelegate, "authDeleteInterfaceInValid" );
+        ThrowIfNull(authDelegate, "authDeleteInterfaceInValid");
 
         auto config = alexaClientSDK::avsCommon::utils::configuration::ConfigurationNode::getRoot();
 
         // create device info
-        deviceInfo = alexaClientSDK::avsCommon::utils::DeviceInfo::create( config );
-        ThrowIfNull( deviceInfo, "createDeviceInfoFailed" );
+        deviceInfo = alexaClientSDK::avsCommon::utils::DeviceInfo::create(config);
+        ThrowIfNull(deviceInfo, "createDeviceInfoFailed");
 
-        m_contactUploaderEngineImpl = aace::engine::contactUploader::ContactUploaderEngineImpl::create( std::move(contactUploader), authDelegate,  deviceInfo );
-        ThrowIfNull( m_contactUploaderEngineImpl, "createContactUploaderEngineImplFailed" );
+        m_contactUploaderEngineImpl = aace::engine::contactUploader::ContactUploaderEngineImpl::create(
+            std::move(contactUploader), authDelegate, deviceInfo);
+        ThrowIfNull(m_contactUploaderEngineImpl, "createContactUploaderEngineImplFailed");
 
         return true;
-    }
-    catch( std::exception& ex ) {
-        AACE_ERROR(LX(TAG,"registerPlatformInterfaceType<ContactUploader>").d("reason", ex.what() ) );
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "registerPlatformInterfaceType<ContactUploader>").d("reason", ex.what()));
         return false;
     }
 }
 
-} // aace::engine::contactUploader
-} // aace::engine
-} // aace
+}  // namespace contactUploader
+}  // namespace engine
+}  // namespace aace

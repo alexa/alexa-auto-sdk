@@ -35,8 +35,7 @@ namespace alexa {
  * to AASB. AASB will route these events to Alexa Auto SDK so that appropriate actions can be
  * taken on the @c aace::alexa::AudioPlayer.
  */
-class PlaybackControllerHandler : public aace::alexa::PlaybackController
-{
+class PlaybackControllerHandler : public aace::alexa::PlaybackController {
 public:
     /**
      * Creates an instance of @c PlaybackControllerHandler.
@@ -80,7 +79,7 @@ private:
     // aasb::core::logger::LoggerHandler
     std::shared_ptr<aasb::core::logger::LoggerHandler> m_logger;
 };
-}
-}
+}  // namespace alexa
+}  // namespace aasb
 
 #endif  // AASB_ALEXA_PLAYBACKCONTROLLERHANDLER_H

@@ -50,13 +50,16 @@
 // Sample Communications Platform Interfaces
 #ifdef ALEXACOMMS
 #include "SampleApp/Communication/CommunicationHandler.h"
-#endif // ALEXACOMMS
+#endif  // ALEXACOMMS
 
 // Sample Location Platform Interfaces
 #include "SampleApp/Location/LocationProviderHandler.h"
 
 // Sample Logger Platform Interfaces
 #include "SampleApp/Logger/LoggerHandler.h"
+
+// Sample Messaging Platform Interfaces
+#include "SampleApp/Messaging/MessagingHandler.h"
 
 // Sample Navigation Platform Interfaces
 #include "SampleApp/Navigation/NavigationHandler.h"
@@ -93,32 +96,44 @@ namespace sampleApp {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class Application {
-  protected:
+protected:
     Application();
 
-  public:
-    static std::unique_ptr<Application> create() { return std::unique_ptr<Application>(new Application()); }
-    auto printMenu(std::shared_ptr<ApplicationContext> applicationContext,
-                   std::shared_ptr<aace::core::Engine> engine,
-                   std::shared_ptr<sampleApp::propertyManager::PropertyManagerHandler> propertyManagerHandler,
-                   std::shared_ptr<View> console,
-                   const std::string &id) -> void;
-    auto printMenuText(std::shared_ptr<ApplicationContext> applicationContext,
-                       std::shared_ptr<View> console,
-                       const std::string &menuId,
-                       const std::string &textId,
-                       std::map<std::string, std::string> variables) -> void;
-    auto printStringLine(std::shared_ptr<View> console, const std::string &string, std::map<std::string, std::string> variables) -> void;
+public:
+    static std::unique_ptr<Application> create() {
+        return std::unique_ptr<Application>(new Application());
+    }
+    auto printMenu(
+        std::shared_ptr<ApplicationContext> applicationContext,
+        std::shared_ptr<aace::core::Engine> engine,
+        std::shared_ptr<sampleApp::propertyManager::PropertyManagerHandler> propertyManagerHandler,
+        std::shared_ptr<View> console,
+        const std::string& id) -> void;
+    auto printMenuText(
+        std::shared_ptr<ApplicationContext> applicationContext,
+        std::shared_ptr<View> console,
+        const std::string& menuId,
+        const std::string& textId,
+        std::map<std::string, std::string> variables) -> void;
+    auto printStringLine(
+        std::shared_ptr<View> console,
+        const std::string& string,
+        std::map<std::string, std::string> variables) -> void;
     auto run(std::shared_ptr<ApplicationContext> applicationContext) -> Status;
-    auto runMenu(std::shared_ptr<ApplicationContext> applicationContext,
-                 std::shared_ptr<aace::core::Engine> engine,
-                 std::shared_ptr<sampleApp::propertyManager::PropertyManagerHandler> propertyManagerHandler,
-                 std::shared_ptr<Activity> activity,
-                 std::shared_ptr<View> console,
-                 const std::string &id) -> Status;
-    auto setupMenu(std::shared_ptr<ApplicationContext> applicationContext, std::shared_ptr<aace::core::Engine> engine, std::shared_ptr<sampleApp::propertyManager::PropertyManagerHandler> propertyManagerHandler, std::shared_ptr<View> console) -> void;
+    auto runMenu(
+        std::shared_ptr<ApplicationContext> applicationContext,
+        std::shared_ptr<aace::core::Engine> engine,
+        std::shared_ptr<sampleApp::propertyManager::PropertyManagerHandler> propertyManagerHandler,
+        std::shared_ptr<Activity> activity,
+        std::shared_ptr<View> console,
+        const std::string& id) -> Status;
+    auto setupMenu(
+        std::shared_ptr<ApplicationContext> applicationContext,
+        std::shared_ptr<aace::core::Engine> engine,
+        std::shared_ptr<sampleApp::propertyManager::PropertyManagerHandler> propertyManagerHandler,
+        std::shared_ptr<View> console) -> void;
 };
 
-} // namespace sampleApp
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_APPLICATION_H
+#endif  // SAMPLEAPP_APPLICATION_H

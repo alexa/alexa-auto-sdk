@@ -31,16 +31,16 @@ namespace alexa {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class NotificationsHandler : public aace::alexa::Notifications /* isa PlatformInterface */ {
-  private:
+private:
     std::weak_ptr<Activity> m_activity{};
     std::weak_ptr<logger::LoggerHandler> m_loggerHandler{};
 
-  protected:
-    NotificationsHandler(std::weak_ptr<Activity> activity,
-                         std::weak_ptr<logger::LoggerHandler> loggerHandler);
+protected:
+    NotificationsHandler(std::weak_ptr<Activity> activity, std::weak_ptr<logger::LoggerHandler> loggerHandler);
 
-  public:
-    template <typename... Args> static auto create(Args &&... args) -> std::shared_ptr<NotificationsHandler> {
+public:
+    template <typename... Args>
+    static auto create(Args&&... args) -> std::shared_ptr<NotificationsHandler> {
         return std::shared_ptr<NotificationsHandler>(new NotificationsHandler(args...));
     }
     auto getActivity() -> std::weak_ptr<Activity>;
@@ -51,15 +51,15 @@ class NotificationsHandler : public aace::alexa::Notifications /* isa PlatformIn
     auto setIndicator(Notifications::IndicatorState state) -> void override;
     auto onNotificationReceived() -> void override;
 
-  private:
+private:
     std::weak_ptr<View> m_console{};
     std::weak_ptr<View> m_indicatorStateView{};
 
-    auto log(logger::LoggerHandler::Level level, const std::string &message) -> void;
+    auto log(logger::LoggerHandler::Level level, const std::string& message) -> void;
     auto setupUI() -> void;
 };
 
-} // namespace alexa
-} // namespace sampleApp
+}  // namespace alexa
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_ALEXA_NOTIFICATIONSHANDLER_H
+#endif  // SAMPLEAPP_ALEXA_NOTIFICATIONSHANDLER_H

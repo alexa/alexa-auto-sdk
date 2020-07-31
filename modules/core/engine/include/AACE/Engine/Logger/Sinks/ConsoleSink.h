@@ -25,18 +25,19 @@ namespace sink {
 
 class ConsoleSink : public Sink {
 private:
-    ConsoleSink( const std::string& id );
-    
+    ConsoleSink(const std::string& id);
+
 public:
-    static std::shared_ptr<ConsoleSink> create( const std::string& id );
-    
+    static std::shared_ptr<ConsoleSink> create(const std::string& id);
+
 private:
-    void log( Level level, std::chrono::system_clock::time_point time, const char* threadMoniker, const char* text ) override;
+    void log(Level level, std::chrono::system_clock::time_point time, const char* threadMoniker, const char* text)
+        override;
 };
 
-}  // aace::engine::logger::sink
-}  // aace::engine::logger
-}  // aace::engine
-}  // aace
+}  // namespace sink
+}  // namespace logger
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_LOGGER_SINKS_CONSOLE_SINK_H
+#endif  // AACE_ENGINE_LOGGER_SINKS_CONSOLE_SINK_H

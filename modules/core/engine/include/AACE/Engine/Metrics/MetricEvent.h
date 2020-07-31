@@ -28,19 +28,12 @@ public:
     /**
      * An enum class to represent the metric types: One of CT (counter), TI (timer), DV (discrete value)
      */
-    enum class MetricDataType {
-        TI,
-        DV,
-        CT
-    };
-    
+    enum class MetricDataType { TI, DV, CT };
+
     /**
      * An enum class to represent upload priority: One of HI (high) or NR (normal). Default is NR.
      */
-    enum class MetricPriority {
-        NR,
-        HI
-    };
+    enum class MetricPriority { NR, HI };
 
     /**
      * Constructor.
@@ -49,7 +42,7 @@ public:
      * @param source The name that provides additional contextual information about how the event happened.
      */
     MetricEvent(const std::string& program, const std::string& source);
-    
+
     /**
      * Constructor.
      *
@@ -65,7 +58,7 @@ public:
      * @param value The time in milliseconds.
      */
     void addTimer(const std::string& name, double value);
-    
+
     /**
      * Add string data to the metric event. 
      *
@@ -73,7 +66,7 @@ public:
      * @param value The string that represents the value.
      */
     void addString(const std::string& name, const std::string& value);
-    
+
     /**
      * Add counter data to the metric event. 
      *
@@ -81,7 +74,7 @@ public:
      * @param value The number that represents frequency or count.
      */
     void addCounter(const std::string& name, int value);
-    
+
     /**
      * Print the metric event data via logger in a standardized metric format.
      */
@@ -94,14 +87,14 @@ private:
      * @param priority The enum to convert.
      */
     static std::string priorityToString(MetricPriority priority);
-    
+
     /**
      * Convert MetricDataType enum to String representation. 
      *
      * @param priority The enum to convert.
      */
     static std::string dataTypeToString(MetricDataType dataPoint);
-    
+
     /**
      * Helper method to append data to the string log that is being built. 
      *
@@ -125,8 +118,8 @@ private:
     MetricPriority m_priority;
 };
 
-}  // metrics
-}  // engine
-}  // aace
+}  // namespace metrics
+}  // namespace engine
+}  // namespace aace
 
 #endif  // AACE_ENGINE_METRICS_METRIC_EVENT_H

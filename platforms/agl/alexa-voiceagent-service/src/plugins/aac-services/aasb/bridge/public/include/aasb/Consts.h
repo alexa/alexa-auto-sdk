@@ -325,7 +325,7 @@ extern const std::string VALUE_PLAYERACTIVITY_PLAYING;
 extern const std::string VALUE_PLAYERACTIVITY_STOPPED;
 extern const std::string VALUE_PLAYERACTIVITY_PAUSED;
 extern const std::string VALUE_PLAYERACTIVITY_BUFFER_UNDERRUN;
-extern const std::string VALUE_PLAYERACTIVITY_FINISHED;	
+extern const std::string VALUE_PLAYERACTIVITY_FINISHED;
 
 }  // namespace bridge
 }  // namespace aasb

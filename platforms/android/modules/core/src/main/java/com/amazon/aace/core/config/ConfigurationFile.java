@@ -15,22 +15,21 @@
 
 package com.amazon.aace.core.config;
 
-final public class ConfigurationFile extends EngineConfiguration
-{
+final public class ConfigurationFile extends EngineConfiguration {
     private String mPath;
 
-    private ConfigurationFile( String path ) {
+    private ConfigurationFile(String path) {
         mPath = path;
     }
 
-    public static ConfigurationFile create( String path ) {
-        return new ConfigurationFile( path );
+    public static ConfigurationFile create(String path) {
+        return new ConfigurationFile(path);
     }
 
     protected long createNativeRef() {
-        return createBinder( mPath );
+        return createBinder(mPath);
     }
 
     // Native Engine JNI methods
-    private native long createBinder( String path );
+    private native long createBinder(String path);
 }

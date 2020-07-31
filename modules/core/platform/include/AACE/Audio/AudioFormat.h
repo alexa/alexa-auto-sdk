@@ -27,31 +27,13 @@ namespace audio {
 
 class AudioFormat {
 public:
-    enum class Encoding {
-        UNKNOWN,
-        LPCM,
-        MP3,
-        OPUS
-    };
-    
-    enum class SampleFormat {
-        UNKNOWN,
-        SIGNED,
-        UNSIGNED,
-        FLOAT
-    };
+    enum class Encoding { UNKNOWN, LPCM, MP3, OPUS };
 
-    enum class Layout {
-        UNKNOWN,
-        NON_INTERLEAVED,
-        INTERLEAVED
-    };
+    enum class SampleFormat { UNKNOWN, SIGNED, UNSIGNED, FLOAT };
 
-    enum class Endianness {
-        UNKNOWN,
-        LITTLE,
-        BIG
-    };
+    enum class Layout { UNKNOWN, NON_INTERLEAVED, INTERLEAVED };
+
+    enum class Endianness { UNKNOWN, LITTLE, BIG };
 
     static AudioFormat UNKNOWN;
 
@@ -59,8 +41,14 @@ private:
     AudioFormat() = default;
 
 public:
-
-    AudioFormat( Encoding encoding, SampleFormat sampleFormat, Layout layout, Endianness endianness, uint32_t sampleRate, uint8_t sampleSize, uint8_t channels );
+    AudioFormat(
+        Encoding encoding,
+        SampleFormat sampleFormat,
+        Layout layout,
+        Endianness endianness,
+        uint32_t sampleRate,
+        uint8_t sampleSize,
+        uint8_t channels);
 
     /**
      * Returns the encoding for the @c AudioFormat. If the encoding is not known
@@ -158,7 +146,7 @@ inline std::ostream& operator<<(std::ostream& stream, const AudioFormat::Endiann
     return stream;
 }
 
-} // aace::audio
-} // aace
+}  // namespace audio
+}  // namespace aace
 
-#endif // AACE_AUDIO_AUDIO_FORMAT_H
+#endif  // AACE_AUDIO_AUDIO_FORMAT_H

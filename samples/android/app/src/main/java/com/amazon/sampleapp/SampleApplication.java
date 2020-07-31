@@ -15,14 +15,20 @@
 package com.amazon.sampleapp;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.google.android.gms.security.ProviderInstaller;
+
+import org.json.JSONObject;
 
 /**
  * Application class
  */
 public class SampleApplication extends Application {
+    private static final String TAG = SampleApplication.class.getSimpleName();
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -34,15 +40,21 @@ public class SampleApplication extends Application {
          */
         ProviderInstaller.installIfNeededAsync(this, new ProviderInstaller.ProviderInstallListener() {
             @Override
-            public void onProviderInstalled() {
-
-            }
+            public void onProviderInstalled() {}
 
             @Override
-            public void onProviderInstallFailed(int i, Intent intent) {
-
-            }
+            public void onProviderInstallFailed(int i, Intent intent) {}
         });
+    }
 
+    private static final String sDeviceConfigFile = "app_config.json";
+
+    public static JSONObject getConfig(Context context, String rootKey) {
+        JSONObject config = FileUtils.getOptionalConfigFromSDCard(sDeviceConfigFile, rootKey);
+        if (config != null) {
+            Log.i(TAG, "Got " + rootKey + " from config file on the SD Card");
+            return config;
+        }
+        return FileUtils.getConfigFromFile(context.getAssets(), sDeviceConfigFile, rootKey);
     }
 }

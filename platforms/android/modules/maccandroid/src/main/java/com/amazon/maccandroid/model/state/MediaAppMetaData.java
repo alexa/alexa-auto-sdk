@@ -42,7 +42,8 @@ public class MediaAppMetaData {
         mAlbum = metadata.getString(MediaMetadataCompat.METADATA_KEY_ALBUM);
         mCoverUrls = metadata.getString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI);
         mMediaProvider = metadata.getString(MediaMetadataCompat.METADATA_KEY_AUTHOR);
-        mMediaType = (metadata.getLong(MediaMetadataCompat.METADATA_KEY_ADVERTISEMENT) != 0L) ? MEDIA_TYPE_AD : MEDIA_TYPE_TRACK;
+        mMediaType = (metadata.getLong(MediaMetadataCompat.METADATA_KEY_ADVERTISEMENT) != 0L) ? MEDIA_TYPE_AD
+                                                                                              : MEDIA_TYPE_TRACK;
         mDurationInMilliseconds = metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION);
     }
 
@@ -98,15 +99,17 @@ public class MediaAppMetaData {
 
         final MediaAppMetaData otherMetaData = (MediaAppMetaData) obj;
 
-//        if (mPlaybackSource!= null || otherMetaData.mPlaybackSource != null) {
-//            if ((mPlaybackSource == null && otherMetaData.mPlaybackSource != null) || (otherMetaData.mPlaybackSource == null && mPlaybackSource != null)) {
-//                return false;
-//            }
-//
-//            if (mPlaybackSource != null && otherMetaData.mPlaybackSource != null && !mPlaybackSource.equals(otherMetaData.mPlaybackSource)) {
-//                return false;
-//            }
-//        }
+        //        if (mPlaybackSource!= null || otherMetaData.mPlaybackSource != null) {
+        //            if ((mPlaybackSource == null && otherMetaData.mPlaybackSource != null) ||
+        //            (otherMetaData.mPlaybackSource == null && mPlaybackSource != null)) {
+        //                return false;
+        //            }
+        //
+        //            if (mPlaybackSource != null && otherMetaData.mPlaybackSource != null &&
+        //            !mPlaybackSource.equals(otherMetaData.mPlaybackSource)) {
+        //                return false;
+        //            }
+        //        }
 
         if (!checkObjectEquality(mPlaybackSource, otherMetaData.mPlaybackSource)) {
             return false;
@@ -136,7 +139,6 @@ public class MediaAppMetaData {
             return false;
         }
 
-
         if (!checkObjectEquality(mMediaProvider, otherMetaData.mMediaProvider)) {
             return false;
         }
@@ -153,7 +155,7 @@ public class MediaAppMetaData {
     }
 
     private boolean checkObjectEquality(Object one, Object two) {
-        if (one!= null || two != null) {
+        if (one != null || two != null) {
             if ((one == null && two != null) || (two == null && one != null)) {
                 return false;
             }

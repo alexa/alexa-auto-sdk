@@ -12,7 +12,7 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
- 
+
 #ifndef AACE_ADDRESS_BOOK_ADDRESS_BOOK_H
 #define AACE_ADDRESS_BOOK_ADDRESS_BOOK_H
 
@@ -54,7 +54,7 @@ public:
          * @param [in] name Name of the entry, or an empty string if not available.
          * @return @c true on successful or @c false when name for the id was already added or if entryId is empty.
          */
-        virtual bool addName( const std::string& entryId, const std::string& name ) = 0;
+        virtual bool addName(const std::string& entryId, const std::string& name) = 0;
 
         /**
          * Add first and last name.
@@ -64,7 +64,7 @@ public:
          * @param [in] lastName Last name of the entry, or an empty string if not available.
          * @return @c true on successful or @c false when name for the id was already added or if entryId is empty.
          */
-        virtual bool addName( const std::string& entryId, const std::string& firstName, const std::string& lastName ) = 0;
+        virtual bool addName(const std::string& entryId, const std::string& firstName, const std::string& lastName) = 0;
 
         /**
          * Add first, last and nick name.
@@ -75,7 +75,11 @@ public:
          * @param [in] nickName Nick name of the entry, or an empty string if not available.
          * @return @c true on successful or @c false when name for the id was already added or if entryId is empty.
          */
-        virtual bool addName( const std::string& entryId, const std::string& firstName, const std::string& lastName, const std::string& nickname ) = 0;
+        virtual bool addName(
+            const std::string& entryId,
+            const std::string& firstName,
+            const std::string& lastName,
+            const std::string& nickname) = 0;
 
         /**
          * Add phone number(s).
@@ -85,7 +89,7 @@ public:
          * @param [in] number Numeric phone number, or an empty string if not available.
          * @return @c true on successful or @c false when reached the max allowed per entryId or if entryId is empty.
          */
-        virtual bool addPhone( const std::string& entryId, const std::string& label, const std::string& number ) = 0;
+        virtual bool addPhone(const std::string& entryId, const std::string& label, const std::string& number) = 0;
 
         /**
          * Add postal address(es).
@@ -105,7 +109,8 @@ public:
          * @param [in] accuracyInMeters Accuracy in meters, or zero if not available.
          * @return @c true on successful or @c false when reached the max allowed per id or if entryId is empty.
          */
-        virtual bool addPostalAddress( const std::string& entryId,
+        virtual bool addPostalAddress(
+            const std::string& entryId,
             const std::string& label,
             const std::string& addressLine1,
             const std::string& addressLine2,
@@ -117,7 +122,7 @@ public:
             const std::string& country,
             float latitudeInDegrees,
             float longitudeInDegrees,
-            float accuracyInMeters ) = 0;
+            float accuracyInMeters) = 0;
     };
 
     /**
@@ -128,7 +133,7 @@ public:
      * @param [in] type Type of the address book @c AddressBookType.
      * @return @c false if address book was already added or some internal error otherwise @c true on successful.
      */
-    bool addAddressBook( const std::string& addressBookSourceId, const std::string& name, AddressBookType type );
+    bool addAddressBook(const std::string& addressBookSourceId, const std::string& name, AddressBookType type);
 
     /**
      * Notifies the engine on a non-availability of an already available address book.
@@ -136,7 +141,7 @@ public:
      * @param [in] addressBookSourceId A unique identifier for an address book. 
      * @return @c false if address book does not already added or some internal error otherwise @c true on successful.
      */
-    bool removeAddressBook( const std::string& addressBookSourceId );
+    bool removeAddressBook(const std::string& addressBookSourceId);
 
     /**
      * Notifies the platform implementation to ingest address book entries using factory methods. Please
@@ -147,7 +152,9 @@ public:
      * @return Return @c true if platform implementation has successfully ingested all the entries of the address book
      * otherwise @c false.
      */
-    virtual bool getEntries( const std::string& addressBookSourceId, std::weak_ptr<IAddressBookEntriesFactory> factory ) = 0;
+    virtual bool getEntries(
+        const std::string& addressBookSourceId,
+        std::weak_ptr<IAddressBookEntriesFactory> factory) = 0;
 
     /**
      * @internal
@@ -155,14 +162,14 @@ public:
      *
      * Should *never* be called by the platform implementation.
      */
-    void setEngineInterface( std::shared_ptr<aace::addressBook::AddressBookEngineInterface> engineInterface );
+    void setEngineInterface(std::shared_ptr<aace::addressBook::AddressBookEngineInterface> engineInterface);
 
 private:
     std::shared_ptr<aace::addressBook::AddressBookEngineInterface> m_engineInterface;
 };
 
-inline std::ostream& operator<<( std::ostream& stream, const AddressBook::AddressBookType& type ) {
-    switch( type ) {
+inline std::ostream& operator<<(std::ostream& stream, const AddressBook::AddressBookType& type) {
+    switch (type) {
         case AddressBook::AddressBookType::CONTACT:
             stream << "CONTACT";
             break;
@@ -173,7 +180,7 @@ inline std::ostream& operator<<( std::ostream& stream, const AddressBook::Addres
     return stream;
 }
 
-} // aace::addressBook
-} // aace
+}  // namespace addressBook
+}  // namespace aace
 
-#endif // AACE_ADDRESS_BOOK_ADDRESS_BOOK_H
+#endif  // AACE_ADDRESS_BOOK_ADDRESS_BOOK_H

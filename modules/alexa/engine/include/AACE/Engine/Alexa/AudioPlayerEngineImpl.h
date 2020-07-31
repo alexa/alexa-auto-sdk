@@ -43,14 +43,13 @@ namespace alexa {
 
 class PlaybackRouterDelegate;
 
-class AudioPlayerEngineImpl :
-    public AudioChannelEngineImpl,
-    public aace::alexa::AudioPlayerEngineInterface,
-    public alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface,
-    public alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface{
-    
+class AudioPlayerEngineImpl
+        : public AudioChannelEngineImpl
+        , public aace::alexa::AudioPlayerEngineInterface
+        , public alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface
+        , public alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface {
 private:
-    AudioPlayerEngineImpl( std::shared_ptr<aace::alexa::AudioPlayer> audioPlayerPlatformInterface );
+    AudioPlayerEngineImpl(std::shared_ptr<aace::alexa::AudioPlayer> audioPlayerPlatformInterface);
 
     bool initialize(
         std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> audioOutputChannel,
@@ -64,7 +63,9 @@ private:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter,
         std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface> audioPlayerObserverDelegate );
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface>
+            audioPlayerObserverDelegate,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate);
 
 public:
     static std::shared_ptr<AudioPlayerEngineImpl> create(
@@ -80,22 +81,25 @@ public:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter,
         std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface> audioPlayerObserverDelegate );
-        
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface>
+            audioPlayerObserverDelegate,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate);
+
     //
     // AudioPlayerEngineInterface
     //
     int64_t onGetPlayerPosition() override;
     int64_t onGetPlayerDuration() override;
-        
+
     //
     // AudioPlayerObserverInterface
     //
-    void onPlayerActivityChanged( alexaClientSDK::avsCommon::avs::PlayerActivity state, const Context& context ) override;
-    
+    void onPlayerActivityChanged(alexaClientSDK::avsCommon::avs::PlayerActivity state, const Context& context) override;
+
     /// @name RenderPlayerInfoCardsProviderInterface Functions
     /// @{
-    void setObserver(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsObserverInterface> observer) override;
+    void setObserver(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsObserverInterface>
+                         observer) override;
     /// @}
 
 protected:
@@ -104,17 +108,17 @@ protected:
 private:
     std::shared_ptr<aace::alexa::AudioPlayer> m_audioPlayerPlatformInterface = nullptr;
     std::shared_ptr<alexaClientSDK::capabilityAgents::audioPlayer::AudioPlayer> m_audioPlayerCapabilityAgent;
-        
+
     /// Observer for changes related to RenderPlayerInfoCards.
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsObserverInterface> m_renderPlayerObserver;
-        
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsObserverInterface>
+        m_renderPlayerObserver;
+
     /// Mutex to serialize access to the observers.
     std::mutex m_observersMutex;
-
 };
 
-} // aace::engine::alexa
-} // aace::engine
-} // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_ALEXA_AUDIO_PLAYER_ENGINE_IMPL_H
+#endif  // AACE_ENGINE_ALEXA_AUDIO_PLAYER_ENGINE_IMPL_H

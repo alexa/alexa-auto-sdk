@@ -23,53 +23,55 @@ namespace aace {
 namespace jni {
 namespace vehicle {
 
-    //
-    // JVehiclePropertyType
-    //
+//
+// JVehiclePropertyType
+//
 
-    class JVehiclePropertyTypeConfig : public EnumConfiguration<aace::vehicle::config::VehicleConfiguration::VehiclePropertyType> {
-    public:
-        using T = aace::vehicle::config::VehicleConfiguration::VehiclePropertyType;
+class JVehiclePropertyTypeConfig
+        : public EnumConfiguration<aace::vehicle::config::VehicleConfiguration::VehiclePropertyType> {
+public:
+    using T = aace::vehicle::config::VehicleConfiguration::VehiclePropertyType;
 
-        const char* getClassName() override {
-            return "com/amazon/aace/vehicle/config/VehicleConfiguration$VehiclePropertyType";
-        }
+    const char* getClassName() override {
+        return "com/amazon/aace/vehicle/config/VehicleConfiguration$VehiclePropertyType";
+    }
 
-        std::vector<std::pair<T,std::string>> getConfiguration() override {
-            return {
-                {T::MAKE,"MAKE"},
-                {T::MODEL,"MODEL"},
-                {T::YEAR,"YEAR"},
-                {T::TRIM,"TRIM"},
-                {T::GEOGRAPHY,"GEOGRAPHY"},
-                {T::VERSION,"VERSION"},
-                {T::OPERATING_SYSTEM,"OPERATING_SYSTEM"},
-                {T::HARDWARE_ARCH,"HARDWARE_ARCH"},
-                {T::LANGUAGE,"LANGUAGE"},
-                {T::MICROPHONE,"MICROPHONE"},
-                {T::COUNTRY_LIST,"COUNTRY_LIST"},
-                {T::VEHICLE_IDENTIFIER,"VEHICLE_IDENTIFIER"}
-            };
-        }
-    };
+    std::vector<std::pair<T, std::string>> getConfiguration() override {
+        return {{T::MAKE, "MAKE"},
+                {T::MODEL, "MODEL"},
+                {T::YEAR, "YEAR"},
+                {T::TRIM, "TRIM"},
+                {T::GEOGRAPHY, "GEOGRAPHY"},
+                {T::VERSION, "VERSION"},
+                {T::OPERATING_SYSTEM, "OPERATING_SYSTEM"},
+                {T::HARDWARE_ARCH, "HARDWARE_ARCH"},
+                {T::LANGUAGE, "LANGUAGE"},
+                {T::MICROPHONE, "MICROPHONE"},
+                {T::COUNTRY_LIST, "COUNTRY_LIST"},
+                {T::VEHICLE_IDENTIFIER, "VEHICLE_IDENTIFIER"}};
+    }
+};
 
-    using JVehiclePropertyType = JEnum<aace::vehicle::config::VehicleConfiguration::VehiclePropertyType,JVehiclePropertyTypeConfig>;
+using JVehiclePropertyType =
+    JEnum<aace::vehicle::config::VehicleConfiguration::VehiclePropertyType, JVehiclePropertyTypeConfig>;
 
-    //
-    // JVehicleProperty
-    //
+//
+// JVehicleProperty
+//
 
-    class JVehicleProperty : public JObject {
-    public:
-        JVehicleProperty( jobject obj ) : JObject( obj, "com/amazon/aace/vehicle/config/VehicleConfiguration$VehicleProperty" ) {}
+class JVehicleProperty : public JObject {
+public:
+    JVehicleProperty(jobject obj) :
+            JObject(obj, "com/amazon/aace/vehicle/config/VehicleConfiguration$VehicleProperty") {
+    }
 
-        aace::vehicle::config::VehicleConfiguration::VehicleProperty getVehicleProperty();
+    aace::vehicle::config::VehicleConfiguration::VehicleProperty getVehicleProperty();
 
-        static std::vector<aace::vehicle::config::VehicleConfiguration::VehicleProperty> convert( jobjectArray vehiclePropertyArrObj );
-    };
-}
-}
-}
+    static std::vector<aace::vehicle::config::VehicleConfiguration::VehicleProperty> convert(
+        jobjectArray vehiclePropertyArrObj);
+};
+}  // namespace vehicle
+}  // namespace jni
+}  // namespace aace
 
-#endif // AACE_JNI_VEHICLE_VEHICLE_CONFIGURATION_BINDER_H
-
+#endif  // AACE_JNI_VEHICLE_VEHICLE_CONFIGURATION_BINDER_H

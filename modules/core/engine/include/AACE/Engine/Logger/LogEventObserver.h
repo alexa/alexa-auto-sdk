@@ -29,11 +29,15 @@ public:
     // LogEventObserver::Level alias
     using Level = aace::logger::LoggerEngineInterface::Level;
 
-    virtual bool onLogEvent( Level level, std::chrono::system_clock::time_point time, const char* source, const char* text ) = 0;
+    virtual bool onLogEvent(
+        Level level,
+        std::chrono::system_clock::time_point time,
+        const char* source,
+        const char* text) = 0;
 };
 
-} // aace::engine::logger
-} // aace::engine
-} // aace
+}  // namespace logger
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_LOGGER_LOG_EVENT_OBSERVER_H
+#endif  // AACE_ENGINE_LOGGER_LOG_EVENT_OBSERVER_H

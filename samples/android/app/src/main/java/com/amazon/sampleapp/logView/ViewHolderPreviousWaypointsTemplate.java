@@ -27,27 +27,26 @@ public class ViewHolderPreviousWaypointsTemplate extends RecyclerView.ViewHolder
     private final TextView[] mNames = new TextView[5];
     private final TextView[] mAddresses = new TextView[5];
 
-    public ViewHolderPreviousWaypointsTemplate( View v ) {
-        super( v );
+    public ViewHolderPreviousWaypointsTemplate(View v) {
+        super(v);
 
-        mNames[0] = v.findViewById( R.id.waypointName1 );
-        mNames[1] = v.findViewById( R.id.waypointName2 );
-        mNames[2] = v.findViewById( R.id.waypointName3 );
-        mNames[3] = v.findViewById( R.id.waypointName4 );
-        mNames[4] = v.findViewById( R.id.waypointName5 );
+        mNames[0] = v.findViewById(R.id.waypointName1);
+        mNames[1] = v.findViewById(R.id.waypointName2);
+        mNames[2] = v.findViewById(R.id.waypointName3);
+        mNames[3] = v.findViewById(R.id.waypointName4);
+        mNames[4] = v.findViewById(R.id.waypointName5);
 
-        mAddresses[0] = v.findViewById( R.id.waypointAddress1 );
-        mAddresses[1] = v.findViewById( R.id.waypointAddress2 );
-        mAddresses[2] = v.findViewById( R.id.waypointAddress3 );
-        mAddresses[3] = v.findViewById( R.id.waypointAddress4 );
-        mAddresses[4] = v.findViewById( R.id.waypointAddress5 );
+        mAddresses[0] = v.findViewById(R.id.waypointAddress1);
+        mAddresses[1] = v.findViewById(R.id.waypointAddress2);
+        mAddresses[2] = v.findViewById(R.id.waypointAddress3);
+        mAddresses[3] = v.findViewById(R.id.waypointAddress4);
+        mAddresses[4] = v.findViewById(R.id.waypointAddress5);
     }
 
-    public void setWaypoints( String[] names, String[] addresses ) {
-        for ( int i = 0; i < 5; i++ ) {
-            mNames[i].setText( names[i] );
-            mAddresses[i].setText( addresses[i] );
+    public void setWaypoints(String[] names, String[] addresses) {
+        for (int i = 0; i < 5; i++) {
+            mNames[i].setText(names[i]);
+            mAddresses[i].setText(addresses[i]);
         }
     }
-
 }

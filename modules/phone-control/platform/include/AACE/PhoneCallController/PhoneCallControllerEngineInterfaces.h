@@ -23,9 +23,7 @@ namespace phoneCallController {
  * PhoneCallControllerEngineInterface
  */
 class PhoneCallControllerEngineInterface {
-
 public:
-
     /**
      * Describes the state of connection to a calling device
      * 
@@ -158,25 +156,29 @@ public:
         DTMF_FAILED
     };
 
-    virtual void onConnectionStateChanged( ConnectionState state  ) = 0;
-    virtual void onCallStateChanged ( CallState state, const std::string& callId, const std::string& callerId ) = 0;
-    virtual void onCallFailed( const std::string& callId, CallError code, const std::string& message ) = 0;
-    virtual void onCallerIdReceived( const std::string& callId, const std::string& callerId ) = 0;
-    virtual void onSendDTMFSucceeded( const std::string& callId) = 0;
-    virtual void onSendDTMFFailed( const std::string& callId, DTMFError code, const std::string& message ) = 0;
-    virtual void onDeviceConfigurationUpdated( std::unordered_map<PhoneCallControllerEngineInterface::CallingDeviceConfigurationProperty, bool> configurationMap ) = 0;
+    virtual void onConnectionStateChanged(ConnectionState state) = 0;
+    virtual void onCallStateChanged(CallState state, const std::string& callId, const std::string& callerId) = 0;
+    virtual void onCallFailed(const std::string& callId, CallError code, const std::string& message) = 0;
+    virtual void onCallerIdReceived(const std::string& callId, const std::string& callerId) = 0;
+    virtual void onSendDTMFSucceeded(const std::string& callId) = 0;
+    virtual void onSendDTMFFailed(const std::string& callId, DTMFError code, const std::string& message) = 0;
+    virtual void onDeviceConfigurationUpdated(
+        std::unordered_map<PhoneCallControllerEngineInterface::CallingDeviceConfigurationProperty, bool>
+            configurationMap) = 0;
     virtual std::string onCreateCallId() = 0;
 };
 
-} // aace::phoneCallController 
-} // aace
+}  // namespace phoneCallController
+}  // namespace aace
 
 namespace std {
-    template <> struct hash<aace::phoneCallController::PhoneCallControllerEngineInterface::CallingDeviceConfigurationProperty> {
-        size_t operator()(aace::phoneCallController::PhoneCallControllerEngineInterface::CallingDeviceConfigurationProperty x) const {
-            return hash<int>()(static_cast<int>(x));
-        }
-    };
-}
+template <>
+struct hash<aace::phoneCallController::PhoneCallControllerEngineInterface::CallingDeviceConfigurationProperty> {
+    size_t operator()(
+        aace::phoneCallController::PhoneCallControllerEngineInterface::CallingDeviceConfigurationProperty x) const {
+        return hash<int>()(static_cast<int>(x));
+    }
+};
+}  // namespace std
 
 #endif

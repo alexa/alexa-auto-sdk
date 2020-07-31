@@ -31,17 +31,19 @@ namespace alexa {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class LocalMediaSourceHandler : public aace::alexa::LocalMediaSource /* isa PlatformInterface */ {
-  private:
+private:
     std::weak_ptr<Activity> m_activity{};
     std::weak_ptr<logger::LoggerHandler> m_loggerHandler{};
 
-  protected:
-    LocalMediaSourceHandler(std::weak_ptr<Activity> activity,
-                            std::weak_ptr<logger::LoggerHandler> loggerHandler,
-                            Source source);
+protected:
+    LocalMediaSourceHandler(
+        std::weak_ptr<Activity> activity,
+        std::weak_ptr<logger::LoggerHandler> loggerHandler,
+        Source source);
 
-  public:
-    template <typename... Args> static auto create(Args &&... args) -> std::shared_ptr<LocalMediaSourceHandler> {
+public:
+    template <typename... Args>
+    static auto create(Args&&... args) -> std::shared_ptr<LocalMediaSourceHandler> {
         return std::shared_ptr<LocalMediaSourceHandler>(new LocalMediaSourceHandler(args...));
     }
     auto getActivity() -> std::weak_ptr<Activity>;
@@ -55,10 +57,10 @@ class LocalMediaSourceHandler : public aace::alexa::LocalMediaSource /* isa Plat
     auto adjustSeek(std::chrono::milliseconds deltaOffset) -> bool override;
     auto getState() -> LocalMediaSourceState override;
 
-    auto volumeChanged( float volume ) -> bool override;
-    auto mutedStateChanged( MutedState state ) -> bool override;
+    auto volumeChanged(float volume) -> bool override;
+    auto mutedStateChanged(MutedState state) -> bool override;
 
-  private:
+private:
     std::weak_ptr<View> m_console{};
 
     std::string m_sourceMediaProvider = "UNDEFINED";
@@ -66,22 +68,21 @@ class LocalMediaSourceHandler : public aace::alexa::LocalMediaSource /* isa Plat
     aace::alexa::LocalMediaSource::Source m_source;
 
     std::map<aace::alexa::LocalMediaSource::Source, std::string> m_localMediaSourceStateMap = {
-      { aace::alexa::LocalMediaSource::Source::BLUETOOTH, "IDLE" },
-      { aace::alexa::LocalMediaSource::Source::USB, "IDLE" },
-      { aace::alexa::LocalMediaSource::Source::FM_RADIO, "IDLE" },
-      { aace::alexa::LocalMediaSource::Source::AM_RADIO, "IDLE" },
-      { aace::alexa::LocalMediaSource::Source::SATELLITE_RADIO, "IDLE" },
-      { aace::alexa::LocalMediaSource::Source::LINE_IN, "IDLE" },
-      { aace::alexa::LocalMediaSource::Source::COMPACT_DISC, "IDLE" },
-      { aace::alexa::LocalMediaSource::Source::SIRIUS_XM, "IDLE" },
-      { aace::alexa::LocalMediaSource::Source::DAB, "IDLE" }
-    };
+        {aace::alexa::LocalMediaSource::Source::BLUETOOTH, "IDLE"},
+        {aace::alexa::LocalMediaSource::Source::USB, "IDLE"},
+        {aace::alexa::LocalMediaSource::Source::FM_RADIO, "IDLE"},
+        {aace::alexa::LocalMediaSource::Source::AM_RADIO, "IDLE"},
+        {aace::alexa::LocalMediaSource::Source::SATELLITE_RADIO, "IDLE"},
+        {aace::alexa::LocalMediaSource::Source::LINE_IN, "IDLE"},
+        {aace::alexa::LocalMediaSource::Source::COMPACT_DISC, "IDLE"},
+        {aace::alexa::LocalMediaSource::Source::SIRIUS_XM, "IDLE"},
+        {aace::alexa::LocalMediaSource::Source::DAB, "IDLE"}};
 
-    auto log(logger::LoggerHandler::Level level, const std::string &message) -> void;
+    auto log(logger::LoggerHandler::Level level, const std::string& message) -> void;
     auto setupUI() -> void;
 };
 
-} // namespace alexa
-} // namespace sampleApp
+}  // namespace alexa
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_ALEXA_LOCALMEDIASOURCEHANDLER_H
+#endif  // SAMPLEAPP_ALEXA_LOCALMEDIASOURCEHANDLER_H

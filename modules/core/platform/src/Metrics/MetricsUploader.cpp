@@ -17,15 +17,12 @@
 
 namespace aace {
 namespace metrics {
- 
-MetricsUploader::~MetricsUploader() = default; // key function
 
-MetricsUploader::Datapoint::Datapoint( DatapointType type, std::string name, std::string value, int count ) :
-    m_type( type ),
-    m_name( name ),
-    m_value( value ),
-    m_count( count ) {
+MetricsUploader::~MetricsUploader() = default;  // key function
+
+MetricsUploader::Datapoint::Datapoint(DatapointType type, std::string name, std::string value, int count) :
+        m_type(type), m_name(name), m_value(value), m_count(count) {
 }
 
-} // aace::metrics
-} // aace
+}  // namespace metrics
+}  // namespace aace

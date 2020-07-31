@@ -1,5 +1,8 @@
 package com.amazon.maccandroid;
 
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.isNull;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -32,13 +35,9 @@ import org.robolectric.annotation.Config;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.isNull;
-
 @RunWith(RobolectricTestRunner.class)
-@Config(shadows={ShadowUri.class})
+@Config(shadows = {ShadowUri.class})
 public class MediaAppsDirectivesHandlerTest {
-
     public static final String TEST_PLAYER_ID = "testPlayerId";
     public static final String TEST_TOKEN = "testToken";
     public static final long TEST_INDEX = 12;
@@ -71,7 +70,7 @@ public class MediaAppsDirectivesHandlerTest {
 
         Mockito.when(mMockContext.getPackageManager()).thenReturn(mMockPackageManager);
         Mockito.when(mMediaControllerCompat.getTransportControls()).thenReturn(mMockTransportControls);
-//        Mockito.when(mMediaControllerCompat.isSessionReady()).thenReturn(true);
+        //        Mockito.when(mMediaControllerCompat.isSessionReady()).thenReturn(true);
         addTestMaccApp();
 
         Mockito.when(mMetaDataBundle.containsKey(Mockito.anyString())).thenReturn(true);
@@ -86,12 +85,10 @@ public class MediaAppsDirectivesHandlerTest {
         mMockResolveInfo = new ArrayList<>();
         mMockResolveInfo.add(resolveInfo);
 
-
         Mockito.when(mMediaControllerCompat.getPlaybackState()).thenReturn(mMockPlayBackState);
         Mockito.when(mMockContext.getResources()).thenReturn(Mockito.mock(Resources.class));
-        Mockito.when(mMockPackageManager.queryBroadcastReceivers(Mockito.any(Intent.class),
-                Mockito.anyInt())).thenReturn(mMockResolveInfo);
-
+        Mockito.when(mMockPackageManager.queryBroadcastReceivers(Mockito.any(Intent.class), Mockito.anyInt()))
+                .thenReturn(mMockResolveInfo);
     }
 
     private void addTestMaccApp() throws PackageManager.NameNotFoundException {
@@ -99,45 +96,45 @@ public class MediaAppsDirectivesHandlerTest {
         Signature[] mockSignatures = new Signature[1];
         mockSignatures[0] = Mockito.mock(Signature.class);
         mMockPackageInfo.signatures = mockSignatures;
-        Mockito.when(mMockPackageManager.getPackageInfo(Mockito.anyString(), Mockito.anyInt())).
-                thenReturn(mMockPackageInfo);
-        mMockMediaApp = new MediaApp(mMockContext, TEST_PLAYER_ID, TEST_CLASS_NAME, TEST_SPI_VERSION, TEST_PLAYER_COOKIE) {
-            @Override
-            public MediaControllerCompat getMediaController() {
-                return mMediaControllerCompat;
-            }
+        Mockito.when(mMockPackageManager.getPackageInfo(Mockito.anyString(), Mockito.anyInt()))
+                .thenReturn(mMockPackageInfo);
+        mMockMediaApp =
+                new MediaApp(mMockContext, TEST_PLAYER_ID, TEST_CLASS_NAME, TEST_SPI_VERSION, TEST_PLAYER_COOKIE) {
+                    @Override
+                    public MediaControllerCompat getMediaController() {
+                        return mMediaControllerCompat;
+                    }
 
-            @Override
-            void initValidationData(Context context) {
-            }
-        };
+                    @Override
+                    void initValidationData(Context context) {}
+                };
         MediaAppsRepository.getInstance().addDiscoveredMediaApp(mMockMediaApp);
         MediaAppsRepository.getInstance().addAuthorizedMediaApp(mMockMediaApp);
     }
 
     @After
-    public void tearDown() throws Exception {
-    }
+    public void tearDown() throws Exception {}
 
-//    @Test
-//    public void handlePlayDirectiveWithPreloadTrue() {
-//        PlayDirective directive = new PlayDirective
-//                (TEST_PLAYER_ID, TEST_TOKEN, TEST_INDEX, OFFSET, true, TEST_NAVIGATION);
-//        mClassUnderTest.handleDirective(directive);
-//        Mockito.verify(mMockTransportControls).playFromUri(Mockito.any(Uri.class), isNull(Bundle.class));
-//    }
+    //    @Test
+    //    public void handlePlayDirectiveWithPreloadTrue() {
+    //        PlayDirective directive = new PlayDirective
+    //                (TEST_PLAYER_ID, TEST_TOKEN, TEST_INDEX, OFFSET, true, TEST_NAVIGATION);
+    //        mClassUnderTest.handleDirective(directive);
+    //        Mockito.verify(mMockTransportControls).playFromUri(Mockito.any(Uri.class), isNull(Bundle.class));
+    //    }
 
-//    @Test
-//    public void handlePlayDirectiveWithPreloadFalse() {
-//        PlayDirective directive = new PlayDirective
-//                (TEST_PLAYER_ID, TEST_TOKEN, TEST_INDEX, OFFSET, false, TEST_NAVIGATION);
-//        mClassUnderTest.handleDirective(directive);
-//        Mockito.verify(mMockTransportControls).prepareFromUri(Mockito.any(Uri.class), isNull(Bundle.class));
-//    }
+    //    @Test
+    //    public void handlePlayDirectiveWithPreloadFalse() {
+    //        PlayDirective directive = new PlayDirective
+    //                (TEST_PLAYER_ID, TEST_TOKEN, TEST_INDEX, OFFSET, false, TEST_NAVIGATION);
+    //        mClassUnderTest.handleDirective(directive);
+    //        Mockito.verify(mMockTransportControls).prepareFromUri(Mockito.any(Uri.class), isNull(Bundle.class));
+    //    }
 
     @Test
     public void handlePlayControlPlayDirective() {
-        PlayControlDirective directive = new PlayControlDirective(TEST_PLAYER_ID, APIConstants.Directives.PlayControl.PLAY_CONTROL_PLAY);
+        PlayControlDirective directive =
+                new PlayControlDirective(TEST_PLAYER_ID, APIConstants.Directives.PlayControl.PLAY_CONTROL_PLAY);
         Mockito.when(mMockPlayBackState.getActions()).thenReturn(PlaybackStateCompat.ACTION_PLAY);
         mClassUnderTest.handleDirective(directive);
         Mockito.verify(mMockTransportControls).play();
@@ -145,16 +142,17 @@ public class MediaAppsDirectivesHandlerTest {
 
     @Test
     public void handlePlayControlStopDirective() {
-        PlayControlDirective directive = new PlayControlDirective(TEST_PLAYER_ID, APIConstants.Directives.PlayControl.PLAY_CONTROL_STOP);
+        PlayControlDirective directive =
+                new PlayControlDirective(TEST_PLAYER_ID, APIConstants.Directives.PlayControl.PLAY_CONTROL_STOP);
         Mockito.when(mMockPlayBackState.getActions()).thenReturn(PlaybackStateCompat.ACTION_STOP);
         mClassUnderTest.handleDirective(directive);
         Mockito.verify(mMockTransportControls).stop();
     }
 
-
     @Test
     public void handlePlayControlPauseDirective() {
-        PlayControlDirective directive = new PlayControlDirective(TEST_PLAYER_ID, APIConstants.Directives.PlayControl.PLAY_CONTROL_PAUSE);
+        PlayControlDirective directive =
+                new PlayControlDirective(TEST_PLAYER_ID, APIConstants.Directives.PlayControl.PLAY_CONTROL_PAUSE);
         Mockito.when(mMockPlayBackState.getActions()).thenReturn(PlaybackStateCompat.ACTION_PAUSE);
         mClassUnderTest.handleDirective(directive);
         Mockito.verify(mMockTransportControls).pause();
@@ -162,7 +160,8 @@ public class MediaAppsDirectivesHandlerTest {
 
     @Test
     public void handlePlayControlStartOverDirective() {
-        PlayControlDirective directive = new PlayControlDirective(TEST_PLAYER_ID, APIConstants.Directives.PlayControl.PLAY_CONTROL_STARTOVER);
+        PlayControlDirective directive =
+                new PlayControlDirective(TEST_PLAYER_ID, APIConstants.Directives.PlayControl.PLAY_CONTROL_STARTOVER);
         Mockito.when(mMockPlayBackState.getActions()).thenReturn(PlaybackStateCompat.ACTION_SEEK_TO);
         mClassUnderTest.handleDirective(directive);
         long val = 0;
@@ -171,7 +170,8 @@ public class MediaAppsDirectivesHandlerTest {
 
     @Test
     public void handlePlayControlPreviousDirective() {
-        PlayControlDirective directive = new PlayControlDirective(TEST_PLAYER_ID, APIConstants.Directives.PlayControl.PLAY_CONTROL_PREVIOUS);
+        PlayControlDirective directive =
+                new PlayControlDirective(TEST_PLAYER_ID, APIConstants.Directives.PlayControl.PLAY_CONTROL_PREVIOUS);
         Mockito.when(mMockPlayBackState.getActions()).thenReturn(PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS);
         mClassUnderTest.handleDirective(directive);
         Mockito.verify(mMockTransportControls).skipToPrevious();
@@ -179,7 +179,8 @@ public class MediaAppsDirectivesHandlerTest {
 
     @Test
     public void handlePlayControlNextDirective() {
-        PlayControlDirective directive = new PlayControlDirective(TEST_PLAYER_ID, APIConstants.Directives.PlayControl.PLAY_CONTROL_NEXT);
+        PlayControlDirective directive =
+                new PlayControlDirective(TEST_PLAYER_ID, APIConstants.Directives.PlayControl.PLAY_CONTROL_NEXT);
         Mockito.when(mMockPlayBackState.getActions()).thenReturn(PlaybackStateCompat.ACTION_SKIP_TO_NEXT);
         mClassUnderTest.handleDirective(directive);
         Mockito.verify(mMockTransportControls).skipToNext();
@@ -187,7 +188,8 @@ public class MediaAppsDirectivesHandlerTest {
 
     @Test
     public void handlePlayControlRewindDirective() {
-        PlayControlDirective directive = new PlayControlDirective(TEST_PLAYER_ID, APIConstants.Directives.PlayControl.PLAY_CONTROL_REWIND);
+        PlayControlDirective directive =
+                new PlayControlDirective(TEST_PLAYER_ID, APIConstants.Directives.PlayControl.PLAY_CONTROL_REWIND);
         Mockito.when(mMockPlayBackState.getActions()).thenReturn(PlaybackStateCompat.ACTION_REWIND);
         mClassUnderTest.handleDirective(directive);
         Mockito.verify(mMockTransportControls).rewind();
@@ -195,7 +197,8 @@ public class MediaAppsDirectivesHandlerTest {
 
     @Test
     public void handlePlayControlFastForwardDirective() {
-        PlayControlDirective directive = new PlayControlDirective(TEST_PLAYER_ID, APIConstants.Directives.PlayControl.PLAY_CONTROL_FASTFORWARD);
+        PlayControlDirective directive =
+                new PlayControlDirective(TEST_PLAYER_ID, APIConstants.Directives.PlayControl.PLAY_CONTROL_FASTFORWARD);
         Mockito.when(mMockPlayBackState.getActions()).thenReturn(PlaybackStateCompat.ACTION_FAST_FORWARD);
         mClassUnderTest.handleDirective(directive);
         Mockito.verify(mMockTransportControls).fastForward();

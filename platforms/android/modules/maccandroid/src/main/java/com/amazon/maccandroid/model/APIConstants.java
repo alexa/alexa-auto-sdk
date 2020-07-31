@@ -2,16 +2,13 @@ package com.amazon.maccandroid.model;
 
 public final class APIConstants {
     public static class ExtrasKeys {
-        public static final String SPI_VERSION_KEY =
-                "com.amazon.alexa.externalmediaplayer.spiVersion";
+        public static final String SPI_VERSION_KEY = "com.amazon.alexa.externalmediaplayer.spiVersion";
         public static final Double MIN_SUPPORTED_SPI_VERSION = 1.0;
-        public static final String PLAYER_COOKIE_KEY =
-                "com.amazon.alexa.externalmediaplayer.playerCookie";
+        public static final String PLAYER_COOKIE_KEY = "com.amazon.alexa.externalmediaplayer.playerCookie";
     }
 
     public static class Events {
-        public static final String SESSION_EVENT_REQUEST_TOKEN =
-                "com.amazon.alexa.externalmediaplayer.REQUEST_TOKEN";
+        public static final String SESSION_EVENT_REQUEST_TOKEN = "com.amazon.alexa.externalmediaplayer.REQUEST_TOKEN";
     }
 
     public static class Timeouts {
@@ -24,8 +21,7 @@ public final class APIConstants {
     }
 
     public static class Permissions {
-        public static final String EMP_CONNECT_PERMISSION =
-                "com.amazon.alexa.externalmediaplayer.permission.CONNECT";
+        public static final String EMP_CONNECT_PERMISSION = "com.amazon.alexa.externalmediaplayer.permission.CONNECT";
     }
 
     public static class Directives {
@@ -65,16 +61,20 @@ public final class APIConstants {
             public static final String ALEXA_SEEK_CONTROLLER_ADJUST_SEEK = "Alexa.SeekController.AdjustSeekPosition";
             public static final String ALEXA_SEEK_CONTROLLER_SET_SEEK = "Alexa.SeekController.SetSeekPosition";
 
-            public static final String ALEXA_PLAYLIST_CONTROLLER_ENABLE_SHUFFLE = "Alexa.PlaylistController.EnableShuffle";
-            public static final String ALEXA_PLAYLIST_CONTROLLER_DISABLE_SHUFFLE = "Alexa.PlaylistController.DisableShuffle";
-            public static final String ALEXA_PLAYLIST_CONTROLLER_ENABLE_REPEAT = "Alexa.PlaylistController.EnableRepeat";
-            public static final String ALEXA_PLAYLIST_CONTROLLER_ENABLE_REPEAT_ONE = "Albuilexa.PlaylistController.EnableRepeatOne";
-            public static final String ALEXA_PLAYLIST_CONTROLLER_DISABLE_REPEAT = "Alexa.PlaylistController.DisableRepeat";
+            public static final String ALEXA_PLAYLIST_CONTROLLER_ENABLE_SHUFFLE =
+                    "Alexa.PlaylistController.EnableShuffle";
+            public static final String ALEXA_PLAYLIST_CONTROLLER_DISABLE_SHUFFLE =
+                    "Alexa.PlaylistController.DisableShuffle";
+            public static final String ALEXA_PLAYLIST_CONTROLLER_ENABLE_REPEAT =
+                    "Alexa.PlaylistController.EnableRepeat";
+            public static final String ALEXA_PLAYLIST_CONTROLLER_ENABLE_REPEAT_ONE =
+                    "Albuilexa.PlaylistController.EnableRepeatOne";
+            public static final String ALEXA_PLAYLIST_CONTROLLER_DISABLE_REPEAT =
+                    "Alexa.PlaylistController.DisableRepeat";
 
             public static final String ALEXA_FAVORITES_CONTROLLER_FAVORITE = "Alexa.FavoritesController.Favorite";
             public static final String ALEXA_FAVORITES_CONTROLLER_UNFAVORITE = "Alexa.FavoritesController.UnFavorite";
             public static final String CUSTOM_ACTION_LOGIN = "com.amazon.alexa.externalmediaplayer.ACCOUNT_LINKING";
         }
     }
-
 }

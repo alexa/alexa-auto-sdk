@@ -30,24 +30,22 @@ namespace navigation {
  * Navigation should be extended to handle navigation directives from the Engine.
  */
 class Navigation : public aace::core::PlatformInterface {
-
 protected:
     Navigation() = default;
 
 public:
-    
     using EventName = aace::navigation::NavigationEngineInterface::EventName;
-    
+
     using ErrorType = aace::navigation::NavigationEngineInterface::ErrorType;
-    
+
     using ErrorCode = aace::navigation::NavigationEngineInterface::ErrorCode;
-    
+
     using AlternateRouteType = aace::navigation::NavigationEngineInterface::AlternateRouteType;
-    
+
     virtual ~Navigation();
-    
+
     enum class ControlDisplay {
-        
+
         SHOW_ROUTE_OVERVIEW,
 
         SHOW_DIRECTIONS_LIST,
@@ -76,16 +74,13 @@ public:
 
         SCROLL_LEFT,
 
-        MUTE_ROUTE_GUIDANCE, // navigation sounds off
+        MUTE_ROUTE_GUIDANCE,  // navigation sounds off
 
-        UNMUTE_ROUTE_GUIDANCE, // navigation sounds on
+        UNMUTE_ROUTE_GUIDANCE,  // navigation sounds on
     };
 
     // user requested road regulation type
-    enum class RoadRegulation {
-        SPEED_LIMIT,
-        CARPOOL_RULES
-    };
+    enum class RoadRegulation { SPEED_LIMIT, CARPOOL_RULES };
 
     /*
      * Notifies the platform implementation to display list of previous waypoints
@@ -102,14 +97,14 @@ public:
      * 
      * @param [in] alternateRouteType The type of alternate route requested
      */
-    virtual void showAlternativeRoutes( AlternateRouteType alternateRouteType ) = 0;
+    virtual void showAlternativeRoutes(AlternateRouteType alternateRouteType) = 0;
 
     /*
      * Notifies the platform implementation to perform user interaction with the onscreen map application
      * @param [in] controlDisplay the user requested map control
      */
-    virtual void controlDisplay( ControlDisplay controlDisplay ) = 0;
-    
+    virtual void controlDisplay(ControlDisplay controlDisplay) = 0;
+
     /**
      * Notifies the platform implementation to cancel navigation
      *
@@ -199,9 +194,9 @@ public:
      * @li waypoints (required) : list of waypoints, which can be empty
      * @li shapes (required) : list of route shapes, which can be empty or limited to 3000 entries
      */
-    
+
     virtual std::string getNavigationState() = 0;
-    
+
     /**
      * Notifies the platform implementation to start the navigation
      *
@@ -289,9 +284,9 @@ public:
      * @li hoursOfOperation.type (required) : Indicates whether the location is open on this day or not (Values: OPEN_DURING_HOURS, OPEN_24_HOURS, CLOSED, UNKNOWN, HOLIDAY)
      * @li metadata.phoneNumber (optional) : The phone number of the location in E.164 format
      */
-    
-    virtual void startNavigation( const std::string& payload  ) = 0;
-    
+
+    virtual void startNavigation(const std::string& payload) = 0;
+
     /**
      * Notifies the platform implementation to give details about a maneuver to next waypoint on the route or a completely
        different waypoint off route.
@@ -328,14 +323,14 @@ public:
      * @li queryTarget.address.districtOrCounty (optional) : district or county
      * @li queryTarget.address.postalCode (optional) : postal code
      */
-    virtual void announceManeuver( const std::string& payload ) = 0;
-    
+    virtual void announceManeuver(const std::string& payload) = 0;
+
     /**
      * Notifies the platform implementation to give details about road regulations about the road segments that the user is on
      *
      * @param [in] roadRegulation Type of road regulation requested.(Values: SPEED_LIMIT, CARPOOL_RULES)
      */
-    virtual void announceRoadRegulation( RoadRegulation roadRegulation ) = 0;
+    virtual void announceRoadRegulation(RoadRegulation roadRegulation) = 0;
 
     /**
      * Notifies the Engine of successful handling of a Navigation directive.
@@ -352,7 +347,7 @@ public:
      * @li announceManeuver(): TURN_GUIDANCE_ANNOUNCED, EXIT_GUIDANCE_ANNOUNCED, ENTER_GUIDANCE_ANNOUNCED, MERGE_GUIDANCE_ANNOUNCED, LANE_GUIDANCE_ANNOUNCED
      * @li announceRoadRegulation(): SPEED_LIMIT_REGULATION_ANNOUNCED, CARPOOL_RULES_REGULATION_ANNOUNCED
      */
-    void navigationEvent( EventName event );
+    void navigationEvent(EventName event);
 
     /**
      * Notifies the Engine of error in handling a Navigation directive.
@@ -371,7 +366,7 @@ public:
      * @param code ErrorCode describing the type of failure. (Values: INTERNAL_SERVICE_ERROR, ROUTE_NOT_FOUND, NO_PREVIOUS_WAYPOINTS, NOT_SUPPORTED, NOT_ALLOWED)
      * @param description String providing additional information.
      */
-    void navigationError( ErrorType type, ErrorCode code, const std::string& description );
+    void navigationError(ErrorType type, ErrorCode code, const std::string& description);
 
     /**
      * Notifies AVS of successful showing of alternative routes to the user
@@ -399,16 +394,15 @@ public:
      * @li savings.amount (required) : The amount of savings achieved by the route. Alexa will use prescribed unit to convert the amount of savings to improve the driver's experience, if needed.
      * @li savings.unit (required) : Measurement unit of the savings
      */
-    void showAlternativeRoutesSucceeded( const std::string& payload );
+    void showAlternativeRoutesSucceeded(const std::string& payload);
 
-    void setEngineInterface ( std::shared_ptr<NavigationEngineInterface>  navigationEngineInterface );
+    void setEngineInterface(std::shared_ptr<NavigationEngineInterface> navigationEngineInterface);
 
 private:
     std::shared_ptr<NavigationEngineInterface> m_navigationEngineInterface;
-
 };
 
-} // aace::navigation
-} // aace
+}  // namespace navigation
+}  // namespace aace
 
-#endif // AACE_NAVIGATION_NAVIGATION_H
+#endif  // AACE_NAVIGATION_NAVIGATION_H

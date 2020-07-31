@@ -25,16 +25,16 @@ namespace phoneCallController {
 class PhoneCallControllerInterface {
 public:
     virtual ~PhoneCallControllerInterface() = default;
-    virtual bool dial( const std::string& payload ) = 0;
-    virtual bool redial( const std::string& payload ) = 0;
-    virtual void answer( const std::string& payload ) = 0;
-    virtual void stop( const std::string& payload ) = 0;
-    virtual void playRingtone( const std::string& payload ) = 0;
-    virtual void sendDTMF( const std::string& payload ) = 0;
+    virtual bool dial(const std::string& payload) = 0;
+    virtual bool redial(const std::string& payload) = 0;
+    virtual void answer(const std::string& payload) = 0;
+    virtual void stop(const std::string& payload) = 0;
+    virtual void playRingtone(const std::string& payload) = 0;
+    virtual void sendDTMF(const std::string& payload) = 0;
 };
 
-} // aace::engine::phoneCallController
-} // aace::engine
-} // aace
+}  // namespace phoneCallController
+}  // namespace engine
+}  // namespace aace
 
 #endif

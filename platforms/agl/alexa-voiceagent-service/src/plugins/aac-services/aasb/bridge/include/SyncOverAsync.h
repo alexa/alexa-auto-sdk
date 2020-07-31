@@ -32,17 +32,18 @@ namespace bridge {
 class SyncOverAsync {
 public:
     SyncOverAsync(
-            std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
-            std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher,
-            std::chrono::microseconds waitDuration);
+        std::shared_ptr<aasb::core::logger::LoggerHandler> logger,
+        std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher,
+        std::chrono::microseconds waitDuration);
 
     bool makeCallAndWaitForResponse(
-            const std::string& topic, const std::string& action, const std::string& payload,
-            std::string& response);
+        const std::string& topic,
+        const std::string& action,
+        const std::string& payload,
+        std::string& response);
     void responseAvailable(const std::string& payload);
 
 private:
-
     // Promise which will be resolved when the response for the msg arrives
     std::promise<const std::string> m_responsePromise;
     // Wait duration for response

@@ -52,8 +52,7 @@ std::shared_ptr<LocalMediaSourceHandler> LocalMediaSourceHandler::create(
 LocalMediaSourceHandler::LocalMediaSourceHandler(
     Source source,
     std::weak_ptr<aasb::bridge::ResponseDispatcher> responseDispatcher) :
-        aace::alexa::LocalMediaSource(source),
-        m_responseDispatcher(responseDispatcher) {
+        aace::alexa::LocalMediaSource(source), m_responseDispatcher(responseDispatcher) {
     m_SourceString = convertSourceToString(source);
     m_updateInProgress = false;
 }
@@ -241,16 +240,15 @@ LocalMediaSourceHandler::LocalMediaSourceState LocalMediaSourceHandler::getState
         std::lock_guard<std::mutex> lock(m_mutex);
         if (!m_updateInProgress) {
             m_updateInProgress = true;
-            m_executor.submit([this]{
-                updateState();
-            });
+            m_executor.submit([this] { updateState(); });
         }
-    
+
         // return current state
         currentState = m_mediaSourceState;
     }
 
-    m_logger->log(Level::INFO, TAG, "getState Source: " + m_SourceString + " current state: " + currentState.playbackState.state);
+    m_logger->log(
+        Level::INFO, TAG, "getState Source: " + m_SourceString + " current state: " + currentState.playbackState.state);
 
     // Return current state
     return currentState;
@@ -407,7 +405,8 @@ bool LocalMediaSourceHandler::setMediaSourceState(const std::string& payload) {
                     m_mediaSourceState.sessionState.supportedContentSelectors.push_back(
                         aace::alexa::LocalMediaSource::ContentSelector::PRESET);
                 } else {
-                    m_logger->log(Level::WARN, TAG, "setMediaSourceState: Unknown supported content selector " + payload);
+                    m_logger->log(
+                        Level::WARN, TAG, "setMediaSourceState: Unknown supported content selector " + payload);
                 }
             }
         } else {
@@ -435,8 +434,7 @@ bool LocalMediaSourceHandler::setMediaSourceState(const std::string& payload) {
 
         if (playbackStateElement.HasMember(JSON_ATTR_SUPPORTED_OPERATIONS.c_str()) &&
             playbackStateElement[JSON_ATTR_SUPPORTED_OPERATIONS.c_str()].IsArray()) {
-            auto supportedOperationsElement =
-                playbackStateElement[JSON_ATTR_SUPPORTED_OPERATIONS.c_str()].GetArray();
+            auto supportedOperationsElement = playbackStateElement[JSON_ATTR_SUPPORTED_OPERATIONS.c_str()].GetArray();
             for (unsigned int j = 0; j < supportedOperationsElement.Size(); j++) {
                 auto next = supportedOperationsElement[j].GetString();
                 if (VALUE_PLAY.compare(next) == 0) {

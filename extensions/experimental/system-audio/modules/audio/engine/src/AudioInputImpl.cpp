@@ -79,14 +79,21 @@ static aal_listener_t aalListener = {
 };
 // clang-format on
 
-AudioInputImpl::AudioInputImpl(const int moduleId, const std::string& deviceName, int sampleRate, const std::string& name) :
-    m_moduleId(moduleId), m_name(name), m_deviceName(deviceName), m_sampleRate(sampleRate)
+AudioInputImpl::AudioInputImpl(
+    const int moduleId,
+    const std::string& deviceName,
+    int sampleRate,
+    const std::string& name) :
+        m_moduleId(moduleId),
+        m_name(name),
+        m_deviceName(deviceName),
+        m_sampleRate(sampleRate)
 #ifdef THROTTLE_AUDIO
-    , m_throttle(
-        DEFAULT_AUDIO_FRAGMENT_SAMPLES,
-        std::chrono::milliseconds(DEFAULT_AUDIO_FRAGMENT_DURATION),
-        [this](const int16_t* data, size_t length) { write(data, length); }
-    )
+        ,
+        m_throttle(
+            DEFAULT_AUDIO_FRAGMENT_SAMPLES,
+            std::chrono::milliseconds(DEFAULT_AUDIO_FRAGMENT_DURATION),
+            [this](const int16_t* data, size_t length) { write(data, length); })
 #endif
 {
 }
@@ -162,7 +169,7 @@ bool AudioInputImpl::startAudioInput() {
                 }
 
                 m_utterance.read(reinterpret_cast<char*>(buffer), sizeof(buffer));
-                auto count =  m_utterance.gcount();
+                auto count = m_utterance.gcount();
                 m_utterance.tellg();
 
                 write(buffer, count / sizeof(int16_t));

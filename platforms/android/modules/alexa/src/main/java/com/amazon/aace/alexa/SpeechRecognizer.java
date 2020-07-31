@@ -30,13 +30,11 @@ import com.amazon.aace.core.PlatformInterface;
  *
  * @note For observing Alexa dialog state transitions, see @c AlexaClient.dialogStateChanged().
  */
-abstract public class SpeechRecognizer extends PlatformInterface
-{
+abstract public class SpeechRecognizer extends PlatformInterface {
     /**
      * Describes type of event that initiated the speech request.
      */
-    public enum Initiator
-    {
+    public enum Initiator {
         /**
          * Hold-to-talk speech initiator type.
          */
@@ -58,7 +56,7 @@ abstract public class SpeechRecognizer extends PlatformInterface
         /**
          * @internal
          */
-        private Initiator( String name ) {
+        private Initiator(String name) {
             m_name = name;
         }
 
@@ -78,10 +76,10 @@ abstract public class SpeechRecognizer extends PlatformInterface
     private final boolean mInitialWakewordDetectionEnabled;
 
     public SpeechRecognizer() {
-        this( true );
+        this(true);
     }
 
-    public SpeechRecognizer( boolean wakewordDetectionEnabled ) {
+    public SpeechRecognizer(boolean wakewordDetectionEnabled) {
         mInitialWakewordDetectionEnabled = wakewordDetectionEnabled;
     }
 
@@ -94,9 +92,10 @@ abstract public class SpeechRecognizer extends PlatformInterface
      *
      * @param  wakeword The wake word that was detected
      *
-     * @return @c true if the Engine should initiate a recognize event, @c false if the Engine should ignore the invocation
+     * @return @c true if the Engine should initiate a recognize event, @c false if the Engine should ignore the
+     *         invocation
      */
-    public boolean wakewordDetected( String wakeword ) {
+    public boolean wakewordDetected(String wakeword) {
         return true;
     }
 
@@ -104,8 +103,7 @@ abstract public class SpeechRecognizer extends PlatformInterface
      * Notifies the platform implementation when end of
      * speech is detected for the current recognize event
      */
-    public void endOfSpeechDetected() {
-    }
+    public void endOfSpeechDetected() {}
 
     /**
      * Notifies the Engine of a speech recognition event initiated by a press-and-hold action on the
@@ -117,7 +115,7 @@ abstract public class SpeechRecognizer extends PlatformInterface
      * @return @c true if the Engine successfully initiated a recognize event, else @c false
      */
     public final boolean holdToTalk() {
-        return holdToTalk( getNativeRef() );
+        return holdToTalk(getNativeRef());
     }
 
     /**
@@ -130,7 +128,7 @@ abstract public class SpeechRecognizer extends PlatformInterface
      * @return @c true if the Engine successfully started a recognize event, else @c false
      */
     public final boolean tapToTalk() {
-        return tapToTalk( getNativeRef() );
+        return tapToTalk(getNativeRef());
     }
 
     /**
@@ -149,17 +147,18 @@ abstract public class SpeechRecognizer extends PlatformInterface
      * initator type is @c WAKEWORD, otherwise should be set to null.
      * @return @c true if the Engine successfully started a recognize event, else @c false
      */
-    public final boolean startCapture( Initiator initiator, long keywordBegin, long keywordEnd, String keyword ) {
-        return startCapture( getNativeRef(), initiator, keywordBegin, keywordEnd, keyword );
+    public final boolean startCapture(Initiator initiator, long keywordBegin, long keywordEnd, String keyword) {
+        return startCapture(getNativeRef(), initiator, keywordBegin, keywordEnd, keyword);
     }
 
     /**
-     * Notifies the Engine to terminate the current recognize event. The Engine will call @c stopAudioInput() to notify the platform implementation when to stop writing audio samples.
+     * Notifies the Engine to terminate the current recognize event. The Engine will call @c stopAudioInput() to notify
+     * the platform implementation when to stop writing audio samples.
      *
      * @return @c true if the Engine successfully terminated the current recognize event, else @c false
      */
     public final boolean stopCapture() {
-        return stopCapture( getNativeRef() );
+        return stopCapture(getNativeRef());
     }
 
     /**
@@ -169,7 +168,7 @@ abstract public class SpeechRecognizer extends PlatformInterface
      * @return @c true if the Engine successfully enabled wake word detection, else @c false
      */
     public final boolean enableWakewordDetection() {
-        return enableWakewordDetection( getNativeRef() );
+        return enableWakewordDetection(getNativeRef());
     }
 
     /**
@@ -178,7 +177,7 @@ abstract public class SpeechRecognizer extends PlatformInterface
      * @return @c true if the Engine successfully disabled wakeword detection, else @c false
      */
     public final boolean disableWakewordDetection() {
-        return disableWakewordDetection( getNativeRef() );
+        return disableWakewordDetection(getNativeRef());
     }
 
     /**
@@ -187,28 +186,27 @@ abstract public class SpeechRecognizer extends PlatformInterface
      * @return @c true if wake word detection is enabled, else @c false
      */
     public final boolean isWakewordDetectionEnabled() {
-        return isWakewordDetectionEnabled( getNativeRef() );
+        return isWakewordDetectionEnabled(getNativeRef());
     }
 
     // NativeRef implementation
     final protected long createNativeRef() {
-        return createBinder( mInitialWakewordDetectionEnabled );
+        return createBinder(mInitialWakewordDetectionEnabled);
     }
 
-    final protected void disposeNativeRef( long nativeRef ) {
-        disposeBinder( nativeRef );
+    final protected void disposeNativeRef(long nativeRef) {
+        disposeBinder(nativeRef);
     }
 
     // Native Engine JNI methods
-    private native long createBinder( boolean wakewordDetectionEnabled );
-    private native void disposeBinder( long nativeRef );
-    private native boolean holdToTalk( long nativeObject );
-    private native boolean tapToTalk( long nativeObject );
-    private native boolean startCapture( long nativeObject, Initiator initiator, long keywordBegin, long keywordEnd, String keyword );
-    private native boolean stopCapture( long nativeObject );
-    private native boolean enableWakewordDetection( long nativeObject );
-    private native boolean disableWakewordDetection( long nativeObject );
-    private native boolean isWakewordDetectionEnabled( long nativeObject );
+    private native long createBinder(boolean wakewordDetectionEnabled);
+    private native void disposeBinder(long nativeRef);
+    private native boolean holdToTalk(long nativeObject);
+    private native boolean tapToTalk(long nativeObject);
+    private native boolean startCapture(
+            long nativeObject, Initiator initiator, long keywordBegin, long keywordEnd, String keyword);
+    private native boolean stopCapture(long nativeObject);
+    private native boolean enableWakewordDetection(long nativeObject);
+    private native boolean disableWakewordDetection(long nativeObject);
+    private native boolean isWakewordDetectionEnabled(long nativeObject);
 }
-
-

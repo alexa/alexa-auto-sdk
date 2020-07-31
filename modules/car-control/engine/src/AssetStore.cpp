@@ -90,7 +90,7 @@ bool AssetStore::addAssets(std::istream& stream) {
 
 const std::vector<AssetStore::NameLocalePair>& AssetStore::getFriendlyNames(const std::string& assetId) const {
     auto iter = m_assets.find(assetId);
-    if (iter != m_assets.end()) { 
+    if (iter != m_assets.end()) {
         return iter->second;
     } else {
         return m_empty;

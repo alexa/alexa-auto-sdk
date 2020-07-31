@@ -25,16 +25,20 @@ namespace audio {
 
 class MockAudioManagerInterface : public aace::engine::audio::AudioManagerInterface {
 public:
-    MOCK_METHOD2(openAudioInputChannel,
-        std::shared_ptr<aace::engine::audio::AudioInputChannelInterface>(const std::string& name,AudioInputType audioInputType)
-    );
-    MOCK_METHOD2(openAudioOutputChannel,
-        std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface>(const std::string& name,AudioOutputType audioOutputType)
-    );
+    MOCK_METHOD2(
+        openAudioInputChannel,
+        std::shared_ptr<aace::engine::audio::AudioInputChannelInterface>(
+            const std::string& name,
+            AudioInputType audioInputType));
+    MOCK_METHOD2(
+        openAudioOutputChannel,
+        std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface>(
+            const std::string& name,
+            AudioOutputType audioOutputType));
 };
 
-} // aace::test::audio
-} // aace::test
-} // aace
+}  // namespace audio
+}  // namespace test
+}  // namespace aace
 
-#endif // AACE_ENGINE_TEST_AUDIO_MOCK_AUDIO_MANAGER_INTERFACE_H
+#endif  // AACE_ENGINE_TEST_AUDIO_MOCK_AUDIO_MANAGER_INTERFACE_H

@@ -23,116 +23,100 @@ namespace aace {
 namespace jni {
 namespace native {
 
-    JavaString::JavaString() : m_cstr( nullptr ) {
-    }
+JavaString::JavaString() : m_cstr(nullptr) {
+}
 
-    JavaString::JavaString( jobject jstr ) : m_cstr( nullptr )
-    {
-        try_with_context
-        {
-            if( jstr != nullptr ) {
-                m_ref = GlobalRef<jstring>( (jstring) jstr );
-            }
+JavaString::JavaString(jobject jstr) : m_cstr(nullptr) {
+    try_with_context {
+        if (jstr != nullptr) {
+            m_ref = GlobalRef<jstring>((jstring)jstr);
+        }
+    }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "JavaString", ex.what());
+    }
+}
+
+JavaString::JavaString(jstring jstr) : m_cstr(nullptr) {
+    if (jstr != nullptr) {
+        m_ref = GlobalRef<jstring>(jstr);
+    }
+}
+
+JavaString::JavaString(const std::string& str) : m_cstr(nullptr) {
+    try_with_context {
+        jstring jstr = env->NewStringUTF(str.c_str());
+        ThrowIfJavaEx(env, "newStringUTFFailed");
+        m_ref = GlobalRef<jstring>(jstr);
+        // delete local string ref
+        env->DeleteLocalRef(jstr);
+    }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "JavaString", ex.what());
+    }
+}
+
+JavaString::JavaString(const char* str) : m_cstr(nullptr) {
+    try_with_context {
+        jstring jstr = env->NewStringUTF(str);
+        ThrowIfJavaEx(env, "newStringUTFFailed");
+        m_ref = GlobalRef<jstring>(jstr);
+        // delete local string ref
+        env->DeleteLocalRef(jstr);
+    }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "JavaString", ex.what());
+    }
+}
+
+JavaString::~JavaString() {
+    try_with_context {
+        if (m_ref.get() != nullptr && m_cstr != nullptr) {
+            env->ReleaseStringUTFChars(m_ref.get(), m_cstr);
+            ThrowIfJavaEx(env, "releaseStringUTFCharsFailed");
+        }
+    }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "~JavaString", ex.what());
+    }
+}
+
+jstring JavaString::get() {
+    try_with_context {
+        ThrowIfNull(m_ref.get(), "invalidStringRef");
+        return (jstring)env->NewLocalRef(m_ref.get());
+    }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "get", ex.what());
+        return nullptr;
+    }
+}
+
+std::string JavaString::toStdStr() {
+    try_with_context {
+        ReturnIf(toCStr() == nullptr, std::string()) return m_cstr;
+    }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "toStdStr", ex.what());
+        return std::string();
+    }
+}
+
+const char* JavaString::toCStr() {
+    if (m_cstr == nullptr) {
+        try_with_context {
+            ThrowIfNull(get(), "invalidGlobalStringRef");
+            m_cstr = context.getEnv()->GetStringUTFChars(get(), nullptr);
+            ThrowIfJavaEx(env, "getStringUTFCharsFailed");
         }
         catch_with_ex {
-            AACE_JNI_ERROR(TAG,"JavaString",ex.what());
+            AACE_JNI_ERROR(TAG, "toCStr", ex.what());
         }
     }
 
-    JavaString::JavaString( jstring jstr ) : m_cstr( nullptr )
-    {
-        if( jstr != nullptr ) {
-            m_ref = GlobalRef<jstring>( jstr );
-        }
-    }
+    return m_cstr;
+}
 
-    JavaString::JavaString( const std::string& str ) : m_cstr( nullptr )
-    {
-        try_with_context
-        {
-            jstring jstr = env->NewStringUTF( str.c_str() );
-            ThrowIfJavaEx( env, "newStringUTFFailed" );
-            m_ref = GlobalRef<jstring>( jstr );
-            // delete local string ref
-            env->DeleteLocalRef( jstr );
-        }
-        catch_with_ex {
-            AACE_JNI_ERROR(TAG,"JavaString",ex.what());
-        }
-    }
-
-    JavaString::JavaString( const char* str ) : m_cstr( nullptr )
-    {
-        try_with_context
-        {
-            jstring jstr = env->NewStringUTF( str );
-            ThrowIfJavaEx( env, "newStringUTFFailed" );
-            m_ref = GlobalRef<jstring>( jstr );
-            // delete local string ref
-            env->DeleteLocalRef( jstr );
-        }
-        catch_with_ex {
-            AACE_JNI_ERROR(TAG,"JavaString",ex.what());
-        }
-    }
-
-    JavaString::~JavaString()
-    {
-        try_with_context
-        {
-            if( m_ref.get() != nullptr && m_cstr != nullptr ) {
-                env->ReleaseStringUTFChars( m_ref.get(), m_cstr );
-                ThrowIfJavaEx( env, "releaseStringUTFCharsFailed" );
-            }
-        }
-        catch_with_ex {
-            AACE_JNI_ERROR(TAG,"~JavaString",ex.what());
-        }
-    }
-
-    jstring JavaString::get() {
-        try_with_context
-        {
-            ThrowIfNull( m_ref.get(), "invalidStringRef" );
-            return (jstring) env->NewLocalRef( m_ref.get() );
-        }
-        catch_with_ex {
-            AACE_JNI_ERROR(TAG,"get",ex.what());
-            return nullptr;
-        }
-    }
-
-    std::string JavaString::toStdStr()
-    {
-        try_with_context 
-        {
-            ReturnIf( toCStr() == nullptr, std::string() )
-            return m_cstr;
-        }
-        catch_with_ex {
-            AACE_JNI_ERROR(TAG,"toStdStr",ex.what());
-            return std::string();
-        }
-    }
-
-    const char* JavaString::toCStr()
-    {
-        if( m_cstr == nullptr )
-        {
-            try_with_context
-            {
-                ThrowIfNull( get(), "invalidGlobalStringRef" );
-                m_cstr = context.getEnv()->GetStringUTFChars( get(), nullptr );
-                ThrowIfJavaEx( env, "getStringUTFCharsFailed" );
-            }
-            catch_with_ex {
-                AACE_JNI_ERROR(TAG,"toCStr",ex.what());
-            }
-        }
-
-        return m_cstr;
-    }
-
-} // aace::jni::native
-} // aace::jni
-} // aace
+}  // namespace native
+}  // namespace jni
+}  // namespace aace

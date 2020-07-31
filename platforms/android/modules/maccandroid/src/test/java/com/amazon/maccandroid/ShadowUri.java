@@ -12,8 +12,7 @@ public class ShadowUri {
     @RealObject
     protected Uri.Builder uriBuilder;
 
-    public void __constructor__() {
-    }
+    public void __constructor__() {}
 
     @Implementation
     public Uri.Builder scheme(String scheme) {

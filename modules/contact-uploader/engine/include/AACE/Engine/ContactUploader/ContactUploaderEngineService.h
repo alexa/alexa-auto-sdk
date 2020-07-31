@@ -28,35 +28,34 @@ namespace engine {
 namespace contactUploader {
 
 class ContactUploaderEngineService : public aace::engine::core::EngineService {
-    DESCRIBE("aace.contactUploader",VERSION("1.0"),DEPENDS(aace::engine::alexa::AlexaEngineService))
+    DESCRIBE("aace.contactUploader", VERSION("1.0"), DEPENDS(aace::engine::alexa::AlexaEngineService))
 
 private:
-    ContactUploaderEngineService( const aace::engine::core::ServiceDescription& description );
+    ContactUploaderEngineService(const aace::engine::core::ServiceDescription& description);
 
 public:
     virtual ~ContactUploaderEngineService() = default;
 
 protected:
     bool shutdown() override;
-    bool registerPlatformInterface( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) override;
+    bool registerPlatformInterface(std::shared_ptr<aace::core::PlatformInterface> platformInterface) override;
 
 private:
     // platform interface registration
     template <class T>
-    bool registerPlatformInterfaceType( std::shared_ptr<aace::core::PlatformInterface> platformInterface ) {
-        std::shared_ptr<T> typedPlatformInterface = std::dynamic_pointer_cast<T>( platformInterface );
-        return typedPlatformInterface != nullptr ? registerPlatformInterfaceType( typedPlatformInterface ) : false;
+    bool registerPlatformInterfaceType(std::shared_ptr<aace::core::PlatformInterface> platformInterface) {
+        std::shared_ptr<T> typedPlatformInterface = std::dynamic_pointer_cast<T>(platformInterface);
+        return typedPlatformInterface != nullptr ? registerPlatformInterfaceType(typedPlatformInterface) : false;
     }
 
-    bool registerPlatformInterfaceType( std::shared_ptr<aace::contactUploader::ContactUploader> contactUploader );
+    bool registerPlatformInterfaceType(std::shared_ptr<aace::contactUploader::ContactUploader> contactUploader);
 
     // engine implementation object references
     std::shared_ptr<ContactUploaderEngineImpl> m_contactUploaderEngineImpl;
-
 };
 
-} // aace::engine::contactUploader
-} // aace::engine
-} // aace
+}  // namespace contactUploader
+}  // namespace engine
+}  // namespace aace
 
 #endif

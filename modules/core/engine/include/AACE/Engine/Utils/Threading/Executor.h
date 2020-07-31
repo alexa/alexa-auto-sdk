@@ -94,9 +94,9 @@ auto Executor::submitToFront(Task task, Args&&... args) -> std::future<decltype(
     return m_taskQueue->pushToFront(task, std::forward<Args>(args)...);
 }
 
-} // aace::engine::utils::threading
-} // aace::engine::utils
-} // aace::engine
-} // aace
+}  // namespace threading
+}  // namespace utils
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_UTILS_THREADING_EXECUTOR_H_
+#endif  // AACE_ENGINE_UTILS_THREADING_EXECUTOR_H_

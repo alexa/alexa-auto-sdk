@@ -18,7 +18,7 @@
 namespace aace {
 namespace audio {
 
-AudioOutputProvider::~AudioOutputProvider() = default; // key function
+AudioOutputProvider::~AudioOutputProvider() = default;  // key function
 
-} // aace::audio
-} // aace
+}  // namespace audio
+}  // namespace aace

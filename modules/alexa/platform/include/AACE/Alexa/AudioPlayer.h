@@ -59,8 +59,9 @@ public:
      *
      * @param [in] state The new playback state
      */
-    virtual void playerActivityChanged( PlayerActivity state ) {}
-    
+    virtual void playerActivityChanged(PlayerActivity state) {
+    }
+
     /**
      * Returns the current playback position of the audio player.
      * If the audio source is not playing, the most recent position played
@@ -85,13 +86,13 @@ public:
      *
      * Should *never* be called by the platform implementation.
      */
-    void setEngineInterface( std::shared_ptr<aace::alexa::AudioPlayerEngineInterface> audioPlayerEngineInterface );
-    
+    void setEngineInterface(std::shared_ptr<aace::alexa::AudioPlayerEngineInterface> audioPlayerEngineInterface);
+
 private:
     std::weak_ptr<aace::alexa::AudioPlayerEngineInterface> m_audioPlayerEngineInterface;
 };
 
-} // aace::alexa
-} // aace
+}  // namespace alexa
+}  // namespace aace
 
-#endif // AACE_ALEXA_AUDIO_PLAYER_H
+#endif  // AACE_ALEXA_AUDIO_PLAYER_H

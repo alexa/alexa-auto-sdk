@@ -27,27 +27,24 @@
 #include <AVSCommon/Utils/Threading/Executor.h>
 #include <AVSCommon/SDKInterfaces/MessageSenderInterface.h>
 
-
 #include "NavigationHandlerInterface.h"
 
 namespace aace {
 namespace engine {
 namespace navigation {
 
-class NavigationCapabilityAgent :
-    public alexaClientSDK::avsCommon::avs::CapabilityAgent,
-    public alexaClientSDK::avsCommon::sdkInterfaces::CapabilityConfigurationInterface,
-    public alexaClientSDK::avsCommon::utils::RequiresShutdown,
-    public std::enable_shared_from_this<NavigationCapabilityAgent> {
-    
+class NavigationCapabilityAgent
+        : public alexaClientSDK::avsCommon::avs::CapabilityAgent
+        , public alexaClientSDK::avsCommon::sdkInterfaces::CapabilityConfigurationInterface
+        , public alexaClientSDK::avsCommon::utils::RequiresShutdown
+        , public std::enable_shared_from_this<NavigationCapabilityAgent> {
 public:
     static std::shared_ptr<NavigationCapabilityAgent> create(
         std::shared_ptr<aace::engine::navigation::NavigationHandlerInterface> navigationHandler,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
-        const std::string& navigationProviderName
-    );
+        const std::string& navigationProviderName);
 
     /**
      * Destructor.
@@ -56,25 +53,28 @@ public:
 
     /// @name CapabilityAgent/DirectiveHandlerInterface Functions
     /// @{
-    void handleDirectiveImmediately( std::shared_ptr<alexaClientSDK::avsCommon::avs::AVSDirective> directive ) override;
-    void preHandleDirective( std::shared_ptr<DirectiveInfo> info ) override;
-    void handleDirective( std::shared_ptr<DirectiveInfo> info ) override;
-    void cancelDirective( std::shared_ptr<DirectiveInfo> info ) override;
+    void handleDirectiveImmediately(std::shared_ptr<alexaClientSDK::avsCommon::avs::AVSDirective> directive) override;
+    void preHandleDirective(std::shared_ptr<DirectiveInfo> info) override;
+    void handleDirective(std::shared_ptr<DirectiveInfo> info) override;
+    void cancelDirective(std::shared_ptr<DirectiveInfo> info) override;
     alexaClientSDK::avsCommon::avs::DirectiveHandlerConfiguration getConfiguration() const override;
     /// @}};
 
-    std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>> getCapabilityConfigurations() override;
+    std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>>
+    getCapabilityConfigurations() override;
 
     // StateProviderInterface
-    void provideState( const alexaClientSDK::avsCommon::avs::NamespaceAndName& stateProviderName, const unsigned int stateRequestToken ) override;
+    void provideState(
+        const alexaClientSDK::avsCommon::avs::NamespaceAndName& stateProviderName,
+        const unsigned int stateRequestToken) override;
 
     /**
      * Send success event corresponding to the @c EventName
      *
      * @param [in] event The @c EventName corresponding to the type of event to be sent.
      */
-    void navigationEvent( aace::navigation::NavigationEngineInterface::EventName event );
-    
+    void navigationEvent(aace::navigation::NavigationEngineInterface::EventName event);
+
     /**
      * Send failure event corresponding to the @c ErrorType
      *
@@ -82,12 +82,18 @@ public:
      * @param [in] code The @c ErrorCode corresponding to the code of error to be sent.
      * @param [in] description The @c string corresponding to the description of error to be sent.
      */
-    void navigationError( aace::navigation::NavigationEngineInterface::ErrorType type, aace::navigation::NavigationEngineInterface::ErrorCode code, const std::string& description );
-    
+    void navigationError(
+        aace::navigation::NavigationEngineInterface::ErrorType type,
+        aace::navigation::NavigationEngineInterface::ErrorCode code,
+        const std::string& description);
 
 private:
-    NavigationCapabilityAgent( std::shared_ptr<aace::engine::navigation::NavigationHandlerInterface> navigationHandler, std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender, std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
-            std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender, const std::string& navigationProviderName );
+    NavigationCapabilityAgent(
+        std::shared_ptr<aace::engine::navigation::NavigationHandlerInterface> navigationHandler,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+        const std::string& navigationProviderName);
 
     // @name RequiresShutdown Functions
     /// @{
@@ -104,7 +110,8 @@ private:
     void sendExceptionEncounteredAndReportFailed(
         std::shared_ptr<DirectiveInfo> info,
         const std::string& message,
-        alexaClientSDK::avsCommon::avs::ExceptionErrorType type = alexaClientSDK::avsCommon::avs::ExceptionErrorType::INTERNAL_ERROR);
+        alexaClientSDK::avsCommon::avs::ExceptionErrorType type =
+            alexaClientSDK::avsCommon::avs::ExceptionErrorType::INTERNAL_ERROR);
 
     /**
      * Remove a directive from the map of message IDs to @c DirectiveInfo instances.
@@ -119,7 +126,7 @@ private:
      * @param [in] info The @c DirectiveInfo containing the @c AVSDirective and the @c DirectiveHandlerResultInterface.
      */
     void setHandlingCompleted(std::shared_ptr<DirectiveInfo> info);
-    
+
     /**
      * This function handles a @c startNavigation directive.
      *
@@ -139,13 +146,13 @@ private:
      * @param [in] info The @c DirectiveInfo containing the @c AVSDirective and the @c DirectiveHandlerResultInterface.
      */
     void handleNavigateToPreviousWaypointDirective(std::shared_ptr<DirectiveInfo> info);
-        
+
     /**
      * This function handles a @c CancelNavigation directive.
      *
      * @param [in] info The @c DirectiveInfo containing the @c AVSDirective and the @c DirectiveHandlerResultInterface.
      */
-        
+
     void handleCancelNavigationDirective(std::shared_ptr<DirectiveInfo> info);
 
     /**
@@ -158,12 +165,17 @@ private:
     /**
      * Exectuor function for provideState
      */
-    void executeProvideState( const alexaClientSDK::avsCommon::avs::NamespaceAndName& stateProviderName, const unsigned int stateRequestToken );
+    void executeProvideState(
+        const alexaClientSDK::avsCommon::avs::NamespaceAndName& stateProviderName,
+        const unsigned int stateRequestToken);
 
     // Executor functions for navigation event handling
-    void executeNavigationEvent( aace::navigation::NavigationEngineInterface::EventName event );
-    void executeNavigationError( aace::navigation::NavigationEngineInterface::ErrorType type, aace::navigation::NavigationEngineInterface::ErrorCode code, const std::string& description );
-    
+    void executeNavigationEvent(aace::navigation::NavigationEngineInterface::EventName event);
+    void executeNavigationError(
+        aace::navigation::NavigationEngineInterface::ErrorType type,
+        aace::navigation::NavigationEngineInterface::ErrorCode code,
+        const std::string& description);
+
     // Convert ErrorCode enum to string based on the error type
     std::string getNavigationErrorCode(aace::navigation::NavigationEngineInterface::ErrorCode code);
     std::string getWaypointErrorCode(aace::navigation::NavigationEngineInterface::ErrorCode code);
@@ -174,14 +186,14 @@ private:
     void navigateToPreviousWaypointSuccess();
 
     // Sends event upon fail event
-    void startNavigationError( std::string code, std::string description );
-    void showPreviousWaypointsError( std::string code, std::string description );
-    void navigateToPreviousWaypointError( std::string code, std::string description );
-    
+    void startNavigationError(std::string code, std::string description);
+    void showPreviousWaypointsError(std::string code, std::string description);
+    void navigateToPreviousWaypointError(std::string code, std::string description);
+
     /**
      * Check Navigation State for validity
      */
-    bool isNavigationStateValid( std::string navigationState  );
+    bool isNavigationStateValid(std::string navigationState);
 
     /**
      * @name Executor Thread Variables
@@ -195,22 +207,23 @@ private:
     /// @}
 
     /// Set of capability configurations that will get published using the Capabilities API
-    std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>> m_capabilityConfigurations;
+    std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>>
+        m_capabilityConfigurations;
 
     /// This is the worker thread for the @c Navigation CA.
     alexaClientSDK::avsCommon::utils::threading::Executor m_executor;
 
     /// The @c ContextManager that needs to be updated of the state.
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> m_contextManager;
-        
+
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> m_messageSender;
 
     /// The last known NavigationState payload
     std::string m_navigationStatePayload;
 };
 
-} // aace::engine::navigation
-} // aace::engine
-} // aace
+}  // namespace navigation
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_NAVIGATION_NAVIGATION_CAPABILITY_AGENT_H
+#endif  // AACE_ENGINE_NAVIGATION_NAVIGATION_CAPABILITY_AGENT_H

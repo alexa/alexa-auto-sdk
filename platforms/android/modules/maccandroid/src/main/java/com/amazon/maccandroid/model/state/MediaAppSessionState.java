@@ -3,7 +3,6 @@ package com.amazon.maccandroid.model.state;
 import com.amazon.maccandroid.MediaApp;
 
 public class MediaAppSessionState {
-
     private final String mPlayerid;
     private final boolean mLaunched;
     private final boolean mActive;

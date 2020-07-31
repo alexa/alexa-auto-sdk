@@ -18,7 +18,7 @@
 namespace aace {
 namespace alexa {
 
-Notifications::~Notifications() = default; // key function
+Notifications::~Notifications() = default;  // key function
 
-} // aace::alexa
-} // aac
+}  // namespace alexa
+}  // namespace aace

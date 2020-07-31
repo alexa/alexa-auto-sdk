@@ -41,7 +41,6 @@ import com.google.android.exoplayer2.util.Util;
 import java.io.IOException;
 
 class MediaSourceFactory {
-
     private static final String sTag = "MediaSourceFactory";
     private static final String sUserAgentName = "com.amazon.sampleapp";
 
@@ -51,67 +50,58 @@ class MediaSourceFactory {
     private final Handler mMainHandler;
     private final PlaylistParser mPlaylistParser = new PlaylistParser();
     private final MediaSourceListener mMediaSourceListener = new MediaSourceListener();
-    private final DataSource.Factory mFileDataSourceFactory = new FileDataSourceFactory( null );
+    private final DataSource.Factory mFileDataSourceFactory = new FileDataSourceFactory(null);
     private final DataSource.Factory mHttpDataSourceFactory;
 
-    MediaSourceFactory( Context context, LoggerHandler logger, String name, Handler handler ) {
+    MediaSourceFactory(Context context, LoggerHandler logger, String name, Handler handler) {
         mContext = context;
         mLogger = logger;
         mName = name;
         mMainHandler = handler;
-        mHttpDataSourceFactory = buildHttpDataSourceFactory( mContext );
+        mHttpDataSourceFactory = buildHttpDataSourceFactory(mContext);
     }
 
-    private HttpDataSource.Factory buildHttpDataSourceFactory( Context context ) {
-        String userAgent = Util.getUserAgent( context, sUserAgentName );
+    private HttpDataSource.Factory buildHttpDataSourceFactory(Context context) {
+        String userAgent = Util.getUserAgent(context, sUserAgentName);
         // Some streams may see a long response time to begin data transfer from server after
         // connection. Use default 8 second connection timeout and increased 20 second read timeout
         // to catch this case and avoid reattempts to connect that will continue to time out.
         // May perceive long "dead time" in cases where data read takes a long time
-        return new DefaultHttpDataSourceFactory( userAgent, null, 8000,
-                20000, true );
+        return new DefaultHttpDataSourceFactory(userAgent, null, 8000, 20000, true);
     }
 
-    MediaSource createFileMediaSource( final Uri uri ) throws Exception {
-        return createMediaSource( uri, mFileDataSourceFactory, mMediaSourceListener, mMainHandler,
-                mPlaylistParser );
+    MediaSource createFileMediaSource(final Uri uri) throws Exception {
+        return createMediaSource(uri, mFileDataSourceFactory, mMediaSourceListener, mMainHandler, mPlaylistParser);
     }
 
-    MediaSource createHttpMediaSource( final Uri uri ) throws Exception {
-        return createMediaSource( uri, mHttpDataSourceFactory, mMediaSourceListener, mMainHandler,
-                mPlaylistParser );
+    MediaSource createHttpMediaSource(final Uri uri) throws Exception {
+        return createMediaSource(uri, mHttpDataSourceFactory, mMediaSourceListener, mMainHandler, mPlaylistParser);
     }
 
-    private static MediaSource createMediaSource( final Uri uri,
-                                           final DataSource.Factory dataSourceFactory,
-                                           final MediaSourceEventListener mediaSourceListener,
-                                           final Handler handler,
-                                           final PlaylistParser playlistParser ) throws Exception {
-        MediaType type = MediaType.inferContentType( uri.getLastPathSegment() );
-        switch ( type ) {
+    private static MediaSource createMediaSource(final Uri uri, final DataSource.Factory dataSourceFactory,
+            final MediaSourceEventListener mediaSourceListener, final Handler handler,
+            final PlaylistParser playlistParser) throws Exception {
+        MediaType type = MediaType.inferContentType(uri.getLastPathSegment());
+        switch (type) {
             case DASH:
-                return new DashMediaSource.Factory(
-                        new DefaultDashChunkSource.Factory( dataSourceFactory ),
-                        dataSourceFactory
-                ).createMediaSource( uri, handler, mediaSourceListener );
+                return new DashMediaSource
+                        .Factory(new DefaultDashChunkSource.Factory(dataSourceFactory), dataSourceFactory)
+                        .createMediaSource(uri, handler, mediaSourceListener);
             case SMOOTH_STREAMING:
-                return new SsMediaSource.Factory(
-                        new DefaultSsChunkSource.Factory( dataSourceFactory ),
-                        dataSourceFactory
-                ).createMediaSource( uri, handler, mediaSourceListener );
+                return new SsMediaSource.Factory(new DefaultSsChunkSource.Factory(dataSourceFactory), dataSourceFactory)
+                        .createMediaSource(uri, handler, mediaSourceListener);
             case HLS:
-                return new HlsMediaSource.Factory( dataSourceFactory )
-                        .createMediaSource( uri, handler, mediaSourceListener );
+                return new HlsMediaSource.Factory(dataSourceFactory)
+                        .createMediaSource(uri, handler, mediaSourceListener);
             case M3U:
             case PLS:
-                Uri parsedUri = playlistParser.parseUri( uri );
-                return createMediaSource( parsedUri, dataSourceFactory, mediaSourceListener,
-                        handler, playlistParser );
+                Uri parsedUri = playlistParser.parseUri(uri);
+                return createMediaSource(parsedUri, dataSourceFactory, mediaSourceListener, handler, playlistParser);
             case OTHER:
-                return new ExtractorMediaSource.Factory( dataSourceFactory )
-                        .createMediaSource( uri, handler, mediaSourceListener );
+                return new ExtractorMediaSource.Factory(dataSourceFactory)
+                        .createMediaSource(uri, handler, mediaSourceListener);
             default:
-                throw new IllegalStateException( "Unsupported type" );
+                throw new IllegalStateException("Unsupported type");
         }
     }
 
@@ -119,32 +109,35 @@ class MediaSourceFactory {
     // Media types for creating an ExoPlayer MediaSource
     //
     enum MediaType {
-        DASH( C.TYPE_DASH ),
-        SMOOTH_STREAMING( C.TYPE_SS ),
-        HLS( C.TYPE_HLS ),
-        OTHER( C.TYPE_OTHER ),
-        M3U( 4 ),
-        PLS( 5 );
+        DASH(C.TYPE_DASH),
+        SMOOTH_STREAMING(C.TYPE_SS),
+        HLS(C.TYPE_HLS),
+        OTHER(C.TYPE_OTHER),
+        M3U(4),
+        PLS(5);
 
         private final int mType;
 
-        MediaType( int type ) {
+        MediaType(int type) {
             mType = type;
         }
 
-        public int getType() { return mType; }
+        public int getType() {
+            return mType;
+        }
 
-        public static MediaType inferContentType( @Nullable final String fileExtension ) {
-            if ( fileExtension == null ) {
+        public static MediaType inferContentType(@Nullable final String fileExtension) {
+            if (fileExtension == null) {
                 return OTHER;
-            } else if ( fileExtension.endsWith( ".ashx" ) || fileExtension.endsWith( ".m3u" ) ) {
+            } else if (fileExtension.endsWith(".ashx") || fileExtension.endsWith(".m3u")) {
                 return M3U;
-            } else if ( fileExtension.endsWith( ".pls" ) ) {
+            } else if (fileExtension.endsWith(".pls")) {
                 return PLS;
             } else {
-                int type = Util.inferContentType( fileExtension );
-                for ( MediaType mediaType : MediaType.values() ) {
-                    if ( mediaType.getType() == type ) return mediaType;
+                int type = Util.inferContentType(fileExtension);
+                for (MediaType mediaType : MediaType.values()) {
+                    if (mediaType.getType() == type)
+                        return mediaType;
                 }
                 return OTHER;
             }
@@ -155,54 +148,44 @@ class MediaSourceFactory {
     // Media Source event listener
     //
     private class MediaSourceListener implements MediaSourceEventListener {
-
         private int mRetryCount = 0;
 
         @Override
-        public void onLoadStarted( DataSpec dataSpec, int dataType, int trackType,
-                                   Format trackFormat, int trackSelectionReason,
-                                   Object trackSelectionData, long mediaStartTimeMs,
-                                   long mediaEndTimeMs, long elapsedRealtimeMs ) {
+        public void onLoadStarted(DataSpec dataSpec, int dataType, int trackType, Format trackFormat,
+                int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs, long mediaEndTimeMs,
+                long elapsedRealtimeMs) {
             mRetryCount = 1;
-            mLogger.postVerbose( sTag, String.format( "(%s) Load media started", mName ) );
+            mLogger.postVerbose(sTag, String.format("(%s) Load media started", mName));
         }
 
         @Override
-        public void onLoadCompleted( DataSpec dataSpec, int dataType, int trackType,
-                                     Format trackFormat, int trackSelectionReason,
-                                     Object trackSelectionData, long mediaStartTimeMs,
-                                     long mediaEndTimeMs, long elapsedRealtimeMs,
-                                     long loadDurationMs, long bytesLoaded ) {
+        public void onLoadCompleted(DataSpec dataSpec, int dataType, int trackType, Format trackFormat,
+                int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs, long mediaEndTimeMs,
+                long elapsedRealtimeMs, long loadDurationMs, long bytesLoaded) {
             mRetryCount = 0;
         }
 
         @Override
-        public void onLoadCanceled( DataSpec dataSpec, int dataType, int trackType,
-                                    Format trackFormat, int trackSelectionReason,
-                                    Object trackSelectionData, long mediaStartTimeMs,
-                                    long mediaEndTimeMs, long elapsedRealtimeMs, long loadDurationMs,
-                                    long bytesLoaded ) {
-            mLogger.postVerbose( sTag, String.format( "(%s) Load media cancelled", mName ) );
+        public void onLoadCanceled(DataSpec dataSpec, int dataType, int trackType, Format trackFormat,
+                int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs, long mediaEndTimeMs,
+                long elapsedRealtimeMs, long loadDurationMs, long bytesLoaded) {
+            mLogger.postVerbose(sTag, String.format("(%s) Load media cancelled", mName));
             mRetryCount = 0;
         }
 
         @Override
-        public void onLoadError( DataSpec dataSpec, int dataType, int trackType, Format trackFormat,
-                                 int trackSelectionReason, Object trackSelectionData,
-                                 long mediaStartTimeMs, long mediaEndTimeMs, long elapsedRealtimeMs,
-                                 long loadDurationMs, long bytesLoaded, IOException error,
-                                 boolean wasCanceled ) {
-            mLogger.postVerbose( sTag,
-                    String.format( "(%s) Error loading media. Attempts: %s", mName, mRetryCount ) );
+        public void onLoadError(DataSpec dataSpec, int dataType, int trackType, Format trackFormat,
+                int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs, long mediaEndTimeMs,
+                long elapsedRealtimeMs, long loadDurationMs, long bytesLoaded, IOException error, boolean wasCanceled) {
+            mLogger.postVerbose(sTag, String.format("(%s) Error loading media. Attempts: %s", mName, mRetryCount));
             mRetryCount++;
         }
 
         @Override
-        public void onUpstreamDiscarded( int trackType, long mediaStartTimeMs, long mediaEndTimeMs ) {}
+        public void onUpstreamDiscarded(int trackType, long mediaStartTimeMs, long mediaEndTimeMs) {}
 
         @Override
-        public void onDownstreamFormatChanged( int trackType, Format trackFormat,
-                                               int trackSelectionReason, Object trackSelectionData,
-                                               long mediaTimeMs ) {}
+        public void onDownstreamFormatChanged(int trackType, Format trackFormat, int trackSelectionReason,
+                Object trackSelectionData, long mediaTimeMs) {}
     }
 }

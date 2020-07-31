@@ -44,7 +44,6 @@ public:
      * @sa @c aace::contactUploader::ContactUploaderEngineInterface::ContactUploadStatus
      */
     using ContactUploaderStatus = aace::contactUploader::ContactUploaderEngineInterface::ContactUploaderStatus;
-    
 
     /**
      * Notifies the Engine to begin the contact upload.
@@ -79,7 +78,7 @@ public:
      * @return @c true on successful, @c false if no upload in progress or due to any internal error.
      */
     bool addContactsCancel();
-    
+
     /**
      * Notifies the Engine to upload the contact.
      *
@@ -114,8 +113,8 @@ public:
      * @li addresses.label (optional): The type value of the phone number like HOME. MOBILE, Phone1.
      *
      * @return @c true if successfully queued, @c false when contact format is not valid, upload not started or for any internal error.
-     */ 
-    bool addContact( const std::string& contact );
+     */
+    bool addContact(const std::string& contact);
 
     /**
      * Notifies the Engine to remove the uploaded local contacts from the Alexa Cloud. This API to be called when the local
@@ -136,7 +135,7 @@ public:
      * @param [in] status The @c ContactUploaderStatus
      * @param [in] info The string with additional information.
      */
-    virtual void contactsUploaderStatusChanged( ContactUploaderStatus status, const std::string& info ) = 0;
+    virtual void contactsUploaderStatusChanged(ContactUploaderStatus status, const std::string& info) = 0;
 
     /**
      * @internal
@@ -144,13 +143,13 @@ public:
      *
      * Should *never* be called by the platform implementation.
      */
-    void setEngineInterface( std::shared_ptr<ContactUploaderEngineInterface> contactUploaderEngineInterface );
+    void setEngineInterface(std::shared_ptr<ContactUploaderEngineInterface> contactUploaderEngineInterface);
 
 private:
     std::shared_ptr<ContactUploaderEngineInterface> m_contactUploaderEngineInterface;
 };
 
-} // aace::contactUploader
-} // aace
+}  // namespace contactUploader
+}  // namespace aace
 
-#endif // AACE_CONTACTUPLOADER_CONTACTUPLOADER_H
+#endif  // AACE_CONTACTUPLOADER_CONTACTUPLOADER_H

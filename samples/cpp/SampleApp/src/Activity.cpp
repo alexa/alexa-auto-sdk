@@ -28,23 +28,28 @@ namespace sampleApp {
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Activity::Activity(std::shared_ptr<ApplicationContext> applicationContext, std::vector<std::shared_ptr<View>> views)
-    : m_applicationContext{std::move(applicationContext)}, m_views{std::move(views)} {
+Activity::Activity(std::shared_ptr<ApplicationContext> applicationContext, std::vector<std::shared_ptr<View>> views) :
+        m_applicationContext{std::move(applicationContext)}, m_views{std::move(views)} {
     // Expects(m_applicationContext != nullptr);
     m_executor = std::make_shared<Executor>();
     m_singleThreadedUI = m_applicationContext->isSingleThreadedUI();
 }
 
-std::weak_ptr<View> Activity::findViewById(const std::string &id) {
-    auto it = std::find_if(m_views.begin(), m_views.end(), [&id](const std::shared_ptr<View> view) { return view->getId() == id; });
+std::weak_ptr<View> Activity::findViewById(const std::string& id) {
+    auto it = std::find_if(
+        m_views.begin(), m_views.end(), [&id](const std::shared_ptr<View> view) { return view->getId() == id; });
     if (it != m_views.end()) {
         return *it;
     }
     return {};
 }
 
-std::shared_ptr<ApplicationContext> Activity::getApplicationContext() { return m_applicationContext; }
+std::shared_ptr<ApplicationContext> Activity::getApplicationContext() {
+    return m_applicationContext;
+}
 
-std::shared_ptr<Executor> Activity::getExecutor() { return m_executor; }
+std::shared_ptr<Executor> Activity::getExecutor() {
+    return m_executor;
+}
 
-} // namespace sampleApp
+}  // namespace sampleApp

@@ -81,7 +81,7 @@ static const std::string EXTERNALMEDIAPLAYER_CAPABILITY_INTERFACE_TYPE = ALEXA_I
 /// ExternalMediaPlayer interface name
 static const std::string EXTERNALMEDIAPLAYER_CAPABILITY_INTERFACE_NAME = "ExternalMediaPlayer";
 /// ExternalMediaPlayer interface version
-static const std::string EXTERNALMEDIAPLAYER_CAPABILITY_INTERFACE_VERSION = "1.1"; // 1.2
+static const std::string EXTERNALMEDIAPLAYER_CAPABILITY_INTERFACE_VERSION = "1.1";
 
 /// Alexa.PlaybackStateReporter name.
 static const std::string PLAYBACKSTATEREPORTER_CAPABILITY_INTERFACE_NAME = PLAYBACKSTATEREPORTER_STATE_NAMESPACE;
@@ -111,7 +111,8 @@ static const std::string FAVORITESCONTROLLER_CAPABILITY_INTERFACE_VERSION = "1.0
 //#ifdef EXTERNALMEDIAPLAYER_1_1
 /// The name of the @c FocusManager channel used by @c ExternalMediaPlayer and
 /// its Adapters.
-static const std::string CHANNEL_NAME = alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface::CONTENT_CHANNEL_NAME;
+static const std::string CHANNEL_NAME =
+    alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface::CONTENT_CHANNEL_NAME;
 
 /**
  * The activityId string used with @c FocusManager by @c ExternalMediaPlayer.
@@ -171,7 +172,6 @@ static const int64_t MAX_PAST_OFFSET = -86400000;
 /// The max relative time in the past that we can  seek to in milliseconds(+12 hours in ms).
 static const int64_t MAX_FUTURE_OFFSET = 86400000;
 
-
 /// The agent key.
 static const char AGENT_KEY[] = "agent";
 
@@ -213,7 +213,8 @@ static const char AUTHORIZATION_COMPLETE[] = "AuthorizationComplete";
  *
  * @return The ExternalMediaPlayer capability configuration.
  */
-static std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration> getExternalMediaPlayerCapabilityConfiguration();
+static std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>
+getExternalMediaPlayerCapabilityConfiguration();
 
 /// The @c m_directiveToHandlerMap Map of the directives to their handlers.
 std::unordered_map<NamespaceAndName, std::pair<RequestType, ExternalMediaPlayer::DirectiveHandler>>
@@ -269,12 +270,12 @@ static DirectiveHandlerConfiguration g_configuration = {{AUTHORIZEDISCOVEREDPLAY
                                                         {UNFAVORITE_DIRECTIVE, neitherNonBlockingPolicy}};
 
 static std::unordered_map<PlaybackButton, RequestType> g_buttonToRequestType = {
-// adapter handlers
+    // adapter handlers
     // Important Note: This changes default AVS Device SDK behavior.
     {PlaybackButton::PLAY, RequestType::RESUME},
     {PlaybackButton::PAUSE, RequestType::PAUSE},
-//     {PlaybackButton::PLAY, RequestType::PAUSE_RESUME_TOGGLE},
-//     {PlaybackButton::PAUSE, RequestType::PAUSE_RESUME_TOGGLE},
+    //     {PlaybackButton::PLAY, RequestType::PAUSE_RESUME_TOGGLE},
+    //     {PlaybackButton::PAUSE, RequestType::PAUSE_RESUME_TOGGLE},
     {PlaybackButton::NEXT, RequestType::NEXT},
     {PlaybackButton::PREVIOUS, RequestType::PREVIOUS}};
 
@@ -318,32 +319,32 @@ std::shared_ptr<ExternalMediaPlayer> ExternalMediaPlayer::create(
     std::shared_ptr<PlaybackRouterInterface> playbackRouter,
     std::shared_ptr<aace::engine::alexa::ExternalMediaAdapterRegistrationInterface> externalMediaAdapterRegistration) {
     if (nullptr == speakerManager) {
-        AACE_ERROR(LX(TAG,"createFailed").d("reason", "nullSpeakerManager"));
+        AACE_ERROR(LX(TAG, "createFailed").d("reason", "nullSpeakerManager"));
         return nullptr;
     }
 
     if (nullptr == messageSender) {
-        AACE_ERROR(LX(TAG,"createFailed").d("reason", "nullMessageSender"));
+        AACE_ERROR(LX(TAG, "createFailed").d("reason", "nullMessageSender"));
         return nullptr;
     }
     if (nullptr == certifiedMessageSender) {
-        AACE_ERROR(LX(TAG,"createFailed").d("reason", "nullCertifiedMessageSender"));
+        AACE_ERROR(LX(TAG, "createFailed").d("reason", "nullCertifiedMessageSender"));
         return nullptr;
     }
     if (nullptr == focusManager) {
-        AACE_ERROR(LX(TAG,"createFailed").d("reason", "nullFocusManager"));
+        AACE_ERROR(LX(TAG, "createFailed").d("reason", "nullFocusManager"));
         return nullptr;
     }
     if (nullptr == contextManager) {
-        AACE_ERROR(LX(TAG,"createFailed").d("reason", "nullContextManager"));
+        AACE_ERROR(LX(TAG, "createFailed").d("reason", "nullContextManager"));
         return nullptr;
     }
     if (nullptr == exceptionSender) {
-        AACE_ERROR(LX(TAG,"createFailed").d("reason", "nullExceptionSender"));
+        AACE_ERROR(LX(TAG, "createFailed").d("reason", "nullExceptionSender"));
         return nullptr;
     }
     if (nullptr == playbackRouter) {
-        AACE_ERROR(LX(TAG,"createFailed").d("reason", "nullPlaybackRouter"));
+        AACE_ERROR(LX(TAG, "createFailed").d("reason", "nullPlaybackRouter"));
         return nullptr;
     }
 
@@ -358,11 +359,11 @@ std::shared_ptr<ExternalMediaPlayer> ExternalMediaPlayer::create(
         externalMediaAdapterRegistration));
 
     if (!externalMediaPlayer->init(mediaPlayers, speakers, adapterCreationMap, focusManager)) {
-        AACE_ERROR(LX(TAG,"createFailed").d("reason", "initFailed"));
+        AACE_ERROR(LX(TAG, "createFailed").d("reason", "initFailed"));
         return nullptr;
     }
 
-// adapter handlers
+    // adapter handlers
     externalMediaPlayer->m_focusManager = focusManager;
 
     return externalMediaPlayer;
@@ -390,7 +391,9 @@ ExternalMediaPlayer::ExternalMediaPlayer(
         m_focusAcquireInProgress{false},
         m_haltInitiator{HaltInitiator::NONE},
         m_ignoreExternalPauseCheck{false},
-        m_currentActivity{alexaClientSDK::avsCommon::avs::PlayerActivity::IDLE} {
+        m_currentActivity{alexaClientSDK::avsCommon::avs::PlayerActivity::IDLE},
+        m_mixingBehavior{alexaClientSDK::avsCommon::avs::MixingBehavior::UNDEFINED},
+        m_currentMixability{alexaClientSDK::avsCommon::avs::ContentType::UNDEFINED} {
     // Register all supported capabilities.
     m_capabilityConfigurations.insert(getExternalMediaPlayerCapabilityConfiguration());
 
@@ -428,7 +431,7 @@ bool ExternalMediaPlayer::init(
 
     m_authorizedSender = AuthorizedSender::create(m_messageSender);
     if (!m_authorizedSender) {
-        AACE_ERROR(LX(TAG,"initFailed").d("reason", "createAuthorizedSenderFailed"));
+        AACE_ERROR(LX(TAG, "initFailed").d("reason", "createAuthorizedSenderFailed"));
         return false;
     }
 
@@ -452,13 +455,13 @@ void ExternalMediaPlayer::addAdapterHandler(
     std::shared_ptr<aace::engine::alexa::ExternalMediaAdapterHandlerInterface> adapterHandler) {
     AACE_VERBOSE(LX(TAG));
     if (!adapterHandler) {
-        AACE_ERROR(LX(TAG,"addAdapterHandler").m("Adapter handler is null."));
+        AACE_ERROR(LX(TAG, "addAdapterHandler").m("Adapter handler is null."));
         return;
     }
     m_executor.submit([this, adapterHandler]() {
         AACE_VERBOSE(LX(TAG));
         if (!m_adapterHandlers.insert(adapterHandler).second) {
-            AACE_ERROR(LX(TAG,"addAdapterHandlerInExecutor").m("Duplicate adapter handler."));
+            AACE_ERROR(LX(TAG, "addAdapterHandlerInExecutor").m("Duplicate adapter handler."));
         }
     });
 }
@@ -467,22 +470,25 @@ void ExternalMediaPlayer::removeAdapterHandler(
     std::shared_ptr<aace::engine::alexa::ExternalMediaAdapterHandlerInterface> adapterHandler) {
     AACE_VERBOSE(LX(TAG));
     if (!adapterHandler) {
-        AACE_ERROR(LX(TAG,"removeAdapterHandler").m("Adapter handler is null."));
+        AACE_ERROR(LX(TAG, "removeAdapterHandler").m("Adapter handler is null."));
         return;
     }
     m_executor.submit([this, adapterHandler]() {
         AACE_VERBOSE(LX(TAG).m("removeAdapterHandlerInExecutor"));
         if (m_adapterHandlers.erase(adapterHandler) == 0) {
-            AACE_WARN(LX(TAG,"removeAdapterHandlerInExecutor").m("Nonexistent adapter handler."));
+            AACE_WARN(LX(TAG, "removeAdapterHandlerInExecutor").m("Nonexistent adapter handler."));
         }
     });
 }
 
 // adapter handler specific code
-void ExternalMediaPlayer::executeOnFocusChanged(aace::engine::alexa::FocusState newFocus) {
-    AACE_DEBUG(
-        LX(TAG).d("from", m_focus).d("to", newFocus).d("m_currentActivity", m_currentActivity).d("m_playerInFocus",m_playerInFocus));
-    if (m_focus == newFocus) {
+void ExternalMediaPlayer::executeOnFocusChanged(aace::engine::alexa::FocusState newFocus, MixingBehavior behavior) {
+    AACE_DEBUG(LX(TAG)
+                   .d("from", m_focus)
+                   .d("to", newFocus)
+                   .d("m_currentActivity", m_currentActivity)
+                   .d("m_playerInFocus", m_playerInFocus));
+    if (m_focus == newFocus && (m_mixingBehavior == behavior)) {
         m_focusAcquireInProgress = false;
         return;
     }
@@ -490,15 +496,12 @@ void ExternalMediaPlayer::executeOnFocusChanged(aace::engine::alexa::FocusState 
     m_focusAcquireInProgress = false;
     {
         // player in focus is empty, wait to see if it is updated soon after
-        if ( m_playerInFocus.empty() ) {
-            auto predicate = [this] {
-                return m_playerInFocus.empty();
-            };
+        if (m_playerInFocus.empty()) {
+            auto predicate = [this] { return m_playerInFocus.empty(); };
 
             std::unique_lock<std::mutex> lock{m_inFocusAdapterMutex};
             if (m_playerInFocusConditionVariable.wait_for(lock, TIMEOUT, predicate)) {
-                AACE_ERROR(
-                    LX(TAG,"m_playerInFocusConditionVariableTimedOut").d("reason", "playerId still empty"));
+                AACE_ERROR(LX(TAG, "m_playerInFocusConditionVariableTimedOut").d("reason", "playerId still empty"));
                 // Reset channel and focus
                 m_focusManager->releaseChannel(CHANNEL_NAME, shared_from_this());
                 m_haltInitiator = HaltInitiator::NONE;
@@ -566,17 +569,23 @@ void ExternalMediaPlayer::executeOnFocusChanged(aace::engine::alexa::FocusState 
                             // check against currently known playback state, not already paused
                             auto adapterStates = adapterHandler->getAdapterStates();
                             for (auto adapterState : adapterStates) {
-                                if ( adapterState.sessionState.playerId.compare(m_playerInFocus) == 0 && !m_ignoreExternalPauseCheck) { // match playerId
+                                if (adapterState.sessionState.playerId.compare(m_playerInFocus) == 0 &&
+                                    !m_ignoreExternalPauseCheck) {  // match playerId
                                     std::string playbackStateString = adapterState.playbackState.state;
-                                    if ( playbackStateString.compare(playerActivityToString(PlayerActivity::IDLE)) != 0 && 
-                                        playbackStateString.compare(playerActivityToString(PlayerActivity::PAUSED)) != 0 &&
-                                        playbackStateString.compare(playerActivityToString(PlayerActivity::STOPPED)) != 0 ) {
+                                    if (playbackStateString.compare(playerActivityToString(PlayerActivity::IDLE)) !=
+                                            0 &&
+                                        playbackStateString.compare(playerActivityToString(PlayerActivity::PAUSED)) !=
+                                            0 &&
+                                        playbackStateString.compare(playerActivityToString(PlayerActivity::STOPPED)) !=
+                                            0) {
                                         // only send pause if currently playing
                                         adapterHandler->playControl(m_playerInFocus, RequestType::PAUSE);
                                         // If we get pushed into the background while playing or buffering, pause the current song.
                                         AACE_DEBUG(LX(TAG).d("action", "pauseExternalMediaPlayer"));
                                         m_haltInitiator = HaltInitiator::FOCUS_CHANGE_PAUSE;
-                                    } else m_haltInitiator = HaltInitiator::EXTERNAL_PAUSE; // Player was not playing, assume external pause
+                                    } else
+                                        m_haltInitiator = HaltInitiator::
+                                            EXTERNAL_PAUSE;  // Player was not playing, assume external pause
                                 }
                             }
                         }
@@ -600,7 +609,7 @@ void ExternalMediaPlayer::executeOnFocusChanged(aace::engine::alexa::FocusState 
                         // If the focus change came in while we were in a 'playing' state, we need to stop the player because we are
                         // yielding the channel.
                         AACE_DEBUG(LX(TAG).d("action", "stopExternalMediaPlayer"));
-                         std::lock_guard<std::mutex> lock{m_inFocusAdapterMutex};
+                        std::lock_guard<std::mutex> lock{m_inFocusAdapterMutex};
                         for (auto adapterHandler : m_adapterHandlers) {
                             adapterHandler->playControl(m_playerInFocus, RequestType::STOP);
                         }
@@ -614,9 +623,9 @@ void ExternalMediaPlayer::executeOnFocusChanged(aace::engine::alexa::FocusState 
     }
 }
 
-void ExternalMediaPlayer::onFocusChanged(FocusState newFocus) {
-    AACE_DEBUG(LX(TAG).d("newFocus", newFocus));
-    m_executor.submit([this, newFocus] { executeOnFocusChanged(newFocus); });
+void ExternalMediaPlayer::onFocusChanged(FocusState newFocus, MixingBehavior behavior) {
+    AACE_DEBUG(LX(TAG).d("newFocus", newFocus).d("MixingBehavior", behavior));
+    m_executor.submit([this, newFocus, behavior] { executeOnFocusChanged(newFocus, behavior); });
 
     switch (newFocus) {
         case FocusState::FOREGROUND:
@@ -626,6 +635,7 @@ void ExternalMediaPlayer::onFocusChanged(FocusState newFocus) {
         case FocusState::BACKGROUND: {
             //Ideally expecting to see a transition to PAUSED, but in terms of user-observable changes, a move to any
             //of PAUSED/STOPPED/FINISHED will indicate that it's safe for another channel to move to the foreground.
+
             auto predicate = [this] {
                 switch (m_currentActivity) {
                     case PlayerActivity::IDLE:
@@ -637,15 +647,16 @@ void ExternalMediaPlayer::onFocusChanged(FocusState newFocus) {
                     case PlayerActivity::BUFFER_UNDERRUN:
                         return false;
                 }
-                AACE_ERROR(LX(TAG,"onFocusChangedFailed")
-                                .d("reason", "unexpectedActivity")
-                                .d("m_currentActivity", m_currentActivity));
+                AACE_ERROR(LX(TAG, "onFocusChangedFailed")
+                               .d("reason", "unexpectedActivity")
+                               .d("m_currentActivity", m_currentActivity));
                 return false;
             };
             std::unique_lock<std::mutex> lock(m_currentActivityMutex);
             if (!m_currentActivityConditionVariable.wait_for(lock, TIMEOUT, predicate)) {
-                AACE_ERROR(
-                    LX(TAG,"onFocusChangedTimedOut").d("newFocus", newFocus).d("m_currentActivity", m_currentActivity));
+                AACE_ERROR(LX(TAG, "onFocusChangedTimedOut")
+                               .d("newFocus", newFocus)
+                               .d("m_currentActivity", m_currentActivity));
             }
         }
             return;
@@ -662,33 +673,32 @@ void ExternalMediaPlayer::onFocusChanged(FocusState newFocus) {
                     case PlayerActivity::BUFFER_UNDERRUN:
                         return false;
                 }
-                AACE_ERROR(LX(TAG,"onFocusChangedFailed")
-                                .d("reason", "unexpectedActivity")
-                                .d("m_currentActivity", m_currentActivity));
+                AACE_ERROR(LX(TAG, "onFocusChangedFailed")
+                               .d("reason", "unexpectedActivity")
+                               .d("m_currentActivity", m_currentActivity));
                 return false;
             };
             std::unique_lock<std::mutex> lock(m_currentActivityMutex);
             if (!m_currentActivityConditionVariable.wait_for(lock, TIMEOUT, predicate)) {
-                AACE_ERROR(LX(TAG,"onFocusChangedFailed")
-                                .d("reason", "activityChangeTimedOut")
-                                .d("newFocus", newFocus)
-                                .d("m_currentActivity", m_currentActivity));
+                AACE_ERROR(LX(TAG, "onFocusChangedFailed")
+                               .d("reason", "activityChangeTimedOut")
+                               .d("newFocus", newFocus)
+                               .d("m_currentActivity", m_currentActivity));
             }
 
             m_executor.submit([this]() {
                 std::unique_lock<std::mutex> lock(m_currentActivityMutex);
-                if ( m_currentActivity == PlayerActivity::STOPPED ) {
+                if (m_currentActivity == PlayerActivity::STOPPED) {
                     std::lock_guard<std::mutex> lock{m_inFocusAdapterMutex};
                     m_playerInFocus = "";
-            } 
+                }
             });
         }
             return;
     }
-    AACE_ERROR(LX(TAG,"onFocusChangedFailed").d("reason", "unexpectedFocusState").d("newFocus", newFocus));
+    AACE_ERROR(LX(TAG, "onFocusChangedFailed").d("reason", "unexpectedFocusState").d("newFocus", newFocus));
 }
 // end adapter handler code
-
 
 void ExternalMediaPlayer::onContextAvailable(const std::string& jsonContext) {
     // Send Message happens on the calling thread. Do not block the ContextManager thread.
@@ -710,10 +720,10 @@ void ExternalMediaPlayer::onContextAvailable(const std::string& jsonContext) {
 void ExternalMediaPlayer::onContextFailure(const alexaClientSDK::avsCommon::sdkInterfaces::ContextRequestError error) {
     std::pair<std::string, std::string> nameAndPayload = m_eventQueue.front();
     m_eventQueue.pop();
-    AACE_ERROR(LX(TAG,__func__)
-                    .d("error", error)
-                    .d("eventName", nameAndPayload.first)
-                    .sensitive("payload", nameAndPayload.second));
+    AACE_ERROR(LX(TAG, __func__)
+                   .d("error", error)
+                   .d("eventName", nameAndPayload.first)
+                   .sensitive("payload", nameAndPayload.second));
 }
 
 void ExternalMediaPlayer::provideState(
@@ -738,10 +748,10 @@ bool ExternalMediaPlayer::parseDirectivePayload(std::shared_ptr<DirectiveInfo> i
         return true;
     }
 
-    AACE_ERROR(LX(TAG,"parseDirectivePayloadFailed")
-                    .d("reason", rapidjson::GetParseError_En(result.Code()))
-                    .d("offset", result.Offset())
-                    .d("messageId", info->directive->getMessageId()));
+    AACE_ERROR(LX(TAG, "parseDirectivePayloadFailed")
+                   .d("reason", rapidjson::GetParseError_En(result.Code()))
+                   .d("offset", result.Offset())
+                   .d("messageId", info->directive->getMessageId()));
 
     sendExceptionEncounteredAndReportFailed(
         info, "Unable to parse payload", ExceptionErrorType::UNEXPECTED_INFORMATION_RECEIVED);
@@ -751,17 +761,17 @@ bool ExternalMediaPlayer::parseDirectivePayload(std::shared_ptr<DirectiveInfo> i
 
 void ExternalMediaPlayer::handleDirective(std::shared_ptr<DirectiveInfo> info) {
     if (!info) {
-        AACE_ERROR(LX(TAG,"handleDirectiveFailed").d("reason", "nullDirectiveInfo"));
+        AACE_ERROR(LX(TAG, "handleDirectiveFailed").d("reason", "nullDirectiveInfo"));
         return;
     }
 
     NamespaceAndName directiveNamespaceAndName(info->directive->getNamespace(), info->directive->getName());
     auto handlerIt = m_directiveToHandlerMap.find(directiveNamespaceAndName);
     if (handlerIt == m_directiveToHandlerMap.end()) {
-        AACE_ERROR(LX(TAG,"handleDirectivesFailed")
-                        .d("reason", "noDirectiveHandlerForDirective")
-                        .d("nameSpace", info->directive->getNamespace())
-                        .d("name", info->directive->getName()));
+        AACE_ERROR(LX(TAG, "handleDirectivesFailed")
+                       .d("reason", "noDirectiveHandlerForDirective")
+                       .d("nameSpace", info->directive->getNamespace())
+                       .d("name", info->directive->getName()));
         sendExceptionEncounteredAndReportFailed(
             info, "Unhandled directive", ExceptionErrorType::UNEXPECTED_INFORMATION_RECEIVED);
         return;
@@ -784,13 +794,13 @@ std::shared_ptr<ExternalMediaAdapterInterface> ExternalMediaPlayer::preprocessDi
 
     std::string playerId;
     if (!jsonUtils::retrieveValue(*document, PLAYER_ID, &playerId)) {
-        AACE_ERROR(LX(TAG,"preprocessDirectiveFailed").d("reason", "nullPlayerId"));
+        AACE_ERROR(LX(TAG, "preprocessDirectiveFailed").d("reason", "nullPlayerId"));
         sendExceptionEncounteredAndReportFailed(info, "No PlayerId in directive.");
         return nullptr;
     }
 
     // adapter handler specific code
-    if (m_adapters.empty()) { // use handlers when there are no adapters
+    if (m_adapters.empty()) {  // use handlers when there are no adapters
         return nullptr;
     }
 
@@ -799,7 +809,7 @@ std::shared_ptr<ExternalMediaAdapterInterface> ExternalMediaPlayer::preprocessDi
     {
         std::lock_guard<std::mutex> lock{m_adaptersMutex};
         if (!adapter) {
-            AACE_ERROR(LX(TAG,"preprocessDirectiveFailed").d("reason", "nullAdapter").d(PLAYER_ID, playerId));
+            AACE_ERROR(LX(TAG, "preprocessDirectiveFailed").d("reason", "nullAdapter").d(PLAYER_ID, playerId));
             sendExceptionEncounteredAndReportFailed(info, "nullAdapter.");
             return nullptr;
         }
@@ -841,59 +851,63 @@ void ExternalMediaPlayer::handleAuthorizeDiscoveredPlayers(std::shared_ptr<Direc
             std::string localPlayerId, playerId, defaultSkillToken;
 
             if (!(*playerIt).IsObject()) {
-                AACE_ERROR(LX(TAG,"handleAuthorizeDiscoveredPlayersFailed").d("reason", "unexpectedFormat"));
+                AACE_ERROR(LX(TAG, "handleAuthorizeDiscoveredPlayersFailed").d("reason", "unexpectedFormat"));
                 parseAllSucceeded = false;
                 continue;
-            } 
+            }
 
             if (!json::jsonUtils::retrieveValue(*playerIt, LOCAL_PLAYER_ID, &localPlayerId)) {
-                AACE_ERROR(LX(TAG,"handleAuthorizeDiscoveredPlayersFailed")
-                                .d("reason", "missingAttribute")
-                                .d("attribute", LOCAL_PLAYER_ID));
+                AACE_ERROR(LX(TAG, "handleAuthorizeDiscoveredPlayersFailed")
+                               .d("reason", "missingAttribute")
+                               .d("attribute", LOCAL_PLAYER_ID));
                 parseAllSucceeded = false;
                 continue;
-            } else playerInfo.localPlayerId = localPlayerId;
+            } else
+                playerInfo.localPlayerId = localPlayerId;
 
             if (!json::jsonUtils::retrieveValue(*playerIt, AUTHORIZED, &authorized)) {
-                AACE_ERROR(LX(TAG,"handleAuthorizeDiscoveredPlayersFailed")
-                                .d("reason", "missingAttribute")
-                                .d("attribute", AUTHORIZED));
+                AACE_ERROR(LX(TAG, "handleAuthorizeDiscoveredPlayersFailed")
+                               .d("reason", "missingAttribute")
+                               .d("attribute", AUTHORIZED));
                 parseAllSucceeded = false;
                 continue;
-            } else playerInfo.authorized = authorized;
+            } else
+                playerInfo.authorized = authorized;
 
             if (authorized) {
                 rapidjson::Value::ConstMemberIterator metadataIt;
 
                 if (!json::jsonUtils::findNode(*playerIt, METADATA, &metadataIt)) {
-                    AACE_ERROR(LX(TAG,"handleAuthorizeDiscoveredPlayersFailed")
-                                    .d("reason", "missingAttribute")
-                                    .d("attribute", METADATA));
+                    AACE_ERROR(LX(TAG, "handleAuthorizeDiscoveredPlayersFailed")
+                                   .d("reason", "missingAttribute")
+                                   .d("attribute", METADATA));
                     parseAllSucceeded = false;
                     continue;
                 }
 
                 if (!json::jsonUtils::retrieveValue(metadataIt->value, PLAYER_ID, &playerId)) {
-                    AACE_ERROR(LX(TAG,"handleAuthorizeDiscoveredPlayersFailed")
-                                    .d("reason", "missingAttribute")
-                                    .d("attribute", PLAYER_ID));
+                    AACE_ERROR(LX(TAG, "handleAuthorizeDiscoveredPlayersFailed")
+                                   .d("reason", "missingAttribute")
+                                   .d("attribute", PLAYER_ID));
                     parseAllSucceeded = false;
                     continue;
-                } else playerInfo.playerId = playerId;
+                } else
+                    playerInfo.playerId = playerId;
                 if (!json::jsonUtils::retrieveValue(metadataIt->value, SKILL_TOKEN, &defaultSkillToken)) {
-                    AACE_ERROR(LX(TAG,"handleAuthorizeDiscoveredPlayersFailed")
-                                    .d("reason", "missingAttribute")
-                                    .d("attribute", SKILL_TOKEN));
+                    AACE_ERROR(LX(TAG, "handleAuthorizeDiscoveredPlayersFailed")
+                                   .d("reason", "missingAttribute")
+                                   .d("attribute", SKILL_TOKEN));
                     parseAllSucceeded = false;
                     continue;
-                } else playerInfo.skillToken = defaultSkillToken;
+                } else
+                    playerInfo.skillToken = defaultSkillToken;
             }
 
             AACE_DEBUG(LX(TAG)
-                            .d("localPlayerId", localPlayerId)
-                            .d("authorized", authorized)
-                            .d("playerId", playerId)
-                            .d("defaultSkillToken", defaultSkillToken));
+                           .d("localPlayerId", localPlayerId)
+                           .d("authorized", authorized)
+                           .d("playerId", playerId)
+                           .d("defaultSkillToken", defaultSkillToken));
 
             playerInfoList.push_back(playerInfo);
             /*
@@ -925,13 +939,13 @@ void ExternalMediaPlayer::handleAuthorizeDiscoveredPlayers(std::shared_ptr<Direc
     }
 
     // adapter handler specific code
-            m_executor.submit([this, info, playerInfoList]() {
-                for (auto adapterHandler : m_adapterHandlers) {
-                    // adapterHandler->authorizeDiscoveredPlayer(localPlayerId, authorized, playerId, defaultSkillToken);
-                    adapterHandler->authorizeDiscoveredPlayers(playerInfoList);
-                }
-                setHandlingCompleted(info);
-            });  
+    m_executor.submit([this, info, playerInfoList]() {
+        for (auto adapterHandler : m_adapterHandlers) {
+            // adapterHandler->authorizeDiscoveredPlayer(localPlayerId, authorized, playerId, defaultSkillToken);
+            adapterHandler->authorizeDiscoveredPlayers(playerInfoList);
+        }
+        setHandlingCompleted(info);
+    });
 
     return;
 
@@ -977,7 +991,7 @@ std::shared_ptr<ExternalMediaAdapterInterface> ExternalMediaPlayer::getAdapterBy
         auto playerIdToLocalPlayerId = m_authorizedAdapters.find(playerId);
 
         if (m_authorizedAdapters.end() == playerIdToLocalPlayerId) {
-            AACE_ERROR(LX(TAG,"getAdapterByPlayerIdFailed").d("reason", "noMatchingLocalId").d(PLAYER_ID, playerId));
+            AACE_ERROR(LX(TAG, "getAdapterByPlayerIdFailed").d("reason", "noMatchingLocalId").d(PLAYER_ID, playerId));
 
             return nullptr;
         } else {
@@ -988,10 +1002,11 @@ std::shared_ptr<ExternalMediaAdapterInterface> ExternalMediaPlayer::getAdapterBy
     return getAdapterByLocalPlayerId(localPlayerId);
 }
 
-std::shared_ptr<ExternalMediaAdapterHandlerInterface> ExternalMediaPlayer::getAdapterHandlerByPlayerId(const std::string& playerId) {
+std::shared_ptr<ExternalMediaAdapterHandlerInterface> ExternalMediaPlayer::getAdapterHandlerByPlayerId(
+    const std::string& playerId) {
     AACE_VERBOSE(LX(TAG));
     for (auto adapterHandler : m_adapterHandlers) {
-        auto adapterStates = adapterHandler->getAdapterStates( false );
+        auto adapterStates = adapterHandler->getAdapterStates(false);
         for (auto adapterState : adapterStates) {
             if (adapterState.sessionState.playerId == playerId) {
                 return adapterHandler;
@@ -1011,8 +1026,9 @@ std::shared_ptr<ExternalMediaAdapterInterface> ExternalMediaPlayer::getAdapterBy
     auto localPlayerIdToAdapter = m_adapters.find(localPlayerId);
 
     if (m_adapters.end() == localPlayerIdToAdapter) {
-        AACE_ERROR(
-            LX(TAG,"getAdapterByLocalPlayerIdFailed").d("reason", "noAdapterForLocalId").d("localPlayerId", localPlayerId));
+        AACE_ERROR(LX(TAG, "getAdapterByLocalPlayerIdFailed")
+                       .d("reason", "noAdapterForLocalId")
+                       .d("localPlayerId", localPlayerId));
         return nullptr;
     }
 
@@ -1020,7 +1036,8 @@ std::shared_ptr<ExternalMediaAdapterInterface> ExternalMediaPlayer::getAdapterBy
 }
 
 bool ExternalMediaPlayer::isRegisteredPlayerId(const std::string& playerId) {
-    return (m_externalMediaAdapterRegistration != nullptr) && (m_externalMediaAdapterRegistration->getPlayerId() == playerId);
+    return (m_externalMediaAdapterRegistration != nullptr) &&
+           (m_externalMediaAdapterRegistration->getPlayerId() == playerId);
 }
 
 void ExternalMediaPlayer::sendAuthorizationCompleteEvent(
@@ -1053,7 +1070,7 @@ void ExternalMediaPlayer::sendAuthorizationCompleteEvent(
     rapidjson::StringBuffer buffer;
     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
     if (!payload.Accept(writer)) {
-        AACE_ERROR(LX(TAG,"sendAuthorizationCompleteEventFailed").d("reason", "writerRefusedJsonObject"));
+        AACE_ERROR(LX(TAG, "sendAuthorizationCompleteEventFailed").d("reason", "writerRefusedJsonObject"));
         return;
     }
 
@@ -1069,14 +1086,14 @@ void ExternalMediaPlayer::handleLogin(std::shared_ptr<DirectiveInfo> info, Reque
 
     std::string playerId;
     if (!jsonUtils::retrieveValue(payload, "playerId", &playerId)) {
-        AACE_ERROR(LX(TAG,"handleDirectiveFailed").d("reason", "nullPlayerId"));
+        AACE_ERROR(LX(TAG, "handleDirectiveFailed").d("reason", "nullPlayerId"));
         sendExceptionEncounteredAndReportFailed(info, "missing playerId in Login directive");
         return;
     }
 
     std::string accessToken;
     if (!jsonUtils::retrieveValue(payload, "accessToken", &accessToken)) {
-        AACE_ERROR(LX(TAG,"handleDirectiveFailed").d("reason", "nullAccessToken"));
+        AACE_ERROR(LX(TAG, "handleDirectiveFailed").d("reason", "nullAccessToken"));
         sendExceptionEncounteredAndReportFailed(info, "missing accessToken in Login directive");
         return;
     }
@@ -1088,23 +1105,24 @@ void ExternalMediaPlayer::handleLogin(std::shared_ptr<DirectiveInfo> info, Reque
 
     int64_t refreshInterval;
     if (!jsonUtils::retrieveValue(payload, "tokenRefreshIntervalInMilliseconds", &refreshInterval)) {
-        AACE_ERROR(LX(TAG,"handleDirectiveFailed").d("reason", "nullRefreshInterval"));
+        AACE_ERROR(LX(TAG, "handleDirectiveFailed").d("reason", "nullRefreshInterval"));
         sendExceptionEncounteredAndReportFailed(info, "missing tokenRefreshIntervalInMilliseconds in Login directive");
         return;
     }
 
     bool forceLogin;
     if (!jsonUtils::retrieveValue(payload, "forceLogin", &forceLogin)) {
-        AACE_ERROR(LX(TAG,"handleDirectiveFailed").d("reason", "nullForceLogin"));
+        AACE_ERROR(LX(TAG, "handleDirectiveFailed").d("reason", "nullForceLogin"));
         sendExceptionEncounteredAndReportFailed(info, "missing forceLogin in Login directive");
         return;
     }
 
     if (!adapter) {
-        // adapter handler specific code   
+        // adapter handler specific code
         m_executor.submit([this, info, playerId, accessToken, userName, refreshInterval, forceLogin]() {
             for (auto adapterHandler : m_adapterHandlers) {
-                adapterHandler->login(playerId, accessToken, userName, forceLogin, std::chrono::milliseconds(refreshInterval) );
+                adapterHandler->login(
+                    playerId, accessToken, userName, forceLogin, std::chrono::milliseconds(refreshInterval));
             }
             setHandlingCompleted(info);
         });
@@ -1123,7 +1141,7 @@ void ExternalMediaPlayer::handleLogout(std::shared_ptr<DirectiveInfo> info, Requ
 
     std::string playerId;
     if (!jsonUtils::retrieveValue(payload, "playerId", &playerId)) {
-        AACE_ERROR(LX(TAG,"handleDirectiveFailed").d("reason", "nullPlayerId"));
+        AACE_ERROR(LX(TAG, "handleDirectiveFailed").d("reason", "nullPlayerId"));
         sendExceptionEncounteredAndReportFailed(info, "missing playerId in Logout directive");
         return;
     }
@@ -1151,14 +1169,14 @@ void ExternalMediaPlayer::handlePlay(std::shared_ptr<DirectiveInfo> info, Reques
 
     std::string playerId;
     if (!jsonUtils::retrieveValue(payload, PLAYER_ID, &playerId)) {
-        AACE_ERROR(LX(TAG,"handleDirectiveFailed").d("reason", "nullPlayerId"));
+        AACE_ERROR(LX(TAG, "handleDirectiveFailed").d("reason", "nullPlayerId"));
         sendExceptionEncounteredAndReportFailed(info, "No PlayerId in directive.");
         return;
     }
 
     std::string playbackContextToken;
     if (!jsonUtils::retrieveValue(payload, "playbackContextToken", &playbackContextToken)) {
-        AACE_ERROR(LX(TAG,"handleDirectiveFailed").d("reason", "nullPlaybackContextToken"));
+        AACE_ERROR(LX(TAG, "handleDirectiveFailed").d("reason", "nullPlaybackContextToken"));
         sendExceptionEncounteredAndReportFailed(info, "missing playbackContextToken in Play directive");
         return;
     }
@@ -1175,28 +1193,28 @@ void ExternalMediaPlayer::handlePlay(std::shared_ptr<DirectiveInfo> info, Reques
 
     std::string skillToken;
     if (!jsonUtils::retrieveValue(payload, "skillToken", &skillToken)) {
-        AACE_ERROR(LX(TAG,"handleDirectiveFailed").d("reason", "nullSkillToken"));
+        AACE_ERROR(LX(TAG, "handleDirectiveFailed").d("reason", "nullSkillToken"));
         sendExceptionEncounteredAndReportFailed(info, "missing skillToken in Play directive");
         return;
     }
 
     std::string playbackSessionId;
     if (!jsonUtils::retrieveValue(payload, "playbackSessionId", &playbackSessionId)) {
-        AACE_ERROR(LX(TAG,"handleDirectiveFailed").d("reason", "nullPlaybackSessionId"));
+        AACE_ERROR(LX(TAG, "handleDirectiveFailed").d("reason", "nullPlaybackSessionId"));
         sendExceptionEncounteredAndReportFailed(info, "missing playbackSessionId in Play directive");
         return;
     }
 
     std::string navigation;
     if (!jsonUtils::retrieveValue(payload, "navigation", &navigation)) {
-        AACE_ERROR(LX(TAG,"handleDirectiveFailed").d("reason", "nullNavigation"));
+        AACE_ERROR(LX(TAG, "handleDirectiveFailed").d("reason", "nullNavigation"));
         sendExceptionEncounteredAndReportFailed(info, "missing navigation in Play directive");
         return;
     }
 
     bool preload;
     if (!jsonUtils::retrieveValue(payload, "preload", &preload)) {
-        AACE_ERROR(LX(TAG,"handleDirectiveFailed").d("reason", "nullPreload"));
+        AACE_ERROR(LX(TAG, "handleDirectiveFailed").d("reason", "nullPreload"));
         sendExceptionEncounteredAndReportFailed(info, "missing preload in Play directive");
         return;
     }
@@ -1205,27 +1223,46 @@ void ExternalMediaPlayer::handlePlay(std::shared_ptr<DirectiveInfo> info, Reques
     alexaClientSDK::avsCommon::avs::PlayRequestor playRequestor;
     if (jsonUtils::findNode(payload, "playRequestor", &playRequestorJson)) {
         if (!jsonUtils::retrieveValue(playRequestorJson->value, "type", &playRequestor.type)) {
-            AACE_ERROR(LX(TAG,"handlePlayDirectiveFailed")
-                            .d("reason", "missingPlayRequestorType")
-                            .d("messageId", info->directive->getMessageId()));
+            AACE_ERROR(LX(TAG, "handlePlayDirectiveFailed")
+                           .d("reason", "missingPlayRequestorType")
+                           .d("messageId", info->directive->getMessageId()));
             sendExceptionEncounteredAndReportFailed(info, "missing playRequestor type in Play directive");
             return;
         }
         if (!jsonUtils::retrieveValue(playRequestorJson->value, "id", &playRequestor.id)) {
-            AACE_ERROR(LX(TAG,"handlePlayDirectiveFailed")
-                            .d("reason", "missingPlayRequestorId")
-                            .d("messageId", info->directive->getMessageId()));
+            AACE_ERROR(LX(TAG, "handlePlayDirectiveFailed")
+                           .d("reason", "missingPlayRequestorId")
+                           .d("messageId", info->directive->getMessageId()));
             sendExceptionEncounteredAndReportFailed(info, "missing playRequestor id in Play directive");
             return;
         }
     }
 
     if (!adapter) {
-        // adapter handler specific code         
-        m_executor.submit([this, request, playerId, playbackContextToken, index, offset, skillToken, playbackSessionId, navigation, preload, playRequestor]() {
+        // adapter handler specific code
+        m_executor.submit([this,
+                           request,
+                           playerId,
+                           playbackContextToken,
+                           index,
+                           offset,
+                           skillToken,
+                           playbackSessionId,
+                           navigation,
+                           preload,
+                           playRequestor]() {
             for (auto adapterHandler : m_adapterHandlers) {
                 setHaltInitiatorRequestHelper(request);
-                adapterHandler->play(playerId, playbackContextToken, index, std::chrono::milliseconds(offset), skillToken, playbackSessionId, navigation, preload, playRequestor);
+                adapterHandler->play(
+                    playerId,
+                    playbackContextToken,
+                    index,
+                    std::chrono::milliseconds(offset),
+                    skillToken,
+                    playbackSessionId,
+                    navigation,
+                    preload,
+                    playRequestor);
             }
         });
         setHandlingCompleted(info);
@@ -1245,20 +1282,20 @@ void ExternalMediaPlayer::handleSeek(std::shared_ptr<DirectiveInfo> info, Reques
 
     std::string playerId;
     if (!jsonUtils::retrieveValue(payload, PLAYER_ID, &playerId)) {
-        AACE_ERROR(LX(TAG,"handleDirectiveFailed").d("reason", "nullPlayerId"));
+        AACE_ERROR(LX(TAG, "handleDirectiveFailed").d("reason", "nullPlayerId"));
         sendExceptionEncounteredAndReportFailed(info, "No PlayerId in directive.");
         return;
     }
 
     int64_t position;
     if (!jsonUtils::retrieveValue(payload, POSITIONINMS, &position)) {
-        AACE_ERROR(LX(TAG,"handleDirectiveFailed").d("reason", "nullPosition"));
+        AACE_ERROR(LX(TAG, "handleDirectiveFailed").d("reason", "nullPosition"));
         sendExceptionEncounteredAndReportFailed(info, "missing positionMilliseconds in SetSeekPosition directive");
         return;
     }
 
     if (!adapter) {
-        // adapter handler specific code         
+        // adapter handler specific code
         m_executor.submit([this, info, playerId, position]() {
             for (auto adapterHandler : m_adapterHandlers) {
                 adapterHandler->seek(playerId, std::chrono::milliseconds(position));
@@ -1280,21 +1317,21 @@ void ExternalMediaPlayer::handleAdjustSeek(std::shared_ptr<DirectiveInfo> info, 
 
     std::string playerId;
     if (!jsonUtils::retrieveValue(payload, PLAYER_ID, &playerId)) {
-        AACE_ERROR(LX(TAG,"handleDirectiveFailed").d("reason", "nullPlayerId"));
+        AACE_ERROR(LX(TAG, "handleDirectiveFailed").d("reason", "nullPlayerId"));
         sendExceptionEncounteredAndReportFailed(info, "No PlayerId in directive.");
         return;
     }
 
     int64_t deltaPosition;
     if (!jsonUtils::retrieveValue(payload, "deltaPositionMilliseconds", &deltaPosition)) {
-        AACE_ERROR(LX(TAG,"handleDirectiveFailed").d("reason", "nullDeltaPositionMilliseconds"));
+        AACE_ERROR(LX(TAG, "handleDirectiveFailed").d("reason", "nullDeltaPositionMilliseconds"));
         sendExceptionEncounteredAndReportFailed(
             info, "missing deltaPositionMilliseconds in AdjustSeekPosition directive");
         return;
     }
 
     if (deltaPosition < MAX_PAST_OFFSET || deltaPosition > MAX_FUTURE_OFFSET) {
-        AACE_ERROR(LX(TAG,"handleDirectiveFailed").d("reason", "deltaPositionMillisecondsOutOfRange."));
+        AACE_ERROR(LX(TAG, "handleDirectiveFailed").d("reason", "deltaPositionMillisecondsOutOfRange."));
         sendExceptionEncounteredAndReportFailed(
             info, "missing deltaPositionMilliseconds in AdjustSeekPosition directive");
         return;
@@ -1314,7 +1351,7 @@ void ExternalMediaPlayer::handleAdjustSeek(std::shared_ptr<DirectiveInfo> info, 
     // adapter specific code
     /*
     setHandlingCompleted(info);
-    adapter->handleAdjustSeek(std::chrono::milliseconds(deltaPosition));*/ 
+    adapter->handleAdjustSeek(std::chrono::milliseconds(deltaPosition));*/
 }
 
 void ExternalMediaPlayer::handlePlayControl(std::shared_ptr<DirectiveInfo> info, RequestType request) {
@@ -1324,7 +1361,7 @@ void ExternalMediaPlayer::handlePlayControl(std::shared_ptr<DirectiveInfo> info,
 
     std::string playerId;
     if (!jsonUtils::retrieveValue(payload, PLAYER_ID, &playerId)) {
-        AACE_ERROR(LX(TAG,"handleDirectiveFailed").d("reason", "nullPlayerId"));
+        AACE_ERROR(LX(TAG, "handleDirectiveFailed").d("reason", "nullPlayerId"));
         sendExceptionEncounteredAndReportFailed(info, "No PlayerId in directive.");
         return;
     }
@@ -1341,20 +1378,22 @@ void ExternalMediaPlayer::handlePlayControl(std::shared_ptr<DirectiveInfo> info,
             return;
         }
         // adapter handler specific code
-        setHaltInitiatorRequestHelper(request);
         m_executor.submit([this, info, playerId, request]() {
             for (auto adapterHandler : m_adapterHandlers) {
-                adapterHandler->playControl(playerId, request);
                 // if in focus play control, other-wise use focus change pause mechanism to initiate resume
-                if ( m_playerInFocus.compare(playerId) == 0) {
+                if (m_playerInFocus.compare(playerId) == 0) {
                     setHaltInitiatorRequestHelper(request);
-                    adapterHandler->playControl(playerId,request);
-                } else if ( request == RequestType::RESUME ) {
+                    adapterHandler->playControl(playerId, request);
+                } else if (request == RequestType::RESUME) {
                     // special case where player has not started playing, but should start on next focus change
                     m_ignoreExternalPauseCheck = true;
                     m_haltInitiator = HaltInitiator::FOCUS_CHANGE_PAUSE;
                     setPlayerInFocus(playerId, true);
-                } else AACE_WARN(LX(TAG).d("reason","cannot playControl non-RESUME request for non-in-focus player").d("playerId", playerId).d("RequestType", request));
+                } else
+                    AACE_WARN(LX(TAG)
+                                  .d("reason", "cannot playControl non-RESUME request for non-in-focus player")
+                                  .d("playerId", playerId)
+                                  .d("RequestType", request));
             }
             setHandlingCompleted(info);
         });
@@ -1390,14 +1429,14 @@ void ExternalMediaPlayer::setCurrentActivity(const alexaClientSDK::avsCommon::av
 
 void ExternalMediaPlayer::setPlayerInFocus(const std::string& playerInFocus, bool focusAcquire) {
     AACE_VERBOSE(LX(TAG).d("playerInFocus", playerInFocus).d("focusAcquire", focusAcquire ? "true" : "false"));
-    if( playerInFocus.empty() ) { // should not be called with empty
-        AACE_ERROR(LX(TAG,"setPlayerInFocusFailed").d("reason", "empty playerInFocus"));
+    if (playerInFocus.empty()) {  // should not be called with empty
+        AACE_ERROR(LX(TAG, "setPlayerInFocusFailed").d("reason", "empty playerInFocus"));
         return;
-    } 
+    }
 
     // registered EMP adapter will not use this focus manger
-    auto registered = isRegisteredPlayerId( playerInFocus );
-    if ( playerInFocus.compare(m_playerInFocus) != 0 && focusAcquire ) {
+    auto registered = isRegisteredPlayerId(playerInFocus);
+    if (playerInFocus.compare(m_playerInFocus) != 0 && focusAcquire) {
         {
             std::lock_guard<std::mutex> lock(m_inFocusAdapterMutex);
             m_playerInFocus = playerInFocus;
@@ -1409,20 +1448,21 @@ void ExternalMediaPlayer::setPlayerInFocus(const std::string& playerInFocus, boo
         m_adapterInFocus = nullptr;
 
         // Acquire the channel and have this ExternalMediaPlayer manage the focus state.
-        if (m_focus == FocusState::NONE && m_focusAcquireInProgress != true && !registered ) {
+        if (m_focus == FocusState::NONE && m_focusAcquireInProgress != true && !registered) {
             // m_currentActivity = alexaClientSDK::avsCommon::avs::PlayerActivity::IDLE;
             // m_haltInitiator = HaltInitiator::NONE;
             m_focusAcquireInProgress = true;
             m_focusManager->acquireChannel(CHANNEL_NAME, shared_from_this(), FOCUS_MANAGER_ACTIVITY_ID);
         }
-    }
-    else if (playerInFocus.compare(m_playerInFocus) == 0 && !focusAcquire && !registered ) {
+    } else if (playerInFocus.compare(m_playerInFocus) == 0 && !focusAcquire && !registered) {
         // We only release the channel when the player is the player in focus.
         m_focusManager->releaseChannel(CHANNEL_NAME, shared_from_this());
         m_haltInitiator = HaltInitiator::NONE;
         m_currentActivity = alexaClientSDK::avsCommon::avs::PlayerActivity::IDLE;
-    } else if (focusAcquire) AACE_VERBOSE(LX(TAG,"no-op").d("reason", "playerId is already player in focus"));
-    else AACE_VERBOSE(LX(TAG,"channel not released on unset focus").d("reason", "playerId is not player in focus"));
+    } else if (focusAcquire)
+        AACE_VERBOSE(LX(TAG, "no-op").d("reason", "playerId is already player in focus"));
+    else
+        AACE_VERBOSE(LX(TAG, "channel not released on unset focus").d("reason", "playerId is not player in focus"));
 }
 
 std::string ExternalMediaPlayer::getPlayerInFocus() {
@@ -1432,25 +1472,27 @@ std::string ExternalMediaPlayer::getPlayerInFocus() {
 // end adapter handler specific code
 
 // begin Auto SDK specific change
-void ExternalMediaPlayer::onPlayerActivityChanged( alexaClientSDK::avsCommon::avs::PlayerActivity state, const alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface::Context& context) {
-    AACE_VERBOSE(LX(TAG,"onPlayerActivityChanged").d("state",state));
+void ExternalMediaPlayer::onPlayerActivityChanged(
+    alexaClientSDK::avsCommon::avs::PlayerActivity state,
+    const alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface::Context& context) {
+    AACE_VERBOSE(LX(TAG, "onPlayerActivityChanged").d("state", state));
     std::string playerInFocus;
     {
         std::lock_guard<std::mutex> lock{m_inFocusAdapterMutex};
         playerInFocus = m_playerInFocus;
     }
     // registered EMP adapter will not use this focus manger
-    auto registered = isRegisteredPlayerId( playerInFocus );
-    switch ( state ) {
+    auto registered = isRegisteredPlayerId(playerInFocus);
+    switch (state) {
         case alexaClientSDK::avsCommon::avs::PlayerActivity::PLAYING:
-            if ( !playerInFocus.empty() && !registered ) {
+            if (!playerInFocus.empty() && !registered) {
                 // Release channel when audioplayer is taking foreground
                 m_focusManager->releaseChannel(CHANNEL_NAME, shared_from_this());
-                AACE_VERBOSE(LX(TAG,"releasing EMP channel due to audioplayer PLAYING"));
+                AACE_VERBOSE(LX(TAG, "releasing EMP channel due to audioplayer PLAYING"));
             }
-        break;
+            break;
         default:
-        break;
+            break;
     }
 }
 // end Auto SDK specific change
@@ -1467,7 +1509,7 @@ std::chrono::milliseconds ExternalMediaPlayer::getAudioItemOffset() {
     std::lock_guard<std::mutex> lock{m_inFocusAdapterMutex};
     if (!m_adapterInFocus) {
         if (!m_adapterHandlerInFocus) {
-            AACE_ERROR(LX(TAG,"getAudioItemOffsetFailed").d("reason", "NoActiveAdapter").d("player", m_playerInFocus));
+            AACE_ERROR(LX(TAG, "getAudioItemOffsetFailed").d("reason", "NoActiveAdapter").d("player", m_playerInFocus));
             return std::chrono::milliseconds::zero();
         }
         return m_adapterHandlerInFocus->getOffset(m_playerInFocus);
@@ -1478,19 +1520,19 @@ std::chrono::milliseconds ExternalMediaPlayer::getAudioItemOffset() {
 void ExternalMediaPlayer::setPlayerInFocus(const std::string& playerInFocus) {
     AACE_VERBOSE(LX(TAG).d("playerInFocus", playerInFocus));
     // registered EMP adapter will not use this focus manger
-    auto registered = isRegisteredPlayerId( playerInFocus );
-    if( !registered )
-    {
+    auto registered = isRegisteredPlayerId(playerInFocus);
+    if (!registered) {
         auto lock = std::unique_lock<std::mutex>(m_authorizedMutex);
         if (m_authorizedAdapters.find(playerInFocus) == m_authorizedAdapters.end()) {
-            AACE_ERROR(LX(TAG,"setPlayerInFocusFailed").d("reason", "unauthorizedPlayer").d("playerId", playerInFocus));
+            AACE_ERROR(
+                LX(TAG, "setPlayerInFocusFailed").d("reason", "unauthorizedPlayer").d("playerId", playerInFocus));
             return;
         }
     }
     AACE_VERBOSE(LX(TAG).d("playerInFocus", playerInFocus));
     std::shared_ptr<aace::engine::alexa::ExternalMediaAdapterInterface> adapterInFocus = nullptr;
     std::shared_ptr<ExternalMediaAdapterHandlerInterface> adapterHandlerInFocus = nullptr;
-    if( !registered ) {
+    if (!registered) {
         adapterInFocus = getAdapterByPlayerId(playerInFocus);
     } else {
         adapterHandlerInFocus = getAdapterHandlerByPlayerId(playerInFocus);
@@ -1527,16 +1569,16 @@ void ExternalMediaPlayer::onButtonPressed(PlaybackButton button) {
     if (!playerInFocus.empty()) {
         if (isRegisteredPlayerId(playerInFocus)) {
             if (requestType == RequestType::PAUSE || requestType == RequestType::RESUME) {
-                requestType = RequestType::PAUSE_RESUME_TOGGLE; // registered adapter handler expects this
+                requestType = RequestType::PAUSE_RESUME_TOGGLE;  // registered adapter handler expects this
             }
             if (auto adapterHandlerInFocus = getAdapterHandlerByPlayerId(playerInFocus)) {
                 adapterHandlerInFocus->playControl(playerInFocus, requestType);
+            } else {
+                AACE_ERROR(LX("onButtonPressedFailed")
+                               .d("reason", "adapterHandlerInFocusNotFound")
+                               .d("playerInFocus", playerInFocus));
             }
-            else {
-                AACE_ERROR(LX("onButtonPressedFailed").d("reason", "adapterHandlerInFocusNotFound").d("playerInFocus", playerInFocus));
-            }
-        }
-        else {
+        } else {
             setHaltInitiatorRequestHelper(requestType);
             m_executor.submit([this, playerInFocus, requestType]() {
                 for (auto adapterHandler : m_adapterHandlers) {
@@ -1568,22 +1610,20 @@ void ExternalMediaPlayer::onTogglePressed(PlaybackToggle toggle, bool action) {
             if (auto adapterHandlerInFocus = getAdapterHandlerByPlayerId(playerInFocus)) {
                 if (action) {
                     adapterHandlerInFocus->playControl(playerInFocus, toggleStates.first);
-                }
-                else {
+                } else {
                     adapterHandlerInFocus->playControl(playerInFocus, toggleStates.second);
                 }
+            } else {
+                AACE_ERROR(LX("onTogglePressedFailed")
+                               .d("reason", "adapterHandlerInFocusNotFound")
+                               .d("playerInFocus", playerInFocus));
             }
-            else {
-                AACE_ERROR(LX("onTogglePressedFailed").d("reason", "adapterHandlerInFocusNotFound").d("playerInFocus", playerInFocus));
-            }
-        }
-        else {
+        } else {
             m_executor.submit([this, playerInFocus, action, toggleStates]() {
                 for (auto adapterHandler : m_adapterHandlers) {
                     if (action) {
                         adapterHandler->playControl(playerInFocus, toggleStates.first);
-                    }
-                    else {
+                    } else {
                         adapterHandler->playControl(playerInFocus, toggleStates.second);
                     }
                 }
@@ -1648,8 +1688,8 @@ void ExternalMediaPlayer::setHaltInitiatorRequestHelper(RequestType request) {
             break;
         case RequestType::PAUSE_RESUME_TOGGLE:
             if (m_currentActivity == alexaClientSDK::avsCommon::avs::PlayerActivity::PLAYING ||
-                    (m_currentActivity == alexaClientSDK::avsCommon::avs::PlayerActivity::PAUSED &&
-                    m_haltInitiator == HaltInitiator::FOCUS_CHANGE_PAUSE)) {
+                (m_currentActivity == alexaClientSDK::avsCommon::avs::PlayerActivity::PAUSED &&
+                 m_haltInitiator == HaltInitiator::FOCUS_CHANGE_PAUSE)) {
                 m_haltInitiator = HaltInitiator::EXTERNAL_PAUSE;
             }
             break;
@@ -1693,7 +1733,7 @@ void ExternalMediaPlayer::executeProvideState(
     AACE_DEBUG(LX(TAG).d("sendToken", sendToken).d("stateRequestToken", stateRequestToken));
     std::string state;
 
-// adapter handler specific code
+    // adapter handler specific code
     std::vector<aace::engine::alexa::AdapterState> adapterStates;
     for (auto adapterHandler : m_adapterHandlers) {
         auto handlerAdapterStates = adapterHandler->getAdapterStates();
@@ -1701,19 +1741,19 @@ void ExternalMediaPlayer::executeProvideState(
     }
 
     if (stateProviderName == SESSION_STATE) {
-// begin adapter handler specific code
+        // begin adapter handler specific code
         state = provideSessionState(adapterStates);
-// else
-//         state = provideSessionState();
-// end adapter handler specific code
+        // else
+        //         state = provideSessionState();
+        // end adapter handler specific code
     } else if (stateProviderName == PLAYBACK_STATE) {
-// begin adapter handler specific code
+        // begin adapter handler specific code
         state = providePlaybackState(adapterStates);
-// else
-//         state = providePlaybackState();
-// end adapter handler specific code
+        // else
+        //         state = providePlaybackState();
+        // end adapter handler specific code
     } else {
-        AACE_ERROR(LX(TAG,"executeProvideState").d("reason", "unknownStateProviderName"));
+        AACE_ERROR(LX(TAG, "executeProvideState").d("reason", "unknownStateProviderName"));
         return;
     }
 
@@ -1725,13 +1765,12 @@ void ExternalMediaPlayer::executeProvideState(
     }
 
     if (result != SetStateResult::SUCCESS) {
-        AACE_ERROR(LX(TAG,"executeProvideState").d("reason", "contextManagerSetStateFailedForEMPState"));
+        AACE_ERROR(LX(TAG, "executeProvideState").d("reason", "contextManagerSetStateFailedForEMPState"));
     }
 }
 
 // adapter handler specific code
 std::string ExternalMediaPlayer::provideSessionState(std::vector<aace::engine::alexa::AdapterState> adapterStates) {
-
     rapidjson::Document state(rapidjson::kObjectType);
     rapidjson::Document::AllocatorType& stateAlloc = state.GetAllocator();
 
@@ -1759,7 +1798,7 @@ std::string ExternalMediaPlayer::provideSessionState(std::vector<aace::engine::a
         notifyObservers(state.playerId, &update);
     }
 
-// adapter handler specific code
+    // adapter handler specific code
     for (auto adapterState : adapterStates) {
         rapidjson::Value playerJson = buildSessionState(adapterState.sessionState, stateAlloc);
         players.PushBack(playerJson, stateAlloc);
@@ -1770,7 +1809,7 @@ std::string ExternalMediaPlayer::provideSessionState(std::vector<aace::engine::a
     rapidjson::StringBuffer buffer;
     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
     if (!state.Accept(writer)) {
-        AACE_ERROR(LX(TAG,"provideSessionStateFailed").d("reason", "writerRefusedJsonObject"));
+        AACE_ERROR(LX(TAG, "provideSessionStateFailed").d("reason", "writerRefusedJsonObject"));
         return "";
     }
 
@@ -1779,7 +1818,6 @@ std::string ExternalMediaPlayer::provideSessionState(std::vector<aace::engine::a
 
 // adapter handler playback states
 std::string ExternalMediaPlayer::providePlaybackState(std::vector<aace::engine::alexa::AdapterState> adapterStates) {
-
     rapidjson::Document state(rapidjson::kObjectType);
     rapidjson::Document::AllocatorType& stateAlloc = state.GetAllocator();
 
@@ -1815,7 +1853,8 @@ std::string ExternalMediaPlayer::providePlaybackState(std::vector<aace::engine::
 
     // adapter handlers
     for (auto adapterState : adapterStates) {
-        rapidjson::Value playerJson = buildPlaybackState(adapterState.sessionState.playerId, adapterState.playbackState, stateAlloc);
+        rapidjson::Value playerJson =
+            buildPlaybackState(adapterState.sessionState.playerId, adapterState.playbackState, stateAlloc);
         players.PushBack(playerJson, stateAlloc);
     }
 
@@ -1825,7 +1864,7 @@ std::string ExternalMediaPlayer::providePlaybackState(std::vector<aace::engine::
     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
 
     if (!state.Accept(writer)) {
-        AACE_ERROR(LX(TAG,"providePlaybackState").d("reason", "writerRefusedJsonObject"));
+        AACE_ERROR(LX(TAG, "providePlaybackState").d("reason", "writerRefusedJsonObject"));
         return "";
     }
 
@@ -1846,12 +1885,12 @@ void ExternalMediaPlayer::createAdapters(
         auto speakerIt = speakers.find(entry.first);
 
         if (mediaPlayerIt == mediaPlayers.end()) {
-            AACE_ERROR(LX(TAG,"adapterCreationFailed").d(PLAYER_ID, entry.first).d("reason", "nullMediaPlayer"));
+            AACE_ERROR(LX(TAG, "adapterCreationFailed").d(PLAYER_ID, entry.first).d("reason", "nullMediaPlayer"));
             continue;
         }
 
         if (speakerIt == speakers.end()) {
-            AACE_ERROR(LX(TAG,"adapterCreationFailed").d(PLAYER_ID, entry.first).d("reason", "nullSpeaker"));
+            AACE_ERROR(LX(TAG, "adapterCreationFailed").d(PLAYER_ID, entry.first).d("reason", "nullSpeaker"));
             continue;
         }
 
@@ -1867,7 +1906,7 @@ void ExternalMediaPlayer::createAdapters(
             std::lock_guard<std::mutex> lock{m_adaptersMutex};
             m_adapters[entry.first] = adapter;
         } else {
-            AACE_ERROR(LX(TAG,"adapterCreationFailed").d(PLAYER_ID, entry.first));
+            AACE_ERROR(LX(TAG, "adapterCreationFailed").d(PLAYER_ID, entry.first));
         }
     }
 }
@@ -1899,7 +1938,7 @@ void ExternalMediaPlayer::sendReportDiscoveredPlayersEvent() {
     rapidjson::StringBuffer buffer;
     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
     if (!payload.Accept(writer)) {
-        AACE_ERROR(LX(TAG,"sendReportDiscoveredPlayersEventFailed").d("reason", "writerRefusedJsonObject"));
+        AACE_ERROR(LX(TAG, "sendReportDiscoveredPlayersEventFailed").d("reason", "writerRefusedJsonObject"));
         return;
     }
 
@@ -1920,7 +1959,7 @@ std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityCon
 
 void ExternalMediaPlayer::addObserver(std::shared_ptr<ExternalMediaPlayerObserverInterface> observer) {
     if (!observer) {
-        AACE_ERROR(LX(TAG,"addObserverFailed").d("reason", "nullObserver"));
+        AACE_ERROR(LX(TAG, "addObserverFailed").d("reason", "nullObserver"));
         return;
     }
     std::lock_guard<std::mutex> lock{m_observersMutex};
@@ -1929,7 +1968,7 @@ void ExternalMediaPlayer::addObserver(std::shared_ptr<ExternalMediaPlayerObserve
 
 void ExternalMediaPlayer::removeObserver(std::shared_ptr<ExternalMediaPlayerObserverInterface> observer) {
     if (!observer) {
-        AACE_ERROR(LX(TAG,"removeObserverFailed").d("reason", "nullObserver"));
+        AACE_ERROR(LX(TAG, "removeObserverFailed").d("reason", "nullObserver"));
         return;
     }
     std::lock_guard<std::mutex> lock{m_observersMutex};
@@ -1953,7 +1992,7 @@ void ExternalMediaPlayer::notifyObservers(
     const ObservableSessionProperties* sessionProperties,
     const ObservablePlaybackStateProperties* playbackProperties) {
     if (playerId.empty()) {
-        AACE_ERROR(LX(TAG,"notifyObserversFailed").d("reason", "emptyPlayerId"));
+        AACE_ERROR(LX(TAG, "notifyObserversFailed").d("reason", "emptyPlayerId"));
         return;
     }
 
@@ -1988,13 +2027,13 @@ void ExternalMediaPlayer::notifyRenderPlayerInfoCardsObservers() {
             }
         }
         if (!found) {
-            AACE_ERROR(LX(TAG,"notifyRenderPlayerInfoCardsFailed")
-                            .d("reason", "stateNotFound"));
+            AACE_ERROR(LX(TAG, "notifyRenderPlayerInfoCardsFailed").d("reason", "stateNotFound"));
             return;
         }
 
         lock.unlock();
-        alexaClientSDK::avsCommon::avs::PlayerActivity playerActivity = alexaClientSDK::avsCommon::avs::PlayerActivity::IDLE;
+        alexaClientSDK::avsCommon::avs::PlayerActivity playerActivity =
+            alexaClientSDK::avsCommon::avs::PlayerActivity::IDLE;
         std::string str = adapterState.playbackState.state;
         if ("IDLE" == str) {
             playerActivity = PlayerActivity::IDLE;
@@ -2009,9 +2048,9 @@ void ExternalMediaPlayer::notifyRenderPlayerInfoCardsObservers() {
         } else if ("FINISHED" == str) {
             playerActivity = PlayerActivity::FINISHED;
         } else {
-            AACE_ERROR(LX(TAG,"notifyRenderPlayerInfoCardsFailed")
-                            .d("reason", "invalidState")
-                            .d("state", adapterState.playbackState.state));
+            AACE_ERROR(LX(TAG, "notifyRenderPlayerInfoCardsFailed")
+                           .d("reason", "invalidState")
+                           .d("state", adapterState.playbackState.state));
             return;
         }
         RenderPlayerInfoCardsObserverInterface::Context context;
@@ -2027,6 +2066,6 @@ void ExternalMediaPlayer::notifyRenderPlayerInfoCardsObservers() {
     }
 }
 
-}  // namespace externalMediaPlayer
-}  // namespace capabilityAgents
-}  // namespace alexaClientSDK
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace

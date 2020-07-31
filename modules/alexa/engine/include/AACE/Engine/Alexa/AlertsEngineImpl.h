@@ -48,13 +48,14 @@ namespace aace {
 namespace engine {
 namespace alexa {
 
-class AlertsEngineImpl :
-    public AudioChannelEngineImpl,
-    public aace::alexa::AlertsEngineInterface,
-    public alexaClientSDK::capabilityAgents::alerts::AlertObserverInterface {
-    
+class AlertsEngineImpl
+        : public AudioChannelEngineImpl
+        , public aace::alexa::AlertsEngineInterface
+        , public alexaClientSDK::capabilityAgents::alerts::AlertObserverInterface {
 private:
-    AlertsEngineImpl( std::shared_ptr<aace::alexa::Alerts> alertsPlatformInterface, std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSConnectionManagerInterface> connectionManager );
+    AlertsEngineImpl(
+        std::shared_ptr<aace::alexa::Alerts> alertsPlatformInterface,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSConnectionManagerInterface> connectionManager);
 
     bool initialize(
         std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> audioOutputChannel,
@@ -66,7 +67,8 @@ private:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::AlertsAudioFactoryInterface> alertsAudioFactory,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::AlertsAudioFactoryInterface>
+            alertsAudioFactory,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
         std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager,
         class DeviceSettingsDelegate& deviceSettingsDelegate);
@@ -83,7 +85,8 @@ public:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::AlertsAudioFactoryInterface> alertsAudioFactory,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::AlertsAudioFactoryInterface>
+            alertsAudioFactory,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
         std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager,
         class DeviceSettingsDelegate& deviceSettingsDelegate);
@@ -91,13 +94,17 @@ public:
     // AlertsEngineInterface
     void onLocalStop() override;
     void removeAllAlerts() override;
-    
+
     // AlertObserverInterface
-    void onAlertStateChange( const std::string & alertToken, const std::string& alertType, State state, const std::string & reason ) override;
+    void onAlertStateChange(
+        const std::string& alertToken,
+        const std::string& alertType,
+        alexaClientSDK::capabilityAgents::alerts::AlertObserverInterface::State state,
+        const std::string& reason) override;
 
-    void onAlertCreated( const std::string & alertToken, const std::string & detailedInfo ) override;
+    void onAlertCreated(const std::string& alertToken, const std::string& detailedInfo) override;
 
-    void onAlertDeleted( const std::string & alertToken ) override;
+    void onAlertDeleted(const std::string& alertToken) override;
 
 protected:
     virtual void doShutdown() override;
@@ -106,10 +113,11 @@ private:
     std::shared_ptr<aace::alexa::Alerts> m_alertsPlatformInterface;
     std::shared_ptr<alexaClientSDK::capabilityAgents::alerts::AlertsCapabilityAgent> m_alertsCapabilityAgent;
     std::weak_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSConnectionManagerInterface> m_connectionManager;
+    std::shared_ptr<alexaClientSDK::capabilityAgents::alerts::renderer::Renderer> m_alertRenderer;
 };
 
-} // aace::engine::alexa
-} // aace::engine
-} // aace
+}  // namespace alexa
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_ALEXA_ALERTS_ENGINE_IMPL_H
+#endif  // AACE_ENGINE_ALEXA_ALERTS_ENGINE_IMPL_H

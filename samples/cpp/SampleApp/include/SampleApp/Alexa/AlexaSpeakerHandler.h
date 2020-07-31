@@ -31,34 +31,36 @@ namespace alexa {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class AlexaSpeakerHandler : public aace::alexa::AlexaSpeaker /* isa PlatformInterface */ {
-  private:
+private:
     std::weak_ptr<Activity> m_activity{};
     std::weak_ptr<logger::LoggerHandler> m_loggerHandler{};
 
-  protected:
+protected:
     AlexaSpeakerHandler(std::weak_ptr<Activity> activity, std::weak_ptr<logger::LoggerHandler> loggerHandler);
 
-  public:
-    template <typename... Args> static auto create(Args &&... args) -> std::shared_ptr<AlexaSpeakerHandler> {
+public:
+    template <typename... Args>
+    static auto create(Args&&... args) -> std::shared_ptr<AlexaSpeakerHandler> {
         return std::shared_ptr<AlexaSpeakerHandler>(new AlexaSpeakerHandler(args...));
     }
     auto getActivity() -> std::weak_ptr<Activity>;
     auto getLoggerHandler() -> std::weak_ptr<logger::LoggerHandler>;
 
     // aace::alexa::AlexaSpeaker interface
-    auto speakerSettingsChanged( aace::alexa::AlexaSpeaker::SpeakerType type, bool local, int8_t volume, bool mute ) -> void override;
+    auto speakerSettingsChanged(aace::alexa::AlexaSpeaker::SpeakerType type, bool local, int8_t volume, bool mute)
+        -> void override;
 
-  private:
+private:
     std::weak_ptr<View> m_console{};
 
-    auto log(logger::LoggerHandler::Level level, const std::string &message) -> void;
+    auto log(logger::LoggerHandler::Level level, const std::string& message) -> void;
     auto setupUI() -> void;
 
-    std::map<std::string, SpeakerType> identityMap {{"speaker", SpeakerType::ALEXA_VOLUME},
-                                                    {"alerts", SpeakerType::ALERTS_VOLUME}};
+    std::map<std::string, SpeakerType> identityMap{{"speaker", SpeakerType::ALEXA_VOLUME},
+                                                   {"alerts", SpeakerType::ALERTS_VOLUME}};
 };
 
-} // namespace alexa
-} // namespace sampleApp
+}  // namespace alexa
+}  // namespace sampleApp
 
-#endif // SAMPLEAPP_ALEXA_ALEXASPEAKERHANDLER_H
+#endif  // SAMPLEAPP_ALEXA_ALEXASPEAKERHANDLER_H

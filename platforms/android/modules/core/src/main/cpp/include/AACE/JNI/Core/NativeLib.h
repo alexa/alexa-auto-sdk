@@ -41,14 +41,14 @@ using JMethod = aace::jni::native::JavaMethodPtr;
 using JField = aace::jni::native::JavaFieldPtr;
 
 using JObjectArray = aace::jni::native::JavaObjectArray;
-using JByteArray = aace::jni::native::JavaArray<jbyteArray,jbyte>;
-using JLongArray = aace::jni::native::JavaArray<jlongArray,jlong>;
-using JIntArray = aace::jni::native::JavaArray<jintArray,jint>;
+using JByteArray = aace::jni::native::JavaArray<jbyteArray, jbyte>;
+using JLongArray = aace::jni::native::JavaArray<jlongArray, jlong>;
+using JIntArray = aace::jni::native::JavaArray<jintArray, jint>;
 
 template <class T, class C>
-using JEnum = aace::jni::native::JavaEnum<T,C>;
+using JEnum = aace::jni::native::JavaEnum<T, C>;
 
 template <class T>
 using EnumConfiguration = aace::jni::native::EnumConfiguration<T>;
 
-#endif // AACE_JNI_CORE_NATIVE_LIB_H
+#endif  // AACE_JNI_CORE_NATIVE_LIB_H

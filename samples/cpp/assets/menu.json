@@ -84,6 +84,100 @@
         },
         {
             "do": "GoTo",
+            "key": "O",
+            "name": "Messaging",
+            "value": {
+                "id": "messaging",
+                "item": [
+                    {
+                        "do": "notify/onMessagingEndpointConnection",
+                        "key": "1",
+                        "name": "Connect phone",
+                        "value": "CONNECTED"
+                    },
+                    {
+                        "do": "notify/onMessagingEndpointConnection",
+                        "key": "2",
+                        "name": "Disconnect phone",
+                        "value": "DISCONNECTED"
+                    },
+                    {
+                        "do": "notify/onMessagingEndpointPermission",
+                        "key": "3",
+                        "name": "Enable send permission",
+                        "value": "SEND/ON"
+                    },
+                    {
+                        "do": "notify/onMessagingEndpointPermission",
+                        "key": "4",
+                        "name": "Disable send permission",
+                        "value": "SEND/OFF"
+                    },
+                    {
+                        "do": "notify/onMessagingEndpointPermission",
+                        "key": "5",
+                        "name": "Enable read permission",
+                        "value": "READ/ON"
+                    },
+                    {
+                        "do": "notify/onMessagingEndpointPermission",
+                        "key": "6",
+                        "name": "Disable read permission",
+                        "value": "READ/OFF"
+                    },
+                    {
+                        "do": "notify/onConversationsReport",
+                        "key": "7",
+                        "name": "Upload conversations report",
+                        "value": "./sampledata/ConversationsReport.json"
+                    },
+                    {
+                        "do": "notify/onSendMessageStatus",
+                        "key": "8",
+                        "name": "Send message succeeded",
+                        "test": "!MessagingResponsesEnabled"
+                    },
+                    {
+                        "do": "notify/onSendMessageStatus",
+                        "key": "9",
+                        "name": "Send message failed",
+                        "value": "NO_PERMISSION/Device does not have permission to send",
+                        "test": "!MessagingResponsesEnabled"
+                    },
+                    {
+                        "do": "notify/onUpdateMessagesStatus",
+                        "key": "a",
+                        "name": "Send update messages succeeded",
+                        "test": "!MessagingResponsesEnabled"
+                    },
+                    {
+                        "do": "notify/onUpdateMessagesStatus",
+                        "key": "b",
+                        "name": "Send update messages failed",
+                        "value": "NO_PERMISSION/Device is not available",
+                        "test": "!MessagingResponsesEnabled"
+                    },
+                    {
+                        "do": "notify/onToggleAutomaticResponses",
+                        "key": "c",
+                        "name": "Toggle automatic responses"
+                    },
+                    {
+                        "do": "notify/onShowMessagingInfo",
+                        "key": "d",
+                        "name": "Show messaging information"
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Messaging Menu"
+            }
+        },
+        {
+            "do": "GoTo",
             "key": "H",
             "name": "Phone Call Controller",
             "value": {

@@ -45,7 +45,6 @@ public:
         std::string& error,
         std::string& info) override;
 
-
     void callAsync(const std::string& api, const std::string& verb, struct json_object* request, CallbackFn callbackFn)
         override;
 

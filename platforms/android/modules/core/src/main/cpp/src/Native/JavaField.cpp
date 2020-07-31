@@ -23,17 +23,18 @@ namespace aace {
 namespace jni {
 namespace native {
 
-    JavaField::JavaField( const std::string& name, const std::string& signature, jfieldID fieldID ) : m_name( name ), m_signature( signature ), m_fieldID( fieldID ) {
-    }
+JavaField::JavaField(const std::string& name, const std::string& signature, jfieldID fieldID) :
+        m_name(name), m_signature(signature), m_fieldID(fieldID) {
+}
 
-    std::shared_ptr<JavaField> JavaField::create( const char* name, const char* signature, jfieldID fieldID ) {
-        return std::shared_ptr<JavaField>( new JavaField( name, signature, fieldID ) );
-    }
+std::shared_ptr<JavaField> JavaField::create(const char* name, const char* signature, jfieldID fieldID) {
+    return std::shared_ptr<JavaField>(new JavaField(name, signature, fieldID));
+}
 
-    jfieldID JavaField::getFieldID() {
-        return m_fieldID;
-    }
+jfieldID JavaField::getFieldID() {
+    return m_fieldID;
+}
 
-} // aace::jni::native
-} // aace::jni
-} // aace
+}  // namespace native
+}  // namespace jni
+}  // namespace aace

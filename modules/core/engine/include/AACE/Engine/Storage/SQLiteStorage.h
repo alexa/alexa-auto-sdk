@@ -31,31 +31,31 @@ namespace storage {
 
 class SQLiteStorage : public LocalStorageInterface {
 public:
-    static std::shared_ptr<SQLiteStorage> create( const std::string& path );
+    static std::shared_ptr<SQLiteStorage> create(const std::string& path);
 
     virtual ~SQLiteStorage();
 
 private:
-    SQLiteStorage( const std::string& path );
+    SQLiteStorage(const std::string& path);
 
     bool initialize();
 
-    std::string createStatement( const char* stmt, ... );
-    
-    bool checkTable( const std::string& table, bool create = false );
-    bool checkKey( const std::string& table, const std::string& key );
-    bool query( const std::string& sql, int (*cb)(void*,int,char**,char**) = nullptr, void* data = nullptr );
-    
+    std::string createStatement(const char* stmt, ...);
+
+    bool checkTable(const std::string& table, bool create = false);
+    bool checkKey(const std::string& table, const std::string& key);
+    bool query(const std::string& sql, int (*cb)(void*, int, char**, char**) = nullptr, void* data = nullptr);
+
 public:
-    bool put( const std::string& table, const std::string& key, const std::string& value ) override;
-    std::string get( const std::string& table, const std::string& key ) override;
-    std::string get( const std::string& table, const std::string& key, const std::string& defaultValue ) override;
-    bool removeKey( const std::string& table, const std::string& key ) override;
-    bool removeTable( const std::string& table ) override;
-    bool containsKey( const std::string& table, const std::string& key ) override;
-    bool containsTable( const std::string& table ) override;
-    std::vector<std::string> keys( const std::string& table ) override;
-    std::vector<KeyValuePair> list( const std::string& table ) override;
+    bool put(const std::string& table, const std::string& key, const std::string& value) override;
+    std::string get(const std::string& table, const std::string& key) override;
+    std::string get(const std::string& table, const std::string& key, const std::string& defaultValue) override;
+    bool removeKey(const std::string& table, const std::string& key) override;
+    bool removeTable(const std::string& table) override;
+    bool containsKey(const std::string& table, const std::string& key) override;
+    bool containsTable(const std::string& table) override;
+    std::vector<std::string> keys(const std::string& table) override;
+    std::vector<KeyValuePair> list(const std::string& table) override;
     bool begin() override;
     bool commit() override;
     bool cancel() override;
@@ -66,8 +66,8 @@ private:
     bool m_transactionInProgress = false;
 };
 
-} // aace::engine::storage
-} // aace::engine
-} // aace
+}  // namespace storage
+}  // namespace engine
+}  // namespace aace
 
-#endif // AACE_ENGINE_STORAGE_SQLITE_STORAGE_H
+#endif  // AACE_ENGINE_STORAGE_SQLITE_STORAGE_H

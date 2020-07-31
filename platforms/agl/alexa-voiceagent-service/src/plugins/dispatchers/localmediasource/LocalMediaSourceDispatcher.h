@@ -75,7 +75,6 @@ public:
      */
     void onPlayerError(const std::string& payload);
 
-
     /// @name ICapabilityMessageDispatcher Functions
     /// @{
     void onReceivedDirective(const std::string& action, const std::string& jsonPayload) override;

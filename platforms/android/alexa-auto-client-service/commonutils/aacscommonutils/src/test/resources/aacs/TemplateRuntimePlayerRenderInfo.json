@@ -1,0 +1,72 @@
+{
+  "audioItemId": "amzn1.as-ct.v1.Dee-Domain-Music#ACRI#url#ACRI#92ccf448-fb9b-456b-8c8b-d723da27e4e7:1",
+  "content": {
+    "art": {
+      "sources": [
+        {
+          "size": "large",
+          "url": "https://m.media-amazon.com/images/I/51S3i18aPQL._UL256_.jpg"
+        },
+        {
+          "size": "x-large",
+          "url": "https://m.media-amazon.com/images/I/817QodLzBKL._UL600_.jpg"
+        }
+      ]
+    },
+    "background": {
+      "sources": [
+        {
+          "size": "large",
+          "url": "https://images-na.ssl-images-amazon.com/images/I/C1qu-jLWkUS._SL1024_CR0,0,1024,600_SCLZZZZZZZ_.jpg"
+        }
+      ]
+    },
+    "header": "My Likes",
+    "mediaLengthInMilliseconds": 189000,
+    "provider": {
+      "logo": {
+        "sources": [
+          {
+            "url": "https://s3.amazonaws.com/music-provider-logos/AmazonMusic.svg"
+          }
+        ]
+      },
+      "name": "Amazon Music"
+    },
+    "title": "Natural",
+    "titleSubtext1": "Imagine Dragons",
+    "titleSubtext2": "Natural"
+  },
+  "controls": [
+    {
+      "enabled": true,
+      "name": "PLAY_PAUSE",
+      "selected": false,
+      "type": "BUTTON"
+    },
+    {
+      "enabled": true,
+      "name": "PREVIOUS",
+      "selected": false,
+      "type": "BUTTON"
+    },
+    {
+      "enabled": true,
+      "name": "NEXT",
+      "selected": false,
+      "type": "BUTTON"
+    },
+    {
+      "enabled": true,
+      "name": "THUMBS_UP",
+      "selected": false,
+      "type": "TOGGLE"
+    },
+    {
+      "enabled": true,
+      "name": "THUMBS_DOWN",
+      "selected": false,
+      "type": "TOGGLE"
+    }
+  ]
+}

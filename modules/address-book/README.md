@@ -16,8 +16,6 @@ The Address Book module provides a common platform interface that you can implem
 
 Both the [Phone Call Controller](../phone-control/README.md) and Alexa-to-Alexa communications implemented via the optional Alexa Communications extension use the phone contacts uploaded via the Address Book module. However, the Contact and Navigation address books are not available for use with any other Alexa devices.
 
-> **Note**: The Address Book module supersedes the [Contact Uploader module](../contact-uploader/README.md), which supports only phone contacts and only online (cloud) use cases. The Contact Uploader module is on the deprecation path beginning with Alexa Auto SDK release 2.0.0, and all new implementations should use the Address Book module instead of the Contact Uploader module.
-
 Your platform implementation is responsible for managing the life cycle of an address book, including:
 
 * obtaining consent from end users to allow Alexa to use their data.

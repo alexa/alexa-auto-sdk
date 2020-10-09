@@ -1,0 +1,1 @@
+static const char* AASB_ALEXA_MODULE = "aasb.alexa";

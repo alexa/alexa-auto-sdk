@@ -183,3 +183,7 @@ The above example shows how you could provide "Speaker reference" into the engin
 ## Playlist URL Support
 
 The System Audio extension supports playback of playlist URL from media streaming services (such as TuneIn) based on `PlaylistParser` provided by AVS Device SDK. The current supported formats include M3U and PLS. Note that only the first playable entry will be played in the current implementation. Choosing a variant based on stream information or continuing playback of the second or later entry is not supported right now.
+
+## Debugging System Audio Extension
+
+If you would like to set breakpoints in AAL, it will be good to extend the state timeout by modifying `SYSTEM_AUDIO_EXTEND_STATE_TIMEOUT` to 1 in `modules/audio/engine/CMakeLists.txt`. Extending the timeout duration (to 300 seconds) allows setting breakpoints in AAL without causing state timeout.

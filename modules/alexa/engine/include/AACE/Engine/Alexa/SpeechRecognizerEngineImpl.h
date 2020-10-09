@@ -114,9 +114,8 @@ public:
     // keyword detection
     bool isWakewordEnabled();
     bool isWakewordSupported();
-
-    bool enableWakewordDetection() override;
-    bool disableWakewordDetection() override;
+    bool enableWakewordDetection();
+    bool disableWakewordDetection();
 
     // AudioInputProcessorObserverInterface
     void onStateChanged(

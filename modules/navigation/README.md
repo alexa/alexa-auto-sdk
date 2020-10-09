@@ -7,9 +7,11 @@ The Alexa Auto SDK Navigation module provides the interfaces required by your pl
 **Table of Contents**
 
 * [Overview](#overview)
+* [Configuring the Navigation module](#configuring-the-navigation-module)
 * [Navigation Sequence Diagrams](#navigation-sequence-diagrams)
 * [Implementing a Navigation Handler](#implementing-a-navigation-handler)
 * [Handling Events and Errors](#handling-events-and-errors)
+
 
 ## Overview<a id ="overview"></a>
 
@@ -87,6 +89,28 @@ This sequence diagram illustrates a possible flow for a use case in which a user
 >**Note:** This diagram illustrates the sequence that will occur when the `navigationEvent` and `navigationError` events are implemented in the Alexa cloud. Until this implementation is complete, the cloud will send the success/error TTS with the `ControlInterface` directive rather than in response to the `navigationEvent` or `navigationError` event.
 
 ![Map_Control](./assets/map_control.png)
+
+## Configuring the Navigation Module <a id = "configuring-the-navigation-module"></a>
+You can configure the Engine by defining "aace.navigation" configuration.
+
+The following is an optional configuration to set the navigation provider name:
+
+```
+"aace.navigation": {
+    "providerName": <PROVIDER_NAME> 
+}
+```
+
+The `providerName` field specifies your navigation provider, which is used for matching search results in the Alexa cloud with the provider used on the device. The accepted values are "HERE", "TOMTOM", and "TELENAV". The default value is "HERE". Add the "aace.navigation" object to the same configuration file you use to configure the Engine.
+
+You can alternatively use the `createNavigationConfig` method to configure the navigation provider programmatically. See [`aace.navigation.config.NavigationConfiguration.createNavigationConfig`](./platform/include/AACE/Navigation/NavigationConfiguration.h). for details.
+
+```cpp
+auto navigationConfig = aace::navigation::config::NavigationConfiguration::createNavigationConfig("HERE");
+```
+
+Refer to the [core module](../core/README.md) documentation for steps to specify configuration data programatically or through a JSON file.
+
 
 ## Implementing a Navigation Handler<a id = "implementing-navigation-handler"></a>
 

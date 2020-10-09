@@ -31,9 +31,6 @@ namespace alexa {
 /**
  * @c LocalMediaSource should be extended to use Alexa to switch among media sources local to the device.
  * It supports bluetooth, USB, FM radio, AM radio, satellite radio, audio line, and CD player sources.
- * It enables playback for these sources via Alexa (e.g. "Alexa, play the CD player"), or via the playback controller.
- *
- * @sa PlaybackController
  */
 class LocalMediaSource : public aace::core::PlatformInterface {
 public:
@@ -114,40 +111,40 @@ public:
          */
         SessionState();
 
-        /// The unique device endpoint.
+        /// The unique device endpoint. default ""
         std::string endpointId;
 
-        /// Flag that identifies if a user is currently logged in.
+        /// Flag that identifies if a user is currently logged in. default false
         bool loggedIn;
 
-        /// The username of the user currently logged in via a Login directive from Alexa.
+        /// The username of the user currently logged in via a Login directive from Alexa. default ""
         std::string userName;
 
-        /// Flag that identifies if the user currently logged in is a guest.
+        /// Flag that identifies if the user currently logged in is a guest. default false
         bool isGuest;
 
-        /// Flag that identifies if an application has been launched.
+        /// Flag that identifies if an source is currently enabled. default true
         bool launched;
 
         /**
          * Flag that identifies if the application is currently active. This could mean different things
-         * for different applications.
+         * for different applications. default false
          */
         bool active;
 
         /**
          * The access token used to log in a user. The access token may also be used as a bearer token if the adapter
-         * makes an authenticated Web API to the music provider.
+         * makes an authenticated Web API to the music provider. default ""
          */
         std::string accessToken;
 
-        /// The validity period of the token in milliseconds.
+        /// The validity period of the token in milliseconds. default 0
         std::chrono::milliseconds tokenRefreshInterval;
 
-        /// Array of content selector types supported by the player
+        /// Array of content selector types supported by the player. default {}
         std::vector<ContentSelector> supportedContentSelectors;
 
-        /// The only spiVersion that currently exists is "1.0"
+        /// The only spiVersion that currently exists is "1.0". default "1.0"
         std::string spiVersion;
     };
 
@@ -159,82 +156,84 @@ public:
         /// Default constructor.
         PlaybackState();
 
-        /// The state of the default player - IDLE/STOPPED/PAUSED/PLAYING/FINISHED/FAST_FORWARDING/REWINDING/BUFFER_UNDERRUN
+        /* The state of the local player.
+         * "IDLE"/"STOPPED"/"PAUSED"/"PLAYING"/"FINISHED"/"FAST_FORWARDING"/"REWINDING"/"BUFFER_UNDERRUN". default "IDLE"
+         */
         std::string state;
 
-        /// The set of states the default player can move into from its current state.
+        /// The set of states the default player can move into from its current state. default {}
         std::vector<SupportedPlaybackOperation> supportedOperations;
 
-        /// The offset of the track in milliseconds.
+        /// The offset of the track in milliseconds. default 0
         std::chrono::milliseconds trackOffset;
 
-        /// Bool to identify if shuffling is enabled.
+        /// Bool to identify if shuffling is enabled. default false
         bool shuffleEnabled;
 
-        ///  Bool to identify if looping of songs is enabled.
+        ///  Bool to identify if looping of songs is enabled. default false
         bool repeatEnabled;
 
-        /// The favorite status {"FAVORITED"/"UNFAVORITED"/"NOT_RATED"}.
+        /// The favorite status FAVORITED/UNFAVORITED/NOT_RATED. default NOT_RATED
         Favorites favorites;
 
-        /// The type of the media item. For now hard-coded to ExternalMediaAdapterMusicItem.
+        /// The type of the media item should be "ExternalMediaAdapterMusicItem". default "ExternalMediaAdapterMusicItem"
         std::string type;
 
-        /// The display name for current playback context, e.g. playlist name.
+        /// The display name for current playback context, e.g. playlist name. default ""
         std::string playbackSource;
 
         /// An arbitrary identifier for current playback context as per the music provider, e.g. a URI that can be saved as
-        /// a preset or queried to Music Service Provider services for additional info.
+        /// a preset or queried to Music Service Provider services for additional info. default ""
         std::string playbackSourceId;
 
-        /// The display name for the currently playing trackname of the track.
+        /// The display name for the currently playing trackname of the track. default ""
         std::string trackName;
 
-        /// The arbitrary identifier for currently playing trackid of the track as per the music provider.
+        /// The arbitrary identifier for currently playing trackid of the track as per the music provider. default ""
         std::string trackId;
 
         /// The display value for the number or abstract position of the currently playing track in the album or context
-        /// trackNumber of the track.
+        /// trackNumber of the track. default ""
         std::string trackNumber;
 
-        /// The display name for the currently playing artist.
+        /// The display name for the currently playing artist. default ""
         std::string artistName;
 
         /// An arbitrary identifier for currently playing artist as per the music provider, e.g. a URI that can be queried
-        /// to MSP services for additional info.
+        /// to MSP services for additional info. default ""
         std::string artistId;
 
-        /// The display name of the currently playing album.
+        /// The display name of the currently playing album. default ""
         std::string albumName;
 
         /// Arbitrary identifier for currently playing album specific to the music provider, e.g. a URI that can be queried
-        /// to MSP services for additional info.
+        /// to MSP services for additional info. default ""
         std::string albumId;
 
-        /// The URL for tiny cover art image resource} .
+        /// The URL for tiny cover art image resource. default ""
         std::string tinyURL;
 
-        /// The URL for small cover art image resource} .
+        /// The URL for small cover art image resource. default ""
         std::string smallURL;
 
-        /// The URL for medium cover art image resource} .
+        /// The URL for medium cover art image resource. default ""
         std::string mediumURL;
 
-        /// The URL for large cover art image resource} .
+        /// The URL for large cover art image resource. default ""
         std::string largeURL;
 
         /// The Arbitrary identifier for cover art image resource specific to the music provider, for retrieval from an MSP
-        /// API.
+        /// API.  default ""
         std::string coverId;
 
         /// Music Service Provider name for the currently playing media item; distinct from the application identity
-        /// although the two may be the same.
+        /// although the two may be the same. default ""
         std::string mediaProvider;
 
-        /// The Media type enum value from {TRACK, PODCAST, STATION, AD, SAMPLE, OTHER} type of the media.
+        /// The Media type TRACK/PODCAST/STATION/AD/SAMPLE/OTHER . default OTHER
         MediaType mediaType;
 
-        /// Media item duration in milliseconds.
+        /// Media item duration in milliseconds. default 0
         std::chrono::milliseconds duration;
     };
 
@@ -272,14 +271,12 @@ public:
     virtual bool play(ContentSelector contentSelectorType, const std::string& payload) = 0;
 
     /**
-     * Occurs during playback control via voice interaction or PlaybackController interface
+     * Occurs during playback control via voice interaction
      *
      * @param [in] controlType Playback control type being invoked
      * 
      * @return @c true if the platform implementation successfully handled the call, 
      * else @c false
-     *
-     * @sa PlaybackController
      */
     virtual bool playControl(PlayControlType controlType) = 0;
 
@@ -340,14 +337,17 @@ public:
     /**
      * Should be called on a local media source player event. This will sync the context with AVS.
      *
-     * @param [in] eventName Canonical event name
+     * @param [in] eventName Canonical event name. Accepted values: 
+     *      @li "PlaybackStarted"
+     *      @li "PlaybackStopped"
      */
     void playerEvent(const std::string& eventName);
 
     /**
      * Should be called on a local media source player error.
      *
-     * @param [in] errorName The name of the error
+     * @param [in] errorName The name of the error. Accepted values: 
+     *      @li "INTERNAL_ERROR"
      *
      * @param [in] code The error code
      *

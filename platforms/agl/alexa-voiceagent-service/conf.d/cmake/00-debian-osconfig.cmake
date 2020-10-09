@@ -1,1 +1,0 @@
-list(APPEND PKG_REQUIRED_LIST lua-5.3>=5.3)

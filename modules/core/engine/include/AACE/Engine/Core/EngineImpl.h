@@ -50,8 +50,6 @@ public:
     bool start() override;
     bool stop() override;
     bool shutdown() override;
-    bool setProperty(const std::string& name, const std::string& value) override;
-    std::string getProperty(const std::string& name) override;
 
     // create the engine
     static std::shared_ptr<EngineImpl> create();

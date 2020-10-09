@@ -973,7 +973,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "en-CA"
           ],
           "defaultValue": "cup holder",
-          "synonyms": []
+          "synonyms": [
+            "cupholder"
+          ]
         },
         {
           "locales": [
@@ -999,14 +1001,18 @@ static const std::string ASSETS_DEFAULT = R"({
             "en-IN"
           ],
           "defaultValue": "cup holder",
-          "synonyms": []
+          "synonyms": [
+            "cupholder"
+          ]
         },
         {
           "locales": [
             "en-GB"
           ],
           "defaultValue": "cup holder",
-          "synonyms": []
+          "synonyms": [
+            "cupholder"
+          ]
         },
         {
           "locales": [
@@ -1306,101 +1312,6 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "luce di cortesia",
           "synonyms": []
-        }
-      ]
-    },
-    {
-      "assetId": "Alexa.Automotive.DeviceName.DriverSeat",
-      "values": [
-        {
-          "locales": [
-            "en-US",
-            "en-CA"
-          ],
-          "defaultValue": "driver seat",
-          "synonyms": [
-            "driver side seat",
-            "seat"
-          ]
-        },
-        {
-          "locales": [
-            "es-MX",
-            "es-US"
-          ],
-          "defaultValue": "asiento del conductor",
-          "synonyms": [
-            "asiento del lado del conductor",
-            "asiento"
-          ]
-        },
-        {
-          "locales": [
-            "fr-CA"
-          ],
-          "defaultValue": "siège conducteur",
-          "synonyms": [
-            "siège côté conducteur",
-            "siège du conducteur",
-            "siège"
-          ]
-        },
-        {
-          "locales": [
-            "en-IN"
-          ],
-          "defaultValue": "driver seat",
-          "synonyms": [
-            "driver side seat"
-          ]
-        },
-        {
-          "locales": [
-            "en-GB"
-          ],
-          "defaultValue": "driver seat",
-          "synonyms": [
-            "driver side seat"
-          ]
-        },
-        {
-          "locales": [
-            "fr-FR"
-          ],
-          "defaultValue": "siège conducteur",
-          "synonyms": [
-            "siège côté conducteur",
-            "siège du conducteur",
-            "siège"
-          ]
-        },
-        {
-          "locales": [
-            "es-ES"
-          ],
-          "defaultValue": "asiento del conductor",
-          "synonyms": [
-            "asiento del lado del conductor",
-            "asiento"
-          ]
-        },
-        {
-          "locales": [
-            "de-DE"
-          ],
-          "defaultValue": "Fahrersitz",
-          "synonyms": [
-            "Autositz"
-          ]
-        },
-        {
-          "locales": [
-            "it-IT"
-          ],
-          "defaultValue": "sedile del guidatore",
-          "synonyms": [
-            "sedile"
-          ]
         }
       ]
     },
@@ -2277,99 +2188,6 @@ static const std::string ASSETS_DEFAULT = R"({
       ]
     },
     {
-      "assetId": "Alexa.Automotive.DeviceName.LeftSeat",
-      "values": [
-        {
-          "locales": [
-            "en-US",
-            "en-CA"
-          ],
-          "defaultValue": "left seat",
-          "synonyms": [
-            "left side seat"
-          ]
-        },
-        {
-          "locales": [
-            "es-MX",
-            "es-US"
-          ],
-          "defaultValue": "asiento izquierdo",
-          "synonyms": [
-            "asiento de la izquierda",
-            "asiento del lado izquierdo"
-          ]
-        },
-        {
-          "locales": [
-            "fr-CA"
-          ],
-          "defaultValue": "siège gauche",
-          "synonyms": [
-            "siège de gauche",
-            "siège côté gauche"
-          ]
-        },
-        {
-          "locales": [
-            "en-IN"
-          ],
-          "defaultValue": "left seat",
-          "synonyms": [
-            "left side seat"
-          ]
-        },
-        {
-          "locales": [
-            "en-GB"
-          ],
-          "defaultValue": "left seat",
-          "synonyms": [
-            "left side seat"
-          ]
-        },
-        {
-          "locales": [
-            "fr-FR"
-          ],
-          "defaultValue": "siège de gauche",
-          "synonyms": [
-            "siège côté gauche",
-            "siège gauche"
-          ]
-        },
-        {
-          "locales": [
-            "es-ES"
-          ],
-          "defaultValue": "asiento izquierdo",
-          "synonyms": [
-            "asiento de la izquierda",
-            "asiento del lado izquierdo"
-          ]
-        },
-        {
-          "locales": [
-            "de-DE"
-          ],
-          "defaultValue": "linker Sitz",
-          "synonyms": [
-            "linksseitiger Sitz"
-          ]
-        },
-        {
-          "locales": [
-            "it-IT"
-          ],
-          "defaultValue": "sedile sinistro",
-          "synonyms": [
-            "sedile di sinistra",
-            "sedile lato sinistro"
-          ]
-        }
-      ]
-    },
-    {
       "assetId": "Alexa.Automotive.DeviceName.Light",
       "values": [
         {
@@ -2624,98 +2442,6 @@ static const std::string ASSETS_DEFAULT = R"({
       ]
     },
     {
-      "assetId": "Alexa.Automotive.DeviceName.PassengerSeat",
-      "values": [
-        {
-          "locales": [
-            "en-US",
-            "en-CA"
-          ],
-          "defaultValue": "passenger seat",
-          "synonyms": [
-            "passenger side seat"
-          ]
-        },
-        {
-          "locales": [
-            "es-MX",
-            "es-US"
-          ],
-          "defaultValue": "asiento del pasajero",
-          "synonyms": [
-            "asiento del lado del pasajero",
-            "asiento del copiloto",
-            "asiento del lado del copiloto"
-          ]
-        },
-        {
-          "locales": [
-            "fr-CA"
-          ],
-          "defaultValue": "siège du passager",
-          "synonyms": [
-            "siège passager"
-          ]
-        },
-        {
-          "locales": [
-            "en-IN"
-          ],
-          "defaultValue": "passenger seat",
-          "synonyms": [
-            "passenger side seat"
-          ]
-        },
-        {
-          "locales": [
-            "en-GB"
-          ],
-          "defaultValue": "passenger seat",
-          "synonyms": [
-            "passenger side seat"
-          ]
-        },
-        {
-          "locales": [
-            "fr-FR"
-          ],
-          "defaultValue": "siège passager",
-          "synonyms": [
-            "siège côté passager",
-            "siège du passager"
-          ]
-        },
-        {
-          "locales": [
-            "es-ES"
-          ],
-          "defaultValue": "asiento del pasajero",
-          "synonyms": [
-            "asiento del lado del pasajero",
-            "asiento del copiloto",
-            "asiento del lado del copiloto"
-          ]
-        },
-        {
-          "locales": [
-            "de-DE"
-          ],
-          "defaultValue": "Beifahrersitz",
-          "synonyms": []
-        },
-        {
-          "locales": [
-            "it-IT"
-          ],
-          "defaultValue": "sedile del passeggero",
-          "synonyms": [
-            "sedile dal lato del passeggero",
-            "sedile del lato del passeggero"
-          ]
-        }
-      ]
-    },
-    {
       "assetId": "Alexa.Automotive.DeviceName.ReadingLight",
       "values": [
         {
@@ -2797,99 +2523,6 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "luce da lettura",
             "luce di lettura"
-          ]
-        }
-      ]
-    },
-    {
-      "assetId": "Alexa.Automotive.DeviceName.RightSeat",
-      "values": [
-        {
-          "locales": [
-            "en-US",
-            "en-CA"
-          ],
-          "defaultValue": "right seat",
-          "synonyms": [
-            "right side seat"
-          ]
-        },
-        {
-          "locales": [
-            "es-MX",
-            "es-US"
-          ],
-          "defaultValue": "asiento derecho",
-          "synonyms": [
-            "asiento de la derecha",
-            "asiento del lado derecho"
-          ]
-        },
-        {
-          "locales": [
-            "fr-CA"
-          ],
-          "defaultValue": "siège droit",
-          "synonyms": [
-            "siège de droite",
-            "siège côté droit"
-          ]
-        },
-        {
-          "locales": [
-            "en-IN"
-          ],
-          "defaultValue": "right seat",
-          "synonyms": [
-            "right side seat"
-          ]
-        },
-        {
-          "locales": [
-            "en-GB"
-          ],
-          "defaultValue": "right seat",
-          "synonyms": [
-            "right side seat"
-          ]
-        },
-        {
-          "locales": [
-            "fr-FR"
-          ],
-          "defaultValue": "siège de droite",
-          "synonyms": [
-            "siège côté droit",
-            "siège droit"
-          ]
-        },
-        {
-          "locales": [
-            "es-ES"
-          ],
-          "defaultValue": "asiento derecho",
-          "synonyms": [
-            "asiento de la derecha",
-            "asiento del lado derecho"
-          ]
-        },
-        {
-          "locales": [
-            "de-DE"
-          ],
-          "defaultValue": "rechter Sitz",
-          "synonyms": [
-            "rechtsseitiger Sitz"
-          ]
-        },
-        {
-          "locales": [
-            "it-IT"
-          ],
-          "defaultValue": "sedile destro",
-          "synonyms": [
-            "sedile di destra",
-            "sedile lato destro"
           ]
         }
       ]

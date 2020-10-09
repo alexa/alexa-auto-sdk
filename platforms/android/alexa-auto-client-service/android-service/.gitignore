@@ -1,0 +1,9 @@
+.DS_Store
+.gradle
+*.iml
+gradle/
+gradlew
+gradlew.bat
+local.properties
+service/.DS_Store
+service/libs/

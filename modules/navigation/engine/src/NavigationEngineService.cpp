@@ -51,12 +51,9 @@ bool NavigationEngineService::configure(std::shared_ptr<std::istream> configurat
 
         auto root = document.GetObject();
 
-        if (root.HasMember("aace.navigation") && root["aace.navigation"].IsObject()) {
-            auto navigation = root["aace.navigation"].GetObject();
-
-            if (navigation.HasMember("providerName") && navigation["providerName"].IsString()) {
-                m_navigationProviderName = navigation["providerName"].GetString();
-            }
+        if (root.HasMember("providerName") && root["providerName"].IsString()) {
+            m_navigationProviderName = root["providerName"].GetString();
+            AACE_DEBUG(LX(TAG, "configure").d("providerName", m_navigationProviderName));
         }
         return true;
     } catch (std::exception& ex) {

@@ -1,0 +1,5 @@
+<resources>
+    <string name="aacs_description">Alexa Auto Client Service lets you talk to Alexa in your vehicle</string>
+    <string name="aacs_title">AACS</string>
+    <string name="component_registry_key">%1$s + %2$s</string>
+</resources>

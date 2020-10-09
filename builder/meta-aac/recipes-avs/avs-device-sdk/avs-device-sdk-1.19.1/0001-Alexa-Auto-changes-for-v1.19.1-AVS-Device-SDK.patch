@@ -1,9 +1,8 @@
-From 5c1da1022b448302b17ba380b56ecccdfe7ce1c3 Mon Sep 17 00:00:00 2001
-From: Muni Sakkuru <muni.sakkuru@gmail.com>
-Date: Tue, 7 Jul 2020 10:16:03 -0700
-Subject: [PATCH 1/1] Alexa Auto changes for v1.19.1 AVS Device SDK
+From e66bb45c76f3e5a0489aae5cac09c0bd335cf01c Mon Sep 17 00:00:00 2001
+From: Eze Cervantes <ezeqc@amazon.com>
+Date: Tue, 6 Oct 2020 12:34:01 -0700
+Subject: [PATCH] Alexa Auto changes for v1.19.1 AVS Device SDK
 
-For internal reference: 3f093bdd
 ---
  ACL/src/AVSConnectionManager.cpp              |   4 +-
  ADSL/include/ADSL/DirectiveProcessor.h        |  15 +-
@@ -54,6 +53,7 @@ For internal reference: 3f093bdd
  .../src/PostConnectCapabilitiesPublisher.cpp  |  90 ++-
  .../src/Utils/DiscoveryUtils.cpp              |  32 +-
  .../PostConnectCapabilitiesPublisherTest.cpp  | 108 ++-
+ .../AIP/src/AudioInputProcessor.cpp           |   3 +-
  .../include/Alerts/AlertObserverInterface.h   |  23 +
  .../include/Alerts/AlertsCapabilityAgent.h    |  41 ++
  .../Alerts/include/Alerts/Renderer/Renderer.h |  10 +-
@@ -99,7 +99,7 @@ For internal reference: 3f093bdd
  SampleApp/src/InteractionManager.cpp          |   2 +-
  .../DoNotDisturbCapabilityAgent.h             |  46 +-
  .../src/DoNotDisturbCapabilityAgent.cpp       |   9 +-
- 94 files changed, 3963 insertions(+), 167 deletions(-)
+ 95 files changed, 3964 insertions(+), 169 deletions(-)
  create mode 100644 AVSCommon/AVS/include/AVSCommon/AVS/ActionsToDirectiveMapping.h
  create mode 100644 AVSCommon/AVS/include/AVSCommon/AVS/CapabilitySemantics.h
  create mode 100644 AVSCommon/AVS/include/AVSCommon/AVS/EndpointResources.h
@@ -2932,7 +2932,7 @@ index e53552ba..4c92910c 100644
          if (instance) {
              addDiscoveryEventSender(instance);
 diff --git a/CapabilitiesDelegate/src/PostConnectCapabilitiesPublisher.cpp b/CapabilitiesDelegate/src/PostConnectCapabilitiesPublisher.cpp
-index 1f9b989e..aad68231 100644
+index 1f9b989e..f93bff88 100644
 --- a/CapabilitiesDelegate/src/PostConnectCapabilitiesPublisher.cpp
 +++ b/CapabilitiesDelegate/src/PostConnectCapabilitiesPublisher.cpp
 @@ -52,7 +52,16 @@ static const std::vector<int> RETRY_TABLE = {
@@ -2943,7 +2943,7 @@ index 1f9b989e..aad68231 100644
 +static constexpr int MAX_ENDPOINTS_PER_ADD_OR_UPDATE_REPORT_EVENT = 300;
 +
 +/// Maximum size of the Discovery event (256 KB)
-+static constexpr int MAX_DISCOVERY_PAYLOAD_SIZE = 200 * 1024;
++static constexpr int MAX_DISCOVERY_PAYLOAD_SIZE = 256 * 1024;
 +
 +/// Maximum size of header and scope fields in the Discovery event (Choosing a sufficiently large size of 10KB).
 +static constexpr int MAX_DISCOVERY_HEADER_AND_SCOPE_SIZE = 10 * 1024;
@@ -3288,6 +3288,27 @@ index 59e3c5ab..4ff52cb9 100644
  /**
   * Test when AddOrUpdateReport response is 202 and DeleteReport response is 4xx.
   */
+diff --git a/CapabilityAgents/AIP/src/AudioInputProcessor.cpp b/CapabilityAgents/AIP/src/AudioInputProcessor.cpp
+index aa2a2e26..d424cfda 100644
+--- a/CapabilityAgents/AIP/src/AudioInputProcessor.cpp
++++ b/CapabilityAgents/AIP/src/AudioInputProcessor.cpp
+@@ -1130,7 +1130,6 @@ bool AudioInputProcessor::executeStopCapture(bool stopImmediately, std::shared_p
+         return true;
+     }
+     if (m_state != ObserverInterface::State::RECOGNIZING) {
+-        static const char* errorMessage = "StopCapture only allowed in RECOGNIZING state.";
+         auto returnValue = false;
+         if (info) {
+             if (info->result) {
+@@ -1143,7 +1142,7 @@ bool AudioInputProcessor::executeStopCapture(bool stopImmediately, std::shared_p
+                                    .m("StopCapture directive ignored because local StopCapture was performed."));
+ 
+                 } else {
+-                    info->result->setFailed(errorMessage);
++                    info->result->setCompleted();
+                     ACSDK_ERROR(LX("executeStopCaptureFailed")
+                                     .d("reason", "invalidState")
+                                     .d("expectedState", "RECOGNIZING")
 diff --git a/CapabilityAgents/Alerts/include/Alerts/AlertObserverInterface.h b/CapabilityAgents/Alerts/include/Alerts/AlertObserverInterface.h
 index ad6b291b..f9fd1f9d 100644
 --- a/CapabilityAgents/Alerts/include/Alerts/AlertObserverInterface.h
@@ -6302,5 +6323,5 @@ index 9e897c5e..f7244c80 100644
      });
      promise.set_value(true);
 -- 
-2.25.0
+2.28.0
 

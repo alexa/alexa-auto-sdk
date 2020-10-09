@@ -25,7 +25,7 @@ namespace alexa {
 
 class SpeechRecognizerHandler : public aace::alexa::SpeechRecognizer {
 public:
-    SpeechRecognizerHandler(jobject obj, bool wakewordDetectionEnabled);
+    SpeechRecognizerHandler(jobject obj);
 
     // aace::alexa::SpeechRecognizer
     bool wakewordDetected(const std::string& wakeword) override;
@@ -37,7 +37,7 @@ private:
 
 class SpeechRecognizerBinder : public aace::jni::core::PlatformInterfaceBinder {
 public:
-    SpeechRecognizerBinder(jobject obj, bool wakewordDetectionEnabled);
+    SpeechRecognizerBinder(jobject obj);
 
     std::shared_ptr<aace::core::PlatformInterface> getPlatformInterface() override {
         return m_speechRecognizerHandler;

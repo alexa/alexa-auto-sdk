@@ -188,15 +188,22 @@ static gboolean bus_message_callback(GstBus* bus, GstMessage* msg, gpointer poin
             ctx->state = AAL_STATE_SS;
             break;
         case GST_MESSAGE_STATE_CHANGED: {
-            GstState old_state, new_state;
-            gst_message_parse_state_changed(msg, &old_state, &new_state, NULL);
-            g_debug(
-                "%s:%s: changed state from %s to %s.",
-                ctx->name,
-                GST_OBJECT_NAME(msg->src),
-                gst_element_state_get_name(old_state),
-                gst_element_state_get_name(new_state));
             if (GST_MESSAGE_SRC(msg) == GST_OBJECT_CAST(ctx->pipeline)) {
+                GstState old_state = GST_STATE_NULL, new_state = GST_STATE_NULL, pending_state = GST_STATE_NULL,
+                         next_state = GST_STATE_NULL, target_state = GST_STATE_NULL;
+                gst_message_parse_state_changed(msg, &old_state, &new_state, &pending_state);
+                next_state = GST_STATE_NEXT(msg->src);
+                target_state = GST_STATE_TARGET(msg->src);
+                g_debug(
+                    "%s:%s: pipeline states: old=%s, new=%s, next=%s, pending=%s, target=%s",
+                    ctx->name,
+                    GST_OBJECT_NAME(msg->src),
+                    gst_element_state_get_name(old_state),
+                    gst_element_state_get_name(new_state),
+                    gst_element_state_get_name(next_state),
+                    gst_element_state_get_name(pending_state),
+                    gst_element_state_get_name(target_state));
+
                 switch (new_state) {
                     case GST_STATE_READY:
                         if (old_state == GST_STATE_NULL) {
@@ -217,29 +224,31 @@ static gboolean bus_message_callback(GstBus* bus, GstMessage* msg, gpointer poin
                         }
                         break;
                     case GST_STATE_PAUSED:
-                        if (old_state == GST_STATE_READY || old_state == GST_STATE_PAUSED) {
+                        if (old_state == GST_STATE_READY && pending_state == GST_STATE_PLAYING) {
                             g_debug(
-                                "%s:%s: ignore READY/PAUSED->PAUSED transition", ctx->name, GST_OBJECT_NAME(msg->src));
+                                "%s:%s: ignore intermediate PAUSED transition before PLAYING",
+                                ctx->name,
+                                GST_OBJECT_NAME(msg->src));
+                            break;
+                        } else if (old_state == GST_STATE_PAUSED) {
+                            g_debug("%s:%s: ignore seek during PAUSED", ctx->name, GST_OBJECT_NAME(msg->src));
+                            break;
+                        } else if (next_state == GST_STATE_READY || ctx->state == AAL_STATE_EOS) {
+                            g_debug(
+                                "%s:%s: ignore intermediate PAUSED transition before READY or EOS",
+                                ctx->name,
+                                GST_OBJECT_NAME(msg->src));
                             break;
                         }
-                        g_debug("%s:%s: paused or going to stop", ctx->name, GST_OBJECT_NAME(msg->src));
-                        if (GST_STATE_NEXT(msg->src) != GST_STATE_READY && ctx->state != AAL_STATE_EOS) {
-                            g_debug(
-                                "%s:%s: paused: next state=%d",
-                                ctx->name,
-                                GST_OBJECT_NAME(msg->src),
-                                GST_STATE_NEXT(msg->src));
-                            if (ctx->listener && ctx->listener->on_stop)
-                                ctx->listener->on_stop(AAL_PAUSED, ctx->user_data);
-                        }
+                        if (ctx->listener && ctx->listener->on_stop) ctx->listener->on_stop(AAL_PAUSED, ctx->user_data);
                         break;
                     case GST_STATE_PLAYING:
                         // Seek if any pending position is available
                         if (ctx->pending_position != 0) {
                             aal_player_seek(ctx, ctx->pending_position);
                             ctx->pending_position = 0;
-                        }
-                        if (ctx->listener && ctx->listener->on_start) {
+                            // should not emit on_start for this state change
+                        } else if (ctx->listener && ctx->listener->on_start) {
                             switch (ctx->state) {
                                 case AAL_STATE_SS:
                                     ctx->listener->on_start(ctx->user_data);
@@ -251,9 +260,9 @@ static gboolean bus_message_callback(GstBus* bus, GstMessage* msg, gpointer poin
                                         GST_OBJECT_NAME(msg->src),
                                         ctx->state);
                             }
+                            GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS(
+                                GST_BIN(ctx->pipeline), GST_DEBUG_GRAPH_SHOW_ALL, "aal_gstreamer_pipeline");
                         }
-                        GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS(
-                            GST_BIN(ctx->pipeline), GST_DEBUG_GRAPH_SHOW_ALL, "aal_gstreamer_pipeline");
                         break;
                     default:
                         break;

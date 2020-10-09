@@ -1,11 +1,8 @@
 package com.amazon.sampleapp.impl.LocalMediaSource;
 
-import android.content.Context;
-
 import com.amazon.aace.alexa.LocalMediaSource;
 import com.amazon.aace.audio.AudioOutput;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
-import com.amazon.sampleapp.impl.PlaybackController.PlaybackControllerHandler;
 
 public abstract class LocalMediaSourceHandler extends LocalMediaSource {
     private static final String sTag = LocalMediaSourceHandler.class.getSimpleName();
@@ -14,12 +11,9 @@ public abstract class LocalMediaSourceHandler extends LocalMediaSource {
 
     private float mVolume = 0.5f;
     private AudioOutput.MutedState mMutedState = AudioOutput.MutedState.UNMUTED;
-    private final PlaybackControllerHandler mPlaybackController;
 
-    protected LocalMediaSourceHandler(
-            Context context, LoggerHandler logger, Source type, PlaybackControllerHandler playbackControllerHandler) {
+    protected LocalMediaSourceHandler(LoggerHandler logger, Source type) {
         super(type);
-        mPlaybackController = playbackControllerHandler;
         mLogger = logger;
     }
 
@@ -28,8 +22,6 @@ public abstract class LocalMediaSourceHandler extends LocalMediaSource {
         mLogger.postInfo(sTag,
                 String.format("play [source=%s,selector=%s,payload=%s]", getSource(), selector.toString(), payload));
         setPlaybackState("PLAYING");
-        mPlaybackController.hidePlayerInfoControls();
-        mPlaybackController.setPlayerInfo("mock", "mock", getSource().toString());
         return true;
     }
 
@@ -37,23 +29,17 @@ public abstract class LocalMediaSourceHandler extends LocalMediaSource {
     public boolean playControl(PlayControlType controlType) {
         mLogger.postInfo(
                 sTag, String.format("playControl [source=%s,controlType=%s]", getSource(), controlType.toString()));
-        mPlaybackController.hidePlayerInfoControls();
-        mPlaybackController.setPlayerInfo("mock", "mock", getSource().toString());
         switch (controlType) {
             case STOP:
                 setPlaybackState("STOPPED");
-                mPlaybackController.stop();
                 break;
             case PAUSE:
                 setPlaybackState("PAUSED");
-                mPlaybackController.stop();
                 break;
             case RESUME:
                 setPlaybackState("PLAYING");
-                mPlaybackController.start();
                 break;
             default:
-                mPlaybackController.start();
                 break;
         }
         return true;

@@ -28,7 +28,8 @@ static const std::string TAG("aace.alexa.SpeechSynthesizerEngineImpl");
 SpeechSynthesizerEngineImpl::SpeechSynthesizerEngineImpl(
     std::shared_ptr<aace::alexa::SpeechSynthesizer> speechSynthesizerPlatformInterface) :
         AudioChannelEngineImpl(
-            alexaClientSDK::avsCommon::sdkInterfaces::ChannelVolumeInterface::Type::AVS_SPEAKER_VOLUME),
+            alexaClientSDK::avsCommon::sdkInterfaces::ChannelVolumeInterface::Type::AVS_SPEAKER_VOLUME,
+            "SpeechSynthesizer"),
         m_speechSynthesizerPlatformInterface(speechSynthesizerPlatformInterface) {
 }
 

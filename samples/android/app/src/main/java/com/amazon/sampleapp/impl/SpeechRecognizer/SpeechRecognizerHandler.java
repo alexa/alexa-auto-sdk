@@ -40,7 +40,6 @@ public class SpeechRecognizerHandler extends SpeechRecognizer {
     private final LoggerHandler mLogger;
     private AudioCueObservable mAudioCueObservable = new AudioCueObservable();
     private final ExecutorService mExecutor = Executors.newFixedThreadPool(1);
-    private boolean mWakeWordEnabled;
     private boolean mAllowStopCapture = false; // Only true if holdToTalk() returned true
     private final View mToggleItem;
     private final View mMessage;
@@ -48,12 +47,9 @@ public class SpeechRecognizerHandler extends SpeechRecognizer {
     private PropertyManagerHandler mPropertyManager;
     // AutoVoiceChrome controller
 
-    public SpeechRecognizerHandler(
-            Activity activity, LoggerHandler logger, PropertyManagerHandler propertyManager, boolean wakeWordEnabled) {
-        super(wakeWordEnabled);
+    public SpeechRecognizerHandler(Activity activity, LoggerHandler logger, PropertyManagerHandler propertyManager) {
         mActivity = activity;
         mLogger = logger;
-        mWakeWordEnabled = wakeWordEnabled;
 
         // Toggle Wake Word switch
         mToggleItem = mActivity.findViewById(R.id.toggleWakeWord);
@@ -114,7 +110,8 @@ public class SpeechRecognizerHandler extends SpeechRecognizer {
         final SwitchCompat wakeWordSwitch = mToggleItem.findViewById(R.id.drawerSwitch);
         mToggleItem.setVisibility(View.VISIBLE);
         mMessage.setVisibility(View.GONE);
-        wakeWordSwitch.setChecked(mWakeWordEnabled);
+        boolean wakeWordEnabled = mPropertyManager.getProperty(AlexaProperties.WAKEWORD_ENABLED).equals("true");
+        wakeWordSwitch.setChecked(wakeWordEnabled);
         mLocaleMessage.setVisibility(View.VISIBLE);
 
         wakeWordSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -140,9 +137,6 @@ public class SpeechRecognizerHandler extends SpeechRecognizer {
                     });
                     mLocaleMessage.setVisibility(View.GONE);
                 }
-                // Notify wake word changes to AutoVoiceChrome
-
-                mWakeWordEnabled = isChecked;
             }
         });
     }

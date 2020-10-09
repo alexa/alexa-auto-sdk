@@ -598,10 +598,12 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
 
     // Speech Recognizer
     // Note : Expects PropertyManager to be not null.
-    auto speechRecognizerHandler = alexa::SpeechRecognizerHandler::create(
-        activity, loggerHandler, propertyManagerHandler, applicationContext->isWakeWordSupported());
+    auto speechRecognizerHandler =
+        alexa::SpeechRecognizerHandler::create(activity, loggerHandler, propertyManagerHandler);
     Ensures(speechRecognizerHandler != nullptr);
     Ensures(engine->registerPlatformInterface(speechRecognizerHandler));
+    Ensures(propertyManagerHandler->setProperty(
+        aace::alexa::property::WAKEWORD_ENABLED, applicationContext->isWakeWordSupported() ? "true" : "false"));
 
     // Speech Synthesizer
     auto speechSynthesizerHandler = alexa::SpeechSynthesizerHandler::create(activity, loggerHandler);
@@ -1032,7 +1034,12 @@ void Application::setupMenu(
         Ensures(menu.count("id") == 1);                      // required menu.id
         if (menu.at("id").get<std::string>() == "LOCALE") {  // reserved id: LOCALE
             auto item = json::array();
-            auto supportedLocales = propertyManagerHandler->getProperty("aace.alexa.supportedLocales");
+            /*
+             * AVS-supported Locales:
+             * https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/system.html#locales
+             */
+            std::string supportedLocales =
+                "de-DE,en-AU,en-CA,en-GB,en-IN,en-US,es-ES,es-MX,es-US,fr-CA,fr-FR,hi-IN,it-IT,ja-JP,pt-BR";
             std::istringstream iss{supportedLocales};
             auto token = std::string();
             unsigned count = std::count(supportedLocales.begin(), supportedLocales.end(), ',') + 1;

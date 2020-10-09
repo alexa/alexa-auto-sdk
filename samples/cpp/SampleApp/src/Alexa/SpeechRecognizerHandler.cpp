@@ -35,15 +35,10 @@ namespace alexa {
 SpeechRecognizerHandler::SpeechRecognizerHandler(
     std::weak_ptr<Activity> activity,
     std::weak_ptr<logger::LoggerHandler> loggerHandler,
-    std::weak_ptr<propertyManager::PropertyManagerHandler> propertyManagerHandler,
-    //std::shared_ptr<sampleApp::AudioInputManager> platformAudioCapture,
-    bool wakewordDetectionEnabled) :
-        aace::alexa::SpeechRecognizer{wakewordDetectionEnabled},
+    std::weak_ptr<propertyManager::PropertyManagerHandler> propertyManagerHandler) :
         m_activity{std::move(activity)},
         m_loggerHandler{std::move(loggerHandler)},
         m_propertyManagerHandler{std::move(propertyManagerHandler)} {
-    // Expects((m_activity != nullptr) && (m_loggerHandler != nullptr));
-    // Expects(m_platformAudioCapture != nullptr);
     setupUI();
 }
 

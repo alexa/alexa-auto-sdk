@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">2.3.0</span>
+   &#160;<span id="projectnumber">3.0.0</span>
    </div>
   </td>
  </tr>
@@ -83,10 +83,6 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:af3f1799a40b40389cdb3c03a4b518c28"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae4f3c98ac03db8b6f8aa0a33d88586b9"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_engine.html#ae4f3c98ac03db8b6f8aa0a33d88586b9">registerPlatformInterface</a> (<a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_platform_interface.html">PlatformInterface</a> platformInterface)</td></tr>
 <tr class="separator:ae4f3c98ac03db8b6f8aa0a33d88586b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2739fa7b37aa1c292d5a55c6e0127189"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_engine.html#a2739fa7b37aa1c292d5a55c6e0127189">setProperty</a> (String key, String value)</td></tr>
-<tr class="separator:a2739fa7b37aa1c292d5a55c6e0127189"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9aa96efbfcb7b0132917957bccb85159"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_engine.html#a9aa96efbfcb7b0132917957bccb85159">getProperty</a> (String key)</td></tr>
-<tr class="separator:a9aa96efbfcb7b0132917957bccb85159"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -216,77 +212,12 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a2739fa7b37aa1c292d5a55c6e0127189"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2739fa7b37aa1c292d5a55c6e0127189">&#9670;&nbsp;</a></span>setProperty()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">boolean com.amazon.aace.core.Engine.setProperty </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>key</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>value</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="section note"><dt>Note</dt><dd>This method is deprecated. Use <a class="el" href="classcom_1_1amazon_1_1aace_1_1property_manager_1_1_property_manager.html#a6a6b6d34ba96850c38f1aa3d40786c7d">com.amazon.aace.propertyManager.PropertyManager.setProperty()</a></dd></dl>
-<p>Sets a property value in the <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_engine.html">Engine</a></p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">name</td><td>The name used by the <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_engine.html">Engine</a> to identify the property. The property name must be one of the property constants recognized by the <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_engine.html">Engine</a>, e.g. the properties in <code>com.amazon.aace.alexa.AlexaProperties.java</code> </td></tr>
-    <tr><td class="paramname">value</td><td>The property setting </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the property value was updated or set to the current setting, else <code>false</code> if an error occured. </dd></dl>
-
-</div>
-</div>
-<a id="a9aa96efbfcb7b0132917957bccb85159"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9aa96efbfcb7b0132917957bccb85159">&#9670;&nbsp;</a></span>getProperty()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">String com.amazon.aace.core.Engine.getProperty </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>key</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="section note"><dt>Note</dt><dd>This method is deprecated. Use <a class="el" href="classcom_1_1amazon_1_1aace_1_1property_manager_1_1_property_manager.html#ae18af547c39b0c8e2a763e34d988f4a2">com.amazon.aace.propertyManager.PropertyManager.getProperty()</a></dd></dl>
-<p>Retrieves the setting for the property identified by <code>name</code> from the <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_engine.html">Engine</a></p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">name</td><td>The name used by the <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_engine.html">Engine</a> to identify the property. The property name must be one of the property constants recognized by the <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_engine.html">Engine</a>, e.g. the properties in <code>com.amazon.aace.alexa.AlexaProperties.java</code> </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The property value as a string, or an empty string if the property value was not found </dd></dl>
-
-</div>
-</div>
 </div><!-- contents -->
 <html>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 2.3.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 3.0.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

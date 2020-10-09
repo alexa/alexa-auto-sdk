@@ -392,8 +392,7 @@ ExternalMediaPlayer::ExternalMediaPlayer(
         m_haltInitiator{HaltInitiator::NONE},
         m_ignoreExternalPauseCheck{false},
         m_currentActivity{alexaClientSDK::avsCommon::avs::PlayerActivity::IDLE},
-        m_mixingBehavior{alexaClientSDK::avsCommon::avs::MixingBehavior::UNDEFINED},
-        m_currentMixability{alexaClientSDK::avsCommon::avs::ContentType::UNDEFINED} {
+        m_mixingBehavior{alexaClientSDK::avsCommon::avs::MixingBehavior::UNDEFINED} {
     // Register all supported capabilities.
     m_capabilityConfigurations.insert(getExternalMediaPlayerCapabilityConfiguration());
 
@@ -1443,9 +1442,7 @@ void ExternalMediaPlayer::setPlayerInFocus(const std::string& playerInFocus, boo
         }
         m_playerInFocusConditionVariable.notify_all();
 
-        m_playbackRouter->setHandler(shared_from_this());
         m_adapterHandlerInFocus = nullptr;
-        m_adapterInFocus = nullptr;
 
         // Acquire the channel and have this ExternalMediaPlayer manage the focus state.
         if (m_focus == FocusState::NONE && m_focusAcquireInProgress != true && !registered) {

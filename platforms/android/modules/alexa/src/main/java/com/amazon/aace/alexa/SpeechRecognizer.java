@@ -73,19 +73,7 @@ abstract public class SpeechRecognizer extends PlatformInterface {
      */
     static public final long UNSPECIFIED_INDEX = -1;
 
-    private final boolean mInitialWakewordDetectionEnabled;
-
-    public SpeechRecognizer() {
-        this(true);
-    }
-
-    public SpeechRecognizer(boolean wakewordDetectionEnabled) {
-        mInitialWakewordDetectionEnabled = wakewordDetectionEnabled;
-    }
-
-    public boolean getInitialWakewordDetectionEnabled() {
-        return mInitialWakewordDetectionEnabled;
-    }
+    public SpeechRecognizer() {}
 
     /**
      * Notifies the platform implementation when a wake word is detected
@@ -161,37 +149,9 @@ abstract public class SpeechRecognizer extends PlatformInterface {
         return stopCapture(getNativeRef());
     }
 
-    /**
-     * Notifies the Engine to enable the wake word engine. Wake word must be supported in the Engine to be enabled
-     * by this call.
-     *
-     * @return @c true if the Engine successfully enabled wake word detection, else @c false
-     */
-    public final boolean enableWakewordDetection() {
-        return enableWakewordDetection(getNativeRef());
-    }
-
-    /**
-     * Notifies the Engine to disable the wake word engine
-     *
-     * @return @c true if the Engine successfully disabled wakeword detection, else @c false
-     */
-    public final boolean disableWakewordDetection() {
-        return disableWakewordDetection(getNativeRef());
-    }
-
-    /**
-     * Checks if wake word detection is enabled in the Engine
-     *
-     * @return @c true if wake word detection is enabled, else @c false
-     */
-    public final boolean isWakewordDetectionEnabled() {
-        return isWakewordDetectionEnabled(getNativeRef());
-    }
-
     // NativeRef implementation
     final protected long createNativeRef() {
-        return createBinder(mInitialWakewordDetectionEnabled);
+        return createBinder();
     }
 
     final protected void disposeNativeRef(long nativeRef) {
@@ -199,14 +159,11 @@ abstract public class SpeechRecognizer extends PlatformInterface {
     }
 
     // Native Engine JNI methods
-    private native long createBinder(boolean wakewordDetectionEnabled);
+    private native long createBinder();
     private native void disposeBinder(long nativeRef);
     private native boolean holdToTalk(long nativeObject);
     private native boolean tapToTalk(long nativeObject);
     private native boolean startCapture(
             long nativeObject, Initiator initiator, long keywordBegin, long keywordEnd, String keyword);
     private native boolean stopCapture(long nativeObject);
-    private native boolean enableWakewordDetection(long nativeObject);
-    private native boolean disableWakewordDetection(long nativeObject);
-    private native boolean isWakewordDetectionEnabled(long nativeObject);
 }

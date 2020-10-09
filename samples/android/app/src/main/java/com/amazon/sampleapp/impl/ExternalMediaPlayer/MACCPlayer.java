@@ -20,11 +20,8 @@ import static com.amazon.maccandroid.model.APIConstants.Directives.PlayControl.S
 import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
-import android.widget.SeekBar;
-import android.widget.TextView;
 
 import com.amazon.aace.alexa.ExternalMediaAdapter;
-import com.amazon.aace.alexa.PlaybackController;
 import com.amazon.aace.audio.AudioOutput.MutedState;
 import com.amazon.maccandroid.MACCAndroidClient;
 import com.amazon.maccandroid.MACCAndroidClientCallback;
@@ -56,10 +53,8 @@ public class MACCPlayer extends ExternalMediaAdapter {
     private final Activity mActivity;
     private final Context mContext;
     private final LoggerHandler mLogger;
-    private final PlaybackControllerHandler mPlaybackController;
     private final MACCAndroidClient mClient;
     public static final int LAST_SCAN_COOLOFF = 5;
-    public static final String SPOTIFY_PROVIDER_NAME = "Spotify";
 
     private long mLastScanTimeInMillis;
 
@@ -113,17 +108,9 @@ public class MACCPlayer extends ExternalMediaAdapter {
             mLogger.postVerbose(TAG, "onPlayerEvent | events: " + playerEvents);
 
             MediaAppPlaybackState state = mClient.getState(playerId).getMediaAppPlaybackState();
-            MediaAppMetaData metaData = state.getMediaAppMetaData();
 
             for (PlayerEvents event : playerEvents) {
                 playerEvent(playerId, event.getName());
-                if (state.getPlaybackState() == PlayBackStateFields.State.PLAYING
-                        || mPlaybackController.getProvider().equals(SPOTIFY_PROVIDER_NAME)) { // is playing
-                    mPlaybackController.hidePlayerInfoControls(); // reset control view
-                    mPlaybackController.setPlayerInfo(
-                            metaData.getTrackName(), metaData.getArtist(), SPOTIFY_PROVIDER_NAME);
-                    updateControls(state);
-                }
             }
         }
 
@@ -138,55 +125,15 @@ public class MACCPlayer extends ExternalMediaAdapter {
             mLogger.postVerbose(TAG, "onRemovedPlayer: " + localPlayerId);
             removeDiscoveredPlayer(localPlayerId);
             scheduleScan();
-            mPlaybackController.hideAllPlayerControls(); // reset control view
         }
     };
 
-    private void updateControls(MediaAppPlaybackState state) {
-        PlayBackStateFields.repeat repeat = state.getRepeatMode();
-        // Set playback controller states on player event
-        for (String operation : state.getSupportedOperations()) {
-            mLogger.postVerbose(TAG, operation);
-            switch (operation) {
-                case "RESUME":
-                    mPlaybackController.stop(); // If resume is currently supported, UI must be in stopped state
-                    break;
-                case "STOP":
-                case "PAUSE":
-                    mPlaybackController.start(); // If pause/stop is currently supported, UI must be in started state
-                    break;
-                case "ENABLE_REPEAT":
-                    // if not set to repeat once
-                    if (repeat != PlayBackStateFields.repeat.ONE_REPEATED) {
-                        boolean enabled = repeat == PlayBackStateFields.repeat.REPEATED;
-                        mPlaybackController.updateControlToggle(
-                                PlaybackController.PlaybackToggle.LOOP.toString(), true, enabled);
-                    }
-                    break;
-                case "ENABLE_SHUFFLE":
-                    boolean enabled = (state.isShuffleEnabled() == PlayBackStateFields.shuffle.SHUFFLED);
-                    mPlaybackController.updateControlToggle(
-                            PlaybackController.PlaybackToggle.SHUFFLE.toString(), true, enabled);
-                    break;
-                case "ENABLE_REPEAT_ONE":
-                    if (repeat == PlayBackStateFields.repeat.ONE_REPEATED) {
-                        mPlaybackController.updateControlToggle(
-                                PlaybackController.PlaybackToggle.REPEAT.toString(), true, true);
-                    } else
-                        mPlaybackController.updateControlToggle(
-                                PlaybackController.PlaybackToggle.REPEAT.toString(), true, false);
-                    break;
-            }
-        }
-    }
-
     private final Handler mHandler;
 
-    public MACCPlayer(Activity activity, LoggerHandler logger, PlaybackControllerHandler playbackControllerHandler) {
+    public MACCPlayer(Activity activity, LoggerHandler logger) {
         mActivity = activity;
         mContext = activity.getApplicationContext();
         mLogger = logger;
-        mPlaybackController = playbackControllerHandler;
         mClient = new MACCAndroidClient(mContext);
         mClient.registerCallback(mMACCAndroidClientCallback);
         mHandler = new Handler();
@@ -248,36 +195,6 @@ public class MACCPlayer extends ExternalMediaAdapter {
         mLogger.postInfo(TAG, "PLAYCONTROL: " + playControlType.toString());
 
         MediaAppPlaybackState state = mClient.getState(localPlayerId).getMediaAppPlaybackState();
-        // enforce correct playback controller GUI states
-        switch (playControlType) {
-            case NEXT:
-            case PREVIOUS:
-                updateControls(state);
-                break;
-            case ENABLE_REPEAT:
-                mPlaybackController.updateControlToggle(PlaybackController.PlaybackToggle.LOOP.toString(), true, true);
-                mPlaybackController.updateControlToggle(
-                        PlaybackController.PlaybackToggle.REPEAT.toString(), true, false);
-                break;
-            case DISABLE_REPEAT:
-                mPlaybackController.updateControlToggle(PlaybackController.PlaybackToggle.LOOP.toString(), true, false);
-                mPlaybackController.updateControlToggle(
-                        PlaybackController.PlaybackToggle.REPEAT.toString(), true, false);
-                break;
-            case ENABLE_REPEAT_ONE:
-                mPlaybackController.updateControlToggle(
-                        PlaybackController.PlaybackToggle.REPEAT.toString(), true, true);
-                mPlaybackController.updateControlToggle(PlaybackController.PlaybackToggle.LOOP.toString(), true, false);
-                break;
-            case ENABLE_SHUFFLE:
-                mPlaybackController.updateControlToggle(
-                        PlaybackController.PlaybackToggle.SHUFFLE.toString(), true, true);
-                break;
-            case DISABLE_SHUFFLE:
-                mPlaybackController.updateControlToggle(
-                        PlaybackController.PlaybackToggle.SHUFFLE.toString(), true, false);
-                break;
-        }
         return true;
     }
 
@@ -470,5 +387,10 @@ public class MACCPlayer extends ExternalMediaAdapter {
             mMutedState = state;
         }
         return true;
+    }
+
+    public void cleanupMACCClient() {
+        if (mClient != null)
+            mClient.cleanup();
     }
 }

@@ -26,7 +26,8 @@ static const std::string TAG("aace.alexa.NotificationsEngineImpl");
 NotificationsEngineImpl::NotificationsEngineImpl(
     std::shared_ptr<aace::alexa::Notifications> notificationsPlatformInterface) :
         AudioChannelEngineImpl(
-            alexaClientSDK::avsCommon::sdkInterfaces::ChannelVolumeInterface::Type::AVS_ALERTS_VOLUME),
+            alexaClientSDK::avsCommon::sdkInterfaces::ChannelVolumeInterface::Type::AVS_ALERTS_VOLUME,
+            "Notification"),
         m_notificationsPlatformInterface(notificationsPlatformInterface) {
 }
 

@@ -20,6 +20,51 @@ namespace alexa {
 
 ExternalMediaAdapter::~ExternalMediaAdapter() = default;  // key function
 
+ExternalMediaAdapter::ExternalMediaAdapterState::ExternalMediaAdapterState() {
+}
+
+// default session state
+ExternalMediaAdapter::SessionState::SessionState() :
+        endpointId(""),
+        loggedIn(false),
+        userName(""),
+        isGuest(false),
+        launched(true),
+        active(false),
+        accessToken(""),
+        tokenRefreshInterval(std::chrono::milliseconds(0)),
+        playerCookie(""),
+        spiVersion("1.0") {
+}
+
+// default playback state
+ExternalMediaAdapter::PlaybackState::PlaybackState() :
+        state("IDLE"),
+        supportedOperations({}),
+        trackOffset(0),
+        shuffleEnabled(false),
+        repeatEnabled(false),
+        favorites(Favorites::NOT_RATED),
+        type("ExternalMediaPlayerMusicItem"),
+        playbackSource(""),
+        playbackSourceId(""),
+        trackName(""),
+        trackId(""),
+        trackNumber(""),
+        artistName(""),
+        artistId(""),
+        albumName(""),
+        albumId(""),
+        tinyURL(""),
+        smallURL(""),
+        mediumURL(""),
+        largeURL(""),
+        coverId(""),
+        mediaProvider(""),
+        mediaType(MediaType::OTHER),
+        duration(std::chrono::milliseconds(0)) {
+}
+
 bool ExternalMediaAdapter::play(
     const std::string& localPlayerId,
     const std::string& playContextToken,

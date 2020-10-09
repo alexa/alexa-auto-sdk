@@ -90,7 +90,6 @@ public:
 
 private:
     std::shared_ptr<std::istream> m_stream;
-    alexaClientSDK::avsCommon::utils::MediaType m_mediaType;
     alexaClientSDK::avsCommon::sdkInterfaces::SystemSoundPlayerInterface::Tone m_tone;
     bool m_closed;
 };

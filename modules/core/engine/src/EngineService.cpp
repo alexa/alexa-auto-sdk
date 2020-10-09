@@ -65,9 +65,7 @@ bool EngineService::handleInitializeEngineEvent(std::shared_ptr<aace::engine::co
 bool EngineService::handleConfigureEngineEvent(std::shared_ptr<std::istream> configuration) {
     try {
         ThrowIfNot(m_initialized, "serviceNotInitialized");
-        ThrowIfNull(configuration, "invalidConfiguration");
-        ThrowIfNot(configure(configuration), "configureServiceFailed");
-
+        ThrowIfNot(configuration != nullptr ? configure(configuration) : configure(), "configureServiceFailed");
         return true;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG, "handleConfigureEngineEvent").d("reason", ex.what()));
@@ -190,8 +188,12 @@ bool EngineService::initialize() {
     return true;
 }
 
+bool EngineService::configure() {
+    return true;
+}
+
 bool EngineService::configure(std::shared_ptr<std::istream> configuration) {
-    return false;
+    return true;
 }
 
 bool EngineService::preRegister() {

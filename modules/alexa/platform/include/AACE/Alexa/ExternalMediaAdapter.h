@@ -253,42 +253,42 @@ public:
         /**
          * Default Constructor.
          */
-        SessionState() = default;
+        SessionState();
 
-        /// The unique device endpoint.
+        /// The unique device endpoint. default ""
         std::string endpointId;
 
-        /// Flag that identifies if a user is currently logged in or not.
+        /// Flag that identifies if a user is currently logged in or not. default false
         bool loggedIn;
 
-        /// The userName of the user currently logged in via a Login directive from the AVS.
+        /// The userName of the user currently logged in via a Login directive from the AVS. default ""
         std::string userName;
 
-        /// Flag that identifies if the user currently logged in is a guest or not.
+        /// Flag that identifies if the user currently logged in is a guest or not. default false
         bool isGuest;
 
-        /// Flag that identifies if an application has been launched or not.
+        /// Flag that identifies if an application has been launched or not. default true
         bool launched;
 
         /**
          * Flag that identifies if the application is currently active or not. This could mean different things
-         * for different applications.
+         * for different applications. default false
          */
         bool active;
 
         /**
          * The accessToken used to login a user. The access token may also be used as a bearer token if the adapter
-         * makes an authenticated Web API to the music provider.
+         * makes an authenticated Web API to the music provider. default ""
          */
         std::string accessToken;
 
-        /// The validity period of the token in milliseconds.
+        /// The validity period of the token in milliseconds. default 0
         std::chrono::milliseconds tokenRefreshInterval;
 
-        /// A player may declare arbitrary information for itself.
+        /// A player may declare arbitrary information for itself. default ""
         std::string playerCookie;
 
-        /// The only spiVersion that currently exists is "1.0"
+        /// The only spiVersion that currently exists is "1.0". default "1.0"
         std::string spiVersion;
     };
 
@@ -298,84 +298,86 @@ public:
     class PlaybackState {
     public:
         /// Default constructor.
-        PlaybackState() = default;
+        PlaybackState();
 
-        /// The state of the default player - IDLE/STOPPED/PLAYING...
+        /* The state of the external media adapter.
+         * "IDLE"/"STOPPED"/"PAUSED"/"PLAYING"/"FINISHED"/"FAST_FORWARDING"/"REWINDING"/"BUFFER_UNDERRUN". default "IDLE"
+         */
         std::string state;
 
-        /// The set of states the default player can move into from its current state.
+        /// The set of states the default player can move into from its current state. default {}
         std::vector<SupportedPlaybackOperation> supportedOperations;
 
-        /// The offset of the track in milliseconds.
+        /// The offset of the track in milliseconds. default 0
         std::chrono::milliseconds trackOffset;
 
-        /// Bool to identify if shuffling is enabled or not.
+        /// Bool to identify if shuffling is enabled or not. default false
         bool shuffleEnabled;
 
-        ///  Bool to identify if looping of songs is enabled or not.
+        ///  Bool to identify if looping of songs is enabled or not. default false
         bool repeatEnabled;
 
-        /// The favorite status {"FAVORITED"/"UNFAVORITED"/"NOT_RATED"}.
+        /// The favorite status FAVORITED/UNFAVORITED/NOT_RATED. default NOT_RATED
         Favorites favorites;
 
-        /// The type of the media item. For now hard-coded to ExternalMediaAdapterMusicItem.
+        /// The type of the media item should be "ExternalMediaAdapterMusicItem". default "ExternalMediaAdapterMusicItem"
         std::string type;
 
-        /// The display name for current playback context, e.g. playlist name.
+        /// The display name for current playback context, e.g. playlist name. default ""
         std::string playbackSource;
 
         /// An arbitrary identifier for current playback context as per the music provider, e.g. a URI that can be saved as
-        /// a preset or queried to Music Service Provider services for additional info.
+        /// a preset or queried to Music Service Provider services for additional info. default ""
         std::string playbackSourceId;
 
-        /// The display name for the currently playing trackname of the track.
+        /// The display name for the currently playing trackname of the track. default ""
         std::string trackName;
 
-        /// The arbitrary identifier for currently playing trackid of the track as per the music provider.
+        /// The arbitrary identifier for currently playing trackid of the track as per the music provider. default ""
         std::string trackId;
 
         /// The display value for the number or abstract position of the currently playing track in the album or context
-        /// trackNumber of the track.
+        /// trackNumber of the track. default ""
         std::string trackNumber;
 
-        /// The display name for the currently playing artist.
+        /// The display name for the currently playing artist. default ""
         std::string artistName;
 
         /// An arbitrary identifier for currently playing artist as per the music provider, e.g. a URI that can be queried
-        /// to MSP services for additional info.
+        /// to MSP services for additional info. default ""
         std::string artistId;
 
-        /// The display name of the currently playing album.
+        /// The display name of the currently playing album. default ""
         std::string albumName;
 
         /// Arbitrary identifier for currently playing album specific to the music provider, e.g. a URI that can be queried
-        /// to MSP services for additional info.
+        /// to MSP services for additional info. default ""
         std::string albumId;
 
-        /// The URL for tiny cover art image resource} .
+        /// The URL for tiny cover art image resource. default ""
         std::string tinyURL;
 
-        /// The URL for small cover art image resource} .
+        /// The URL for small cover art image resource. default ""
         std::string smallURL;
 
-        /// The URL for medium cover art image resource} .
+        /// The URL for medium cover art image resource. default ""
         std::string mediumURL;
 
-        /// The URL for large cover art image resource} .
+        /// The URL for large cover art image resource. default ""
         std::string largeURL;
 
         /// The Arbitrary identifier for cover art image resource specific to the music provider, for retrieval from an MSP
-        /// API.
+        /// API. default ""
         std::string coverId;
 
         /// Music Service Provider name for the currently playing media item; distinct from the application identity
-        /// although the two may be the same.
+        /// although the two may be the same. default ""
         std::string mediaProvider;
 
-        /// The Media type enum value from {TRACK, PODCAST, STATION, AD, SAMPLE, OTHER} type of the media.
+        /// The Media type TRACK/PODCAST/STATION/AD/SAMPLE/OTHER . default OTHER
         MediaType mediaType;
 
-        /// Media item duration in milliseconds.
+        /// Media item duration in milliseconds. default 0
         std::chrono::milliseconds duration;
     };
 
@@ -385,7 +387,7 @@ public:
     class ExternalMediaAdapterState {
     public:
         /// Default constructor.
-        ExternalMediaAdapterState() = default;
+        ExternalMediaAdapterState();
 
         /// Variable to hold the session state.
         SessionState sessionState;
@@ -488,7 +490,7 @@ public:
         const std::string& skillToken);
 
     /**
-     * Occurs during playback control via voice interaction or PlaybackController interface
+     * Occurs during playback control via voice interaction
      *
      * @param [in] localPlayerId The opaque token that uniquely identifies the local external player app
      *
@@ -496,8 +498,6 @@ public:
      *
      * @return @c true if the platform implementation successfully handled the call, 
      * else @c false
-     * 
-     * @sa PlaybackController
      */
     virtual bool playControl(const std::string& localPlayerId, PlayControlType controlType) = 0;
 
@@ -616,7 +616,15 @@ public:
      *
      * @param [in] localPlayerId The opaque token that uniquely identifies the local external player app
      *
-     * @param [in] eventName Canonical event name
+     * @param [in] eventName Canonical event name. Accepted values: 
+     *      @li "TrackChanged"
+     *      @li "PlaybackSessionStarted"
+     *      @li "PlaybackSessionEnded"
+     *      @li "PlaybackStarted"
+     *      @li "PlaybackStopped"
+     *      @li "PlaybackPrevious"
+     *      @li "PlaybackNext"
+     *      @li "PlayModeChanged"
      */
     void playerEvent(const std::string& localPlayerId, const std::string& eventName);
 
@@ -625,7 +633,23 @@ public:
      *
      * @param [in] localPlayerId The opaque token that uniquely identifies the local external player app
      *
-     * @param [in] errorName The name of the error
+     * @param [in] errorName The name of the error. Accepted values: 
+     *      @li "INTERNAL_ERROR"
+     *      @li "UNPLAYABLE_BY_AUTHORIZATION"
+     *      @li "UNPLAYABLE_BY_STREAM_CONCURRENCY"
+     *      @li "UNPLAYABLE_BY_ACCOUNT"
+     *      @li "OPERATION_REJECTED_UNINTERRUPTIBLE"
+     *      @li "OPERATION_REJECTED_END_OF_QUEUE"
+     *      @li "UNPLAYABLE_BY_REGION"
+     *      @li "OPERATION_UNSUPPORTED"
+     *      @li "UNPLAYABLE_BY_PARENTAL_CONTROL"
+     *      @li "UNPLAYABLE_BY_SUBSCRIPTION"
+     *      @li "OPERATION_REJECTED_SKIP_LIMIT"
+     *      @li "UNKNOWN_ERROR"
+     *      @li "PLAYER_UNKNOWN"
+     *      @li "PLAYER_NOT_FOUND"
+     *      @li "PLAYER_CONNECTION_REJECTED"
+     *      @li "PLAYER_CONNECTION_TIMEOUT"
      *
      * @param [in] code The error code
      *

@@ -1,25 +1,25 @@
 # Alexa Auto SDK C++ Sample App on Linux
 
 The purpose of the C++ Sample App is to provide useful example code to help you integrate your platform implementation with the Alexa Auto SDK. The C++ Sample App provides an example of creating and configuring an instance of the Engine, overriding the default implementation of each Alexa Auto platform interface, and registering those custom interface handlers with the Engine. It includes one default example implementation of authorizing with Alexa Voice Service (AVS) via Code Based Linking (CBL). The C++ Sample App also includes detailed logs for interactions with the Alexa Auto SDK and convenience features for viewing those logs in the application, as well as UI elements relevant to each platform interface implementation.
+<!-- omit in toc -->
+## Table of Contents
 
-**Table of Contents**:
+- [Prerequisites](#prerequisites)
+- [Enabling Optional Device Capabilities](#enabling-optional-device-capabilities)
+- [Setting up the C++ Sample App](#setting-up-the-c-sample-app)
+- [Building the C++ Sample App](#building-the-c-sample-app)
+- [Running the C++ Sample App](#running-the-c-sample-app)
+- [Using the C++ Sample App](#using-the-c-sample-app)
+- [Troubleshooting](#troubleshooting)
+- [Known Issues](#known-issues)
 
-* [Prerequisites](#prerequisites)
-* [Enabling Optional Device Capabilities](#enabling-optional-device-capabilities)
-* [Setting up the C++ Sample App](#setting-up-the-c-sample-app)
-* [Building the C++ Sample App](#building-the-c-sample-app)
-* [Running the C++ Sample App](#running-the-c-sample-app)
-* [Using the C++ Sample App](#using-the-c-sample-app)
-* [Troubleshooting](#troubleshooting)
-* [Known Issues](#ki)
+## Prerequisites
 
-## Prerequisites <a id="prerequisites"></a>
-
-### Amazon Developer Account <a id="amazon-developer-account"></a>
+### Amazon Developer Account
 
 To use the C++ Sample App, you need an [Amazon Developer](https://developer.amazon.com/docs/app-submission/manage-account-and-permissions.html#create-a-developer-account/) account.
 
-### Registered Product and Security Profile <a id= "register-product"></a>
+### Registered Product and Security Profile
 
 After creating an Amazon developer account, you'll need to [register a product and create a security profile](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/register-a-product.html) on the AVS developer portal.
 
@@ -30,19 +30,19 @@ When you follow the instructions to [fill in the product information](https://de
 
 When you follow the instructions to [set up your security profile](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/register-a-product.html#set-up-your-security-profile), generate a **Client ID** and take note of it, as this information is required for your [configuration file](#configuration-file).
 
-### Linux Ubuntu 16.04 LTS <a id="linux-ubuntu-1604-lts"></a>
+### Linux Ubuntu 16.04 LTS
 
 All development and testing of the C++ Sample App has been performed on Linux Ubuntu 16.04 LTS. You need around 15GB of free space for building the Alexa Auto SDK and C++ Sample App for one target. Working with multiple targets can significantly increase the storage footprint.
 
-### Configuration File <a id="configuration-file"></a>
+### Configuration File
 
 The C++ Sample App requires one or more [configuration files](#editing-the-configuration-file) for device information, module configuration, and Alexa settings.
 
-## Enabling Optional Device Capabilities <a id ="enabling-optional-device-capabilities"></a>
+## Enabling Optional Device Capabilities
 
 In order to use certain optional Alexa Auto SDK functionality (for example, AmazonLite Wake Word, Alexa Communications, Local Voice Control (LVC), and Device Client Metrics (DCM)) with the Sample App, your product must be whitelisted by Amazon. Copy the product's **Amazon ID** from the Developer Console and follow the whitelisting directions on the [Need Help?](../../NEED_HELP.md#requesting-additional-functionality-whitelisting) page.
 
-## Setting up the C++ Sample App <a id="setting-up-the-c-sample-app"></a>
+## Setting up the C++ Sample App
 
 Create your project directory (if you do not already have one):
 
@@ -61,14 +61,17 @@ $ export AAC_SDK_HOME=$(pwd)
 
 >**Note:** Most of the commands that follow are meant to be run from this `alexa-auto-sdk` directory.
 
-### Editing the Configuration File <a id = "editing-the-configuration-file"></a>
+### Editing the Configuration File
 
 You can pass one or more configuration files to the Sample App using the `--config <config-file-path>` flag. When you build additional modules with the sample app, you may need to pass module-specific configuration. Please refer to the `README` file within each module to get this configuration information. For convenience, a [config file template](./assets/config.json.in) has been included for the core Auto SDK modules. 
 You must customize this template with values specific to your implementation. To do this:
 
 1. Edit the [config file template](./assets/config.json.in) and save it as `samples/cpp/assets/config.json`.
 
-2. Replace the `${YOUR_CLIENT_ID}`, `${YOUR_DEVICE_SERIAL_NUMBER}`, and `${YOUR_PRODUCT_ID}` placeholders with your values, replacing `${YOUR_CLIENT_ID}` and `${YOUR_PRODUCT_ID}` with the Client ID and Product ID you noted when you [registered a product and created a security profile](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/register-a-product.html). You can also find the Client ID in your device's Security Profile under the **Other devices and platforms** tab. The `${YOUR_DEVICE_SERIAL_NUMBER}` can be arbitrary but should not contain spaces and must be unique.
+2. Replace the `${YOUR_CLIENT_ID}`, `${YOUR_PRODUCT_ID}`, and `${YOUR_DEVICE_SERIAL_NUMBER}` placeholders with your values as follows:
+   * Replace `${YOUR_CLIENT_ID}` with the Client ID, which you can find in your device's Security Profile under the **Other devices and platforms** tab.
+   * Replace `${YOUR_PRODUCT_ID}` with the Product ID, which you can find under the **Products** tab on the AVS Developer Console. (It is different from the Amazon ID.)
+   * Replace `${YOUR_DEVICE_SERIAL_NUMBER}` with an arbitrary value that must not contain spaces and must be unique.
 
  >**Note:** The Client ID and Product ID must correspond to a development device profile that you created as an **automotive** product by selecting the `Automotive` product category when you [filled in the product information](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/register-a-product.html#fill-in-product-information).  
 
@@ -96,7 +99,7 @@ sudo apt-get install -y gstreamer1.0-libav \
 
 >**Note:** The command sequence above installs the minimum set of GStreamer libraries and plugins required by the [System Audio extension](../../extensions/experimental/system-audio/README.md) for audio capture/playback on Linux and Mac. See [Recommended Media Support](https://developer.amazon.com/docs/alexa-voice-service/recommended-media-support.html) for a list of codecs, containers, streaming formats, and playlists that your product should support to provide a familiar Alexa experience to your customers.
 
-## Building the C++ Sample App <a id="building-the-c-sample-app"></a>
+## Building the C++ Sample App
 
 Follow the instructions in the [Alexa Auto SDK Builder](../../builder/README.md) documentation to set up your development environment, then from `${AAC_SDK_HOME}`, build the C++ Sample App with debug symbols:
 
@@ -129,7 +132,7 @@ Copy the edited config file from `samples/cpp/assets/config.json` to `/opt/AAC/e
 
 `cp ${AAC_SDK_HOME}/samples/cpp/assets/config.json /opt/AAC/etc/`
 
-## Running the C++ Sample App <a id="running-the-c-sample-app"></a>
+## Running the C++ Sample App
 
 The C++ Sample App requires that you specify one or more configuration files and other parameters at the command line. For convenience all needed configuration files and assets (such as certificates, sample data, and menu) are automatically copied to `/opt/AAC/etc/`. To run the C++ Sample App using default installation files:
 
@@ -143,7 +146,7 @@ $ LD_LIBRARY_PATH=/opt/AAC/lib \
 >
 >When you run the C++ Sample App, a `config-system-audio.json` file with default audio settings for Linux platforms is copied to `/opt/AAC/etc`. For information about how to modify these settings for QNX, see the [System Audio extension README](../../extensions/experimental/system-audio/README.md#running-the-c-sampleapp-with-the-audio-configuration).
 
-### Authenticating with AVS using Code-Based Linking (CBL) <a id ="authenticating-with-avs-using-code-based-linking-cbl"></a>
+### Authenticating with AVS using Code-Based Linking (CBL)
 
 After the Sample App launches, you will see the Main Menu. Follow these steps to authenticate with AVS using CBL:
 
@@ -172,12 +175,12 @@ Open a new terminal and tail the SampleApp.log file:
 $ tail -f SampleApp.log
 ```
 
-## Using the C++ Sample App <a id ="using-the-c-sample-app"></a>
-### Authorization with AVS in the Sample App <a id="authorization"></a>
+## Using the C++ Sample App
+### Authorization with AVS in the Sample App
 
 Every request to AVS requires an Login with Amazon (LWA) access token. Code-Based Linking (CBL) is the recommended method to acquire access tokens and is demonstrated by the C++ Sample App. See the [CBL module README](../../modules/cbl/README.md) for details about the Auto SDK's implementation of CBL.
 
-### Multimedia Support for QNX <a id="multimedia-for-qnx"></a>
+### Multimedia Support for QNX
 
 The C++ Sample App supports the [BlackBerry QNX Multimedia Suite](https://blackberry.qnx.com/content/dam/qnx/products/qnxcar/QNX_MultimediaSuite_ProductBrief_Online_FINAL.pdf) for live audio input and output on QNX platforms. 
 
@@ -185,7 +188,7 @@ The C++ Sample App supports the [BlackBerry QNX Multimedia Suite](https://blackb
 
 See the [System Audio extension README](../../extensions/experimental/system-audio/README.md) for details about configuring audio input and output on QNX platforms.
 
-### AudioFile Menu <a id="audio-menu"></a>
+### AudioFile Menu
 
 The C++ Sample App provides an AudioFile menu to send pre-recorded utterances. Responses are saved as MP3 audio files within the current directory where the app was run. Refer to the [C++ Sample App Menu System documentation](./assets/MENU.md#audiofile) for information on how to extend the AudioFile menu with custom audio files. However, this menu is only available if there is no default audio provider specified during the build. By default the Auto SDK Builder will build the C++ Sample App with the [System Audio](../../extensions/experimental/system-audio/README.md) configuration defined in the config-system-audio.json file.
 
@@ -201,7 +204,7 @@ The Sample App does not configure SiriusXM as a local media source by default. I
 
 >**Note:** When SiriusXM is present as a local media source, the cloud defaults to local SiriusXM only and blocks any use of the cloud SiriusXM service even if the local implementation/service is unavailable or not enabled. 
 
-## Troubleshooting <a id="troubleshooting"></a>
+## Troubleshooting
 
 * When interacting with Alexa, if the Dialog State goes from `LISTENING` immediately to `IDLE`, you might not be logged in. Try [logging into your account via CBL](#authenticating-with-avs-using-code-based-linking-cbl) by tapping `A` from the Main Menu.
 
@@ -220,14 +223,11 @@ The Sample App does not configure SiriusXM as a local media source by default. I
     ```
     
     To resolve this, edit the `samples/cpp/assets/config.json` file and choose a unique serial number.
-
-## Known Issues <a id="ki"></a>
-* Playback controls in the Playback Controller Menu are static text items and do not change visual state (e.g. add/remove, hilite, select) based on audio player metadata.
-* Increasing or decreasing speaker volume in quick succession causes lag and delayed responses from Alexa.
-* On QNX:
-    * You cannot mute alarms and music playback separately with the sample app.
-    * You might experience volume control issues caused by a known OpenMAX AL (application layer) problem that has been resolved in the 11/28/19 release of QNX Multimedia Suite 2.0. Contact QNX to obtain the fix.
-    * You might experience a delay to start playback of iHeartRadioStations caused by an OpenMAX AL (application layer) problem.
-    * You might experience intermittent distorted audio when streaming SiriusXM.
-
-Refer to the [System Audio extension README](../../extensions/experimental/system-audio/README.md) for known issues related to audio.
+    
+## Known Issues
+The dual locale combinations are not present in the locale menu of the sample app. You have to add the locale combinations in the hard-coded locale string in the sample app. For the permitted locale combinations, see the [Alexa Voice Service documentation](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/system.html#localecombinations). The locale combinations you add to the string must be the same as the ones used to configure the Engine. The following example shows the hard-coded string with locale combinations:
+~~~
+    std::string supportedLocales =
+        "de-DE,en-AU,en-CA,en-GB,en-IN,en-US,es-ES,es-MX,es-US,fr-CA,fr-FR,hi-IN,it-IT,ja-JP,pt-BR,en-CA/"
+        "fr-CA,en-IN/hi-IN,en-US/es-US,es-US/en-US,fr-CA/en-CA,hi-IN/en-IN";
+~~~

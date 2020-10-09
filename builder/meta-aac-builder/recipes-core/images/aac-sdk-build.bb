@@ -10,7 +10,6 @@ IMAGE_INSTALL += "\
     aac-module-apl \
     aac-module-navigation \
     aac-module-phone-control \
-    aac-module-contact-uploader \
     aac-module-cbl \
     aac-module-address-book \
     aac-module-car-control \

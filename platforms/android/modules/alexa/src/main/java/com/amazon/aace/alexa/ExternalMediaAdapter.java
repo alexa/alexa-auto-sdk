@@ -570,13 +570,11 @@ abstract public class ExternalMediaAdapter extends PlatformInterface {
     }
 
     /**
-     * Occurs during playback control via voice interaction or PlaybackController interface
+     * Occurs during playback control via voice interaction
      *
      * @param  localPlayerId The opaque token that uniquely identifies the local external player app
      *
      * @param  playControlType Playback control type being invoked
-     *
-     * @sa PlaybackController
      *
      * @return @c true if the platform implementation successfully handled the call,
      * else @c false
@@ -725,7 +723,15 @@ abstract public class ExternalMediaAdapter extends PlatformInterface {
      *
      * @param localPlayerId The opaque token that uniquely identifies the local external player app
      *
-     * @param eventName Canonical event name
+     * @param [in] eventName Canonical event name. Accepted values:
+     *      @li "TrackChanged"
+     *      @li "PlaybackSessionStarted"
+     *      @li "PlaybackSessionEnded"
+     *      @li "PlaybackStarted"
+     *      @li "PlaybackStopped"
+     *      @li "PlaybackPrevious"
+     *      @li "PlaybackNext"
+     *      @li "PlayModeChanged"
      */
     final public void playerEvent(String localPlayerId, String eventName) {
         playerEvent(getNativeRef(), localPlayerId, eventName);
@@ -736,7 +742,23 @@ abstract public class ExternalMediaAdapter extends PlatformInterface {
      *
      * @param localPlayerId The opaque token that uniquely identifies the local external player app
      *
-     * @param errorName The name of the error
+     * @param [in] errorName The name of the error. Accepted values:
+     *      @li "INTERNAL_ERROR"
+     *      @li "UNPLAYABLE_BY_AUTHORIZATION"
+     *      @li "UNPLAYABLE_BY_STREAM_CONCURRENCY"
+     *      @li "UNPLAYABLE_BY_ACCOUNT"
+     *      @li "OPERATION_REJECTED_UNINTERRUPTIBLE"
+     *      @li "OPERATION_REJECTED_END_OF_QUEUE"
+     *      @li "UNPLAYABLE_BY_REGION"
+     *      @li "OPERATION_UNSUPPORTED"
+     *      @li "UNPLAYABLE_BY_PARENTAL_CONTROL"
+     *      @li "UNPLAYABLE_BY_SUBSCRIPTION"
+     *      @li "OPERATION_REJECTED_SKIP_LIMIT"
+     *      @li "UNKNOWN_ERROR"
+     *      @li "PLAYER_UNKNOWN"
+     *      @li "PLAYER_NOT_FOUND"
+     *      @li "PLAYER_CONNECTION_REJECTED"
+     *      @li "PLAYER_CONNECTION_TIMEOUT"
      *
      * @param code The error code
      *

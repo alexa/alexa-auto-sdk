@@ -302,6 +302,13 @@ bool LocalMediaSourceEngineImpl::handleGetAdapterState(
                     break;
             }
         }
+
+        // add dynamic pluggable capability
+        // this is needed to whitelist the launched paramater to function as expected (to be deprecated)
+        document["capabilities"].AddMember("disablePluggable", "1.0", allocator);
+        // this is the new name needed to whitelist the launched paramater to function as expected
+        document["capabilities"].AddMember("enableIsLaunched", "1.0", allocator);
+
         rapidjson::StringBuffer strbuf;
         rapidjson::Writer<rapidjson::StringBuffer> writer(strbuf);
         document.Accept(writer);

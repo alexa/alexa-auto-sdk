@@ -19,6 +19,7 @@ import android.graphics.Color;
 import android.util.Log;
 
 import com.amazon.aace.logger.Logger;
+import com.amazon.sampleapp.core.LoggerControllerInterface;
 import com.amazon.sampleapp.logView.LogEntry;
 import com.amazon.sampleapp.logView.LogRecyclerViewAdapter;
 
@@ -31,11 +32,13 @@ import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Queue;
 
-public class LoggerHandler extends Logger {
+public class LoggerHandler extends Logger implements LoggerControllerInterface {
     /* Log colors */
     private static final int sColorVerbose = Color.parseColor("#B3E5FC"); // Light Blue
     private static final int sColorInfo = Color.parseColor("#FFFFFF"); // White
@@ -50,6 +53,9 @@ public class LoggerHandler extends Logger {
     private static final String sClientSourceTag = "CLI";
 
     private LoggerObservable mObservable;
+
+    private Queue<LogEntry> mDisplayLogsQueue = new LinkedList<LogEntry>();
+    private boolean mIsEnqueuingLogs = false;
 
     public LoggerHandler() {
         mObservable = new LoggerObservable();
@@ -144,7 +150,14 @@ public class LoggerHandler extends Logger {
             Log.e(sClientSourceTag, "Error: ", e);
             return;
         }
-        mObservable.log(json, LogRecyclerViewAdapter.JSON_TEXT);
+
+        synchronized (this) {
+            if (mIsEnqueuingLogs) {
+                mDisplayLogsQueue.add(new LogEntry(LogRecyclerViewAdapter.JSON_TEXT, json));
+            } else {
+                mObservable.log(json, LogRecyclerViewAdapter.JSON_TEXT);
+            }
+        }
     }
 
     // Client log for display cards
@@ -160,7 +173,32 @@ public class LoggerHandler extends Logger {
             Log.e(sClientSourceTag, "Error: ", e);
         }
 
-        mObservable.log(json, logType);
+        synchronized (this) {
+            if (mIsEnqueuingLogs) {
+                mDisplayLogsQueue.add(new LogEntry(logType, json));
+            } else {
+                mObservable.log(json, logType);
+            }
+        }
+    }
+
+    public void pause() {
+        synchronized (this) {
+            mIsEnqueuingLogs = true;
+        }
+    }
+
+    public void resume() {
+        synchronized (this) {
+            mIsEnqueuingLogs = false;
+
+            while (!mDisplayLogsQueue.isEmpty()) {
+                LogEntry entry = mDisplayLogsQueue.remove();
+                int logType = entry.getType();
+                JSONObject json = entry.getJSON();
+                mObservable.log(json, logType);
+            }
+        }
     }
 
     /* Logger Observable for inserting logs into GUI log view */

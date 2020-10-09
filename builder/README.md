@@ -1,36 +1,77 @@
 # Build the Alexa Auto SDK
 
-The `builder` directory contains a collection of software which is required to build the Alexa Auto SDK software components for various target platforms.
+The `builder` directory contains a collection of software which is required to build the Alexa Auto SDK components for various target platforms.
 
-**Table of Contents**
+<!-- omit in toc -->
+## Table of Contents
+- [Overview](#overview)
+- [General Build Requirements and Recommendations](#general-build-requirements-and-recommendations)
+- [Supported Platforms and Targets](#supported-platforms-and-targets)
+- [Build Dependencies and License Information](#build-dependencies-and-license-information)
+- [Using the Auto SDK Builder](#using-the-auto-sdk-builder)
+  - [Preparing the Host](#preparing-the-host)
+  - [Using the Auto SDK Builder](#using-the-auto-sdk-builder)
+  - [Building AACS Using the Auto SDK Builder (Local Build Flavor)](#building-aacs-using-the-auto-sdk-builder-local-build-flavor)
+  - [Building AACS Using the Pre-built AARs (Remote Build Flavor)](#building-aacs-using-the-pre-built-aars-remote-build-flavor)
+  - [Builder Setup on a Desktop Linux Host](#builder-setup-on-a-desktop-linux-host)
+  - [Builder Setup in a Docker Environment](#builder-setup-in-a-docker-environment)
+  - [Additional Setup for Poky Linux Targets](#additional-setup-for-poky-linux-targets)
+  - [Additional Setup for Generic Linux ARM Targets](#additional-setup-for-generic-linux-arm-targets)
+  - [Additional Setup for Android Targets](#additional-setup-for-android-targets)
+  - [Builder Command Arguments](#builder-command-arguments)
+  - [Clean build](#clean-build)
+  - [Building with mbedTLS](#building-with-mbedtls)
+- [Using the Auto SDK OE Layer](#using-the-auto-sdk-oe-layer)
+  - [Adding layers and module recipes](#adding-layers-and-module-recipes)
+  - [cURL with ngHTTP2](#curl-with-nghttp2)
 
-* [Overview](#overview)
-* [General Build Requirements](#general-build-requirements)
-* [Using the Auto SDK Builder](#using-the-auto-sdk-builder)
-* [Using the Auto SDK OE Layer](#using-the-auto-sdk-oe-layer)
+## Overview
 
-## Overview<a id ="overview"></a>
+There are two methods to build the Alexa Auto SDK: 
 
-You can build the Alexa Auto SDK software components using either the Auto SDK Builder or using the Auto SDK OE layer. 
+* [Auto SDK Builder](#using-the-auto-sdk-builder) (Recommended): The builder is based on [OpenEmbedded (OE)](https://www.openembedded.org/), which provides a simple way to cross compile all the Auto SDK components for various target platforms. If you want to build the Auto SDK with Alexa Auto Client Service (AACS), you must use this method. 
 
-* The Alexa Auto SDK Builder is based on [OpenEmbedded](https://www.openembedded.org/) (OE), which provides a simple way to cross compile all the Alexa Auto SDK software components for various target platforms and is recommended if you want to use platforms such as Android and QNX. To get started using the Auto SDK builder,  see [Using the Auto SDK Builder](#using-the-auto-sdk-builder).
+* [Auto SDK OE layer](#using-the-auto-sdk-oe-layer): For target platforms already based on the OpenEmbedded infrastructure, such as [Yocto/Poky](https://www.yoctoproject.org/), you can use an OE-generated SDK or a `meta-aac` layer to build and install the Auto SDK.
 
-* For target platforms already based on OpenEmbedded infrastructure, such as [Yocto/Poky](https://www.yoctoproject.org/), you can use an OE-generated SDK or alternatively you can use `meta-aac` layer to build and install the Alexa Auto SDK into your system. For details, see [Using the Auto SDK OE Layer](#using-the-auto-sdk-oe-layer).
+>**Note**: For Android and QNX targets, use the Auto SDK Builder because the Auto SDK OE Layer method may require advanced OpenEmbedded system administration skills.
+  
+The Auto SDK home directory is the directory to which you clone the `alexa-auto-sdk` repository and is represented as `${AAC_SDK_HOME}` in this document.
 
-## General Build Requirements <a id="general-build-requirements"></a>
+## General Build Requirements and Recommendations
 
-You can build on a Linux, Unix, or macOS host of your choice. 
+You can build the Auto SDK on a Linux, Unix, or macOS host. The builder can run either natively on a Linux host or in a Docker environment (recommended). For information about Docker, see the [Docker documentation](https://docs.docker.com/get-docker).
 
-However, we recommend and support running a Docker environment with the following configuration:
+The following list describes the required host configuration:
 
-* macOS Sierra or Ubuntu 16.04 LTS
+* Operating system:
+  * macOS Sierra 
+  * Ubuntu 16.04 LTS or Ubuntu 18.04 LTS
 * Processor: 2.5 GHz
 * Memory: 16 Gb
-* Storage: 1 Gb+ available to use.
+* Storage: 1 Gb+ available to use
 
-### Build Dependencies and License Information
+For QNX targets, you must install the [QNX 7.0 SDP](http://blackberry.qnx.com/en/sdp7/sdp70_download) on your host.
 
-During the build time, the following dependencies are fetched and built for the target platform by the Alexa Auto SDK Builder. Please refer to each of the individual entities for the particular licenses.
+## Supported Platforms and Targets
+
+You can build the Auto SDK for the following operating systems (platforms) and hardware architectures (targets):
+
+* Android 5.1 Lollipop API Level 22 or higher.
+    * ARM 32-bit
+    * ARM 64-bit
+    * x86 64-bit
+* QNX 7.0
+    * ARM 64-bit
+    * x86 64-bit
+* Generic Linux
+    * x86 64-bit
+* Poky Linux
+    * ARMv7a (+NEON)
+    * AArch64
+
+## Build Dependencies and License Information
+
+During build time, the Auto SDK Builder fetches and builds the dependencies appropriate for the  platform. For license information about the dependencies, go to the following websites:
 
 * [AVS Device SDK v1.19.1](https://github.com/alexa/avs-device-sdk/)
   * [cURL 7.65.3](https://curl.haxx.se/)
@@ -45,151 +86,186 @@ During the build time, the following dependencies are fetched and built for the 
   * [NDK r20](https://developer.android.com/ndk/)
   * [SDK Tools 26.0.1](https://developer.android.com/studio/releases/sdk-tools)
 
-> **Note**: that *OpenEmbedded-Core* will fetch and build additional components for preparing the dedicated toolchain for your environment (Such as *GNU Binutils*). Please refer to the [Yocto project](https://www.yoctoproject.org/software-overview/) to understand how it works.
+> **Note**: OpenEmbedded-Core fetches and builds additional components to prepare the dedicated toolchain for your environment (for example, GNU Binutils). For information about how OpenEmbedded-Core works, see the [Yocto project](https://www.yoctoproject.org/software-overview/).
 
-### Supported Target Platforms
+## Using the Auto SDK Builder
+This section describes how to build the Auto SDK with the builder. 
 
-The Alexa Auto SDK is supported on the following platforms:
+### Preparing the Host
+Depending on your host, you might need to perform builder setup before using the builder, as described in the following sections:
 
-* Android 5.1 Lollipop API Level 22 or higher.
-    * ARM 32-bit
-    * ARM 64-bit
-    * x86 64-bit
-* QNX 7.0
-    * ARM 64-bit
-    * x86 64-bit
-* AGL
-    * ARM 64-bit
-* Generic Linux
-    * x86 64-bit
-* Poky Linux
-    * ARMv7a (+NEON)
-    * AArch64
-
-> **Note**: For Android targets, pre-built platform AARs for the default Auto SDK modules are available in the [JCenter repo](https://jcenter.bintray.com/com/amazon/alexa/aace/). Read the instructions about downloading and using the AARs in the [Android Sample App README](../samples/android/README.md).
-
-## Using the Auto SDK Builder<a id="using-the-auto-sdk-builder"></a>
-
-You can run the Alexa Auto SDK Builder either natively on a Linux host or in a Docker environment. If you are using macOS, you can run the Alexa Auto SDK Builder using [Docker for Mac](https://www.docker.com/docker-mac).
-
->**Note:** For QNX targets, you must install the [QNX 7.0 SDP](http://blackberry.qnx.com/en/sdp7/sdp70_download) within your host.
-
-Follow these steps to use the Alexa Auto SDK Builder OE-based building system to build the complete Alexa Auto SDK software for various cross targets:
-
-1. **Perform any setup necessary for your environment**.
   * [Builder Setup on a Desktop Linux Host](#builder-setup-on-a-desktop-linux-host)
   * [Builder Setup in a Docker Environment](#builder-setup-in-a-docker-environment)
   * [Additional setup for Poky Linux targets](#additional-setup-for-poky-linux-targets)
   * [Additional setup for Generic Linux ARM targets](#additional-setup-for=generic-linux-arm-targets)
   * [Additional Setup for Android Targets](#additional-setup-for-android-targets)
   
-2. **Issue the following command to run the Auto SDK Builder and generate a complete target installation package** (where `AAC_SDK_HOME` is the location into which you've installed the Alexa Auto SDK). See [Builder Command Arguments](#builder-command-arguments) for details about the `platform`, `target` and `options` arguments.
+### Using the Auto SDK Builder
+This section describes how to build the Auto SDK and install the built package.
 
-  ```
-$ ${AAC_SDK_HOME}/builder/build.sh <platform> -t <target> [options]
-```
-  After you successfully build the Auto SDK, the output directory `deploy` will be generated under the `${AAC_SDK_HOME}/builder` directory.
+#### Running the Build Script
+Enter the following command to build the Auto SDK and generate an installation package:
 
-  >**Note:** The first run might take up to an hour to complete while OpenEmbedded generates all necessary toolchains internally.
+`$ ${AAC_SDK_HOME}/builder/build.sh <platform> -t <target> [options]`
+    
+See [Builder Command Arguments](#builder-command-arguments) for details about the `platform`, `target` and `options` arguments. This command creates the `deploy` directory in `${AAC_SDK_HOME}/builder`. With the `-g` option, the builder creates an archive named `aac-sdk-build-<target>-dbg.tar.gz`, which contains debug symbols for later GDB use.
 
-3. **Install the built package for your target platform**.
+>**Note:** The first run might take up to an hour to complete while OpenEmbedded generates all necessary toolchains internally.
+#### Installing the Built Package on Android Targets
+The output directory contains the .aar file (AAR) for each module and a sample-core.aar file required to generate the Android Sample App. Pre-built default platform AARs for the default Auto SDK modules and the sample-core AAR are also available from the [JCenter repo](https://jcenter.bintray.com/com/amazon/alexa/aace/). You can add these AARs as dependencies of your Android project instead of building the AARs with the Auto SDK Builder.
 
-  * **For Android targets**
-     
-    Within the output directory, you will find the .aar file (AAR) for each module as well as an sample-core.aar file that is required to generate the Android Sample App. Pre-built default platform AARs for the default Auto SDK modules and the sample-core AAR are also available from the [JCenter repo](https://jcenter.bintray.com/com/amazon/alexa/aace/). You can add these AARs as dependencies of your Android project instead of building the AARs yourself with the Auto SDK Builder.
+>**Note:** If you want to implement any optional modules (such as wake word support, Alexa Communications, Local Voice Control (LVC), Device Client Metrics (DCM), or Voice Chrome), you must use the AARs generated by the Auto SDK Builder. The prebuilt platform AARs and sample-core AAR available in JCenter are for the default modules only. 
 
-    >**Note:** If you want to implement any optional modules (such as wake word support, Alexa Communications, Local Voice Control (LVC), Device Client Metrics (DCM), or Voice Chrome), you must use the AARs generated by the Alexa Auto SDK Builder. The prebuilt platform AARs and sample-core AAR available in JCenter are for the default Auto SDK modules only.
+#### Installing the Built Package on Linux or QNX Targets
 
-  * **For Linux/QNX targets**
+The output directory contains the tar.gz archive, `aac-sdk-build-<target>.tar.gz`. You can upload this package to your target.
 
-    Within the output directory, you will find the tar.gz archive `aac-sdk-build-<target>.tar.gz`. You can upload this package to your actual target hardware.
+The `aac-sdk-build` directory contains the following build artifacts:
 
-    `aac-sdk-build` contains the following build artifacts:
-
-     * `/opt/AAC/bin/`: *cURL* binaries with *ngHTTP2* enabled
-     * `/opt/AAC/include/`: All dev headers for all dependencies.
-     * `/opt/AAC/lib/`: All shared libraries, including *AVS Device SDK*, *cURL*, *ngHTTP2*.
-     * `/opt/AAC/share/`: CMake files for building external Alexa Auto SDK modules.
+  * `/opt/AAC/bin/`: *cURL* binaries with *ngHTTP2* enabled.
+  * `/opt/AAC/include/`: All dev headers for all dependencies.
+  * `/opt/AAC/lib/`: All shared libraries, including *AVS Device SDK*, *cURL*, *ngHTTP2*.
+  * `/opt/AAC/share/`: CMake files for building external Alexa Auto SDK modules.
       
-    If you've built the `native` target, then you can install these build artifacts directly on your Linux PC.
+If you build for the `native` target, you can install these build artifacts directly on your Linux host.
 
-    >**Note**: If you've built Auto SDK with the `-g` option, you will find an extra tar.gz archive `aac-sdk-build-<target>-dbg.tar.gz`, which contains debug symbols for later GDB use.
+### Building AACS Using the Auto SDK Builder (Local Build Flavor)
+If your platform is Android, you can build the Auto SDK with AACS. When running the builder script, you must specify the `--aacs-android` option. The following example shows how to build the Auto SDK for the `androidarm` target with AACS and the optional Alexa Communications and Local Voice Control modules:
 
+`$ ${AAC_SDK_HOME}/builder/build.sh android -t androidarm --aacs-android extensions/extras/alexacomms extensions/extras/local-voice-control`
 
-### Builder Setup on a Desktop Linux Host <a id ="builder-setup-on-a-desktop-linux-host"></a>
-To run the Alexa Auto SDK Builder natively, follow the guide below. **Ubuntu 18.04 LTS** and **Ubuntu 16.04 LTS** were tested and are recommended as the Linux host environment.
+See [Builder Command Arguments](#builder-command-arguments) for details about the `platform`, `target` and `options` arguments. The builder creates the `builder/deploy/aar`, which contains the AARs, and `builder/deploy/apk`, which contains the AACS APK. With the `-g` option, the command also creates an archive named `aac-sdk-build-<target>-dbg.tar.gz`, which contains debug symbols for later GDB use.
 
-#### Set up OpenEmbedded/BitBake
-First you will need to set up [OpenEmbedded-Core](https://www.openembedded.org/wiki/OpenEmbedded-Core).
+>**Note:** You do not need to specify the AASB extension when building the Auto SDK with AACS. The AASB extension is included by default.
 
-The following example installs OpenEmbedded-Core and BitBake under your home directory. Note that the variable `OE_CORE_PATH` must be pointed at the OpenEmbedded-Core source directory.
+>**Note:** The first run might take up to an hour to complete while OpenEmbedded generates all necessary toolchains internally.
 
-```
-$ cd ~
-$ git clone git://git.openembedded.org/openembedded-core oe-core -b rocko
-$ cd oe-core
-$ git clone git://git.openembedded.org/bitbake -b 1.36
-$ export OE_CORE_PATH=$(pwd)
-```
-The minimum requirements to run OpenEmbedded on an Ubuntu Linux host are as follows:
+The unsigned version of the AACS APK is in `builder/deploy/apk`. Go to [Signing the AACS APK](#signing-the-aacs-apk) for information about signing the APK. 
+
+### Building AACS Using the Pre-built AARs (Remote Build Flavor)
+The AACS Gradle build is configured to use JCenter to always pull the latest release artifacts during compilation. The pre-built platform AARs for the default modules and the AARs required to build AACS are available in the JCenter repo. To run the build, enter the following commands:
 
 ```
-$ apt-get install chrpath diffstat gawk texinfo \
-python python3 wget unzip build-essential cpio \
-git-core libssl-dev quilt cmake \
-libsqlite3-dev libarchive-dev python3-dev \
-libdb-dev libpopt-dev zlib1g-dev
+    $ cd ${AAC_SDK_HOME}/platforms/android/alex-auto-client-service/android-service
+    $ gradle assembleRemoteRelease
 ```
 
->**Note:** For Linux targets, you must install libssl-dev as well:
+#### Signing the AACS APK
+To sign the AACS APK, follow these steps:
+
+1. Create a custom keystore using the following command, or skip to the next step and use an existing keystore:
+    
+    `keytool -genkey -v -keystore <keystore_name>.keystore -alias <alias> -keyalg RSA -keysize 2048 -validity 10000`
+
+2. Enter the following command to change to the directory where the APK is:
+   
+   `cd ${AAC_SDK_HOME}/builder/deploy/apk`
+
+3. Enter one of the following commands to optimize the APK files, depending on whether you have the local or remote build flavor:
+   
+    `zipalign -v -p 4 service-local-release-unsigned.apk service-local-release-unsigned-aligned.apk`
+    `zipalign -v -p 4 service-local-release-unsigned.apk service-remote-release-unsigned-aligned.apk`
+
+    `zipalign` is included in the Android SDK Build Tools. On a Mac, it is usually located in this directory:
+    
+     ~/Library/Android/sdk/build-tools/<Android_SDK_Build_Tools_version>/zipalign
+
+4. Enter one of the following commands to sign the APK by using your keystore, depending on whether you have the local or remote build flavor:
+   
+    `apksigner sign --ks <path_to_keystore>/<keystore_name>.keystore  --ks-pass pass:<passphrase> --out service-app-release.apk service-local-release-unsigned-aligned.apk`
+    `apksigner sign --ks <path_to_keystore>/<keystore_name>.keystore  --ks-pass pass:<passphrase> --out service-app-release.apk service-remote-release-unsigned-aligned.apk`
+
+    When prompted, enter the passphrase that you set when you created the keystore. The `apksigner` tool is in Android SDK Build Tools 24.0.3 or higher. On a Mac, it is usually in the following directory:
+    
+     ~/Library/Android/sdk/build-tools/<Android_SDK_Build_Tools_version>/apksigner
+
+### Builder Setup on a Desktop Linux Host
+Follow these steps to prepare for building the Auto SDK natively on the Linux host: 
+
+1. Set up [OpenEmbedded-Core](https://www.openembedded.org/wiki/OpenEmbedded-Core). The following example installs `OpenEmbedded-Core` and `BitBake` under your home directory. The variable `OE_CORE_PATH` must point to the `OpenEmbedded-Core` source directory.
 
 ```
-$ apt-get install libssl-dev
+    $ cd ~
+    $ git clone git://git.openembedded.org/openembedded-core oe-core -b rocko
+    $ cd oe-core
+    $ git clone git://git.openembedded.org/bitbake -b 1.36
+    $ export OE_CORE_PATH=$(pwd)
 ```
-### Builder Setup in a Docker Environment <a name ="builder-setup-in-a-docker-environment"></a>
+2. Enter the following command to ensure that the Ubuntu host meets the minimum requirements to run `OpenEmbedded`:
 
-To use Builder on macOS hosts, you must install [Docker Community Edition (CE) for Mac](https://www.docker.com/docker-mac) according to its official guide.
+```
+    $ apt-get install chrpath diffstat gawk texinfo \
+    python python3 wget unzip build-essential cpio \
+    git-core libssl-dev quilt cmake \
+    libsqlite3-dev libarchive-dev python3-dev \
+    libdb-dev libpopt-dev zlib1g-dev
+```
 
-Upon first run, Builder builds the Docker image `aac/ubuntu-base:<revision>` and creates a dedicated Docker volume `buildervolume` to run the Alexa Auto SDK Builder in your Docker environment. This might take up to an hour to complete.
+3. For a Linux target, enter the following command to install `libssl-dev`:
 
->**Note:** If you are upgrading from Auto SDK v1.6.0 or earlier to Auto SDK v2.0.0 or later, be sure to clean the `buildervolume` Docker volume before performing the upgrade.
+```
+    $ apt-get install libssl-dev
+```
+### Builder Setup in a Docker Environment
 
->**IMPORTANT NOTE for macOS:** If you are trying to build for QNX targets on a macOS host, you must install QNX 7.0.0 SDP within a **case-sensitive** file system, using additional Linux installation tools. You may need to use an external drive for installation since your system file system is NOT case-sensitive by default.
+To use the builder on a macOS host, install [Docker Community Edition (CE) for Mac](https://www.docker.com/docker-mac) according to its official guide.
 
-### Additional setup for Poky Linux targets <a id ="additional-setup-for-poky-linux-targets"></a>
-If you are building a Poky Linux ARM target, make sure you have the appropriate toolchain for your target platform prior to running the Alexa Auto SDK Builder. For example, if you are building a Poky Linux ARM target `pokyarm64` on an Ubuntu system you can download and run the [Poky ARM toolchain](http://downloads.yoctoproject.org/releases/yocto/yocto-2.6.1/toolchain/x86_64/poky-glibc-x86_64-core-image-sato-aarch64-toolchain-2.6.1.sh).
+Follow these important guidelines:
 
-Auto SDK Builder will use `/opt/poky/2.6.1` as a root SDK directory by default. You can change this behavior with the `--poky-sdk` option.
+* If you are upgrading from Auto SDK v1.6.0 or earlier to Auto SDK v2.0.0 or later, be sure to clean the `buildervolume` Docker volume before performing the upgrade.
 
-### Additional setup for Generic Linux ARM targets <a id ="additional-setup-for=generic-linux-arm-targets"></a>
+* To build for QNX targets on a macOS host, you must install QNX 7.0.0 SDP within a **case-sensitive** file system, using additional Linux installation tools. You may need to use an external drive for installation because your system file system is NOT case-sensitive by default.
+
+* When compiling the Auto SDK for the first time, the builder instantiates the Docker environment and starts building. On macOS, the builder might crash with this error message:
+   
+  `g++: internal compiler error: Killed (program cc1plus)`
+  
+   This error occurs when Docker runs out of memory. By default, Docker is set to use 2 GB of memory, which is sufficient on a host with 2 cores. If your host has more than 2 cores, allocate 6 GB to Docker to resolve this issue.
+
+Upon first run, the builder builds the Docker image `aac/ubuntu-base:<revision>` and creates a dedicated Docker volume `buildervolume` to run the Auto SDK Builder in your Docker environment. This might take up to an hour to complete.
+
+### Additional Setup for Poky Linux Targets
+To build a Poky Linux ARM target, make sure you have the appropriate toolchain for your target platform prior to running the Auto SDK Builder. For example, if you are building a Poky Linux ARM target `pokyarm64` on an Ubuntu system, you can download and run the [Poky ARM toolchain](http://downloads.yoctoproject.org/releases/yocto/yocto-2.6.1/toolchain/x86_64/poky-glibc-x86_64-core-image-sato-aarch64-toolchain-2.6.1.sh).
+
+Auto SDK Builder uses `/opt/poky/2.6.1` as a root SDK directory by default. You can change this behavior with the `--poky-sdk` option.
+
+### Additional Setup for Generic Linux ARM Targets
 
 #### Linaro Toolchain
 
 >**Note:** The Linaro Linux targets are available as previews only and have not been tested fully.
 
-Make sure to install the following prerequisites on your host:
+A Linaro Linux target requires the [Linaro Linux targeted binary toolchain](https://www.linaro.org/downloads/). Version `gcc-linaro-7.4.1-2019.02` is recommended.
 
-* [Linaro Linux targeted binary toolchain](https://www.linaro.org/downloads/) (Version `gcc-linaro-7.4.1-2019.02` is recommended)
+Linaro toolchains are typically named in the following format:
 
-Linaro toolchains are typically named in the following format: `<version>-<build>-<host>` (e.g. `gcc-linaro-7.4.1-2019.02-x86_64_arm-linux-gnueabihf`)
+`<version>-<build>-<host>`
 
-The Auto SDK Builder will try to find the Linaro toolchain in the above format, under the `${HOME}` directory by default. For ARMv7A HF targets, you should install the toolchain in `${HOME}/gcc-linaro-7.4.1-2019.02-x86_64_arm-linux-gnueabihf`.
+The following example shows a Linaro toolchain:
 
-To change this behavior, you should use the `--linaro-prefix` option to specify a prefix in `<path>/<version>-` format. (Defaults to `${HOME}/gcc-linaro-7.4.1-2019.02-`, with `<build>-<host>` determined by the Auto SDK Builder.)
+`gcc-linaro-7.4.1-2019.02-x86_64_arm-linux-gnueabihf`)`
+
+The Auto SDK Builder tries to find the Linaro toolchain in this format, under the `${HOME}` directory, by default. For ARMv7A HF targets, install the toolchain in `${HOME}/gcc-linaro-7.4.1-2019.02-x86_64_arm-linux-gnueabihf`.
+
+To change this behavior, use the `--linaro-prefix` option to specify a prefix in the following format:
+
+`<path>/<version>-`
+
+The default prefix is `${HOME}/gcc-linaro-7.4.1-2019.02-`. The `<build>-<host>` portion following the prefix is determined by the Auto SDK Builder.
 
 #### Cross sysroots
 
-Additionally, you need the cross sysroot directory for your cross targets. The Auto SDK Builder will try to find sysroot under the `${HOME}/sysroots` directory by default. The Sysroot directory name must match the `<host>` value from the toolchain. For ARMv7A HF targets, you should install your copy of sysroot in `${HOME}/sysroots/arm-linux-gnueabihf`.
+Additionally, you need the cross `sysroot` directory for your cross targets. The Auto SDK Builder tries to find `sysroot` under the `${HOME}/sysroots` directory by default. The `sysroot` directory name must match the `<host>` value from the toolchain. For ARMv7A HF targets, install your copy of `sysroot` in `${HOME}/sysroots/arm-linux-gnueabihf`.
 
-To change this behavior, you should specify the search path via the `--linaro-sysroots` option. (Defaults to `${HOME}/sysroots`).
+To change this behavior, specify the search path via the `--linaro-sysroots` option. The default search path is `${HOME}/sysroots`.
 
-### Additional Setup for Android Targets <a id = "additional-setup-for-android-targets"></a>
-* Make sure to install the following prerequisites on your host:
+### Additional Setup for Android Targets
+* Install the following required software on your host:
 
   * Android Studio 3.4.1+
   * Gradle 5.6.4 or above
 
-  >**Note:**  You must ensure that the Gradle version you are using is compatible with the Android Studio version you are using. See the [Android Gradle Plugin Release Notes](https://developer.android.com/studio/releases/gradle-plugin#updating-gradle) for information about matching Android Studio versions to Gradle versions.
+  >**Note:**  You must ensure that your Gradle version is compatible with the Android Studio version that you use for building the Auto SDK. See the [Android Gradle Plugin Release Notes](https://developer.android.com/studio/releases/gradle-plugin#updating-gradle) for information about matching Android Studio versions to Gradle versions.
 
   * *(macOS host only)* `gsed`, `gfind`, and `coreutils`</p><p>
     You can use Homebrew to install the required macOS prerequisites:
@@ -198,7 +274,7 @@ To change this behavior, you should specify the search path via the `--linaro-sy
       brew install gnu-sed findutils coreutils
       ```
 
-* Set the `ANDROID_HOME`to Android SDK Path. For example:
+* Set the `ANDROID_HOME`to Android SDK path. For example:
 
   ```
   $ export ANDROID_HOME=~/User/<user>/Android/sdk
@@ -206,7 +282,7 @@ To change this behavior, you should specify the search path via the `--linaro-sy
 
 * Make sure to accept the licenses in the SDK Manager.
 
-### Builder Command Arguments <a id = "builder-command-arguments"></a>
+### Builder Command Arguments
 
 #### `platform`
 The following `platform` values are available:
@@ -214,12 +290,11 @@ The following `platform` values are available:
 * `linux` for Linux targets
 * `android` for Android targets
 * `qnx7` for QNX7 targets
-* `agl` for Automotive Grade Linux targets
 
 #### `target`
 The table below lists the `target` values available to specify the cross compilation target.
 
-You must specify at least one `target`. For multiple targets, use a comma-separated list; for example:
+You must specify at least one `target`. For multiple targets, use a comma-separated list as in the following example:
 
 ```
 $ ${AAC_SDK_HOME}/builder/build.sh linux -t native,pokyarm,pokyarm64
@@ -237,28 +312,29 @@ $ ${AAC_SDK_HOME}/builder/build.sh linux -t native,pokyarm,pokyarm64
 | Android x86-64             | `android`  | `androidx86-64` |
 | QNX AArch64                | `qnx7`     | `qnx7arm64`     |
 | QNX x86-64                 | `qnx7`     | `qnx7x86-64`    |
-| AGL AArch64                | `agl`      | `aglarm64`      |
+|
 
 >**Note:** The `linaroarmel` and `linaroarmhf` targets are available as previews only and have not been tested fully.
 
-For all other targets/toolchains, please refer to the files `meta-aac-builder/conf/machine/*.conf`. Those targets are provided by default for Poky-based Linux systems.
+For all other targets or toolchains, see the files `meta-aac-builder/conf/machine/*.conf`. Those targets are provided by default for Poky-based Linux systems.
 
 #### `options`
-The availabe `options` include:
+The following list describes the available `options`:
 
-* `-h,--help` to show full available options.
-* `-g,--debug` option to build with debugging options.
-* *(Android targets only)* `--android-api <integer>` option to explicitly specify Android API level. The default is `22`.
-* *(QNX7 targets only)* `--qnx7sdp-path <path>` option to specify QNX 7.0.0 SDP installation (in host). If you run Builder within Docker environment, host QNX SDP tools are always used. So make sure you have installed Linux tools within SDP even if your host is macOS.
-* *(Poky Linux & AGL targets only)* `--pokysdk-path <path>` option to specify Poky SDK installation root path.
-* *(Generic Linux ARM targets only)* `--linaro-prefix <prefix>` option to specify the path where the Linaro toolchain is located. See the section *Additional setup for Generic Linux ARM targets* above for the details.
-* *(Generic Linux ARM targets only)* `--linaro-sysroots <path>` option to specify the path where the cross sysroot directories are located. See the section *Additional setup for Generic Linux ARM targets* above for the details.
-* `--default-logger-enabled <enabled>` option to enable/disable the default engine logger ( `On` | `Off` ). This default value is `On`. If you enable the default Engine logger, you must also set the `--default-logger-level <level>` and `--default-logger-sink <sink>` options, either explicitly or by accepting the default values.
-* `--default-logger-level <level>` option to set the logger level for the default engine logger ( `Verbose` | `Info` | `Metric` | `Warn` | `Error` | `Critical` ). The default value is `Info` for release builds, and `Verbose` for debug builds.
-* `--default-logger-sink <sink>` option to set the logger sink for the default engine logger ( `Console` | `Syslog` ). The default value is `Syslog` for Android build targets, and `Console` for all other build targets.
-* `--enable-sensitive-logs <Off | On>` option to enable or disable the inclusion of sensitive data in debugging logs. The  default value is `Off`. If you enable sensitive logs, you must also build with debugging options (`--debug`).
+* `-h,--help`: Show full available options.
+* `-g,--debug`: Build with debugging options.
+* *(Android targets only)* `--android-api <integer>`: Explicitly specify the Android API level. The default is `22`.
+* *(QNX7 targets only)* `--qnx7sdp-path <path>`: Specify QNX 7.0.0 SDP installation (in host). If you run the builder within the Docker environment, host QNX SDP tools are always used. So make sure you have installed Linux tools within SDP even if your host is macOS.
+* *(Poky Linux target only)* `--pokysdk-path <path>`: Specify Poky SDK installation root path.
+* *(Generic Linux ARM targets only)* `--linaro-prefix <prefix>`: Specify the path where the Linaro toolchain is located. See the section *Additional setup for Generic Linux ARM targets* for details.
+* *(Generic Linux ARM targets only)* `--linaro-sysroots <path>`: Specify the path where the cross `sysroot` directories are located. See the section *Additional setup for Generic Linux ARM targets* for details.
+* `--default-logger-enabled <enabled>`: Enable/disable the default engine logger ( `On` | `Off` ). The default value is `On`. If you enable the default Engine logger, you must also set the `--default-logger-level <level>` and `--default-logger-sink <sink>` options, either explicitly or by accepting the default values.
+* `--default-logger-level <level>`: Set the logger level for the default engine logger ( `Verbose` | `Info` | `Metric` | `Warn` | `Error` | `Critical` ). The default value is `Info` for release builds, and `Verbose` for debug builds.
+* `--default-logger-sink <sink>`: Set the logger sink for the default engine logger ( `Console` | `Syslog` ). The default value is `Syslog` for Android build targets, and `Console` for all other build targets.
+* `--enable-sensitive-logs <Off | On>`: Enable or disable the inclusion of sensitive data in debugging logs. The default value is `Off`. If you enable sensitive logs, you must also build with debugging options (`--debug`).
+    >**Important:** If you enable sensitive logs, make sure you redact any sensitive data if posting logs publicly.
 
-  >**Important:** If you enable sensitive logs, make sure you redact any sensitive data if posting logs publicly.
+* `--aacs-android`: Build AACS including the required components AASB, IPC, and constants. 
 
 ### Clean build
 
@@ -268,28 +344,27 @@ To build cleanly, use the following command to remove all caches.
 $ ./build.sh clean
 ```
 
->**Tip**: The `build.sh` script typically performs a clean build. In most situations there is no need for a more thorough clean. When you use the `clean` option, the OpenEmbedded build cache used for building is purged. As a result, the next build may take up to an hour to complete.
+>**Tip**: The `build.sh` script typically performs a clean build. In most situations there is no need for a more thorough clean. Using the `clean` option purges the `OpenEmbedded` build cache. As a result, the next build may take up to an hour to complete.
 
 ### Building with mbedTLS
 
-On some Android Samsung devices, OpenSSL causes the Alexa Auto Sample App to terminate. You can specify an additional argument `--use-mbedtls` to build the Auto SDK with mbedTLS.
+On some Android Samsung devices, OpenSSL causes the Alexa Auto Sample App to terminate. The alternative is to use mbedTLS. To build the SDK with mbedTLS, specify the `--use-mbedtls` argument.
 
-## Using the Auto SDK OE Layer <a name ="using-the-auto-sdk-oe-layer"></a>
+## Using the Auto SDK OE Layer
 
-If you want to integrate the Alexa Auto SDK software into an existing OpenEmbedded-based system, you can use the *Alexa Auto SDK OE Layer* a.k.a `meta-aac`, without using the *Alexa Auto SDK Builder*.
+If you want to integrate the Auto SDK into an existing OpenEmbedded-based system, you can use the Alexa Auto SDK OE Layer, which is also known as `meta-aac`, instead of the Auto SDK Builder.
 
->**Note**: For Android and QNX targets, you should use the Alexa Auto SDK Builder since the Alexa Auto SDK OE Layer method may require advanced OpenEmbedded system administration skills.
-
-The recommended and tested platform is **Poky Linux 2.4 (rocko)**.
+The recommended and tested platform is Poky Linux 2.4 (rocko).
 
 ### Adding layers and module recipes
 
-You need to add the following OE layers into your setup.
+Add the following OE layers to your setup:
 
-* Alexa Auto SDK OE layer: `${AAC_SDK_HOME}/builder/meta-aac`
+* Alexa Auto SDK OE layer, which is at the following location:
+  
+  `${AAC_SDK_HOME}/builder/meta-aac`
 
-Additionally, you may need to add the individual Alexa Auto SDK module recipes by adding them to `BBFILES`. To add all SDK modules, you can simply add the following line to your `bblayers.conf`:
-
+* You may need to add the individual Auto SDK module recipes to `BBFILES`. To add all modules, simply add the following line to the `bblayers.conf` file:
 
 ```
 BBFILES += "${AAC_SDK_HOME}/modules/*/*.bb"
@@ -298,6 +373,6 @@ BBFILES += "${AAC_SDK_HOME}/modules/*/*.bb"
 
 ### cURL with ngHTTP2
 
-You must configure the `curl` package with the `nghttp2` feature enabled. The `meta-aac` layer defines a default `PACKAGECONFIG` for `curl` but if your system has its own definition, you need to modify `PACKAGECONFIG` to include `nghttp2`.
+You must configure the `curl` package with the `nghttp2` feature enabled. The `meta-aac` layer defines a default `PACKAGECONFIG` for `curl`. However, if your system has its own definition, you must modify `PACKAGECONFIG` to include `nghttp2`.
 
->**Note:** We provide the default `nghttp2` recipe within the `meta-aac` layer, but you may use other alternatives.
+>**Note:** The default `nghttp2` recipe is included in the `meta-aac` layer, but you may use other alternatives.

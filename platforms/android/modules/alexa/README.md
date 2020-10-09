@@ -72,18 +72,6 @@ public class SpeechRecognizerHandler extends SpeechRecognizer {
     // For example, when hold-to-talk was used and is now being ended by the button release action
     stopCapture();
     ...
-        
-    // If the implementation has configured a wake word engine, this call enables it. 
-    enableWakewordDetection();
-    ... 
-        
-    // If the implementation has configured a wake word engine, this call disables it.
-    disableWakewordDetection();
-    ...
-    
-    // To check whether the wake word engine is enabled
-    isWakewordDetectionEnabled();
-    ... 
 }
 ```
 
@@ -226,11 +214,33 @@ public class AudioPlayerHandler extends AudioPlayer {
 ```
 ## Handling Playback Controller Events <a id="handling-playback-controller-events"></a>
 
-The Engine provides methods to notify it of media playback control events that happen without voice interaction, for example, a "pause" button press. The platform implementation must inform the Engine of these events using the PlaybackController interface any time the user uses on-screen or physical button presses to control media provided by the Engine, such as AudioPlayer source music or ExternalMediaPlayer sources, if applicable.
+The Engine provides a platform interface `com.amazon.aace.alexa.PlaybackController` for the platform implementation to report on-device transport control button presses for media playing through Alexa. For example, if the user presses the on-screen pause button while listening to Amazon Music through Alexa's `AudioPlayer` interface, the platform implementation calls a `PlaybackController` method to report the button press to the Engine.
 
->**Note:** PlaybackController events that control AudioPlayer report button presses or the equivalent; they do not report changes to the playback state that happen locally first. The Alexa cloud manages the playback queue for AudioPlayer content, so each PlaybackController event can be considered a request for the cloud to act on the user's local request. The result of the request will come as a method invocation on the AudioOutput associated with the channel used for AudioPlayer.
+>**Note:** `PlaybackController` method calls to manage `AudioPlayer`'s state or playback queue proactively report button presses or the equivalent so that Alexa can react; they do *not* report changes to the playback state that happen locally first. The Alexa cloud manages the playback queue for `AudioPlayer` content, so each `PlaybackController` method call is a request for Alexa to act on the user's local request. The result of the request will come as one or more method invocations on the `AudioOutput` associated with the channel used for `AudioPlayer`.
 
->**Note:** If your implementation needs to stop AudioPlayer media in response to system events, such as audio focus transitions to audio playing outside the scope of Auto SDK, PlaybackController is the interface to use to notify the Engine of such changes. However, expected usage of the interface does not change when using it for this use case.
+> **Note:** If your implementation needs to stop `AudioPlayer` media in response to system events, such as audio focus transitions to audio playing outside the scope of the Auto SDK, use `PlaybackController` to notify the Engine of such changes. However, bear in mind that the expected usage of the interface does not change when it is used in this use case.
+
+>**Note:** `PlaybackController` only controls media coming from Alexa, i.e. the `AudioPlayer`. `PlaybackController` should not be used the expectation of controlling playback for non-media Alexa audio sources like `SpeechSynthesizer` or Alexa-aware external media sources integrated with `ExternalMediaAdapter` or `LocalMediaSource`. Additionally, calling a `PlaybackController` method while audio is playing through another Alexa-aware external media source will produce unexpected results and is not recommended.
+
+Whenever Alexa plays a source, the `TemplateRuntime` platform interface will also receive a player info card. This card will contain information about which playback controls should be shown, and will vary case by case. When any button is pressed, an event is sent to Alexa, and then another player infodirective will be issued with the new control state in the payload to synchronize the display. 
+
+Below is a table of supported button and toggle controls, and how they relate to player info controls.
+
+| associated PlayerInfo control name | PlaybackController | 
+|:---|:--- |
+| **PlaybackButton** | | 
+| "PLAY_PAUSE" | PLAY | 
+| "PLAY_PAUSE" | PAUSE | 
+| "NEXT" | NEXT |
+| "PREVIOUS" | PREVIOUS |
+| "SKIP_FORWARD" | SKIP_FORWARD | 
+| "SKIP_BACKWARD" | SKIP_BACKWARD |
+| **PlaybackToggle** |
+| "SHUFFLE" | SHUFFLE | 
+| "LOOP" | LOOP | 
+| "REPEAT" | REPEAT | 
+| "THUMBS_UP" | THUMBS_UP |
+| "THUMBS_DOWN" | THUMBS_DOWN |
 
 To implement a custom handler for the playback controller, extend the `PlaybackController` class:
 
@@ -254,19 +264,6 @@ public class PlaybackControllerHandler extends PlaybackController {
     // toggle control state is given by PlayerInfo
     togglePressed(PlaybackButton.SHUFFLE, true); // should be called with opposing state from the PlayerInfo template
 ```
-### PlayerInfo Only controls
-
-The Template Runtime's PlayerInfo template specifies the display of some additional controls. This is for GUI implementations that use the PlayerInfo template as a reference for their GUI displays during `AudioPlayer` media playback. The available controls for the active `AudioPlayer` stream are enabled in the payload of the PlayerInfo template and vary by media service provider. When the toggle button is pressed, another RenderPlayerInfo directive is issued with the new toggle state in the payload to synchronize the display. 
-
-* Buttons
-	- Skip Forward ( service defined scrub forward )
-	- Skip Backward ( service defined scrub backward )
-* Toggles
-	- Shuffle ( toggle shuffle songs )
-	- Loop ( toggle playlist looping )
-	- Repeat ( toggle repeat current media once )
-	- Thumbs Up ( toggle thumbs up state )
-	- Thumbs Down ( toggle thumbs down state )
 
 ## Handling Equalizer Control <a id="handling-equalizer-control"></a>
 
@@ -379,7 +376,7 @@ public class TemplateRuntimeHandler extends TemplateRuntime {
 ```
 >**Note:** In the case of lists, it is the responsibility of the platform implementation to handle pagination. Alexa sends down the entire list as a JSON response and starts reading out the first five elements of the list. At the end of the first five elements, Alexa prompts the user whether or not to read the remaining elements from the list. If the user chooses to proceed with the remaining elements, Alexa sends down the entire list as a JSON response but starts reading from the sixth element onwards.
 
-## Handling External Media Application Sources with MACCAndroidClient <a id="handling-external-media-adapter-with-maccandroidclient"></a> 
+## Handling External Media Adapter with MACCAndroidClient <a id="handling-external-media-adapter-with-maccandroidclient"></a> 
 
 The External Media Player (EMP) Adapter allows you to declare and use external media application sources in your application. In order to interface with the EMP Adapter, you must use one of the following:
 
@@ -470,38 +467,39 @@ public void onError(String errorName, int errorCode, boolean fatal, String playe
     ...
 ```
 
-The Alexa client tracks the focus via the `playerEvent()` and `playerError()` methods in addition to successful calls to `play()` and `playControl()`. If the external media application obtains Alexa client focus in some way other than via Alexa interaction (for example via external GUI navigation), you can call the `setFocus()` method to force the Alexa client's focus state. Additional calls to `setFocus()` are redundant, but should not have adverse effects. 
+The tables below describe the supported event and error names implemented according to the MACC specification:
 
-Below is a table of player error and event names implemented according to the MACC specification, with notes about how they affect Alexa's internal focus control:
+| playerEvent() event name | Description |
+|:--|:--|
+| "PlaybackSessionStarted" | A new playback session has started, either from a GUI interaction or as a result of a user voice request to Alexa. The Engine considers the player active and in focus (although it may or may not yet be playing). |
+| "PlaybackStarted" | During an active session, the player has started to play or resumed from a paused state. The Engine considers the player active and in focus. |
+| "TrackChanged" | During an active session, one track has ended and another has started. The Engine uses this primarily for state reporting.  |
+| "PlaybackNext" | During an active session, the player skipped from one track to the next track, either as a result of a GUI interaction or a user voice request to Alexa. The Engine uses this primarily for state reporting. |
+| "PlaybackPrevious" | During an active session, the player skipped from one track to the previous track, either as a result of a GUI interaction or a user voice request to Alexa. The Engine uses this primarily for state reporting. |
+| "PlayModeChanged" | During an active session, some user setting for the track or playback session changed, such as the favorite setting or the shuffle mode. The Engine uses this primarily for state reporting.|
+| "PlaybackStopped" | During an active session, the player has paused or stopped, either as a result of a GUI interaction or a user voice request to Alexa. The Engine considers the player active and in focus, just not currently playing. User voice requests to resume still control the player. |
+| "PlaybackSessionEnded" | An active playback session has ended. The player should no longer be playing or playable until a new session is started by GUI interaction or user voice request to Alexa. The Engine considers the player inactive and no longer in focus. |
 
-| Name ( String ) | Alexa Focus Change | Notes
-| ------------- |:-------------:| :-----:
-| **PlayerEvents** 
-| TrackChanged | If player state is playing, focus player | This can occur via Alexa-independant mechanism
-| PlaybackSessionStarted | If player state is playing, focus player | This usually occurs after player is first discovered
-| PlaybackSessionEnded | unfocus player | This usually occurs when the player app or service is stopped
-| PlaybackStarted | focus player | This can occur via Alexa-independant mechanism
-| PlaybackStopped | no change 
-| PlaybackPrevious | no change 
-| PlaybackNext | no change 
-| PlayModeChanged | no change   
-| **PlayerError** 
-| INTERNAL\_ERROR | unfocus player | This could occur while previously playing media
-| UNPLAYABLE\_BY\_AUTHORIZATION | unfocus player | This could occur while previously playing media
-| UNPLAYABLE\_BY\_STREAM\_CONCURRENCY | unfocus player | This could occur while previously playing media
-| UNPLAYABLE\_BY\_ACCOUNT | no change |       
-| OPERATION\_REJECTED\_UNINTERRUPTIBLE | no change  |    
-| OPERATION\_REJECTED\_END\_OF\_QUEUE | no change  |    
-| UNPLAYABLE\_BY\_REGION | no change  |  
-| OPERATION\_UNSUPPORTED | no change   |   
-| UNPLAYABLE\_BY\_PARENTAL\_CONTROL | no change  |    
-| UNPLAYABLE\_BY\_SUBSCRIPTION | no change  |    
-| OPERATION\_REJECTED\_SKIP\_LIMIT | no change  |    
-| UNKNOWN\_ERROR | no change | We make no assumptions about what this error means
-| PLAYER\_UNKNOWN | no change | player not discovered yet
-| PLAYER\_NOT\_FOUND | no change | player not discovered yet
-| PLAYER\_CONNECTION\_REJECTED | no change | player not discovered yet
-| PLAYER\_CONNECTION\_TIMEOUT | no change | player not discovered yet
+| playerError() event name | Description |
+|:--|:--|
+| "INTERNAL\_ERROR" | Any fatal player error has occured
+| "UNKNOWN\_ERROR" | An unknown error occured
+| "UNPLAYABLE\_BY\_AUTHORIZATION" | The media couldn't be played due to an unauthorized account
+| "UNPLAYABLE\_BY\_STREAM\_CONCURRENCY" | The media couldn't be played due to the number of accounts currently streaming
+| "UNPLAYABLE\_BY\_ACCOUNT" | The media couldn't be played due to the account type
+| "UNPLAYABLE\_BY\_REGION" | The media couldn't be played due to the current region
+| "UNPLAYABLE\_BY\_PARENTAL\_CONTROL" | The media couldn't be played due to parental settings
+| "UNPLAYABLE\_BY\_SUBSCRIPTION" | The media couldn't be played due to the subscription type 
+| "OPERATION\_REJECTED\_UNINTERRUPTIBLE" | The operation could not be performed due to non interruptible media
+| "OPERATION\_REJECTED\_END\_OF\_QUEUE" | The operation could not be performed due to the end of media being reached
+| "OPERATION\_UNSUPPORTED" | The operation was not supported
+| "OPERATION\_REJECTED\_SKIP\_LIMIT" | The operation failed because a skip limit was reached 
+| "PLAYER\_UNKNOWN" | An unknown player was detected
+| "PLAYER\_NOT\_FOUND" | The player was not discovered
+| "PLAYER\_CONNECTION\_REJECTED" | The connection to the player failed
+| "PLAYER\_CONNECTION\_TIMEOUT" | The connection to the player timed out
+
+The Alexa client usually sets internal focus via the `playerEvent()` and `playerError()` methods in addition to successful calls to `play()` and `playControl()`. If the platform wishes to update the Alexa client focus in some way other than via Alexa interaction (for example via external GUI navigation), the `setFocus()` method can be used. Then the user can subsequently use Alexa to voice control the source.
 
 Additionally, successful calls to `play()` and `playControl()` will also set the focus, and unsuccessful calls will unset the focus. A call to the `removeDiscoveredPlayer()` will unset focus.
 
@@ -555,7 +553,7 @@ public boolean mutedStateChanged( MutedState state ) {
 ...
 ```
 
-The `PlaybackController` APIs control playback of an `ExternalMediaAdapter` implementation such as MACCPlayer when it is the player in focus. This is useful in scenarios such as when the external app is playing, but its own GUI is not displayed, and you wish to use the same GUI to control the external app as traditional Alexa-managed music that plays through the `AudioPlayer` interface. 
+The `playControl` interface is called when a user requests playback control via voice (for example, "Pause"), while the EMP source is in focus. 
 
 ```
 @Override
@@ -564,7 +562,7 @@ public boolean playControl(String localPlayerId, PlayControlType playControlType
     ...
 ```
 
-`PlayControlType` will be sent corresponding to the player's `supportedOperations`. The `supportedOperations` are specified in the `getState()` interface. 
+The `PlayControlType` is determined by player's `supportedOperations`, which are specified by your implementation in the return value of `getState()`. 
 
 The `getState()` method is called to synchronize the MACC player's state with the cloud. This method is used to maintain correct state during start up, and after every Alexa request. 
 
@@ -593,44 +591,45 @@ public ExternalMediaAdapter.ExternalMediaAdapterState getState(String localPlaye
 
 The following table describes the fields comprising a `ExternalMediaAdapterState` for MACC app integration, which includes two sub-components: `PlaybackState` and `SessionState`. The exact state reporting requirements may be subject to change depending on the platform or media service. 
 
-| State        | Type           | Notes  |
-| ------------- |:-------------:| -----:|
+| State        | Type           | Required | Notes  |
+| :------------- |:-------------| :-----| :-----|
 | **PlaybackState**      |
-| state      | String        |   "IDLE"/"STOPPED"/"PLAYING" required |
-| supportedOperations | SupportedPlaybackOperation[] | (see SupportedPlaybackOperation) required |
-| trackOffset      | long  |   optional |
-| shuffleEnabled      | boolean       |   required |
-| repeatEnabled      | boolean       |   required |
-| favorites      | Favorites  | FAVORITED/UNFAVORITED/NOT_RATED optional |
-| type      | String  |   "ExternalMediaPlayerMusicItem" required |
-| playbackSource      | String       |   If available else use local player name. optional|
-| playbackSourceId      | String  |   empty |
-| trackName      | String   |   If available else use local player name. optional|
-| trackId      | String    |   empty |
-| trackNumber      | String   |  optional |
-| artistName      | String    |  optional |
-| artistId      | String   |   empty |
-| albumName      | String |   optional |
-| albumId      | String |   empty |
-| tinyURL      | String |   optional |
-| smallURL      | String |   optional |
-| mediumURL      | String |   optional |
-| largeURL      | String |   optional |
-| coverId      | String  |   empty |
-| mediaProvider      | String  |   optional |
-| mediaType      | MediaType |   TRACK, PODCAST, STATION, AD, SAMPLE, OTHER required |
-| duration      | long  |   optional |
+| state      | String        | Yes | "IDLE"/"STOPPED"/"PLAYING" |
+| supportedOperations | SupportedPlaybackOperation[] | Yes | see SupportedOperation |
+| trackOffset      | long  | No |  optional |
+| shuffleEnabled      | boolean       |  Yes | report shuffle status |
+| repeatEnabled      | boolean       |  Yes | report repeat status |
+| favorites      | Favorites  | No | see Favorites |
+| type      | String  |  Yes | must be set as "ExternalMediaPlayerMusicItem" |
+| playbackSource      | String       | No |   If available else use local player name |
+| playbackSourceId      | String  | No |  empty |
+| trackName      | String   | No |  If available else use local player name |
+| trackId      | String    |  No | empty |
+| trackNumber      | String   | No | optional |
+| artistName      | String    | No | optional |
+| artistId      | String   |  No | empty |
+| albumName      | String |  No | optional |
+| albumId      | String | No |  empty |
+| tinyURL      | String | No |  optional |
+| smallURL      | String | No |  optional |
+| mediumURL      | String | No |  optional |
+| largeURL      | String | No |  optional |
+| coverId      | String  |  No | empty |
+| mediaProvider      | String  | No |  optional |
+| mediaType      | MediaType | Yes |  see MediaType |
+| duration      | long  | No |  optional |
 | **SessionsState** |
-| endpointId      | String  |   empty |
-| loggedIn      | boolean  |   empty |
-| userName      | String  |   empty |
-| isGuest      | boolean  |   empty |
-| launched      | boolean  |   True if MediaController was successfully connected and MediaControllerCompat.Callback.onSessionDestroyed has not been invoked. |
-| active      | boolean  |   Media session state. required  |
-| accessToken      | String  |   empty |
-| tokenRefreshInterval      | long  |   empty |
-| playerCookie      | String  |   A player may declare arbitrary information for itself. optional |
-| spiVersion      | String  |   "1.0" required  |
+| endpointId      | String  | No |  empty |
+| loggedIn      | boolean  | No |  empty |
+| userName      | String  |  No | empty |
+| isGuest      | boolean  | No |  empty |
+| launched      | boolean  | Yes |  True if MediaController was successfully connected and MediaControllerCompat.Callback.onSessionDestroyed has not been invoked |
+| active      | boolean  | Yes |  Media session state  |
+| accessToken      | String  |  No | empty |
+| tokenRefreshInterval      | long  | No |   empty |
+| playerCookie      | String  | No |  A player may declare arbitrary information for itself |
+| spiVersion      | String  |  Yes | must be set as "1.0" |
+
 
 `supportedOperations` should be a list the operations that the external media adapter supports. Below is a list of every `SupportedPlaybackOperation`.
 
@@ -657,7 +656,7 @@ SupportedPlaybackOperation.START_OVER
 
 ## Handling Local Media Sources <a id ="handling-local-media-sources"></a>
 
-The `LocalMediaSource` interface allows the platform to register a local media source by type(`BLUETOOTH`, `USB`, `LINE_IN`, `AM_RADIO` etc.). Registering a local media source allows playback control of a source via Alexa (e.g. "Alexa, play the CD player") or via button press through through the PlaybackController interface, if desired. It will also enable playback initiation via Alexa by frequency, channel, or preset for relevant source types (e.g. "Alexa, play 98.7 FM").
+The `LocalMediaSource` interface allows the platform to register a local media source by type (`BLUETOOTH`, `USB`, `AM_RADIO`, `FM_RADIO`, `SATELLITE_RADIO`, `LINE_IN`, `COMPACT_DISC`, `SIRIUS_XM`, `DAB`). Registering a local media source allows playback control of a source via Alexa (e.g. "Alexa, play the CD player"). It will also enable playback initiation via Alexa by frequency, channel, or preset for relevant source types (e.g. "Alexa, play 98.7 FM").
 
 The following is an example of registering a CD player local media source using type `Source.COMPACT_DISC`:
 
@@ -672,7 +671,7 @@ public class CDLocalMediaSource extends LocalMediaSource {
     ...
 ```    
 
-The `play()` method is called when Alexa invokes play by `ContentSelector` type (`FREQUENCY`, `CHANNEL`, `PRESET`) for a radio local media source (`AM_RADIO`, `FM_RADIO`, `SIRIUS_XM`). The `payload` is a string that depends on the `ContentSelector` type and local media `Source` type.
+The `play()` method is called when Alexa invokes play by `ContentSelector` type (`FREQUENCY`, `CHANNEL`, `PRESET`) for a radio local media source (`AM_RADIO`, `FM_RADIO`, `SIRIUS_XM`). The `payload` is a string that depends on the `ContentSelector` type and local media `Source` type (e.g., "1", "98.7 FM HD 1").
 
 ```
 @Override
@@ -684,7 +683,7 @@ public boolean play( ContentSelector type, String payload ) {
 The table below provides details about the supported `ContentSelector` types based on `Source` type:
 
 | Source type | Supported content selector(s) |
-|------|---------|---|---|
+|:------|:---------|
 | FM | FREQUENCY, PRESET | 
 | AM | FREQUENCY, PRESET | 
 | SXM | CHANNEL, PRESET | 
@@ -693,11 +692,9 @@ The ranges and increments for valid frequency, preset, and channel may vary, dep
 
 The `play()` method will not be invoked if a source cannot handle the specified `ContentSelector` type.
 
-The implementation depends on the local media source; however, if the call is handled successfully, `setFocus()` should always be called. This informs the Engine that the local player is in focus. 
-
 >**Note:** Cases in which a preset is requested but the source is unknown are handled by the `GlobalPreset` interface. See [Handling Global Presets](#handling-global-presets) for details.
 
-The `playControl()` method is called with a `PlayControlType`(e.g. `RESUME`, `PAUSE`, `NEXT`, `SHUFFLE`, `REPEAT` etc.) when either Alexa or the GUI (using the `PlaybackController` APIs) invokes a playback control on the local media source.
+The `playControl()` method is called with a `PlayControlType`( `RESUME`, `PAUSE`, `STOP`, `NEXT`, `PREVIOUS`, `START_OVER`, `FAST_FORWARD`, `REWIND`, `ENABLE_REPEAT_ONE`, `ENABLE_REPEAT`, `DISABLE_REPEAT`, `ENABLE_SHUFFLE`, `DISABLE_SHUFFLE`, `FAVORITE`, `UNFAVORITE`) when Alexa invokes a playback control on the local media source.
  
 
 ```
@@ -739,7 +736,11 @@ public boolean mutedStateChanged( MutedState state ) {
 ...
 ```
 
-Whether or not you call `setFocus()` depends on the desired client behavior. When playback of a source is requested via Alexa, the focus is handled internally. However, if the focus on a source is changed externally, you should use `setFocus()` to notify Alexa of that change. Additional calls to `setFocus()` are redundant, but should not have adverse effects.
+Use the `setFocus()` method to tell the Engine that the `LocalMediaSource` instance has become focused or un-focused on the system. The Engine already considers a source active when the user requests Alexa to play the source by name, so this should only be used when the state of the source is changed by a user GUI interaction.
+
+Call `setFocus(true)` to tell the Engine that the user brought the `LocalMediaSource` to the foreground with a GUI interaction. The Engine considers the source to have an active playback session, although it may or may not be playing yet. If no other Alexa media source is playing, utterances such as “Alexa, play” target this source.
+
+Call `setFocus(false)` to tell the Engine that the `LocalMediaSource` is no longer in the foreground, typically as a result of a GUI interaction from the user after the player is stopped. The Engine considers the source inactive, and starting a new playback session for the source requires a further GUI interaction or user voice request to Alexa that targets the source by name.
 
 ```	
 public class CDLocalMediaSource extends LocalMediaSource {
@@ -750,12 +751,26 @@ public void setAlexaFocusForFMRadio( boolean isFocused ) {
 	// FM Radio begins playback independantly of Alexa
    	setFocus( true ); // or setFocus();
 ...    
- 	// FM Radio should not be in focus anymore with Alexa-independent behavior( non playback controller or voice interaction )
+ 	// Notify Alexa that FM Radio is no longer the active media source on the device as a result of platform driven change
    	setFocus( false );
 ...    
 ```
+>**Note:** Only one `LocalMediaSource` type can have Alexa focus at a time.
 
-`playerError()` and `playerEvent()` are not used currently for local media sources; however, calling them should have no adverse effect. 
+The `LocalMediaSource` interface provides methods `playerEvent()` and `playerError()` for your implementation to report events regarding the state of the playback session managed by your local source. Even though your local source manages its own playback, including reacting to on-device transport control button presses from the user and reacting appropriately to other non-Alexa audio events on the system, the  `playerEvent()` and `playerError()` calls in conjunction with `setFocus()` provide important information to the Engine:
+    
+1. The Engine may use calls to these methods to synchronize the state of your local source's playback session with Alexa.
+
+2. The Engine may react to these calls according to the event name specified to update its internal view of your local source's state. Particular event names indicate if the source is focused on the system (meaning it has an active playback session) or if it is un-focused (meaning it is not in use and is brought into use only by further on-device interaction by the user or a user voice request to Alexa). The Engine uses this information to sync its internal focus management.
+
+| playerEvent() event name | Description |
+|:--|:--|
+| "PlaybackStarted" |  During an active session, the local source has started to play or resumed from a paused state. The Engine considers the source active and in focus. |
+| "PlaybackStopped" | During an active session, the player stopped, either as a result of a GUI interaction or a user voice request to Alexa. The player should not be considered stopped, unless it is not resumeable. |
+
+| playerError() event name | Description |
+|:--|:--|
+| "INTERNAL\_ERROR" | During an active session, an internal error caused playback to stop.
 
 The `getState()` method is called to synchronize the local player's state with the cloud. This method is used to maintain correct state during startup and with every Alexa request. All relevant information should be added to the `LocalMediaSourceState` and returned. 
 
@@ -778,44 +793,44 @@ public LocalMediaSourceState getState() {
 
 The following table describes the fields comprising a `LocalMediaSourceState`, which includes two sub-components: `PlaybackState` and `SessionState`.
 
-| State        | Type           | Notes  |
-| ------------- |:-------------:| -----:|
-| **PlaybackState**      |
-| state      | String        |   "IDLE"/"STOPPED"/"PLAYING" required |
-| supportedOperations | SupportedPlaybackOperation[] | (see SupportedPlaybackOperation) required |
-| trackOffset      | long  |   empty |
-| shuffleEnabled      | boolean       |   empty |
-| repeatEnabled      | boolean       |   empty |
-| favorites      | Favorites  |   FAVORITED/UNFAVORITED/NOT_RATED optional  |
-| type      | String  |   "ExternalMediaPlayerMusicItem" required |
-| playbackSource      | String       |   empty |
-| playbackSourceId      | String  |   empty |
-| trackName      | String   |   empty |
-| trackId      | String    |   empty |
-| trackNumber      | String   |  empty |
-| artistName      | String    |  empty |
-| artistId      | String   |   empty |
-| albumName      | String |   empty |
-| albumId      | String |   empty |
-| tinyURL      | String |   empty |
-| smallURL      | String |   empty |
-| mediumURL      | String |   empty |
-| largeURL      | String |   empty |
-| coverId      | String  |   empty |
-| mediaProvider      | String  |   empty |
-| mediaType      | MediaType |   TRACK, PODCAST, STATION, AD, SAMPLE, OTHER optional |
-| duration      | long  |   empty |
-| **SessionState** |
-| endpointId      | String  |   empty |
-| loggedIn      | boolean  |   empty |
-| userName      | String  |   empty |
-| isGuest      | boolean  |   empty |
-| launched      | boolean  |   empty |
-| active      | boolean  |   empty |
-| accessToken      | String  |   empty |
-| tokenRefreshInterval      | long  |   empty |
-| supportedContentSelectors      | ContentSelector[]  |  A player declares it's supported content selectors (see ContentSelector) optional |
-| spiVersion      | String  |   "1.0" required  |
+| State        | Type           | Required | Notes  |
+| :------------- |:-------------| -----:| -----:|
+| **PlaybackState**      | 
+| state      | String        |  Yes | "IDLE"/"STOPPED"/"PLAYING" |
+| supportedOperations | SupportedPlaybackOperation[] | Yes | see SupportedPlaybackOperation |
+| trackOffset      | long  |  No | optional | 
+| shuffleEnabled      | boolean       |   No | optional |
+| repeatEnabled      | boolean       |   No | optional |
+| favorites      | Favorites  |   No  | see Favorites |
+| type      | String  |   Yes | must be set to "ExternalMediaPlayerMusicItem" |
+| playbackSource      | String       |  No | If available else use local player name |
+| playbackSourceId      | String  |   No | optional |
+| trackName      | String   | No | If available else use local player name |
+| trackId      | String    | No |  empty |
+| trackNumber      | String   | No | optional |
+| artistName      | String    | No | optional |
+| artistId      | String   | No |  empty |
+| albumName      | String |  No | optional |
+| albumId      | String |  No | empty |
+| tinyURL      | String | No | optional |
+| smallURL      | String | No |  optional |
+| mediumURL      | String | No |  optional |
+| largeURL      | String | No |  optional |
+| coverId      | String  | No |  empty |
+| mediaProvider      | String  | No | optional |
+| mediaType      | MediaType | No |  TRACK, PODCAST, STATION, AD, SAMPLE, OTHER |
+| duration      | long  | No |  optional |
+| **SessionsState** | 
+| endpointId      | String  | No |  empty |
+| loggedIn      | boolean  |  No | empty |
+| userName      | String  | No |  empty |
+| isGuest      | boolean  | No |  empty |
+| launched      | boolean  |  Yes | true if the source is enabled, false otherwise |
+| active      | boolean  | No |  empty |
+| accessToken      | String  | No |  empty |
+| tokenRefreshInterval      | long  | No |  empty |
+| supportedContentSelectors      | ContentSelector[]  | No | see ContentSelector |
+| spiVersion      | String  |  Yes | must be "1.0"  |
 
 `supportedOperations` should list the operations which the local media source supports. Below is a list of all `SupportedPlaybackOperation`:
 
@@ -844,10 +859,12 @@ SupportedPlaybackOperation.START_OVER
 `supportedContentSelectors` should list the `ContentSelector` types the radio local media source supports. The table below lists the valid local media `Source`/`ContentSelector` pairs.
 
 | Source | Supportable `ContentSelector` Values |
-|---|---|
+|:---|:---|
 | `AM_RADIO` |  `PRESET`, `FREQUENCY` |
 | `FM_RADIO` |  `PRESET`, `FREQUENCY` |
 | `SIRIUS_XM` |  `PRESET`, `CHANNEL` |
+
+`launched` specifies whether the source is enabled. The player is disabled for use with Alexa when this value is false, such as when a removable source like USB is disconnected.
 
 ## Handling Global Presets <a id="handling-global-presets"></a>
 

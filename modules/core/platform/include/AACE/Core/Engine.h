@@ -92,38 +92,6 @@ public:
     virtual bool shutdown() = 0;
 
     /**
-     * @note This method is deprecated. Use
-     *       aace::propertyManager::PropertyManager::setProperty()
-     *
-     * Sets a property value in the Engine
-     *
-     * @param [in] name The name used by the Engine to identify the property.
-     *        The property name must be one of the property constants recognized
-     *        by the Engine, e.g. the properties in
-     *        @c aace::alexa::property::AlexaProperties.h
-     * @param [in] value The property setting
-     * @return @c true if the property value was updated or set to the current
-     *         setting, else @c false if an error occured.
-     */
-    virtual bool setProperty(const std::string& key, const std::string& value) = 0;
-
-    /**
-     * @note This method is deprecated. Use
-     *       aace::propertyManager::PropertyManager::getProperty()
-     *
-     * Retrieves the setting for the property identified by
-     * @c name from the Engine
-     *
-     * @param [in] name The name used by the Engine to identify the property.
-     *        The property name must be one of the property constants recognized
-     *        by the Engine, e.g. the properties in
-     *        @c aace::alexa::property::AlexaProperties.h
-     * @return The property value as a string, or an empty string if the 
-     *        property value was not found
-     */
-    virtual std::string getProperty(const std::string& key) = 0;
-
-    /**
      * Registers a @c PlatformInterface instance with the Engine
      *
      * The platform implementation must register each interface required by the application.

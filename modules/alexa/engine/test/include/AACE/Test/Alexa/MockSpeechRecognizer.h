@@ -25,8 +25,7 @@ namespace alexa {
 
 class MockSpeechRecognizer : public aace::alexa::SpeechRecognizer {
 public:
-    MockSpeechRecognizer(bool wakewordDetectionEnabled = false) :
-            aace::alexa::SpeechRecognizer(wakewordDetectionEnabled) {
+    MockSpeechRecognizer() : aace::alexa::SpeechRecognizer() {
     }
     MOCK_METHOD1(wakewordDetected, bool(const std::string& wakeword));
     MOCK_METHOD0(endOfSpeechDetected, void());

@@ -33,7 +33,7 @@ namespace systemAudio {
 
 class AudioOutputImpl : public aace::audio::AudioOutput {
 public:
-    ~AudioOutputImpl();
+    ~AudioOutputImpl() override;
 
     // Factory
     static std::unique_ptr<AudioOutputImpl> create(
@@ -62,7 +62,7 @@ public:
     bool mutedStateChanged(MutedState state) override;
 
 private:
-    AudioOutputImpl(int moduleId, const std::string& deviceName, const std::string& name);
+    AudioOutputImpl(int moduleId, std::string deviceName, std::string name);
     bool initialize();
     bool writeStreamToFile(aace::audio::AudioStream* stream, const std::string& path);
     bool writeStreamToPipeline();
@@ -73,10 +73,10 @@ private:
     void executeStartStreaming();
     void executeStopStreaming();
 
-    bool executePrepare(std::shared_ptr<aace::audio::AudioStream> stream, bool repeating);
+    bool executePrepare(const std::shared_ptr<aace::audio::AudioStream>& stream, bool repeating);
     bool executePrepare(const std::string& url, bool repeating);
-    bool prepareLocked(const std::string& url, std::shared_ptr<aace::audio::AudioStream> stream, bool repeating);
-    void preparePlayer(const std::string& url, std::shared_ptr<aace::audio::AudioStream> stream);
+    bool prepareLocked(const std::string& url, const std::shared_ptr<aace::audio::AudioStream>& stream, bool repeating);
+    void preparePlayer(const std::string& url, const std::shared_ptr<aace::audio::AudioStream>& stream);
     bool executePlay();
     bool executeStop();
     bool executePause();
@@ -90,6 +90,8 @@ private:
 
     std::vector<std::string> parsePlaylistUrl(const std::string& url);
 
+    // States ending with 'ing' are intermediate states that are not allowed outside an execute* method.
+    // That means an execute* method should end with an *ed state by calling waitForState.
     enum class State {
         Created,
         Initialized,
@@ -107,7 +109,10 @@ private:
     friend std::ostream& operator<<(std::ostream& stream, State state);
 
     bool checkState(std::initializer_list<State> validStates);
+    bool checkState(State state);
     void setState(State state);
+    void setStateLocked(State state);
+    bool waitForState(State state);
 
     int m_moduleId;
     std::string m_name;
@@ -116,7 +121,7 @@ private:
     std::string m_mediaUrl;
     std::deque<std::string> m_mediaQueue;
     bool m_repeating = false;
-    int64_t m_currentPosition = 0;
+    std::atomic<int64_t> m_currentPosition{0};
     float m_currentVolume = 0.5;
     MutedState m_currentMutedState = MutedState::UNMUTED;
     std::string m_tmpFile;
@@ -125,7 +130,14 @@ private:
     std::string m_deviceName;
 
     State m_state;
+    std::mutex m_stateMutex;
+    std::condition_variable m_cvStateChange;
+
+    // Executor to serialize AudioOutput operations
     alexaClientSDK::avsCommon::utils::threading::Executor m_executor;
+
+    // Executor to serialize gstreamer callbacks
+    alexaClientSDK::avsCommon::utils::threading::Executor m_executorCallback;
 };
 
 }  // namespace systemAudio

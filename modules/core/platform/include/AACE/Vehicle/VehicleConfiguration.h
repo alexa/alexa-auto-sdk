@@ -99,6 +99,7 @@ public:
         MICROPHONE,
 
         /**
+         * This API is depreciated, we do NOT recommend to continue to use this property anymore.
          * A comma-separated list of supported countries (ISO country codes).
          * Example value: "US,CA"
          */

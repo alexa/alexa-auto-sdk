@@ -26,7 +26,8 @@ static const std::string TAG("aace.alexa.AudioPlayerEngineImpl");
 
 AudioPlayerEngineImpl::AudioPlayerEngineImpl(std::shared_ptr<aace::alexa::AudioPlayer> audioPlayerPlatformInterface) :
         AudioChannelEngineImpl(
-            alexaClientSDK::avsCommon::sdkInterfaces::ChannelVolumeInterface::Type::AVS_SPEAKER_VOLUME),
+            alexaClientSDK::avsCommon::sdkInterfaces::ChannelVolumeInterface::Type::AVS_SPEAKER_VOLUME,
+            "AudioPlayer"),
         m_audioPlayerPlatformInterface(audioPlayerPlatformInterface) {
 }
 

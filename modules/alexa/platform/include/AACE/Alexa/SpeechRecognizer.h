@@ -25,7 +25,7 @@ namespace aace {
 namespace alexa {
 
 /**
- * SpeechRecognizer should be extended to initiate voice interactions with Alexa and provide audio input to AVS.
+ * SpeechRecognizer should be extended to initiate voice interactions with Alexa.
  * 
  * SpeechRecognizer provides interfaces for 
  * @li Initiating a dialog interaction with Alexa
@@ -38,7 +38,7 @@ namespace alexa {
  */
 class SpeechRecognizer : public aace::core::PlatformInterface {
 protected:
-    SpeechRecognizer(bool wakewordDetectionEnabled = true);
+    SpeechRecognizer();
 
 public:
     virtual ~SpeechRecognizer();
@@ -56,8 +56,8 @@ public:
 
     /**
      * Notifies the Engine of a speech recognition event initiated by a press-and-hold action on the 
-     * platform. The Engine will call @c startAudioInput() to notify the platform implementation when
-     * to start writing audio samples.
+     * platform. The Engine will call @c aace::audio::AudioInput::startAudioInput() to notify the
+     * platform implementation when to start writing audio samples.
      *
      * The platform implementation should call @c stopCapture() to terminate speech recognition on release
      * of the press-and-hold action.
@@ -68,8 +68,8 @@ public:
 
     /**
      * Notifies the Engine of a speech recognition event initiated by a press-and-release action on the 
-     * platform. The Engine will call @c startAudioInput() to notify the platform implementation when
-     * to start writing audio samples.
+     * platform. The Engine will call @c aace::audio::AudioInput::startAudioInput() to notify the
+     * platform implementation when to start writing audio samples.
      *
      * The Engine will terminate the recognize event initiated by the press-and-release action
      * when end of speech is detected.
@@ -79,8 +79,7 @@ public:
     bool tapToTalk();
 
     /**
-     * Notifies the Engine of a speech recognition event. The Engine will call @c startAudioInput() to notify 
-     * the platform implementation when to start writing audio samples.
+     * Notifies the Engine of a speech recognition event.
      *
      * If the initator type is @c HOLD_TO_TALK, then the platform implementation should call @c stopCapture() 
      * to terminate speech recognition on release of the press-and-hold action. Otherwise, the Engine will 
@@ -102,43 +101,13 @@ public:
         const std::string& keyword = "");
 
     /**
-     * Notifies the Engine to terminate the current recognize event. The Engine will call @c stopAudioInput()
-     * to notify the platform implementation when to stop writing audio samples.
+     * Notifies the Engine to terminate the current recognize event. The Engine will 
+     * call @c aace::audio::AudioInput::stopAudioInput() to notify the platform implementation
+     * when to stop writing audio samples.
      *
      * @return @c true if the Engine successfully terminated the current recognize event, else @c false
      */
     bool stopCapture();
-
-    /**
-     * @note This method is deprecated. Use
-     *       aace::propertyManager::PropertyManager::setProperty()
-     *
-     * Notifies the Engine to enable the wake word engine. Wake word must be supported in the Engine to be enabled
-     * by this call.
-     *
-     * @return @c true if the Engine successfully enabled wake word detection, else @c false
-     */
-    bool enableWakewordDetection();
-
-    /**
-     * @note This method is deprecated. Use
-     *       aace::propertyManager::PropertyManager::setProperty()
-     *
-     * Notifies the Engine to disable the wake word engine
-     *
-     * @return @c true if the Engine successfully disabled wakeword detection, else @c false
-     */
-    bool disableWakewordDetection();
-
-    /**
-     * @note This method is deprecated. Use
-     *       aace::propertyManager::PropertyManager::getProperty()
-     *
-     * Checks if wake word detection is enabled in the Engine
-     *
-     * @return @c true if wake word detection is enabled, else @c false
-     */
-    bool isWakewordDetectionEnabled();
 
     /**
      * Notifies the platform implementation when a wake word is detected
@@ -166,8 +135,6 @@ public:
 
 private:
     std::weak_ptr<aace::alexa::SpeechRecognizerEngineInterface> m_speechRecognizerEngineInterface;
-
-    bool m_wakewordDetectionEnabled;
 };
 
 }  // namespace alexa

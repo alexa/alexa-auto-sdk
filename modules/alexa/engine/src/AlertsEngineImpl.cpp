@@ -27,7 +27,8 @@ AlertsEngineImpl::AlertsEngineImpl(
     std::shared_ptr<aace::alexa::Alerts> alertsPlatformInterface,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSConnectionManagerInterface> connectionManager) :
         AudioChannelEngineImpl(
-            alexaClientSDK::avsCommon::sdkInterfaces::ChannelVolumeInterface::Type::AVS_ALERTS_VOLUME),
+            alexaClientSDK::avsCommon::sdkInterfaces::ChannelVolumeInterface::Type::AVS_ALERTS_VOLUME,
+            "Alerts"),
         m_alertsPlatformInterface(alertsPlatformInterface),
         m_connectionManager(connectionManager) {
 }

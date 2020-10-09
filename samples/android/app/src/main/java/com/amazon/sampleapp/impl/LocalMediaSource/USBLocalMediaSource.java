@@ -1,16 +1,12 @@
 package com.amazon.sampleapp.impl.LocalMediaSource;
 
-import android.content.Context;
-
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
-import com.amazon.sampleapp.impl.PlaybackController.PlaybackControllerHandler;
 
 public class USBLocalMediaSource extends LocalMediaSourceHandler {
     String m_state = "IDLE";
 
-    public USBLocalMediaSource(
-            Context context, LoggerHandler logger, PlaybackControllerHandler playbackControllerHandler) {
-        super(context, logger, Source.USB, playbackControllerHandler);
+    public USBLocalMediaSource(LoggerHandler logger) {
+        super(logger, Source.USB);
     }
 
     @Override

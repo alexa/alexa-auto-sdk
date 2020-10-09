@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">2.3.0</span>
+   &#160;<span id="projectnumber">3.0.0</span>
    </div>
   </td>
  </tr>
@@ -82,12 +82,8 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a4c8189b23f28853714a99f3e0f1e8404"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_template_runtime.html#a4c8189b23f28853714a99f3e0f1e8404">renderTemplate</a> (String payload)</td></tr>
-<tr class="separator:a4c8189b23f28853714a99f3e0f1e8404"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2b47479f51a5998559dc2d7e9b33fdbe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_template_runtime.html#a2b47479f51a5998559dc2d7e9b33fdbe">renderTemplate</a> (String payload, <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_template_runtime_1_1_focus_state.html">FocusState</a> focusState)</td></tr>
 <tr class="separator:a2b47479f51a5998559dc2d7e9b33fdbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a485b27cafa223d145a1808326446f13b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_template_runtime.html#a485b27cafa223d145a1808326446f13b">renderPlayerInfo</a> (String payload)</td></tr>
-<tr class="separator:a485b27cafa223d145a1808326446f13b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a09010f2bbdf49bbd579108d7c405e040"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_template_runtime.html#a09010f2bbdf49bbd579108d7c405e040">renderPlayerInfo</a> (String payload, <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_template_runtime_1_1_player_activity.html">PlayerActivity</a> audioPlayerState, long offset, <a class="el" href="enumcom_1_1amazon_1_1aace_1_1alexa_1_1_template_runtime_1_1_focus_state.html">FocusState</a> focusState)</td></tr>
 <tr class="separator:a09010f2bbdf49bbd579108d7c405e040"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a298e0e13beabd319017ddd30e40dbdec"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_template_runtime.html#a298e0e13beabd319017ddd30e40dbdec">clearTemplate</a> ()</td></tr>
@@ -100,35 +96,8 @@ Public Member Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_template_runtime.html">TemplateRuntime</a> should be extended to handle directives from the Engine for rendering visual metadata with display cards. Metadata is provided as structured JSON and should be parsed by the platform implementation for rendering cards that adhere to design guidelines for the platform device type. For screen-specific design guidance, see the AVS UX Design Overview: <a href="https://developer.amazon.com/docs/alexa-voice-service/ux-design-overview.html#displaycards">https://developer.amazon.com/docs/alexa-voice-service/ux-design-overview.html#displaycards</a> </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a4c8189b23f28853714a99f3e0f1e8404"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4c8189b23f28853714a99f3e0f1e8404">&#9670;&nbsp;</a></span>renderTemplate() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void com.amazon.aace.alexa.TemplateRuntime.renderTemplate </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>payload</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000004">Deprecated:</a></b></dt><dd>Use <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_template_runtime.html#a2b47479f51a5998559dc2d7e9b33fdbe">renderTemplate( String payload, FocusState focusState )</a></code>.</dd></dl>
-<p>Provides visual metadata associated with a user request to Alexa. The platform implementation should parse the template metadata and render a display card for the user.</p>
-<p>For supported templates and rendering guidelines, see <a href="https://alexa.design/DevDocRenderTemplate">https://alexa.design/DevDocRenderTemplate</a></p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">payload</td><td>Renderable template metadata in structured JSON format </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
 <a id="a2b47479f51a5998559dc2d7e9b33fdbe"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2b47479f51a5998559dc2d7e9b33fdbe">&#9670;&nbsp;</a></span>renderTemplate() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b47479f51a5998559dc2d7e9b33fdbe">&#9670;&nbsp;</a></span>renderTemplate()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -164,38 +133,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a485b27cafa223d145a1808326446f13b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a485b27cafa223d145a1808326446f13b">&#9670;&nbsp;</a></span>renderPlayerInfo() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void com.amazon.aace.alexa.TemplateRuntime.renderPlayerInfo </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>payload</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000005">Deprecated:</a></b></dt><dd>Use <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_template_runtime.html#a09010f2bbdf49bbd579108d7c405e040">renderPlayerInfo( String payload, PlayerActivity audioPlayerState, long offset, FocusState focusState )</a></code>.</dd></dl>
-<p>Provides visual metadata associated with a user request to Alexa for audio playback. The platform implementation should parse the player info metadata and render a display card for the user.</p>
-<p>For rendering guidelines, see <a href="https://amzn.to/DevDocTemplatePlayerInfo">https://amzn.to/DevDocTemplatePlayerInfo</a></p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">payload</td><td>Renderable player info metadata in structured JSON format </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_playback_controller.html">PlaybackController</a> </dd>
-<dd>
-<a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_player.html">AudioPlayer</a> </dd></dl>
-
-</div>
-</div>
 <a id="a09010f2bbdf49bbd579108d7c405e040"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a09010f2bbdf49bbd579108d7c405e040">&#9670;&nbsp;</a></span>renderPlayerInfo() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a09010f2bbdf49bbd579108d7c405e040">&#9670;&nbsp;</a></span>renderPlayerInfo()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -307,7 +246,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 2.3.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 3.0.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

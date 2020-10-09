@@ -589,7 +589,7 @@ private:
 
     /// The id of the player which currently has focus.  Access to @c m_playerInFocus is protected by @c
     /// m_inFocusAdapterMutex.
-    /// TODO: ACSDK-2834 Consolidate m_playerInFocus and m_adapterInFocus.
+    /// TODO: Consolidate m_playerInFocus and m_adapterInFocus.
     std::string m_playerInFocus;
 
     /// The adapter with the @c m_playerInFocus which currently has focus.  Access to @c m_adapterInFocus is
@@ -672,9 +672,6 @@ private:
     /// Set of capability configurations that will get published using the Capabilities API
     std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>>
         m_capabilityConfigurations;
-
-    /// Current ContentType Rendering in the AudioPlayer
-    alexaClientSDK::avsCommon::avs::ContentType m_currentMixability;
 
     /// Current MixingBehavior for the AudioPlayer.
     alexaClientSDK::avsCommon::avs::MixingBehavior m_mixingBehavior;

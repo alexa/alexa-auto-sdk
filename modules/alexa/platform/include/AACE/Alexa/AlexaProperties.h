@@ -49,24 +49,6 @@ static const std::string FIRMWARE_VERSION = "aace.alexa.system.firmwareVersion";
 static const std::string LOCALE = "aace.alexa.setting.locale";
 
 /**
- * @deprecated
- * This property will be removed in a future version of Auto SDK.
- *
- * This read-only property is used with
- * aace::propertyManager::PropertyManager::getProperty() to get a list 
- * of device supported locales and locale combinations.
- * E.g. "de-DE,fr-CA,en-CA,en-CA/fr-CA,..." 
- * The list is comma-separated. For locale combinations, the entry in the returned 
- * list is a forward slash-separated locale pair.
- * 
- * @note Prior to version 2.1 of Auto SDK, this property returned a list of AVS-supported
- * locales. See the list of AVS-supported locales here: 
- * https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/system.html#locales
- *
- */
-static const std::string SUPPORTED_LOCALES = "aace.alexa.supportedLocales";
-
-/**
  * This read-only property is used with
  * aace::propertyManager::PropertyManager::getProperty() to check if the
  * vehicle's country is supported.

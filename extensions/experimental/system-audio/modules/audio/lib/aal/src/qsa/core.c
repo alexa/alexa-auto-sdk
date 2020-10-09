@@ -29,7 +29,7 @@ static ssize_t qsa_read_from_write_buffer(aal_qsa_context_t* ctx, uint8_t* buffe
     if (available > 0) {
         size = MIN(available, ctx->buffer_size);
         if (!ringbuf_memcpy_from(buffer, ctx->write_buffer, size)) {
-            debug("ringbuf_memcpy_from Failed");
+            debug("ringbuf_memcpy_from failed");
             size = -1;
         }
     }
@@ -128,7 +128,7 @@ static void* qsa_read_loop(void* argument) {
             ctx->status.channel = ctx->channel;
             int r = snd_pcm_plugin_status(ctx->pcm_handle, &ctx->status);
             if (r != 0) {
-                debug("failed to get audio status: %d", r);
+                debug("Failed to get audio status: %d", r);
             }
 
             stop_requested = ctx->stop_requested;
@@ -182,26 +182,6 @@ void qsa_play(aal_handle_t handle) {
     aal_qsa_context_t* ctx = (aal_qsa_context_t*)handle;
     int r;
 
-    memset(&ctx->mixer_group, 0, sizeof(ctx->mixer_group));
-
-    snd_pcm_channel_setup_t setup = {0};
-    setup.channel = ctx->channel;
-    setup.mixer_gid = &ctx->mixer_group.gid;
-    r = snd_pcm_plugin_setup(ctx->pcm_handle, &setup);
-    bail_if_error(r);
-
-    debug("Format %s", snd_pcm_get_format_name(setup.format.format));
-    debug("Frag Size %d", setup.buf.block.frag_size);
-    debug("Total Frags %d", setup.buf.block.frags);
-    debug("Rate %d", setup.format.rate);
-    ctx->buffer_size = setup.buf.block.frag_size;
-
-    if (ctx->channel == SND_PCM_CHANNEL_PLAYBACK) {
-        /* Prepare ring buffer */
-        ctx->write_buffer = ringbuf_new(ctx->buffer_size * 10);
-        bail_if_null(ctx->write_buffer);
-    }
-
     r = snd_pcm_plugin_prepare(ctx->pcm_handle, ctx->channel);
     bail_if_error(r);
 
@@ -211,9 +191,7 @@ void qsa_play(aal_handle_t handle) {
     return;
 
 bail:
-    if (ctx->write_buffer) ringbuf_free(&ctx->write_buffer);
-
-    return;
+    debug("Failed to player, error = %d", r);
 }
 
 void qsa_stop(aal_handle_t handle) {
@@ -227,6 +205,7 @@ void qsa_stop(aal_handle_t handle) {
 
 void qsa_destroy(aal_handle_t handle) {
     aal_qsa_context_t* ctx = (aal_qsa_context_t*)handle;
+    if (ctx->write_buffer) ringbuf_free(&ctx->write_buffer);
     if (ctx->mixer_handle) snd_mixer_close(ctx->mixer_handle);
     if (ctx->pcm_handle) snd_pcm_close(ctx->pcm_handle);
     free(ctx);
@@ -299,7 +278,6 @@ aal_handle_t qsa_create_context(int32_t channel, const aal_attributes_t* attrs, 
     /* Set channel direction before calling plugin_info... */
     snd_pcm_channel_info_t channel_info;
     channel_info.channel = ctx->channel;
-    debug("snd_pcm_plugin_info");
     r = snd_pcm_plugin_info(ctx->pcm_handle, &channel_info);
     bail_if_error(r);
 
@@ -347,7 +325,6 @@ aal_handle_t qsa_create_context(int32_t channel, const aal_attributes_t* attrs, 
     }
 
     params.buf.block.frags_min = 1;
-    debug("Configure PCM params and ready");
     r = snd_pcm_plugin_params(ctx->pcm_handle, &params);
     bail_if_error(r);
 
@@ -356,10 +333,29 @@ aal_handle_t qsa_create_context(int32_t channel, const aal_attributes_t* attrs, 
     pthread_getschedparam(pthread_self(), &sched_policy, &sched_param);
     ctx->base_sched_priority = sched_param.sched_priority;
 
+    snd_pcm_channel_setup_t setup = {0};
+    setup.channel = ctx->channel;
+    setup.mixer_gid = &ctx->mixer_group.gid;
+    r = snd_pcm_plugin_setup(ctx->pcm_handle, &setup);
+    bail_if_error(r);
+
+    debug("Format %s", snd_pcm_get_format_name(setup.format.format));
+    debug("Frag Size %d", setup.buf.block.frag_size);
+    debug("Total Frags %d", setup.buf.block.frags);
+    debug("Rate %d", setup.format.rate);
+    ctx->buffer_size = setup.buf.block.frag_size;
+
+    if (ctx->channel == SND_PCM_CHANNEL_PLAYBACK) {
+        /* Prepare ring buffer */
+        ctx->write_buffer = ringbuf_new(ctx->buffer_size * 10);
+        bail_if_null(ctx->write_buffer);
+    }
+
     return ctx;
 
 bail:
     debug("Error status: %d", r);
+    if (ctx->write_buffer) ringbuf_free(&ctx->write_buffer);
     if (ctx->mixer_handle) snd_mixer_close(ctx->mixer_handle);
     if (ctx->pcm_handle) snd_pcm_close(ctx->pcm_handle);
     free(ctx);

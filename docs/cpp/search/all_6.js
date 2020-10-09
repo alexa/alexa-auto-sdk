@@ -19,7 +19,7 @@ var searchData=
   ['getplayerduration',['getPlayerDuration',['../classaace_1_1alexa_1_1_audio_player.html#a79508257fa720e5fe633c5b76c0ff911',1,'aace::alexa::AudioPlayer']]],
   ['getplayerposition',['getPlayerPosition',['../classaace_1_1alexa_1_1_audio_player.html#aa2b61c4887d9bca905914559b23fcf38',1,'aace::alexa::AudioPlayer']]],
   ['getposition',['getPosition',['../classaace_1_1audio_1_1_audio_output.html#a04ff4005d0f36300bc54421906b89299',1,'aace::audio::AudioOutput']]],
-  ['getproperty',['getProperty',['../classaace_1_1core_1_1_engine.html#abab5399f2030131a54f1ba93e4981508',1,'aace::core::Engine::getProperty()'],['../classaace_1_1property_manager_1_1_property_manager.html#a1892fedbf2193e03f040758207a4dea6',1,'aace::propertyManager::PropertyManager::getProperty()']]],
+  ['getproperty',['getProperty',['../classaace_1_1property_manager_1_1_property_manager.html#a1892fedbf2193e03f040758207a4dea6',1,'aace::propertyManager::PropertyManager']]],
   ['getrangecontrollervalue',['getRangeControllerValue',['../classaace_1_1car_control_1_1_car_control.html#a37f2556dd5b73fe6a098679b9cce60d5',1,'aace::carControl::CarControl']]],
   ['getrefreshtoken',['getRefreshToken',['../classaace_1_1cbl_1_1_c_b_l.html#ae957213803bd5ca4a6a19d4133160963',1,'aace::cbl::CBL']]],
   ['getsource',['getSource',['../classaace_1_1alexa_1_1_local_media_source.html#a7876023493487be41be9044c198dfba2',1,'aace::alexa::LocalMediaSource']]],

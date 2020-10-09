@@ -96,42 +96,6 @@ final public class Engine extends NativeRef {
         return registerPlatformInterface(getNativeRef(), platformInterface.getNativeRef());
     }
 
-    /**
-     * @note This method is deprecated. Use
-     *       com.amazon.aace.propertyManager.PropertyManager.setProperty()
-     *
-     * Sets a property value in the Engine
-     *
-     * @param name The name used by the Engine to identify the property.
-     *        The property name must be one of the property constants recognized
-     *        by the Engine, e.g. the properties in
-     *        @c com.amazon.aace.alexa.AlexaProperties.java
-     * @param value The property setting
-     * @return @c true if the property value was updated or set to the current
-     *         setting, else @c false if an error occured.
-     */
-    public boolean setProperty(String key, String value) {
-        return setProperty(getNativeRef(), key, value);
-    }
-
-    /**
-     * @note This method is deprecated. Use
-     *       com.amazon.aace.propertyManager.PropertyManager.getProperty()
-     *
-     * Retrieves the setting for the property identified by
-     * @c name from the Engine
-     *
-     * @param name The name used by the Engine to identify the property.
-     *        The property name must be one of the property constants recognized
-     *        by the Engine, e.g. the properties in
-     *        @c com.amazon.aace.alexa.AlexaProperties.java
-     * @return The property value as a string, or an empty string if the
-     *        property value was not found
-     */
-    public String getProperty(String key) {
-        return getProperty(getNativeRef(), key);
-    }
-
     // Retrieve library names of built modules
     private static void loadModuleLibraries(Context context) {
         try {
@@ -178,7 +142,5 @@ final public class Engine extends NativeRef {
     private native boolean start(long nativeRef);
     private native boolean stop(long nativeRef);
     private native boolean registerPlatformInterface(long nativeRef, long platformInterfaceRef);
-    private native boolean setProperty(long nativeRef, String key, String value);
-    private native String getProperty(long nativeRef, String key);
     private native boolean setNativeEnv(long nativeRef, String name, String value);
 }

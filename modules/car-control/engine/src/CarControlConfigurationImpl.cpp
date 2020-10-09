@@ -40,8 +40,7 @@ CarControlConfigurationImpl::CarControlConfigurationImpl() : m_failed(false) {
     // clang-format off
     m_document = {{
         "aace.carControl", {
-            {"endpoints", json::array()},
-            {"zones", json::array()}
+            {"endpoints", json::array()}
         }
     }};
     // clang-format on
@@ -84,43 +83,6 @@ CarControlConfiguration& CarControlConfigurationImpl::createEndpoint(const std::
         m_allowedOptions = {Option::ENDPOINT};
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("endpointId", endpointId).d("reason", ex.what()));
-        m_failed = true;
-    }
-
-    return *this;
-}
-
-CarControlConfiguration& CarControlConfigurationImpl::createControl(
-    const std::string& controlId,
-    const std::string& zoneId) {
-    try {
-        ThrowIf(m_failed, "previouslyFailed");
-        auto& endpoints = m_document["aace.carControl"]["endpoints"];
-        for (const auto& item : endpoints.items()) {
-            const auto& endpoint = item.value();
-            ThrowIf(endpoint["endpointId"] == controlId, "duplicateEndpoint " + controlId);
-        }
-
-        // clang-format off
-        json endpoint = {
-            {"endpointId", controlId},
-            {"endpointResources", {
-                {"friendlyNames", json::array()}
-            }},
-            {"capabilities", json::array()},
-            {"relationships", {{
-                "isMemberOf", {{
-                    "zoneId", zoneId
-                }}
-            }}}
-        };
-        // clang-format on
-        createDefaultZone(zoneId);
-        endpoints.push_back(endpoint);
-
-        m_allowedOptions = {Option::ENDPOINT};
-    } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("controlId", controlId).d("zoneId", zoneId).d("reason", ex.what()));
         m_failed = true;
     }
 
@@ -680,11 +642,8 @@ CarControlConfiguration& CarControlConfigurationImpl::createZone(const std::stri
     try {
         ThrowIf(m_failed, "previouslyFailed");
 
-        // For compatibility with "default zones" of 2.0.
-        // We remove the "default" zone so it isn't created twice
-        auto index = std::find(m_defaultZones.begin(), m_defaultZones.end(), zoneId);
-        if (index != m_defaultZones.end()) {
-            m_defaultZones.erase(index);
+        if (!m_document["aace.carControl"].contains("zones")) {
+            m_document["aace.carControl"]["zones"] = json::array();
         }
 
         auto& zones = m_document["aace.carControl"]["zones"];
@@ -777,21 +736,6 @@ bool CarControlConfigurationImpl::addUniqueAssetId(json& friendlyNames, const st
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("assetId", assetId).d("reason", ex.what()));
         return false;
-    }
-}
-
-void CarControlConfigurationImpl::createDefaultZone(const std::string& zoneId) {
-    try {
-        auto index = std::find(m_defaultZones.begin(), m_defaultZones.end(), zoneId);
-        if (index != m_defaultZones.end()) {
-            createZone(zoneId);
-            for (auto& assetId : m_idToAssetIds[zoneId]) {
-                addAssetId(assetId);
-            }
-            m_defaultZones.erase(index);
-        }
-    } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
     }
 }
 

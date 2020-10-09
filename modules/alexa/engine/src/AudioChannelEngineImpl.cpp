@@ -30,12 +30,16 @@ static const uint8_t DEFAULT_SPEAKER_VOLUME = 50;
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.AudioChannelEngineImpl");
 
+#define LXT LX(TAG).d("name", m_name)
+
 alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId AudioChannelEngineImpl::s_nextId =
     alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::ERROR;
 
 AudioChannelEngineImpl::AudioChannelEngineImpl(
-    alexaClientSDK::avsCommon::sdkInterfaces::ChannelVolumeInterface::Type channelVolumeType) :
+    alexaClientSDK::avsCommon::sdkInterfaces::ChannelVolumeInterface::Type channelVolumeType,
+    std::string name) :
         alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
+        m_name(std::move(name)),
         m_channelVolumeType(channelVolumeType),
         m_currentId(ERROR),
         m_savedOffset(std::chrono::milliseconds(0)),
@@ -72,13 +76,13 @@ bool AudioChannelEngineImpl::initializeAudioChannel(
 
         return true;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        AACE_ERROR(LXT.d("reason", ex.what()));
         return false;
     }
 }
 
 void AudioChannelEngineImpl::doShutdown() {
-    AACE_INFO(LX(TAG));
+    AACE_INFO(LXT);
 
     m_executor.shutdown();
 
@@ -132,7 +136,7 @@ void AudioChannelEngineImpl::sendEvent(PendingEventState state) {
     } else if (state == PendingEventState::PLAYBACK_PAUSED) {
         m_executor.submit([this, id] { executePlaybackPaused(id); });
     } else {
-        AACE_WARN(LX(TAG).d("reason", "unhandledEventState").d("state", state).d("m_currentId", m_currentId));
+        AACE_WARN(LXT.d("reason", "unhandledEventState").d("state", state).d("m_currentId", m_currentId));
     }
 }
 
@@ -168,8 +172,7 @@ void AudioChannelEngineImpl::executeMediaStateChanged(SourceId id, MediaState st
     std::unique_lock<std::mutex> lock(m_mutex);
 
     try {
-        AACE_VERBOSE(LX(TAG)
-                         .d("currentState", m_currentMediaState)
+        AACE_VERBOSE(LXT.d("currentState", m_currentMediaState)
                          .d("newState", state)
                          .d("pendingEvent", m_pendingEventState)
                          .d("id", id));
@@ -299,8 +302,7 @@ void AudioChannelEngineImpl::executeMediaStateChanged(SourceId id, MediaState st
 
         m_currentMediaState = state;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG)
-                       .d("reason", ex.what())
+        AACE_ERROR(LXT.d("reason", ex.what())
                        .d("currentState", m_currentMediaState)
                        .d("newState", state)
                        .d("pendingEvent", m_pendingEventState)
@@ -309,6 +311,7 @@ void AudioChannelEngineImpl::executeMediaStateChanged(SourceId id, MediaState st
 }
 
 void AudioChannelEngineImpl::onMediaError(MediaError error, const std::string& description) {
+    AACE_VERBOSE(LXT.d("error", error));
     auto id = m_currentId;
     m_executor.submit([this, id, error, description] { executeMediaError(id, error, description); });
     m_pendingEventState = PendingEventState::NONE;
@@ -335,24 +338,24 @@ void AudioChannelEngineImpl::executeMediaError(SourceId id, MediaError error, co
 
         m_currentId = ERROR;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("id", id));
+        AACE_ERROR(LXT.d("reason", ex.what()).d("id", id));
     }
 }
 
 void AudioChannelEngineImpl::handlePrePlaybackStarted(SourceId id) {
-    AACE_DEBUG(LX(TAG).d("Event", "Handling pre-playback started"));
+    AACE_DEBUG(LXT.d("Event", "Handling pre-playback started"));
 }
 
 void AudioChannelEngineImpl::handlePostPlaybackStarted(SourceId id) {
-    AACE_DEBUG(LX(TAG).d("Event", "Handling post-playback started"));
+    AACE_DEBUG(LXT.d("Event", "Handling post-playback started"));
 }
 
 void AudioChannelEngineImpl::handlePrePlaybackFinished(SourceId id) {
-    AACE_DEBUG(LX(TAG).d("Event", "Handling pre-playback finished"));
+    AACE_DEBUG(LXT.d("Event", "Handling pre-playback finished"));
 }
 
 void AudioChannelEngineImpl::handlePostPlaybackFinished(SourceId id) {
-    AACE_DEBUG(LX(TAG).d("Event", "Handling post-playback finished"));
+    AACE_DEBUG(LXT.d("Event", "Handling post-playback finished"));
 }
 
 void AudioChannelEngineImpl::executePlaybackStarted(SourceId id) {
@@ -374,7 +377,7 @@ void AudioChannelEngineImpl::executePlaybackStarted(SourceId id) {
 
         handlePostPlaybackStarted(id);
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState", m_pendingEventState).d("id", id));
+        AACE_ERROR(LXT.d("reason", ex.what()).d("expectedState", m_pendingEventState).d("id", id));
     }
 }
 
@@ -402,7 +405,7 @@ void AudioChannelEngineImpl::executePlaybackFinished(SourceId id) {
 
         handlePostPlaybackFinished(id);
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState", m_pendingEventState).d("id", id));
+        AACE_ERROR(LXT.d("reason", ex.what()).d("expectedState", m_pendingEventState).d("id", id));
     }
 }
 
@@ -425,7 +428,7 @@ void AudioChannelEngineImpl::executePlaybackPaused(SourceId id) {
             }
         }
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState", m_pendingEventState).d("id", id));
+        AACE_ERROR(LXT.d("reason", ex.what()).d("expectedState", m_pendingEventState).d("id", id));
     }
 }
 
@@ -445,7 +448,7 @@ void AudioChannelEngineImpl::executePlaybackResumed(SourceId id) {
             }
         }
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState", m_pendingEventState).d("id", id));
+        AACE_ERROR(LXT.d("reason", ex.what()).d("expectedState", m_pendingEventState).d("id", id));
     }
 }
 
@@ -468,7 +471,7 @@ void AudioChannelEngineImpl::executePlaybackStopped(SourceId id) {
             }
         }
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState", m_pendingEventState).d("id", id));
+        AACE_ERROR(LXT.d("reason", ex.what()).d("expectedState", m_pendingEventState).d("id", id));
     }
 }
 
@@ -492,7 +495,7 @@ void AudioChannelEngineImpl::executePlaybackError(SourceId id, MediaError error,
 
         m_currentId = ERROR;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("id", id).d("error", error).d("description", description));
+        AACE_ERROR(LXT.d("reason", ex.what()).d("id", id).d("error", error).d("description", description));
     }
 }
 
@@ -512,7 +515,7 @@ void AudioChannelEngineImpl::executeBufferUnderrun(SourceId id) {
             }
         }
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("id", id));
+        AACE_ERROR(LXT.d("reason", ex.what()).d("id", id));
     }
 }
 
@@ -532,7 +535,7 @@ void AudioChannelEngineImpl::executeBufferRefilled(SourceId id) {
             }
         }
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("id", id));
+        AACE_ERROR(LXT.d("reason", ex.what()).d("id", id));
     }
 }
 
@@ -556,7 +559,7 @@ alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId Au
     std::unique_lock<std::mutex> lock(m_mutex);
 
     try {
-        AACE_DEBUG(LX(TAG).d("type", "attachment"));
+        AACE_DEBUG(LXT.d("type", "attachment"));
 
         resetSource();
 
@@ -569,7 +572,7 @@ alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId Au
             ThrowIfNot(m_audioOutputChannel->prepare(reader, false), "audioOutputChannelSetStreamFailed");
         }
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("id", m_currentId).d("type", "attachment"));
+        AACE_ERROR(LXT.d("reason", ex.what()).d("id", m_currentId).d("type", "attachment"));
         resetSource();
     }
 
@@ -584,7 +587,7 @@ alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId Au
     std::unique_lock<std::mutex> lock(m_mutex);
 
     try {
-        AACE_DEBUG(LX(TAG).d("type", "stream"));
+        AACE_DEBUG(LXT.d("type", "stream"));
 
         resetSource();
 
@@ -611,8 +614,7 @@ alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId Au
                 "audioOutputChannelSetStreamFailed");
         }
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG)
-                       .d("reason", ex.what())
+        AACE_ERROR(LXT.d("reason", ex.what())
                        .d("expectedState", m_pendingEventState)
                        .d("repeat", repeat)
                        .d("id", m_currentId));
@@ -630,7 +632,7 @@ alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId Au
     std::unique_lock<std::mutex> lock(m_mutex);
 
     try {
-        AACE_DEBUG(LX(TAG).d("type", "url").sensitive("url", url));
+        AACE_DEBUG(LXT.d("type", "url").sensitive("url", url));
 
         resetSource();
 
@@ -643,7 +645,7 @@ alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId Au
             ThrowIfNot(outputChannel->setPosition(offset.count()), "platformMediaPlayerSetPositionFailed");
         }
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("url", url).d("repeat", repeat).d("id", m_currentId));
+        AACE_ERROR(LXT.d("reason", ex.what()).d("url", url).d("repeat", repeat).d("id", m_currentId));
         resetSource();
     }
 
@@ -654,7 +656,7 @@ bool AudioChannelEngineImpl::play(alexaClientSDK::avsCommon::utils::mediaPlayer:
     std::unique_lock<std::mutex> lock(m_mutex);
 
     try {
-        AACE_VERBOSE(LX(TAG).d("id", id));
+        AACE_VERBOSE(LXT.d("id", id));
 
         ThrowIfNot(validateSource(id), "invalidSource");
 
@@ -678,7 +680,7 @@ bool AudioChannelEngineImpl::play(alexaClientSDK::avsCommon::utils::mediaPlayer:
 
         return true;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState", m_pendingEventState).d("id", id));
+        AACE_ERROR(LXT.d("reason", ex.what()).d("expectedState", m_pendingEventState).d("id", id));
         return false;
     }
 }
@@ -687,7 +689,7 @@ bool AudioChannelEngineImpl::stop(alexaClientSDK::avsCommon::utils::mediaPlayer:
     std::unique_lock<std::mutex> lock(m_mutex);
 
     try {
-        AACE_VERBOSE(LX(TAG).d("id", id));
+        AACE_VERBOSE(LXT.d("id", id));
 
         ThrowIfNot(validateSource(id), "invalidSource");
 
@@ -708,7 +710,7 @@ bool AudioChannelEngineImpl::stop(alexaClientSDK::avsCommon::utils::mediaPlayer:
 
         return true;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState", m_pendingEventState));
+        AACE_ERROR(LXT.d("reason", ex.what()).d("expectedState", m_pendingEventState));
         return false;
     }
 }
@@ -717,7 +719,7 @@ bool AudioChannelEngineImpl::pause(alexaClientSDK::avsCommon::utils::mediaPlayer
     std::unique_lock<std::mutex> lock(m_mutex);
 
     try {
-        AACE_VERBOSE(LX(TAG).d("id", id));
+        AACE_VERBOSE(LXT.d("id", id));
 
         ThrowIfNot(validateSource(id), "invalidSource");
         ReturnIf(id == ERROR, true);
@@ -747,7 +749,7 @@ bool AudioChannelEngineImpl::pause(alexaClientSDK::avsCommon::utils::mediaPlayer
 
         return true;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState", m_pendingEventState).d("id", id));
+        AACE_ERROR(LXT.d("reason", ex.what()).d("expectedState", m_pendingEventState).d("id", id));
         return false;
     }
 }
@@ -756,7 +758,7 @@ bool AudioChannelEngineImpl::resume(alexaClientSDK::avsCommon::utils::mediaPlaye
     std::unique_lock<std::mutex> lock(m_mutex);
 
     try {
-        AACE_VERBOSE(LX(TAG).d("id", id));
+        AACE_VERBOSE(LXT.d("id", id));
 
         ThrowIfNot(validateSource(id), "invalidSource");
 
@@ -783,7 +785,7 @@ bool AudioChannelEngineImpl::resume(alexaClientSDK::avsCommon::utils::mediaPlaye
 
         return true;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("expectedState", m_pendingEventState).d("id", id));
+        AACE_ERROR(LXT.d("reason", ex.what()).d("expectedState", m_pendingEventState).d("id", id));
         return false;
     }
 }
@@ -798,7 +800,7 @@ std::chrono::milliseconds AudioChannelEngineImpl::getOffset(
 
         return offset;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("id", id));
+        AACE_ERROR(LXT.d("reason", ex.what()).d("id", id));
         return std::chrono::milliseconds(0);
     }
 }
@@ -811,7 +813,7 @@ uint64_t AudioChannelEngineImpl::getNumBytesBuffered() {
             return 0;
         }
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        AACE_ERROR(LXT.d("reason", ex.what()));
         return 0;
     }
 }
@@ -836,7 +838,7 @@ void AudioChannelEngineImpl::removeObserver(
     std::shared_ptr<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerObserverInterface> observer) {
     std::unique_lock<std::mutex> lock(m_mediaPlayerObserverMutex);
     auto numberErased = m_mediaPlayerObservers.erase(observer);
-    AACE_DEBUG(LX(TAG).d("removed observers", numberErased));
+    AACE_DEBUG(LXT.d("removed observers", numberErased));
 }
 
 bool AudioChannelEngineImpl::validateSource(
@@ -845,7 +847,7 @@ bool AudioChannelEngineImpl::validateSource(
         ThrowIf(m_currentId != id, "invalidSource");
         return true;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("id", id).d("currentId", m_currentId));
+        AACE_ERROR(LXT.d("reason", ex.what()).d("id", id).d("currentId", m_currentId));
         return false;
     }
 }
@@ -867,7 +869,7 @@ bool AudioChannelEngineImpl::setVolume(int8_t volume) {
 
         return true;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("id", m_currentId).d("volume", volume));
+        AACE_ERROR(LXT.d("reason", ex.what()).d("id", m_currentId).d("volume", volume));
         return false;
     }
 }
@@ -884,7 +886,7 @@ bool AudioChannelEngineImpl::setMute(bool mute) {
 
         return true;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("id", m_currentId).d("mute", mute));
+        AACE_ERROR(LXT.d("reason", ex.what()).d("id", m_currentId).d("mute", mute));
         return false;
     }
 }
@@ -896,7 +898,7 @@ bool AudioChannelEngineImpl::getSpeakerSettings(
         settings->mute = m_muted;
         return true;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("id", m_currentId));
+        AACE_ERROR(LXT.d("reason", ex.what()).d("id", m_currentId));
         return false;
     }
 }
@@ -909,7 +911,7 @@ void AudioChannelEngineImpl::onAuthStateChange(
     // Stop audio playback if we are not authenticated
     if (state == alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State::UNINITIALIZED) {
         if (m_audioOutputChannel != nullptr) {
-            AACE_INFO(LX(TAG).m("Stop audio playback since we are not authenticated"));
+            AACE_INFO(LXT.m("Stop audio playback since we are not authenticated"));
             m_audioOutputChannel->stop();
         }
     }

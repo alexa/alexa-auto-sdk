@@ -27,7 +27,7 @@ final public class StreamConfiguration extends EngineConfiguration {
             int size;
 
             while ((size = is.read(buffer)) > 0) {
-                mByteArray.write(buffer);
+                mByteArray.write(buffer, 0, size);
             }
         } catch (Throwable ex) {
             ex.printStackTrace();

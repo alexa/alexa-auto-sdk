@@ -416,13 +416,13 @@ engine->start();
 ```
 
 ## Stopping the Engine <a id ="stopping-the-engine"></a>
-If you need to stop the engine for any reason, use the Engine's `stop()` method. You can then restart the Engine by calling `start()` again.
+If you need to stop the engine for any reason except for logging out the user, use the Engine's `stop()` method. You can then restart the Engine by calling `start()` again.
 
 ```
 engine->stop();
 ```
 
-You should call `dispose()` on the Engine when the app is being destroyed.
+You should call `dispose()` on the Engine when the app is being destroyed or the user is logged out. This makes sure when the next user logs in, a corresponding publish message is sent to the cloud with new capabilities and configuration that is tied to the new user. 
 
 ```
 engine->dispose();
@@ -438,8 +438,6 @@ The Auto SDK Property Manager maintains the runtime properties by storing proper
     >**Note:** `setProperty()` is asynchronous. After calling `setProperty()`, `getProperty()` returns the updated value only after the Engine calls `propertyStateChanged()` with `PropertyState::SUCCEEDED`.
 * `propertyStateChanged()` - notifies your application about the status of a property value change (`SUCCEEDED` or `FAILED`). This is an asynchronous response to your application's call to `setProperty()`.
 * `propertyChanged()` - notifies your application about a property value change in the Engine that was initiated internally, either by AVS or an Engine component.
-
->**NOTE:** `PropertyManager::setProperty()` and `PropertyManager::getProperty()` replace deprecated `Engine::setProperty()` and `Engine::getProperty()` in Auto SDK v2.2 and later.
 
 ### Property Manager Sequence Diagrams
 

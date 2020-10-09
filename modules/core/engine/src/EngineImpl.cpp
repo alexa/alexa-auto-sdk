@@ -36,9 +36,6 @@ namespace aace {
 namespace engine {
 namespace core {
 
-// default user agent constant
-static const std::string USER_AGENT_NAME = "AlexaAutoSDK";
-
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.core.EngineImpl");
 
@@ -51,7 +48,7 @@ std::shared_ptr<EngineImpl> EngineImpl::create() {
 
         return engine;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "create").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return nullptr;
     }
 }
@@ -65,9 +62,9 @@ EngineImpl::~EngineImpl() {
 
 bool EngineImpl::initialize() {
     try {
-        AACE_INFO(LX(TAG, "initialize").d("engineVersion", aace::engine::core::version::getEngineVersion()));
+        AACE_INFO(LX(TAG).d("engineVersion", aace::engine::core::version::getEngineVersion()));
 #ifndef NO_SIGPIPE
-        AACE_VERBOSE(LX(TAG, "initialize").d("signal", "SIGPIPE").d("value", "SIG_IGN"));
+        AACE_VERBOSE(LX(TAG).d("signal", "SIGPIPE").d("value", "SIG_IGN"));
         ThrowIf(std::signal(SIGPIPE, SIG_IGN) == SIG_ERR, "setSignalFailed");
 #endif
 
@@ -85,7 +82,7 @@ bool EngineImpl::initialize() {
         ThrowIfNot(registerProperties(), "registerPropertiesFailed");
         return true;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "initialize").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
 }
@@ -101,7 +98,7 @@ bool EngineImpl::registerProperties() {
             aace::core::property::VERSION, nullptr, std::bind(&EngineImpl::getProperty_version, this)));
         return true;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "initialize").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
 }
@@ -109,25 +106,25 @@ bool EngineImpl::registerProperties() {
 bool EngineImpl::shutdown() {
     try {
         if (m_initialized == false) {
-            AACE_WARN(LX(TAG, "shutdown").m("Attempting to shutdown engine that is not initialized - doing nothing."));
+            AACE_WARN(LX(TAG).m("Attempting to shutdown engine that is not initialized - doing nothing."));
             return true;
         }
 
         // engine must be stopped before shutdown, but continue with shutdown if failed...
         if (stop() == false) {
-            AACE_ERROR(LX(TAG, "shutdown").d("reason", "stopEngineFailed"));
+            AACE_ERROR(LX(TAG).d("reason", "stopEngineFailed"));
         }
 
-        AACE_DEBUG(LX(TAG, "shutdown").m("EngineShutdown"));
+        AACE_DEBUG(LX(TAG).m("EngineShutdown"));
 
         // iterate through registered engine services and call shutdown() for each module
         for (auto next : m_orderedServiceList) {
-            AACE_DEBUG(LX(TAG, "shutdown").m(next->getDescription().getType()));
+            AACE_DEBUG(LX(TAG).m(next->getDescription().getType()));
 
             // if shutting down the service failed throw an error but continue with
             // shutting down remaining services
             if (next->handleShutdownEngineEvent() == false) {
-                AACE_ERROR(LX(TAG, "shutdown")
+                AACE_ERROR(LX(TAG)
                                .d("reason", "handleShutdownEngineEventFailed")
                                .d("service", next->getDescription().getType()));
             }
@@ -141,7 +138,7 @@ bool EngineImpl::shutdown() {
 
         return true;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "shutdown").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
 }
@@ -151,7 +148,7 @@ bool EngineImpl::configure(std::shared_ptr<aace::core::config::EngineConfigurati
         ThrowIfNull(configuration, "invalidConfiguration");
         return configure({configuration});
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "configure").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
 }
@@ -163,7 +160,7 @@ bool EngineImpl::configure(
 
 bool EngineImpl::configure(std::vector<std::shared_ptr<aace::core::config::EngineConfiguration>> configurationList) {
     try {
-        AACE_DEBUG(LX(TAG, "configure").m("EngineConfigure"));
+        AACE_DEBUG(LX(TAG).m("EngineConfigure"));
 
         ThrowIfNot(m_initialized, "engineNotInitialized");
         ThrowIf(m_running, "engineRunning");
@@ -175,11 +172,11 @@ bool EngineImpl::configure(std::vector<std::shared_ptr<aace::core::config::Engin
         rapidjson::Document configuration(rapidjson::kObjectType);
         auto root = configuration.GetObject();
 
-        for (auto next : configurationList) {
-            ThrowIfNull(next, "invalidConfiguration");
+        for (auto nextStream : configurationList) {
+            ThrowIfNull(nextStream, "invalidConfiguration");
 
             // parse the next configuration stream
-            auto document = aace::engine::utils::json::parse(next->getStream());
+            auto document = aace::engine::utils::json::parse(nextStream->getStream());
             ThrowIfNull(document, "parseConfigurationStreamFailed");
 
             // merge the document with the main configuration
@@ -201,6 +198,10 @@ bool EngineImpl::configure(std::vector<std::shared_ptr<aace::core::config::Engin
                 ThrowIfNot(
                     nextService->handleConfigureEngineEvent(aace::engine::utils::json::toStream(subDocument)),
                     "Service failed to configure: " + nextService->getDescription().getType());
+            } else {
+                ThrowIfNot(
+                    nextService->handleConfigureEngineEvent(nullptr),
+                    "Service failed to configure: " + nextService->getDescription().getType());
             }
         }
 
@@ -213,7 +214,7 @@ bool EngineImpl::configure(std::vector<std::shared_ptr<aace::core::config::Engin
 
         return true;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "configure").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
 }
@@ -313,12 +314,12 @@ bool EngineImpl::checkServices() {
         for (auto next : m_orderedServiceList) {
             auto desc = next->getDescription();
             auto version = desc.getVersion();
-            AACE_INFO(LX(TAG, "checkServices").m(desc.getType()).d("v", version.toString()));
+            AACE_INFO(LX(TAG).m(desc.getType()).d("v", version.toString()));
         }
 
         return true;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "checkServices").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
         m_orderedServiceList.clear();
         m_registeredServiceMap.clear();
         return false;
@@ -327,8 +328,8 @@ bool EngineImpl::checkServices() {
 
 bool EngineImpl::start() {
     try {
-        AACE_DEBUG(LX(TAG, "start").m("EngineStart"));
-        CORE_METRIC(LX(TAG, "start"), aace::engine::core::CoreMetrics::Location::ENGINE_START_BEGIN);
+        AACE_DEBUG(LX(TAG).m("EngineStart"));
+        CORE_METRIC(LX(TAG), aace::engine::core::CoreMetrics::Location::ENGINE_START_BEGIN);
 
         ThrowIf(m_running, "engineAlreadyRunning");
         ThrowIfNot(m_initialized, "engineNotInitialized");
@@ -358,22 +359,22 @@ bool EngineImpl::start() {
         // set the engine running flag to true
         m_running = true;
 
-        CORE_METRIC(LX(TAG, "start"), aace::engine::core::CoreMetrics::Location::ENGINE_START_END);
+        CORE_METRIC(LX(TAG), aace::engine::core::CoreMetrics::Location::ENGINE_START_END);
         return true;
     } catch (std::exception& ex) {
-        CORE_METRIC(LX(TAG, "start"), aace::engine::core::CoreMetrics::Location::ENGINE_START_EXCEPTION);
-        AACE_ERROR(LX(TAG, "start").d("reason", ex.what()));
+        CORE_METRIC(LX(TAG), aace::engine::core::CoreMetrics::Location::ENGINE_START_EXCEPTION);
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
 }
 
 bool EngineImpl::stop() {
     try {
-        AACE_DEBUG(LX(TAG, "stop").m("EngineStop"));
-        CORE_METRIC(LX(TAG, "stop"), aace::engine::core::CoreMetrics::Location::ENGINE_STOP_BEGIN);
+        AACE_DEBUG(LX(TAG).m("EngineStop"));
+        CORE_METRIC(LX(TAG), aace::engine::core::CoreMetrics::Location::ENGINE_STOP_BEGIN);
 
         if (m_running == false) {
-            AACE_WARN(LX(TAG, "stop").m("Attempting to stop engine that is not running - doing nothing."));
+            AACE_WARN(LX(TAG).m("Attempting to stop engine that is not running - doing nothing."));
             return true;
         }
 
@@ -385,11 +386,11 @@ bool EngineImpl::stop() {
         // set the engine running and configured flag to false - the engine must be reconfigured before starting again
         m_running = false;
 
-        CORE_METRIC(LX(TAG, "stop"), aace::engine::core::CoreMetrics::Location::ENGINE_STOP_END);
+        CORE_METRIC(LX(TAG), aace::engine::core::CoreMetrics::Location::ENGINE_STOP_END);
         return true;
     } catch (std::exception& ex) {
-        CORE_METRIC(LX(TAG, "stop"), aace::engine::core::CoreMetrics::Location::ENGINE_STOP_EXCEPTION);
-        AACE_ERROR(LX(TAG, "stop").d("reason", ex.what()));
+        CORE_METRIC(LX(TAG), aace::engine::core::CoreMetrics::Location::ENGINE_STOP_EXCEPTION);
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
 }
@@ -421,34 +422,6 @@ std::string EngineImpl::getProperty_version() {
     }
 }
 
-bool EngineImpl::setProperty(const std::string& name, const std::string& value) {
-    try {
-        // get the property engine service interface from the property manager service
-        auto propertyManager =
-            getServiceInterface<aace::engine::propertyManager::PropertyManagerServiceInterface>("aace.propertyManager");
-        ThrowIfNull(propertyManager, "nullPropertyManagerServiceInterface");
-
-        return propertyManager->setProperty(name, value, true);
-    } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("name", name).sensitive("value", value));
-        return false;
-    }
-}
-
-std::string EngineImpl::getProperty(const std::string& name) {
-    try {
-        // get the property engine service interface from the property manager service
-        auto propertyManager =
-            getServiceInterface<aace::engine::propertyManager::PropertyManagerServiceInterface>("aace.propertyManager");
-        ThrowIfNull(propertyManager, "nullPropertyManagerServiceInterface");
-
-        return propertyManager->getProperty(name);
-    } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("name", name));
-        return std::string();
-    }
-}
-
 bool EngineImpl::registerPlatformInterface(std::shared_ptr<aace::core::PlatformInterface> platformInterface) {
     try {
         ThrowIfNot(m_configured, "engineNotConfigured");
@@ -462,7 +435,7 @@ bool EngineImpl::registerPlatformInterface(std::shared_ptr<aace::core::PlatformI
 
         Throw("platformInterfaceNotRegistered");
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "registerPlatformInterface").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
 }
@@ -478,7 +451,7 @@ bool EngineImpl::registerPlatformInterface(
 
         return true;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "registerPlatformInterface").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
 }

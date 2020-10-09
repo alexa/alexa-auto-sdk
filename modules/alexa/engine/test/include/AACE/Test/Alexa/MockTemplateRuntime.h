@@ -25,9 +25,15 @@ namespace alexa {
 
 class MockTemplateRuntime : public aace::alexa::TemplateRuntime {
 public:
-    MOCK_METHOD1(renderTemplate, void(const std::string& payload));
+    MOCK_METHOD2(renderTemplate, void(const std::string& payload, FocusState focusState));
     MOCK_METHOD0(clearTemplate, void());
-    MOCK_METHOD1(renderPlayerInfo, void(const std::string& payload));
+    MOCK_METHOD4(
+        renderPlayerInfo,
+        void(
+            const std::string& payload,
+            PlayerActivity audioPlayerState,
+            std::chrono::milliseconds offset,
+            FocusState focusState));
     MOCK_METHOD0(clearPlayerInfo, void());
 };
 

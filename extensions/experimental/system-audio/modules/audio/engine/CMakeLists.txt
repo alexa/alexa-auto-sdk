@@ -13,6 +13,9 @@ find_path(RAPIDJSON_INCLUDE_DIR rapidjson/rapidjson.h
     CMAKE_FIND_ROOT_PATH_BOTH
 )
 
+# For debugging purpose since setting breakpoints in AAL can easily cause state timeout
+target_compile_definitions(AACESystemAudioEngine PRIVATE SYSTEM_AUDIO_EXTEND_STATE_TIMEOUT=0)
+
 target_include_directories(AACESystemAudioEngine
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

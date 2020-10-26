@@ -131,20 +131,6 @@ abstract public class TemplateRuntime extends PlatformInterface {
     public TemplateRuntime() {}
 
     /**
-     * @deprecated
-     * Use @c renderTemplate( String payload, FocusState focusState ).
-     *
-     * Provides visual metadata associated with a user request to Alexa.
-     * The platform implementation should parse the template metadata and render
-     * a display card for the user.
-     *
-     * For supported templates and rendering guidelines, see https://alexa.design/DevDocRenderTemplate
-     *
-     * @param [in] payload Renderable template metadata in structured JSON format
-     */
-    public void renderTemplate(String payload) {}
-
-    /**
      * Provides visual metadata associated with a user request to Alexa.
      * The platform implementation should parse the template metadata and render
      * a display card for the user.
@@ -154,25 +140,7 @@ abstract public class TemplateRuntime extends PlatformInterface {
      * @param [in] payload Renderable template metadata in structured JSON format
      * @param [in] focusState The @c FocusState of the channel used by TemplateRuntime interface
      */
-    public void renderTemplate(String payload, FocusState focusState) {
-        renderTemplate(payload);
-    }
-
-    /**
-     * @deprecated
-     * Use @c renderPlayerInfo( String payload, PlayerActivity audioPlayerState, long offset, FocusState focusState ).
-     *
-     * Provides visual metadata associated with a user request to Alexa for audio playback.
-     * The platform implementation should parse the player info metadata and render
-     * a display card for the user.
-     *
-     * For rendering guidelines, see https://amzn.to/DevDocTemplatePlayerInfo
-     *
-     * @param [in] payload Renderable player info metadata in structured JSON format
-     * @sa PlaybackController
-     * @sa AudioPlayer
-     */
-    public void renderPlayerInfo(String payload) {}
+    public void renderTemplate(String payload, FocusState focusState) {}
 
     /**
      * Provides visual metadata associated with a user request to Alexa for audio playback.
@@ -190,9 +158,7 @@ abstract public class TemplateRuntime extends PlatformInterface {
      * @sa PlaybackController
      * @sa AudioPlayer
      */
-    public void renderPlayerInfo(String payload, PlayerActivity audioPlayerState, long offset, FocusState focusState) {
-        renderPlayerInfo(payload);
-    }
+    public void renderPlayerInfo(String payload, PlayerActivity audioPlayerState, long offset, FocusState focusState) {}
 
     /**
      * Notifies the platform implementation to dismiss the template display card

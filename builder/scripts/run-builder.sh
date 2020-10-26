@@ -144,6 +144,10 @@ while [[ $# -gt 0 ]]; do
 		ENABLE_COVERAGE=1
 		shift
 		;;
+		--aacs-android)
+		AACS_ANDROID="1"
+		shift
+		;;
 		-D*=*)
 		DEFINES+=("$1")
 		shift
@@ -172,6 +176,9 @@ LATENCY_LOGS=${LATENCY_LOGS:-0}
 ENABLE_TESTS=${ENABLE_TESTS:-0}
 FORCE_DOCKER=${FORCE_DOCKER:-0}
 USE_MBEDTLS=${USE_MBEDTLS:-0}
+AACS_ANDROID=${AACS_ANDROID:-0}
+COMMS=${COMMS:-0}
+AASB=${AASB:-0}
 
 SCRIPT_OPTIONS=""
 EXTRA_MODULES=$@
@@ -261,11 +268,24 @@ build_sdk() {
 	local extra_local_conf="${BUILDER_HOME}/.extralocal.conf"
 	local audio_extension="${SDK_HOME}/extensions/experimental/system-audio"
 	local sample_app="${SDK_HOME}/samples/cpp/aac-sample-cpp.bb"
+	local aasb_extension="${SDK_HOME}/extensions/aasb"
+	local aasb_comms_extension="${SDK_HOME}/extensions/extras/alexacomms/extensions/aasb-comms"
+	local audio_extension="${SDK_HOME}/extensions/experimental/system-audio"
 	local platform=$1
 
 	case ${platform} in
 	"android")
 		available_targets=("androidarm" "androidarm64" "androidx86" "androidx86-64")
+		if [[ "${AACS_ANDROID}" = "1" ]] && [[ "${COMMS}" = "1" ]] 
+		then
+			extensions="${aasb_extension} ${aasb_comms_extension}"
+		elif [[ "${COMMS}" = "1" ]] && [[ "${AASB}" = "1" ]] 
+		then
+			extensions="${aasb_comms_extension}"
+		elif [ "${AACS_ANDROID}" = "1" ]; 
+		then 
+		   	extensions="${aasb_extension}"
+		fi
 		;;
 	"qnx7")
 		available_targets=("qnx7arm64" "qnx7x86-64")
@@ -275,10 +295,6 @@ build_sdk() {
 	"linux")
 		available_targets=("native" "pokyarm" "pokyarm64" "linaroarmel" "linaroarmhf" "linaroarm64")
 		extensions="${sample_app} ${audio_extension}"
-		;;
-	"agl")
-		available_targets=("aglarm64")
-		extensions="${audio_extension}"
 		;;
 	*)
 		error "Unknown platform: ${platform}"
@@ -315,6 +331,23 @@ if [ ${PLATFORM} = "clean" ]; then
 	exit $?
 fi
 
+
+check_extra_module() {
+        local module=$(realpath ${1})
+        local module_name=$(basename ${module})
+        if [ "${module_name}" = "alexacomms" ];
+        then
+                COMMS=1
+        elif [ "${module_name}" = "aasb" ];
+        then
+                AASB=1
+        fi
+}
+
+for module in ${EXTRA_MODULES} ; do
+	check_extra_module ${module}
+done
+
 # Run OE build for all platforms
 build_sdk ${PLATFORM}
 
@@ -324,5 +357,8 @@ if [ ${PLATFORM} = "android" ]; then
 	if [ ${DEBUG_BUILD} = 1 ]; then
 		gradle_options="${gradle_options} -g"
 	fi
-	${THISDIR}/run-gradle.sh ${gradle_options} ${EXTRA_MODULES}
+	${THISDIR}/run-gradle.sh ${gradle_options} ${EXTRA_MODULES} ${extensions}
+        if [ ${AACS_ANDROID} = "1" ]; then
+		${THISDIR}/run-aacs-android.sh ${gradle_options} ${EXTRA_MODULES} 
+	fi
 fi

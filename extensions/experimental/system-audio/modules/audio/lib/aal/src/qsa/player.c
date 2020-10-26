@@ -26,7 +26,6 @@ static aal_handle_t qsa_player_create(const aal_attributes_t* attrs, aal_audio_p
 static void qsa_player_pause(aal_handle_t handle) {
     aal_qsa_context_t* ctx = (aal_qsa_context_t*)handle;
 
-    debug("Request pause");
     pthread_mutex_lock(&ctx->lock);
     ctx->stop_requested = true;
     pthread_mutex_unlock(&ctx->lock);
@@ -50,7 +49,7 @@ int64_t qsa_player_get_position(aal_handle_t handle) {
 }
 
 int64_t qsa_player_get_duration(aal_handle_t handle) {
-    debug("player_get_duration not supported");
+    debug("qsa_player_get_duration not supported");
     return -1;
 }
 
@@ -66,7 +65,7 @@ int64_t qsa_player_get_num_bytes_buffered(aal_handle_t handle) {
 }
 
 void qsa_player_seek(aal_handle_t handle, int64_t position) {
-    debug("player_seek not supported");
+    debug("qsa_player_seek not supported");
 }
 
 static bool player_set_volume(aal_qsa_context_t* ctx, double volume) {
@@ -89,11 +88,13 @@ static bool player_set_volume(aal_qsa_context_t* ctx, double volume) {
     return true;
 
 bail:
-    debug("failed to set volume");
+    debug("Failed to set volume, error = %d", r);
     return false;
 }
 
 void qsa_player_set_volume(aal_handle_t handle, double volume) {
+    debug("Set volume %f", volume);
+
     aal_qsa_context_t* ctx = (aal_qsa_context_t*)handle;
 
     if (player_set_volume(ctx, volume)) {
@@ -102,6 +103,8 @@ void qsa_player_set_volume(aal_handle_t handle, double volume) {
 }
 
 void qsa_player_set_mute(aal_handle_t handle, bool mute) {
+    debug("Set mute %d", mute);
+
     aal_qsa_context_t* ctx = (aal_qsa_context_t*)handle;
 
     if (mute) {

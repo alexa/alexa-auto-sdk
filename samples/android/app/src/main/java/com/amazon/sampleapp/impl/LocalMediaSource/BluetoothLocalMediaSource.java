@@ -1,15 +1,12 @@
 package com.amazon.sampleapp.impl.LocalMediaSource;
 
-import android.content.Context;
-
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
-import com.amazon.sampleapp.impl.PlaybackController.PlaybackControllerHandler;
 
 public class BluetoothLocalMediaSource extends LocalMediaSourceHandler {
     String m_state = "IDLE";
-    public BluetoothLocalMediaSource(
-            Context context, LoggerHandler logger, PlaybackControllerHandler playbackControllerHandler) {
-        super(context, logger, Source.BLUETOOTH, playbackControllerHandler);
+
+    public BluetoothLocalMediaSource(LoggerHandler logger) {
+        super(logger, Source.BLUETOOTH);
     }
 
     @Override

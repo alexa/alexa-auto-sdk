@@ -72,6 +72,7 @@ public:
 
 protected:
     virtual bool initialize();
+    virtual bool configure();
     virtual bool configure(std::shared_ptr<std::istream> configuration);
     virtual bool preRegister();
     virtual bool postRegister();
@@ -162,10 +163,6 @@ private:
 
 class EngineContext {
 public:
-    virtual std::string getProperty(const std::string& key) = 0;
-
-    virtual bool setProperty(const std::string& key, const std::string& value) = 0;
-
     virtual bool registerPlatformInterface(std::shared_ptr<aace::core::PlatformInterface> platformInterface) = 0;
 
     template <class T>

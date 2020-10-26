@@ -1,0 +1,1 @@
+static const char* AASB_APL_MODULE = "aasb.apl";

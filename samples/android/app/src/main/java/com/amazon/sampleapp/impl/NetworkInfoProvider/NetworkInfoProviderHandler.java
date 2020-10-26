@@ -38,6 +38,7 @@ import com.amazon.aace.network.NetworkInfoProvider;
 import com.amazon.aace.network.NetworkProperties;
 import com.amazon.sampleapp.R;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
+import com.amazon.sampleapp.impl.PropertyManager.PropertyManagerHandler;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -47,7 +48,7 @@ public class NetworkInfoProviderHandler extends NetworkInfoProvider {
 
     private final Activity mActivity;
     private final LoggerHandler mLogger;
-    private final Engine mEngine;
+    private final PropertyManagerHandler mPropertyManager;
     private final WifiManager mWifiManager;
     private final ConnectivityManager mConnectivityManager;
     private final NetworkChangeReceiver mReceiver;
@@ -61,10 +62,10 @@ public class NetworkInfoProviderHandler extends NetworkInfoProvider {
     // List of Network Connection observers
     private Set<NetworkConnectionObserver> mObservers;
 
-    public NetworkInfoProviderHandler(Activity activity, LoggerHandler logger, Engine engine) {
+    public NetworkInfoProviderHandler(Activity activity, LoggerHandler logger, PropertyManagerHandler propertyManager) {
         mActivity = activity;
         mLogger = logger;
-        mEngine = engine;
+        mPropertyManager = propertyManager;
         mStatus = NetworkStatus.UNKNOWN;
 
         // Initialize GUI components
@@ -244,7 +245,7 @@ public class NetworkInfoProviderHandler extends NetworkInfoProvider {
     }
 
     private boolean setNetworkInterface(String interfaceText) {
-        return mEngine.setProperty(NetworkProperties.NETWORK_INTERFACE, interfaceText);
+        return mPropertyManager.setProperty(NetworkProperties.NETWORK_INTERFACE, interfaceText);
     }
 
     private void startSetNetworkInterfaceAsyncTask(String interfaceText, String alertSecondaryMessage) {

@@ -20,6 +20,7 @@ include(${AAC_HOME}/share/cmake/AACENavigation.cmake)
 set(NAVIGATION_CPP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/main/cpp)
 set(NAVIGATION_SOURCE
     ${NAVIGATION_CPP_DIR}/src/Navigation/NavigationBinder.cpp
+    ${NAVIGATION_CPP_DIR}/src/Navigation/NavigationConfigurationBinder.cpp
 )
 set(NAVIGATION_DEPENDENCIES
     AACENavigationPlatform

@@ -52,20 +52,6 @@ public:
     virtual ~TemplateRuntime();
 
     /**
-     * @deprecated
-     * Use @c renderTemplate( const std::string& payload, FocusState focusState ).
-     *
-     * Provides visual metadata associated with a user request to Alexa.
-     * The platform implementation should parse the template metadata and render
-     * a display card for the user.
-     *
-     * For supported templates and rendering guidelines, see https://alexa.design/DevDocRenderTemplate
-     *
-     * @param [in] payload Renderable template metadata in structured JSON format
-     */
-    virtual void renderTemplate(const std::string& payload);
-
-    /**
      * Provides visual metadata associated with a user request to Alexa.
      * The platform implementation should parse the template metadata and render
      * a display card for the user.
@@ -75,28 +61,12 @@ public:
      * @param [in] payload Renderable template metadata in structured JSON format
      * @param [in] focusState The @c FocusState of the channel used by TemplateRuntime interface
      */
-    virtual void renderTemplate(const std::string& payload, FocusState focusState);
+    virtual void renderTemplate(const std::string& payload, FocusState focusState) = 0;
 
     /**
      * Notifies the platform implementation to dismiss the template display card
      */
     virtual void clearTemplate() = 0;
-
-    /**
-     * @deprecated
-     * Use @c renderPlayerInfo( const std::string& payload, PlayerActivity audioPlayerState, std::chrono::milliseconds offset, FocusState focusState ).
-     *
-     * Provides visual metadata associated with a user request to Alexa for audio playback.
-     * The platform implementation should parse the player info metadata and render
-     * a display card for the user.
-     *
-     * For rendering guidelines, see https://amzn.to/DevDocTemplatePlayerInfo
-     *
-     * @param [in] payload Renderable player info metadata in structured JSON format
-     * @sa PlaybackController
-     * @sa AudioPlayer
-     */
-    virtual void renderPlayerInfo(const std::string& payload);
 
     /**
      * Provides visual metadata associated with a user request to Alexa for audio playback.
@@ -118,7 +88,7 @@ public:
         const std::string& payload,
         PlayerActivity audioPlayerState,
         std::chrono::milliseconds offset,
-        FocusState focusState);
+        FocusState focusState) = 0;
 
     /**
      * Notifies the platform implementation to dismiss the player info display card

@@ -129,7 +129,7 @@ bool SpeechRecognizerEngineImpl::initialize(
         m_wakewordVerifier = wakewordVerifier;
 
         // get the initialize wakeword enabled state from the platform interface
-        m_wakewordEnabled = isWakewordSupported() && m_speechRecognizerPlatformInterface->isWakewordDetectionEnabled();
+        m_wakewordEnabled = isWakewordSupported() && m_initialWakewordEnabledState;
 
         return true;
     } catch (std::exception& ex) {

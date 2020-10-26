@@ -23,7 +23,6 @@
 #include <ADSL/DirectiveSequencer.h>
 #include <Alexa/AlexaInterfaceMessageSender.h>
 #include <Audio/AudioFactory.h>
-
 #include <AVSCommon/AVS/Initialization/AlexaClientSDKInit.h>
 #include <AVSCommon/SDKInterfaces/AVSGatewayManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/HTTPContentFetcherInterface.h>
@@ -32,11 +31,13 @@
 #include <AVSGatewayManager/Storage/AVSGatewayManagerStorage.h>
 #include <CapabilitiesDelegate/Storage/SQLiteCapabilitiesDelegateStorage.h>
 #include <CertifiedSender/SQLiteMessageStorage.h>
+#include <InterruptModel/InterruptModel.h>
 #include <PlaybackController/PlaybackRouter.h>
 #include <SpeechEncoder/OpusEncoderContext.h>
 #include <SQLiteStorage/SQLiteMiscStorage.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
+#include <SynchronizeStateSender/SynchronizeStateSenderFactory.h>
 #include <System/LocaleHandler.h>
 #include <System/ReportStateHandler.h>
 #include <System/SystemCapabilityProvider.h>
@@ -54,6 +55,7 @@
 #include "AACE/Engine/Utils/String/StringUtils.h"
 #include "AACE/Vehicle/VehicleProperties.h"
 #include "AACE/Engine/Vehicle/VehiclePropertyInterface.h"
+#include "AACE/Engine/Alexa/AudioDuckingConfig.h"
 
 namespace aace {
 namespace engine {
@@ -68,21 +70,14 @@ static const std::string ALEXA_SERVICE_LOCAL_STORAGE_TABLE = "aace.alexa";
 // state provider constants
 static const alexaClientSDK::avsCommon::avs::NamespaceAndName LOCATION_STATE{"Geolocation", "GeolocationState"};
 
-// focus manager default audio channels
-static const std::vector<alexaClientSDK::afml::FocusManager::ChannelConfiguration> DEFAULT_AUDIO_CHANNELS = {
-    {alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface::DIALOG_CHANNEL_NAME,
-     alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface::DIALOG_CHANNEL_PRIORITY},
-    {alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface::ALERT_CHANNEL_NAME,
-     alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface::ALERT_CHANNEL_PRIORITY},
-    {alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface::COMMUNICATIONS_CHANNEL_NAME,
-     alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface::COMMUNICATIONS_CHANNEL_PRIORITY},
-    {alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface::CONTENT_CHANNEL_NAME,
-     alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface::CONTENT_CHANNEL_PRIORITY}};
+/// Key for audio channel array configurations in configuration node.
+static const std::string AUDIO_CHANNEL_CONFIG_KEY = "audioChannels";
 
-// focus manager default visual channels
-static const std::vector<alexaClientSDK::afml::FocusManager::ChannelConfiguration> DEFAULT_VISUAL_CHANNELS = {
-    {alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface::VISUAL_CHANNEL_NAME,
-     alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface::VISUAL_CHANNEL_PRIORITY}};
+/// Key for visual channel array configurations in configuration node.
+static const std::string VISUAL_CHANNEL_CONFIG_KEY = "visualChannels";
+
+/// Key for the interrupt model configuration
+static const std::string INTERRUPT_MODEL_CONFIG_KEY = "interruptModel";
 
 static const std::string DEFAULT_AVS_GATEWAY = "https://alexa.na.gateway.devices.a2z.com";
 static const std::string DEFAULT_CBL_ENDPOINT = "https://api.amazon.com/auth/O2/";
@@ -165,12 +160,6 @@ bool AlexaEngineService::registerProperties() {
                 std::placeholders::_4),
             std::bind(&AlexaEngineService::getProperty_locale, this)));
 
-        // Register property - SUPPORTED_LOCALES
-        propertyManager->registerProperty(aace::engine::propertyManager::PropertyDescription(
-            aace::alexa::property::SUPPORTED_LOCALES,
-            nullptr,
-            std::bind(&AlexaEngineService::getProperty_supportedLocales, this)));
-
         // Register property - COUNTRY_SUPPORTED
         propertyManager->registerProperty(aace::engine::propertyManager::PropertyDescription(
             aace::alexa::property::COUNTRY_SUPPORTED,
@@ -210,9 +199,13 @@ bool AlexaEngineService::registerProperties() {
 
 bool AlexaEngineService::configureDeviceSDK(std::shared_ptr<std::istream> configuration) {
     try {
+        // configure static interupt model with audio ducking off
+        std::shared_ptr<std::istream> duckingConfigStream = aace::engine::alexa::AudioDuckingConfig::getConfig(false);
+
         // Initialize the Alexa Client SDK
         ThrowIfNot(
-            alexaClientSDK::avsCommon::avs::initialization::AlexaClientSDKInit::initialize({configuration}),
+            alexaClientSDK::avsCommon::avs::initialization::AlexaClientSDKInit::initialize(
+                {configuration, duckingConfigStream}),
             "initializeAlexaClientSDKFailed");
         auto config = alexaClientSDK::avsCommon::utils::configuration::ConfigurationNode::getRoot();
 
@@ -265,10 +258,15 @@ bool AlexaEngineService::configureDeviceSDK(std::shared_ptr<std::istream> config
             std::move(avsGatewayManagerStorage), m_customerDataManager, config);
         ThrowIfNull(m_avsGatewayManager, "createAVSGatewayManagerFailed");
 
+        // Create Synchronize State Sender Factory instance to utilize Synchroinze State from AVS
+        auto synchronizeStateSenderFactory =
+            alexaClientSDK::synchronizeStateSender::SynchronizeStateSenderFactory::create(m_contextManager);
+        ThrowIfNull(synchronizeStateSenderFactory, "createSynchronizeStateSenderFactoryFailed");
+
         // Create the post-connect sequencer factory - Creates objects that handle tasks right after the AVS
         // connection is established
-        auto postConnectSequencerFactory =
-            alexaClientSDK::acl::PostConnectSequencerFactory::create({m_avsGatewayManager, m_capabilitiesDelegate});
+        auto postConnectSequencerFactory = alexaClientSDK::acl::PostConnectSequencerFactory::create(
+            {m_avsGatewayManager, m_capabilitiesDelegate, synchronizeStateSenderFactory});
         ThrowIfNull(postConnectSequencerFactory, "createPostConnectSequencerFactoryFailed");
 
         // Create the transport factory - Creates objects that handle establishing connection to AVS
@@ -375,11 +373,31 @@ bool AlexaEngineService::configureDeviceSDK(std::shared_ptr<std::istream> config
         ThrowIfNull(m_audioActivityTracker, "createAudioActivityTrackerFailed");
         m_defaultEndpointBuilder->withCapabilityConfiguration(m_audioActivityTracker);
 
+        // configure interrupt model
+        auto interruptModel =
+            alexaClientSDK::afml::interruptModel::InterruptModel::create(config[INTERRUPT_MODEL_CONFIG_KEY]);
+
+        // Read virtual audioChannels configuration from config file
+        std::vector<alexaClientSDK::afml::FocusManager::ChannelConfiguration> audioVirtualChannelConfiguration;
+        if (!alexaClientSDK::afml::FocusManager::ChannelConfiguration::readChannelConfiguration(
+                AUDIO_CHANNEL_CONFIG_KEY, &audioVirtualChannelConfiguration)) {
+            AACE_ERROR(LX(TAG, "readAudioVirtualChannelChannelConfigurationFailed"));
+        }
+
         // Create the audio focus manager - Manages audio focus across various components by enforcing audio channel
         // priority
-        m_audioFocusManager =
-            std::make_shared<alexaClientSDK::afml::FocusManager>(DEFAULT_AUDIO_CHANNELS, m_audioActivityTracker);
+        m_audioFocusManager = std::make_shared<alexaClientSDK::afml::FocusManager>(
+            alexaClientSDK::afml::FocusManager::getDefaultAudioChannels(),
+            m_audioActivityTracker,
+            audioVirtualChannelConfiguration,
+            interruptModel);
         ThrowIfNull(m_audioFocusManager, "createAudioFocusManagerFailed");
+
+        std::vector<alexaClientSDK::afml::FocusManager::ChannelConfiguration> visualVirtualChannelConfiguration;
+        if (!alexaClientSDK::afml::FocusManager::ChannelConfiguration::readChannelConfiguration(
+                VISUAL_CHANNEL_CONFIG_KEY, &visualVirtualChannelConfiguration)) {
+            AACE_ERROR(LX(TAG, "readVisualVirtualChannelConfigurationFailed"));
+        }
 
         // Create the visual activity tracker - Reports the visual channel focus info to AVS
         m_visualActivityTracker = alexaClientSDK::afml::VisualActivityTracker::create(m_contextManager);
@@ -388,8 +406,11 @@ bool AlexaEngineService::configureDeviceSDK(std::shared_ptr<std::istream> config
 
         // Create the visual focus manager - Manages visual focus across various components by enforcing visual channel
         // priority
-        m_visualFocusManager =
-            std::make_shared<alexaClientSDK::afml::FocusManager>(DEFAULT_VISUAL_CHANNELS, m_visualActivityTracker);
+        m_visualFocusManager = std::make_shared<alexaClientSDK::afml::FocusManager>(
+            alexaClientSDK::afml::FocusManager::getDefaultVisualChannels(),
+            m_visualActivityTracker,
+            visualVirtualChannelConfiguration,
+            interruptModel);
         ThrowIfNull(m_visualFocusManager, "createVisualFocusManagerFailed");
 
         // Create the user inactivity manager - Updates AVS of user inactivity per the AVS System interface
@@ -1218,34 +1239,6 @@ std::string AlexaEngineService::getProperty_locale() {
         }
         locales = locales.substr(0, locales.length() - 1);  // removing trailing slash
         return locales;
-    } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
-        return "";
-    }
-}
-
-std::string AlexaEngineService::getProperty_supportedLocales() {
-    try {
-        AACE_INFO(LX(TAG));
-        ThrowIfNull(m_localeAssetManager, "nullLocaleAssetManager");
-        const auto& locales = m_localeAssetManager->getSupportedLocales();
-        const auto& localeCombinations = m_localeAssetManager->getSupportedLocaleCombinations();
-        std::string localeCombinationString;
-        std::string ret;
-        for (auto& locale : locales) {
-            ret += locale + ",";
-        }
-        for (auto& localeCombination : localeCombinations) {
-            localeCombinationString = "";
-            for (auto& locale : localeCombination) {
-                localeCombinationString += locale + "/";
-            }
-            ret += localeCombinationString.substr(0, localeCombinationString.size() - 1) + ",";
-        }
-        if (!ret.empty()) {
-            ret = ret.substr(0, ret.size() - 1);
-        }
-        return ret;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return "";

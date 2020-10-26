@@ -80,23 +80,6 @@ JNIEXPORT void JNICALL Java_com_amazon_aace_carControl_CarControlConfiguration_c
     }
 }
 
-JNIEXPORT void JNICALL Java_com_amazon_aace_carControl_CarControlConfiguration_createControl(
-    JNIEnv*,
-    jobject obj,
-    jlong ref,
-    jstring controlId,
-    jstring zoneId) {
-    try {
-        auto configBinder = ENGINE_CONFIGURATION_BINDER(ref);
-        ThrowIfNull(configBinder, "invalidConfigBinder");
-
-        auto carControlConfig = CAR_CONTROL_CONFIGURATION(configBinder->getConfig());
-        carControlConfig->createControl(JString(controlId).toStdStr(), JString(zoneId).toStdStr());
-    } catch (const std::exception& ex) {
-        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_carControl_CarControlConfiguration_createControl", ex.what());
-    }
-}
-
 JNIEXPORT void JNICALL
 Java_com_amazon_aace_carControl_CarControlConfiguration_addAssetId(JNIEnv*, jobject obj, jlong ref, jstring assetId) {
     try {

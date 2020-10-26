@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">2.3.0</span>
+   &#160;<span id="projectnumber">3.0.0</span>
    </div>
   </td>
  </tr>
@@ -86,10 +86,6 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a456599306224a018b0c7b708594671f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8d127cbe960a7e4e86fb404289011901"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1core_1_1_engine.html#a8d127cbe960a7e4e86fb404289011901">shutdown</a> ()=0</td></tr>
 <tr class="separator:a8d127cbe960a7e4e86fb404289011901"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a65f89859ff67cfaa56051785543ceae2"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1core_1_1_engine.html#a65f89859ff67cfaa56051785543ceae2">setProperty</a> (const std::string &amp;key, const std::string &amp;value)=0</td></tr>
-<tr class="separator:a65f89859ff67cfaa56051785543ceae2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abab5399f2030131a54f1ba93e4981508"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1core_1_1_engine.html#abab5399f2030131a54f1ba93e4981508">getProperty</a> (const std::string &amp;key)=0</td></tr>
-<tr class="separator:abab5399f2030131a54f1ba93e4981508"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abab09ff31a4c13f8841bc124d87c24eb"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1core_1_1_engine.html#abab09ff31a4c13f8841bc124d87c24eb">registerPlatformInterface</a> (std::shared_ptr&lt; <a class="el" href="classaace_1_1core_1_1_platform_interface.html">aace::core::PlatformInterface</a> &gt; platformInterface)=0</td></tr>
 <tr class="separator:abab09ff31a4c13f8841bc124d87c24eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5b1e5999b008bee74249d162c95be7c7"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1core_1_1_engine.html#a5b1e5999b008bee74249d162c95be7c7">registerPlatformInterface</a> (std::initializer_list&lt; std::shared_ptr&lt; <a class="el" href="classaace_1_1core_1_1_platform_interface.html">aace::core::PlatformInterface</a> &gt;&gt; platformInterfaceList)=0</td></tr>
@@ -284,87 +280,6 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a65f89859ff67cfaa56051785543ceae2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a65f89859ff67cfaa56051785543ceae2">&#9670;&nbsp;</a></span>setProperty()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual bool aace::core::Engine::setProperty </td>
-          <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>key</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>value</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="section note"><dt>Note</dt><dd>This method is deprecated. Use <a class="el" href="classaace_1_1property_manager_1_1_property_manager.html#a07bd961c86047b1b1e5de7366bf83820">aace::propertyManager::PropertyManager::setProperty()</a></dd></dl>
-<p>Sets a property value in the <a class="el" href="classaace_1_1core_1_1_engine.html">Engine</a></p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">name</td><td>The name used by the <a class="el" href="classaace_1_1core_1_1_engine.html">Engine</a> to identify the property. The property name must be one of the property constants recognized by the <a class="el" href="classaace_1_1core_1_1_engine.html">Engine</a>, e.g. the properties in <code>aace::alexa::property::AlexaProperties.h</code> </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">value</td><td>The property setting </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the property value was updated or set to the current setting, else <code>false</code> if an error occured. </dd></dl>
-
-</div>
-</div>
-<a id="abab5399f2030131a54f1ba93e4981508"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abab5399f2030131a54f1ba93e4981508">&#9670;&nbsp;</a></span>getProperty()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual std::string aace::core::Engine::getProperty </td>
-          <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>key</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="section note"><dt>Note</dt><dd>This method is deprecated. Use <a class="el" href="classaace_1_1property_manager_1_1_property_manager.html#a1892fedbf2193e03f040758207a4dea6">aace::propertyManager::PropertyManager::getProperty()</a></dd></dl>
-<p>Retrieves the setting for the property identified by <code>name</code> from the <a class="el" href="classaace_1_1core_1_1_engine.html">Engine</a></p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">name</td><td>The name used by the <a class="el" href="classaace_1_1core_1_1_engine.html">Engine</a> to identify the property. The property name must be one of the property constants recognized by the <a class="el" href="classaace_1_1core_1_1_engine.html">Engine</a>, e.g. the properties in <code>aace::alexa::property::AlexaProperties.h</code> </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The property value as a string, or an empty string if the property value was not found </dd></dl>
-
-</div>
-</div>
 <a id="abab09ff31a4c13f8841bc124d87c24eb"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abab09ff31a4c13f8841bc124d87c24eb">&#9670;&nbsp;</a></span>registerPlatformInterface() <span class="overload">[1/2]</span></h2>
 
@@ -444,7 +359,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 2.3.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 3.0.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

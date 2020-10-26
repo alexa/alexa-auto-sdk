@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">2.3.0</span>
+   &#160;<span id="projectnumber">3.0.0</span>
    </div>
   </td>
  </tr>
@@ -305,7 +305,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Occurs during playback control via voice interaction or <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_playback_controller.html">PlaybackController</a> interface</p>
+<p>Occurs during playback control via voice interaction</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">localPlayerId</td><td>The opaque token that uniquely identifies the local external player app</td></tr>
@@ -313,7 +313,6 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_playback_controller.html">PlaybackController</a></dd></dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation successfully handled the call, else <code>false</code> </dd></dl>
 
 </div>
@@ -655,8 +654,18 @@ Public Member Functions</h2></td></tr>
 <p>Should be called on a local external media player event. This will sync the context with AVS.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">localPlayerId</td><td>The opaque token that uniquely identifies the local external player app</td></tr>
-    <tr><td class="paramname">eventName</td><td>Canonical event name </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">localPlayerId</td><td>The opaque token that uniquely identifies the local external player app</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">eventName</td><td>Canonical event name. Accepted values: <ul>
+<li>"TrackChanged" </li>
+<li>"PlaybackSessionStarted" </li>
+<li>"PlaybackSessionEnded" </li>
+<li>"PlaybackStarted" </li>
+<li>"PlaybackStopped" </li>
+<li>"PlaybackPrevious" </li>
+<li>"PlaybackNext" </li>
+<li>"PlayModeChanged" </li>
+</ul>
+</td></tr>
   </table>
   </dd>
 </dl>
@@ -709,11 +718,29 @@ Public Member Functions</h2></td></tr>
 <p>Should be called on a player error.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">localPlayerId</td><td>The opaque token that uniquely identifies the local external player app</td></tr>
-    <tr><td class="paramname">errorName</td><td>The name of the error</td></tr>
-    <tr><td class="paramname">code</td><td>The error code</td></tr>
-    <tr><td class="paramname">description</td><td>The detailed error description</td></tr>
-    <tr><td class="paramname">fatal</td><td>true if the error is fatal </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">localPlayerId</td><td>The opaque token that uniquely identifies the local external player app</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">errorName</td><td>The name of the error. Accepted values: <ul>
+<li>"INTERNAL_ERROR" </li>
+<li>"UNPLAYABLE_BY_AUTHORIZATION" </li>
+<li>"UNPLAYABLE_BY_STREAM_CONCURRENCY" </li>
+<li>"UNPLAYABLE_BY_ACCOUNT" </li>
+<li>"OPERATION_REJECTED_UNINTERRUPTIBLE" </li>
+<li>"OPERATION_REJECTED_END_OF_QUEUE" </li>
+<li>"UNPLAYABLE_BY_REGION" </li>
+<li>"OPERATION_UNSUPPORTED" </li>
+<li>"UNPLAYABLE_BY_PARENTAL_CONTROL" </li>
+<li>"UNPLAYABLE_BY_SUBSCRIPTION" </li>
+<li>"OPERATION_REJECTED_SKIP_LIMIT" </li>
+<li>"UNKNOWN_ERROR" </li>
+<li>"PLAYER_UNKNOWN" </li>
+<li>"PLAYER_NOT_FOUND" </li>
+<li>"PLAYER_CONNECTION_REJECTED" </li>
+<li>"PLAYER_CONNECTION_TIMEOUT"</li>
+</ul>
+</td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">code</td><td>The error code</td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">description</td><td>The detailed error description</td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">fatal</td><td>true if the error is fatal </td></tr>
   </table>
   </dd>
 </dl>
@@ -775,7 +802,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 2.3.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 3.0.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

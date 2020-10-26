@@ -104,11 +104,6 @@ std::pair<alexaClientSDK::avsCommon::avs::AlexaResponseType, std::string> Toggle
                 m_carControlServiceInterface->turnToggleControllerOff(getEndpointId(), getInstance()),
                 "turnToggleControllerOffFailed");
         }
-        bool isOn = false;
-        ThrowIfNot(
-            m_carControlServiceInterface->isToggleControllerOn(getEndpointId(), getInstance(), isOn),
-            "isToggleControllerOnFailed");
-        ThrowIfNot(isOn == state, "toggleControllerStateValidationFailed");
         return std::make_pair(AlexaResponseType::SUCCESS, "");
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));

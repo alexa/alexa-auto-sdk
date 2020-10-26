@@ -1,20 +1,20 @@
 # Alexa Auto SDK Android Sample App
 
 The purpose of the Android Sample App is to provide useful example code to help you integrate your platform implementation with the Alexa Auto SDK. The Android Sample App provides an example of creating and configuring an instance of the Engine, overriding the default implementation of each Alexa Auto Platform Interface, and registering those custom interface handlers with the Engine. It includes one default example implementation of authorizing with Alexa Voice Service (AVS) via Code Based Linking (CBL). The Android Sample App also includes detailed logs for interactions with the Alexa Auto SDK and convenience features for viewing those logs in the application, as well as UI elements relevant to each Platform Interface implementation. 
+<!-- omit in toc -->
+## Table of Contents
 
-**Table of Contents**:
+- [Prerequisites](#prerequisites)
+- [Enabling Optional Device Capabilities](#enabling-optional-device-capabilities)
+- [Setting up the Android Sample App](#setting-up-the-android-sample-app)
+- [Running the Android Sample App](#running-the-android-sample-app)
+- [Using the Android Sample App](#using-the-android-sample-app)
+- [Debugging Notes](#debugging-notes)
+- [Known Issues](#known-issues)
 
-* [Prerequisites](#prerequisites)
-* [Enabling Optional Device Capabilities](#enabling-optional-device-capabilities)
-* [Setting up the Android Sample App](#setting-up-the-android-sample-app)
-* [Running the Android Sample App](#running-the-android-sample-app)
-* [Using the Android Sample App](#using-the-android-sample-app)
-* [Debugging Notes](#debugging-notes)
-* [Known Issues](#ki)
+## Prerequisites
 
-## Prerequisites<a id="prerequisites"></a>
-
-### Amazon Developer Account <a id="amazon-developer-account"></a>
+### Amazon Developer Account
 
 To use the Android Sample App, you need an [Amazon Developer](https://developer.amazon.com/docs/app-submission/manage-account-and-permissions.html#create-a-developer-account/) account.
 
@@ -29,15 +29,15 @@ When you follow the instructions to [fill in the product information](https://de
 
 When you follow the instructions to [set up your security profile](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/register-a-product.html#set-up-your-security-profile), generate a **Client ID** and take note of it, as this information is required for your [configuration file](#configuration-file).
 
-### Configuration File <a id="configuration-file"></a>
+### Configuration File
 
 The Android Sample App requires a [configuration file](#editing-the-configuration-file) that contains information device client information required for authorization with AVS. 
 
-## Enabling Optional Device Capabilities <a id ="enabling-optional-device-capabilities"></a>
+## Enabling Optional Device Capabilities
 
 In order to use certain optional Alexa Auto SDK functionality (for example, AmazonLite Wake Word, Alexa Communications, Local Voice Control (LVC), Device Client Metrics (DCM), or Voice Chrome for Android) with the Sample App, your product must be whitelisted by Amazon. Copy the product's **Amazon ID** from the Developer Console and follow the whitelisting directions on the [Need Help?](../../NEED_HELP.md#requesting-additional-functionality-whitelisting) page.
 
-## Setting up the Android Sample App<a id="setting-up-the-android-sample-app"></a>
+## Setting up the Android Sample App
 
 Create your project directory (if you do not already have one):
 
@@ -66,7 +66,7 @@ You must populate the [`app_config.json`](./app/src/main/assets/app_config.json)
     
 >**Note:**You can leave `"amazonId"` set to its placeholder value. This parameter is not required unless you are using the optional Device Client Metrics (DCM) extension.
 
-### Including Alexa Auto SDK Build Dependencies (AAR files)<a id="include-build-dependencies"></a>
+### Including Alexa Auto SDK Build Dependencies (AAR files)
 
 Choose one of the following two options to include the Alexa Auto SDK build dependencies. These options correspond to two build flavors: remote and local.
 
@@ -111,7 +111,7 @@ Alternatively, you can follow the steps to [configure the project in Android Stu
 >**Note:** If you get gradle-related errors (such as `Could not open settings remapped class cache...`, `Could not open settings generic class cache...`, or `BUG! exception in phase 'semantic analysis' in source unit 'BuildScript' Unsupported class file major version 57`) when attempting to build the Android Sample App using the Alexa Auto SDK Builder, install Java 8 and point the java_home directory to 1.8:
 `export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)`.
 
-### Configure the Project in Android Studio<a id="configure-the-project-in-android-studio"></a> (optional)
+### Configure the Project in Android Studio (optional)
 
 > **Note:** The Auto SDK requires Android Studio version 3.4.1+. In addition, you must ensure that the Gradle version you are using is compatible with the Android Studio version you are using. See the [Android Gradle Plugin Release Notes](https://developer.android.com/studio/releases/gradle-plugin#updating-gradle) for information about matching Android Studio versions to Gradle versions.
 
@@ -123,7 +123,7 @@ Alternatively, you can follow the steps to [configure the project in Android Stu
 
 > **Note**: Android Studio builds and signs the Android Package File.
 
-## Running the Android Sample App<a id="running-the-android-sample-app"></a>
+## Running the Android Sample App
 
 Use Android Studio to install and run the Sample App on your target device.
 
@@ -138,7 +138,7 @@ When the Sample App launches, it displays a code and a URL in a box. Follow the 
 2. In the browser, enter the code displayed in the Sample App.
 3. Click **Continue** and follow the onscreen instructions in the browser to complete the authentication.
 
-## Using the Android Sample App <a id ="using-the-android-sample-app"></a>
+## Using the Android Sample App
 The Sample App provides an example of how to create and configure an instance of the Engine, extend the Alexa Auto SDK Platform Interfaces, and register the interface implementations with the Engine. The Platform Interface implementations are located in the `impl/` folder of the `com.amazon.sampleapp` directory with the `Handler` postfix. These classes extend the JNI wrapper classes, which mirror the Alexa Auto C++ API. You can read more about these interfaces in the following documentation:
  
  * [Core module README](../../platforms/android/modules/core/README.md)
@@ -164,14 +164,14 @@ Initiate various interactions with Alexa and explore the options menu features a
 > **Note**:
 Some Alexa interactions will return data for rendering a [Display Card](https://alexa.design/dev-display-cards) for visual feedback. Card rendering in the Sample App is an example of parsing the payload of rendering calls to the TemplateRuntime Platform Interface. The Sample App implementation of these cards is not meant as a UI design guideline or requirement.
 
-### Authorization with AVS in the Sample App <a id="authorization-with-avs-in-the-sample-app"></a>
+### Authorization with AVS in the Sample App
 
 Every request to Amazon Voice Service (AVS) requires an Login with Amazon (LWA) access token. Code-Based Linking (CBL) is the recommended method to acquire access tokens and is demonstrated by the Android Sample App. See the [CBL module README](../../platforms/android/modules/cbl/README.md) for details about the Auto SDK's implementation of CBL.
 
 ### Handling Unknown Locations in Navigation Use Cases
 Your platform implementation should handle cases where a GPS location cannot be obtained by returning the `UNDEFINED` value provided by the Auto SDK. In these cases, the Auto SDK does not report the location in the context, and your platform implementation should return a localization object initialized with `UNDEFINED` values for latitude and longitude ((latitude,longitude) = (`UNDEFINED`,`UNDEFINED`)) in the context object of every SpeechRecognizer event.
 
-### Enabling Google Maps for Navigation view (optional) <a id = "enablegooglemaps"></a>
+### Enabling Google Maps for Navigation view (optional)
 
 In order to view Google Map locations on navigation requests via the Sample App, you must input your own Google Maps API key.
 
@@ -207,12 +207,12 @@ ArrayList<EngineConfiguration> configuration = new ArrayList<EngineConfiguration
 ));
 ```
 
-## Debugging notes<a id = "debugging-notes"></a>
+## Debugging Notes
 
 ### Debugging the Sample App
 Use Android Studio and press the **Debug 'app'** button on toolbar. This will launch the app on target device and attach the app with Android Studio debugger.
 
-### Debugging Java Code<a id="java-debugging"></a>
+### Debugging Java Code
 Debugging Java code is straightforward. Open the file and scroll to the method which you wish to debug. Click on to the vertical gray bar on the left of the source editor. This will set the breakpoint on the source line. Use the Android Studio UI to navigate the stack trace, watch variables etc., when breakpoint is hit.
 
 ### Debugging C++ Code
@@ -252,14 +252,13 @@ aac-module-core/0.99.0-r0/src/engine/src/ ${AAC_SDK_HOME}/modules/core/engine/sr
 12. From the LLDB `image lookup` output, locate the fully qualified unmangled name of the function ("Function: name = "). Set the breakpoint on the function with LLDB `breakpoint set`. For example:
 
 	 `breakpoint set --name aace::engine::core::EngineImpl::start`
-13. When the breakpoint is hit, use the Android Studio debugger window to find call stacks, watch variables, etc. You can also set a further breakpoint using Android Studio editor, with either method described under [Debugging Java Cpde](#java-debugging), and use other features of LLDB as you need.
+13. When the breakpoint is hit, use the Android Studio debugger window to find call stacks, watch variables, etc. You can also set a further breakpoint using Android Studio editor, with either method described under [Debugging Java Code](#java-debugging), and use other features of LLDB as you need.
 
 > **Note**: If the LLDB window isn't visible in the debug tab, select **Run** -> **Edit Configurations** -> **Debugger** and change the `Debug Type` to `Native`.
 
-## Known Issues <a id = "ki"></a>
+## Known Issues
 
 * In the Alexa companion app, if you change the timezone of the device to a value already listed in the sample app timezone drop down, the timezone field of the sample app is not updated to the new value until the app is restarted.
-* After you forcibly close an external media app and then press the "next" playback button, the media playback gets into a "no content playing" state in which all GUI playback control buttons no longer work. 
 * Alexa Presentation Language (APL) rendering does not support ssmlToSpeech and ssmlToText transformers. Therefore, some skills, like Jeopardy, will not provide the expected user experience.
 * The sample app goes into listening mode when calling 911, as Alexa prompts the user to say "Alexa, Cancel" to stop. This is due to the Android platform not providing audio loopback to cancel out self triggers. See the [Loopback Detector README](../../extensions/loopback-detector/README.md) for an example of using the Auto SDK with the AmazonLite wake word to cancel out self references.
 * The `AudioOutput.prepare()` method implementation in `AudioOutputHandler` blocks returning until it reads the full audio attachment from the Engine on the caller's thread. If working properly, the implementation returns quickly and reads the attachment on a separate thread.
@@ -270,3 +269,7 @@ aac-module-core/0.99.0-r0/src/engine/src/ ${AAC_SDK_HOME}/modules/core/engine/sr
 * Alexa dialog playback may stop abruptly when switching between Wi-Fi and mobile data.
 * The sample app disconnects from AVS after remaining idle for some time and takes a while to reconnect.
 * Music service provider logos in the SVG format are not rendered during the music playback.
+* The dual locale combinations are not present in the locale menu of the sample app. You have to add the locale combinations in the hard-coded locale list in the sample app. For the permitted locale combinations, see the [Alexa Voice Service documentation](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/system.html#localecombinations). The locale combinations you add to the list must be the same as the ones used to configure the Engine. The following example shows the hard-coded list with locale combinations:
+~~~
+    private static final String[] sSupportedLocales = {"de-DE", "en-AU", "en-CA", "en-GB", "en-IN", "en-US", "es-ES", "es-MX", "es-US", "fr-CA", "fr-FR", "hi-IN", "it-IT", "ja-JP", "pt-BR", "en-CA/fr-CA", "en-IN/hi-IN", "en-US/es-US", "es-US/en-US", "fr-CA/en-CA", "hi-IN/en-IN"};
+~~~

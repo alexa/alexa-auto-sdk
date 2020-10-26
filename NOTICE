@@ -19,7 +19,6 @@ modules/core
 modules/messaging
 modules/navigation
 modules/phone-control
-platforms/agl
 platforms/android
 samples/android
 samples/cpp

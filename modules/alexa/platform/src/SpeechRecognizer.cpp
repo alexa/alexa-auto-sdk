@@ -18,8 +18,7 @@
 namespace aace {
 namespace alexa {
 
-SpeechRecognizer::SpeechRecognizer(bool wakewordDetectionEnabled) :
-        m_wakewordDetectionEnabled(wakewordDetectionEnabled) {
+SpeechRecognizer::SpeechRecognizer() {
 }
 
 SpeechRecognizer::~SpeechRecognizer() = default;  // key function
@@ -50,30 +49,6 @@ bool SpeechRecognizer::stopCapture() {
     } else {
         return false;
     }
-}
-
-bool SpeechRecognizer::enableWakewordDetection() {
-    m_wakewordDetectionEnabled = true;
-
-    if (auto m_speechRecognizerEngineInterface_lock = m_speechRecognizerEngineInterface.lock()) {
-        return m_speechRecognizerEngineInterface_lock->enableWakewordDetection();
-    } else {
-        return false;
-    }
-}
-
-bool SpeechRecognizer::disableWakewordDetection() {
-    m_wakewordDetectionEnabled = false;
-
-    if (auto m_speechRecognizerEngineInterface_lock = m_speechRecognizerEngineInterface.lock()) {
-        return m_speechRecognizerEngineInterface_lock->disableWakewordDetection();
-    } else {
-        return false;
-    }
-}
-
-bool SpeechRecognizer::isWakewordDetectionEnabled() {
-    return m_wakewordDetectionEnabled;
 }
 
 bool SpeechRecognizer::wakewordDetected(const std::string& wakeword) {

@@ -1,0 +1,101 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        minSdkVersion 26
+        targetSdkVersion 27
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        debug {
+            debuggable true
+            jniDebuggable true
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    flavorDimensions "type"
+    productFlavors {
+        remote {
+            dimension "type"
+        }
+        local {
+            dimension "type"
+        }
+    } 
+    // Prevent duplicate .so libraries
+    packagingOptions {
+        pickFirst 'lib/armeabi-v7a/libc++_shared.so'
+        pickFirst 'lib/arm64-v8a/libc++_shared.so'
+        pickFirst 'lib/x86/libc++_shared.so'
+        pickFirst 'lib/x86_64/libc++_shared.so'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+}
+
+ext {
+    remoteLibVersion = "3.0+"
+}
+dependencies {
+    implementation fileTree(include: ['*.aar'], dir: 'src/main/libs')
+    def tasks = gradle.startParameter.getTaskNames()
+    if (tasks.empty || tasks.any { it.toLowerCase().contains("local") }) {
+        localImplementation fileTree(include: ['*.aar'], dir: 'libs')
+    } else if (tasks.any { it.toLowerCase().contains("remote") }) {
+        remoteImplementation "com.amazon.alexa.aace:core:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:alexa:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:addressbook:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:car-control:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:cbl:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:maccandroid:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:messaging:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:navigation:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:phonecontrol:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:aasb-address-book:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:aasb-alexa:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:aasb-car-control:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:aasb-cbl:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:aasb-core:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:aasb-messaging:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:aasb-navigation:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:aasb-phone-control:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:aasb:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:aacs-extra:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aacs:aacsipc:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aacs:aacsconstants:${remoteLibVersion}@aar" 
+    } 
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:support-media-compat:27.1.1'
+    implementation 'org.greenrobot:eventbus:3.1.1'
+    implementation 'com.squareup.okhttp3:okhttp:4.0.1'
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.7.1'
+    implementation 'com.google.android.exoplayer:exoplayer-dash:2.7.1'
+    implementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.7.1'
+    implementation 'com.google.android.exoplayer:exoplayer-hls:2.7.1'
+
+    androidTestImplementation 'androidx.test.ext:junit:1.0.0'
+    androidTestImplementation 'androidx.test:rules:1.1.0'
+    androidTestImplementation 'androidx.test:runner:1.1.0'
+    androidTestImplementation 'org.mockito:mockito-android:2.22.0'
+
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.mockito:mockito-core:2.25.0'
+    testImplementation 'org.robolectric:robolectric:4.3'
+}
+
+

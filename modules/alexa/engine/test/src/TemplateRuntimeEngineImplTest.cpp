@@ -23,8 +23,6 @@
 #include <AVSCommon/AVS/Initialization/AlexaClientSDKInit.h>
 
 #include <AACE/Test/Alexa/AlexaTestHelper.h>
-#include <AACE/Test/Audio/MockAudioManagerInterface.h>
-#include <AACE/Test/Audio/MockAudioOutputChannelInterface.h>
 #include <AACE/Test/Alexa/MockTemplateRuntime.h>
 
 #include <AACE/Engine/Alexa/TemplateRuntimeEngineImpl.h>
@@ -193,14 +191,22 @@ TEST_F(TemplateRuntimeEngineImplTest, validateTemplateRuntimeCallbacks) {
     auto templateRuntimeEngineImpl = createTemplateRuntimeEngineImpl();
     ASSERT_NE(templateRuntimeEngineImpl, nullptr) << "TemplateRuntimeEngineImpl pointer expected to be not null";
 
-    EXPECT_CALL(*m_alexaMockFactory->getTemplateRuntimeMock(), renderTemplate(testing::StrEq("TEMPLATE_PAYLOAD")));
+    EXPECT_CALL(
+        *m_alexaMockFactory->getTemplateRuntimeMock(),
+        renderTemplate(testing::StrEq("TEMPLATE_PAYLOAD"), testing::Eq(aace::alexa::FocusState::FOREGROUND)));
     templateRuntimeEngineImpl->renderTemplateCard(
         "TEMPLATE_PAYLOAD", alexaClientSDK::avsCommon::avs::FocusState::FOREGROUND);
 
     EXPECT_CALL(*m_alexaMockFactory->getTemplateRuntimeMock(), clearTemplate());
     templateRuntimeEngineImpl->clearTemplateCard();
 
-    EXPECT_CALL(*m_alexaMockFactory->getTemplateRuntimeMock(), renderPlayerInfo(testing::StrEq("PLAYER_INFO_PAYLOAD")));
+    EXPECT_CALL(
+        *m_alexaMockFactory->getTemplateRuntimeMock(),
+        renderPlayerInfo(
+            testing::StrEq("PLAYER_INFO_PAYLOAD"),
+            testing::Eq(aace::alexa::PlayerActivity::IDLE),
+            testing::Eq(std::chrono::milliseconds::zero()),
+            testing::Eq(aace::alexa::FocusState::FOREGROUND)));
     templateRuntimeEngineImpl->renderPlayerInfoCard(
         "PLAYER_INFO_PAYLOAD",
         alexaClientSDK::avsCommon::sdkInterfaces::TemplateRuntimeObserverInterface::AudioPlayerInfo(),

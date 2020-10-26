@@ -112,15 +112,3 @@ TEST_F(EngineImplTest, shutdown) {
     // test shutdown valid
     ASSERT_TRUE(m_engine->shutdown()) << "Shutdown engine failed!";
 }
-
-TEST_F(EngineImplTest, setProperty) {
-    ASSERT_FALSE(m_engine->setProperty(aace::core::property::VERSION, "1.0")) << "Set version property did not fail!";
-    ASSERT_FALSE(m_engine->setProperty("", "test-value")) << "Set invalid property did not fail!";
-    ASSERT_FALSE(m_engine->setProperty("test-key", "test-value")) << "Set invalid property did not fail!";
-}
-
-TEST_F(EngineImplTest, getProperty) {
-    ASSERT_STRNE(m_engine->getProperty(aace::core::property::VERSION).c_str(), "") << "Get version property failed!";
-    ASSERT_STREQ(m_engine->getProperty("").c_str(), "") << "Get invalid property did not fail!";
-    ASSERT_STREQ(m_engine->getProperty("test-key").c_str(), "") << "Get invalid property did not fail!";
-}

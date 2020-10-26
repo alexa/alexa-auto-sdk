@@ -49,7 +49,9 @@ private:
     using MediaError = aace::audio::AudioOutputEngineInterface::MediaError;
 
 public:
-    AudioChannelEngineImpl(alexaClientSDK::avsCommon::sdkInterfaces::ChannelVolumeInterface::Type channelVolumeType);
+    AudioChannelEngineImpl(
+        alexaClientSDK::avsCommon::sdkInterfaces::ChannelVolumeInterface::Type channelVolumeType,
+        std::string name = "");
 
     virtual bool initializeAudioChannel(
         std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> audioOutputChannel,
@@ -157,6 +159,7 @@ private:
     friend std::ostream& operator<<(std::ostream& stream, const PendingEventState& state);
 
 private:
+    std::string m_name;
     std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> m_audioOutputChannel;
 
     alexaClientSDK::avsCommon::sdkInterfaces::ChannelVolumeInterface::Type m_channelVolumeType;
@@ -193,9 +196,6 @@ private:
 
     // mutex for blocking setSource calls
     std::mutex m_mutex;
-
-    // wait condition
-    std::condition_variable m_trigger;
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const AudioChannelEngineImpl::PendingEventState& state) {

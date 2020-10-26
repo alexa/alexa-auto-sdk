@@ -20,28 +20,6 @@ namespace alexa {
 
 TemplateRuntime::~TemplateRuntime() = default;  // key function
 
-void TemplateRuntime::renderTemplate(const std::string& payload) {
-}
-
-void TemplateRuntime::renderTemplate(const std::string& payload, FocusState focusState) {
-    // DEPRECATION NOTICE: The renderTemplate( const std::string& payload ) method is deprecated.
-    // Use renderTemplate( const std::string& payload, FocusState focusState ) instead.
-    return renderTemplate(payload);
-}
-
-void TemplateRuntime::renderPlayerInfo(const std::string& payload) {
-}
-
-void TemplateRuntime::renderPlayerInfo(
-    const std::string& payload,
-    PlayerActivity audioPlayerState,
-    std::chrono::milliseconds offset,
-    FocusState focusState) {
-    // DEPRECATION NOTICE: The renderPlayerInfo( const std::string& payload ) method is deprecated.
-    // Use renderPlayerInfo( const std::string& payload, PlayerActivity audioPlayerState, std::chrono::milliseconds offset, FocusState focusState ) instead.
-    return renderPlayerInfo(payload);
-}
-
 void TemplateRuntime::displayCardCleared() {
     if (auto m_templateRuntimeEngineInterface_lock = m_templateRuntimeEngineInterface.lock()) {
         m_templateRuntimeEngineInterface_lock->onDisplayCardCleared();

@@ -56,6 +56,7 @@ import android.widget.Toast;
 
 import com.amazon.aace.alexa.AlexaClient;
 import com.amazon.aace.alexa.AlexaProperties;
+import com.amazon.aace.alexa.SpeechRecognizer;
 import com.amazon.aace.alexa.config.AlexaConfiguration;
 import com.amazon.aace.audio.AudioOutputProvider;
 import com.amazon.aace.core.CoreProperties;
@@ -65,8 +66,10 @@ import com.amazon.aace.core.config.ConfigurationFile;
 import com.amazon.aace.core.config.EngineConfiguration;
 import com.amazon.aace.logger.Logger;
 import com.amazon.aace.navigation.Navigation;
+import com.amazon.aace.navigation.config.NavigationConfiguration;
 import com.amazon.aace.storage.config.StorageConfiguration;
 import com.amazon.aace.vehicle.config.VehicleConfiguration;
+import com.amazon.sampleapp.core.LoggerControllerInterface;
 import com.amazon.sampleapp.core.ModuleFactoryInterface;
 import com.amazon.sampleapp.core.SampleAppContext;
 import com.amazon.sampleapp.impl.AddressBook.AddressBookHandler;
@@ -129,6 +132,10 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
     private static final int sPermissionRequestCode = 0;
     private static final String[] sRequiredPermissions = {Manifest.permission.RECORD_AUDIO,
             Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_EXTERNAL_STORAGE};
+
+    // AVS-supported locales: https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/system.html#locales
+    private static final String[] sSupportedLocales = {"de-DE", "en-AU", "en-CA", "en-GB", "en-IN", "en-US", "es-ES",
+            "es-MX", "es-US", "fr-CA", "fr-FR", "hi-IN", "it-IT", "ja-JP", "pt-BR"};
 
     /* AACE Platform Interface Handlers */
 
@@ -279,6 +286,16 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
     @Override
     public AudioOutputProvider getAudioOutputProvider() {
         return mAudioOutputProvider;
+    }
+
+    @Override
+    public LoggerControllerInterface getLoggerController() {
+        return mLogger;
+    }
+
+    @Override
+    public SpeechRecognizer getSpeechRecognizer() {
+        return mSpeechRecognizer;
     }
 
     @Override
@@ -525,7 +542,7 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
         // SpeechRecognizer
         // Note : Expects PropertyManager to be not null.
         if (!mEngine.registerPlatformInterface(
-                    mSpeechRecognizer = new SpeechRecognizerHandler(this, mLogger, mPropertyManager, true)))
+                    mSpeechRecognizer = new SpeechRecognizerHandler(this, mLogger, mPropertyManager)))
             throw new RuntimeException("Could not register SpeechRecognizer platform interface");
 
         // AudioPlayer
@@ -551,7 +568,7 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
 
         // NetworkInfoProvider
         if (!mEngine.registerPlatformInterface(
-                    mNetworkInfoProvider = new NetworkInfoProviderHandler(this, mLogger, mEngine)))
+                    mNetworkInfoProvider = new NetworkInfoProviderHandler(this, mLogger, mPropertyManager)))
             throw new RuntimeException("Could not register NetworkInfoProvider platform interface");
 
         // CBL
@@ -604,7 +621,7 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
             throw new RuntimeException("Could not register Car Control platform interface");
         }
 
-        mMACCPlayer = new MACCPlayer(this, mLogger, mPlaybackController);
+        mMACCPlayer = new MACCPlayer(this, mLogger);
         if (!mEngine.registerPlatformInterface(mMACCPlayer)) {
             Log.i("MACC", "registration failed");
             throw new RuntimeException("Could not register external media player platform interface");
@@ -628,51 +645,43 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
         }
 
         // Mock CD platform handler
-        if (!mEngine.registerPlatformInterface(
-                    mCDLocalMediaSource = new CDLocalMediaSource(this, mLogger, mPlaybackController)))
+        if (!mEngine.registerPlatformInterface(mCDLocalMediaSource = new CDLocalMediaSource(mLogger)))
             throw new RuntimeException("Could not register Mock CD player Local Media Source platform interface");
 
         // Mock DAB platform handler
-        if (!mEngine.registerPlatformInterface(
-                    mDABLocalMediaSource = new DABLocalMediaSource(this, mLogger, mPlaybackController)))
+        if (!mEngine.registerPlatformInterface(mDABLocalMediaSource = new DABLocalMediaSource(mLogger)))
             throw new RuntimeException("Could not register Mock DAB player Local Media Source platform interface");
 
         // Mock AM platform handler
-        if (!mEngine.registerPlatformInterface(
-                    mAMLocalMediaSource = new AMLocalMediaSource(this, mLogger, mPlaybackController)))
+        if (!mEngine.registerPlatformInterface(mAMLocalMediaSource = new AMLocalMediaSource(mLogger)))
             throw new RuntimeException("Could not register Mock AM radio player Local Media Source platform interface");
 
         // Mock SIRIUSXM platform handler
         if (mockSiriusXM
                 && !mEngine.registerPlatformInterface(
-                        mSIRIUSXMLocalMediaSource = new SiriusXMLocalMediaSource(this, mLogger, mPlaybackController)))
+                        mSIRIUSXMLocalMediaSource = new SiriusXMLocalMediaSource(mLogger)))
             throw new RuntimeException("Could not register Mock SIRIUSXM player Local Media Source platform interface");
 
         // Mock FM platform handler
-        if (!mEngine.registerPlatformInterface(
-                    mFMLocalMediaSource = new FMLocalMediaSource(this, mLogger, mPlaybackController)))
+        if (!mEngine.registerPlatformInterface(mFMLocalMediaSource = new FMLocalMediaSource(mLogger)))
             throw new RuntimeException("Could not register Mock FM radio player Local Media Source platform interface");
 
         // Mock Bluetooth platform handler
-        if (!mEngine.registerPlatformInterface(
-                    mBTLocalMediaSource = new BluetoothLocalMediaSource(this, mLogger, mPlaybackController)))
+        if (!mEngine.registerPlatformInterface(mBTLocalMediaSource = new BluetoothLocalMediaSource(mLogger)))
             throw new RuntimeException(
                     "Could not register Mock Bluetooth player Local Media Source platform interface");
 
         // Mock Line In platform handler
-        if (!mEngine.registerPlatformInterface(
-                    mLILocalMediaSource = new LineInLocalMediaSource(this, mLogger, mPlaybackController)))
+        if (!mEngine.registerPlatformInterface(mLILocalMediaSource = new LineInLocalMediaSource(mLogger)))
             throw new RuntimeException("Could not register Mock Line In player Local Media Source platform interface");
 
         // Mock Satellite Radio platform handler
-        if (!mEngine.registerPlatformInterface(
-                    mSATRADLocalMediaSource = new SatelliteLocalMediaSource(this, mLogger, mPlaybackController)))
+        if (!mEngine.registerPlatformInterface(mSATRADLocalMediaSource = new SatelliteLocalMediaSource(mLogger)))
             throw new RuntimeException(
                     "Could not register Mock Satellite radio player Local Media Source platform interface");
 
         // Mock USB platform handler
-        if (!mEngine.registerPlatformInterface(
-                    mUSBLocalMediaSource = new USBLocalMediaSource(this, mLogger, mPlaybackController)))
+        if (!mEngine.registerPlatformInterface(mUSBLocalMediaSource = new USBLocalMediaSource(mLogger)))
             throw new RuntimeException("Could not register Mock USB player Local Media Source platform interface");
 
         // Mock global preset
@@ -683,11 +692,8 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
         loadPlatformInterfacesAndLoadUI(mEngine, extraFactories, this);
 
         // Alexa Locale
-        final String supportedLocales = mPropertyManager.getProperty(AlexaProperties.SUPPORTED_LOCALES);
-        final String[] localesArray = supportedLocales.split(",");
-
         ArrayAdapter<String> localeAdapter =
-                new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, localesArray);
+                new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, sSupportedLocales);
 
         Spinner spinnerView = (Spinner) findViewById(R.id.locale_spinner);
         spinnerView.setAdapter(localeAdapter);
@@ -704,7 +710,7 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
         spinnerView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long arg3) {
-                String s = localesArray[position];
+                String s = sSupportedLocales[position];
                 if (!mPropertyManager.getProperty(AlexaProperties.LOCALE).equals(s)) {
                     Toast.makeText(MainActivity.this, "Switching Alexa locale to " + s, Toast.LENGTH_SHORT).show();
 
@@ -817,6 +823,9 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
                 // AlexaConfiguration.createTemplateRuntimeTimeoutConfig( timeoutList ),
                 StorageConfiguration.createLocalStorageConfig(appDataDir.getPath() + "/localStorage.sqlite"),
 
+                // Create the optional navigation provider config name
+                NavigationConfiguration.createNavigationConfig("HERE"),
+
                 // Example Vehicle Config
                 VehicleConfiguration.createVehicleInfoConfig(new VehicleConfiguration.VehicleProperty[] {
                         new VehicleConfiguration.VehicleProperty(
@@ -828,9 +837,8 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
                         new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.YEAR, "2025"),
                         new VehicleConfiguration.VehicleProperty(
                                 VehicleConfiguration.VehiclePropertyType.GEOGRAPHY, "US"),
-                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.VERSION,
-                                String.format("Vehicle Software Version 1.0 (Auto SDK Version %s)",
-                                        mEngine.getProperty(CoreProperties.VERSION))),
+                        new VehicleConfiguration.VehicleProperty(
+                                VehicleConfiguration.VehiclePropertyType.VERSION, "1.0.0"),
                         new VehicleConfiguration.VehicleProperty(
                                 VehicleConfiguration.VehiclePropertyType.OPERATING_SYSTEM,
                                 "Android 8.1 Oreo API Level 26"),
@@ -924,6 +932,10 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
 
         if (mAlexaClient != null && mCBLHandler != null) {
             mAlexaClient.removeAuthStateObserver(mCBLHandler);
+        }
+
+        if (mMACCPlayer != null) {
+            mMACCPlayer.cleanupMACCClient();
         }
 
         // cleanup for restarting sample app while using LVE

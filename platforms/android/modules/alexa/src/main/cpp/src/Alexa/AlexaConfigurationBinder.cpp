@@ -37,15 +37,17 @@ TemplateRuntimeTimeout JTemplateRuntimeTimeout::getTemplateRuntimeTimeout() {
         jobject timeoutTypeObj;
         ThrowIfNot(
             invoke(
-                "getType", "()Lcom/amazon/aace/alexa/AlexaConfiguration$TemplateRuntimeTimeoutType;", &timeoutTypeObj),
-            "invokeMethodFailed");
+                "getType",
+                "()Lcom/amazon/aace/alexa/config/AlexaConfiguration$TemplateRuntimeTimeoutType;",
+                &timeoutTypeObj),
+            "getType:invokeMethodFailed");
 
         TemplateRuntimeTimeoutType checkedTimeoutTypeObj;
         ThrowIfNot(
             JTemplateRuntimeTimeoutType::checkType(timeoutTypeObj, &checkedTimeoutTypeObj), "invalidTimeoutType");
 
         jint checkedInt;
-        ThrowIfNot(invoke("getValue", "()I", &checkedInt), "invokeMethodFailed");
+        ThrowIfNot(invoke("getValue", "()I", &checkedInt), "getValue:invokeMethodFailed");
 
         return {checkedTimeoutTypeObj, std::chrono::milliseconds(checkedInt)};
     }

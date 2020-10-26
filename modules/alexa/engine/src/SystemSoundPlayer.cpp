@@ -134,7 +134,7 @@ SystemSoundAudioStream::SystemSoundAudioStream(
     std::shared_ptr<std::istream> stream,
     alexaClientSDK::avsCommon::utils::MediaType mediaType,
     alexaClientSDK::avsCommon::sdkInterfaces::SystemSoundPlayerInterface::Tone tone) :
-        m_stream(stream), m_mediaType(mediaType), m_tone(tone), m_closed(false) {
+        m_stream(stream), m_tone(tone), m_closed(false) {
 }
 
 std::shared_ptr<SystemSoundAudioStream> SystemSoundAudioStream::create(

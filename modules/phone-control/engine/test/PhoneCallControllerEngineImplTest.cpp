@@ -104,7 +104,14 @@ public:
 
         EXPECT_CALL(*m_mockAuthDelegate, addAuthObserver(testing::_)).WillOnce(testing::Return());
         EXPECT_CALL(*m_mockAuthDelegate, removeAuthObserver(testing::_)).WillOnce(testing::Return());
-        EXPECT_CALL(*m_mockFocusManager, releaseChannel(testing::_, testing::_)).Times(testing::Exactly(1));
+        EXPECT_CALL(*m_mockFocusManager, releaseChannel(testing::_, testing::_))
+        .Times(testing::AtLeast(1))
+        .WillRepeatedly(testing::InvokeWithoutArgs([this] {
+            auto tempFuture = std::promise<bool>();
+            m_releaseChannelPromise.swap(tempFuture);
+            m_releaseChannelPromise.set_value(true);
+            return m_releaseChannelPromise.get_future();
+        }));
         EXPECT_CALL(*m_mockContextManager, setState(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(alexaClientSDK::avsCommon::sdkInterfaces::SetStateResult::SUCCESS));
         m_engineImpl = aace::engine::phoneCallController::PhoneCallControllerEngineImpl::create(
             m_mockPlatformInterface,
@@ -124,7 +131,8 @@ public:
             alexaClientSDK::avsCommon::avs::initialization::AlexaClientSDKInit::uninitialize();
         }
     }
-
+    
+    std::promise<bool> m_releaseChannelPromise;
     std::shared_ptr<aace::engine::phoneCallController::PhoneCallControllerEngineImpl> m_engineImpl;
     std::shared_ptr<aace::phoneCallController::PhoneCallController> m_mockPlatformInterface;
     std::shared_ptr<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockContextManager>> m_mockContextManager;

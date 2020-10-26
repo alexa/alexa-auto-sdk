@@ -26,9 +26,6 @@ import com.amazon.aace.core.PlatformInterface;
 /**
  * @c LocalMediaSource should be extended to use Alexa to switch among media sources local to the device.
  * It supports bluetooth, USB, FM radio, AM radio, satellite radio, audio line, and CD player sources.
- * It enables playback for these sources via Alexa (e.g. "Alexa, play the CD player"), or via the playback controller.
- *
- * @sa PlaybackController
  */
 abstract public class LocalMediaSource extends PlatformInterface {
     private final Source mSource;
@@ -411,8 +408,8 @@ abstract public class LocalMediaSource extends PlatformInterface {
         /// Flag that identifies if the user currently logged in is a guest or not.
         public boolean isGuest = false;
 
-        /// Flag that identifies if an application has been launched or not.
-        public boolean launched = false;
+        /// Flag that identifies whether the local souce is enabled or not.
+        public boolean launched = true;
 
         /**
          * Flag that identifies if the application is currently active or not. This could mean different things
@@ -546,11 +543,10 @@ abstract public class LocalMediaSource extends PlatformInterface {
     }
 
     /**
-     * Occurs during playback control via voice interaction or PlaybackController interface
+     * Occurs during playback control via voice interaction
      *
      * @param  controlType Playback control type being invoked
      *
-     * @sa PlaybackController
      *
      * @return @c true if the platform implementation successfully handled the call,
      * else @c false
@@ -596,7 +592,9 @@ abstract public class LocalMediaSource extends PlatformInterface {
     /**
      * Should be called on a local media source player event. This will sync the context with AVS.
      *
-     * @param eventName Canonical event name
+     * @param [in] eventName Canonical event name. Accepted values:
+     *      @li "PlaybackStarted"
+     *      @li "PlaybackStopped"
      */
     public void playerEvent(String eventName) {
         playerEvent(getNativeRef(), eventName);
@@ -605,7 +603,8 @@ abstract public class LocalMediaSource extends PlatformInterface {
     /**
      * Should be called on a local media source player error.
      *
-     * @param errorName The name of the error
+     * @param [in] errorName The name of the error. Accepted values:
+     *      @li "INTERNAL_ERROR"
      *
      * @param code The error code
      *

@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">2.3.0</span>
+   &#160;<span id="projectnumber">3.0.0</span>
    </div>
   </td>
  </tr>
@@ -77,8 +77,6 @@ $(function() {
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ad5854625364fa4390d96712dc4eff550"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classaace_1_1car_control_1_1config_1_1_car_control_configuration.html">CarControlConfiguration</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1car_control_1_1config_1_1_car_control_configuration.html#ad5854625364fa4390d96712dc4eff550">createEndpoint</a> (const std::string &amp;endpointId)=0</td></tr>
 <tr class="separator:ad5854625364fa4390d96712dc4eff550"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0a9236ba93a3b3c0c1e85900f40af697"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classaace_1_1car_control_1_1config_1_1_car_control_configuration.html">CarControlConfiguration</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1car_control_1_1config_1_1_car_control_configuration.html#a0a9236ba93a3b3c0c1e85900f40af697">createControl</a> (const std::string &amp;controlId, const std::string &amp;zoneId=zone::ALL)=0</td></tr>
-<tr class="separator:a0a9236ba93a3b3c0c1e85900f40af697"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae1038896bbf114e0ee90c50082e3dad4"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classaace_1_1car_control_1_1config_1_1_car_control_configuration.html">CarControlConfiguration</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1car_control_1_1config_1_1_car_control_configuration.html#ae1038896bbf114e0ee90c50082e3dad4">addAssetId</a> (const std::string &amp;assetId)=0</td></tr>
 <tr class="separator:ae1038896bbf114e0ee90c50082e3dad4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad33d73690c37cdb458e8bea1e8f81fb6"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classaace_1_1car_control_1_1config_1_1_car_control_configuration.html">CarControlConfiguration</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1car_control_1_1config_1_1_car_control_configuration.html#ad33d73690c37cdb458e8bea1e8f81fb6">addPowerController</a> (bool retrievable)=0</td></tr>
@@ -183,56 +181,6 @@ Static Public Member Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">endpointId</td><td>The unique identifier for the endpoint. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd><code><a class="el" href="classaace_1_1car_control_1_1config_1_1_car_control_configuration.html">CarControlConfiguration</a></code> to allow chaining. </dd></dl>
-
-</div>
-</div>
-<a id="a0a9236ba93a3b3c0c1e85900f40af697"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0a9236ba93a3b3c0c1e85900f40af697">&#9670;&nbsp;</a></span>createControl()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual <a class="el" href="classaace_1_1car_control_1_1config_1_1_car_control_configuration.html">CarControlConfiguration</a>&amp; aace::carControl::config::CarControlConfiguration::createControl </td>
-          <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>controlId</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>zoneId</em> = <code>zone::ALL</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000006">Deprecated:</a></b></dt><dd>Use <code><a class="el" href="classaace_1_1car_control_1_1config_1_1_car_control_configuration.html#ad5854625364fa4390d96712dc4eff550">CarControlConfiguration::createEndpoint()</a></code>.</dd></dl>
-<dl class="section note"><dt>Note</dt><dd>This method is for backward compatibility. Do not use method <code><a class="el" href="classaace_1_1car_control_1_1config_1_1_car_control_configuration.html#a1aa86c1e0502e89b386bc6eabf2d8b61">addMembers()</a></code> on a zone definition if you create endpoints with <code><a class="el" href="classaace_1_1car_control_1_1config_1_1_car_control_configuration.html#a0a9236ba93a3b3c0c1e85900f40af697">createControl()</a></code>. <code><a class="el" href="classaace_1_1car_control_1_1config_1_1_car_control_configuration.html#a1aa86c1e0502e89b386bc6eabf2d8b61">addMembers()</a></code> is only compatible with <code><a class="el" href="classaace_1_1car_control_1_1config_1_1_car_control_configuration.html#ad5854625364fa4390d96712dc4eff550">createEndpoint()</a></code>.</dd>
-<dd>
-Do not use both <code><a class="el" href="classaace_1_1car_control_1_1config_1_1_car_control_configuration.html#a0a9236ba93a3b3c0c1e85900f40af697">createControl()</a></code> and <code><a class="el" href="classaace_1_1car_control_1_1config_1_1_car_control_configuration.html#ad5854625364fa4390d96712dc4eff550">createEndpoint()</a></code> in your implementation.</dd></dl>
-<p>Begin an endpoint definition using the specified endpoint ID. This creates a single entry in the "endpoints" array of 'aace.carControl'.</p>
-<dl class="section note"><dt>Note</dt><dd>Do not use the following format for the <em>endpointId:</em> &lt;clientId&gt;::&lt;productId&gt;::&lt;serialNumber&gt;::[-&lt;extEndpoint&gt;]. The Engine internally prepends the 3-part device prefix to your specified <em>endpointId</em> before sending the configuration to the cloud in an <b>AddOrUpdateReport</b> event. Configuring the full ID directly results in duplication and excess characters.</dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">controlId</td><td>The unique identifier for the endpoint. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">zoneId</td><td>The unique identifier of the zone the endpoint is located in. Default is <code>"zone.all"</code>. </td></tr>
   </table>
   </dd>
 </dl>
@@ -876,9 +824,7 @@ Only the action IDs defined in the <code><a class="el" href="namespaceaace_1_1ca
 </table>
 </div><div class="memdoc">
 <p>Add the specified endpoint IDs to the definition of the enclosing zone.</p>
-<dl class="section note"><dt>Note</dt><dd>An endpoint ID added to this zone instance may belong to other zones as well.</dd>
-<dd>
-Do not use deprecated method <code><a class="el" href="classaace_1_1car_control_1_1config_1_1_car_control_configuration.html#a0a9236ba93a3b3c0c1e85900f40af697">createControl()</a></code> to create endpoints if using this method.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>An endpoint ID added to this zone instance may belong to other zones as well.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">endpointIds</td><td>The IDs of the endpoints belonging to this zone. Endpoint IDs used must correspond to endpoints created with <code><a class="el" href="classaace_1_1car_control_1_1config_1_1_car_control_configuration.html#ad5854625364fa4390d96712dc4eff550">createEndpoint()</a></code>. </td></tr>
@@ -996,7 +942,7 @@ Do not use deprecated method <code><a class="el" href="classaace_1_1car_control_
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 2.3.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 3.0.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

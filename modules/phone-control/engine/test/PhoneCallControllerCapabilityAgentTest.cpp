@@ -155,11 +155,16 @@ public:
         m_mockFocusManager =
             std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockFocusManager>>();
         m_mockGui = std::make_shared<testing::StrictMock<MockGui>>();
-
         EXPECT_CALL(*m_mockContextManager, setState(testing::_, testing::_, testing::_, testing::_))
             .WillOnce(testing::Return(alexaClientSDK::avsCommon::sdkInterfaces::SetStateResult::SUCCESS));
-        EXPECT_CALL(*m_mockFocusManager, releaseChannel(testing::_, testing::_)).Times(testing::AtLeast(1));
-
+        EXPECT_CALL(*m_mockFocusManager, releaseChannel(testing::_, testing::_))
+            .Times(testing::AtLeast(1))
+            .WillRepeatedly(testing::InvokeWithoutArgs([this] {
+                auto tempFuture = std::promise<bool>();
+                m_releaseChannelPromise.swap(tempFuture);
+                m_releaseChannelPromise.set_value(true);
+                return m_releaseChannelPromise.get_future();
+            }));
         m_capAgent = aace::engine::phoneCallController::PhoneCallControllerCapabilityAgent::create(
             m_mockGui, m_mockContextManager, m_mockExceptionSender, m_mockMessageSender, m_mockFocusManager);
     }
@@ -176,6 +181,7 @@ public:
 
     std::promise<void> m_wakeSetCompletedPromise;
     std::future<void> m_wakeSetCompletedFuture;
+    std::promise<bool> m_releaseChannelPromise;
 
     std::shared_ptr<aace::engine::phoneCallController::PhoneCallControllerCapabilityAgent> m_capAgent;
     std::shared_ptr<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockContextManager>>

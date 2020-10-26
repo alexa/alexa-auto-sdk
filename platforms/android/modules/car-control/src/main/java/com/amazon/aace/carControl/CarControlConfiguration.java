@@ -199,32 +199,6 @@ public class CarControlConfiguration extends EngineConfiguration {
     private CarControlConfiguration() {}
 
     /**
-     * @deprecated
-     * Define your own zone IDs rather than using these constants. For every zone ID you use, create the
-     * corresponding zone definition with @c createZone(). Implicit creation of the 'default' zones listed here may be
-     * removed in a future version.
-     *
-     * Default zone IDs.
-     * The zone definition for a default zone is created automatically when an endpoint in your configuration uses the
-     * zone's ID.
-     */
-    public class Zone {
-        public static final String ALL = "zone.all";
-        public static final String DRIVER = "zone.driver";
-        public static final String DRIVER_ROW = "zone.driver.row";
-        public static final String FIRST_ROW = "zone.first.row";
-        public static final String FOURTH_ROW = "zone.fourth.row";
-        public static final String FRONT = "zone.front";
-        public static final String PASSENGER = "zone.passenger";
-        public static final String PASSENGER_ROW = "zone.passenger.row";
-        public static final String REAR = "zone.rear";
-        public static final String REAR_DRIVER = "zone.rear.driver";
-        public static final String REAR_PASSENGER = "zone.rear.passenger";
-        public static final String SECOND_ROW = "zone.second.row";
-        public static final String THIRD_ROW = "zone.third.row";
-    }
-
-    /**
      * Supported action IDs used to create action mapping 'semantic annotations' for capability instances on endpoints.
      * Action mapping semantic annotations enable mapping specific additional utterances to the directives of individual
      * capability instances.
@@ -267,33 +241,6 @@ public class CarControlConfiguration extends EngineConfiguration {
      */
     final public CarControlConfiguration createEndpoint(String endpointId) {
         createEndpoint(getNativeRef(), endpointId);
-        return this;
-    }
-
-    /**
-     * @deprecated
-     * Use @c CarControlConfiguration.createEndpoint().
-     *
-     * @note This method is for backward compatibility. Do not use method @c addMembers() on a zone definition if you
-     * create endpoints with @c createControl(). @c addMembers() is only compatible with @c createEndpoint().
-     *
-     * @note Do not use both @c createControl() and @c createEndpoint() in your implementation.
-     *
-     * Begin an endpoint definition using the specified endpoint ID. This creates a single entry in the "endpoints"
-     * array of 'aace.carControl'.
-     *
-     * @note Do not use the following format for the @a endpointId:
-     * <clientId>::<productId>::<serialNumber>::[-<extEndpoint>].
-     * The Engine internally prepends the 3-part device prefix to your specified @a endpointId before sending the
-     * configuration to the cloud in an @b AddOrUpdateReport event. Configuring the full ID directly results in
-     * duplication and excess characters.
-     *
-     * @param controlId The unique identifier for the endpoint.
-     * @param zoneId The unique identifier of the zone the endpoint is located in. Default is @c "zone.all".
-     * @return @c CarControlConfiguration to allow chaining.
-     */
-    final public CarControlConfiguration createControl(String controlId, String zoneId) {
-        createControl(getNativeRef(), controlId, zoneId);
         return this;
     }
 
@@ -541,8 +488,6 @@ public class CarControlConfiguration extends EngineConfiguration {
      *
      * @note An endpoint ID added to this zone instance may belong to other zones as well.
      *
-     * @note Do not use deprecated method @c createControl() to create endpoints if using this method.
-     *
      * @param endpointIds The IDs of the endpoints belonging to this zone. Endpoint IDs used must correspond to
      *        endpoints created with @c createEndpoint().
      * @return @c CarControlConfiguration to allow chaining.
@@ -607,7 +552,6 @@ public class CarControlConfiguration extends EngineConfiguration {
 
     // Native Platform Interfaces
     private native void createEndpoint(long nativeRef, String endpointId);
-    private native void createControl(long nativeRef, String controlId, String zoneId);
     private native void addAssetId(long nativeRef, String assetId);
     private native void addPowerController(long nativeRef, boolean retrievable);
     private native void addToggleController(long nativeRef, String instanceId, boolean retrievable);

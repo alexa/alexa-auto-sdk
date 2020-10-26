@@ -1,0 +1,1 @@
+static const char* AACE_LOOPBACK_DETECTOR = "aace.engine.loopbackDetector";

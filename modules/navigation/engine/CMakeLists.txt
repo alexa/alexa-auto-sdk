@@ -22,6 +22,7 @@ add_library(AACENavigationEngine SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/DisplayManagerCapabilityAgent.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/NavigationAssistanceCapabilityAgent.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/NavigationCapabilityAgent.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/NavigationConfigurationImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/NavigationEngineImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/NavigationEngineService.cpp
 )

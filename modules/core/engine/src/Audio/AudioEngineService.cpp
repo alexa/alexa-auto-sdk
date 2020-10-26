@@ -115,7 +115,7 @@ std::shared_ptr<AudioOutputChannelInterface> AudioEngineService::openAudioOutput
 
         return channel;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "openAudioInputChannel").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG, "openAudioOutputChannel").d("reason", ex.what()));
         return nullptr;
     }
 }

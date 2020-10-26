@@ -47,7 +47,7 @@ import java.io.IOException;
 import java.util.Map;
 
 public class AudioOutputHandler
-        extends AudioOutput implements AuthStateObserver, Releasable, EqualizerControllerHandler.EqualizerProvider {
+        extends AudioOutput implements Releasable, EqualizerControllerHandler.EqualizerProvider {
     private static final String sTag = AudioOutputHandler.class.getSimpleName();
     private static final String sFileName = "alexa_media"; // Note: not thread safe
     private static final long sSkipThresholdInMS = 1500; // 1500 ms
@@ -142,7 +142,7 @@ public class AudioOutputHandler
 
     @Override
     public boolean prepare(String url, boolean repeating) {
-        mLogger.postVerbose(sTag, String.format("(%s) Handling prepare(url)", mName));
+        mLogger.postVerbose(sTag, String.format("(%s) Handling prepare(url) (%s)", mName, url));
         resetPlayer();
         mRepeating = repeating;
         Uri uri = Uri.parse(url);
@@ -293,18 +293,6 @@ public class AudioOutputHandler
     private void onPlaybackBuffering() {
         mLogger.postVerbose(sTag, String.format("(%s) Media State Changed. STATE: BUFFERING", mName));
         mediaStateChanged(MediaState.BUFFERING);
-    }
-
-    @Override
-    public void onAuthStateChanged(AuthState state, AuthError error) {
-        if (state == AuthState.UNINITIALIZED) {
-            // Stop playing media if user logs out
-            if (mPlayer.getPlayWhenReady()) {
-                // Ensure media is playing before stopping
-                mLogger.postInfo(sTag, String.format("(%s) Auth state is uninitialized. Stopping media player", mName));
-                mPlayer.setPlayWhenReady(false);
-            }
-        }
     }
 
     @Override

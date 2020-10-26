@@ -49,19 +49,25 @@ public:
     virtual void setCurrentActivity(const alexaClientSDK::avsCommon::avs::PlayerActivity currentActivity) = 0;
 
     /**
-     * Method to set the player in focus after an adapter has acquired the channel.
+     * Sets the player in focus to the specified player ID and acquires or
+     * releases @c FocusManager focus for the channel.
      *
-     * @param playerInFocus The business name of the adapter that has currently acquired focus.
+     * @note This method does not update the @c PlaybackHandlerInterface used by
+     * the @c PlaybackRouter.
+     *
+     * @param playerInFocus The player ID of the adapter that has currently acquired focus.
      * @param focusAcquire If @c true, acquire the channel and manage the focus state.
      * If @c false release the channel when the player is the player in focus.
      */
     virtual void setPlayerInFocus(const std::string& playerInFocus, bool focusAcquire) = 0;
 
     /**
-     * Method to set the player in focus after an adapter has acquired the channel.
+     * Sets the player in focus to the specified player ID and sets the @c PlaybackRouter @c PlaybackHandlerInterface to @c ExternalMediaPlayer.
+     * The player may or may not be playing already, and if it is playing, the @c FocusManager
+     * channel should already be acquired for the player.
      *
-     * @param playerInFocus The business name of the adapter that has currently acquired focus.
-     * @note This function should not be called during the callback in @c ExternalMediaAdapterInterface.
+     *
+     * @param playerInFocus The player ID of the adapter that has currently acquired focus.
      */
     virtual void setPlayerInFocus(const std::string& playerInFocus) = 0;
 

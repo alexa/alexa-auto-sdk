@@ -94,39 +94,35 @@ public class CarControlDataProvider {
         CarControlConfiguration config = CarControlConfiguration.create();
         // clang-format off
 
-        //----------------------------------------------------------------------
+        //--------------------------------------------------------------------------
         // Important note: See the car control module README at
         // platforms/android/modules/car-control/README.md for the suggested
-        // modeling of endpoints. The sample configuration in the README
-        // document is the source of truth for configuring features supported
-        // for car control rather than what is shown below.
-        //----------------------------------------------------------------------
+        // modeling of additional endpoints not shown in this example. The
+        // sample configuration in the README document is the source of truth
+        // for how endpoints should be configured.
+        //--------------------------------------------------------------------------
 
         //---------------------------------------------------------------------
         // Define the zones of the vehicle.
         // Ensure the endpoint IDs added to the zones are also defined.
         //---------------------------------------------------------------------
-        config.createZone("zone.all")
+        config.createZone("zone.default")
             .addAssetId(CarControlAssets.Location.ALL)
             .addMembers(new String[] {
-                "all.fan",
-                "all.heater",
-                "ac",
-                "vent",
-                "ambient.light",
-                "reading.light"});
+                "default.fan",
+                "default.heater",
+                "default.ac",
+                "default.vent",
+                "default.reading.light"});
         config.createZone("zone.rear")
             .addAssetId(CarControlAssets.Location.REAR)
             .addMembers(new String[] {"rear.windshield"});
         config.createZone("zone.front")
             .addAssetId(CarControlAssets.Location.FRONT)
-            .addMembers(new String[] {
-                "front.light",
-                "driver.seat",
-                "passenger.seat"});
+            .addMembers(new String[] {"front.light"});
         config.createZone("zone.driver")
             .addAssetId(CarControlAssets.Location.DRIVER)
-            .addAssetId(CarControlAssets.Location.LEFT)
+            .addAssetId(CarControlAssets.Location.FRONT_LEFT)
             .addMembers(new String[] {
                 "driver.fan",
                 "driver.heater",
@@ -135,7 +131,7 @@ public class CarControlDataProvider {
                 "driver.window"});
         config.createZone("zone.passenger")
             .addAssetId(CarControlAssets.Location.PASSENGER)
-            .addAssetId(CarControlAssets.Location.RIGHT)
+            .addAssetId(CarControlAssets.Location.FRONT_RIGHT)
             .addMembers(new String[] {
                 "passenger.fan",
                 "passenger.heater",
@@ -144,9 +140,9 @@ public class CarControlDataProvider {
         config.createZone("zone.secondRow")
             .addAssetId(CarControlAssets.Location.SECOND_ROW)
             .addMembers(new String[] {"secondRow.heater", "secondRow.light"});
-        
-        // Since "zone.all" is set to default, utterances matching endpoints in 
-        // this zone take precedence
+
+        // Since "zone.default" is set to default, utterances matching endpoints
+        // in this zone take precedence
         config.setDefaultZone("zone.all");
 
         //---------------------------------------------------------------------
@@ -159,12 +155,13 @@ public class CarControlDataProvider {
         //    "Alexa, set the fan to <value between 1 and 10>"
         //    "Alexa, turn up the blower"
         //    "Alexa, [increase|decrease] the fan speed by 3"
-        //--------------------------------------------------------------------- 
-        config.createEndpoint("all.fan")
+        //---------------------------------------------------------------------
+        config.createEndpoint("default.fan")
             .addAssetId(CarControlAssets.Device.FAN)
             .addPowerController(false)
             .addRangeController("speed", false, 1, 10, 1, "")
                 .addAssetId(CarControlAssets.Setting.FAN_SPEED)
+                .addAssetId(CarControlAssets.Setting.SPEED)
                 .addPreset(1)
                     .addAssetId(CarControlAssets.Value.LOW)
                     .addAssetId(CarControlAssets.Value.MINIMUM)
@@ -174,14 +171,15 @@ public class CarControlDataProvider {
                     .addAssetId(CarControlAssets.Value.HIGH)
                     .addAssetId(CarControlAssets.Value.MAXIMUM);
         // Update internal data structure (not relevant to CarControlConfiguration)
-        m_boolControllers.put(genKey("all.fan"), new BoolController());
-        m_rangeControllers.put(genKey("all.fan", "speed"), new RangeController(1, 10));
-        
+        m_boolControllers.put(genKey("default.fan"), new BoolController());
+        m_rangeControllers.put(genKey("default.fan", "speed"), new RangeController(1, 10));
+
         config.createEndpoint("driver.fan")
             .addAssetId(CarControlAssets.Device.FAN)
             .addPowerController(false)
             .addRangeController("speed", false, 1, 10, 1, "")
                 .addAssetId(CarControlAssets.Setting.FAN_SPEED)
+                .addAssetId(CarControlAssets.Setting.SPEED)
                 .addPreset(1)
                     .addAssetId(CarControlAssets.Value.LOW)
                     .addAssetId(CarControlAssets.Value.MINIMUM)
@@ -199,6 +197,7 @@ public class CarControlDataProvider {
             .addPowerController(false)
             .addRangeController("speed", false, 1, 10, 1, "")
                 .addAssetId(CarControlAssets.Setting.FAN_SPEED)
+                .addAssetId(CarControlAssets.Setting.SPEED)
                 .addPreset(1)
                     .addAssetId(CarControlAssets.Value.LOW)
                     .addAssetId(CarControlAssets.Value.MINIMUM)
@@ -212,7 +211,7 @@ public class CarControlDataProvider {
         m_rangeControllers.put(genKey("passenger.fan", "speed"), new RangeController(1, 10));
 
         //---------------------------------------------------------------------
-        // Create a "heater" endpoint for various zones. 
+        // Create a "heater" endpoint for various zones.
         //
         // Things to try:
         //    "Alexa, turn [on|off] the heater"
@@ -222,7 +221,7 @@ public class CarControlDataProvider {
         //    "Alexa, [increase/decrease] the temperature"
         //    "Alexa, increase the temperature by 4"
         //---------------------------------------------------------------------
-        config.createEndpoint("all.heater")
+        config.createEndpoint("default.heater")
             .addAssetId(CarControlAssets.Device.HEATER)
             .addAssetId(CarControlAssets.Device.COOLER)
             .addPowerController(false)
@@ -238,15 +237,14 @@ public class CarControlDataProvider {
                     .addAssetId(CarControlAssets.Value.HIGH)
                     .addAssetId(CarControlAssets.Value.MAXIMUM);
         // Update internal data structure (not relevant to CarControlConfiguration)
-        m_boolControllers.put(genKey("all.heater"), new BoolController());
-        m_rangeControllers.put(genKey("all.heater", "temperature"), new RangeController(60, 90));
+        m_boolControllers.put(genKey("default.heater"), new BoolController());
+        m_rangeControllers.put(genKey("default.heater", "temperature"), new RangeController(60, 90));
 
         config.createEndpoint("driver.heater")
             .addAssetId(CarControlAssets.Device.HEATER)
             .addAssetId(CarControlAssets.Device.COOLER)
             .addPowerController(false)
-            .addRangeController(
-                "temperature", false, 60, 90, 1, CarControlAssets.Unit.FAHRENHEIT)
+            .addRangeController("temperature", false, 60, 90, 1, CarControlAssets.Unit.FAHRENHEIT)
                 .addAssetId(CarControlAssets.Setting.TEMPERATURE)
                 .addAssetId(CarControlAssets.Setting.HEAT)
                 .addPreset(60)
@@ -265,8 +263,7 @@ public class CarControlDataProvider {
             .addAssetId(CarControlAssets.Device.HEATER)
             .addAssetId(CarControlAssets.Device.COOLER)
             .addPowerController(false)
-            .addRangeController(
-                "temperature", false, 60, 90, 1, CarControlAssets.Unit.FAHRENHEIT)
+            .addRangeController("temperature", false, 60, 90, 1, CarControlAssets.Unit.FAHRENHEIT)
                 .addAssetId(CarControlAssets.Setting.TEMPERATURE)
                 .addAssetId(CarControlAssets.Setting.HEAT)
                 .addPreset(60)
@@ -285,8 +282,7 @@ public class CarControlDataProvider {
             .addAssetId(CarControlAssets.Device.HEATER)
             .addAssetId(CarControlAssets.Device.COOLER)
             .addPowerController(false)
-            .addRangeController(
-                "temperature", false, 60, 90, 1, CarControlAssets.Unit.FAHRENHEIT)
+            .addRangeController("temperature", false, 60, 90, 1, CarControlAssets.Unit.FAHRENHEIT)
                 .addAssetId(CarControlAssets.Setting.TEMPERATURE)
                 .addAssetId(CarControlAssets.Setting.HEAT)
                 .addPreset(60)
@@ -308,29 +304,26 @@ public class CarControlDataProvider {
         //
         // Things to try:
         //    Without semantic action mappings...
-        //      "Alexa, set the driver window height to [low|medium|high]""
+        //      "Alexa, set the driver window height to full"
         //    With semantic action mappings...
-        //      "Alexa, [open|close|raise|lower] the driver window"
+        //      "Alexa, [close|raise] the driver window"
         //---------------------------------------------------------------------
         config.createEndpoint("driver.window")
             .addAssetId(CarControlAssets.Device.WINDOW)
-            .addRangeController("height", false, 0, 100, 1, "")
+            .addRangeController("height", false, 0, 10, 1, "")
                 .addAssetId(CarControlAssets.Setting.HEIGHT)
-                .addPreset(0)
-                    .addAssetId(CarControlAssets.Value.LOW)
-                    .addAssetId(CarControlAssets.Value.MINIMUM)
-                .addPreset(50)
+                .addPreset(10)
+                    .addAssetId(CarControlAssets.Value.FULL)
+                .addPreset(5)
                     .addAssetId(CarControlAssets.Value.MEDIUM)
-                .addPreset(100)
-                    .addAssetId(CarControlAssets.Value.HIGH)
-                    .addAssetId(CarControlAssets.Value.MAXIMUM)
-                .addActionSetRange(new String[] {CarControlConfiguration.Action.OPEN}, 0)
-                .addActionSetRange(new String[] {CarControlConfiguration.Action.CLOSE}, 100)
-                .addActionAdjustRange(new String[] {CarControlConfiguration.Action.RAISE}, 10)
-                .addActionAdjustRange(new String[] {CarControlConfiguration.Action.LOWER}, -10);
+                    .addAssetId(CarControlAssets.Value.HALF)
+                .addActionSetRange(new String[] {
+                    CarControlConfiguration.Action.CLOSE, CarControlConfiguration.Action.RAISE}, 10)
+                .addActionSetRange(new String[] {
+                    CarControlConfiguration.Action.OPEN, CarControlConfiguration.Action.LOWER}, 0);
 
         // Update internal data structure (not relevant to CarControlConfiguration)
-        m_rangeControllers.put(genKey("driver.window", "height"), new RangeController(0, 100));
+        m_rangeControllers.put(genKey("driver.window", "height"), new RangeController(0, 10));
 
         //---------------------------------------------------------------------
         // Create generic "light" endpoints for various zones.
@@ -340,15 +333,23 @@ public class CarControlDataProvider {
         //---------------------------------------------------------------------
         config.createEndpoint("driver.light")
             .addAssetId(CarControlAssets.Device.LIGHT)
+            .addAssetId(CarControlAssets.Device.DOME_LIGHT)
+            .addAssetId(CarControlAssets.Device.CABIN_LIGHT)
             .addPowerController(false);
         config.createEndpoint("passenger.light")
             .addAssetId(CarControlAssets.Device.LIGHT)
+            .addAssetId(CarControlAssets.Device.DOME_LIGHT)
+            .addAssetId(CarControlAssets.Device.CABIN_LIGHT)
             .addPowerController(false);
         config.createEndpoint("front.light")
             .addAssetId(CarControlAssets.Device.LIGHT)
+            .addAssetId(CarControlAssets.Device.DOME_LIGHT)
+            .addAssetId(CarControlAssets.Device.CABIN_LIGHT)
             .addPowerController(false);
         config.createEndpoint("secondRow.light")
             .addAssetId(CarControlAssets.Device.LIGHT)
+            .addAssetId(CarControlAssets.Device.DOME_LIGHT)
+            .addAssetId(CarControlAssets.Device.CABIN_LIGHT)
             .addPowerController(false);
         // Update internal data structure (not relevant to CarControlConfiguration)
         m_boolControllers.put(genKey("driver.light"), new BoolController());
@@ -357,31 +358,24 @@ public class CarControlDataProvider {
         m_boolControllers.put(genKey("secondRow.light"), new BoolController());
 
         //---------------------------------------------------------------------
-        // Create various additional endpoints for specialized "lights"
+        // Create various additional endpoints for specialized lights
         //
         // Things to try:
-        //    "Alexa, turn [on|off] the light"
         //    "Alexa, turn [on|off] the [dome|cabin|reading] light"
         //    "Alexa, set the ambient light to blue"
         //---------------------------------------------------------------------
-        config.createEndpoint("dome.light")
-            .addAssetId(CarControlAssets.Device.DOME_LIGHT)
-            .addAssetId(CarControlAssets.Device.CABIN_LIGHT)
-            .addPowerController(false);
-        // Update internal data structure (not relevant to CarControlConfiguration)
-        m_boolControllers.put(genKey("dome.light"), new BoolController());
-
-        config.createEndpoint("reading.light")
+        config.createEndpoint("default.reading.light")
             .addAssetId(CarControlAssets.Device.READING_LIGHT)
             .addPowerController(false);
         // Update internal data structure (not relevant to CarControlConfiguration)
-        m_boolControllers.put(genKey("reading.light"), new BoolController());
+        m_boolControllers.put(genKey("default.reading.light"), new BoolController());
 
         config.createEndpoint("ambient.light")
             .addAssetId(CarControlAssets.Device.AMBIENT_LIGHT)
             .addPowerController(false)
-            .addModeController("color", false, true)
+            .addModeController("color", false, false)
                 .addAssetId(CarControlAssets.Setting.COLOR)
+                .addAssetId(CarControlAssets.Setting.MODE)
                 .addValue("RED")
                     .addAssetId(CarControlAssets.Color.RED)
                 .addValue("BLUE")
@@ -419,16 +413,15 @@ public class CarControlDataProvider {
         //    "Alexa, set the AC mode to [economy|auto|manual]"
         //    "Alexa, set the AC intensity to [min|low|medium|high|max]"
         //    "Alexa, [increase|decrease] the AC"
-        //    "Alexa, [raise|lower]" the AC
         //---------------------------------------------------------------------
-        config.createEndpoint("ac")
+        config.createEndpoint("default.ac")
             .addAssetId(CarControlAssets.Device.AIR_CONDITIONER)
             .addPowerController(false)
             .addModeController("mode", false, false)
                 .addAssetId(CarControlAssets.Setting.MODE)
                 .addValue("ECONOMY")
                     .addAssetId(CarControlAssets.Setting.ECONOMY)
-                .addValue("AUTO")
+                .addValue("AUTOMATIC")
                     .addAssetId(CarControlAssets.Setting.AUTO)
                 .addValue("MANUAL")
                     .addAssetId(CarControlAssets.Setting.MANUAL)
@@ -441,21 +434,19 @@ public class CarControlDataProvider {
                     .addAssetId(CarControlAssets.Value.MEDIUM)
                 .addValue("HIGH")
                     .addAssetId(CarControlAssets.Value.HIGH)
-                    .addAssetId(CarControlAssets.Value.MAXIMUM)
-                .addActionAdjustMode(new String[] {CarControlConfiguration.Action.RAISE}, 1)
-                .addActionAdjustMode(new String[] {CarControlConfiguration.Action.LOWER}, -1);
+                    .addAssetId(CarControlAssets.Value.MAXIMUM);
         // Update internal data structure (not relevant to CarControlConfiguration)
-        m_boolControllers.put(genKey("ac"), new BoolController());
+        m_boolControllers.put(genKey("default.ac"), new BoolController());
         ModeController acMode = new ModeController();
             acMode.addMode("ECONOMY");
-            acMode.addMode("AUTO");
+            acMode.addMode("AUTOMATIC");
             acMode.addMode("MANUAL");
-        m_modeControllers.put(genKey("ac", "mode"), acMode);
+        m_modeControllers.put(genKey("default.ac", "mode"), acMode);
         ModeController acIntensity = new ModeController();
             acIntensity.addMode("LOW");
             acIntensity.addMode("MEDIUM");
             acIntensity.addMode("HIGH");
-        m_modeControllers.put(genKey("ac", "intensity"), acIntensity);
+        m_modeControllers.put(genKey("default.ac", "intensity"), acIntensity);
 
         //---------------------------------------------------------------------
         // Create a "windshield" endpoint for the rear zone.
@@ -464,27 +455,27 @@ public class CarControlDataProvider {
         //    "Alexa, turn [on|off] the rear windshield defroster"
         //---------------------------------------------------------------------
         config.createEndpoint("rear.windshield")
-                .addAssetId(CarControlAssets.Device.WINDSHIELD)
-                .addAssetId(CarControlAssets.Device.WINDOW)
-                .addToggleController("defroster", false)
-                    .addAssetId(CarControlAssets.Setting.DEFROST);
+            .addAssetId(CarControlAssets.Device.WINDOW)
+            .addAssetId(CarControlAssets.Device.WINDSHIELD)
+            .addToggleController("defroster", false)
+                .addAssetId(CarControlAssets.Setting.DEFROST)
+                .addAssetId(CarControlAssets.Setting.WINDSHIELD_VENTS);
         // Update internal data structure (not relevant to CarControlConfiguration)
         m_boolControllers.put(genKey("rear.windshield", "defroster"), new BoolController());
 
         //---------------------------------------------------------------------
-        // Create a "vent" endpoint. 
-        // This endpoint includes a semantic action mapping for more natural 
+        // Create a "vent" endpoint.
+        // This endpoint includes a semantic action mapping for more natural
         // voice targeting.
         //
         // Things to try:
         //    "Alexa, turn [on|off] the vent"
         //    "Alexa, set the vent position to [floor|body|mix]"
-        //    "Alexa, [open|close|raise|lower] the vent"
         //---------------------------------------------------------------------
-        config.createEndpoint("vent")
+        config.createEndpoint("default.vent")
             .addAssetId(CarControlAssets.Device.VENT)
             .addPowerController(false)
-            .addModeController("position", false, true)
+            .addModeController("position", false, false)
                 .addAssetId(CarControlAssets.Setting.POSITION)
                 .addValue("BODY")
                     .addAssetId(CarControlAssets.Setting.BODY_VENTS)
@@ -493,41 +484,40 @@ public class CarControlDataProvider {
                 .addValue("WINDSHIELD")
                     .addAssetId(CarControlAssets.Setting.WINDSHIELD_VENTS)
                 .addValue("MIX")
-                    .addAssetId(CarControlAssets.Setting.MIX_VENTS)
-            .addToggleController("height", false)
-                .addAssetId(CarControlAssets.Setting.POSITION)
-                .addActionTurnOn(new String[] {CarControlConfiguration.Action.OPEN, CarControlConfiguration.Action.RAISE})
-                .addActionTurnOff(new String[] {CarControlConfiguration.Action.CLOSE, CarControlConfiguration.Action.LOWER});
+                    .addAssetId(CarControlAssets.Setting.MIX_VENTS);
         // Update internal data structure (not relevant to CarControlConfiguration)
-        m_boolControllers.put(genKey("vent"), new BoolController());
+        m_boolControllers.put(genKey("default.vent"), new BoolController());
         ModeController ventPosition = new ModeController();
             ventPosition.addMode("BODY");
             ventPosition.addMode("FLOOR");
             ventPosition.addMode("WINDSHIELD");
             ventPosition.addMode("MIX");
-        m_modeControllers.put(genKey("vent", "position"), ventPosition);
-        m_boolControllers.put(genKey("vent", "height"), new BoolController());
+        m_modeControllers.put(genKey("default.vent", "position"), ventPosition);
+        m_boolControllers.put(genKey("default.vent", "height"), new BoolController());
 
         //---------------------------------------------------------------------
-        // Create "seat heater" endpoints for driver and passenger zones.
+        // Create "seat" endpoints for driver and passenger zones.
         //
         // Things to try:
         //    "Alexa, turn [on|off] the [driver|passenger] seat heater"
-        //    "Alexa, set the [driver|passenger] seat heater intensity to 
+        //    "Alexa, set the [driver|passenger] seat heater intensity to
         //          [low|minimum|medium|high|max]"
-        //    "Alexa, set the [driver|passenger] seat heater to 
+        //    "Alexa, set the [driver|passenger] seat heater to
         //          <value between 1 and 3>"
-        //    "Alexa, [turn up|increase|decrease] the [driver|passenger] seat 
+        //    "Alexa, [turn up|increase|decrease] the [driver|passenger] seat
         //          heater"
-        //---------------------------------------------------------------------  
+        //    "Alexa, set the [driver|passenger] seat position to [1|2|3]"
+        //---------------------------------------------------------------------
         config.createEndpoint("driver.seat")
             .addAssetId(CarControlAssets.Device.SEAT)
             .addToggleController("heater", false)
                 .addAssetId(CarControlAssets.Device.HEATER)
                 .addAssetId(CarControlAssets.Setting.HEAT)
+                .addAssetId(CarControlAssets.Device.SEAT_HEATER)
             .addRangeController("heaterintensity", false, 1, 3, 1, "")
                 .addAssetId(CarControlAssets.Device.HEATER)
                 .addAssetId(CarControlAssets.Setting.HEAT)
+                .addAssetId(CarControlAssets.Device.SEAT_HEATER)
                 .addPreset(1)
                     .addAssetId(CarControlAssets.Value.LOW)
                     .addAssetId(CarControlAssets.Value.MINIMUM)
@@ -535,15 +525,27 @@ public class CarControlDataProvider {
                     .addAssetId(CarControlAssets.Value.MEDIUM)
                 .addPreset(3)
                     .addAssetId(CarControlAssets.Value.HIGH)
-                    .addAssetId(CarControlAssets.Value.MAXIMUM);
+                    .addAssetId(CarControlAssets.Value.MAXIMUM)
+            .addToggleController("vent", false)
+                .addAssetId(CarControlAssets.Device.VENT)
+            .addModeController("position", false, true)
+                .addAssetId(CarControlAssets.Setting.STORED_POSITION)
+                .addValue("ONE")
+                    .addAssetId(CarControlAssets.Value.POSITION_ONE)
+                .addValue("TWO")
+                    .addAssetId(CarControlAssets.Value.POSITION_TWO)
+                .addValue("THREE")
+                    .addAssetId(CarControlAssets.Value.POSITION_THREE);
         config.createEndpoint("passenger.seat")
             .addAssetId(CarControlAssets.Device.SEAT)
             .addToggleController("heater", false)
                 .addAssetId(CarControlAssets.Device.HEATER)
                 .addAssetId(CarControlAssets.Setting.HEAT)
+                .addAssetId(CarControlAssets.Device.SEAT_HEATER)
             .addRangeController("heaterintensity", false, 1, 3, 1, "")
                 .addAssetId(CarControlAssets.Device.HEATER)
                 .addAssetId(CarControlAssets.Setting.HEAT)
+                .addAssetId(CarControlAssets.Device.SEAT_HEATER)
                 .addPreset(1)
                     .addAssetId(CarControlAssets.Value.LOW)
                     .addAssetId(CarControlAssets.Value.MINIMUM)
@@ -551,29 +553,60 @@ public class CarControlDataProvider {
                     .addAssetId(CarControlAssets.Value.MEDIUM)
                 .addPreset(3)
                     .addAssetId(CarControlAssets.Value.HIGH)
-                    .addAssetId(CarControlAssets.Value.MAXIMUM);
+                    .addAssetId(CarControlAssets.Value.MAXIMUM)
+            .addToggleController("vent", false)
+                .addAssetId(CarControlAssets.Device.VENT)
+            .addModeController("position", false, true)
+                .addAssetId(CarControlAssets.Setting.STORED_POSITION)
+                .addValue("ONE")
+                    .addAssetId(CarControlAssets.Value.POSITION_ONE)
+                .addValue("TWO")
+                    .addAssetId(CarControlAssets.Value.POSITION_TWO)
+                .addValue("THREE")
+                    .addAssetId(CarControlAssets.Value.POSITION_THREE);
         // Update internal data structure (not relevant to CarControlConfiguration)
         m_boolControllers.put(genKey("driver.seat", "heater"), new BoolController());
         m_boolControllers.put(genKey("passenger.seat", "heater"), new BoolController());
         m_rangeControllers.put(genKey("driver.seat", "heaterintensity"), new RangeController(1, 3));
         m_rangeControllers.put(genKey("passenger.seat", "heaterintensity"), new RangeController(1, 3));
-
+        m_boolControllers.put(genKey("driver.seat", "vent"), new BoolController());
+        m_boolControllers.put(genKey("passenger.seat", "vent"), new BoolController());
+        ModeController positionMode = new ModeController();
+            positionMode.addMode("ONE");
+            positionMode.addMode("TWO");
+            positionMode.addMode("THREE");
+        m_modeControllers.put(genKey("driver.seat", "position"), positionMode);
+        m_modeControllers.put(genKey("passenger.seat", "position"), positionMode);
         //---------------------------------------------------------------------
         // Create a "car" root endpoint for miscellaneous controls not
         // associated with any other endpoint.
         //
         // Things to try:
         //    "Alexa, turn [on|off] air recirculation"
+        //    "Alexa, set air recirculation to [inside|outside|auto]"
         //    "Alexa, turn [on|off] climate sync"
         //---------------------------------------------------------------------
         config.createEndpoint("car")
             .addAssetId(CarControlAssets.Device.CAR)
             .addToggleController("recirculate", false)
                 .addAssetId(CarControlAssets.Setting.AIR_RECIRCULATION)
+            .addModeController("recirculatemode", false, false)
+                .addAssetId(CarControlAssets.Setting.AIR_RECIRCULATION)
+                .addValue("INSIDE")
+                    .addAssetId(CarControlAssets.Value.INSIDE_AIR)
+                .addValue("OUTSIDE")
+                    .addAssetId(CarControlAssets.Value.OUTSIDE_AIR)
+                .addValue("AUTO")
+                    .addAssetId(CarControlAssets.Setting.AUTO)
             .addToggleController("climate.sync", false)
                 .addAssetId(CarControlAssets.Setting.CLIMATE_SYNC);
         // Update internal data structure (not relevant to CarControlConfiguration)
         m_boolControllers.put(genKey("car", "recirculate"), new BoolController());
+        ModeController recirculateMode = new ModeController();
+            recirculateMode.addMode("INSIDE");
+            recirculateMode.addMode("OUTSIDE");
+            recirculateMode.addMode("AUTO");
+        m_modeControllers.put(genKey("car", "recirculatemode"), recirculateMode);
         m_boolControllers.put(genKey("car", "climate.sync"), new BoolController());
 
         // clang-format on

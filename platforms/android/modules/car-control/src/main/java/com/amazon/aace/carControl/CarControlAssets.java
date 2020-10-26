@@ -33,7 +33,6 @@ public class CarControlAssets {
         public static final String DISPLAY = "Alexa.Automotive.DeviceName.Display";
         public static final String DISPLAY_SCREEN = "Alexa.Automotive.DeviceName.DisplayScreen";
         public static final String DOME_LIGHT = "Alexa.Automotive.DeviceName.DomeLight";
-        public static final String DRIVER_SEAT = "Alexa.Automotive.DeviceName.DriverSeat";
         public static final String FAN = "Alexa.Automotive.DeviceName.Fan";
         public static final String FOG_LIGHT = "Alexa.Automotive.DeviceName.FogLight";
         public static final String GAS_DOOR = "Alexa.Automotive.DeviceName.GasDoor";
@@ -44,13 +43,10 @@ public class CarControlAssets {
         public static final String HOOD = "Alexa.Automotive.DeviceName.Hood";
         public static final String HUD = "Alexa.Automotive.DeviceName.HUD";
         public static final String INFO_SCREEN = "Alexa.Automotive.DeviceName.InfoScreen";
-        public static final String LEFT_SEAT = "Alexa.Automotive.DeviceName.LeftSeat";
         public static final String LIGHT = "Alexa.Automotive.DeviceName.Light";
         public static final String MOONROOF = "Alexa.Automotive.DeviceName.Moonroof";
         public static final String PARKING_LIGHTS = "Alexa.Automotive.DeviceName.ParkingLights";
-        public static final String PASSENGER_SEAT = "Alexa.Automotive.DeviceName.PassengerSeat";
         public static final String READING_LIGHT = "Alexa.Automotive.DeviceName.ReadingLight";
-        public static final String RIGHT_SEAT = "Alexa.Automotive.DeviceName.RightSeat";
         public static final String SEAT = "Alexa.Automotive.DeviceName.Seat";
         public static final String SEAT_HEATER = "Alexa.Automotive.DeviceName.SeatHeater";
         public static final String STEERING_WHEEL = "Alexa.Automotive.DeviceName.SteeringWheel";

@@ -20,7 +20,7 @@
 #include <AACE/Audio/AudioFormat.h>
 #include <unistd.h>
 #include <cstring>
-#include <cctype>
+#include <utility>
 #include "curl/curl.h"
 
 namespace aace {
@@ -30,7 +30,7 @@ namespace systemAudio {
 #define LXT LX(TAG).d("name", m_name)
 
 // String to identify log entries originating from this file.
-static const std::string TAG("aace.systemAudio.AudioOutputImpl");
+static const char* TAG("aace.systemAudio.AudioOutputImpl");
 
 static constexpr size_t READ_BUFFER_SIZE = 4096;
 
@@ -76,43 +76,83 @@ std::ostream& operator<<(std::ostream& stream, AudioOutputImpl::State state) {
     return stream;
 }
 
+bool AudioOutputImpl::checkState(AudioOutputImpl::State state) {
+    std::unique_lock<std::mutex> lock{m_stateMutex};
+    return m_state == state;
+}
+
 bool AudioOutputImpl::checkState(std::initializer_list<AudioOutputImpl::State> validStates) {
+    std::unique_lock<std::mutex> lock{m_stateMutex};
     return std::find(validStates.begin(), validStates.end(), m_state) != validStates.end();
 }
 
 void AudioOutputImpl::setState(State state) {
-    AACE_INFO(LXT.d("old", m_state).d("new", state));
-    m_state = state;
+    std::unique_lock<std::mutex> lock{m_stateMutex};
+    setStateLocked(state);
 }
 
-// clang-format off
-static aal_listener_t aalListener = {
-    .on_start = [](void* user_data) {
-        ReturnIf(!user_data);
-        auto self = static_cast<AudioOutputImpl*>(user_data);
-        self->onStart();
-    },
-    .on_stop = [](aal_status_t reason, void* user_data) {
-        ReturnIf(!user_data);
-        auto self = static_cast<AudioOutputImpl*>(user_data);
-        self->onStop(reason);
-    },
-    .on_almost_done = [](void* user_data) {
-        ReturnIf(!user_data);
-        auto self = static_cast<AudioOutputImpl*>(user_data);
-        self->onAlmostDone();
-    },
-    .on_data = nullptr,
-    .on_data_requested = [](void* user_data) {
-        ReturnIf(!user_data);
-        auto self = static_cast<AudioOutputImpl*>(user_data);
-        self->onDataRequested();
-    }
-};
-// clang-format on
+void AudioOutputImpl::setStateLocked(State state) {
+    AACE_INFO(LXT.d("old", m_state).d("new", state));
+    m_state = state;
+    m_cvStateChange.notify_all();
 
-AudioOutputImpl::AudioOutputImpl(const int moduleId, const std::string& deviceName, const std::string& name) :
-        m_moduleId(moduleId), m_name(name), m_deviceName(deviceName) {
+    switch (m_state) {
+        case State::Started:
+            mediaStateChanged(MediaState::PLAYING);
+            break;
+        case State::Paused:
+        case State::Stopped:
+            mediaStateChanged(MediaState::STOPPED);
+            break;
+        case State::Faulted:
+            // Try stopping the player for any faults
+            if (m_player) {
+                aal_player_stop(m_player);
+            }
+            mediaError(MediaError::MEDIA_ERROR_INTERNAL_DEVICE_ERROR);
+            break;
+        case State::Created:
+        case State::Initialized:
+        case State::Preparing:
+        case State::Prepared:
+        case State::Starting:
+        case State::Pausing:
+        case State::Resuming:
+        case State::Stopping:
+            break;
+    }
+}
+
+bool AudioOutputImpl::waitForState(State state) {
+#if SYSTEM_AUDIO_EXTEND_STATE_TIMEOUT
+    // setting breakpoints during debugging can easily cause state timeout
+    constexpr auto WAIT_FOR_STATE_TIMEOUT = std::chrono::seconds(300);
+#else
+    constexpr auto WAIT_FOR_STATE_TIMEOUT = std::chrono::seconds(3);
+#endif
+
+    std::unique_lock<std::mutex> stateLock{m_stateMutex};
+    if (!m_cvStateChange.wait_for(stateLock, WAIT_FOR_STATE_TIMEOUT, [this, state] {
+            return m_state == State::Faulted || m_state == state;
+        })) {
+        AACE_ERROR(LXT.m("waitForStateTimeout").d("state", state));
+
+        setStateLocked(State::Faulted);
+        return false;
+    }
+    if (m_state != state) {
+        AACE_ERROR(LXT.d("state", m_state).d("waitForState", state));
+        return false;
+    }
+    return true;
+}
+
+AudioOutputImpl::AudioOutputImpl(const int moduleId, std::string deviceName, std::string name) :
+        m_moduleId(moduleId),
+        m_name(std::move(name)),
+        m_streaming(false),
+        m_deviceName(std::move(deviceName)),
+        m_state(State::Created) {
 }
 
 AudioOutputImpl::~AudioOutputImpl() {
@@ -162,11 +202,10 @@ bool AudioOutputImpl::writeStreamToFile(aace::audio::AudioStream* stream, const 
 
         // copy the stream to the file
         char buffer[READ_BUFFER_SIZE];
-        ssize_t bytesRead;
         ssize_t size = 0;
 
         while (!stream->isClosed()) {
-            bytesRead = stream->read(buffer, READ_BUFFER_SIZE);
+            ssize_t bytesRead = stream->read(buffer, READ_BUFFER_SIZE);
 
             // throw an error if the read failed
             ThrowIf(bytesRead < 0, "readFromStreamFailed");
@@ -194,7 +233,7 @@ bool AudioOutputImpl::writeStreamToPipeline() {
 
         constexpr std::chrono::milliseconds RETRY_INTERVAL(100);
         char buffer[READ_BUFFER_SIZE];
-        ssize_t size;
+        ssize_t size = 0;
 
         while (m_streaming) {
             size = m_currentStream->read(buffer, READ_BUFFER_SIZE);
@@ -234,77 +273,91 @@ bool AudioOutputImpl::writeStreamToPipeline() {
 }
 
 void AudioOutputImpl::onStart() {
-    m_executor.submit([this] { executeOnStart(); });
+    m_executorCallback.submit([this] { executeOnStart(); });
 }
 
 void AudioOutputImpl::executeOnStart() {
-    AACE_VERBOSE(LXT);
-    if (checkState({State::Started})) {
-        return;  // repeated start
-    }
+    AACE_INFO(LXT);
     if (!checkState({
             State::Starting,  // the first starting
             State::Resuming,  // resuming
-            State::Stopping,  // immediate stop after start?!
+            State::Faulted,
         })) {
-        AACE_WARN(LXT.d("reason", "suspicious state change").d("state", m_state));
+        AACE_ERROR(LXT.d("reason", "suspicious state change").d("state", m_state));
+        return;
     }
+    if (checkState(State::Faulted)) {
+        AACE_DEBUG(LXT.m("ignore late OnStart"));
+        return;
+    }
+
     setState(State::Started);
-    mediaStateChanged(MediaState::PLAYING);
 }
 
 void AudioOutputImpl::onStop(aal_status_t reason) {
-    m_executor.submit([this, reason] { executeOnStop(reason); });
+    m_executorCallback.submit([this, reason] { executeOnStop(reason); });
 }
 
 void AudioOutputImpl::onAlmostDone() {
     int64_t almostDonePosition = aal_player_get_position(m_player);
-    m_executor.submit([this, almostDonePosition] { m_currentPosition = almostDonePosition; });
+    m_executorCallback.submit([this, almostDonePosition] { m_currentPosition = almostDonePosition; });
 }
 
 void AudioOutputImpl::executeOnStop(aal_status_t reason) {
-    AACE_VERBOSE(LXT.d("reason", reason));
+    AACE_INFO(LXT.d("reason", reason));
     if (!checkState({
             State::Stopping,  // intentional stop
             State::Pausing,   // pause
             State::Started,   // completed
-            State::Starting,  // AAL failed to start
-            State::Faulted,   // Fault during playback
+            State::Faulted,
         })) {
-        AACE_WARN(LXT.d("reason", "suspicious state change").d("state", m_state));
-    }
-    try {
-        executeStopStreaming();
         if (reason == AAL_ERROR) {
             setState(State::Faulted);
-            mediaError(MediaError::MEDIA_ERROR_INTERNAL_DEVICE_ERROR);
         } else {
-            if (reason == AAL_SUCCESS) {
-                if (!m_mediaQueue.empty()) {
-                    m_mediaQueue.pop_front();
-                }
-                if (!m_mediaQueue.empty()) {
-                    // play next media item
-                    preparePlayer(m_mediaQueue.front(), nullptr);
-                    if (m_player) {
-                        aal_player_play(m_player);
-                        return;  // no state change
-                    }
-                } else if (m_repeating && !m_mediaUrl.empty()) {
-                    // play the URL again
-                    if (prepareLocked(m_mediaUrl, nullptr, m_repeating)) {
-                        aal_player_play(m_player);
-                        return;  // no state change
-                    }
-                }
-            }
+            AACE_ERROR(LXT.d("reason", "suspicious state change").d("state", m_state));
+        }
+        return;
+    }
+    if (checkState(State::Faulted)) {
+        AACE_DEBUG(LXT.m("ignore late OnStop"));
+        return;
+    }
+    try {
+        m_executor.submit([this] { executeStopStreaming(); });
 
-            if (m_state == State::Pausing) {
-                setState(State::Paused);
-            } else {
-                setState(State::Stopped);
+        if (checkState(State::Pausing)) {
+            setState(State::Paused);
+        } else if (checkState(State::Stopping)) {
+            setState(State::Stopped);
+        } else if (checkState(State::Started)) {
+            if (reason != AAL_SUCCESS) {
+                setState(State::Faulted);
+                return;
             }
-            mediaStateChanged(MediaState::STOPPED);
+            m_executor
+                .submit([this]() {
+                    if (!m_mediaQueue.empty()) {
+                        m_mediaQueue.pop_front();
+                    }
+                    if (!m_mediaQueue.empty()) {
+                        // play next media item
+                        preparePlayer(m_mediaQueue.front(), nullptr);
+                        if (m_player) {
+                            aal_player_play(m_player);
+                            return;  // no state change
+                        }
+                    } else if (m_repeating && !m_mediaUrl.empty()) {
+                        // play the URL again
+                        if (prepareLocked(m_mediaUrl, nullptr, m_repeating)) {
+                            aal_player_play(m_player);
+                            return;  // no state change
+                        }
+                    }
+                    setState(State::Stopped);
+                })
+                .wait();
+        } else {
+            AACE_ERROR(LXT.m("unexpected state"));
         }
     } catch (std::exception& ex) {
         AACE_ERROR(LXT.d("reason", ex.what()));
@@ -335,7 +388,7 @@ void AudioOutputImpl::executeStopStreaming() {
 }
 
 void AudioOutputImpl::onDataRequested() {
-    m_executor.submit([this]() { executeStartStreaming(); });
+    m_executorCallback.submit([this]() { executeStartStreaming(); });
 }
 
 //
@@ -346,19 +399,21 @@ bool AudioOutputImpl::prepare(std::shared_ptr<aace::audio::AudioStream> stream, 
     return m_executor.submit([this, stream, repeating] { return executePrepare(stream, repeating); }).get();
 }
 
-bool AudioOutputImpl::executePrepare(std::shared_ptr<aace::audio::AudioStream> stream, bool repeating) {
+bool AudioOutputImpl::executePrepare(const std::shared_ptr<aace::audio::AudioStream>& stream, bool repeating) {
     if (!checkState({
             State::Initialized,  // new one
+            State::Prepared,     // re-prepare
             State::Stopped,      // completed
             State::Faulted,      // failed last time
         })) {
-        AACE_WARN(LXT.d("reason", "suspicious state change").d("state", m_state));
+        AACE_ERROR(LXT.d("reason", "invalid state change").d("state", m_state));
+        return false;
     }
 
-    bool succeeded;
     try {
-        AACE_VERBOSE(LXT.d("encoding", stream->getEncoding()).d("repeating", repeating));
+        setState(State::Preparing);
 
+        AACE_VERBOSE(LXT.d("encoding", stream->getEncoding()).d("repeating", repeating));
         switch (stream->getEncoding()) {
             case audio::AudioStream::Encoding::UNKNOWN:
                 // Note: We assume the unknown streams are all MP3 formatted
@@ -366,11 +421,7 @@ bool AudioOutputImpl::executePrepare(std::shared_ptr<aace::audio::AudioStream> s
                 // write the audio stream to a temp file
                 char tmpFile[] = "/tmp/aac_audio_XXXXXX";
                 int fd = mkstemp(tmpFile);
-                if (fd < 0) {
-                    AACE_ERROR(LX(TAG).m("mkstemp failed"));
-                    succeeded = false;
-                    break;
-                }
+                ThrowIf(fd < 0, "mkstempFailed");
                 close(fd);
                 ThrowIfNot(writeStreamToFile(stream.get(), tmpFile), "writeStreamToFileFailed");
 
@@ -379,23 +430,24 @@ bool AudioOutputImpl::executePrepare(std::shared_ptr<aace::audio::AudioStream> s
                     AACE_INFO(LXT.m("tempFileRemoved").d("path", m_tmpFile));
                 }
                 m_tmpFile = tmpFile;
-                succeeded = prepareLocked("file://" + m_tmpFile, nullptr, repeating);
+                ThrowIfNot(prepareLocked("file://" + m_tmpFile, nullptr, repeating), "prepareMP3Failed");
                 break;
             }
             case audio::AudioStream::Encoding::LPCM:
                 m_currentStream = stream;
-                succeeded = prepareLocked("", stream, repeating);
+                ThrowIfNot(prepareLocked("", stream, repeating), "prepareLPCMFailed");
                 break;
             default:
                 Throw("unsupportedStreamEncoding");
         }
     } catch (std::exception& ex) {
         AACE_WARN(LXT.d("reason", ex.what()));
-        succeeded = false;
+        setState(State::Faulted);
+        return false;
     }
 
-    setState(succeeded ? State::Prepared : State::Faulted);
-    return succeeded;
+    setState(State::Prepared);
+    return true;
 }
 
 bool AudioOutputImpl::prepare(const std::string& url, bool repeating) {
@@ -405,10 +457,12 @@ bool AudioOutputImpl::prepare(const std::string& url, bool repeating) {
 bool AudioOutputImpl::executePrepare(const std::string& url, bool repeating) {
     if (!checkState({
             State::Initialized,  // new one
+            State::Prepared,     // re-prepare
             State::Stopped,      // completed
             State::Faulted,      // failed last time
         })) {
-        AACE_WARN(LXT.d("reason", "suspicious state change").d("state", m_state));
+        AACE_ERROR(LXT.d("reason", "invalid state change").d("state", m_state));
+        return false;
     }
 
     bool succeeded = prepareLocked(url, nullptr, repeating);
@@ -488,9 +542,8 @@ std::vector<std::string> AudioOutputImpl::parsePlaylistUrl(const std::string& ur
 
 bool AudioOutputImpl::prepareLocked(
     const std::string& url,
-    std::shared_ptr<aace::audio::AudioStream> stream,
+    const std::shared_ptr<aace::audio::AudioStream>& stream,
     bool repeating) {
-    bool succeeded;
     try {
         AACE_INFO(LXT.sensitive("url", url).d("repeating", repeating));
 
@@ -514,21 +567,45 @@ bool AudioOutputImpl::prepareLocked(
 
         m_mediaUrl = url;
         m_repeating = repeating;
-
-        succeeded = true;
     } catch (std::exception& ex) {
         AACE_ERROR(LXT.d("reason", ex.what()));
-        succeeded = false;
+        return false;
     }
 
-    return succeeded;
+    return true;
 }
 
-void AudioOutputImpl::preparePlayer(const std::string& url, std::shared_ptr<aace::audio::AudioStream> stream) {
+void AudioOutputImpl::preparePlayer(const std::string& url, const std::shared_ptr<aace::audio::AudioStream>& stream) {
     if (m_player) {
         aal_player_destroy(m_player);
         m_player = nullptr;
     }
+
+    // clang-format off
+    static aal_listener_t aalListener = {
+        .on_start = [](void* user_data) {
+          ReturnIf(!user_data);
+          auto *self = static_cast<AudioOutputImpl*>(user_data);
+          self->onStart();
+        },
+        .on_stop = [](aal_status_t reason, void* user_data) {
+          ReturnIf(!user_data);
+          auto *self = static_cast<AudioOutputImpl*>(user_data);
+          self->onStop(reason);
+        },
+        .on_almost_done = [](void* user_data) {
+          ReturnIf(!user_data);
+          auto *self = static_cast<AudioOutputImpl*>(user_data);
+          self->onAlmostDone();
+        },
+        .on_data = nullptr,
+        .on_data_requested = [](void* user_data) {
+          ReturnIf(!user_data);
+          auto *self = static_cast<AudioOutputImpl*>(user_data);
+          self->onDataRequested();
+        }
+    };
+    // clang-format on
 
     // clang-format off
     aal_attributes_t attr = {
@@ -575,24 +652,26 @@ void AudioOutputImpl::preparePlayer(const std::string& url, std::shared_ptr<aace
 }
 
 bool AudioOutputImpl::play() {
-    return m_executor.submit([this] { return executePlay(); }).get();
+    m_executor.submit([this] { return executePlay(); });
+    return true;
 }
 
 bool AudioOutputImpl::executePlay() {
     try {
         AACE_VERBOSE(LXT);
-        ThrowIfNull(m_player, "playerIsNULL");
-        if (!checkState({
-                State::Prepared,  // first-time play
-                State::Stopping,  // repeated play
-                State::Stopped,   // play another
-            })) {
+        if (checkState(State::Started)) {
+            AACE_WARN(LXT.m("already started"));
+            return false;
+        } else if (!checkState({
+                       State::Prepared,  // first-time play
+                       State::Stopped,   // play another
+                   })) {
             AACE_ERROR(LXT.d("reason", "invalid state").d("state", m_state));
             return false;
         }
         setState(State::Starting);
         aal_player_play(m_player);
-        return true;
+        return waitForState(State::Started);
     } catch (std::exception& ex) {
         AACE_ERROR(LXT.d("reason", ex.what()));
         setState(State::Faulted);
@@ -601,20 +680,23 @@ bool AudioOutputImpl::executePlay() {
 }
 
 bool AudioOutputImpl::stop() {
-    return m_executor.submit([this] { return executeStop(); }).get();
+    m_executor.submit([this] { return executeStop(); });
+    return true;
 }
 
 bool AudioOutputImpl::executeStop() {
     try {
         AACE_VERBOSE(LXT);
-        ThrowIfNull(m_player, "playerIsNULL");
-        if (!checkState({State::Starting, State::Started, State::Paused})) {
+        if (checkState({State::Initialized, State::Prepared, State::Stopped})) {
+            AACE_WARN(LXT.m("already stopped"));
+            return false;
+        } else if (!checkState({State::Started, State::Paused})) {
             AACE_ERROR(LXT.d("reason", "invalid state").d("state", m_state));
             return false;
         }
         setState(State::Stopping);
         aal_player_stop(m_player);
-        return true;
+        return waitForState(State::Stopped);
     } catch (std::exception& ex) {
         AACE_ERROR(LXT.d("reason", ex.what()));
         setState(State::Faulted);
@@ -623,20 +705,23 @@ bool AudioOutputImpl::executeStop() {
 }
 
 bool AudioOutputImpl::pause() {
-    return m_executor.submit([this] { return executePause(); }).get();
+    m_executor.submit([this] { return executePause(); });
+    return true;
 }
 
 bool AudioOutputImpl::executePause() {
     try {
         AACE_VERBOSE(LXT);
-        ThrowIfNull(m_player, "playerIsNULL");
-        if (m_state != State::Started) {
+        if (checkState(State::Paused)) {
+            AACE_WARN(LXT.m("already paused"));
+            return false;
+        } else if (!checkState(State::Started)) {
             AACE_ERROR(LXT.d("reason", "invalid state").d("state", m_state));
             return false;
         }
         setState(State::Pausing);
         aal_player_pause(m_player);
-        return true;
+        return waitForState(State::Paused);
     } catch (std::exception& ex) {
         AACE_ERROR(LXT.d("reason", ex.what()));
         setState(State::Faulted);
@@ -645,20 +730,23 @@ bool AudioOutputImpl::executePause() {
 }
 
 bool AudioOutputImpl::resume() {
-    return m_executor.submit([this] { return executeResume(); }).get();
+    m_executor.submit([this] { return executeResume(); });
+    return true;
 }
 
 bool AudioOutputImpl::executeResume() {
     try {
         AACE_VERBOSE(LXT);
-        ThrowIfNull(m_player, "playerIsNULL");
-        if (m_state != State::Paused) {
+        if (checkState(State::Started)) {
+            AACE_WARN(LXT.m("already started"));
+            return false;
+        } else if (!checkState(State::Paused)) {
             AACE_ERROR(LXT.d("reason", "invalid state").d("state", m_state));
             return false;
         }
         setState(State::Resuming);
         aal_player_play(m_player);
-        return true;
+        return waitForState(State::Started);
     } catch (std::exception& ex) {
         AACE_ERROR(LXT.d("reason", ex.what()));
         setState(State::Faulted);
@@ -687,7 +775,8 @@ int64_t AudioOutputImpl::executeGetPosition() {
 }
 
 bool AudioOutputImpl::setPosition(int64_t position) {
-    return m_executor.submit([this, position] { return executeSetPosition(position); }).get();
+    m_executor.submit([this, position] { return executeSetPosition(position); });
+    return true;
 }
 
 bool AudioOutputImpl::executeSetPosition(int64_t position) {

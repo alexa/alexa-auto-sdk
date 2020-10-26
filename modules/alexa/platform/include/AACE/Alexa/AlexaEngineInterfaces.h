@@ -101,8 +101,6 @@ public:
         uint64_t keywordEnd,
         const std::string& keyword) = 0;
     virtual bool onStopCapture() = 0;
-    virtual bool enableWakewordDetection() = 0;
-    virtual bool disableWakewordDetection() = 0;
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const SpeechRecognizerEngineInterface::Initiator& initiator) {

@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">2.3.0</span>
+   &#160;<span id="projectnumber">3.0.0</span>
    </div>
   </td>
  </tr>
@@ -92,12 +92,6 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a5c85bfc150b64cc2389c4a036fa6c367"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9c043bac65f630eed854a2e48182144c"><td class="memItemLeft" align="right" valign="top">final boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a9c043bac65f630eed854a2e48182144c">stopCapture</a> ()</td></tr>
 <tr class="separator:a9c043bac65f630eed854a2e48182144c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0deee93d537185fac5422de414a38945"><td class="memItemLeft" align="right" valign="top">final boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a0deee93d537185fac5422de414a38945">enableWakewordDetection</a> ()</td></tr>
-<tr class="separator:a0deee93d537185fac5422de414a38945"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acf85cb08497b64f28dc95cabbd90ea52"><td class="memItemLeft" align="right" valign="top">final boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#acf85cb08497b64f28dc95cabbd90ea52">disableWakewordDetection</a> ()</td></tr>
-<tr class="separator:acf85cb08497b64f28dc95cabbd90ea52"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af0d4c212de01891b3647b2bf18a59df6"><td class="memItemLeft" align="right" valign="top">final boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#af0d4c212de01891b3647b2bf18a59df6">isWakewordDetectionEnabled</a> ()</td></tr>
-<tr class="separator:af0d4c212de01891b3647b2bf18a59df6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html">SpeechRecognizer</a> should be extended to initiate voice interactions with Alexa. <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html">SpeechRecognizer</a> provides interfaces for</p>
@@ -264,69 +258,12 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a0deee93d537185fac5422de414a38945"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0deee93d537185fac5422de414a38945">&#9670;&nbsp;</a></span>enableWakewordDetection()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">final boolean com.amazon.aace.alexa.SpeechRecognizer.enableWakewordDetection </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Notifies the Engine to enable the wake word engine. Wake word must be supported in the Engine to be enabled by this call.</p>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the Engine successfully enabled wake word detection, else <code>false</code> </dd></dl>
-
-</div>
-</div>
-<a id="acf85cb08497b64f28dc95cabbd90ea52"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acf85cb08497b64f28dc95cabbd90ea52">&#9670;&nbsp;</a></span>disableWakewordDetection()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">final boolean com.amazon.aace.alexa.SpeechRecognizer.disableWakewordDetection </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Notifies the Engine to disable the wake word engine</p>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the Engine successfully disabled wakeword detection, else <code>false</code> </dd></dl>
-
-</div>
-</div>
-<a id="af0d4c212de01891b3647b2bf18a59df6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af0d4c212de01891b3647b2bf18a59df6">&#9670;&nbsp;</a></span>isWakewordDetectionEnabled()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">final boolean com.amazon.aace.alexa.SpeechRecognizer.isWakewordDetectionEnabled </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Checks if wake word detection is enabled in the Engine</p>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if wake word detection is enabled, else <code>false</code> </dd></dl>
-
-</div>
-</div>
 </div><!-- contents -->
 <html>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 2.3.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 3.0.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

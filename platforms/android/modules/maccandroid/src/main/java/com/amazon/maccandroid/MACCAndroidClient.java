@@ -112,6 +112,14 @@ public class MACCAndroidClient {
                 APIConstants.Permissions.EMP_CONNECT_PERMISSION, null);
     }
 
+    public void cleanup() {
+        Log.i(TAG, "unregistering mPackageChangedReceiver & mAppInitiatedBroadcastReceiver");
+        if (mAppInitiatedBroadcastReceiver != null)
+            mContext.unregisterReceiver(mAppInitiatedBroadcastReceiver);
+        if (mPackageChangedReceiver != null)
+            mContext.unregisterReceiver(mPackageChangedReceiver);
+    }
+
     /**
      * runs a single instance of the discovery scan, usually good to run at startup
      */

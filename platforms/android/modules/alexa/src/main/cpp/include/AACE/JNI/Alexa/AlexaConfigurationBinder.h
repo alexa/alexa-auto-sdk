@@ -34,7 +34,7 @@ public:
     using T = aace::alexa::config::AlexaConfiguration::TemplateRuntimeTimeoutType;
 
     const char* getClassName() override {
-        return "com/amazon/aace/alexa/AlexaConfiguration$TemplateRuntimeTimeoutType";
+        return "com/amazon/aace/alexa/config/AlexaConfiguration$TemplateRuntimeTimeoutType";
     }
 
     std::vector<std::pair<T, std::string>> getConfiguration() override {
@@ -55,7 +55,7 @@ using JTemplateRuntimeTimeoutType =
 class JTemplateRuntimeTimeout : public JObject {
 public:
     JTemplateRuntimeTimeout(jobject obj) :
-            JObject(obj, "com/amazon/aace/alexa/AlexaConfiguration$TemplateRuntimeTimeout"){};
+            JObject(obj, "com/amazon/aace/alexa/config/AlexaConfiguration$TemplateRuntimeTimeout"){};
 
     aace::alexa::config::AlexaConfiguration::TemplateRuntimeTimeout getTemplateRuntimeTimeout();
 

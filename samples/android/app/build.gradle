@@ -7,7 +7,7 @@ android {
         minSdkVersion 22
         targetSdkVersion 28
         versionCode 1
-        versionName "2.3"
+        versionName "3.0"
     }
     buildTypes {
         release {
@@ -39,7 +39,7 @@ android {
 }
 
 ext {
-    remoteLibVersion = "2.3+"
+    remoteLibVersion = "3.0+"
 }
 
 dependencies {
@@ -54,7 +54,6 @@ dependencies {
         remoteImplementation "com.amazon.alexa.aace:addressbook:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aace:apl:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aace:cbl:${remoteLibVersion}@aar"
-        remoteImplementation "com.amazon.alexa.aace:contactuploader:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aace:car-control:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aace:maccandroid:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aace:messaging:${remoteLibVersion}@aar"

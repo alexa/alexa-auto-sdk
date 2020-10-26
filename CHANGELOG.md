@@ -1,5 +1,66 @@
 # Change Log
 ___
+## v3.0.0 released on 2020-10-09
+
+### Enhancements
+* Added Alexa Auto Client Service (AACS), which enables OEMs of Android-based devices to simplify the process of integrating the Auto SDK. For more information about AACS, see the AACS [README](./platforms/android/alexa-auto-client-service/README.md).
+  
+* Added support for removing local media sources at runtime, such as a USB drive or a Bluetooth device. Previously, if a user removed a USB drive and then requested to play music from the USB drive, the Auto SDK would attempt to play and not return an appropriate error message. This feature is enabled with an existing field in the `LocalMediaSource` platform interface state. For information about the platform interface state, see the `alexa` module [README](./modules/alexa/README.md).
+
+### Resolved Issues
+* On QNX, when a portion of music on Spotify is skipped, either by the user saying, "Skip forward," or by the user skipping to a different song, the volume is no longer reset to the default level.
+* A user barging in when music is playing no longer hears an Alexa response to the barge-in request. Previously, this issue happened if the System Audio extension was used.
+
+### Known Issues
+* General
+    * If the "locales" field of the "deviceSettings" node of the Alexa module configuration JSON is not specified, the Engine automatically declares support for the following locale combinations:
+        ["en-US", "es-US"],
+        ["es-US", "en-US"],
+        ["en-IN", "hi-IN"],
+        ["hi-IN", "en-IN"],
+        ["fr-CA", "en-CA"],
+        ["en-CA", "fr-CA"].
+    
+      The Engine does not declare support for locale combinations if the "locales" field is assigned an empty value.
+
+* Car Control
+    * For car control, there is a limit of two Device Serial Numbers (DSN) per account or Customer ID (CID). Limit the number of devices for testing with a single account accordingly. If you use the Android sample app, be sure to configure a specific DSN.
+    * It can take up to 20 seconds from the time of user login to the time Alexa is available to accept utterances. The cloud uses this time to ingest the car control endpoint configurations sent by Auto SDK after login.
+    * If you configure the Auto SDK Engine and connect to Alexa using a set of endpoint configurations, you cannot delete any endpoint in a set in the cloud. For example, after you configure set A with endpoints 1, 2, and 3, if you change your car control configuration during development to set B with endpoints 2, 3, and 4, endpoint 1 from set A remains in the cloud and might interfere with resolving the correct endpoint ID for your utterances. However, any endpoint configurations with matching IDs override previous configurations. For example, the configuration of endpoint 2 in set B replaces endpoint 2 in set A. During development, limit configuration changes to create only supersets of previous endpoint configurations. Work with your Solutions Architect or Partner Manager to produce the correct configuration on the first try.
+    * Car control utterances that are variations of supported utterances but do not follow the supported utterance patterns return errors. Examples include “please turn on the light in the car” instead of the supported “turn on the light“, and ”put on the defroster“ or “defrost the windshield” instead of the supported ”turn on the defroster”.  
+    * The air conditioner endpoint supports only Power Controller and Mode Controller capabilities, not Range Controller for numeric settings.
+
+* Communications
+    * A user request to send an SMS to an Alexa contact results in an Alexa-to-Alexa message instead. However ‘send message’ instead ‘send SMS’ to a contact works.
+    * When using LVC in online mode, users can redial a call when the phone connection state is OFF.
+    * DTMF utterances that include the letters "A", "B", "C", or "D" (for example "press A" or "dial 3*#B") are ignored.
+    * Calling numbers such as 1-800-xxx-xxxx by using utterances such as “Alexa call one eight double oh...” may return unexpected results. Similarly, when you call numbers by using utterances that include "triple," "hundred," and "thousand," or press special characters such as # or * by saying "Alexa press *#", you may experience unexpected results. We recommend that your client application ignore special characters, dots, and non-numeric characters when requesting Alexa to call or press digits.
+    * A user playing any skill with extended multi-turn dialogs (such as Jeopardy or Skyrim) cannot use voice to accept or reject incoming Alexa-to-Alexa calls.
+
+* Entertainment
+    * A user playing notifications while music is playing hears the music for a split second between the end of one notification and the start of the next.
+    * The word, "line-in," in an utterance is sometimes misinterpreted as "line" or other words. For example, if the user says, "Switch to line-in," the misinterpretation of "line-in" might cause an incorrect response.
+    * When an external player authorization is in progress at the exact moment of shutdown, a very rare race condition might occur, causing the Engine to crash.
+
+* Authentication
+    * The CBL module uses a backoff when refreshing the access token after expiry. If the internet is disconnected when the refresh is attempted, it could take up to a minute to refresh the token when the internet connection is restored.
+    * If you log out and log in, the client-side Do Not Disturb (DND) state may not be synchronized with the Alexa cloud.
+
+* AACS
+  
+    * For some platform interface APIs in the Core module, when an application fails to handle a directive, there is no way to report the failure to the Engine. This is because AASB assumes that the application always handles messages correctly. When AASB incorrectly reports how the application handles the message, the Engine state might become inconsistent with the application state. For example, suppose the Engine sends a directive to the application to set the audio volume but the application fails to make the change. AASB does not report the failure to the Engine. As a result, the Engine's and the application's settings become out of sync. The following list shows the affected APIs:
+        * `AudioInput`: 
+            * `startAudioInput()`
+        * `AudioOutput`: 
+            * `setPosition(int64_t position)`
+            * `volumeChanged(float volume)`
+            * `mutedStateChanged(MutedState state)`
+    
+     * In the commonutils library, the JSON parser (`RenderPlayerInfo.kt`) for the `renderPlayerInfo` message of `templateRuntime` can only parse the `payload` field of the AASB `RenderPlayerInfo` message payload. The `payload` field of `RenderPlayerInfo` is the inner payload of the nested payload structure. When using `TemplateRuntime.parseRenderInfo(String json)`, provide it with the embedded JSON as a string of the string value whose key is `payload` in the `RenderPlayerInfo` message’s payload instead of the overall AASB payload.
+    
+### Additional Changes
+Starting with Auto SDK v3.0, we no longer support the Automotive Grade Linux (AGL) Alexa Voice agent in the Auto SDK. If you intend to use the AGL Alexa Voice Agent, continue using Auto SDK v2.3.0, which is the last version that provides AGL support.
+
 ## v2.3.0 released on 2020-07-31
 
 ### Enhancements
@@ -101,7 +162,7 @@ ___
 * Fixed an External Media Player (EMP) Engine implementation that caused an unexpected sequence of Local Media Source playControl() method invocations such as play, then pause, followed by play again in quick succession.
 * Fixed an issue where the Engine might hang during shutdown if it was shut down while TTS was being played or read.
 * Fixed an issue where Auto SDK initialization failed at startup when applications using the optional LVC extension didn't register a NetworkInfoProvider platform interface.
-* Fixed an issue where building the Auto SDK with senstive logging enabled was not working as expected.
+* Fixed an issue where building the Auto SDK with sensitive logging enabled was not working as expected.
 * Added alerts error enums (`DELETED` and `SCHEDULED_FOR_LATER`) to the [`Alerts.h`](./modules/alexa/platform/include/AACE/Alexa/Alerts.h) and [`Alerts.java`](./platforms/android/modules/alexa/src/main/java/com/amazon/aace/alexa/Alerts.java) files.
 * With the exception of road regulation and maneuver events, the Alexa cloud no longer returns an `INVALID_REQUEST_EXCEPTION` or `INTERNAL_SERVICE_EXCEPTION` in response to navigation events sent by the Auto SDK.
 * Alexa now prompts or notifies the clients and rejects the ping packet when the user deregisters from the companion app.
@@ -110,7 +171,7 @@ ___
 * General
   * If the local timezone of your device differs from the timezone that was configured through the Alexa companion app, the user may experience unexpected behavior. For example, if your device shows 12pm PST, but the device on the Alexa companion app is configured with an EST timezone, then asking "Alexa set an alarm for 1pm today," will return, "Sorry I can't set alarms in the past". Auto SDK v2.2.0 adds support for setting the timezone of the vehicle, which allows your device to synchronize with the timezone set in the Alexa companion app; however, the Auto SDK currently does not receive a `SetTimeZone` directive when the timezone is changed from the companion app.
 * Navigation
-  * The Alexa cloud currently returns an `INTERNAL_SERVICE_EXCEPTION` in response to any navigation road regulation or manuever event sent by the Auto SDK (triggered by an utterance such as "which lane should I take", for example). You may see a harmless error/exception in the logs.
+  * The Alexa cloud currently returns an `INTERNAL_SERVICE_EXCEPTION` in response to any navigation road regulation or maneuver event sent by the Auto SDK (triggered by an utterance such as "which lane should I take", for example). You may see a harmless error/exception in the logs.
 * Car Control
   * Certain car control utterances return errors. Problematic utterances include natural versions of certain test utterances (for example, “turn on the light“ instead of “please turn on the light in the car”); utterances that include the words “lights” or “my”; and utterances to control the defroster or defogger that use “put on” or “set on” rather than “turn on” or “switch on”.
   * Setting the air conditioner using range controller control capabilities (for example “set the air conditioner to 65” or “set the air conditioner to low”) is not currently supported.

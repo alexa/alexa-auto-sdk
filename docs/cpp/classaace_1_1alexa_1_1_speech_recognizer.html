@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">2.3.0</span>
+   &#160;<span id="projectnumber">3.0.0</span>
    </div>
   </td>
  </tr>
@@ -88,19 +88,13 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ab2d1df9942a32ff6eb829211a1ebffba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afbbd237e855308ed0d440c7f3d469a69"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#afbbd237e855308ed0d440c7f3d469a69">stopCapture</a> ()</td></tr>
 <tr class="separator:afbbd237e855308ed0d440c7f3d469a69"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac8aa31ea0dcceddf5c7628a72cf58475"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#ac8aa31ea0dcceddf5c7628a72cf58475">enableWakewordDetection</a> ()</td></tr>
-<tr class="separator:ac8aa31ea0dcceddf5c7628a72cf58475"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae8655a4ecaab90892d240d5f21602e86"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#ae8655a4ecaab90892d240d5f21602e86">disableWakewordDetection</a> ()</td></tr>
-<tr class="separator:ae8655a4ecaab90892d240d5f21602e86"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a04744304f5997c94d4e76d2eb5f38660"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#a04744304f5997c94d4e76d2eb5f38660">isWakewordDetectionEnabled</a> ()</td></tr>
-<tr class="separator:a04744304f5997c94d4e76d2eb5f38660"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb2ff621353bb47de5e4d1d41662b278"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#adb2ff621353bb47de5e4d1d41662b278">wakewordDetected</a> (const std::string &amp;wakeword)</td></tr>
 <tr class="separator:adb2ff621353bb47de5e4d1d41662b278"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7e4d179fd39031d3a898466841905748"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#a7e4d179fd39031d3a898466841905748">endOfSpeechDetected</a> ()</td></tr>
 <tr class="separator:a7e4d179fd39031d3a898466841905748"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html">SpeechRecognizer</a> should be extended to initiate voice interactions with Alexa and provide audio input to AVS.</p>
+<div class="textblock"><p><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html">SpeechRecognizer</a> should be extended to initiate voice interactions with Alexa.</p>
 <p><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html">SpeechRecognizer</a> provides interfaces for </p><ul>
 <li>Initiating a dialog interaction with Alexa via press-and-hold, press-and-release, and voice-initiated user actions </li>
 <li>Streaming audio input to the Engine </li>
@@ -139,7 +133,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Notifies the Engine of a speech recognition event initiated by a press-and-hold action on the platform. The Engine will call <code>startAudioInput()</code> to notify the platform implementation when to start writing audio samples.</p>
+<p>Notifies the Engine of a speech recognition event initiated by a press-and-hold action on the platform. The Engine will call <code>aace::audio::AudioInput::startAudioInput()</code> to notify the platform implementation when to start writing audio samples.</p>
 <p>The platform implementation should call <code><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#afbbd237e855308ed0d440c7f3d469a69">stopCapture()</a></code> to terminate speech recognition on release of the press-and-hold action.</p>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if the Engine successfully initiated a recognize event, else <code>false</code> </dd></dl>
 
@@ -159,7 +153,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Notifies the Engine of a speech recognition event initiated by a press-and-release action on the platform. The Engine will call <code>startAudioInput()</code> to notify the platform implementation when to start writing audio samples.</p>
+<p>Notifies the Engine of a speech recognition event initiated by a press-and-release action on the platform. The Engine will call <code>aace::audio::AudioInput::startAudioInput()</code> to notify the platform implementation when to start writing audio samples.</p>
 <p>The Engine will terminate the recognize event initiated by the press-and-release action when end of speech is detected.</p>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if the Engine successfully started a recognize event, else <code>false</code> </dd></dl>
 
@@ -202,7 +196,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Notifies the Engine of a speech recognition event. The Engine will call <code>startAudioInput()</code> to notify the platform implementation when to start writing audio samples.</p>
+<p>Notifies the Engine of a speech recognition event.</p>
 <p>If the initator type is <code>HOLD_TO_TALK</code>, then the platform implementation should call <code><a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#afbbd237e855308ed0d440c7f3d469a69">stopCapture()</a></code> to terminate speech recognition on release of the press-and-hold action. Otherwise, the Engine will terminate the recognize event when end of speech is detected.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -231,68 +225,8 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Notifies the Engine to terminate the current recognize event. The Engine will call <code>stopAudioInput()</code> to notify the platform implementation when to stop writing audio samples.</p>
+<p>Notifies the Engine to terminate the current recognize event. The Engine will call <code>aace::audio::AudioInput::stopAudioInput()</code> to notify the platform implementation when to stop writing audio samples.</p>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if the Engine successfully terminated the current recognize event, else <code>false</code> </dd></dl>
-
-</div>
-</div>
-<a id="ac8aa31ea0dcceddf5c7628a72cf58475"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac8aa31ea0dcceddf5c7628a72cf58475">&#9670;&nbsp;</a></span>enableWakewordDetection()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool aace::alexa::SpeechRecognizer::enableWakewordDetection </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="section note"><dt>Note</dt><dd>This method is deprecated. Use <a class="el" href="classaace_1_1property_manager_1_1_property_manager.html#a07bd961c86047b1b1e5de7366bf83820">aace::propertyManager::PropertyManager::setProperty()</a></dd></dl>
-<p>Notifies the Engine to enable the wake word engine. Wake word must be supported in the Engine to be enabled by this call.</p>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the Engine successfully enabled wake word detection, else <code>false</code> </dd></dl>
-
-</div>
-</div>
-<a id="ae8655a4ecaab90892d240d5f21602e86"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae8655a4ecaab90892d240d5f21602e86">&#9670;&nbsp;</a></span>disableWakewordDetection()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool aace::alexa::SpeechRecognizer::disableWakewordDetection </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="section note"><dt>Note</dt><dd>This method is deprecated. Use <a class="el" href="classaace_1_1property_manager_1_1_property_manager.html#a07bd961c86047b1b1e5de7366bf83820">aace::propertyManager::PropertyManager::setProperty()</a></dd></dl>
-<p>Notifies the Engine to disable the wake word engine</p>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the Engine successfully disabled wakeword detection, else <code>false</code> </dd></dl>
-
-</div>
-</div>
-<a id="a04744304f5997c94d4e76d2eb5f38660"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a04744304f5997c94d4e76d2eb5f38660">&#9670;&nbsp;</a></span>isWakewordDetectionEnabled()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool aace::alexa::SpeechRecognizer::isWakewordDetectionEnabled </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="section note"><dt>Note</dt><dd>This method is deprecated. Use <a class="el" href="classaace_1_1property_manager_1_1_property_manager.html#a1892fedbf2193e03f040758207a4dea6">aace::propertyManager::PropertyManager::getProperty()</a></dd></dl>
-<p>Checks if wake word detection is enabled in the Engine</p>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if wake word detection is enabled, else <code>false</code> </dd></dl>
 
 </div>
 </div>
@@ -361,7 +295,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 2.3.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 3.0.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

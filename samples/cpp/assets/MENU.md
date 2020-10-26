@@ -281,7 +281,7 @@ For example:
 }
 ```
 
->**Note:** `LOCALE` is a special menu identifier - the id manager inserts `aace.alexa.supportedLocales` property values at runtime. `LOCATION` is used by the `LocationProviderHandler::getLocation()` function.
+>**Note:** `LOCALE` is a special menu identifier. `LOCATION` is used by the `LocationProviderHandler::getLocation()` function.
 
 ### Help<a id="help"></a>
 

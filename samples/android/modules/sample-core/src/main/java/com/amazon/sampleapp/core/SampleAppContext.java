@@ -3,6 +3,7 @@ package com.amazon.sampleapp.core;
 import android.app.Activity;
 import android.support.v4.view.ViewPager;
 
+import com.amazon.aace.alexa.SpeechRecognizer;
 import com.amazon.aace.audio.AudioOutputProvider;
 
 import org.json.JSONObject;
@@ -17,6 +18,10 @@ public interface SampleAppContext {
     Activity getActivity();
 
     AudioOutputProvider getAudioOutputProvider();
+
+    LoggerControllerInterface getLoggerController();
+
+    SpeechRecognizer getSpeechRecognizer();
 
     ViewPager getViewPager();
 

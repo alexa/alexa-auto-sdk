@@ -1,0 +1,26 @@
+@startuml
+skinparam roundcorner 10
+participant Driver 
+participant App
+participant AACS
+participant Alexa 
+Driver->App: initiate login process
+App->AACS: CBL:Start
+AACS-->App: CBL:StateChanged (STARTING)
+AACS->Alexa: requestingCodePair()
+Alexa-->AACS: (codePair, URL, expiresInSeconds)
+AACS->App: CBL:StateChanged (CODE_PAIR_RECEIVED, codePair, URL)
+AACS->App: CBL:StateChanged (REQUESTING_TOKEN)
+loop x seconds
+    AACS->Alexa: requestRefresh()
+end
+note right of Driver: Driver authenticates code pair with provided URL
+Alexa-->AACS: refreshToken, accessToken
+AACS->App: CBL:SetRefreshToken (refreshToken)
+loop per hour
+    AACS->App: CBL:GetRefreshToken
+    App-->AACS: CBL:GetRefreshToken Reply
+    AACS->Alexa: RequestRefresh()
+    Alexa-->AACS: (accessToken)
+end
+@enduml

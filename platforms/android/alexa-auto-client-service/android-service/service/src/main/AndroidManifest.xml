@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    android:sharedUserId="com.amazon.AlexaAutoUserId"
+    package="com.amazon.alexaautoclientservice">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="com.amazon.alexaauto.lvc" />
+
+    <permission android:name="com.amazon.alexaautoclientservice"
+        android:protectionLevel= "signature|privileged"/>
+
+    <application
+        android:allowBackup="true"
+        android:supportsRtl="true"
+        android:persistent="true"
+        android:extractNativeLibs="true">
+        <receiver
+            android:name="com.amazon.alexaautoclientservice.receiver.StartOnBootReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".AlexaAutoClientService"
+            android:enabled="true"
+            android:exported="true"
+            android:description="@string/aacs_description"
+            android:permission="com.amazon.alexaautoclientservice">
+            <intent-filter>
+                <action android:name="com.amazon.alexaautoclientservice.Start" />
+            </intent-filter>
+        </service>
+    </application>
+
+</manifest>

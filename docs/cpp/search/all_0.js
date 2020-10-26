@@ -13,10 +13,6 @@ var searchData=
   ['addactionturnoff',['addActionTurnOff',['../classaace_1_1car_control_1_1config_1_1_car_control_configuration.html#a2db0169e27a32bfddf2e7d54971ed121',1,'aace::carControl::config::CarControlConfiguration']]],
   ['addactionturnon',['addActionTurnOn',['../classaace_1_1car_control_1_1config_1_1_car_control_configuration.html#aa590e83d2ea0c72701d97efe6419ed5e',1,'aace::carControl::config::CarControlConfiguration']]],
   ['addassetid',['addAssetId',['../classaace_1_1car_control_1_1config_1_1_car_control_configuration.html#ae1038896bbf114e0ee90c50082e3dad4',1,'aace::carControl::config::CarControlConfiguration']]],
-  ['addcontact',['addContact',['../classaace_1_1contact_uploader_1_1_contact_uploader.html#a2b69454f9157b11c7e022d0e3d554671',1,'aace::contactUploader::ContactUploader']]],
-  ['addcontactsbegin',['addContactsBegin',['../classaace_1_1contact_uploader_1_1_contact_uploader.html#a542e1b6b49003f9f550178c8ecfb50a6',1,'aace::contactUploader::ContactUploader']]],
-  ['addcontactscancel',['addContactsCancel',['../classaace_1_1contact_uploader_1_1_contact_uploader.html#a83daa6d9078fd4a662afb6deb102c7bf',1,'aace::contactUploader::ContactUploader']]],
-  ['addcontactsend',['addContactsEnd',['../classaace_1_1contact_uploader_1_1_contact_uploader.html#a4ed1fe8a3b3eff4988c24b5187cf0298',1,'aace::contactUploader::ContactUploader']]],
   ['addcustomassetspath',['addCustomAssetsPath',['../classaace_1_1car_control_1_1config_1_1_car_control_configuration.html#ae9bc03e46eaf50a6d6afbd90ee13064a',1,'aace::carControl::config::CarControlConfiguration']]],
   ['adddefaultassetspath',['addDefaultAssetsPath',['../classaace_1_1car_control_1_1config_1_1_car_control_configuration.html#a67b0af557aa409231020239fa7960255',1,'aace::carControl::config::CarControlConfiguration']]],
   ['addmembers',['addMembers',['../classaace_1_1car_control_1_1config_1_1_car_control_configuration.html#a1aa86c1e0502e89b386bc6eabf2d8b61',1,'aace::carControl::config::CarControlConfiguration']]],
@@ -73,6 +69,5 @@ var searchData=
   ['authproviderengineinterface',['AuthProviderEngineInterface',['../classaace_1_1alexa_1_1_auth_provider_engine_interface.html',1,'aace::alexa']]],
   ['authstate',['AuthState',['../classaace_1_1alexa_1_1_auth_provider_engine_interface.html#abe4ab37548dfaf7744afe9078e1792ec',1,'aace::alexa::AuthProviderEngineInterface::AuthState()'],['../classaace_1_1alexa_1_1_auth_provider.html#a703c765e6cb7c747a9fc6a12d81b7ef4',1,'aace::alexa::AuthProvider::AuthState()']]],
   ['authstatechanged',['authStateChanged',['../classaace_1_1alexa_1_1_alexa_client.html#a6b469f0511ffdea1083044f0fe9f421e',1,'aace::alexa::AlexaClient::authStateChanged()'],['../classaace_1_1alexa_1_1_auth_provider.html#a38e948a90a4e5ef46e2bdc34eb0b19cf',1,'aace::alexa::AuthProvider::authStateChanged()']]],
-  ['alexa_20auto_20sdk_20for_20c_2b_2b',['Alexa Auto SDK for C++',['../index.html',1,'']]],
-  ['zone',['zone',['../namespaceaace_1_1car_control_1_1config_1_1zone.html',1,'aace::carControl::config']]]
+  ['alexa_20auto_20sdk_20for_20c_2b_2b',['Alexa Auto SDK for C++',['../index.html',1,'']]]
 ];

@@ -105,6 +105,7 @@ bool AudioInputEngineImpl::stop(ChannelId id) {
 
 void AudioInputEngineImpl::doShutdown() {
     std::lock_guard<std::mutex> clientLock(m_mutex);
+    std::lock_guard<std::mutex> callbackLock(m_callbackMutex);
     m_platformAudioInput->setEngineInterface(nullptr);
 }
 

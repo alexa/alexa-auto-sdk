@@ -143,36 +143,6 @@ JNIEXPORT jboolean JNICALL Java_com_amazon_aace_core_Engine_registerPlatformInte
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_amazon_aace_core_Engine_setProperty(JNIEnv* env, jobject /* this */, jlong ref, jstring key, jstring value) {
-    try {
-        auto engineBinder = ENGINE_BINDER(ref);
-        ThrowIfNull(engineBinder, "invalidEngineBinder");
-
-        ThrowIfNot(
-            engineBinder->getEngine()->setProperty(JString(key).toStdStr(), JString(value).toStdStr()),
-            "engineSetPropertyFailed")
-
-            return true;
-    } catch (const std::exception& ex) {
-        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_core_Engine_setProperty", ex.what());
-        return false;
-    }
-}
-
-JNIEXPORT jstring JNICALL
-Java_com_amazon_aace_core_Engine_getProperty(JNIEnv* env, jobject /* this */, jlong ref, jstring key) {
-    try {
-        auto engineBinder = ENGINE_BINDER(ref);
-        ThrowIfNull(engineBinder, "invalidEngineBinder");
-
-        return JString(engineBinder->getEngine()->getProperty(JString(key).toStdStr())).get();
-    } catch (const std::exception& ex) {
-        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_core_Engine_getProperty", ex.what());
-        return JString().get();
-    }
-}
-
-JNIEXPORT jboolean JNICALL
 Java_com_amazon_aace_core_Engine_setNativeEnv(JNIEnv* env, jobject /* this */, jlong ref, jstring name, jstring value) {
     try {
         ThrowIf(setenv(JString(name).toCStr(), JString(value).toCStr(), 1) != 0, "setEnvironmentFailed") return true;

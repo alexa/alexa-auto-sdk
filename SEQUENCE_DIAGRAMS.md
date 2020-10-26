@@ -47,4 +47,4 @@ This diagram includes the actual names and syntax for the methods and functions 
 
 1. While in the listening state, audio data is sent to Alexa until the end of speech is detected. Once the end of speech is detected, Alexa sends a ```StopCapture``` directive to the Engine and the dialog state is changed to "thinking." Alexa then respond with additional directives in response to the speech request.
 
-1. The application should continue to send audio to the Engine until ```stopAudioInput()``` is received. When wake word is enabled, this happens when the Engine is stopped, or when ```disableWakewordDetection()``` is explicitly called by the application.
+1. The application should continue to send audio to the Engine until ```stopAudioInput()``` is received. When wake word is enabled, this happens when the Engine is stopped, or when wakeword detection is disabled explicitly by the application.

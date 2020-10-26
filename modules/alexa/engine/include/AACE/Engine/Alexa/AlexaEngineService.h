@@ -266,7 +266,6 @@ public:
         bool& sync,
         const SetPropertyResultCallback& callbackFunction);
     std::string getProperty_locale();
-    std::string getProperty_supportedLocales();
     std::string getProperty_countrySupported();
     std::string getProperty_timezone();
     bool setProperty_wakewordEnabled(

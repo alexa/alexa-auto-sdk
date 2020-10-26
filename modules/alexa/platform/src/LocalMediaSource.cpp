@@ -34,7 +34,7 @@ LocalMediaSource::SessionState::SessionState() :
         loggedIn(false),
         userName(""),
         isGuest(false),
-        launched(false),
+        launched(true),
         active(false),
         accessToken(""),
         tokenRefreshInterval(std::chrono::milliseconds(0)),

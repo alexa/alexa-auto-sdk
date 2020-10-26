@@ -16,8 +16,6 @@
 #ifndef AAC_NAVIGATION_NAVIGATION_ENGINE_INTERFACES_H
 #define AAC_NAVIGATION_NAVIGATION_ENGINE_INTERFACES_H
 
-#include "Navigation.h"
-
 namespace aace {
 namespace navigation {
 

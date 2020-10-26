@@ -105,7 +105,7 @@ bool CarControlEngineService::configure(std::shared_ptr<std::istream> configurat
             ThrowIfNot(m_assetStore.addDefaultAssets(), "addDefaultAssetsFailed");
         }
 
-        // Translate zones config format from <2.2 to 2.3
+        // Translate <v2.2 zones config format (top level "zones" array) to v2.3+ (ZoneDefinitions capability)
         translateConfigForZones(jconfiguration);
 
         // Construct an object representation of each endpoint in configuration
@@ -164,6 +164,8 @@ bool CarControlEngineService::setup() {
             }
 
             // Add ZoneDefinitions capability to a dummy endpoint
+            // Note: Only cloud discovery code path uses this.
+            // A dummy endpoint was added to the LVC config already in translateConfigForZones()
             if (m_zonesCapabilityConfig.contains("configuration")) {
                 auto zoneDefinitions = aace::engine::carControl::ZoneDefinitions::create(
                     m_zonesCapabilityConfig, m_assetStore, endpointIdMappings);
@@ -244,95 +246,48 @@ bool CarControlEngineService::shutdown() {
 void CarControlEngineService::translateConfigForZones(json& jconfiguration) {
     try {
         if (jconfiguration.contains("zones") && jconfiguration.at("zones").is_array()) {
-            // Store each zone definition in a map so 'members' can be updated easily
-            std::unordered_map<std::string, json> zoneMap;
-            auto& zones = jconfiguration.at("zones");
-            for (auto& item : zones.items()) {
-                auto& zone = item.value();
-                // Add 'members' if it's not already there
-                if (!zone.contains("members")) {
-                    zone["members"] = json::array();
-                }
-                ThrowIfNot(zone.contains("zoneId") && zone.at("zoneId").is_string(), "zoneIdNotString");
-                std::string zoneId = zone.at("zoneId");
-                zoneMap.insert({zoneId, zone});
-            }
+            // Construct a 'ZoneDefinitions' capability and populate its "zones" array of
+            // capability configuration with the top-level "zones" array of "aace.carControl"
+            // clang-format off
+            json capability = {
+                {"type", "AlexaInterface"},
+                {"interface", "Alexa.Automotive.ZoneDefinitions"},
+                {"version", "1.0"},
+                {"configuration", {
+                    {"zones", jconfiguration["zones"]}
+                }}
+            };
+            // clang-format on
             // Remove 'zones' from the top level of configuration
             jconfiguration.erase("zones");
 
-            // From each endpoint definition, strip 'relationships' and add each ID to corresponding zone definition
-            if (jconfiguration.contains("endpoints") && jconfiguration.at("endpoints").is_array()) {
-                // Store the endpoint definitions to update the configuration after stripping 'relationships'
-                std::vector<json> endpoints;
-                for (auto& item : jconfiguration.at("endpoints").items()) {
-                    auto& endpoint = item.value();
-                    ThrowIfNot(
-                        endpoint.contains("endpointId") && endpoint.at("endpointId").is_string(),
-                        "endpointIdNotString");
-                    std::string endpointId = endpoint.at("endpointId");
-                    if (endpoint.contains("relationships") && endpoint.at("relationships").contains("isMemberOf")) {
-                        auto& isMemberOf = endpoint.at("relationships").at("isMemberOf");
-                        ThrowIfNot(isMemberOf.is_object(), "isMemberOfNotObject");
-                        ThrowIfNot(
-                            isMemberOf.contains("zoneId") && isMemberOf.at("zoneId").is_string(), "zoneIdNotString");
-                        std::string zoneId = isMemberOf.at("zoneId");
-                        auto zoneDefItr = zoneMap.find(zoneId);
-                        ThrowIf(zoneDefItr == zoneMap.end(), "endpointZoneIDNotFound");
-                        json& zoneDef = zoneDefItr->second;
-                        auto& members = zoneDef.at("members");
-                        members.push_back({{"endpointId", endpointId}});
-
-                        endpoint.erase("relationships");
-                    }
-                    endpoints.push_back(endpoint);
-                }
-                // Replace the 'endpoints' in config with the new list
-                jconfiguration.erase("endpoints");
-                jconfiguration["endpoints"] = json::array();
-                for (auto endpoint = endpoints.begin(); endpoint != endpoints.end(); ++endpoint) {
-                    jconfiguration["endpoints"].push_back(*endpoint);
-                }
-
-                // Construct a 'ZoneDefinitions' capability on a dummy endpoint
-
-                json zonesArray = json::array();
-                for (auto zoneDef = zoneMap.begin(); zoneDef != zoneMap.end(); ++zoneDef) {
-                    zonesArray.push_back(zoneDef->second);
-                }
-
-                // clang-format off
-                json capability = {
-                    {"type", "AlexaInterface"},
-                    {"interface", "Alexa.Automotive.ZoneDefinitions"},
-                    {"version", "1.0"},
-                    {"configuration", {
-                        {"zones", zonesArray}
-                    }}
-                };
-                // clang-format on
-                if (jconfiguration.contains("defaultZoneId")) {
-                    capability["configuration"].push_back({"defaultZoneId", jconfiguration["defaultZoneId"]});
-                    jconfiguration.erase("defaultZoneId");
-                }
-                // clang-format off
-
-                // Cache the capability configuration for further translation for the cloud discovery (see ZoneDefinitions.h)
-                m_zonesCapabilityConfig = capability;
-
-                json zoneEndpoint = {
-                    {"endpointId", INTERNAL_ENDPOINT_ID},
-                    {"friendlyName", INTERNAL_ENDPOINT_ID},
-                    {"description", "internal reference endpoint"},
-                    {"cookies", {
-                        {"createdBy", "AutoSDK"}
-                    }},
-                    {"displayCategories", {"VEHICLE"}},
-                    {"capabilities", json::array({capability})}
-                };
-                // clang-format on
-
-                jconfiguration["endpoints"].push_back(zoneEndpoint);
+            // Copy default zone ID from top-level "aace.carControl" to ZoneDefinitions capability config
+            if (jconfiguration.contains("defaultZoneId")) {
+                capability["configuration"].push_back({"defaultZoneId", jconfiguration["defaultZoneId"]});
+                jconfiguration.erase("defaultZoneId");
             }
+
+            // Cache the capability configuration for further translation for the cloud discovery (see ZoneDefinitions.h)
+            m_zonesCapabilityConfig = capability;
+
+            // Assign the ZoneDefinitions capability to a dummy endpoint
+            // Note: Only LVC code path (CarControlLocalService) parses this addition to jconfiguration
+            // clang-format off
+            json zoneEndpoint = {
+                {"endpointId", INTERNAL_ENDPOINT_ID},
+                {"friendlyName", INTERNAL_ENDPOINT_ID},
+                {"description", "internal reference endpoint"},
+                {"cookies", {
+                    {"createdBy", "AutoSDK"}
+                }},
+                {"displayCategories", {"VEHICLE"}},
+                {"capabilities", json::array({capability})}
+            };
+            // clang-format on
+            if (!jconfiguration.contains("endpoints")) {
+                jconfiguration["endpoints"] = json::array();
+            }
+            jconfiguration["endpoints"].push_back(zoneEndpoint);
         }
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).m("translationFailed").d("reason", ex.what()));

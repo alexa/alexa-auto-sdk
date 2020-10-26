@@ -28,32 +28,6 @@ namespace carControl {
 namespace config {
 
 /**
- * @deprecated 
- * Define your own zone IDs rather than using these constants. For every zone ID you use, create the
- * corresponding zone definition with @c createZone(). Implicit creation of the 'default' zones listed here may be 
- * removed in a future version.
- * 
- * Default zone IDs. 
- * The zone definition for a default zone is created automatically when an endpoint in your configuration uses the 
- * zone's ID.
- */
-namespace zone {
-static const std::string ALL = "zone.all";
-static const std::string DRIVER = "zone.driver";
-static const std::string DRIVER_ROW = "zone.driver.row";
-static const std::string FIRST_ROW = "zone.first.row";
-static const std::string FOURTH_ROW = "zone.fourth.row";
-static const std::string FRONT = "zone.front";
-static const std::string PASSENGER = "zone.passenger";
-static const std::string PASSENGER_ROW = "zone.passenger.row";
-static const std::string REAR = "zone.rear";
-static const std::string REAR_DRIVER = "zone.rear.driver";
-static const std::string REAR_PASSENGER = "zone.rear.passenger";
-static const std::string SECOND_ROW = "zone.second.row";
-static const std::string THIRD_ROW = "zone.third.row";
-}  // namespace zone
-
-/**
  * Supported action IDs used to create action mapping 'semantic annotations' for capability instances on endpoints. 
  * Action mapping semantic annotations enable mapping specific additional utterances to the directives of individual 
  * capability instances.
@@ -272,32 +246,6 @@ public:
     virtual CarControlConfiguration& createEndpoint(const std::string& endpointId) = 0;
 
     /**
-     * @deprecated
-     * Use @c CarControlConfiguration::createEndpoint().
-     * 
-     * @note This method is for backward compatibility. Do not use method @c addMembers() on a zone definition if you 
-     * create endpoints with @c createControl(). @c addMembers() is only compatible with @c createEndpoint().
-     * 
-     * @note Do not use both @c createControl() and @c createEndpoint() in your implementation.
-     * 
-     * Begin an endpoint definition using the specified endpoint ID. This creates a single entry in the "endpoints" 
-     * array of 'aace.carControl'.
-     * 
-     * @note Do not use the following format for the @a endpointId:
-     * <clientId>::<productId>::<serialNumber>::[-<extEndpoint>]. 
-     * The Engine internally prepends the 3-part device prefix to your specified @a endpointId before sending the
-     * configuration to the cloud in an @b AddOrUpdateReport event. Configuring the full ID directly results in 
-     * duplication and excess characters. 
-     *
-     * @param [in] controlId The unique identifier for the endpoint.
-     * @param [in] zoneId The unique identifier of the zone the endpoint is located in. Default is @c "zone.all".
-     * @return @c CarControlConfiguration to allow chaining.
-     */
-    virtual CarControlConfiguration& createControl(
-        const std::string& controlId,
-        const std::string& zoneId = zone::ALL) = 0;
-
-    /**
      * Add an asset ID to the enclosing element. This can be called to add an asset ID to the friendly names list for 
      * the following elements:
      *  @li The 'endpointResources' of an endpoint definition
@@ -508,8 +456,6 @@ public:
      * Add the specified endpoint IDs to the definition of the enclosing zone.
      * 
      * @note An endpoint ID added to this zone instance may belong to other zones as well.
-     * 
-     * @note Do not use deprecated method @c createControl() to create endpoints if using this method.
      * 
      * @param [in] endpointIds The IDs of the endpoints belonging to this zone. Endpoint IDs used must correspond to
      *        endpoints created with @c createEndpoint().

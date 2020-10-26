@@ -46,7 +46,6 @@ private:
     std::weak_ptr<Activity> m_activity{};
     std::weak_ptr<logger::LoggerHandler> m_loggerHandler{};
     std::weak_ptr<propertyManager::PropertyManagerHandler> m_propertyManagerHandler{};
-    //std::shared_ptr<sampleApp::AudioInputManager> m_platformAudioCapture{};
 
     std::string m_audioFilePath{};
     std::atomic<bool> m_isStreamingAudioFile{false};
@@ -57,9 +56,7 @@ protected:
     SpeechRecognizerHandler(
         std::weak_ptr<Activity> activity,
         std::weak_ptr<logger::LoggerHandler> loggerHandler,
-        std::weak_ptr<propertyManager::PropertyManagerHandler> propertyManagerHandler,
-        //std::shared_ptr<sampleApp::AudioInputManager> platformAudioCapture,
-        bool wakewordDetectionEnabled);
+        std::weak_ptr<propertyManager::PropertyManagerHandler> propertyManagerHandler);
 
 public:
     template <typename... Args>
@@ -68,16 +65,11 @@ public:
     }
     auto getActivity() -> std::weak_ptr<Activity>;
     auto getLoggerHandler() -> std::weak_ptr<logger::LoggerHandler>;
-    //    auto startStreamingAudioFile(const std::string &audioFilePath) -> bool;
-    //    auto stopStreamingAudioFile() -> bool;
-    //    auto streamAudioFile(const std::string &audioFilePath) -> bool;
 
     // aace::alexa::SpeechRecognizer interface
 
     auto wakewordDetected(const std::string& wakeword) -> bool override;
     auto endOfSpeechDetected() -> void override;
-    //auto startAudioInput() -> bool override;
-    //auto stopAudioInput() -> bool override;
 
 private:
     std::weak_ptr<View> m_console{};

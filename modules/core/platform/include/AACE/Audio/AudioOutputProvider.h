@@ -26,7 +26,7 @@ namespace audio {
 
 class AudioOutputProvider : public aace::core::PlatformInterface {
 public:
-    enum class AudioOutputType { TTS, MUSIC, NOTIFICATION, ALARM, EARCON, COMMUNICATION, RINGTONE };
+    enum class AudioOutputType { TTS, MUSIC, NOTIFICATION, ALARM, EARCON, COMMUNICATION, RINGTONE, UNDEFINED };
 
 protected:
     AudioOutputProvider() = default;
@@ -59,6 +59,9 @@ inline std::ostream& operator<<(std::ostream& stream, const AudioOutputProvider:
             break;
         case AudioOutputProvider::AudioOutputType::RINGTONE:
             stream << "RINGTONE";
+            break;
+        case AudioOutputProvider::AudioOutputType::UNDEFINED:
+            stream << "UNDEFINED";
             break;
     }
     return stream;

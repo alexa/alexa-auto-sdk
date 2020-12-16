@@ -150,6 +150,11 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/PropertyManager/PropertyManagerEngineImpl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/PropertyManager/PropertyManagerEngineService.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/PropertyManager/PropertyDescription.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Authorization/AuthorizationEngineService.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Authorization/AuthorizationEngineImpl.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Authorization/AuthorizationProvider.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Authorization/AuthorizationProviderListenerInterface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Authorization/AuthorizationServiceInterface.h
 )
  
 source_group("Header Files" FILES ${HEADERS})
@@ -204,6 +209,9 @@ add_library(AACECoreEngine SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/PropertyManager/PropertyManagerEngineImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/PropertyManager/PropertyManagerEngineService.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/PropertyManager/PropertyDescription.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Authorization/AuthorizationEngineService.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Authorization/AuthorizationEngineImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Authorization/AuthorizationProvider.cpp
 )
 
 find_path(RAPIDJSON_INCLUDE_DIR rapidjson/rapidjson.h

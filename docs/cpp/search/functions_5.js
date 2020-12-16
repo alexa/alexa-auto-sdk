@@ -2,6 +2,7 @@ var searchData=
 [
   ['getaccuracy',['getAccuracy',['../classaace_1_1location_1_1_location.html#a1741ce546e33172d68825650d5499ce9',1,'aace::location::Location']]],
   ['getaltitude',['getAltitude',['../classaace_1_1location_1_1_location.html#a6651d8181e4361df5777f1992cb063c0',1,'aace::location::Location']]],
+  ['getauthorizationdata',['getAuthorizationData',['../classaace_1_1authorization_1_1_authorization.html#aaeb9fc700765a86d973a0e03ed865c29',1,'aace::authorization::Authorization']]],
   ['getauthstate',['getAuthState',['../classaace_1_1alexa_1_1_auth_provider.html#a6d00a8dac76187fd4d7eebc3f13160fd',1,'aace::alexa::AuthProvider']]],
   ['getauthtoken',['getAuthToken',['../classaace_1_1alexa_1_1_auth_provider.html#ac2600cbd59d19ce4f9e5d5134913376f',1,'aace::alexa::AuthProvider']]],
   ['getbandlevels',['getBandLevels',['../classaace_1_1alexa_1_1_equalizer_controller.html#ac9c19ed0f79cfef1675a950560320b1e',1,'aace::alexa::EqualizerController']]],

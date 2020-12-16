@@ -49,7 +49,6 @@
             "arch": "Sample Arch 1.0",
             "language": "en-US",
             "microphone": "SingleArray",
-            "countries": "US,GB,IE,CA,DE,AT,IN,JP,AU,NZ,FR",
             "vehicleIdentifier": "Sample Identifier ABC"
         },
         "operatingCountry": "US"

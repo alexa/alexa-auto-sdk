@@ -40,15 +40,15 @@ namespace messaging {
 //Enum Definition
 enum class ConnectionState {
     DISCONNECTED,
-    ON,
+    CONNECTED,
 };
 
 inline std::string toString(ConnectionState enumValue) {
     switch (enumValue) {
         case (ConnectionState::DISCONNECTED):
             return "DISCONNECTED";
-        case (ConnectionState::ON):
-            return "ON";
+        case (ConnectionState::CONNECTED):
+            return "CONNECTED";
     }
     throw std::runtime_error("invalidConnectionStateType");
 }
@@ -56,7 +56,7 @@ inline std::string toString(ConnectionState enumValue) {
 inline ConnectionState toConnectionState(const std::string& stringValue) {
     static std::unordered_map<std::string, ConnectionState> map = {
         {"DISCONNECTED", ConnectionState::DISCONNECTED},
-        {"ON", ConnectionState::ON},
+        {"CONNECTED", ConnectionState::CONNECTED},
     };
 
     auto search = map.find(stringValue);

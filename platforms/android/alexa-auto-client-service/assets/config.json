@@ -36,7 +36,7 @@
     "zones":[]
   },
   "aacs.aasb": {
-    "version": "3.0"
+    "version": "3.1"
   },
   "aacs.general" : {
     "version": "1.0",
@@ -46,137 +46,152 @@
       "cacheCapacity": 20
     },
     "intentTargets" : {
-      "AASB" : {
-        "type": [],
-        "package": [],
-        "class": []
-      },
-      "APL" : {
-        "type": [],
-        "package": [],
-        "class": []
-      },
-      "AddressBook" : {
-        "type": [],
-        "package": [],
-        "class": []
-      },
-      "Alerts" : {
-        "type": [],
-        "package": [],
-        "class": []
-      },
-      "AlexaClient" : {
-        "type": [],
-        "package": [],
-        "class": []
-      },
-      "AlexaComms" : {
-        "type": [],
-        "package": [],
-        "class": []
-      },
-      "AlexaSpeaker" : {
-        "type": [],
-        "package": [],
-        "class": []
-      },
-      "AudioInput" : {
-        "type": [],
-        "package": [],
-        "class": []
-      },
-      "AudioOutput" : {
-        "type": [],
-        "package": [],
-        "class": []
-      },
-      "AudioPlayer" : {
-        "type": [],
-        "package": [],
-        "class": []
-      },
-      "AuthProvider" : {
-        "type": [],
-        "package": [],
-        "class": []
-      },
-      "CarControl" : {
-        "type": [],
-        "package": [],
-        "class": []
-      },
-      "CBL" : {
-        "type": [],
-        "package": [],
-        "class": []
-      },
-      "DoNotDisturb" : {
-        "type": [],
-        "package": [],
-        "class": []
-      },
-      "EqualizerController" : {
-        "type": [],
-        "package": [],
-        "class": []
-      },
-      "ExternalMediaAdapter" : {
-        "type": [],
-        "package": [],
-        "class": []
-      },
-      "GlobalPreset" : {
-        "type": [],
-        "package": [],
-        "class": []
-      },
-      "LocalMediaSource" : {
-        "type": [],
-        "package": [],
-        "class": []
-      },
-      "LocationProvider" : {
-        "type": [],
-        "package": [],
-        "class": []
-      },
-      "Navigation" : {
-        "type": [],
-        "package": [],
-        "class": []
-      },
-      "NetworkInfoProvider" : {
-        "type": [],
-        "package": [],
-        "class": []
-      },
-      "Notifications" : {
-        "type": [],
-        "package": [],
-        "class": []
-      },
-      "PhoneCallController" : {
-        "type": [],
-        "package": [],
-        "class": []
-      },
-      "PlaybackController" : {
-        "type": [],
-        "package": [],
-        "class": []
-      },
-      "PropertyManager" : {
-        "type": [],
-        "package": [],
-        "class": []
-      },
-      "SpeechRecognizer" : {
-        "type": [],
-        "package": [],
-        "class": []
-      },
-      "TemplateRuntime" : {
+        "AASB" : {
+           "type": [],
+           "package": [], 
+           "class": []
+        },
+        "APL" : {
+           "type": [],
+            "package": [], 
+            "class": []
+        },
+        "AddressBook" : {
+            "type": [],
+            "package": [], 
+            "class": []
+        },
+        "Alerts" : {
+          "type": [],
+          "package": [], 
+          "class": []
+        },
+        "AlexaClient" : {
+          "type": [],
+           "package": [], 
+           "class": []
+        },
+        "AlexaComms" : {
+           "type": [],
+           "package": [], 
+           "class": []
+        },
+        "AlexaSpeaker" : {
+           "type": [],
+           "package": [], 
+           "class": []
+        },
+        "AudioInput" : {
+            "type": [],
+            "package": [], 
+            "class": []
+        },
+        "AudioOutput" : {
+            "type": [],
+            "package": [], 
+            "class": []
+        },
+        "AudioPlayer" : {
+            "type": [],
+            "package": [], 
+            "class": []
+        },
+        "Authorization" : {
+            "type": [],
+            "package": [],
+            "class": []
+        },
+        "AuthProvider" : {
+            "type": [],
+            "package": [],
+            "class": []
+        },
+        "CarControl" : {
+            "type": [],
+            "package": [], 
+            "class": []
+        },
+        "CBL" : {
+            "type": [],
+            "package": [], 
+            "class": []
+        },
+        "Connectivity" : {
+            "type": [],
+            "package": [],
+            "class": []
+        },
+        "DoNotDisturb" : {
+            "type": [],
+            "package": [], 
+            "class": []
+        },
+        "EqualizerController" : {
+            "type": [],
+            "package": [], 
+            "class": []
+        },
+        "ExternalMediaAdapter" : {
+            "type": [],
+            "package": [], 
+            "class": []
+        },
+        "GlobalPreset" : {
+            "type": [],
+            "package": [], 
+            "class": []
+        },
+        "LocalMediaSource" : {
+            "type": [],
+            "package": [], 
+            "class": []
+        },
+        "LocationProvider" : {
+            "type": [],
+            "package": [], 
+            "class": []
+        },
+        "Navigation" : {
+            "type": [],
+            "package": [], 
+            "class": []
+        },
+        "NetworkInfoProvider" : {
+            "type": [],
+            "package": [], 
+            "class": []
+        },
+        "Notifications" : {
+            "type": [],
+            "package": [], 
+            "class": []
+        },
+        "PhoneCallController" : {
+            "type": [],
+            "package": [], 
+            "class": []
+        },
+        "PlaybackController" : {
+            "type": [],
+            "package": [], 
+            "class": []
+        },
+        "PropertyManager" : {
+            "type": [],
+            "package": [], 
+            "class": []
+        },
+        "SpeechRecognizer" : {
+            "type": [],
+            "package": [], 
+            "class": []
+        },
+        "TemplateRuntime" : {
+            "type": [],
+            "package": [], 
+            "class": []
+        },
+      "TextToSpeech" : {
         "type": [],
         "package": [],
         "class": []

@@ -231,6 +231,7 @@ bool ExternalMediaAdapterEngineImpl::handleGetAdapterState(
         state.playbackState.trackOffset = platformState.playbackState.trackOffset;
         state.playbackState.shuffleEnabled = platformState.playbackState.shuffleEnabled;
         state.playbackState.repeatEnabled = platformState.playbackState.repeatEnabled;
+        state.playbackState.repeatOneEnabled = platformState.playbackState.repeatOneEnabled;
         state.playbackState.favorites =
             static_cast<aace::engine::alexa::Favorites>(platformState.playbackState.favorites);
         state.playbackState.type = platformState.playbackState.type;

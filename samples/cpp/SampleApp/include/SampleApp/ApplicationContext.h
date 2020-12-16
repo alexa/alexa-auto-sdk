@@ -16,7 +16,7 @@
 #ifndef SAMPLEAPP_APPLICATIONCONTEXT_H
 #define SAMPLEAPP_APPLICATIONCONTEXT_H
 
-#include "SampleApp/CBL/CBLHandler.h"
+#include "SampleApp/Authorization/AuthorizationHandler.h"
 #include "SampleApp/Logger/LoggerHandler.h"
 
 // C++ Standard Library
@@ -29,6 +29,8 @@
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
+#include "Event.h"
+
 namespace sampleApp {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,15 +42,18 @@ namespace sampleApp {
 class ApplicationContext {
 private:
     bool m_audioFileSupported{false};
+    bool m_authProviderAvailable{false};
     bool m_logEnabled{false};
+    bool m_messagingResponsesEnabled{true};
     bool m_singleThreadedUI{false};
     bool m_testAutomation{false};
-    bool m_messagingResponsesEnabled{true};
     json m_menuRegister{};
     logger::LoggerHandler::Level m_level{};
+    std::string m_activeAuthorization{};
     std::string m_applicationDirPath{};
     std::string m_applicationPath{};
     std::string m_audioInputDevice{};
+    std::string m_authorizationInProgress{};
     std::string m_browserCommand{};
     std::string m_mediaPlayerCommand{};
     std::string m_payloadScriptCommand{};
@@ -70,7 +75,6 @@ public:
     auto addMenuFilePath(const std::string& menuFilePath) -> void;
     auto checkDcmConfiguration(const std::vector<json>& configs) -> bool;
     auto clearLevel() -> void;
-    auto clearRefreshToken() -> void;
     auto clearUserConfigFilePath() -> void;
     auto executeCommand(const char* command) -> std::string;
     auto getApplicationDirPath() -> std::string;
@@ -94,23 +98,32 @@ public:
     auto getUserConfigFilePath() -> std::string;
     auto hasDefaultMediaPlayer() -> bool;
     auto hasMenu(const std::string& id) -> bool;
-    auto hasRefreshToken() -> bool;
+    auto hasRefreshToken(const std::string& service) -> bool;
     auto hasUserConfigFilePath() -> bool;
     auto isAlexaCommsSupported() -> bool;
     auto isAudioFileSupported() -> bool;
+    auto isConnectivitySupported() -> bool;
     auto isDcmSupported() -> bool;
     auto isLocalVoiceControlSupported() -> bool;
     auto isLogEnabled() -> bool;
     auto isSingleThreadedUI() -> bool;
     auto isTestAutomation() -> bool;
-    auto isWakeWordSupported() -> bool;
+    auto isAuthProviderAuthorizationActive() -> bool;
+    auto isAuthProviderAuthorizationInProgress() -> bool;
+    auto isAuthProviderSupported() -> bool;
+    auto isCBLAuthorizationActive() -> bool;
+    auto isCBLAuthorizationInProgress() -> bool;
     auto isMessagingResponsesEnabled() -> bool;
+    auto isWakeWordSupported() -> bool;
     auto makeTempPath(const std::string& name, const std::string& extension) -> std::string;
     auto popAudioFilePath() -> std::string;
     auto registerMenu(const std::string& id, const json& menu) -> std::size_t;
     auto saveContent(const std::string& path, const std::string& content) -> bool;
+    auto setActiveAuthorization(const std::string& service) -> void;
     auto setAudioFileSupported(bool audioFileSupported) -> void;
     auto setAudioInputDevice(const std::string& audioInputDevice) -> void;
+    auto setAuthorizationInProgress(const std::string& service) -> void;
+    auto setAuthProviderAvailability(bool available) -> void;
     auto setBrowserCommand(const std::string& browserCommand) -> void;
     auto setLevel(logger::LoggerHandler::Level level) -> void;
     auto setMediaPlayerCommand(const std::string& mediaPlayerCommand) -> void;
@@ -118,13 +131,17 @@ public:
     auto setPayloadScriptCommand(const std::string& payloadScriptCommand) -> void;
     auto setSingleThreadedUI(bool singleThreadedUI) -> void;
     auto setUserConfigFilePath(const std::string& userConfigFilePath) -> void;
-    auto test(const std::string& value) -> bool;
+    auto testExpression(const std::string& value) -> bool;
+    auto testValue(const std::string& value) -> bool;
 
 private:
-    friend cbl::CBLHandler;
-    std::string m_refreshToken{};
-    auto getRefreshToken() -> std::string;
-    auto setRefreshToken(const std::string& refreshToken) -> void;
+    friend authorization::AuthorizationHandler;
+    friend authorization::AuthProviderAuthorizationHandler;
+    /// Map of service to map of key and value
+    std::map<std::string, std::map<std::string, std::string>> m_authorizationData;
+
+    auto getAuthorizationData(const std::string& service, const std::string& key) -> std::string;
+    auto setAuthorizationData(const std::string& service, const std::string& key, const std::string& data) -> void;
 };
 
 }  // namespace sampleApp

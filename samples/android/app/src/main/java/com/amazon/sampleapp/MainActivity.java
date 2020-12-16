@@ -36,8 +36,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -54,7 +52,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.amazon.aace.alexa.AlexaClient;
 import com.amazon.aace.alexa.AlexaProperties;
 import com.amazon.aace.alexa.SpeechRecognizer;
 import com.amazon.aace.alexa.config.AlexaConfiguration;
@@ -64,11 +61,15 @@ import com.amazon.aace.core.Engine;
 import com.amazon.aace.core.PlatformInterface;
 import com.amazon.aace.core.config.ConfigurationFile;
 import com.amazon.aace.core.config.EngineConfiguration;
+import com.amazon.aace.core.config.StreamConfiguration;
 import com.amazon.aace.logger.Logger;
 import com.amazon.aace.navigation.Navigation;
 import com.amazon.aace.navigation.config.NavigationConfiguration;
+import com.amazon.aace.propertyManager.PropertyManager;
 import com.amazon.aace.storage.config.StorageConfiguration;
 import com.amazon.aace.vehicle.config.VehicleConfiguration;
+import com.amazon.sampleapp.core.AuthorizationHandlerFactoryInterface;
+import com.amazon.sampleapp.core.AuthorizationHandlerObserverInterface;
 import com.amazon.sampleapp.core.LoggerControllerInterface;
 import com.amazon.sampleapp.core.ModuleFactoryInterface;
 import com.amazon.sampleapp.core.SampleAppContext;
@@ -79,7 +80,8 @@ import com.amazon.sampleapp.impl.AlexaSpeaker.AlexaSpeakerHandler;
 import com.amazon.sampleapp.impl.Audio.AudioInputProviderHandler;
 import com.amazon.sampleapp.impl.Audio.AudioOutputProviderHandler;
 import com.amazon.sampleapp.impl.AudioPlayer.AudioPlayerHandler;
-import com.amazon.sampleapp.impl.CBL.CBLHandler;
+import com.amazon.sampleapp.impl.Authorization.AuthorizationHandler;
+import com.amazon.sampleapp.impl.Authorization.CBLAuthorizationHandler;
 import com.amazon.sampleapp.impl.CarControl.CarControlDataProvider;
 import com.amazon.sampleapp.impl.CarControl.CarControlHandler;
 import com.amazon.sampleapp.impl.DoNotDisturb.DoNotDisturbHandler;
@@ -109,12 +111,14 @@ import com.amazon.sampleapp.impl.PropertyManager.PropertyManagerHandler;
 import com.amazon.sampleapp.impl.SpeechRecognizer.SpeechRecognizerHandler;
 import com.amazon.sampleapp.impl.SpeechSynthesizer.SpeechSynthesizerHandler;
 import com.amazon.sampleapp.impl.TemplateRuntime.TemplateRuntimeHandler;
+import com.amazon.sampleapp.impl.TextToSpeech.TextToSpeechHandler;
 import com.amazon.sampleapp.logView.LogEntry;
-import com.amazon.sampleapp.logView.LogRecyclerViewAdapter;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -135,7 +139,8 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
 
     // AVS-supported locales: https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/system.html#locales
     private static final String[] sSupportedLocales = {"de-DE", "en-AU", "en-CA", "en-GB", "en-IN", "en-US", "es-ES",
-            "es-MX", "es-US", "fr-CA", "fr-FR", "hi-IN", "it-IT", "ja-JP", "pt-BR"};
+            "es-MX", "es-US", "fr-CA", "fr-FR", "hi-IN", "it-IT", "ja-JP", "pt-BR", "en-CA/fr-CA", "en-IN/hi-IN",
+            "en-US/es-US", "es-US/en-US", "fr-CA/en-CA", "hi-IN/en-IN"};
 
     /* AACE Platform Interface Handlers */
 
@@ -143,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
     private AlertsHandler mAlerts;
     private AlexaClientHandler mAlexaClient;
     private AudioPlayerHandler mAudioPlayer;
-    private CBLHandler mCBLHandler;
+    private AuthorizationHandler mAuthorizationHandler;
     private EqualizerControllerHandler mEqualizerControllerHandler;
     private NotificationsHandler mNotifications;
     private PhoneCallControllerHandler mPhoneCallController;
@@ -183,6 +188,9 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
 
     // Property Manager
     private PropertyManagerHandler mPropertyManager;
+
+    // TextToSpeech
+    private TextToSpeechHandler mTextToSpeech;
 
     /* Tab Fragment Adapter */
     private TabFragmentAdapter mAdapter;
@@ -296,6 +304,11 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
     @Override
     public SpeechRecognizer getSpeechRecognizer() {
         return mSpeechRecognizer;
+    }
+
+    @Override
+    public PropertyManager getPropertyManager() {
+        return (PropertyManager) mPropertyManager;
     }
 
     @Override
@@ -571,11 +584,24 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
                     mNetworkInfoProvider = new NetworkInfoProviderHandler(this, mLogger, mPropertyManager)))
             throw new RuntimeException("Could not register NetworkInfoProvider platform interface");
 
-        // CBL
-        if (!mEngine.registerPlatformInterface(mCBLHandler = new CBLHandler(this, mLogger)))
-            throw new RuntimeException("Could not register CBL platform interface");
+        // Authorization
+        if (!mEngine.registerPlatformInterface(mAuthorizationHandler = new AuthorizationHandler(this, mLogger)))
+            throw new RuntimeException("Could not register Authorization platform interface");
 
-        mAlexaClient.registerAuthStateObserver(mCBLHandler);
+        JSONObject deviceConfig = new JSONObject();
+        try {
+            deviceConfig.put("productId", mPreferences.getString(getString(R.string.preference_product_id), ""));
+            deviceConfig.put("productDsn", mPreferences.getString(getString(R.string.preference_product_dsn), ""));
+        } catch (JSONException e) {
+            throw new RuntimeException("Cloud not create a device json");
+        }
+
+        AuthorizationHandlerObserverInterface cblAuth = new CBLAuthorizationHandler(this, mLogger);
+        cblAuth.initialize(mAuthorizationHandler, deviceConfig);
+
+        List<AuthorizationHandlerFactoryInterface> extraAuthorizationModuleFactories =
+                getExtraAuthorizationHandlerFactory();
+        loadAuthorizationHandlerUIAndRegister(extraAuthorizationModuleFactories, this);
 
         // Navigation
         if (!mEngine.registerPlatformInterface(mNavigation = new NavigationHandler(this, mLogger)))
@@ -591,6 +617,10 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
             throw new RuntimeException("Could not register DoNotDisturb platform interface");
         else
             mAlexaClient.registerAuthStateObserver(mDoNotDisturb);
+
+        // TextToSpeech
+        if (!mEngine.registerPlatformInterface(mTextToSpeech = new TextToSpeechHandler(this, mLogger)))
+            throw new RuntimeException("Could not register TextToSpeech platform interface");
 
         // Contacts/NavigationFavorites
         String sampleContactsDataPath = sampleDataDir.getPath() + "/Contacts.json";
@@ -849,8 +879,6 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
                         new VehicleConfiguration.VehicleProperty(
                                 VehicleConfiguration.VehiclePropertyType.MICROPHONE, "Single, roof mounted"),
                         // If this list is left blank, it will be fetched by the engine using amazon default endpoint
-                        new VehicleConfiguration.VehicleProperty(VehicleConfiguration.VehiclePropertyType.COUNTRY_LIST,
-                                "US,GB,IE,CA,DE,AT,IN,JP,AU,NZ,FR"),
                         new VehicleConfiguration.VehicleProperty(
                                 VehicleConfiguration.VehiclePropertyType.VEHICLE_IDENTIFIER, "123456789a")})));
 
@@ -928,10 +956,6 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
 
         if (mNetworkInfoProvider != null) {
             mNetworkInfoProvider.unregister();
-        }
-
-        if (mAlexaClient != null && mCBLHandler != null) {
-            mAlexaClient.removeAuthStateObserver(mCBLHandler);
         }
 
         if (mMACCPlayer != null) {
@@ -1156,7 +1180,22 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
         }
     }
 
-    // Retrieve Factories of extra modules
+    /**
+     * Retrieves a list of factory classes implementing @c ModuleFactoryInterface by
+     * iterating through the json files that are located under the sample-app folder of assets
+     * directory. The json contains the fully qualified class name of the factory class.
+     * The expected json format:
+     *
+     * @code{.json}
+     * {
+     *
+     *   "factory": {
+     *     "name": "fully-qualified-class-name-implementing-ModuleFactoryInterface"
+     *   }
+     *
+     * }
+     * @endcode
+     */
     private List<ModuleFactoryInterface> getExtraModuleFactory() {
         List<ModuleFactoryInterface> extraModuleFactories = new ArrayList<>();
         try {
@@ -1164,7 +1203,7 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
             String factoryKey = "factory";
             String category = "name";
             String[] fileList = getAssets().list(folderName);
-            Log.e("loadPlatformInterfaces", "begin loading");
+            Log.i(TAG, "getExtraModuleFactory: begin loading");
             for (String f : fileList) {
                 InputStream is = getAssets().open(folderName + "/" + f);
                 byte[] buffer = new byte[is.available()];
@@ -1172,17 +1211,100 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
                 String json = new String(buffer, "UTF-8");
                 JSONObject obj = new JSONObject(json);
                 if (obj != null) {
-                    String factoryName = obj.getJSONObject(factoryKey).getString(category);
+                    JSONObject factoryKeyObj = obj.optJSONObject(factoryKey);
+                    if (factoryKeyObj == null) {
+                        continue;
+                    }
+                    String factoryName = factoryKeyObj.getString(category);
                     ModuleFactoryInterface instance = (ModuleFactoryInterface) Class.forName(factoryName).newInstance();
                     extraModuleFactories.add(instance);
-                    Log.i(TAG, "load extra module:" + factoryName);
+                    Log.i(TAG, "load extra module: " + factoryName);
                 }
                 is.close();
             }
         } catch (Exception e) {
-            Log.e("loadPlatformInterfaces", e.getMessage());
+            Log.e(TAG, "getExtraModuleFactory: " + e.getMessage());
         }
         return extraModuleFactories;
+    }
+
+    /**
+     * Retrieves a list of factory classes implementing @c AuthorizationHandlerFactoryInterface by
+     * iterating through the json files that are located under the sample-app folder of assets
+     * directory. The json contains the fully qualified class name of the factory class.
+     * The expected json format:
+     *
+     * @code{.json}
+     * {
+     *
+     *   "authorizationhandlerfactory": {
+     *     "name": "fully-qualified-class-name-implementing-AuthorizationHandlerFactoryInterface"
+     *   }
+     *
+     * }
+     * @endcode
+     */
+    private List<AuthorizationHandlerFactoryInterface> getExtraAuthorizationHandlerFactory() {
+        List<AuthorizationHandlerFactoryInterface> extraAuthorizationHandlerFactories = new ArrayList<>();
+        try {
+            String folderName = "sample-app";
+            String factoryKey = "authorizationhandlerfactory";
+            String category = "name";
+            String[] fileList = getAssets().list(folderName);
+            Log.i(TAG, "getExtraAuthorizationHandlerFactory: begin loading");
+            for (String f : fileList) {
+                InputStream is = getAssets().open(folderName + "/" + f);
+                byte[] buffer = new byte[is.available()];
+                is.read(buffer);
+                String json = new String(buffer, "UTF-8");
+                JSONObject obj = new JSONObject(json);
+                if (obj != null) {
+                    JSONObject factoryKeyObj = obj.optJSONObject(factoryKey);
+                    if (factoryKeyObj == null) {
+                        continue;
+                    }
+                    String factoryName = factoryKeyObj.getString(category);
+                    AuthorizationHandlerFactoryInterface instance =
+                            (AuthorizationHandlerFactoryInterface) Class.forName(factoryName).newInstance();
+                    extraAuthorizationHandlerFactories.add(instance);
+                    Log.i(TAG, "getExtraAuthorizationHandlerFactory: load extra module:" + factoryName);
+                }
+                is.close();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "getExtraAuthorizationHandlerFactory: " + e.getMessage());
+        }
+        return extraAuthorizationHandlerFactories;
+    }
+
+    // Load UI of extra authorization handlers and set authorization handler
+    private void loadAuthorizationHandlerUIAndRegister(
+            List<AuthorizationHandlerFactoryInterface> extraAuthorizationHandlerFactories,
+            SampleAppContext sampleAppContext) {
+        JSONObject deviceConfig = new JSONObject();
+        try {
+            deviceConfig.put("productId", mPreferences.getString(getString(R.string.preference_product_id), ""));
+            deviceConfig.put("productDsn", mPreferences.getString(getString(R.string.preference_product_dsn), ""));
+        } catch (JSONException e) {
+            Log.e(TAG, "loadAuthorizationHandlerUIAndRegister: Cloud not create a device json");
+            return;
+        }
+
+        for (AuthorizationHandlerFactoryInterface handlerFactory : extraAuthorizationHandlerFactories) {
+            // Inflate any drawer view UIs
+            LinearLayout llDisplayData = findViewById(R.id.drawer_linear_layout);
+            LayoutInflater linflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            for (int layoutResourceNumber : handlerFactory.getLayoutResourceNums()) {
+                View tempView = linflater.inflate(layoutResourceNumber, null);
+                llDisplayData.addView(tempView);
+            }
+
+            List<AuthorizationHandlerObserverInterface> handlers =
+                    handlerFactory.getModuleAuthorizationHandlerInterfaces(this);
+            for (AuthorizationHandlerObserverInterface handler : handlers) {
+                handler.initialize(mAuthorizationHandler, deviceConfig);
+            }
+        }
     }
 
     //     Add configuration of extra modules
@@ -1222,6 +1344,7 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
             }
         }
     }
+
     private void setUpTimeZoneUI() {
         final String[] timezones = new String[timezoneArray.size()];
         timezoneAdapter =

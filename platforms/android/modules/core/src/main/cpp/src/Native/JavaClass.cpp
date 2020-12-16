@@ -25,6 +25,9 @@ namespace aace {
 namespace jni {
 namespace native {
 
+// Initialize static variable
+std::mutex JavaClass::s_mutex;
+
 std::unordered_map<std::string, JavaClassPtr> JavaClass::s_javaClassRegistry;
 GlobalRef<jobject> JavaClass::s_classLoaderObjectRef;
 jmethodID JavaClass::s_findClassMethodID;
@@ -68,6 +71,10 @@ bool JavaClass::initializeClassLoader() {
 
 std::shared_ptr<JavaClass> JavaClass::find(const char* name) {
     try_with_context {
+        // lock to prevent loading same class name multiple times
+        std::lock_guard<std::mutex> lock(s_mutex);
+
+        // check if class is already loaded
         auto it = s_javaClassRegistry.find(name);
 
         // if we found the class in the registry then return it

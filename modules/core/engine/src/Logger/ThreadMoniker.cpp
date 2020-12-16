@@ -14,9 +14,9 @@
  */
 
 #include <atomic>
+#include <cstring>
 #include <iomanip>
 #include <sstream>
-#include <thread>
 
 #include "AACE/Engine/Logger/ThreadMoniker.h"
 
@@ -29,10 +29,11 @@ thread_local ThreadMoniker ThreadMoniker::m_threadMoniker;
 /// Counter to generate (small) unique thread monikers.
 static std::atomic<int> g_nextThreadMoniker(1);
 
-ThreadMoniker::ThreadMoniker() {
+ThreadMoniker::ThreadMoniker() : m_moniker{} {
     std::ostringstream stream;
     stream << std::setw(3) << std::hex << std::right << g_nextThreadMoniker++;
-    m_moniker = stream.str();
+    auto moniker = stream.str();
+    std::strncpy(m_moniker, moniker.c_str(), sizeof(m_moniker) - 1);
 }
 
 }  // namespace logger

@@ -1,0 +1,109 @@
+{
+  "locales": [
+    {
+      "id": "en-US",
+      "locale": {
+        "language": "English",
+        "country": "United States"
+      }
+    },
+    {
+      "id": "es-US",
+      "locale": {
+        "language": "Español",
+        "country": "Estados Unidos"
+      }
+    },
+    {
+      "id": "de-DE",
+      "locale": {
+        "language": "Deutsch",
+        "country": "Deutschland"
+      }
+    },
+    {
+      "id": "en-AU",
+      "locale": {
+        "language": "English",
+        "country": "Australia / New Zealand"
+      }
+    },
+    {
+      "id": "en-CA",
+      "locale": {
+        "language": "English",
+        "country": "Canada"
+      }
+    },
+    {
+      "id": "en-GB",
+      "locale": {
+        "language": "English",
+        "country": "United Kingdom"
+      }
+    },
+    {
+      "id": "en-IN",
+      "locale": {
+        "language": "English",
+        "country": "India"
+      }
+    },
+    {
+      "id": "es-ES",
+      "locale": {
+        "language": "Español",
+        "country": "España"
+      }
+    },
+    {
+      "id": "es-MX",
+      "locale": {
+        "language": "Español",
+        "country": "México"
+      }
+    },
+    {
+      "id": "fr-CA",
+      "locale": {
+        "language": "Français",
+        "country": "Canada"
+      }
+    },
+    {
+      "id": "fr-FR",
+      "locale": {
+        "language": "Françai",
+        "country": "France"
+      }
+    },
+    {
+      "id": "hi-IN",
+      "locale": {
+        "language": "हिंदी",
+        "country": "भारत"
+      }
+    },
+    {
+      "id": "it-IT",
+      "locale": {
+        "language": "Italiano",
+        "country": "Italia"
+      }
+    },
+    {
+      "id": "ja-JP",
+      "locale": {
+        "language": "日本語",
+        "country": "日本"
+      }
+    },
+    {
+      "id": "pt-BR",
+      "locale": {
+        "language": "Português",
+        "country": "Brasil"
+      }
+    }
+  ]
+}

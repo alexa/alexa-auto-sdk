@@ -3,6 +3,7 @@ var searchData=
   ['geography',['GEOGRAPHY',['../enumcom_1_1amazon_1_1aace_1_1vehicle_1_1config_1_1_vehicle_configuration_1_1_vehicle_property_type.html#a74aaae5e6c036dd4c85965d3258f7766',1,'com::amazon::aace::vehicle::config::VehicleConfiguration::VehiclePropertyType']]],
   ['getaccuracy',['getAccuracy',['../classcom_1_1amazon_1_1aace_1_1location_1_1_location.html#acdf035ff2abe6c67f416de07c95f724c',1,'com::amazon::aace::location::Location']]],
   ['getaltitude',['getAltitude',['../classcom_1_1amazon_1_1aace_1_1location_1_1_location.html#ae5ee423032967f1fae0570d394af3951',1,'com::amazon::aace::location::Location']]],
+  ['getauthorizationdata',['getAuthorizationData',['../classcom_1_1amazon_1_1aace_1_1authorization_1_1_authorization.html#a7f2f391a3991f344ee1bec75ae33fd48',1,'com::amazon::aace::authorization::Authorization']]],
   ['getauthstate',['getAuthState',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider.html#aa04277b311b61fdcf18c759714d148b1',1,'com::amazon::aace::alexa::AuthProvider']]],
   ['getauthtoken',['getAuthToken',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider.html#aeedf509b073beea5fd1bf29a170e1c57',1,'com::amazon::aace::alexa::AuthProvider']]],
   ['getbandlevels',['getBandLevels',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_equalizer_controller.html#a8146f0ae36888847ce00ea09f82761dc',1,'com::amazon::aace::alexa::EqualizerController']]],

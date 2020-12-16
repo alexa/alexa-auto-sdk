@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['unauthorized',['UNAUTHORIZED',['../classaace_1_1authorization_1_1_authorization_engine_interface.html#a41738dc27f412d602c2fe572ec5eeac3a0ab06e7c28266cc1ed601325013a874c',1,'aace::authorization::AuthorizationEngineInterface']]],
   ['unauthorized_5fclient',['UNAUTHORIZED_CLIENT',['../classaace_1_1alexa_1_1_auth_provider_engine_interface.html#a006d3fd3bee07feafa325968054abc37a0416665af33a040a02e16a0448a44c92',1,'aace::alexa::AuthProviderEngineInterface']]],
   ['uninitialized',['UNINITIALIZED',['../classaace_1_1alexa_1_1_auth_provider_engine_interface.html#abe4ab37548dfaf7744afe9078e1792ecadd652546039b18970b8dcf2cff824268',1,'aace::alexa::AuthProviderEngineInterface']]],
   ['unknown',['UNKNOWN',['../classaace_1_1alexa_1_1_notifications.html#a745c257147c726a31f30ccf52c4f83d1a696b031073e74bf2cb98e5ef201d4aa3',1,'aace::alexa::Notifications::UNKNOWN()'],['../classaace_1_1network_1_1_network_info_provider_engine_interface.html#a749ba056220c9a3bb9ed9e100fc8f0d1a696b031073e74bf2cb98e5ef201d4aa3',1,'aace::network::NetworkInfoProviderEngineInterface::UNKNOWN()']]],

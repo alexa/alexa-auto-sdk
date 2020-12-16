@@ -1,0 +1,14 @@
+{
+  "header": {
+    "version": "3.0",
+    "messageType": "Publish",
+    "id": "testIdForListening",
+    "messageDescription": {
+      "topic": "AlexaClient",
+      "action": "DialogStateChanged"
+    }
+  },
+  "payload": {
+    "state": "SPEAKING"
+  }
+}

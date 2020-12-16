@@ -28,16 +28,21 @@ namespace carControl {
 
 class AASBCarControlEngineService : public aace::engine::aasb::AASBHandlerEngineService {
 public:
-    DESCRIBE("aasb.carcontrol", VERSION("1.0"), DEPENDS(aace::engine::aasb::AASBEngineService))
+    DESCRIBE("aasb.carControl", VERSION("1.0"), DEPENDS(aace::engine::aasb::AASBEngineService))
 
 private:
     AASBCarControlEngineService(const aace::engine::core::ServiceDescription& description);
+    bool configureCarControl(std::istream& configuration);
 
 protected:
     bool postRegister() override;
+    bool configureAASBInterface(const std::string& name, bool enabled, std::istream& configuration) override;
 
 public:
     virtual ~AASBCarControlEngineService() = default;
+
+private:
+    uint32_t m_asyncReplyTimeout = 5000;
 };
 
 }  // namespace carControl

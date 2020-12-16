@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<attr name="hintColorOnBackground" format="color" />
+<attr name="colorOnPrimary" format="color" />
+<attr name="colorSurface" format="color" />
+<attr name="colorOnSurface" format="color" />
+<attr name="colorOnBackground" format="color" />
+
+<attr name="shapeAppearanceMediumComponent" format="reference" />
+<attr name="shapeAppearanceSmallComponent" format="reference" />
+</resources>

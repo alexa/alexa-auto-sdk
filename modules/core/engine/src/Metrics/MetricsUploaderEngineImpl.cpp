@@ -35,11 +35,31 @@ const std::string MetricsUploaderEngineImpl::COUNTER_KEY = "CT";
 const std::string MetricsUploaderEngineImpl::NORMAL_PRIORITY = "NR";
 const std::string MetricsUploaderEngineImpl::HIGH_PRIORITY = "HI";
 
-static const std::regex metricRegex("^([^:]+):([^:]+):([^:]+):(.+):(NR|HI)");
 static const std::regex dataRegex("([^;=,:]+)=([^;=,:]+);([^;=,:]+);([0-9]+),");
+static const std::regex priorityRegex(":(NR|HI)");
 
-// Overly large metric cause regular expression match errors
-static const int METRIC_LENGTH = 10000;
+// Helper function to parse metric header for programName and sourceName
+size_t parseHeader(const std::string& metric, std::string& programName, std::string& sourceName) {
+    size_t pos = 0;
+
+    for (int count = 0; count < 3; count++) {
+        auto next = metric.find(":", pos);
+        if (next == std::string::npos) return std::string::npos;
+        auto field = metric.substr(pos, next - pos);
+
+        //Extract Program and source name
+        switch (count) {
+            case 1:
+                programName = field;
+                break;
+            case 2:
+                sourceName = field;
+                break;
+        }
+        pos = next + 1;
+    }
+    return pos;
+}
 
 MetricsUploaderEngineImpl::MetricsUploaderEngineImpl(
     std::shared_ptr<aace::metrics::MetricsUploader> platformMetricsUploaderInterface) :
@@ -100,19 +120,22 @@ void MetricsUploaderEngineImpl::log(
             return;
         }
 
-        // Large metrics will cause regex to crash so ignore them
-        if (logMessage.size() > METRIC_LENGTH) {
+        //Parse program, source, datapoints to record metric
+        std::string programName;
+        std::string sourceName;
+        size_t dataPointSepPos = parseHeader(logMessage, programName, sourceName);
+        if (dataPointSepPos == std::string::npos) {
             return;
         }
 
-        //Parse program, source, datapoints to record metric
-        std::smatch metricMatch;
-        if (std::regex_match(logMessage, metricMatch, metricRegex)) {
-            //Handle regex groups
-            std::string programName = metricMatch[2].str();
-            std::string sourceName = metricMatch[3].str();
-            std::string datapoints = metricMatch[4].str();
-            std::string priority = metricMatch[5].str();
+        // Delimitate priority from metric log message by last 3 character of the message
+        std::string metricPriority = logMessage.substr(logMessage.size() - 3, 3);
+        std::smatch metricPriorityMatch;
+        if (std::regex_match(metricPriority, metricPriorityMatch, priorityRegex)) {
+            //Handle datapoints string by delimitate log message from datapoint separate position to metric priority
+            std::string datapoints = logMessage.substr(dataPointSepPos, logMessage.size() - dataPointSepPos - 3);
+            //Handle priority string by delimitate last 2 charaters from log message
+            std::string priority = logMessage.substr(logMessage.size() - 2, 2);
 
             //Validate values are not empty/null
             if (programName.empty() || sourceName.empty() || datapoints.empty() || priority.empty()) {
@@ -162,7 +185,6 @@ void MetricsUploaderEngineImpl::log(
         //Exception occurred
     }
 }
-
 }  // namespace metrics
 }  // namespace engine
 }  // namespace aace

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Login dimensions -->
+    <dimen name="login_alexa_image_width">250dp</dimen>
+    <dimen name="login_alexa_image_height">180dp</dimen>
+    <dimen name="login_confirm_item_margin_top">32dp</dimen>
+    <dimen name="login_confirm_item_width">100dp</dimen>
+    <dimen name="login_confirm_item_height">32dp</dimen>
+    <dimen name="login_item_margin_top">50dp</dimen>
+    <dimen name="login_action_item_margin_top">300dp</dimen>
+    <dimen name="login_item_margin_bottom">8dp</dimen>
+    <dimen name="login_item_margin_start">100dp</dimen>
+    <dimen name="login_item_margin_end">100dp</dimen>
+    <dimen name="login_item_regular_text_size">20sp</dimen>
+    <dimen name="login_qr_code_size">150dp</dimen>
+
+    <dimen name="login_header_footer_vertical_margin">8dp</dimen>
+    <dimen name="login_margin_start">50dp</dimen>
+    <dimen name="login_margin_end">50dp</dimen>
+    <dimen name="login_margin_start_double">32dp</dimen>
+</resources>

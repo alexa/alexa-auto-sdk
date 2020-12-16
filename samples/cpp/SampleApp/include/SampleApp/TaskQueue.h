@@ -140,7 +140,11 @@ auto TaskQueue::pushToFront(Task task, Args&&... args) -> std::future<decltype(t
  */
 template <typename T>
 inline static void forwardPromise(std::shared_ptr<std::promise<T>> promise, std::future<T>* future) {
-    promise->set_value(future->get());
+    try {
+        promise->set_value(future->get());
+    } catch (...) {
+        promise->set_exception(std::current_exception());
+    }
 }
 
 /**
@@ -151,8 +155,12 @@ inline static void forwardPromise(std::shared_ptr<std::promise<T>> promise, std:
  */
 template <>
 inline void forwardPromise<void>(std::shared_ptr<std::promise<void>> promise, std::future<void>* future) {
-    future->get();
-    promise->set_value();
+    try {
+        future->get();
+        promise->set_value();
+    } catch (...) {
+        promise->set_exception(std::current_exception());
+    }
 }
 
 template <typename Task, typename... Args>

@@ -40,7 +40,7 @@ The C++ Sample App requires one or more [configuration files](#editing-the-confi
 
 ## Enabling Optional Device Capabilities
 
-In order to use certain optional Alexa Auto SDK functionality (for example, AmazonLite Wake Word, Alexa Communications, Local Voice Control (LVC), and Device Client Metrics (DCM)) with the Sample App, your product must be whitelisted by Amazon. Copy the product's **Amazon ID** from the Developer Console and follow the whitelisting directions on the [Need Help?](../../NEED_HELP.md#requesting-additional-functionality-whitelisting) page.
+In order to use certain optional Alexa Auto SDK functionality (for example, AmazonLite Wake Word, Alexa Communications, Local Voice Control (LVC), and Device Client Metrics (DCM)) with the Sample App, your product must be placed on the allow list by Amazon. Copy the product's **Amazon ID** from the Developer Console and follow the directions on the [Need Help?](../../NEED_HELP.md#requesting-additional-functionality) page.
 
 ## Setting up the C++ Sample App
 
@@ -148,11 +148,22 @@ $ LD_LIBRARY_PATH=/opt/AAC/lib \
 
 ### Authenticating with AVS using Code-Based Linking (CBL)
 
-After the Sample App launches, you will see the Main Menu. Follow these steps to authenticate with AVS using CBL:
+After the Sample App launches, you will see the Main Menu. Follow these steps to authorize your device with AVS using CBL.
 
-1. Press `A`.
+#### Starting the CBL authorization
 
-2. The Sample App displays messages, including a code and a URL in a format similar to the following:
+1. Press `A`, the Sample App displays the below message:
+    ```shell
+    ################################################################################
+    #                                                                              #
+    #                              Authorization Menu                              #
+    #                                                                              #
+    ################################################################################
+
+    [ 1 ]    Start CBL Authorization
+    [ esc ]  Go back
+    ```
+2. Press `1` to start the CBL authorization. The Sample App displays messages, including a code and a URL in a format similar to the following:
 
     ```
     ###########################
@@ -166,6 +177,37 @@ After the Sample App launches, you will see the Main Menu. Follow these steps to
 3. Open a browser and navigate to the URL displayed in the Sample App.
 4. In the browser, enter the code displayed in the Sample App.
 5. Click **Continue** and follow the instructions in the browser to complete the authentication.
+
+#### Canceling the authorization
+
+After you start the authorization, the `Authorization` menu displays option [1] for you to cancel the authorization that is in progress. Press `1` to cancel the authorization.
+
+```shell
+################################################################################
+#                                                                              #
+#                              Authorization Menu                              #
+#                                                                              #
+################################################################################
+
+ [ 1 ]    Cancel CBL Authorization
+ [ esc ]  Go back
+```
+
+#### Logging out of the CBL authorization
+
+After the device is registered successfully, the Sample App displays option [1] in the `Authorization` menu for you to log out of CBL authorization. Press `1` to log out from the authorization.
+
+```shell
+################################################################################
+#                                                                              #
+#                              Authorization Menu                              #
+#                                                                              #
+################################################################################
+
+ [ 1 ]    Logout CBL Authorization
+ [ esc ]  Go back
+
+```
 
 ### Tailing the Log File
 
@@ -225,9 +267,4 @@ The Sample App does not configure SiriusXM as a local media source by default. I
     To resolve this, edit the `samples/cpp/assets/config.json` file and choose a unique serial number.
     
 ## Known Issues
-The dual locale combinations are not present in the locale menu of the sample app. You have to add the locale combinations in the hard-coded locale string in the sample app. For the permitted locale combinations, see the [Alexa Voice Service documentation](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/system.html#localecombinations). The locale combinations you add to the string must be the same as the ones used to configure the Engine. The following example shows the hard-coded string with locale combinations:
-~~~
-    std::string supportedLocales =
-        "de-DE,en-AU,en-CA,en-GB,en-IN,en-US,es-ES,es-MX,es-US,fr-CA,fr-FR,hi-IN,it-IT,ja-JP,pt-BR,en-CA/"
-        "fr-CA,en-IN/hi-IN,en-US/es-US,es-US/en-US,fr-CA/en-CA,hi-IN/en-IN";
-~~~
+None.

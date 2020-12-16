@@ -1,0 +1,54 @@
+apply plugin: 'com.android.library'
+apply plugin: 'checkstyle'
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        minSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            testCoverageEnabled true
+            debuggable true
+        }
+    }
+
+    testOptions {
+        // Unit Test: Make all android methods return true by default
+        unitTests.returnDefaultValues = true
+    }
+
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
+
+    libraryVariants.all { variant ->
+        variant.outputs.all {
+            def project = "alexa-auto-lwa-auth"
+            def separator = "_"
+            def buildType = variant.buildType.name
+            def apkName = project + separator + buildType + ".aar"
+            outputFileName = new File(apkName)
+        }
+    }
+}
+
+dependencies {
+    implementation project(':aacsconstants')
+    implementation project(':aacsipc')
+    implementation project(':aacscommonutils')
+
+    implementation project(":alexa-auto-apis")
+
+    implementation deps.androidx_annotation
+    implementation deps.rxjava3
+    implementation deps.eventbus
+}

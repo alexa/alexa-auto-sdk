@@ -139,16 +139,18 @@ clean_aar() {
 }
 
 run_sample_gradle() {
-        local gradle_command="assembleRelease"
+	local gradle_command="assembleRelease"
 	if [ ${DEBUG_BUILD} = "1" ]; then
 		gradle_command="assembleDebug"
 	fi
-        pushd ${ANDROID_SAMPLE_DIR}/modules/sample-core
+	# Sample Core Build
+	pushd ${ANDROID_SAMPLE_DIR}/modules/sample-core
 	if [ ${CLEAN} = "1" ]; then
 		gradle clean
 	fi
-        gradle ${gradle_command}
-        popd
+	gradle ${gradle_command}
+	popd
+	# Sample APL Build (optional)
 	if [ -f ${ANDROID_SAMPLE_DIR}/app/src/main/libs/aplRelease.aar ] || [ -f ${ANDROID_SAMPLE_DIR}/modules/sample-apl/src/main/libs/aplRelease.aar ]; then
 		note "Running Sample APL Build"
 		pushd ${ANDROID_SAMPLE_DIR}/modules/sample-apl
@@ -158,7 +160,17 @@ run_sample_gradle() {
 		gradle ${gradle_command}
 		popd
 	fi
+	# Sample Connectivity Build
+	note "Running Sample Connectivity Build"
+	pushd ${ANDROID_SAMPLE_DIR}/modules/sample-connectivity
+	if [ ${CLEAN} = "1" ]; then
+		gradle clean
+	fi
+	gradle ${gradle_command}
+	popd
+	# Copy the AARs
 	copy_aar ${ANDROID_SAMPLE_DIR}
+	# Extra Module Builds
 	for module in ${EXTRA_MODULES} ; do
 		if [ -d "${module}/samples/android" ]; then
 			local module_path=$(${FIND} ${module}/samples/android/modules -mindepth 1 -maxdepth 1 -type d 2> /dev/null)

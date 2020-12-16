@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="timeBarPlayColor">#ef232f3e</color>
+    <color name="timeBarBufferColor">#3b232f3e</color>
+    <color name="mediaOptionsBackground">#1DA0A0A0</color>
+    <color name="mediaOptionsColor">#FFFFF7</color>
+    <color name="transparent">#0000ffff</color>
+    <color name="mediaAlbumTextColor">#232F3E</color>
+    <color name="mediaArtistTextColor">#747474</color>
+</resources>

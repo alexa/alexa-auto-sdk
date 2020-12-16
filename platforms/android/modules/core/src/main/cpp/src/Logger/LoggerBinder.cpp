@@ -16,7 +16,7 @@
 #include <AACE/JNI/Logger/LoggerBinder.h>
 
 // String to identify log entries originating from this file.
-static const char TAG[] = "aace.jni.network.LoggerBinder";
+static const char TAG[] = "aace.jni.logger.LoggerBinder";
 
 namespace aace {
 namespace jni {

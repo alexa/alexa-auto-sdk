@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/navigation"
+    app:startDestination="@id/navigation_fragment_settings_home">
+
+    <fragment
+        android:id="@+id/navigation_fragment_settings_home"
+        android:name="com.amazon.alexa.auto.voiceinteraction.settings.SettingsHomeFragment"
+        android:label="Alexa">
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_fragment_alexa_settings_home"
+        android:name="com.amazon.alexa.auto.voiceinteraction.settings.AlexaSettingsHomeFragment"
+        android:label="Alexa Settings">
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_fragment_alexa_settings_languages"
+        android:name="com.amazon.alexa.auto.voiceinteraction.settings.AlexaSettingsLanguagesFragment"
+        android:label="Alexa Languages">
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_fragment_aacs_preferences"
+        android:name="com.amazon.alexa.auto.voiceinteraction.settings.AACSPreferenceFragment"
+        android:label="AACS Preferences">
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_fragment_login"
+        android:name="com.amazon.alexa.auto.login.CBLLoginFragment"
+        android:label="Sign in"/>
+</navigation>

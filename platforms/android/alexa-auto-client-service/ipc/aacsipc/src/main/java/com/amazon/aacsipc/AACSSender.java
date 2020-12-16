@@ -109,6 +109,14 @@ public class AACSSender {
         if (mExecutor != null) {
             mExecutor.shutdown();
         }
+
+        if (mStreamFetchCallbackMap != null) {
+            mStreamFetchCallbackMap.clear();
+        }
+
+        if (mStreamPushCallbackMap != null) {
+            mStreamPushCallbackMap.clear();
+        }
     }
 
     // Requirement: message string must be less than 400KB.
@@ -421,6 +429,9 @@ public class AACSSender {
             } else {
                 Log.e(TAG, "IPC: FAILED to find fetch callback associated with streamId: " + streamId);
             }
+            if (mStreamFetchCallbackMap.containsKey(streamId)) {
+                mStreamFetchCallbackMap.remove(streamId);
+            }
         }
     }
 
@@ -445,6 +456,9 @@ public class AACSSender {
                 pushCallback.onPushToStreamId(streamId, writePipe);
             } else {
                 Log.e(TAG, "IPC: FAILED to find push callback associated with streamId: " + streamId);
+            }
+            if (mStreamPushCallbackMap.containsKey(streamId)) {
+                mStreamPushCallbackMap.remove(streamId);
             }
         }
     }

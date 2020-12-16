@@ -29,6 +29,8 @@ namespace alexa {
 /**
  * AuthProvider should be extended to manage access tokens for AVS authorization and report
  * client authorization state to the Engine.
+ * 
+ * @deprecated This platform interface is being deprecated. Use `aace::authorization::Authorization` instead.
  */
 class AuthProvider : public aace::core::PlatformInterface {
 protected:
@@ -38,12 +40,16 @@ public:
     /**
      * Describes the state of client authorization with AVS
      * @sa @c aace::alexa::AuthProviderEngineInterface::AuthState
+     * 
+     * @deprecated This enum is being deprecated as this platform interface is being deprecated.
      */
     using AuthState = aace::alexa::AuthProviderEngineInterface::AuthState;
 
     /**
      * Describes an error during an attempt to authorize with AVS
      * @sa @c aace::alexa::AuthProviderEngineInterface::AuthError
+     * 
+     * @deprecated This enum is being deprecated as this platform interface is being deprecated.
      */
     using AuthError = aace::alexa::AuthProviderEngineInterface::AuthError;
 
@@ -53,6 +59,7 @@ public:
      * Returns the token used by the platform implementation for authorization with AVS.
      * The platform implementation should retrieve an auth token if it does not have one.
      *
+     * @deprecated This method is being deprecated as this platform interface is being deprecated.
      * @return The token used to authorize with AVS
      */
     virtual std::string getAuthToken() = 0;
@@ -60,6 +67,7 @@ public:
     /**
      * Returns the AVS authorization state of the platform implementation
      *
+     * @deprecated This method is being deprecated as this platform interface is being deprecated.
      * @return The AVS authorization state
      */
     virtual AuthState getAuthState() = 0;
@@ -69,6 +77,7 @@ public:
      * unauthorized request to AVS. AVS responded to this request with a 403 code
      * indicating the token was not valid.
      *
+     * @deprecated This method is being deprecated as this platform interface is being deprecated.
      * @param [in] token The access token used in an unauthorized request to AVS
      */
     virtual void authFailure(const std::string& token){};
@@ -76,6 +85,7 @@ public:
     /**
      * Notifies the Engine of a change in AVS authorization state in the platform implementation
      *
+     * @deprecated This method is being deprecated as this platform interface is being deprecated.
      * @param [in] authState The new authorization state
      * @param [in] authError The error state of the authorization attempt
      */

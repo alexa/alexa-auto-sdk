@@ -1,0 +1,46 @@
+@startuml
+
+skinparam participant {
+	BackgroundColor White
+	ArrowColor Black
+	BorderColor DarkGray
+    BackgroundColor<<Engine>> Wheat
+	BorderColor<<Engine>> SandyBrown
+    BackgroundColor<<Platform>> LightSkyBlue
+	BorderColor<<Platform>> CornflowerBlue
+    BackgroundColor<<AVS>> TECHNOLOGY
+	BorderColor<<AVS>> Green
+	BorderColor<<AlexaCloud>> Pink
+	BackgroundColor<<AlexaCloud>> Pink
+}
+
+participant Application <<Application>> order 20
+participant Connectivity <<Platform>> order 30
+participant ConnectivityEngineImpl <<Engine>> order 40
+participant ConnectivityCapabilityAgent <<AVS>> order 50
+participant SynchronizeState <<AVS>> order 60
+participant ContextManager <<AVS>> order 70
+participant ReportStateHandler <<AVS>> order 80
+participant Internet_DataPlan_Connectivity_API <<AlexaCloud>> order 90
+
+Application -> ConnectivityEngineImpl: registerPlatformInterface()
+ConnectivityEngineImpl-> ConnectivityCapabilityAgent**:  create()
+ConnectivityCapabilityAgent -> ContextManager : addStateProvider(this);
+
+... __**Cloud asks for the ReportState**__ ...
+ReportStateHandler <- Internet_DataPlan_Connectivity_API: ReportState directive 
+ReportStateHandler -> ContextManager : getContext()
+
+...
+ContextManager -> ConnectivityCapabilityAgent: provideState()
+
+...
+ConnectivityCapabilityAgent-> ConnectivityEngineImpl: getConnectivityState()
+ConnectivityEngineImpl-> Connectivity: getConnectivityState()
+Connectivity --> ConnectivityEngineImpl : ConnectivityStatePayload {JSON}
+ConnectivityEngineImpl -> ConnectivityCapabilityAgent: onConnectivityStateChange()
+ConnectivityCapabilityAgent -> ContextManager : executeProvideState()
+ContextManager -> ReportStateHandler : provideStateResponse()
+ReportStateHandler -> Internet_DataPlan_Connectivity_API : sendReportState()
+
+@enduml

@@ -173,6 +173,9 @@ public:
         ///  Bool to identify if looping of songs is enabled. default false
         bool repeatEnabled;
 
+        /// Bool to identify if repeating the track is enabled. default false
+        bool repeatOneEnabled;
+
         /// The favorite status FAVORITED/UNFAVORITED/NOT_RATED. default NOT_RATED
         Favorites favorites;
 
@@ -263,7 +266,7 @@ public:
      * 
      * @param [in] ContentSelector Content selection type 
      * 
-     * @param [in] payload Content selector payload (i.e. "1", "98.7 FM HD 1")
+     * @param [in] payload Content selector payload (e.g. "1", "98.7 FM HD 1", "bbc radio four")
      * 
      * @return @c true if the platform implementation successfully handled the call, 
      * else @c false

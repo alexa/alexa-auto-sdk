@@ -39,7 +39,7 @@ set(CORE_SOURCE
     ${CORE_CPP_DIR}/src/Metrics/MetricsUploaderBinder.cpp
     ${CORE_CPP_DIR}/src/Logger/LoggerConfigurationBinder.cpp
     ${CORE_CPP_DIR}/src/PropertyManager/PropertyManagerBinder.cpp
-
+    ${CORE_CPP_DIR}/src/Authorization/AuthorizationBinder.cpp
 )
 set(CORE_DEPENDENCIES
     AACECoreEngine AACECorePlatform

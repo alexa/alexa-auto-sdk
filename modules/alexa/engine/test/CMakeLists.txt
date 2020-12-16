@@ -34,6 +34,7 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Alexa/AlexaMockComponentFactory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Alexa/MockAlerts.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Alexa/MockAudioPlayer.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Alexa/MockAuthorizationManager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Alexa/MockNotifications.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Alexa/MockPlaybackController.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Alexa/MockSpeechRecognizer.h
@@ -81,6 +82,8 @@ set(UNIT_TEST_SRCS
     SpeechRecognizerEngineImplTest.cpp
     AlexaEngineClientObserverTest.cpp
     DoNotDisturbEngineImplTest.cpp
+    AuthorizationManagerTest.cpp
+    AlexaAuthorizationProviderTest.cpp
 )
 
 target_link_libraries(AACEAlexaTestsLib
@@ -128,6 +131,9 @@ add_executable(AACEAlexaTests
     ${CMAKE_CURRENT_SOURCE_DIR}/src/SpeechRecognizerEngineImplTest.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AlexaEngineClientObserverTest.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/DoNotDisturbEngineImplTest.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/StubMiscStorage.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/AuthorizationManagerTest.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/AlexaAuthorizationProviderTest.cpp
 )
 
 target_include_directories(AACEAlexaTests

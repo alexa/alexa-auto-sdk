@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/login_finished_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/alexa_img_view"
+        android:layout_width="@dimen/login_alexa_image_width"
+        android:layout_height="@dimen/login_alexa_image_height"
+        android:layout_gravity="center"
+        android:layout_marginStart="@dimen/login_item_margin_start"
+        android:layout_marginEnd="@dimen/login_item_margin_end"
+        android:layout_marginTop="@dimen/login_item_margin_top"
+        android:src="@drawable/amazon_alexa_placeholder_logo"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toTopOf="@+id/qr_code_title_textview"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <TextView
+        android:id="@+id/login_finish_heading"
+        style="@style/Alexa.Heading2Text"
+        android:text="@string/login_finish_heading_text"
+        android:textAlignment="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/login_margin_start"
+        android:layout_marginEnd="@dimen/login_margin_start"
+        android:layout_marginTop="@dimen/login_item_margin_top"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/alexa_img_view"/>
+
+    <TextView
+        android:id="@+id/login_hint_try"
+        style="@style/Alexa.Heading2Text"
+        android:text="@string/login_finish_try_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/login_item_margin_top"
+        android:layout_marginStart="@dimen/login_margin_start_double"
+        android:layout_marginEnd="@dimen/login_margin_start_double"
+        android:gravity="center_horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/login_finish_heading"
+        app:layout_constraintBottom_toTopOf="@+id/alexa_hint1"
+        app:layout_constraintVertical_chainStyle="packed"/>
+
+    <TextView
+        android:id="@+id/alexa_hint1"
+        style="@style/Alexa.Hint2Text"
+        android:text="@string/login_alexa_hint1"
+        android:textAlignment="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/login_margin_start_double"
+        android:layout_marginEnd="@dimen/login_margin_start_double"
+        app:layout_constraintTop_toBottomOf="@+id/login_hint_try"
+        app:layout_constraintBottom_toTopOf="@+id/alexa_hint2"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/alexa_hint2"
+        style="@style/Alexa.Hint2Text"
+        android:text="@string/login_alexa_hint2"
+        android:textAlignment="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/login_margin_start_double"
+        android:layout_marginEnd="@dimen/login_margin_start_double"
+        app:layout_constraintTop_toBottomOf="@+id/alexa_hint1"
+        app:layout_constraintBottom_toTopOf="@+id/alexa_hint3"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/alexa_hint3"
+        style="@style/Alexa.Hint2Text"
+        android:text="@string/login_alexa_hint3"
+        android:textAlignment="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/login_margin_start_double"
+        android:layout_marginEnd="@dimen/login_margin_start_double"
+        app:layout_constraintTop_toBottomOf="@+id/alexa_hint2"
+        app:layout_constraintBottom_toTopOf="@+id/alexa_hint4"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/alexa_hint4"
+        style="@style/Alexa.Hint2Text"
+        android:textAppearance="@style/Alexa.HintText"
+        android:text="@string/login_alexa_hint4"
+        android:textAlignment="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/login_margin_start_double"
+        android:layout_marginEnd="@dimen/login_margin_start_double"
+        android:layout_marginBottom="@dimen/login_item_margin_top"
+        app:layout_constraintTop_toBottomOf="@+id/alexa_hint3"
+        app:layout_constraintBottom_toTopOf="@+id/login_finished_btn"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/login_finished_btn"
+        style="@style/Alexa.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/login_item_margin_top"
+        android:text="@string/login_all_done_btn_text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/login_finish_footer" />
+
+    <TextView
+        android:id="@+id/login_finish_footer"
+        style="@style/Alexa.HintText"
+        android:text="@string/login_alexa_finish_footer_text"
+        android:textAlignment="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/login_header_footer_vertical_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

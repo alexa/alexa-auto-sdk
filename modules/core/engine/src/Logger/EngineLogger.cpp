@@ -137,7 +137,7 @@ void EngineLogger::log(
     std::chrono::system_clock::time_point time,
     const std::string& threadMoniker,
     const std::string& text) {
-    emit(source, tag, level, time, threadMoniker, text);
+    emit(source, tag, level, time, threadMoniker.c_str(), text.c_str());
 }
 
 void EngineLogger::emit(
@@ -145,19 +145,19 @@ void EngineLogger::emit(
     const std::string& tag,
     Level level,
     std::chrono::system_clock::time_point time,
-    const std::string& threadMoniker,
-    const std::string& text) {
+    const char* threadMoniker,
+    const char* text) {
     std::lock_guard<std::mutex> lock(m_mutex);
 
     // iterate through each register sink and emit the log entry
     for (auto it = m_sinkMap.begin(); it != m_sinkMap.end(); it++) {
-        it->second->emit(source, tag, level, time, threadMoniker.c_str(), text.c_str());
+        it->second->emit(source, tag, level, time, threadMoniker, text);
     }
 
     // iterate through all of the log event observers and log the message
     // to each observer in the list
     for (auto next : m_observers) {
-        next->onLogEvent(level, time, source.c_str(), text.c_str());
+        next->onLogEvent(level, time, source.c_str(), text);
     }
 }
 

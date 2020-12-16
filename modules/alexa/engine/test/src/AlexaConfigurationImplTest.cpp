@@ -337,3 +337,25 @@ TEST_F(AlexaConfigurationImplTest, createTemplateRuntimeConfigWithNoKeys) {
     configStr << config->getStream()->rdbuf();
     EXPECT_EQ(configStr.str(), expectedConfigStr) << "Error in the Configuration String";
 }
+
+TEST_F(AlexaConfigurationImplTest, createAuthProviderConfigBestCase) {
+    std::string expectedConfigStr =
+        "{\n"
+        "    \"aace.alexa\": {\n"
+        "        \"authProvider\": {\n"
+        "            \"providers\": [\n"
+        "                \"ABC\",\n"
+        "                \"ABCD\",\n"
+        "                \"TEST\"\n"
+        "            ]\n"
+        "        }\n"
+        "    }\n"
+        "}";
+
+    auto config = aace::alexa::config::AlexaConfiguration::createAuthProviderConfig({"ABC", "ABCD", "TEST"});
+
+    //Convert to ostringstream for comparing the istream
+    std::ostringstream configStr;
+    configStr << config->getStream()->rdbuf();
+    EXPECT_EQ(configStr.str(), expectedConfigStr) << "Error in the Configuration String";
+}

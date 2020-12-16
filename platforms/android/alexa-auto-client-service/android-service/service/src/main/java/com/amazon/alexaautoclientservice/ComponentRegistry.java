@@ -60,24 +60,29 @@ public class ComponentRegistry {
             return targets;
         }
 
+        String cacheKey = topic + "+" + action;
+
         // Query mTargetCache
         Log.v(TAG, String.format("No target specified in config for topic=%s, checking mTargetCache", topic));
-        targets = mTargetCache.get(topic);
+        targets = mTargetCache.get(cacheKey);
         if (targets != null) {
-            Log.i(TAG, String.format("Found targets=%s for topic=%s in mTargetcache", targets, topic));
+            Log.i(TAG,
+                    String.format("Found targets=%s for topic=%s action=%s in mTargetcache", targets, topic, action));
             return targets;
         }
 
         // Query package manager
-        Log.v(TAG, String.format("No targets found in mTargetCache for topic=%s, querying package manager", topic));
+        Log.v(TAG,
+                String.format("No targets found in mTargetCache for topic=%s action=%s, querying package manager",
+                        topic, action));
         targets = queryPackageManager(context, topic, action);
         if (targets == null) {
             Log.e(TAG, String.format("No targets found for topic=%s action=%s ", topic, action));
             return null;
         }
 
-        Log.i(TAG, String.format("Caching topic=%s with targets=%s", topic, targets));
-        mTargetCache.put(topic, targets);
+        Log.i(TAG, String.format("Caching topic=%s, action=%s with targets=%s", topic, action, targets));
+        mTargetCache.put(cacheKey, targets);
         return targets;
     }
 
@@ -125,7 +130,9 @@ public class ComponentRegistry {
                 break;
             }
             if (checkPermission(context, AACSConstants.AACS_PERMISSION, target)) {
-                Log.v(TAG, String.format("Target for topic=%s found in config: %s", topic, target));
+                Log.v(TAG,
+                        String.format(
+                                "Target for topic=%s found in config: %s", topic, target.component.getClassName()));
                 targets.add(target);
             }
         }
@@ -133,7 +140,9 @@ public class ComponentRegistry {
         if (targets.size() > 0) {
             return targets;
         } else {
-            Log.w(TAG, String.format("None of the specified targets for topic=%s have the AACS permission", topic));
+            Log.w(TAG,
+                    String.format(
+                            "None of the specified targets in config for topic=%s have the AACS permission", topic));
             return null;
         }
     }
@@ -165,42 +174,45 @@ public class ComponentRegistry {
         List<TargetComponent> targets = new ArrayList<>();
 
         // Query broadcast receivers
-        queryReceivers(context, queryIntent, targets, topic);
+        queryReceivers(context, queryIntent, targets, topic, action);
 
         // Query activities
-        queryActivities(context, queryIntent, targets, topic);
+        queryActivities(context, queryIntent, targets, topic, action);
 
         // Query services
-        queryServices(context, queryIntent, targets, topic);
+        queryServices(context, queryIntent, targets, topic, action);
 
         if (targets.size() == 0) {
-            Log.e(TAG, String.format("No targets found by package manager for topic=%s", topic));
+            Log.e(TAG, String.format("No targets found by package manager for topic=%s action=%s", topic, action));
             return null;
         }
 
         return targets;
     }
 
-    private void queryReceivers(Context context, Intent queryIntent, List<TargetComponent> targets, String topic) {
+    private void queryReceivers(
+            Context context, Intent queryIntent, List<TargetComponent> targets, String topic, String action) {
         List<ResolveInfo> receivers =
                 context.getPackageManager().queryBroadcastReceivers(queryIntent, PACKAGE_MANAGER_QUERY_FLAGS);
-        filterByPermission(context, receivers, targets, TargetComponent.Type.RECEIVER, topic);
+        filterByPermission(context, receivers, targets, TargetComponent.Type.RECEIVER, topic, action);
     }
 
-    private void queryActivities(Context context, Intent queryIntent, List<TargetComponent> targets, String topic) {
+    private void queryActivities(
+            Context context, Intent queryIntent, List<TargetComponent> targets, String topic, String action) {
         List<ResolveInfo> receivers =
                 context.getPackageManager().queryIntentActivities(queryIntent, PACKAGE_MANAGER_QUERY_FLAGS);
-        filterByPermission(context, receivers, targets, TargetComponent.Type.ACTIVITY, topic);
+        filterByPermission(context, receivers, targets, TargetComponent.Type.ACTIVITY, topic, action);
     }
 
-    private void queryServices(Context context, Intent queryIntent, List<TargetComponent> targets, String topic) {
+    private void queryServices(
+            Context context, Intent queryIntent, List<TargetComponent> targets, String topic, String action) {
         List<ResolveInfo> receivers =
                 context.getPackageManager().queryIntentServices(queryIntent, PACKAGE_MANAGER_QUERY_FLAGS);
-        filterByPermission(context, receivers, targets, TargetComponent.Type.SERVICE, topic);
+        filterByPermission(context, receivers, targets, TargetComponent.Type.SERVICE, topic, action);
     }
 
     private void filterByPermission(Context context, List<ResolveInfo> infos, List<TargetComponent> targets,
-            TargetComponent.Type type, String topic) {
+            TargetComponent.Type type, String topic, String action) {
         if (infos.size() > 0) {
             for (ResolveInfo info : infos) {
                 TargetComponent target = null;
@@ -212,10 +224,12 @@ public class ComponentRegistry {
                             new ComponentName(info.serviceInfo.packageName, info.serviceInfo.name), type);
                 }
                 if (checkPermission(context, AACSConstants.AACS_PERMISSION, target)) {
-                    Log.v(TAG,
-                            String.format("Target in type=%s for topic=%s found by package manager: %s", type, topic,
-                                    target));
-                    targets.add(target);
+                    if (target != null) {
+                        Log.v(TAG,
+                                String.format("Target in type=%s for topic=%s action=%s found by package manager: %s",
+                                        type, topic, action, target.component.getClassName()));
+                        targets.add(target);
+                    }
                 }
             }
         } else {
@@ -234,6 +248,13 @@ public class ComponentRegistry {
             default:
                 Log.w(TAG, String.format("Unknown target type: %s", type));
                 return TargetComponent.Type.UNKNOWN;
+        }
+    }
+
+    public void cleanUp() {
+        if (mTargetCache != null) {
+            mTargetCache.clear();
+            Log.v(TAG, "Target Cache in Component Registry is cleaned");
         }
     }
 }

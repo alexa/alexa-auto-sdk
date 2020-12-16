@@ -26,15 +26,15 @@ class ThreadMoniker {
 public:
     ThreadMoniker();
 
-    static inline const std::string& getThisThreadMoniker();
+    static inline const char* getThisThreadMoniker();
 
 private:
-    std::string m_moniker;
+    char m_moniker[16];
 
     static thread_local ThreadMoniker m_threadMoniker;
 };
 
-const std::string& ThreadMoniker::getThisThreadMoniker() {
+const char* ThreadMoniker::getThisThreadMoniker() {
     return m_threadMoniker.m_moniker;
 }
 

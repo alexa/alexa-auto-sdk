@@ -1,0 +1,19 @@
+@startuml
+
+skinparam roundcorner 10
+
+autonumber
+participant Application  order 20
+participant AuthorizationHandler  order 30
+participant "Auto SDK" as AutoSDK  order 40
+
+Application -> AuthorizationHandler : Logging out from CBL authorization.
+AuthorizationHandler -> AutoSDK : logout( "alexa:cbl" )
+
+... Clearing stored refresh token ...
+AutoSDK -> AuthorizationHandler : setAuthorizationData( "alexa:cbl", "refreshToken", "" )
+
+... Notifying the Application as unauthorized ...
+AutoSDK -> AuthorizationHandler : authorizationStateChanged( "alexa:cbl", UNAUTHORIZED )
+
+@enduml

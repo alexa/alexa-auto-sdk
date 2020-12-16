@@ -20,7 +20,7 @@ var searchData=
   ['loggerconfiguration',['LoggerConfiguration',['../classcom_1_1amazon_1_1aace_1_1logger_1_1config_1_1_logger_configuration.html',1,'com::amazon::aace::logger::config']]],
   ['login',['login',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter.html#a6aa1476a6900c5380884944191f71136',1,'com::amazon::aace::alexa::ExternalMediaAdapter']]],
   ['logincomplete',['loginComplete',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter.html#a3423902d7b22164145d24e74a171765e',1,'com::amazon::aace::alexa::ExternalMediaAdapter']]],
-  ['logout',['logout',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter.html#a8dfc0565e9ac5c0662a9431886f8ef6e',1,'com::amazon::aace::alexa::ExternalMediaAdapter']]],
+  ['logout',['logout',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter.html#a8dfc0565e9ac5c0662a9431886f8ef6e',1,'com.amazon.aace.alexa.ExternalMediaAdapter.logout()'],['../classcom_1_1amazon_1_1aace_1_1authorization_1_1_authorization.html#a33d59157ab8510d41612ac7863c9af5d',1,'com.amazon.aace.authorization.Authorization.logout()']]],
   ['logoutcomplete',['logoutComplete',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter.html#a9d6279826669b48ebf5c670985f0f092',1,'com::amazon::aace::alexa::ExternalMediaAdapter']]],
   ['loop',['LOOP',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_playback_controller_1_1_playback_toggle.html#ae1c56e3222db7bc492ce0e13e132008c',1,'com::amazon::aace::alexa::PlaybackController::PlaybackToggle']]],
   ['lower',['LOWER',['../classcom_1_1amazon_1_1aace_1_1car_control_1_1_car_control_configuration_1_1_action.html#a617b78dcb007cdf76be24cc4c01a14dd',1,'com::amazon::aace::carControl::CarControlConfiguration::Action']]]

@@ -25,6 +25,16 @@ using json = nlohmann::json;
 
 namespace sampleApp {
 
+std::string get_string_value(json& payload, const std::string& key) {
+    if (payload.count(key) > 0) {
+        auto val = payload.at(key);
+        if (val.is_string()) {
+            return val.get<std::string>();
+        }
+    }
+    return "";
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  View
@@ -359,36 +369,72 @@ void ContentView::set(const std::string& string, const Type type) {
                 Ensures(object.is_object());
                 if (object.count("content")) {
                     auto content = object.at("content");
-                    if (content.count("title")) {
-                        stream << content.at("title").get<std::string>() << std::endl;
+                    auto title = get_string_value(content, "title");
+                    if (!title.empty()) {
+                        stream << title << std::endl;
                     }
-                    if (content.count("titleSubtext1")) {
-                        stream << content.at("titleSubtext1").get<std::string>() << std::endl;
+                    auto titleSubtext1 = get_string_value(content, "titleSubtext1");
+                    if (!titleSubtext1.empty()) {
+                        stream << titleSubtext1 << std::endl;
                     }
-                    if (content.count("titleSubtext2")) {
-                        stream << content.at("titleSubtext2").get<std::string>() << std::endl;
+                    auto titleSubtext2 = get_string_value(content, "titleSubtext2");
+                    if (!titleSubtext2.empty()) {
+                        stream << titleSubtext2 << std::endl;
                     }
                     stream << std::endl;
-                    if (content.count("header")) {
-                        stream << content.at("header").get<std::string>() << std::endl;
+                    auto header = get_string_value(content, "header");
+                    if (!header.empty()) {
+                        stream << header << std::endl;
                     }
-                    if (content.count("headerSubtext1")) {
-                        stream << content.at("headerSubtext1").get<std::string>() << std::endl;
+                    auto headerSubtext1 = get_string_value(content, "headerSubtext1");
+                    if (!headerSubtext1.empty()) {
+                        stream << headerSubtext1 << std::endl;
                     } else if (content.count("provider")) {
                         auto provider = content.at("provider");
-                        if (provider.count("name")) {
-                            stream << provider.at("name").get<std::string>() << std::endl;
+                        auto name = get_string_value(provider, "name");
+                        if (!name.empty()) {
+                            stream << name << std::endl;
                         }
                     }
                     if (content.count("art")) {
                         auto art = content.at("art");
-                        if (art.count("contentDescription")) {
-                            stream << art.at("contentDescription").get<std::string>() << std::endl;
+                        auto contentDescription = get_string_value(art, "contentDescription");
+                        if (!contentDescription.empty()) {
+                            stream << contentDescription << std::endl;
                         }
                     }
                 }
             } catch (std::exception& e) {
                 stream << "PlayerInfo parser error" << e.what() << std::endl;
+            }
+            break;
+        case Type::AuthorizationStateChanged:
+            try {
+                auto object = json::parse(string);
+                Ensures(object.is_object());
+                if (object.count("service") && object.count("state")) {
+                    auto service = object.at("service").get<std::string>();
+                    auto state = object.at("state").get<std::string>();
+                    stream << "Authorization Service: " << service << std::endl;
+                    stream << "State:  " << state << std::endl;
+                }
+            } catch (std::exception& e) {
+                stream << "AuthorizationStateChanged parser error" << e.what() << std::endl;
+            }
+            break;
+        case Type::AuthorizationError:
+            try {
+                auto object = json::parse(string);
+                Ensures(object.is_object());
+                if (object.count("service") && object.count("error")) {
+                    auto service = object.at("service").get<std::string>();
+                    auto error = object.at("error").get<std::string>();
+                    stream << "Authorization Service: " << service << std::endl;
+                    stream << "Error:  " << error << std::endl;
+                    stream << std::endl;
+                }
+            } catch (std::exception& e) {
+                stream << "AuthorizationError parser error" << e.what() << std::endl;
             }
             break;
         default:

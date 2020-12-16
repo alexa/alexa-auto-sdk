@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/msp_option_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/msp_option_logo"
+        android:layout_width="@dimen/msp_option_logo_width"
+        android:layout_height="@dimen/msp_option_logo_width"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/msp_option_logo_margin_top" />
+
+    <TextView
+        android:id="@+id/msp_option_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textColor="#232F3E"
+        android:textSize="@dimen/msp_option_text_size" />
+</LinearLayout>

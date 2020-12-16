@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<color name="Cyan">#00CFFF</color>
+<color name="Abbey">#555A62</color>
+<color name="White">#FFFFFF</color>
+<color name="Black">#000000</color>
+<color name="OxfordBlue">#2F3747</color>
+<color name="EbonyClay">#232F3E</color>
+<color name="GrayChateau">#A6ABAF</color>
+<color name="transparent_black">#99000000</color>
+</resources>

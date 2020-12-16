@@ -49,7 +49,8 @@ LocalMediaSourceEngineImpl::LocalMediaSourceEngineImpl(
         m_localPlayerId(localPlayerId),
         m_contentSelectorNameMap{{"frequency", ContentSelector::FREQUENCY},
                                  {"channel", ContentSelector::CHANNEL},
-                                 {"preset", ContentSelector::PRESET}} {
+                                 {"preset", ContentSelector::PRESET},
+                                 {"dabchannel", ContentSelector::CHANNEL}} {
 }
 
 std::shared_ptr<LocalMediaSourceEngineImpl> LocalMediaSourceEngineImpl::create(
@@ -303,10 +304,7 @@ bool LocalMediaSourceEngineImpl::handleGetAdapterState(
             }
         }
 
-        // add dynamic pluggable capability
-        // this is needed to whitelist the launched paramater to function as expected (to be deprecated)
-        document["capabilities"].AddMember("disablePluggable", "1.0", allocator);
-        // this is the new name needed to whitelist the launched paramater to function as expected
+        // add dynamic pluggable capability clearlist payload
         document["capabilities"].AddMember("enableIsLaunched", "1.0", allocator);
 
         rapidjson::StringBuffer strbuf;
@@ -320,6 +318,7 @@ bool LocalMediaSourceEngineImpl::handleGetAdapterState(
         state.playbackState.trackOffset = platformState.playbackState.trackOffset;
         state.playbackState.shuffleEnabled = platformState.playbackState.shuffleEnabled;
         state.playbackState.repeatEnabled = platformState.playbackState.repeatEnabled;
+        state.playbackState.repeatOneEnabled = platformState.playbackState.repeatOneEnabled;
         state.playbackState.favorites =
             static_cast<aace::engine::alexa::Favorites>(platformState.playbackState.favorites);
         state.playbackState.type = platformState.playbackState.type;
@@ -442,7 +441,7 @@ std::string LocalMediaSourceEngineImpl::getPlayerId(Source source) {
             return "SIRIUS_XM";
 
         case Source::DAB:
-            return "DAB";
+            return "DAB_RADIO";
 
         default:
             throw("invalidLocalMediaSource");

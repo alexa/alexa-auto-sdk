@@ -1,0 +1,14 @@
+{
+  "aacs.alexa": {
+    "deviceInfo": {
+      "clientId": "testClientId",
+      "productId" : "testProductId",
+      "deviceSerialNumber": "testDeviceSerialNumber",
+      "manufacturerName": "na",
+      "description": "na"
+    },
+    "localMediaSource": {
+      "types": []
+    }
+  }
+}

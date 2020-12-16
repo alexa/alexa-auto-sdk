@@ -1,7 +1,8 @@
 package com.amazon.alexaautoclientservice.util;
 
-import android.support.annotation.NonNull;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.amazon.aacsconstants.AACSConstants;
 import com.amazon.aacsconstants.Action;

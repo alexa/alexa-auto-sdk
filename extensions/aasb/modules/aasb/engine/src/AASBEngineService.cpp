@@ -182,7 +182,7 @@ aace::engine::core::Version AASBEngineService::getConfiguredVersion() {
 }
 
 aace::engine::core::Version AASBEngineService::getCurrentVersion() {
-    return VERSION("3.0");
+    return VERSION("3.1");
 }
 
 bool AASBEngineService::getAutoEnableInterfaces() {

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="card_margin_top">60dp</dimen>
+    <dimen name="constrained_max_height">550dp</dimen>
+    <dimen name="poi_detail_large_margin">30dp</dimen>
+    <dimen name="action_buttons_margin_bottom">20dp</dimen>
+</resources>

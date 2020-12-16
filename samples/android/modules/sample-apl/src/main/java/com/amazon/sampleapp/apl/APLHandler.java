@@ -81,11 +81,12 @@ public class APLHandler extends APL {
     @Override
     public String getVisualContext() {
         try {
-            JSONObject context = new JSONObject()
-                                         .put("token", mToken)
-                                         .put("version", mVersion)
-                                         .put("componentsVisibleOnScreen", new JSONArray().put(mVisualContext));
-
+            JSONObject context = new JSONObject().put("token", mToken).put("version", mVersion);
+            JSONArray components = new JSONArray();
+            if (mVisualContext != null && !mVisualContext.equals("")) {
+                components.put(mVisualContext);
+            }
+            context.put("componentsVisibleOnScreen", components);
             Log.i(sTag, "Visual context requested: " + context.toString());
             return context.toString();
         } catch (JSONException e) {
@@ -163,12 +164,16 @@ public class APLHandler extends APL {
                 Log.i(sTag, "executeCommands called: " + payload);
                 JSONObject commands = new JSONObject(payload);
                 if (commands.has("commands")) {
-                    mAplController.executeCommands(commands.getJSONArray("commands").toString());
-                    mExecutor.submit(() -> {
-                        Log.i(sTag, "executeCommands result succeeded. token: " + mToken);
+                    if (commands.getJSONArray("commands").getJSONObject(0).getString("type").equals("Finish")) {
                         executeCommandsResult(mToken, true, "");
-                        processActivityEvent(mToken, APL.ActivityEvent.ACTIVATED);
-                    });
+                        processActivityEvent(mToken, APL.ActivityEvent.DEACTIVATED);
+                    } else {
+                        mAplController.executeCommands(commands.getJSONArray("commands").toString()).then(() -> {
+                            Log.i(sTag, "executeCommands result succeeded. token: " + mToken);
+                            executeCommandsResult(mToken, true, "");
+                            processActivityEvent(mToken, APL.ActivityEvent.ACTIVATED);
+                        });
+                    }
                 } else {
                     mExecutor.submit(() -> {
                         Log.e(sTag, "executeCommands failed. token: " + mToken);
@@ -296,9 +301,12 @@ public class APLHandler extends APL {
                             vpMode = ViewportMode.kViewportModeAuto;
                     }
 
-                    specifications.add(new Scaling.ViewportSpecification(spec.getInt("minWidth"),
-                            spec.getInt("maxWidth"), spec.getInt("minHeight"), spec.getInt("maxHeight"),
-                            spec.getString("shape").equals("ROUND"), vpMode));
+                    if (spec.has("minWidth") && spec.has("maxWidth") && spec.has("minHeight") && spec.has("maxHeight")
+                            && spec.has("shape")) {
+                        specifications.add(new Scaling.ViewportSpecification(spec.getInt("minWidth"),
+                                spec.getInt("maxWidth"), spec.getInt("minHeight"), spec.getInt("maxHeight"),
+                                spec.getString("shape").equals("ROUND"), vpMode));
+                    }
                 }
                 scaling = new Scaling(10, specifications);
             }

@@ -77,8 +77,6 @@ std::string VehicleEngineService::getPropertyAttributeForMetric(VehiclePropertyT
             return "Language";
         case VehiclePropertyType::MICROPHONE:
             return "Microphone";
-        case VehiclePropertyType::COUNTRY_LIST:
-            return "Countries";
         case VehiclePropertyType::VEHICLE_IDENTIFIER:
             return "VehicleIdentifier";
     }
@@ -178,7 +176,6 @@ bool VehicleEngineService::configure(std::shared_ptr<std::istream> configuration
             getVehicleConfigProperty(info, "arch", VehiclePropertyType::HARDWARE_ARCH, m_vehiclePropertyMap);
             getVehicleConfigProperty(info, "language", VehiclePropertyType::LANGUAGE, m_vehiclePropertyMap);
             getVehicleConfigProperty(info, "microphone", VehiclePropertyType::MICROPHONE, m_vehiclePropertyMap);
-            getVehicleConfigProperty(info, "countries", VehiclePropertyType::COUNTRY_LIST, m_vehiclePropertyMap);
             getVehicleConfigProperty(
                 info, "vehicleIdentifier", VehiclePropertyType::VEHICLE_IDENTIFIER, m_vehiclePropertyMap);
             m_vehicleInfoConfigured = true;

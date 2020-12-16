@@ -1,6 +1,8 @@
 # AASB Core Engine
 
 set(HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Engine/Authorization/AASBAuthorizationEngineService.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Engine/Authorization/AASBAuthorization.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Engine/Location/AASBLocationEngineService.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Engine/Location/AASBLocationProvider.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Engine/Network/AASBNetworkEngineService.h
@@ -15,6 +17,22 @@ set(HEADERS
 )
 
 source_group("Header Files" FILES ${HEADERS})
+
+set(AASB_AUTHORIZATION_MESSAGES
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Authorization/Authorization/AuthorizationErrorMessage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Authorization/Authorization/AuthorizationState.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Authorization/Authorization/AuthorizationStateChangedMessage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Authorization/Authorization/CancelAuthorizationMessage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Authorization/Authorization/EventReceivedMessage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Authorization/Authorization/GetAuthorizationDataMessage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Authorization/Authorization/GetAuthorizationDataMessageReply.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Authorization/Authorization/LogoutMessage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Authorization/Authorization/SendEventMessage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Authorization/Authorization/SetAuthorizationDataMessage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Authorization/Authorization/StartAuthorizationMessage.h
+)
+
+source_group("Authorization Message Headers" FILES ${AASB_AUTHORIZATION_MESSAGES})
 
 set(AASB_AUDIO_MESSAGES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Audio/AudioInput/AudioInputAudioType.h
@@ -83,6 +101,8 @@ add_library(AASBCoreEngine SHARED
     ${AASB_LOCATION_MESSAGES}
     ${AASB_NETWORK_MESSAGES}
     ${AASB_PROPERTY_MANAGER_MESSAGES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Authorization/AASBAuthorizationEngineService.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Authorization/AASBAuthorization.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Location/AASBLocationEngineService.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Location/AASBLocationProvider.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Network/AASBNetworkEngineService.cpp

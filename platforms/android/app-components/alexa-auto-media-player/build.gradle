@@ -1,0 +1,89 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+android {
+    compileSdkVersion 30
+    defaultConfig {
+        minSdkVersion 26
+        targetSdkVersion 30
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        libraryVariants.all { variant ->
+            variant.outputs.all {
+                def project = "alexa-auto-media-player"
+                def separator = "_"
+                def buildType = variant.buildType.name
+                def aarName = project + separator + buildType + ".aar"
+                outputFileName = new File(aarName)
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    testOptions {
+        // Unit Test: Make all android methods return true by default
+        unitTests.returnDefaultValues = true
+        unitTests.includeAndroidResources = true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    repositories {
+        flatDir {
+            dirs 'libs'
+        }
+    }
+}
+
+dependencies {
+    // AACS Client Libraries
+    implementation project(':aacsconstants')
+    implementation project(':aacsipc')
+    implementation project(':aacscommonutils')
+
+    implementation project(":alexa-auto-apis")
+    implementation project(':alexa-auto-apps-common-ui')
+    implementation project(':alexa-auto-apps-common-util')
+
+    implementation deps.androidx_core
+    implementation deps.androidx_media
+
+    // Kotlin
+    implementation deps.kotlin_stdlib
+    implementation deps.androidx_core_ktx
+
+    // Dagger
+    implementation deps.dagger
+    kapt deps.dagger_compiler
+
+    // Exo Player
+    implementation deps.exoplayer_core
+    implementation deps.exoplayer_dash
+    implementation deps.exoplayer_smooth
+    implementation deps.exoplayer_hls
+
+    // RX
+    implementation deps.rxjava3
+
+    // Glide (loading images)
+    implementation deps.glide
+
+    //Test Dependencies
+    testImplementation deps.junit
+    testImplementation deps.mockito
+    testImplementation deps.mockito_inline
+    testImplementation deps.mockito_nhaarman
+    testImplementation deps.androidx_test_core
+    testImplementation deps.roboelectric
+}

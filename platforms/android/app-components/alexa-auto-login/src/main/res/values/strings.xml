@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="login_qr_code_message">
+        <![CDATA[
+            To use Alexa, you must sign in to Amazon. Go to <font color=\'#33B5E5\'>amazon.com/code</font> and enter this code:
+        ]]>
+    </string>
+    <string name="login_action_button">Get Started</string>
+    <string name="login_message">With Alexa, you can ask to play music, get directions, place calls, control smart home devices, and more - just by asking.</string>
+    <string name="login_method_or_text">Or scan this code:</string>
+    <string name="login_finish_heading_text">To use Alexa, simply say \"Alexa\".</string>
+    <string name="login_finish_try_text">Try:</string>
+    <string name="login_alexa_hint1">\"Alexa, find a nearby gas station.\"</string>
+    <string name="login_alexa_hint2">\"Alexa, play music.\"</string>
+    <string name="login_alexa_hint3">\"Alexa, call Erin\'s cell phone.\"</string>
+    <string name="login_alexa_hint4">\"Alexa, what else can I do in my vehicle?\"</string>
+    <string name="login_all_done_btn_text">Done</string>
+    <string name="login_alexa_finish_footer_text">To learn more and access additional features, download the Alexa app on your phone.</string>
+</resources>

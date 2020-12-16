@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">3.0.0</span>
+   &#160;<span id="projectnumber">3.1.0</span>
    </div>
   </td>
  </tr>
@@ -92,7 +92,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a38e948a90a4e5ef46e2bdc34eb0b19cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p><a class="el" href="classaace_1_1alexa_1_1_auth_provider.html">AuthProvider</a> should be extended to manage access tokens for AVS authorization and report client authorization state to the Engine. </p>
+<div class="textblock"><p><a class="el" href="classaace_1_1alexa_1_1_auth_provider.html">AuthProvider</a> should be extended to manage access tokens for AVS authorization and report client authorization state to the Engine.</p>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000002">Deprecated:</a></b></dt><dd>This platform interface is being deprecated. Use <code><a class="el" href="classaace_1_1authorization_1_1_authorization.html">aace::authorization::Authorization</a></code> instead. </dd></dl>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a703c765e6cb7c747a9fc6a12d81b7ef4"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a703c765e6cb7c747a9fc6a12d81b7ef4">&#9670;&nbsp;</a></span>AuthState</h2>
@@ -106,6 +107,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Describes the state of client authorization with AVS </p><dl class="section see"><dt>See also</dt><dd><code><a class="el" href="classaace_1_1alexa_1_1_auth_provider_engine_interface.html#abe4ab37548dfaf7744afe9078e1792ec">aace::alexa::AuthProviderEngineInterface::AuthState</a></code> </dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000003">Deprecated:</a></b></dt><dd>This enum is being deprecated as this platform interface is being deprecated. </dd></dl>
 
 </div>
 </div>
@@ -121,6 +123,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Describes an error during an attempt to authorize with AVS </p><dl class="section see"><dt>See also</dt><dd><code><a class="el" href="classaace_1_1alexa_1_1_auth_provider_engine_interface.html#a006d3fd3bee07feafa325968054abc37">aace::alexa::AuthProviderEngineInterface::AuthError</a></code> </dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000004">Deprecated:</a></b></dt><dd>This enum is being deprecated as this platform interface is being deprecated. </dd></dl>
 
 </div>
 </div>
@@ -148,6 +151,7 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Returns the token used by the platform implementation for authorization with AVS. The platform implementation should retrieve an auth token if it does not have one.</p>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000005">Deprecated:</a></b></dt><dd>This method is being deprecated as this platform interface is being deprecated. </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>The token used to authorize with AVS </dd></dl>
 
 </div>
@@ -175,6 +179,7 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Returns the AVS authorization state of the platform implementation</p>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000006">Deprecated:</a></b></dt><dd>This method is being deprecated as this platform interface is being deprecated. </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>The AVS authorization state </dd></dl>
 
 </div>
@@ -203,6 +208,7 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Notifies the platform implementation that the specified access token was used in an unauthorized request to AVS. AVS responded to this request with a 403 code indicating the token was not valid.</p>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000007">Deprecated:</a></b></dt><dd>This method is being deprecated as this platform interface is being deprecated. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">token</td><td>The access token used in an unauthorized request to AVS </td></tr>
@@ -238,6 +244,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Notifies the Engine of a change in AVS authorization state in the platform implementation</p>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000008">Deprecated:</a></b></dt><dd>This method is being deprecated as this platform interface is being deprecated. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">authState</td><td>The new authorization state </td></tr>
@@ -253,7 +260,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 3.0.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 3.1.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

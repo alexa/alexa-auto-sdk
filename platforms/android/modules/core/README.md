@@ -11,6 +11,7 @@ The Alexa Auto SDK module contains the Engine base classes and the abstract plat
 * [Starting the Engine](#starting-the-engine)
 * [Stopping the Engine](#stopping-the-engine)
 * [Managing Runtime Properties with the Property Manager](#managing-runtime-properties-with-the-property-manager)
+  * [Managing Authorization](#managing-authorization)
 
 ## Overview <a id="overview"></a>
 The Core module provides an easy way to integrate Alexa Auto SDK into an application or a framework. To do this, follow these steps:
@@ -111,8 +112,7 @@ You must configure vehicle information in the Engine configuration. A sample con
          "os": "<OPERATING_SYSTEM>",
          "arch": "<HARDWARE_ARCH>",
          "language": "<LANGUAGE>",
-         "microphone": "<MICROPHONE>"
-         "countries": "<COUNTRY_LIST>",
+         "microphone": "<MICROPHONE>",
          "vehicleIdentifier": "<VEHICLE_IDENTIFIER>"
      }
   }
@@ -520,3 +520,96 @@ String locale  = mPropertyManager.getProperty(com.amazon.aace.alexa.AlexaPropert
 ### Property Definitions
 The definitions of the properties used with the `PropertyManager.setProperty()` and `PropertyManager.getProperty()` methods are included in the [AlexaProperties.java](../alexa/src/main/java/com/amazon/aace/alexa/AlexaProperties.java) and [CoreProperties.java](./src/main/java/com/amazon/aace/core/CoreProperties.java) files. For a list of the Alexa Voice Service (AVS) supported locales for the `LOCALE` property, see the [Alexa Voice Service (AVS) documentation](https://developer.amazon.com/docs/alexa-voice-service/system.html#locales).
 
+## Managing Authorization
+
+The Auto SDK needs access to cloud services and resources to function. Gaining access requires that the device be authorized with an authorization service such as Login With Amazon (LWA), which provides the access token. The Engine uses the token to access cloud services and resources. For example, to access Alexa APIs, the device must be authorized with LWA to obtain the access token.
+
+The Auto SDK Authorization module is responsible for managing authorizations for different cloud services. For example, to use Alexa, your device must be authorized with LWA. The module provides a single platform interface for all authorizations and communicates with the engine services (referred to here as authorization services). The authorization service is responsible for carrying out the authorization method you choose. For example, for Alexa, you can use the CBL authorization or Auth Provider authorization method. The CBL or Auth Provider authorization service carries out the actual authorization process or flow.
+
+For information on how to use the Authorization module with different authorization methods, see the Alexa module [README](../alexa/README.md#handling-authorization) and the CBL module [README](../cbl/README.md).
+
+### Authorization Sequence Diagrams
+
+#### Starting the Authorization Process
+
+The following sequence diagram shows the typical call sequences between platform implementation and Auto SDK to start an authorization process.
+
+<details><summary>Click to expand or collapse the diagram</summary>
+<p>
+![Starting_Authorization](./assets/Authorization_start.png)
+</p>
+</details>
+
+#### Canceling the Authorization Process
+
+The following sequence diagram shows the typical call sequence between the platform implementation and Auto SDK to cancel an authorization process.
+
+<details><summary>Click to expand or collapse the diagram</summary>
+<p>
+![Cancel_Authorization](./assets/Authorization_cancel.png)
+</p>
+</details>
+
+#### Logging out the Authorization
+
+The following sequence diagram shows the typical call sequence between the platform implementation and Auto SDK to log out of an authorization.
+<details><summary>Click to expand or collapse the diagram</summary>
+<p>
+![Logout_Authorization](./assets/Authorization_logout.png)
+</p>
+</details>
+
+### Using the Authorization Module
+
+To implement the custom `Authorization`  handler, extend the `Authorization` class as follows:
+
+```java
+public class MyAuthorizationHandler extends Authorization {     
+    // There is an event from the requested authorization service.
+    @Override
+    void eventReceived(String service, String event) {
+        // Take the necessary action as defined by the service protocol.
+    }
+
+    // Authorization service notifying the platform implementation of the state change.
+    @Override
+    void authorizationStateChanged(String service, AuthorizationState state) {
+        // Handle the authorization state change as required by your application.
+    }
+    
+    // Authorization service notifies an error in the process.
+    @Override
+    void authorizationError(String service, String error, String message) {
+        // Handle the authorization error as required by your application.
+    }
+
+    // Authorization service needs to get the authorization-related data from the platform implementation.
+    @Override
+    std::string getAuthorizationData(String service, String key) {
+        // Return the data identified by key.
+    }
+    
+    // Authorization service requires the platform implementation to store the authorization-related data.
+    void setAuthorizationData(String service, String key, String data) {
+        // Store/Clear the data identified by the key securely on the device.
+    }
+}
+...
+
+// Register the platform interface with the Engine
+Authorization mAuthorizationHandler = new MyAuthorizationHandler();
+mEngine.registerPlatformInterface( mAuthorizationHandler );
+
+// To notify the Engine to start authorization process represented by `service-name`
+mAuthorizationHandler.startAuthorization("service-name", "data-as-defined-by-service");
+
+// To notify the Engine to cancel authorization process represented by `service-name`, which is already in progress
+mAuthorizationHandler.cancelAuthorization("service-name");
+
+// To notify the Engine to log out from the authorization for the service represented by `service-name`.
+mAuthorizationHandler.logout("service-name");
+
+// To send events from the platform implementation to the authorization service.
+mAuthorizationHandler.sendEvent("service-name", "event-data-as-defined-by-service");
+
+```

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.amazon.alexa.auto.navigation">
+
+    <!-- Enables getting intents from AACS -->
+    <uses-permission android:name="com.amazon.alexaautoclientservice"/>
+
+    <application
+        android:allowBackup="true"
+        android:usesCleartextTraffic="true"
+        android:label="@string/app_name"
+        android:supportsRtl="true">
+        <receiver android:name=".receiver.NavigationReceiver"
+            android:exported="true">
+            <intent-filter>
+                <category android:name="com.amazon.aacs.aasb.Navigation" />
+                <action android:name="com.amazon.aacs.aasb.StartNavigation"/>
+                <action android:name="com.amazon.aacs.aasb.CancelNavigation"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".receiver.LocalSearchTemplateRuntimeReceiver"
+            android:exported="true">
+            <intent-filter>
+                <category android:name="com.amazon.aacs.aasb.TemplateRuntime" />
+                <action android:name="com.amazon.aacs.aasb.RenderPlayerInfo" />
+                <action android:name="com.amazon.aacs.aasb.RenderTemplate" />
+                <action android:name="com.amazon.aacs.aasb.ClearTemplate" />
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>

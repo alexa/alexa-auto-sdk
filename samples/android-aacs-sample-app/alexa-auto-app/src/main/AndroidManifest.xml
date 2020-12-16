@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.amazon.alexa.auto.app">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.READ_USER_DICTIONARY" />
+
+    <!-- Enables listening to wifi state changes -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Enables getting intents from AACS -->
+    <uses-permission android:name="com.amazon.alexaautoclientservice"/>
+
+    <application
+        android:name=".AutoApplication"
+        android:allowBackup="true"
+        android:label="@string/alexa_app_name"
+        android:supportsRtl="true"
+        tools:replace="android:label"
+        tools:ignore="GoogleAppIndexingWarning">
+
+        <service android:name=".audio.AudioIOService"
+            android:exported="true">
+            <!-- No explicit intent filters are required. AACS will send stream
+                 fetch intents to the service, because we send the service info
+                 in the configuration to AACS. -->
+        </service>
+    </application>
+</manifest>

@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">3.0.0</span>
+   &#160;<span id="projectnumber">3.1.0</span>
    </div>
   </td>
  </tr>
@@ -190,6 +190,16 @@ $(function() {
 <li>authFailure()
 : <a class="el" href="classaace_1_1alexa_1_1_auth_provider.html#a5a2736293fd2ae80d5fdb85b372bbd50">aace::alexa::AuthProvider</a>
 </li>
+<li>authorizationError()
+: <a class="el" href="classaace_1_1authorization_1_1_authorization.html#a960cf0000db8889a9720af6a09e0a5a6">aace::authorization::Authorization</a>
+</li>
+<li>AuthorizationState
+: <a class="el" href="classaace_1_1authorization_1_1_authorization.html#ae0290e2252f9cd0b623c203800350598">aace::authorization::Authorization</a>
+, <a class="el" href="classaace_1_1authorization_1_1_authorization_engine_interface.html#a41738dc27f412d602c2fe572ec5eeac3">aace::authorization::AuthorizationEngineInterface</a>
+</li>
+<li>authorizationStateChanged()
+: <a class="el" href="classaace_1_1authorization_1_1_authorization.html#a32778e7fae5a205a5e9fe48e086fd188">aace::authorization::Authorization</a>
+</li>
 <li>authorized
 : <a class="el" href="classaace_1_1alexa_1_1_external_media_adapter_1_1_authorized_player_info.html#ab490eef2715a6dc3a5ccd8447e701f88">aace::alexa::ExternalMediaAdapter::AuthorizedPlayerInfo</a>
 </li>
@@ -235,6 +245,9 @@ $(function() {
 </li>
 <li>cancel()
 : <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#a08eafdc469f9d7d282878c5caa016237">aace::cbl::CBL</a>
+</li>
+<li>cancelAuthorization()
+: <a class="el" href="classaace_1_1authorization_1_1_authorization.html#a6a7a83d21ddf58261ef0df5b87ae911d">aace::authorization::Authorization</a>
 </li>
 <li>cancelNavigation()
 : <a class="el" href="classaace_1_1navigation_1_1_navigation.html#afbda005d6f22d549b01b3700144f1d2a">aace::navigation::Navigation</a>
@@ -305,6 +318,9 @@ $(function() {
 </li>
 <li>createAlexaPresentationTimeoutConfig()
 : <a class="el" href="classaace_1_1apl_1_1config_1_1_a_p_l_configuration.html#a56ef719eddebda92b88505f908a8d85b">aace::apl::config::APLConfiguration</a>
+</li>
+<li>createAuthProviderConfig()
+: <a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#aac1f2b1ed508bf0b0d481195660c6cca">aace::alexa::config::AlexaConfiguration</a>
 </li>
 <li>createCallId()
 : <a class="el" href="classaace_1_1phone_call_controller_1_1_phone_call_controller.html#a24de2d5e0fc97b239d8b9881341e6790">aace::phoneCallController::PhoneCallController</a>
@@ -444,6 +460,9 @@ $(function() {
 , <a class="el" href="classaace_1_1alexa_1_1_equalizer_controller.html#a5785072a612afeff083b230978275347">aace::alexa::EqualizerController</a>
 , <a class="el" href="classaace_1_1alexa_1_1_equalizer_controller_engine_interface.html#a383ac0bd70d914002dd5906e1dd1f74d">aace::alexa::EqualizerControllerEngineInterface</a>
 </li>
+<li>eventReceived()
+: <a class="el" href="classaace_1_1authorization_1_1_authorization.html#a1398bf1a4bde9c3f240b8f0819374096">aace::authorization::Authorization</a>
+</li>
 <li>executeCommands()
 : <a class="el" href="classaace_1_1apl_1_1_a_p_l.html#a14091f7b0a6e8898098d04ec67abac8c">aace::apl::APL</a>
 </li>
@@ -473,6 +492,9 @@ $(function() {
 </li>
 <li>getAltitude()
 : <a class="el" href="classaace_1_1location_1_1_location.html#a6651d8181e4361df5777f1992cb063c0">aace::location::Location</a>
+</li>
+<li>getAuthorizationData()
+: <a class="el" href="classaace_1_1authorization_1_1_authorization.html#aaeb9fc700765a86d973a0e03ed865c29">aace::authorization::Authorization</a>
 </li>
 <li>getAuthState()
 : <a class="el" href="classaace_1_1alexa_1_1_auth_provider.html#a6d00a8dac76187fd4d7eebc3f13160fd">aace::alexa::AuthProvider</a>
@@ -637,7 +659,7 @@ $(function() {
 : <a class="el" href="classaace_1_1alexa_1_1_alerts.html#a0ad3204360a08a578af1af59013f64a8">aace::alexa::Alerts</a>
 </li>
 <li>Location()
-: <a class="el" href="classaace_1_1location_1_1_location.html#a2fee1df1854e9ae0f8a279ef0fe4bae9">aace::location::Location</a>
+: <a class="el" href="classaace_1_1location_1_1_location.html#af72835578a771a956936116f9597a10e">aace::location::Location</a>
 </li>
 <li>log()
 : <a class="el" href="classaace_1_1logger_1_1_logger.html#a3cb300839a1de085377517669522ad78">aace::logger::Logger</a>
@@ -648,6 +670,9 @@ $(function() {
 <li>loggedIn
 : <a class="el" href="classaace_1_1alexa_1_1_external_media_adapter_1_1_session_state.html#ada22c60c9c13b72b9d2b16ada309d3e9">aace::alexa::ExternalMediaAdapter::SessionState</a>
 , <a class="el" href="classaace_1_1alexa_1_1_local_media_source_1_1_session_state.html#aa34672570b2e78efa57b913ba5de086d">aace::alexa::LocalMediaSource::SessionState</a>
+</li>
+<li>logout()
+: <a class="el" href="classaace_1_1authorization_1_1_authorization.html#a66f95375e98f4b8012f5f2531100550c">aace::authorization::Authorization</a>
 </li>
 </ul>
 
@@ -705,6 +730,9 @@ $(function() {
 
 
 <h3><a id="index_o"></a>- o -</h3><ul>
+<li>onCancelAuthorization()
+: <a class="el" href="classaace_1_1authorization_1_1_authorization_engine_interface.html#aac2bb834613c656019d6637dc360aac1">aace::authorization::AuthorizationEngineInterface</a>
+</li>
 <li>onDisplayCardCleared()
 : <a class="el" href="classaace_1_1alexa_1_1_template_runtime_engine_interface.html#ae996902577687707f57ef00b240752f5">aace::alexa::TemplateRuntimeEngineInterface</a>
 </li>
@@ -714,8 +742,17 @@ $(function() {
 <li>onGetPlayerPosition()
 : <a class="el" href="classaace_1_1alexa_1_1_audio_player_engine_interface.html#a8b16159c547ae8f0703d3a8385fa6ff8">aace::alexa::AudioPlayerEngineInterface</a>
 </li>
+<li>onLogout()
+: <a class="el" href="classaace_1_1authorization_1_1_authorization_engine_interface.html#a1ab5b57b2b705d2d30a4d533cc1146af">aace::authorization::AuthorizationEngineInterface</a>
+</li>
 <li>onNotificationReceived()
 : <a class="el" href="classaace_1_1alexa_1_1_notifications.html#a72f76e86a5e8a022db2aee933751c7dc">aace::alexa::Notifications</a>
+</li>
+<li>onSendEvent()
+: <a class="el" href="classaace_1_1authorization_1_1_authorization_engine_interface.html#a227a1f3016ebf443b568b9dd96a232a5">aace::authorization::AuthorizationEngineInterface</a>
+</li>
+<li>onStartAuthorization()
+: <a class="el" href="classaace_1_1authorization_1_1_authorization_engine_interface.html#a47cdafa4c4b2869eddee1e664221bc6a">aace::authorization::AuthorizationEngineInterface</a>
 </li>
 <li>operator=()
 : <a class="el" href="classaace_1_1audio_1_1_audio_stream_property.html#a924207ad94f9a5d8409e6048e229da37">aace::audio::AudioStreamProperty</a>
@@ -781,7 +818,7 @@ $(function() {
 : <a class="el" href="classaace_1_1alexa_1_1_local_media_source.html#a874c1999278a4a9598b2cfddf2639563">aace::alexa::LocalMediaSource</a>
 </li>
 <li>prepare()
-: <a class="el" href="classaace_1_1audio_1_1_audio_output.html#a2e67f2223e68d842685da2f32f14d49d">aace::audio::AudioOutput</a>
+: <a class="el" href="classaace_1_1audio_1_1_audio_output.html#ac65040330bf053723e6ded2df6c2da88">aace::audio::AudioOutput</a>
 </li>
 <li>processActivityEvent()
 : <a class="el" href="classaace_1_1apl_1_1_a_p_l.html#a1e382051d18bc09a39e1f3cd9b9ddb9a">aace::apl::APL</a>
@@ -824,6 +861,10 @@ $(function() {
 : <a class="el" href="classaace_1_1alexa_1_1_external_media_adapter_1_1_playback_state.html#ad18c03b18fc5fd59d4502cb5902841c9">aace::alexa::ExternalMediaAdapter::PlaybackState</a>
 , <a class="el" href="classaace_1_1alexa_1_1_local_media_source_1_1_playback_state.html#ac7d32d117f01f4e07020b68eb3d7a329">aace::alexa::LocalMediaSource::PlaybackState</a>
 </li>
+<li>repeatOneEnabled
+: <a class="el" href="classaace_1_1alexa_1_1_external_media_adapter_1_1_playback_state.html#a0bb23d6c12a7b4527c71849079c6f4d7">aace::alexa::ExternalMediaAdapter::PlaybackState</a>
+, <a class="el" href="classaace_1_1alexa_1_1_local_media_source_1_1_playback_state.html#a0c9af887be4652b9006229d650abf733">aace::alexa::LocalMediaSource::PlaybackState</a>
+</li>
 <li>reset()
 : <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#a6b9bf59fb1f4a358273851049b2a74b6">aace::cbl::CBL</a>
 </li>
@@ -846,6 +887,9 @@ $(function() {
 <li>sendDTMFSucceeded()
 : <a class="el" href="classaace_1_1phone_call_controller_1_1_phone_call_controller.html#a4d89b0bc7309cd32a096641a45f559e5">aace::phoneCallController::PhoneCallController</a>
 </li>
+<li>sendEvent()
+: <a class="el" href="classaace_1_1authorization_1_1_authorization.html#a7c5073cd65feff21a46022ab6e6d2274">aace::authorization::Authorization</a>
+</li>
 <li>sendUserEvent()
 : <a class="el" href="classaace_1_1apl_1_1_a_p_l.html#a650185d2e461fa04a54ca6389cea9b7e">aace::apl::APL</a>
 </li>
@@ -860,6 +904,9 @@ $(function() {
 </li>
 <li>setAPLMaxVersion()
 : <a class="el" href="classaace_1_1apl_1_1_a_p_l.html#ae78b5ed9cf53ac882d12bdff99d69638">aace::apl::APL</a>
+</li>
+<li>setAuthorizationData()
+: <a class="el" href="classaace_1_1authorization_1_1_authorization.html#a147681c6d9a1677d289aa715e910bb3d">aace::authorization::Authorization</a>
 </li>
 <li>setBandLevels()
 : <a class="el" href="classaace_1_1alexa_1_1_equalizer_controller.html#a9f0774201117c45bc87f68e571f2478e">aace::alexa::EqualizerController</a>
@@ -928,6 +975,9 @@ $(function() {
 <li>start()
 : <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#a98ab22f22a9e395718c09730b35c9bdf">aace::cbl::CBL</a>
 , <a class="el" href="classaace_1_1core_1_1_engine.html#ace84ee80b94b7da5c7f38390d5a160d7">aace::core::Engine</a>
+</li>
+<li>startAuthorization()
+: <a class="el" href="classaace_1_1authorization_1_1_authorization.html#af93d589976a27961166a454ca50239eb">aace::authorization::Authorization</a>
 </li>
 <li>startCapture()
 : <a class="el" href="classaace_1_1alexa_1_1_speech_recognizer.html#ab2d1df9942a32ff6eb829211a1ebffba">aace::alexa::SpeechRecognizer</a>
@@ -1052,6 +1102,9 @@ $(function() {
 
 
 <h3><a id="index_0x7e"></a>- ~ -</h3><ul>
+<li>~Authorization()
+: <a class="el" href="classaace_1_1authorization_1_1_authorization.html#a31e6849b0c9fc20dd58b70fb68db89d2">aace::authorization::Authorization</a>
+</li>
 <li>~CarControl()
 : <a class="el" href="classaace_1_1car_control_1_1_car_control.html#a2a6f08b35b122c21fef79c0304a77d0a">aace::carControl::CarControl</a>
 </li>
@@ -1061,7 +1114,7 @@ $(function() {
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 3.0.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 3.1.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

@@ -14,6 +14,7 @@ with a few additional fields unique to AACS.
   - [useDefaultLocationProvider](#usedefaultlocationprovider)
   - [useDefaultNetworkInfoProvider](#usedefaultnetworkinfoprovider)
   - [useDefaultExternalMediaAdapter](#usedefaultexternalmediaadapter)
+  - [useDefaultPropertyManager](#usedefaultpropertymanager)
   - [audioInput](#audioinput)
   - [audioOutput](#audiooutput)
 
@@ -34,7 +35,7 @@ The `aacs.aasb` module requires a field `version`, as detailed in [AASB README](
 ~~~
 {
     "aacs.aasb": {
-        "version": "3.0"
+        "version": "3.1"
     }
 }
 ~~~
@@ -134,12 +135,22 @@ Specifies the available local media sources. Possible values are `BLUETOOTH`, `U
                 "package": [],
                 "class": []
             },
+            "Authorization" : {
+                "type": [],
+                "package": [],
+                "class": []
+            },
             "CarControl" : {
                 "type": [],
                 "package": [],
                 "class": []
             },
             "CBL" : {
+                "type": [],
+                "package": [],
+                "class": []
+            },
+            "Connectivity" : {
                 "type": [],
                 "package": [],
                 "class": []
@@ -213,6 +224,11 @@ Specifies the available local media sources. Possible values are `BLUETOOTH`, `U
                 "type": [],
                 "package": [],
                 "class": []
+            },
+            "TextToSpeech" : {
+                "type": [],
+                "package": [],
+                "class": []
             }
         }
     }
@@ -259,6 +275,7 @@ AACS provides the default platform implementation for certain services, which yo
     "useDefaultLocationProvider": true,
     "useDefaultNetworkInfoProvider": true,
     "useDefaultExternalMediaAdapter": true,
+    "useDefaultPropertyManager": true,
     "audioInput": {
         "audioType": {
             "VOICE": {
@@ -313,6 +330,11 @@ Set to `true` to enable the default `NetworkInfoProvider` platform implementatio
 **Type:** Boolean
 
 Set to `true` to enable the default `ExternalMediaAdapter` platform implementation in AACS. If `useDefaultExternalMediaAdapter` is set to `false`, your application must separately handle the messages for this topic.
+
+### useDefaultPropertyManager
+**Type:** Boolean
+
+Set to `true` to enable the default `PropertyManager` platform implementation in AACS. This enables synchronous managing of properties using AACS's ContentProvider. If `useDefaultPropertyManager` is set to `false`, your application must separately handle the messages for this topic.
 
 ### audioInput
 **Type:** JSON Object

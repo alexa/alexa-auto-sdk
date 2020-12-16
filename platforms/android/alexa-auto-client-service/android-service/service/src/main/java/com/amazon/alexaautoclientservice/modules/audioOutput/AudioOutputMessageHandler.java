@@ -18,9 +18,10 @@ import static com.amazon.aacsconstants.AASBConstants.AudioOutput;
 
 import android.content.Context;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 import com.amazon.aace.aasb.AASBStream;
 import com.amazon.aacsconstants.AACSConstants;

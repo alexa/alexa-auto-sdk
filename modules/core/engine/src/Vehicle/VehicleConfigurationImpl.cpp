@@ -52,8 +52,6 @@ std::string getVehiclePropertyAttribute(VehiclePropertyType property) {
             return "language";
         case VehiclePropertyType::MICROPHONE:
             return "microphone";
-        case VehiclePropertyType::COUNTRY_LIST:
-            return "countries";
         case VehiclePropertyType::VEHICLE_IDENTIFIER:
             return "vehicleIdentifier";
     }

@@ -2,22 +2,56 @@
     "id": "main",
     "item": [
         {
-            "do": "notify/onCBLStart",
+            "do": "GoTo",
             "key": "A",
-            "name": "Authenticate with CBL",
-            "test": "!RefreshToken"
-        },
-        {
-            "do": "notify/onCBLCancel",
-            "key": "C",
-            "name": "Cancel Authentication",
-            "test": "!RefreshToken"
-        },
-        {
-            "do": "notify/onCBLReset",
-            "key": "K",
-            "name": "Reset Authentication",
-            "test": "RefreshToken"
+            "name": "Authorization",
+            "value": {
+                "id": "authorization",
+                "item": [
+                    {
+                        "do": "notify/onStartCBLAuthorization",
+                        "key": "1",
+                        "name": "Start CBL Authorization",
+                        "when" : "!CBLAuthorizationActive && !CBLAuthorizationInProgress"
+                    },
+                    {
+                        "do": "notify/onCancelCBLAuthorization",
+                        "key": "1",
+                        "name": "Cancel CBL Authorization",
+                        "when" : "CBLAuthorizationInProgress && !CBLAuthorizationActive"
+                    },
+                    {
+                        "do": "notify/onLogoutCBLAuthorization",
+                        "key": "1",
+                        "name": "Logout CBL Authorization",
+                        "when" : "CBLAuthorizationActive"
+                    },
+                    {
+                        "do": "notify/onStartAuthProviderAuthorization",
+                        "key": "2",
+                        "name": "Start Auth Provider Authorization",
+                        "when" : "AuthProviderSupported && !AuthProviderAuthorizationActive && !AuthProviderAuthorizationInProgress"
+                    },
+                    {
+                        "do": "notify/onCancelAuthProviderAuthorization",
+                        "key": "2",
+                        "name": "Cancel Auth Provider Authorization",
+                        "when" : "AuthProviderSupported && AuthProviderAuthorizationInProgress && !AuthProviderAuthorizationActive"
+                    },
+                    {
+                        "do": "notify/onLogoutAuthProviderAuthorization",
+                        "key": "2",
+                        "name": "Logout Auth Provider Authorization",
+                        "when" : "AuthProviderSupported && AuthProviderAuthorizationActive"
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }                   
+                ],
+                "name": "Authorization Menu"
+            }
         },
         {
             "do": "GoTo",
@@ -67,6 +101,65 @@
             }
         },
         {
+            "do": "GoTo",
+            "key": "F",
+            "name": "Alexa Connectivity",
+            "test": "ConnectivitySupported",
+            "value": {
+                "id": "alexa-connectivity",
+                "item": [
+                    {
+                        "do": "notify/onConnectivityConnectivityStateChange",
+                        "key": "1",
+                        "name": "Full Experience (Not Managed)",
+                        "value": "NOT_MANAGED"
+                    },
+                    {
+                        "do": "notify/onConnectivityConnectivityStateChange",
+                        "key": "2",
+                        "name": "Full Experience (Paid)",
+                        "value": "PAID"
+                    },
+                    {
+                        "do": "notify/onConnectivityConnectivityStateChange",
+                        "key": "3",
+                        "name": "Full Experience (Trial)",
+                        "value": "TRIAL"
+                    },
+                    {
+                        "do": "notify/onConnectivityConnectivityStateChange",
+                        "key": "4",
+                        "name": "Full Experience (Trial Expiring in 5 days)",
+                        "value": "TRIAL_EXPIRING"
+                    },
+                    {
+                        "do": "notify/onConnectivityConnectivityStateChange",
+                        "key": "5",
+                        "name": "Partial Experience (Amazon Sponsored)",
+                        "value": "AMAZON_SPONSORED"
+                    },
+                    {
+                        "do": "notify/onConnectivityConnectivityStateChange",
+                        "key": "6",
+                        "name": "Partial Experience (Terms Declined)",
+                        "value": "TERMS_DECLINED"
+                    },
+                    {
+                        "do": "notify/onConnectivityConnectivityStateChange",
+                        "key": "7",
+                        "name": "Partial Experience (Trial Expired)",
+                        "value": "TRIAL_EXPIRED"
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Alexa Connectivity Menu"
+            }
+        },
+        {
             "do": "notify/onSpeechRecognizerTapToTalk",
             "key": "T",
             "name": "Tap (for Tap-to-Talk)"
@@ -81,6 +174,64 @@
             "do": "notify/onSpeechRecognizerStopCapture",
             "key": "S",
             "name": "Stop Capture"
+        },
+        {
+            "do": "GoTo",
+            "key": "E",
+            "name": "TextToSpeech",
+            "value": {
+                "id": "text-to-speech",
+                "item": [
+                    {
+                        "do": "notify/onPrepareSpeech",
+                        "key": "1",
+                        "name": "Turn left in 1 mile",
+                        "value": "Turn left in 1 mile"
+                    },
+                    {
+                        "do": "notify/onPrepareSpeech",
+                        "key": "2",
+                        "name": "Take Exit 39B",
+                        "value": "Take Exit 39B"
+                    },
+                    {
+                        "do": "notify/onPrepareSpeech",
+                        "key": "3",
+                        "name": "Take the next left",
+                        "value": "Take the next left"
+                    },
+                    {
+                        "do": "notify/onPrepareSpeech",
+                        "key": "4",
+                        "name": "In 500ft, take the next exit",
+                        "value": "In 500ft, take the next exit"
+                    },
+                    {
+                        "do": "notify/onPrepareSpeech",
+                        "key": "5",
+                        "name": "Wrong way, turn around",
+                        "value": "Wrong way, turn around"
+                    },
+                    {
+                        "do": "notify/onPrepareSpeech",
+                        "key": "6",
+                        "name": "You have reached your destination",
+                        "value": "You have reached your destination"
+                    },
+                    {
+                        "do": "notify/onGetCapabilities",
+                        "key": "c",
+                        "name": "Get Capabilities",
+                        "value": "Get Capabilities"
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Local Text-To-Speech Menu"
+            }
         },
         {
             "do": "GoTo",

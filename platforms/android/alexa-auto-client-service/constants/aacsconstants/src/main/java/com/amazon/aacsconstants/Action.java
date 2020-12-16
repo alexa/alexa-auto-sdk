@@ -63,6 +63,18 @@ public class Action {
         public static final String GET_AUTH_TOKEN = "GetAuthToken";
     }
 
+    public static class Authorization {
+        public static final String AUTHORIZATION_ERROR = "AuthorizationError";
+        public static final String AUTHORIZATION_STATE_CHANGED = "AuthorizationStateChanged";
+        public static final String CANCEL_AUTHORIZATION = "CancelAuthorization";
+        public static final String EVENT_RECEIVED = "EventReceived";
+        public static final String GET_AUTHORIZATION_DATA = "GetAuthorizationData";
+        public static final String LOGOUT = "Logout";
+        public static final String SEND_EVENT = "SendEvent";
+        public static final String SET_AUTHORIZATION_DATA = "SetAuthorizationData";
+        public static final String START_AUTHORIZATION = "StartAuthorization";
+    }
+
     public static class DoNotDisturb {
         public static final String DO_NOT_DISTURB_CHANGED = "DoNotDisturbChanged";
         public static final String SET_DO_NOT_DISTURB = "SetDoNotDisturb";

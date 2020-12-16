@@ -44,7 +44,7 @@ public class SpeechRecognizerMessagesTest {
         assertTrue(sendResult.get());
 
         verify(mockMessageSender, Mockito.times(1))
-                .sendMessage(
-                        Mockito.eq(Topic.SPEECH_RECOGNIZER), Mockito.eq(Action.START_CAPTURE), Mockito.anyString());
+                .sendMessage(Mockito.eq(Topic.SPEECH_RECOGNIZER), Mockito.eq(Action.SpeechRecognizer.START_CAPTURE),
+                        Mockito.anyString());
     }
 }

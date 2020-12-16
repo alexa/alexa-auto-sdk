@@ -45,15 +45,22 @@ if(AAC_HOME)
     include(${AAC_HOME}/share/cmake/AACEAddressBook.cmake)
     include(${AAC_HOME}/share/cmake/AACECarControl.cmake)
     include(${AAC_HOME}/share/cmake/AACEMessaging.cmake)
+    include(${AAC_HOME}/share/cmake/AACETextToSpeech.cmake)
+    include(${AAC_HOME}/share/cmake/AACETextToSpeechProvider.cmake)
     if(AMAZONLITE)
         include(${AAC_HOME}/share/cmake/AACEAmazonLite.cmake)
         add_definitions(-DAMAZONLITE)
+    endif()
+    if(CONNECTIVITY)
+        include(${AAC_HOME}/share/cmake/AACEConnectivity.cmake)
+        add_definitions(-DCONNECTIVITY)
     endif()
     if(LOCALVOICECONTROL)
         include(${AAC_HOME}/share/cmake/AACECarControlLocalService.cmake)
         include(${AAC_HOME}/share/cmake/AACELocalVoiceControl.cmake)
         include(${AAC_HOME}/share/cmake/AACELocalSkillService.cmake)
         include(${AAC_HOME}/share/cmake/AACEAddressBookLocalService.cmake)
+        include(${AAC_HOME}/share/cmake/AACELocalNavigation.cmake)
         add_definitions(-DLOCALVOICECONTROL)
     endif()
     if(ALEXACOMMS)
@@ -77,6 +84,9 @@ if(AAC_HOME)
 else()
     if(AMAZONLITE)
         add_definitions(-DAMAZONLITE)
+    endif()
+    if(CONNECTIVITY)
+        add_definitions(-DCONNECTIVITY)
     endif()
     if(LOCALVOICECONTROL)
         add_definitions(-DLOCALVOICECONTROL)
@@ -119,12 +129,14 @@ set(CXX_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Application.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/ApplicationContext.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Args.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Authorization/AuthProviderAuthorizationHandler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Authorization/AuthProviderAuthorizationListenerInterface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Authorization/AuthorizationHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/CarControl/BoolController.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/CarControl/CarControlDataProvider.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/CarControl/CarControlHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/CarControl/ModeController.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/CarControl/RangeController.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/CBL/CBLHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Event.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Executor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Location/LocationProviderHandler.h
@@ -138,13 +150,32 @@ set(CXX_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Subject.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/TaskQueue.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/TaskThread.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/TextToSpeech/TextToSpeechHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/TTY.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Views.h    
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Views.h
 )
 
 if(ALEXACOMMS)
     set(CXX_HEADER_FILES ${CXX_HEADER_FILES}
         ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Communication/CommunicationHandler.h
+    )
+endif()
+
+if(CONNECTIVITY)
+    set(CXX_HEADER_FILES ${CXX_HEADER_FILES}
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Connectivity/AlexaConnectivityHandler.h
+    )
+endif()
+
+if(LOCALVOICECONTROL)
+    set(CXX_HEADER_FILES ${CXX_HEADER_FILES}
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/LocalNavigation/LocalSearchProviderHandler.h
+    )
+endif()
+
+if(TEXT_TO_SPEECH)
+    set(CXX_HEADER_FILES ${CXX_HEADER_FILES}
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/TextToSpeech/TextToSpeechHandler.h
     )
 endif()
 
@@ -169,9 +200,10 @@ set(CXX_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Audio/AudioOutputProviderHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Application.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ApplicationContext.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Authorization/AuthorizationHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Authorization/AuthProviderAuthorizationHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/CarControl/CarControlDataProvider.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/CarControl/CarControlHandler.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/CBL/CBLHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Executor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Location/LocationProviderHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Logger/LoggerHandler.cpp
@@ -182,6 +214,7 @@ set(CXX_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/PropertyManager/PropertyManagerHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/TaskQueue.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/TaskThread.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/TextToSpeech/TextToSpeechHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Views.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
 )
@@ -189,6 +222,24 @@ set(CXX_SOURCE_FILES
 if(ALEXACOMMS)
     set(CXX_SOURCE_FILES ${CXX_SOURCE_FILES}
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Communication/CommunicationHandler.cpp
+    )
+endif()
+
+if(CONNECTIVITY)
+    set(CXX_SOURCE_FILES ${CXX_SOURCE_FILES}
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Connectivity/AlexaConnectivityHandler.cpp
+    )
+endif()
+
+if(LOCALVOICECONTROL)
+    set(CXX_SOURCE_FILES ${CXX_SOURCE_FILES}
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/LocalNavigation/LocalSearchProviderHandler.cpp
+    )
+endif()
+
+if(TEXT_TO_SPEECH)
+    set(CXX_SOURCE_FILES ${CXX_SOURCE_FILES}
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TextToSpeech/TextToSpeechHandler.cpp
     )
 endif()
 
@@ -223,6 +274,9 @@ target_link_libraries(SampleApp
     AACEAddressBookEngine
     AACEMessagingPlatform
     AACEMessagingEngine
+    AACETextToSpeechPlatform
+    AACETextToSpeechEngine
+    AACETextToSpeechProviderEngine
     ${CURL_LIBRARIES}
     ${SQLITE3_LIBRARIES}
 )
@@ -237,6 +291,13 @@ endif()
 if(FILEAUDIO)
     target_link_libraries(SampleApp
         AACEFileAudio
+    )
+endif()
+
+if(CONNECTIVITY)
+    target_link_libraries(SampleApp
+        AACEConnectivityEngine
+        AACEConnectivityPlatform
     )
 endif()
 
@@ -261,6 +322,8 @@ if(LOCALVOICECONTROL)
         AACELocalVoiceControlEngine
         AACEAddressBookLocalServiceEngine
         AACECarControlLocalServiceEngine
+        AACELocalNavigationEngine
+        AACELocalNavigationPlatform
     )
 endif()
 

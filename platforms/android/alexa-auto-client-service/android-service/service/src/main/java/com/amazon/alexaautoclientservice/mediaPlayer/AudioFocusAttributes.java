@@ -2,8 +2,9 @@ package com.amazon.alexaautoclientservice.mediaPlayer;
 
 import android.media.AudioAttributes;
 import android.media.AudioManager;
-import android.support.annotation.NonNull;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.amazon.aacsconstants.AACSConstants;
 import com.amazon.aacsconstants.AASBConstants.AudioOutput.AudioType;

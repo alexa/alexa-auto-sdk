@@ -54,15 +54,13 @@ enum class Event {
     onLoadNavigationState,
     onClearNavigationState,
 
-    // CBL
-    onCBLStart,
-    onCBLCancel,
-    onCBLReset,
-
     // EqualizerController
     onEqualizerControllerLocalSetBandLevels,
     onEqualizerControllerLocalAdjustBandLevels,
     onEqualizerControllerLocalResetBands,
+
+    // Connectivity
+    onConnectivityConnectivityStateChange,
 
     // MediaPlayer
     onMediaPlayerMediaStateChanged,
@@ -122,6 +120,18 @@ enum class Event {
 
     // AlexaClient
     onStopForegroundActivity,
+
+    // Authorization
+    onStartCBLAuthorization,
+    onCancelCBLAuthorization,
+    onLogoutCBLAuthorization,
+    onStartAuthProviderAuthorization,
+    onCancelAuthProviderAuthorization,
+    onLogoutAuthProviderAuthorization,
+
+    // Text-To-Speech
+    onPrepareSpeech,
+    onGetCapabilities,
 };
 
 static const std::map<std::string, Event> EventEnumerator{
@@ -150,15 +160,13 @@ static const std::map<std::string, Event> EventEnumerator{
     {"onLoadNavigationState", Event::onLoadNavigationState},
     {"onClearNavigationState", Event::onClearNavigationState},
 
-    // CBL
-    {"onCBLStart", Event::onCBLStart},
-    {"onCBLCancel", Event::onCBLCancel},
-    {"onCBLReset", Event::onCBLReset},
-
     // EqualizerController
     {"onEqualizerControllerLocalSetBandLevels", Event::onEqualizerControllerLocalSetBandLevels},
     {"onEqualizerControllerLocalAdjustBandLevels", Event::onEqualizerControllerLocalAdjustBandLevels},
     {"onEqualizerControllerLocalResetBands", Event::onEqualizerControllerLocalResetBands},
+
+    // Connectivity
+    {"onConnectivityConnectivityStateChange", Event::onConnectivityConnectivityStateChange},
 
     // MediaPlayer
     {"onMediaPlayerMediaStateChanged", Event::onMediaPlayerMediaStateChanged},
@@ -214,8 +222,20 @@ static const std::map<std::string, Event> EventEnumerator{
     {"onSendMessageStatus", Event::onSendMessageStatus},
     {"onUpdateMessagesStatus", Event::onUpdateMessagesStatus},
     {"onShowMessagingInfo", Event::onShowMessagingInfo},
-    {"onToggleAutomaticResponses", Event::onToggleAutomaticResponses}};
+    {"onToggleAutomaticResponses", Event::onToggleAutomaticResponses},
 
+    {"onPrepareSpeech", Event::onPrepareSpeech},
+    {"onGetCapabilities", Event::onGetCapabilities},
+
+    // Authorization
+    {"onStartCBLAuthorization", Event::onStartCBLAuthorization},
+    {"onCancelCBLAuthorization", Event::onCancelCBLAuthorization},
+    {"onLogoutCBLAuthorization", Event::onLogoutCBLAuthorization},
+    {"onStartAuthProviderAuthorization", Event::onStartAuthProviderAuthorization},
+    {"onCancelAuthProviderAuthorization", Event::onCancelAuthProviderAuthorization},
+    {"onLogoutAuthProviderAuthorization", Event::onLogoutAuthProviderAuthorization}
+
+};
 }  // namespace sampleApp
 
 #endif  // SAMPLEAPP_EVENT_H

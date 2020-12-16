@@ -1,0 +1,15 @@
+{
+  "header" : {
+    "version" : "3.0",
+    "messageType" : "Publish",
+    "id" : "testIdForDisconnected",
+    "messageDescription" : {
+      "topic" : "AlexaClient",
+      "action" : "ConnectionStatusChanged"
+    }
+  },
+  "payload" : {
+    "status" : "DISCONNECTED",
+    "reason" : "NONE"
+  }
+}

@@ -27,9 +27,7 @@ static const std::string ASSETS_DEFAULT = R"({
         {
           "locales": [
             "en-US",
-            "en-CA",
-            "en-IN",
-            "en-GB"
+            "en-CA"
           ],
           "defaultValue": "three hundred sixty degree camera",
           "synonyms": [
@@ -61,6 +59,45 @@ static const std::string ASSETS_DEFAULT = R"({
             "caméra à trois cent soixante degrés",
             "caméra trois cent soixante",
             "caméra trois cent soixante degrés"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "three sixty degree camera",
+          "synonyms": [
+            "तीन सौ साठ degree camera",
+            "तीन सौ साठ camera",
+            "three hundred sixty degree camera",
+            "three hundred sixty camera",
+            "three sixty degree camera three sixty camera",
+            "three hundred and sixty degree camera",
+            "three hundred and sixty camera"
+          ]
+        },
+        {
+          "locales": [
+            "en-IN"
+          ],
+          "defaultValue": "three hundred sixty degree camera",
+          "synonyms": [
+            "three hundred sixty camera",
+            "three sixty degree camera three sixty camera",
+            "three hundred and sixty degree camera",
+            "three hundred and sixty camera"
+          ]
+        },
+        {
+          "locales": [
+            "en-GB"
+          ],
+          "defaultValue": "three hundred sixty degree camera",
+          "synonyms": [
+            "three hundred sixty camera",
+            "three sixty degree camera three sixty camera",
+            "three hundred and sixty degree camera",
+            "three hundred and sixty camera"
           ]
         },
         {
@@ -102,6 +139,35 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "macchina fotografica a trecentosessanta gradi",
             "fotocamera trecentosessanta gradi"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "three hundred sixty degree camera",
+          "synonyms": [
+            "three hundred sixty camera",
+            "three sixty degree camera",
+            "three sixty camera",
+            "three hundred and sixty degree camera",
+            "three hundred and sixty camera"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "三百六十度カメラ",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "câmera trezentos e sessenta graus",
+          "synonyms": [
+            "câmera trezentos e sessenta"
           ]
         }
       ]
@@ -146,6 +212,15 @@ static const std::string ASSETS_DEFAULT = R"({
             "système de caméra 3D",
             "système de camera à 360",
             "système de camera à 360 degrés"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "AVM camera",
+          "synonyms": [
+            "a. v. m. camera"
           ]
         },
         {
@@ -214,6 +289,33 @@ static const std::string ASSETS_DEFAULT = R"({
             "sistema con videocamera a 360 gradi",
             "sistema a. v. m."
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "AVM camera",
+          "synonyms": [
+            "a. v. m. camera"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "全方位カメラ",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "câmera AVM",
+          "synonyms": [
+            "câmera a. v. m.",
+            "câmera panorâmica",
+            "câmera 360 graus"
+          ]
         }
       ]
     },
@@ -241,10 +343,11 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "aire acondicionado",
           "synonyms": [
-            "climatización",
             "aire",
             "ac",
-            "a c"
+            "a c",
+            "aire condicionado",
+            "climatizador"
           ]
         },
         {
@@ -259,6 +362,21 @@ static const std::string ASSETS_DEFAULT = R"({
             "ac",
             "air conditionné",
             "conditionneur d'air"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "वातानुकूलक",
+          "synonyms": [
+            "वातानुकूलन",
+            "air conditioner",
+            "air conditioning",
+            "air con",
+            "aircon",
+            "ac",
+            "a c"
           ]
         },
         {
@@ -305,9 +423,7 @@ static const std::string ASSETS_DEFAULT = R"({
             "es-ES"
           ],
           "defaultValue": "aire acondicionado",
-          "synonyms": [
-            "climatización"
-          ]
+          "synonyms": []
         },
         {
           "locales": [
@@ -327,6 +443,40 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "condizionatore",
             "condizionatore d' aria"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "air conditioner",
+          "synonyms": [
+            "air conditioning",
+            "air con",
+            "aircon",
+            "ac",
+            "a c"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "冷房",
+          "synonyms": [
+            "エアコン"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "ar condicionado",
+          "synonyms": [
+            "refrigeração",
+            "ar",
+            "ac",
+            "a c"
           ]
         }
       ]
@@ -355,7 +505,9 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "iluminación ambiental",
             "luz de ambiente",
-            "iluminación de ambiente"
+            "iluminación de ambiente",
+            "luz de colores",
+            "luces de colores"
           ]
         },
         {
@@ -370,9 +522,20 @@ static const std::string ASSETS_DEFAULT = R"({
             "lumière d'ambiance",
             "lumières d'ambiance",
             "éclairage d'ambiance",
-            "éclairages d'ambiance",
-            "lampe d'ambiance",
-            "lampes d'ambiance"
+            "éclairages d'ambiance"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "mood वाली बत्ती",
+          "synonyms": [
+            "mood वाली light",
+            "ambient light",
+            "ambient lighting",
+            "mood light",
+            "mood lighting"
           ]
         },
         {
@@ -433,7 +596,10 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "Umgebungsbeleuchtung",
             "Stimmungslicht",
-            "Stimmungsbeleuchtung"
+            "Stimmungsbeleuchtung",
+            "Ambient Light",
+            "Ambientes Licht",
+            "Ambiente Beleuchtung"
           ]
         },
         {
@@ -448,6 +614,40 @@ static const std::string ASSETS_DEFAULT = R"({
             "mood lighting",
             "illuminazione di atmosfera",
             "luce ambientale"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "ambient light",
+          "synonyms": [
+            "ambient lighting",
+            "mood light",
+            "mood lighting"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "アンビエントライト",
+          "synonyms": [
+            "アンビエントランプ",
+            "アンビエント照明",
+            "間接照明",
+            "ムードライト",
+            "ムードランプ",
+            "ムード照明"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "iluminação ambiente",
+          "synonyms": [
+            "luz ambiente"
           ]
         }
       ]
@@ -483,7 +683,17 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "appuie-bras",
           "synonyms": [
             "accoudoir",
-            "accoudoirs"
+            "accoudoirs",
+            "repos bras"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "armrest",
+          "synonyms": [
+            "arm rest"
           ]
         },
         {
@@ -525,13 +735,40 @@ static const std::string ASSETS_DEFAULT = R"({
             "de-DE"
           ],
           "defaultValue": "Armlehne",
-          "synonyms": []
+          "synonyms": [
+            "Arm lenen"
+          ]
         },
         {
           "locales": [
             "it-IT"
           ],
           "defaultValue": "bracciolo",
+          "synonyms": [
+            "bracciolo per auto"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "armrest",
+          "synonyms": [
+            "arm rest"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "アームレスト",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "apoio de braço",
           "synonyms": []
         }
       ]
@@ -553,7 +790,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "es-US"
           ],
           "defaultValue": "luz de la cabina",
-          "synonyms": []
+          "synonyms": [
+            "luz de cabina"
+          ]
         },
         {
           "locales": [
@@ -564,16 +803,22 @@ static const std::string ASSETS_DEFAULT = R"({
             "plafonniers",
             "lumière du plafond",
             "lumières du plafond",
-            "lampe du plafond",
-            "lampes du plafond",
             "lumière intérieure",
-            "lampe intérieure",
-            "lampes intérieures",
             "lumières intérieures",
             "lumière de l'habitacle",
-            "lumières de l'habitacle",
-            "lampe de l'habitacle",
-            "lampes de l'habitacle"
+            "lumières de l'habitacle"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "कक्ष की बत्ती",
+          "synonyms": [
+            "cabin light",
+            "cabin की light",
+            "cabin की बत्ती",
+            "cabin की lights"
           ]
         },
         {
@@ -625,7 +870,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "de-DE"
           ],
           "defaultValue": "Innenraumbeleuchtung",
-          "synonyms": []
+          "synonyms": [
+            "Innenraumlicht"
+          ]
         },
         {
           "locales": [
@@ -634,6 +881,29 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "luce abitacolo",
           "synonyms": [
             "luce dell'abitacolo"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "cabin light",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "インテリアランプ",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "luz interna",
+          "synonyms": [
+            "luz da cabine"
           ]
         }
       ]
@@ -673,6 +943,18 @@ static const std::string ASSETS_DEFAULT = R"({
             "auto",
             "automobile",
             "char"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "गाड़ी",
+          "synonyms": [
+            "गाडी",
+            "वाहन",
+            "car",
+            "automobile"
           ]
         },
         {
@@ -730,6 +1012,33 @@ static const std::string ASSETS_DEFAULT = R"({
             "automobile",
             "macchina"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "car",
+          "synonyms": [
+            "automobile"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "車",
+          "synonyms": [
+            "自動車"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "carro",
+          "synonyms": [
+            "automóvel"
+          ]
         }
       ]
     },
@@ -759,6 +1068,15 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "trappe de la prise de recharge",
           "synonyms": [
             "trappe de rechargement"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "charge door",
+          "synonyms": [
+            "charging door"
           ]
         },
         {
@@ -810,6 +1128,29 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "sportello della porta di ricarica"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "charge door",
+          "synonyms": [
+            "charging door"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "充電ポート",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "porta do carregador",
+          "synonyms": []
         }
       ]
     },
@@ -831,7 +1172,9 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "climatización",
           "synonyms": [
-            "control de temperatura"
+            "control de temperatura",
+            "control de la temperatura",
+            "radiador"
           ]
         },
         {
@@ -840,6 +1183,15 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "contrôle de la température",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "वातावरण नियंत्रण",
+          "synonyms": [
+            "climate control"
+          ]
         },
         {
           "locales": [
@@ -876,7 +1228,7 @@ static const std::string ASSETS_DEFAULT = R"({
           "locales": [
             "de-DE"
           ],
-          "defaultValue": "Klimatisierung",
+          "defaultValue": "klimaregelung",
           "synonyms": []
         },
         {
@@ -887,6 +1239,27 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "climatizzatore"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "climate control",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "気候制御",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "controle de climatização",
+          "synonyms": []
         }
       ]
     },
@@ -908,7 +1281,8 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "enfriador",
           "synonyms": [
-            "sistema de enfriación"
+            "sistema de enfriación",
+            "sistema enfriador"
           ]
         },
         {
@@ -916,6 +1290,15 @@ static const std::string ASSETS_DEFAULT = R"({
             "fr-CA"
           ],
           "defaultValue": "système de refroidissement",
+          "synonyms": [
+            "cooler"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "cooler",
           "synonyms": []
         },
         {
@@ -961,6 +1344,29 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "raffreddamento"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "cooler",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "冷房",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "refrigerador",
+          "synonyms": [
+            "refrigeração"
+          ]
         }
       ]
     },
@@ -983,7 +1389,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "es-US"
           ],
           "defaultValue": "portavasos",
-          "synonyms": []
+          "synonyms": [
+            "bebida"
+          ]
         },
         {
           "locales": [
@@ -994,6 +1402,15 @@ static const std::string ASSETS_DEFAULT = R"({
             "porte gobelet",
             "portes-gobelets",
             "portes gobelets"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "cup holder",
+          "synonyms": [
+            "cupholder"
           ]
         },
         {
@@ -1039,7 +1456,10 @@ static const std::string ASSETS_DEFAULT = R"({
             "de-DE"
           ],
           "defaultValue": "Getränkehalter",
-          "synonyms": []
+          "synonyms": [
+            "Becherhalter",
+            "Tassenhalter"
+          ]
         },
         {
           "locales": [
@@ -1047,7 +1467,35 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "portabicchieri",
           "synonyms": [
-            "portabicchiere"
+            "portabicchiere",
+            "portabevande"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "cup holder",
+          "synonyms": [
+            "cupholder"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "カップホルダー",
+          "synonyms": [
+            "ドリンクホルダー"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "suporte de bebida",
+          "synonyms": [
+            "porta-bebida"
           ]
         }
       ]
@@ -1076,6 +1524,15 @@ static const std::string ASSETS_DEFAULT = R"({
             "fr-CA"
           ],
           "defaultValue": "écran d'affichage",
+          "synonyms": [
+            "display"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "display",
           "synonyms": []
         },
         {
@@ -1111,7 +1568,10 @@ static const std::string ASSETS_DEFAULT = R"({
             "de-DE"
           ],
           "defaultValue": "Bildschirmanzeige",
-          "synonyms": []
+          "synonyms": [
+            "Bildschirm",
+            "Display"
+          ]
         },
         {
           "locales": [
@@ -1121,6 +1581,29 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "schermo",
             "schermata"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "display",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "ディスプレイ",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "tela",
+          "synonyms": [
+            "display"
           ]
         }
       ]
@@ -1154,7 +1637,19 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "écran d'affichage",
           "synonyms": [
-            "écrans d'affichage"
+            "écrans d'affichage",
+            "tableau de bord",
+            "display",
+            "d' affichage"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "display",
+          "synonyms": [
+            "screen"
           ]
         },
         {
@@ -1181,7 +1676,8 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "écran d'affichage",
           "synonyms": [
-            "écrans d'affichage"
+            "écrans d'affichage",
+            "tableau de bord"
           ]
         },
         {
@@ -1198,7 +1694,10 @@ static const std::string ASSETS_DEFAULT = R"({
             "de-DE"
           ],
           "defaultValue": "Bildschirmanzeige",
-          "synonyms": []
+          "synonyms": [
+            "Bildschirm",
+            "Display"
+          ]
         },
         {
           "locales": [
@@ -1209,6 +1708,33 @@ static const std::string ASSETS_DEFAULT = R"({
             "schermo",
             "schermo di visualizzazione",
             "schermata"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "display",
+          "synonyms": [
+            "screen"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "ディスプレイ",
+          "synonyms": [
+            "画面"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "tela de exibição",
+          "synonyms": [
+            "display multimídia"
           ]
         }
       ]
@@ -1231,7 +1757,8 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "luz del techo",
           "synonyms": [
-            "luz interior"
+            "luz interior",
+            "luz de arriba"
           ]
         },
         {
@@ -1243,17 +1770,19 @@ static const std::string ASSETS_DEFAULT = R"({
             "plafonniers",
             "lumière du plafond",
             "lumières du plafond",
-            "lampe du plafond",
-            "lampes du plafond",
             "lumière intérieure",
-            "lampe intérieure",
             "lampes intérieures",
             "lumières intérieures",
             "lumière de l'habitacle",
-            "lumières de l'habitacle",
-            "lampe de l'habitacle",
-            "lampes de l'habitacle"
+            "lumières de l'habitacle"
           ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "dome light",
+          "synonyms": []
         },
         {
           "locales": [
@@ -1312,6 +1841,29 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "luce di cortesia",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "dome light",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "インテリアランプ",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "luz do teto",
+          "synonyms": [
+            "luz de teto"
+          ]
         }
       ]
     },
@@ -1353,7 +1905,30 @@ static const std::string ASSETS_DEFAULT = R"({
             "air",
             "ventilation",
             "débit d'air",
-            "flux d' air"
+            "flux d' air",
+            "débit d' aération",
+            "aération",
+            "bouche d' aération",
+            "flux d'air"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "पंखा",
+          "synonyms": [
+            "हवा",
+            "वायु",
+            "वायु प्रवाह",
+            "हवा का बहाव",
+            "air का flow",
+            "हवा का flow",
+            "fan",
+            "air",
+            "blower",
+            "air flow",
+            "airflow"
           ]
         },
         {
@@ -1424,7 +1999,45 @@ static const std::string ASSETS_DEFAULT = R"({
             "ventilatore",
             "aria",
             "flusso d'aria",
-            "areazione"
+            "areazione",
+            "ventola ad aria",
+            "ventola abitacolo"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "fan",
+          "synonyms": [
+            "air",
+            "blower",
+            "air flow",
+            "airflow"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "ファン",
+          "synonyms": [
+            "扇風機",
+            "空気",
+            "空調",
+            "吹き出し口",
+            "送風"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "ventilador",
+          "synonyms": [
+            "ar",
+            "ventilação",
+            "fluxo de ar"
           ]
         }
       ]
@@ -1450,7 +2063,13 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "faros antiniebla",
           "synonyms": [
             "luces antiniebla",
-            "neblineros"
+            "neblineros",
+            "luces de niebla",
+            "luces para niebra",
+            "faros para niebla",
+            "luces para neblina",
+            "faros para neblina",
+            "faros antineblina"
           ]
         },
         {
@@ -1460,7 +2079,27 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "feux de brouillard",
           "synonyms": [
             "phares antibrouillard",
-            "feux antibrouillard"
+            "feux antibrouillard",
+            "lumières de brouillard",
+            "lumières antibrouillard",
+            "phares de brouillard"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "fog वाली बत्ती",
+          "synonyms": [
+            "fog वाली बत्तियाँ",
+            "fog वाली lights",
+            "fog वाली lighten",
+            "कोहरे वाली बत्ती",
+            "कोहरे वाली बत्तियाँ",
+            "कोहरे  वाली lights",
+            "कोहरे वाली lighten",
+            "fog light",
+            "fog lights"
           ]
         },
         {
@@ -1488,7 +2127,10 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "feux de brouillard",
           "synonyms": [
             "phares antibrouillard",
-            "feux antibrouillard"
+            "feux antibrouillard",
+            "lumières de brouillard",
+            "lumières antibrouillard",
+            "phares de brouillard"
           ]
         },
         {
@@ -1505,7 +2147,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "de-DE"
           ],
           "defaultValue": "Nebelscheinwerfer",
-          "synonyms": []
+          "synonyms": [
+            "Nebellicht"
+          ]
         },
         {
           "locales": [
@@ -1513,6 +2157,31 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "fendinebbia",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "fog light",
+          "synonyms": [
+            "fog lights"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "フォグランプ",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "luz de neblina",
+          "synonyms": [
+            "luzes de neblina"
+          ]
         }
       ]
     },
@@ -1533,7 +2202,10 @@ static const std::string ASSETS_DEFAULT = R"({
             "es-US"
           ],
           "defaultValue": "tapa de la gasolina",
-          "synonyms": []
+          "synonyms": [
+            "tapa de la gas",
+            "tapa del gas"
+          ]
         },
         {
           "locales": [
@@ -1543,6 +2215,28 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "trappe à carburant",
             "trappe à essence"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "ईंधन की टंकी का दरवाज़ा",
+          "synonyms": [
+            "fuel की टंकी का दरवाजा",
+            "petrol की टंकी का द्वार",
+            "petrol की टंकी का दरवाज़ा",
+            "petrol की टंकी का दरवाजा",
+            "diesel की टंकी का द्वार",
+            "diesel की टंकी का दरवाज़ा",
+            "diesel की टंकी का दरवाजा",
+            "fuel door",
+            "gas door",
+            "petrol door",
+            "diesel door",
+            "fuel tank door",
+            "petrol tank door",
+            "diesel tank door"
           ]
         },
         {
@@ -1600,6 +2294,39 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "sportellino del serbatoio"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "fuel door",
+          "synonyms": [
+            "gas door",
+            "petrol door",
+            "diesel door",
+            "fuel tank door",
+            "petrol tank door",
+            "diesel tank door"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "給油口",
+          "synonyms": [
+            "フューエルリッド"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "portinhola da tampa do tanque",
+          "synonyms": [
+            "porta da tampa do tanque",
+            "tampa do tanque"
+          ]
         }
       ]
     },
@@ -1622,7 +2349,8 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "pantalla HUD",
           "synonyms": [
             "HUD",
-            "heads up display"
+            "heads up display",
+            "pantalla de visualización"
           ]
         },
         {
@@ -1632,8 +2360,16 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "affichage tête haute",
           "synonyms": [
             "HUD",
-            "affichage frontal"
+            "affichage frontal",
+            "heads up"
           ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "heads up display",
+          "synonyms": []
         },
         {
           "locales": [
@@ -1674,7 +2410,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "de-DE"
           ],
           "defaultValue": "Frontscheibenanzeige",
-          "synonyms": []
+          "synonyms": [
+            "Heads up display"
+          ]
         },
         {
           "locales": [
@@ -1682,6 +2420,29 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "heads up display",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "heads up display",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "ヘッドアップディスプレイ",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "display de alerta",
+          "synonyms": [
+            "exibição de alerta"
+          ]
         }
       ]
     },
@@ -1702,7 +2463,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "es-US"
           ],
           "defaultValue": "luces de emergencia",
-          "synonyms": []
+          "synonyms": [
+            "luces de peligro"
+          ]
         },
         {
           "locales": [
@@ -1710,7 +2473,26 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "phares d'urgence",
           "synonyms": [
-            "lumière d'urgence"
+            "lumière d'urgence",
+            "lumières de détresse",
+            "feux de détresse",
+            "phares de détresse",
+            "feux d'urgence",
+            "clignotants de détresse",
+            "clignotants d'urgence",
+            "hazard"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "खतरे वाली lights",
+          "synonyms": [
+            "खतरे वाली lighten",
+            "खतरे वाली बत्तियाँ",
+            "खतरे वाली बत्ती",
+            "hazard lights"
           ]
         },
         {
@@ -1733,7 +2515,12 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "feux de détresse",
           "synonyms": [
-            "warnings"
+            "warnings",
+            "lumières de détresse",
+            "phares de détresse",
+            "feux d'urgence",
+            "clignotants de détresse",
+            "clignotants d'urgence"
           ]
         },
         {
@@ -1750,13 +2537,42 @@ static const std::string ASSETS_DEFAULT = R"({
             "de-DE"
           ],
           "defaultValue": "Warnblinkleuchten",
-          "synonyms": []
+          "synonyms": [
+            "Warnlicht"
+          ]
         },
         {
           "locales": [
             "it-IT"
           ],
           "defaultValue": "luci di emergenza",
+          "synonyms": [
+            "quatto frecce"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "hazard lights",
+          "synonyms": [
+            "hazards"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "ハザードランプ",
+          "synonyms": [
+            "警告灯"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "pisca-alerta",
           "synonyms": []
         }
       ]
@@ -1778,7 +2594,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "es-US"
           ],
           "defaultValue": "faros",
-          "synonyms": []
+          "synonyms": [
+            "luces"
+          ]
         },
         {
           "locales": [
@@ -1788,6 +2606,13 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "lumières"
           ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "headlights",
+          "synonyms": []
         },
         {
           "locales": [
@@ -1829,6 +2654,31 @@ static const std::string ASSETS_DEFAULT = R"({
             "it-IT"
           ],
           "defaultValue": "fari",
+          "synonyms": [
+            "fanali"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "headlights",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "ヘッドライト",
+          "synonyms": [
+            "前照灯"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "faróis",
           "synonyms": []
         }
       ]
@@ -1861,7 +2711,18 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "chauffage",
           "synonyms": [
-            "chauffé"
+            "chauffé",
+            "chaufferette",
+            "heater"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "तापक",
+          "synonyms": [
+            "heater"
           ]
         },
         {
@@ -1915,6 +2776,27 @@ static const std::string ASSETS_DEFAULT = R"({
             "riscaldabili",
             "riscaldati"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "heater",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "暖房",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "aquecedor",
+          "synonyms": []
         }
       ]
     },
@@ -1946,6 +2828,15 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "phares à haute intensité",
           "synonyms": [
             "lumières à haute intensité"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "ऊँची किरणें",
+          "synonyms": [
+            "high beams"
           ]
         },
         {
@@ -1997,6 +2888,33 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "abbaglianti",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "high beams",
+          "synonyms": [
+            "beams",
+            "full beams",
+            "brights"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "ハイビーム",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "farol alto",
+          "synonyms": [
+            "luz alta"
+          ]
         }
       ]
     },
@@ -2018,7 +2936,6 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "cofre",
           "synonyms": [
-            "capó",
             "tapa del motor"
           ]
         },
@@ -2029,6 +2946,15 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "capot",
           "synonyms": [
             "hood"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "hood",
+          "synonyms": [
+            "bonnet"
           ]
         },
         {
@@ -2076,6 +3002,29 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "cofano",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "hood",
+          "synonyms": [
+            "bonnet"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "ボンネット",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "capô",
+          "synonyms": []
         }
       ]
     },
@@ -2118,6 +3067,17 @@ static const std::string ASSETS_DEFAULT = R"({
             "écrans d'info-divertissement",
             "écrans d'information et divertissement",
             "système d'information et divertissements"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "infotainment screen",
+          "synonyms": [
+            "infotainment",
+            "ivi",
+            "i. v. i."
           ]
         },
         {
@@ -2184,6 +3144,33 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "infotainment"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "infotainment screen",
+          "synonyms": [
+            "infotainment",
+            "ivi",
+            "i. v. i."
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "インフォテインメント画面",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "tela infotainment",
+          "synonyms": [
+            "sistema infotainment"
+          ]
         }
       ]
     },
@@ -2210,11 +3197,21 @@ static const std::string ASSETS_DEFAULT = R"({
           "locales": [
             "fr-CA"
           ],
-          "defaultValue": "lampe",
+          "defaultValue": "lumière",
           "synonyms": [
-            "lampes",
-            "lumière",
             "lumières"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "बत्ती",
+          "synonyms": [
+            "बत्तियाँ",
+            "lighten",
+            "lighton",
+            "light"
           ]
         },
         {
@@ -2267,6 +3264,31 @@ static const std::string ASSETS_DEFAULT = R"({
             "it-IT"
           ],
           "defaultValue": "luce",
+          "synonyms": [
+            "luci"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "light",
+          "synonyms": [
+            "lights"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "ランプ",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "luz",
           "synonyms": []
         }
       ]
@@ -2303,6 +3325,13 @@ static const std::string ASSETS_DEFAULT = R"({
         },
         {
           "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "moonroof",
+          "synonyms": []
+        },
+        {
+          "locales": [
             "en-IN"
           ],
           "defaultValue": "moonroof",
@@ -2332,7 +3361,9 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "techo corredizo",
           "synonyms": [
-            "techo panorámico"
+            "techo panorámico",
+            "quemacocos",
+            "moonroof"
           ]
         },
         {
@@ -2354,6 +3385,27 @@ static const std::string ASSETS_DEFAULT = R"({
             "tettuccio apribile",
             "tettino apribile"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "moonroof",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "ムーンルーフ",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "teto solar",
+          "synonyms": []
         }
       ]
     },
@@ -2382,8 +3434,16 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "feux de stationnement",
           "synonyms": [
-            "phares de stationnement",
-            "lampes de stationnement"
+            "phares de stationnement"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "parking की बत्तियां",
+          "synonyms": [
+            "parking की रोशनीयां"
           ]
         },
         {
@@ -2416,7 +3476,9 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "luces de estacionamiento",
           "synonyms": [
-            "luces de aparcamiento"
+            "luces de aparcamiento",
+            "luces de estacionarse",
+            "luces intermitentes"
           ]
         },
         {
@@ -2438,6 +3500,29 @@ static const std::string ASSETS_DEFAULT = R"({
             "fari di stazionamento",
             "fari di sosta"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "parking lights",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "パーキングランプ",
+          "synonyms": [
+            "駐車ランプ"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "luzes de estacionamento",
+          "synonyms": []
         }
       ]
     },
@@ -2469,7 +3554,19 @@ static const std::string ASSETS_DEFAULT = R"({
             "lampes de lecture",
             "liseuse",
             "liseuses",
-            "lumière de lecture"
+            "lumière de lecture",
+            "lumières de lecture"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "reading वाली बत्ती",
+          "synonyms": [
+            "पढ़ने वाली बत्ती",
+            "पढ़ने की light",
+            "reading light"
           ]
         },
         {
@@ -2513,7 +3610,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "de-DE"
           ],
           "defaultValue": "Leselampe",
-          "synonyms": []
+          "synonyms": [
+            "Leselicht"
+          ]
         },
         {
           "locales": [
@@ -2522,7 +3621,33 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "luce lettura",
           "synonyms": [
             "luce da lettura",
-            "luce di lettura"
+            "luce di lettura",
+            "luci da lettura"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "reading light",
+          "synonyms": [
+            "reading lamp"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "パーソナルランプ",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "luz de leitura",
+          "synonyms": [
+            "lâmpada de leitura"
           ]
         }
       ]
@@ -2551,7 +3676,20 @@ static const std::string ASSETS_DEFAULT = R"({
             "fr-CA"
           ],
           "defaultValue": "siège",
-          "synonyms": []
+          "synonyms": [
+            "banc"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "आसन",
+          "synonyms": [
+            "गद्दी",
+            "कुर्सी",
+            "seat"
+          ]
         },
         {
           "locales": [
@@ -2596,6 +3734,31 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "sedili"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "seat",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "シート",
+          "synonyms": [
+            "座席"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "banco",
+          "synonyms": [
+            "assento"
+          ]
         }
       ]
     },
@@ -2619,7 +3782,13 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "calentador de asiento",
           "synonyms": [
-            "calefaccóin de asiento"
+            "calefacción de asiento",
+            "calentador del asiento",
+            "calefacción del asiento",
+            "calefacción de asientos",
+            "calendator de asientos",
+            "calefacción de los asientos",
+            "calentador de los asientos"
           ]
         },
         {
@@ -2632,6 +3801,16 @@ static const std::string ASSETS_DEFAULT = R"({
             "siège chauffé",
             "sièges chauffés",
             "chauffage du siège"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "गद्दी का तापक",
+          "synonyms": [
+            "seat heater",
+            "seat heating"
           ]
         },
         {
@@ -2670,8 +3849,8 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "calentador de asiento",
           "synonyms": [
-            "calefaccóin de asiento",
-            "Calefacción de los asientos",
+            "calefacción de asiento",
+            "calefacción de los asientos",
             "calefacción del asiento"
           ]
         },
@@ -2690,6 +3869,37 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "sedile riscaldabile",
             "riscaldamento del sedile"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "seat heater",
+          "synonyms": [
+            "seat heating",
+            "seat warmer",
+            "seat warming"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "シートヒーター",
+          "synonyms": [
+            "座席暖房"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "aquecedor do banco",
+          "synonyms": [
+            "aquecedor do assento",
+            "aquecimento do banco",
+            "aquecimento do assento"
           ]
         }
       ]
@@ -2718,6 +3928,15 @@ static const std::string ASSETS_DEFAULT = R"({
             "fr-CA"
           ],
           "defaultValue": "volant",
+          "synonyms": [
+            "steering"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "steering wheel",
           "synonyms": []
         },
         {
@@ -2761,6 +3980,27 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "volante",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "steering wheel",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "ステアリング",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "volante",
+          "synonyms": []
         }
       ]
     },
@@ -2797,6 +4037,13 @@ static const std::string ASSETS_DEFAULT = R"({
             "toit vitré",
             "fenêtre de toit"
           ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "sunroof",
+          "synonyms": []
         },
         {
           "locales": [
@@ -2839,7 +4086,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "de-DE"
           ],
           "defaultValue": "Schiebedach",
-          "synonyms": []
+          "synonyms": [
+            "Dachfenster"
+          ]
         },
         {
           "locales": [
@@ -2850,6 +4099,27 @@ static const std::string ASSETS_DEFAULT = R"({
             "tettuccio apribile",
             "tettuccio"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "sunroof",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "サンルーフ",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "teto solar",
+          "synonyms": []
         }
       ]
     },
@@ -2883,6 +4153,16 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "pare-soleil",
           "synonyms": [
             "pares-soleil"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "sun shade",
+          "synonyms": [
+            "shade",
+            "sunshade"
           ]
         },
         {
@@ -2936,8 +4216,34 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "parasole",
           "synonyms": [
-            "visiera"
+            "visiera",
+            "parasole anteriore",
+            "parasole posteriore"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "sun shade",
+          "synonyms": [
+            "shade",
+            "sunshade"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "サンシェード",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "teto solar",
+          "synonyms": []
         }
       ]
     },
@@ -2959,7 +4265,6 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "puerta trasera",
           "synonyms": [
-            "puerta de caja",
             "puerta de la cajuela",
             "puerta de cajuela"
           ]
@@ -2972,6 +4277,13 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "tailgate"
           ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "tailgate",
+          "synonyms": []
         },
         {
           "locales": [
@@ -3013,6 +4325,31 @@ static const std::string ASSETS_DEFAULT = R"({
             "it-IT"
           ],
           "defaultValue": "portellone",
+          "synonyms": [
+            "portellone posteriore"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "tailgate",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "バックドア",
+          "synonyms": [
+            "テールゲート"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "porta-mala",
           "synonyms": []
         }
       ]
@@ -3043,6 +4380,16 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "valise",
           "synonyms": [
             "coffre"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "boot",
+          "synonyms": [
+            "trunk",
+            "dickie"
           ]
         },
         {
@@ -3093,6 +4440,29 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "baule"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "boot",
+          "synonyms": [
+            "trunk"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "トランク",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "porta-mala",
+          "synonyms": []
         }
       ]
     },
@@ -3114,7 +4484,8 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "luz del maletero",
           "synonyms": [
-            "luz de la cajuela"
+            "luz de la cajuela",
+            "luz de cajuela"
           ]
         },
         {
@@ -3124,10 +4495,22 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "lumière du coffre",
           "synonyms": [
             "lumières du coffre",
-            "lampe de la valise",
-            "lampes de la valise",
             "lumière de la valise",
             "lumières de la valise"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "trunk की light",
+          "synonyms": [
+            "trunk की बत्ती",
+            "boot की light",
+            "boot की बत्ती",
+            "dickey की light",
+            "dickey की बत्ती",
+            "trunk light"
           ]
         },
         {
@@ -3172,7 +4555,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "de-DE"
           ],
           "defaultValue": "Kofferraumbeleuchtung",
-          "synonyms": []
+          "synonyms": [
+            "Kofferraumlicht"
+          ]
         },
         {
           "locales": [
@@ -3184,6 +4569,29 @@ static const std::string ASSETS_DEFAULT = R"({
             "luce baule",
             "luce del baule"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "trunk light",
+          "synonyms": [
+            "boot light"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "トランクランプ",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "luz do porta-mala",
+          "synonyms": []
         }
       ]
     },
@@ -3201,7 +4609,7 @@ static const std::string ASSETS_DEFAULT = R"({
             "air vent",
             "air vents",
             "air outlet",
-            "ait outlets"
+            "air outlets"
           ]
         },
         {
@@ -3217,7 +4625,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "salida del aire",
             "salidas del aire",
             "rejilla de aire",
-            "salida de aire"
+            "salida de aire",
+            "salidas de aire",
+            "rejillas de aire"
           ]
         },
         {
@@ -3230,7 +4640,25 @@ static const std::string ASSETS_DEFAULT = R"({
             "bouche d’aération",
             "bouches d’aération",
             "sortie d’air",
-            "sorties d’air"
+            "sorties d’air",
+            "grille d'aération",
+            "grilles d'aération",
+            "trappe d'aération",
+            "trappes d'aération",
+            "areation"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "vent",
+          "synonyms": [
+            "vents",
+            "air vent",
+            "air vents",
+            "air outlet",
+            "air outlets"
           ]
         },
         {
@@ -3243,7 +4671,7 @@ static const std::string ASSETS_DEFAULT = R"({
             "air vent",
             "air vents",
             "air outlet",
-            "ait outlets"
+            "air outlets"
           ]
         },
         {
@@ -3256,7 +4684,7 @@ static const std::string ASSETS_DEFAULT = R"({
             "air vent",
             "air vents",
             "air outlet",
-            "ait outlets"
+            "air outlets"
           ]
         },
         {
@@ -3312,6 +4740,43 @@ static const std::string ASSETS_DEFAULT = R"({
             "bocchetta",
             "bocchette"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "vent",
+          "synonyms": [
+            "vents",
+            "air vent",
+            "air vents",
+            "air outlet",
+            "air outlets"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "吹き出し口",
+          "synonyms": [
+            "換気口"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "ventilador",
+          "synonyms": [
+            "ventoinha",
+            "ventiladores",
+            "ventoinhas",
+            "difusor de ar",
+            "difusores de ar",
+            "saída de ar",
+            "saídas de ar"
+          ]
         }
       ]
     },
@@ -3343,6 +4808,17 @@ static const std::string ASSETS_DEFAULT = R"({
             "fenêtres",
             "vitre",
             "vitres"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "खिड़की",
+          "synonyms": [
+            "खिड़कियाँ",
+            "खिड़कियों",
+            "window"
           ]
         },
         {
@@ -3394,7 +4870,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "de-DE"
           ],
           "defaultValue": "Fenster",
-          "synonyms": []
+          "synonyms": [
+            "Scheibe"
+          ]
         },
         {
           "locales": [
@@ -3402,6 +4880,36 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "finestrino",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "window",
+          "synonyms": [
+            "windows",
+            "car window",
+            "car windows"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "窓",
+          "synonyms": [
+            "窓ガラス",
+            "ドアガラス"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "janela",
+          "synonyms": [
+            "vidro"
+          ]
         }
       ]
     },
@@ -3430,8 +4938,16 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "pare-brise",
           "synonyms": [
-            "windshield"
+            "windshield",
+            "parebrise"
           ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "windshield",
+          "synonyms": []
         },
         {
           "locales": [
@@ -3456,7 +4972,10 @@ static const std::string ASSETS_DEFAULT = R"({
             "fr-FR"
           ],
           "defaultValue": "pare-brise",
-          "synonyms": []
+          "synonyms": [
+            "parebrise",
+            "pare brise"
+          ]
         },
         {
           "locales": [
@@ -3477,6 +4996,29 @@ static const std::string ASSETS_DEFAULT = R"({
             "it-IT"
           ],
           "defaultValue": "parabrezza",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "windshield",
+          "synonyms": [
+            "windscreen"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "フロントガラス",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "para-brisa",
           "synonyms": []
         }
       ]
@@ -3508,7 +5050,23 @@ static const std::string ASSETS_DEFAULT = R"({
             "fr-CA"
           ],
           "defaultValue": "essuie-glaces",
-          "synonyms": []
+          "synonyms": [
+            "essuie glace",
+            "wipers",
+            "wipers du windshield"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "windshield के wipers",
+          "synonyms": [
+            "windscreen के wipers",
+            "wipers",
+            "windshield wipers",
+            "windscreen wipers"
+          ]
         },
         {
           "locales": [
@@ -3535,7 +5093,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "fr-FR"
           ],
           "defaultValue": "essuie-glaces",
-          "synonyms": []
+          "synonyms": [
+            "essuie glace"
+          ]
         },
         {
           "locales": [
@@ -3557,6 +5117,32 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "tergicristalli",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "wipers",
+          "synonyms": [
+            "windshield wipers",
+            "windscreen wipers"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "ワイパー",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "limpadores",
+          "synonyms": [
+            "limpadores de para-brisa"
+          ]
         }
       ]
     },
@@ -3590,6 +5176,24 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "partout",
           "synonyms": [
             "tous"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "हर जगह",
+          "synonyms": [
+            "सब जगह",
+            "सर्वत्र",
+            "हर कहीं",
+            "सब",
+            "समस्त",
+            "सभी",
+            "सारे",
+            "सारा",
+            "everywhere",
+            "all"
           ]
         },
         {
@@ -3645,7 +5249,37 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "dovunque",
             "tutte",
-            "tutti"
+            "tutti",
+            "dappertutto"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "everywhere",
+          "synonyms": [
+            "all"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "全部",
+          "synonyms": [
+            "すべて"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "todos os lugares",
+          "synonyms": [
+            "todos",
+            "todas",
+            "todo"
           ]
         }
       ]
@@ -3672,7 +5306,9 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "conductor",
           "synonyms": [
             "conductor delantero",
-            "lado del conductor"
+            "lado del conductor",
+            "chofer",
+            "lado del chofer"
           ]
         },
         {
@@ -3684,6 +5320,26 @@ static const std::string ASSETS_DEFAULT = R"({
             "conducteur avant",
             "côté conducteur",
             "côté du conducteur"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "चालक",
+          "synonyms": [
+            "आगे का चालक",
+            "आगे का driver",
+            "सामने का driver",
+            "आगे वाला driver",
+            "सामने वाला चालक",
+            "driver की side",
+            "चालक की side",
+            "चालक की तरफ",
+            "driver की तरफ",
+            "driver",
+            "front driver",
+            "driver side"
           ]
         },
         {
@@ -3748,6 +5404,36 @@ static const std::string ASSETS_DEFAULT = R"({
             "lato del guidatore",
             "lato dell’autista"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "driver",
+          "synonyms": [
+            "front driver",
+            "driver side"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "運転席",
+          "synonyms": [
+            "運転席側"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "motorista",
+          "synonyms": [
+            "motorista da frente",
+            "do lado do motorista",
+            "lateral do motorista"
+          ]
         }
       ]
     },
@@ -3777,6 +5463,18 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "rangée conducteur",
           "synonyms": [
             "côté conducteur"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "driver की row",
+          "synonyms": [
+            "चालक की row",
+            "चालक का row",
+            "driver का row",
+            "driver row"
           ]
         },
         {
@@ -3822,6 +5520,29 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "fila del guidatore",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "driver row",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "運転席列",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "fileira do motorista",
+          "synonyms": [
+            "fileira da frente"
+          ]
         }
       ]
     },
@@ -3856,6 +5577,18 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "première rangée",
           "synonyms": [
             "1re rangée"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "पहला row",
+          "synonyms": [
+            "प्रथम row",
+            "पहली row",
+            "first row",
+            "1st row"
           ]
         },
         {
@@ -3911,6 +5644,33 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "1a fila"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "first row",
+          "synonyms": [
+            "1st row"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "一列目",
+          "synonyms": [
+            "前列"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "primeira fileira",
+          "synonyms": [
+            "1a fileira"
+          ]
         }
       ]
     },
@@ -3945,6 +5705,17 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "quatrième rangée",
           "synonyms": [
             "4e rangée"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "चौथी row",
+          "synonyms": [
+            "चौथा row",
+            "fourth row",
+            "4th row"
           ]
         },
         {
@@ -4000,6 +5771,31 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "4a fila"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "fourth row",
+          "synonyms": [
+            "4th row"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "四列目",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "quarta fileira",
+          "synonyms": [
+            "4a fileira"
+          ]
         }
       ]
     },
@@ -4020,7 +5816,10 @@ static const std::string ASSETS_DEFAULT = R"({
             "es-US"
           ],
           "defaultValue": "frente",
-          "synonyms": []
+          "synonyms": [
+            "frontal",
+            "delantero"
+          ]
         },
         {
           "locales": [
@@ -4028,6 +5827,16 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "avant",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "आगे",
+          "synonyms": [
+            "सामने",
+            "front"
+          ]
         },
         {
           "locales": [
@@ -4066,14 +5875,45 @@ static const std::string ASSETS_DEFAULT = R"({
             "de-DE"
           ],
           "defaultValue": "Vorderseite",
-          "synonyms": []
+          "synonyms": [
+            "Front"
+          ]
         },
         {
           "locales": [
             "it-IT"
           ],
           "defaultValue": "davanti",
+          "synonyms": [
+            "di fronte",
+            "anteriore",
+            "anteriori"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "front",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "前",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "frente",
+          "synonyms": [
+            "frontal",
+            "dianteira",
+            "dianteiro"
+          ]
         }
       ]
     },
@@ -4109,6 +5949,22 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "avant-gauche",
           "synonyms": [
             "avant gauche"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "सामने बाएं तरफ",
+          "synonyms": [
+            "सामने बायीं तरफ",
+            "आगे का बायाँ",
+            "आगे बाईं ओर",
+            "सामने बायीं ओर",
+            "सामने का left",
+            "आगे का left",
+            "front right",
+            "right front"
           ]
         },
         {
@@ -4163,6 +6019,31 @@ static const std::string ASSETS_DEFAULT = R"({
             "sinistra frontale",
             "parte sinistra frontale"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "front left",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "左前",
+          "synonyms": [
+            "左フロント"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "frontal esquerda",
+          "synonyms": [
+            "esquerda frontal"
+          ]
         }
       ]
     },
@@ -4195,11 +6076,26 @@ static const std::string ASSETS_DEFAULT = R"({
           "locales": [
             "fr-CA"
           ],
-          "defaultValue": "avant-droit",
+          "defaultValue": "avant droit",
           "synonyms": [
+            "avant-droit",
             "avant-droite",
-            "avant droit",
             "avant droite"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "सामने दायीं तरफ",
+          "synonyms": [
+            "आगे का दायाँ",
+            "आगे दाईं ओर",
+            "सामने दायीं ओर",
+            "सामने का right",
+            "आगे का right",
+            "front right",
+            "right front"
           ]
         },
         {
@@ -4256,6 +6152,31 @@ static const std::string ASSETS_DEFAULT = R"({
             "destra frontale",
             "parte destra frontale"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "front right",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "右前",
+          "synonyms": [
+            "右フロント"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "frontal direita",
+          "synonyms": [
+            "direita frontal"
+          ]
         }
       ]
     },
@@ -4285,7 +6206,31 @@ static const std::string ASSETS_DEFAULT = R"({
             "fr-CA"
           ],
           "defaultValue": "gauche",
-          "synonyms": []
+          "synonyms": [
+            "côté gauche"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "बाएं",
+          "synonyms": [
+            "बाएं तरफ",
+            "बायीं तरफ",
+            "बायाँ",
+            "बाएँ",
+            "बायीं",
+            "बायें",
+            "बायाँ side",
+            "बाएँ side",
+            "बायीं side",
+            "बायें side",
+            "बायीं ओर",
+            "बाईं ओर",
+            "left",
+            "left side"
+          ]
         },
         {
           "locales": [
@@ -4317,7 +6262,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "es-ES"
           ],
           "defaultValue": "izquierda",
-          "synonyms": []
+          "synonyms": [
+            "lado izquiero"
+          ]
         },
         {
           "locales": [
@@ -4330,8 +6277,37 @@ static const std::string ASSETS_DEFAULT = R"({
           "locales": [
             "it-IT"
           ],
-          "defaultValue": "destra",
-          "synonyms": []
+          "defaultValue": "sinistra",
+          "synonyms": [
+            "lato sinistro"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "left",
+          "synonyms": [
+            "left side"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "左",
+          "synonyms": [
+            "左側"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "esquerdo",
+          "synonyms": [
+            "lado esquerdo"
+          ]
         }
       ]
     },
@@ -4354,9 +6330,8 @@ static const std::string ASSETS_DEFAULT = R"({
             "es-MX",
             "es-US"
           ],
-          "defaultValue": "pasajero",
+          "defaultValue": "pasajero delantero",
           "synonyms": [
-            "pasajero delantero",
             "lado del pasajero",
             "lado del copiloto"
           ]
@@ -4370,6 +6345,26 @@ static const std::string ASSETS_DEFAULT = R"({
             "passager avant",
             "côté passager",
             "côté du passager"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "यात्री",
+          "synonyms": [
+            "आगे का यात्री",
+            "आगे का passenger",
+            "सामने का passenger",
+            "आगे वाला passenger",
+            "सामने वाला यात्री",
+            "passenger की side",
+            "यात्री की side",
+            "यात्री की तरफ",
+            "passenger की तरफ",
+            "passenger",
+            "front passenger",
+            "passenger side"
           ]
         },
         {
@@ -4433,7 +6428,39 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "passeggero anteriore",
             "passeggero davanti",
-            "lato del passeggero"
+            "lato del passeggero",
+            "posto del passeggero"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "passenger",
+          "synonyms": [
+            "front passenger",
+            "passenger side"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "助手席",
+          "synonyms": [
+            "助手席側"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "passageiro",
+          "synonyms": [
+            "passageiro da frente",
+            "passageiro dianteiro",
+            "do lado do passageiro",
+            "lateral do passageiro"
           ]
         }
       ]
@@ -4455,7 +6482,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "es-US"
           ],
           "defaultValue": "fila del pasajero",
-          "synonyms": []
+          "synonyms": [
+            "fila del copiloto"
+          ]
         },
         {
           "locales": [
@@ -4464,6 +6493,18 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "rangée passager",
           "synonyms": [
             "côté passager"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "passenger की row",
+          "synonyms": [
+            "यात्री की row",
+            "यात्री का row",
+            "passenger का row",
+            "passenger row"
           ]
         },
         {
@@ -4494,7 +6535,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "es-ES"
           ],
           "defaultValue": "fila del pasajero",
-          "synonyms": []
+          "synonyms": [
+            "fila del copiloto"
+          ]
         },
         {
           "locales": [
@@ -4508,6 +6551,27 @@ static const std::string ASSETS_DEFAULT = R"({
             "it-IT"
           ],
           "defaultValue": "fila del passeggero",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "passenger row",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "助手席列",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "fileira de trás",
           "synonyms": []
         }
       ]
@@ -4532,7 +6596,9 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "parte posterior",
           "synonyms": [
-            "atrás"
+            "atrás",
+            "trasero",
+            "parte de atrás"
           ]
         },
         {
@@ -4542,6 +6608,17 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "arrière",
           "synonyms": [
             "derrière"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "पिछला",
+          "synonyms": [
+            "पीछे",
+            "rear",
+            "back"
           ]
         },
         {
@@ -4599,6 +6676,33 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "posteriore"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "rear",
+          "synonyms": [
+            "back"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "後ろ",
+          "synonyms": [
+            "後部"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "de trás",
+          "synonyms": [
+            "atrás"
+          ]
         }
       ]
     },
@@ -4620,9 +6724,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "es-MX",
             "es-US"
           ],
-          "defaultValue": "conductor trasero",
+          "defaultValue": "pasajero de atrés del conductor",
           "synonyms": [
-            "conductor posterior"
+            "pasajero de atrás del chofer"
           ]
         },
         {
@@ -4632,6 +6736,19 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "conducteur arrière",
           "synonyms": [
             "chauffeur arrière"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "पीछे का driver",
+          "synonyms": [
+            "पीछे का चालक",
+            "पिछला चालक",
+            "पिछला driver",
+            "rear driver",
+            "back driver"
           ]
         },
         {
@@ -4679,9 +6796,37 @@ static const std::string ASSETS_DEFAULT = R"({
           "locales": [
             "it-IT"
           ],
-          "defaultValue": "guidatore posteriore",
+          "defaultValue": "passeggero posteriore",
           "synonyms": [
-            "guidatore dietro"
+            "posto del passeggero posteriore",
+            "passeggero dietro"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "rear driver",
+          "synonyms": [
+            "back driver"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "運転席後ろ",
+          "synonyms": [
+            "運転席後方"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "atrás do motorista",
+          "synonyms": [
+            "do passageiro atrás do motorista"
           ]
         }
       ]
@@ -4715,9 +6860,23 @@ static const std::string ASSETS_DEFAULT = R"({
           "locales": [
             "fr-CA"
           ],
-          "defaultValue": "arrière gauche",
+          "defaultValue": "arrière-gauche",
           "synonyms": [
-            "arrière-gauche"
+            "arrière gauche"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "पिछला बायाँ",
+          "synonyms": [
+            "पिछला बायें",
+            "पीछे का left",
+            "पीछे का बाएँ",
+            "पीछे का बायाँ",
+            "rear left",
+            "left rear"
           ]
         },
         {
@@ -4773,6 +6932,29 @@ static const std::string ASSETS_DEFAULT = R"({
             "sinistra posteriore",
             "parte sinistra posteriore"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "rear left",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "左後ろ",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "traseira esquerda",
+          "synonyms": [
+            "esquerda traseira"
+          ]
         }
       ]
     },
@@ -4796,7 +6978,9 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "pasajero trasero",
           "synonyms": [
-            "pasajero posterior"
+            "pasajero posterior",
+            "pasajero de atrás del copiloto",
+            "pasajero trasero del lado del copiloto"
           ]
         },
         {
@@ -4806,6 +6990,19 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "passager arrière",
           "synonyms": [
             "passager à l'arrière"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "पीछे का passenger",
+          "synonyms": [
+            "पीछे का यात्री",
+            "पिछला यात्री",
+            "पिछला passenger",
+            "rear passenger",
+            "back passenger"
           ]
         },
         {
@@ -4861,6 +7058,33 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "passeggero dietro"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "rear passenger",
+          "synonyms": [
+            "back passenger"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "運転席後ろ",
+          "synonyms": [
+            "運転席後方"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "atrás do passageiro da frente",
+          "synonyms": [
+            "do passageiro atrás do passageiro da frente"
+          ]
         }
       ]
     },
@@ -4893,11 +7117,26 @@ static const std::string ASSETS_DEFAULT = R"({
           "locales": [
             "fr-CA"
           ],
-          "defaultValue": "arrière-droit",
+          "defaultValue": "arrière droite",
           "synonyms": [
+            "arrière droit",
             "arrière-droite",
-            "arrière droite",
-            "arrière droit"
+            "arrière-droit"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "पिछला दाहिना",
+          "synonyms": [
+            "पिछला दाएँ",
+            "पीछे का दाएँ",
+            "पीछे का right",
+            "पीछे का दाहिना",
+            "पीछे का दायाँ",
+            "rear right",
+            "right rear"
           ]
         },
         {
@@ -4955,6 +7194,29 @@ static const std::string ASSETS_DEFAULT = R"({
             "destra posteriore",
             "parte destra posteriore"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "rear right",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "右後ろ",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "traseira direita",
+          "synonyms": [
+            "direita traseira"
+          ]
         }
       ]
     },
@@ -4984,7 +7246,31 @@ static const std::string ASSETS_DEFAULT = R"({
             "fr-CA"
           ],
           "defaultValue": "droite",
-          "synonyms": []
+          "synonyms": [
+            "côté droit"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "दाहिने",
+          "synonyms": [
+            "दाहिने तरफ",
+            "दायाँ",
+            "दाएँ",
+            "दायीं",
+            "दायें",
+            "दाहिने side",
+            "दायाँ side",
+            "दाएँ side",
+            "दायीं side",
+            "दायें side",
+            "दायीं ओर",
+            "दाईं ओर",
+            "right",
+            "right side"
+          ]
         },
         {
           "locales": [
@@ -5016,7 +7302,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "es-ES"
           ],
           "defaultValue": "derecha",
-          "synonyms": []
+          "synonyms": [
+            "lado derecho"
+          ]
         },
         {
           "locales": [
@@ -5029,8 +7317,37 @@ static const std::string ASSETS_DEFAULT = R"({
           "locales": [
             "it-IT"
           ],
-          "defaultValue": "diritto",
-          "synonyms": []
+          "defaultValue": "destra",
+          "synonyms": [
+            "lato destro"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "right",
+          "synonyms": [
+            "right side"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "右",
+          "synonyms": [
+            "右側"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "direito",
+          "synonyms": [
+            "lado direito"
+          ]
         }
       ]
     },
@@ -5066,6 +7383,17 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "2ème rangée",
             "2nde rangée"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "दूसरी row",
+          "synonyms": [
+            "दूसरा row",
+            "second row",
+            "2nd row"
           ]
         },
         {
@@ -5122,6 +7450,31 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "2a fila"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "second row",
+          "synonyms": [
+            "2nd row"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "二列目",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "segunda fileira",
+          "synonyms": [
+            "2a fileira"
+          ]
         }
       ]
     },
@@ -5156,6 +7509,17 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "troisième rangée",
           "synonyms": [
             "3e rangée"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "तीसरी row",
+          "synonyms": [
+            "तीसरा row",
+            "third row",
+            "3rd row"
           ]
         },
         {
@@ -5211,6 +7575,31 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "3a fila"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "third row",
+          "synonyms": [
+            "3rd row"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "三列目",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "terceira fileira",
+          "synonyms": [
+            "3a fileira"
+          ]
         }
       ]
     },
@@ -5234,7 +7623,9 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "recirculación de aire",
           "synonyms": [
-            "recirculación"
+            "recirculación",
+            "recircular",
+            "reciclar el aire"
           ]
         },
         {
@@ -5247,6 +7638,18 @@ static const std::string ASSETS_DEFAULT = R"({
             "recyclage d'air",
             "recirculation d’air",
             "recirculation"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "air recirculation",
+          "synonyms": [
+            "recirculation",
+            "हवा का recirculation",
+            "वायु का recirculation",
+            "air का recirculation"
           ]
         },
         {
@@ -5294,7 +7697,10 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "Umluftbetrieb",
           "synonyms": [
-            "Umluft"
+            "Umluft",
+            "Rückführung",
+            "Dauerumlauf",
+            "Rezirkulation"
           ]
         },
         {
@@ -5304,6 +7710,31 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "ricircolo dell'aria",
           "synonyms": [
             "ricircolo"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "air recirculation",
+          "synonyms": [
+            "recirculation"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "空気の再循環",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "recirculação de ar",
+          "synonyms": [
+            "recirculação"
           ]
         }
       ]
@@ -5344,6 +7775,17 @@ static const std::string ASSETS_DEFAULT = R"({
             "mode auto",
             "automatique",
             "mode automatique"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "auto",
+          "synonyms": [
+            "auto mode",
+            "automatic",
+            "automatic mode"
           ]
         },
         {
@@ -5397,7 +7839,9 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "Automatik",
           "synonyms": [
             "Automatikbetrieb",
-            "automatisch"
+            "automatisch",
+            "Auto-Modus",
+            "Automatikmodus"
           ]
         },
         {
@@ -5408,6 +7852,39 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "automatica",
             "modalità automatica"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "auto",
+          "synonyms": [
+            "auto mode",
+            "automatic",
+            "automatic mode"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "オート",
+          "synonyms": [
+            "オートモード",
+            "自動",
+            "自動モード"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "auto",
+          "synonyms": [
+            "modo auto",
+            "automático",
+            "modo automático"
           ]
         }
       ]
@@ -5446,6 +7923,13 @@ static const std::string ASSETS_DEFAULT = R"({
             "arrêt auto",
             "arrêt automatique"
           ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "auto hold",
+          "synonyms": []
         },
         {
           "locales": [
@@ -5501,6 +7985,31 @@ static const std::string ASSETS_DEFAULT = R"({
             "freno di stazionamento automatico",
             "freno di stazionamento elettrico"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "auto hold",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "ブレーキホールド",
+          "synonyms": [
+            "オートホールド"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "freio de estacionamento com acionamento eletrônico",
+          "synonyms": [
+            "freio auto hold"
+          ]
         }
       ]
     },
@@ -5521,7 +8030,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "es-US"
           ],
           "defaultValue": "menú del bluetooth",
-          "synonyms": []
+          "synonyms": [
+            "menú de bluetooth"
+          ]
         },
         {
           "locales": [
@@ -5531,6 +8042,13 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "bluetooth"
           ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "bluetooth page",
+          "synonyms": []
         },
         {
           "locales": [
@@ -5577,8 +8095,30 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "pagina del bluetooth",
           "synonyms": [
-            "menu del bluetooth"
+            "menu del bluetooth",
+            "pagina bluetooth"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "bluetooth page",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "ブルートゥース ページ",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "página do bluetooth",
+          "synonyms": []
         }
       ]
     },
@@ -5624,17 +8164,25 @@ static const std::string ASSETS_DEFAULT = R"({
             "frontal",
             "delantera",
             "ventilación frontal",
-            "ventilación delantera"
+            "ventilación delantera",
+            "aire para el cuerpo",
+            "aire de cuerpo",
+            "aire de cara",
+            "aire para la cara",
+            "aire hacia el cuerpo",
+            "aire hacia la cara",
+            "de enfrente",
+            "delantero",
+            "ventilación de adelante",
+            "ventilación de enfrente"
           ]
         },
         {
           "locales": [
             "fr-CA"
           ],
-          "defaultValue": "grille d'aération",
+          "defaultValue": "grille d'aération corps",
           "synonyms": [
-            "grilles d'aération",
-            "grille d'aération corps",
             "grilles d'aération corps",
             "grille d'aération visage",
             "grilles d'aération visage",
@@ -5674,7 +8222,54 @@ static const std::string ASSETS_DEFAULT = R"({
             "bouche de ventilation au milieu",
             "bouches de ventilation de face",
             "bouches de ventilation avant",
-            "bouches de ventilation au milieu"
+            "bouches de ventilation au milieu",
+            "trappe d'aération avant",
+            "trappe d'aération du milieu",
+            "trappe d'aération de face",
+            "trappe d'aération du corps",
+            "trappe d'aération du visage",
+            "trappes d'aération avant",
+            "trappes d'aération du milieu",
+            "trappes d'aération de face",
+            "trappes d'aération du corps",
+            "trappes d'aération du visage"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "शारीरिक vents",
+          "synonyms": [
+            "body के vents",
+            "शरीर के vents",
+            "शरीर का vent",
+            "चेहरे के vents",
+            "चेहरे का vent",
+            "मुँह के vents",
+            "मुँह का vent",
+            "शरीर",
+            "चेहरा",
+            "मुख",
+            "मुँह",
+            "मध्य",
+            "सामने",
+            "आगे",
+            "आगे का vent",
+            "सामने के vents",
+            "सामने का vent",
+            "आगे के vents",
+            "body vents",
+            "body vent",
+            "face vents",
+            "face vent",
+            "body",
+            "face",
+            "center",
+            "top",
+            "front",
+            "front vent",
+            "front vents"
           ]
         },
         {
@@ -5760,7 +8355,20 @@ static const std::string ASSETS_DEFAULT = R"({
             "bouche de ventilation au milieu",
             "bouches de ventilation de face",
             "bouches de ventilation avant",
-            "bouches de ventilation au milieu"
+            "bouches de ventilation au milieu",
+            "grille du milieu",
+            "grilles du milieu",
+            "bouche du milieu",
+            "bouches du milieu",
+            "bouche d'aération du milieu",
+            "bouches d'aération du milieu",
+            "bouche de ventilation du milieu",
+            "bouches de ventilation du milieu",
+            "grille d'aération avant",
+            "grille d'aération de face",
+            "grilles d'aération du milieu",
+            "grilles d'aération de face",
+            "grilles d'aération avant"
           ]
         },
         {
@@ -5817,6 +8425,58 @@ static const std::string ASSETS_DEFAULT = R"({
             "frontale",
             "laterale"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "body vents",
+          "synonyms": [
+            "body vent",
+            "face vents",
+            "face vent",
+            "body",
+            "face",
+            "centre",
+            "center",
+            "top",
+            "front",
+            "front vent",
+            "front vents"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "上半身送風",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "distribuição de ar para o tronco",
+          "synonyms": [
+            "ventilador do corpo",
+            "distribuição de ar para o rosto",
+            "ventilador do rosto",
+            "tronco",
+            "corpo",
+            "rosto",
+            "central",
+            "de cima",
+            "superior",
+            "da frente",
+            "frontal",
+            "dianteiro",
+            "ventilador da frente",
+            "ventilador frontal",
+            "ventilador dianteiro",
+            "ventiladores da frente",
+            "ventiladores frontais",
+            "ventiladores dianteiros"
+          ]
         }
       ]
     },
@@ -5844,7 +8504,19 @@ static const std::string ASSETS_DEFAULT = R"({
             "fr-CA"
           ],
           "defaultValue": "luminosité",
-          "synonyms": []
+          "synonyms": [
+            "lumière"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "प्रकाश",
+          "synonyms": [
+            "चमक",
+            "brightness"
+          ]
         },
         {
           "locales": [
@@ -5889,6 +8561,31 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "luminosità",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "brightness",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "明るさ",
+          "synonyms": [
+            "輝度"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "brilho",
+          "synonyms": [
+            "luminosidade"
+          ]
         }
       ]
     },
@@ -5909,7 +8606,10 @@ static const std::string ASSETS_DEFAULT = R"({
             "es-US"
           ],
           "defaultValue": "bloqueo de puerta para niños",
-          "synonyms": []
+          "synonyms": [
+            "seguro infantil",
+            "seguro para niños  seguro de puerta infantil"
+          ]
         },
         {
           "locales": [
@@ -5917,6 +8617,19 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "verrouillage de sécurité pour enfants",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "child door lock",
+          "synonyms": [
+            "child door locks",
+            "child lock",
+            "child locks",
+            "child door का lock",
+            "child door का ताला"
+          ]
         },
         {
           "locales": [
@@ -5969,6 +8682,36 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "blocco porta bambini",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "child door lock",
+          "synonyms": [
+            "child door locks",
+            "child lock",
+            "child locks",
+            "kiddie locks",
+            "child proof locks",
+            "childproof locks"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "チャイルドロック",
+          "synonyms": [
+            "チャイルドロック切り替えスイッチ"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "trava de proteção para criança",
+          "synonyms": []
         }
       ]
     },
@@ -5996,7 +8739,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "sincronización",
             "sincronización del control del clima",
             "sincronización del climatizador",
-            "sincronización del control de temperatura"
+            "sincronización del control de temperatura",
+            "sincronización de la temperatura",
+            "sinctonrización ambiental"
           ]
         },
         {
@@ -6008,7 +8753,22 @@ static const std::string ASSETS_DEFAULT = R"({
             "syncho de la température",
             "température syncronisée",
             "synchronisation du contrôle de la température",
-            "synchro du contrôle de la température"
+            "synchro du contrôle de la température",
+            "sync"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "वातावरण sync",
+          "synonyms": [
+            "sync",
+            "climate नियंत्रण sync",
+            "वातावरण नियंत्रण sync",
+            "वातावरण control sync",
+            "climate sync",
+            "climate control sync"
           ]
         },
         {
@@ -6037,10 +8797,10 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "synchronisation de la température",
           "synonyms": [
-            "syncho de la température",
             "température syncronisée",
             "synchronisation du contrôle de la température",
-            "synchro du contrôle de la température"
+            "synchro du contrôle de la température",
+            "synchro de la température"
           ]
         },
         {
@@ -6057,10 +8817,11 @@ static const std::string ASSETS_DEFAULT = R"({
           "locales": [
             "de-DE"
           ],
-          "defaultValue": "Klimaregelung",
+          "defaultValue": "Klimasynchronisierung",
           "synonyms": [
-            "Regelung",
-            "Temperaturregelung"
+            "Klimaregelungssynchronisierung",
+            "Klimaanlagensynchronisierung",
+            "Klima Sync"
           ]
         },
         {
@@ -6070,7 +8831,39 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "sincronizzazione clima",
           "synonyms": [
             "sincronizzare",
-            "sincronizzazione climatizzatore"
+            "sincronizzazione climatizzatore",
+            "sincronizzazione della temperatura",
+            "sincronizzazione temperatura"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "climate sync",
+          "synonyms": [
+            "sync",
+            "climate control sync"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "気候制御同期",
+          "synonyms": [
+            "シンク",
+            "クライメートメートコントロールシンク"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "climatização sincronizada",
+          "synonyms": [
+            "sync",
+            "controle de climatização sincronizada"
           ]
         }
       ]
@@ -6099,6 +8892,13 @@ static const std::string ASSETS_DEFAULT = R"({
             "fr-CA"
           ],
           "defaultValue": "couleur",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "रंग",
           "synonyms": []
         },
         {
@@ -6142,6 +8942,27 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "colore",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "colour",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "色",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "cor",
+          "synonyms": []
         }
       ]
     },
@@ -6175,6 +8996,16 @@ static const std::string ASSETS_DEFAULT = R"({
         },
         {
           "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "ठंडा",
+          "synonyms": [
+            "शीतल",
+            "cooling"
+          ]
+        },
+        {
+          "locales": [
             "en-IN"
           ],
           "defaultValue": "cooling",
@@ -6192,7 +9023,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "fr-FR"
           ],
           "defaultValue": "réfrigération",
-          "synonyms": []
+          "synonyms": [
+            "refroidissement"
+          ]
         },
         {
           "locales": [
@@ -6215,6 +9048,29 @@ static const std::string ASSETS_DEFAULT = R"({
             "it-IT"
           ],
           "defaultValue": "raffreddamento",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "cooling",
+          "synonyms": [
+            "cool"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "冷房",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "refrigeração",
           "synonyms": []
         }
       ]
@@ -6241,7 +9097,9 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "piloto automático",
             "velocidad del cruise control",
-            "velocidad del piloto automático"
+            "velocidad del piloto automático",
+            "velocidad en cruise control",
+            "velocidad en piloto automático"
           ]
         },
         {
@@ -6256,6 +9114,16 @@ static const std::string ASSETS_DEFAULT = R"({
             "vitesse du régulateur de vitesse",
             "vitesse du limitateur de vitesse",
             "vitesse du pilote automatique"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "cruise control की speed",
+          "synonyms": [
+            "cruise control",
+            "cruise control speed"
           ]
         },
         {
@@ -6308,7 +9176,8 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "Geschwindigkeitsregler",
           "synonyms": [
-            "Tempomat-Geschwindigkeit"
+            "Tempomat-Geschwindigkeit",
+            "Tempomat"
           ]
         },
         {
@@ -6318,6 +9187,34 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "cruise control",
           "synonyms": [
             "velocità del cruise control"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "cruise control",
+          "synonyms": [
+            "cruise control speed"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "クルーズコントロール",
+          "synonyms": [
+            "オートクルーズ制御",
+            "低速走行制御"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "piloto automático",
+          "synonyms": [
+            "velocidade do piloto automático"
           ]
         }
       ]
@@ -6340,10 +9237,8 @@ static const std::string ASSETS_DEFAULT = R"({
             "es-MX",
             "es-US"
           ],
-          "defaultValue": "descongelador",
+          "defaultValue": "desempañador",
           "synonyms": [
-            "descongelar",
-            "desempañador",
             "desempañar"
           ]
         },
@@ -6354,7 +9249,17 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "dégivrage",
           "synonyms": [
             "dégivrer",
-            "dégivreur"
+            "dégivreur",
+            "defogger"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "demist",
+          "synonyms": [
+            "demister"
           ]
         },
         {
@@ -6411,6 +9316,33 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "sbrina"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "demist",
+          "synonyms": [
+            "demister",
+            "defogger",
+            "defog"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "デフォッガー",
+          "synonyms": [
+            "曇り取り"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "desembaçador do carro",
+          "synonyms": []
         }
       ]
     },
@@ -6439,7 +9371,8 @@ static const std::string ASSETS_DEFAULT = R"({
             "descongelar",
             "desconelador",
             "desempañador",
-            "desempañar"
+            "desempañar",
+            "calentador del parabrisas"
           ]
         },
         {
@@ -6449,7 +9382,20 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "dégivrage",
           "synonyms": [
             "dégivrer",
-            "dégivreur"
+            "dégivreur",
+            "defroster",
+            "deforgger"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "defroster",
+          "synonyms": [
+            "defrost",
+            "demist",
+            "demister"
           ]
         },
         {
@@ -6471,7 +9417,9 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "defrost",
             "demist",
-            "demister"
+            "demister",
+            "defog",
+            "defogger"
           ]
         },
         {
@@ -6495,7 +9443,8 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "descongelar",
             "desempañador",
-            "desempañar"
+            "desempañar",
+            "calentador del parabrisas"
           ]
         },
         {
@@ -6506,7 +9455,10 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "enteisen",
             "Scheibenheizung",
-            "Scheiben beheizen"
+            "Scheiben beheizen",
+            "Enteiser",
+            "Entfroster",
+            "Defroster"
           ]
         },
         {
@@ -6516,6 +9468,39 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "sbrinatore",
           "synonyms": [
             "sbrina"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "defroster",
+          "synonyms": [
+            "defrost",
+            "demist",
+            "demister",
+            "defog",
+            "defogger"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "デフロスター",
+          "synonyms": [
+            "デフォッガー",
+            "曇り取り"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "degelo",
+          "synonyms": [
+            "desembaçador",
+            "desembaçamento"
           ]
         }
       ]
@@ -6545,6 +9530,15 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "direction",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "दिशा",
+          "synonyms": [
+            "direction"
+          ]
         },
         {
           "locales": [
@@ -6587,6 +9581,27 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "direzione",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "direction",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "方向",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "direção",
+          "synonyms": []
         }
       ]
     },
@@ -6608,7 +9623,8 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "modo al volante",
           "synonyms": [
-            "modo de conducción"
+            "modo de conducción",
+            "modo de conducir"
           ]
         },
         {
@@ -6616,6 +9632,13 @@ static const std::string ASSETS_DEFAULT = R"({
             "fr-CA"
           ],
           "defaultValue": "mode de conduite",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "drive mode",
           "synonyms": []
         },
         {
@@ -6661,6 +9684,27 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "modalità di guida",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "drive mode",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "運転モード",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "modo de direção",
+          "synonyms": []
         }
       ]
     },
@@ -6701,7 +9745,19 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "mode économie",
             "écono",
-            "mode économie d'énergie"
+            "mode économie d'énergie",
+            "éco"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "economy",
+          "synonyms": [
+            "economy mode",
+            "eco",
+            "eco mode"
           ]
         },
         {
@@ -6764,7 +9820,41 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "modalità eco",
           "synonyms": [
             "modalità risparmio",
-            "eco"
+            "eco",
+            "modalità economica"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "economy",
+          "synonyms": [
+            "economy mode",
+            "eco",
+            "eco mode"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "エコノミー",
+          "synonyms": [
+            "エコノミーモード",
+            "エコ",
+            "エコモード"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "economia",
+          "synonyms": [
+            "modo economia",
+            "eco",
+            "modo eco"
           ]
         }
       ]
@@ -6795,7 +9885,10 @@ static const std::string ASSETS_DEFAULT = R"({
             "velocidad del flujo del aire",
             "velocidad del viento",
             "velocidad del aire",
-            "fuerza del aire"
+            "fuerza del aire",
+            "fuerza del venilador",
+            "fuerza del flujo de aire",
+            "fuerza del viento"
           ]
         },
         {
@@ -6807,7 +9900,29 @@ static const std::string ASSETS_DEFAULT = R"({
             "vitesse du flux d'air",
             "vitesse du vent",
             "vitesse de l'air",
-            "vélocité de l'air"
+            "vélocité de l'air",
+            "vitesse de la fan"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "पंखे की गति",
+          "synonyms": [
+            "पंखे की speed",
+            "पंखे की रफ्तार",
+            "हवा के बहाव की speed",
+            "हवा की गति",
+            "हवा की speed",
+            "वायु की गति",
+            "वायु की रफ्तार",
+            "हवा की रफ्तार",
+            "fan speed",
+            "airflow speed",
+            "wind speed",
+            "air speed",
+            "air velocity"
           ]
         },
         {
@@ -6881,6 +9996,39 @@ static const std::string ASSETS_DEFAULT = R"({
             "potenza del flusso d'aria",
             "potenza del flusso dell'aria"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "fan speed",
+          "synonyms": [
+            "airflow speed",
+            "wind speed",
+            "air speed",
+            "air velocity"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "風量",
+          "synonyms": [
+            "ファン回転速度",
+            "気流速度"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "velocidade do ventilador",
+          "synonyms": [
+            "velocidade do fluxo de ar",
+            "velocidade do vento",
+            "velocidade do ar"
+          ]
         }
       ]
     },
@@ -6926,7 +10074,24 @@ static const std::string ASSETS_DEFAULT = R"({
             "rejilla hacia abajo",
             "rejillas hacia los pies",
             "rejilla hacia los pies",
-            "suelo"
+            "suelo",
+            "rejilla hacia el piso",
+            "rejillas hacia el piso",
+            "piernas",
+            "pierna",
+            "rejillas para las piernas",
+            "rejilla de piernas",
+            "aire hacia el piso",
+            "aire hacia los pies",
+            "aire hacia las piernas",
+            "aire hacia abajo",
+            "aire hacia el suelo",
+            "aire de piernas",
+            "aire de pies",
+            "aire para abajo",
+            "aire para el piso",
+            "aire para las piernas",
+            "aire para los pies"
           ]
         },
         {
@@ -6941,7 +10106,44 @@ static const std::string ASSETS_DEFAULT = R"({
             "bouches d’air des pieds",
             "bouche d’air des pieds",
             "plancher",
-            "pieds"
+            "pieds",
+            "pied",
+            "trappe d'aération au plancher",
+            "trappes d'aération au plancher"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "floor vents",
+          "synonyms": [
+            "floor vent",
+            "downfacing vents",
+            "downfacing vent",
+            "feet vents",
+            "feet vent",
+            "floor",
+            "feet",
+            "bottom",
+            "legs",
+            "leg",
+            "floor के vents",
+            "floor का vent",
+            "फर्श के vents",
+            "फर्श का vent",
+            "पैरों के vents",
+            "पैरों का vent",
+            "नीचे की और वाले vents",
+            "नीचे की तरफ वाला vent",
+            "फर्श",
+            "पैर",
+            "पाँव",
+            "पद",
+            "तल",
+            "तह",
+            "टांग",
+            "टांगें"
           ]
         },
         {
@@ -6998,7 +10200,21 @@ static const std::string ASSETS_DEFAULT = R"({
             "bouches d’air des pieds",
             "bouche d’air des pieds",
             "sol",
-            "pieds"
+            "pieds",
+            "grille d'aération du plancher",
+            "grilles d'aération du plancher",
+            "bouche d'aération du plancher",
+            "bouches d'aération du plancher",
+            "grille de ventilation du plancher",
+            "grilles de ventilation du plancher",
+            "grille d'aération du sol",
+            "grilles d'aération du sol",
+            "bouche d'aération du sol",
+            "bouches d'aération du sol",
+            "grille de ventilation du sol",
+            "grilles de ventilation du sol",
+            "bouche de ventilation du sol",
+            "bouches de ventilation du sol"
           ]
         },
         {
@@ -7028,7 +10244,8 @@ static const std::string ASSETS_DEFAULT = R"({
             "Lüftungsschlitze für die Füße",
             "Lüftungsschlitz für die Füße",
             "Boden",
-            "Füße"
+            "Füße",
+            "Fußraum"
           ]
         },
         {
@@ -7041,7 +10258,59 @@ static const std::string ASSETS_DEFAULT = R"({
             "bocchetta del pavimento",
             "bocchette del pavimento",
             "piedi",
-            "pavimento"
+            "pavimento",
+            "bocchetta aria inferiore",
+            "bocchette aria inferiori"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "floor vents",
+          "synonyms": [
+            "floor vent",
+            "downfacing vents",
+            "downfacing vent",
+            "feet vents",
+            "feet vent",
+            "floor",
+            "feet",
+            "bottom",
+            "legs",
+            "leg"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "足元の吹き出し口",
+          "synonyms": [
+            "足元送風"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "ventiladores do chão",
+          "synonyms": [
+            "distribuição de ar para o chão",
+            "ventilador do chão",
+            "ventiladores de baixo",
+            "ventiladores inferiores",
+            "distribuição de ar para baixo",
+            "ventilador de baixo",
+            "ventilador inferior",
+            "ventiladores dos pés",
+            "distribuição de ar para os pés",
+            "ventilador do pé",
+            "chão",
+            "pés",
+            "baixo",
+            "pernas",
+            "perna"
           ]
         }
       ]
@@ -7065,7 +10334,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "es-US"
           ],
           "defaultValue": "calor",
-          "synonyms": []
+          "synonyms": [
+            "calefacción"
+          ]
         },
         {
           "locales": [
@@ -7078,17 +10349,33 @@ static const std::string ASSETS_DEFAULT = R"({
         },
         {
           "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "तपिश",
+          "synonyms": [
+            "गर्मी",
+            "गर्माहट",
+            "heat",
+            "heating"
+          ]
+        },
+        {
+          "locales": [
             "en-IN"
           ],
           "defaultValue": "heat",
-          "synonyms": []
+          "synonyms": [
+            "heating"
+          ]
         },
         {
           "locales": [
             "en-GB"
           ],
           "defaultValue": "heat",
-          "synonyms": []
+          "synonyms": [
+            "heating"
+          ]
         },
         {
           "locales": [
@@ -7096,7 +10383,8 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "chaleur",
           "synonyms": [
-            "chauffant"
+            "chauffant",
+            "chauffage"
           ]
         },
         {
@@ -7111,13 +10399,38 @@ static const std::string ASSETS_DEFAULT = R"({
             "de-DE"
           ],
           "defaultValue": "Hitze",
-          "synonyms": []
+          "synonyms": [
+            "Wärme"
+          ]
         },
         {
           "locales": [
             "it-IT"
           ],
           "defaultValue": "calore",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "heat",
+          "synonyms": [
+            "heating"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "暖房",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "aquecimento",
           "synonyms": []
         }
       ]
@@ -7148,6 +10461,15 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "hauteur",
           "synonyms": [
             "hauteurs"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "ऊंचाई",
+          "synonyms": [
+            "height"
           ]
         },
         {
@@ -7193,6 +10515,27 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "altezza",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "height",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "高さ",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "altura",
+          "synonyms": []
         }
       ]
     },
@@ -7235,7 +10578,10 @@ static const std::string ASSETS_DEFAULT = R"({
             "asistente de arranque en subida",
             "ayuda de arranque en subida",
             "asistente de arranque en cuesta",
-            "ayuda de arranque en cuesta"
+            "ayuda de arranque en cuesta",
+            "ayuda de retención en pendientes",
+            "ayuda de descenso en pendientes",
+            "ayuda de arranque cuesta arriba"
           ]
         },
         {
@@ -7257,6 +10603,23 @@ static const std::string ASSETS_DEFAULT = R"({
             "assistant de démarrage en pente",
             "dispositif de démarrage en côte",
             "dispositif de démarrage en pente"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "hill keeping assist",
+          "synonyms": [
+            "hill hold assist",
+            "hill start assist",
+            "hill assist control",
+            "hill assist system",
+            "hill descent control",
+            "hill descent system",
+            "hill hold control",
+            "hill hold system",
+            "hill keep assist"
           ]
         },
         {
@@ -7342,7 +10705,8 @@ static const std::string ASSETS_DEFAULT = R"({
             "Berganfahrassistent Abstiegskontrolle",
             "Berganfahrassistent Abstiegssystem",
             "Berganfahrassistent Halt Kontrolle",
-            "Berganfahrassistent Halt System"
+            "Berganfahrassistent Halt System",
+            "Anfahrhilfe"
           ]
         },
         {
@@ -7361,6 +10725,52 @@ static const std::string ASSETS_DEFAULT = R"({
             "controllo della tenuta in salita",
             "sistema della tenuta in salita",
             "assistenza di tenuta in salita"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "hill keeping assist",
+          "synonyms": [
+            "hill hold assist",
+            "hill start assist",
+            "hill assist control",
+            "hill assist system",
+            "hill descent control",
+            "hill descent system",
+            "hill hold control",
+            "hill hold system",
+            "hill keep assist"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "ヒルホールドアシスト",
+          "synonyms": [
+            "ヒルスタートアシスト",
+            "ヒルホールドコントロール",
+            "坂道発進アシスト",
+            "ヒルディセントコントロール",
+            "ヒルホールドシステム",
+            "坂道発進補助"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "suporte de ladeira",
+          "synonyms": [
+            "assistente de partida em rampa",
+            "controle de assitência em rampa",
+            "sistema de assistência em rampa",
+            "controle de descida em rampa",
+            "sistema de descida em rampa",
+            "controle de assistente de partida",
+            "sistema de assistente de partida"
           ]
         }
       ]
@@ -7388,9 +10798,18 @@ static const std::string ASSETS_DEFAULT = R"({
           "locales": [
             "fr-CA"
           ],
-          "defaultValue": "menu des informations",
+          "defaultValue": "menu infos",
           "synonyms": [
-            "menu infos"
+            "menu d'information"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "information page",
+          "synonyms": [
+            "सूचना का page"
           ]
         },
         {
@@ -7440,6 +10859,29 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "menu delle informazioni"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "information page",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "情報ページ",
+          "synonyms": [
+            "情報画面"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "página de informação",
+          "synonyms": []
         }
       ]
     },
@@ -7467,6 +10909,13 @@ static const std::string ASSETS_DEFAULT = R"({
             "fr-CA"
           ],
           "defaultValue": "intensité",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "intensity",
           "synonyms": []
         },
         {
@@ -7504,13 +10953,36 @@ static const std::string ASSETS_DEFAULT = R"({
             "de-DE"
           ],
           "defaultValue": "Stärke",
-          "synonyms": []
+          "synonyms": [
+            "Intensität"
+          ]
         },
         {
           "locales": [
             "it-IT"
           ],
           "defaultValue": "intensità",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "intensity",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "強度",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "intensidade",
           "synonyms": []
         }
       ]
@@ -7532,7 +11004,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "es-US"
           ],
           "defaultValue": "asistencia de mantenimiento de carril",
-          "synonyms": []
+          "synonyms": [
+            "asistencia de mantenimiento en carril"
+          ]
         },
         {
           "locales": [
@@ -7541,6 +11015,17 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "assistance au maintien de la trajectoire",
           "synonyms": [
             "système d’avertissement de franchissement de ligne"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "lane keeping assist",
+          "synonyms": [
+            "lane keeping assistance",
+            "lane assist",
+            "lane assistance"
           ]
         },
         {
@@ -7598,6 +11083,34 @@ static const std::string ASSETS_DEFAULT = R"({
             "lane assist",
             "lane keeping assist"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "lane keeping assist",
+          "synonyms": [
+            "lane keeping assistance",
+            "lane assist",
+            "lane assistance"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "車線維持支援",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "assistente de permanência na faixa",
+          "synonyms": [
+            "sistema de manutenção na faixa",
+            "assistente de faixa de rodagem"
+          ]
         }
       ]
     },
@@ -7631,6 +11144,15 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "manuel",
           "synonyms": [
             "mode manuel"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "manual",
+          "synonyms": [
+            "manual mode"
           ]
         },
         {
@@ -7684,7 +11206,37 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "manuale",
           "synonyms": [
-            "modalità manuale"
+            "modalità manuale",
+            "cambio manuale"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "manual",
+          "synonyms": [
+            "manual mode"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "手動",
+          "synonyms": [
+            "手動モード",
+            "マニュアル",
+            "マニュアルモード"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "manual",
+          "synonyms": [
+            "modo manual"
           ]
         }
       ]
@@ -7721,7 +11273,9 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "Potencia máxima del aire",
             "Aire acondicionado al máximo",
-            "Aire al máximo"
+            "Aire al máximo",
+            "Potencia máxima de aire acondicionado",
+            "Potencia máxima de aire"
           ]
         },
         {
@@ -7758,6 +11312,36 @@ static const std::string ASSETS_DEFAULT = R"({
             "clim au niveau maximum",
             "air conditionné au niveau max",
             "air conditionné au niveau maximum"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "max वातानुकूलक",
+          "synonyms": [
+            "maximum वातानुकूलन",
+            "maximum वातानुकूलक",
+            "max वातानुकूलन",
+            "अधिकतम वातानुकूलन",
+            "अधिकतम a c",
+            "अधिकतम air conditioning",
+            "अधिकतम air conditioner",
+            "अधिकतम air con",
+            "अधिकतम aircon",
+            "अधिकतम ac",
+            "max air conditioning",
+            "max air conditioner",
+            "max air con",
+            "max aircon",
+            "max ac",
+            "max a c",
+            "maximum air conditioning",
+            "maximum air conditioner",
+            "maximum air con",
+            "maximum aircon",
+            "maximum ac",
+            "maximum a c"
           ]
         },
         {
@@ -7876,7 +11460,48 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "aria condizionata al massimo",
           "synonyms": [
-            "condizionatore dell'aria al massimo"
+            "condizionatore dell'aria al massimo",
+            "potenza massima dell' aria condizionata"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "max air conditioning",
+          "synonyms": [
+            "max air conditioner",
+            "max air con",
+            "max aircon",
+            "max ac",
+            "max a c",
+            "maximum air conditioning",
+            "maximum air conditioner",
+            "maximum air con",
+            "maximum aircon",
+            "maximum ac",
+            "maximum a c"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "最大風",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "ar condicionado max",
+          "synonyms": [
+            "ac max",
+            "a c max",
+            "ac máximo",
+            "ac no máximo",
+            "ar condicionado máximo",
+            "ar condicionado no máximo"
           ]
         }
       ]
@@ -7909,7 +11534,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "mixta",
             "combinada",
             "rejilla combinada",
-            "rejillas combinadas"
+            "rejillas combinadas",
+            "aire mixto",
+            "aire combinado"
           ]
         },
         {
@@ -7921,7 +11548,22 @@ static const std::string ASSETS_DEFAULT = R"({
             "bouche d’air mixte",
             "mixte",
             "bouche d’air combinée",
-            "bouches d’air combinées"
+            "bouches d’air combinées",
+            "trappe d'aération mixte",
+            "trappes d'aérations mixtes"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "mix vents",
+          "synonyms": [
+            "mix vent",
+            "mix",
+            "mixed",
+            "mixed vent",
+            "mixed vents"
           ]
         },
         {
@@ -7995,13 +11637,42 @@ static const std::string ASSETS_DEFAULT = R"({
           "locales": [
             "it-IT"
           ],
-          "defaultValue": "bocchette miste",
+          "defaultValue": "miste",
           "synonyms": [
-            "bocchette misto",
-            "bocchette misti",
-            "miste",
             "misto",
-            "misti"
+            "misti",
+            "bocchetta aria direzionale",
+            "bocchette aria direzionali"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "mix vents",
+          "synonyms": [
+            "mix vent",
+            "mix",
+            "mixed",
+            "mixed vent",
+            "mixed vents"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "上半身と足元の吹き出し口",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "ventiladores mistos",
+          "synonyms": [
+            "ventilador misto",
+            "misto"
           ]
         }
       ]
@@ -8028,6 +11699,13 @@ static const std::string ASSETS_DEFAULT = R"({
         {
           "locales": [
             "fr-CA"
+          ],
+          "defaultValue": "mode",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
           ],
           "defaultValue": "mode",
           "synonyms": []
@@ -8073,6 +11751,27 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "modalità",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "mode",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "モード",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "modo",
+          "synonyms": []
         }
       ]
     },
@@ -8106,6 +11805,15 @@ static const std::string ASSETS_DEFAULT = R"({
         },
         {
           "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "navigation का Page",
+          "synonyms": [
+            "navigation page"
+          ]
+        },
+        {
+          "locales": [
             "en-IN"
           ],
           "defaultValue": "navigation page",
@@ -8124,7 +11832,8 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "menu navigation",
           "synonyms": [
-            "navigation"
+            "navigation",
+            "menu de navigation"
           ]
         },
         {
@@ -8149,6 +11858,29 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "menu della navigazione"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "navigation page",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "ナビ画面",
+          "synonyms": [
+            "ナビページ"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "página de navegação",
+          "synonyms": []
         }
       ]
     },
@@ -8178,6 +11910,15 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "degré d'ouverture",
           "synonyms": [
             "ouverture"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "खुलापन",
+          "synonyms": [
+            "openness"
           ]
         },
         {
@@ -8223,6 +11964,27 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "apertura",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "openness",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "開閉度合い",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "abertura",
+          "synonyms": []
         }
       ]
     },
@@ -8250,7 +12012,18 @@ static const std::string ASSETS_DEFAULT = R"({
             "fr-CA"
           ],
           "defaultValue": "frein à main",
-          "synonyms": []
+          "synonyms": [
+            "brake à bras"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "आपातकालीन brake",
+          "synonyms": [
+            "parking brake"
+          ]
         },
         {
           "locales": [
@@ -8291,14 +12064,48 @@ static const std::string ASSETS_DEFAULT = R"({
             "de-DE"
           ],
           "defaultValue": "Feststellbremse",
-          "synonyms": []
+          "synonyms": [
+            "Parkbremse",
+            "Standbremse",
+            "Handbremse"
+          ]
         },
         {
           "locales": [
             "it-IT"
           ],
           "defaultValue": "freno di parcheggio",
-          "synonyms": []
+          "synonyms": [
+            "freno a mano"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "parking brake",
+          "synonyms": [
+            "hand brake",
+            "emergency brake"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "パーキングブレーキ",
+          "synonyms": [
+            "駐車ブレーキ"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "freio de estacionamento",
+          "synonyms": [
+            "freio de mão"
+          ]
         }
       ]
     },
@@ -8327,6 +12134,15 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "position",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "जगह",
+          "synonyms": [
+            "position"
+          ]
         },
         {
           "locales": [
@@ -8369,6 +12185,27 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "posizione",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "position",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "位置",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "posição",
+          "synonyms": []
         }
       ]
     },
@@ -8400,6 +12237,15 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "freinage préventif",
           "synonyms": [
             "freins anti-collision"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "टक्कर के पूर्व की braking",
+          "synonyms": [
+            "pre collision braking"
           ]
         },
         {
@@ -8454,6 +12300,36 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "pre collision braking"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "pre collision braking",
+          "synonyms": [
+            "automatic braking"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "衝突被害軽減制動制御",
+          "synonyms": [
+            "自動緊急ブレーキ",
+            "衝突軽減ブレーキ",
+            "プリクラッシュセーフティーシステム"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "freio pré-colisão",
+          "synonyms": [
+            "sistema pré-colisão",
+            "pré-colisão"
+          ]
         }
       ]
     },
@@ -8474,7 +12350,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "es-US"
           ],
           "defaultValue": "manú de la radio",
-          "synonyms": []
+          "synonyms": [
+            "menú de radio"
+          ]
         },
         {
           "locales": [
@@ -8482,8 +12360,21 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "menu radio",
           "synonyms": [
-            "radio"
+            "radio",
+            "l'écran radio",
+            "l'écran de la radio",
+            "l'écran d'accueil de la radio",
+            "page radio",
+            "page de la radio",
+            "page d'accueil de la radio"
           ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "radio page",
+          "synonyms": []
         },
         {
           "locales": [
@@ -8505,7 +12396,14 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "menu radio",
           "synonyms": [
-            "radio"
+            "radio",
+            "l'écran radio",
+            "l'écran de la radio",
+            "l'écran d'accueil de la radio",
+            "page radio",
+            "page de la radio",
+            "page d'accueil de la radio",
+            "menu de la radio"
           ]
         },
         {
@@ -8530,6 +12428,27 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "menu della radio"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "radio page",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "ラジオページ",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "página do rádio",
+          "synonyms": []
         }
       ]
     },
@@ -8560,6 +12479,15 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "menu radio satellite",
             "radio satellite"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "satellite radio page",
+          "synonyms": [
+            "satellite radio का page"
           ]
         },
         {
@@ -8608,6 +12536,27 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "menu della radio satellitare"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "satellite radio page",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "サテライトラジオ画面",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "página de rádio por satélite",
+          "synonyms": []
         }
       ]
     },
@@ -8637,6 +12586,15 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "menu des services",
           "synonyms": [
             "menu services"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "service page",
+          "synonyms": [
+            "services का page"
           ]
         },
         {
@@ -8686,6 +12644,30 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "menu della manutenzione"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "service page",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "点検ページ",
+          "synonyms": [
+            "修理ページ",
+            "サービスページ"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "página de serviço",
+          "synonyms": []
         }
       ]
     },
@@ -8715,7 +12697,18 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "menu paramètres",
           "synonyms": [
             "paramètres",
-            "paramètres de configuration"
+            "paramètres de configuration",
+            "settings",
+            "menu settings"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "settings का page",
+          "synonyms": [
+            "settings page"
           ]
         },
         {
@@ -8739,7 +12732,8 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "menu paramètres",
           "synonyms": [
             "paramètres",
-            "paramètres de configuration"
+            "paramètres de configuration",
+            "menu des paramètres"
           ]
         },
         {
@@ -8764,8 +12758,32 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "pagina delle impostazioni",
           "synonyms": [
-            "menu delle impostazioni"
+            "menu delle impostazioni",
+            "menu impostazioni"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "settings page",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "ブルートゥース画面",
+          "synonyms": [
+            "ブルートゥースページ"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "página de configurações",
+          "synonyms": []
         }
       ]
     },
@@ -8794,6 +12812,17 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "vitesse",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "गति",
+          "synonyms": [
+            "चाल",
+            "speed",
+            "रफ़्तार"
+          ]
         },
         {
           "locales": [
@@ -8836,6 +12865,27 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "velocità",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "speed",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "速度",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "velocidade",
+          "synonyms": []
         }
       ]
     },
@@ -8869,7 +12919,17 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "position",
           "synonyms": [
             "position de stockage",
-            "position mémorisée"
+            "position mémorisée",
+            "mémoire"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "position",
+          "synonyms": [
+            "stored position"
           ]
         },
         {
@@ -8914,7 +12974,8 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "Position",
           "synonyms": [
-            "festgelegte Position"
+            "festgelegte Position",
+            "gespeicherte Position"
           ]
         },
         {
@@ -8924,6 +12985,33 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "posizione",
           "synonyms": [
             "posizione salvata"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "position",
+          "synonyms": [
+            "stored position"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "位置",
+          "synonyms": [
+            "保存された位置"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "posição",
+          "synonyms": [
+            "posição na memória"
           ]
         }
       ]
@@ -8952,6 +13040,13 @@ static const std::string ASSETS_DEFAULT = R"({
             "fr-CA"
           ],
           "defaultValue": "avertissement de changement de trajectoire",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "sway warning",
           "synonyms": []
         },
         {
@@ -8999,6 +13094,31 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "avviso di superamento corsia",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "sway warning",
+          "synonyms": [
+            "vehicle sway warning"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "車線逸脱警報",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "aviso de mudança de faixa",
+          "synonyms": [
+            "alerta de mudança de faixa"
+          ]
         }
       ]
     },
@@ -9021,9 +13141,7 @@ static const std::string ASSETS_DEFAULT = R"({
             "es-US"
           ],
           "defaultValue": "temperatura",
-          "synonyms": [
-            "temp"
-          ]
+          "synonyms": []
         },
         {
           "locales": [
@@ -9031,6 +13149,17 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "température",
           "synonyms": [
+            "temp"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "तापमान",
+          "synonyms": [
+            "ताप",
+            "temperature",
             "temp"
           ]
         },
@@ -9057,9 +13186,7 @@ static const std::string ASSETS_DEFAULT = R"({
             "fr-FR"
           ],
           "defaultValue": "température",
-          "synonyms": [
-            "temp."
-          ]
+          "synonyms": []
         },
         {
           "locales": [
@@ -9073,13 +13200,38 @@ static const std::string ASSETS_DEFAULT = R"({
             "de-DE"
           ],
           "defaultValue": "Temperatur",
-          "synonyms": [
-            "Temp."
-          ]
+          "synonyms": []
         },
         {
           "locales": [
             "it-IT"
+          ],
+          "defaultValue": "temperatura",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "temperature",
+          "synonyms": [
+            "temp"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "温度",
+          "synonyms": [
+            "車室内温度",
+            "車内温度",
+            "室内温度"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
           ],
           "defaultValue": "temperatura",
           "synonyms": []
@@ -9107,7 +13259,8 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "modo remolque",
           "synonyms": [
             "control de remolque",
-            "modo de remolque"
+            "modo de remolque",
+            "control del remolque"
           ]
         },
         {
@@ -9120,6 +13273,17 @@ static const std::string ASSETS_DEFAULT = R"({
             "aide au remorquage",
             "assistant de remorquage",
             "fonction de remorquage"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "towing वाला mode",
+          "synonyms": [
+            "रस्से वाला mode",
+            "towing mode",
+            "towing control"
           ]
         },
         {
@@ -9171,7 +13335,8 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "Abschleppmodus",
           "synonyms": [
             "Abschleppmenü",
-            "Abschlepp Menü"
+            "Abschlepp Menü",
+            "Abschleppkontrolle"
           ]
         },
         {
@@ -9185,6 +13350,35 @@ static const std::string ASSETS_DEFAULT = R"({
             "funzione di rimorchio",
             "controllo del rimorchio",
             "controllo del traino"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "towing mode",
+          "synonyms": [
+            "tow mode",
+            "towing control",
+            "tow control"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "牽引モード",
+          "synonyms": [
+            "牽引コントロール"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "modo reboque",
+          "synonyms": [
+            "controle de reboque"
           ]
         }
       ]
@@ -9213,6 +13407,13 @@ static const std::string ASSETS_DEFAULT = R"({
             "fr-CA"
           ],
           "defaultValue": "contrôle de la traction",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "traction control",
           "synonyms": []
         },
         {
@@ -9256,8 +13457,33 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "controllo di trazione",
           "synonyms": [
-            "traction control"
+            "traction control",
+            "tcs",
+            "tcs auto"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "traction control",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "トラクションコントロール",
+          "synonyms": [
+            "駆動力電子制御"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "controle de tração",
+          "synonyms": []
         }
       ]
     },
@@ -9279,7 +13505,9 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "bloqueo de ventanas",
           "synonyms": [
-            "bloqueo de ventanillas"
+            "bloqueo de ventanillas",
+            "seguros de las ventanas",
+            "seguro de ventanas"
           ]
         },
         {
@@ -9288,6 +13516,18 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "verrouillage des fenêtres",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "खिड़की के ताले",
+          "synonyms": [
+            "window locks",
+            "window के ताले",
+            "window के locks",
+            "खिड़की के locks"
+          ]
         },
         {
           "locales": [
@@ -9322,13 +13562,37 @@ static const std::string ASSETS_DEFAULT = R"({
             "de-DE"
           ],
           "defaultValue": "Fensterverriegelungen",
-          "synonyms": []
+          "synonyms": [
+            "Fenstersperre",
+            "Fensterschloss"
+          ]
         },
         {
           "locales": [
             "it-IT"
           ],
           "defaultValue": "blocco finestrini",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "window locks",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "パワーウインドウロック",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "travas de janela",
           "synonyms": []
         }
       ]
@@ -9357,7 +13621,10 @@ static const std::string ASSETS_DEFAULT = R"({
             "rejillas para el parabrisas",
             "parabrisas",
             "rejillas hacia el parabrisas",
-            "rejilla hacia el parabrisas"
+            "rejilla hacia el parabrisas",
+            "aire del parabrisas",
+            "aire de parabrisas",
+            "aire hacia el parabrisas"
           ]
         },
         {
@@ -9367,7 +13634,23 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "bouches d’air du pare-brise",
           "synonyms": [
             "bouche d’air du pare-brise",
-            "pare-brise"
+            "pare-brise",
+            "parebrise",
+            "trappe d'aération du pare-brise",
+            "trappes d'aération du pare-brise",
+            "windshield"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "windshield vents",
+          "synonyms": [
+            "windshield vent",
+            "windshield",
+            "windshield का vent",
+            "windshield के vents"
           ]
         },
         {
@@ -9432,6 +13715,34 @@ static const std::string ASSETS_DEFAULT = R"({
             "bocchette del parabrezza",
             "parabrezza"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "windshield vents",
+          "synonyms": [
+            "windshield vent",
+            "windscreen vent",
+            "windscreen vents"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "フロントウインドウガラスの吹き出し口",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "ventiladores do para-brisa",
+          "synonyms": [
+            "ventilador do para-brisa",
+            "para-brisa"
+          ]
         }
       ]
     },
@@ -9462,6 +13773,16 @@ static const std::string ASSETS_DEFAULT = R"({
             "fr-CA"
           ],
           "defaultValue": "traction intégrale automatique",
+          "synonyms": [
+            "four wheel drive",
+            "transmission 4 x 4 automatique"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "four auto",
           "synonyms": []
         },
         {
@@ -9509,6 +13830,32 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "trazione integrale automatica",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "four auto",
+          "synonyms": [
+            "four wheel drive"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "四WD",
+          "synonyms": [
+            "四輪軸動",
+            "四軸"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "tração automática",
+          "synonyms": []
         }
       ]
     },
@@ -9537,6 +13884,15 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "traction intégrale à prise constante",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "चार ज़्यादा",
+          "synonyms": [
+            "four high"
+          ]
         },
         {
           "locales": [
@@ -9579,6 +13935,27 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "trazione integrale marce normali",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "four high",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "四WDハイ",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "tração alta",
+          "synonyms": []
         }
       ]
     },
@@ -9607,6 +13984,15 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "traction intégrale à prise temporaire",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "चार कम",
+          "synonyms": [
+            "four low"
+          ]
         },
         {
           "locales": [
@@ -9649,6 +14035,27 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "trazione integrale marce ridotte",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "four low",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "四WDロー",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "tração reduzida",
+          "synonyms": []
         }
       ]
     },
@@ -9688,6 +14095,15 @@ static const std::string ASSETS_DEFAULT = R"({
             "interface des alertes",
             "interface alertes",
             "alertes"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "alerts page",
+          "synonyms": [
+            "alerts screen"
           ]
         },
         {
@@ -9755,6 +14171,33 @@ static const std::string ASSETS_DEFAULT = R"({
             "menù degli avvisi",
             "avvisi"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "alerts page",
+          "synonyms": [
+            "alerts screen"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "アラートページ",
+          "synonyms": [
+            "アラート画面"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "página de alertas",
+          "synonyms": [
+            "tela de alertas"
+          ]
         }
       ]
     },
@@ -9783,6 +14226,15 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "bleu",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "आसमानी",
+          "synonyms": [
+            "blue"
+          ]
         },
         {
           "locales": [
@@ -9825,6 +14277,27 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "blu",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "blue",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "青",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "azul",
+          "synonyms": []
         }
       ]
     },
@@ -9862,6 +14335,15 @@ static const std::string ASSETS_DEFAULT = R"({
             "écran d'accueil bluetooth",
             "interface bluetooth",
             "bluetooth"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "bluetooth screen",
+          "synonyms": [
+            "bluetooth page"
           ]
         },
         {
@@ -9906,7 +14388,7 @@ static const std::string ASSETS_DEFAULT = R"({
           "locales": [
             "de-DE"
           ],
-          "defaultValue": "Bluetooth Bildschrim",
+          "defaultValue": "Bluetooth Bildschirm",
           "synonyms": [
             "Bluetooth Anzeige"
           ]
@@ -9919,6 +14401,33 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "pagina di bluetooth",
             "interfaccia bluetooth"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "bluetooth screen",
+          "synonyms": [
+            "bluetooth page"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "ブルートゥースページ",
+          "synonyms": [
+            "ブルートゥース画面"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "tela do bluetooth",
+          "synonyms": [
+            "página do bluetooth"
           ]
         }
       ]
@@ -9955,6 +14464,15 @@ static const std::string ASSETS_DEFAULT = R"({
             "fermés",
             "fermée",
             "fermées"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "बंद",
+          "synonyms": [
+            "closed"
           ]
         },
         {
@@ -10016,6 +14534,29 @@ static const std::string ASSETS_DEFAULT = R"({
             "chiusi",
             "chiuse"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "closed",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "閉まっている",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "fechada",
+          "synonyms": [
+            "fechado"
+          ]
         }
       ]
     },
@@ -10043,6 +14584,13 @@ static const std::string ASSETS_DEFAULT = R"({
             "fr-CA"
           ],
           "defaultValue": "confort",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "comfort",
           "synonyms": []
         },
         {
@@ -10086,6 +14634,27 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "confort",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "comfort",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "コンフォート",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "comfort",
+          "synonyms": []
         }
       ]
     },
@@ -10125,6 +14694,17 @@ static const std::string ASSETS_DEFAULT = R"({
             "interface des contacts",
             "interface contacts",
             "contacts"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "संपर्कों का page",
+          "synonyms": [
+            "संपर्कों का screen",
+            "contacts page",
+            "contacts screen"
           ]
         },
         {
@@ -10189,6 +14769,33 @@ static const std::string ASSETS_DEFAULT = R"({
             "schermata dei contatti",
             "schermo dei contatti"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "contacts page",
+          "synonyms": [
+            "contacts screen"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "連絡ページ",
+          "synonyms": [
+            "連絡画面"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "página de contatos",
+          "synonyms": [
+            "tela de contatos"
+          ]
         }
       ]
     },
@@ -10225,6 +14832,19 @@ static const std::string ASSETS_DEFAULT = R"({
             "page des contrôles",
             "interfaces de contrôles",
             "contrôles"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "नियंत्रणों वाला पृष्ठ",
+          "synonyms": [
+            "नियंत्रणों वाली screen",
+            "controls वाला page",
+            "controls वाली screen",
+            "controls page",
+            "controls screen"
           ]
         },
         {
@@ -10285,6 +14905,33 @@ static const std::string ASSETS_DEFAULT = R"({
             "menù dei comandi",
             "pagina dei comandi"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "controls page",
+          "synonyms": [
+            "controls screen"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "コントロールページ",
+          "synonyms": [
+            "コントロール画面"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "página de controles",
+          "synonyms": [
+            "tela de controles"
+          ]
         }
       ]
     },
@@ -10306,7 +14953,9 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "vista del lado del conductor",
           "synonyms": [
-            "visión lateral del conductor"
+            "visión lateral del conductor",
+            "vista del lado del chofer",
+            "visión lateral del chofer"
           ]
         },
         {
@@ -10315,6 +14964,17 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "vue du côté conducteur",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "चालक की तरफ का दृश्य",
+          "synonyms": [
+            "driver की side का view",
+            "driver side view",
+            "driver side का view"
+          ]
         },
         {
           "locales": [
@@ -10357,6 +15017,27 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "vista lato guidatore",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "driver side view",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "運転側視界",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "vista do lado do motorista",
+          "synonyms": []
         }
       ]
     },
@@ -10397,6 +15078,18 @@ static const std::string ASSETS_DEFAULT = R"({
         },
         {
           "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "dynamics coordinator",
+          "synonyms": [
+            "dynamics coordinator page",
+            "dynamics coordinator screen",
+            "dynamics coordinator वाला page",
+            "dynamics coordinator वाली screen"
+          ]
+        },
+        {
+          "locales": [
             "en-IN"
           ],
           "defaultValue": "dynamics coordinator",
@@ -10432,7 +15125,8 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "menú de coordinador de dinámicas",
           "synonyms": [
             "página de coordinador de dinámicas",
-            "pantalla de coordinador de dinámicas"
+            "pantalla de coordinador de dinámicas",
+            "coordinador de dinámicas"
           ]
         },
         {
@@ -10458,6 +15152,37 @@ static const std::string ASSETS_DEFAULT = R"({
             "schermata dinamica integrata",
             "pagina del controllo dinamico",
             "pagina della dinamica integrata"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "dynamics coordinator",
+          "synonyms": [
+            "dynamics coordinator page",
+            "dynamics coordinator screen"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "ダイナミクスコーディネータ",
+          "synonyms": [
+            "ダイナミクスコーディネータページ",
+            "ダイナミクスコーディネータ画面"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "orientação de rota",
+          "synonyms": [
+            "dinâmica",
+            "página de orientação de rota",
+            "tela de orientação de rota"
           ]
         }
       ]
@@ -10490,6 +15215,18 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "vue frontale",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "सामने का दृश्य",
+          "synonyms": [
+            "आगे का दृश्य",
+            "अगला view",
+            "front view",
+            "front का view"
+          ]
         },
         {
           "locales": [
@@ -10532,6 +15269,31 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "vista frontale",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "front view",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "フロント視界",
+          "synonyms": [
+            "前方視界"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "vista frontal",
+          "synonyms": [
+            "vista dianteira"
+          ]
         }
       ]
     },
@@ -10561,7 +15323,18 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "totalement",
           "synonyms": [
             "complètement",
-            "en entier"
+            "en entier",
+            "au complet"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "पूरा",
+          "synonyms": [
+            "पूर्ण",
+            "full"
           ]
         },
         {
@@ -10593,7 +15366,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "es-ES"
           ],
           "defaultValue": "completo",
-          "synonyms": []
+          "synonyms": [
+            "completamente"
+          ]
         },
         {
           "locales": [
@@ -10610,6 +15385,29 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "completamente",
             "interamente"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "full",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "全",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "completo",
+          "synonyms": [
+            "inteiro"
           ]
         }
       ]
@@ -10651,6 +15449,17 @@ static const std::string ASSETS_DEFAULT = R"({
         },
         {
           "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "g. p. s. वाला page",
+          "synonyms": [
+            "g. p. s. वाली screen",
+            "g. p. s. page",
+            "g. p. s. screen"
+          ]
+        },
+        {
+          "locales": [
             "en-IN"
           ],
           "defaultValue": "g. p. s. page",
@@ -10685,7 +15494,10 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "menú de g. p. s.",
           "synonyms": [
             "página de g. p. s.",
-            "pantalla de g. p. s."
+            "pantalla de g. p. s.",
+            "menú del g. p. s",
+            "página del g. p. s.",
+            "pantalla del g. p. s."
           ]
         },
         {
@@ -10706,6 +15518,33 @@ static const std::string ASSETS_DEFAULT = R"({
             "schermo g. p. s.",
             "pagina g. p. s.",
             "interfaccia g. p. s."
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "g. p. s. page",
+          "synonyms": [
+            "g. p. s. screen"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "gpsページ",
+          "synonyms": [
+            "gps画面"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "página do g .p. s.",
+          "synonyms": [
+            "tela do g. p. s."
           ]
         }
       ]
@@ -10735,6 +15574,15 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "vert",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "हरा",
+          "synonyms": [
+            "green"
+          ]
         },
         {
           "locales": [
@@ -10777,6 +15625,27 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "verde",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "green",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "緑",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "verde",
+          "synonyms": []
         }
       ]
     },
@@ -10811,6 +15680,19 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "à demi",
             "au milieu"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "आधा",
+          "synonyms": [
+            "आधी",
+            "आधे",
+            "आधे रास्ते",
+            "half",
+            "halfway"
           ]
         },
         {
@@ -10855,9 +15737,7 @@ static const std::string ASSETS_DEFAULT = R"({
             "de-DE"
           ],
           "defaultValue": "halb",
-          "synonyms": [
-            "halbwegs"
-          ]
+          "synonyms": []
         },
         {
           "locales": [
@@ -10866,6 +15746,32 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "a metà",
           "synonyms": [
             "semiaperto"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "half",
+          "synonyms": [
+            "halfway"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "半分",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "pela metade",
+          "synonyms": [
+            "até a metade",
+            "até o meio"
           ]
         }
       ]
@@ -10894,7 +15800,20 @@ static const std::string ASSETS_DEFAULT = R"({
             "fr-CA"
           ],
           "defaultValue": "élevé",
-          "synonyms": []
+          "synonyms": [
+            "high"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "ऊँचा",
+          "synonyms": [
+            "ऊँची",
+            "उच्च",
+            "high"
+          ]
         },
         {
           "locales": [
@@ -10941,6 +15860,29 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "alta"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "high",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "高",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "alta",
+          "synonyms": [
+            "alto"
+          ]
         }
       ]
     },
@@ -10985,6 +15927,15 @@ static const std::string ASSETS_DEFAULT = R"({
         },
         {
           "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "home screen",
+          "synonyms": [
+            "main screen"
+          ]
+        },
+        {
+          "locales": [
             "en-IN"
           ],
           "defaultValue": "home screen",
@@ -11018,11 +15969,13 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "menú de inicio",
           "synonyms": [
-            "menú de principal",
             "página de inicio",
             "página de principal",
             "pantalla de inicio",
-            "pantalla principal"
+            "pantalla principal",
+            "menú principal",
+            "menú inicial",
+            "página inicial"
           ]
         },
         {
@@ -11043,6 +15996,35 @@ static const std::string ASSETS_DEFAULT = R"({
             "pagina principale",
             "pagina d'inizio",
             "interfaccia iniziale"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "home screen",
+          "synonyms": [
+            "main screen",
+            "home page",
+            "homepage"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "ホーム画面",
+          "synonyms": [
+            "メイン画面"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "tela inicial",
+          "synonyms": [
+            "tela principal"
           ]
         }
       ]
@@ -11074,6 +16056,15 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "indigo",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "नीला",
+          "synonyms": [
+            "indigo"
+          ]
         },
         {
           "locales": [
@@ -11118,6 +16109,29 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "indaco",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "indigo",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "藍",
+          "synonyms": [
+            "インジゴ"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "índigo",
+          "synonyms": []
         }
       ]
     },
@@ -11157,6 +16171,19 @@ static const std::string ASSETS_DEFAULT = R"({
         },
         {
           "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "सूचना page",
+          "synonyms": [
+            "सूचना screen",
+            "information की screen",
+            "information का page",
+            "information screen",
+            "information page"
+          ]
+        },
+        {
+          "locales": [
             "en-IN"
           ],
           "defaultValue": "information screen",
@@ -11186,7 +16213,8 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "menú de información",
           "synonyms": [
             "página de información",
-            "pantalla de información"
+            "pantalla de información",
+            "menú informativo"
           ]
         },
         {
@@ -11207,6 +16235,31 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "informazioni",
             "pagina delle informazioni"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "information screen",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "情報ページ",
+          "synonyms": [
+            "情報画面"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "tela de informação",
+          "synonyms": [
+            "página de informação"
           ]
         }
       ]
@@ -11237,7 +16290,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "dentro",
             "adentro",
             "interior",
-            "interno"
+            "interno",
+            "adentro del auto",
+            "solamente dentro del carro"
           ]
         },
         {
@@ -11250,6 +16305,26 @@ static const std::string ASSETS_DEFAULT = R"({
             "à l'intérieur",
             "dedans",
             "dans"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "अंदर की हवा",
+          "synonyms": [
+            "भीतर की हवा",
+            "भीतर की वायु",
+            "गाड़ी के अंदर",
+            "car के अंदर",
+            "car के भीतर",
+            "गाड़ी के भीतर",
+            "भीतर",
+            "केवल अंदर की गाड़ी",
+            "inside air",
+            "inside car",
+            "inside",
+            "inside car only"
           ]
         },
         {
@@ -11315,6 +16390,35 @@ static const std::string ASSETS_DEFAULT = R"({
             "dentro",
             "interno"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "inside air",
+          "synonyms": [
+            "inside car",
+            "inside",
+            "inside car only"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "内気",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "ar interno",
+          "synonyms": [
+            "interno do carro",
+            "interno",
+            "apenas interno do carro"
+          ]
         }
       ]
     },
@@ -11340,6 +16444,13 @@ static const std::string ASSETS_DEFAULT = R"({
         {
           "locales": [
             "fr-CA"
+          ],
+          "defaultValue": "intermittent",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
           ],
           "defaultValue": "intermittent",
           "synonyms": []
@@ -11395,6 +16506,27 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "intermittente",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "intermittent",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "間欠",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "intermitente",
+          "synonyms": []
         }
       ]
     },
@@ -11422,7 +16554,18 @@ static const std::string ASSETS_DEFAULT = R"({
             "fr-CA"
           ],
           "defaultValue": "bas",
-          "synonyms": []
+          "synonyms": [
+            "low"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "low",
+          "synonyms": [
+            "कम"
+          ]
         },
         {
           "locales": [
@@ -11467,6 +16610,31 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "bassa"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "low",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "低",
+          "synonyms": [
+            "弱"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "baixa",
+          "synonyms": [
+            "baixo"
+          ]
         }
       ]
     },
@@ -11504,6 +16672,24 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "max",
             "le plus élevé"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "अधिकतम",
+          "synonyms": [
+            "अधिक",
+            "सबसे ज़्यादा",
+            "सबसे अधिक",
+            "सबसे high",
+            "सबसे ऊँचा",
+            "उच्चतम",
+            "उच्च",
+            "maximum",
+            "max",
+            "highest"
           ]
         },
         {
@@ -11553,7 +16739,6 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "Maximum",
           "synonyms": [
-            "max.",
             "am höchsten"
           ]
         },
@@ -11565,6 +16750,39 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "massima",
             "al massimo"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "maximum",
+          "synonyms": [
+            "max",
+            "highest"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "マキシマム",
+          "synonyms": [
+            "マックス",
+            "最高",
+            "最強"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "máxima",
+          "synonyms": [
+            "máximo",
+            "max",
+            "mais alta",
+            "mais alto"
           ]
         }
       ]
@@ -11590,7 +16808,6 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "medio",
           "synonyms": [
-            "med",
             "media",
             "intermedio",
             "mitad"
@@ -11603,7 +16820,21 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "moyen",
           "synonyms": [
             "milieu",
-            "intermédiaire"
+            "intermédiaire",
+            "médium"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "मध्यम",
+          "synonyms": [
+            "मध्य",
+            "बीच का",
+            "medium",
+            "mid",
+            "middle"
           ]
         },
         {
@@ -11665,6 +16896,35 @@ static const std::string ASSETS_DEFAULT = R"({
             "a metà",
             "medio"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "medium",
+          "synonyms": [
+            "mid",
+            "middle"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "中",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "média",
+          "synonyms": [
+            "médio",
+            "med",
+            "intermediária",
+            "intermediário"
+          ]
         }
       ]
     },
@@ -11689,9 +16949,9 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "mínimo",
           "synonyms": [
-            "mín",
             "más bajo",
-            "lo más bajo posible"
+            "lo más bajo posible",
+            "lo más bajo"
           ]
         },
         {
@@ -11702,6 +16962,21 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "min",
             "le plus bas"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "न्यूनतम",
+          "synonyms": [
+            "सबसे कम",
+            "बहुत कम",
+            "सबसे निचला",
+            "सबसे नीचे",
+            "minimum",
+            "min",
+            "lowest"
           ]
         },
         {
@@ -11730,7 +17005,6 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "minimum",
           "synonyms": [
-            "min.",
             "le plus bas",
             "le moins fort"
           ]
@@ -11752,7 +17026,6 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "Minimum",
           "synonyms": [
-            "mind.",
             "am niedrigsten"
           ]
         },
@@ -11765,6 +17038,36 @@ static const std::string ASSETS_DEFAULT = R"({
             "minima",
             "più bassa",
             "più basso"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "minimum",
+          "synonyms": [
+            "min",
+            "lowest"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "ミニマム",
+          "synonyms": [
+            "最低"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "mínima",
+          "synonyms": [
+            "mínimo",
+            "min",
+            "mais baixa"
           ]
         }
       ]
@@ -11806,6 +17109,15 @@ static const std::string ASSETS_DEFAULT = R"({
         },
         {
           "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "multimedia page",
+          "synonyms": [
+            "multimedia screen"
+          ]
+        },
+        {
+          "locales": [
             "en-IN"
           ],
           "defaultValue": "multimedia page",
@@ -11840,7 +17152,10 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "menú de multimedia",
           "synonyms": [
             "página de multimedia",
-            "pantalla de multimedia"
+            "pantalla de multimedia",
+            "menú multimedia",
+            "página multimedia",
+            "pantalla  multimedia"
           ]
         },
         {
@@ -11861,6 +17176,33 @@ static const std::string ASSETS_DEFAULT = R"({
             "interfaccia multimediale",
             "schermata multimediale",
             "schermo multimediale"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "multimedia page",
+          "synonyms": [
+            "multimedia screen"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "マルチメディアページ",
+          "synonyms": [
+            "マルチメディア画面"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "página de multimídia",
+          "synonyms": [
+            "tela de multimídia"
           ]
         }
       ]
@@ -11905,6 +17247,21 @@ static const std::string ASSETS_DEFAULT = R"({
         },
         {
           "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "संगीत page",
+          "synonyms": [
+            "संगीत की screen",
+            "music वाला page",
+            "music वाली screen",
+            "music का page",
+            "music की screen",
+            "music page",
+            "music screen"
+          ]
+        },
+        {
+          "locales": [
             "en-IN"
           ],
           "defaultValue": "music page",
@@ -11932,7 +17289,8 @@ static const std::string ASSETS_DEFAULT = R"({
             "écran musique",
             "interface musique",
             "interface de la musique",
-            "musique"
+            "musique",
+            "écran de musique"
           ]
         },
         {
@@ -11961,7 +17319,35 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "pagina della musica",
           "synonyms": [
             "schermo della musica",
-            "schermata della musica"
+            "schermata della musica",
+            "schermo musica"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "music page",
+          "synonyms": [
+            "music screen"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "音楽ページ",
+          "synonyms": [
+            "音楽画面"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "página de música",
+          "synonyms": [
+            "tela de música"
           ]
         }
       ]
@@ -11999,6 +17385,17 @@ static const std::string ASSETS_DEFAULT = R"({
             "page de navigation",
             "interface navigation",
             "navigation"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "navigation screen",
+          "synonyms": [
+            "navigation page",
+            "navigation वाली screen",
+            "navigation वाला page"
           ]
         },
         {
@@ -12059,6 +17456,35 @@ static const std::string ASSETS_DEFAULT = R"({
             "pagina di navigazione",
             "schermata di navigazione"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "navigation screen",
+          "synonyms": [
+            "navigation page"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "ナビ画面",
+          "synonyms": [
+            "ナビページ",
+            "ナビゲーション画面",
+            "ナビゲーションページ"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "página de navegação",
+          "synonyms": [
+            "tela de navegação"
+          ]
         }
       ]
     },
@@ -12087,6 +17513,16 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "normal",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "साधारण",
+          "synonyms": [
+            "सामान्य",
+            "normal"
+          ]
         },
         {
           "locales": [
@@ -12133,6 +17569,29 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "normale",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "normal",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "標準",
+          "synonyms": [
+            "通常"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "normal",
+          "synonyms": []
         }
       ]
     },
@@ -12172,6 +17631,17 @@ static const std::string ASSETS_DEFAULT = R"({
             "interface des notifications",
             "interface notifications",
             "notifications"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "notifications का page",
+          "synonyms": [
+            "notifications की screen",
+            "notifications page",
+            "notifications screen"
           ]
         },
         {
@@ -12237,6 +17707,33 @@ static const std::string ASSETS_DEFAULT = R"({
             "schermo delle notifiche",
             "notifiche"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "notifications page",
+          "synonyms": [
+            "notifications screen"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "通知ページ",
+          "synonyms": [
+            "通知画面"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "página de notificações",
+          "synonyms": [
+            "tela de notificações"
+          ]
         }
       ]
     },
@@ -12272,6 +17769,16 @@ static const std::string ASSETS_DEFAULT = R"({
             "ouvert",
             "ouvertes",
             "ouverts"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "खुला",
+          "synonyms": [
+            "खुली",
+            "open"
           ]
         },
         {
@@ -12339,6 +17846,31 @@ static const std::string ASSETS_DEFAULT = R"({
             "aperti",
             "aperte"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "open",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "開いている",
+          "synonyms": [
+            "開いてる"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "aberta",
+          "synonyms": [
+            "aberto"
+          ]
         }
       ]
     },
@@ -12368,6 +17900,16 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "optimal",
           "synonyms": [
             "optimum"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "सर्वोत्तम",
+          "synonyms": [
+            "श्रेष्ठ",
+            "optimal"
           ]
         },
         {
@@ -12415,6 +17957,27 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "ottimale"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "optimal",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "最適",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "ideal",
+          "synonyms": []
         }
       ]
     },
@@ -12443,6 +18006,15 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "orange",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "नारंगी",
+          "synonyms": [
+            "orange"
+          ]
         },
         {
           "locales": [
@@ -12485,6 +18057,29 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "arancione",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "orange",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "オレンジ",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "laranja",
+          "synonyms": [
+            "abóbora"
+          ]
         }
       ]
     },
@@ -12517,7 +18112,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "exterior",
             "externo",
             "fuera",
-            "fresco"
+            "fresco",
+            "aire de afuera del coche",
+            "aire del exterior del coche"
           ]
         },
         {
@@ -12532,6 +18129,31 @@ static const std::string ASSETS_DEFAULT = R"({
             "à l'extérieur",
             "de l'extérieur",
             "frais"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "बाहर की हवा",
+          "synonyms": [
+            "ताज़ा हवा",
+            "ताज़ी हवा",
+            "ताज़ी air",
+            "fresh हवा",
+            "स्वच्छ वायु",
+            "ताजी वात",
+            "गाड़ी के बाहर",
+            "बाहर",
+            "ताजा",
+            "ताज़ा",
+            "ताज़ी",
+            "ताजी",
+            "outside air",
+            "fresh air",
+            "outside car",
+            "outside",
+            "fresh"
           ]
         },
         {
@@ -12565,7 +18187,6 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "air extérieur",
           "synonyms": [
             "air frais",
-            "fraîche air",
             "extérieur",
             "à l'extérieur",
             "de l'extérieur",
@@ -12604,6 +18225,37 @@ static const std::string ASSETS_DEFAULT = R"({
             "fuori",
             "esterno"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "outside air",
+          "synonyms": [
+            "fresh air",
+            "outside car",
+            "outside",
+            "fresh"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "外気",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "ar externo",
+          "synonyms": [
+            "ar fresco",
+            "externo do carro",
+            "externo",
+            "fresco"
+          ]
         }
       ]
     },
@@ -12634,6 +18286,18 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "vue du côté passager",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "यात्री की तरफ का दृश्य",
+          "synonyms": [
+            "passenger की side का view",
+            "driver side view",
+            "passenger side का view",
+            "passenger side view"
+          ]
         },
         {
           "locales": [
@@ -12676,6 +18340,27 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "vista lato passeggero",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "passenger side view",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "助手側視界",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "vista do lado do passageiro",
+          "synonyms": []
         }
       ]
     },
@@ -12716,6 +18401,17 @@ static const std::string ASSETS_DEFAULT = R"({
         },
         {
           "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "performance page",
+          "synonyms": [
+            "performance screen",
+            "performance वाले page",
+            "performance वाली screen"
+          ]
+        },
+        {
+          "locales": [
             "en-IN"
           ],
           "defaultValue": "performance page",
@@ -12748,7 +18444,10 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "menú de rendimiento",
           "synonyms": [
             "página de rendimiento",
-            "pantalla de rendimiento"
+            "pantalla de rendimiento",
+            "pantalla del rendimiento",
+            "menú del rendimiento",
+            "página del rendimiento"
           ]
         },
         {
@@ -12768,6 +18467,33 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "menù delle prestazioni",
           "synonyms": [
             "pagina delle prestazioni"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "performance page",
+          "synonyms": [
+            "performance screen"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "パーフォーマンスページ",
+          "synonyms": [
+            "パーフォーマンス画面"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "página de desempenho",
+          "synonyms": [
+            "tela de desempenho"
           ]
         }
       ]
@@ -12822,6 +18548,28 @@ static const std::string ASSETS_DEFAULT = R"({
             "position mémorisée numéro 1",
             "position mémorisée numéro un",
             "position mémorisée numéro une"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "पहली position",
+          "synonyms": [
+            "पहली जगह",
+            "पहली stored position",
+            "पहली stored जगह",
+            "position पहली",
+            "जगह पहली",
+            "stored position पहली",
+            "stored जगह पहली",
+            "stored position एक",
+            "stored जगह एक",
+            "position एक",
+            "position 1",
+            "position one",
+            "stored position 1",
+            "stored position one"
           ]
         },
         {
@@ -12884,7 +18632,8 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "Position Eins",
             "festgelegte Position 1",
-            "festgelegte Position Eins"
+            "festgelegte Position Eins",
+            "gespeicherte Position eins"
           ]
         },
         {
@@ -12895,7 +18644,42 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "posizione uno",
             "posizione salvata 1",
-            "posizione salvata uno"
+            "posizione salvata uno",
+            "prima posizione",
+            "prima posizione salvata"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "position 1",
+          "synonyms": [
+            "position one",
+            "stored position 1",
+            "stored position one"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "第一の位置",
+          "synonyms": [
+            "位置一",
+            "保存された第一の位置",
+            "保存された位置一"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "posição 1",
+          "synonyms": [
+            "posição um",
+            "posição 1 na memória",
+            "posição um na memória"
           ]
         }
       ]
@@ -12944,6 +18728,30 @@ static const std::string ASSETS_DEFAULT = R"({
             "position mémorisée trois",
             "position mémorisée numéro 3",
             "position mémorisée numéro trois"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "तीसरी position",
+          "synonyms": [
+            "तीसरी जगह",
+            "तीसरा स्थान",
+            "तीसरी stored position",
+            "तीसरी stored जगह",
+            "position तीसरी",
+            "जगह तीसरी",
+            "स्थान तीसरा",
+            "stored position तीसरी",
+            "stored जगह तीसरी",
+            "stored position तीन",
+            "stored जगह तीन",
+            "position तीन",
+            "position 1",
+            "position one",
+            "stored position 1",
+            "stored position one"
           ]
         },
         {
@@ -13002,7 +18810,8 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "Position Drei",
             "festgelegte Position 3",
-            "festgelegte Position Drei"
+            "festgelegte Position Drei",
+            "gespeicherte Position drei"
           ]
         },
         {
@@ -13013,7 +18822,42 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "posizione tre",
             "posizione salvata 3",
-            "posizione salvata tre"
+            "posizione salvata tre",
+            "terza posizione",
+            "terza posizione salvata"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "position 3",
+          "synonyms": [
+            "position three",
+            "stored position 3",
+            "stored position three"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "第三の位置",
+          "synonyms": [
+            "位置三",
+            "保存された第三の位置",
+            "保存された位置三"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "posição 3",
+          "synonyms": [
+            "posição três",
+            "posição 3 na memória",
+            "posição três na memória"
           ]
         }
       ]
@@ -13062,6 +18906,29 @@ static const std::string ASSETS_DEFAULT = R"({
             "position mémorisée deux",
             "position mémorisée numéro 2",
             "position mémorisée numéro deux"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "दूसरी position",
+          "synonyms": [
+            "दूसरी जगह",
+            "दूसरा स्थान",
+            "दूसरी stored position",
+            "दूसरी stored जगह",
+            "position दूसरी",
+            "जगह दूसरी",
+            "stored position दूसरी",
+            "stored जगह दूसरी",
+            "stored position दो",
+            "stored जगह दो",
+            "position एक",
+            "position 1",
+            "position one",
+            "stored position 1",
+            "stored position one"
           ]
         },
         {
@@ -13120,7 +18987,8 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "Position Zwei",
             "festgelegte Position 2",
-            "festgelegte Position Zwei"
+            "festgelegte Position Zwei",
+            "gespeicherte Position zwei"
           ]
         },
         {
@@ -13131,7 +18999,42 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "posizione due",
             "posizione salvata 2",
-            "posizione salvata due"
+            "posizione salvata due",
+            "seconda posizione",
+            "seconda posizione salvata"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "position 2",
+          "synonyms": [
+            "position two",
+            "stored position 2",
+            "stored position two"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "第二の位置",
+          "synonyms": [
+            "位置二",
+            "保存された第二の位置",
+            "保存された位置二"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "posição 2",
+          "synonyms": [
+            "posição dois",
+            "posição 2 na memória",
+            "posição dois na memória"
           ]
         }
       ]
@@ -13175,6 +19078,15 @@ static const std::string ASSETS_DEFAULT = R"({
         },
         {
           "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "radio screen",
+          "synonyms": [
+            "radio page"
+          ]
+        },
+        {
+          "locales": [
             "en-IN"
           ],
           "defaultValue": "radio screen",
@@ -13199,7 +19111,11 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "page des radios",
             "écran d'accueil des radios",
-            "radios"
+            "radios",
+            "écran d'accueil de radio",
+            "écran d'acceuil de la radio",
+            "écran de radio",
+            "écran de la radio"
           ]
         },
         {
@@ -13209,7 +19125,10 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "menú de radio",
           "synonyms": [
             "página de radio",
-            "pantalla de radio"
+            "pantalla de radio",
+            "menú de la radio",
+            "página de la radio",
+            "pantalla de la radio"
           ]
         },
         {
@@ -13227,6 +19146,33 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "schermo della radio",
             "interfaccia della radio"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "radio screen",
+          "synonyms": [
+            "radio page"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "ラジオ画面",
+          "synonyms": [
+            "ラジオページ"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "tela do rádio",
+          "synonyms": [
+            "página do rádio"
           ]
         }
       ]
@@ -13260,6 +19206,19 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "vue arrière",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "पीछे का दृश्य",
+          "synonyms": [
+            "पीछे का view",
+            "rear view",
+            "पिछला view",
+            "पिछला दृश्य",
+            "rear दृश्य"
+          ]
         },
         {
           "locales": [
@@ -13300,8 +19259,34 @@ static const std::string ASSETS_DEFAULT = R"({
           "locales": [
             "it-IT"
           ],
-          "defaultValue": "vista poteriore",
+          "defaultValue": "vista posteriore",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "rear view",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "後方視界",
+          "synonyms": [
+            "リア視界",
+            "リヤ視界"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "vista de trás",
+          "synonyms": [
+            "vista traseira"
+          ]
         }
       ]
     },
@@ -13330,6 +19315,15 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "rouge",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "लाल",
+          "synonyms": [
+            "red"
+          ]
         },
         {
           "locales": [
@@ -13371,6 +19365,27 @@ static const std::string ASSETS_DEFAULT = R"({
             "it-IT"
           ],
           "defaultValue": "rosso",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "red",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "赤",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "vermelha",
           "synonyms": []
         }
       ]
@@ -13414,6 +19429,17 @@ static const std::string ASSETS_DEFAULT = R"({
         },
         {
           "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "satellite radio screen",
+          "synonyms": [
+            "satellite radio page",
+            "satellite radio की screen",
+            "satellite radio का page"
+          ]
+        },
+        {
+          "locales": [
             "en-IN"
           ],
           "defaultValue": "satellite radio screen",
@@ -13447,11 +19473,13 @@ static const std::string ASSETS_DEFAULT = R"({
           "locales": [
             "es-ES"
           ],
-          "defaultValue": "menú de radio satelita",
+          "defaultValue": "pantalla de radio satelital",
           "synonyms": [
-            "página de radio satelita",
-            "pantalla de radio satelital",
-            "pantalla de radio satélite"
+            "pantalla de radio satélite",
+            "menú de radio satelital",
+            "página de radio satelital",
+            "menú de radio satélite",
+            "página de radio satélite"
           ]
         },
         {
@@ -13474,6 +19502,33 @@ static const std::string ASSETS_DEFAULT = R"({
             "pagina radio satellitare",
             "schermata radio satellitare",
             "interfaccia radio satellitare"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "satellite radio screen",
+          "synonyms": [
+            "satellite radio page"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "衛星ラジオ画面",
+          "synonyms": [
+            "衛星ラジオページ"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "tela de rádio satélite",
+          "synonyms": [
+            "página de rádio satélite"
           ]
         }
       ]
@@ -13512,6 +19567,15 @@ static const std::string ASSETS_DEFAULT = R"({
             "page des services",
             "interface des services",
             "services"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "service screen",
+          "synonyms": [
+            "service page"
           ]
         },
         {
@@ -13573,6 +19637,33 @@ static const std::string ASSETS_DEFAULT = R"({
             "schermo della manutenzione",
             "pagina della manutenzione"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "service screen",
+          "synonyms": [
+            "service page"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "サービス画面",
+          "synonyms": [
+            "サービスページ"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "tela de serviço",
+          "synonyms": [
+            "página de serviço"
+          ]
         }
       ]
     },
@@ -13615,7 +19706,20 @@ static const std::string ASSETS_DEFAULT = R"({
             "interface des paramètres",
             "interface paramétrages",
             "paramètres",
-            "paramétrages"
+            "paramétrages",
+            "settings",
+            "page des settings"
+          ]
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "settings screen",
+          "synonyms": [
+            "settings page",
+            "settings वाली screen",
+            "settings वाला page"
           ]
         },
         {
@@ -13644,7 +19748,7 @@ static const std::string ASSETS_DEFAULT = R"({
           "synonyms": [
             "page de paramètres",
             "écran des paramétrages",
-            "page dees paramètrages"
+            "page des paramètrages"
           ]
         },
         {
@@ -13657,7 +19761,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "página de configuración",
             "página de ajustes",
             "pantalla de configuración",
-            "pantalla de ajustes"
+            "pantalla de ajustes",
+            "configuración",
+            "ajustes"
           ]
         },
         {
@@ -13677,6 +19783,33 @@ static const std::string ASSETS_DEFAULT = R"({
             "menù delle configurazioni",
             "pagina delle configurazioni",
             "menù di impostazione"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "settings screen",
+          "synonyms": [
+            "settings page"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "設定ページ",
+          "synonyms": [
+            "設定画面"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "tela de configurações",
+          "synonyms": [
+            "página de configurações"
           ]
         }
       ]
@@ -13703,6 +19836,13 @@ static const std::string ASSETS_DEFAULT = R"({
         {
           "locales": [
             "fr-CA"
+          ],
+          "defaultValue": "sport",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
           ],
           "defaultValue": "sport",
           "synonyms": []
@@ -13748,6 +19888,27 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "sport",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "sport",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "スポーツ",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "sport",
+          "synonyms": []
         }
       ]
     },
@@ -13773,6 +19934,13 @@ static const std::string ASSETS_DEFAULT = R"({
         {
           "locales": [
             "fr-CA"
+          ],
+          "defaultValue": "sport plus",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
           ],
           "defaultValue": "sport plus",
           "synonyms": []
@@ -13815,6 +19983,27 @@ static const std::string ASSETS_DEFAULT = R"({
         {
           "locales": [
             "it-IT"
+          ],
+          "defaultValue": "sport plus",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "sport plus",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "スポーツプラス",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
           ],
           "defaultValue": "sport plus",
           "synonyms": []
@@ -13861,6 +20050,16 @@ static const std::string ASSETS_DEFAULT = R"({
         },
         {
           "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "telephone की screen",
+          "synonyms": [
+            "telephone page",
+            "telephone screen"
+          ]
+        },
+        {
+          "locales": [
             "en-IN"
           ],
           "defaultValue": "telephone page",
@@ -13898,7 +20097,10 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "menú de teléfono",
           "synonyms": [
             "página de teléfono",
-            "pantalla de teléfono"
+            "pantalla de teléfono",
+            "menú del teléfono",
+            "página del teléfono",
+            "pantalla del teléfono"
           ]
         },
         {
@@ -13921,6 +20123,39 @@ static const std::string ASSETS_DEFAULT = R"({
             "pagina del telefono",
             "schermata del telefono",
             "schermo del telefono"
+          ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "telephone page",
+          "synonyms": [
+            "telephone screen",
+            "phone page",
+            "phone screen",
+            "calling page",
+            "calling screen"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "電話ページ",
+          "synonyms": [
+            "電話画面",
+            "通話ページ",
+            "通話画面"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "página de telefone",
+          "synonyms": [
+            "tela de telefone"
           ]
         }
       ]
@@ -13965,6 +20200,18 @@ static const std::string ASSETS_DEFAULT = R"({
         },
         {
           "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "वाहन स्थिति क screen",
+          "synonyms": [
+            "vehicle status का page",
+            "vehicle status की screen",
+            "vehicle status page",
+            "vehicle status screen"
+          ]
+        },
+        {
+          "locales": [
             "en-IN"
           ],
           "defaultValue": "vehicle status page",
@@ -14002,7 +20249,10 @@ static const std::string ASSETS_DEFAULT = R"({
           "defaultValue": "menú de estado del vehículo",
           "synonyms": [
             "página de estado del vehículo",
-            "pantalla de estado del vehículo"
+            "pantalla de estado del vehículo",
+            "menú del estado del vehículo",
+            "página del estado del vehículo",
+            "pantalla del estado del vehículo"
           ]
         },
         {
@@ -14027,6 +20277,35 @@ static const std::string ASSETS_DEFAULT = R"({
             "pagina di stato del veicolo",
             "interfaccia di stato del veicolo"
           ]
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "vehicle status page",
+          "synonyms": [
+            "vehicle status screen"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "状態ページ",
+          "synonyms": [
+            "状態画面",
+            "ステータスページ",
+            "ステータス画面"
+          ]
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "página de status do veículo",
+          "synonyms": [
+            "tela de status do veículo"
+          ]
         }
       ]
     },
@@ -14047,7 +20326,9 @@ static const std::string ASSETS_DEFAULT = R"({
             "es-US"
           ],
           "defaultValue": "morado",
-          "synonyms": []
+          "synonyms": [
+            "violeta"
+          ]
         },
         {
           "locales": [
@@ -14055,6 +20336,15 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "mauve",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "बैंगनी",
+          "synonyms": [
+            "violet"
+          ]
         },
         {
           "locales": [
@@ -14099,6 +20389,29 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "viola",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "violet",
+          "synonyms": [
+            "purple"
+          ]
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "紫",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "violeta",
+          "synonyms": []
         }
       ]
     },
@@ -14127,6 +20440,16 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "blanc",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "सफेद",
+          "synonyms": [
+            "सफ़ेद",
+            "white"
+          ]
         },
         {
           "locales": [
@@ -14169,6 +20492,27 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "bianco",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "white",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "白",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "branca",
+          "synonyms": []
         }
       ]
     },
@@ -14197,6 +20541,15 @@ static const std::string ASSETS_DEFAULT = R"({
           ],
           "defaultValue": "jaune",
           "synonyms": []
+        },
+        {
+          "locales": [
+            "hi-IN"
+          ],
+          "defaultValue": "पीला",
+          "synonyms": [
+            "yellow"
+          ]
         },
         {
           "locales": [
@@ -14238,6 +20591,27 @@ static const std::string ASSETS_DEFAULT = R"({
             "it-IT"
           ],
           "defaultValue": "giallo",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "en-AU"
+          ],
+          "defaultValue": "yellow",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "ja-JP"
+          ],
+          "defaultValue": "黄",
+          "synonyms": []
+        },
+        {
+          "locales": [
+            "pt-BR"
+          ],
+          "defaultValue": "amarela",
           "synonyms": []
         }
       ]

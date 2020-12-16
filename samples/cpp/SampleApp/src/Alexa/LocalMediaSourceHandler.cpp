@@ -180,15 +180,16 @@ LocalMediaSourceHandler::LocalMediaSourceState LocalMediaSourceHandler::getState
     std::vector<aace::alexa::LocalMediaSource::SupportedPlaybackOperation> supportedOperations{};
     std::vector<aace::alexa::LocalMediaSource::ContentSelector> supportedContentSelectors{};
 
-    if (m_source != LocalMediaSource::Source::DAB) {  // DAB no
-        supportedOperations.insert(
-            supportedOperations.begin(),
-            {LocalMediaSource::SupportedPlaybackOperation::PLAY,
-             LocalMediaSource::SupportedPlaybackOperation::PAUSE,
-             LocalMediaSource::SupportedPlaybackOperation::STOP});
-    }
+    supportedOperations.insert(
+        supportedOperations.begin(),
+        {LocalMediaSource::SupportedPlaybackOperation::PLAY,
+         LocalMediaSource::SupportedPlaybackOperation::PAUSE,
+         LocalMediaSource::SupportedPlaybackOperation::STOP});
     switch (m_source) {
         case LocalMediaSource::Source::DAB:
+            supportedContentSelectors.insert(
+                supportedContentSelectors.begin(), {LocalMediaSource::ContentSelector::CHANNEL});
+            break;
         case LocalMediaSource::Source::SATELLITE_RADIO:
             break;
         case LocalMediaSource::Source::AM_RADIO:

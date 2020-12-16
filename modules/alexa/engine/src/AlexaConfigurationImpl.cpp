@@ -405,6 +405,26 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
     return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document));
 }
 
+std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createAuthProviderConfig(
+    const std::vector<std::string>& providerNames) {
+    rapidjson::Document document(rapidjson::kObjectType);
+    rapidjson::Value aaceAlexaElement(rapidjson::kObjectType);
+    rapidjson::Value authProviderElement(rapidjson::kObjectType);
+    rapidjson::Value providersElement(rapidjson::kArrayType);
+
+    for (auto& providerName : providerNames) {
+        providersElement.PushBack(
+            rapidjson::Value().SetString(providerName.c_str(), providerName.length()), document.GetAllocator());
+    }
+
+    authProviderElement.AddMember("providers", providersElement, document.GetAllocator());
+    aaceAlexaElement.AddMember("authProvider", authProviderElement, document.GetAllocator());
+
+    document.AddMember("aace.alexa", aaceAlexaElement, document.GetAllocator());
+
+    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document));
+}
+
 }  // namespace config
 }  // namespace alexa
 }  // namespace aace

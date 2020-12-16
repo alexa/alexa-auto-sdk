@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+<LinearLayout
+    android:id="@+id/poi_item_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:layout_marginBottom="20dp"
+    android:layout_weight="1"
+    >
+    <TextView
+        android:id="@+id/poi_ordinal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/poi_ordinal_card_margin_top"
+        android:layout_marginStart="@dimen/poi_card_margin_start"
+        tools:text="1"
+        style="@style/LocalSearchListItemOrdinal"/>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+    <TextView
+        android:id="@+id/poi_name"
+        android:layout_marginStart="@dimen/poi_card_margin_start"
+        android:layout_marginEnd="@dimen/poi_name_margin_end"
+        android:layout_marginTop="@dimen/poi_card_margin_top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Poi Name"
+        style="@style/LocalSearchListItemName"/>
+
+    </LinearLayout>
+        <TextView
+            android:id="@+id/poi_address"
+            android:layout_width="@dimen/poi_list_address_width"
+            android:layout_height="wrap_content"
+            tools:text="1414 11th Ave, City STATE"
+            android:layout_marginTop="@dimen/poi_address_margin_top"
+            android:layout_marginStart="@dimen/poi_card_margin_start"
+            style="@style/LocalSearchListItemAddress"/>
+
+        <LinearLayout
+            android:id="@+id/yelp_rating_row"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/poi_address_margin_top">
+
+            <ImageView
+                android:id="@+id/yelp_rating_image"
+                android:layout_width="@dimen/local_search_list_yelp_star_width"
+                android:layout_height="@dimen/local_search_list_yelp_star_height"
+                android:scaleType="centerCrop"
+                android:layout_marginStart="@dimen/poi_card_margin_start"
+                android:layout_marginTop="@dimen/local_search_list_yelp_star_margin_top"/>
+            <TextView
+                android:id="@+id/yelp_rating_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="257"
+                android:layout_marginStart="@dimen/local_search_list_yelp_row_spacing"
+                style="@style/LocalSearchListItemAddress"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/yelp_provider"
+                android:layout_marginStart="@dimen/local_search_list_yelp_row_spacing"
+                style="@style/LocalSearchListItemAddress"/>
+        </LinearLayout>
+    </LinearLayout>
+    <TextView
+        android:id="@+id/poi_list_eta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/poi_item_margin_end"
+        android:layout_marginTop="@dimen/poi_eta_margin_top"
+        android:gravity="end"
+        tools:text="9 mins"
+        style="@style/LocalSearchListItemEta"/>
+</LinearLayout>
+    <View
+        android:id="@+id/poi_splitter"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/splitter_height"
+        android:layout_marginEnd="@dimen/splitter_begin_end_margin"
+        android:layout_marginStart="@dimen/splitter_begin_end_margin"
+        android:background="@color/poi_circle_background_color" />
+</LinearLayout>

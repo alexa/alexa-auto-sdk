@@ -1,6 +1,6 @@
 package com.amazon.alexaautoclientservice.mediaPlayer;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 @FunctionalInterface
 public interface EventReceiver {

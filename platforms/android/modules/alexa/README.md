@@ -2,14 +2,14 @@
 
 The Alexa Auto SDK Alexa module provides interfaces for standard Alexa features. The Engine handles some extra setup and steps to sequence events and handle directives so you can focus on using the provided API to interact with Alexa. You do this by registering platform interface implementations via the Engine object. 
 
->**Note:** If you want to enable wake word support, [contact your Amazon Solutions Architect (SA)](../../../../NEED_HELP.md#requesting-additional-functionality-whitelisting)
+>**Note:** If you want to enable wake word support, [contact your Amazon Solutions Architect (SA)](../../../../NEED_HELP.md#requesting-additional-functionality)
 
 **Table of Contents**
 
 * [Alexa Module Sequence Diagrams](#alexa-module-sequence-diagrams)
 * [Handling Speech Input](#handling-speech-input)
 * [Handling Speech Output](#handling-speech-output)
-* [Handling Authentication](#handling-authentication)
+* [Handling Authorization](#handling-authorization)
 * [Handling Audio Output](#handling-gui-templates)
 * [Handling Alexa Speaker](#handling-alexa-speaker)
 * [Handling Audio Player Output](#handling-audio-player-output)
@@ -90,19 +90,206 @@ public class SpeechSynthesizerHandler extends SpeechSynthesizer {
 // Register the platform interface with the Engine
 mEngine.registerPlatformInterface( mSpeechSynthesizer = new SpeechSynthesizerHandler() );
 ```  
+## Handling Authorization
 
-## Handling Authentication<a id="handling-authentication"></a>
+Every request to Alexa Voice Service (AVS) requires a Login with Amazon (LWA) access token.
+Starting with Auto SDK v3.1.0, use the Authorization platform interface to start, cancel, and log out of authorization. The Auto SDK continues to support the AuthProvider platform interface, but it is on the deprecation path. For more information about how the Engine manages authorization, see the Core module [README](../core/README.md).
 
-Every request to Alexa Voice Service (AVS) requires an access token from Logon with Amazon (LWA). The `AuthProvider` platform interface is responsible for acquiring and refreshing access tokens.  You can obtain a token from LWA as described in the [LWA documentation](https://developer.amazon.com/docs/login-with-amazon/documentation-overview.html) and create a custom implementation of the `AuthProvider` platform interface to acquire access tokens. If you don't want to acquire access tokens yourself, you can use the [Alexa Auto SDK Code-Based-Linking (CBL) module](../cbl/README.md), which implements the CBL mechanism of acquiring access tokens.
+In this document, "Auth Provider authorization" refers to the general method through which the application implements acquiring access tokens itself and provides them to the Engine.
 
-> **Note:** It is the responsibility of the platform implementation to provide an authorization method for establishing a connection to AVS. The Alexa Auto SDK provides an interface to handle authorization state changes and storing context. In addition, the access and refresh tokens must be cleared when the user logs out, and any time the access and refresh tokens are cleared, users must go through the authentication and authorization process again.
+>**Note**: Auth Provider authorization and other authorization methods, such as [CBL](../cbl/README.md), are mutually exclusive. For example, if the device is already registered with CBL, starting Auth Provider authorization logs out the device from the previous authorization.
+
+> **Note:** The access and refresh tokens must be cleared when the user logs out, and any time the access and refresh tokens are cleared, users must go through the authentication and authorization process again.
 
 > **Note:** Your application should stop the audio player if the user logs out of a device when music is currently playing.
+
+For more information about authorization, see the following documents:
+
+* [Authorize from a Companion App](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/authorize-companion-app.html)
+* [Authorize from an AVS Product](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/authorize-on-product.html)
+* [Authorize from a Companion Site](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/authorize-companion-site.html)
+
+### Using the Authorization Platform Interface to Carry out Auth Provider Authorization
+This section describes how an application uses the Authorization platform interface to carry out Auth Provider authorization.
+The service name used by Authorization for Auth Provider authorization is `alexa:auth-provider`.
+
+#### Starting Authorization	
+To start authorization, the application uses the `startAuthorization` API.
+The data parameter in the `startAuthorization` API is an empty string, as shown in the following example: 
+
+~~~
+startAuthorization( "alexa:auth-provider", "" )
+~~~
+
+>**Note:** With the Authorization platform interface, it is the responsibility of the application to start authorization at every Engine start. Each time the Engine is restarted, it does not automatically start the authorization that was previously in effect before the Engine restart.
+
+#### Receiving Events from Engine
+This section describes the protocol for the application to receive events from the Engine. The API used is `eventReceived`. 
+The application needs to receive an event in these scenarios:
+
+* when the Engine requests the application to start authorization
+* when the application needs to log out of the authorization
+
+To request the application to start authorization, the Engine passes the request to the application by using the event parameter in the `eventReceived` API. The parameter has the following JSON structure:
+
+~~~
+{
+    "type": "requestAuthorization"
+}
+~~~
+
+The application receives the event from the Engine through the `eventReceived` API as follows:
+
+~~~
+eventReceived( "alexa:auth-provider", "{"type":"requestAuthorization"}" )
+~~~
+
+To log out, the event parameter in the `eventReceived` API has the following JSON structure:
+
+~~~
+{
+    "type": "logout"
+}
+~~~
+
+The Engine calls the `eventReceived` method to log out the device as follows:
+
+~~~
+eventReceived( "alexa:auth-provider", "{"type":"logout"}" )
+~~~
+
+#### Sending Events to Engine
+To notify the Engine of an authorization state change, the application uses the event parameter of the `sendEvent` API. The parameter has the following JSON structure:
+
+~~~
+{
+    "type":"authStateChangeEvent",
+    "payload": {
+        "state":"{STRING}"
+    }
+}
+~~~
+
+The possible state strings are AUTHORIZED and UNAUTHORIZED.
+
+The application needs to notify the Engine of an authorization state change for one of the following reasons:
+* There is a request from Engine via `eventReceived` with `type` set to `requestAuthorization`.
+* The application transitions to a new state, as shown in the following example where state transitions from `UNAUTHORIZED` to `AUTHORIZED`:
+
+~~~
+sendEvent( "alexa:auth-provider",
+    "{
+        "type":"authStateChangeEvent"
+        "payload": {
+            "state":"AUTHORIZED"
+        }  
+    }"
+ )
+~~~
+
+#### Getting Access Token
+The Engine calls the application to get the access token by using the `accessToken` parameter in the `getAuthorizationData` API as follows:
+
+~~~
+getAuthorizationData("accessToken")
+~~~
+
+The application responds with an access token, as shown in the following example.
+~~~
+{
+    "accessToken":"Atza|AAAAAABBBBBBCCCCCC"
+}
+~~~
+
+#### Canceling Authorization
+To cancel authorization, the API to use is `cancelAuthorization`, as follows:
+
+~~~
+cancelAuthorization( "alexa:auth-provider" );
+~~~
+
+You may call this API to cancel the authorization that is started by calling `startAuthorization` but before sending an event via `sendEvent`. Canceling authorization does not affect the device authorization state.
+
+
+#### Logging Out
+
+The application makes the `logout` API call to the Engine to log out, as follows:
+
+~~~
+logout( "alexa:auth-provider" );
+~~~
+
+#### Handling Errors
+The Engine notifies the application about any error during the authorization process.
+
+The following list describes possible errors during authorization:
+
+* `UNKNOWN_ERROR`: An unrecoverable error happens in the authorization process.
+* `AUTH_FAILURE`: An invalid or expired access token is provided.
+* `LOGOUT_FAILED`: The application cannot complete the logout process.
+* `START_AUTHORIZATION_FAILED`: The authorization process cannot start.
+
+The following example shows how the API handles an error when the provided access token is either expired or invalid:
+~~~
+authorizationError( "alexa:auth-provider", "AUTH_FAILURE", "" )
+~~~
+
+### Sequence Diagrams for Auth Provider Authorization
+
+The following sequence diagram illustrates the flow when the Authorization platform interface starts an authorization.
+
+<p align="center">
+<img src="./assets/authprovider-start-sequence.png"/>
+</p>
+
+The following sequence diagram illustrates the flow when the Authorization platform interface cancels an authorization.
+
+<p align="center">
+<img src="./assets/authprovider-cancel-sequence.png"/>
+</p>
+
+The following sequence diagram illustrates the flow when the Authorization platform interface logs out of an authorization.
+
+<p align="center">
+<img src="./assets/authprovider-logout-sequence.png"/>
+</p>
+
+### Optional Auth Provider Configuration
+By default, the Engine supports one Auth Provider authorization. However, if your application supports more than one, provide the Engine with the following configuration. You can also build the configuration programmatically by using [`createAuthProviderConfig`](./src/main/java/com/amazon/aace/alexa/config/AlexaConfiguration.java).
+
+```json
+{
+    "aace.alexa" : {
+        "authProvider" : {
+           "providers" : [<LIST_OF_PROVIDER_NAMES_STRINGS>]
+        }
+    }
+}
+```
+
+For example, if your application supports two Auth Provider authorizations, named "serviceA" and "serviceB," provide the following configuration:
+
+
+```json
+{
+    "aace.alexa" : {
+        "authProvider" : {
+           "providers" : ["serviceA" , "serviceB"]
+        }
+    }
+}
+```
+
+With this configuration, the Engine uses the service names "serviceA" and "serviceB" with the Authorization platform interface instead of using the default Auth Provider service name `alexa:auth-provider`.
+
+
+### (Deprecated) Implementing a Custom Handler for AuthProvider
+>**Note:** The information in this section is not applicable if you use the Authorization platform interface. The AuthProvider platform interface is deprecated.
 
 To implement a custom handler for authentication, extend the `AuthProvider` class:
 
 
-```
+```java
 public class AuthProviderHandler extends AuthProvider {
 
     @Override
@@ -125,6 +312,13 @@ public class AuthProviderHandler extends AuthProvider {
 // Register the platform interface with the Engine
 mEngine.registerPlatformInterface( mAuthProvider = new AuthProviderHandler() );
 ```
+
+### Switching User Account
+
+When switching from one authorized user account to another, you must call the `authStateChanged(UNINITIALIZED)` API before providing access tokens for the second user.
+
+>**NOTE:** Starting with the Auto SDK 3.1, you don't have to restart the Engine after a user logs out. Immediately after the `authStateChanged(UNINITIALIZED)` API returns, you may start a fresh Auth Provider authorization by calling the `authStateChanged(REFRESHED)` API.
+
 ### AuthProvider Login/Logout Sequence Diagrams<a id="loginlogout"></a>
 
 The following diagram illustrates the login sequence when using the AuthProvider platform interface to obtain access and refresh tokens.
@@ -158,13 +352,13 @@ When audio data is received from Alexa it is the responsibility of the platform 
 
 ### Custom Volume Control for Alexa Devices
 
-You can use a custom volume control to support an Alexa device's native input volume range. By default, Alexa supports voice utterances that specify volume values between 0 and 10, but some devices may support a different range (i.e. 0 to 100). By whitelisting your Alexa devices volume range with Amazon for your target platform, you can specify input volume levels per your device's range. Your device's input volume range is then mapped appropriately to the Alexa volume range.
+You can use a custom volume control to support an Alexa device's native input volume range. By default, Alexa supports voice utterances that specify volume values between 0 and 10, but some devices may support a different range (i.e. 0 to 100). By placing on Amazon's allow list your Alexa device's volume range for your target platform, you can specify input volume levels per your device's range. Your device's input volume range is then mapped appropriately to the Alexa volume range.
 
-Contact your Alexa Auto Solution Architect (SA) for help with whitelisting. Whitelisting requires the following parameters:
+Contact your Alexa Auto Solution Architect (SA) for help with allow lists. Placing a device on the allow list requires the following parameters:
 
-* DeviceTypeID
-* Min:
-* Max:
+* DeviceTypeID: <YOUR_DEVICE_TYPE_ID>
+* Min: <YOUR_MIN_VOLUME_VALUE>
+* Max: <YOUR_MAX_VOLUME_VALUE>
 
 This does not impact the range used in the directives to the device. You must continue to use the SDK 0-100 volume range used by `AudioOutput` and `AlexaSpeaker` and map these values to the correct range in your implementation.
 
@@ -182,7 +376,7 @@ public class AlexaSpeakerHandler extends AlexaSpeaker {
     ...
     
     // Notify the Engine of local UI volume setting change
-    SpeakerType type = SpeakerType.AVS_VOLUME;
+    SpeakerType type = SpeakerType.ALEXA_VOLUME;
     localSetVolume( type, 100 );
     ...
     
@@ -192,7 +386,7 @@ public class AlexaSpeakerHandler extends AlexaSpeaker {
     ...
     
     // Notify the Engine of local UI mute setting change
-    SpeakerType type = SpeakerType.AVS_VOLUME;
+    SpeakerType type = SpeakerType.ALEXA_VOLUME;
     localSetMute( type, true );
 ```  
 
@@ -671,7 +865,7 @@ public class CDLocalMediaSource extends LocalMediaSource {
     ...
 ```    
 
-The `play()` method is called when Alexa invokes play by `ContentSelector` type (`FREQUENCY`, `CHANNEL`, `PRESET`) for a radio local media source (`AM_RADIO`, `FM_RADIO`, `SIRIUS_XM`). The `payload` is a string that depends on the `ContentSelector` type and local media `Source` type (e.g., "1", "98.7 FM HD 1").
+The `play()` method is called when Alexa invokes play by `ContentSelector` type (`FREQUENCY`, `CHANNEL`, `PRESET`) for a radio local media source (`AM_RADIO`, `FM_RADIO`, `SIRIUS_XM`, `DAB`). The `payload` is a string that depends on the `ContentSelector` type and local media `Source` type (e.g., "1", "98.7 FM HD 1").
 
 ```
 @Override
@@ -687,8 +881,11 @@ The table below provides details about the supported `ContentSelector` types bas
 | FM | FREQUENCY, PRESET | 
 | AM | FREQUENCY, PRESET | 
 | SXM | CHANNEL, PRESET | 
+| DAB | CHANNEL |
 
-The ranges and increments for valid frequency, preset, and channel may vary, depending on the region you are in. Contact your partner manager for more detailed information. 
+The support, ranges and increments for valid frequency, preset, and channel may vary, depending on the region you are in. Contact your partner manager for more detailed information.
+
+>**Note:** The `DAB` channel payload is the radio station name string. If supported, then the name string must be handled by the client's DAB implementation.
 
 The `play()` method will not be invoked if a source cannot handle the specified `ContentSelector` type.
 

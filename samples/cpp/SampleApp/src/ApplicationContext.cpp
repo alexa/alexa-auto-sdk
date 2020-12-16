@@ -22,6 +22,7 @@
 #include <array>    // std::array
 #include <cstddef>  // std::size_t
 #include <fstream>  // std::ofstream
+#include <regex>    // std::regex
 #include <stdio.h>  // std::stdio
 
 // Guidelines Support Library
@@ -47,11 +48,7 @@ ApplicationContext::ApplicationContext(const std::string& path) {
         // dir path does not include trailing slash
         m_applicationDirPath = m_applicationPath.substr(0, pos);
     }
-    auto input = std::ifstream(m_applicationDirPath + "/token", std::ifstream::in);
-    if (input.good()) {
-        input >> m_refreshToken;
-        input.close();
-    }
+
     m_menuRegister = json::object();
 }
 
@@ -83,11 +80,6 @@ bool ApplicationContext::checkDcmConfiguration(const std::vector<json>& configs)
 
 void ApplicationContext::clearLevel() {
     m_logEnabled = false;
-}
-
-void ApplicationContext::clearRefreshToken() {
-    std::remove((m_applicationDirPath + "/token").c_str());
-    return m_refreshToken.clear();
 }
 
 void ApplicationContext::clearUserConfigFilePath() {
@@ -222,8 +214,16 @@ bool ApplicationContext::hasMenu(const std::string& id) {
     return m_menuRegister.count(id) == 1;
 }
 
-bool ApplicationContext::hasRefreshToken() {
-    return !m_refreshToken.empty();
+bool ApplicationContext::hasRefreshToken(const std::string& service) {
+    if (!m_authorizationData[service]["refreshToken"].empty()) {
+        return true;
+    }
+    auto input = std::ifstream(m_applicationDirPath + "/token-" + service, std::ifstream::in);
+    if (input.good()) {
+        input >> m_authorizationData[service]["refreshToken"];
+        input.close();
+    }
+    return !m_authorizationData[service]["refreshToken"].empty();
 }
 
 bool ApplicationContext::hasUserConfigFilePath() {
@@ -240,6 +240,14 @@ bool ApplicationContext::isAlexaCommsSupported() {
 
 bool ApplicationContext::isAudioFileSupported() {
     return m_audioFileSupported;
+}
+
+bool ApplicationContext::isConnectivitySupported() {
+#ifdef CONNECTIVITY
+    return true;
+#else
+    return false;
+#endif  // CONNECTIVITY
 }
 
 bool ApplicationContext::isDcmSupported() {
@@ -282,6 +290,38 @@ bool ApplicationContext::isMessagingResponsesEnabled() {
     return m_messagingResponsesEnabled;
 }
 
+bool ApplicationContext::isAuthProviderAuthorizationActive() {
+    if (m_activeAuthorization == "alexa:auth-provider") {
+        return true;
+    }
+    return false;
+}
+
+bool ApplicationContext::isAuthProviderAuthorizationInProgress() {
+    if (m_authorizationInProgress == "alexa:auth-provider") {
+        return true;
+    }
+    return false;
+}
+
+bool ApplicationContext::isAuthProviderSupported() {
+    return m_authProviderAvailable;
+}
+
+bool ApplicationContext::isCBLAuthorizationActive() {
+    if (m_activeAuthorization == "alexa:cbl") {
+        return true;
+    }
+    return false;
+}
+
+bool ApplicationContext::isCBLAuthorizationInProgress() {
+    if (m_authorizationInProgress == "alexa:cbl") {
+        return true;
+    }
+    return false;
+}
+
 std::string ApplicationContext::makeTempPath(const std::string& name, const std::string& extension) {
     static std::map<std::string, unsigned> Count{};
     if (Count.count(name) == 0) {
@@ -318,12 +358,25 @@ bool ApplicationContext::saveContent(const std::string& path, const std::string&
     return true;
 }
 
+void ApplicationContext::setActiveAuthorization(const std::string& service) {
+    m_activeAuthorization = service;
+    m_authorizationInProgress = "";
+}
+
 void ApplicationContext::setAudioFileSupported(bool audioFileSupported) {
     m_audioFileSupported = audioFileSupported;
 }
 
 void ApplicationContext::setAudioInputDevice(const std::string& audioInputDevice) {
     m_audioInputDevice = audioInputDevice;
+}
+
+void ApplicationContext::setAuthorizationInProgress(const std::string& service) {
+    m_authorizationInProgress = service;
+}
+
+void ApplicationContext::setAuthProviderAvailability(bool available) {
+    m_authProviderAvailable = available;
 }
 
 void ApplicationContext::setBrowserCommand(const std::string& browserCommand) {
@@ -357,17 +410,46 @@ void ApplicationContext::setMessagingResponses(bool messagingResponses) {
 
 // private
 
-std::string ApplicationContext::getRefreshToken() {
-    return m_refreshToken;
+std::string ApplicationContext::getAuthorizationData(const std::string& service, const std::string& key) {
+    return m_authorizationData[service][key];
 }
 
-void ApplicationContext::setRefreshToken(const std::string& refreshToken) {
-    // IMPORTANT: YOUR PRODUCT IS RESPONSIBLE FOR STORING THE REFRESH TOKEN SECURELY.
-    // FOR SECURITY REASONS, AUTHENTICATION IS NOT PRESERVED IN THE C++ SAMPLE APP.
-    m_refreshToken = refreshToken;
+void ApplicationContext::setAuthorizationData(
+    const std::string& service,
+    const std::string& key,
+    const std::string& data) {
+    // IMPORTANT: YOUR PRODUCT IS RESPONSIBLE FOR STORING THE AUTHORIZATION DATA SECURELY.
+    // VISIT THIS PAGE (https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/avs-security-reqs.html)
+    // FOR MORE INFORMATION SECURITY REQUIREMENTS.
+
+    // JUST TO FACILITATE TESTING AND VERIFICATION, THIS SAMPLE APP SHALL STORE TOKEN ON THE FILE SYSTEM.
+    m_authorizationData[service][key] = data;
+    if (key == "refreshToken") {
+        auto path = m_applicationDirPath + "/token-" + service;
+        if (data.empty()) {
+            std::remove(path.c_str());
+        } else {
+            saveContent(path, data);
+        }
+    }
 }
 
-bool ApplicationContext::test(const std::string& value) {
+bool ApplicationContext::testExpression(const std::string& value) {
+    // NOTE: EXPRESSION ONLY SUPPORTS LOGICAL AND (&&) HERE
+    // e.g. "!RefreshToken && AudioFileSupported"
+    bool result = true;
+    auto s = value;
+    static std::regex r("\\s*(&&)\\s*", std::regex::optimize);
+    std::smatch sm{};
+    while (std::regex_search(s, sm, r)) {
+        result = result && testValue(sm.prefix());
+        s = sm.suffix();
+    }
+    result = result && testValue(s);
+    return result;
+}
+
+bool ApplicationContext::testValue(const std::string& value) {
     std::string fn;
     bool negate = false;
     bool result = false;
@@ -381,11 +463,16 @@ bool ApplicationContext::test(const std::string& value) {
     // clang-format off
     static std::map<std::string, std::function<bool()>> DispatchTable{
         // has
-        {"RefreshToken", std::bind(&ApplicationContext::hasRefreshToken, this)},
+        {"AuthProviderAuthorizationInProgress", std::bind(&ApplicationContext::isAuthProviderAuthorizationInProgress, this)},
+        {"CBLAuthorizationInProgress", std::bind(&ApplicationContext::isCBLAuthorizationInProgress, this)},
         {"UserConfigFilePath", std::bind(&ApplicationContext::hasUserConfigFilePath, this)},
         // is
         {"AlexaCommsSupported", std::bind(&ApplicationContext::isAlexaCommsSupported, this)},
         {"AudioFileSupported", std::bind(&ApplicationContext::isAudioFileSupported, this)},
+        {"AuthProviderAuthorizationActive", std::bind(&ApplicationContext::isAuthProviderAuthorizationActive, this)},
+        {"AuthProviderSupported", std::bind(&ApplicationContext::isAuthProviderSupported, this)},
+        {"CBLAuthorizationActive", std::bind(&ApplicationContext::isCBLAuthorizationActive, this)},
+        {"ConnectivitySupported", std::bind(&ApplicationContext::isConnectivitySupported, this)},
         {"LocalVoiceControlSupported", std::bind(&ApplicationContext::isLocalVoiceControlSupported, this)},
         {"LogEnabled", std::bind(&ApplicationContext::isLogEnabled, this)},
         {"SingleThreadedUI", std::bind(&ApplicationContext::isSingleThreadedUI, this)},

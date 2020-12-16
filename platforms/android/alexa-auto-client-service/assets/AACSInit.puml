@@ -11,6 +11,10 @@ App->AACS: startForegroundService(Intent) intent with \nNEW_CONFIG = true
 rnote over AACS: Start as foreground \nservice
 rnote over AACS: Wait for configuration
 |||
+App->AACS: Send Intent.ACTION_SEND_MULTIPLE intent \n containing URIs of files to be shared \n(if necessary)
+|||
+rnote over AACS: Creates local copy of files \nto be used when configuring
+|||
 App->AACS: AACSSender.sendConfigMessageAnySize(\nString, TargetComponent, Context)
 |||
 rnote over AACS: Store configuration in \nSharedPreferences

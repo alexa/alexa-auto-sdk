@@ -2,13 +2,15 @@
 
 This guide outlines the changes you need to make to migrate from Auto SDK v2.0 to later versions of the Auto SDK.
 
->**Note:** If you migrate from a version earlier than v2.3, be sure to read the relevant sections of this guide to understand all changes introduced between your current version and v3.0. The information helps you decide what changes you must include. For example, if you migrate from v2.0, include the changes described in [Migrating from Auto SDK v2.0 to v2.1](#migrating-from-auto-sdk-v20-to-v21), the changes described in [Migrating from Auto SDK v2.1 to v2.2](#migrating-from-auto-sdk-v21-to-v22), and so on, taking into consideration the deprecated or removed features in v2.3 and v3.0.
+>**Note:** If you migrate from a version earlier than v2.3, be sure to read the relevant sections of this guide to understand all changes introduced between your current version and v3.1. The information helps you decide what changes you must include. For example, if you migrate from v2.0, include the changes described in [Migrating from Auto SDK v2.0 to v2.1](#migrating-from-auto-sdk-v20-to-v21), the changes described in [Migrating from Auto SDK v2.1 to v2.2](#migrating-from-auto-sdk-v21-to-v22), and so on, taking into consideration the deprecated or removed features in each version.
 
 <!-- omit in toc -->
 ## Table of Contents
 
+- [Migrating from Auto SDK v3.0.0 to v3.1.0](#migrating-from-auto-sdk-v300-to-v310)
+  - [Migrating to the Authorization Platform Interface](#migrating-to-the-authorization-platform-interface)
 - [Deprecated Features Removed in Auto SDK v3.0.0](#deprecated-features-removed-in-auto-sdk-v300)
-    - [Using the Address Book Module](#using-the-address-book-module)
+  - [Using the Address Book Module](#using-the-address-book-module)
 - [Migrating from Auto SDK v2.2.1 to v2.3.0](#migrating-from-auto-sdk-v221-to-v230)
   - [Car Control Enhancements and Breaking Changes](#car-control-enhancements-and-breaking-changes)
   - [Language Model Packaging](#language-model-packaging)
@@ -25,6 +27,41 @@ This guide outlines the changes you need to make to migrate from Auto SDK v2.0 t
   - [Navigation Enhancements](#navigation-enhancements)
   - [Car Control Source File Relocation](#car-control-source-file-relocation)
   - [Code-Based-Linking (CBL) Handler in the Sample Apps](#code-based-linking-cbl-handler-in-the-sample-apps)
+
+## Migrating from Auto SDK v3.0.0 to v3.1.0
+This section provides the information you need to migrate from Auto SDK v3.0.0 to Auto SDK v3.1.0.
+
+### Migrating to the Authorization Platform Interface
+
+Auto SDK v3.1.0 introduces the Authorization module that provides a single platform interface to manage different types of authorizations supported by the Engine. This single platform interface works with the Engine services that carry out the actual authorization process or flow. For more information about how authorization works, see the [Core module README](./modules/core/README.md). This section provides the information you need for migrating to the Authorization platform interface from the CBL or AuthProvider platform interface, which are deprecated in v3.1.0
+
+**Migrating from the CBL Platform Interface**
+
+To migrate from the CBL platform interface to the Authorization platform interface, follow the instructions in the [CBL README](./modules/cbl/README.md), which describes the Authorization APIs for CBL authorization. 
+
+The Engine notifies the application of any errors during the authorization process via the `authorizationError` API. The errors reported when you use the Authorization platform interface are different from the ones reported with the CBL platform interface, as shown in the following table:
+
+| CBL                 | Authorization            | Description                                      |
+|-----------------------|----------------------------|--------------------------------------------------|
+| ERROR                 | UNKNOWN_ERROR              |Unknown error occurs during the authorization flow.     |
+| TIMEOUT               | TIMEOUT                    |Request for the the CBL code from LWA times out.      |
+| CODE_PAIR_EXPIRED     | CODE_PAIR_EXPIRED          |The code pair obtained has expired.               |
+| AUTHORIZATION_EXPIRED | AUTHORIZATION_EXPIRED      |Refresh token is expired or revoked.              |
+|             | START_AUTHORIZATION_FAILED |Authorization fails to start.                     |
+|             | LOGOUT_FAILED              |Logout fails.                                     |
+
+**Migrating from the AuthProvider Platform Interface**
+
+To migrate from the AuthProvider platform interface to the Authorization platform interface, follow the instructions in the [Alexa README](./modules/alexa/README.md), which describes the Authorization APIs for Auth Provider authorization. 
+
+The Engine notifies the application of any errors during the authorization process via the `authorizationError` API. The errors reported when you use the Authorization platform interface are different from the ones reported with the AuthProvider platform interface, as shown in the following table:
+
+| AuthProvider        | Authorization              | Description                                      |
+|---------------------|----------------------------|--------------------------------------------------|
+| authFailure         | AUTH_FAILURE               |Invalid or expired access token was provided.     |
+| NOT PRESENT         | UNKNOWN_ERROR              |Unknown error occurs during the authorization flow.     |
+| NOT PRESENT         | START_AUTHORIZATION_FAILED |Authorization fails to start.  |
+| NOT PRESENT         | LOGOUT_FAILED              |Logout fails.            |
 
 ## Deprecated Features Removed in Auto SDK v3.0.0
 * The following asset IDs for Car Control have been removed: "Alexa.Automotive.DeviceName.DriverSeat", "Alexa.Automotive.DeviceName.LeftSeat", "Alexa.Automotive.DeviceName.PassengerSeat", "Alexa.Automotive.DeviceName.RightSeat".

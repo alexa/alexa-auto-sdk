@@ -88,8 +88,9 @@
     <string name="product_dsn">PRODUCT DSN:</string>
 
     <!-- Auth -->
-    <string name="auth_cancel">CANCEL LOGIN</string>
-    <string name="auth_logout">LOG OUT</string>
+    <string name="auth_cbl_login">LOGIN USING CBL</string>
+    <string name="auth_cbl_logout">LOGOUT CBL</string>
+    <string name="auth_cbl_cancel">CANCEL CBL LOGIN</string>
     <string name="auth_product_id">PRODUCT ID</string>
     <string name="auth_product_dsn">PRODUCT DSN</string>
 
@@ -196,6 +197,7 @@
     <string name="preference_product_id">Product ID Key</string>q
     <string name="preference_product_dsn">Product DSN Key</string>
     <string name="preference_refresh_token">Refresh Token Key</string>
+    <string name="preferred_authorization">Preferred Authorization Service</string>
 
     <!-- DoNotDisturb -->
     <string name="doNotDisturb">DO NOT DISTURB</string>
@@ -204,4 +206,7 @@
 
     <!-- Shutdown -->
     <string name="callOnDestroy">DESTROY MAIN APP TASK</string>
+
+    <!-- Text to Speech -->
+    <string name="text_to_speech_title">TEXT TO SPEECH</string>
 </resources>

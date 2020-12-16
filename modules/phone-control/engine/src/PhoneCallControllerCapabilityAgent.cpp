@@ -88,6 +88,15 @@ void PhoneCallControllerCapabilityAgent::handleDirective(std::shared_ptr<Directi
     try {
         ThrowIfNot(info && info->directive, "nullDirectiveInfo");
 
+        if (m_connectionState !=
+            aace::phoneCallController::PhoneCallControllerEngineInterface::ConnectionState::CONNECTED) {
+            sendExceptionEncounteredAndReportFailed(
+                info,
+                "Connection state is not CONNECTED",
+                alexaClientSDK::avsCommon::avs::ExceptionErrorType::INTERNAL_ERROR);
+            return;
+        }
+
         if (info->directive->getName() == DIAL.name) {
             handleDialDirective(info);
         } else if (info->directive->getName() == REDIAL.name) {

@@ -2,13 +2,13 @@
 
 The Alexa Auto Services Bridge (AASB) extension simplifies the integration work required to implement the Alexa Auto SDK. To generate messages and events without the AASB extension, you must create a handler and implement the message serialization and underlying event behavior for all the Auto SDK modules required by your service and applications. In contrast, the AASB extension provides a single platform interface that you can customize and implement to consume messages from and reply back to the Auto SDK Engine. 
 
-**Table of Contents:**
+<!-- omit in toc -->
+## Table of Contents
+- [Overview and High-level Architecture](#overview-and-high-level-architecture)
+- [Building the Auto SDK with the AASB Extension](#building-the-auto-sdk-with-the-aasb-extension)
+- [Using the AASB Extension](#using-the-aasb-extension)
 
-* [Overview and High-level Architecture](#overview-and-high-level-architecture)
-* [Building the Auto SDK with the AASB Extension](#building-the-auto-sdk-with-the-aasb-extension)
-* [Using the AASB Extension](#using-the-aasb-extension)
-
-## Overview and High-level Architecture<a id ="overview-and-high-level-architecture"></a>
+## Overview and High-level Architecture
 The most common approach to integrating the Auto SDK without the AASB extension is to implement custom handlers for each Auto SDK platform interface, as illustrated in the architecture diagram below.
 
 **System without the AASB Extension**
@@ -32,30 +32,32 @@ The default implementations send the messages, each with a specific message topi
 
 >**Note:** The AASB extension adds its default implementation only if you have not registered the handler for the corresponding platform interface with the Auto SDK Engine.
 
-## Building the Auto SDK with the AASB Extension <a id="building-the-auto-sdk-with-the-aasb-extension"></a>
+## Building the Auto SDK with the AASB Extension
 
-To build the Auto SDK with the AASB extension, run the Auto SDK Builder from the location into which you've installed the Auto SDK (for example, `AAC_SDK_HOME`) and specify AASB as an extension:
+This section describes how to build the Auto SDK with the AASB extension by using the Auto SDK Builder. The builder is located in the directory where you installed the Auto SDK (represented as `${AAC_SDK_HOME}` in this document).
 
-```
-builder/build.sh <platform> -t <target> extensions/aasb
-```
-
-For details about the Auto SDK Builder and build command arguments, see the [Auto SDK Builder README](https://github.com/alexa/alexa-auto-sdk/blob/2.1/builder/README.md)
-
-If you want to use the AASB extension with any of the other Auto SDK optional extensions, you must include these extensions and their corresponding AASB services in the build command. For example to build with the Alexa Communications extension, use:
+If your platform is Android and you want to build the Auto SDK with AACS, the Auto SDK Builder builds AASB by default. To build the Auto SDK with AACS, specify `--aacs-android` for the build command. The following command syntax builds the Auto SDK with AACS and AASB:
 
 ```
-builder/build.sh <platform> -t <target> extensions/aasb extensions/extras/alexacomms
+${AAC_SDK_HOME}/builder/build.sh android -t <target> --aacs-android
 ```
 
-## Using the AASB Extension <a id="using-the-aasb-extension"></a>
+If you do not build the Auto SDK with AACS but want to use the AASB extension, specify AASB as an extension for the build command as in the following command syntax:
+
+```
+${AAC_SDK_HOME}/builder/build.sh <platform> -t <target> extensions/aasb
+```
+
+For details about the Auto SDK Builder and build command arguments, see the [Auto SDK Builder README](../../builder/README.md).
+
+## Using the AASB Extension
 To use the AASB extension in your service and applications:
 
 1. Implement a custom handler for the AASB platform interface by extending the `AASB` class to handle sending and receiving AASB messages to and from the Engine.
 
     >**Note:** In most cases, you will send the messages to the application layer using IPC.
 
-  ```
+```
 #include <AACE/AASB/AASB.h>
 
     class AASBHandler : public aace::core::PlatformInterface {
@@ -68,13 +70,13 @@ To use the AASB extension in your service and applications:
 
 2. Create the Auto SDK Engine:
 
- ```
+```
 auto engine = aace::core::Engine::create();
 ```
 
 3. Configure the Auto SDK Engine, using a file-based JSON configuration: 
 
- ```
+```
 engine->configure( aace::core::config::ConfigurationFile::create( "config.json" ) );
 ```
 
@@ -82,23 +84,22 @@ engine->configure( aace::core::config::ConfigurationFile::create( "config.json" 
 
 4. Register your AASB platform interface handler:
 
- ``` 
+``` 
 engine->registerPlatformInterface( std::make_shared<AASBHandler>() );
 ```
 
 5. Start the Engine:
 
- ```
+```
 engine->start();
 ```
-
 ### Configuring the AASB Version Being Used
 
 If the Auto SDK is built with AASB, provide in the configuration a version string indicating the AASB version that the platform uses for communication with the Auto SDK. AASB version starts from 3.0. AASB validates the version before starting the Engine. Failure to provide a version string, which is considered valid if it lies within the range of minimum version supported and the current version, causes the Engine not to start. The following example shows the configuration with the AASB version string:
 ```
 {
     "aace.aasb": {
-        "version": "3.0"
+        "version": "3.1"
     }
 }
 ```
@@ -108,31 +109,31 @@ In some cases you may want to implement the behavior for a particular platform i
 
 1. Create the Auto SDK Engine.
 
- ```
+```
 auto engine = aace::core::Engine::create();
 ```
 
 2. Configure the Engine using a file-based JSON configuration.
 
- ```
+```
 engine->configure( aace::core::config::ConfigurationFile::create( "config.json" ) );
 ``` 
 
 3. Register the AASB platform interface handler.
 
- ```
+```
 engine->registerPlatformInterface( std::make_shared<AASBHandler>() );
 ```
  
 4. Override the default AASB implementation for a specific platform interface by registering a custom handler with the Engine. For example, to register a custom LocationProvider handler:
 
- ```
+```
 engine->registerPlatformInterface( std::make_shared<LocationProviderHandler>() );
 ```
 
 5. Start the Engine.
 
- ```
+```
 engine->start();
 ```
 
@@ -205,12 +206,11 @@ In addition to the message header, each AASB JSON message includes a `payload` s
       ...
    }
 }
-
 ```
 
 Each message defines a specific schema for its payload data, so you should refer to the [AASB protocol and message reference documentation](./docs/Introduction.html) before implementing any message behavior.
 
-### Publishing Messages <a id = "publishing-messages"></a>
+### Publishing Messages
 Your application must notify the Auto SDK when a state has changed, or to perform an action. To do this, your application sends messages to the Engine using the `publish()` method of the AASB platform interface. The format is the same as that of the messages received from the Engine. To understand which messages to send, refer to the [AASB protocol and message reference documentation](./docs/Introduction.html).
 
 The following example shows how you would send a message to the Auto SDK to initiate a tap-to-talk interaction:
@@ -325,4 +325,4 @@ while( ! stream->isClosed() ) {
 }
 ```
 
-You can also use the `AASBStream` interface's `write()` method to write data to the stream. Certain messages (such as `AudioInput:StartAudioInput`) pass in a stream reference and expect the stream to be opened in `WRITE` mode. Once the stream is opened, data should be written to the stream object until another message is received to stop sending data or the stream is closed. 
+You can also use the `AASBStream` interface's `write()` method to write data to the stream. Certain messages (such as `AudioInput:StartAudioInput`) pass in a stream reference and expect the stream to be opened in `WRITE` mode. After the stream is opened, data should be written to the stream object until another message is received to stop sending data or the stream is closed. 

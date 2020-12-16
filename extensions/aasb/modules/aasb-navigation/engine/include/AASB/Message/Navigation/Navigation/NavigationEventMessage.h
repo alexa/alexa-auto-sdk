@@ -52,7 +52,7 @@ struct NavigationEventMessage {
             }
         };
         static const std::string& version() {
-            static std::string version = "3.0";
+            static std::string version = "3.1";
             return version;
         }
         static const std::string& messageType() {
@@ -76,7 +76,7 @@ struct NavigationEventMessage {
         return action;
     }
     static const std::string& version() {
-        static std::string version = "3.0";
+        static std::string version = "3.1";
         return version;
     }
     static const std::string& messageType() {

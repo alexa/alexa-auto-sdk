@@ -108,14 +108,6 @@ public class VehicleConfiguration {
         MICROPHONE("MICROPHONE", "microphone"),
 
         /**
-         * A comma-separated list of supported countries (ISO country codes).
-         * Example value: "US,CA"
-         *
-         * @hideinitializer
-         */
-        COUNTRY_LIST("COUNTRY_LIST", "countries"),
-
-        /**
          * The automaker's identifier for the vehicle.
          *
          * @hideinitializer
@@ -192,7 +184,6 @@ public class VehicleConfiguration {
      *          "arch": "<HARDWARE_ARCH>",
      *          "language": "<LANGUAGE>",
      *          "microphone": "<MICROPHONE>",
-     *          "countries": "<COUNTRY_LIST>",
      *          "vehicleIdentifier": "<VEHICLE_IDENTIFIER>"
      *      }
      *   }

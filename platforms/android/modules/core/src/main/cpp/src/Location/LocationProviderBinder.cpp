@@ -73,17 +73,32 @@ std::string LocationProviderHandler::getCountry() {
 //
 aace::location::Location JLocation::getLocation() {
     try_with_context {
+        jdouble jundefined;
+        ThrowIfNot(getStatic("UNDEFINED", &jundefined), "getStaticFailed");
+
         jdouble latitude;
         ThrowIfNot(invoke("getLatitude", "()D", &latitude), "invokeMethodFailed");
+        if (latitude == jundefined) {
+            latitude = aace::location::Location::UNDEFINED;
+        }
 
         jdouble longitude;
         ThrowIfNot(invoke("getLongitude", "()D", &longitude), "invokeMethodFailed");
+        if (longitude == jundefined) {
+            longitude = aace::location::Location::UNDEFINED;
+        }
 
         jdouble altitude;
         ThrowIfNot(invoke("getAltitude", "()D", &altitude), "invokeMethodFailed");
+        if (altitude == jundefined) {
+            altitude = aace::location::Location::UNDEFINED;
+        }
 
         jdouble accuracy;
         ThrowIfNot(invoke("getAccuracy", "()D", &accuracy), "invokeMethodFailed");
+        if (accuracy == jundefined) {
+            accuracy = aace::location::Location::UNDEFINED;
+        }
 
         return aace::location::Location(latitude, longitude, altitude, accuracy);
     }

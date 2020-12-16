@@ -15,8 +15,9 @@
 
 package com.amazon.alexaautoclientservice.util;
 
-import android.support.annotation.NonNull;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.amazon.aacsconstants.AACSConstants;
 
@@ -35,7 +36,7 @@ public class AASBUtil {
             if (replyToId.isEmpty()) {
                 aasbMessage = "{\n"
                         + "  \"header\" : {\n"
-                        + "    \"version\" : \"3.0\",\n"
+                        + "    \"version\" : \"3.1\",\n"
                         + "    \"messageType\" : \"Publish\",\n"
                         + "    \"id\" : \"" + uniqueID + "\",\n"
                         + "    \"messageDescription\" : {\n"
@@ -47,7 +48,7 @@ public class AASBUtil {
             } else {
                 aasbMessage = "{\n"
                         + "  \"header\" : {\n"
-                        + "    \"version\" : \"3.0\",\n"
+                        + "    \"version\" : \"3.1\",\n"
                         + "    \"messageType\" : \"Reply\",\n"
                         + "    \"id\" : \"" + uniqueID + "\",\n"
                         + "    \"messageDescription\" : {\n"

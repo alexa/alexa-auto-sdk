@@ -52,7 +52,7 @@ struct GetNavigationStateMessageReply {
             std::string replyToId;
         };
         static const std::string& version() {
-            static std::string version = "3.0";
+            static std::string version = "3.1";
             return version;
         }
         static const std::string& messageType() {
@@ -63,7 +63,7 @@ struct GetNavigationStateMessageReply {
         MessageDescription messageDescription;
     };
     struct Payload {
-        nlohmann::json navigationState;
+        std::string navigationState;
     };
     static const std::string& topic() {
         static std::string topic = "Navigation";
@@ -74,7 +74,7 @@ struct GetNavigationStateMessageReply {
         return action;
     }
     static const std::string& version() {
-        static std::string version = "3.0";
+        static std::string version = "3.1";
         return version;
     }
     static const std::string& messageType() {
@@ -93,7 +93,7 @@ inline void to_json(nlohmann::json& j, const GetNavigationStateMessageReply::Pay
     };
 }
 inline void from_json(const nlohmann::json& j, GetNavigationStateMessageReply::Payload& c) {
-    c.navigationState = j.at("navigationState");
+    j.at("navigationState").get_to(c.navigationState);
 }
 
 inline void to_json(nlohmann::json& j, const GetNavigationStateMessageReply::Header::MessageDescription& c) {

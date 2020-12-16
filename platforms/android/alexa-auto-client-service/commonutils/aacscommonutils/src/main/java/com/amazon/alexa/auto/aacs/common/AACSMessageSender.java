@@ -91,7 +91,7 @@ public class AACSMessageSender {
             return CompletableFuture.completedFuture(false);
         }
 
-        Optional<String> message = AACSMessageBuilder.buildReplyMessage(replyToId, payload);
+        Optional<String> message = AACSMessageBuilder.buildReplyMessage(replyToId, topic, action, payload);
         if (!message.isPresent()) {
             Log.w(TAG,
                     "Failed to build AACS payload for reply. ReplyId: " + replyToId + " Topic: " + topic

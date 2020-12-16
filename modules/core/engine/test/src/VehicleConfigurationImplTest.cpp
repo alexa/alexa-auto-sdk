@@ -52,7 +52,6 @@ TEST_F(VehicleConfigurationImplTest, createVehicleInfoConfig) {
         "            \"arch\": \"x86_64\",\n"
         "            \"language\": \"en_US\",\n"
         "            \"microphone\": \"SingleArray\",\n"
-        "            \"countries\": \"US,GB,IE,CA,DE,AT,IN,JP,AU,NZ,FR\",\n"
         "            \"vehicleIdentifier\": \"123456789a\"\n"
         "        }\n"
         "    }\n"
@@ -70,7 +69,6 @@ TEST_F(VehicleConfigurationImplTest, createVehicleInfoConfig) {
          {VehiclePropertyType::HARDWARE_ARCH, "x86_64"},
          {VehiclePropertyType::LANGUAGE, "en_US"},
          {VehiclePropertyType::MICROPHONE, "SingleArray"},
-         {VehiclePropertyType::COUNTRY_LIST, "US,GB,IE,CA,DE,AT,IN,JP,AU,NZ,FR"},
          {VehiclePropertyType::VEHICLE_IDENTIFIER, "123456789a"}});
 
     //Convert to ostringstream for comparing the istream
@@ -122,7 +120,6 @@ TEST_F(VehicleConfigurationImplTest, createVehicleInfoConfigWithEmptyValueString
         "            \"arch\": \"x86_64\",\n"
         "            \"language\": \"en_US\",\n"
         "            \"microphone\": \"SingleArray\",\n"
-        "            \"countries\": \"US,GB,IE,CA,DE,AT,IN,JP,AU,NZ,FR\",\n"
         "            \"vehicleIdentifier\": \"123456789a\"\n"
         "        }\n"
         "    }\n"
@@ -140,7 +137,6 @@ TEST_F(VehicleConfigurationImplTest, createVehicleInfoConfigWithEmptyValueString
          {VehiclePropertyType::HARDWARE_ARCH, "x86_64"},
          {VehiclePropertyType::LANGUAGE, "en_US"},
          {VehiclePropertyType::MICROPHONE, "SingleArray"},
-         {VehiclePropertyType::COUNTRY_LIST, "US,GB,IE,CA,DE,AT,IN,JP,AU,NZ,FR"},
          {VehiclePropertyType::VEHICLE_IDENTIFIER, "123456789a"}});
 
     //Convert to ostringstream for comparing the istream
@@ -170,7 +166,6 @@ TEST_F(VehicleConfigurationImplTest, createVehicleInfoConfigWithPossibleCharsinV
         "            \"arch\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
         "            \"language\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
         "            \"microphone\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
-        "            \"countries\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
         "            \"vehicleIdentifier\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\"\n"
         "        }\n"
         "    }\n"
@@ -188,7 +183,6 @@ TEST_F(VehicleConfigurationImplTest, createVehicleInfoConfigWithPossibleCharsinV
          {VehiclePropertyType::HARDWARE_ARCH, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
          {VehiclePropertyType::LANGUAGE, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
          {VehiclePropertyType::MICROPHONE, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
-         {VehiclePropertyType::COUNTRY_LIST, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
          {VehiclePropertyType::VEHICLE_IDENTIFIER, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"}});
 
     //Convert to ostringstream for comparing the istream

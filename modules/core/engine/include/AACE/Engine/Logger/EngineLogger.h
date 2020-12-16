@@ -57,8 +57,8 @@ private:
         const std::string& tag,
         Level level,
         std::chrono::system_clock::time_point time,
-        const std::string& threadMoniker,
-        const std::string& text);
+        const char* threadMoniker,
+        const char* text);
 
 public:
     virtual ~EngineLogger() = default;

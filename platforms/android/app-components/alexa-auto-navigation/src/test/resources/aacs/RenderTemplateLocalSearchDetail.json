@@ -1,0 +1,15 @@
+{
+  "header": {
+    "id": "7fd5e391-572b-47ef-bf4f-34792d283e63",
+    "messageDescription": {
+      "action": "RenderTemplate",
+      "topic": "TemplateRuntime"
+    },
+    "messageType": "Publish",
+    "version": "3.0"
+  },
+  "payload": {
+    "focusState": "FOREGROUND",
+    "payload": "{\"type\":\"LocalSearchDetailTemplate1\",\"token\":\"7d01a4f3-a7a6-458d-a008-b0c13c2818c1\",\"phoneNumber\":\"+16509652048\",\"travelTime\":\"4 min\",\"image\":{\"sources\":[{\"url\":\"https:\/\/s3-media0.fl.yelpcdn.com\/bphoto\/Uym5IKuYq9YYuRS6YkS6lA\/o.jpg\"}]},\"title\":{\"subTitle\":\"Food,Coffee & Tea\",\"mainTitle\":\"Starbucks\"},\"coordinate\":{\"longitudeInDegrees\":-122.077697,\"latitudeInDegrees\":37.415753},\"address\":\"1380 Pear Ave Mountain View, CA 94043\",\"provider\":\"Yelp\",\"currentStatus\":\"CLOSED\",\"travelDistance\":\"0.9 mi\",\"hoursOfOperation\":[{\"dayOfWeek\":\"SUNDAY\",\"type\":\"OPEN_DURING_HOURS\",\"hours\":\"05:00:00-17:00:00\"},{\"dayOfWeek\":\"MONDAY\",\"type\":\"OPEN_DURING_HOURS\",\"hours\":\"05:00:00-17:00:00\"},{\"dayOfWeek\":\"TUESDAY\",\"type\":\"OPEN_DURING_HOURS\",\"hours\":\"05:00:00-17:00:00\"},{\"dayOfWeek\":\"WEDNESDAY\",\"type\":\"OPEN_DURING_HOURS\",\"hours\":\"05:00:00-17:00:00\"},{\"dayOfWeek\":\"THURSDAY\",\"type\":\"OPEN_DURING_HOURS\",\"hours\":\"05:00:00-17:00:00\"},{\"dayOfWeek\":\"FRIDAY\",\"type\":\"OPEN_DURING_HOURS\",\"hours\":\"05:00:00-17:00:00\"},{\"dayOfWeek\":\"SATURDAY\",\"type\":\"OPEN_DURING_HOURS\",\"hours\":\"05:00:00-17:00:00\"}],\"url\":\"https:\/\/www.yelp.com\/biz\/starbucks-mountain-view-14?adjust_creative=amazon&utm_campaign=yelp_feed&utm_medium=feed_v2&utm_source=amazon\",\"priceRange\":\"1\",\"rating\":{\"image\":{\"sources\":[{\"url\":\"http:\/\/d1uvtkq5kfhsug.cloudfront.net\/yelp_icons\/yelp_rating_stars_3_5.png\"}]},\"value\":\"3.5\",\"provider\":{\"image\":{\"sources\":[{}]},\"name\":\"Yelp\"},\"reviewCount\":\"104\"}}"
+  }
+}

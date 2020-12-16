@@ -1,0 +1,18 @@
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style"
+    app:iconSpaceReserved="false">
+
+    <SwitchPreferenceCompat
+        app:key="alexa-hands-free-settings"
+        app:title="@string/preference_alexa_hands_free_title"
+        app:summary="@string/preference_alexa_hands_free_summary"
+        app:defaultValue="true"
+        app:iconSpaceReserved="true"/>
+
+    <Preference
+        app:key="alexa-languages-settings"
+        app:title="@string/preference_alexa_language_title"
+        app:iconSpaceReserved="true"/>
+</androidx.preference.PreferenceScreen>

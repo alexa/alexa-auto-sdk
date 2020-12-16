@@ -35,7 +35,7 @@ The Android Sample App requires a [configuration file](#editing-the-configuratio
 
 ## Enabling Optional Device Capabilities
 
-In order to use certain optional Alexa Auto SDK functionality (for example, AmazonLite Wake Word, Alexa Communications, Local Voice Control (LVC), Device Client Metrics (DCM), or Voice Chrome for Android) with the Sample App, your product must be whitelisted by Amazon. Copy the product's **Amazon ID** from the Developer Console and follow the whitelisting directions on the [Need Help?](../../NEED_HELP.md#requesting-additional-functionality-whitelisting) page.
+In order to use certain optional Alexa Auto SDK functionality (for example, AmazonLite Wake Word, Alexa Communications, Local Voice Control (LVC), Device Client Metrics (DCM), or Voice Chrome for Android) with the Sample App, your product must be placed on the allow list by Amazon. Copy the product's **Amazon ID** from the Developer Console and follow the directions on the [Need Help?](../../NEED_HELP.md#requesting-additional-functionality) page.
 
 ## Setting up the Android Sample App
 
@@ -149,7 +149,7 @@ The Sample App provides an example of how to create and configure an instance of
     >**Note:** The Android Sample App includes a simulated local phone that leverages the Phone Call Controller module. However, it cannot currently use cellular voice connections paired with or installed in the host device. You can use this simulator as an example of how to implement the Phone Control interface on the host platform to perform actions such as dialing, hanging up, etc.
  * [Code-based Linking (CBL) module README](../../platforms/android/modules/cbl/README.md)
  * [Alexa Presentation (APL) module README](../../platforms/android/modules/apl/README.md)
-    >**Note:** APL rendering on the Android Sample App requires a component that is available by [request from your Amazon Solutions Architect (SA) or Partner Manager](../../NEED_HELP.md#requesting-additional-functionality-whitelisting).
+    >**Note:** APL rendering on the Android Sample App requires a component that is available by [request from your Amazon Solutions Architect (SA) or Partner Manager](../../NEED_HELP.md#requesting-additional-functionality).
 
 The Sample App GUI consists of a menu bar and a log console. The expandable menu icon in the menu bar opens an options menu to the right of the screen that contains GUI elements relevant to the Platform Interface implementations as well as the authentication UI. Interacting with Alexa and the Engine requires successful authentication with AVS. You can log out using the **Log Out** button in the options menu, which will clear the saved refresh token.
 
@@ -269,7 +269,3 @@ aac-module-core/0.99.0-r0/src/engine/src/ ${AAC_SDK_HOME}/modules/core/engine/sr
 * Alexa dialog playback may stop abruptly when switching between Wi-Fi and mobile data.
 * The sample app disconnects from AVS after remaining idle for some time and takes a while to reconnect.
 * Music service provider logos in the SVG format are not rendered during the music playback.
-* The dual locale combinations are not present in the locale menu of the sample app. You have to add the locale combinations in the hard-coded locale list in the sample app. For the permitted locale combinations, see the [Alexa Voice Service documentation](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/system.html#localecombinations). The locale combinations you add to the list must be the same as the ones used to configure the Engine. The following example shows the hard-coded list with locale combinations:
-~~~
-    private static final String[] sSupportedLocales = {"de-DE", "en-AU", "en-CA", "en-GB", "en-IN", "en-US", "es-ES", "es-MX", "es-US", "fr-CA", "fr-FR", "hi-IN", "it-IT", "ja-JP", "pt-BR", "en-CA/fr-CA", "en-IN/hi-IN", "en-US/es-US", "es-US/en-US", "fr-CA/en-CA", "hi-IN/en-IN"};
-~~~

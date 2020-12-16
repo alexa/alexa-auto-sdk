@@ -1,6 +1,7 @@
 package com.amazon.alexa.auto.aacs.common
 
 import com.squareup.moshi.JsonClass
+import java.util.*
 
 @JsonClass(generateAdapter = true)
 data class ImageSource (
@@ -44,16 +45,21 @@ data class PlaybackControl (
 )
 
 @JsonClass(generateAdapter = true)
-data class RenderPlayerInfo (
+data class RenderPlayerInfoPayload (
     val content : RenderPlayerContent,
     val controls : List<PlaybackControl>
 )
 
-/**
- * Collection of Extension functions on @c RenderPlayerInfo
- */
-object RenderPlayerInfoExtension {
-    @JvmStatic
-    fun RenderPlayerInfo.isControlEnabled(controlName : String) : Boolean =
-        this.controls.firstOrNull() { it.name.equals(controlName) }?.enabled ?: false
+@JsonClass(generateAdapter = true)
+data class RenderPlayerInfo (
+    val payload : RenderPlayerInfoPayload,
+    val audioPlayerState : String,
+    val offset : Int,
+    val focusState :  String
+) {
+    fun isControlEnabled(controlName: String) : Boolean =
+        payload.controls.firstOrNull() { it.name.equals(controlName) }?.enabled ?: false
+
+    fun getControl(controlName: String) =
+        payload.controls.firstOrNull() { it.name.equals(controlName) }
 }

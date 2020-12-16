@@ -25,6 +25,8 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/PropertyManager/PropertyManager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/PropertyManager/PropertyManagerEngineInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Audio/AudioFormat.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Authorization/Authorization.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Authorization/AuthorizationEngineInterface.h
 )
 
 source_group("Header Files" FILES ${HEADERS})
@@ -45,6 +47,7 @@ add_library(AACECorePlatform SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Audio/AudioStream.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/PropertyManager/PropertyManager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Audio/AudioFormat.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Authorization/Authorization.cpp
 )
 
 target_include_directories(AACECorePlatform

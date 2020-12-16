@@ -1,0 +1,51 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 28
+
+    defaultConfig {
+        minSdkVersion 22
+        targetSdkVersion 28
+        versionCode 1
+        versionName "3.1"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    // Enable desugaring (dependency contains Java 8 bytecode)
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+}
+
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.6.2'
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+}
+
+dependencies {
+    // compileOnly fileTree(dir: "${aarDir}", include: ['connectivity*.aar', 'core*.aar', 'sample-core*.aar'])
+    compileOnly fileTree(dir: "${project.rootDir}/../../../../builder/deploy/aar", include: ['core*.aar', 'connectivity*.aar'])
+    compileOnly fileTree(dir: "${project.rootDir}/../../../../samples/android/modules/sample-core/build/outputs/aar", include: ['*.aar'])
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+}

@@ -273,8 +273,10 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testDialDirective) {
 
     EXPECT_CALL(*m_mockGui, dial(DIAL_PAYLOAD)).Times(testing::Exactly(1)).WillOnce(testing::Return(true));
     EXPECT_CALL(*m_mockContextManager, setState(testing::_, testing::_, testing::_, testing::_))
-        .Times(testing::Exactly(1));
+        .Times(testing::Exactly(2));
 
+    m_capAgent->connectionStateChanged(
+        aace::phoneCallController::PhoneCallControllerEngineInterface::ConnectionState::CONNECTED);
     m_capAgent->CapabilityAgent::preHandleDirective(directive, std::move(m_mockDirectiveHandlerResult));
     m_capAgent->CapabilityAgent::handleDirective(directive->getMessageId());
     m_wakeSetCompletedFuture.wait_for(TIMEOUT);
@@ -295,8 +297,10 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testDialDirectiveReturnFalse) {
 
     EXPECT_CALL(*m_mockGui, dial(DIAL_PAYLOAD)).Times(testing::Exactly(1)).WillOnce(testing::Return(false));
     EXPECT_CALL(*m_mockContextManager, setState(testing::_, testing::_, testing::_, testing::_))
-        .Times(testing::Exactly(1));
+        .Times(testing::Exactly(2));
 
+    m_capAgent->connectionStateChanged(
+        aace::phoneCallController::PhoneCallControllerEngineInterface::ConnectionState::CONNECTED);
     m_capAgent->CapabilityAgent::preHandleDirective(directive, std::move(m_mockDirectiveHandlerResult));
     m_capAgent->CapabilityAgent::handleDirective(directive->getMessageId());
     m_wakeSetCompletedFuture.wait_for(TIMEOUT);
@@ -313,9 +317,13 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testDialDirectiveNoCallId) {
         alexaClientSDK::avsCommon::avs::AVSDirective::create(
             "", avsMessageHeader, DIAL_PAYLOAD_NO_CALLID, attachmentManager, "");
 
+    EXPECT_CALL(*m_mockContextManager, setState(testing::_, testing::_, testing::_, testing::_))
+        .Times(testing::Exactly(1));
     EXPECT_CALL(*m_mockExceptionSender, sendExceptionEncountered(testing::_, testing::_, testing::_))
         .Times(testing::Exactly(1));
 
+    m_capAgent->connectionStateChanged(
+        aace::phoneCallController::PhoneCallControllerEngineInterface::ConnectionState::CONNECTED);
     m_capAgent->CapabilityAgent::preHandleDirective(directive, std::move(m_mockDirectiveHandlerResult));
     m_capAgent->CapabilityAgent::handleDirective(directive->getMessageId());
     m_wakeSetCompletedFuture.wait_for(TIMEOUT);
@@ -353,8 +361,10 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testRedialDirective) {
 
     EXPECT_CALL(*m_mockGui, redial(REDIAL_PAYLOAD)).Times(testing::Exactly(1)).WillOnce(testing::Return(true));
     EXPECT_CALL(*m_mockContextManager, setState(testing::_, testing::_, testing::_, testing::_))
-        .Times(testing::Exactly(1));
+        .Times(testing::Exactly(2));
 
+    m_capAgent->connectionStateChanged(
+        aace::phoneCallController::PhoneCallControllerEngineInterface::ConnectionState::CONNECTED);
     m_capAgent->CapabilityAgent::preHandleDirective(directive, std::move(m_mockDirectiveHandlerResult));
     m_capAgent->CapabilityAgent::handleDirective(directive->getMessageId());
     m_wakeSetCompletedFuture.wait_for(TIMEOUT);
@@ -376,8 +386,10 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testRedialDirectiveReturnFalse) {
 
     EXPECT_CALL(*m_mockGui, redial(REDIAL_PAYLOAD)).Times(testing::Exactly(1)).WillOnce(testing::Return(false));
     EXPECT_CALL(*m_mockContextManager, setState(testing::_, testing::_, testing::_, testing::_))
-        .Times(testing::Exactly(1));
+        .Times(testing::Exactly(2));
 
+    m_capAgent->connectionStateChanged(
+        aace::phoneCallController::PhoneCallControllerEngineInterface::ConnectionState::CONNECTED);
     m_capAgent->CapabilityAgent::preHandleDirective(directive, std::move(m_mockDirectiveHandlerResult));
     m_capAgent->CapabilityAgent::handleDirective(directive->getMessageId());
     m_wakeSetCompletedFuture.wait_for(TIMEOUT);
@@ -395,7 +407,11 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testAnswerDirective) {
             "", avsMessageHeader, ANSWER_PAYLOAD, attachmentManager, "");
 
     EXPECT_CALL(*m_mockGui, answer(ANSWER_PAYLOAD)).Times(testing::Exactly(1));
+    EXPECT_CALL(*m_mockContextManager, setState(testing::_, testing::_, testing::_, testing::_))
+        .Times(testing::Exactly(1));
 
+    m_capAgent->connectionStateChanged(
+        aace::phoneCallController::PhoneCallControllerEngineInterface::ConnectionState::CONNECTED);
     m_capAgent->CapabilityAgent::preHandleDirective(directive, std::move(m_mockDirectiveHandlerResult));
     m_capAgent->CapabilityAgent::handleDirective(directive->getMessageId());
     m_wakeSetCompletedFuture.wait_for(TIMEOUT);
@@ -409,8 +425,12 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testStopDirective) {
     std::shared_ptr<alexaClientSDK::avsCommon::avs::AVSDirective> directive =
         alexaClientSDK::avsCommon::avs::AVSDirective::create("", avsMessageHeader, STOP_PAYLOAD, attachmentManager, "");
 
+    EXPECT_CALL(*m_mockContextManager, setState(testing::_, testing::_, testing::_, testing::_))
+        .Times(testing::Exactly(1));
     EXPECT_CALL(*m_mockGui, stop(STOP_PAYLOAD)).Times(testing::Exactly(1));
 
+    m_capAgent->connectionStateChanged(
+        aace::phoneCallController::PhoneCallControllerEngineInterface::ConnectionState::CONNECTED);
     m_capAgent->CapabilityAgent::preHandleDirective(directive, std::move(m_mockDirectiveHandlerResult));
     m_capAgent->CapabilityAgent::handleDirective(directive->getMessageId());
     m_wakeSetCompletedFuture.wait_for(TIMEOUT);
@@ -425,8 +445,12 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testSENDDTMFDirective) {
         alexaClientSDK::avsCommon::avs::AVSDirective::create(
             "", avsMessageHeader, SENDDTMF_PAYLOAD, attachmentManager, "");
 
+    EXPECT_CALL(*m_mockContextManager, setState(testing::_, testing::_, testing::_, testing::_))
+        .Times(testing::Exactly(1));
     EXPECT_CALL(*m_mockGui, sendDTMF(SENDDTMF_PAYLOAD)).Times(testing::Exactly(1));
 
+    m_capAgent->connectionStateChanged(
+        aace::phoneCallController::PhoneCallControllerEngineInterface::ConnectionState::CONNECTED);
     m_capAgent->CapabilityAgent::preHandleDirective(directive, std::move(m_mockDirectiveHandlerResult));
     m_capAgent->CapabilityAgent::handleDirective(directive->getMessageId());
     m_wakeSetCompletedFuture.wait_for(TIMEOUT);
@@ -446,8 +470,10 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testCallFailedInvalidCallId) {
 
     EXPECT_CALL(*m_mockGui, dial(testing::_)).Times(testing::Exactly(1)).WillOnce(testing::Return(true));
     EXPECT_CALL(*m_mockContextManager, setState(testing::_, testing::_, testing::_, testing::_))
-        .Times(testing::Exactly(1));
+        .Times(testing::Exactly(2));
 
+    m_capAgent->connectionStateChanged(
+        aace::phoneCallController::PhoneCallControllerEngineInterface::ConnectionState::CONNECTED);
     m_capAgent->CapabilityAgent::preHandleDirective(directive, std::move(m_mockDirectiveHandlerResult));
     m_capAgent->CapabilityAgent::handleDirective(directive->getMessageId());
     m_wakeSetCompletedFuture.wait_for(TIMEOUT);
@@ -472,8 +498,10 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testCallFailed) {
 
     EXPECT_CALL(*m_mockGui, dial(testing::_)).Times(testing::Exactly(1)).WillOnce(testing::Return(true));
     EXPECT_CALL(*m_mockContextManager, setState(testing::_, testing::_, testing::_, testing::_))
-        .Times(testing::Exactly(2));
+        .Times(testing::Exactly(3));
 
+    m_capAgent->connectionStateChanged(
+        aace::phoneCallController::PhoneCallControllerEngineInterface::ConnectionState::CONNECTED);
     m_capAgent->CapabilityAgent::preHandleDirective(directive, std::move(m_mockDirectiveHandlerResult));
     m_capAgent->CapabilityAgent::handleDirective(directive->getMessageId());
     m_wakeSetCompletedFuture.wait_for(TIMEOUT);

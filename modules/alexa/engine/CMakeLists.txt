@@ -55,6 +55,12 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/LocaleAssetsManager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/SystemSoundPlayer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/DeviceSettingsDelegate.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AuthorizationAdapterInterface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AuthorizationManagerInterface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AuthorizationManager.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AuthorizationManagerStorageInterface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AuthorizationManagerStorage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AlexaAuthorizationProvider.h
 )
 
 source_group("Header Files" FILES ${HEADERS})
@@ -94,6 +100,13 @@ add_library(AACEAlexaEngine SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/UPLService.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/VehicleData.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/WakewordEngineManager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/AuthorizationManager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/AuthorizationManagerStorage.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/AlexaAuthorizationProvider.cpp
+)
+
+find_path(NLOHMANN_INCLUDE_DIR nlohmann/json.hpp
+    CMAKE_FIND_ROOT_PATH_BOTH
 )
 
 target_include_directories(AACEAlexaEngine
@@ -102,6 +115,7 @@ target_include_directories(AACEAlexaEngine
         $<INSTALL_INTERFACE:include>
     PRIVATE
         ${AVS_INCLUDE_DIRS}
+        ${NLOHMANN_INCLUDE_DIR}
 )
 
 target_link_libraries(AACEAlexaEngine
@@ -122,6 +136,12 @@ install(
     DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE
     DESTINATION include
     FILES_MATCHING PATTERN "*.h"
+)
+
+install(
+    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/nlohmann
+    DESTINATION include
+    FILES_MATCHING PATTERN "*.hpp"
 )
 
 if(AAC_ENABLE_TESTS)

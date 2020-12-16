@@ -24,6 +24,7 @@
 #include <string>
 #include <unordered_set>
 #include <vector>
+#include <atomic>
 
 #include <ACL/AVSConnectionManager.h>
 #include <ACL/Transport/PostConnectSequencerFactory.h>
@@ -69,6 +70,7 @@
 #include <Endpoints/EndpointRegistrationManager.h>
 #include <InteractionModel/InteractionModelCapabilityAgent.h>
 #include <RegistrationManager/RegistrationManager.h>
+#include <RegistrationManager/RegistrationObserverInterface.h>
 #include <SpeakerManager/SpeakerManager.h>
 #include <SQLiteStorage/SQLiteMiscStorage.h>
 #include <System/SoftwareInfoSender.h>
@@ -111,6 +113,7 @@
 #include "WakewordEngineManager.h"
 #include "WakewordObservableInterface.h"
 #include "WakewordObserverInterface.h"
+#include "AuthorizationManager.h"
 
 namespace aace {
 namespace engine {
@@ -119,7 +122,7 @@ namespace alexa {
 class AlexaEngineGlobalSettingsObserver;
 class AlexaEngineLocationStateProvider;
 class AlexaEngineSoftwareInfoSenderObserver;
-class AuthDelegateRouter;
+class AuthDelegateProxy;
 class HttpPutDelegate;
 class PlaybackRouterDelegate;
 class AudioPlayerObserverDelegate;
@@ -133,6 +136,7 @@ class AlexaEngineService
         , public alexaClientSDK::settings::SettingObserverInterface<alexaClientSDK::settings::TimeZoneSetting>
         , public AlexaComponentInterface
         , public AlexaEndpointInterface
+        , public alexaClientSDK::registrationManager::RegistrationObserverInterface
         , public WakewordObservableInterface
         , public std::enable_shared_from_this<AlexaEngineService> {
 public:
@@ -208,6 +212,7 @@ public:
         override;
     std::shared_ptr<alexaClientSDK::acl::TransportFactoryInterface> getTransportFactory() override;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> getVisualFocusManager() override;
+    std::shared_ptr<AuthorizationManager> getAuthorizationManager() override;
     /// @}
 
     /// AlexaEndpointInterface
@@ -266,7 +271,6 @@ public:
         bool& sync,
         const SetPropertyResultCallback& callbackFunction);
     std::string getProperty_locale();
-    std::string getProperty_countrySupported();
     std::string getProperty_timezone();
     bool setProperty_wakewordEnabled(
         const std::string& value,
@@ -274,6 +278,11 @@ public:
         bool& async,
         const SetPropertyResultCallback& callbackFunction);
     std::string getProperty_wakewordEnabled();
+    /// @}
+
+    /// @name RegistrationObserverInterface Functions
+    /// @{
+    void onLogout() override;
     /// @}
 
 protected:
@@ -291,11 +300,6 @@ private:
     bool disconnect();
     void recordVehicleMetric(bool full);
     bool registerProperties();
-
-    // country supported
-    std::string getVehicleCountry();
-    bool isCountrySupported(const std::string& country);
-    bool isCountryInList(const std::string& countryList, const std::string& country);
 
     // platform interface registration
     template <class T>
@@ -358,6 +362,8 @@ private:
     std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> m_certifiedSender;
     std::shared_ptr<alexaClientSDK::endpoints::EndpointRegistrationManager> m_endpointManager;
     std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> m_customerDataManager;
+    std::shared_ptr<alexaClientSDK::registrationManager::RegistrationManager> m_registrationManager;
+    std::shared_ptr<AuthorizationManager> m_authorizationManager;
     std::unique_ptr<DeviceSettingsDelegate> m_deviceSettingsDelegate;
     std::shared_ptr<alexaClientSDK::storage::sqliteStorage::SQLiteMiscStorage> m_miscStorage;
     std::shared_ptr<alexaClientSDK::capabilityAgents::alexa::AlexaInterfaceMessageSender> m_alexaMessageSender;
@@ -366,14 +372,14 @@ private:
 
     std::shared_ptr<AlexaEngineGlobalSettingsObserver> m_globalSettingsObserver;
     std::shared_ptr<AlexaEngineSoftwareInfoSenderObserver> m_softwareInfoSenderObserver;
-    std::shared_ptr<AuthDelegateRouter> m_authDelegateRouter;
+    std::shared_ptr<AuthDelegateProxy> m_authDelegateProxy;
     std::shared_ptr<HttpPutDelegate> m_httpPutDelegate;
     std::shared_ptr<PlaybackRouterDelegate> m_playbackRouterDelegate;
     std::shared_ptr<SystemSoundPlayer> m_systemSoundPlayer;
     std::shared_ptr<AudioPlayerObserverDelegate> m_audioPlayerObserverDelegate;
+    std::shared_ptr<AlexaAuthorizationProvider> m_alexaAuthorizationProvider;
 
     std::shared_ptr<aace::engine::storage::LocalStorageInterface> m_localStorage;
-    std::shared_ptr<aace::alexa::AuthProvider> m_authProviderPlatformInterface;
 
     std::string m_avsGateway;
     std::string m_lwaEndpoint;
@@ -389,7 +395,6 @@ private:
     /// Whether the AlexaEngineService has already been started once
     bool m_previouslyStarted = false;
     std::mutex m_connectionMutex;
-    bool m_countrySupported = false;
     bool m_encoderEnabled;
     std::string m_encoderName;
     alexaClientSDK::avsCommon::sdkInterfaces::softwareInfo::FirmwareVersion m_firmwareVersion = 1;
@@ -399,6 +404,9 @@ private:
     bool m_previousAVSConnectionState = false;
     bool m_speakerManagerEnabled;
     std::string m_timezone;
+
+    /// Holds the provider names in scenarios where application supports multiple authorizations.
+    std::vector<std::string> m_authProviderNames;
 
     // engine implementation object references
     std::shared_ptr<aace::engine::alexa::AlertsEngineImpl> m_alertsEngineImpl;
@@ -432,6 +440,9 @@ private:
 
     // executer
     alexaClientSDK::avsCommon::utils::threading::Executor m_executor;
+
+    // determine if alexa engine service was shut down in async callback methods
+    std::atomic<bool> m_isShuttingDown;
 
     std::mutex m_setPropertyResultCallbackMutex;
 };
@@ -490,33 +501,6 @@ class AlexaEngineGlobalSettingsObserver
         : public alexaClientSDK::avsCommon::sdkInterfaces::GlobalSettingsObserverInterface {
 public:
     void onSettingChanged(const std::unordered_map<std::string, std::string>& mapOfSettings) override;
-};
-
-//
-// AuthDelegateRouter
-//
-
-class AuthDelegateRouter : public alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface {
-public:
-    AuthDelegateRouter() = default;
-
-    void setAuthDelegate(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate);
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> getAuthDelegate();
-
-    // alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface
-    void addAuthObserver(
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer) override;
-    void removeAuthObserver(
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer) override;
-    std::string getAuthToken() override;
-    void onAuthFailure(const std::string& token) override;
-
-private:
-    std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface>> m_observers;
-
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> m_authDelegate;
-
-    std::mutex m_mutex;
 };
 
 //

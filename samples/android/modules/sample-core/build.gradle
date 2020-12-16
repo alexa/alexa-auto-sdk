@@ -9,7 +9,7 @@ android {
         minSdkVersion 22
         targetSdkVersion 26
         versionCode 1
-        versionName "3.0"
+        versionName "3.1"
 
     }
 

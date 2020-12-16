@@ -3,7 +3,7 @@
 
 The Alexa Auto SDK Address Book module provides the features required by a platform implementation to augment the communications and navigation capabilities of Alexa with user data such as phone contacts and/or navigation favorites ("home", "work", etc.), allowing the user to upload and access phone contacts, or navigation favorites, or both.
 
-> **Note:** In order to use the Address Book contact and navigation favorites uploading functionality, your product must be whitelisted by Amazon. See [Requesting Additional Functionality (whitelisting)](../../../../NEED_HELP.md#requesting-additional-functionality-whitelisting) for details.
+> **Note:** In order to use the Address Book contact and navigation favorites uploading functionality, your product must be placed on the allow list by Amazon. See [Requesting Additional Functionality](../../../../NEED_HELP.md#requesting-additional-functionality) for details.
 
 **Table of Contents**
 
@@ -16,8 +16,6 @@ The Alexa Auto SDK Address Book module provides the features required by a platf
 The Address Book module provides a common platform interface that you can implement to either upload user data to the Alexa cloud or allow the local communications and navigation capabilities to access user data for offline use cases (supported by the optional local voice control (LVC) module). The user can then use Alexa to call contacts by name, be informed of a caller's name, or get directions to favorite destinations.
 
 Both the [Phone Call Controller](../phonecontrol/README.md) and Alexa-to-Alexa communications implemented via the optional Alexa Communications extension use the phone contacts uploaded via the Address Book module. However, the Contact and Navigation address books are not available for use with any other Alexa devices.
-
-> **Note**: The Address Book module supersedes the [Contact Uploader module](../contactuploader/README.md), which supports only phone contacts and only online (cloud) use cases. The Contact Uploader module is on the deprecation path beginning with Alexa Auto SDK release 2.0.0, and all new implementations should use the Address Book module instead of the Contact Uploader module.
 
 Your platform implementation is responsible for managing the life cycle of an address book, including:
 

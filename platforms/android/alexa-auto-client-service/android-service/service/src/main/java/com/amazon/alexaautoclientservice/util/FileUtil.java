@@ -19,8 +19,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.media.MediaRecorder;
-import android.support.annotation.NonNull;
+import android.net.Uri;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.amazon.aace.alexa.config.AlexaConfiguration;
 import com.amazon.aace.core.config.EngineConfiguration;
@@ -36,7 +38,9 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,15 +48,34 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Objects;
 
 public class FileUtil {
     private static final String TAG = AACSConstants.AACS + "-" + FileUtil.class.getSimpleName();
 
-    private static final String APPDATA_DIR = "appdata";
-    private static final String CERTS_DIR = "certs";
+    public static final String APPDATA_DIR = "appdata";
+    public static final String CERTS_DIR = "certs";
+    public static final String EXTERNAL_FILE_DIR = "externalFiles";
+    public static final String MODEL_DIR = "aacs.amazonLite";
     public static final String CONFIG_KEY = "aacs-configuration";
     public static final String AACS_GENERAL_CONFIG = "aacs-general";
+    public static final String AACS_EXTRAS_CONFIG = "aacs-extras";
+
+    public static final String AACS_CONFIG_NETWORK_INFO_PROVIDER = "NetworkInfoProvider";
+    public static final String AACS_CONFIG_LOCATION_PROVIDER = "LocationProvider";
+    public static final String AACS_CONFIG_EXTERNAL_MEDIA_ADAPTER = "ExternalMediaAdapter";
+    public static final String AACS_CONFIG_PROPERTY_MANAGER = "PropertyManager";
+
+    public static final HashMap<String, String> mInterfaceToModuleNames = new HashMap<String, String>() {
+        {
+            put(AACS_CONFIG_NETWORK_INFO_PROVIDER, "network");
+            put(AACS_CONFIG_LOCATION_PROVIDER, "location");
+            put(AACS_CONFIG_EXTERNAL_MEDIA_ADAPTER, "alexa");
+            put(AACS_CONFIG_PROPERTY_MANAGER, "propertyManager");
+        }
+    };
 
     private static boolean copyFileFromAssetPath(
             String assetPath, File destFile, boolean force, AssetManager assetManager) {
@@ -79,8 +102,8 @@ public class FileUtil {
         return true;
     }
 
-    private static boolean createDirectoriesAndCopyCertificates(
-            File certsDir, File appDataDir, AssetManager assetManager) {
+    public static void createDirectoriesAndCopyCertificates(
+            File certsDir, File appDataDir, File externalFileDir, File modelsDir, AssetManager assetManager) {
         if (!appDataDir.exists()) {
             appDataDir.mkdir();
         }
@@ -89,9 +112,17 @@ public class FileUtil {
             certsDir.mkdir();
         }
 
-        if (!appDataDir.exists() || !certsDir.exists()) {
-            Log.w(TAG, " appData or certsDir is missing");
-            return false;
+        if (!externalFileDir.exists()) {
+            externalFileDir.mkdir();
+        }
+
+        if (!modelsDir.exists()) {
+            modelsDir.mkdir();
+        }
+
+        if (!appDataDir.exists() || !certsDir.exists() || !externalFileDir.exists() || !modelsDir.exists()) {
+            Log.w(TAG, "Failed to create internal storage directories.");
+            return;
         }
 
         try {
@@ -99,26 +130,22 @@ public class FileUtil {
             for (String next : certAssets) {
                 if (copyFileFromAssetPath(CERTS_DIR + "/" + next, new File(certsDir, next), false, assetManager))
                     continue;
-                return false;
+                return;
             }
         } catch (IOException e) {
             Log.w(TAG, "Cannot copy certs to cache directory. Error: " + e.getMessage());
-            return false;
         }
-        return true;
     }
 
     public static ArrayList<EngineConfiguration> getEngineConfiguration(@NonNull Context context) {
         File certsDir = new File(context.getCacheDir(), CERTS_DIR);
         File appDataDir = new File(context.getFilesDir(), APPDATA_DIR);
 
-        // Copy certificates and configuration onto the device location accessible to the layer which handles AACE
-        if (!createDirectoriesAndCopyCertificates(certsDir, appDataDir, context.getAssets()))
-            return null;
+        InputStream configStream = new ByteArrayInputStream(
+                getSavedConfigurationForEngine(context).toString().getBytes(StandardCharsets.UTF_8));
 
-        // Construct EngineConfigurations list
-        ArrayList<EngineConfiguration> configuration = new ArrayList<EngineConfiguration>(Arrays.asList(
-                AlexaConfiguration.createCurlConfig(certsDir.getPath()),
+        // Construct and return EngineConfigurations list
+        return new ArrayList<EngineConfiguration>(Arrays.asList(AlexaConfiguration.createCurlConfig(certsDir.getPath()),
                 AlexaConfiguration.createMiscStorageConfig(appDataDir.getPath() + "/miscStorage.sqlite"),
                 AlexaConfiguration.createCertifiedSenderConfig(appDataDir.getPath() + "/certifiedSender.sqlite"),
                 AlexaConfiguration.createCapabilitiesDelegateConfig(
@@ -127,29 +154,36 @@ public class FileUtil {
                 AlexaConfiguration.createNotificationsConfig(appDataDir.getPath() + "/notifications.sqlite"),
                 AlexaConfiguration.createDeviceSettingsConfig(appDataDir.getPath() + "/deviceSettings.sqlite"),
                 StorageConfiguration.createLocalStorageConfig(appDataDir.getPath() + "/localStorage.sqlite"),
-                StreamConfiguration.create(getSavedConfigurationForEngine(context))));
-
-        return configuration;
+                StreamConfiguration.create(configStream)));
     }
 
     private static SharedPreferences getSharedPreferences(Context context) {
         return context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
     }
 
-    public static InputStream getSavedConfigurationForEngine(@NonNull Context context) {
-        InputStream configStream = null;
-
+    public static JSONObject getSavedConfigurationForEngine(@NonNull Context context) {
         String config = getSharedPreferences(context).getString(CONFIG_KEY, "");
-
+        JSONObject configJson = null;
         try {
-            JSONObject configJson = new JSONObject(config);
+            configJson = new JSONObject(config);
             configJson.remove("aacs.general");
             configJson.remove("aacs.defaultPlatformHandlers");
-            configStream = new ByteArrayInputStream(configJson.toString().getBytes(StandardCharsets.UTF_8));
         } catch (JSONException e) {
             Log.e(TAG, "Error while constructing InputStream from stored configuration.");
         }
-        return configStream;
+        return configJson;
+    }
+
+    private static void updateEngineConfigurationInSharedPref(Context context, JSONObject engineConfig) {
+        SharedPreferences sp = getSharedPreferences(context);
+        try {
+            JSONObject fullConfig = new JSONObject(sp.getString(CONFIG_KEY, ""));
+            engineConfig.put("aacs.general", fullConfig.get("aacs.general"));
+            engineConfig.put("aacs.defaultPlatformHandlers", fullConfig.get("aacs.defaultPlatformHandlers"));
+            sp.edit().putString(CONFIG_KEY, engineConfig.toString()).apply();
+        } catch (JSONException e) {
+            Log.e(TAG, "Error while saving engine configuration: " + e.getMessage());
+        }
     }
 
     public static boolean isConfigurationSaved(@NonNull Context context) {
@@ -161,7 +195,7 @@ public class FileUtil {
         Log.i(TAG, "Constructing configuration and saving into SharedPreferences.");
 
         JSONObject fullConfig = constructFullConfiguration(configFilepaths, configs);
-        fullConfig = translateToEngineConfiguration(fullConfig);
+        fullConfig = translateToEngineConfiguration(context, fullConfig);
 
         if (fullConfig == null || !validateConfig(fullConfig))
             return false;
@@ -174,6 +208,16 @@ public class FileUtil {
                     .apply();
         } catch (JSONException e) {
             Log.e(TAG, "Error while storing aacs.general config into shared preferences.");
+        }
+
+        // Delete extras config stored in SharedPref
+        getSharedPreferences(context).edit().remove(AACS_EXTRAS_CONFIG).apply();
+
+        // Add config to deregister AASB platform interfaces that have default impl
+        for (String pi : mInterfaceToModuleNames.keySet()) {
+            if (isDefaultImplementationEnabled(context, pi)) {
+                deregisterAASBPlatformInterface(context, mInterfaceToModuleNames.get(pi), pi);
+            }
         }
         return true;
     }
@@ -281,7 +325,7 @@ public class FileUtil {
         }
     }
 
-    private static JSONObject translateToEngineConfiguration(JSONObject config) {
+    private static JSONObject translateToEngineConfiguration(Context context, JSONObject config) {
         if (config == null)
             return null;
         JSONObject translatedConfig = new JSONObject();
@@ -304,6 +348,14 @@ public class FileUtil {
                         translatedConfig.put("aasb.alexa", aasbAlexaConfig);
                         translatedConfig.put("aace.alexa", new JSONObject().put("avsDeviceSDK", aacsAlexaConfig));
                     } else {
+                        if (key.contains("dcm")) {
+                            JSONObject dcmConfig = config.getJSONObject("aacs.dcm");
+                            String filePath = dcmConfig.optString("metricsFilePath");
+                            if (filePath == null || filePath.equals("")) {
+                                File appDataDir = new File(context.getFilesDir(), APPDATA_DIR);
+                                dcmConfig.put("metricsFilePath", appDataDir.getPath());
+                            }
+                        }
                         translatedConfig.put("aace" + key.substring(4), config.getJSONObject(key));
                     }
                 } else if (key.contains("modules")) {
@@ -319,6 +371,66 @@ public class FileUtil {
 
         Log.d(TAG, "Configuration successfully translated");
         return translatedConfig;
+    }
+
+    public static JSONObject removeExtrasModuleConfiguration(@NonNull Context context, @NonNull String configKey) {
+        JSONObject engineConfig = getSavedConfigurationForEngine(context);
+        JSONObject moduleConfig = new JSONObject();
+        SharedPreferences sp = getSharedPreferences(context);
+        SharedPreferences.Editor editor = sp.edit();
+
+        // Support both aacs and aace in config key
+        if (configKey.substring(0, 4).equals("aacs")) {
+            configKey = "aace" + configKey.substring(4);
+        }
+
+        // Check full configuration in SharedPref for extras config first
+        if (engineConfig.has(configKey)) {
+            try {
+                moduleConfig = (JSONObject) engineConfig.remove(configKey);
+                updateEngineConfigurationInSharedPref(context, engineConfig);
+            } catch (Exception e) {
+                Log.w(TAG, String.format("Failed to remove and retrieve config for %s", configKey));
+            }
+
+            // Save config for extras module factory in separate SharedPreferences field
+            JSONObject extrasJson = new JSONObject();
+            if (sp.contains(AACS_EXTRAS_CONFIG)) {
+                String extrasConfig = sp.getString(AACS_EXTRAS_CONFIG, "");
+                try {
+                    extrasJson = new JSONObject(extrasConfig);
+                } catch (JSONException e) {
+                    Log.w(TAG,
+                            String.format(
+                                    "Error while creating JSON object for extras config. Error: %s", e.getMessage()));
+                }
+            }
+
+            try {
+                extrasJson.put(configKey, moduleConfig);
+            } catch (JSONException e) {
+                Log.w(TAG,
+                        String.format(
+                                "Error while constructing JSON object for extras config. Error: %s", e.getMessage()));
+            }
+            editor.putString(AACS_EXTRAS_CONFIG, extrasJson.toString()).apply();
+        } else {
+            // If not in full configuration, check SharedPref for extras (Using stored config)
+            if (sp.contains(AACS_EXTRAS_CONFIG)) {
+                String extrasConfig = sp.getString(AACS_EXTRAS_CONFIG, "");
+                try {
+                    JSONObject extrasJson = new JSONObject(extrasConfig);
+                    if (extrasJson.has(configKey))
+                        moduleConfig = new JSONObject(extrasJson.getString(configKey));
+                } catch (JSONException e) {
+                    Log.w(TAG,
+                            String.format(
+                                    "Error while getting JSON object for extras config. Error: %s", e.getMessage()));
+                }
+            }
+        }
+
+        return moduleConfig;
     }
 
     public static boolean isPersistentSystemService(@NonNull Context context) {
@@ -350,22 +462,6 @@ public class FileUtil {
         } catch (Exception e) {
             Log.w(TAG, "Defaulting to startServiceOnBootEnabled=false, since it was not specified in config.");
             return false;
-        }
-    }
-
-    public static String getCarControlAssetsPath(@NonNull Context context) {
-        String config = getSharedPreferences(context).getString(AACS_GENERAL_CONFIG, "");
-        try {
-            JSONObject configJson = new JSONObject(config);
-            Object leafNodeValue = getLeafNodeValueFromJson(configJson, "localVoiceControl", "carControlAssetsPath");
-            if (!(leafNodeValue instanceof String)) {
-                Log.w(TAG, "Defaulting to carControlAssets being empty, since the leaf node value was not valid");
-                return "";
-            }
-            return (String) leafNodeValue;
-        } catch (Exception e) {
-            Log.w(TAG, "Defaulting to carControlAssets being empty, since it was not specified in config.");
-            return "";
         }
     }
 
@@ -563,31 +659,49 @@ public class FileUtil {
     }
 
     public static String getLVCConfiguration(@NonNull Context context) {
-        String config = getSharedPreferences(context).getString(AACS_GENERAL_CONFIG, "");
-        try {
-            JSONObject configJson = new JSONObject(config);
-            Object leafNodeValue = getLeafNodeValueFromJson(configJson, "localVoiceControl");
-            if (leafNodeValue instanceof JSONObject) {
-                return leafNodeValue.toString();
-            } else {
-                Log.e(TAG, "Invalid leaf node value config for localVoiceControl");
-                return null;
+        JSONObject config = getSavedConfigurationForEngine(context);
+        String lvcModule = "aace.localVoiceControl";
+
+        if (config.has(lvcModule)) {
+            // Remove LVC config and store in SharedPref; Used for LVC apk, rather than Auto SDK
+            JSONObject lvcConfig = (JSONObject) config.remove(lvcModule);
+
+            JSONObject extrasJson = new JSONObject();
+            SharedPreferences sp = getSharedPreferences(context);
+            if (sp.contains(AACS_EXTRAS_CONFIG)) {
+                String extrasConfig = sp.getString(AACS_EXTRAS_CONFIG, "");
+                try {
+                    extrasJson = new JSONObject(extrasConfig);
+                } catch (JSONException e) {
+                    Log.w(TAG,
+                            String.format(
+                                    "Error while creating JSON object for extras config. Error: %s", e.getMessage()));
+                }
             }
-        } catch (JSONException e) {
-            Log.w(TAG, "Could not find localVoiceControl in config file");
+
+            try {
+                extrasJson.put(lvcModule, lvcConfig);
+            } catch (JSONException e) {
+                Log.w(TAG,
+                        String.format(
+                                "Error while constructing JSON object for extras config. Error: %s", e.getMessage()));
+            }
+            sp.edit().putString(AACS_EXTRAS_CONFIG, extrasJson.toString()).apply();
+
+            return lvcConfig.toString();
+        } else {
+            Log.d(TAG, "The optional LVC Configuration is not included.");
         }
         return null;
     }
 
-    public static boolean lvcConfigurationAvailable(@NonNull Context context) {
-        String config = getSharedPreferences(context).getString(AACS_GENERAL_CONFIG, "");
+    public static boolean lvcEnabled() {
         try {
-            JSONObject configJson = new JSONObject(config);
-            return configJson.has("localVoiceControl");
-        } catch (JSONException e) {
-            Log.w(TAG, "Could not find localVoiceControl in config file");
+            Class.forName("com.amazon.alexaautoclientservice.lvc.LvcModuleFactory");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
         }
-        return false;
     }
 
     public static double getVersionNumber(@NonNull Context context) {
@@ -621,5 +735,85 @@ public class FileUtil {
             Log.w(TAG, "Could not find capacity from config");
         }
         return IPCConstants.DEFAULT_CACHE_CAPACITY;
+    }
+
+    public static void copyExternalFileToAACS(
+            @NonNull Context context, @NonNull Uri fileUri, @NonNull String module, @NonNull String field) {
+        // Create copy file in externalFiles directory
+        File externalFilesDir = new File(context.getFilesDir(), "externalFiles");
+        if (!externalFilesDir.exists())
+            externalFilesDir.mkdir();
+
+        File newModuleDir = externalFilesDir;
+        if (!module.equals("")) {
+            newModuleDir = new File(externalFilesDir, module);
+            if (!newModuleDir.exists()) {
+                newModuleDir.mkdir();
+            }
+        }
+
+        File externalFileCopy = new File(newModuleDir, field);
+        if (externalFileCopy.exists())
+            externalFileCopy.delete();
+
+        if (!externalFilesDir.exists() || !newModuleDir.exists() || externalFileCopy.exists()) {
+            Log.e(TAG, "Error while setting up externalFiles directory.");
+            return;
+        }
+
+        try {
+            if (!externalFileCopy.createNewFile()) {
+                Log.e(TAG, String.format("Failed to create new file %s for module %s.", field, module));
+            }
+        } catch (IOException e) {
+            Log.e(TAG,
+                    String.format("Error while creating new file %s for module %s. Error: %s", field, module,
+                            e.getMessage()));
+        }
+
+        // Copy contents of file descriptor to copy file
+        try {
+            FileDescriptor fd = Objects.requireNonNull(context.getContentResolver().openFileDescriptor(fileUri, "r"))
+                                        .getFileDescriptor();
+            InputStream inputStream = new FileInputStream(fd);
+            OutputStream outputStream = new FileOutputStream(externalFileCopy);
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = inputStream.read(buf)) > 0) {
+                outputStream.write(buf, 0, len);
+            }
+        } catch (FileNotFoundException e) {
+            Log.w(TAG,
+                    String.format("File associated with URI (%s) provided not found. Error: %s", fileUri.toString(),
+                            e.getMessage()));
+        } catch (IOException e) {
+            Log.e(TAG,
+                    String.format("Error while copying files locally for URI: %s. Error: %s", fileUri.toString(),
+                            e.getMessage()));
+        } catch (SecurityException e) {
+            Log.e(TAG,
+                    String.format("AACS does not have permissions to access URI (%s). Error: %s", fileUri.toString(),
+                            e.getMessage()));
+        }
+    }
+
+    public static void deregisterAASBPlatformInterface(
+            @NonNull Context context, @NonNull String module, @NonNull String interfaceName) {
+        JSONObject config = getSavedConfigurationForEngine(context);
+        String aasbModule = "aasb." + module;
+        try {
+            Log.d(TAG, String.format("Deregistering %s.%s PI from AASB", module, interfaceName));
+            JSONObject enabled = new JSONObject();
+            enabled.put("enabled", false);
+            JSONObject moduleJson = new JSONObject();
+            if (config.has(aasbModule)) {
+                moduleJson = config.getJSONObject(aasbModule);
+            }
+            moduleJson.put(interfaceName, enabled);
+            config.put(aasbModule, moduleJson);
+            updateEngineConfigurationInSharedPref(context, config);
+        } catch (JSONException e) {
+            Log.e(TAG, String.format("Error while deregistering AASB PI. Error: %s", e.getMessage()));
+        }
     }
 }

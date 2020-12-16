@@ -32,7 +32,7 @@ class AASBCarControl
         , public std::enable_shared_from_this<AASBCarControl> {
 private:
     using CarControlPromise = std::promise<bool>;
-    AASBCarControl() = default;
+    AASBCarControl(uint32_t asyncReplyTimeout);
 
     bool initialize(std::shared_ptr<aace::engine::aasb::MessageBrokerInterface> messageBroker);
     void addReplyMessagePromise(const std::string& messageId, std::shared_ptr<CarControlPromise> promise);
@@ -42,7 +42,8 @@ private:
 
 public:
     static std::shared_ptr<AASBCarControl> create(
-        std::shared_ptr<aace::engine::aasb::MessageBrokerInterface> messageBroker);
+        std::shared_ptr<aace::engine::aasb::MessageBrokerInterface> messageBroker,
+        uint32_t asyncReplyTimeout);
 
     // aace::carControl
     bool turnPowerControllerOn(const std::string& endpointId) override;
@@ -69,7 +70,7 @@ public:
 
 private:
     std::weak_ptr<aace::engine::aasb::MessageBrokerInterface> m_messageBroker;
-    int m_replyMessageTimeout = 5000;
+    uint32_t m_replyMessageTimeout;
     std::mutex m_promise_map_access_mutex;
     std::unordered_map<std::string, std::shared_ptr<CarControlPromise>> m_promiseMap;
 };

@@ -35,6 +35,39 @@ AASBCarControlEngineService::AASBCarControlEngineService(const aace::engine::cor
         aace::engine::aasb::AASBHandlerEngineService(description, minRequiredVersion, {"CarControl"}) {
 }
 
+bool AASBCarControlEngineService::configureAASBInterface(
+    const std::string& name,
+    bool enabled,
+    std::istream& configuration) {
+    try {
+        // call inherited configure method
+        ThrowIfNot(
+            AASBHandlerEngineService::configureAASBInterface(name, enabled, configuration),
+            "configureAASBInterfaceFailed");
+
+        // handle specific interface configuration options
+        if (enabled && name == "CarControl") {
+            ThrowIfNot(configureCarControl(configuration), "configureCarControlFailed");
+        }
+
+        return true;
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
+}
+
+bool AASBCarControlEngineService::configureCarControl(std::istream& configuration) {
+    try {
+        auto root = nlohmann::json::parse(configuration);
+        m_asyncReplyTimeout = root["/asyncReplyTimeout"_json_pointer];
+        return true;
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
+}
+
 bool AASBCarControlEngineService::postRegister() {
     try {
         auto aasbServiceInterface =
@@ -43,7 +76,7 @@ bool AASBCarControlEngineService::postRegister() {
 
         // CarControl
         if (isInterfaceEnabled("CarControl")) {
-            auto carControl = AASBCarControl::create(aasbServiceInterface->getMessageBroker());
+            auto carControl = AASBCarControl::create(aasbServiceInterface->getMessageBroker(), m_asyncReplyTimeout);
             ThrowIfNull(carControl, "invalidCarControlHandler");
             getContext()->registerPlatformInterface(carControl);
         }

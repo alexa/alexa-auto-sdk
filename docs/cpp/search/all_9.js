@@ -25,5 +25,6 @@ var searchData=
   ['logger',['Logger',['../classaace_1_1logger_1_1_logger.html',1,'aace::logger']]],
   ['loggerconfiguration',['LoggerConfiguration',['../classaace_1_1logger_1_1config_1_1_logger_configuration.html',1,'aace::logger::config']]],
   ['loggerengineinterface',['LoggerEngineInterface',['../classaace_1_1logger_1_1_logger_engine_interface.html',1,'aace::logger']]],
+  ['logout',['logout',['../classaace_1_1authorization_1_1_authorization.html#a66f95375e98f4b8012f5f2531100550c',1,'aace::authorization::Authorization']]],
   ['loop',['LOOP',['../classaace_1_1alexa_1_1_playback_controller_engine_interface.html#a990f517d423450b712fcfd0488403e8ca9159b3578e4e1eb31ffdf90acd6f6e40',1,'aace::alexa::PlaybackControllerEngineInterface']]]
 ];

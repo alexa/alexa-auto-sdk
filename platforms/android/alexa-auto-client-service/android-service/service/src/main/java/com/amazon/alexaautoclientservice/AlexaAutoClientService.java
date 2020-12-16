@@ -21,21 +21,25 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
+import android.content.ContentProviderClient;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
-import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.amazon.aace.aasb.AASBStream;
 import com.amazon.aace.core.Engine;
+import com.amazon.aace.core.PlatformInterface;
 import com.amazon.aace.core.config.EngineConfiguration;
 import com.amazon.aacsconstants.AACSConstants;
 import com.amazon.aacsconstants.AASBConstants;
@@ -50,16 +54,20 @@ import com.amazon.alexaautoclientservice.constants.LVCServiceConstants;
 import com.amazon.alexaautoclientservice.modules.externalMediaPlayer.MACCPlayer;
 import com.amazon.alexaautoclientservice.modules.locationProvider.LocationProviderHandler;
 import com.amazon.alexaautoclientservice.modules.networkInfoProvider.NetworkInfoProviderHandler;
+import com.amazon.alexaautoclientservice.modules.propertyManager.PropertyManagerHandler;
 import com.amazon.alexaautoclientservice.receiver.LVCReceiver;
+import com.amazon.alexaautoclientservice.receiver.PingReceiver;
 import com.amazon.alexaautoclientservice.util.FileUtil;
 
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -69,7 +77,7 @@ public class AlexaAutoClientService extends Service implements AACSContext {
 
     // AACS Version Info
     private static final double MIN_SUPPORTED_VERSION = 1.0;
-    private static final double CURRENT_VERSION = 1.0;
+    private static final double CURRENT_VERSION = 1.1;
 
     private static final int THREAD_JOIN_TIMEOUT_IN_MILLIS = 2000;
     private static final int FETCH_READ_BUFFER_CHUNK_SIZE = 4096;
@@ -78,9 +86,6 @@ public class AlexaAutoClientService extends Service implements AACSContext {
     private static final String AACS_CHANNEL_ID = "com.amazon.alexaautoclientservice";
     private static final String AACS_CHANNEL_NAME = "AACS";
     private static final int AACS_SERVICE_STARTED_NOTIFICATION_ID = 1;
-    private static final String AACS_CONFIG_NETWORK_INFO_PROVIDER = "NetworkInfoProvider";
-    private static final String AACS_CONFIG_LOCATION_PROVIDER = "LocationProvider";
-    private static final String AACS_CONFIG_EXTERNAL_MEDIA_ADAPTER = "ExternalMediaAdapter";
 
     private Context mContext = this;
     private AASBHandler mAASBHandler;
@@ -93,13 +98,17 @@ public class AlexaAutoClientService extends Service implements AACSContext {
     private Handler mEngineHandler;
 
     private AACSReceiver mAACSReceiver;
+    private ContentProviderClient mAPCP;
     private ExecutorService mIPCStreamReadExecutor = Executors.newFixedThreadPool(2);
     private ExecutorService mIPCStreamWriteExecutor = Executors.newFixedThreadPool(2);
     private LVCInteractionProvider mLVCInteractionProvider;
     private LVCReceiver mLVCConfigReceiver;
+    private PingReceiver mPingReceiver;
+    private PropertyManagerHandler mPropertyManagerHandler;
     private MACCPlayer mMACCPlayer;
     private ConcurrentHashMap<String, ParcelFileDescriptor.AutoCloseOutputStream> mOutputStreamMap =
             new ConcurrentHashMap<>();
+    private Long mOnCreateTimeMs;
 
     public AlexaAutoClientService() {
         mAASBHandler = null;
@@ -108,7 +117,10 @@ public class AlexaAutoClientService extends Service implements AACSContext {
     @Override
     public void onCreate() {
         super.onCreate();
+        mOnCreateTimeMs = System.currentTimeMillis();
         Log.i(TAG, "AlexaAutoClientService created");
+
+        initPingReceiver();
 
         mStateMachine = new AACSStateMachine();
         mStateMachine.setState(State.STARTED);
@@ -124,18 +136,48 @@ public class AlexaAutoClientService extends Service implements AACSContext {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand, " + intent);
 
-        if (mStateMachine.getState() == State.STARTED && intent != null && intent.hasExtra(AACSConstants.NEW_CONFIG)) {
-            if (!intent.getBooleanExtra(AACSConstants.NEW_CONFIG, true) && FileUtil.isConfigurationSaved(this)) {
-                if (FileUtil.lvcConfigurationAvailable(this)) {
-                    mStateMachine.setState(State.WAIT_FOR_LVC_CONFIG);
-                    Log.d(TAG,
-                            "Setting AACSState to WAIT_FOR_LVC_CONFIG since the NEW_CONFIG parameter is false and LVC is enabled.");
+        if (mStateMachine.getState() == State.STARTED && intent != null) {
+            if (intent.hasExtra(AACSConstants.NEW_CONFIG)) {
+                if (!intent.getBooleanExtra(AACSConstants.NEW_CONFIG, true) && FileUtil.isConfigurationSaved(this)) {
+                    if (FileUtil.lvcEnabled()) {
+                        mStateMachine.setState(State.WAIT_FOR_LVC_CONFIG);
+                        Log.d(TAG,
+                                "Setting AACSState to WAIT_FOR_LVC_CONFIG since the NEW_CONFIG parameter is false and LVC is enabled.");
+                    } else {
+                        mStateMachine.setState(State.CONFIGURED);
+                        Log.d(TAG, "Setting AACSState to CONFIGURED since the NEW_CONFIG parameter is false.");
+                    }
                 } else {
-                    mStateMachine.setState(State.CONFIGURED);
-                    Log.d(TAG, "Setting AACSState to CONFIGURED since the NEW_CONFIG parameter is false.");
+                    Log.d(TAG, "Waiting for AACS Configuration message.");
                 }
-            } else {
-                Log.d(TAG, "Waiting for AACS Configuration message.");
+            }
+
+            if (intent.getAction().equals(Intent.ACTION_SEND_MULTIPLE)) {
+                if (intent.hasExtra(Intent.EXTRA_STREAM)) {
+                    ArrayList<Uri> fileUris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
+                    String module = "";
+                    if (intent.hasExtra(AACSConstants.CONFIG_MODULE)) {
+                        module = intent.getStringExtra(AACSConstants.CONFIG_MODULE);
+                    } else {
+                        Log.w(TAG,
+                                String.format(
+                                        "%s Intent is missing a configModule extra.", Intent.ACTION_SEND_MULTIPLE));
+                    }
+                    for (Uri fileUri : fileUris) {
+                        if (fileUri != null) {
+                            Log.d(TAG,
+                                    String.format(
+                                            "Acquired URI (%s) permission. Copying to AACS.", fileUri.toString()));
+                            FileUtil.copyExternalFileToAACS(this, fileUri, module, fileUri.getLastPathSegment());
+                        } else {
+                            Log.w(TAG, String.format("%s Intent contains null URI.", Intent.ACTION_SEND_MULTIPLE));
+                        }
+                    }
+                } else {
+                    Log.w(TAG,
+                            String.format("%s intent is missing %s extra containing URIs.", Intent.ACTION_SEND_MULTIPLE,
+                                    Intent.EXTRA_STREAM));
+                }
             }
         }
 
@@ -154,6 +196,14 @@ public class AlexaAutoClientService extends Service implements AACSContext {
         return Service.START_STICKY;
     }
 
+    private void initPingReceiver() {
+        mPingReceiver = new PingReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("com.amazon.aacs.ping");
+        filter.addCategory("com.amazon.aacs.pingtopic");
+        mContext.registerReceiver(mPingReceiver, filter, "com.amazon.alexaautoclientservice.ping", null);
+        Log.i(TAG, "Registered ping receiver");
+    }
     private void initializeAASB() {
         Log.d(TAG, "initializeAASB");
         mAASBHandler = new AASBHandler(this);
@@ -308,7 +358,7 @@ public class AlexaAutoClientService extends Service implements AACSContext {
                                 .build();
     }
 
-    private List<AACSModuleFactoryInterface> getExtraModuleFactory() {
+    private List<AACSModuleFactoryInterface> getExtraModuleFactories() {
         List<AACSModuleFactoryInterface> extraModuleFactories = new ArrayList<>();
         try {
             String folderName = "alexaautoclientservice";
@@ -337,8 +387,8 @@ public class AlexaAutoClientService extends Service implements AACSContext {
         return extraModuleFactories;
     }
 
-    private void configureExtras(AACSContext aacsContext, ArrayList<EngineConfiguration> configuration) {
-        List<AACSModuleFactoryInterface> extraFactories = getExtraModuleFactory();
+    private void getExtrasConfiguration(AACSContext aacsContext, List<AACSModuleFactoryInterface> extraFactories,
+            ArrayList<EngineConfiguration> configuration) {
         for (AACSModuleFactoryInterface moduleFactory : extraFactories) {
             List<EngineConfiguration> moduleConfigs = moduleFactory.getConfiguration(aacsContext);
             for (EngineConfiguration moduleConfig : moduleConfigs) {
@@ -348,11 +398,26 @@ public class AlexaAutoClientService extends Service implements AACSContext {
         }
     }
 
-    private boolean startEngine() {
-        mEngine = Engine.create(this);
-        ArrayList<EngineConfiguration> configuration = FileUtil.getEngineConfiguration(this);
-        configureExtras(this, configuration);
+    private void loadExtrasPlatformInterfaces(List<AACSModuleFactoryInterface> extraFactories) {
+        for (AACSModuleFactoryInterface moduleFactory : extraFactories) {
+            List<PlatformInterface> platformInterfaces = moduleFactory.getModulePlatformInterfaces(this);
+            for (PlatformInterface platformInterface : platformInterfaces) {
+                if (!mEngine.registerPlatformInterface(platformInterface))
+                    Log.e(TAG, "Could not register extra module interface");
+            }
+        }
+    }
 
+    private boolean startEngine() {
+        List<AACSModuleFactoryInterface> extraFactories = getExtraModuleFactories();
+        mEngine = Engine.create(this);
+
+        // Generate extras config first, since this may require removing extras modules from OEM config.
+        ArrayList<EngineConfiguration> extraConfiguration = new ArrayList<>();
+        getExtrasConfiguration(this, extraFactories, extraConfiguration);
+
+        ArrayList<EngineConfiguration> configuration = FileUtil.getEngineConfiguration(this);
+        configuration.addAll(extraConfiguration);
         EngineConfiguration[] configurationArray = configuration.toArray(new EngineConfiguration[configuration.size()]);
 
         if (!mEngine.configure(configurationArray)) {
@@ -360,21 +425,29 @@ public class AlexaAutoClientService extends Service implements AACSContext {
             return false;
         }
 
-        if (isDefaultImplementationEnabled(this, AACS_CONFIG_LOCATION_PROVIDER)) {
+        loadExtrasPlatformInterfaces(extraFactories);
+
+        if (isDefaultImplementationEnabled(this, FileUtil.AACS_CONFIG_LOCATION_PROVIDER)) {
             mEngine.registerPlatformInterface(new LocationProviderHandler(this));
             Log.v(TAG, "registerPlatformInterface LocationProviderHandler");
         }
 
-        if (isDefaultImplementationEnabled(this, AACS_CONFIG_NETWORK_INFO_PROVIDER)) {
+        if (isDefaultImplementationEnabled(this, FileUtil.AACS_CONFIG_NETWORK_INFO_PROVIDER)) {
             mEngine.registerPlatformInterface(mNetworkInfoProviderHandler = new NetworkInfoProviderHandler(this));
             Log.v(TAG, "registerPlatformInterface mNetworkInfoProviderHandler");
         }
 
-        if (isDefaultImplementationEnabled(this, AACS_CONFIG_EXTERNAL_MEDIA_ADAPTER)) {
+        if (isDefaultImplementationEnabled(this, FileUtil.AACS_CONFIG_EXTERNAL_MEDIA_ADAPTER)) {
             mMACCPlayer = new MACCPlayer(this);
             mEngine.registerPlatformInterface(mMACCPlayer);
             mMACCPlayer.runDiscovery();
             Log.v(TAG, "registerPlatformInterface mMACCPlayer");
+        }
+
+        if (isDefaultImplementationEnabled(this, FileUtil.AACS_CONFIG_PROPERTY_MANAGER)) {
+            mPropertyManagerHandler = new PropertyManagerHandler();
+            mEngine.registerPlatformInterface(mPropertyManagerHandler);
+            Log.v(TAG, "registerPlatformInterface mPropertyManagerHandler");
         }
 
         if (!mEngine.registerPlatformInterface(mAASBHandler))
@@ -383,12 +456,21 @@ public class AlexaAutoClientService extends Service implements AACSContext {
         if (!mEngine.start())
             throw new RuntimeException("Could not start engine");
 
+        // Initialize Property Content Provider only after engine starts and config setting to true
+        if (isDefaultImplementationEnabled(this, FileUtil.AACS_CONFIG_PROPERTY_MANAGER)) {
+            mAPCP = getContentResolver().acquireContentProviderClient(
+                    Uri.parse("content://" + AACSConstants.AACS_PROPERTY_URI));
+            AACSPropertyContentProvider apcp = (AACSPropertyContentProvider) mAPCP.getLocalContentProvider();
+            apcp.setPropertyManagerHandler(mPropertyManagerHandler);
+        }
+
         return true;
     }
 
     private void createNotificationAndStartForegroundService() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             // Create notification channel. Required for Android O and above.
+            Log.d(TAG, "Creating notification channel");
             NotificationManager notificationManager =
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             NotificationChannel notificationChannel =
@@ -400,6 +482,7 @@ public class AlexaAutoClientService extends Service implements AACSContext {
         }
 
         // Create notification. Notification channel id is ignored in Android versions below O.
+        Log.d(TAG, "Build foreground notification");
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, AACS_CHANNEL_ID)
                                                      .setContentTitle(this.getString(R.string.aacs_title))
                                                      .setContentText(this.getString(R.string.aacs_description))
@@ -408,8 +491,9 @@ public class AlexaAutoClientService extends Service implements AACSContext {
 
         Notification notification = builder.build();
 
+        long duration = System.currentTimeMillis() - mOnCreateTimeMs.longValue();
         startForeground(AACS_SERVICE_STARTED_NOTIFICATION_ID, notification);
-        Log.d(TAG, "Starting service in the foreground.");
+        Log.d(TAG, "Starting service in the foreground " + String.valueOf(duration) + " ms after onCreate().");
     }
 
     private boolean isConfiguredVersionValid() {
@@ -468,6 +552,7 @@ public class AlexaAutoClientService extends Service implements AACSContext {
     @Override
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
+        mContext.unregisterReceiver(mPingReceiver);
         super.onDestroy();
         mStateMachine.setState(State.STOPPED);
     }
@@ -491,7 +576,19 @@ public class AlexaAutoClientService extends Service implements AACSContext {
         public void enter() {
             Log.d(TAG, "AACSStateMachine enter started");
 
+            File fileDir = getFilesDir();
+            File certsDir = new File(getCacheDir(), FileUtil.CERTS_DIR);
+            File appDataDir = new File(fileDir, FileUtil.APPDATA_DIR);
+            File externalFileDir = new File(fileDir, FileUtil.EXTERNAL_FILE_DIR);
+            File modelsDir = new File(externalFileDir, FileUtil.MODEL_DIR);
+
+            FileUtil.createDirectoriesAndCopyCertificates(
+                    certsDir, appDataDir, externalFileDir, modelsDir, getAssets());
+
             mAACSContextMap = new HashMap<>();
+            mAACSContextMap.put(AACSContext.APPDATA_DIR, appDataDir.getPath());
+            mAACSContextMap.put(AACSContext.MODEL_DIR, modelsDir.getPath());
+            mAACSContextMap.put(AACSContext.CERTS_DIR, certsDir.getPath());
 
             initAACSReceivers();
 
@@ -511,7 +608,7 @@ public class AlexaAutoClientService extends Service implements AACSContext {
 
         @Override
         public void enter() {
-            if (FileUtil.lvcConfigurationAvailable(mContext))
+            if (FileUtil.lvcEnabled())
                 initLVC();
         }
 
@@ -532,13 +629,20 @@ public class AlexaAutoClientService extends Service implements AACSContext {
                 @Override
                 public void run() {
                     if (isConfiguredVersionValid()) {
+                        Log.d(TAG, "Initializing AASB");
                         initializeAASB();
+                        Log.d(TAG, "Starting engine");
                         boolean success = startEngine();
+                        Log.d(TAG, "Start engine result: " + success);
 
                         if (success) {
                             // if service is not configured to be a persistent service, start it in the foreground.
-                            if (!FileUtil.isPersistentSystemService(mContext))
+                            if (!FileUtil.isPersistentSystemService(mContext)) {
+                                Log.d(TAG, "Creating notification and starting foreground service");
                                 createNotificationAndStartForegroundService();
+                            } else {
+                                Log.d(TAG, "Is a persistent service so not calling startForeground()");
+                            }
                         }
                     }
                 }
@@ -598,10 +702,14 @@ public class AlexaAutoClientService extends Service implements AACSContext {
                 mAASBHandler.cleanUp();
             }
 
+            if (mAPCP != null) {
+                mAPCP.close();
+            }
+
             Log.i(TAG, "AlexaAutoClientService Destroyed");
             mAASBHandler = null;
 
-            if (FileUtil.lvcConfigurationAvailable(mContext)) {
+            if (FileUtil.lvcEnabled()) {
                 if (mLVCInteractionProvider != null)
                     mLVCInteractionProvider.uninitialize();
 
@@ -650,6 +758,7 @@ public class AlexaAutoClientService extends Service implements AACSContext {
                     return;
             }
             Log.i(TAG, String.format("AACSState updated to %s", mState.getState().toString()));
+            mPingReceiver.setState(mState.getState().name());
             mState.enter();
         }
 
@@ -661,7 +770,6 @@ public class AlexaAutoClientService extends Service implements AACSContext {
     //
     // AACSContext (For Extras Configuration)
     //
-
     @Override
     public Context getContext() {
         return this;
@@ -670,5 +778,20 @@ public class AlexaAutoClientService extends Service implements AACSContext {
     @Override
     public String getData(String key) {
         return mAACSContextMap.get(key);
+    }
+
+    @Override
+    public JSONObject getConfiguration(String configKey) {
+        return FileUtil.removeExtrasModuleConfiguration(this, configKey);
+    }
+
+    @Override
+    public boolean isPlatformInterfaceEnabled(String name) {
+        return isDefaultImplementationEnabled(this, name);
+    }
+
+    @Override
+    public void deregisterAASBPlatformInterface(String module, String name) {
+        FileUtil.deregisterAASBPlatformInterface(this, module, name);
     }
 }

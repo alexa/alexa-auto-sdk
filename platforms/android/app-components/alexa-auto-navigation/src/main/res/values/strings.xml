@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Alexa Navigation</string>
+    <string name="yelp_provider">Yelp</string>
+    <string name="navigate_button_text">Navigate</string>
+    <string name="call_button_text">Call</string>
+    <string name="separator">&#160;-&#160;</string>
+    <string name="alexa_title">alexa</string>
+    <string name="closed_text">Closed</string>
+</resources>

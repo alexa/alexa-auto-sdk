@@ -21,6 +21,7 @@ modules/navigation
 modules/phone-control
 platforms/android
 samples/android
+samples/android-aacs-sample-app
 samples/cpp
 
 You may not use this file except in compliance with the License. A copy of
@@ -117,4 +118,22 @@ Copyright Vasil Dinkov, Vadikom Web Ltd.
 http://vadikom.com
 
 Licensed MIT
+----------------------------------------
+
+AACS Sample App includes the following open source Google material design icons:
+
+Google material design icons - v4.0.0 - August 31, 2020
+https://github.com/google/material-design-icons/blob/master/android/av/album/materialicons/black/res/drawable/baseline_album_24.xml
+https://github.com/google/material-design-icons/blob/master/android/av/forward_30/materialicons/black/res/drawable/baseline_forward_30_24.xml
+https://github.com/google/material-design-icons/blob/master/android/av/replay_30/materialicons/black/res/drawable/baseline_replay_30_24.xml
+https://github.com/google/material-design-icons/blob/master/android/social/thumb_up_alt/materialicons/black/res/drawable/baseline_thumb_up_alt_24.xml
+https://github.com/google/material-design-icons/blob/master/android/social/thumb_up_alt/materialiconsoutlined/black/res/drawable/outline_thumb_up_alt_24.xml
+https://github.com/google/material-design-icons/blob/master/android/social/thumb_down_alt/materialicons/black/res/drawable/baseline_thumb_down_alt_24.xml
+https://github.com/google/material-design-icons/blob/master/android/social/thumb_down_alt/materialiconsoutlined/black/res/drawable/outline_thumb_down_alt_24.xml
+https://github.com/google/material-design-icons/blob/master/android/navigation/close/materialicons/black/res/drawable/baseline_close_24.xml
+https://github.com/google/material-design-icons/blob/master/android/navigation/arrow_back/materialicons/black/res/drawable/baseline_arrow_back_24.xml
+https://github.com/google/material-design-icons/blob/master/android/navigation/check/materialicons/black/res/drawable/baseline_check_24.xml
+
+Google material design icons are under Apache License Version 2.0
+https://github.com/google/material-design-icons/blob/master/LICENSE
 ----------------------------------------

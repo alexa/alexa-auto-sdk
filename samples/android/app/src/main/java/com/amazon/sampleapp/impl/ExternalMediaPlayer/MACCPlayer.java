@@ -249,7 +249,7 @@ public class MACCPlayer extends ExternalMediaAdapter {
         stateToReturn.playbackState.playbackSourceId =
                 state.getMediaAppPlaybackState().getMediaAppMetaData().getPlaybackSourceId();
         stateToReturn.playbackState.trackName = state.getMediaAppPlaybackState().getMediaAppMetaData().getTrackName();
-        stateToReturn.playbackState.trackId = "";
+        stateToReturn.playbackState.trackId = state.getMediaAppPlaybackState().getMediaAppMetaData().getTrackId();
         stateToReturn.playbackState.trackNumber =
                 state.getMediaAppPlaybackState().getMediaAppMetaData().getTrackNumber();
         stateToReturn.playbackState.artistName = state.getMediaAppPlaybackState().getMediaAppMetaData().getArtist();

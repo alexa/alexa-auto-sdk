@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.amazon.aacstts">
+    <uses-permission android:name="com.amazon.alexaautoclientservice" />
+    <uses-permission android:name="com.amazon.alexaautoclientservice.ping" />
+
+    <application
+        android:allowBackup="true"
+        android:usesCleartextTraffic="true">
+
+        <service
+            android:name=".AmazonTextToSpeechService"
+            android:label="@string/tts_engine_name"
+            android:process=":aacstts">
+            <intent-filter>
+                <action android:name="android.intent.action.TTS_SERVICE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+        <receiver
+            android:name=".TTSIntentReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":aacstts">
+            <intent-filter>
+                <category android:name="com.amazon.aacs.aasb.AlexaClient" />
+                <action android:name="com.amazon.aacs.aasb.ConnectionStatusChanged" />
+            </intent-filter>
+
+            <intent-filter>
+                <category android:name="com.amazon.aacs.aasb.TextToSpeech" />
+                <action android:name="com.amazon.aacs.aasb.GetCapabilities" />
+                <action android:name="com.amazon.aacs.aasb.PrepareSpeechCompleted" />
+                <action android:name="com.amazon.aacs.aasb.PrepareSpeechFailed" />
+            </intent-filter>
+
+            <intent-filter>
+                <category android:name="com.amazon.aacs.aasb.AASB" />
+                <action android:name="com.amazon.aacs.aasb.StopService" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+</manifest>

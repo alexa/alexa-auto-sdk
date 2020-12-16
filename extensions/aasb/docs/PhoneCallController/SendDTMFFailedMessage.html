@@ -392,6 +392,26 @@ FromEngine:
 </div>
 </div>
 <div class="navitem">
+<button class="dropdown">+ AlexaConnectivity</button>
+<div class="dropdown-container">
+ToEngine:
+            
+<a href='../AlexaConnectivity/ConnectivityStateChangeMessage.html'>ConnectivityStateChange</a>
+
+            
+<a href='../AlexaConnectivity/ConnectivityStateChangeMessageReply.html'>ConnectivityStateChange Reply</a>
+
+FromEngine:
+            
+<a href='../AlexaConnectivity/GetConnectivityStateMessage.html'>GetConnectivityState</a>
+
+            
+<a href='../AlexaConnectivity/GetConnectivityStateMessageReply.html'>GetConnectivityState Reply</a>
+          
+
+</div>
+</div>
+<div class="navitem">
 <button class="dropdown">+ AlexaSpeaker</button>
 <div class="dropdown-container">
 ToEngine:
@@ -511,6 +531,38 @@ FromEngine:
 <a href='../AuthProvider/GetAuthStateMessage.html'>GetAuthState</a>
 
 <a href='../AuthProvider/GetAuthTokenMessage.html'>GetAuthToken</a>
+
+                      
+
+</div>
+</div>
+<div class="navitem">
+<button class="dropdown">+ Authorization</button>
+<div class="dropdown-container">
+ToEngine:
+            
+<a href='../Authorization/CancelAuthorizationMessage.html'>CancelAuthorization</a>
+
+<a href='../Authorization/LogoutMessage.html'>Logout</a>
+
+<a href='../Authorization/SendEventMessage.html'>SendEvent</a>
+
+<a href='../Authorization/StartAuthorizationMessage.html'>StartAuthorization</a>
+
+            
+<a href='../Authorization/GetAuthorizationDataMessageReply.html'>GetAuthorizationData Reply</a>
+
+FromEngine:
+            
+<a href='../Authorization/AuthorizationErrorMessage.html'>AuthorizationError</a>
+
+<a href='../Authorization/AuthorizationStateChangedMessage.html'>AuthorizationStateChanged</a>
+
+<a href='../Authorization/EventReceivedMessage.html'>EventReceived</a>
+
+<a href='../Authorization/GetAuthorizationDataMessage.html'>GetAuthorizationData</a>
+
+<a href='../Authorization/SetAuthorizationDataMessage.html'>SetAuthorizationData</a>
 
                       
 
@@ -748,22 +800,23 @@ ToEngine:
 
 <a href='../Messaging/SendMessageFailedMessage.html'>SendMessageFailed</a>
 
-<a href='../Messaging/SendMessageMessage.html'>SendMessage</a>
-
 <a href='../Messaging/SendMessageSucceededMessage.html'>SendMessageSucceeded</a>
 
 <a href='../Messaging/UpdateMessagesStatusFailedMessage.html'>UpdateMessagesStatusFailed</a>
-
-<a href='../Messaging/UpdateMessagesStatusMessage.html'>UpdateMessagesStatus</a>
 
 <a href='../Messaging/UpdateMessagesStatusSucceededMessage.html'>UpdateMessagesStatusSucceeded</a>
 
 <a href='../Messaging/UpdateMessagingEndpointStateMessage.html'>UpdateMessagingEndpointState</a>
 
+            
+FromEngine:
+            
+<a href='../Messaging/SendMessageMessage.html'>SendMessage</a>
+
+<a href='../Messaging/UpdateMessagesStatusMessage.html'>UpdateMessagesStatus</a>
+
 <a href='../Messaging/UploadConversationsMessage.html'>UploadConversations</a>
 
-            
-            
                       
 
 </div>
@@ -962,6 +1015,28 @@ FromEngine:
 
 </div>
 </div>
+<div class="navitem">
+<button class="dropdown">+ TextToSpeech</button>
+<div class="dropdown-container">
+ToEngine:
+            
+<a href='../TextToSpeech/GetCapabilitiesMessage.html'>GetCapabilities</a>
+
+<a href='../TextToSpeech/PrepareSpeechMessage.html'>PrepareSpeech</a>
+
+            
+FromEngine:
+            
+<a href='../TextToSpeech/PrepareSpeechCompletedMessage.html'>PrepareSpeechCompleted</a>
+
+<a href='../TextToSpeech/PrepareSpeechFailedMessage.html'>PrepareSpeechFailed</a>
+
+            
+<a href='../TextToSpeech/GetCapabilitiesMessageReply.html'>GetCapabilities Reply</a>
+          
+
+</div>
+</div>
 
 </div>
 
@@ -985,7 +1060,7 @@ Notifies the Engine that the DTMF signal could not be delivered to the remote pa
 <pre>
 {
   <span class="json-key">"header"</span> : {
-    "<span class="json-key">version"</span> : <span class="json-val">"3.0"</span>,
+    "<span class="json-key">version"</span> : <span class="json-val">"3.1"</span>,
     "<span class="json-key">messageType"</span> : <span class="json-val">"Publish"</span>,
     "<span class="json-key">id"</span> : {{<span class="json-input">String</span>}},
     <span class="json-key">"messageDescription"</span> : {
@@ -1015,7 +1090,7 @@ Notifies the Engine that the DTMF signal could not be delivered to the remote pa
     </tr> </thead>
         <tr>
         <td>version</td>
-        <td style="color:blue">"3.0"</td>
+        <td style="color:blue">"3.1"</td>
         <td>String</td>
     </tr>
     <tr>
@@ -1110,7 +1185,7 @@ Notifies the Engine that the DTMF signal could not be delivered to the remote pa
 <pre>
 {
   <span class="json-key">"header"</span> : {
-    <span class="json-key">"version"</span> : <span class="json-val">"3.0"</span>,
+    <span class="json-key">"version"</span> : <span class="json-val">"3.1"</span>,
     <span class="json-key">"messageType"</span> : <span class="json-val">"Publish"</span>,
     <span class="json-key">"id"</span> : <span class="json-val">"id-SampleText"</span>,
     <span class="json-key">"messageDescription"</span> : {

@@ -1,0 +1,38 @@
+@startuml
+skinparam roundcorner 10
+participant AuthorizationHandler as Authorization 
+participant "Auto SDK" as AutoSDK 
+
+== Starting the authorization process ==
+Authorization->AutoSDK : startAuthorization("service-name", "data-as-defined-by-service")
+
+alt On successful 
+    AutoSDK->Authorization : authorizationStateChanged("service-name", AUTHORIZING)
+else On failure 
+    AutoSDK->Authorization : authorizationError("service-name", "error-as-defined-by-service","message")
+end
+
+== Events from Auto SDK ==
+opt Any authorization events from Auto SDK for selected service
+    AutoSDK->Authorization : eventReceived("service-name", "event-as-defined-by-service")
+end
+
+== Events from Platform Implementation ==
+opt Any authorization event from Platform Implemenation to Auto SDK
+    Authorization->AutoSDK : sendEvent("service-name", "event-as-defined-by-service")
+end
+
+== Storing/retrieving of authorization-related data   ==
+opt Storing the authorization data from Auto SDK
+    AutoSDK->Authorization : setAuthorizationData("service-name", "key", "data-as-defined-by-service")
+end
+
+opt Getting the authorization data from Platform Implementation
+    AutoSDK->Authorization : getAuthorizationData("service-name", "key")
+    Authorization-->AutoSDK : <Data>
+end
+
+== On successful authorization ==
+    AutoSDK->Authorization : authorizationStateChanged("service-name", AUTHORIZED)
+
+@enduml

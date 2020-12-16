@@ -1,0 +1,25 @@
+{
+  "payload": {
+    "transportationMode": "DRIVING",
+    "waypoints": [
+      {
+        "type": "Destination",
+        "coordinate": [
+          37.31879,
+          -121.842216
+        ],
+        "address": {
+          "addressLine1": "test address 1",
+          "addressLine2": "",
+          "addressLine3": "",
+          "city": "Santa Clara",
+          "stateOrRegion": "California",
+          "districtOrCounty": "Santa Clara",
+          "postalCode": "54123",
+          "countryCode": "US"
+        },
+        "name": "Home"
+      }
+    ]
+  }
+}

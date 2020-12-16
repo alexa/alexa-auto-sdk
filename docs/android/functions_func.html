@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">3.0.0</span>
+   &#160;<span id="projectnumber">3.1.0</span>
    </div>
   </td>
  </tr>
@@ -142,6 +142,12 @@ $(function() {
 <li>authFailure()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider.html#a73c6d42ae6537e38fa7a910cf84e5b8a">com.amazon.aace.alexa.AuthProvider</a>
 </li>
+<li>authorizationError()
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1authorization_1_1_authorization.html#ac2087542c1f5f41240fbe1154dc9dc51">com.amazon.aace.authorization.Authorization</a>
+</li>
+<li>authorizationStateChanged()
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1authorization_1_1_authorization.html#aac7df2c628d7212d332bca7d04248087">com.amazon.aace.authorization.Authorization</a>
+</li>
 <li>authorize()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter.html#a0ddaaef81a0c9edbdffc2f4149f638e8">com.amazon.aace.alexa.ExternalMediaAdapter</a>
 </li>
@@ -173,6 +179,9 @@ $(function() {
 </li>
 <li>cancel()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1cbl_1_1_c_b_l.html#a75298918ee94a5f4f5621824d0665ff7">com.amazon.aace.cbl.CBL</a>
+</li>
+<li>cancelAuthorization()
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1authorization_1_1_authorization.html#a29cc92d67c72d2bb1f8fc1fa0d6a3e53">com.amazon.aace.authorization.Authorization</a>
 </li>
 <li>cancelNavigation()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1navigation_1_1_navigation.html#ab8bfcea62eb634ece636a1264b5b5a89">com.amazon.aace.navigation.Navigation</a>
@@ -219,6 +228,9 @@ $(function() {
 </li>
 <li>createAlexaPresentationTimeoutConfig()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1apl_1_1config_1_1_a_p_l_configuration.html#ad894310b1978f5a3e35bc4477218b48b">com.amazon.aace.apl.config.APLConfiguration</a>
+</li>
+<li>createAuthProviderConfig()
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1config_1_1_alexa_configuration.html#a7d8ab3df5c49018304c1382af1dfce31">com.amazon.aace.alexa.config.AlexaConfiguration</a>
 </li>
 <li>createCallId()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a2998eb274f0bdbc50cc89f2a3d12cd13">com.amazon.aace.phonecontrol.PhoneCallController</a>
@@ -327,6 +339,9 @@ $(function() {
 <li>endOfSpeechDetected()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a59f998dabf28a7db3d87e2b9350a221b">com.amazon.aace.alexa.SpeechRecognizer</a>
 </li>
+<li>eventReceived()
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1authorization_1_1_authorization.html#a7401ba9e417362adc91e1b67eb82fd63">com.amazon.aace.authorization.Authorization</a>
+</li>
 <li>executeCommands()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1apl_1_1_a_p_l.html#aaebb36d48655e30799879fa2293743b2">com.amazon.aace.apl.APL</a>
 </li>
@@ -342,6 +357,9 @@ $(function() {
 </li>
 <li>getAltitude()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1location_1_1_location.html#ae5ee423032967f1fae0570d394af3951">com.amazon.aace.location.Location</a>
+</li>
+<li>getAuthorizationData()
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1authorization_1_1_authorization.html#a7f2f391a3991f344ee1bec75ae33fd48">com.amazon.aace.authorization.Authorization</a>
 </li>
 <li>getAuthState()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider.html#aa04277b311b61fdcf18c759714d148b1">com.amazon.aace.alexa.AuthProvider</a>
@@ -482,6 +500,7 @@ $(function() {
 </li>
 <li>logout()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter.html#a8dfc0565e9ac5c0662a9431886f8ef6e">com.amazon.aace.alexa.ExternalMediaAdapter</a>
+, <a class="el" href="classcom_1_1amazon_1_1aace_1_1authorization_1_1_authorization.html#a33d59157ab8510d41612ac7863c9af5d">com.amazon.aace.authorization.Authorization</a>
 </li>
 <li>logoutComplete()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter.html#a9d6279826669b48ebf5c670985f0f092">com.amazon.aace.alexa.ExternalMediaAdapter</a>
@@ -620,11 +639,17 @@ $(function() {
 <li>sendDTMFSucceeded()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#abbef49449a17271bc67e885054c50416">com.amazon.aace.phonecontrol.PhoneCallController</a>
 </li>
+<li>sendEvent()
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1authorization_1_1_authorization.html#a642481290c6676c77421712813cbc9fd">com.amazon.aace.authorization.Authorization</a>
+</li>
 <li>sendUserEvent()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1apl_1_1_a_p_l.html#a596b08f65e81293660be6b9b0b1e13b9">com.amazon.aace.apl.APL</a>
 </li>
 <li>setAPLMaxVersion()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1apl_1_1_a_p_l.html#a52b6f421255ee73cfef5b3c5e73073fc">com.amazon.aace.apl.APL</a>
+</li>
+<li>setAuthorizationData()
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1authorization_1_1_authorization.html#a5d7a33dce5adbb4ab084eb0b3b6de90e">com.amazon.aace.authorization.Authorization</a>
 </li>
 <li>setBandLevels()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_equalizer_controller.html#a3acad44f203be8b5a06f426d0c9db7fd">com.amazon.aace.alexa.EqualizerController</a>
@@ -672,6 +697,9 @@ $(function() {
 <li>start()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1cbl_1_1_c_b_l.html#ae628b6fbb8421609b19f24e462b6a2aa">com.amazon.aace.cbl.CBL</a>
 , <a class="el" href="classcom_1_1amazon_1_1aace_1_1core_1_1_engine.html#a363681ccf0a37aa487dd32a0b1d3ce15">com.amazon.aace.core.Engine</a>
+</li>
+<li>startAuthorization()
+: <a class="el" href="classcom_1_1amazon_1_1aace_1_1authorization_1_1_authorization.html#a58915285c9d94a41840da1b5fdaa7534">com.amazon.aace.authorization.Authorization</a>
 </li>
 <li>startCapture()
 : <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_speech_recognizer.html#a5c85bfc150b64cc2389c4a036fa6c367">com.amazon.aace.alexa.SpeechRecognizer</a>
@@ -737,7 +765,7 @@ $(function() {
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 3.0.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 3.1.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

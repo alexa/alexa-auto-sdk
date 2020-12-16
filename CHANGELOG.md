@@ -1,5 +1,123 @@
 # Change Log
 ___
+## v3.1.0 released on 2020-12-15
+
+### Enhancements
+* Added the Authorization platform interface that replaces the CBL platform interface and the AuthProvider platform interface. For information about how the Alexa Auto SDK Engine handles authorization with the Authorization platform interface, see the [Core module README](./modules/core/README.md).
+   
+>**Note:** Logging out from CBL or Auth Provider authorization clears
+the databases that store user data, such as alerts and settings. For example,
+when the user logs out, pending alerts in the database are cleared to ensure that the next user who logs in does not receive the alerts. In addition, upon logout, 
+the locale setting is reset to the default value in the Engine configuration. 
+Therefore, if the current device locale is different from the default locale, you must set the locale before starting an authorization flow.
+
+* Added the Text To Speech module that exposes the platform interface for requesting synthesis of Alexa speech on demand from a text or Speech Synthesis Markup Language (SSML) string. Added the Text To Speech Provider module that synthesizes the Alexa speech. The Text to Speech provider requires Auto SDK to be built with the Local Voice Control extension. For information about these modules, see the [Text To Speech module README](./modules/text-to-speech/README.md) and [Text To Speech Provider README](./modules/text-to-speech-provider/README.md).
+  >**Note:** This feature may only be used with voice-guided turn-by-turn navigation.
+  
+* Added the Connectivity module that creates a lower data consumption mode for Alexa, allowing automakers to offer tiered functionality based on the status of their connectivity plans. By using this module, you can send the customer's connectivity status from the vehicle to Alexa, which determines whether the customer can enjoy a full or partial set of Alexa features. For information about the Connectivity module, see the [README](./modules/connectivity/README.md).
+
+* Added the Local Navigation module for the Local Voice Control (LVC) extension. This module enables you to provide customers with offline search and navigation to points of interest (POI) by leveraging the POI data of an onboard navigation provider. The POIs include categories, chains, and entities. The Local Voice Control (LVC) extension is required for the Local Navigation module. 
+
+>**Note:** Offline search with the Local Navigation module is only supported in the en-US locale.
+  
+* Added the Alexa Auto Client Service (AACS) Sample App that demonstrates how an application uses AACS. The Auto SDK includes the app components used by the AACS Sample App, which you can also use when developing an application that communicates with AACS. For information about the AACS Sample App, see the [README](./samples/android-aacs-sample-app/alexa-auto-app/README.md).
+
+* Added support for Digital Audio Broadcasting (DAB) radio. For more information about the DAB local media source, see the [Alexa module README](./modules/alexa/README.md). 
+* Enhancements for AACS:
+
+  * Enhanced the file sharing protocol of AACS by using Android's FileProvider. This enhancement grants AACS permission to access files within your AACS client application, which are required by configuration fields for the Auto SDK.
+
+  * Added support for the Android `ContentProvider` class, which is a standard Android mechanism for performing CRUD (Create, Read, Update, Delete) operations on stored data. By extending this class, you can use a content provider, instead of AACS messages, to manage Auto SDK properties and retrieve state information.
+
+    For information about how AACS uses `FileProvider` and `ContentProvider`, see the [README](./platforms/android/alexa-auto-client-service/README.md).
+
+  * Added support for a `ping` broadcast to check the AACS connection state. For more information about how to use `ping`, see the [README](./platforms/android/alexa-auto-client-service/README.md).
+  
+  * Added support for caching AASB message intent targets based on AASB Action. This enables you to define an intent filter with a subset of the possible actions for an AASB topic. For more information on specifying intent targets, see the [README](./platforms/android/alexa-auto-client-service/README.md#specifying-the-intent-targets-for-handling-messages).
+
+  * Added support for Text-to-Speech Service, which allows Android applications to interact with Android TTS APIs to convert text to speech. For information about the Text-to-Speech Service, see the [README](./platforms/android/alexa-auto-client-service/tts/README.md).
+  
+
+### Resolved Issues
+* On Android, the Engine returns the correct value (`UNDEFINED`) for requests to `LocationProvider.getLocation()` when the device does not have access to location. Previously the Engine populated the user geolocation with a default value when `Location.UNDEFINED` was returned in `LocationProvider.getLocation()`. 
+  
+* In the AACS commonutils library, the JSON parser (`RenderPlayerInfo.kt`) for the `renderPlayerInfo` message of `templateRuntime` could only parse the `payload` field of the AASB `RenderPlayerInfo` message payload. Now it can parse the overall AASB payload.
+
+
+* Notifications sound plays correctly. Previously, the sound did not play as expected due to improper channel configuration.
+
+* The CBL module code request flow correctly applies the locale setting to the Login With Amazon (LWA) code request. Previously, the URL returned by LWA was always in the en-US locale.
+
+* If you log out and log in, the client-side Do Not Disturb (DND) state is synchronized with Alexa.
+
+### Known Issues
+* General
+    * If the "locales" field of the "deviceSettings" node of the Alexa module configuration JSON is not specified, the Engine automatically declares support for the following locale combinations:
+        ["en-US", "es-US"],
+        ["es-US", "en-US"],
+        ["en-IN", "hi-IN"],
+        ["hi-IN", "en-IN"],
+        ["fr-CA", "en-CA"],
+        ["en-CA", "fr-CA"].
+    
+      The Engine does not declare support for locale combinations if the "locales" field is assigned an empty value.
+
+    * The `wakewordEnabled` property is not persistent across device reboots. If you use AACS, however, this issue does not occur. 
+
+* Car Control
+    * For car control, there is a limit of two Device Serial Numbers (DSN) per account or Customer ID (CID). Limit the number of devices for testing with a single account accordingly. If you use the Android sample app, be sure to configure a specific DSN.
+  
+    * It can take up to 20 seconds from the time of user login to the time Alexa is available to accept utterances. The cloud uses this time to ingest the car control endpoint configurations sent by Auto SDK after login.
+  
+    * If you configure the Auto SDK Engine and connect to Alexa using a set of endpoint configurations, you cannot delete any endpoint in a set in the cloud. For example, after you configure set A with endpoints 1, 2, and 3, if you change your car control configuration during development to set B with endpoints 2, 3, and 4, endpoint 1 from set A remains in the cloud and might interfere with resolving the correct endpoint ID for your utterances. However, any endpoint configurations with matching IDs override previous configurations. For example, the configuration of endpoint 2 in set B replaces endpoint 2 in set A. During development, limit configuration changes to create only supersets of previous endpoint configurations. Work with your Solutions Architect or Partner Manager to produce the correct configuration on the first try.
+  
+    * Car control utterances that are variations of supported utterances but do not follow the supported utterance patterns return errors. Examples include “please turn on the light in the car” instead of the supported “turn on the light“, and ”put on the defroster“ or “defrost the windshield” instead of the supported ”turn on the defroster”.  
+    * The air conditioner endpoint supports only Power Controller and Mode Controller capabilities, not Range Controller for numeric settings.
+  
+
+* Communications
+    * A user request to send an SMS to an Alexa contact results in an Alexa-to-Alexa message instead. However, ‘send message’ instead of ‘send SMS’ to a contact works.
+  
+    * When using LVC in online mode, users can redial a call when the phone connection state is OFF.
+  
+    * DTMF utterances that include the letters "A", "B", "C", or "D" (for example "press A" or "dial 3*#B") are ignored.
+  
+    * Calling numbers such as 1-800-xxx-xxxx by using utterances such as “Alexa call one eight double oh...” may return unexpected results. Similarly, when you call numbers by using utterances that include "triple," "hundred," and "thousand," or press special characters such as # or * by saying "Alexa press *#", you may experience unexpected results. We recommend that your client application ignore special characters, dots, and non-numeric characters when requesting Alexa to call or press digits.
+  
+    * A user playing any skill with extended multi-turn dialogs (such as Jeopardy or Skyrim) cannot use voice to accept or reject incoming Alexa-to-Alexa calls.
+
+* Entertainment
+    * A user playing notifications while music is playing hears the music for a split second between the end of one notification and the start of the next.
+  
+    * The word, "line-in," in an utterance is sometimes misinterpreted as "line" or other words. For example, if the user says, "Switch to line-in," the misinterpretation of "line-in" might cause an incorrect response.
+  
+    * When an external player authorization is in progress at the exact moment of shutdown, a very rare race condition might occur, causing the Engine to crash.
+
+* Authentication
+    * The CBL module uses a backoff when refreshing the access token after expiry. If the internet is disconnected when the refresh is attempted, it could take up to a minute to refresh the token when the internet connection is restored.
+
+* AACS
+  
+    * For some platform interface APIs in the Core module, when an application fails to handle a directive, there is no way to report the failure to the Engine. This is because AASB assumes that the application always handles messages correctly. When AASB incorrectly reports how the application handles the message, the Engine state might become inconsistent with the application state. For example, suppose the Engine sends a directive to the application to set the audio volume but the application fails to make the change. AASB does not report the failure to the Engine. As a result, the Engine's and the application's settings become out of sync. The following list shows the affected APIs:
+        * `AudioInput`: 
+            * `startAudioInput()`
+        * `AudioOutput`: 
+            * `setPosition(int64_t position)`
+            * `volumeChanged(float volume)`
+            * `mutedStateChanged(MutedState state)`  
+    * AACS enables APL by default, but it does not have a default implementation for APL. AACS expects the client application to handle the messages or directives from the Engine. If APL is not handled on the client side, utterances that trigger APL capabilities, such as "tell me a joke," fail. To disable APL, add the lines below to the AACS configuration file. See "Configuring the AASB Interface Handlers" in the [AASB README](./extensions/aasb/README.md) for more details.
+
+~~~
+        "aasb.apl": {
+            "APL": {
+                   "enabled" : false
+               }
+        }
+~~~
+  
+### Additional Changes
+Starting with v3.1.0, the Local Voice Control (LVC) extension is no longer supported on ARM32 platforms. 
+
 ## v3.0.0 released on 2020-10-09
 
 ### Enhancements
@@ -10,6 +128,7 @@ ___
 ### Resolved Issues
 * On QNX, when a portion of music on Spotify is skipped, either by the user saying, "Skip forward," or by the user skipping to a different song, the volume is no longer reset to the default level.
 * A user barging in when music is playing no longer hears an Alexa response to the barge-in request. Previously, this issue happened if the System Audio extension was used.
+* When streaming music from Alexa, the user can switch to a local media source by using one utterance, such as "Alexa, play radio." Previously, Alexa would not switch to the local media source after the first utterance. The user needed to issue the request again before Alexa could play from the local media source. 
 
 ### Known Issues
 * General
@@ -55,9 +174,9 @@ ___
             * `setPosition(int64_t position)`
             * `volumeChanged(float volume)`
             * `mutedStateChanged(MutedState state)`
-    
+
      * In the commonutils library, the JSON parser (`RenderPlayerInfo.kt`) for the `renderPlayerInfo` message of `templateRuntime` can only parse the `payload` field of the AASB `RenderPlayerInfo` message payload. The `payload` field of `RenderPlayerInfo` is the inner payload of the nested payload structure. When using `TemplateRuntime.parseRenderInfo(String json)`, provide it with the embedded JSON as a string of the string value whose key is `payload` in the `RenderPlayerInfo` message’s payload instead of the overall AASB payload.
-    
+     
 ### Additional Changes
 Starting with Auto SDK v3.0, we no longer support the Automotive Grade Linux (AGL) Alexa Voice agent in the Auto SDK. If you intend to use the AGL Alexa Voice Agent, continue using Auto SDK v2.3.0, which is the last version that provides AGL support.
 
@@ -202,7 +321,7 @@ Starting with Auto SDK v3.0, we no longer support the Automotive Grade Linux (AG
 
 * Added support for Alexa Presentation Language (APL) rendering to present visual information and manage user interactions with Alexa.
 
-    >**Note:** In order to use APL rendering with the Android Sample App, you must install an extra component in the Auto SDK. [Contact your Amazon Solutions Architect (SA) or Partner Manager](./NEED_HELP.md#requesting-additional-functionality-whitelisting) for details.
+    >**Note:** In order to use APL rendering with the Android Sample App, you must install an extra component in the Auto SDK. [Contact your Amazon Solutions Architect (SA) or Partner Manager](./NEED_HELP.md#requesting-additional-functionality) for details.
 * Added support for the Alexa DoNotDisturb (DND) interface, which allows users to block all incoming notifications, announcements, and calls to their devices, and to set daily recurring schedules that turn DND off and on. For details, see the [DND Interface documentation](https://developer.amazon.com/docs/alexa-voice-service/donotdisturb.html).
     >**Note:** Alexa does not notify the user of the DND state.
 * Added a System Audio extension to provide the default audio capturing and playback functionality for various platforms, including audio input/output on QNX platforms. The Alexa Auto SDK Builder automatically includes the System Audio extension when you build the Auto SDK.

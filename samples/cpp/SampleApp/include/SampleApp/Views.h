@@ -69,7 +69,13 @@ public:
         /*8*/ TrafficDetailsTemplate,
 
         // TemplateRuntime/RenderPlayerInfo
-        PlayerInfo
+        PlayerInfo,
+
+        // Authorization/authorizationStateChanged
+        AuthorizationStateChanged,
+
+        // Authorization/authorizationError
+        AuthorizationError
     };
     static std::shared_ptr<View> create(const std::string& id);
     template <typename... Args>

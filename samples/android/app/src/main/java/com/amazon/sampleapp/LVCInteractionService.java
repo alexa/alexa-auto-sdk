@@ -33,10 +33,12 @@ import com.amazon.alexalve.ILVCClient;
 import com.amazon.alexalve.ILVCService;
 import com.amazon.sampleapp.FileUtils;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.Iterator;
 
 /**
  * LVCInteractionService is responsible for establishing a connection with the LVC service and
@@ -198,28 +200,52 @@ public class LVCInteractionService extends Service {
                 String carControlAssetsPath = getCarControlAssetsPath(appDataDirPath);
                 carControlNode.put("CustomAssetsFilePath", carControlAssetsPath);
 
-                // To configure LVC to use the custom volume range, add the "CustomVolume" node.
-                // This tells the LVC service in the LVC APK to use a volume range different than
-                // the default. If your application does not use a custom volume range for online
+                // To configure LVC to use the custom volume range, add the "CustomVolume" node inside
+                // the "lvcConfig" node. This tells the LVC service in the LVC APK to use a volume range
+                // different than the default. If your application does not use a custom volume range for online
                 // utterances, skip supplying a custom volume configuration to LVC.
                 //
-                // To facilitate the testing, we check if a custom volume configuration file
-                // "CustomVolume.json" is present on root of the SD card. If present, it should
+                // To facilitate the testing, we check if a custom volume in configuration file
+                // "autoSDKSampleAppExtraConfig.json" is present on root of the SD card. If present, it should
                 // define the custom volume config in the JSON format as shown below and should match
                 // the custom configuration you use for the cloud.
                 //
                 // {
-                //    "CustomVolume": {
-                //          "minVolumeValue": "<Min VUI Volume Value>",
-                //          "maxVolumeValue": "<Max VUI Volume Value>",
-                //          "volumeAdjustmentStepValue": "<Device volume adjustment step value>"
+                //     "lvcConfig": {
+                //         "CustomVolume": {
+                //             "minVolumeValue": "<Min VUI Volume Value>",
+                //             "maxVolumeValue": "<Max VUI Volume Value>",
+                //             "volumeAdjustmentStepValue": "<Device volume adjustment step value>"
+                //         }
                 //     }
-                //  }
-                JSONObject customVolumeConfig =
-                        FileUtils.getOptionalConfigFromSDCard("CustomVolume.json", "CustomVolume");
-                if (customVolumeConfig != null) {
-                    config.put("CustomVolume", customVolumeConfig);
+                // }
+
+                JSONObject extraConfig =
+                        FileUtils.getOptionalConfigFromSDCard("autoSDKSampleAppExtraConfig.json", "lvcConfig");
+                if (extraConfig != null) {
+                    Log.i(TAG, "Reading extra config directly from file.");
+                    Iterator<String> keys = extraConfig.keys();
+                    while (keys.hasNext()) {
+                        String key = keys.next();
+                        Log.i(TAG, "Config key = " + key);
+                        Object val = extraConfig.get(key);
+                        if (val instanceof JSONObject) {
+                            config.put(key, extraConfig.getJSONObject(key));
+                        } else if (val instanceof JSONArray) {
+                            config.put(key, extraConfig.getJSONArray(key));
+                        }
+                    }
                 }
+
+                // To use offline local POI search and navigation features, provide the "LocalSearch"
+                // node. You must also register implementations of platform interfaces Navigation
+                // and LocalSearchProvider.
+                JSONObject localSearchConfig = new JSONObject();
+                localSearchConfig.put("NavigationPOISocketDir", appDataDirPath);
+                localSearchConfig.put("NavigationPOISocketName", "poi_navigation.socket");
+                localSearchConfig.put("POIEERSocketDir", appDataDirPath);
+                localSearchConfig.put("POIEERSocketName", "poi_eer.socket");
+                config.put("LocalSearch", localSearchConfig);
 
                 configString = config.toString();
             } catch (JSONException e) {
@@ -232,7 +258,6 @@ public class LVCInteractionService extends Service {
         @Override
         public void configure(String configuration) {
             Log.i(TAG, "Configuration received from LVC service");
-
             mLVCConfig = configuration;
             sendAHEInitSuccess(configuration);
         }

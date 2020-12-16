@@ -38,6 +38,7 @@
 #include <Settings/Storage/DeviceSettingStorageInterface.h>
 #include <SpeechSynthesizer/SpeechSynthesizer.h>
 
+#include "AuthorizationManager.h"
 #include "EndpointBuilderFactory.h"
 #include "ExternalMediaPlayer.h"
 
@@ -83,6 +84,7 @@ public:
     virtual std::shared_ptr<alexaClientSDK::acl::TransportFactoryInterface> getTransportFactory() = 0;
     virtual std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface>
     getVisualFocusManager() = 0;
+    virtual std::shared_ptr<AuthorizationManager> getAuthorizationManager() = 0;
 };
 
 }  // namespace alexa

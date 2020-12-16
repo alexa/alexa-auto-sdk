@@ -21,68 +21,66 @@
 #include <string>
 
 #include <AVSCommon/SDKInterfaces/AuthDelegateInterface.h>
+#include <AVSCommon/Utils/DeviceInfo.h>
 #include <AVSCommon/Utils/RequiresShutdown.h>
 
 #include <AACE/CBL/CBL.h>
 #include <AACE/CBL/CBLEngineInterface.h>
 
-#include "AACE/Engine/Alexa/LocaleAssetsManager.h"
+#include <AACE/Engine/Alexa/AlexaEndpointInterface.h>
+#include <AACE/Engine/Alexa/LocaleAssetsManager.h>
+#include <AACE/Engine/Authorization/AuthorizationProviderListenerInterface.h>
+#include <AACE/Engine/PropertyManager/PropertyManagerServiceInterface.h>
 
-#include "CBLAuthDelegate.h"
-#include "CBLAuthRequesterInterface.h"
+#include "CBLAuthorizationProvider.h"
+#include "CBLConfiguration.h"
 
 namespace aace {
 namespace engine {
 namespace cbl {
 
 class CBLEngineImpl
-        : public alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface
-        , public CBLAuthRequesterInterface
-        , public aace::cbl::CBLEngineInterface
+        : public aace::cbl::CBLEngineInterface
+        , public authorization::AuthorizationProviderListenerInterface
         , public alexaClientSDK::avsCommon::utils::RequiresShutdown
         , public std::enable_shared_from_this<CBLEngineImpl> {
 private:
     CBLEngineImpl(std::shared_ptr<aace::cbl::CBL> cblPlatformInterface);
 
     bool initialize(
-        std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> customerDataManager,
+        std::shared_ptr<aace::engine::alexa::AuthorizationManagerInterface> authorizationManagerInterface,
         std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
         std::chrono::seconds codePairRequestTimeout,
         std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
         std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> localeAssetManager,
+        std::shared_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> propertyManager,
         bool enableUserProfile);
 
 public:
     static std::shared_ptr<CBLEngineImpl> create(
         std::shared_ptr<aace::cbl::CBL> cblPlatformInterface,
-        std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> customerDataManager,
+        std::shared_ptr<aace::engine::alexa::AuthorizationManagerInterface> authorizationManagerInterface,
         std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
         std::chrono::seconds codePairRequestTimeout,
         std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
         std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> localeAssetManager,
+        std::shared_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> propertyManager,
         bool enableUserProfile);
 
     void enable();
     void disable();
 
-    // AuthDelegateInterface
-    void addAuthObserver(
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer) override;
-    void removeAuthObserver(
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer) override;
-    std::string getAuthToken() override;
-    void onAuthFailure(const std::string& token) override;
-
-    // CBLAuthRequestInterface
-    void cblStateChanged(
-        CBLAuthRequesterInterface::CBLState state,
-        CBLAuthRequesterInterface::CBLStateChangedReason reason,
-        const std::string& url,
-        const std::string& code) override;
-    void clearRefreshToken() override;
-    void setRefreshToken(const std::string& refreshToken) override;
-    std::string getRefreshToken() override;
-    void setUserProfile(const std::string& name, const std::string& email) override;
+    /// @name AuthorizationProviderListenerInterface
+    /// @{
+    void onAuthorizationStateChanged(
+        const std::string& service,
+        AuthorizationProviderListenerInterface::AuthorizationState state) override;
+    void onAuthorizationError(const std::string& service, const std::string& error, const std::string& message)
+        override;
+    void onEventReceived(const std::string& service, const std::string& request) override;
+    std::string onGetAuthorizationData(const std::string& service, const std::string& key) override;
+    void onSetAuthorizationData(const std::string& service, const std::string& key, const std::string& data) override;
+    /// @}
 
     // CBLEngineInterface
     void onStart() override;
@@ -94,7 +92,34 @@ protected:
 
 private:
     std::shared_ptr<aace::cbl::CBL> m_cblPlatformInterface;
-    std::shared_ptr<CBLAuthDelegate> m_cblAuthDelegate;
+    std::shared_ptr<CBLAuthorizationProvider> m_cblAuthorizationProvider;
+
+    /// Represents the possible states of AuthProviderEngineImpl
+    enum class CBLEngineState {
+        /// Initial State
+        INITIALIZED,
+
+        /// Same as AuthorizationState::AUTHORIZING
+        AUTHORIZING,
+
+        /// Same as AuthorizationState::AUTHORIZED
+        AUTHORIZED,
+
+        /// Same as AuthorizationState::UNAUTHORIZED
+        UNAUTHORIZED,
+
+        /// Represents the error when onAuthorizationError() occurs
+        ERROR
+    };
+
+    /// Represents the current state of CBLEngineImpl
+    CBLEngineState m_state;
+
+    /// Synchronizes @c CBLEngineInterface calls with @c AuthorizationProviderListenerInterface callbacks that update @c m_state
+    std::condition_variable m_cv;
+
+    /// To serialize access to @c m_state
+    std::mutex m_mutex;
 };
 
 }  // namespace cbl

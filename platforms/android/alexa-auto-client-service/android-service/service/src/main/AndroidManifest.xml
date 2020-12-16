@@ -13,6 +13,10 @@
     <permission android:name="com.amazon.alexaautoclientservice"
         android:protectionLevel= "signature|privileged"/>
 
+    <permission android:name="com.amazon.alexaautoclientservice.ping"
+        android:protectionLevel= "signature"/>
+    <uses-permission android:name="com.amazon.alexaautoclientservice.ping" />
+
     <application
         android:allowBackup="true"
         android:supportsRtl="true"
@@ -38,7 +42,18 @@
             <intent-filter>
                 <action android:name="com.amazon.alexaautoclientservice.Start" />
             </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEND_MULTIPLE"/>
+            </intent-filter>
         </service>
+        <provider android:name="com.amazon.alexaautoclientservice.AACSPropertyContentProvider"
+            android:permission="android.permission.READ_USER_DICTIONARY"
+            android:grantUriPermissions="true"
+            android:authorities="com.amazon.alexaautoclientservice.AACSPropertyContentProvider"
+            android:enabled="true"
+            android:exported="true" >
+        </provider>
     </application>
 
 </manifest>

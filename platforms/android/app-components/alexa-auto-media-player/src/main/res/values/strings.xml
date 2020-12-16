@@ -1,0 +1,19 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">Alexa Media</string>
+    <string name="notification_channel">Alexa Music</string>
+    <string name="notification_channel_description">Alexa Music with Media Control</string>
+    <string name="notification_service_title">Alexa Music</string>
+
+    <string name="playback_control_skip_forward">Skip Forward</string>
+    <string name="playback_control_skip_backward">Skip Backward</string>
+    <string name="playback_control_thumbsup">Thumbs Up</string>
+    <string name="playback_control_thumbsdown">Thumbs Down</string>
+
+    <string name="alexa_music_login_required">Please login with Amazon to play music with Alexa</string>
+    <string name="alexa_music_login_text">Sign in</string>
+    <string name="alexa_music_alexa_not_selected_va">Change Assist App to Alexa to play music with Alexa</string>
+    <string name="alexa_music_select_va">Select Alexa as Assist App</string>
+    <string name="alexa_music_hint_1">Try saying, \"Alexa, Play music\"</string>
+
+    <string name="artist_msp_seperator">&#160;|&#160;</string>
+</resources>

@@ -6,8 +6,9 @@ import android.media.AudioFocusRequest;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
-import android.support.annotation.NonNull;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.amazon.aace.aasb.AASBStream;
 import com.amazon.aacsconstants.AACSConstants;

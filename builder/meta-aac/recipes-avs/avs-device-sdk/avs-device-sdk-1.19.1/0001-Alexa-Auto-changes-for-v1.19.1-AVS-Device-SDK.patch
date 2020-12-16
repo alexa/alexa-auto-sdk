@@ -1,8 +1,9 @@
-From e66bb45c76f3e5a0489aae5cac09c0bd335cf01c Mon Sep 17 00:00:00 2001
-From: Eze Cervantes <ezeqc@amazon.com>
-Date: Tue, 6 Oct 2020 12:34:01 -0700
-Subject: [PATCH] Alexa Auto changes for v1.19.1 AVS Device SDK
+From 9b8850e797dd9be90a4a0a62ce9a15eaa447c67e Mon Sep 17 00:00:00 2001
+From: Muni Sakkuru <muni.sakkuru@gmail.com>
+Date: Tue, 24 Nov 2020 13:34:39 -0800
+Subject: [PATCH 1/1] Alexa Auto changes for v1.19.1 AVS Device SDK
 
+For internal reference: 45cc3665
 ---
  ACL/src/AVSConnectionManager.cpp              |   4 +-
  ADSL/include/ADSL/DirectiveProcessor.h        |  15 +-
@@ -15,13 +16,16 @@ Subject: [PATCH] Alexa Auto changes for v1.19.1 AVS Device SDK
  .../AVS/AVSDiscoveryEndpointAttributes.h      |   4 +
  .../AVSCommon/AVS/ActionsToDirectiveMapping.h |  88 +++
  .../AVSCommon/AVS/CapabilitySemantics.h       |  71 ++
+ .../AVSCommon/AVS/DialogUXStateAggregator.h   |  45 +-
  .../include/AVSCommon/AVS/EndpointResources.h | 188 +++++
  .../AVS/src/ActionsToDirectiveMapping.cpp     | 101 +++
  AVSCommon/AVS/src/CapabilityResources.cpp     |   5 +-
  AVSCommon/AVS/src/CapabilitySemantics.cpp     |  68 ++
+ AVSCommon/AVS/src/DialogUXStateAggregator.cpp | 112 ++-
  AVSCommon/AVS/src/EndpointResources.cpp       | 223 ++++++
  .../AVS/test/CapabilityResourcesTest.cpp      |  16 +-
  .../AVS/test/CapabilitySemanticsTest.cpp      | 223 ++++++
+ .../AVS/test/DialogUXStateAggregatorTest.cpp  |  24 +-
  AVSCommon/CMakeLists.txt                      |   5 +
  .../CallStateObserverInterface.h              |  17 +-
  .../DirectiveSequencerInterface.h             |   4 +
@@ -41,12 +45,19 @@ Subject: [PATCH] Alexa Auto changes for v1.19.1 AVS Device SDK
  .../Utils/LibcurlUtils/HttpDeleteInterface.h  |  56 ++
  .../AVSCommon/Utils/LibcurlUtils/HttpGet.h    |  83 +++
  .../Utils/LibcurlUtils/HttpGetInterface.h     |  56 ++
+ .../AVSCommon/Utils/Logger/ThreadMoniker.h    |   9 +-
+ .../AVSCommon/Utils/Threading/Executor.h      |  14 +-
  .../include/AVSCommon/Utils/Timing/Timer.h    |   7 +-
- .../LibcurlUtils/CurlEasyHandleWrapper.cpp    |  56 +-
+ .../LibcurlUtils/CurlEasyHandleWrapper.cpp    |  58 +-
  .../Utils/src/LibcurlUtils/HttpDelete.cpp     | 129 ++++
  AVSCommon/Utils/src/LibcurlUtils/HttpGet.cpp  | 129 ++++
+ .../LibCurlHttpContentFetcher.cpp             |  11 +
+ AVSCommon/Utils/src/Logger/ConsoleLogger.cpp  |   2 +-
+ AVSCommon/Utils/src/Logger/Logger.cpp         |   2 +-
+ AVSCommon/Utils/src/Logger/ThreadMoniker.cpp  |   5 +-
  AVSCommon/Utils/src/Timer.cpp                 |   6 +-
- .../DefaultClient/src/DefaultClient.cpp       |   1 +
+ .../src/Storage/AVSGatewayManagerStorage.cpp  |   6 -
+ .../DefaultClient/src/DefaultClient.cpp       |   3 +-
  .../CapabilitiesDelegate.h                    |   3 +
  .../PostConnectCapabilitiesPublisher.h        |   9 +-
  .../src/CapabilitiesDelegate.cpp              |   6 +-
@@ -54,6 +65,7 @@ Subject: [PATCH] Alexa Auto changes for v1.19.1 AVS Device SDK
  .../src/Utils/DiscoveryUtils.cpp              |  32 +-
  .../PostConnectCapabilitiesPublisherTest.cpp  | 108 ++-
  .../AIP/src/AudioInputProcessor.cpp           |   3 +-
+ .../AIP/test/AudioInputProcessorTest.cpp      |   1 -
  .../include/Alerts/AlertObserverInterface.h   |  23 +
  .../include/Alerts/AlertsCapabilityAgent.h    |  41 ++
  .../Alerts/include/Alerts/Renderer/Renderer.h |  10 +-
@@ -82,6 +94,7 @@ Subject: [PATCH] Alexa Auto changes for v1.19.1 AVS Device SDK
  .../src/RangeControllerAttributeBuilder.cpp   |  18 +-
  .../src/RangeControllerCapabilityAgent.cpp    |   9 +-
  .../src/SpeechSynthesizer.cpp                 |  27 +-
+ .../System/src/ReportStateHandler.cpp         |   1 -
  .../System/src/SoftwareInfoSendRequest.cpp    |  19 +-
  .../TemplateRuntime/src/TemplateRuntime.cpp   |   6 +-
  .../test/TemplateRuntimeTest.cpp              |   6 +-
@@ -94,12 +107,15 @@ Subject: [PATCH] Alexa Auto changes for v1.19.1 AVS Device SDK
  Endpoints/include/Endpoints/EndpointBuilder.h |   5 +
  Endpoints/src/EndpointAttributeValidation.cpp |   4 +
  Endpoints/src/EndpointBuilder.cpp             |  31 +-
+ .../src/MiscDBEqualizerStorage.cpp            |   6 -
  .../test/AudioPlayerIntegrationTest.cpp       |  19 +
  .../include/SampleApp/InteractionManager.h    |   2 +-
  SampleApp/src/InteractionManager.cpp          |   2 +-
+ Settings/include/Settings/Setting.h           |   9 +-
+ Settings/src/Types/LocaleWakeWordsSetting.cpp |  18 +-
  .../DoNotDisturbCapabilityAgent.h             |  46 +-
  .../src/DoNotDisturbCapabilityAgent.cpp       |   9 +-
- 95 files changed, 3964 insertions(+), 169 deletions(-)
+ 110 files changed, 4136 insertions(+), 266 deletions(-)
  create mode 100644 AVSCommon/AVS/include/AVSCommon/AVS/ActionsToDirectiveMapping.h
  create mode 100644 AVSCommon/AVS/include/AVSCommon/AVS/CapabilitySemantics.h
  create mode 100644 AVSCommon/AVS/include/AVSCommon/AVS/EndpointResources.h
@@ -525,6 +541,117 @@ index 00000000..4a39a401
 +}  // namespace alexaClientSDK
 +
 +#endif  // ALEXA_CLIENT_SDK_AVSCOMMON_AVS_INCLUDE_AVSCOMMON_AVS_CAPABILITYSEMANTICS_H_
+diff --git a/AVSCommon/AVS/include/AVSCommon/AVS/DialogUXStateAggregator.h b/AVSCommon/AVS/include/AVSCommon/AVS/DialogUXStateAggregator.h
+index cb7ef738..c99726d1 100644
+--- a/AVSCommon/AVS/include/AVSCommon/AVS/DialogUXStateAggregator.h
++++ b/AVSCommon/AVS/include/AVSCommon/AVS/DialogUXStateAggregator.h
+@@ -19,6 +19,7 @@
+ #include <atomic>
+ #include <chrono>
+ #include <unordered_set>
++#include <vector>
+ 
+ #include "AVSCommon/SDKInterfaces/AudioInputProcessorObserverInterface.h"
+ #include <AVSCommon/SDKInterfaces/ConnectionStatusObserverInterface.h>
+@@ -41,10 +42,27 @@ namespace avs {
+ class DialogUXStateAggregator
+         : public sdkInterfaces::AudioInputProcessorObserverInterface
+         , public sdkInterfaces::SpeechSynthesizerObserverInterface
+-        , public sdkInterfaces::MessageObserverInterface
+         , public sdkInterfaces::ConnectionStatusObserverInterface
+         , public sdkInterfaces::InteractionModelRequestProcessingObserverInterface {
+ public:
++    /**
++     * This timeout will be used to avoid going to the IDLE state immediately after receiving a message from AVS so
++     * that other UX states (such as speech starting) may be processed and propagated before going to IDLE.
++     */
++    static constexpr std::chrono::milliseconds SHORT_TIMEOUT_FOR_THINKING_TO_IDLE = std::chrono::milliseconds{200};
++
++    /**
++     * This timeout will be used to time out from the THINKING state in case no messages arrive from AVS so that the
++     * client may move back to an IDLE state.
++     */
++    static constexpr std::chrono::seconds LONG_TIMEOUT_FOR_THINKING_TO_IDLE = std::chrono::seconds{8};
++
++    /**
++     * This timeout will be used to time out from the LISTENING state in case the Request Processing Started (RPS)
++     * directive is not received from AVS so that the client may move back to an IDLE state.
++     */
++    static constexpr std::chrono::seconds LONG_TIMEOUT_FOR_LISTENING_TO_IDLE = std::chrono::seconds{8};
++
+     /**
+      * Constructor.
+      *
+@@ -55,11 +73,13 @@ public:
+      * arrive from AVS.
+      * @param timeoutForListeningToIdle This timeout will be used to time out from the LISTENING state in case the
+      * Request Processing Started (RPS) directive is not received from AVS.
++     * @param shortTimeoutForThinkingToIdle This timeout will be used to avoid going to the IDLE state immediately
+      */
+     DialogUXStateAggregator(
+         std::shared_ptr<avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder = nullptr,
+-        std::chrono::milliseconds timeoutForThinkingToIdle = std::chrono::seconds{8},
+-        std::chrono::milliseconds timeoutForListeningToIdle = std::chrono::seconds{8});
++        std::chrono::milliseconds timeoutForThinkingToIdle = LONG_TIMEOUT_FOR_THINKING_TO_IDLE,
++        std::chrono::milliseconds timeoutForListeningToIdle = LONG_TIMEOUT_FOR_LISTENING_TO_IDLE,
++        std::chrono::milliseconds shortTimeoutForThinkingToIdle = SHORT_TIMEOUT_FOR_THINKING_TO_IDLE);
+ 
+     /**
+      * Adds an observer to be notified of UX state changes.
+@@ -91,8 +111,6 @@ public:
+         const avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId mediaSourceId,
+         const avsCommon::utils::Optional<avsCommon::utils::mediaPlayer::MediaPlayerState>& mediaPlayerState) override;
+ 
+-    void receive(const std::string& contextId, const std::string& message) override;
+-
+     /// @name InteractionModelRequestProcessingObserverInterface Functions
+     /// @{
+     void onRequestProcessingStarted() override;
+@@ -109,14 +127,21 @@ private:
+      * Sets the internal state to the new state.
+      *
+      * @param newState The new Alexa UX state.
++     * @return Whether the state transition was successful.
+      */
+-    void setState(sdkInterfaces::DialogUXStateObserverInterface::DialogUXState newState);
++    bool executeSetState(sdkInterfaces::DialogUXStateObserverInterface::DialogUXState newState);
+ 
+     /**
+      * Sets the internal state to @c IDLE if both @c SpeechSynthesizer and @c AudioInputProcessor are in idle state.
+      */
+     void tryEnterIdleState();
+ 
++    /**
++     * An event has occurred which may transition @c DialogUXStateAggregator out of THINKING mode. This function
++     * evaluates if the transition is valid and performs the necessary logic to prepare for the transition.
++     */
++    void tryExitThinkingState();
++
+     /**
+      * Transitions the internal state from THINKING to IDLE.
+      */
+@@ -162,6 +187,12 @@ private:
+     /// The timeout to be used for transitioning away from the THINKING state in case no messages are received.
+     const std::chrono::milliseconds m_timeoutForThinkingToIdle;
+ 
++    /**
++     * This timeout will be used to avoid going to the IDLE state immediately after receiving a message from AVS so
++     * that other UX states (such as speech starting) may be processed and propagated.
++     */
++    const std::chrono::milliseconds m_shortTimeoutForThinkingToIdle;
++
+     /// A timer to transition out of the THINKING state.
+     avsCommon::utils::timing::Timer m_thinkingTimeoutTimer;
+ 
+@@ -170,7 +201,7 @@ private:
+ 
+     /// The timeout to be used for transitioning away form the LISTENING state in case RPS (Request Processing Started)
+     /// directive is not received.
+-    const std::chrono::microseconds m_timeoutForListeningToIdle;
++    const std::chrono::milliseconds m_timeoutForListeningToIdle;
+ 
+     /// A timer to transition out of the LISTENING state to IDLE state in case RPS (Request Processing Started)
+     /// directive is not received.
 diff --git a/AVSCommon/AVS/include/AVSCommon/AVS/EndpointResources.h b/AVSCommon/AVS/include/AVSCommon/AVS/EndpointResources.h
 new file mode 100644
 index 00000000..1bb0b5bf
@@ -919,6 +1046,265 @@ index 00000000..d5f17740
 +}  // namespace avs
 +}  // namespace avsCommon
 +}  // namespace alexaClientSDK
+diff --git a/AVSCommon/AVS/src/DialogUXStateAggregator.cpp b/AVSCommon/AVS/src/DialogUXStateAggregator.cpp
+index 13431e65..2d9ed9e6 100644
+--- a/AVSCommon/AVS/src/DialogUXStateAggregator.cpp
++++ b/AVSCommon/AVS/src/DialogUXStateAggregator.cpp
+@@ -34,11 +34,6 @@ static const std::string TAG("DialogUXStateAggregator");
+  */
+ #define LX(event) alexaClientSDK::avsCommon::utils::logger::LogEntry(TAG, event)
+ 
+-/**
+- * A short timeout that is used to avoid going to the IDLE state immediately while waiting for other state changes.
+- */
+-static const std::chrono::milliseconds SHORT_TIMEOUT{200};
+-
+ /// Custom Metrics prefix used by DialogUXStateAggregator.
+ static const std::string CUSTOM_METRIC_PREFIX = "CUSTOM-";
+ 
+@@ -48,6 +43,10 @@ static const std::string LISTENING_TIMEOUT_EXPIRES = "LISTENING_TIMEOUT_EXPIRES"
+ /// error metric for Thinking timeout expires
+ static const std::string THINKING_TIMEOUT_EXPIRES = "THINKING_TIMEOUT_EXPIRES";
+ 
++constexpr std::chrono::milliseconds DialogUXStateAggregator::SHORT_TIMEOUT_FOR_THINKING_TO_IDLE;
++constexpr std::chrono::seconds DialogUXStateAggregator::LONG_TIMEOUT_FOR_THINKING_TO_IDLE;
++constexpr std::chrono::seconds DialogUXStateAggregator::LONG_TIMEOUT_FOR_LISTENING_TO_IDLE;
++
+ /**
+  * Submits a metric of given event name
+  * @param metricRecorder The @c MetricRecorderInterface which records Metric events
+@@ -73,13 +72,19 @@ static void submitMetric(const std::shared_ptr<MetricRecorderInterface>& metricR
+ DialogUXStateAggregator::DialogUXStateAggregator(
+     std::shared_ptr<MetricRecorderInterface> metricRecorder,
+     std::chrono::milliseconds timeoutForThinkingToIdle,
+-    std::chrono::milliseconds timeoutForListeningToIdle) :
++    std::chrono::milliseconds timeoutForListeningToIdle,
++    std::chrono::milliseconds shortTimeoutForThinkingToIdle) :
+         m_metricRecorder{metricRecorder},
+         m_currentState{DialogUXStateObserverInterface::DialogUXState::IDLE},
+         m_timeoutForThinkingToIdle{timeoutForThinkingToIdle},
++        m_shortTimeoutForThinkingToIdle{shortTimeoutForThinkingToIdle},
+         m_timeoutForListeningToIdle{timeoutForListeningToIdle},
+         m_speechSynthesizerState{SpeechSynthesizerObserverInterface::SpeechSynthesizerState::FINISHED},
+         m_audioInputProcessorState{AudioInputProcessorObserverInterface::State::IDLE} {
++    ACSDK_DEBUG8(LX("timeout values in milliseconds")
++                     .d("m_timeoutForThinkingToIdle", m_timeoutForThinkingToIdle.count())
++                     .d("m_shortTimeoutForThinkingToIdle", m_shortTimeoutForThinkingToIdle.count())
++                     .d("m_timeoutForListeningToIdle", m_timeoutForListeningToIdle.count()));
+ }
+ 
+ void DialogUXStateAggregator::addObserver(std::shared_ptr<DialogUXStateObserverInterface> observer) {
+@@ -102,29 +107,32 @@ void DialogUXStateAggregator::removeObserver(std::shared_ptr<DialogUXStateObserv
+ }
+ 
+ void DialogUXStateAggregator::onStateChanged(AudioInputProcessorObserverInterface::State state) {
++    ACSDK_DEBUG0(LX(__func__).d("AudioInputProcessorState", state));
+     m_audioInputProcessorState = state;
+-
+     m_executor.submit([this, state]() {
++        ACSDK_DEBUG0(LX("onStateChangedLambda").d("AudioInputProcessorState", state));
+         switch (state) {
+             case AudioInputProcessorObserverInterface::State::IDLE:
+                 tryEnterIdleState();
+                 return;
+             case AudioInputProcessorObserverInterface::State::RECOGNIZING:
+                 onActivityStarted();
+-                setState(DialogUXStateObserverInterface::DialogUXState::LISTENING);
++                executeSetState(DialogUXStateObserverInterface::DialogUXState::LISTENING);
+                 return;
+             case AudioInputProcessorObserverInterface::State::EXPECTING_SPEECH:
+                 onActivityStarted();
+-                setState(DialogUXStateObserverInterface::DialogUXState::EXPECTING);
++                executeSetState(DialogUXStateObserverInterface::DialogUXState::EXPECTING);
+                 return;
+             case AudioInputProcessorObserverInterface::State::BUSY:
+-                setState(DialogUXStateObserverInterface::DialogUXState::LISTENING);
+-                if (!m_listeningTimeoutTimer
+-                         .start(
+-                             m_timeoutForListeningToIdle,
+-                             std::bind(&DialogUXStateAggregator::transitionFromListeningTimedOut, this))
+-                         .valid()) {
+-                    ACSDK_ERROR(LX("failedToStartTimerFromListeningToIdle"));
++                if (executeSetState(DialogUXStateObserverInterface::DialogUXState::LISTENING) ||
++                    DialogUXStateObserverInterface::DialogUXState::LISTENING == m_currentState) {
++                    if (!m_listeningTimeoutTimer
++                             .start(
++                                 m_timeoutForListeningToIdle,
++                                 std::bind(&DialogUXStateAggregator::transitionFromListeningTimedOut, this))
++                             .valid()) {
++                        ACSDK_ERROR(LX("failedToStartTimerFromListeningToIdle"));
++                    }
+                 }
+                 return;
+         }
+@@ -136,13 +144,14 @@ void DialogUXStateAggregator::onStateChanged(
+     SpeechSynthesizerObserverInterface::SpeechSynthesizerState state,
+     const avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId mediaSourceId,
+     const avsCommon::utils::Optional<avsCommon::utils::mediaPlayer::MediaPlayerState>& mediaPlayerState) {
++    ACSDK_DEBUG0(LX(__func__).d("SpeechSynthesizerState", state));
+     m_speechSynthesizerState = state;
+-
+     m_executor.submit([this, state]() {
++        ACSDK_DEBUG0(LX("onStateChangedLambda").d("SpeechSynthesizerState", state));
+         switch (state) {
+             case SpeechSynthesizerObserverInterface::SpeechSynthesizerState::PLAYING:
+                 onActivityStarted();
+-                setState(DialogUXStateObserverInterface::DialogUXState::SPEAKING);
++                executeSetState(DialogUXStateObserverInterface::DialogUXState::SPEAKING);
+                 return;
+             case SpeechSynthesizerObserverInterface::SpeechSynthesizerState::FINISHED:
+             case SpeechSynthesizerObserverInterface::SpeechSynthesizerState::INTERRUPTED:
+@@ -158,10 +167,14 @@ void DialogUXStateAggregator::onStateChanged(
+     });
+ }
+ 
+-void DialogUXStateAggregator::receive(const std::string& contextId, const std::string& message) {
++void DialogUXStateAggregator::tryExitThinkingState() {
++    ACSDK_DEBUG0(LX(__func__));
+     m_executor.submit([this]() {
++        ACSDK_DEBUG0(LX("tryExitThinkingStateLambda"));
+         if (DialogUXStateObserverInterface::DialogUXState::THINKING == m_currentState &&
+             SpeechSynthesizerObserverInterface::SpeechSynthesizerState::GAINING_FOCUS != m_speechSynthesizerState) {
++            ACSDK_DEBUG5(
++                LX("Kicking off short timer").d("shortTimeout in ms", m_shortTimeoutForThinkingToIdle.count()));
+             /*
+              * Stop the long timer and start a short timer so that either the state will change (i.e. Speech begins)
+              * or we automatically go to idle after the short timeout (i.e. the directive received isn't related to
+@@ -170,7 +183,8 @@ void DialogUXStateAggregator::receive(const std::string& contextId, const std::s
+              */
+             m_thinkingTimeoutTimer.stop();
+             m_thinkingTimeoutTimer.start(
+-                SHORT_TIMEOUT, std::bind(&DialogUXStateAggregator::transitionFromThinkingTimedOut, this));
++                m_shortTimeoutForThinkingToIdle,
++                std::bind(&DialogUXStateAggregator::transitionFromThinkingTimedOut, this));
+         }
+     });
+ }
+@@ -180,26 +194,24 @@ void DialogUXStateAggregator::onConnectionStatusChanged(
+     const ConnectionStatusObserverInterface::ChangedReason reason) {
+     m_executor.submit([this, status]() {
+         if (status != avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status::CONNECTED) {
+-            setState(DialogUXStateObserverInterface::DialogUXState::IDLE);
++            executeSetState(DialogUXStateObserverInterface::DialogUXState::IDLE);
+         }
+     });
+ }
+ 
+ void DialogUXStateAggregator::onRequestProcessingStarted() {
+-    ACSDK_DEBUG(LX("onRequestProcessingStarted"));
++    ACSDK_DEBUG0(LX("onRequestProcessingStarted"));
+     m_executor.submit([this]() {
++        ACSDK_DEBUG0(LX("onRequestProcessingStartedLambda").d("currentState", m_currentState));
+         // Stop the listening timer
+         m_listeningTimeoutTimer.stop();
+-
+-        ACSDK_DEBUG0(LX("onRequestProcessingStartedLambda").d("currentState", m_currentState));
+-
+         switch (m_currentState) {
+             // IDLE is included for the theoretical edgecase that RPS is received after the listening timeout occurs.
+             case DialogUXStateObserverInterface::DialogUXState::IDLE:
+                 ACSDK_WARN(LX("onRequestProcessingStartedLambda").d("reason", "transitioningFromIdle"));
+             /* FALL-THROUGH */
+             case DialogUXStateObserverInterface::DialogUXState::LISTENING:
+-                setState(DialogUXStateObserverInterface::DialogUXState::THINKING);
++                executeSetState(DialogUXStateObserverInterface::DialogUXState::THINKING);
+ 
+                 if (!m_thinkingTimeoutTimer
+                          .start(
+@@ -218,13 +230,8 @@ void DialogUXStateAggregator::onRequestProcessingStarted() {
+ }
+ 
+ void DialogUXStateAggregator::onRequestProcessingCompleted() {
+-    // No-op
+-    /*
+-     * No particular processing is needed for this directive. The RequestProcessCompleted directive exists in the
+-     * Interaction Model 1.1 to let AVS activate a logic that stops the thinking mode without any other semantic. But
+-     * the specification is such that any directive will interrupt the thinking mode. So here we are simply confirming
+-     * that this directive is supported.
+-     */
++    ACSDK_DEBUG(LX("onRequestProcessingCompleted"));
++    tryExitThinkingState();
+ }
+ 
+ void DialogUXStateAggregator::notifyObserversOfState() {
+@@ -239,7 +246,7 @@ void DialogUXStateAggregator::transitionFromThinkingTimedOut() {
+     m_executor.submit([this]() {
+         if (DialogUXStateObserverInterface::DialogUXState::THINKING == m_currentState) {
+             ACSDK_DEBUG(LX("transitionFromThinkingTimedOut"));
+-            setState(DialogUXStateObserverInterface::DialogUXState::IDLE);
++            executeSetState(DialogUXStateObserverInterface::DialogUXState::IDLE);
+ 
+             submitMetric(m_metricRecorder, THINKING_TIMEOUT_EXPIRES);
+         }
+@@ -250,7 +257,7 @@ void DialogUXStateAggregator::transitionFromListeningTimedOut() {
+     m_executor.submit([this]() {
+         if (DialogUXStateObserverInterface::DialogUXState::LISTENING == m_currentState) {
+             ACSDK_DEBUG(LX("transitionFromListeningTimedOut"));
+-            setState(DialogUXStateObserverInterface::DialogUXState::IDLE);
++            executeSetState(DialogUXStateObserverInterface::DialogUXState::IDLE);
+ 
+             submitMetric(m_metricRecorder, LISTENING_TIMEOUT_EXPIRES);
+         }
+@@ -263,21 +270,45 @@ void DialogUXStateAggregator::tryEnterIdleStateOnTimer() {
+             m_audioInputProcessorState == AudioInputProcessorObserverInterface::State::IDLE &&
+             (m_speechSynthesizerState == SpeechSynthesizerObserverInterface::SpeechSynthesizerState::FINISHED ||
+              m_speechSynthesizerState == SpeechSynthesizerObserverInterface::SpeechSynthesizerState::INTERRUPTED)) {
+-            setState(sdkInterfaces::DialogUXStateObserverInterface::DialogUXState::IDLE);
++            executeSetState(sdkInterfaces::DialogUXStateObserverInterface::DialogUXState::IDLE);
+         }
+     });
+ }
+ 
+-void DialogUXStateAggregator::setState(sdkInterfaces::DialogUXStateObserverInterface::DialogUXState newState) {
++bool DialogUXStateAggregator::executeSetState(sdkInterfaces::DialogUXStateObserverInterface::DialogUXState newState) {
++    bool validTransition = true;
++
+     if (newState == m_currentState) {
+-        return;
++        validTransition = false;
++    } else {
++        switch (m_currentState) {
++            case DialogUXStateObserverInterface::DialogUXState::THINKING:
++                if (DialogUXStateObserverInterface::DialogUXState::LISTENING == newState) {
++                    validTransition = false;
++                }
++
++                break;
++            default:
++                break;
++        }
++    }
++
++    ACSDK_DEBUG0(LX(__func__)
++                     .d("from", m_currentState)
++                     .d("to", newState)
++                     .d("validTransition", validTransition ? "true" : "false"));
++
++    if (!validTransition) {
++        return false;
+     }
++
+     m_listeningTimeoutTimer.stop();
+     m_thinkingTimeoutTimer.stop();
+     m_multiturnSpeakingToListeningTimer.stop();
+-    ACSDK_DEBUG(LX("setState").d("from", m_currentState).d("to", newState));
+     m_currentState = newState;
+     notifyObserversOfState();
++
++    return true;
+ }
+ 
+ void DialogUXStateAggregator::tryEnterIdleState() {
+@@ -285,7 +316,8 @@ void DialogUXStateAggregator::tryEnterIdleState() {
+     m_thinkingTimeoutTimer.stop();
+     m_multiturnSpeakingToListeningTimer.stop();
+     if (!m_multiturnSpeakingToListeningTimer
+-             .start(SHORT_TIMEOUT, std::bind(&DialogUXStateAggregator::tryEnterIdleStateOnTimer, this))
++             .start(
++                 m_shortTimeoutForThinkingToIdle, std::bind(&DialogUXStateAggregator::tryEnterIdleStateOnTimer, this))
+              .valid()) {
+         ACSDK_ERROR(LX("failedToStartTryEnterIdleStateTimer"));
+     }
 diff --git a/AVSCommon/AVS/src/EndpointResources.cpp b/AVSCommon/AVS/src/EndpointResources.cpp
 new file mode 100644
 index 00000000..efe10619
@@ -1415,6 +1801,107 @@ index 00000000..16d09d0d
 +}  // namespace avs
 +}  // namespace avsCommon
 +}  // namespace alexaClientSDK
+diff --git a/AVSCommon/AVS/test/DialogUXStateAggregatorTest.cpp b/AVSCommon/AVS/test/DialogUXStateAggregatorTest.cpp
+index c0862685..1dcf2b72 100644
+--- a/AVSCommon/AVS/test/DialogUXStateAggregatorTest.cpp
++++ b/AVSCommon/AVS/test/DialogUXStateAggregatorTest.cpp
+@@ -34,7 +34,7 @@ static const auto SHORT_TIMEOUT = std::chrono::milliseconds(50);
+ 
+ /// Time out for testing if transitionFromThinking or transitionFromListneing timeouts have occurred.
+ // This needs to be longer than the values passed into the DialogUXStateAggregator.
+-static const auto TRANSITION_TIMEOUT = std::chrono::milliseconds(300);
++static const auto TRANSITION_TIMEOUT = std::chrono::seconds(9);
+ 
+ /// Dummy value for a media player source id
+ static const avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId TEST_SOURCE_ID = -1;
+@@ -285,7 +285,6 @@ TEST_F(DialogUXAggregatorTest, test_thinkingThenReceiveGoesToIdleAfterLongTimeou
+     m_aggregator->onRequestProcessingStarted();
+     assertStateChange(m_testObserver, DialogUXStateObserverInterface::DialogUXState::THINKING);
+ 
+-    m_aggregator->receive("", "");
+     assertStateChange(m_testObserver, DialogUXStateObserverInterface::DialogUXState::IDLE, TRANSITION_TIMEOUT);
+ }
+ 
+@@ -302,8 +301,6 @@ TEST_F(DialogUXAggregatorTest, test_listeningThenReceiveThenSpeakGoesToSpeakButN
+     m_aggregator->onRequestProcessingStarted();
+     assertStateChange(m_testObserver, DialogUXStateObserverInterface::DialogUXState::THINKING);
+ 
+-    m_aggregator->receive("", "");
+-
+     m_aggregator->onStateChanged(
+         SpeechSynthesizerObserverInterface::SpeechSynthesizerState::PLAYING, TEST_SOURCE_ID, m_testMediaPlayerState);
+ 
+@@ -321,8 +318,6 @@ TEST_F(DialogUXAggregatorTest, test_speakingAndRecognizingFinishedGoesToIdle) {
+     m_aggregator->onRequestProcessingStarted();
+     assertStateChange(m_testObserver, DialogUXStateObserverInterface::DialogUXState::THINKING);
+ 
+-    m_aggregator->receive("", "");
+-
+     m_aggregator->onStateChanged(
+         SpeechSynthesizerObserverInterface::SpeechSynthesizerState::PLAYING, TEST_SOURCE_ID, m_testMediaPlayerState);
+ 
+@@ -371,8 +366,6 @@ TEST_F(DialogUXAggregatorTest, test_speakingFinishedDoesNotGoesToIdleImmediately
+     m_aggregator->onRequestProcessingStarted();
+     assertStateChange(m_testObserver, DialogUXStateObserverInterface::DialogUXState::THINKING);
+ 
+-    m_aggregator->receive("", "");
+-
+     m_aggregator->onStateChanged(
+         SpeechSynthesizerObserverInterface::SpeechSynthesizerState::PLAYING, TEST_SOURCE_ID, m_testMediaPlayerState);
+ 
+@@ -388,8 +381,6 @@ TEST_F(DialogUXAggregatorTest, test_speakingFinishedDoesNotGoesToIdleImmediately
+ TEST_F(DialogUXAggregatorTest, test_simpleReceiveDoesNothing) {
+     assertStateChange(m_testObserver, DialogUXStateObserverInterface::DialogUXState::IDLE);
+ 
+-    m_aggregator->receive("", "");
+-
+     assertNoStateChange(m_testObserver);
+ 
+     m_aggregator->onStateChanged(
+@@ -397,8 +388,6 @@ TEST_F(DialogUXAggregatorTest, test_simpleReceiveDoesNothing) {
+ 
+     assertStateChange(m_testObserver, DialogUXStateObserverInterface::DialogUXState::SPEAKING);
+ 
+-    m_aggregator->receive("", "");
+-
+     assertNoStateChange(m_testObserver);
+ }
+ 
+@@ -412,16 +401,11 @@ TEST_F(DialogUXAggregatorTest, test_thinkingThenReceiveRemainsInThinkingIfSpeech
+     m_aggregator->onRequestProcessingStarted();
+     assertStateChange(m_testObserver, DialogUXStateObserverInterface::DialogUXState::THINKING);
+ 
+-    m_aggregator->receive("", "");
+-
+     m_aggregator->onStateChanged(
+         SpeechSynthesizerObserverInterface::SpeechSynthesizerState::GAINING_FOCUS,
+         TEST_SOURCE_ID,
+         m_testMediaPlayerState);
+ 
+-    // Make sure after SpeechSynthesizer reports GAINING_FOCUS, that it would stay in THINKING state
+-    m_aggregator->receive("", "");
+-
+     assertNoStateChange(m_testObserver, TRANSITION_TIMEOUT);
+ }
+ 
+@@ -431,15 +415,13 @@ TEST_F(DialogUXAggregatorTest, test_validStatesForRPSToThinking) {
+     m_aggregator->onRequestProcessingStarted();
+     assertStateChange(m_testObserver, DialogUXStateObserverInterface::DialogUXState::THINKING);
+ 
+-    m_aggregator->receive("", "");
+-    assertStateChange(m_testObserver, DialogUXStateObserverInterface::DialogUXState::IDLE);
++    assertStateChange(m_testObserver, DialogUXStateObserverInterface::DialogUXState::IDLE, TRANSITION_TIMEOUT);
+     m_aggregator->onStateChanged(AudioInputProcessorObserverInterface::State::BUSY);
+     assertStateChange(m_testObserver, DialogUXStateObserverInterface::DialogUXState::LISTENING);
+     m_aggregator->onRequestProcessingStarted();
+     assertStateChange(m_testObserver, DialogUXStateObserverInterface::DialogUXState::THINKING);
+ 
+-    m_aggregator->receive("", "");
+-    assertStateChange(m_testObserver, DialogUXStateObserverInterface::DialogUXState::IDLE);
++    assertStateChange(m_testObserver, DialogUXStateObserverInterface::DialogUXState::IDLE, TRANSITION_TIMEOUT);
+     m_aggregator->onStateChanged(
+         SpeechSynthesizerObserverInterface::SpeechSynthesizerState::PLAYING, TEST_SOURCE_ID, m_testMediaPlayerState);
+     assertStateChange(m_testObserver, DialogUXStateObserverInterface::DialogUXState::SPEAKING);
 diff --git a/AVSCommon/CMakeLists.txt b/AVSCommon/CMakeLists.txt
 index 6cb0457b..99b00ac7 100644
 --- a/AVSCommon/CMakeLists.txt
@@ -2430,6 +2917,74 @@ index 00000000..68573f06
 +}  // namespace alexaClientSDK
 +
 +#endif  // ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LIBCURLUTILS_HTTPGETINTERFACE_H_
+diff --git a/AVSCommon/Utils/include/AVSCommon/Utils/Logger/ThreadMoniker.h b/AVSCommon/Utils/include/AVSCommon/Utils/Logger/ThreadMoniker.h
+index ec70c280..758a213d 100644
+--- a/AVSCommon/Utils/include/AVSCommon/Utils/Logger/ThreadMoniker.h
++++ b/AVSCommon/Utils/include/AVSCommon/Utils/Logger/ThreadMoniker.h
+@@ -39,7 +39,7 @@ public:
+      *
+      * @return The moniker for @c std::this_thread.
+      */
+-    static inline std::string getThisThreadMoniker();
++    static inline const char* getThisThreadMoniker();
+ 
+     /**
+      * Generate a unique moniker.
+@@ -52,7 +52,8 @@ public:
+      * Set the moniker for @c std::this_thread. This method should be called before @c getThisThreadMoniker() in order
+      * to take effect.
+      *
+-     * @param moniker The moniker for @c std::this_thread.
++     * @param moniker The moniker for @c std::this_thread. The maximum length of the moniker is 15 characters. Any
++     * characters beyond the limit will be truncated.
+      */
+     static inline void setThisThreadMoniker(const std::string& moniker);
+ 
+@@ -81,10 +82,10 @@ private:
+     static const ThreadMoniker& getMonikerObjectFromMap(const std::string& moniker = std::string());
+ 
+     /// The current thread's moniker.
+-    std::string m_moniker;
++    char m_moniker[16];
+ };
+ 
+-std::string ThreadMoniker::getThisThreadMoniker() {
++const char* ThreadMoniker::getThisThreadMoniker() {
+     return getMonikerObject().m_moniker;
+ }
+ 
+diff --git a/AVSCommon/Utils/include/AVSCommon/Utils/Threading/Executor.h b/AVSCommon/Utils/include/AVSCommon/Utils/Threading/Executor.h
+index 99c7e251..4eab4b77 100644
+--- a/AVSCommon/Utils/include/AVSCommon/Utils/Threading/Executor.h
++++ b/AVSCommon/Utils/include/AVSCommon/Utils/Threading/Executor.h
+@@ -166,7 +166,11 @@ auto Executor::submitToFront(Task task, Args&&... args) -> std::future<decltype(
+  */
+ template <typename T>
+ inline static void forwardPromise(std::shared_ptr<std::promise<T>> promise, std::future<T>* future) {
+-    promise->set_value(future->get());
++    try {
++        promise->set_value(future->get());
++    } catch (...) {
++        promise->set_exception(std::current_exception());
++    }
+ }
+ 
+ /**
+@@ -177,8 +181,12 @@ inline static void forwardPromise(std::shared_ptr<std::promise<T>> promise, std:
+  */
+ template <>
+ inline void forwardPromise<void>(std::shared_ptr<std::promise<void>> promise, std::future<void>* future) {
+-    future->get();
+-    promise->set_value();
++    try {
++        future->get();
++        promise->set_value();
++    } catch (...) {
++        promise->set_exception(std::current_exception());
++    }
+ }
+ 
+ template <typename Task, typename... Args>
 diff --git a/AVSCommon/Utils/include/AVSCommon/Utils/Timing/Timer.h b/AVSCommon/Utils/include/AVSCommon/Utils/Timing/Timer.h
 index 8f5c05e4..a936eadd 100644
 --- a/AVSCommon/Utils/include/AVSCommon/Utils/Timing/Timer.h
@@ -2453,7 +3008,7 @@ index 8f5c05e4..a936eadd 100644
      /**
       * Reports whether the @c Timer is active.  A timer is considered active if it is waiting to start a call to the
 diff --git a/AVSCommon/Utils/src/LibcurlUtils/CurlEasyHandleWrapper.cpp b/AVSCommon/Utils/src/LibcurlUtils/CurlEasyHandleWrapper.cpp
-index fdfb346b..e1e0bda4 100644
+index fdfb346b..2b2e874c 100644
 --- a/AVSCommon/Utils/src/LibcurlUtils/CurlEasyHandleWrapper.cpp
 +++ b/AVSCommon/Utils/src/LibcurlUtils/CurlEasyHandleWrapper.cpp
 @@ -54,6 +54,12 @@ static const std::string LIBCURLUTILS_CONFIG_KEY = "libcurlUtils";
@@ -2540,6 +3095,15 @@ index fdfb346b..e1e0bda4 100644
  #ifdef ACSDK_EMIT_CURL_LOGS
  void CurlEasyHandleWrapper::initStreamLog() {
      std::string streamLogPrefix;
+@@ -437,7 +485,7 @@ int CurlEasyHandleWrapper::debugFunction(CURL* handle, curl_infotype type, char*
+         (*stream->m_streamLog) << logFormatter.format(
+                                       logger::Level::INFO,
+                                       std::chrono::system_clock::now(),
+-                                      logger::ThreadMoniker::getThisThreadMoniker().c_str(),
++                                      logger::ThreadMoniker::getThisThreadMoniker(),
+                                       curlInfoTypeToString(type))
+                                << std::endl;
+         if (CURLINFO_TEXT == type) {
 diff --git a/AVSCommon/Utils/src/LibcurlUtils/HttpDelete.cpp b/AVSCommon/Utils/src/LibcurlUtils/HttpDelete.cpp
 new file mode 100644
 index 00000000..129fca85
@@ -2810,6 +3374,77 @@ index 00000000..10e6836a
 +}  // namespace utils
 +}  // namespace avsCommon
 +}  // namespace alexaClientSDK
+diff --git a/AVSCommon/Utils/src/LibcurlUtils/LibCurlHttpContentFetcher.cpp b/AVSCommon/Utils/src/LibcurlUtils/LibCurlHttpContentFetcher.cpp
+index 406599c2..2e166144 100644
+--- a/AVSCommon/Utils/src/LibcurlUtils/LibCurlHttpContentFetcher.cpp
++++ b/AVSCommon/Utils/src/LibcurlUtils/LibCurlHttpContentFetcher.cpp
+@@ -300,6 +300,17 @@ std::unique_ptr<avsCommon::utils::HTTPContent> LibCurlHttpContentFetcher::getCon
+         stateTransition(State::ERROR, false);
+         return nullptr;
+     }
++
++    // Use HTTP1.1 if url is not https
++    if (m_url.find("https") != 0) {
++        curlReturnValue = curl_easy_setopt(m_curlWrapper.getCurlHandle(), CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
++        if (curlReturnValue != CURLE_OK) {
++            ACSDK_ERROR(LX("getContentFailed").d("reason", "setHttpVersion").d("error", curlReturnValue));
++            stateTransition(State::ERROR, false);
++            return nullptr;
++        }
++    }
++
+     if (!m_curlWrapper.setConnectionTimeout(TIMEOUT_CONNECTION)) {
+         ACSDK_ERROR(LX("getContentFailed").d("reason", "setConnectionTimeoutFailed"));
+         stateTransition(State::ERROR, false);
+diff --git a/AVSCommon/Utils/src/Logger/ConsoleLogger.cpp b/AVSCommon/Utils/src/Logger/ConsoleLogger.cpp
+index 1f8a9a9c..7001360b 100644
+--- a/AVSCommon/Utils/src/Logger/ConsoleLogger.cpp
++++ b/AVSCommon/Utils/src/Logger/ConsoleLogger.cpp
+@@ -56,7 +56,7 @@ ConsoleLogger::ConsoleLogger() : Logger(Level::UNKNOWN) {
+     emit(
+         alexaClientSDK::avsCommon::utils::logger::Level::INFO,
+         std::chrono::system_clock::now(),
+-        ThreadMoniker::getThisThreadMoniker().c_str(),
++        ThreadMoniker::getThisThreadMoniker(),
+         currentVersionLogEntry.c_str());
+ }
+ 
+diff --git a/AVSCommon/Utils/src/Logger/Logger.cpp b/AVSCommon/Utils/src/Logger/Logger.cpp
+index 1145dc34..95ad89c8 100644
+--- a/AVSCommon/Utils/src/Logger/Logger.cpp
++++ b/AVSCommon/Utils/src/Logger/Logger.cpp
+@@ -36,7 +36,7 @@ Logger::Logger(Level level) : m_level{level} {
+ 
+ void Logger::log(Level level, const LogEntry& entry) {
+     if (shouldLog(level)) {
+-        emit(level, std::chrono::system_clock::now(), ThreadMoniker::getThisThreadMoniker().c_str(), entry.c_str());
++        emit(level, std::chrono::system_clock::now(), ThreadMoniker::getThisThreadMoniker(), entry.c_str());
+     }
+ }
+ 
+diff --git a/AVSCommon/Utils/src/Logger/ThreadMoniker.cpp b/AVSCommon/Utils/src/Logger/ThreadMoniker.cpp
+index 363ae08b..98e2ac93 100644
+--- a/AVSCommon/Utils/src/Logger/ThreadMoniker.cpp
++++ b/AVSCommon/Utils/src/Logger/ThreadMoniker.cpp
+@@ -14,6 +14,7 @@
+  */
+ 
+ #include <atomic>
++#include <cstring>
+ #include <iomanip>
+ #include <mutex>
+ #include <sstream>
+@@ -30,7 +31,9 @@ namespace logger {
+ /// Counter to generate (small) unique thread monikers.
+ static std::atomic<int> g_nextThreadMoniker(1);
+ 
+-ThreadMoniker::ThreadMoniker(const std::string& moniker) : m_moniker{moniker.empty() ? generateMoniker() : moniker} {
++ThreadMoniker::ThreadMoniker(const std::string& moniker) : m_moniker{} {
++    auto& m = moniker.empty() ? generateMoniker() : moniker;
++    std::strncpy(m_moniker, m.c_str(), sizeof(m_moniker) - 1);
+ }
+ 
+ std::string ThreadMoniker::generateMoniker() {
 diff --git a/AVSCommon/Utils/src/Timer.cpp b/AVSCommon/Utils/src/Timer.cpp
 index bab3a556..58ab7a3c 100644
 --- a/AVSCommon/Utils/src/Timer.cpp
@@ -2834,10 +3469,36 @@ index bab3a556..58ab7a3c 100644
          m_thread.join();
      }
  }
+diff --git a/AVSGatewayManager/src/Storage/AVSGatewayManagerStorage.cpp b/AVSGatewayManager/src/Storage/AVSGatewayManagerStorage.cpp
+index 422f2189..eea2caba 100644
+--- a/AVSGatewayManager/src/Storage/AVSGatewayManagerStorage.cpp
++++ b/AVSGatewayManager/src/Storage/AVSGatewayManagerStorage.cpp
+@@ -158,12 +158,6 @@ void AVSGatewayManagerStorage::clear() {
+                                 .d("table", VERIFICATION_STATE_TABLE)
+                                 .d("component", COMPONENT_NAME)
+                                 .m("Please clear the table for proper future functioning."));
+-            } else if (!m_miscStorage->deleteTable(COMPONENT_NAME, VERIFICATION_STATE_TABLE)) {
+-                ACSDK_ERROR(LX("clearFailed")
+-                                .d("reason", "Unable to delete the table")
+-                                .d("table", VERIFICATION_STATE_TABLE)
+-                                .d("component", COMPONENT_NAME)
+-                                .m("Please delete the table for proper future functioning."));
+             }
+         }
+     } else {
 diff --git a/ApplicationUtilities/DefaultClient/src/DefaultClient.cpp b/ApplicationUtilities/DefaultClient/src/DefaultClient.cpp
-index 1717076a..e4fc595e 100644
+index 1717076a..6559b539 100644
 --- a/ApplicationUtilities/DefaultClient/src/DefaultClient.cpp
 +++ b/ApplicationUtilities/DefaultClient/src/DefaultClient.cpp
+@@ -435,7 +435,7 @@ bool DefaultClient::initialize(
+      * the other networking components into one easy-to-use component.
+      */
+     m_connectionManager = acl::AVSConnectionManager::create(
+-        m_messageRouter, false, connectionObservers, {m_dialogUXStateAggregator}, internetConnectionMonitor);
++        m_messageRouter, false, connectionObservers, {}, internetConnectionMonitor);
+     if (!m_connectionManager) {
+         ACSDK_ERROR(LX("initializeFailed").d("reason", "unableToCreateConnectionManager"));
+         return false;
 @@ -822,6 +822,7 @@ bool DefaultClient::initialize(
          m_exceptionSender,
          m_playbackRouter,
@@ -3309,6 +3970,18 @@ index aa2a2e26..d424cfda 100644
                      ACSDK_ERROR(LX("executeStopCaptureFailed")
                                      .d("reason", "invalidState")
                                      .d("expectedState", "RECOGNIZING")
+diff --git a/CapabilityAgents/AIP/test/AudioInputProcessorTest.cpp b/CapabilityAgents/AIP/test/AudioInputProcessorTest.cpp
+index 620b4f76..ff6751e0 100644
+--- a/CapabilityAgents/AIP/test/AudioInputProcessorTest.cpp
++++ b/CapabilityAgents/AIP/test/AudioInputProcessorTest.cpp
+@@ -615,7 +615,6 @@ TestDialogUXStateObserver::TestDialogUXStateObserver(
+ 
+ void TestDialogUXStateObserver::onDialogUXStateChanged(DialogUXState newState) {
+     if (DialogUXState::THINKING == newState) {
+-        m_aggregator->receive("", "");
+     }
+ }
+ 
 diff --git a/CapabilityAgents/Alerts/include/Alerts/AlertObserverInterface.h b/CapabilityAgents/Alerts/include/Alerts/AlertObserverInterface.h
 index ad6b291b..f9fd1f9d 100644
 --- a/CapabilityAgents/Alerts/include/Alerts/AlertObserverInterface.h
@@ -5678,6 +6351,18 @@ index e3fb92a0..d90ce34b 100644
          }
          m_currentInfo = speakInfo;
      }
+diff --git a/CapabilityAgents/System/src/ReportStateHandler.cpp b/CapabilityAgents/System/src/ReportStateHandler.cpp
+index fc88f0ef..cc691d29 100644
+--- a/CapabilityAgents/System/src/ReportStateHandler.cpp
++++ b/CapabilityAgents/System/src/ReportStateHandler.cpp
+@@ -281,7 +281,6 @@ void ReportStateHandler::sendReportState() {
+ void system::ReportStateHandler::clearData() {
+     std::lock_guard<std::mutex> lock(m_stateMutex);
+     m_storage->clearTable(REPORT_STATE_COMPONENT_NAME, REPORT_STATE_TABLE);
+-    m_storage->deleteTable(REPORT_STATE_COMPONENT_NAME, REPORT_STATE_TABLE);
+ }
+ 
+ void ReportStateHandler::addStateReportGenerator(const StateReportGenerator& generator) {
 diff --git a/CapabilityAgents/System/src/SoftwareInfoSendRequest.cpp b/CapabilityAgents/System/src/SoftwareInfoSendRequest.cpp
 index 6975b071..8f2d7a7f 100644
 --- a/CapabilityAgents/System/src/SoftwareInfoSendRequest.cpp
@@ -6085,6 +6770,23 @@ index 249c30f4..4a67815f 100644
              endpoint->addCapabilityConfiguration(capability.first);
          } else {
              endpoint->addCapability(capability.first, capability.second);
+diff --git a/EqualizerImplementations/src/MiscDBEqualizerStorage.cpp b/EqualizerImplementations/src/MiscDBEqualizerStorage.cpp
+index 19cfa870..7daa441a 100644
+--- a/EqualizerImplementations/src/MiscDBEqualizerStorage.cpp
++++ b/EqualizerImplementations/src/MiscDBEqualizerStorage.cpp
+@@ -88,12 +88,6 @@ void MiscDBEqualizerStorage::clear() {
+                                 .d("table", EQUALIZER_STATE_TABLE)
+                                 .d("component", COMPONENT_NAME)
+                                 .m("Please clear the table for proper future functioning."));
+-            } else if (!m_miscStorage->deleteTable(COMPONENT_NAME, EQUALIZER_STATE_TABLE)) {
+-                ACSDK_ERROR(LX("clearFailed")
+-                                .d("reason", "Unable to delete the table")
+-                                .d("table", EQUALIZER_STATE_TABLE)
+-                                .d("component", COMPONENT_NAME)
+-                                .m("Please delete the table for proper future functioning."));
+             }
+         }
+     } else {
 diff --git a/Integration/test/AudioPlayerIntegrationTest.cpp b/Integration/test/AudioPlayerIntegrationTest.cpp
 index f63c1888..2d891472 100644
 --- a/Integration/test/AudioPlayerIntegrationTest.cpp
@@ -6183,6 +6885,62 @@ index 7736668a..7f30a041 100644
      m_executor.submit([this, state]() {
          if (CallState::CALL_CONNECTED == state) {
              if (!m_micWrapper->isStreaming()) {
+diff --git a/Settings/include/Settings/Setting.h b/Settings/include/Settings/Setting.h
+index f122d70d..c13a1421 100644
+--- a/Settings/include/Settings/Setting.h
++++ b/Settings/include/Settings/Setting.h
+@@ -187,7 +187,14 @@ template <typename ValueT>
+ bool Setting<ValueT>::clearData(const ValueType& value) {
+     std::lock_guard<std::mutex> lock{m_mutex};
+     this->m_value = value;
+-    return m_protocol->clearData();
++    // Clear customer's data before restoring the initial value
++    auto result = m_protocol->clearData();
++    if (result) {
++        // this->m_value (initial value) is restored
++        // as databaseValue.empty() == true
++        restore();
++    }
++    return result;
+ }
+ 
+ template <typename ValueT>
+diff --git a/Settings/src/Types/LocaleWakeWordsSetting.cpp b/Settings/src/Types/LocaleWakeWordsSetting.cpp
+index e71321c1..7129a51f 100644
+--- a/Settings/src/Types/LocaleWakeWordsSetting.cpp
++++ b/Settings/src/Types/LocaleWakeWordsSetting.cpp
+@@ -359,7 +359,14 @@ bool LocaleWakeWordsSetting::clearData(const DeviceLocales& locales) {
+     m_pendingRequest.reset();
+     m_localeStatus = SettingStatus::NOT_AVAILABLE;
+     LocalesSetting::m_value = locales;
+-    return m_storage->deleteSetting(LOCALE_KEY);
++    // Clear customer's data before restoring the initial value
++    auto result = m_storage->deleteSetting(LOCALE_KEY);
++    if (result) {
++        // As m_localeStatus == SettingStatus::NOT_AVAILABLE restoreInitialValue()
++        // calls LocalesSetting::get() which returns LocalesSetting::m_value
++        restoreInitialValue();
++    }
++    return result;
+ }
+ 
+ bool LocaleWakeWordsSetting::clearData(const WakeWords& wakeWords) {
+@@ -368,7 +375,14 @@ bool LocaleWakeWordsSetting::clearData(const WakeWords& wakeWords) {
+     m_pendingRequest.reset();
+     m_wakeWordsStatus = SettingStatus::NOT_AVAILABLE;
+     WakeWordsSetting::m_value = wakeWords;
+-    return m_storage->deleteSetting(WAKE_WORDS_KEY);
++    // Clear customer's data before restoring the initial value
++    auto result = m_storage->deleteSetting(WAKE_WORDS_KEY);;
++    if (result) {
++        // As m_wakeWordsStatus == SettingStatus::NOT_AVAILABLE restoreInitialValue()
++        // calls WakeWordsSetting::get() which returns WakeWordsSetting::m_value
++        restoreInitialValue();
++    }
++    return result;
+ }
+ 
+ void LocaleWakeWordsSetting::restoreInitialValue() {
 diff --git a/capabilities/DoNotDisturb/include/DoNotDisturbCA/DoNotDisturbCapabilityAgent.h b/capabilities/DoNotDisturb/include/DoNotDisturbCA/DoNotDisturbCapabilityAgent.h
 index 80b6495a..d2fd15d3 100644
 --- a/capabilities/DoNotDisturb/include/DoNotDisturbCA/DoNotDisturbCapabilityAgent.h
@@ -6297,15 +7055,15 @@ index 80b6495a..d2fd15d3 100644
      /**
       * Flag indicating latest reported connection status. True if SDK is connected to the AVS and ready,
 diff --git a/capabilities/DoNotDisturb/src/DoNotDisturbCapabilityAgent.cpp b/capabilities/DoNotDisturb/src/DoNotDisturbCapabilityAgent.cpp
-index 9e897c5e..f7244c80 100644
+index 9e897c5e..24d219b1 100644
 --- a/capabilities/DoNotDisturb/src/DoNotDisturbCapabilityAgent.cpp
 +++ b/capabilities/DoNotDisturb/src/DoNotDisturbCapabilityAgent.cpp
 @@ -282,14 +282,19 @@ std::shared_future<bool> DoNotDisturbCapabilityAgent::sendChangedEvent(const std
          m_hasOfflineChanges = false;
      }
  
-+    // [AUTOHUT-10397] capture-by-value dndModeSetting. (or optionally use a weak_ptr instead)
-+    // this is needed to avoid a race condition where doShutdown() resets the m_dndModeSetting pointer 
++    // Capture-by-value dndModeSetting. (or optionally use a weak_ptr instead)
++    // this is needed to avoid a race condition where doShutdown() resets the m_dndModeSetting pointer
 +    // while the lambda executes, causing a segfault if m_dndModeSetting is dereferenced.
 +    auto dndModeSetting = m_dndModeSetting;
 +
@@ -6323,5 +7081,5 @@ index 9e897c5e..f7244c80 100644
      });
      promise.set_value(true);
 -- 
-2.28.0
+2.25.0
 

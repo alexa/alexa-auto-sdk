@@ -1,0 +1,37 @@
+gradle.ext.aacsRoot = System.getenv('AACS_ROOT')
+if (gradle.ext.aacsRoot == null || gradle.ext.aacsRoot.isEmpty()) {
+    gradle.ext.aacsRoot = new File(rootProject.projectDir, "../../platforms/android/alexa-auto-client-service").getAbsolutePath()
+}
+
+gradle.ext.appComponentsRoot = System.getenv('AACS_APP_COMPONENTS')
+if (gradle.ext.appComponentsRoot == null || gradle.ext.appComponentsRoot.isEmpty()) {
+    gradle.ext.appComponentsRoot =  new File(rootProject.projectDir, "../../platforms/android/app-components").getAbsolutePath()
+}
+
+// AACS Components
+include ':aacsconstants'
+project(':aacsconstants').projectDir = new File(gradle.ext.aacsRoot, '/constants/aacsconstants')
+include ':aacsipc'
+project(':aacsipc').projectDir = new File(gradle.ext.aacsRoot, '/ipc/aacsipc')
+include ':aacscommonutils'
+project(':aacscommonutils').projectDir = new File(gradle.ext.aacsRoot, '/commonutils/aacscommonutils')
+
+// AACS Sample App Projects
+include ':alexa-auto-apis'
+project(':alexa-auto-apis').projectDir = new File(gradle.ext.appComponentsRoot, '/alexa-auto-apis')
+include ':alexa-auto-lwa-auth'
+project(':alexa-auto-lwa-auth').projectDir = new File(gradle.ext.appComponentsRoot, '/alexa-auto-lwa-auth')
+include ':alexa-auto-login'
+project(':alexa-auto-login').projectDir = new File(gradle.ext.appComponentsRoot, '/alexa-auto-login')
+include ':alexa-auto-media-player'
+project(':alexa-auto-media-player').projectDir = new File(gradle.ext.appComponentsRoot, '/alexa-auto-media-player')
+include ':alexa-auto-app'
+project(':alexa-auto-app').projectDir = new File(rootProject.projectDir, '/alexa-auto-app')
+include ':alexa-auto-apps-common-util'
+project(':alexa-auto-apps-common-util').projectDir = new File(gradle.ext.appComponentsRoot, '/alexa-auto-apps-common-util')
+include ':alexa-auto-voice-interaction'
+project(':alexa-auto-voice-interaction').projectDir = new File(gradle.ext.appComponentsRoot, '/alexa-auto-voice-interaction')
+include ':alexa-auto-apps-common-ui'
+project(':alexa-auto-apps-common-ui').projectDir = new File(gradle.ext.appComponentsRoot, '/alexa-auto-apps-common-ui')
+include ':alexa-auto-navigation'
+project(':alexa-auto-navigation').projectDir = new File(gradle.ext.appComponentsRoot, '/alexa-auto-navigation')

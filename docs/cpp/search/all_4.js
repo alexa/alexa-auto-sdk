@@ -10,6 +10,7 @@ var searchData=
   ['equalizercontroller',['EqualizerController',['../classaace_1_1alexa_1_1_equalizer_controller.html',1,'aace::alexa']]],
   ['equalizercontrollerengineinterface',['EqualizerControllerEngineInterface',['../classaace_1_1alexa_1_1_equalizer_controller_engine_interface.html',1,'aace::alexa']]],
   ['error',['ERROR',['../classaace_1_1alexa_1_1_alerts.html#a81cccb7e632cf26b7903d9c9c168fb22abb1ca97ec761fc37101737ba0aa2e7c5',1,'aace::alexa::Alerts::ERROR()'],['../classaace_1_1cbl_1_1_c_b_l.html#a4a095678f1d75f972b59f09b7c3aae0aabb1ca97ec761fc37101737ba0aa2e7c5',1,'aace::cbl::CBL::ERROR()'],['../classaace_1_1logger_1_1_logger_engine_interface.html#aa97c461bbc4f77638b45f7eb9271b786abb1ca97ec761fc37101737ba0aa2e7c5',1,'aace::logger::LoggerEngineInterface::ERROR()']]],
+  ['eventreceived',['eventReceived',['../classaace_1_1authorization_1_1_authorization.html#a1398bf1a4bde9c3f240b8f0819374096',1,'aace::authorization::Authorization']]],
   ['executecommands',['executeCommands',['../classaace_1_1apl_1_1_a_p_l.html#a14091f7b0a6e8898098d04ec67abac8c',1,'aace::apl::APL']]],
   ['executecommandsresult',['executeCommandsResult',['../classaace_1_1apl_1_1_a_p_l.html#a3599f0eec806b4e0d1315ca1f1e8d1b1',1,'aace::apl::APL']]],
   ['expecting',['EXPECTING',['../classaace_1_1alexa_1_1_alexa_client.html#a5f3b9fc09843bc68b5bb9f0ed6b8586eabd416d769c9ba62060c04ae8455e98d2',1,'aace::alexa::AlexaClient']]],

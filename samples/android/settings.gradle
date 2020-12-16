@@ -1,2 +1,2 @@
 rootProject.name = "alexa-auto-sdk"
-include ':app', ':modules:sample-core'
+include ':app', ':modules:sample-core', ':modules:sample-connectivity'

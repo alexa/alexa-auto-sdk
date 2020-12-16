@@ -317,6 +317,9 @@ public:
         ///  Bool to identify if looping of songs is enabled or not. default false
         bool repeatEnabled;
 
+        /// Bool to identify if repeating the track is enabled.
+        bool repeatOneEnabled;
+
         /// The favorite status FAVORITED/UNFAVORITED/NOT_RATED. default NOT_RATED
         Favorites favorites;
 

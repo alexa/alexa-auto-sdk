@@ -1,8 +1,9 @@
 package com.amazon.alexaautoclientservice;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.amazon.aacsconstants.AACSConstants;
 import com.amazon.aacsipc.AACSReceiver;
@@ -33,7 +34,7 @@ public class ConfigMessageReceivedCallback implements AACSReceiver.MessageReceiv
                         configMessage.getJSONArray("configFilepaths"), configMessage.getJSONArray("configStrings"));
 
                 if (configSaved) {
-                    if (FileUtil.lvcConfigurationAvailable(mContext)) {
+                    if (FileUtil.lvcEnabled()) {
                         mStateMachine.setState(State.WAIT_FOR_LVC_CONFIG);
                     } else {
                         mStateMachine.setState(State.CONFIGURED);

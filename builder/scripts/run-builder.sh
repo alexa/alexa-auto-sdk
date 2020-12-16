@@ -178,6 +178,7 @@ FORCE_DOCKER=${FORCE_DOCKER:-0}
 USE_MBEDTLS=${USE_MBEDTLS:-0}
 AACS_ANDROID=${AACS_ANDROID:-0}
 COMMS=${COMMS:-0}
+LVC=${LVC:-0}
 AASB=${AASB:-0}
 
 SCRIPT_OPTIONS=""
@@ -265,26 +266,37 @@ init_extra_local_conf() {
 
 build_sdk() {
 	local available_targets=()
+	local available_extensions=(comms lvc)
 	local extra_local_conf="${BUILDER_HOME}/.extralocal.conf"
 	local audio_extension="${SDK_HOME}/extensions/experimental/system-audio"
 	local sample_app="${SDK_HOME}/samples/cpp/aac-sample-cpp.bb"
 	local aasb_extension="${SDK_HOME}/extensions/aasb"
 	local aasb_comms_extension="${SDK_HOME}/extensions/extras/alexacomms/extensions/aasb-comms"
+	local aasb_lvc_extension="${SDK_HOME}/extensions/extras/local-voice-control/extensions/aasb-lvc"
 	local audio_extension="${SDK_HOME}/extensions/experimental/system-audio"
 	local platform=$1
 
 	case ${platform} in
 	"android")
 		available_targets=("androidarm" "androidarm64" "androidx86" "androidx86-64")
-		if [[ "${AACS_ANDROID}" = "1" ]] && [[ "${COMMS}" = "1" ]] 
+		if [[ "${AACS_ANDROID}" = "1" ]]
 		then
-			extensions="${aasb_extension} ${aasb_comms_extension}"
-		elif [[ "${COMMS}" = "1" ]] && [[ "${AASB}" = "1" ]] 
+			extensions="${aasb_extension}"
+			for i in "${available_extensions[@]}"
+			do
+				local upper_ext=$(echo ${i} | tr '[:lower:]' '[:upper:]')
+				if [[ "${!upper_ext}" = 1 ]]
+				then
+					ext_name=aasb_${i}_extension
+					extensions="${extensions} ${!ext_name}"
+                                fi
+                        done
+		elif [[ "${COMMS}" = "1" ]] && [[ "${AASB}" = "1" ]]
 		then
 			extensions="${aasb_comms_extension}"
-		elif [ "${AACS_ANDROID}" = "1" ]; 
-		then 
-		   	extensions="${aasb_extension}"
+		elif [[ "${LVC}" = "1" ]] && [[ "${AASB}" = "1" ]]
+		then
+			extensions="${aasb_lvc_extension}"
 		fi
 		;;
 	"qnx7")
@@ -341,6 +353,9 @@ check_extra_module() {
         elif [ "${module_name}" = "aasb" ];
         then
                 AASB=1
+        elif [ "${module_name}" = "local-voice-control" ];
+        then
+                LVC=1
         fi
 }
 

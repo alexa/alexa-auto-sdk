@@ -705,7 +705,7 @@ std::string ExternalMediaPlayerEngineImpl::getLocalPlayerIdForSource(aace::alexa
                 return "com.amazon.alexa.auto.players.SIRIUS_XM";
 
             case aace::alexa::LocalMediaSource::Source::DAB:
-                return "com.amazon.alexa.auto.players.DAB";
+                return "com.amazon.alexa.auto.players.DAB_RADIO";
 
             default:
                 throw("invalidLocalMediaSource");

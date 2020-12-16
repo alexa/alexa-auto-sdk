@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">sample-connectivity</string>
+
+    <!-- Connectivity -->
+    <string name="connectivity_view_title">Alexa Connectivity</string>
+
+</resources>

@@ -44,13 +44,23 @@
 #include "SampleApp/Audio/AudioInputProviderHandler.h"
 #include "SampleApp/Audio/AudioOutputProviderHandler.h"
 
-// Sample Code-Based Linking (CBL) Interfaces
-#include "SampleApp/CBL/CBLHandler.h"
+// Sample Authorization Interfaces
+#include "SampleApp/Authorization/AuthorizationHandler.h"
 
 // Sample Communications Platform Interfaces
 #ifdef ALEXACOMMS
 #include "SampleApp/Communication/CommunicationHandler.h"
 #endif  // ALEXACOMMS
+
+// Sample AlexaConnectivity Platform Interfaces
+#ifdef CONNECTIVITY
+#include "SampleApp/Connectivity/AlexaConnectivityHandler.h"
+#endif  // CONNECTIVITY
+
+// Sample Local Search Provider Platform Interface
+#ifdef LOCALVOICECONTROL
+#include "SampleApp/LocalNavigation/LocalSearchProviderHandler.h"
+#endif  // LOCALVOICECONTROL
 
 // Sample Location Platform Interfaces
 #include "SampleApp/Location/LocationProviderHandler.h"
@@ -132,6 +142,7 @@ public:
         std::shared_ptr<aace::core::Engine> engine,
         std::shared_ptr<sampleApp::propertyManager::PropertyManagerHandler> propertyManagerHandler,
         std::shared_ptr<View> console) -> void;
+    auto testMenuItem(std::shared_ptr<ApplicationContext> applicationContext, const json& item) -> bool;
 };
 
 }  // namespace sampleApp

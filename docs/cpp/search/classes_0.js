@@ -13,6 +13,8 @@ var searchData=
   ['audioplayer',['AudioPlayer',['../classaace_1_1alexa_1_1_audio_player.html',1,'aace::alexa']]],
   ['audioplayerengineinterface',['AudioPlayerEngineInterface',['../classaace_1_1alexa_1_1_audio_player_engine_interface.html',1,'aace::alexa']]],
   ['audiostreamproperty',['AudioStreamProperty',['../classaace_1_1audio_1_1_audio_stream_property.html',1,'aace::audio']]],
+  ['authorization',['Authorization',['../classaace_1_1authorization_1_1_authorization.html',1,'aace::authorization']]],
+  ['authorizationengineinterface',['AuthorizationEngineInterface',['../classaace_1_1authorization_1_1_authorization_engine_interface.html',1,'aace::authorization']]],
   ['authorizedplayerinfo',['AuthorizedPlayerInfo',['../classaace_1_1alexa_1_1_external_media_adapter_1_1_authorized_player_info.html',1,'aace::alexa::ExternalMediaAdapter']]],
   ['authprovider',['AuthProvider',['../classaace_1_1alexa_1_1_auth_provider.html',1,'aace::alexa']]],
   ['authproviderengineinterface',['AuthProviderEngineInterface',['../classaace_1_1alexa_1_1_auth_provider_engine_interface.html',1,'aace::alexa']]]

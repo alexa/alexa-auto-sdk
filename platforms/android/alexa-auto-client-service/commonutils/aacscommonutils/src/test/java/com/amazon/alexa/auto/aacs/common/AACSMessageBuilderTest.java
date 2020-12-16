@@ -1,7 +1,6 @@
 package com.amazon.alexa.auto.aacs.common;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Intent;
@@ -37,15 +36,19 @@ public class AACSMessageBuilderTest {
     @Test
     public void testCanBuildAndParseReplyMessage() {
         String replyToId = "reply-id";
+        String topic = "my-topic";
+        String action = "my-action";
         String payload = "{\"test\":\"123\"}";
-        testReplyMessage(replyToId, payload);
+        testReplyMessage(replyToId, topic, action, payload);
     }
 
     @Test
     public void testNullPayloadIsAcceptedForBuildingParsingReplyMessage() {
         String replyToId = "reply-id";
+        String topic = "my-topic";
+        String action = "my-action";
         String payload = null;
-        testReplyMessage(replyToId, payload);
+        testReplyMessage(replyToId, topic, action, payload);
     }
 
     @Test
@@ -78,8 +81,9 @@ public class AACSMessageBuilderTest {
         assertEquals(payload, parsedMessage.get().payload);
     }
 
-    private void testReplyMessage(@NonNull String replyToId, String payload) {
-        Optional<String> message = AACSMessageBuilder.buildReplyMessage(replyToId, payload);
+    private void testReplyMessage(
+            @NonNull String replyToId, @NonNull String topic, @NonNull String action, String payload) {
+        Optional<String> message = AACSMessageBuilder.buildReplyMessage(replyToId, topic, action, payload);
         assertTrue(message.isPresent());
 
         // Parse the message and match the inputs.
@@ -87,6 +91,8 @@ public class AACSMessageBuilderTest {
         assertTrue(parsedMessage.isPresent());
 
         assertEquals(replyToId, parsedMessage.get().replyToId);
+        assertEquals(topic, parsedMessage.get().topic);
+        assertEquals(action, parsedMessage.get().action);
         assertEquals(payload, parsedMessage.get().payload);
     }
 }

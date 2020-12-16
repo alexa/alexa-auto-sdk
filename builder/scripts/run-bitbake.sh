@@ -288,7 +288,7 @@ EOF
 		echo "DL_DIR = \"${DL_DIR}\"" >> ${LOCAL_CONF}
 	fi
 
-	# Export white list for ECS
+	# Export allow list for ECS
 	echo "export AWS_CONTAINER_CREDENTIALS_RELATIVE_URI" >> ${LOCAL_CONF}
 	echo "export AWS_DEFAULT_REGION" >> ${LOCAL_CONF}
 	echo "export AWS_REGION" >> ${LOCAL_CONF}
@@ -317,9 +317,9 @@ execute_bitbake() {
 	# Initialize BB with a build directory
 	source ${OE_CORE_PATH}/oe-init-build-env ${BUILD_DIR}
 
-	# Export whitelist for ECS
+	# Export allow list for ECS
 	export BB_ENV_EXTRAWHITE="${BB_ENV_EXTRAWHITE} AWS_CONTAINER_CREDENTIALS_RELATIVE_URI AWS_DEFAULT_REGION AWS_REGION"
-	# Export whitelist for additional environments
+	# Export allow list for additional environments
 	export BB_ENV_EXTRAWHITE="${BB_ENV_EXTRAWHITE} ANDROID_TOOLCHAIN QNX_BASE"
 
 	MACHINE=${TARGET} bitbake $@ ${PACKAGE}

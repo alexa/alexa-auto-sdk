@@ -1,0 +1,33 @@
+@startuml
+
+skinparam roundcorner 10
+
+autonumber
+participant Application order 20
+participant AuthorizationHandler order 30
+participant "Auto SDK" as AutoSDK  order 40
+
+Application -> AuthorizationHandler : Start AuthProvider authorization flow.
+AuthorizationHandler -> AutoSDK :startAuthorization( "alexa:auth-provider", "" )
+opt Other Alexa authorizations used previously will be logged out.
+AutoSDK -> AuthorizationHandler : authorizationStateChanged( "<previous-service>", UNAUTHORIZED )
+end
+AutoSDK -> AuthorizationHandler : authorizationStateChanged( "alexa:auth-provider", AUTHORIZING )
+
+== Engine notifying Application to provide the authorization token state ==
+AutoSDK -> AuthorizationHandler : eventReceived( "alexa:auth-provider", "{ "type" : "requestAuthorization" }" )
+
+== Application notifying Engine the authorization token state ==
+alt On successful authorization
+AuthorizationHandler -> AutoSDK : sendEvent( "alexa:auth-provider", "{\n\t"type" : "authStateChangeEvent",\n\t"payload" : {\n\t\t"state" : "AUTHORIZED" \n\t}\n}")
+AutoSDK -> AuthorizationHandler : authorizationStateChanged( "alexa:auth-provider", AUTHORIZED )
+else On unsuccessful authorization
+AuthorizationHandler -> AutoSDK : sendEvent( "alexa:auth-provider", "{\n\t"type" : "authStateChangeEvent",\n\t"payload" : {\n\t\t"state" : "UNAUTHORIZED" \n\t}\n}")
+AutoSDK -> AuthorizationHandler : authorizationStateChanged( "alexa:auth-provider", UNAUTHORIZED )
+end
+
+== Whenever the access token is required by Auto SDK ==
+AutoSDK -> AuthorizationHandler : getAuthorizationData( "alexa:auth-provider", "accessToken" )
+AuthorizationHandler-->AutoSDK : "{ "accessToken" : "<access-token>" }"
+
+@enduml

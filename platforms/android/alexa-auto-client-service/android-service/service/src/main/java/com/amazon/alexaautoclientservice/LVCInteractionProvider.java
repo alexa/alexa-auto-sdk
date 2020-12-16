@@ -23,9 +23,10 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.support.annotation.NonNull;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.amazon.aacsconstants.AACSConstants;
 import com.amazon.alexaautoclientservice.constants.LVCServiceConstants;
@@ -37,6 +38,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 public class LVCInteractionProvider {
@@ -149,8 +151,38 @@ public class LVCInteractionProvider {
         @Override
         public String getConfiguration() {
             String configString = FileUtil.getLVCConfiguration(mContext.get());
+
+            File fileDir = mContext.get().getFilesDir();
+            JSONObject configToLvcApk = new JSONObject();
+            try {
+                if (configString != null && !configString.isEmpty()) {
+                    configToLvcApk = new JSONObject(configString);
+                }
+                File lssSocket = new File(fileDir, "LSS.socket");
+                JSONObject lssJson = new JSONObject();
+                lssJson.put("UnixDomainSocketPath", lssSocket.getPath());
+                configToLvcApk.put("LocalSkillService", lssJson);
+
+                File externalFiles = new File(fileDir, "externalFiles");
+                File lvcFiles = new File(externalFiles, "aacs.localVoiceControl");
+                File ccAssetsFile = new File(lvcFiles, "CarControlAssets.json");
+                if (ccAssetsFile.exists()) {
+                    JSONObject ccJson = new JSONObject();
+                    ccJson.put("CustomAssetsFilePath", ccAssetsFile.getPath());
+                    configToLvcApk.put("CarControl", ccJson);
+                }
+                JSONObject localSearchJson = new JSONObject();
+                localSearchJson.put("NavigationPOISocketDir", fileDir.getPath());
+                localSearchJson.put("NavigationPOISocketName", "poi_navigation.socket");
+                localSearchJson.put("POIEERSocketDir", fileDir.getPath());
+                localSearchJson.put("POIEERSocketName", "poi_eer.socket");
+                configToLvcApk.put("LocalSearch", localSearchJson);
+            } catch (JSONException e) {
+                Log.w(TAG, String.format("Error while constructing config for LVC APK. Error: %s", e.getMessage()));
+            }
+
             Log.d(TAG, "Returning config to LVC service");
-            return configString;
+            return configToLvcApk.toString();
         }
 
         @Override

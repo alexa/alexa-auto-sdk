@@ -1,0 +1,15 @@
+@startuml
+skinparam roundcorner 10
+participant Application 
+participant TextToSpeechHandler 
+participant "Auto SDK"
+Application->TextToSpeechHandler: "Get Capabilities"
+
+TextToSpeechHandler-->"Auto SDK" : getCapabilities( "ID-123" , "text-to-speech-provider" )
+alt Success
+	"Auto SDK"->TextToSpeechHandler: true
+else FAIL
+	"Auto SDK"->TextToSpeechHandler: false
+end
+"Auto SDK"->TextToSpeechHandler: capabilitiesReceived( "ID-123", "{ CAPABILITIES_OF_PROVIDER }" )
+@enduml

@@ -23,6 +23,7 @@ public class Topic {
     public static final String ALEXA_SPEAKER = "AlexaSpeaker";
     public static final String AUDIO_PLAYER = "AudioPlayer";
     public static final String AUTH_PROVIDER = "AuthProvider";
+    public static final String AUTHORIZATION = "Authorization";
     public static final String DO_NOT_DISTURB = "DoNotDisturb";
     public static final String EQUALIZER_CONTROLLER = "EqualizerController";
     public static final String EXTERNAL_MEDIA_ADAPTER = "ExternalMediaAdapter";

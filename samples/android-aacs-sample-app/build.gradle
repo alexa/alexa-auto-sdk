@@ -1,0 +1,91 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    ext.versions = [
+        'kotlin': '1.4.0',
+        'androidx_core': '1.3.2',
+        'androidx_appcompat': '1.2.0',
+        'androidx_annotation': '1.1.0',
+        'androidx_constraint': '2.0.1',
+        'androidx_preference': '1.1.1',
+        'androidx_navigation': '2.3.0',
+        'androidx_lifecycle': '2.2.0',
+        'androidx_media': '1.1.0',
+        'dagger': '2.22',
+        'exoplayer': '2.11.5',
+        'moshi': '1.9.3',
+
+        // Test Dependencies
+        'mockito': '3.4.0',
+    ]
+
+    ext.deps = [
+        'kotlin_stdlib': "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${versions.kotlin}",
+
+        'androidx_core': "androidx.core:core:${versions.androidx_core}",
+        'androidx_core_ktx': "androidx.core:core-ktx:${versions.androidx_core}",
+        'androidx_appcompat': "androidx.appcompat:appcompat:${versions.androidx_appcompat}",
+        'androidx_annotation': "androidx.annotation:annotation:${versions.androidx_annotation}",
+        'androidx_constraint': "androidx.constraintlayout:constraintlayout:${versions.androidx_constraint}",
+        'androidx_viewmodel': "androidx.lifecycle:lifecycle-viewmodel:${versions.androidx_lifecycle}",
+        'androidx_preference': "androidx.preference:preference:${versions.androidx_preference}",
+        'androidx_navigation_fragment': "androidx.navigation:navigation-fragment:${versions.androidx_navigation}",
+        'androidx_navigation_ui': "androidx.navigation:navigation-ui:${versions.androidx_navigation}",
+
+        'androidx_media': "androidx.media:media:${versions.androidx_media}",
+
+        'dagger': "com.google.dagger:dagger:${versions.dagger}",
+        'dagger_compiler': "com.google.dagger:dagger-compiler:${versions.dagger}",
+
+        'moshi': "com.squareup.moshi:moshi:${versions.moshi}",
+        'moshi_codegen': "com.squareup.moshi:moshi-kotlin-codegen:${versions.moshi}",
+
+        'rxjava3': "io.reactivex.rxjava3:rxjava:3.0.4",
+        'glide': "com.github.bumptech.glide:glide:4.11.0",
+        'google_zxing': 'com.google.zxing:core:3.2.0',
+        'eventbus': 'org.greenrobot:eventbus:3.2.0',
+
+        'exoplayer_core': "com.google.android.exoplayer:exoplayer-core:${versions.exoplayer}",
+        'exoplayer_dash': "com.google.android.exoplayer:exoplayer-dash:${versions.exoplayer}",
+        'exoplayer_smooth': "com.google.android.exoplayer:exoplayer-smoothstreaming:${versions.exoplayer}",
+        'exoplayer_hls': "com.google.android.exoplayer:exoplayer-hls:${versions.exoplayer}",
+        'exoplayer_mediasession': "com.google.android.exoplayer:extension-mediasession:${versions.exoplayer}",
+
+        'junit': 'junit:junit:4.12',
+        'mockito': "org.mockito:mockito-core:${versions.mockito}",
+        'mockito_inline': "org.mockito:mockito-inline:${versions.mockito}",
+        'mockito_nhaarman': 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0',
+        'androidx_test_core': 'androidx.test:core:1.3.0',
+        'androidx_arch_core_testing': 'androidx.arch.core:core-testing:2.1.0',
+        'androidx_fragment_testing': 'androidx.fragment:fragment-testing:1.2.5',
+        'roboelectric': 'org.robolectric:robolectric:4.3',
+    ]
+
+    repositories {
+        google()
+        jcenter()
+        maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
+    }
+
+    dependencies {
+        classpath "com.android.tools.build:gradle:4.0.1"
+
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}"
+        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:${versions.androidx_navigation}"
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+        flatDir {
+            dirs 'libs'
+            dirs project(':alexa-auto-voice-interaction').file('libs')
+        }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

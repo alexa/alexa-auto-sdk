@@ -1,0 +1,1 @@
+static const char* AASB_CONNECTIVITY_MODULE = "aasb.connectivity";

@@ -35,8 +35,9 @@ import static com.amazon.maccandroid.model.APIConstants.Directives.PlayControl.S
 import android.content.Context;
 import android.media.AudioManager;
 import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.amazon.aace.alexa.ExternalMediaAdapter;
 import com.amazon.aace.audio.AudioOutput.MutedState;

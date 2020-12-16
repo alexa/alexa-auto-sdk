@@ -12,34 +12,34 @@
         android:paddingEnd="8dp"
         android:id="@+id/drawer_linear_layout">
 
-        <!-- Container for login -->
+        <!-- Container for CBL login -->
         <LinearLayout
-            android:id="@+id/login"
+            android:id="@+id/cblLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
             android:background="@color/drawerSection"
             android:orientation="vertical"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
             android:visibility="visible">
 
-            <!-- Login with Amazon button -->
-            <ImageButton
-                android:id="@+id/loginButton"
-                android:layout_width="wrap_content"
+            <!-- Log out button -->
+            <TextView
+                android:id="@+id/cblLoginButton"
+                style="@style/button"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
-                android:background="@null"
-                android:src="@drawable/lwa_btn_src" />
+                android:text="@string/auth_cbl_login" />
         </LinearLayout>
 
-        <!-- Container for cancel -->
+        <!-- Container for CBL cancel -->
         <LinearLayout
-            android:id="@+id/cancel"
+            android:id="@+id/cblCancel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
@@ -50,7 +50,7 @@
 
             <!-- Log out button -->
             <TextView
-                android:id="@+id/cancelButton"
+                android:id="@+id/cblCancelButton"
                 style="@style/button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -59,12 +59,12 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
-                android:text="@string/auth_cancel" />
+                android:text="@string/auth_cbl_cancel" />
         </LinearLayout>
 
-        <!-- Container for logout -->
+        <!-- Container for CBL logout -->
         <LinearLayout
-            android:id="@+id/logout"
+            android:id="@+id/cblLogout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
@@ -73,9 +73,9 @@
             android:orientation="vertical"
             android:visibility="gone">
 
-            <!-- Log out button -->
+            <!-- Logout CBL button -->
             <TextView
-                android:id="@+id/logoutButton"
+                android:id="@+id/cblLogoutButton"
                 style="@style/button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -84,7 +84,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
-                android:text="@string/auth_logout" />
+                android:text="@string/auth_cbl_logout" />
         </LinearLayout>
 
         <!-- Config Info -->
@@ -1778,6 +1778,84 @@
                 android:layout_marginBottom="8dp"
                 android:text="@string/callOnDestroy" />
         </LinearLayout>
+
+        <!-- Text to Speech -->
+        <LinearLayout
+            android:id="@+id/textToSpeech"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="8dp"
+            android:background="@color/drawerSection"
+            android:orientation="vertical"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
+
+            <TextView
+                android:id="@+id/textToSpeech_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/text_to_speech_title"
+                android:textColor="@color/drawerHeader"
+                android:layout_marginBottom="4dp"
+                android:textSize="18sp" />
+
+            <!-- Spinner -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:background="@color/drawerSection"
+                android:orientation="horizontal"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp">
+
+                <TextView
+                    android:layout_width="66dp"
+                    android:layout_height="wrap_content"
+                    android:paddingRight="10dp"
+                    android:text="SSML"
+                    android:textColor="@color/drawerHeader"
+                    android:textSize="16sp" />
+
+                <Spinner
+                    android:id="@+id/textToSpeechSSMLOnlySpinner"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="4dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:background="@color/drawerSection"
+                android:orientation="horizontal"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp">
+
+                <TextView
+                    android:layout_width="61dp"
+                    android:layout_height="44dp"
+                    android:paddingRight="10dp"
+                    android:text="TEXT"
+                    android:textColor="@color/drawerHeader"
+                    android:textSize="16sp" />
+
+                <Spinner
+                    android:id="@+id/textToSpeechTextOnlySpinner"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="4dp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </ScrollView>

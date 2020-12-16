@@ -319,6 +319,9 @@ struct AdapterPlaybackState {
     ///  Bool to identify if looping of songs is enabled or not.
     bool repeatEnabled;
 
+    /// Bool to identify if repeating the track is enabled.
+    bool repeatOneEnabled;
+
     /// The favorite status {"FAVORITED"/"UNFAVORITED"/"NOT_RATED"}.
     Favorites favorites;
 
@@ -519,6 +522,7 @@ inline AdapterPlaybackState::AdapterPlaybackState() :
         trackOffset{0},
         shuffleEnabled{false},
         repeatEnabled{false},
+        repeatOneEnabled{false},
         favorites{Favorites::NOT_RATED},
         mediaType{MediaType::TRACK},
         duration{0} {
@@ -744,8 +748,8 @@ inline std::string SHUFFLE_STATUS_STRING(bool shuffleEnabled) {
     return (shuffleEnabled == true) ? "SHUFFLED" : "NOT_SHUFFLED";
 }
 
-inline std::string REPEAT_STATUS_STRING(bool repeatEnabled) {
-    return (repeatEnabled == true) ? "REPEATED" : "NOT_REPEATED";
+inline std::string REPEAT_STATUS_STRING(bool repeatEnabled, bool repeatOneEnabled) {
+    return (repeatEnabled == true) ? "REPEATED" : (repeatOneEnabled == true) ? "ONE_REPEATED" : "NOT_REPEATED";
 }
 
 }  // namespace alexa

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/auto_voice_interaction_view_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/auto_padding_bottom"
+    android:orientation="vertical"
+    android:background="@android:color/transparent">
+
+    <LinearLayout
+        android:id="@+id/auto_voice_interaction_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:background="@android:color/transparent"/>
+
+    <LinearLayout
+        android:id="@+id/auto_voice_chrome_bar_view"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/voice_chrome_bar_height"
+        android:orientation="vertical" />
+
+</LinearLayout>

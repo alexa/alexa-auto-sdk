@@ -6,6 +6,7 @@ public class MediaAppMetaData {
     private final String mPlaybackSource;
     private final String mPlaybackSourceId;
     private final String mTrackName;
+    private final String mTrackID;
     private final String mTrackNumber;
     private final String mArtist;
     private final String mAlbum;
@@ -25,6 +26,7 @@ public class MediaAppMetaData {
         mTrackName = null;
         mPlaybackSourceId = null;
         mTrackNumber = null;
+        mTrackID = null;
         mArtist = null;
         mAlbum = null;
         mCoverUrls = null;
@@ -37,6 +39,7 @@ public class MediaAppMetaData {
         mPlaybackSource = metadata.getString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE);
         mPlaybackSourceId = metadata.getString(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI);
         mTrackName = metadata.getString(MediaMetadataCompat.METADATA_KEY_TITLE);
+        mTrackID = metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI);
         mTrackNumber = Long.toString(metadata.getLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER));
         mArtist = metadata.getString(MediaMetadataCompat.METADATA_KEY_ARTIST);
         mAlbum = metadata.getString(MediaMetadataCompat.METADATA_KEY_ALBUM);
@@ -57,6 +60,10 @@ public class MediaAppMetaData {
 
     public String getTrackName() {
         return mTrackName;
+    }
+
+    public String getTrackId() {
+        return mTrackID;
     }
 
     public String getTrackNumber() {

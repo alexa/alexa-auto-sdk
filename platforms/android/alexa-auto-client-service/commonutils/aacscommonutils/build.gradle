@@ -29,17 +29,17 @@ android {
 }
 
 dependencies {
-    implementation project(':alexa-auto-client-service:constants:aacsconstants')
-    implementation project(':alexa-auto-client-service:ipc:aacsipc')
+    implementation project(':aacsconstants')
+    implementation project(':aacsipc')
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation "androidx.annotation:annotation:1.1.0"
+    implementation deps.kotlin_stdlib
+    implementation deps.androidx_annotation
 
     // JSON Parsing
-    kapt "com.squareup.moshi:moshi-kotlin-codegen:1.9.3"
-    implementation "com.squareup.moshi:moshi:1.9.3"
+    kapt deps.moshi_codegen
+    implementation deps.moshi
 
-    testImplementation 'junit:junit:4.12'
-    testImplementation 'org.mockito:mockito-core:2.25.0'
-    testImplementation 'org.robolectric:robolectric:4.3'
+    testImplementation deps.junit
+    testImplementation deps.mockito
+    testImplementation deps.roboelectric
 }

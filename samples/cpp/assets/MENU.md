@@ -452,14 +452,13 @@ The **notify/*** action exercises the application platform interfaces with event
 | onAlertsRemoveAllAlerts                     | -
 | **AudioManager**                            |
 | onAudioManagerSpeaker                       | `identity/name/value`
-| **CBL**                                     |
-| onCBLStart                                  | -
-| onCBLCancel                                 | -
 | **Communications**                          |
 | onCommunicationAcceptCall                   | -
 | onCommunicationStopCall                     | -
 | onCommunicationShowDisplayInfo              | -
 | onCommunicationShowState                    | -
+| **Connectivity**                            |
+| onConnectivityConnectivityStateChange       | `json`
 | **DoNotDisturb**                            |
 | onDoNotDisturbChanged                       | -
 | **Logger**                                  |
@@ -494,6 +493,9 @@ The **notify/*** action exercises the application platform interfaces with event
 | onSpeechRecognizerDisableWakewordDetection  | -
 | onSpeechRecognizerStartStreamingAudioFile   | [audio file path](#audiofile)
 | onSpeechRecognizerStopStreamingAudioFile    | -
+| **TextToSpeech**                            |
+| onPrepareSpeech                             | `text/SSML`
+| onGetCapabilities                           | -
 | **AlexaClient**                             |
 | onStopForegroundActivity                    | -
 
@@ -547,3 +549,10 @@ For example:
 | ------------------- | ---------------------------------
 | code                | GENERIC_FAILURE, NO_CONNECTIVITY, NO_PERMISSION (see `Messaging::ErrorCode`)
 | message             | A string with the error code message
+
+
+##### onPrepareSpeech
+
+| Field               | Values
+| ------------------- | ---------------------------------
+| text/SSML           | A string/SSML used for speech synthesis

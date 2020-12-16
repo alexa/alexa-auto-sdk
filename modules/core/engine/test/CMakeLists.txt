@@ -9,6 +9,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
 
 set(HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Authorization/MockAuthorizationProviderListener.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Core/CoreTestHelper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Core/MockEngineConfiguration.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Core/MockPlatformInterface.h
@@ -64,6 +65,7 @@ add_executable(AACECoreTests
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/EngineImplTest.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/VehicleConfigurationImplTest.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/AuthorizationEngineImplTest.cpp
 )
 
 target_include_directories(AACECoreTests

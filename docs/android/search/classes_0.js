@@ -17,6 +17,8 @@ var searchData=
   ['audiooutputtype',['AudioOutputType',['../enumcom_1_1amazon_1_1aace_1_1audio_1_1_audio_output_provider_1_1_audio_output_type.html',1,'com::amazon::aace::audio::AudioOutputProvider']]],
   ['audioplayer',['AudioPlayer',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_player.html',1,'com::amazon::aace::alexa']]],
   ['autherror',['AuthError',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_auth_error.html',1,'com.amazon.aace.alexa.AlexaClient.AuthError'],['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider_1_1_auth_error.html',1,'com.amazon.aace.alexa.AuthProvider.AuthError']]],
+  ['authorization',['Authorization',['../classcom_1_1amazon_1_1aace_1_1authorization_1_1_authorization.html',1,'com::amazon::aace::authorization']]],
+  ['authorizationstate',['AuthorizationState',['../enumcom_1_1amazon_1_1aace_1_1authorization_1_1_authorization_1_1_authorization_state.html',1,'com::amazon::aace::authorization::Authorization']]],
   ['authprovider',['AuthProvider',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider.html',1,'com::amazon::aace::alexa']]],
   ['authstate',['AuthState',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_auth_state.html',1,'com.amazon.aace.alexa.AlexaClient.AuthState'],['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider_1_1_auth_state.html',1,'com.amazon.aace.alexa.AuthProvider.AuthState']]]
 ];

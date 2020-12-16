@@ -99,13 +99,6 @@ public:
         MICROPHONE,
 
         /**
-         * This API is depreciated, we do NOT recommend to continue to use this property anymore.
-         * A comma-separated list of supported countries (ISO country codes).
-         * Example value: "US,CA"
-         */
-        COUNTRY_LIST,
-
-        /**
          * The automaker's identifier for the vehicle.
          */
         VEHICLE_IDENTIFIER
@@ -136,7 +129,6 @@ public:
      *          "arch": "<HARDWARE_ARCH>",
      *          "language": "<LANGUAGE>",
      *          "microphone": "<MICROPHONE>",
-     *          "countries": "<COUNTRY_LIST>",
      *          "vehicleIdentifier": "<VEHICLE_IDENTIFIER>"
      *      }
      *   }
@@ -198,9 +190,6 @@ inline std::ostream& operator<<(std::ostream& stream, const VehicleConfiguration
             break;
         case VehicleConfiguration::VehiclePropertyType::MICROPHONE:
             stream << "MICROPHONE";
-            break;
-        case VehicleConfiguration::VehiclePropertyType::COUNTRY_LIST:
-            stream << "COUNTRY_LIST";
             break;
         case VehicleConfiguration::VehiclePropertyType::VEHICLE_IDENTIFIER:
             stream << "VEHICLE_IDENTIFIER";

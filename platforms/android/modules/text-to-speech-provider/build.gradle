@@ -1,0 +1,79 @@
+// For generateAbiFiltersDeploy()
+apply from: "${project.rootDir}/abifilter.gradle"
+
+buildscript {
+    repositories {
+        jcenter()
+        google()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.6.2'
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        google()
+    }
+}
+
+apply plugin: 'com.android.library'
+
+// copy the so to the libs folder
+def copySoToLibsTask( String soFile ) {
+    return tasks.create("copy${soFile}" ) {
+        doFirst { //handle during gradle execution phase
+            List<Map<String, String>>  abiplatform = generateAbiAndAndroidPlatformMap()
+            for ( Map<String, String> map : abiplatform ) {
+                for( String abi : map.keySet() ) {
+                    StringBuilder sb = new StringBuilder()
+                    String logMsg = String.format("Copying %s file for abi '%s' to libs", soFile, abi )
+                    String line = generateLine(logMsg.length())
+                    sb.append(line).append(logMsg).append(line)
+                    logger.lifecycle(sb.toString())
+                    copy {
+                        from("${project.rootDir}/../native-build/"+abi + "-" + map.get(abi) + "/opt/AAC/lib" )
+                        into("libs/" + abi )
+                        include(soFile)
+                    }
+                }
+            }
+        }
+    }
+}
+
+task cleanLibs(type: Delete) {
+    doFirst{ //handle during gradle execution phase
+        delete 'libs/'
+    }
+}
+
+android {
+    compileSdkVersion 26
+    defaultConfig {
+        minSdkVersion 22
+        targetSdkVersion 23
+        versionCode 1
+        versionName '1.4'
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            debuggable true
+            jniDebuggable true
+        }
+    }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+            assets.srcDirs = ['src/main/assets']
+        }
+    }
+    preBuild.dependsOn cleanLibs, copySoToLibsTask( 'libAACETextToSpeechProviderEngine.so' )
+}

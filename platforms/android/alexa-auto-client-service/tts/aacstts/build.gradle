@@ -1,0 +1,52 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 28
+
+    defaultConfig {
+        minSdkVersion 26
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+}
+
+dependencies {
+    compileOnly fileTree(dir: '../../../../../builder/deploy/aar', include: ['aacscommonutils*.aar', 'aacsconstants*.aar', 'aacsipc*.aar'])
+    testImplementation fileTree(dir: '../../../../../builder/deploy/aar', include: ['aacscommonutils*.aar', 'aacsconstants*.aar', 'aacsipc*.aar'])
+
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation "androidx.preference:preference:1.0.0"
+
+    /** Test Dependencies **/
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.powermock:powermock-api-mockito:1.6.2'
+    testImplementation 'org.powermock:powermock-module-junit4-rule-agent:1.6.2'
+    testImplementation 'org.powermock:powermock-module-junit4-rule:1.6.2'
+    testImplementation 'org.powermock:powermock-module-junit4:1.6.2'
+    testImplementation 'org.json:json:20200518'
+    testImplementation 'org.mockito:mockito-core:1.10.19'
+
+    androidTestImplementation 'androidx.test.ext:junit:1.1.0'
+    androidTestImplementation 'androidx.test:rules:1.1.0'
+    androidTestImplementation 'androidx.test:runner:1.1.0'
+    androidTestImplementation 'org.mockito:mockito-android:2.22.0'
+}

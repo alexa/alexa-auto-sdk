@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.amazon.alexa.auto.lwaauth">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Enables listening to wifi state changes -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Enables getting intents from AACS -->
+    <uses-permission android:name="com.amazon.alexaautoclientservice"/>
+
+
+    <application
+        android:allowBackup="true"
+        android:label="@string/alexa_app_name"
+        android:supportsRtl="true"
+        tools:replace="android:label"
+        tools:ignore="GoogleAppIndexingWarning">
+
+        <receiver android:name="com.amazon.alexa.auto.lwa.CBLReceiver"
+            android:exported="true">
+            <intent-filter>
+                <category android:name="com.amazon.aacs.aasb.CBL" />
+
+                <action android:name="com.amazon.aacs.aasb.GetRefreshToken" />
+                <action android:name="com.amazon.aacs.aasb.SetRefreshToken" />
+                <action android:name="com.amazon.aacs.aasb.ClearRefreshToken" />
+                <action android:name="com.amazon.aacs.aasb.CBLStateChanged" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+</manifest>

@@ -80,16 +80,18 @@ public class AACSMessageBuilder {
             JSONObject aasbMessage = new JSONObject(message);
 
             String messageId = aasbMessage.getJSONObject(AASBConstants.HEADER).getString(AASBConstants.ID);
-            String replyToId = aasbMessage.getJSONObject(AASBConstants.HEADER)
-                                       .getJSONObject(AASBConstants.MESSAGE_DESCRIPTION)
-                                       .getString(AASBConstants.REPLY_TO_ID);
+            JSONObject messageObj =
+                    aasbMessage.getJSONObject(AASBConstants.HEADER).getJSONObject(AASBConstants.MESSAGE_DESCRIPTION);
+            String replyToId = messageObj.getString(AASBConstants.REPLY_TO_ID);
+            String topic = messageObj.getString(AASBConstants.TOPIC);
+            String action = messageObj.getString(AASBConstants.ACTION);
 
             String payload = null;
             if (aasbMessage.has(AASBConstants.PAYLOAD)) {
                 payload = aasbMessage.getJSONObject(AASBConstants.PAYLOAD).toString();
             }
 
-            return Optional.of(new AACSReplyMessage(messageId, replyToId, payload));
+            return Optional.of(new AACSReplyMessage(messageId, replyToId, topic, action, payload));
         } catch (JSONException exception) {
             Log.d(TAG, "Invalid json. Error:" + exception);
             return Optional.empty();
@@ -100,11 +102,14 @@ public class AACSMessageBuilder {
      * Build a AACS Reply Message JSON from its constituents.
      *
      * @param replyToId If a message is a response to earlier message.
+     * @param topic Topic of the message.
+     * @param action Action of the message.
      * @param payload Payload of the message.
      *
      * @return Message encoded as JSON.
      */
-    public static Optional<String> buildReplyMessage(@NonNull String replyToId, String payload) {
+    public static Optional<String> buildReplyMessage(
+            @NonNull String replyToId, @NonNull String topic, @NonNull String action, String payload) {
         String uniqueID = UUID.randomUUID().toString();
         try {
             String aasbMessage = "{\n"
@@ -113,6 +118,8 @@ public class AACSMessageBuilder {
                     + "    \"messageType\" : \"Reply\",\n"
                     + "    \"id\" : \"" + uniqueID + "\",\n"
                     + "    \"messageDescription\" : {\n"
+                    + "      \"topic\" : \"" + topic + "\",\n"
+                    + "      \"action\" : \"" + action + "\",\n"
                     + "      \"replyToId\" : \"" + replyToId + "\"\n"
                     + "    }\n"
                     + "  }\n"

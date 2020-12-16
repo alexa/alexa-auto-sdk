@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<style name="Theme.Alexa.Standard" parent="Theme.AppCompat.DayNight.NoActionBar">
+    <!-- Theme Colors -->
+    <item name="colorPrimary">@color/EbonyClay</item>
+    <item name="colorOnPrimary">@color/White</item>
+    <item name="android:textColorPrimary">?attr/colorOnPrimary</item>
+
+    <item name="android:colorSecondary">@color/Cyan</item>
+    <item name="android:textColorSecondary">@color/GrayChateau</item>
+
+    <item name="colorAccent">@color/Cyan</item>
+
+    <item name="colorSurface">@color/GrayChateau</item>
+    <item name="colorOnSurface">@color/White</item>
+
+    <item name="android:colorBackground">@color/Black</item>
+    <item name="colorOnBackground">@color/White</item>
+    <item name="hintColorOnBackground">@color/GrayChateau</item>
+
+    <!-- Theme Shapes -->
+    <item name="shapeAppearanceMediumComponent">@drawable/medium_component_background</item>
+    <item name="shapeAppearanceSmallComponent">@drawable/small_component_background</item>
+
+    <!-- All EditTexts -->
+    <item name="editTextStyle">@style/Alexa.EditText</item>
+    <item name="android:editTextPreferenceStyle">@style/Alexa.EditText</item>
+
+    <!-- All Dialogs -->
+    <item name="android:alertDialogTheme">@style/Alexa.AlertDialog</item>
+</style>
+</resources>

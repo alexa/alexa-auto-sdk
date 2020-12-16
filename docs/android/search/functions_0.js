@@ -26,6 +26,8 @@ var searchData=
   ['announceroadregulation',['announceRoadRegulation',['../classcom_1_1amazon_1_1aace_1_1navigation_1_1_navigation.html#aee853c3f66d8205e733fb27644b829f1',1,'com::amazon::aace::navigation::Navigation']]],
   ['answer',['answer',['../classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a96fcb25d9e32de9524becbec82a79ed7',1,'com::amazon::aace::phonecontrol::PhoneCallController']]],
   ['authfailure',['authFailure',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider.html#a73c6d42ae6537e38fa7a910cf84e5b8a',1,'com::amazon::aace::alexa::AuthProvider']]],
+  ['authorizationerror',['authorizationError',['../classcom_1_1amazon_1_1aace_1_1authorization_1_1_authorization.html#ac2087542c1f5f41240fbe1154dc9dc51',1,'com::amazon::aace::authorization::Authorization']]],
+  ['authorizationstatechanged',['authorizationStateChanged',['../classcom_1_1amazon_1_1aace_1_1authorization_1_1_authorization.html#aac7df2c628d7212d332bca7d04248087',1,'com::amazon::aace::authorization::Authorization']]],
   ['authorize',['authorize',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter.html#a0ddaaef81a0c9edbdffc2f4149f638e8',1,'com::amazon::aace::alexa::ExternalMediaAdapter']]],
   ['authstatechange',['authStateChange',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider.html#ae41d2954a60f8ec802e8784d1963f3eb',1,'com::amazon::aace::alexa::AuthProvider']]],
   ['authstatechanged',['authStateChanged',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client.html#aadf5e36e715105b0c182cab93d3bf427',1,'com::amazon::aace::alexa::AlexaClient']]]

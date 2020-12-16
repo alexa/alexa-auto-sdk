@@ -21,10 +21,19 @@ public class AACSConstants {
     public static String AACS = "AACS";
 
     public static final String NEW_CONFIG = "newConfig";
+    public static final String CONFIG_MODULE = "configModule";
     public static final String PAYLOAD = "payload";
     public static final String AACS_GENERAL_CONFIG = "aacs.general";
     public static final String AACS_AASB_CONFIG = "aacs.aasb";
 
+    public static final String AACS_PROPERTY_URI = "com.amazon.alexaautoclientservice.AACSPropertyContentProvider";
+    public static final String[] ALEXA_PROPERTIES = {AACSPropertyConstants.WAKEWORD_SUPPORTED,
+            AACSPropertyConstants.FIRMWARE_VERSION, AACSPropertyConstants.LOCALE,
+            AACSPropertyConstants.COUNTRY_SUPPORTED, AACSPropertyConstants.TIMEZONE,
+            AACSPropertyConstants.WAKEWORD_ENABLED, AACSPropertyConstants.OPERATING_COUNTRY,
+            AACSPropertyConstants.VERSION, AACSPropertyConstants.NETWORK_INTERFACE};
+
     // AACS Permission
     public static final String AACS_PERMISSION = "com.amazon.alexaautoclientservice";
+    public static final String AACS_PING_PERMISSION = "com.amazon.alexaautoclientservice.ping";
 }

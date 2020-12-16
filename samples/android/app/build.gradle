@@ -7,7 +7,7 @@ android {
         minSdkVersion 22
         targetSdkVersion 28
         versionCode 1
-        versionName "3.0"
+        versionName "3.1"
     }
     buildTypes {
         release {
@@ -30,6 +30,7 @@ android {
         pickFirst 'lib/arm64-v8a/libc++_shared.so'
         pickFirst 'lib/x86/libc++_shared.so'
         pickFirst 'lib/x86_64/libc++_shared.so'
+        doNotStrip '**/*'
     }
     // Enable desugaring (dependency contains Java 8 bytecode)
     compileOptions {
@@ -39,7 +40,7 @@ android {
 }
 
 ext {
-    remoteLibVersion = "3.0+"
+    remoteLibVersion = "3.1+"
 }
 
 dependencies {
@@ -55,11 +56,15 @@ dependencies {
         remoteImplementation "com.amazon.alexa.aace:apl:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aace:cbl:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aace:car-control:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:connectivity:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aace:maccandroid:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aace:messaging:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aace:navigation:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aace:phonecontrol:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aace:sample-core:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:sample-connectivity:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:text-to-speech:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:text-to-speech-provider:${remoteLibVersion}@aar"
     }
 
     implementation 'com.android.support:appcompat-v7:28+'

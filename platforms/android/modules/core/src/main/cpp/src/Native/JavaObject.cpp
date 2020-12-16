@@ -85,6 +85,17 @@ JavaFieldPtr JavaObject::getField(const char* name, const char* signature) {
     }
 }
 
+JavaFieldPtr JavaObject::getStaticField(const char* name, const char* signature) {
+    try_with_context {
+        ThrowIfNull(m_class, "invalidJavaClass");
+        return m_class->getStaticField(name, signature);
+    }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "getStaticField", ex.what());
+        return nullptr;
+    }
+}
+
 jobject JavaObject::get() {
     return m_globalObjRef.get();
 }

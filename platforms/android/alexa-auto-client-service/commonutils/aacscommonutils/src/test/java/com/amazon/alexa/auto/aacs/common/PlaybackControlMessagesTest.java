@@ -49,8 +49,8 @@ public class PlaybackControlMessagesTest {
         assertTrue(sendResult.get());
 
         Mockito.verify(mockMessageSender, Mockito.times(1))
-                .sendMessage(
-                        Mockito.eq(Topic.PLAYBACK_CONTROLLER), Mockito.eq(Action.TOGGLE_PRESSED), Mockito.anyString());
+                .sendMessage(Mockito.eq(Topic.PLAYBACK_CONTROLLER),
+                        Mockito.eq(Action.PlaybackController.TOGGLE_PRESSED), Mockito.anyString());
     }
 
     @Test
@@ -61,7 +61,7 @@ public class PlaybackControlMessagesTest {
         assertTrue(sendResult.get());
 
         Mockito.verify(mockMessageSender, Mockito.times(1))
-                .sendMessage(
-                        Mockito.eq(Topic.PLAYBACK_CONTROLLER), Mockito.eq(Action.BUTTON_PRESSED), Mockito.anyString());
+                .sendMessage(Mockito.eq(Topic.PLAYBACK_CONTROLLER),
+                        Mockito.eq(Action.PlaybackController.BUTTON_PRESSED), Mockito.anyString());
     }
 }

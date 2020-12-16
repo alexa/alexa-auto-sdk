@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.amazon.alexa.auto.media">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="com.amazon.alexaautoclientservice"/>
+
+    <application
+        android:allowBackup="true"
+        android:usesCleartextTraffic="true"
+        android:label="@string/app_name"
+        android:supportsRtl="true">
+
+
+        <service
+            android:label="@string/app_name"
+            android:name=".browse.AlexaMediaBrowseService">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="android.media.browse.MediaBrowserService" />
+            </intent-filter>
+            <intent-filter>
+                <category android:name="com.amazon.aacs.aasb.AudioOutput" />
+
+                <action android:name="com.amazon.aacs.aasb.Pause" />
+                <action android:name="com.amazon.aacs.aasb.Play" />
+                <action android:name="com.amazon.aacs.aasb.Prepare" />
+                <action android:name="com.amazon.aacs.aasb.Stop" />
+                <action android:name="com.amazon.aacs.aasb.Resume" />
+                <action android:name="com.amazon.aacs.aasb.GetPosition" />
+                <action android:name="com.amazon.aacs.aasb.GetDuration" />
+                <action android:name="com.amazon.aacs.aasb.SetPosition" />
+                <action android:name="com.amazon.aacs.aasb.MutedStateChanged" />
+                <action android:name="com.amazon.aacs.aasb.VolumeChanged" />
+            </intent-filter>
+            <intent-filter>
+                <category android:name="com.amazon.aacs.aasb.TemplateRuntime" />
+
+                <action android:name="com.amazon.aacs.aasb.RenderPlayerInfo" />
+            </intent-filter>
+
+            <intent-filter>
+                <category android:name="com.amazon.aacs.aasb.LocalMediaSource" />
+
+                <action android:name="com.amazon.aacs.aasb.localmediasource/play" />
+                <action android:name="com.amazon.aacs.aasb.localmediasource/play_control" />
+                <action android:name="com.amazon.aacs.aasb.localmediasource/seek" />
+                <action android:name="com.amazon.aacs.aasb.localmediasource/adjust_seek" />
+                <action android:name="com.amazon.aacs.aasb.localmediasource/get_state" />
+                <action android:name="com.amazon.aacs.aasb.localmediasource/get_state_response" />
+                <action android:name="com.amazon.aacs.aasb.localmediasource/player_event" />
+                <action android:name="com.amazon.aacs.aasb.localmediasource/player_error" />
+            </intent-filter>
+        </service>
+
+        <provider
+            android:name="com.amazon.alexa.auto.media.content.AlbumArtContentProvider"
+            android:authorities="com.amazon.alexa.auto.media.provider"
+            android:exported="true" />
+
+        <receiver android:name="android.support.v4.media.session.MediaButtonReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>

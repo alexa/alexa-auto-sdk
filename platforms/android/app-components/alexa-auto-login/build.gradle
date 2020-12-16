@@ -1,0 +1,65 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        minSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+        vectorDrawables.useSupportLibrary = true
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            testCoverageEnabled true
+            debuggable true
+        }
+    }
+
+    testOptions {
+        // Unit Test: Make all android methods return true by default
+        unitTests.returnDefaultValues = true
+        unitTests.includeAndroidResources = true
+    }
+
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
+
+    libraryVariants.all { variant ->
+        variant.outputs.all {
+            def project = "alexa-auto-login"
+            def separator = "_"
+            def buildType = variant.buildType.name
+            def apkName = project + separator + buildType + ".aar"
+            outputFileName = new File(apkName)
+        }
+    }
+}
+
+dependencies {
+    implementation project(':aacscommonutils')
+    implementation project(':aacsconstants')
+
+    implementation project(":alexa-auto-apis")
+    implementation project(":alexa-auto-apps-common-ui")
+    implementation project(":alexa-auto-apps-common-util")
+
+    implementation deps.google_zxing
+    implementation deps.androidx_appcompat
+    implementation deps.androidx_constraint
+    implementation deps.androidx_viewmodel
+    implementation deps.rxjava3
+
+    testImplementation deps.junit
+    testImplementation deps.mockito
+    testImplementation deps.mockito_inline
+    testImplementation deps.androidx_arch_core_testing
+    testImplementation deps.androidx_fragment_testing
+    testImplementation deps.roboelectric
+}

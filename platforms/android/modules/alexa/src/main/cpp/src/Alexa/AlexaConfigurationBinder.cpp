@@ -378,4 +378,29 @@ JNIEXPORT jlong JNICALL Java_com_amazon_aace_alexa_config_AlexaConfiguration_cre
         return 0;
     }
 }
+
+JNIEXPORT jlong JNICALL Java_com_amazon_aace_alexa_config_AlexaConfiguration_createAuthProviderConfigBinder(
+    JNIEnv* env,
+    jobject obj,
+    jobjectArray providerNames) {
+    try {
+        std::vector<std::string> providerNamesVector;
+        int providerNamesSize = env->GetArrayLength(providerNames);
+        jstring providerName;
+
+        for (int j = 0; j < providerNamesSize; j++) {
+            providerName = (jstring)env->GetObjectArrayElement(providerNames, j);
+            providerNamesVector.push_back(JString(providerName).toStdStr());
+        }
+
+        auto config = aace::alexa::config::AlexaConfiguration::createAuthProviderConfig(providerNamesVector);
+        ThrowIfNull(config, "createAuthProviderConfigFailed");
+
+        return reinterpret_cast<long>(new aace::jni::core::config::EngineConfigurationBinder(config));
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(
+            TAG, "Java_com_amazon_aace_alexa_config_AlexaConfiguration_createAuthProviderConfigBinder", ex.what());
+        return 0;
+    }
+}
 }

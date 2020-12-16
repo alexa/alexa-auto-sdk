@@ -1,0 +1,15 @@
+@startuml
+skinparam roundcorner 10
+participant AuthorizationHandler as Authorization 
+participant "Auto SDK" as AutoSDK 
+
+== Logging out from authorization ==
+Authorization->AutoSDK : logout("service-name")
+
+alt On successful logout
+    AutoSDK->Authorization : authorizationStateChanged("service-name", UNAUTHORIZED)
+else On failed logout 
+    AutoSDK->Authorization : authorizationError("service-name", "error-as-defined-by-service", "message")
+end
+
+@enduml

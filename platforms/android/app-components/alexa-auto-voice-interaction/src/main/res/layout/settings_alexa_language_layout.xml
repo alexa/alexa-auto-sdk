@@ -1,0 +1,723 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/preference_host_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/setting_item_horizontal_margin_start"
+        android:layout_marginEnd="@dimen/setting_item_horizontal_margin"
+        android:orientation="vertical">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/enUSImage"
+                android:layout_width="@dimen/nav_bar_icon_height_width"
+                android:layout_height="@dimen/nav_bar_icon_height_width"
+                android:src="@drawable/ic_check"
+                android:layout_marginStart="@dimen/item_horizontal_margin_double"
+                app:layout_constraintTop_toTopOf="@+id/enUS"
+                app:layout_constraintStart_toEndOf="@+id/enUS"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="2" />
+
+            <LinearLayout
+                android:id="@+id/enUS"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/item_horizontal_margin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/enUSImage"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="10"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/enUSTitle"
+                    android:textAppearance="@style/Alexa.BodyText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                </TextView>
+
+                <TextView
+                    android:id="@+id/enUSSummary"
+                    android:textAppearance="@style/Alexa.HintText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                </TextView>
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/esUSImage"
+                android:layout_width="@dimen/nav_bar_icon_height_width"
+                android:layout_height="@dimen/nav_bar_icon_height_width"
+                android:src="@drawable/ic_check"
+                android:layout_marginStart="@dimen/item_horizontal_margin_double"
+                app:layout_constraintTop_toTopOf="@+id/esUS"
+                app:layout_constraintStart_toEndOf="@+id/esUS"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="2" />
+
+            <LinearLayout
+                android:id="@+id/esUS"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/item_horizontal_margin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/esUSImage"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="10"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/esUSTitle"
+                    android:textAppearance="@style/Alexa.BodyText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                </TextView>
+
+                <TextView
+                    android:id="@+id/esUSSummary"
+                    android:textAppearance="@style/Alexa.HintText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                </TextView>
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/deDEImage"
+                android:layout_width="@dimen/nav_bar_icon_height_width"
+                android:layout_height="@dimen/nav_bar_icon_height_width"
+                android:src="@drawable/ic_check"
+                android:layout_marginStart="@dimen/item_horizontal_margin_double"
+                app:layout_constraintTop_toTopOf="@+id/deDE"
+                app:layout_constraintStart_toEndOf="@+id/deDE"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="2" />
+
+            <LinearLayout
+                android:id="@+id/deDE"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/item_horizontal_margin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/deDEImage"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="10"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/deDETitle"
+                    android:textAppearance="@style/Alexa.BodyText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                </TextView>
+
+                <TextView
+                    android:id="@+id/deDESummary"
+                    android:textAppearance="@style/Alexa.HintText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                </TextView>
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/enAUImage"
+                android:layout_width="@dimen/nav_bar_icon_height_width"
+                android:layout_height="@dimen/nav_bar_icon_height_width"
+                android:src="@drawable/ic_check"
+                android:layout_marginStart="@dimen/item_horizontal_margin_double"
+                app:layout_constraintTop_toTopOf="@+id/enAU"
+                app:layout_constraintStart_toEndOf="@+id/enAU"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="2" />
+
+            <LinearLayout
+                android:id="@+id/enAU"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/item_horizontal_margin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/enAUImage"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="10"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/enAUTitle"
+                    android:textAppearance="@style/Alexa.BodyText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                </TextView>
+
+                <TextView
+                    android:id="@+id/enAUSummary"
+                    android:textAppearance="@style/Alexa.HintText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                </TextView>
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/enCAImage"
+                android:layout_width="@dimen/nav_bar_icon_height_width"
+                android:layout_height="@dimen/nav_bar_icon_height_width"
+                android:src="@drawable/ic_check"
+                android:layout_marginStart="@dimen/item_horizontal_margin_double"
+                app:layout_constraintTop_toTopOf="@+id/enCA"
+                app:layout_constraintStart_toEndOf="@+id/enCA"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="2" />
+
+            <LinearLayout
+                android:id="@+id/enCA"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/item_horizontal_margin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/enCAImage"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="10"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/enCATitle"
+                    android:textAppearance="@style/Alexa.BodyText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                </TextView>
+
+                <TextView
+                    android:id="@+id/enCASummary"
+                    android:textAppearance="@style/Alexa.HintText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                </TextView>
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/enGBImage"
+                android:layout_width="@dimen/nav_bar_icon_height_width"
+                android:layout_height="@dimen/nav_bar_icon_height_width"
+                android:src="@drawable/ic_check"
+                android:layout_marginStart="@dimen/item_horizontal_margin_double"
+                app:layout_constraintTop_toTopOf="@+id/enGB"
+                app:layout_constraintStart_toEndOf="@+id/enGB"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="2" />
+
+            <LinearLayout
+                android:id="@+id/enGB"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/item_horizontal_margin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/enGBImage"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="10"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/enGBTitle"
+                    android:textAppearance="@style/Alexa.BodyText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                </TextView>
+
+                <TextView
+                    android:id="@+id/enGBSummary"
+                    android:textAppearance="@style/Alexa.HintText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                </TextView>
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/enINImage"
+                android:layout_width="@dimen/nav_bar_icon_height_width"
+                android:layout_height="@dimen/nav_bar_icon_height_width"
+                android:src="@drawable/ic_check"
+                android:layout_marginStart="@dimen/item_horizontal_margin_double"
+                app:layout_constraintTop_toTopOf="@+id/enIN"
+                app:layout_constraintStart_toEndOf="@+id/enIN"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="2" />
+
+            <LinearLayout
+                android:id="@+id/enIN"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/item_horizontal_margin"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/enINImage"
+                app:layout_constraintHorizontal_weight="10"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="1.0">
+
+                <TextView
+                    android:id="@+id/enINTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/setting_item_vertical_margin"
+                    android:textAppearance="@style/Alexa.BodyText">
+                </TextView>
+
+                <TextView
+                    android:id="@+id/enINSummary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/Alexa.HintText">
+                </TextView>
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/esESImage"
+                android:layout_width="@dimen/nav_bar_icon_height_width"
+                android:layout_height="@dimen/nav_bar_icon_height_width"
+                android:src="@drawable/ic_check"
+                android:layout_marginStart="@dimen/item_horizontal_margin_double"
+                app:layout_constraintTop_toTopOf="@+id/esES"
+                app:layout_constraintStart_toEndOf="@+id/esES"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="2" />
+
+            <LinearLayout
+                android:id="@+id/esES"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="@dimen/item_horizontal_margin"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/esESImage"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="10"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/esESTitle"
+                    android:textAppearance="@style/Alexa.BodyText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                </TextView>
+
+                <TextView
+                    android:id="@+id/esESSummary"
+                    android:textAppearance="@style/Alexa.HintText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                </TextView>
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/esMXImage"
+                android:layout_width="@dimen/nav_bar_icon_height_width"
+                android:layout_height="@dimen/nav_bar_icon_height_width"
+                android:src="@drawable/ic_check"
+                android:layout_marginStart="@dimen/item_horizontal_margin_double"
+                app:layout_constraintTop_toTopOf="@+id/esMX"
+                app:layout_constraintStart_toEndOf="@+id/esMX"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="2" />
+
+            <LinearLayout
+                android:id="@+id/esMX"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="@dimen/item_horizontal_margin"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/esMXImage"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="10"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/esMXTitle"
+                    android:textAppearance="@style/Alexa.BodyText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                </TextView>
+
+                <TextView
+                    android:id="@+id/esMXSummary"
+                    android:textAppearance="@style/Alexa.HintText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                </TextView>
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/frCAImage"
+                android:layout_width="@dimen/nav_bar_icon_height_width"
+                android:layout_height="@dimen/nav_bar_icon_height_width"
+                android:src="@drawable/ic_check"
+                android:layout_marginStart="@dimen/item_horizontal_margin_double"
+                app:layout_constraintTop_toTopOf="@+id/frCA"
+                app:layout_constraintStart_toEndOf="@+id/frCA"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="2" />
+
+            <LinearLayout
+                android:id="@+id/frCA"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="@dimen/item_horizontal_margin"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/frCAImage"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="10"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/frCATitle"
+                    android:textAppearance="@style/Alexa.BodyText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                </TextView>
+
+                <TextView
+                    android:id="@+id/frCASummary"
+                    android:textAppearance="@style/Alexa.HintText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                </TextView>
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/frFRImage"
+                android:layout_width="@dimen/nav_bar_icon_height_width"
+                android:layout_height="@dimen/nav_bar_icon_height_width"
+                android:src="@drawable/ic_check"
+                android:layout_marginStart="@dimen/item_horizontal_margin_double"
+                app:layout_constraintTop_toTopOf="@+id/frFR"
+                app:layout_constraintStart_toEndOf="@+id/frFR"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="2" />
+
+            <LinearLayout
+                android:id="@+id/frFR"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="@dimen/item_horizontal_margin"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/frFRImage"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="10"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/frFRTitle"
+                    android:textAppearance="@style/Alexa.BodyText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                </TextView>
+
+                <TextView
+                    android:id="@+id/frFRSummary"
+                    android:textAppearance="@style/Alexa.HintText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                </TextView>
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/hiINImage"
+                android:layout_width="@dimen/nav_bar_icon_height_width"
+                android:layout_height="@dimen/nav_bar_icon_height_width"
+                android:src="@drawable/ic_check"
+                android:layout_marginStart="@dimen/item_horizontal_margin_double"
+                app:layout_constraintTop_toTopOf="@+id/hiIN"
+                app:layout_constraintStart_toEndOf="@+id/hiIN"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="2" />
+
+            <LinearLayout
+                android:id="@+id/hiIN"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="@dimen/item_horizontal_margin"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/hiINImage"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="10"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/hiINTitle"
+                    android:textAppearance="@style/Alexa.BodyText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                </TextView>
+
+                <TextView
+                    android:id="@+id/hiINSummary"
+                    android:textAppearance="@style/Alexa.HintText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                </TextView>
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/itITImage"
+                android:layout_width="@dimen/nav_bar_icon_height_width"
+                android:layout_height="@dimen/nav_bar_icon_height_width"
+                android:src="@drawable/ic_check"
+                android:layout_marginStart="@dimen/item_horizontal_margin_double"
+                app:layout_constraintTop_toTopOf="@+id/itIT"
+                app:layout_constraintStart_toEndOf="@+id/itIT"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="2" />
+
+            <LinearLayout
+                android:id="@+id/itIT"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="@dimen/item_horizontal_margin"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/itITImage"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="10"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/itITTitle"
+                    android:textAppearance="@style/Alexa.BodyText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                </TextView>
+
+                <TextView
+                    android:id="@+id/itITSummary"
+                    android:textAppearance="@style/Alexa.HintText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                </TextView>
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/jaJPImage"
+                android:layout_width="@dimen/nav_bar_icon_height_width"
+                android:layout_height="@dimen/nav_bar_icon_height_width"
+                android:src="@drawable/ic_check"
+                android:layout_marginStart="@dimen/item_horizontal_margin_double"
+                app:layout_constraintTop_toTopOf="@+id/jaJP"
+                app:layout_constraintStart_toEndOf="@+id/jaJP"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="2" />
+
+            <LinearLayout
+                android:id="@+id/jaJP"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="@dimen/item_horizontal_margin"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/jaJPImage"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="10"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/jaJPTitle"
+                    android:textAppearance="@style/Alexa.BodyText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                </TextView>
+
+                <TextView
+                    android:id="@+id/jaJPSummary"
+                    android:textAppearance="@style/Alexa.HintText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                </TextView>
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/ptBRLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/ptBRImage"
+                android:layout_width="@dimen/nav_bar_icon_height_width"
+                android:layout_height="@dimen/nav_bar_icon_height_width"
+                android:src="@drawable/ic_check"
+                android:layout_marginStart="@dimen/item_horizontal_margin_double"
+                app:layout_constraintTop_toTopOf="@+id/ptBR"
+                app:layout_constraintStart_toEndOf="@+id/ptBR"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="2" />
+
+            <LinearLayout
+                android:id="@+id/ptBR"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="@dimen/item_horizontal_margin"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/ptBRImage"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="10"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/ptBRTitle"
+                    android:textAppearance="@style/Alexa.BodyText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                </TextView>
+
+                <TextView
+                    android:id="@+id/ptBRSummary"
+                    android:textAppearance="@style/Alexa.HintText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                </TextView>
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:id="@+id/bottomMargin"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/setting_item_horizontal_bottom"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/ptBRLayout"
+            app:layout_constraintEnd_toStartOf="@+id/ptBRLayout"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:orientation="vertical">
+        </LinearLayout>
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

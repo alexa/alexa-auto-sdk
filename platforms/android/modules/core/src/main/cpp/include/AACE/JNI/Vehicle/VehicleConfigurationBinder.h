@@ -47,7 +47,6 @@ public:
                 {T::HARDWARE_ARCH, "HARDWARE_ARCH"},
                 {T::LANGUAGE, "LANGUAGE"},
                 {T::MICROPHONE, "MICROPHONE"},
-                {T::COUNTRY_LIST, "COUNTRY_LIST"},
                 {T::VEHICLE_IDENTIFIER, "VEHICLE_IDENTIFIER"}};
     }
 };

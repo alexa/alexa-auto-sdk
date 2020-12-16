@@ -7,7 +7,7 @@ android {
         minSdkVersion 22
         targetSdkVersion 28
         versionCode 1
-        versionName "3.0"
+        versionName "3.1"
     }
 
     buildTypes {
@@ -44,10 +44,18 @@ allprojects {
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar','*.aar'], dir: 'src/main/libs')
-    implementation fileTree(include: ['*.jar','*.aar'], dir: '../../app/src/main/libs')
     compileOnly fileTree(dir: "${project.rootDir}/../../../../builder/deploy/aar", include: ['core*.aar', 'apl*.aar'])
     implementation fileTree(dir: "${project.rootDir}/../../../../samples/android/modules/sample-core/build/outputs/aar", include: ['*.aar'])
+
+    // APL AARs might be in module 'app' or this module 'sample-apl'. They should not be in both modules.
+    if (file('../../app/src/main/libs/aplRelease.aar').exists()) {
+        implementation files('../../app/src/main/libs/aplRelease.aar')
+    }
+    if (file('../../app/src/main/libs/ttsplayerRelease.aar').exists()) {
+        implementation files('../../app/src/main/libs/ttsplayerRelease.aar')
+    }
+    implementation fileTree(include: ['*.aar'], dir: 'src/main/libs')
+
     implementation 'com.android.support:appcompat-v7:28+'
     implementation 'com.android.support:design:28+'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'

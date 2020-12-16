@@ -1,0 +1,19 @@
+@startuml
+
+skinparam roundcorner 10
+
+autonumber
+participant Application  order 20
+participant AuthorizationHandler  order 30
+participant "Auto SDK" as AutoSDK  order 40
+
+Application -> AuthorizationHandler : Logging out from AuthProvider authorization.
+AuthorizationHandler -> AutoSDK : logout( "alexa:auth-provider" )
+
+== Engine notifying Application to perform the logout ==
+AutoSDK -> AuthorizationHandler : eventReceived( "alexa:auth-provider", "{ "type" : "logout" }" )
+
+... Engine notifying Application as unauthorized ...
+AutoSDK -> AuthorizationHandler : authorizationStateChanged( "alexa:auth-provider", UNAUTHORIZED )
+
+@enduml

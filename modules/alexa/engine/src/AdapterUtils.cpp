@@ -95,7 +95,8 @@ rapidjson::Value buildPlaybackState(
     playerJson.AddMember(OPERATIONS, operations, allocator);
     playerJson.AddMember(POSITIONINMS, static_cast<uint64_t>(playbackState.trackOffset.count()), allocator);
     playerJson.AddMember(SHUFFLE, SHUFFLE_STATUS_STRING(playbackState.shuffleEnabled), allocator);
-    playerJson.AddMember(REPEAT, REPEAT_STATUS_STRING(playbackState.repeatEnabled), allocator);
+    playerJson.AddMember(
+        REPEAT, REPEAT_STATUS_STRING(playbackState.repeatEnabled, playbackState.repeatOneEnabled), allocator);
     playerJson.AddMember(FAVORITE, RatingToString(playbackState.favorites), allocator);
 
     rapidjson::Document media(rapidjson::kObjectType);
@@ -158,7 +159,7 @@ bool buildDefaultPlayerState(rapidjson::Value* document, rapidjson::Document::Al
     rapidjson::Value opArray(rapidjson::kArrayType);
     document->AddMember(OPERATIONS, opArray, allocator);
     document->AddMember(SHUFFLE, SHUFFLE_STATUS_STRING(false), allocator);
-    document->AddMember(REPEAT, REPEAT_STATUS_STRING(false), allocator);
+    document->AddMember(REPEAT, REPEAT_STATUS_STRING(false, false), allocator);
     document->AddMember(FAVORITE, RatingToString(Favorites::NOT_RATED), allocator);
     document->AddMember(POSITIONINMS, 0, allocator);
 

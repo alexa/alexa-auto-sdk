@@ -36,13 +36,19 @@ static const std::string TAG("aasb.carControl.AASBCarControl");
 // aliases
 using Message = aace::engine::aasb::Message;
 
+AASBCarControl::AASBCarControl(uint32_t asyncReplyTimeout) {
+    AACE_VERBOSE(LX(TAG).d("asyncReplyTimeout", asyncReplyTimeout));
+    m_replyMessageTimeout = asyncReplyTimeout;
+}
+
 std::shared_ptr<AASBCarControl> AASBCarControl::create(
-    std::shared_ptr<aace::engine::aasb::MessageBrokerInterface> messageBroker) {
+    std::shared_ptr<aace::engine::aasb::MessageBrokerInterface> messageBroker,
+    uint32_t asyncReplyTimeout) {
     try {
         ThrowIfNull(messageBroker, "invalidMessageBrokerInterface");
 
         // create the car control platform handler
-        auto carControl = std::shared_ptr<AASBCarControl>(new AASBCarControl());
+        auto carControl = std::shared_ptr<AASBCarControl>(new AASBCarControl(asyncReplyTimeout));
 
         // initialize the platform handler
         ThrowIfNot(carControl->initialize(messageBroker), "initializeAASBCarControlFailed");

@@ -1,34 +1,48 @@
 # Core Module
 
 
-The Alexa Auto SDK Core module contains the Engine base classes and the abstract platform interfaces that can be utilized by the platform and/or other modules.
+The Auto SDK Core module contains the Engine base classes and the abstract platform interfaces that the platform or other modules can use.
 
-**Table of Contents:**
+<!-- omit in toc -->
+## Table of Contents
+- [Overview](#overview)
+- [Creating the Engine](#creating-the-engine)
+- [Configuring the Engine](#configuring-the-engine)
+  - [Configuration Database Files](#configuration-database-files)
+  - [Specifying Configuration Data Using a JSON File](#specifying-configuration-data-using-a-json-file)
+  - [Specifying Configuration Data Programmatically](#specifying-configuration-data-programmatically)
+  - [Vehicle Information Requirements](#vehicle-information-requirements)
+- [Extending the Default Platform Implementation](#extending-the-default-platform-implementation)
+  - [Implementing a Location Provider](#implementing-a-location-provider)
+  - [Implementing a Network Information Provider](#implementing-a-network-information-provider)
+  - [Implementing Log Events](#implementing-log-events)
+  - [Implementing Audio](#implementing-audio)
+- [Starting the Engine](#starting-the-engine)
+- [Stopping the Engine](#stopping-the-engine)
+- [Managing Runtime Properties with the Property Manager](#managing-runtime-properties-with-the-property-manager)
+  - [Property Manager Sequence Diagrams](#property-manager-sequence-diagrams)
+  - [Implementing a Custom Property Manager Handler](#implementing-a-custom-property-manager-handler)
+  - [Property Definitions](#property-definitions)
+- [Managing Authorization](#managing-authorization)
+  - [Authorization Sequence Diagrams](#authorization-sequence-diagrams)
+  - [Using the Authorization Module](#using-the-authorization-module)
 
-* [Overview](#overview)
-* [Creating the Engine](#creating-the-engine)
-* [Configuring the Engine](#configuring-the-engine)
-* [Extending the Default Platform Implementation](#extending-the-default-platform-implementation)
-* [Starting the Engine](#starting-the-engine)
-* [Stopping the Engine](#stopping-the-engine)
-* [Managing Runtime Properties with the Property Manager](#managing-runtime-properties-with-the-property-manager)
+## Overview
 
-## Overview <a id="overview"></a>
-
-The Core module provides an easy way to integrate the Alexa Auto SDK into an application or a framework. To do this, follow these steps:
+The Core module provides an easy way to integrate the Auto SDK into an application or a framework. To do this, follow these steps:
 
 1. [Create](#creating-the-engine) and [configure](#configuring-the-engine) an instance of `aace::core::Engine`.
-2. [Override default platform implementation classes](#extending-the-default-platform-implementation) to extend the default Alexa Auto SDK platform implementation and register the platform interface handlers with the instantiated Engine.
+2. [Override default platform implementation classes](#extending-the-default-platform-implementation) to extend the default Auto SDK platform implementation and register the platform interface handlers with the instantiated Engine.
 4. [Start the Engine](#starting-the-engine).
 5. [Change the runtime settings](#getting-and-setting-core-engine-properties) if desired.
 
-## Creating the Engine <a id="creating-the-engine"></a>
+## Creating the Engine
 
 To create an instance of the Engine, call the static function `aace::core::Engine::create()`:
 
     std::shared_ptr<aace::core::Engine> engine = aace::core::Engine::create();
 
-## Configuring the Engine <a id="configuring-the-engine"></a>
+## Configuring the Engine
 
 Before you can start the Engine, you must configure it using the required `aace::core::config::EngineConfiguration` object(s) for the services you will be using:
 
@@ -56,7 +70,7 @@ Some values in the Engine configuration, such as `"defaultlocale"`, are used onl
 
 By default, the Auto SDK stores the configuration database files in the `/opt/AAC/data/` directory, but you have the option to change the path to the configuration database files as part of your Engine configuration. If you delete the database files, the Auto SDK will create new ones the next time you run the application.
 
-### Specifying Configuration Data Using a JSON File <a id = "specifying-configuration-data-using-a-json-file"></a>
+### Specifying Configuration Data Using a JSON File
 
 The Auto SDK provides a class in [`EngineConfiguration.h`](./platform/include/AACE/Core/EngineConfiguration.h) that reads the configuration from a specified JSON file and creates an `EngineConfiguration` object from that configuration:
 
@@ -76,7 +90,7 @@ auto navigationConfig = aace::core::config::ConfigurationFile::create( “naviga
 
 The [config.json.in](../../samples/cpp/assets/config.json.in) file provides an example of a JSON configuration file. If desired, you can use this file as a starting point for customizing the Engine configuration to suit your needs.
 
-### Specifying Configuration Data Programmatically <a id ="specifying-configuration-data-programmatically"></a>
+### Specifying Configuration Data Programmatically
 
 You can also specify the configuration data programmatically by using the configuration factory methods provided in the library. For example, you can configure the `alertsCapabilityAgent` settings by instantiating an `EngineConfiguration` object with the following method:
 
@@ -105,8 +119,7 @@ You must configure vehicle information in the Engine configuration. A sample con
          "os": "<OPERATING_SYSTEM>",
          "arch": "<HARDWARE_ARCH>",
          "language": "<LANGUAGE>",
-         "microphone": "<MICROPHONE>"
-         "countries": "<COUNTRY_LIST>",
+         "microphone": "<MICROPHONE>",
          "vehicleIdentifier": "<VEHICLE_IDENTIFIER>"
      }
   }
@@ -116,7 +129,7 @@ For details about the vehicle properties included in the `VehicleConfiguration` 
 
 >**Important!** To pass the certification process, the vehicle information that you provide in the Engine configuration must include a `"vehicleIdentifier"` that is NOT the vehicle identification number (VIN).
 
-## Extending the Default Platform Implementation <a id="extending-the-default-platform-implementation"></a>
+## Extending the Default Platform Implementation
 
 To extend each Auto SDK interface you will use in your platform implementation:
 
@@ -140,11 +153,11 @@ To extend each Auto SDK interface you will use in your platform implementation:
     engine->registerPlatformInterface({ myInterface1, myInterface2 });
     ```
 
-The functions that you override in the interface handlers are typically associated with directives from Alexa Voice Service (AVS). The functions that are made available by the interfaces are typically associated with events or context sent to AVS. It is not always a one-to-one mapping however, because the Alexa Auto SDK attempts to simplify the interaction with AVS.
+The functions that you override in the interface handlers are typically associated with directives from Alexa Voice Service (AVS). The functions that are made available by the interfaces are typically associated with events or context sent to AVS. It is not always a one-to-one mapping, however, because the Auto SDK attempts to simplify the interaction with AVS.
 
 The sections below provide information about and examples for creating and registering [location provider](#implementing-a-location-provider), [network information provider](#implementing-a-network-information-provider), [logging](#implementing-log-events), and [audio](#implementing-audio) interface handlers with the Engine. For details about creating handlers for the various Auto SDK modules, see the README files for those modules.
 
-### Implementing a Location Provider <a id = "implementing-a-location-provider"></a>
+### Implementing a Location Provider
 
 The Engine provides a callback for implementing location requests from Alexa and other modules and a Location type definition. This is optional and dependent on the platform implementation.
 
@@ -168,13 +181,13 @@ class MyLocationProvider : public aace::location::LocationProvider {
 engine->registerPlatformInterface( std::make_shared<MyLocationProvider>());
 ```
 
-### Implementing a Network Information Provider <a id = "implementing-a-network-information-provider"></a>
+### Implementing a Network Information Provider
 
 The `NetworkInfoProvider` platform interface provides methods that you can implement in a custom handler to allow your application to monitor network connectivity and send network status change events whenever the network status changes. Methods such as `getNetworkStatus()` and `getWifiSignalStrength()` allow the Engine to retrieve network status information, while the `networkStatusChanged()` method informs the Engine about network status changes.
 
 The `NetworkInfoProvider` methods are dependent on your platform implementation and are required by various internal Auto SDK components to get the initial network status from the network provider and update that status appropriately. When you implement the `NetworkInfoProvider` platform interface correctly, Auto SDK components that use the methods provided by this interface work more effectively and can adapt their internal behavior to the initial network status and changing network status events as they come in.
 
-> **Important!** Connectivity monitoring is the responsibility of the platform. The Alexa Auto SDK doesn't monitor network connectivity.
+> **Important!** Network connectivity monitoring is the responsibility of the platform. The Auto SDK doesn't monitor network connectivity.
 
 To implement a custom handler to monitor network connectivity and send network status change events, extend the `NetworkInfoProvider` class:
 
@@ -209,7 +222,7 @@ myNetworkInfoProvider->networkStatusChanged( networkStatus, wifiSignalStrength )
 
 ```
 
-### Implementing Log Events <a id="implementing-log-events"></a>
+### Implementing Log Events
 
 The Engine provides a callback for implementing log events from the AVS SDK. This is optional, but useful for the platform implementation.
 
@@ -221,7 +234,7 @@ To implement a custom log event handler for logging events from AVS using the de
 class MyLogger : public aace::logger::Logger {
 
   void logEvent(aace::logger::Logger::Level level, std::chrono::system_clock::time_point time, const std::string& source, const std::string& message) override {
-    //handle the log events from Alexa Auto SDK, AVS, or other source
+    //handle the log events from Auto SDK, AVS, or other source
   };
   ...
 
@@ -231,7 +244,7 @@ class MyLogger : public aace::logger::Logger {
 engine->registerPlatformInterface( std::make_shared<MyLogger>());
 ```        
     
-### Implementing Audio <a id="implementing-audio"></a>
+### Implementing Audio
 
 The platform should implement audio input and audio output handling. Other Auto SDK components can then make use of the provided implementation to provision audio input and output channels. 
   
@@ -407,7 +420,7 @@ class AudioOutputHandler :
 
 }; 
 ```
-## Starting the Engine <a id ="starting-the-engine"></a>
+## Starting the Engine
 
 After creating and registering handlers for all required platform interfaces, you can start the Engine by calling the Engine's `start()` method. The Engine will first attempt to register all listed interface handlers, and then attempt to establish a connection with the given authorization implementation.
 
@@ -415,19 +428,19 @@ After creating and registering handlers for all required platform interfaces, yo
 engine->start();
 ```
 
-## Stopping the Engine <a id ="stopping-the-engine"></a>
+## Stopping the Engine
 If you need to stop the engine for any reason except for logging out the user, use the Engine's `stop()` method. You can then restart the Engine by calling `start()` again.
 
 ```
 engine->stop();
 ```
 
-You should call `dispose()` on the Engine when the app is being destroyed or the user is logged out. This makes sure when the next user logs in, a corresponding publish message is sent to the cloud with new capabilities and configuration that is tied to the new user. 
+You should call `shutdown()` on the Engine when the app is being destroyed or the user is logged out. This makes sure when the next user logs in, a corresponding publish message is sent to the cloud with new capabilities and configuration that is tied to the new user. 
 
 ```
-engine->dispose();
+engine->shutdown();
 ```
-## Managing Runtime Properties with the Property Manager <a id ="managing-runtime-properties-with-the-property-manager"></a>
+## Managing Runtime Properties with the Property Manager
 
 Certain modules in the Auto SDK define constants (for example `FIRMWARE_VERSION` and `LOCALE`) that are used to get and set the values of runtime properties in the Engine. Changes to property values may also be initiated from the Alexa Voice Service (AVS). For example, the `TIMEZONE` property may be changed through AVS when the user changes the timezone setting in the Alexa Companion App.
 
@@ -504,4 +517,93 @@ auto locale  = m_propertyManagerHandler->getProperty(aace::alexa::property::LOCA
 The definitions of the properties used with the `PropertyManager::setProperty()` and `PropertyManager::getProperty()` methods are included in the [AlexaProperties.h](../alexa/platform/include/AACE/Alexa/AlexaProperties.h) and [CoreProperties.h](./platform/include/AACE/Core/CoreProperties.h) files. For a list of the Alexa Voice Service (AVS) supported locales for the `LOCALE` property, see the [Alexa Voice Service (AVS) documentation](https://developer.amazon.com/docs/alexa-voice-service/system.html#locales).
 
 
+## Managing Authorization
 
+The Auto SDK needs access to cloud services and resources to function. Gaining access requires that the device be authorized with an authorization service such as Login With Amazon (LWA), which provides the access token. The Engine uses the token to access cloud services and resources. For example, to access Alexa APIs, the device must be authorized with LWA to obtain the access token.
+
+The Auto SDK Authorization module is responsible for managing authorizations for different cloud services. For example, to use Alexa, your device must be authorized with LWA. The module provides a single platform interface for all authorizations and communicates with the engine services (referred to here as authorization services). The authorization service is responsible for carrying out the authorization method you choose. For example, for Alexa, you can use the CBL authorization or Auth Provider authorization method. The CBL or Auth Provider authorization service carries out the actual authorization process or flow.
+
+For information on how to use the Authorization module with different authorization methods, see the Alexa module [README](../alexa/README.md#handling-authorization) and the CBL module [README](../cbl/README.md).
+
+### Authorization Sequence Diagrams
+
+#### Starting the Authorization Process
+
+The following sequence diagram shows the typical call sequences between platform implementation and Auto SDK to start an authorization process.
+
+<details><summary>Click to expand or collapse the diagram</summary>
+<p>
+![Starting_Authorization](./assets/Authorization_start.png)
+</p>
+</details>
+
+#### Canceling the Authorization Process
+
+The following sequence diagram shows the typical call sequence between the platform implementation and Auto SDK to cancel an authorization process.
+
+<details><summary>Click to expand or collapse the diagram</summary>
+<p>
+![Cancel_Authorization](./assets/Authorization_cancel.png)
+</p>
+</details
+
+#### Logging out the Authorization
+
+The following sequence diagram shows the typical call sequence between the platform implementation and Auto SDK to log out of an authorization.
+<details><summary>Click to expand or collapse the diagram</summary>
+<p>
+![Logout_Authorization](./assets/Authorization_logout.png)
+</p>
+</details
+
+### Using the Authorization Module
+
+To implement the custom `Authorization`  handler, extend the `Authorization` class as follows:
+
+```cpp
+#include <AACE/Authorization/Authorization.h>
+
+class MyAuthorizationHandler : public aace::authorization::Authorization {     
+    // There is an event from the requested authorization service.
+    void eventReceived(const std::string& service, const std::string& event) override {
+        // Take the necessary action as defined by the service protocol.
+    }
+
+    // Authorization service notifying the platform implementation of the state change.
+    void authorizationStateChanged(const std::string& service, AuthorizationState state) override{
+        // Handle the authorization state change as required by your application.
+    }
+    
+    // Authorization service notifies an error in the process.
+    void authorizationError(const std::string& service, const std::string& error, const std::string& message) override {
+        // Handle the authorization error as required by your application.
+    }
+
+    // Authorization service needs to get the authorization-related data from the platform implementation.
+    std::string getAuthorizationData(const std::string& service, const std::string& key) override {
+        // Return the data identified by key.
+    }
+    
+    // Authorization service requires the platform implementation to store the authorization-related data.
+    void setAuthorizationData(const std::string& service, const std::string& key, const std::string& data) override {
+        // Store/Clear the data identified by the key securely on the device.
+    }
+}
+
+// Register the platform interface with the Engine
+auto m_authorizationHandler = std::make_shared<MyAuthorizationHandler>();
+engine->registerPlatformInterface( m_authorizationHandler );
+
+// To notify the Engine to start authorization process represented by `service-name`
+m_authorizationHandler->startAuthorization("service-name", "data-as-defined-by-service");
+
+// To notify the Engine to cancel authorization process represented by `service-name`, which is already in progress
+m_authorizationHandler->cancelAuthorization("service-name");
+
+// To notify the Engine to log out from the authorization for the service represented by `service-name`.
+m_authorizationHandler->logout("service-name");
+
+// To send events from the platform implementation to the authorization service.
+m_authorizationHandler->sendEvent("service-name", "event-data-as-defined-by-service");
+
+```

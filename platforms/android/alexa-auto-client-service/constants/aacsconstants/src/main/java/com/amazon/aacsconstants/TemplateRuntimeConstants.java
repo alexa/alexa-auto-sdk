@@ -22,4 +22,9 @@ public class TemplateRuntimeConstants {
     public static final String CONTROL_NAME_THUMBS_DOWN = "THUMBS_DOWN";
     public static final String CONTROL_NAME_SHUFFLE = "SHUFFLE";
     public static final String CONTROL_NAME_LOOP = "LOOP";
+
+    // Template Types
+    public static final String TEMPLATE_TYPE_LOCAL_SEARCH_DETAIL = "LocalSearchDetailTemplate1";
+    public static final String TEMPLATE_TYPE_LOCAL_SEARCH_LIST = "LocalSearchListTemplate2";
+    public static final String TEMPLATE_TYPE_TRAFFIC_DETAIL = "TrafficDetailsTemplate";
 }

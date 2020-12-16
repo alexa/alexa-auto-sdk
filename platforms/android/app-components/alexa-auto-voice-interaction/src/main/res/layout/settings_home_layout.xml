@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/item_vertical_margin_double"
+        android:layout_marginStart="@dimen/setting_item_horizontal_margin_start"
+        android:layout_marginEnd="@dimen/setting_item_horizontal_margin"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/settings_alexa"
+            android:textAppearance="@style/Alexa.Heading3Text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_alexa"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/item_vertical_margin"/>
+
+        <TextView
+            android:id="@+id/settings_aacs"
+            android:textAppearance="@style/Alexa.Heading3Text"
+            android:layout_marginTop="@dimen/item_vertical_margin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_aacs"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/item_vertical_margin"/>
+
+        <TextView
+            android:id="@+id/settings_logout"
+            android:textAppearance="@style/Alexa.Heading3Text"
+            android:layout_marginTop="@dimen/item_vertical_margin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/logout"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/item_vertical_margin"/>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

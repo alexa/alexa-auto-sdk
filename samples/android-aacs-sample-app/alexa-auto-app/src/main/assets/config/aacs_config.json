@@ -1,0 +1,75 @@
+{
+  "aacs.aasb": {
+    "version": "3.1"
+  },
+  "aacs.alexa": {
+    "deviceInfo": {
+      "clientId": "",
+      "productId" : "",
+      "deviceSerialNumber": "",
+      "manufacturerName": "",
+      "description": ""
+    },
+    "localMediaSource": {
+      "types": []
+    }
+  },
+  "aacs.vehicle": {
+    "info": {
+      "make": "Amazon",
+      "model": "AACE",
+      "year": "2019",
+      "trim": "aac",
+      "geography": "US",
+      "version": "1.2.3",
+      "os": "Sample OS 1.0",
+      "arch": "Sample Arch 1.0",
+      "language": "en-US",
+      "microphone": "SingleArray",
+      "countries": "US,GB,IE,CA,DE,AT,IN,JP,AU,NZ,FR",
+      "vehicleIdentifier": "Sample Identifier ABC"
+    },
+    "operatingCountry": "US"
+  },
+  "aacs.cbl": {
+    "enableUserProfile": false
+  },
+  "aacs.general": {
+    "version": "1.0",
+    "persistentSystemService": false,
+    "startServiceOnBootEnabled": false
+  },
+  "aacs.defaultPlatformHandlers": {
+    "useDefaultLocationProvider": true,
+    "useDefaultNetworkInfoProvider": true,
+    "useDefaultExternalMediaAdapter": true,
+    "useDefaultPropertyManager": true,
+    "audioInput": {
+      "audioType": {
+        "VOICE": {
+          "useDefault": true,
+          "audioSource": "MediaRecorder.AudioSource.MIC"
+        }
+      }
+    },
+    "audioOutput": {
+      "audioType": {
+        "TTS": {
+          "useDefault": true
+        },
+        "ALARM": {
+          "useDefault": true
+        },
+        "MUSIC": {
+          "useDefault": false
+        },
+        "NOTIFICATION": {
+          "useDefault": true
+        },
+        "RINGTONE": {
+          "useDefault": true
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linearLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/transparent_black">
+
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="@dimen/poi_card_width"
+        android:layout_height="wrap_content"
+        android:background="@drawable/local_search_background"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="@dimen/card_margin_top"
+        app:layout_constraintHeight_max="@dimen/constrained_max_height"
+        app:layout_constrainedHeight="true"
+        >
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/alexa_header_height"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/local_search_detail_header_margin_top">
+
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="@dimen/alexa_logo_width"
+                android:layout_height="wrap_content"
+                android:src="@drawable/alexa_placeholder_logo"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <ImageView
+                android:id="@+id/close_button"
+                android:layout_width="@dimen/close_button_height_width"
+                android:layout_height="@dimen/close_button_height_width"
+                android:src="@drawable/ic_cancel"
+                android:layout_marginEnd="@dimen/close_button_margin_end"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/poi_detail_content_margin_start"
+            android:layout_marginTop="@dimen/poi_card_content_margin_top"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/local_search_detail_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Coffee Shop"
+                style="@style/LocalSearchDetailTitleText" />
+
+            <LinearLayout
+                android:id="@+id/yelp_rating_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/yelp_info_margin_top"
+                android:orientation="horizontal">
+                <ImageView
+                    android:id="@+id/yelp_rating_image"
+                    android:layout_width="@dimen/local_search_detail_yelp_star_width"
+                    android:layout_height="@dimen/local_search_detail_yelp_star_height"
+                    android:scaleType="centerCrop"
+                    android:layout_marginTop="@dimen/yelp_image_margin_top"
+                    />
+                <TextView
+                    android:id="@+id/yelp_review_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/yelp_reviews_margin_left"
+                    style="@style/LocalSearchListItemYelpTextStyle"
+                    tools:text="(257)"/>
+
+                <TextView
+                    android:id="@+id/provider"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/provider_margin_start"
+                    style="@style/LocalSearchListItemYelpTextStyle"
+                    android:text="@string/yelp_provider"/>
+            </LinearLayout>
+            <TextView
+                android:id="@+id/local_search_hours_of_operation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/poi_detail_content_margin_top"
+                style="@style/LocalSearchOpenTimeText"
+                tools:text="Today: 11 AM - 7 PM" />
+
+            <TextView
+                android:id="@+id/local_search_address"
+                android:layout_width="@dimen/poi_detail_address_width"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/poi_detail_content_margin_top"
+                android:layout_marginStart="@dimen/local_search_address_margin_start"
+                tools:text="3501 Tasman Dr, Santa Clara, CA 95054"
+                style="@style/LocalSearchDetailAddressText" />
+
+
+            <LinearLayout
+                android:id="@+id/distance_eta_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/poi_detail_large_margin"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/local_search_distance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="9 mi"
+                    style="@style/LocalSearchDetailDistanceEtaText"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/separator"
+                    style="@style/LocalSearchDetailDistanceEtaText"
+                    />
+                <TextView
+                    android:id="@+id/local_search_eta"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="5 min"
+                    style="@style/LocalSearchDetailDistanceEtaText"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/action_buttons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/poi_detail_large_margin"
+                android:layout_marginBottom="@dimen/action_buttons_margin_bottom"
+                android:layout_marginEnd="@dimen/action_button_margin_end"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/call_button"
+                    android:layout_width="@dimen/call_button_width"
+                    android:layout_height="wrap_content"
+                    android:text="@string/call_button_text"
+                    android:gravity="center"
+                    style="@style/LocalSearchDarkButtonBackground"
+                    android:layout_weight="1"
+                    />
+
+                <TextView
+                    android:id="@+id/navigate_button"
+                    android:layout_width="@dimen/navigate_button_width"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/button_margin_start"
+                    android:text="@string/navigate_button_text"
+                    android:gravity="center"
+                    style="@style/LocalSearchLightButtonBackground"
+                    android:layout_weight="1"
+                    />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

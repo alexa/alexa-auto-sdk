@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/transparent_black">
+
+    <LinearLayout
+        android:id="@+id/local_search_list_card"
+        android:layout_width="@dimen/poi_card_width"
+        android:layout_height="wrap_content"
+        android:background="@drawable/local_search_background"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="@dimen/card_margin_top"
+        app:layout_constraintHeight_max="@dimen/constrained_max_height"
+        app:layout_constrainedHeight="true">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/alexa_header_height"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/local_search_list_header_margin_top">
+
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="@dimen/alexa_logo_width"
+                android:layout_height="wrap_content"
+                android:src="@drawable/alexa_placeholder_logo"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/close_button"
+                android:layout_width="@dimen/close_button_height_width"
+                android:layout_height="@dimen/close_button_height_width"
+                android:src="@drawable/ic_cancel"
+                android:layout_marginEnd="@dimen/close_button_margin_end"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/poi_title_height"
+            android:layout_marginTop="@dimen/header_margin_top"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/poi_card_title_text"
+                style="@style/LocalSearchTitleText"
+                android:layout_width="@dimen/poi_title_text_width"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/poi_card_margin_start"
+                android:layout_weight="1"
+                tools:text="COFFEE SHOPS" />
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/poi_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="vertical" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -59,7 +59,7 @@ public:
     /**
      * Notifies the Engine of a volume change event
      * originating on the platform, such as a user pressing a "volume up" or "volume down"
-     * button. If the Speaker is @c Type::AVS_SPEAKER_VOLUME, the Engine will respond with a
+     * button. If the Speaker is @c Type::ALEXA_VOLUME, the Engine will respond with a
      * call to @c setVolume() on each AVS-synced Speaker.
      *
      * @param [in] type The type of Alexa speaker being set.
@@ -84,7 +84,7 @@ public:
     /**
      * Notifies the Engine of a mute setting change event
      * originating on the platform, such as a user pressing a "mute" button.
-     * If the Speaker is @c Type::AVS_SPEAKER_VOLUME, the Engine will respond with a
+     * If the Speaker is @c Type::ALEXA_VOLUME, the Engine will respond with a
      * call to @c setMute() on each AVS-synced Speaker.
      *
      * @param [in] type The type of Alexa speaker being set.

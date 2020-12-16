@@ -15,6 +15,9 @@
 
 #include "SampleApp/Application.h"
 
+// Sample Text To Speech Platform Interfaces
+#include "SampleApp/TextToSpeech/TextToSpeechHandler.h"
+
 // C++ Standard Library
 #ifdef __linux__
 #include <linux/limits.h>  // PATH_MAX
@@ -158,11 +161,8 @@ void Application::printMenu(
     if (menu.count("item")) {
         unsigned keyMax = 0;
         for (auto& item : menu.at("item")) {
-            if (item.count("test")) {  // optional item.test
-                auto value = item.at("test").get<std::string>();
-                if (!applicationContext->test(value)) {
-                    continue;
-                }
+            if (!testMenuItem(applicationContext, item)) {
+                continue;
             }
             auto key = item.at("key").get<std::string>();  // required item.key
             auto keyLength = key.length();
@@ -172,11 +172,8 @@ void Application::printMenu(
         }
         unsigned index = 0;
         for (auto& item : menu.at("item")) {
-            if (item.count("test")) {  // optional item.test
-                auto value = item.at("test").get<std::string>();
-                if (!applicationContext->test(value)) {
-                    continue;
-                }
+            if (!testMenuItem(applicationContext, item)) {
+                continue;
             }
             auto action = item.at("do").get<std::string>();  // required item.do
             auto key = item.at("key").get<std::string>();    // required item.key
@@ -368,6 +365,7 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
 
     // Create configuration files for --config files path passed from the command line
     std::vector<std::shared_ptr<aace::core::config::EngineConfiguration>> configurationFiles;
+
     auto configFilePaths = applicationContext->getConfigFilePaths();
     for (auto& configFilePath : configFilePaths) {
         auto configurationFile = aace::core::config::ConfigurationFile::create(configFilePath);
@@ -515,10 +513,11 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     Ensures(audioPlayerHandler != nullptr);
     Ensures(engine->registerPlatformInterface(audioPlayerHandler));
 
-    // CBL
-    auto cblHandler = cbl::CBLHandler::create(activity, loggerHandler);
-    Ensures(cblHandler != nullptr);
-    Ensures(engine->registerPlatformInterface(cblHandler));
+    // Authorization
+    auto authorizationHandler = authorization::AuthorizationHandler::create(activity, loggerHandler);
+    Ensures(authorizationHandler != nullptr);
+    Ensures(engine->registerPlatformInterface(authorizationHandler));
+    authorizationHandler->saveDeviceInfo(jsonConfigs);
 
     // Alerts
     auto doNotDisturbHandler = alexa::DoNotDisturbHandler::create(activity, loggerHandler);
@@ -539,10 +538,31 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     }
 #endif  // ALEXACOMMS
 
+#ifdef LOCALVOICECONTROL
+    // Local Search Provider
+    auto localSearchProvider = localNavigation::LocalSearchProviderHandler::create(loggerHandler);
+    Ensures(localSearchProvider != nullptr);
+    Ensures(engine->registerPlatformInterface(localSearchProvider));
+#endif  // LOCALVOICECONTROL
+
+#ifdef TEXT_TO_SPEECH
+    // Text To Speech Handler
+    auto textToSpeechHandler = textToSpeech::TextToSpeechHandler::create(activity, loggerHandler);
+    Ensures(textToSpeechHandler != nullptr);
+    Ensures(engine->registerPlatformInterface(textToSpeechHandler));
+#endif  // TEXT_TO_SPEECH
+
     // Equalizer Controller
     auto equalizerControllerHandler = alexa::EqualizerControllerHandler::create(activity, loggerHandler);
     Ensures(equalizerControllerHandler != nullptr);
     Ensures(engine->registerPlatformInterface(equalizerControllerHandler));
+
+#ifdef CONNECTIVITY
+    // Alexa Connectivity
+    auto alexaConnectivityHandler = connectivity::AlexaConnectivityHandler::create(activity, loggerHandler);
+    Ensures(alexaConnectivityHandler != nullptr);
+    Ensures(engine->registerPlatformInterface(alexaConnectivityHandler));
+#endif  // CONNECTIVITY
 
     std::vector<std::pair<aace::alexa::LocalMediaSource::Source, std::shared_ptr<alexa::LocalMediaSourceHandler>>>
         LocalMediaSources = {{aace::alexa::LocalMediaSource::Source::BLUETOOTH, nullptr},
@@ -614,6 +634,12 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     auto templateRuntimeHandler = alexa::TemplateRuntimeHandler::create(activity, loggerHandler);
     Ensures(templateRuntimeHandler != nullptr);
     Ensures(engine->registerPlatformInterface(templateRuntimeHandler));
+
+    // Text To Speech Handler
+    auto textToSpeechHandler =
+        textToSpeech::TextToSpeechHandler::create(activity, loggerHandler, defaultAudioOutputProvider);
+    Ensures(textToSpeechHandler != nullptr);
+    Ensures(engine->registerPlatformInterface(textToSpeechHandler));
 
     auto addressBookHandler = addressBook::AddressBookHandler::create(activity, loggerHandler);
     Ensures(addressBookHandler != nullptr);
@@ -692,7 +718,7 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
         auto id = std::string("main");
         if (applicationContext->hasUserConfigFilePath()) {
             // For user configurations, automatically authenticate with CBL
-            activity->notify(Event::onCBLStart);
+            activity->notify(Event::onStartCBLAuthorization);
         } else if (applicationContext->hasMenu("user")) {
             // If not logged in, and user menu is available, run it instead of main
             id = std::string("user");
@@ -819,11 +845,8 @@ Status Application::runMenu(
             unsigned index = 0;
             // break range-based for loop
             for (auto& item : menuPtr->at("item")) {
-                if (item.count("test")) {  // optional item.test
-                    auto value = item.at("test").get<std::string>();
-                    if (!applicationContext->test(value)) {
-                        continue;
-                    }
+                if (!testMenuItem(applicationContext, item)) {
+                    continue;
                 }
                 auto key = item.at("key").get<std::string>();  // required item.key
                 if (key == "esc" || key == "ESC") {
@@ -901,7 +924,7 @@ Status Application::runMenu(
                     } else if (action == "Logout") {
                         console->printLine("Are you sure you want to logout Y/n?");
                         if ('Y' == static_cast<unsigned char>(fgetc(stdin))) {
-                            applicationContext->clearRefreshToken();
+                            activity->notify(Event::onLogoutCBLAuthorization);
                             applicationContext->clearUserConfigFilePath();
                             status = Status::Restart;
                         } else {
@@ -1039,7 +1062,8 @@ void Application::setupMenu(
              * https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/system.html#locales
              */
             std::string supportedLocales =
-                "de-DE,en-AU,en-CA,en-GB,en-IN,en-US,es-ES,es-MX,es-US,fr-CA,fr-FR,hi-IN,it-IT,ja-JP,pt-BR";
+                "de-DE,en-AU,en-CA,en-GB,en-IN,en-US,es-ES,es-MX,es-US,fr-CA,fr-FR,hi-IN,it-IT,ja-JP,pt-BR,en-CA/"
+                "fr-CA,en-IN/hi-IN,en-US/es-US,es-US/en-US,fr-CA/en-CA,hi-IN/en-IN";
             std::istringstream iss{supportedLocales};
             auto token = std::string();
             unsigned count = std::count(supportedLocales.begin(), supportedLocales.end(), ',') + 1;
@@ -1093,6 +1117,15 @@ void Application::setupMenu(
             console->printLine("Error: could not load menu", path);
         }
     }
+}
+
+bool Application::testMenuItem(std::shared_ptr<ApplicationContext> applicationContext, const json& item) {
+    std::string name = item.count("test") ? "test" : item.count("when") ? "when" : "";
+    if (!name.empty()) {
+        auto value = item.at(name).get<std::string>();
+        return applicationContext->testExpression(value);
+    }
+    return true;
 }
 
 }  // namespace sampleApp

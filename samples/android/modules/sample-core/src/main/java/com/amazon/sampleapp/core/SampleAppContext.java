@@ -5,6 +5,7 @@ import android.support.v4.view.ViewPager;
 
 import com.amazon.aace.alexa.SpeechRecognizer;
 import com.amazon.aace.audio.AudioOutputProvider;
+import com.amazon.aace.propertyManager.PropertyManager;
 
 import org.json.JSONObject;
 
@@ -28,4 +29,6 @@ public interface SampleAppContext {
     String getData(String key);
 
     JSONObject getConfigFromFile(String configAssetName, String configRootKey);
+
+    PropertyManager getPropertyManager();
 }

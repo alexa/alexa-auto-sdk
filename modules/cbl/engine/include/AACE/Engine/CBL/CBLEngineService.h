@@ -37,6 +37,7 @@ public:
 
 protected:
     bool configure(std::shared_ptr<std::istream> configuration) override;
+    bool setup() override;
     bool start() override;
     bool stop() override;
     bool shutdown() override;
@@ -57,6 +58,7 @@ private:
     std::chrono::seconds m_codePairRequestTimeout;
     std::string m_endpoint;
     bool m_enableUserProfile;
+    std::shared_ptr<CBLAuthorizationProvider> m_cblAuthorizationProvider;
 };
 
 }  // namespace cbl

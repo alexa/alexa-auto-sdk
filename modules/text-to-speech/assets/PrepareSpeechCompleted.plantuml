@@ -1,0 +1,16 @@
+@startuml
+skinparam roundcorner 10
+participant Application 
+participant TextToSpeechHandler 
+participant "Auto SDK"
+Application->TextToSpeechHandler: "Synthesize Alexa speech - Hello"
+
+alt
+	TextToSpeechHandler-->"Auto SDK" : prepareSpeech( "ID-123", "Hello", "text-to-speech-provider", "" )
+else
+	TextToSpeechHandler-->"Auto SDK" : prepareSpeech( "ID-123", "<speak> Hello </speak>", "text-to-speech-provider", "" )	
+end
+
+"Auto SDK"->TextToSpeechHandler: true
+"Auto SDK"->TextToSpeechHandler: prepareSpeechCompleted( "ID-123" , std::shared_ptr<aace::audio::AudioStream> , "" )
+@enduml

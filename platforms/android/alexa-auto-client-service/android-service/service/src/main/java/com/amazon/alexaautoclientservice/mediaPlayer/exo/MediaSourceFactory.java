@@ -18,9 +18,10 @@ package com.amazon.alexaautoclientservice.mediaPlayer.exo;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.amazon.aacsconstants.AACSConstants;
 import com.google.android.exoplayer2.C;

@@ -19,6 +19,7 @@
 #include <string>
 #include <unordered_map>
 #include <memory>
+#include <mutex>
 
 #include "JavaMethod.h"
 #include "JavaField.h"
@@ -65,6 +66,9 @@ private:
     static std::unordered_map<std::string, std::shared_ptr<JavaClass>> s_javaClassRegistry;
     static GlobalRef<jobject> s_classLoaderObjectRef;
     static jmethodID s_findClassMethodID;
+
+    // mutex
+    static std::mutex s_mutex;
 };
 
 using JavaClassPtr = std::shared_ptr<JavaClass>;

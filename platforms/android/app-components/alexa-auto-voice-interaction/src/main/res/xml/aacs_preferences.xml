@@ -1,0 +1,87 @@
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style"
+    app:iconSpaceReserved="false">
+
+    <SwitchPreferenceCompat
+        app:key="aacs-override-base-config"
+        app:title="@string/preference_aacs_override_base_config_title"
+        app:summary="@string/preference_aacs_override_base_config_summary"
+        app:iconSpaceReserved="false"/>
+
+    <PreferenceCategory
+        app:title="@string/preference_category_aacs_service"
+        app:iconSpaceReserved="false"
+        app:dependency="aacs-override-base-config">
+        <SwitchPreferenceCompat
+            app:key="aacs-startonboot"
+            app:title="@string/preference_aacs_startonboot"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="@string/preference_category_aacs_defaults"
+        app:iconSpaceReserved="false"
+        app:dependency="aacs-override-base-config">
+        <SwitchPreferenceCompat
+            app:key="aacs-audio-input-internal"
+            app:title="@string/preference_aacs_use_aacs_audio_input"
+            app:defaultValue="true"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="@string/preference_category_alexa_device"
+        app:iconSpaceReserved="false"
+        app:dependency="aacs-override-base-config">
+        <EditTextPreference
+            app:key="avs-device-clientid"
+            app:title="@string/preference_avsdevice_clientid"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false"/>
+        <EditTextPreference
+            app:key="avs-device-productid"
+            app:title="@string/preference_avsdevice_productid"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false"/>
+        <EditTextPreference
+            app:key="avs-device-dsn"
+            app:title="@string/preference_avsdevice_dsn"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false"/>
+        <EditTextPreference
+            app:key="avs-device-manufacturer"
+            app:title="@string/preference_avsdevice_manufacturer"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="@string/preference_category_aacs_control"
+        app:iconSpaceReserved="false">
+        <Preference
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:singleLineTitle="true"
+            app:iconSpaceReserved="false"
+            app:key="aacs-reboot-apply-config"
+            app:title="@string/preference_aacs_reboot_now"/>
+        <Preference
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:singleLineTitle="true"
+            app:iconSpaceReserved="false"
+            app:key="aacs-shutdown"
+            app:title="@string/preference_aacs_shutdown"/>
+        <Preference
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:singleLineTitle="true"
+            app:iconSpaceReserved="false"
+            app:key="aacs-start"
+            app:title="@string/preference_aacs_start"/>
+    </PreferenceCategory>
+</androidx.preference.PreferenceScreen>

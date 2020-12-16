@@ -32,6 +32,7 @@ public:
     JavaClassPtr getClass();
     JavaMethodPtr getMethod(const char* name, const char* signature);
     JavaFieldPtr getField(const char* name, const char* signature);
+    JavaFieldPtr getStaticField(const char* name, const char* signature);
 
     // jobject reference accessor
     jobject get();
@@ -56,6 +57,12 @@ public:
     bool get(const char* name, T* value);
     template <class T>
     bool get(JavaFieldPtr field, T* value);
+    template <class T>
+    bool getStatic(const char* name, const char* signature, T* value);
+    template <class T>
+    bool getStatic(const char* name, T* value);
+    template <class T>
+    bool getStatic(JavaFieldPtr field, T* value);
 
     // assignment opperator
     JavaObject& operator=(const JavaObject& jobj) {
@@ -143,7 +150,21 @@ bool JavaObject::get(const char* name, const char* signature, T* value) {
         return get<T>(field, value);
     }
     catch_with_ex {
-        AACE_JNI_ERROR("aace.jni.native.JavaObject", "set", ex.what());
+        AACE_JNI_ERROR("aace.jni.native.JavaObject", "get", ex.what());
+        return false;
+    }
+}
+
+template <class T>
+bool JavaObject::getStatic(const char* name, const char* signature, T* value) {
+    try_with_context {
+        auto field = getStaticField(name, signature);
+        ThrowIfNull(field, "invalidField");
+
+        return getStatic<T>(field, value);
+    }
+    catch_with_ex {
+        AACE_JNI_ERROR("aace.jni.native.JavaObject", "getStatic", ex.what());
         return false;
     }
 }
@@ -655,6 +676,11 @@ inline bool JavaObject::get<jdouble>(const char* name, jdouble* result) {
 }
 
 template <>
+inline bool JavaObject::getStatic<jdouble>(const char* name, jdouble* result) {
+    return getStatic<jdouble>(name, "D", result);
+}
+
+template <>
 inline bool JavaObject::set<jdouble>(JavaFieldPtr field, jdouble value) {
     try_with_context {
         ThrowIfNull(m_globalObjRef.get(), "invalidObjectReference");
@@ -678,6 +704,19 @@ inline bool JavaObject::get<jdouble>(JavaFieldPtr field, jdouble* result) {
     }
     catch_with_ex {
         AACE_JNI_ERROR("aace.jni.native.JavaObject", "get<jdouble>", ex.what());
+        return false;
+    }
+}
+
+template <>
+inline bool JavaObject::getStatic<jdouble>(JavaFieldPtr field, jdouble* result) {
+    try_with_context {
+        *result = env->GetStaticDoubleField(m_class->get(), field->getFieldID());
+        ThrowIfJavaEx(env, "GetStaticDoubleFailed");
+        return true;
+    }
+    catch_with_ex {
+        AACE_JNI_ERROR("aace.jni.native.JavaObject", "getStatic<jdouble>", ex.what());
         return false;
     }
 }

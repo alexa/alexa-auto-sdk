@@ -146,7 +146,7 @@ The unsigned version of the AACS APK is in `builder/deploy/apk`. Go to [Signing 
 The AACS Gradle build is configured to use JCenter to always pull the latest release artifacts during compilation. The pre-built platform AARs for the default modules and the AARs required to build AACS are available in the JCenter repo. To run the build, enter the following commands:
 
 ```
-    $ cd ${AAC_SDK_HOME}/platforms/android/alex-auto-client-service/android-service
+    $ cd ${AAC_SDK_HOME}/platforms/android/alexa-auto-client-service/android-service
     $ gradle assembleRemoteRelease
 ```
 
@@ -164,6 +164,7 @@ To sign the AACS APK, follow these steps:
 3. Enter one of the following commands to optimize the APK files, depending on whether you have the local or remote build flavor:
    
     `zipalign -v -p 4 service-local-release-unsigned.apk service-local-release-unsigned-aligned.apk`
+
     `zipalign -v -p 4 service-local-release-unsigned.apk service-remote-release-unsigned-aligned.apk`
 
     `zipalign` is included in the Android SDK Build Tools. On a Mac, it is usually located in this directory:
@@ -258,6 +259,8 @@ The default prefix is `${HOME}/gcc-linaro-7.4.1-2019.02-`. The `<build>-<host>` 
 Additionally, you need the cross `sysroot` directory for your cross targets. The Auto SDK Builder tries to find `sysroot` under the `${HOME}/sysroots` directory by default. The `sysroot` directory name must match the `<host>` value from the toolchain. For ARMv7A HF targets, install your copy of `sysroot` in `${HOME}/sysroots/arm-linux-gnueabihf`.
 
 To change this behavior, specify the search path via the `--linaro-sysroots` option. The default search path is `${HOME}/sysroots`.
+
+  >**Note:**  The sysroot from the Linaro website is extremely minimal and is not sufficient for building the Auto SDK. For example, it does not include the required connectivity, multimedia, and other support packages. Linaro Linux target is intended for generic Linux ARM targets, which have their own build or vendor provided sysroots. Make sure to use the sysroot for your target root filesystem, not the Linaro sysroot.
 
 ### Additional Setup for Android Targets
 * Install the following required software on your host:

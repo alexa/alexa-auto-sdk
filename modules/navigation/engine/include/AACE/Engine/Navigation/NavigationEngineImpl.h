@@ -83,7 +83,7 @@ private:
     std::shared_ptr<displaymanager::DisplayManagerCapabilityAgent> m_displayManagerCapabilityAgent;
     std::shared_ptr<navigationassistance::NavigationAssistanceCapabilityAgent> m_navigationAssistanceCapabilityAgent;
     //    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> m_directiveSequencer;
-    const std::string& m_navigationProviderName;
+    std::string m_navigationProviderName;
 };
 
 }  // namespace navigation

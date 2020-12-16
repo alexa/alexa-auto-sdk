@@ -24,7 +24,9 @@ namespace aace {
 namespace cbl {
 
 /**
- *CBL should be extended to perform CBL authentication 
+ * CBL should be extended to perform CBL authentication 
+ * 
+ * @deprecated This platform interface is being deprecated. Use `aace::authorization::Authorization` instead.
  */
 class CBL : public aace::core::PlatformInterface {
 protected:
@@ -33,6 +35,8 @@ protected:
 public:
     /**
      * Specifies the state of the authorization flow
+     * 
+     * @deprecated This enum is being deprecated as this platform interface is being deprecated.
      */
     enum class CBLState {
 
@@ -69,6 +73,8 @@ public:
 
     /**
      * Specifies the reason for the state change
+     * 
+     * @deprecated This enum is being deprecated as this platform interface is being deprecated.
      */
     enum class CBLStateChangedReason {
 
@@ -107,6 +113,8 @@ public:
 
     /**
      * Notifies the platform implementation of an authorization flow state change
+     * 
+     * @deprecated This method is being deprecated as this platform interface is being deprecated.
      */
     virtual void cblStateChanged(
         CBLState state,
@@ -116,36 +124,53 @@ public:
 
     /**
      * Notifies the platform implementation to clear the refresh token
+     * 
+     * @deprecated This method is being deprecated as this platform interface is being deprecated.
      */
     virtual void clearRefreshToken() = 0;
 
     /**
      * Notifies the platform implemnentation to set the refresh token
+     * 
+     * @deprecated This method is being deprecated as this platform interface is being deprecated.
      */
     virtual void setRefreshToken(const std::string& refreshToken) = 0;
 
     /**
      * Returns the refresh token stored by the platform implementation, otherwise return an empty string
+     * 
+     * @deprecated This method is being deprecated as this platform interface is being deprecated.
      */
     virtual std::string getRefreshToken() = 0;
 
     /**
      * Notifies the platform implementation to set the user profile
      * requestUserProfile must be enabled in configuration
+     * 
+     * @deprecated This method is being deprecated as this platform interface is being deprecated.
      */
     virtual void setUserProfile(const std::string& name, const std::string& email) = 0;
+
     /**
      * Notifies the Engine to begin the authorization process
+     * 
+     * @deprecated This method is being deprecated as this platform interface is being deprecated.
      */
     void start();
 
     /** 
      * Notifies the Engine to cancel the authorization process
+     * 
+     * @deprecated This method is being deprecated as this platform interface is being deprecated.
      */
     void cancel();
 
     /**
      * Notifies the Engine to reset the authorization state
+     * 
+     * @deprecated This method is being deprecated as this platform interface is being deprecated.
+     * 
+     * Note: Starting with Auto SDK 3.1, this API ensures that all the persisted user-related data is removed. You no longer have to restart the Engine before starting the next user login process.
      */
     void reset();
 

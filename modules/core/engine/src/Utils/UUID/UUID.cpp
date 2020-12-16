@@ -132,6 +132,12 @@ const std::string generateUUID() {
     return uuidText.str();
 }
 
+bool compare(const std::string& uuid1, const std::string& uuid2) {
+    return std::equal(uuid1.begin(), uuid1.end(), uuid2.begin(), [](unsigned char a, unsigned char b) -> bool {
+        return std::toupper(a) == std::toupper(b);
+    });
+}
+
 }  // namespace uuid
 }  // namespace utils
 }  // namespace engine

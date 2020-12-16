@@ -1,0 +1,14 @@
+{
+  "header" : {
+    "version" : "3.0",
+    "messageType" : "Publish",
+    "id" : "id-SampleText",
+    "messageDescription" : {
+      "topic" : "SpeechRecognizer",
+      "action" : "WakewordDetected"
+    }
+  },
+  "payload" : {
+    "wakeword" : "wakeword-SampleText"
+  }
+}

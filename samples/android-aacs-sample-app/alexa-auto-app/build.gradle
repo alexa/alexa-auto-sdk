@@ -1,0 +1,102 @@
+apply plugin: 'com.android.application'
+apply plugin: 'androidx.navigation.safeargs'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "com.amazon.alexa.auto.app"
+        minSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            testCoverageEnabled true
+            debuggable true
+        }
+    }
+
+    testOptions {
+        // Unit Test: Make all android methods return true by default
+        unitTests.returnDefaultValues = true
+        unitTests.includeAndroidResources = true
+    }
+
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
+
+    buildFeatures {
+        viewBinding = true
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            def project = "alexa-auto-app"
+            def separator = "_"
+            def buildType = variant.buildType.name
+            def version = variant.versionName
+            def apkName = project + separator + buildType + separator + version + ".apk"
+            outputFileName = new File(apkName)
+        }
+    }
+}
+
+dependencies {
+    // AACS Projects.
+    implementation project(':aacsconstants')
+    implementation project(':aacsipc')
+    implementation project(':aacscommonutils')
+
+    // AACS Sample App Projects.
+    implementation project(':alexa-auto-apis')
+    implementation project(":alexa-auto-apps-common-ui")
+    implementation project(':alexa-auto-apps-common-util')
+    implementation project(':alexa-auto-lwa-auth')
+    implementation project(':alexa-auto-login')
+    implementation project(':alexa-auto-media-player')
+    implementation project(':alexa-auto-voice-interaction')
+    implementation project(':alexa-auto-navigation')
+
+    // AndroidX dependencies
+    implementation deps.androidx_annotation
+    implementation deps.androidx_appcompat
+    implementation deps.androidx_core
+    implementation deps.androidx_constraint
+    implementation deps.androidx_preference
+
+    // Kotlin
+    implementation deps.kotlin_stdlib
+    implementation deps.androidx_core_ktx
+
+    // Navigation between UI components.
+    implementation deps.androidx_navigation_fragment
+    implementation deps.androidx_navigation_ui
+
+    // Dagger
+    implementation deps.dagger
+    kapt deps.dagger_compiler
+
+    // RX
+    implementation deps.rxjava3
+
+    //Event Bus
+    implementation deps.eventbus
+
+    //Unit Tests
+    testImplementation deps.junit
+    testImplementation deps.mockito
+    testImplementation deps.mockito_inline
+    testImplementation deps.androidx_test_core
+    testImplementation deps.androidx_arch_core_testing
+    testImplementation deps.roboelectric
+}

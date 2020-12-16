@@ -1,7 +1,7 @@
 rootProject.name = 'aace'
 
 // Include all basic modules
-include ':alexa', ':apl', 'car-control', ':cbl', ':contactuploader', ':core', ':maccandroid', ':messaging', ':navigation', ':phonecontrol', ':addressbook'
+include ':alexa', ':apl', 'car-control', ':cbl', ':connectivity', ':contactuploader', ':core', ':maccandroid', ':messaging', ':navigation', ':phonecontrol', ':addressbook', ':text-to-speech', ':text-to-speech-provider'
 
 // Include extra modules if any
 if (hasProperty('aace.extraModules')) {

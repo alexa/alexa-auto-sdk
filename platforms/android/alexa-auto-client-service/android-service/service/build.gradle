@@ -6,7 +6,7 @@ android {
         minSdkVersion 26
         targetSdkVersion 27
         versionCode 1
-        versionName "1.0"
+        versionName "3.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -34,6 +34,7 @@ android {
         pickFirst 'lib/arm64-v8a/libc++_shared.so'
         pickFirst 'lib/x86/libc++_shared.so'
         pickFirst 'lib/x86_64/libc++_shared.so'
+        doNotStrip '**/*'
     }
 
     compileOptions {
@@ -49,7 +50,7 @@ android {
 }
 
 ext {
-    remoteLibVersion = "3.0+"
+    remoteLibVersion = "3.1+"
 }
 dependencies {
     implementation fileTree(include: ['*.aar'], dir: 'src/main/libs')
@@ -62,24 +63,31 @@ dependencies {
         remoteImplementation "com.amazon.alexa.aace:addressbook:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aace:car-control:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aace:cbl:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:connectivity:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aace:maccandroid:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aace:messaging:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aace:navigation:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aace:phonecontrol:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:text-to-speech:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:text-to-speech-provider:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aace:aasb-address-book:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aace:aasb-alexa:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aace:aasb-car-control:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aace:aasb-cbl:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aace:aasb-core:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:aasb-connectivity:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aace:aasb-messaging:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aace:aasb-navigation:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aace:aasb-phone-control:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:aasb-text-to-speech:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aace:aasb:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aace:aacs-extra:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aacs:aacsipc:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aacs:aacsconstants:${remoteLibVersion}@aar" 
-    } 
-    implementation 'com.android.support:appcompat-v7:27.1.1'
+        remoteImplementation "com.amazon.alexa.aacs:aacscommonutils:${remoteLibVersion}@aar" 
+        remoteImplementation "com.amazon.alexa.aacs:aacstts:${remoteLibVersion}@aar" 
+    }
+    implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation 'com.android.support:support-media-compat:27.1.1'
     implementation 'org.greenrobot:eventbus:3.1.1'
     implementation 'com.squareup.okhttp3:okhttp:4.0.1'
@@ -87,6 +95,9 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer-dash:2.7.1'
     implementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.7.1'
     implementation 'com.google.android.exoplayer:exoplayer-hls:2.7.1'
+    implementation 'com.google.android.material:material:1.1.0'
+    implementation "androidx.preference:preference:1.1.0"
+    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
 
     androidTestImplementation 'androidx.test.ext:junit:1.0.0'
     androidTestImplementation 'androidx.test:rules:1.1.0'

@@ -20,8 +20,9 @@ import static com.amazon.alexaautoclientservice.util.FileUtil.isAudioInputTypeEn
 import static com.amazon.alexaautoclientservice.util.FileUtil.isAudioOutputTypeEnabled;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.amazon.aace.aasb.AASB;
 import com.amazon.aace.aasb.AASBStream;
@@ -215,5 +216,8 @@ public class AASBHandler extends AASB {
             mAudioOutput.cleanUp();
             mAudioOutput = null;
         }
+
+        if (ComponentRegistry.getInstance() != null)
+            ComponentRegistry.getInstance().cleanUp();
     }
 }

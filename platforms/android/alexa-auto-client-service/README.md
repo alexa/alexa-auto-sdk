@@ -13,12 +13,16 @@ This document assumes that you understand how the Auto SDK and Alexa Auto Servic
   - [AACS as Foreground Service or System Application](#aacs-as-foreground-service-or-system-application)
   - [AACS Initialization and Configuration](#aacs-initialization-and-configuration)
 - [Default Platform Implementation](#default-platform-implementation)
-- [Specifying the App Targets for Handling Messages](#specifying-the-app-targets-for-handling-messages)
+  - [Text-to-Speech Service Implementation](#text-to-speech-service-implementation)
+  - [Property Content Provider Implementation (Optional)](#property-content-provider-implementation-optional)
+- [Specifying the Intent Targets for Handling Messages](#specifying-the-intent-targets-for-handling-messages)
 - [Platform Implementation in Your Application](#platform-implementation-in-your-application)
   - [Initial Authentication Sequence Diagram](#initial-authentication-sequence-diagram)
   - [Wake Word Enabled Sequence Diagram](#wake-word-enabled-sequence-diagram)
 - [Client Utility Library](#client-utility-library)
 - [Device Settings Required for AACS](#device-settings-required-for-aacs)
+- [Checking AACS Connection State](#checking-aacs-connection-state)
+- [AACS Sample App](#aacs-sample-app)
 
 ## AACS Architecture
 The following diagram shows the high-level architecture of AACS on the Android platform. The shaded boxes in the diagram represent components developed by Amazon that are packaged in AACS. The `MessagingImplementation`, `MessageBroker`, and `MessageHandler` services make up the Alexa Auto Service Bridge (AASB) extension. 
@@ -176,7 +180,7 @@ The following documents provide more information about configuration:
     "zones":[]
   },
   "aacs.aasb": {
-    "version": "3.0"
+    "version": "3.1"
   },
   "aacs.general" : {
     "version": "1.0",
@@ -200,6 +204,7 @@ The following documents provide more information about configuration:
       "useDefaultLocationProvider": true,
       "useDefaultNetworkInfoProvider": true,
       "useDefaultExternalMediaAdapter": true,
+      "useDefaultPropertyManager": true",
       "audioInput": {
         "audioType": {
           "VOICE": {
@@ -244,7 +249,7 @@ The following documents provide more information about configuration:
 #### Sending a Configuration Message
 Sending the configuration relies on the provided [IPC library](./ipc/README.md). This section describes the configuration's basic syntax. 
 
-The message structure consists of two fields, `configFilepaths` and `configStrings`. `configFilepaths` is a String array containing paths to files which hold full or partial configuration JSON. `configStrings` is a String array containing full or partial configurations in the form of escaped JSON Strings. All partial configurations (from filepath or String) will be reconstructed by AACS to be a single, full configuration. We recommend using the `configStrings` option, see the **Important** note on filepaths in the beginning of the [Configuration](#configuration-schema) section. The following code shows an empty `configMessage`: 
+The message structure consists of two fields, `configFilepaths` and `configStrings`. `configFilepaths` is a String array containing paths to files which hold full or partial configuration JSON. `configStrings` is a String array containing full or partial configurations in the form of escaped JSON Strings. All partial configurations (from filepath or String) will be reconstructed by AACS to be a single, full configuration. We recommend using the `configStrings` option. See the **Important** note on filepaths in the beginning of the [Configuration](#configuration-schema) section. The following code shows an empty `configMessage`: 
 ~~~
 {
     "configFilepaths: [],
@@ -268,16 +273,55 @@ try {
 }
 ~~~
 
-#### Protocol
-Send the configuration after the initialization of AACS. That is, send the configuration immediately after you
-send the `startService` intent. The configuration is not part of the `startService` intent because intents in Android have size limits, which the configuration might exceed. Using the provided IPC library allows for sending configuration of any size. 
+#### File Sharing and Permissions
+Some configurable fields for the Auto SDK require paths to files in your application, which is inaccessible to AACS. To enable the Auto SDK to get the file paths, AACS provides a protocol for applications to grant the Auto SDK URI permissions for these files. AACS then creates a local copy of the file in its internal storage and configures the fields for the Auto SDK, using the file path to the local copy to ensure accessibility. Fields that require file sharing are described in documentation. Currently, only installed extensions have configurable fields that need file sharing. See the AACS README for your extension for more information about file sharing. 
+
+AACS's file sharing protocol uses Android's `FileProvider` class to securely receive the URIs of files in applications. See the [Android documentation](#https://developer.android.com/training/secure-file-sharing/setup-sharing) on how to set up `FileProvider` in your application. Your `FileProvider` is functional after the application includes a `<provider>` element in its AndroidManifest and a `filepaths.xml` file for specifying shareable paths. 
+
+After `FileProvider` is set up, AACS expects to receive an intent with action  `Intent.ACTION_SEND_MULTIPLE` to include the URIs of files to be shared. Send the intent **after** service initialization but **before** the configuration message is sent. It requires the following structure:
+* **Action:** `Intent.ACTION_SEND_MULTIPLE` - The standard Android intent for sharing multiple pieces of content
+* **Type:** The MIME type of a URI 
+* **Extra:** `AACSConstants.CONFIG_MODULE` or `configModule`- A `String` representing the module to be configured by the shared files
+* **ParcelableArrayListExtra:** `Intent.EXTRA_STREAM` - An `ArrayList<Uri>` containing URIs of files to be shared
+
+Before sending the intent, be sure to grant the `Intent.FLAG_GRANT_READ_URI_PERMISSION` to AACS for each URI being sent. Also, because the intent holds multiple file URIs for a single configuration module at a time, if there are multiple files for separate modules, send multiple intents, as shown in the following example implementation:
+
+~~~
+private void shareFilePermissionsOfSameModule(File parent, String[] filenames, String module) {
+    ArrayList<Uri> fileUris = new ArrayList<>();
+    for (String name : filenames) {
+        File file = new File(parent, name);
+        Uri fileUri = FileProvider.getUriForFile(
+            MainActivity.this,
+            <your-application's-provider>,
+            file);
+        grantUriPermission(AACSConstants.AACS_PACKAGE_NAME, fileUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        fileUris.add(fileUri);
+    }
+
+    Intent shareFileIntent = new Intent();
+    shareFileIntent.setComponent(
+        new ComponentName(AACSConstants.AACS_PACKAGE_NAME, AACSConstants.AACS_CLASS_NAME));
+    shareFileIntent.setAction(Intent.ACTION_SEND_MULTIPLE);
+    shareFileIntent.setType(getContentResolver().getType(fileUris.get(0)));
+    shareFileIntent.putExtra(AACSConstants.CONFIG_MODULE, module);
+    shareFileIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, fileUris);
+    startForegroundService(shareFileIntent);
+}
+~~~
+
+#### Initialization Protocol
+After starting the service, send file sharing intents for any files outside of AACS that will be needed for configuration. Then, send the configuration message. If there are no files to be shared, the configuration can be sent immediately after AACS is initialized. The configuration is not part of the initial intent to start the service because intents in Android have size limits, which the configuration might exceed. Using the provided IPC library allows for sending configuration of any size. 
 
 Because AACS stores the last configuration received, the only requirement is that the configuration is sent the first time AACS is run
-after installation. At any subsequent start, AACS uses the stored configuration.
+after installation. At any subsequent start, AACS uses the stored configuration. Similarly for shared files, AACS retains local copies of the files, 
+so file sharing intents do not have to be resent in subsequent launches.
 
 However, updating the stored configuration (without uninstalling AACS) requires that the
 `startService` intent include an `Extras` field called `newConfig`. `newConfig` holds a
 boolean value that alerts AACS not to start running with the stored configuration, but wait for a new configuration message. 
+In addition, whenever the `newConfig` field is set to `true`, AACS clears all local copies of shared files
+and expect new file sharing intents, if necessary for the new configuration. 
 
 **Note**: The old configuration is overwritten by the new configuration.
 
@@ -295,7 +339,7 @@ Omitting `newConfig` is the same as setting it to `false`, which causes AACS to 
 
 **Important**: Sending a new configuration is allowed only once per service run. After AACS is configured and
 running, AACS ignores subsequent attempts to update the configuration, even if the `newConfig` field is `true`. To update an existing configuration, you must
-stop the service and restart it with `newConfig` set to `true`.
+stop the service and restart it with `newConfig` set to `true`. This same rule applies to file sharing intents.
 
 #### Initialization Sequence Diagram
 The following diagram shows an example of initializing AACS from an app used by a driver.
@@ -325,6 +369,7 @@ configuration file to instruct AACS to handle `LocationProvider` and `NetworkInf
     "useDefaultLocationProvider": true,
     "useDefaultNetworkInfoProvider": true,
     "useDefaultExternalMediaAdapter": true,
+    "useDefaultPropertyManager": true",
     "audioInput": {
       "audioType": {
         "VOICE": {
@@ -346,12 +391,171 @@ configuration file to instruct AACS to handle `LocationProvider` and `NetworkInf
   }
 ~~~
 
-## Specifying the App Targets for Handling Messages
+### Text-to-Speech Service Implementation
+AACS supports the Android Text-to-Speech APIs and provides a default implementation for Text-to-Speech Service. For more information, see this [README](./tts/README.md).
 
-Use the AACS configuration file to specify the app that can handle AASB messages with a specific "topic."
-Possible `intentTargets` are listed in the [Configuration Reference documentation](./android-service/README.md). The following sample configuration shows how to populate the `intentTargets` for each topic. The field `type` accepts `RECEIVER`, `ACTIVITY`, and `SERVICE`, depending on the target that handles the intents with the topic. The targets can be broadcast receiver, application activity, and service.
+### Property Content Provider Implementation (Optional)
 
-The format for a topic is as follows:
+AACS supports the Android `ContentProvider` class, which is a standard Android mechanism for performing CRUD (Create, Read, Update, Delete) operations on stored data. By extending this class, you can use a content provider, instead of AACS messages, to manage Auto SDK properties and retrieve state information. Using a content provider offers the following advantages:
+
+* AACS can consistently provide the properties across multiple launches. Because properties are persistent, your application does not need to reset the properties after each AACS restart.
+
+* AACS messages are asynchronous, which might cause timeouts and subsequently incorrect or error states. Using a content provider to retrieve state data makes the retrieval process synchronous, thus guaranteeing that the request for state information reaches its destination and a response is received.
+
+* ContentProvider is the standard Android mechanism for performing CRUD (Create, Read, Update, Delete) operations on stored data.
+
+#### Sequence Diagram and Overview
+
+The following sequence diagram illustrates the workflow for the default property manager implementation in AACS. This implementation provides the interface, based on the Android `ContentProvider`, for OEM apps to get and set Auto SDK properties.
+
+~~~
+aace.alexa.wakewordSupported
+aace.alexa.system.firmwareVersion
+aace.alexa.setting.locale
+aace.alexa.countrySupported
+aace.alexa.timezone
+aace.alexa.wakewordEnabled
+aace.vehicle.operatingCountry
+aace.core.version
+aace.network.networkInterface
+~~~
+
+By using the native Android `ContentProvider` class, you can initiate `query` and `update` operations. query retrieves and returns the current String value of an Auto SDK property. `update` sets an Auto SDK property in the Engine and returns a boolean value based on the success of the operation. Insert and Delete operations are disabled for Auto SDK properties. 
+
+<p align="center">
+<img src="./assets/APCP.png"/>
+</p>
+
+#### Implementation Examples
+1. Add `useDefaultPropertyManager` in the `config.json` file and set it to `true`, as shown in the following example:
+~~~
+...
+    "aacs.defaultPlatformHandlers": {
+        "useDefaultLocationProvider": true,
+-->     "useDefaultPropertyManager": true,
+        "audioInput": {
+        "audioType": {
+...
+~~~
+
+2. Add `READ_USER_DICTIONARY` permission to `AndroidManifest.xml` in your application, as shown in the following example:
+~~~
+<uses-permission...
+<uses-permission android:name="android.permission.READ_USER_DICTIONARY" />
+<uses-permission...
+~~~
+
+3. In the application implementation, set the URI for getting the `ContentResolver` instance as follows:
+~~~
+private final Uri uri = Uri.parse("content://" + AACSConstants.AACS_PROPERTY_URI);
+~~~
+
+4. Register `ContentObserver` for monitoring any Auto SDK property changes that are initiated by the engine. `ContentObserver` is a native Android class which observes changes to data and will call its `onChange()` method to perform callbacks when a content change occurs. It includes the changed content Uri when available.
+
+To register `ContentObserver`, first register your application with `ContentObserver`
+~~~
+// PropertyHandler is an example class using ContentProvider API to query and update properties in your application 
+PropertyHandler alexaPropertyHandler = new PropertyHandler(this);
+
+// PropertyContentObserver is an example implementation of the callback for property changes
+PropertyContentObserver propertyObserver = new PropertyContentObserver(alexaPropertyHandler, this);
+
+getContentResolver().registerContentObserver(Uri.parse("content://" + AACSConstants.AACS_PROPERTY_URI), true, propertyObserver);
+~~~
+
+Then implement the `PropertyContentObserver` class and add the desired callback behavior in method `onChange()`:
+~~~
+public class PropertyContentObserver extends ContentObserver {
+    private static Activity mActivity;
+    public PropertyContentObserver(Handler handler, Activity activity) {
+        super(handler);
+        mActivity = activity;
+    }
+
+    @Override
+    public void onChange(boolean changed) {
+        this.onChange(changed, null);
+    }
+
+    @Override
+    public void onChange(boolean changed, Uri uri) {
+        // Do something when content change occurs
+    }
+}
+~~~
+
+5. Perform query() and update() operation within application using the previously set URI: 
+
+query()
+
+~~~
+Cursor cursor = getContentResolver().query(uri, null, propertyName, null, null);
+cursor.moveToFirst();
+String propertyValue = cursor.getString(1);
+~~~
+
+update() must be called in its own thread, not the main UI thread since update() calls setProperty and receive the result asynchronously.
+
+~~~
+ExecutorService mExecutor;
+ContentValues cv = new ContentValues();
+cv.put(propertyName, propertyValue);
+if (mExecutor == null ) {
+    mExecutor = Executors.newSingleThreadExecutor();
+} else {
+    synchronized (OEMApplication.class) {
+        if (mExecutor.isShutdown()) {
+            // Log warning that Executor has already been shut down for update. Not updating property.
+        }
+        mExecutor.submit(() -> {
+            getContentResolver().update(uri, cv, propertyName, null);
+        });
+    }
+}
+~~~
+
+#### Important Considerations for Using ContentProvider
+
+* AACS Property Content Provider does not support the `insert` and `delete` APIs in Property ContentProvider;
+
+* You must build AACS with the AmazonLite Wake Word extension if you want to update `aace.alexa.wakewordEnabled` property;
+
+* `aace.alexa.countrySupported` is a deprecated property and cannot be get/set;
+
+* `aace.alexa.wakewordSupported` and `aace.core.version` are read-only properties acquired when building Auto SDK and cannot be set.
+
+* Valid property value for `aace.alexa.wakewordEnabled` is `true` or `false`. All the other Auto SDK properties will be validated by Auto SDK. Auto SDK will provide value validation for `aace.alexa.wakewordEnabled` in the future.
+
+## Specifying the Intent Targets for Handling Messages
+
+The AASB message intent targets can be `ACTIVITY`, `RECEIVER`, or `SERVICE`. There are two ways to specify the intent targets for AASB message intents from AACS.
+
+* Define intent filters in your application's Android Manifest. The intent filter must exactly match the intents' categories and actions. In the intent filter for an intent that wraps an AASB message, specify the category as `com.amazon.aacs.aasb.<AASB_Message_Topic>` and action as `com.amazon.aacs.aasb.<AASB_Message_Action>`. 
+
+The following example shows an intent filter of all the CBL message intents for a broadcast receiver target:
+~~~
+<intent-filter>
+    <action android:name="com.amazon.aacs.aasb.CBLStateChanged"/>
+    <action android:name="com.amazon.aacs.aasb.CodepairReceived"/>
+    <action android:name="com.amazon.aacs.aasb.CodepairExpired"/>
+    <action android:name="com.amazon.aacs.aasb.SetProfileName"/>
+    <action android:name="com.amazon.aacs.aasb.GetRefreshToken"/>
+    <action android:name="com.amazon.aacs.aasb.SetRefreshToken"/>
+    <action android:name="com.amazon.aacs.aasb.ClearRefreshToken"/>
+    <category android:name="com.amazon.aacs.aasb.CBL" />
+</intent-filter>
+~~~
+To receive the message specified through the Android Manifest, the application must also have `com.amazon.alexaautoclientservice` permission in its Android Manifest.  
+~~~
+<uses-permission android:name="com.amazon.alexaautoclientservice" />
+~~~
+
+**NOTE**: If the target is an activity, you must add `<category android:name="android.intent.category.DEFAULT" />` to the intent filter as explained [here](https://developer.android.com/guide/components/intents-filters).
+
+* Use the AACS configuration file to specify the app that can handle AASB messages with a specific "topic". This method of specifying intent targets has the highest priority, meaning it can *override* the ones specified through intent filters in manifests. After you use the AACS configuration to specify the app, intents with all the actions belonging to the topic go to the specified targets.
+Fill the optional fields in `intentTargets` in the AACS configuration file as needed. See the  [Configuration Reference documentation](./android-service/README.md) for information about `intentTargets`. The following sample configuration shows how to populate `intentTargets` for each topic. The field `type` accepts `RECEIVER`, `ACTIVITY`, and `SERVICE`, depending on the type of the target that handles the intents with the topic. The targets can be broadcast receiver, application activity, and service.
+
+The format for specifying AASB message intent targets for an AASB message topic is as follows:
 ~~~
 "<topic>" : {
     "type": [<target_1_type>, <target_2_type>, ...],
@@ -379,29 +583,12 @@ The following example shows two topics, which are `AASB` and `APL`:
     }
 ~~~
 
-Alternatively, AACS also allows specifying the intent filters that can exactly match the intents' categories and actions through the Android Manifest as shown below.
-To receive the message specified through the Android Manifest, the application must also have `com.amazon.alexaautoclientservice` permission in its Android Manifest. If a given "topic" is specified both in the configuration file and the
-Android Manifest, the configuration file takes priority.
+**NOTE**: If a given "topic" is specified both in the configuration file and the
+Android Manifest, the configuration file takes priority and the targets with intent filters are ignored. Amazon recommends intent filters when possible. Use the configuration approach only if you need to override the existing intent filters.
 
-The following example shows an intent filter of all the CBL message intents for a broadcast receiver target:
-~~~
-<intent-filter>
-    <action android:name="com.amazon.aacs.aasb.CBLStateChanged"/>
-    <action android:name="com.amazon.aacs.aasb.CodepairReceived"/>
-    <action android:name="com.amazon.aacs.aasb.CodepairExpired"/>
-    <action android:name="com.amazon.aacs.aasb.SetProfileName"/>
-    <action android:name="com.amazon.aacs.aasb.GetRefreshToken"/>
-    <action android:name="com.amazon.aacs.aasb.SetRefreshToken"/>
-    <action android:name="com.amazon.aacs.aasb.ClearRefreshToken"/>
-    <category android:name="com.amazon.aacs.aasb.CBL" />
-</intent-filter>
-~~~
-AACS first searches for targets for an intent with a topic in the configuration file. If nothing is found, the package manager scans the intent filters on the device to try to find a match.
-
-**NOTE**: If the target is an activity, you must add `<category android:name="android.intent.category.DEFAULT" />` to the intent filter as explained [here](https://developer.android.com/guide/components/intents-filters).
-
+AACS first searches for targets for an intent with a topic in the configuration file. If nothing is found, the package manager scans the intent filters on the device to locate a match. AACS also caches the scan results based on both topic and action. The cache is cleared every time AACS is restarted.
 ## Platform Implementation in Your Application
-Your applications can register for specific AASB messages and provide a platform implementation. For example, an application (“Login app") can register for CBL messages. The detailed description of the CBL module is provided here (https://gitlab.automotive.alexa.a2z.com/alexa-auto-hut/aac-sdk/-/tree/master/modules%2Fcbl#cbl-states-and-state-change-reasons).
+Your applications can register for specific AASB messages and provide a platform implementation. For example, an application (“Login app") can register for CBL messages. For information about the CBL module, see the [CBL README](../../../modules/cbl/README.md).
 
 ### Initial Authentication Sequence Diagram
 The following sequence diagram illustrates how an application (“Login app") exchanges messages with AACS over Android Intents to log in the user for Alexa.
@@ -431,3 +618,43 @@ AACS requires microphone and location permissions when the default implementatio
 * Location: Enable `android.permission.ACCESS_FINE_LOCATION`to give AACS access the current location.
 
 * Microphone: Enable `android.permission.RECORD_AUDIO` to give permission to AACS to record audio. Microphone must be enabled if you configure AudioInput to use the default implementation of AACS. 
+
+## Checking AACS Connection State
+Your application or service can check the status of AACS by using `ping`, which returns a response as long as AACS is running. The `AACSPinger` utility class from the IPC library enables you to use `ping`. 
+
+To ping AACS, specify the ping permission name in your application's Android Manifest file as follows:
+
+~~~
+<uses-permission android:name="com.amazon.alexaautoclientservice.ping"/>
+~~~
+
+The following example shows how to use `AACSPinger`:
+
+~~~
+AACSPinger aacsPinger = new AACSPinger(getApplicationContext(), 
+    "com.amazon.alexaautoclientservice.ping");
+    
+Future<AACSPinger.AACSPingResponse> fut = aacsPinger.pingAACS();
+
+AACSPinger.AACSPingResponse response = fut.get();
+
+if (response.hasResponse) {
+     // Ping was responded to by AACS
+    String state = response.AACSState;
+    ...
+} else {
+     // Ping timed out without an AACS response
+}
+~~~
+
+If AACS responds to the ping request, the `AACSPingResponse.AACSState` string returned by `AACSPinger.pingAACS()` has one of the following values: 
+
+* `STARTED` 
+* `WAIT_FOR_LVC_CONFIG`
+* `CONFIGURED` 
+* `STOPPED`
+
+If AACS does not respond within the default timeout of 1 second, `AACSPingResponse.hasResponse` is `false`.
+
+## AACS Sample App
+The Auto SDK includes an Android-based application that demonstrates how an application uses AACS. For more information about the AACS Sample App, see the [AACS Sample App README](../../../samples/android-aacs-sample-app/alexa-auto-app/README.md).

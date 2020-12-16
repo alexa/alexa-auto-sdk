@@ -34,6 +34,8 @@ namespace uuid {
  */
 const std::string generateUUID();
 
+bool compare(const std::string& uuid1, const std::string& uuid2);
+
 }  // namespace uuid
 }  // namespace utils
 }  // namespace engine

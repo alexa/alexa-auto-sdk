@@ -62,6 +62,8 @@ ANDROID_SERVICE="${ANDROID_SERVICE_DIR}/service"
 ANDROID_SERVICE_LIBS_FOLDER=${ANDROID_SERVICE}/libs
 IPC_DIR="${AACS_DIR}/ipc"
 CONSTANTS_DIR="${AACS_DIR}/constants"
+UTILS_DIR="${AACS_DIR}/commonutils"
+TTS_DIR="${AACS_DIR}/tts"
 AAR_DEPLOY_DIR="${DEPLOY_DIR}/aar"
 APK_DEPLOY_DIR="${DEPLOY_DIR}/apk"
 
@@ -168,11 +170,18 @@ note "$(head ${DEPLOY_DIR}/buildinfo.txt)"
 
 clean_aar
 clean_apk
+
 run_gradle ${IPC_DIR}
-run_gradle ${CONSTANTS_DIR}
-run_aacs_gradle
 copy_aar ${IPC_DIR}
+run_gradle ${CONSTANTS_DIR}
 copy_aar ${CONSTANTS_DIR}
+run_gradle ${UTILS_DIR}
+copy_aar ${UTILS_DIR}
+run_gradle ${TTS_DIR}
+copy_aar ${TTS_DIR}
+
+run_aacs_gradle
+
 if [ -d ${ANDROID_SERVICE_LIBS_FOLDER} ]; then
 	rm -f ${ANDROID_SERVICE_LIBS_FOLDER}/*
         cp -r `ls -A ${AAR_DEPLOY_DIR}/* | grep -v "sample-*"` ${ANDROID_SERVICE_LIBS_FOLDER}/ 

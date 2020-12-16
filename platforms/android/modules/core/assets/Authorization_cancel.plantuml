@@ -1,0 +1,13 @@
+@startuml
+skinparam roundcorner 10
+participant AuthorizationHandler as Authorization 
+participant "Auto SDK" as AutoSDK 
+
+== Canceling authorization ==
+Authorization->AutoSDK : cancelAuthorization("service-name")
+
+alt On successful cancelAuthorization
+    AutoSDK->Authorization : authorizationStateChanged("service-name", UNAUTHORIZED)
+end
+
+@enduml

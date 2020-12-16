@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="auto_padding_bottom">112dp</dimen>
+    <dimen name="voice_chrome_bar_height">11dp</dimen>
+    <dimen name="nav_bar_icon_height_width">42dp</dimen>
+
+    <!-- Margins -->
+    <dimen name="item_horizontal_margin">8dp</dimen>
+    <dimen name="item_vertical_margin">8dp</dimen>
+    <dimen name="item_horizontal_margin_double">32dp</dimen>
+    <dimen name="item_vertical_margin_double">16dp</dimen>
+    <dimen name="setting_item_horizontal_margin">36dp</dimen>
+    <dimen name="setting_item_horizontal_margin_start">122dp</dimen>
+    <dimen name="setting_item_horizontal_bottom">112dp</dimen>
+    <dimen name="setting_item_vertical_margin">32dp</dimen>
+    <dimen name="header_footer_vertical_margin">16dp</dimen>
+    <dimen name="navigation_horizontal_margin">20dp</dimen>
+    <dimen name="setting_main_fragment_margin_start">86dp</dimen>
+</resources>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.AppCompat.Translucent" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation</item>
+    </style>
+
+    <style name="LocalSearchTitleText">
+        <item name="android:textColor">@color/White</item>
+        <item name="android:textSize">@dimen/poi_title_text_size</item>
+    </style>
+
+    <style name="LocalSearchListItemName">
+        <item name="android:textColor">@color/White</item>
+        <item name="android:textSize">@dimen/poi_list_name_text_size</item>
+        <item name="android:lines">1</item>
+    </style>
+
+    <style name="LocalSearchListItemAddress">
+        <item name="android:textSize">@dimen/poi_address_text_size</item>
+        <item name="android:lines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="LocalSearchListItemYelpTextStyle">
+        <item name="android:textSize">22sp</item>
+        <item name="android:lines">1</item>
+        <item name="android:textColor">@color/White</item>
+    </style>
+
+    <style name="LocalSearchListItemOrdinal">
+        <item name="android:textSize">@dimen/poi_list_ordinal_text_size</item>
+        <item name="android:textColor">@color/White</item>
+        <item name="android:lines">1</item>
+        <item name="android:background">@drawable/circle_background</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="LocalSearchListItemEta">
+        <item name="android:textSize">@dimen/poi_title_text_size</item>
+        <item name="android:textColor">@color/White</item>
+        <item name="android:lines">1</item>
+    </style>
+
+    <style name="LocalSearchOpenTimeText">
+        <item name="android:paddingStart">15dp</item>
+        <item name="android:paddingEnd">15dp</item>
+        <item name="android:paddingTop">5dp</item>
+        <item name="android:paddingBottom">5dp</item>
+        <item name="android:background">@drawable/light_info_background</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:textColor">@color/White</item>
+        <item name="android:lines">1</item>
+    </style>
+
+    <style name="LocalSearchDetailAddressText">
+        <item name="android:textSize">24sp</item>
+        <item name="android:maxLines">2</item>
+    </style>
+
+    <style name="LocalSearchDetailDistanceEtaText">
+        <item name="android:textSize">45sp</item>
+        <item name="android:textColor">@color/White</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="LocalSearchLightButtonBackground">
+        <item name="android:paddingStart">15dp</item>
+        <item name="android:paddingEnd">15dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:background">@drawable/light_button_background</item>
+        <item name="android:textStyle">italic</item>
+        <item name="android:textSize">35sp</item>
+        <item name="android:textColor">@color/Black</item>
+        <item name="android:lines">1</item>
+    </style>
+
+    <style name="LocalSearchDarkButtonBackground">
+        <item name="android:paddingStart">15dp</item>
+        <item name="android:paddingEnd">15dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:background">@drawable/transparent_button_background</item>
+        <item name="android:textStyle">italic</item>
+        <item name="android:textSize">35sp</item>
+        <item name="android:textColor">@color/White</item>
+        <item name="android:lines">1</item>
+    </style>
+
+    <style name="LocalSearchDetailTitleText">
+        <item name="android:textColor">@color/White</item>
+        <item name="android:textSize">40sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:lines">1</item>
+    </style>
+</resources>

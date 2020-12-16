@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.amazon.alexa.auto.voiceinteraction">
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+
+    <!-- Enables listening to wifi state changes -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Enables getting intents from AACS -->
+    <uses-permission android:name="com.amazon.alexaautoclientservice"/>
+
+    <application
+        android:allowBackup="true"
+        android:label="@string/alexa_app_name"
+        android:supportsRtl="true">
+
+        <service android:name=".service.AutoVoiceInteractionService"
+            android:permission="android.permission.BIND_VOICE_INTERACTION">
+            <meta-data android:name="android.voice_interaction"
+                android:resource="@xml/auto_voice_interaction_service" />
+            <intent-filter>
+                <action android:name="android.service.voice.VoiceInteractionService"/>
+            </intent-filter>
+        </service>
+
+        <service android:name=".service.AutoVoiceInteractionSessionService"
+            android:permission="android.permission.BIND_VOICE_INTERACTION">
+        </service>
+
+        <activity android:name=".settings.SettingsActivity"
+            android:label="Voice Interaction Settings">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <receiver android:name=".receiver.AACSBroadcastReceiver"
+            android:exported="true">
+            <intent-filter>
+                <category android:name="com.amazon.aacs.aasb.AlexaClient" />
+
+                <action android:name="com.amazon.aacs.aasb.DialogStateChanged"/>
+                <action android:name="com.amazon.aacs.aasb.ConnectionStatusChanged"/>
+
+                <category android:name="com.amazon.aacs.aasb.SpeechRecognizer" />
+                <action android:name="com.amazon.aacs.aasb.WakewordDetected"/>
+                <action android:name="com.amazon.aacs.aasb.EndOfSpeechDetected"/>
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>

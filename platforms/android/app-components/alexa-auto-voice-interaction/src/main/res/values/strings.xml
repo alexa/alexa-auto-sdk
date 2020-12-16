@@ -1,0 +1,47 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="alexa_app_name">Alexa App</string>
+
+    <!-- Settings -->
+    <string name="settings_aacs" tools:ignore="MissingTranslation">Alexa Auto Client Service</string>
+    <string name="settings_alexa" tools:ignore="MissingTranslation">Settings</string>
+    <string name="logout" tools:ignore="MissingTranslation">Sign out</string>
+    <string name="logout_confirm" tools:ignore="MissingTranslation">Sign out of Amazon Alexa?</string>
+    <string name="confirm_yesno_yes" tools:ignore="MissingTranslation">Sign out</string>
+    <string name="confirm_yesno_no" tools:ignore="MissingTranslation">Cancel</string>
+
+    <!-- Preferences -->
+    <string name="aacs_preferences_title" tools:ignore="MissingTranslation">AACS Settings</string>
+    <string name="preference_aacs_override_base_config_title" tools:ignore="MissingTranslation">Override Base Configuration</string>
+    <string name="preference_aacs_override_base_config_summary" tools:ignore="MissingTranslation">All configurations below will be applied if this is selected</string>
+
+    <string name="preference_category_alexa_capabilities" tools:ignore="MissingTranslation">Alexa Capabilities</string>
+    <string name="preference_alexa_pcc_capability_title" tools:ignore="MissingTranslation">Phone Call Control</string>
+    <string name="preference_alexa_pcc_capability_summary" tools:ignore="MissingTranslation">Allow Alexa to initiate Phone Calls</string>
+    <string name="preference_alexa_a2a_capability_title" tools:ignore="MissingTranslation">Alexa to Alexa Communication</string>
+    <string name="preference_alexa_a2a_capability_summary" tools:ignore="MissingTranslation">Allow Alexa to Alexa Communication</string>
+    <string name="preference_alexa_carcontrol_capability_title" tools:ignore="MissingTranslation">Car Control</string>
+    <string name="preference_alexa_carcontrol_capability_summary" tools:ignore="MissingTranslation">Allow Alexa to Control Car</string>
+
+    <string name="preference_category_alexa_device" tools:ignore="MissingTranslation">Alexa Device</string>
+    <string name="preference_avsdevice_clientid" tools:ignore="MissingTranslation">Client Id</string>
+    <string name="preference_avsdevice_productid" tools:ignore="MissingTranslation">Product Id</string>
+    <string name="preference_avsdevice_dsn" tools:ignore="MissingTranslation">Device Serial Number</string>
+    <string name="preference_avsdevice_manufacturer" tools:ignore="MissingTranslation">Manufacturer</string>
+
+    <string name="preference_category_aacs_service" tools:ignore="MissingTranslation">AACS General</string>
+    <string name="preference_aacs_startonboot" tools:ignore="MissingTranslation">Start AACS on Device Bootup</string>
+
+    <string name="preference_category_aacs_defaults" tools:ignore="MissingTranslation">AACS Defaults</string>
+    <string name="preference_aacs_default_external_media_adapter" tools:ignore="MissingTranslation">Defautlt External Media</string>
+    <string name="preference_aacs_use_aacs_audio_input" tools:ignore="MissingTranslation">Use AACS Audio Input</string>
+
+    <string name="preference_category_aacs_control" tools:ignore="MissingTranslation">Control AACS</string>
+    <string name="preference_aacs_reboot_now" tools:ignore="MissingTranslation">REBOOT AACS &amp; APPLY CONFIGURATION</string>
+    <string name="preference_aacs_shutdown" tools:ignore="MissingTranslation">SHUTDOWN AACS</string>
+    <string name="preference_aacs_start" tools:ignore="MissingTranslation">START AACS</string>
+
+    <!-- Alexa Settings -->
+    <string name="preference_alexa_hands_free_title" tools:ignore="MissingTranslation">Alexa Hands-Free</string>
+    <string name="preference_alexa_hands_free_summary" tools:ignore="MissingTranslation">Say \"Alexa\" to get her attention</string>
+    <string name="preference_alexa_language_title" tools:ignore="MissingTranslation">Alexa\'s language</string>
+</resources>

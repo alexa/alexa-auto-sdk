@@ -11,7 +11,7 @@ The Alexa Auto SDK module contains the Engine base classes and the abstract plat
 * [Starting the Engine](#starting-the-engine)
 * [Stopping the Engine](#stopping-the-engine)
 * [Managing Runtime Properties with the Property Manager](#managing-runtime-properties-with-the-property-manager)
-  * [Managing Authorization](#managing-authorization)
+* [Managing Authorization](#managing-authorization)
 
 ## Overview <a id="overview"></a>
 The Core module provides an easy way to integrate Alexa Auto SDK into an application or a framework. To do this, follow these steps:
@@ -460,27 +460,20 @@ The Auto SDK Property Manager maintains the runtime properties by storing proper
 
 #### Application Changes a Property Value
 The following sequence diagram illustrates the flow when your application calls `setProperty()` to set a property value in the Engine.
-<details><summary>Click to expand or collapse the diagram</summary>
-<p>
+
 ![Set_Property](./assets/PropertyManager_set.png)
-</p>
-</details>
 
 #### Application Retrieves a Property Value
 The following sequence diagram illustrates the flow when your application calls `getProperty()` to retrieve a property value from the Engine.
-<details><summary>Click to expand or collapse the diagram</summary>
-<p>
+
 ![Get_Property](./assets/PropertyManager_get.png)
-</p>
-</details>
+
 
 #### Notification of Property Value Change Initiated via AVS
 The following sequence diagram illustrates the flow when a property value change is initiated by AVS and the Property Manager notifies your application.
-<details><summary>Click to expand or collapse the diagram</summary>
-<p>
+
 ![Property_Changed](./assets/PropertyManager_changed.png)
-</p>
-</details>
+
 
 ### Implementing a Custom Property Manager Handler
 To implement a custom Property Manager handler to set and retrieve Engine property values and be notified of property value changes, extend the `PropertyManager` class:
@@ -534,32 +527,22 @@ For information on how to use the Authorization module with different authorizat
 
 The following sequence diagram shows the typical call sequences between platform implementation and Auto SDK to start an authorization process.
 
-<details><summary>Click to expand or collapse the diagram</summary>
-<p>
 ![Starting_Authorization](./assets/Authorization_start.png)
-</p>
-</details>
 
 #### Canceling the Authorization Process
 
 The following sequence diagram shows the typical call sequence between the platform implementation and Auto SDK to cancel an authorization process.
 
-<details><summary>Click to expand or collapse the diagram</summary>
-<p>
 ![Cancel_Authorization](./assets/Authorization_cancel.png)
-</p>
-</details>
+
 
 #### Logging out the Authorization
 
 The following sequence diagram shows the typical call sequence between the platform implementation and Auto SDK to log out of an authorization.
-<details><summary>Click to expand or collapse the diagram</summary>
-<p>
-![Logout_Authorization](./assets/Authorization_logout.png)
-</p>
-</details>
 
-### Using the Authorization Module
+![Logout_Authorization](./assets/Authorization_logout.png)
+
+## Using the Authorization Module
 
 To implement the custom `Authorization`  handler, extend the `Authorization` class as follows:
 

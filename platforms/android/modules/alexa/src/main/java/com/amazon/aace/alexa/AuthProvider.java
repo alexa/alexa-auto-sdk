@@ -20,6 +20,8 @@ import com.amazon.aace.core.PlatformInterface;
 /**
  * AuthProvider should be extended to manage access tokens for AVS authorization and report
  * client authorization state to the Engine.
+ *
+ * @deprecated This platform interface is being deprecated. Use `com.amazon.aace.authorization.Authorization` instead.
  */
 abstract public class AuthProvider extends PlatformInterface {
     /**
@@ -168,6 +170,8 @@ abstract public class AuthProvider extends PlatformInterface {
      * Returns the token used by the platform implementation for authorization with AVS.
      * The platform implementation should retrieve an auth token if it does not have one.
      *
+     * @deprecated This method is being deprecated as this platform interface is being deprecated.
+     *
      * @return The token used to authorize with AVS
      */
     public String getAuthToken() {
@@ -176,6 +180,8 @@ abstract public class AuthProvider extends PlatformInterface {
 
     /**
      * Returns the AVS authorization state of the platform implementation
+     *
+     * @deprecated This method is being deprecated as this platform interface is being deprecated.
      *
      * @return The AVS authorization state
      */
@@ -188,6 +194,8 @@ abstract public class AuthProvider extends PlatformInterface {
      * unauthorized request to AVS. AVS responded to this request with a 403 code
      * indicating the token was not valid.
      *
+     * @deprecated This method is being deprecated as this platform interface is being deprecated.
+     *
      * @param token The access token used in an unauthorized request to AVS
      */
     public void authFailure(String token) {}
@@ -195,8 +203,9 @@ abstract public class AuthProvider extends PlatformInterface {
     /**
      * Notifies the Engine of a change in AVS authorization state in the platform implementation
      *
-     * @param  authState The new authorization state
+     * @deprecated This method is being deprecated as this platform interface is being deprecated.
      *
+     * @param  authState The new authorization state
      * @param  authError The error state of the authorization attempt
      */
     final public void authStateChange(AuthState authState, AuthError authError) {

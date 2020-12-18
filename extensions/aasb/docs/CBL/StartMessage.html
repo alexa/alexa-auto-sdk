@@ -257,6 +257,14 @@ th {
 tr:nth-child(even) {
     background-color: #f2f2f2;
 }
+
+.deprecated {
+    padding: 20px 20px 20px 20px;
+    background-color: #FBEFE4;
+    color: red;
+    line-height:150%;
+}
+
 </style>
 </head>
 <body>
@@ -1056,6 +1064,10 @@ FromEngine:
 <div class="structure">
 Sent <b>to</b> the engine. <br/><br/>
 Notifies the Engine to begin the authorization process
+    <br/><br/>
+    <div class="deprecated">
+        This message is being deprecated. Please use messages with topic Authorization for CBL authorization
+    </div>
 <h3><a name="Structure">JSON Structure</a></h3>
 <pre>
 {

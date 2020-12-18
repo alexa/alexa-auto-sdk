@@ -18,7 +18,9 @@ package com.amazon.aace.cbl;
 import com.amazon.aace.core.PlatformInterface;
 
 /**
- * PhoneCallController should be extended to perform CBL authentication
+ * CBL should be extended to perform CBL authentication.
+ *
+ * @deprecated This platform interface is being deprecated. Use `com.amazon.aace.authorization.Authorization` instead.
  */
 abstract public class CBL extends PlatformInterface {
     /**
@@ -147,21 +149,29 @@ abstract public class CBL extends PlatformInterface {
 
     /**
      * Notifies the platform implementation of an authorization flow state change
+     *
+     * @deprecated This method is being deprecated as this platform interface is being deprecated.
      */
     public void cblStateChanged(CBLState state, CBLStateChangedReason reason, String url, String code) {}
 
     /**
      * Notifies the platform implementation to clear the refresh token
+     *
+     * @deprecated This method is being deprecated as this platform interface is being deprecated.
      */
     public void clearRefreshToken() {}
 
     /**
      * Notifies the platform implementation to set the refresh token
+     *
+     * @deprecated This method is being deprecated as this platform interface is being deprecated.
      */
     public void setRefreshToken(String refreshToken) {}
 
     /**
      * Returns the refresh token stored by the platform implementation, otherwise return an empty string
+     *
+     * @deprecated This method is being deprecated as this platform interface is being deprecated.
      */
     public String getRefreshToken() {
         return "";
@@ -170,11 +180,15 @@ abstract public class CBL extends PlatformInterface {
     /**
      * Notifies the platform implementation to set the user profile, this is requested one time after authorization
      * requestUserProfile must be enabled in configuration
+     *
+     * @deprecated This method is being deprecated as this platform interface is being deprecated.
      */
     public void setUserProfile(String name, String email) {}
 
     /**
      * Notifies the Engine to begin the authorization process
+     *
+     * @deprecated This method is being deprecated as this platform interface is being deprecated.
      */
     final protected void start() {
         start(getNativeRef());
@@ -182,6 +196,8 @@ abstract public class CBL extends PlatformInterface {
 
     /**
      * Notifies the Engine to cancel the authorization process
+     *
+     * @deprecated This method is being deprecated as this platform interface is being deprecated.
      */
     final protected void cancel() {
         cancel(getNativeRef());
@@ -189,6 +205,8 @@ abstract public class CBL extends PlatformInterface {
 
     /**
      * Notifies the Engine to reset the authorization state
+     *
+     * @deprecated This method is being deprecated as this platform interface is being deprecated.
      */
     final protected void reset() {
         reset(getNativeRef());

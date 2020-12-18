@@ -10,6 +10,7 @@ ___
 ### Resolved Issues
 * On QNX, when a portion of music on Spotify is skipped, either by the user saying, "Skip forward," or by the user skipping to a different song, the volume is no longer reset to the default level.
 * A user barging in when music is playing no longer hears an Alexa response to the barge-in request. Previously, this issue happened if the System Audio extension was used.
+* When streaming music from Alexa, the user can switch to a local media source by using one utterance, such as "Alexa, play radio." Previously, Alexa would not switch to the local media source after the first utterance. The user needed to issue the request again before Alexa could play from the local media source. 
 
 ### Known Issues
 * General
